@@ -8,8 +8,8 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditing2RoleIdentifierFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
 
 /**
  * Add the SelfEditing2RoleIdentifier factory to the IdentifierFactory list
@@ -29,17 +29,16 @@ public class SelfEditing2RoleIdentifierSetup implements ServletContextListener{
 
     private static final Log log = LogFactory.getLog(SelfEditing2RoleIdentifierSetup.class.getName());
     
-    public void contextDestroyed(ServletContextEvent sce) {
+    @Override
+	public void contextDestroyed(ServletContextEvent sce) {
         //do nothing            
     }
 
-    public void contextInitialized(ServletContextEvent sce) {
+    @Override
+	public void contextInitialized(ServletContextEvent sce) {
         try{
             log.debug("Setting up SelfEditing2RoleIdentifier");                                
-
-            SelfEditing2RoleIdentifierFactory niif =new SelfEditing2RoleIdentifierFactory();
-            ServletIdentifierBundleFactory.addIdentifierBundleFactory(sce.getServletContext(), niif);
-
+            ActiveIdentifierBundleFactories.addFactory(sce, new SelfEditing2RoleIdentifierFactory());
             log.debug( "SelfEditing2RoleIdentifier has been setup. " );            
         }catch(Exception e){
             log.error("could not run SelfEditing2RoleIdentifier: " + e);

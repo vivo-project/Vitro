@@ -3,14 +3,12 @@
 package edu.cornell.mannlib.vitro.webapp.auth;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.RequestPolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
@@ -73,15 +71,7 @@ public class AuthorizationHelper {
     }
 
     private IdentifierBundle getIdentifiers() {
-        HttpSession session = vreq.getSession();
-        ServletContext context = session.getServletContext();
-        IdentifierBundle ids = ServletIdentifierBundleFactory
-                .getIdBundleForRequest(vreq, session, context);
-        if (ids == null) {
-            return new ArrayIdentifierBundle();
-        } else {
-            return ids;
-        }
+        return RequestIdentifiers.getIdBundleForRequest(vreq);
     }
 
 }

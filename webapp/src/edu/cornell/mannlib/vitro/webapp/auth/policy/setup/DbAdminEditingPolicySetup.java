@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.auth.policy.setup;
 
 import java.util.HashSet;
-import java.util.ListIterator;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -19,13 +18,10 @@ import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.DbAdminEditingIdentifierFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundleFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.DbAdminEditingPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
@@ -44,7 +40,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 public class DbAdminEditingPolicySetup  implements ServletContextListener  {
     private static final Log log = LogFactory.getLog(DbAdminEditingPolicySetup.class.getName());
    
-    public void contextInitialized(ServletContextEvent sce) {
+    @Override
+	public void contextInitialized(ServletContextEvent sce) {
         try{
             log.debug("Setting up DbAdminEditingPolicy");
             
@@ -54,8 +51,7 @@ public class DbAdminEditingPolicySetup  implements ServletContextListener  {
             ServletPolicyList.addPolicy(sce.getServletContext(), cep);
             
             //need to put an IdentifierFactory for DbAdminEditingIds into the ServletContext
-            IdentifierBundleFactory ibfToAdd = new DbAdminEditingIdentifierFactory();
-            ServletIdentifierBundleFactory.addIdentifierBundleFactory(sce.getServletContext(), ibfToAdd); 
+            ActiveIdentifierBundleFactories.addFactory(sce, new DbAdminEditingIdentifierFactory()); 
             
             log.debug( "Finished setting up DbAdminEditingPolicy: " + cep );            
         }catch(Exception e){
@@ -64,7 +60,8 @@ public class DbAdminEditingPolicySetup  implements ServletContextListener  {
         }
     }
     
-    public void contextDestroyed(ServletContextEvent sce) { /*nothing*/  }
+    @Override
+	public void contextDestroyed(ServletContextEvent sce) { /*nothing*/  }
     
     public static DbAdminEditingPolicy makeDbAdminEditPolicyFromModel( Model model ){
         DbAdminEditingPolicy pol = null;

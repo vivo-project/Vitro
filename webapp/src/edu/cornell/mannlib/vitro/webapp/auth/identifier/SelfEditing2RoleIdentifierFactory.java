@@ -3,18 +3,10 @@
 package edu.cornell.mannlib.vitro.webapp.auth.identifier;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import com.hp.hpl.jena.ontology.OntModel;
-
 import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy.AuthRole;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.setup.SelfEditingPolicySetup;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
@@ -34,9 +26,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 public class SelfEditing2RoleIdentifierFactory implements
         IdentifierBundleFactory {
 
-    public IdentifierBundle getIdentifierBundle(ServletRequest request,
+    @Override
+	public IdentifierBundle getIdentifierBundle(ServletRequest request,
             HttpSession session, ServletContext context) {               
-        IdentifierBundle whoToAuth = ServletIdentifierBundleFactory.getExistingIdBundle(request);
+        IdentifierBundle whoToAuth = RequestIdentifiers.getIdBundleForRequest(request);
         if( whoToAuth != null ){            
             WebappDaoFactory wdf = (WebappDaoFactory)context.getAttribute("webappDaoFactory");
                 if( wdf == null ) 

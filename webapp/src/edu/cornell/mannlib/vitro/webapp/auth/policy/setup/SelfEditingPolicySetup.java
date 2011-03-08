@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy.setup;
 
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.ListIterator;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -15,17 +14,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.SelfEditingPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
@@ -51,16 +47,15 @@ public class SelfEditingPolicySetup  implements ServletContextListener  {
     private static final Log log = LogFactory.getLog(SelfEditingPolicySetup.class.getName());
     public static final String SELF_EDITING_POLICY_WAS_SETUP= "selfEditingPolicyWasSetup";
     
-    public void contextInitialized(ServletContextEvent sce) {
+    @Override
+	public void contextInitialized(ServletContextEvent sce) {
         try{
             log.debug("Setting up SelfEditingPolicy");
             
             OntModel model = (OntModel)sce.getServletContext().getAttribute("jenaOntModel");
             replaceSelfEditing(sce.getServletContext(), model);
 
-            
-            SelfEditingIdentifierFactory niif =new SelfEditingIdentifierFactory();
-            ServletIdentifierBundleFactory.addIdentifierBundleFactory(sce.getServletContext(), niif);
+            ActiveIdentifierBundleFactories.addFactory(sce, new SelfEditingIdentifierFactory());
             
             sce.getServletContext().setAttribute(SELF_EDITING_POLICY_WAS_SETUP, Boolean.TRUE);
             
@@ -71,7 +66,8 @@ public class SelfEditingPolicySetup  implements ServletContextListener  {
         }
     }
     
-    public void contextDestroyed(ServletContextEvent sce) { /*nothing*/  }
+    @Override
+	public void contextDestroyed(ServletContextEvent sce) { /*nothing*/  }
     
     public static SelfEditingPolicy makeSelfEditPolicyFromModel( OntModel model ){
         SelfEditingPolicy pol = null;

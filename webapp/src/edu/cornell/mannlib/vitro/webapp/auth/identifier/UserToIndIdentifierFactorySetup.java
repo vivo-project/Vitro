@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.identifier;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -23,18 +22,19 @@ import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
 public class UserToIndIdentifierFactorySetup implements ServletContextListener{
 	private static final Log log = LogFactory.getLog(UserToIndIdentifierFactorySetup.class.getName());
 	
+	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 	    
         if (AbortStartup.isStartupAborted(sce.getServletContext())) {
             return;
         }
 	    
-		ServletContext sc = sce.getServletContext();
-		 ServletIdentifierBundleFactory
-	     	.addIdentifierBundleFactory(sc, new UserToIndIdentifierFactory());
-		 log.info("Set up Identifier Factory UserToIndIdentifierFactory.");		
+		ActiveIdentifierBundleFactories.addFactory(sce,	new UserToIndIdentifierFactory());
+		log.info("Set up Identifier Factory UserToIndIdentifierFactory.");
 	}
 	
+	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
+		// Nothing to do.
 	}	
 }

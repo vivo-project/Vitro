@@ -23,10 +23,10 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.NetId;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DefaultInconclusivePolicy;
@@ -39,8 +39,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.RemoveUser;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.ServerStatus;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.UpdateTextIndex;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.UploadFile;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.AdminRequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.OntoRequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.CreateOwlClass;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.DefineDataProperty;
@@ -367,10 +365,8 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Visiti
      *
      */
     public class ContextSetup implements ServletContextListener {
-
-
-
-        public void contextInitialized(ServletContextEvent sce) {
+        @Override
+		public void contextInitialized(ServletContextEvent sce) {
             try{
                 log.trace("Setting up JenaNetidPolicy");
 
@@ -383,14 +379,14 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Visiti
                 ServletPolicyList spl = ServletPolicyList.getPolicies(sce.getServletContext());
                 spl.add(jnip);
 
-                SelfEditingIdentifierFactory niif  =new SelfEditingIdentifierFactory();
-                ServletIdentifierBundleFactory.addIdentifierBundleFactory(sce.getServletContext(), niif);
+                ActiveIdentifierBundleFactories.addFactory(sce, new SelfEditingIdentifierFactory());
             }catch(Exception e){
                 log.error("could not create AuthorizationFactory: " + e);
                 e.printStackTrace();
             }
         }
-        public void contextDestroyed(ServletContextEvent sce) { /*nothing*/  }
+        @Override
+		public void contextDestroyed(ServletContextEvent sce) { /*nothing*/  }
 
     }
 

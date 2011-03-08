@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy.setup;
 
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.ListIterator;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -20,12 +19,10 @@ import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.CuratorEditingIdentifierFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundleFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.CuratorEditingPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
@@ -44,7 +41,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 public class CuratorEditingPolicySetup  implements ServletContextListener  {
     private static final Log log = LogFactory.getLog(CuratorEditingPolicySetup.class.getName());
    
-    public void contextInitialized(ServletContextEvent sce) {
+    @Override
+	public void contextInitialized(ServletContextEvent sce) {
         try{
             log.debug("Setting up CuratorEditingPolicy");
             
@@ -54,8 +52,7 @@ public class CuratorEditingPolicySetup  implements ServletContextListener  {
             ServletPolicyList.addPolicy(sce.getServletContext(), cep);
             
             //need to put an IdentifierFactory for CuratorEditingIds into the ServletContext
-            IdentifierBundleFactory ibfToAdd = new CuratorEditingIdentifierFactory();
-            ServletIdentifierBundleFactory.addIdentifierBundleFactory(sce.getServletContext(), ibfToAdd); 
+            ActiveIdentifierBundleFactories.addFactory(sce, new CuratorEditingIdentifierFactory()); 
             
             log.debug( "Finished setting up CuratorEditingPolicy: " + cep );            
         }catch(Exception e){
@@ -64,7 +61,8 @@ public class CuratorEditingPolicySetup  implements ServletContextListener  {
         }
     }
     
-    public void contextDestroyed(ServletContextEvent sce) { /*nothing*/  }
+    @Override
+	public void contextDestroyed(ServletContextEvent sce) { /*nothing*/  }
     
     public static CuratorEditingPolicy makeCuratorEditPolicyFromModel( Model model ){
         CuratorEditingPolicy pol = null;

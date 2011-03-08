@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy.setup;
 
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.ListIterator;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -20,14 +19,10 @@ import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.EditorEditingIdentifierFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundleFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.EditorEditingPolicy;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.SelfEditingPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
@@ -46,7 +41,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 public class EditorEditingPolicySetup  implements ServletContextListener  {
     private static final Log log = LogFactory.getLog(EditorEditingPolicySetup.class.getName());
    
-    public void contextInitialized(ServletContextEvent sce) {
+    @Override
+	public void contextInitialized(ServletContextEvent sce) {
         try{
             log.debug("Setting up EditorEditingPolicy");
             
@@ -56,8 +52,7 @@ public class EditorEditingPolicySetup  implements ServletContextListener  {
             ServletPolicyList.addPolicy(sce.getServletContext(), cep);
             
             //need to put an IdentifierFactory for EditorEditingIds into the ServletContext
-            IdentifierBundleFactory ibfToAdd = new EditorEditingIdentifierFactory();
-            ServletIdentifierBundleFactory.addIdentifierBundleFactory(sce.getServletContext(), ibfToAdd); 
+            ActiveIdentifierBundleFactories.addFactory(sce, new EditorEditingIdentifierFactory()); 
             
             log.debug( "Finished setting up EditorEditingPolicy: " + cep );            
         }catch(Exception e){
@@ -66,7 +61,8 @@ public class EditorEditingPolicySetup  implements ServletContextListener  {
         }
     }
     
-    public void contextDestroyed(ServletContextEvent sce) { /*nothing*/  }
+    @Override
+	public void contextDestroyed(ServletContextEvent sce) { /*nothing*/  }
     
     public static EditorEditingPolicy makeEditorEditPolicyFromModel( Model model ){
         EditorEditingPolicy pol = null;

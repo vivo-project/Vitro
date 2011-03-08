@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.identifier;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -15,9 +14,8 @@ public class SetupFakeSelfEditingIdentifierFactory implements ServletContextList
 	
 	private static final Log log = LogFactory.getLog(SetupFakeSelfEditingIdentifierFactory.class.getName());
 
-    public void contextInitialized(ServletContextEvent sce) {
-        ServletContext sc = sce.getServletContext();
-        
+    @Override
+	public void contextInitialized(ServletContextEvent sce) {
         WebappDaoFactory wdf = (WebappDaoFactory)sce.getServletContext().getAttribute("webappDaoFactory");
         if( wdf == null ){
             log.debug("SetupFakeSelfEditingIdentifierFactory: need a " +
@@ -27,9 +25,11 @@ public class SetupFakeSelfEditingIdentifierFactory implements ServletContextList
         }
         
         IdentifierBundleFactory ibfToAdd = new FakeSelfEditingIdentifierFactory();
-        ServletIdentifierBundleFactory.addIdentifierBundleFactory(sc, ibfToAdd);        
+        ActiveIdentifierBundleFactories.addFactory(sce, ibfToAdd);        
     }
 
-    public void contextDestroyed(ServletContextEvent sce) {     
+    @Override
+	public void contextDestroyed(ServletContextEvent sce) {
+    	// Nothing to do.
     }
 }

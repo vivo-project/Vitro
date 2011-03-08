@@ -10,8 +10,8 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
 
@@ -29,7 +29,8 @@ public class JenaNetidPolicySetup implements ServletContextListener  {
 	
 	private static final Log log = LogFactory.getLog(JenaNetidPolicySetup.class.getName());
 
-    public void contextInitialized(ServletContextEvent sce) {
+    @Override
+	public void contextInitialized(ServletContextEvent sce) {
         try{
             log.debug("Setting up JenaNetidPolicy");
 
@@ -37,7 +38,7 @@ public class JenaNetidPolicySetup implements ServletContextListener  {
             ServletPolicyList.addPolicy(sce.getServletContext(), jnip);
 
             SelfEditingIdentifierFactory niif =new SelfEditingIdentifierFactory();
-            ServletIdentifierBundleFactory.addIdentifierBundleFactory(sce.getServletContext(), niif);
+            ActiveIdentifierBundleFactories.addFactory(sce, niif);
 
         }catch(Exception e){
             log.error("could not create AuthorizationFactory: " + e);
@@ -45,7 +46,8 @@ public class JenaNetidPolicySetup implements ServletContextListener  {
         }
     }
 
-    public void contextDestroyed(ServletContextEvent sce) {
+    @Override
+	public void contextDestroyed(ServletContextEvent sce) {
         /*nothing*/
     }
 
