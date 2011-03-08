@@ -19,7 +19,7 @@
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.policy.SelfEditingPolicy"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AddObjectPropStmt"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropStmt"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 
