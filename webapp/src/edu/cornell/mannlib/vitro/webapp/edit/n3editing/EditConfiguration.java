@@ -29,7 +29,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.UserToIndIdentifierFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
@@ -256,7 +256,7 @@ public class EditConfiguration {
                 throw new Error("EditConfiguration.addSystemValues() needs a session");
 
             /* ********** Get URI of a logged in user ************** */
-            IdentifierBundle ids = ServletIdentifierBundleFactory.getIdBundleForRequest(request,request.getSession(),context);
+            IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(request);
             List<String> userUris = 
               UserToIndIdentifierFactory.getIndividualsForUser(ids);
                         

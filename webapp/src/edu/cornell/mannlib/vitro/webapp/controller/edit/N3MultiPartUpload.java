@@ -276,8 +276,7 @@ public class N3MultiPartUpload extends VitroHttpServlet {
                 }
                 if (postUploadSuccess) {
                     /* **** Save the models for all the files **** */
-                    String editorUri = EditN3Utils.getEditorUri(request,
-                            session, application);
+                    String editorUri = EditN3Utils.getEditorUri(request);
                     Lock lock = null;
                     try {
                         lock = jenaOntModel.getLock();

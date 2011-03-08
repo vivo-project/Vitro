@@ -7,9 +7,8 @@ import javax.servlet.ServletContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.RequestPolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
@@ -46,12 +45,7 @@ public class EditingPolicyHelper {
     }
     
     private void setIds() {
-        ids = (IdentifierBundle)ServletIdentifierBundleFactory
-            .getIdBundleForRequest(vreq, vreq.getSession(), servletContext);
-        
-        if (ids == null) {
-            log.error("No IdentifierBundle objects for request");
-        }
+        ids = RequestIdentifiers.getIdBundleForRequest(vreq);
     }
    
     protected boolean isAuthorizedAction(RequestedAction action) {

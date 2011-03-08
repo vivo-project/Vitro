@@ -20,14 +20,12 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.query.DataSource;
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.DatasetFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.SelfEditing;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
@@ -45,7 +43,6 @@ import edu.cornell.mannlib.vitro.webapp.flags.FlagException;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.flags.RequestToAuthFlag;
 import edu.cornell.mannlib.vitro.webapp.flags.SunsetFlag;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 /**
  * This sets up several objects in the Request scope for each
@@ -429,12 +426,7 @@ public class VitroRequestPrep implements Filter {
 			return false;
 		}
 
-		ServletContext sc = session.getServletContext();
-		IdentifierBundle idBundle = ServletIdentifierBundleFactory.getIdBundleForRequest(request, session, sc);
-		if (idBundle == null) {
-			return false;
-		}
-		
+		IdentifierBundle idBundle = RequestIdentifiers.getIdBundleForRequest(request);
 		SelfEditing selfId = SelfEditingIdentifierFactory.getSelfEditingIdentifier(idBundle);
 		if (selfId == null) {
 			return false;

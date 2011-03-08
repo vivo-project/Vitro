@@ -21,7 +21,7 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.RequestPolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
@@ -99,15 +99,7 @@ public class PropertyEditLinks extends TagSupport{
             }
         }              
         
-        IdentifierBundle ids = (IdentifierBundle)ServletIdentifierBundleFactory
-            .getIdBundleForRequest(pageContext.getRequest(), 
-                    pageContext.getSession(), 
-                    pageContext.getServletContext());
-        
-        if( ids == null ){
-            log.error("No IdentifierBundle objects for request");
-            return SKIP_BODY;
-        }
+		IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(pageContext.getRequest());
         
         Individual entity = (Individual)pageContext.getRequest().getAttribute("entity");           
         LinkStruct[] links = null;

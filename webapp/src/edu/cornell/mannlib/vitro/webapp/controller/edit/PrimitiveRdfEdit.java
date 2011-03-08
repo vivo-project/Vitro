@@ -7,7 +7,6 @@ import java.io.StringReader;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -77,9 +76,7 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
             return;
         }
 
-
-        ServletContext sc = getServletContext();
-        String editorUri = EditN3Utils.getEditorUri(vreq, vreq.getSession(false), sc);           
+        String editorUri = EditN3Utils.getEditorUri(vreq);           
         try {
             processChanges( additions, retractions, getWriteModel(vreq),getQueryModel(vreq), editorUri);
         } catch (Exception e) {
