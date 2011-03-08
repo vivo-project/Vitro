@@ -132,7 +132,7 @@ public class ObjectPropertyStatementDaoSDB extends
 	                            } 
 	                            
 	                        } catch (IndividualNotFoundException t) {
-	                            log.error(t,t);
+	                            log.debug(t,t);
 	                            continue;
 	                        } catch (Throwable t){
 	                            log.error(t,t);
