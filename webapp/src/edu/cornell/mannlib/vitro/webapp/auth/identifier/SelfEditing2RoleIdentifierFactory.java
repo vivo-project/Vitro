@@ -30,31 +30,29 @@ public class SelfEditing2RoleIdentifierFactory implements
 	public IdentifierBundle getIdentifierBundle(ServletRequest request,
             HttpSession session, ServletContext context) {               
         IdentifierBundle whoToAuth = RequestIdentifiers.getIdBundleForRequest(request);
-        if( whoToAuth != null ){            
-            WebappDaoFactory wdf = (WebappDaoFactory)context.getAttribute("webappDaoFactory");
-                if( wdf == null ) 
-                    return whoToAuth;
-                SelfEditingIdentifierFactory.SelfEditing selfEditing = 
-                SelfEditingIdentifierFactory.getSelfEditingIdentifier(whoToAuth);
-            if( selfEditing != null ){
-                User user = wdf.getUserDao().getUserByURI(selfEditing.getIndividual().getURI());
-                if( user != null){
-                    String role = user.getRoleURI();
-                    if("role/:50".equals(role)){
-                        whoToAuth.add( AuthRole.DBA );
-                    }
-                    if("role/:4".equals(role)){
-                        whoToAuth.add( AuthRole.CURATOR);
-                    }
-                    if("role/:3".equals(role)){
-                        whoToAuth.add( AuthRole.EDITOR);
-                    }
-                    if("role/:2".equals(role)){
-                        whoToAuth.add( AuthRole.USER );
-                    }                                                            
-                }               
-            }            
-        }
+        WebappDaoFactory wdf = (WebappDaoFactory)context.getAttribute("webappDaoFactory");
+            if( wdf == null ) 
+                return whoToAuth;
+            SelfEditingIdentifierFactory.SelfEditing selfEditing = 
+            SelfEditingIdentifierFactory.getSelfEditingIdentifier(whoToAuth);
+        if( selfEditing != null ){
+            User user = wdf.getUserDao().getUserByURI(selfEditing.getIndividual().getURI());
+            if( user != null){
+                String role = user.getRoleURI();
+                if("role/:50".equals(role)){
+                    whoToAuth.add( AuthRole.DBA );
+                }
+                if("role/:4".equals(role)){
+                    whoToAuth.add( AuthRole.CURATOR);
+                }
+                if("role/:3".equals(role)){
+                    whoToAuth.add( AuthRole.EDITOR);
+                }
+                if("role/:2".equals(role)){
+                    whoToAuth.add( AuthRole.USER );
+                }                                                            
+            }               
+        }            
         return whoToAuth;
     }   
 }
