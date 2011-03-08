@@ -9,5 +9,5 @@
 </div>
 
 <#if stylesheets??>
-    ${stylesheets.add("/css/dump.css")}
+    ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/dump.css" />')}
 </#if>

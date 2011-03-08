@@ -129,9 +129,9 @@ ${s2} => ${str.unCamelCase(s2)}<br />
 <@dump var="zoo1" />
 <@dump var="pojo" />
 
-${stylesheets.addFromTheme("/css/sstest.css", "/css/sstest2.css")}
-${scripts.addFromTheme("/js/jstest.js")}
-${scripts.add("/js/script1.js", "/js/script2.js", "/js/script3.js")}
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/script1.js"></script>',
+              '<script type="text/javascript" src="${urls.base}/js/script2.js"></script>',
+              '<script type="text/javascript" src="${urls.base}/js/script3.js"></script>')}
 
 <@dumpAll />
 

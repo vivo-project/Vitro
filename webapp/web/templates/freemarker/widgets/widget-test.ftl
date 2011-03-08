@@ -3,9 +3,9 @@
 <#-- Test widget -->
 
 <#macro assets>
-    ${stylesheets.add("/css/test.css")}
-    ${scripts.add("/js/testscript.js")}
-    ${headScripts.add("/js/testheadscript.js")} 
+    ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/test.css" />')}
+    ${scripts.add('<script type="text/javascript" src="${urls.base}/js/testscript.js"></script>')}
+    ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/testheadscript.js"></script>')}
 </#macro>
 
 <#macro loggedIn>

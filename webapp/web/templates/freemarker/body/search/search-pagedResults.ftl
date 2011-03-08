@@ -56,4 +56,4 @@
 
 </div> <!-- end contentsBrowseGroup -->
 
-${stylesheets.add("/css/search.css")}
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/search.css" />')}

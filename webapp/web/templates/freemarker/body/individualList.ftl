@@ -3,7 +3,8 @@
 <#-- List individuals in the requested class. -->
 
 <#import "lib-list.ftl" as l>
-${stylesheets.add("/css/browseIndex.css")}
+
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseIndex.css" />')}
 
 <section class="individualList">
    <h2>${title} <span class="rdfLink"><a class="icon-rdf" href="${redirecturl}" title="View the ${title} list in RDF format">RDF</a></span></h2>

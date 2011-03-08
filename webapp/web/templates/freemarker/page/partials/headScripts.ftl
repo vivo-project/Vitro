@@ -10,7 +10,7 @@
 <script type="text/javascript" src="${urls.base}/js/html5.js"></script>
 <![endif]-->
 
-${headScripts.tags}
+${headScripts.list} 
 
 <!--[if lt IE 7]>
 <script type="text/javascript" src="${urls.base}/js/jquery_plugins/supersleight.js"></script>

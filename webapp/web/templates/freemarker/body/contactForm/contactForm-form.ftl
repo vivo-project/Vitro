@@ -54,4 +54,4 @@
     
 </div>
 
-${scripts.add("/js/commentForm.js")}
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/commentForm.js"></script>')}

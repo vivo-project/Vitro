@@ -70,14 +70,13 @@
 <#-- Ontology properties -->
 <#include "individual-properties.ftl">
 
-${stylesheets.add("/css/individual/individual.css")}
-                           
-<#-- RY Figure out which of these scripts really need to go into the head, and which are needed at all (e.g., tinyMCE??) -->
-${headScripts.add("/js/jquery_plugins/getURLParam.js",                  
-                  "/js/jquery_plugins/colorAnimations.js",
-                  "/js/jquery_plugins/jquery.form.js",
-                  "/js/tiny_mce/tiny_mce.js", 
-                  "/js/controls.js",
-                  "/js/toggle.js")}
-                  
-${scripts.add("/js/imageUpload/imageUploadUtils.js")}
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/individual/individual.css" />')}
+
+${headScripts.add('<script type="text/javascript" src="${urls.base}/js/jquery_plugins/getURLParam.js"></script>',
+                  '<script type="text/javascript" src="${urls.base}/js/jquery_plugins/colorAnimations.js"></script>',
+                  '<script type="text/javascript" src="${urls.base}/js/jquery_plugins/jquery.form.js.js"></script>',
+                  '<script type="text/javascript" src="${urls.base}/js/tiny_mce/tiny_mce.js"></script>',
+                  '<script type="text/javascript" src="${urls.base}/js/controls.js"></script>',
+                  '<script type="text/javascript" src="${urls.base}/js/toggle.js"></script>')}
+
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/imageUpload/imageUploadUtils.js"></script>')}

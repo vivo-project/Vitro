@@ -10,4 +10,4 @@
     </#list>
 </div>
 
-${stylesheets.add("/css/dump.css")}
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/dump.css" />')}

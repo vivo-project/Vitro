@@ -8,9 +8,9 @@
          because we don't have the user in the template data model when we generate the assets. This can also be fixed by 
          NIHVIVO-1357.     
     <#if ! user.loggedIn> -->
-        ${stylesheets.add("/css/login.css")} 
+        ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/login.css" />')}
         <#-- ${scripts.add("")} -->
-        ${headScripts.add("/js/login/loginUtils.js")}
+        ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/login/loginUtils.js"></script>')}
     <#-- </#if> -->
 </#macro>
 

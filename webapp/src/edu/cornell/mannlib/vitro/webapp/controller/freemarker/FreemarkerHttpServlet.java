@@ -36,9 +36,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.BreadCrumbsUtil;
 import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.Tags;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Scripts;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Stylesheets;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.TabMenu;
 import freemarker.ext.beans.BeansWrapper;
@@ -290,35 +289,21 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return wrapper;
     }
     
-    private TemplateModel getStylesheetList(String themeDir) {
+    private TemplateModel getTagList() {
         
         // For script and stylesheet lists, use an object wrapper that exposes write methods, 
         // instead of the configuration's object wrapper, which doesn't. The templates can
         // add stylesheets and scripts to the lists by calling their add() methods.
         BeansWrapper wrapper = getNonDefaultBeansWrapper(BeansWrapper.EXPOSE_SAFE);
         try {
-            // Here themeDir SHOULD NOT have the context path already added to it.
-            return wrapper.wrap(new Stylesheets(themeDir));       
+            return wrapper.wrap(new Tags());       
         } catch (TemplateModelException e) {
-            log.error("Error creating stylesheet TemplateModel");
+            log.error("Error creating Tags template model");
             return null;
         }
     }
     
-    private TemplateModel getScriptList(String themeDir) {
-        
-        // For script and stylesheet lists, use an object wrapper that exposes write methods, 
-        // instead of the configuration's object wrapper, which doesn't. The templates can
-        // add stylesheets and scripts to the lists by calling their add() methods.
-        BeansWrapper wrapper = getNonDefaultBeansWrapper(BeansWrapper.EXPOSE_SAFE);
-        try {
-            return wrapper.wrap(new Scripts(themeDir));       
-        } catch (TemplateModelException e) {
-            log.error("Error creating script TemplateModel");
-            return null;
-        }        
-    }
-    
+
     /**
      *  Add any Java directives the templates should have access to.
      *  This is public and static so that these may be used by other classes during
@@ -368,9 +353,9 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 
         map.put("themeDir", themeDir);
         map.put("currentTheme", themeDir.substring(themeDir.lastIndexOf('/')+1));
-        map.put("stylesheets", getStylesheetList(themeDir));
-        map.put("scripts", getScriptList(themeDir));
-        map.put("headScripts", getScriptList(themeDir));
+        map.put("stylesheets", getTagList());
+        map.put("scripts", getTagList());
+        map.put("headScripts", getTagList());
         
         map.putAll(getDirectives());
         map.putAll(getMethods());

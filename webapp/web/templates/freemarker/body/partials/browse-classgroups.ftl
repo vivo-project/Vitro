@@ -2,7 +2,7 @@
 
 <#-- Browse class groups on the home page. Could potentially become a widget -->
 
-${stylesheets.add("/css/browseClassGroups.css")}
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseClassGroups.css" />')}
 
 <#macro allClassGroups classGroups>
     <#-- Loop through classGroups first so we can account for situations when all class groups are empty -->
@@ -72,8 +72,8 @@ ${stylesheets.add("/css/browseClassGroups.css")}
                 defaultBrowseClassGroupCount: '${firstPopulatedClassGroup.individualCount!}'
             };
         </script>
+        ${scripts.add('<script type="text/javascript" src="${urls.base}/js/browseClassGroups.js"></script>')}
 
-        ${scripts.add("/js/browseClassGroups.js")}
     <#else>
         <#-- Would be nice to update classgroups-checkForData.ftl with macro so it could be used here as well -->
         <#-- <#include "classgroups-checkForData.ftl"> -->
@@ -104,5 +104,7 @@ ${stylesheets.add("/css/browseClassGroups.css")}
         <#-- Will be populated dynamically via AJAX request -->
     </section>
     
-    ${scripts.add("/js/raphael/raphael.js", "/js/raphael/g.raphael.js", "/js/raphael/g.bar.js")}
+    ${scripts.add('<script type="text/javascript" src="${urls.base}/js/raphael/raphael.js"></script>',
+                  '<script type="text/javascript" src="${urls.base}/js/raphael/g.raphael.js"></script>',
+                  '<script type="text/javascript" src="${urls.base}/js/raphael/g.bar.js"></script>')}
 </#macro>
