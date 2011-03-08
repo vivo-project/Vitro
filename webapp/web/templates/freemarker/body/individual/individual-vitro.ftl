@@ -10,7 +10,7 @@
                   namespaces=namespaces 
                   editable=editable 
                   showPlaceholder="with_add_link" 
-                  placeholder="${urls.images}/placeholders/non.person.thumbnail.jpg" />
+                  placeholder="${urls.images}/placeholders/thumbnail.jpg" />
     </#assign>
     
     <#if ( individualImage?contains('<img class="individual-photo"') )>
