@@ -10,9 +10,9 @@
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.NetId"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.SelfEditing"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers"%>
 <%@page import="java.io.IOException"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundleFactory"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList"%>
@@ -26,26 +26,12 @@
 
 <h1>SelfEditing Sanity Check</h1>
 
-<h3>Is there a Factory that will create self editing identifiers?</h3>
-<%
-    ServletIdentifierBundleFactory sibf = ServletIdentifierBundleFactory.getIdentifierBundleFactory(application);
-String found = "Self editing identifier factory found.";
-for( IdentifierBundleFactory ibf : sibf ){
-   if( ibf instanceof SelfEditingIdentifierFactory ){
-       found = "Found a self editing identifier factory.";
-       break;
-   }
-}
-%>
-<%= found %>
-
-
 <h3>Is there a self editing policy in the context?</h3>
 <% 
 ServletPolicyList spl = ServletPolicyList.getPolicies(application);
 SelfEditingPolicy sePolicy = null;
 ListIterator it = spl.listIterator();
-found = "Could not find a SelfEditingPolicy";
+String found = "Could not find a SelfEditingPolicy";
 while(it.hasNext()){
     PolicyIface p = (PolicyIface)it.next();
     if( p instanceof SelfEditingPolicy ){
@@ -70,19 +56,15 @@ if( user != null && user.length() > 0){
  SelfEditingIdentifierFactory.SelfEditing selfEditingId = null;
  IdentifierBundle ib  = null;
 if( user != null && user.length() > 0){
-  ib = sibf.getIdentifierBundle(request,session,application);
-  if( ib != null ) {
-       for( Object obj : ib){
-           if( obj instanceof SelfEditingIdentifierFactory.SelfEditing )
-               selfEditingId = (SelfEditingIdentifierFactory.SelfEditing) obj;
-       }
-       if( selfEditingId != null )
-           found = "found a SelfEditingId " + selfEditingId.getValue();
-       else
-           found = "Cound not find a SelfEditingId";
-  }else{
-      found = "Could not get any identififers";
-  }  
+  ib = RequestIdentifiers.getIdBundleForRequest(request);
+  for( Object obj : ib){
+      if( obj instanceof SelfEditingIdentifierFactory.SelfEditing )
+          selfEditingId = (SelfEditingIdentifierFactory.SelfEditing) obj;
+  }
+  if( selfEditingId != null )
+      found = "found a SelfEditingId " + selfEditingId.getValue();
+  else
+      found = "Cound not find a SelfEditingId";
 %>
   <%= found %>
 <%}else{%> 

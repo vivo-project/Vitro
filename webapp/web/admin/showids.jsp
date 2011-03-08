@@ -1,13 +1,13 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
 <%@page
-   import="edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory"%>
+   import="edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers"%>
 <%@page
    import="java.util.List"%>
 
 
 <%
-      List idb = ServletIdentifierBundleFactory.getIdBundleForRequest(request, session, application);
+      List idb = RequestIdentifiers.getIdBundleForRequest(request);
 
 out.write("<html><body>");
 out.write("<h2>Identifiers in effect: </h2>");
