@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
+import java.io.IOException;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -9,21 +11,17 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
-import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vedit.util.FormUtils;
+import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
+import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
+import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
-import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.Iterator;
-import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 
 
 public class ClassgroupRetryController extends BaseEditController {

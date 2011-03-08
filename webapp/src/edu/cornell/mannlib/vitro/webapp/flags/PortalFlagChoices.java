@@ -2,16 +2,18 @@
 
 package edu.cornell.mannlib.vitro.webapp.flags;
 
-import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
-import edu.cornell.mannlib.vitro.webapp.beans.*;
-import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
-
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.beans.Flagpole;
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
 
 /**
  * These methods generate flag choice html input elements.

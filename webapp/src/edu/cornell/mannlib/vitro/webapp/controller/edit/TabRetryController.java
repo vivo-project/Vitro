@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,15 +21,10 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
 import edu.cornell.mannlib.vedit.util.FormUtils;
-import edu.cornell.mannlib.vedit.validator.impl.EnumValuesValidator;
-import edu.cornell.mannlib.vedit.validator.impl.XMLNameValidator;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
-import edu.cornell.mannlib.vitro.webapp.beans.Tab;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-
+import edu.cornell.mannlib.vitro.webapp.beans.Tab;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.edit.PropertyRetryController.PropertyInsertPageForwarder;
 import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
 
 public class TabRetryController extends BaseEditController {

@@ -5,21 +5,17 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena.tabFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import net.sf.jga.algorithms.Sort;
 import net.sf.jga.algorithms.Transform;
 import net.sf.jga.algorithms.Unique;
 import net.sf.jga.fn.UnaryFunctor;
 
-import com.hp.hpl.jena.ontology.OntModel;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;

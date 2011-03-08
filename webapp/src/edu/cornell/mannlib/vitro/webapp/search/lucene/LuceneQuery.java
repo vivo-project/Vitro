@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.search.lucene;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,11 +15,8 @@ import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.RangeQuery;
 import org.apache.lucene.search.TermQuery;
-import org.joda.time.DateTime;
 
-import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;

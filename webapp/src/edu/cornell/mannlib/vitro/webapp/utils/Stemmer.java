@@ -36,12 +36,8 @@ package edu.cornell.mannlib.vitro.webapp.utils;
 
 */
 
-import java.io.*;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
 
 /**
   * Stemmer, implementing the Porter Stemming Algorithm

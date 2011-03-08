@@ -2,26 +2,40 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
-import edu.cornell.mannlib.vedit.beans.Checkbox;
-import edu.cornell.mannlib.vedit.beans.EditProcessObject;
-import edu.cornell.mannlib.vedit.beans.FormObject;
-import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vedit.util.FormUtils;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
-import edu.cornell.mannlib.vitro.webapp.beans.*;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.*;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
-import org.apache.commons.collections.map.ListOrderedMap;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+
+import org.apache.commons.collections.map.ListOrderedMap;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import edu.cornell.mannlib.vedit.beans.Checkbox;
+import edu.cornell.mannlib.vedit.beans.EditProcessObject;
+import edu.cornell.mannlib.vedit.beans.FormObject;
+import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vedit.util.FormUtils;
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.beans.Tab;
+import edu.cornell.mannlib.vitro.webapp.beans.TabIndividualRelation;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
+import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
+import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
+import edu.cornell.mannlib.vitro.webapp.dao.TabIndividualRelationDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class TabEditController extends BaseEditController {
 	
