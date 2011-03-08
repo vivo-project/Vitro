@@ -74,7 +74,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/individual/indi
 
 ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/jquery_plugins/getURLParam.js"></script>',
                   '<script type="text/javascript" src="${urls.base}/js/jquery_plugins/colorAnimations.js"></script>',
-                  '<script type="text/javascript" src="${urls.base}/js/jquery_plugins/jquery.form.js.js"></script>',
+                  '<script type="text/javascript" src="${urls.base}/js/jquery_plugins/jquery.form.js"></script>',
                   '<script type="text/javascript" src="${urls.base}/js/tiny_mce/tiny_mce.js"></script>',
                   '<script type="text/javascript" src="${urls.base}/js/controls.js"></script>',
                   '<script type="text/javascript" src="${urls.base}/js/toggle.js"></script>')}
