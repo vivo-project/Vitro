@@ -181,7 +181,7 @@
 
 <c:if test="${requestScope.predicate.offerCreateNewOption == true}">
  	<c:if test="${requestScope.rangeOptionsExist == true }">
-    	<p>If you don't find the appropriate entry on the selection list:</p>
+    	<p style="margin-top: 2em">If you don't find the appropriate entry on the selection list:</p>
   	</c:if>
   	<c:if test="${requestScope.rangeOptionsExist == false }">
   		<p style="margin-top: 5em">Please create a new entry.</p>  		    
