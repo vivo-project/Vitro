@@ -41,7 +41,7 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         
         // If editing, create a helper object to check requested actions against policies
         if (isEditable()) {
-            policyHelper = new EditingPolicyHelper(vreq, getServletContext());
+            policyHelper = new EditingPolicyHelper(vreq);
         } 
     }
     

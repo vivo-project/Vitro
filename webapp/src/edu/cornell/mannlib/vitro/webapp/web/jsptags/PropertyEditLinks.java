@@ -88,12 +88,8 @@ public class PropertyEditLinks extends TagSupport{
             log.error("item passed to <edLnk> tag is null");
             return SKIP_BODY;
         }                                
-        //try the policy in the request first, the look for a policy in the servlet context
-        //request policy takes precedence
-        PolicyIface policy = RequestPolicyList.getPolicies(pageContext.getRequest());
-        if( policy == null || ( policy instanceof PolicyList && ((PolicyList)policy).size() == 0 )){
-            policy = ServletPolicyList.getPolicies( pageContext.getServletContext() );
-        }              
+
+        PolicyIface policy = RequestPolicyList.getPolicies((HttpServletRequest)pageContext.getRequest());
         
 		IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(pageContext.getRequest());
         
@@ -136,7 +132,7 @@ public class PropertyEditLinks extends TagSupport{
                 if (data == null) { // link to add a new value
                     links = doVitroNsDataProp( subjectUri, predicateUri, policyToAccess(ids, policy, subjectUri, predicateUri), contextPath );
                 } else { // links to edit or delete an existing value
-                    DataPropertyStatement dps = (DataPropertyStatement) new DataPropertyStatementImpl(subjectUri, predicateUri, data); 
+                    DataPropertyStatement dps = new DataPropertyStatementImpl(subjectUri, predicateUri, data); 
                     links = doVitroNsDataPropStmt( dps, entity, policyToAccess(ids, policy, dps), contextPath );                       
                 }           
             } else if (FrontEndEditingUtils.isVitroNsObjProp(predicateUri)) {
@@ -627,7 +623,7 @@ public class PropertyEditLinks extends TagSupport{
         return access;
     }
     
-    public enum EditLinkAccess{ MODIFY, DELETE, ADDNEW, INFO, ADMIN  };
+    public enum EditLinkAccess{ MODIFY, DELETE, ADDNEW, INFO, ADMIN  }
 
     public class LinkStruct {
         String href;

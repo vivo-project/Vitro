@@ -2,7 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -10,36 +12,60 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 
 /**
- * This is store and get policies with a Request.
+ * Allow us to store policies in a Request, in addition to those in the
+ * ServletContext
  */
-public class RequestPolicyList extends PolicyList{       
-    public final static String POLICY_LIST = "PolicyList";
-    private static final Log log = LogFactory.getLog( RequestPolicyList.class );
+public class RequestPolicyList extends PolicyList {
+	private static final String ATTRIBUTE_POLICY_ADDITIONS = RequestPolicyList.class
+			.getName();
+	private static final Log log = LogFactory.getLog(RequestPolicyList.class);
 
-    @SuppressWarnings("unchecked")
-    public static PolicyList getPolicies(ServletRequest request){
-        PolicyList list  = null;
-        try{
-            list = (PolicyList)request.getAttribute(POLICY_LIST);
-        }catch(ClassCastException cce){
-            log.error(POLICY_LIST +" server context attribute was not of type PolicyList");
-        }
-        if( list == null ){
-            list = new RequestPolicyList();
-            request.setAttribute(POLICY_LIST, list);
-        }
-        return list;
-    }
+	/**
+	 * Get a copy of the current list of policies. This includes the policies in
+	 * the ServletContext, followed by any stored in the request. This method may
+	 * return an empty list, but it never returns null.
+	 */
+	public static PolicyList getPolicies(HttpServletRequest request) {
+		ServletContext ctx = request.getSession().getServletContext();
 
-    public static void addPolicy(ServletRequest request, PolicyIface policy){
-        PolicyList policies = getPolicies(request);
-        if( !policies.contains(policy) ){
-            policies.add(policy);
-            log.info("Added policy: " + policy.toString());
-        }else{
-            log.info("Ignored attempt to add redundent policy.");
-        }
-    }
-    
+		PolicyList list = ServletPolicyList.getPolicies(ctx);
+		list.addAll(getPoliciesFromRequest(request));
+		return list;
+	}
 
+	public static void addPolicy(ServletRequest request, PolicyIface policy) {
+		PolicyList policies = getPoliciesFromRequest(request);
+		if (!policies.contains(policy)) {
+			policies.add(policy);
+			log.debug("Added policy: " + policy.toString());
+		} else {
+			log.warn("Ignored attempt to add redundent policy.");
+		}
+	}
+
+	/**
+	 * Get the current list of policy additions from the request, or create one
+	 * if there is none. This method may return an empty list, but it never
+	 * returns null.
+	 */
+	private static PolicyList getPoliciesFromRequest(ServletRequest request) {
+		if (request == null) {
+			throw new NullPointerException("request may not be null.");
+		}
+		
+		Object obj = request.getAttribute(ATTRIBUTE_POLICY_ADDITIONS);
+		if (obj == null) {
+			obj = new PolicyList();
+			request.setAttribute(ATTRIBUTE_POLICY_ADDITIONS, obj);
+		}
+		
+		if (!(obj instanceof PolicyList)) {
+			throw new IllegalStateException("Expected to find an instance of "
+					+ PolicyList.class.getName()
+					+ " in the context, but found an instance of "
+					+ obj.getClass().getName() + " instead.");
+		}
+
+		return (PolicyList) obj;
+	}
 }
