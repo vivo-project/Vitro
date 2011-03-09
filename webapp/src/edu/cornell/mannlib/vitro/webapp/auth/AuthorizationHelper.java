@@ -51,11 +51,6 @@ public class AuthorizationHelper {
         PolicyIface policy = RequestPolicyList.getPolicies(vreq);
         if (isEmptyPolicy(policy)) {
             policy = ServletPolicyList.getPolicies(servletContext);
-            if (isEmptyPolicy(policy)) {
-                log.error("No policy found in request at "
-                        + RequestPolicyList.POLICY_LIST);
-                policy = new PolicyList();
-            }
         }
 
         return policy;

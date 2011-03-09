@@ -375,9 +375,7 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Visiti
                     log.error("could not get jenaOntModel from JenaBaseDao, JenaNetidPolicy will not work");
                 }
 
-                JenaNetidPolicy jnip = new JenaNetidPolicy(model);
-                ServletPolicyList spl = ServletPolicyList.getPolicies(sce.getServletContext());
-                spl.add(jnip);
+                ServletPolicyList.addPolicy(sce.getServletContext(), new JenaNetidPolicy(model));
 
                 ActiveIdentifierBundleFactories.addFactory(sce, new SelfEditingIdentifierFactory());
             }catch(Exception e){

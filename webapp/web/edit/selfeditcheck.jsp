@@ -28,7 +28,7 @@
 
 <h3>Is there a self editing policy in the context?</h3>
 <% 
-ServletPolicyList spl = ServletPolicyList.getPolicies(application);
+PolicyList spl = ServletPolicyList.getPolicies(application);
 SelfEditingPolicy sePolicy = null;
 ListIterator it = spl.listIterator();
 String found = "Could not find a SelfEditingPolicy";

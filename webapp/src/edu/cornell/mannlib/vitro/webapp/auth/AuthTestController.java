@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
@@ -59,12 +60,12 @@ public class AuthTestController extends VitroHttpServlet {
 
     private void checkAuths(ServletOutputStream out, IdentifierBundle ids, ServletContext servletContext)
     throws IOException{
-        ServletPolicyList policy = ServletPolicyList.getPolicies(servletContext);
+        PolicyList policy = ServletPolicyList.getPolicies(servletContext);
         out.println("<h1>Authorization tests:</h1>");
 
-        if( policy == null ) { out.println("No Policy objects found in ServletContext. ");
-
-        }
+		if (policy.isEmpty()) {
+			out.println("No Policy objects found in ServletContext. ");
+		}
         out.println("<table>");
         for(RequestedAction action: actions){
             out.println("<tr><td>"+action.getClass().getName()+"</td>");

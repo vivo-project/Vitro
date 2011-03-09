@@ -38,9 +38,6 @@ public class EditingPolicyHelper {
         policy = RequestPolicyList.getPolicies(vreq);
         if( policy == null || ( policy instanceof PolicyList && ((PolicyList)policy).size() == 0 )){
             policy = ServletPolicyList.getPolicies( servletContext );
-            if( policy == null || ( policy instanceof PolicyList && ((PolicyList)policy).size() == 0 )){            
-                log.error("No policy found in request at " + RequestPolicyList.POLICY_LIST);
-            }
         }           
     }
     

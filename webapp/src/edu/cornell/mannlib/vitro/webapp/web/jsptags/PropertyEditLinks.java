@@ -93,10 +93,6 @@ public class PropertyEditLinks extends TagSupport{
         PolicyIface policy = RequestPolicyList.getPolicies(pageContext.getRequest());
         if( policy == null || ( policy instanceof PolicyList && ((PolicyList)policy).size() == 0 )){
             policy = ServletPolicyList.getPolicies( pageContext.getServletContext() );
-            if( policy == null || ( policy instanceof PolicyList && ((PolicyList)policy).size() == 0 )){            
-                log.error("No policy found in request at " + RequestPolicyList.POLICY_LIST);
-                return SKIP_BODY;
-            }
         }              
         
 		IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(pageContext.getRequest());
