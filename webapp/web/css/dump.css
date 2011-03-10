@@ -42,6 +42,7 @@
     list-style: decimal inside none;
 }
 
-.var .var {
+.dump .var .var,
+.dump.datamodel .var .var {
     margin-left: 1.5em;
 }
