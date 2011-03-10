@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces;
 
-/** marker interface */
-
-public interface AdminRequestedAction {
-
+public interface AdminRequestedAction extends RequestedAction {
+	/** marker interface */
 }

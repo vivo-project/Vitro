@@ -6,7 +6,6 @@ public abstract class TwoParameterAction implements RequestedAction {
     protected String resourceUri;
     protected String secondUri;
 
-
     public String getResourceUri() {
         return resourceUri;
     }
@@ -19,6 +18,5 @@ public abstract class TwoParameterAction implements RequestedAction {
     public void setSecondUri(String secondUri) {
         this.secondUri = secondUri;
     }
-
 
 }

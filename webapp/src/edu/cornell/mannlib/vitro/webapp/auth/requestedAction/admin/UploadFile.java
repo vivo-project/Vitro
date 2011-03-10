@@ -7,10 +7,8 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.AdminRequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 
-public class UploadFile implements RequestedAction, AdminRequestedAction{
-
+public class UploadFile implements AdminRequestedAction{
     protected String subjectUri;
     protected String predicateUri;
 
@@ -20,10 +18,12 @@ public class UploadFile implements RequestedAction, AdminRequestedAction{
         this.predicateUri = predicateUri;
     }
 
-    public String getURI() {
+    @Override
+	public String getURI() {
         return RequestActionConstants.actionNamespace + this.getClass().getName();
     }
-    public PolicyDecision accept(VisitingPolicyIface policy, IdentifierBundle ids){
+    @Override
+	public PolicyDecision accept(VisitingPolicyIface policy, IdentifierBundle ids){
         return policy.visit(ids,this);
     }
 }

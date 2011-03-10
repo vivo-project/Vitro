@@ -5,10 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 
-public class DropObjectPropStmt extends AbstractObjectPropertyAction implements
-		RequestedAction {
+public class DropObjectPropStmt extends AbstractObjectPropertyAction {
 
 	public DropObjectPropStmt(String sub, String pred, String obj) {
 		super(sub, pred, obj);
