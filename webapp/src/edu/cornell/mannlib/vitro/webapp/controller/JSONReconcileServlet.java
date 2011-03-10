@@ -35,6 +35,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
@@ -52,7 +53,8 @@ import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
  */
 public class JSONReconcileServlet extends VitroHttpServlet {
 
-	private static String VIVO_NAMESPACE = "http://vivo.med.cornell.edu/individual/";
+	private String defaultNamespace;
+	private String defaultTypeList;
 	private static String QUERY_PARAMETER_NAME = "term";
 	public static final int MAX_QUERY_LENGTH = 500;
 	private static final Log log = LogFactory.getLog(JSONReconcileServlet.class.getName());
@@ -68,6 +70,8 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 			throws ServletException, IOException {
 		super.doGet(req, resp);
 		VitroRequest vreq = new VitroRequest(req);
+		this.defaultNamespace = vreq.getWebappDaoFactory().getDefaultNamespace();
+		this.defaultTypeList = ConfigurationProperties.getBean(req).getProperty("Vitro.reconcile.defaultTypeList");
 
 		try {
 			if (vreq.getParameter("query") != null
@@ -113,7 +117,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 			String qStr = (String) qObj;
 			queries.add(qStr);
 			System.out.println();
-			System.out.println("strArr: " + qStr + "\n");
+			System.out.println("query: " + qStr + "\n");
 		}
 
 		try {
@@ -139,7 +143,6 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 								searchWithTypeMap.put(key, jsonLvl2);
 							} else {
 								// user did not specify a type
-								// System.out.println("before search: " + jsonLvl2.getString("query"));
 								searchNoTypeMap.put(key, jsonLvl2);
 							}
 						}
@@ -175,9 +178,10 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 		JSONObject json = new JSONObject();
 		try {
 			json.put("name", "VIVO Reconciliation Service");
-			json.put("identifierSpace", this.VIVO_NAMESPACE);
-			json.put("schemaSpace", this.VIVO_NAMESPACE);
-
+			if (this.defaultNamespace != null) {
+				json.put("identifierSpace", this.defaultNamespace);
+				json.put("schemaSpace", this.defaultNamespace);
+			}
 			JSONObject viewJson = new JSONObject();
 			StringBuffer urlBuf = new StringBuffer();
 			urlBuf.append("http://" + req.getServerName());
@@ -190,26 +194,23 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 			viewJson.put("url", urlBuf.toString() + "/individual?uri={{id}}");
 			json.put("view", viewJson);
 
-			HashMap<String, String> typeMap = new HashMap<String, String>();
-			typeMap.put("http://vivoweb.org/ontology/core#Course", "Course");
-			typeMap.put("http://vivoweb.org/ontology/core#Grant", "Grant");
-			typeMap.put("http://vivoweb.org/ontology/core#GeographicRegion",
-					"Location");
-			typeMap.put("http://xmlns.com/foaf/0.1/Organization",
-					"Organization");
-			typeMap.put("http://xmlns.com/foaf/0.1/Person", "Person");
-			typeMap.put("http://purl.org/ontology/bibo/Article", "Publication");
-
-			JSONArray defaultTypesJsonArr = new JSONArray();
-			for (Map.Entry<String, String> entry : typeMap.entrySet()) {
-				String id = entry.getKey();
-				String name = entry.getValue();
-				JSONObject defaultTypesJson = new JSONObject();
-				defaultTypesJson.put("id", id);
-				defaultTypesJson.put("name", name);
-				defaultTypesJsonArr.put(defaultTypesJson);
+			// parse defaultTypeList from deploy.properties
+			if (this.defaultTypeList != null) {
+				String[] splitList = this.defaultTypeList.split(";");
+				String[][] idNameArray = new String[splitList.length][splitList.length];
+				for(int i = 0; i<splitList.length; i++) {
+					idNameArray[i] = splitList[i].split(",");
+				}
+				// process and add to json defaultTypes
+				JSONArray defaultTypesJsonArr = new JSONArray();
+				for (int i = 0; i<idNameArray.length; i++) {
+					JSONObject defaultTypesJson = new JSONObject();
+					defaultTypesJson.put("id", idNameArray[i][0].trim());
+					defaultTypesJson.put("name", idNameArray[i][1].trim());
+					defaultTypesJsonArr.put(defaultTypesJson);
+				}
+				json.put("defaultTypes", defaultTypesJsonArr);
 			}
-			json.put("defaultTypes", defaultTypesJsonArr);
 		} catch (JSONException ex) {
 			throw new ServletException(
 					"JSONReconcileServlet: Could not create metadata: " + ex);
@@ -262,7 +263,6 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 				}
 
 				// begin search
-				// System.out.println("queryVal: " + queryVal);
 				JSONArray resultJsonArr = new JSONArray();
 				Query query = getReconcileQuery(vreq, portalFlag, analyzer,
 						queryVal, searchType, propertiesList);
@@ -270,7 +270,6 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 				TopDocs topDocs = searcherForRequest.search(query, null, limit);
 				if (topDocs != null && topDocs.scoreDocs != null) {
 					int hitsLength = topDocs.scoreDocs.length;
-					//System.out.println("hitsLength: " + hitsLength);
 					if (hitsLength > 0) {
 						for (int i = 0; i < topDocs.scoreDocs.length; i++) {
 							JSONObject resultJson = new JSONObject();
@@ -285,7 +284,9 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 							Individual ind = iDao.getIndividualByURI(uri);
 							if (ind != null) {
 								String name = ind.getName();
-								resultJson.put("id", uri);
+								// encode e.g. # to %23
+								String modUri = java.net.URLEncoder.encode(uri, "ISO-8859-1");
+								resultJson.put("id", modUri);
 								resultJson.put("name", name);
 							}
 							List fields = doc.getFields();
@@ -294,8 +295,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 								Field field = (Field) fields.get(j);
 								String fieldName = field.name();
 								if ("type".equals(fieldName)) {
-									// e.g.
-									// http://vivoweb.org/ontology/core#FacultyMember
+									// e.g. http://aims.fao.org/aos/geopolitical.owl#area
 									String type = field.stringValue();
 									int lastIndex2 = type.lastIndexOf('/') + 1;
 									String typeName = type
@@ -430,7 +430,6 @@ public class JSONReconcileServlet extends VitroHttpServlet {
     private Query getReconcileQuery(VitroRequest request, PortalFlag portalState,
     		Analyzer analyzer, String querystr, String typeParam, ArrayList<String[]> propertiesList) throws SearchException{
 
-    	// System.out.println("querystr: " + querystr);
     	Query query = null;
     	try {
     		if( querystr == null){
@@ -449,7 +448,6 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 
     		// filter by type
     		if (typeParam != null) {
-    			System.out.println("typeParam: " + typeParam);
     			BooleanQuery boolQuery = new BooleanQuery(); 
     			boolQuery.add(  new TermQuery(
     					new Term(VitroLuceneTermNames.RDFTYPE, 
@@ -463,7 +461,6 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 			Iterator<String[]> it = propertiesList.iterator();
 			while (it.hasNext()) {
 				String[] pvPair = it.next();
-				System.out.println("property val: " + pvPair[0] + " " + pvPair[1]);
 				Query extraQuery = makeReconcileNameQuery(pvPair[1], analyzer, request);
 				if (!"".equals(pvPair[0]) && pvPair[0] != null) {
 					BooleanQuery boolQuery = new BooleanQuery();
