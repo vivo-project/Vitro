@@ -45,8 +45,8 @@ public class FileGraphSetup implements ServletContextListener {
             return;
         }
 	    
-		boolean aboxChanged = false; // indicates whether any ABox filegraph model has changed
-		boolean tboxChanged = false; // indicates whether any TBox filegraph model has changed
+		boolean aboxChanged = false; // indicates whether any ABox file graph model has changed
+		boolean tboxChanged = false; // indicates whether any TBox file graph model has changed
 		
 		try {
 			OntModelSelectorImpl baseOms = (OntModelSelectorImpl) sce.getServletContext().getAttribute("baseOntModelSelector");
