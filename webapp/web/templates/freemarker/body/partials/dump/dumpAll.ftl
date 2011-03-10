@@ -33,6 +33,4 @@
       
 </div>
 
-<#if stylesheets??>
-    ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/dump.css" />')}
-</#if>
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/dump.css" />')}

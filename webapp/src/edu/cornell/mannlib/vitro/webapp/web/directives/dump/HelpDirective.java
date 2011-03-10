@@ -78,15 +78,9 @@ public class HelpDirective extends BaseTemplateDirectiveModel {
         Map<String, Object> map = new HashMap<String, Object>();       
         map.put("help", help);
         map.put("type", type);
-        
-        try {
-            map.put("stylesheets", dataModel.get("stylesheets"));
-        } catch (TemplateModelException e) {
-            log.error("Error getting value of stylesheets variable from data model.");
-        }
 
         DumpHelper helper = new DumpHelper(env);  
-        helper.writeDump("help.ftl", map, name);   
+        helper.writeDump("help.ftl", map, name, dataModel);   
         
     }
     

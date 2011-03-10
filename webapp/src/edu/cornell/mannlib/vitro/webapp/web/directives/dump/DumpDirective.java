@@ -49,15 +49,8 @@ public class DumpDirective extends BaseTemplateDirectiveModel {
         DumpHelper helper = new DumpHelper(env);        
         Map<String, Object> map = new HashMap<String, Object>();      
         map.put("var", helper.getVariableDump(var));
-        
-        TemplateHashModel dataModel = env.getDataModel();
-        try {
-            map.put("stylesheets", dataModel.get("stylesheets"));
-        } catch (TemplateModelException e) {
-            log.error("Error getting value of stylesheets variable from data model.");
-        }
 
-        helper.writeDump("dump.ftl", map, var);   
+        helper.writeDump("dump.ftl", map, var, env.getDataModel());   
     }
         
     @Override

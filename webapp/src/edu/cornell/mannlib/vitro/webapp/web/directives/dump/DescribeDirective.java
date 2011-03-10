@@ -81,14 +81,8 @@ public class DescribeDirective extends BaseTemplateDirectiveModel {
         Map<String, Object> map = new HashMap<String, Object>(); 
         map.put("var", varName);
         map.put("methods", methodDisplayNames);
-        
-        try {
-            map.put("stylesheets", dataModel.get("stylesheets"));
-        } catch (TemplateModelException e) {
-            log.error("Error getting value of stylesheets variable from data model.");
-        }
 
-        helper.writeDump("describe.ftl", map, varName);   
+        helper.writeDump("describe.ftl", map, varName, dataModel);   
     }
     
     @Override

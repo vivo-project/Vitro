@@ -73,13 +73,7 @@ public class DumpAllDirective extends BaseTemplateDirectiveModel {
         map.put("methods", methods);
         map.put("containingTemplate", env.getTemplate().getName());
 
-        try {
-            map.put("stylesheets", dataModel.get("stylesheets"));
-        } catch (TemplateModelException e) {
-            log.error("Error getting value of stylesheets variable from data model.");
-        }
-        
-        helper.writeDump("dumpAll.ftl", map, "template data model");
+        helper.writeDump("dumpAll.ftl", map, "template data model", dataModel);
 
     }
 

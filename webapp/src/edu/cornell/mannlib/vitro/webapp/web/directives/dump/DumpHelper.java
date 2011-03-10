@@ -125,7 +125,17 @@ public class DumpHelper {
         return map;
     }
     
-    public void writeDump(String templateName, Map<String, Object> map, String modelName) {
+    public void writeDump(String templateName, Map<String, Object> map, String modelName, TemplateHashModel dataModel) {
+        
+        // Add objects to data model of calling template that are needed by 
+        // dump templates.
+        try {
+            map.put("stylesheets", dataModel.get("stylesheets"));
+            map.put("urls", dataModel.get("urls"));
+        } catch (TemplateModelException e) {
+            log.error("Error getting values from data model.");
+        }
+        
         String output = BaseTemplateDirectiveModel.processTemplateToString(templateName, map, env);      
         Writer out = env.getOut();
         try {
