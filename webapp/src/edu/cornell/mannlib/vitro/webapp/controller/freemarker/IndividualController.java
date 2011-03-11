@@ -30,6 +30,7 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -40,6 +41,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RdfResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
@@ -123,6 +125,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     		body.put("relatedSubject", getRelatedSubject(vreq));
     		body.put("namespaces", namespaces);
     		body.put("temporalVisualizationEnabled", getTemporalVisualizationFlag());
+    		body.put("verbosePropertyForm", getVerbosePropertyValues(vreq));
     		
     		IndividualTemplateModel itm = getIndividualTemplateModel(vreq, individual);
     		/* We need to expose non-getters in displaying the individual's property list, 
@@ -149,6 +152,39 @@ public class IndividualController extends FreemarkerHttpServlet {
 	    session.removeAttribute("editjson");
 	    EditConfiguration.clearAllConfigsInSession(session);
 	    EditSubmission.clearAllEditSubmissionsInSession(session);
+    }
+    
+    private Map<String, Object> getVerbosePropertyValues(VitroRequest vreq) {
+        
+        Map<String, Object> map = null;
+        
+        LoginStatusBean loginBean = LoginStatusBean.getBean(vreq);
+
+        if (loginBean.isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
+            // Get current verbose property display value
+            String verbose = vreq.getParameter("verbose");
+            Boolean verbosePropertyDisplayValue;
+            // If the form was submitted, get that value
+            if (verbose != null) {
+                verbosePropertyDisplayValue = "true".equals(verbose);
+            // If form not submitted, get the session value
+            } else {
+                Boolean verbosePropertyDisplayValueInSession = (Boolean) vreq.getSession().getAttribute("verbosePropertyDisplay"); 
+                // True if session value is true, otherwise (session value is false or null) false
+                verbosePropertyDisplayValue = Boolean.TRUE.equals(verbosePropertyDisplayValueInSession);           
+            }
+            vreq.getSession().setAttribute("verbosePropertyDisplay", verbosePropertyDisplayValue);
+            
+            map = new HashMap<String, Object>();
+            map.put("verboseFieldValue", String.valueOf(!verbosePropertyDisplayValue)); // the form toggles the current value
+            map.put("action", ""); // FIX THIS - 
+            map.put("currentValue", verbosePropertyDisplayValue ? "on" : "off");
+            map.put("newValue", verbosePropertyDisplayValue ? "off" : "on");
+        } else {
+            vreq.getSession().setAttribute("verbosePropertyDisplay", false);
+        }
+        
+        return map;
     }
     
     private Map<String, Object> getRelatedSubject(VitroRequest vreq) {

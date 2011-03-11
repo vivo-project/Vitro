@@ -32,13 +32,6 @@
             <li><a href="${ontologyEditor.urls.dataPropertyHierarchy}">Data property hierarchy</a></li>      
             <li><a href="${ontologyEditor.urls.propertyGroups}">Property groups</a></li>
         </ul>
-        
-        <#assign formId = "verbosePropertyForm">
-        <form id="${formId}" action="${ontologyEditor.verbosePropertyForm.action}#${formId}" method="get">
-            <input type="hidden" name="verbose" value="${ontologyEditor.verbosePropertyForm.verboseFieldValue}" />
-            <span>Verbose property display for this session is <b>${ontologyEditor.verbosePropertyForm.currentValue}</b>.</span>
-            <input type="submit" id="submit" value="Turn ${ontologyEditor.verbosePropertyForm.newValue}" />
-        </form>  
-        
+
     </div>                       
 </#if>
