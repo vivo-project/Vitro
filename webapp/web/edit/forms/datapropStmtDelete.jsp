@@ -43,7 +43,7 @@
 
     VitroRequest vreq = new VitroRequest(request);
     WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-    String editorUri = EditN3Utils.getEditorUri(request,session,application);        
+    String editorUri = EditN3Utils.getEditorUri();        
     wdf = wdf.getUserAwareDaoFactory(editorUri);
     
     DataProperty prop = wdf.getDataPropertyDao().getDataPropertyByURI(predicateUri);

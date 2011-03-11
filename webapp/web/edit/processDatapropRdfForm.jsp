@@ -255,7 +255,7 @@ and set a flag in the request to indicate "back button confusion"
     
     OntModel writeModel = editConfig.getWriteModelSelector().getModel(request,application);
     Lock lock = null;
-    String editorUri = EditN3Utils.getEditorUri(request,session,application);    
+    String editorUri = EditN3Utils.getEditorUri(request);    
     try{
         lock =  writeModel.getLock();
         lock.enterCriticalSection(Lock.WRITE);

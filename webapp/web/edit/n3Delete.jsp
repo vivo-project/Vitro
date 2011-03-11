@@ -210,7 +210,7 @@
     }    
     
     OntModel writeModel = editConfig.getWriteModelSelector().getModel(request,application);
-    String editorUri = EditN3Utils.getEditorUri(request,session,application);    
+    String editorUri = EditN3Utils.getEditorUri(request);    
     Lock lock = null;
     try{
         lock =  writeModel.getLock();
