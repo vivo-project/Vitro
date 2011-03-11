@@ -2,15 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 
@@ -20,8 +16,8 @@ public abstract class BaseTemplateModel {
     
     protected static ServletContext servletContext = null;
 
-    // Wrap UrlBuilder method so templates can call ${item.url}
-    public String getUrl(String path) {
+    // Convenience method so subclasses can call getUrl(path)
+    protected String getUrl(String path) {
         return UrlBuilder.getUrl(path);
     }
 
@@ -43,8 +39,4 @@ public abstract class BaseTemplateModel {
         servletContext = context;
     }
     
-    public String dump() {
-        return toString(); // fallback when subclass doesn't define a class-specific dump()
-    }
-
 }
