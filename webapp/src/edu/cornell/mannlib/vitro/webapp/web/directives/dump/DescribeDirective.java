@@ -51,16 +51,16 @@ public class DescribeDirective extends BaseTemplateDirectiveModel {
         
         TemplateHashModel dataModel = env.getDataModel();
 
-        TemplateModel tm =  null;
+        TemplateModel wrappedModel =  null;
         try {
-            tm = dataModel.get(varName);
+            wrappedModel = dataModel.get(varName);
         } catch (TemplateModelException tme) {
             log.error("Error getting value of template model " + varName + " from data model.");
         }
 
         Object unwrappedModel = null;
         try {
-            unwrappedModel = DeepUnwrap.permissiveUnwrap(tm);
+            unwrappedModel = DeepUnwrap.permissiveUnwrap(wrappedModel);
         } catch (TemplateModelException e) {
             log.error("Cannot unwrap template model  " + varName + ".");
         }
@@ -71,7 +71,7 @@ public class DescribeDirective extends BaseTemplateDirectiveModel {
         }
         
         DumpHelper helper = new DumpHelper(env); 
-        List<Method> methods = helper.getMethodsAvailableToTemplate(unwrappedModel.getClass());
+        List<Method> methods = helper.getMethodsAvailableToTemplate(wrappedModel, unwrappedModel.getClass());
         List<String> methodDisplayNames = new ArrayList<String>(methods.size());
         for (Method m : methods) {
             methodDisplayNames.add(helper.getMethodDisplayName(m));

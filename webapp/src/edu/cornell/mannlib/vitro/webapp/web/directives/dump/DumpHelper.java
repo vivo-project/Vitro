@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,12 +24,17 @@ import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.directives.BaseTemplateDirectiveModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 import freemarker.core.Environment;
+import freemarker.ext.beans.BeanModel;
+import freemarker.ext.beans.BeansWrapper;
+import freemarker.ext.beans.WrapperExtractor;
+import freemarker.template.Configuration;
 import freemarker.template.TemplateBooleanModel;
 import freemarker.template.TemplateDateModel;
 import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 import freemarker.template.TemplateNumberModel;
+import freemarker.template.TemplateScalarModel;
 import freemarker.template.TemplateSequenceModel;
 import freemarker.template.utility.DeepUnwrap;
 
@@ -49,9 +56,9 @@ public class DumpHelper {
     private Map<String, Object> getVariableDumpData(String varName) {
         TemplateHashModel dataModel = env.getDataModel();
 
-        TemplateModel tm =  null;
+        TemplateModel wrappedModel =  null;
         try {
-            tm = dataModel.get(varName);
+            wrappedModel = dataModel.get(varName);
         } catch (TemplateModelException e) {
             log.error("Error getting value of template model '" + varName + "' from data model.");
         }
@@ -59,20 +66,20 @@ public class DumpHelper {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("var", varName);
         
-        // DON'T return null if tm == null. We still want to return the map to the template.
-        if (tm != null) {   
+        // DON'T return null if wrappedModel == null. We still want to return the map to the template.
+        if (wrappedModel != null) {   
             Object unwrappedModel = null;
             try {
-                unwrappedModel = DeepUnwrap.permissiveUnwrap(tm);
+                unwrappedModel = DeepUnwrap.permissiveUnwrap(wrappedModel);
             } catch (TemplateModelException e) {
                 log.error("Cannot unwrap template model  " + varName + ".");
                 return null;
             }
             
             // Just use toString() method for now. Handles nested collections. Could make more sophisticated later.
-            // tm.toString() gives wrong results in the case of, e.g., a boolean value in a hash. tm.toString() may
+            // wrappedModel.toString() gives wrong results in the case of, e.g., a boolean value in a hash. tm.toString() may
             // return a TemplateBooleanModel object, while unwrappedModel.toString() returns "true" or "false."
-            String value = unwrappedModel.toString(); // tm.toString();
+            String value = unwrappedModel.toString(); // wrappedModel.toString();
             String className = unwrappedModel.getClass().getName();
             String type = null;
             
@@ -82,29 +89,32 @@ public class DumpHelper {
             // information about the object (available methods, for example) that it is helpful to
             // view in the dump. Not sure if we should handle our application-specific, non-template
             // model objects in the same way. For now, these get assigned a shorthand type below.
+            
+            // if (wrappedModel instanceof TemplateHashModelEx) - 
+            // a subcase of this is unwrappedModel instanceof BaseTemplateModel
             if (unwrappedModel instanceof BaseTemplateModel) {
-                map.putAll(getTemplateModelValues((BaseTemplateModel)unwrappedModel)); 
+                map.putAll(getTemplateModelValues(wrappedModel, (BaseTemplateModel)unwrappedModel)); 
                 type = className;
-            // Can't use this, because tm of (at least some) POJOs are
+            // Do TemplateHashModel case first, because wrappedModel of (at least some) POJOs are
             // StringModels, which are both TemplateScalarModels and TemplateHashModels
-            // if (tm instanceof TemplateScalarModel)
-            } else if (unwrappedModel instanceof String) {
+            } else if (wrappedModel instanceof TemplateHashModel) {
+                type = "Hash";
+            } else if (wrappedModel instanceof TemplateScalarModel) {
                 type = "String";
-            } else if (tm instanceof TemplateDateModel) { 
+            } else if (wrappedModel instanceof TemplateDateModel) { 
                 type = "Date";
-            } else if (tm instanceof TemplateNumberModel) {
+            } else if (wrappedModel instanceof TemplateNumberModel) {
                 type = "Number";
-            } else if (tm instanceof TemplateBooleanModel) {
+            } else if (wrappedModel instanceof TemplateBooleanModel) {
                 type = "Boolean";
                 try {
-                    value = ((TemplateBooleanModel) tm).getAsBoolean() ? "true" : "false";
+                    value = ((TemplateBooleanModel) wrappedModel).getAsBoolean() ? "true" : "false";
                 } catch (TemplateModelException e) {
                     log.error("Error getting boolean value for " + varName + ".");
                 }
-            } else if (tm instanceof TemplateSequenceModel){
+            } else if (wrappedModel instanceof TemplateSequenceModel){
                 type = "Sequence";
-            } else if (tm instanceof TemplateHashModel) {
-                type = "Hash";
+
             } else {
                 // One of the above cases should have applied. Just in case not, show the Java class name.
                 type = className;
@@ -142,34 +152,62 @@ public class DumpHelper {
         }          
     }
     
-    protected List<Method> getMethodsAvailableToTemplate(Class<?> cls) {
+    protected List<Method> getMethodsAvailableToTemplate(TemplateModel wrappedModel, Class<?> cls) {       
+        int exposureLevel = getExposureLevel(wrappedModel, cls);
+        return getMethodsAvailableToTemplate(exposureLevel, cls);
+    }
+    
+    private int getExposureLevel(TemplateModel model, Class<?> cls) {
+        
+        int exposureLevel;
+        // Get the exposure level of the BeansWrapper that wrapped this object.
+        if (model instanceof BeanModel) {
+            exposureLevel = WrapperExtractor.getWrapperExposureLevel((BeanModel) model);
+            log.debug("Exposure level for class " + cls.getCanonicalName() + " wrapped as " + model.getClass() + " = " + exposureLevel);
+        // We don't expect to get here, since we are dealing only with BaseTemplateModel objects, which get wrapped into BeanModel objects, 
+        // but it's here as a safety net.
+        } else {
+            HttpServletRequest request = (HttpServletRequest) env.getCustomAttribute("request");
+            Configuration config = (Configuration) request.getAttribute("freemarkerConfig");
+            BeansWrapper wrapper = (BeansWrapper) config.getObjectWrapper();
+            exposureLevel = WrapperExtractor.getWrapperExposureLevel(wrapper);
+            log.debug("Class " + cls.getCanonicalName() + " wrapped as " + model.getClass() + " uses default exposure level " + exposureLevel);
+        }
+        
+        return exposureLevel;
+    }
+    
+    private List<Method> getMethodsAvailableToTemplate(int exposureLevel, Class<?> cls) {
         List<Method> methods = new ArrayList<Method>();
-
+        
         // Go up the class hierarchy only as far as the immediate subclass of BaseTemplateModel
         if (! cls.getName().equals("edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel")) {
-            methods = getDeclaredPublicMethods(cls);
-            methods.addAll(getMethodsAvailableToTemplate(cls.getSuperclass()));
+            methods = getDeclaredMethodsAvailableToTemplate(exposureLevel, cls);
+            methods.addAll(getMethodsAvailableToTemplate(exposureLevel, cls.getSuperclass()));
         }
         
         return methods;
     }
-
-    private List<Method> getDeclaredPublicMethods(Class<?> cls) {
+        
+    private List<Method> getDeclaredMethodsAvailableToTemplate(int exposureLevel, Class<?> cls) {
         
         List<Method> methods = new ArrayList<Method>();
         Method[] declaredMethods = cls.getDeclaredMethods();
-        for (Method m : declaredMethods) {
-            int mod = m.getModifiers();
+        for (Method method : declaredMethods) {
+            int mod = method.getModifiers();
             if (Modifier.isPublic(mod) && !Modifier.isStatic(mod)) {
-                // If the method takes args, make sure the BeanWrapper used makes this method visible.
-                // RY It may not be possible to determine this.
-                methods.add(m);
+                Class<?>[] params = method.getParameterTypes();
+                // If the method takes arguments, then it is not available to the template unless
+                // the exposure level of the BeansWrapper that wrapped the object allows it. 
+                if (params.length > 0 && exposureLevel > BeansWrapper.EXPOSE_SAFE) {                    
+                    continue;
+                }
+                methods.add(method);
             }
         }
         return methods;
     }
     
-
     protected String getMethodDisplayName(Method method) {
         String methodName = method.getName();
         Class<?>[] paramTypes = method.getParameterTypes();
@@ -190,20 +228,21 @@ public class DumpHelper {
         }
         
         return methodName;        
-    }    
+    }
     
-    private Map<String, Object> getTemplateModelValues(BaseTemplateModel model) {
+    private Map<String, Object> getTemplateModelValues(TemplateModel wrappedModel, BaseTemplateModel unwrappedModel) {
+        int exposureLevel = getExposureLevel(wrappedModel, unwrappedModel.getClass());
+        return getTemplateModelValues(unwrappedModel, exposureLevel);      
+    }
+    
+    private Map<String, Object> getTemplateModelValues(BaseTemplateModel model, int exposureLevel) {
         Map<String, Object> map = new HashMap<String, Object>();   
-        map.put("value", model.dump());
+        map.put("value", model.toString());
         
-        List<Method> publicMethods = getMethodsAvailableToTemplate(model.getClass());        
+        List<Method> publicMethods = getMethodsAvailableToTemplate(exposureLevel, model.getClass());        
         SortedMap<String, String> properties = new TreeMap<String, String>();
         List<String> methods = new ArrayList<String>();
         for (Method method : publicMethods) {
-            // Don't include the dump method, since this is used above to provide the value of the object.
-            if (method.getName().equals("dump")) {
-                continue;
-            }
             String key = getMethodDisplayName(method);           
             if (key.endsWith(")")) {
                 methods.add(key);
@@ -212,18 +251,13 @@ public class DumpHelper {
                     Object result = method.invoke(model);
                     String value;
                     if (result ==  null) {
-                        value = "null";  // distinguish a null from an empty string
+                        value = "null";
                     } else if (result instanceof BaseTemplateModel) {
-                       value = getTemplateModelDump((BaseTemplateModel)result); 
+                       value = getTemplateModelDump((BaseTemplateModel)result, exposureLevel); 
                     } else {
-                        value = result.toString();
-                        if (value.isEmpty()) {
-                            value = "(empty string)";
-                        } else {
-                            // Don't use ?html in the template, because then the output of
-                            // getTemplateModelDump, which is html, gets escaped too.
-                            value = StringEscapeUtils.escapeHtml(value);
-                        }
+                        // Don't use ?html in the template, because then the output of
+                        // getTemplateModelDump, which is html, gets escaped too.
+                        value = StringEscapeUtils.escapeHtml(result.toString());
                     }
                     properties.put(key, value);
                 } catch (Exception e) {
@@ -240,8 +274,8 @@ public class DumpHelper {
         return map;
     }
     
-    private String getTemplateModelDump(BaseTemplateModel model) {
-        Map<String, Object> map = getTemplateModelValues(model);       
+    private String getTemplateModelDump(BaseTemplateModel model, int exposureLevel) {
+        Map<String, Object> map = getTemplateModelValues(model, exposureLevel);       
         return BaseTemplateDirectiveModel.processTemplateToString("dump-var.ftl", map, env);
     }
 
