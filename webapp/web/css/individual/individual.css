@@ -21,6 +21,7 @@
 #admin a.edit-individual {
     padding-left: 0;
     border-left: none;
+    padding-top: 7px;
 }
 #verbosePropertyForm{
     float: right;
