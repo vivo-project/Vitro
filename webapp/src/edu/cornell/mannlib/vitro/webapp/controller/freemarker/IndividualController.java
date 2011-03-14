@@ -177,7 +177,7 @@ public class IndividualController extends FreemarkerHttpServlet {
             
             map = new HashMap<String, Object>();
             map.put("verboseFieldValue", String.valueOf(!verbosePropertyDisplayValue)); // the form toggles the current value
-            map.put("action", ""); // FIX THIS - 
+            map.put("action", vreq.getRequestURI());
             map.put("currentValue", verbosePropertyDisplayValue ? "on" : "off");
             map.put("newValue", verbosePropertyDisplayValue ? "off" : "on");
         } else {
