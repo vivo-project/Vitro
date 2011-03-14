@@ -20,9 +20,7 @@
     <div id="photo-wrapper">${individualImage}</div>
     
     <section id="individual-info" ${infoClass!} role="region">
-        <#if individual.showAdminPanel>
-               <#include "individual-adminPanel.ftl">
-        </#if>
+        <#include "individual-adminPanel.ftl">
         
         <header>
             <#if relatedSubject??>
