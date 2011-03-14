@@ -10,10 +10,13 @@
             <#assign formId = "verbosePropertyForm">
             <form id="${formId}" action="${verbosePropertyForm.action}#${formId}" method="get">
                 <input type="hidden" name="verbose" value="${verbosePropertyForm.verboseFieldValue}" />
-                <span>Verbose property display for this session is <b>${verbosePropertyForm.currentValue}</b></span>
-                <input type="submit" id="submit" value="Turn ${verbosePropertyForm.newValue}" />
+                
+                <span>Verbose property display is <b>${verbosePropertyForm.currentValue}</b> | </span>
+                
+                <input type="submit" id="submit" class="small" value="Turn ${verbosePropertyForm.newValue}" />
             </form>  
-        </#if>
+        </#if> 
+        </form>
     
         <p class="uri-link">Resource URI: <a href="${individual.uri}" target="_blank">${individual.uri}</a></p>
     </section>

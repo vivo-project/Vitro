@@ -11,14 +11,23 @@
     padding: 3px 6px 3px 10px;
     margin-bottom: 5px;
     font-size: 14px;
+    float: left;
 }
 #admin .uri-link {
     padding-left: 11px;
     padding-bottom: 5px;
+    clear: left;
 }
 #admin a.edit-individual {
-    padding-left: 5px;
+    padding-left: 0;
     border-left: none;
+}
+#verbosePropertyForm{
+    float: right;
+    padding-left: 10px;
+}
+#verbosePropertyForm .small {
+    padding: 2px 4px 3px;
 }
 /* <------ INDIVIDUAL INTRO FOR ANY CLASS*/
 #individual-intro {
