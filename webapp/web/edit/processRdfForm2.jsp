@@ -318,7 +318,7 @@ are well formed.
     // get the model to write to here in case a preprocessor has switched the write layer
     OntModel writeModel = editConfig.getWriteModelSelector().getModel(request,application);  
    
-    String editorUri = EditN3Utils.getEditorUri(vreq,session,application); 
+    String editorUri = EditN3Utils.getEditorUri(vreq); 
     Lock lock = null;
     try{
         lock =  writeModel.getLock();
