@@ -8,16 +8,15 @@
         
         <#if verbosePropertyForm??>
             <#assign formId = "verbosePropertyForm">
-            <form id="${formId}" action="${verbosePropertyForm.action}#${formId}" method="get">
-                <input type="hidden" name="verbose" value="${verbosePropertyForm.verboseFieldValue}" />
-                
-                <span>Verbose property display is <b>${verbosePropertyForm.currentValue}</b> | </span>
-                
-                <input type="submit" id="submit" class="small" value="Turn ${verbosePropertyForm.newValue}" />
+            <#assign currentValue = verbosePropertyForm.currentValue?string("on", "off")>
+            <#assign newValue = verbosePropertyForm.currentValue?string("off", "on")>
+            <form id="${formId}" action="${verbosePropertyForm.action}#${formId}" method="${verbosePropertyForm.method}">
+                <input type="hidden" name="verbose" value="${verbosePropertyForm.newValue}" />
+                <span>Verbose property display is <b>${currentValue}</b> | </span>
+                <input type="submit" id="submit" class="small" value="Turn ${newValue}" />
             </form>  
         </#if> 
-        </form>
-    
+
         <p class="uri-link">Resource URI: <a href="${individual.uri}" target="_blank">${individual.uri}</a></p>
     </section>
 </#if>

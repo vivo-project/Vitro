@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -41,7 +42,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RdfResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
@@ -163,23 +163,29 @@ public class IndividualController extends FreemarkerHttpServlet {
         if (loginBean.isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
             // Get current verbose property display value
             String verbose = vreq.getParameter("verbose");
-            Boolean verbosePropertyDisplayValue;
+            Boolean verboseValue;
             // If the form was submitted, get that value
             if (verbose != null) {
-                verbosePropertyDisplayValue = "true".equals(verbose);
+                verboseValue = "true".equals(verbose);
             // If form not submitted, get the session value
             } else {
                 Boolean verbosePropertyDisplayValueInSession = (Boolean) vreq.getSession().getAttribute("verbosePropertyDisplay"); 
                 // True if session value is true, otherwise (session value is false or null) false
-                verbosePropertyDisplayValue = Boolean.TRUE.equals(verbosePropertyDisplayValueInSession);           
+                verboseValue = Boolean.TRUE.equals(verbosePropertyDisplayValueInSession);           
             }
-            vreq.getSession().setAttribute("verbosePropertyDisplay", verbosePropertyDisplayValue);
+            vreq.getSession().setAttribute("verbosePropertyDisplay", verboseValue);
             
             map = new HashMap<String, Object>();
-            map.put("verboseFieldValue", String.valueOf(!verbosePropertyDisplayValue)); // the form toggles the current value
-            map.put("action", vreq.getRequestURI());
-            map.put("currentValue", verbosePropertyDisplayValue ? "on" : "off");
-            map.put("newValue", verbosePropertyDisplayValue ? "off" : "on");
+            String formAction = vreq.getRequestURI();
+            String queryString = vreq.getQueryString();
+            if (! StringUtils.isBlank(queryString)) {
+                formAction += "?" + queryString;
+            }
+            map.put("action", formAction);
+            // Use post since we are appending query string to form action.
+            map.put("method", "post");
+            map.put("currentValue", verboseValue);
+            map.put("newValue", String.valueOf(!verboseValue)); 
         } else {
             vreq.getSession().setAttribute("verbosePropertyDisplay", false);
         }
