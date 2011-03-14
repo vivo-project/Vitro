@@ -41,7 +41,7 @@ public interface Searcher {
      * @param q
      * @return
      */
-    public abstract VitroHighlighter getHighlighter(VitroQuery q);
+ //   public abstract VitroHighlighter getHighlighter(VitroQuery q);
 
     /**
      * Used to close the searcher if the index that it was using gets

@@ -28,6 +28,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanClause;
@@ -69,7 +70,6 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.SimpleLuceneHighlighter;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.Html2Text;
 import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
@@ -157,6 +157,9 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
+    	
+    	log.info("All parameters present in the request: "+ vreq.getParameterMap().toString());
+    	
         //There may be other non-html formats in the future
         Format format = getFormat(vreq);            
         boolean wasXmlRequested = Format.XML == format;
@@ -177,6 +180,10 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
             VClassGroupDao grpDao = vreq.getWebappDaoFactory().getVClassGroupDao();
             VClassDao vclassDao = vreq.getWebappDaoFactory().getVClassDao();
             String alphaFilter = vreq.getParameter("alpha");
+            
+            
+            log.info("IndividualDao is " + iDao.toString() + " Public classes in the classgroup are " + grpDao.getPublicGroupsWithVClasses().toString());
+            log.info("VClassDao is "+ vclassDao.toString() );
             
             int startIndex = 0;
             try{ 
@@ -206,6 +213,8 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
             String qtxt = vreq.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
             Analyzer analyzer = getAnalyzer(getServletContext());
             
+            log.info("Query text is "+ qtxt + " Analyzer is "+ analyzer.toString());
+            
             Query query = null;
             try {
                 query = getQuery(vreq, portalFlag, analyzer, qtxt);
@@ -218,6 +227,8 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
                                                 
             TopDocs topDocs = null;
             try{
+            	log.info("Searching for query term in the Index with maxHitSize "+ maxHitSize);
+            	log.info("Query is "+ query.toString());
                 topDocs = searcherForRequest.search(query,null,maxHitSize);
             }catch(Throwable t){
                 log.error("in first pass at search: " + t);
@@ -241,7 +252,9 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
                 return doFailedSearch(msg, qtxt,format);
             }
             
+            
             int hitsLength = topDocs.scoreDocs.length;
+            log.info("No. of hits "+ hitsLength);
             if ( hitsLength < 1 ){                
                 return doNoHits(qtxt,format);
             }            
@@ -260,6 +273,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
                     if( (i >= startIndex) && (i <= lastHitToShow) ){                        
                         Document doc = searcherForRequest.doc(topDocs.scoreDocs[i].doc);                    
                         String uri = doc.get(Entity2LuceneDoc.term.URI);
+                        log.info("Retrieving entity with uri "+ uri);
                         Individual ent = new IndividualImpl();
                         ent.setURI(uri);
                         ent = iDao.getIndividualByURI(uri);
@@ -582,11 +596,20 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
                         "query length is " + MAX_QUERY_LENGTH );
                 return null;
             }               
+            
+            log.info("Parsing query using QueryParser ");
+            
             QueryParser parser = getQueryParser(analyzer);
             query = parser.parse(querystr);
 
             String alpha = request.getParameter("alpha");
+            
+            
             if( alpha != null && !"".equals(alpha) && alpha.length() == 1){
+            	
+            	log.info("Firing alpha query ");
+            	log.info("request.getParameter(alpha) is " + alpha);
+            	
                 BooleanQuery boolQuery = new BooleanQuery();
                 boolQuery.add( query, BooleanClause.Occur.MUST );
                 boolQuery.add( 
@@ -597,7 +620,11 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
             
             //check if this is classgroup filtered
             Object param = request.getParameter("classgroup");
-            if( param != null && !"".equals(param)){                         
+            if( param != null && !"".equals(param)){
+            	
+            	log.info("Firing classgroup query ");
+                log.info("request.getParameter(classgroup) is "+ param.toString());
+
                   BooleanQuery boolQuery = new BooleanQuery();
                   boolQuery.add( query, BooleanClause.Occur.MUST);
                   boolQuery.add(  new TermQuery(
@@ -609,8 +636,11 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
 
             //check if this is rdf:type filtered
             param = request.getParameter("type");
-            if(  param != null && !"".equals(param)){                
-                BooleanQuery boolQuery = new BooleanQuery();
+            if(  param != null && !"".equals(param)){                         
+            	log.info("Firing type query ");
+            	log.info("request.getParameter(type) is "+ param.toString());   
+                
+            	BooleanQuery boolQuery = new BooleanQuery();
                 boolQuery.add( query, BooleanClause.Occur.MUST);
                 boolQuery.add(  new TermQuery(
                                     new Term(Entity2LuceneDoc.term.RDFTYPE, 
@@ -623,6 +653,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
             //it by making a BooelanQuery.
             Query flagQuery = makeFlagQuery( portalState );
             if( flagQuery != null ){
+            	log.info("Firing Flag query ");
                 BooleanQuery boolQuery = new BooleanQuery();
                 boolQuery.add( query, BooleanClause.Occur.MUST);
                 boolQuery.add( flagQuery, BooleanClause.Occur.MUST);
@@ -646,14 +677,17 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
         //indicated in the query string.
         //The analyzer is needed so that we use the same analyzer on the search queries as
         //was used on the text that was indexed.
-        QueryParser qp = new QueryParser(defaultSearchField,analyzer);
+    	//QueryParser qp = new QueryParser("NAME",analyzer);
         //this sets the query parser to AND all of the query terms it finds.
-        qp.setDefaultOperator(QueryParser.AND_OPERATOR);
+        //qp.setDefaultOperator(QueryParser.AND_OPERATOR);
         //set up the map of stemmed field names -> unstemmed field names
 //        HashMap<String,String> map = new HashMap<String, String>();
 //        map.put(Entity2LuceneDoc.term.ALLTEXT,Entity2LuceneDoc.term.ALLTEXTUNSTEMMED);
 //        qp.setStemmedToUnstemmed(map);
-        return qp;
+    	
+    	MultiFieldQueryParser qp = new MultiFieldQueryParser(new String[]{"ALLTEXT", "name", "type"}, analyzer);
+    	
+    	return qp;
     }
  
     /**

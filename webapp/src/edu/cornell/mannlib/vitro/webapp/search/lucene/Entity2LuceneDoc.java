@@ -149,16 +149,21 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
                 if( clz.getSearchBoost() != null )
                     doc.setBoost( doc.getBoost() + clz.getSearchBoost() );
                 
-                doc.add( new Field(term.RDFTYPE, clz.getURI(), 
-                                    Field.Store.YES, Field.Index.NOT_ANALYZED));
+                Field typeField = new Field (term.RDFTYPE, clz.getName(), Field.Store.YES, Field.Index.ANALYZED);
+                typeField.setBoost(2*FIELD_BOOST);
+                
+                doc.add( typeField);
                 
                 if( clz.getName() != null )
                     classPublicNames = classPublicNames + " " + clz.getName();
                 
                 //Classgroup URI
-                if( clz.getGroupURI() != null )
-                    doc.add( new Field(term.CLASSGROUP_URI, clz.getGroupURI(), 
-                                        Field.Store.YES, Field.Index.NOT_ANALYZED));
+                if( clz.getGroupURI() != null ){
+                	Field classGroupField = new Field(term.CLASSGROUP_URI, clz.getGroupURI(), 
+                            Field.Store.YES, Field.Index.ANALYZED);
+                	classGroupField.setBoost(FIELD_BOOST);
+                    doc.add(classGroupField);
+                }
             }
         }        
         doc.add( new Field(term.PROHIBITED_FROM_TEXT_RESULTS, prohibited?"1":"0", 
@@ -184,7 +189,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
             value = ent.getLocalName();
         }
         Field name =new Field(term.NAME, value, 
-                               Field.Store.NO, Field.Index.ANALYZED);
+                               Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.YES);
         name.setBoost( NAME_BOOST );
         doc.add( name );
         
@@ -238,7 +243,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
             }
         }catch (Exception ex){
             value = null;
-        }
+        } 
         if( value != null )
             doc.add( new Field(term.SUNSET, value, Field.Store.YES, Field.Index.NOT_ANALYZED));
         else
@@ -308,9 +313,9 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
                 }
             }
             //stemmed terms
-            doc.add( new  Field(term.ALLTEXT, value , Field.Store.NO, Field.Index.ANALYZED));
+            doc.add( new  Field(term.ALLTEXT, value , Field.Store.NO, Field.Index.ANALYZED, Field.TermVector.YES));
             //unstemmed terms
-            doc.add( new Field(term.ALLTEXTUNSTEMMED, value, Field.Store.NO, Field.Index.ANALYZED));
+            doc.add( new Field(term.ALLTEXTUNSTEMMED, value, Field.Store.NO, Field.Index.ANALYZED, Field.TermVector.YES));
         }
         
         //flagX and portal flags are no longer indexed.
@@ -359,6 +364,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         this.classesProhibitedFromSearch = classesProhibitedFromSearch;
     }
     
-    public static float NAME_BOOST = 10;
-    public static float KEYWORD_BOOST = 2;
+    public static float NAME_BOOST = 3.0F;
+    public static float KEYWORD_BOOST = 2.0F;
+    public static float FIELD_BOOST = 1.0F;
 }

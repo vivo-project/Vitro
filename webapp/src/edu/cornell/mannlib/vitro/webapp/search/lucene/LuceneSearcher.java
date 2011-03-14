@@ -306,7 +306,7 @@ public class LuceneSearcher implements Searcher {
      * we need to 'rewrite' the query.  That takes any wild cards
      * and replaces them will all terms that are found in the index.
      */
-    public VitroHighlighter getHighlighter(VitroQuery queryIn){
+/*    public VitroHighlighter getHighlighter(VitroQuery queryIn){
         if( ! (queryIn instanceof LuceneQuery) ){
             log.error("LuceneSearcher expects to get a LuceneQuery");
             throw new Error("LuceneSearcher expects to get a LuceneQuery");
@@ -327,6 +327,6 @@ public class LuceneSearcher implements Searcher {
             log.error(e, e);
         }
         return   (VitroHighlighter)highlighter;
-    }
+    }*/
 
 }
