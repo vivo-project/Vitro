@@ -97,6 +97,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
     private int defaultMaxSearchSize= 1000;   
     
     protected static final Map<Format,Map<Result,String>> templateTable;
+	private static final float QUERY_BOOST = 2.0F;
     
     protected enum Format{ 
         HTML, XML; 
@@ -229,7 +230,12 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
             try{
             	log.info("Searching for query term in the Index with maxHitSize "+ maxHitSize);
             	log.info("Query is "+ query.toString());
-                topDocs = searcherForRequest.search(query,null,maxHitSize);
+            	
+            	//sets the query boost for the query. the lucene docs matching this query term
+            	//are multiplied by QUERY_BOOST to get their total score
+            	query.setBoost(QUERY_BOOST);
+                
+            	topDocs = searcherForRequest.search(query,null,maxHitSize);
             }catch(Throwable t){
                 log.error("in first pass at search: " + t);
                 // this is a hack to deal with odd cases where search and index threads interact
