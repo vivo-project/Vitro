@@ -152,16 +152,15 @@ name will be used as the label. -->
 <#macro verboseDisplay property>
     <#local verboseDisplay = property.verboseDisplay!>
     <#if verboseDisplay?has_content>       
-        <span class="verbosePropertyListing">
+        <section class="verbosePropertyListing">
             <a class="propertyLink" href="${verboseDisplay.propertyEditUrl}">${verboseDisplay.localName}</a> 
-            (${property.type?lower_case} property);
-            display tier: ${verboseDisplay.displayTier}; 
-            display level: ${verboseDisplay.displayLevel};
-            update level: ${verboseDisplay.updateLevel}
-        </span>
+            (<span>${property.type?lower_case}</span> property);
+            order in group: <span>${verboseDisplay.displayTier};</span> 
+            display level: <span>${verboseDisplay.displayLevel};</span>
+            update level: <span>${verboseDisplay.updateLevel}</span>
+        </section>
     </#if>
 </#macro>
-
 
 <#-----------------------------------------------------------------------------
     Macros for specific properties

@@ -368,3 +368,9 @@ a.edit-mainImage img.edit-individual {
     font-size: 0.8em;
     background: #f4f4f4;
 }
+/* VERBOSE DISPLAY------>  */
+section.verbosePropertyListing {
+    display: inline-block;
+    background-color: #eaebec;
+    padding: 10px;
+}
