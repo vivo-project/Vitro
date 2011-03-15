@@ -82,8 +82,9 @@ we need to also show the property label. If no label is specified, the property
 name will be used as the label. -->
 <#macro addLinkWithLabel property editable label="${property.name?capitalize}" extraParams="">
     <#local addLink><@addLink property editable label extraParams /></#local>
-    <#if addLink?has_content>
-        <h2 id="${property.localName}">${label} ${addLink} <@verboseDisplay property /></h2>         
+    <#local verboseDisplay><@verboseDisplay property /></#local>
+    <#if addLink?has_content || verboseDisplay?has_content>
+        <h2 id="${property.localName}">${label} ${addLink!} ${verboseDisplay!}</h2>         
     </#if>
 </#macro>
 

@@ -125,7 +125,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     		body.put("relatedSubject", getRelatedSubject(vreq));
     		body.put("namespaces", namespaces);
     		body.put("temporalVisualizationEnabled", getTemporalVisualizationFlag());
-    		body.put("verbosePropertyForm", getVerbosePropertyValues(vreq));
+    		body.put("verbosePropertyForm", getVerbosePropertyFormValues(vreq));
     		
     		IndividualTemplateModel itm = getIndividualTemplateModel(vreq, individual);
     		/* We need to expose non-getters in displaying the individual's property list, 
@@ -154,7 +154,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	    EditSubmission.clearAllEditSubmissionsInSession(session);
     }
     
-    private Map<String, Object> getVerbosePropertyValues(VitroRequest vreq) {
+    private Map<String, Object> getVerbosePropertyFormValues(VitroRequest vreq) {
         
         Map<String, Object> map = null;
         
