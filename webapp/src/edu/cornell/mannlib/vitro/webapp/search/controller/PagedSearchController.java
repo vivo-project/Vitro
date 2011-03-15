@@ -691,7 +691,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
 //        map.put(Entity2LuceneDoc.term.ALLTEXT,Entity2LuceneDoc.term.ALLTEXTUNSTEMMED);
 //        qp.setStemmedToUnstemmed(map);
     	
-    	MultiFieldQueryParser qp = new MultiFieldQueryParser(new String[]{"ALLTEXT", "name", "type"}, analyzer);
+    	MultiFieldQueryParser qp = new MultiFieldQueryParser(new String[]{"ALLTEXT", "name", "type", "moniker"}, analyzer);
     	
     	return qp;
     }

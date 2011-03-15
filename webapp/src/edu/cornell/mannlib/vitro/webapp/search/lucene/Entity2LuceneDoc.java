@@ -63,6 +63,8 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         public static String SUNSET="SUNSET";
         /** time of sunrise/start of entity in yyyymmddhhmm  */
         public static String SUNRISE="SUNRISE";
+        /** entity's moniker */
+        public static String MONIKER="moniker";
         /** text for 'full text' search, this is stemmed */
         public static String ALLTEXT    = "ALLTEXT";
         /** text for 'full text' search, this is unstemmed for
@@ -189,7 +191,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
             value = ent.getLocalName();
         }
         Field name =new Field(term.NAME, value, 
-                               Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.YES);
+                               Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
         name.setBoost( NAME_BOOST );
         doc.add( name );
         
@@ -203,6 +205,15 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         doc.add( nameUnanalyzed );
         
         doc.add( new Field(term.NAMERAW, value, Field.Store.YES, Field.Index.NOT_ANALYZED));
+        
+        
+        //Moniker
+        
+        if(ent.getMoniker() != null){
+        	Field moniker = new Field(term.MONIKER, ent.getMoniker(), Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
+        	moniker.setBoost(MONIKER_BOOST);
+        	doc.add(moniker);
+        }
         
         //boost for entity
         if( ent.getSearchBoost() != null && ent.getSearchBoost() != 0 )
@@ -365,6 +376,6 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
     }
     
     public static float NAME_BOOST = 3.0F;
-    public static float KEYWORD_BOOST = 2.0F;
+    public static float MONIKER_BOOST = 2.0F;
     public static float FIELD_BOOST = 1.0F;
 }
