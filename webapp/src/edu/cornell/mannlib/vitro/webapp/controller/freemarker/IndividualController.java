@@ -177,13 +177,14 @@ public class IndividualController extends FreemarkerHttpServlet {
             
             map = new HashMap<String, Object>();
             String formAction = vreq.getRequestURI();
-            // The URL for an individual in a non-default namespace has a uri parameter to identify the individual.
+            // Append query string for current page, including uri param for individuals in non-default namespace.
             String queryString = vreq.getQueryString();
             if (! StringUtils.isBlank(queryString)) {
                 formAction += "?" + queryString;
             }
             map.put("action", formAction);
-            // Use post since we are appending the query string to form action.
+            // NB Query params on form action url not recognized for get (also makes processing easier, else
+            // we'd need to strip the verbose param out of the query string).
             map.put("method", "post");
             map.put("currentValue", verboseValue);
             map.put("newValue", String.valueOf(!verboseValue)); 

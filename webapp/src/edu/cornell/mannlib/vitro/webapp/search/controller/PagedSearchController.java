@@ -214,7 +214,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
             String qtxt = vreq.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
             Analyzer analyzer = getAnalyzer(getServletContext());
             
-            log.info("Query text is "+ qtxt + " Analyzer is "+ analyzer.toString());
+            log.debug("Query text is "+ qtxt + " Analyzer is "+ analyzer.toString());
             
             Query query = null;
             try {
