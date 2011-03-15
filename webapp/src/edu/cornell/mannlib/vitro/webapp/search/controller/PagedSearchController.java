@@ -159,7 +159,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
     	
-    	log.info("All parameters present in the request: "+ vreq.getParameterMap().toString());
+    	log.debug("All parameters present in the request: "+ vreq.getParameterMap().toString());
     	
         //There may be other non-html formats in the future
         Format format = getFormat(vreq);            
@@ -183,8 +183,8 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
             String alphaFilter = vreq.getParameter("alpha");
             
             
-            log.info("IndividualDao is " + iDao.toString() + " Public classes in the classgroup are " + grpDao.getPublicGroupsWithVClasses().toString());
-            log.info("VClassDao is "+ vclassDao.toString() );
+            log.debug("IndividualDao is " + iDao.toString() + " Public classes in the classgroup are " + grpDao.getPublicGroupsWithVClasses().toString());
+            log.debug("VClassDao is "+ vclassDao.toString() );
             
             int startIndex = 0;
             try{ 
@@ -228,8 +228,8 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
                                                 
             TopDocs topDocs = null;
             try{
-            	log.info("Searching for query term in the Index with maxHitSize "+ maxHitSize);
-            	log.info("Query is "+ query.toString());
+            	log.debug("Searching for query term in the Index with maxHitSize "+ maxHitSize);
+            	log.debug("Query is "+ query.toString());
             	
             	//sets the query boost for the query. the lucene docs matching this query term
             	//are multiplied by QUERY_BOOST to get their total score
@@ -260,7 +260,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
             
             
             int hitsLength = topDocs.scoreDocs.length;
-            log.info("No. of hits "+ hitsLength);
+            log.debug("No. of hits "+ hitsLength);
             if ( hitsLength < 1 ){                
                 return doNoHits(qtxt,format);
             }            
@@ -279,7 +279,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
                     if( (i >= startIndex) && (i <= lastHitToShow) ){                        
                         Document doc = searcherForRequest.doc(topDocs.scoreDocs[i].doc);                    
                         String uri = doc.get(Entity2LuceneDoc.term.URI);
-                        log.info("Retrieving entity with uri "+ uri);
+                        log.debug("Retrieving entity with uri "+ uri);
                         Individual ent = new IndividualImpl();
                         ent.setURI(uri);
                         ent = iDao.getIndividualByURI(uri);
@@ -603,7 +603,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
                 return null;
             }               
             
-            log.info("Parsing query using QueryParser ");
+            log.debug("Parsing query using QueryParser ");
             
             QueryParser parser = getQueryParser(analyzer);
             query = parser.parse(querystr);
@@ -613,8 +613,8 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
             
             if( alpha != null && !"".equals(alpha) && alpha.length() == 1){
             	
-            	log.info("Firing alpha query ");
-            	log.info("request.getParameter(alpha) is " + alpha);
+            	log.debug("Firing alpha query ");
+            	log.debug("request.getParameter(alpha) is " + alpha);
             	
                 BooleanQuery boolQuery = new BooleanQuery();
                 boolQuery.add( query, BooleanClause.Occur.MUST );
@@ -628,8 +628,8 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
             Object param = request.getParameter("classgroup");
             if( param != null && !"".equals(param)){
             	
-            	log.info("Firing classgroup query ");
-                log.info("request.getParameter(classgroup) is "+ param.toString());
+            	log.debug("Firing classgroup query ");
+                log.debug("request.getParameter(classgroup) is "+ param.toString());
 
                   BooleanQuery boolQuery = new BooleanQuery();
                   boolQuery.add( query, BooleanClause.Occur.MUST);
@@ -643,8 +643,8 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
             //check if this is rdf:type filtered
             param = request.getParameter("type");
             if(  param != null && !"".equals(param)){                         
-            	log.info("Firing type query ");
-            	log.info("request.getParameter(type) is "+ param.toString());   
+            	log.debug("Firing type query ");
+            	log.debug("request.getParameter(type) is "+ param.toString());   
                 
             	BooleanQuery boolQuery = new BooleanQuery();
                 boolQuery.add( query, BooleanClause.Occur.MUST);
@@ -659,7 +659,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
             //it by making a BooelanQuery.
             Query flagQuery = makeFlagQuery( portalState );
             if( flagQuery != null ){
-            	log.info("Firing Flag query ");
+            	log.debug("Firing Flag query ");
                 BooleanQuery boolQuery = new BooleanQuery();
                 boolQuery.add( query, BooleanClause.Occur.MUST);
                 boolQuery.add( flagQuery, BooleanClause.Occur.MUST);
