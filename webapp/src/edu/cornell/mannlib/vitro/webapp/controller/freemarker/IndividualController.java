@@ -125,7 +125,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     		body.put("relatedSubject", getRelatedSubject(vreq));
     		body.put("namespaces", namespaces);
     		body.put("temporalVisualizationEnabled", getTemporalVisualizationFlag());
-    		body.put("verbosePropertyForm", getVerbosePropertyFormValues(vreq));
+    		body.put("verbosePropertySwitch", getVerbosePropertyValues(vreq));
     		
     		IndividualTemplateModel itm = getIndividualTemplateModel(vreq, individual);
     		/* We need to expose non-getters in displaying the individual's property list, 
@@ -154,7 +154,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	    EditSubmission.clearAllEditSubmissionsInSession(session);
     }
     
-    private Map<String, Object> getVerbosePropertyFormValues(VitroRequest vreq) {
+    private Map<String, Object> getVerbosePropertyValues(VitroRequest vreq) {
         
         Map<String, Object> map = null;
         
@@ -176,18 +176,20 @@ public class IndividualController extends FreemarkerHttpServlet {
             vreq.getSession().setAttribute("verbosePropertyDisplay", verboseValue);
             
             map = new HashMap<String, Object>();
-            String formAction = vreq.getRequestURI();
-            // Append query string for current page, including uri param for individuals in non-default namespace.
-            String queryString = vreq.getQueryString();
-            if (! StringUtils.isBlank(queryString)) {
-                formAction += "?" + queryString;
-            }
-            map.put("action", formAction);
-            // NB Query params on form action url not recognized for get (also makes processing easier, else
-            // we'd need to strip the verbose param out of the query string).
-            map.put("method", "post");
             map.put("currentValue", verboseValue);
-            map.put("newValue", String.valueOf(!verboseValue)); 
+
+            String url = vreq.getRequestURI() + "?verbose=" + !verboseValue;
+            // Append request query string, except for current verbose value, to url
+            String queryString = vreq.getQueryString();
+            if (queryString != null) {
+                String[] params = queryString.split("&");
+                for (String param : params) {
+                    if (! param.startsWith("verbose=")) {
+                        url += "&" + param;
+                    }
+                }
+            }
+            map.put("url", url);            
         } else {
             vreq.getSession().setAttribute("verbosePropertyDisplay", false);
         }
