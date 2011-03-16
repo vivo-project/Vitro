@@ -16,14 +16,13 @@ package edu.cornell.mannlib.vitro.webapp.web;
 */
 
 /*
+ * THIS CODE HAS BEEN MODIFIED:
+ * The members of the Vitro/VIVO project have modified this code.  It has
+ * been modified from the version produced by Google Inc.
+ * 
  * The code in this file is from the Google data API project 1.40.3 on 2010-03-08.
- * See full license from gdata at bottom of this file. 
- * The Vitro project only uses the method getBestContentType().
+ * See full license from gdata at bottom of this file.  
  */
-
-//package com.google.gdata.util;
-
-//import com.google.gdata.client.Service;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -215,6 +214,26 @@ public class ContentType implements Serializable {
   */
  public static final ContentType ANY = new ContentType("*/*").lock();
 
+ 
+
+ /**
+  * A ContetType that describes RDF/XML.
+  * Added by Brian Caruso for VIVO.
+  */
+ public final static ContentType RDFXML = new ContentType("application/rdf+xml").lock();
+ 
+ /**
+  * A ContetType that describes N3 RDF, this is unofficial and unregistered
+  * Added by Brian Caruso for VIVO.
+  */
+ public final static ContentType N3 = new ContentType("text/n3").lock(); 
+ 
+ /**
+  * A ContetType that describes turtle RDF, this is unofficial and unregistered
+  * Added by Brian Caruso for VIVO.
+  */
+ public final static ContentType TURTLE = new ContentType("text/turtle").lock(); 
+
  /**
   * Determines the best "Content-Type" header to use in a servlet response
   * based on the "Accept" header from a servlet request.
@@ -301,6 +320,81 @@ public class ContentType implements Serializable {
    return null;
  }
 
+/**
+ * Gets the best content type based weighted q from client accept header and 
+ * the server weighted q of the extent that the type conveys the resource.
+ * 
+ * From suggestions by Tim Berners-Lee at http://www.w3.org/DesignIssues/Conneg
+ * 
+ * @param clentAcceptsTypes types the client can accept with Q weights.
+ * @param serverTypes types the server can provide with Q weights.
+ * @return returns content type of best match or null if no match.
+ */
+ public static String getBestContentType(
+         Map<String, Float> clientAcceptsTypes,
+         Map<String, Float> serverTypes) {
+     float maxQ = 0.0f;
+     String type = null;
+     for( String serverType:  serverTypes.keySet()){
+         float serverQ = serverTypes.get(serverType);
+         Float clientQ = clientAcceptsTypes.get(serverType);
+         if( clientQ != null && ((serverQ * clientQ)+ 0.001) > (maxQ + 0.001) ){
+             maxQ = (serverQ * clientQ);
+             type = serverType;
+         }
+     }     
+     return type;
+ }
+ 
+ /**
+  * This method was added by Brian Caruso of the VIVO project. March 15 2011.
+  * 
+  * @param acceptHeader
+  * @return the types and the q values from the accept header
+  */
+ public static Map<String,Float> getTypesAndQ(String acceptHeader){
+     if (acceptHeader == null) {
+       return Collections.emptyMap();
+     }
+
+     Map<String,Float> qcMap = new HashMap<String,Float>();
+     // iterate over all of the accepted content types
+     String[] acceptedTypes = acceptHeader.split(",");
+     for (String acceptedTypeString : acceptedTypes) {
+
+       // create the content type object
+       ContentType acceptedContentType;
+       try {
+         acceptedContentType = new ContentType(acceptedTypeString.trim());
+       } catch (IllegalArgumentException ex) {
+         // ignore exception
+         continue;
+       }
+
+       // parse the "q" value (default of 1)
+       float curQ = 1;
+       try {
+         String qAttr = acceptedContentType.getAttribute("q");
+         if (qAttr != null) {
+           float qValue = Float.valueOf(qAttr);
+           if (qValue <= 0 || qValue > 1) {
+             continue;
+           }
+           curQ = qValue + 0.0001F;
+         }
+       } catch (NumberFormatException ex) {
+         // ignore exception
+         continue;
+       }
+       
+       if( acceptedContentType != null ){
+           qcMap.put(acceptedContentType.getMediaType(), curQ);
+       }
+     }
+     
+     return qcMap;
+ }
+ 
 /**
   * Constructs a new instance with default media type
   */
@@ -407,6 +501,8 @@ public class ContentType implements Serializable {
    return sb.toString();
  }
 
+ private Float q=1.0f;
+ 
  private HashMap<String, String> attributes = new HashMap<String, String>();
 
  /**
@@ -445,6 +541,17 @@ public class ContentType implements Serializable {
    return attributes.get(name);
  }
 
+ /**
+  * returns q associated with content type. 
+  */
+ public float getQ(){
+     return q;
+ }
+ 
+ public void setQ(float q){
+     this.q = q;
+ }
+ 
  /*
   * Returns the charset attribute of the content type or null if the
   * attribute has not been set.
@@ -545,6 +652,7 @@ public class ContentType implements Serializable {
    return (type.hashCode() * 31 + subType.hashCode()) * 31 + attributes
        .hashCode();
  }
+
 }
 /*
 

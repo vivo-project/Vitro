@@ -81,7 +81,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     
     private static final String TEMPLATE_INDIVIDUAL_DEFAULT = "individual.ftl";
     private static final String TEMPLATE_HELP = "individual-help.ftl";
-    
+    private static Map<String,Float>qsMap;
     
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
@@ -486,42 +486,36 @@ public class IndividualController extends FreemarkerHttpServlet {
      */
 	protected ContentType checkForLinkedDataRequest(String url, VitroRequest vreq ) {		
 		try {
-		    ContentType contentType = null;
 		    Matcher m;
 		    // Check for url param specifying format
 		    String formatParam = (String) vreq.getParameter("format");
 		    if (formatParam != null) {
 		        m = RDFXML_FORMAT.matcher(formatParam);
 		        if ( m.matches() ) {
-		            return new ContentType(RDFXML_MIMETYPE);
+		            return  ContentType.RDFXML;
 		        }
 	            m = N3_FORMAT.matcher(formatParam);
 	            if( m.matches() ) {
-	                return new ContentType(N3_MIMETYPE);
+	                return  ContentType.N3;
 	            }
 	            m = TTL_FORMAT.matcher(formatParam);
 	            if( m.matches() ) {
-	                return new ContentType(TTL_MIMETYPE);
+	                return  ContentType.TURTLE;
 	            } 		        
 		    }
 		    
 			//check the accept header
 		    String acceptHeader = vreq.getHeader("accept");
-			if (acceptHeader != null) {
-				List<ContentType> actualContentTypes = new ArrayList<ContentType>();				
-				actualContentTypes.add(new ContentType( XHTML_MIMETYPE ));
-				actualContentTypes.add(new ContentType( HTML_MIMETYPE ));				
-				
-				actualContentTypes.add(new ContentType( RDFXML_MIMETYPE ));
-				actualContentTypes.add(new ContentType( N3_MIMETYPE ));
-				actualContentTypes.add(new ContentType( TTL_MIMETYPE ));
-			
-				contentType = ContentType.getBestContentType(acceptHeader,actualContentTypes);
-				if (contentType!=null && (
-						RDFXML_MIMETYPE.equals(contentType.getMediaType()) || 
-						N3_MIMETYPE.equals(contentType.getMediaType()) ||
-						TTL_MIMETYPE.equals(contentType.getMediaType()) ))
-					return contentType;				
+			if (acceptHeader != null) {			    
+				String ctStr = ContentType.getBestContentType(
+				        ContentType.getTypesAndQ(acceptHeader), 
+				        getAcceptedContentTypes());
+								
+				if (ctStr!=null && (
+						RDFXML_MIMETYPE.equals(ctStr) || 
+						N3_MIMETYPE.equals(ctStr) ||
+						TTL_MIMETYPE.equals(ctStr) ))
+					return new ContentType(ctStr);				
 			}
 			
 			/*
@@ -532,15 +526,15 @@ public class IndividualController extends FreemarkerHttpServlet {
 			 */
 	        m = RDF_REQUEST.matcher(url);
 	        if( m.matches() ) {
-	            return new ContentType(RDFXML_MIMETYPE);
+	            return ContentType.RDFXML;
 	        }
 	        m = N3_REQUEST.matcher(url);
 	        if( m.matches() ) {
-	            return new ContentType(N3_MIMETYPE);
+	            return ContentType.N3;
 	        }
 	        m = TTL_REQUEST.matcher(url);
 	        if( m.matches() ) {
-	            return new ContentType(TTL_MIMETYPE);
+	            return ContentType.TURTLE;
 	        }    
 			
 			
@@ -550,10 +544,6 @@ public class IndividualController extends FreemarkerHttpServlet {
 		return null;
 	}  
 	
-	private ContentType getContentTypeFromString(String string) {
-
-        return null;
-	}
 
 	@SuppressWarnings("unused")
 	private boolean checkForSunset(VitroRequest vreq, Individual entity) {
@@ -750,4 +740,21 @@ public class IndividualController extends FreemarkerHttpServlet {
         return new TemplateResponseValues(Template.TITLED_ERROR_MESSAGE.toString(), body);
     }
 
+    public static Map<String, Float> getAcceptedContentTypes() {
+        if( qsMap == null ){
+            HashMap<String,Float> map = new HashMap<String,Float>();
+            map.put(HTML_MIMETYPE , 0.5f);
+            map.put(XHTML_MIMETYPE, 0.5f);
+            map.put("application/xml", 0.5f);
+            map.put(RDFXML_MIMETYPE, 1.0f);
+            map.put(N3_MIMETYPE, 1.0f);
+            map.put(TTL_MIMETYPE, 1.0f);
+            qsMap = map;
+        }
+        return qsMap;
+    }
+    
+//    static String getAcceptedContentType(String acceptHeader,Map<String,Float>qs){
+//        
+//    }
 }
