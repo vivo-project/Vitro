@@ -178,6 +178,18 @@ public class IndividualController extends FreemarkerHttpServlet {
             map = new HashMap<String, Object>();
             map.put("currentValue", verboseValue);
 
+            /* Factors contributing to switching from a form to an anchor element:
+               - Can't use GET with a query string on the action unless there is no form data, since
+                 the form data is appended to the action with a "?", so there can't already be a query string
+                 on it.
+               - The browser (at least Firefox) does not submit a form that has no form data.
+               - Some browsers might strip the query string off the form action of a POST - though 
+                 probably they shouldn't, because the HTML spec allows a full URI as a form action.
+               - Given these three, the only reliable solution is to dynamically create hidden inputs
+                 for the query parameters. 
+               - Much simpler is to just create an anchor element. This has the added advantage that the
+                 browser doesn't ask to resend the form data when reloading the page.
+             */
             String url = vreq.getRequestURI() + "?verbose=" + !verboseValue;
             // Append request query string, except for current verbose value, to url
             String queryString = vreq.getQueryString();
