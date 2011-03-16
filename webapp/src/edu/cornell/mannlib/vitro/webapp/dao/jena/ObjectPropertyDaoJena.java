@@ -894,7 +894,9 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             String uri = resource.getURI();
             log.debug("Found populated object property " + uri);
             ObjectProperty property = getObjectPropertyByURI(uri);
-            properties.add(property);
+            if (property != null) {
+                properties.add(property);
+            }
         }
         return properties; 
     }
