@@ -112,6 +112,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         Document doc = new Document();
         String classPublicNames = "";
         
+        
         //DocId
         String id = ent.getURI();
         log.debug("translating " + id);
@@ -152,7 +153,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
                     doc.setBoost( doc.getBoost() + clz.getSearchBoost() );
                 
                 Field typeField = new Field (term.RDFTYPE, clz.getName(), Field.Store.YES, Field.Index.ANALYZED);
-                typeField.setBoost(2*FIELD_BOOST);
+                //typeField.setBoost(2*FIELD_BOOST);
                 
                 doc.add( typeField);
                 
@@ -163,7 +164,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
                 if( clz.getGroupURI() != null ){
                 	Field classGroupField = new Field(term.CLASSGROUP_URI, clz.getGroupURI(), 
                             Field.Store.YES, Field.Index.ANALYZED);
-                	classGroupField.setBoost(FIELD_BOOST);
+                //	classGroupField.setBoost(FIELD_BOOST);
                     doc.add(classGroupField);
                 }
             }
@@ -192,12 +193,12 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         }
         Field name =new Field(term.NAME, value, 
                                Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
-        name.setBoost( NAME_BOOST );
+       // name.setBoost( NAME_BOOST );
         doc.add( name );
         
         Field nameUn = new Field(term.NAMEUNSTEMMED, value, 
         						Field.Store.NO, Field.Index.ANALYZED);        
-        nameUn.setBoost( NAME_BOOST );
+       // nameUn.setBoost( NAME_BOOST );
         doc.add( nameUn );
 
         Field nameUnanalyzed = new Field(term.NAMELOWERCASE, value.toLowerCase(), 
@@ -211,7 +212,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         
         if(ent.getMoniker() != null){
         	Field moniker = new Field(term.MONIKER, ent.getMoniker(), Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
-        	moniker.setBoost(MONIKER_BOOST);
+        //	moniker.setBoost(MONIKER_BOOST);
         	doc.add(moniker);
         }
         
@@ -227,38 +228,6 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
             value=  (new DateTime()).toString(LuceneIndexer.MODTIME_DATE_FORMAT) ;
         }
         doc.add(  new Field(term.MODTIME, value , Field.Store.YES, Field.Index.NOT_ANALYZED));
-
-        //do sunrise and sunset. set to 'null' if not found
-        // which would indicate that it was sunrised at the beginning of
-        // time or sunset at the end of time.
-        try{
-            value = null;
-            if( ent.getSunrise() != null ){
-                value = (new DateTime(ent.getSunrise().getTime()))
-                    .toString(LuceneIndexer.DATE_FORMAT);
-            }
-        }catch (Exception ex){
-            value = null;
-        }
-        if( value != null )
-            doc.add( new Field(term.SUNRISE, value, Field.Store.YES, Field.Index.NOT_ANALYZED));
-        else
-            doc.add(new Field(term.SUNRISE, earliestTime, Field.Store.YES, Field.Index.NOT_ANALYZED));
-        
-        /* Sunset */
-        try{
-            value = null;
-            if( ent.getSunset() != null ){
-                value = (new DateTime(ent.getSunset().getTime()))
-                    .toString(LuceneIndexer.DATE_FORMAT);
-            }
-        }catch (Exception ex){
-            value = null;
-        } 
-        if( value != null )
-            doc.add( new Field(term.SUNSET, value, Field.Store.YES, Field.Index.NOT_ANALYZED));
-        else
-            doc.add(new Field(term.SUNSET, latestTime, Field.Store.YES, Field.Index.NOT_ANALYZED));
         
         /* timekey */
         try{
@@ -271,17 +240,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
             log.error("could not save timekey " + ex);            
         }        
         
-        /* thumbnail */
-        try{
-            value = null;
-            if( ent.hasThumb() )
-                doc.add(new Field(term.THUMBNAIL, "1", Field.Store.YES, Field.Index.NOT_ANALYZED));
-            else
-                doc.add(new Field(term.THUMBNAIL, "0", Field.Store.YES, Field.Index.NOT_ANALYZED));
-        }catch(Exception ex){
-            log.debug("could not index thumbnail: " + ex);
-        }
-        
+
         //time of index in millis past epoc
         Object anon[] =  { new Long((new DateTime() ).getMillis())  };
         doc.add(  new Field(term.INDEXEDTIME, String.format( "%019d", anon ),
