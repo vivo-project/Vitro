@@ -263,7 +263,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         urls.put("login", urlBuilder.getLoginUrl());          
         urls.put("logout", urlBuilder.getLogoutUrl());       
         urls.put("siteAdmin", urlBuilder.getPortalUrl(Route.SITE_ADMIN));  
-        urls.put("siteIcons", urlBuilder.getPortalUrl(themeDir + "/site_icons")); // deprecated
         urls.put("themeImages", urlBuilder.getPortalUrl(themeDir + "/images"));
         urls.put("images", UrlBuilder.getUrl("/images"));
         urls.put("theme", UrlBuilder.getUrl(themeDir));
