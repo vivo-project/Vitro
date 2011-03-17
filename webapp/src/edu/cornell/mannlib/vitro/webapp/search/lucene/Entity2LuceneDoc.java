@@ -192,15 +192,14 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
             value = ent.getLocalName();
         }
         Field name =new Field(term.NAME, value, 
-                               Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
-       // name.setBoost( NAME_BOOST );
+                               Field.Store.YES, Field.Index.ANALYZED);
         doc.add( name );
         
         Field nameUn = new Field(term.NAMEUNSTEMMED, value, 
         						Field.Store.NO, Field.Index.ANALYZED);        
-       // nameUn.setBoost( NAME_BOOST );
         doc.add( nameUn );
 
+        // BK nameunanalyzed is used by IndividualListController
         Field nameUnanalyzed = new Field(term.NAMELOWERCASE, value.toLowerCase(), 
 				Field.Store.YES, Field.Index.NOT_ANALYZED);        
         doc.add( nameUnanalyzed );
@@ -211,8 +210,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         //Moniker
         
         if(ent.getMoniker() != null){
-        	Field moniker = new Field(term.MONIKER, ent.getMoniker(), Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.WITH_POSITIONS_OFFSETS);
-        //	moniker.setBoost(MONIKER_BOOST);
+        	Field moniker = new Field(term.MONIKER, ent.getMoniker(), Field.Store.YES, Field.Index.ANALYZED);
         	doc.add(moniker);
         }
         
@@ -240,7 +238,18 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
             log.error("could not save timekey " + ex);            
         }        
         
-
+        /* thumbnail */
+        try{
+            value = null;
+            if( ent.hasThumb() )
+                doc.add(new Field(term.THUMBNAIL, "1", Field.Store.YES, Field.Index.NOT_ANALYZED));
+            else
+                doc.add(new Field(term.THUMBNAIL, "0", Field.Store.YES, Field.Index.NOT_ANALYZED));
+        }catch(Exception ex){
+            log.debug("could not index thumbnail: " + ex);
+        }
+                        
+        
         //time of index in millis past epoc
         Object anon[] =  { new Long((new DateTime() ).getMillis())  };
         doc.add(  new Field(term.INDEXEDTIME, String.format( "%019d", anon ),
@@ -283,9 +292,9 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
                 }
             }
             //stemmed terms
-            doc.add( new  Field(term.ALLTEXT, value , Field.Store.NO, Field.Index.ANALYZED, Field.TermVector.YES));
+            doc.add( new  Field(term.ALLTEXT, value , Field.Store.NO, Field.Index.ANALYZED));
             //unstemmed terms
-            doc.add( new Field(term.ALLTEXTUNSTEMMED, value, Field.Store.NO, Field.Index.ANALYZED, Field.TermVector.YES));
+            doc.add( new Field(term.ALLTEXTUNSTEMMED, value, Field.Store.NO, Field.Index.ANALYZED));
         }
         
         //flagX and portal flags are no longer indexed.

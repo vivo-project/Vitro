@@ -233,7 +233,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
             	
             	//sets the query boost for the query. the lucene docs matching this query term
             	//are multiplied by QUERY_BOOST to get their total score
-            	query.setBoost(QUERY_BOOST);
+            	//query.setBoost(QUERY_BOOST);
                 
             	topDocs = searcherForRequest.search(query,null,maxHitSize);
             }catch(Throwable t){
@@ -685,13 +685,14 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
         //was used on the text that was indexed.
     	//QueryParser qp = new QueryParser("NAME",analyzer);
         //this sets the query parser to AND all of the query terms it finds.
-        //qp.setDefaultOperator(QueryParser.AND_OPERATOR);
         //set up the map of stemmed field names -> unstemmed field names
 //        HashMap<String,String> map = new HashMap<String, String>();
 //        map.put(Entity2LuceneDoc.term.ALLTEXT,Entity2LuceneDoc.term.ALLTEXTUNSTEMMED);
 //        qp.setStemmedToUnstemmed(map);
     	
-    	MultiFieldQueryParser qp = new MultiFieldQueryParser(new String[]{"ALLTEXT", "name", "type", "moniker"}, analyzer);
+    	MultiFieldQueryParser qp = new MultiFieldQueryParser(new String[]{ "name", "nameunstemmed", "type", "moniker", "ALLTEXT", "ALLTEXTUNSTEMMED", "nameraw" }, analyzer);
+        qp.setDefaultOperator(QueryParser.AND_OPERATOR);
+
     	
     	return qp;
     }
