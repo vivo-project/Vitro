@@ -152,7 +152,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
                 if( clz.getSearchBoost() != null )
                     doc.setBoost( doc.getBoost() + clz.getSearchBoost() );
                 
-                Field typeField = new Field (term.RDFTYPE, clz.getName(), Field.Store.YES, Field.Index.ANALYZED);
+                Field typeField = new Field (term.RDFTYPE, clz.getURI(), Field.Store.YES, Field.Index.NOT_ANALYZED);
                 //typeField.setBoost(2*FIELD_BOOST);
                 
                 doc.add( typeField);
@@ -163,7 +163,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
                 //Classgroup URI
                 if( clz.getGroupURI() != null ){
                 	Field classGroupField = new Field(term.CLASSGROUP_URI, clz.getGroupURI(), 
-                            Field.Store.YES, Field.Index.ANALYZED);
+                            Field.Store.YES, Field.Index.NOT_ANALYZED);
                 //	classGroupField.setBoost(FIELD_BOOST);
                     doc.add(classGroupField);
                 }
