@@ -147,7 +147,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
    //up an editing form.
    //Note that we do not want this behavior for the delete link (handled above).
    if ( (predicateUri != null) && (objectUri != null) && (wdf.getObjectPropertyDao().skipEditForm(predicateUri)) ) {
-       System.out.println("redirecting for predicate " + predicateUri);
+       log.debug("redirecting for predicate " + predicateUri);
        %><c:redirect url="/individual">
              <c:param name="uri" value="${param.objectUri}"/>
              <c:param name="relatedSubjectUri" value="${param.subjectUri}"/>

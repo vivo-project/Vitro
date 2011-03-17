@@ -41,7 +41,7 @@ import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 import freemarker.template.Configuration;
 
 /**
- * AutocompleteController is used to generate autocomplete and select element content
+ * AutocompleteController is used to generate autocomplete content
  * through a Lucene search. 
  */
 
@@ -73,15 +73,7 @@ public class AutocompleteController extends VitroAjaxController {
         PortalFlag portalFlag = vreq.getPortalFlag();
         
         try {
- 
-            // make sure an IndividualDao is available
-            if( vreq.getWebappDaoFactory() == null 
-                    || vreq.getWebappDaoFactory().getIndividualDao() == null ){
-                log.error("makeUsableBeans() could not get IndividualDao ");
-                doSearchError(map, config, vreq, response);
-                return;
-            }                    
-            
+
             int maxHitSize = defaultMaxSearchSize;
             
             String qtxt = vreq.getParameter(QUERY_PARAMETER_NAME);
@@ -156,14 +148,6 @@ public class AutocompleteController extends VitroAjaxController {
         }
     }
 
-//    private String getIndexDir(ServletContext servletContext) throws SearchException {
-//        Object obj = servletContext.getAttribute(LuceneSetup.INDEX_DIR);
-//        if( obj == null || !(obj instanceof String) )
-//            throw new SearchException("Could not get IndexDir for lucene index");
-//        else
-//            return (String)obj;
-//    }
-
     private Analyzer getAnalyzer(ServletContext servletContext) throws SearchException {
         Object obj = servletContext.getAttribute(LuceneSetup.ANALYZER);
         if( obj == null || !(obj instanceof Analyzer) )
@@ -200,18 +184,6 @@ public class AutocompleteController extends VitroAjaxController {
                 boolQuery.add(query, BooleanClause.Occur.MUST);
                 query = boolQuery;
             }
-
-            //if we have a flag/portal query then we add
-            //it by making a BooelanQuery.
-            // RY 7/24/10 Temporarily commenting out for now because we're suddenly getting portal:2
-            // thrown onto the query. Will need to investigate post-launch of NIHVIVO 1.1.
-//            Query flagQuery = makeFlagQuery( portalState );
-//            if( flagQuery != null ){
-//                BooleanQuery boolQuery = new BooleanQuery();
-//                boolQuery.add( query, BooleanClause.Occur.MUST);
-//                boolQuery.add( flagQuery, BooleanClause.Occur.MUST);
-//                query = boolQuery;
-//            }
             
         } catch (Exception ex){
             throw new SearchException(ex.getMessage());
@@ -269,58 +241,8 @@ public class AutocompleteController extends VitroAjaxController {
         } catch (ParseException e) {
             log.warn(e, e);
         }
-        
-        
-        return boolQuery;
-        
-/*       
-        Query query = null;
-        
-        // The search index is lowercased
-        querystr = querystr.toLowerCase();
-        
-        List<String> terms = Arrays.asList(querystr.split("[, ]+"));
-        for (Iterator<String> i = terms.iterator(); i.hasNext(); ) {
-            String term = (String) i.next();
-            BooleanQuery boolQuery = new BooleanQuery(); 
-            // All items but last get a regular term query
-            if (i.hasNext()) {                
-                boolQuery.add( 
-                        new TermQuery(new Term(termName, term)),
-                        BooleanClause.Occur.MUST);  
-                if (query != null) {
-                    boolQuery.add(query, BooleanClause.Occur.MUST);
-                }
-                query = boolQuery;                          
-            }
-            // Last term
-            else {
-                // If the last token of the query string ends in a word-delimiting character
-                // it should not get a wildcard query term.
-                // E.g., "Dickens," should match "Dickens" but not "Dickenson"
-                Pattern p = Pattern.compile("\\W$");
-                Matcher m = p.matcher(querystr);
-                boolean lastTermIsWildcard = !m.find();
-                
-                if (lastTermIsWildcard) {
-                    log.debug("Adding wildcard query on last term");
-                    boolQuery.add( 
-                            new WildcardQuery(new Term(termName, term + "*")),
-                            BooleanClause.Occur.MUST);                 
-                } else {
-                    log.debug("Adding term query on last term");
-                    boolQuery.add( 
-                            new TermQuery(new Term(termName, term)),
-                            BooleanClause.Occur.MUST);                    
-                }
-                if (query != null) {
-                    boolQuery.add(query, BooleanClause.Occur.MUST); 
-                }
-                query = boolQuery;
-            }
-        }
-        return query;
-*/        
+       
+        return boolQuery;  
     }
 
     private Query makeUntokenizedNameQuery(String querystr) {
