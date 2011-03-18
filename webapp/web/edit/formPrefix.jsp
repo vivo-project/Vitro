@@ -43,8 +43,6 @@ FreemarkerHttpServlet.getFreemarkerComponentsForJsp(request);
         <link rel="stylesheet" type="text/css" href="<c:url value="${cssFile}"/>" media="screen"/>
     </c:forEach>
     
-    <link rel="stylesheet" type="text/css" href="<c:url value="/js/jquery_plugins/thickbox/thickbox.css"/>" />
-    
     ${ftl_head}
     
     <c:if test="${!empty scripts}"><jsp:include page="${scripts}"/></c:if>
