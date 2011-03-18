@@ -100,7 +100,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         
         // Get the config for this object property
         try {
-            config = new PropertyListConfig(op, vreq);
+            config = new PropertyListConfig(op, vreq, policyHelper);
         } catch (InvalidConfigurationException e) {
             throw e;
         } catch (Exception e) {
@@ -325,6 +325,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private static final String NODE_NAME_TEMPLATE = "template";
         private static final String NODE_NAME_POSTPROCESSOR = "postprocessor";
         private static final String NODE_NAME_COLLATION_FRAGMENT = "collation-fragment";
+        private static final String NODE_NAME_LINKED_INDIVIDUAL_OPTIONAL = "linked-individual-optional";
 
         /* NB The default post-processor is not the same as the post-processor for the default view. The latter
          * actually defines its own post-processor, whereas the default post-processor is used for custom views
@@ -339,7 +340,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private String templateName;
         private ObjectPropertyDataPostProcessor postprocessor = null;
 
-        PropertyListConfig(ObjectProperty op, VitroRequest vreq) 
+        PropertyListConfig(ObjectProperty op, VitroRequest vreq, EditingPolicyHelper policyHelper) 
             throws InvalidConfigurationException {
 
             // Get the custom config filename
@@ -359,7 +360,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                     configFilePath = getConfigFilePath(DEFAULT_CONFIG_FILE_NAME);
                     // Should we test for the existence of the default, and throw an error if it doesn't exist?
                 }                   
-                setValuesFromConfigFile(configFilePath, op, vreq.getWebappDaoFactory());           
+                setValuesFromConfigFile(configFilePath, op, vreq.getWebappDaoFactory(), policyHelper);           
 
             } catch (Exception e) {
                 log.error("Error processing config file " + configFilePath + " for object property " + op.getURI(), e);
@@ -379,7 +380,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                             " in " + configFilePath + ":\n" +                            
                             configError + " Using default config instead.");
                     configFilePath = getConfigFilePath(DEFAULT_CONFIG_FILE_NAME);
-                    setValuesFromConfigFile(configFilePath, op, vreq.getWebappDaoFactory());                    
+                    setValuesFromConfigFile(configFilePath, op, vreq.getWebappDaoFactory(), policyHelper);                    
                 }
             }
             
@@ -418,7 +419,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             return null;
         }
         
-        private void setValuesFromConfigFile(String configFilePath, ObjectProperty op, WebappDaoFactory wdf) {
+        private void setValuesFromConfigFile(String configFilePath, ObjectProperty op, WebappDaoFactory wdf, 
+                EditingPolicyHelper policyHelper) {
             
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db;
@@ -429,7 +431,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                 String propertyUri = op.getURI();
                 
                 // Required values
-                selectQuery = getSelectQuery(doc, propertyUri);
+                selectQuery = getSelectQuery(doc, propertyUri, policyHelper);
                 
                 templateName = getConfigValue(doc, NODE_NAME_TEMPLATE, propertyUri); 
                 
@@ -457,21 +459,31 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             }            
         }
         
-        private String getSelectQuery(Document doc, String propertyUri) {
+        private String getSelectQuery(Document doc, String propertyUri, EditingPolicyHelper policyHelper) {
             Node selectQueryNode = doc.getElementsByTagName(NODE_NAME_QUERY_SELECT).item(0);
             String value = null;
             if (selectQueryNode != null) {
                 boolean removeCollationFragments = ObjectPropertyTemplateModel.this instanceof UncollatedObjectPropertyTemplateModel;
+                /* If editing the page (policyHelper != null), show statements with missing linked individual; otherwise, hide these
+                 * statements. We might want to refine this based on whether the user can edit the statement in question, but that
+                 * would require a completely different approach: including the statement in the query results, and then during the 
+                 * postprocessing phase, checking the editing policy, and  removing the statement if it's not editable. We would not
+                 * preprocess the query, as here.
+                 */
+                boolean linkedIndividualOptional = policyHelper != null;
                 NodeList children = selectQueryNode.getChildNodes();
                 int childCount = children.getLength();
                 value = "";
                 for (int i = 0; i < childCount; i++) {
                     Node node = children.item(i);    
                     if (node.getNodeName().equals(NODE_NAME_COLLATION_FRAGMENT)) {
-                        if (removeCollationFragments) {
-                            continue;
+                        if (!removeCollationFragments) {
+                            value += node.getChildNodes().item(0).getNodeValue();
+                        }                        
+                    } else if (node.getNodeName().equals(NODE_NAME_LINKED_INDIVIDUAL_OPTIONAL)) {
+                        if (linkedIndividualOptional) {
+                            value += node.getChildNodes().item(0).getNodeValue();
                         }
-                        value += node.getChildNodes().item(0).getNodeValue();
                     } else {
                         value += node.getNodeValue();
                     }     
