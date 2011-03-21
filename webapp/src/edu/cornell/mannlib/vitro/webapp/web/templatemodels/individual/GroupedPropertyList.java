@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -100,8 +101,39 @@ public class GroupedPropertyList extends BaseTemplateModel {
         for (PropertyGroup propertyGroup: propertyGroupList) {
             groups.add(new PropertyGroupTemplateModel(vreq, propertyGroup, subject, 
                     policyHelper, populatedDataPropertyList, populatedObjectPropertyList));
-        }   
+        }  
+        
+        if (!editing) {
+            pruneEmptyProperties();
+        }
     
+    }
+    
+    // It's possible that a collated object property retrieved in the call to getPopulatedObjectPropertyList()
+    // is now empty of statements, because if not editing, some statements without a linked individual
+    // are not retrieved by the query. (See <linked-individual-required> elements in queries.)
+    // Remove these properties, and also remove any groups with no remaining properties. 
+    private void pruneEmptyProperties() {
+        Iterator<PropertyGroupTemplateModel> iGroups = groups.iterator();
+        while (iGroups.hasNext()) {
+            PropertyGroupTemplateModel pgtm = iGroups.next();
+            Iterator<PropertyTemplateModel> iProperties = pgtm.getProperties().iterator();
+            while (iProperties.hasNext()) {
+                PropertyTemplateModel property = iProperties.next();
+                if (property instanceof ObjectPropertyTemplateModel) {
+                    // It's not necessary to do comparable pruning of the subclass list
+                    // of a CollatedObjectPropertyTemplateModel, because the collated subclass
+                    // list is compiled on the basis of existing statements. There will not
+                    // be any empty subclasses.
+                    if ( ( (ObjectPropertyTemplateModel) property).isEmpty() ) {                        
+                        iProperties.remove();
+                    }
+                }
+            } 
+            if (pgtm.isEmpty()) {
+                iGroups.remove();
+            }
+        }        
     }
 
     @SuppressWarnings("unchecked")
@@ -417,14 +449,18 @@ public class GroupedPropertyList extends BaseTemplateModel {
     }
     
     public PropertyTemplateModel getPropertyAndRemoveFromList(String propertyUri) {
-
+        
         for (PropertyGroupTemplateModel pgtm : groups) {
             List<PropertyTemplateModel> properties = pgtm.getProperties();
             for (PropertyTemplateModel ptm : properties) {
                 if (propertyUri.equals(ptm.getUri())) { 
-                    // Remove the property from the group
+                    // Remove the property from the group.
+                    // NB Works with a for-each loop instead of an iterator, since
+                    // iteration doesn't continue after the remove.
                     properties.remove(ptm);
-                    // If this is the only property in the group, remove the group as well
+                    // If this is the only property in the group, remove the group as well.
+                    // NB Works with a for-each loop instead of an iterator, since
+                    // iteration doesn't continue after the remove.
                     if (properties.size() == 0) {
                         groups.remove(pgtm);   
                     }

@@ -118,6 +118,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         }
     }
     
+    protected abstract boolean isEmpty();
+    
     @Override 
     protected int getPropertyDisplayTier(Property p) {
         // For some reason ObjectProperty.getDomainDisplayTier() returns a String
@@ -324,8 +326,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private static final String NODE_NAME_QUERY_SELECT = "query-select";
         private static final String NODE_NAME_TEMPLATE = "template";
         private static final String NODE_NAME_POSTPROCESSOR = "postprocessor";
-        private static final String NODE_NAME_COLLATION_FRAGMENT = "collation-fragment";
-        private static final String NODE_NAME_LINKED_INDIVIDUAL_OPTIONAL = "linked-individual-optional";
+        private static final String NODE_NAME_COLLATED = "collated";
+        private static final String NODE_NAME_LINKED_INDIVIDUAL_REQUIRED = "linked-individual-required";
 
         /* NB The default post-processor is not the same as the post-processor for the default view. The latter
          * actually defines its own post-processor, whereas the default post-processor is used for custom views
@@ -463,27 +465,27 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             Node selectQueryNode = doc.getElementsByTagName(NODE_NAME_QUERY_SELECT).item(0);
             String value = null;
             if (selectQueryNode != null) {
-                boolean removeCollationFragments = ObjectPropertyTemplateModel.this instanceof UncollatedObjectPropertyTemplateModel;
-                /* If editing the page (policyHelper != null), show statements with missing linked individual; otherwise, hide these
+                boolean collated = ObjectPropertyTemplateModel.this instanceof CollatedObjectPropertyTemplateModel;
+                /* If not editing the page (policyHelper == null), hide statements with missing linked individual; otherwise, show these
                  * statements. We might want to refine this based on whether the user can edit the statement in question, but that
-                 * would require a completely different approach: including the statement in the query results, and then during the 
-                 * postprocessing phase, checking the editing policy, and  removing the statement if it's not editable. We would not
+                 * would require a completely different approach: include the statement in the query results, and then during the 
+                 * postprocessing phase, check the editing policy, and  remove the statement if it's not editable. We would not
                  * preprocess the query, as here.
                  */
-                boolean linkedIndividualOptional = policyHelper != null;
+                boolean linkedIndividualRequired = policyHelper == null;
                 NodeList children = selectQueryNode.getChildNodes();
                 int childCount = children.getLength();
                 value = "";
                 for (int i = 0; i < childCount; i++) {
                     Node node = children.item(i);    
-                    if (node.getNodeName().equals(NODE_NAME_COLLATION_FRAGMENT)) {
-                        if (!removeCollationFragments) {
+                    if (node.getNodeName().equals(NODE_NAME_COLLATED)) {
+                        if (collated) {
                             value += node.getChildNodes().item(0).getNodeValue();
-                        }                        
-                    } else if (node.getNodeName().equals(NODE_NAME_LINKED_INDIVIDUAL_OPTIONAL)) {
-                        if (linkedIndividualOptional) {
+                        } // else ignore this node                    
+                    } else if (node.getNodeName().equals(NODE_NAME_LINKED_INDIVIDUAL_REQUIRED)) {
+                        if (linkedIndividualRequired) {
                             value += node.getChildNodes().item(0).getNodeValue();
-                        }
+                        } // else ignore this node
                     } else {
                         value += node.getNodeValue();
                     }     

@@ -11,15 +11,15 @@
         PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;  
         PREFIX afn:  &lt;http://jena.hpl.hp.com/ARQ/function#&gt;
           
-        SELECT <collation-fragment> ?subclass </collation-fragment>
+        SELECT <collated> ?subclass </collated>
                ?object ?name ?moniker WHERE {
             ?subject ?property ?object
-            <collation-fragment> OPTIONAL { ?object a ?subclass } 
+            <collated> OPTIONAL { ?object a ?subclass } 
             FILTER ( afn:namespace(?subclass) != "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" )   
-            </collation-fragment>
+            </collated>
             OPTIONAL { ?object rdfs:label ?name }
             OPTIONAL { ?object vitro:moniker ?moniker }               
-        } ORDER BY <collation-fragment> ?subclass </collation-fragment> ?name ?object  
+        } ORDER BY <collated> ?subclass </collated> ?name ?object  
     </query-select>
 
     <query-construct>

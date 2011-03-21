@@ -82,6 +82,11 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         }
     }
     
+    @Override
+    protected boolean isEmpty() {
+        return subclasses.isEmpty();
+    }
+    
     protected ConfigError checkQuery(String queryString) {
         
         if (StringUtils.isBlank(queryString)) {

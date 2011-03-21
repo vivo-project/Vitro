@@ -55,6 +55,11 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
         }
     }
     
+    @Override
+    protected boolean isEmpty() {
+        return statements.isEmpty();
+    }
+    
     /* Access methods for templates */
 
     public List<ObjectPropertyStatementTemplateModel> getStatements() {
