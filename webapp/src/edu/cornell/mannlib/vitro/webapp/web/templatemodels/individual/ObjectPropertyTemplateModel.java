@@ -327,7 +327,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private static final String NODE_NAME_TEMPLATE = "template";
         private static final String NODE_NAME_POSTPROCESSOR = "postprocessor";
         private static final String NODE_NAME_COLLATED = "collated";
-        private static final String NODE_NAME_LINKED_INDIVIDUAL_REQUIRED = "linked-individual-required";
+        private static final String NODE_NAME_CRITICAL_DATA_REQUIRED = "critical-data-required";
 
         /* NB The default post-processor is not the same as the post-processor for the default view. The latter
          * actually defines its own post-processor, whereas the default post-processor is used for custom views
@@ -466,13 +466,14 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             String value = null;
             if (selectQueryNode != null) {
                 boolean collated = ObjectPropertyTemplateModel.this instanceof CollatedObjectPropertyTemplateModel;
-                /* If not editing the page (policyHelper == null), hide statements with missing linked individual; otherwise, show these
-                 * statements. We might want to refine this based on whether the user can edit the statement in question, but that
+                /* If not editing the page (policyHelper == null), hide statements with missing linked individual or other
+                 * critical information missing (e.g., anchor and url on a link); otherwise, show these statements.
+                 * We might want to refine this based on whether the user can edit the statement in question, but that
                  * would require a completely different approach: include the statement in the query results, and then during the 
                  * postprocessing phase, check the editing policy, and  remove the statement if it's not editable. We would not
                  * preprocess the query, as here.
                  */
-                boolean linkedIndividualRequired = policyHelper == null;
+                boolean criticalDataRequired = policyHelper == null;
                 NodeList children = selectQueryNode.getChildNodes();
                 int childCount = children.getLength();
                 value = "";
@@ -482,8 +483,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                         if (collated) {
                             value += node.getChildNodes().item(0).getNodeValue();
                         } // else ignore this node                    
-                    } else if (node.getNodeName().equals(NODE_NAME_LINKED_INDIVIDUAL_REQUIRED)) {
-                        if (linkedIndividualRequired) {
+                    } else if (node.getNodeName().equals(NODE_NAME_CRITICAL_DATA_REQUIRED)) {
+                        if (criticalDataRequired) {
                             value += node.getChildNodes().item(0).getNodeValue();
                         } // else ignore this node
                     } else {
