@@ -248,6 +248,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
             		
             		log.debug("Document title: "+ document.get(Entity2LuceneDoc.VitroLuceneTermNames.NAME) + " score: " +scoreDoc.score);
             		log.debug("Scoring of the doc explained " + explanation.toString());
+            		log.debug("Explanation's description "+ explanation.getDescription());
             	
             	}
             	
@@ -705,7 +706,8 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
 //        map.put(Entity2LuceneDoc.term.ALLTEXT,Entity2LuceneDoc.term.ALLTEXTUNSTEMMED);
 //        qp.setStemmedToUnstemmed(map);
     	
-    	MultiFieldQueryParser qp = new MultiFieldQueryParser(Version.LUCENE_29, new String[]{ "name", "nameunstemmed", "type", "moniker", "ALLTEXT", "ALLTEXTUNSTEMMED", "nameraw" }, analyzer);
+    	MultiFieldQueryParser qp = new MultiFieldQueryParser(Version.LUCENE_29, new String[]{ 
+    				"name", "nameunstemmed", "type", "moniker", "ALLTEXT", "ALLTEXTUNSTEMMED", "nameraw" , "classLocalName", "classLocalNameLowerCase" }, analyzer);
         qp.setDefaultOperator(QueryParser.AND_OPERATOR);
 
     	

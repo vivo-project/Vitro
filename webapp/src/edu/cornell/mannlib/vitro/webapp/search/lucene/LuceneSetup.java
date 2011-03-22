@@ -8,6 +8,9 @@ import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.Vi
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.NAMEUNSTEMMED;
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.MONIKER;
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.RDFTYPE;
+import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.CLASSLOCALNAME;
+import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.CLASSLOCALNAMELOWERCASE;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
+import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.util.Version;
@@ -231,7 +235,9 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
      * @return
      */
     private Analyzer getAnalyzer() {
-        PerFieldAnalyzerWrapper analyzer = new PerFieldAnalyzerWrapper( new StandardAnalyzer(Version.LUCENE_29));
+    	
+    	PerFieldAnalyzerWrapper analyzer = new PerFieldAnalyzerWrapper( new StandardAnalyzer(Version.LUCENE_29));
+    	
     	analyzer.addAnalyzer(ALLTEXT, new HtmlLowerStopStemAnalyzer());
     	analyzer.addAnalyzer(NAME, new HtmlLowerStopStemAnalyzer());
         analyzer.addAnalyzer(ALLTEXTUNSTEMMED, new HtmlLowerStopAnalyzer());
@@ -239,7 +245,9 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
         analyzer.addAnalyzer(NAME, new StandardAnalyzer(Version.LUCENE_29));
         analyzer.addAnalyzer(MONIKER, new StandardAnalyzer(Version.LUCENE_29));
         analyzer.addAnalyzer(RDFTYPE, new StandardAnalyzer(Version.LUCENE_29));
-         
+        analyzer.addAnalyzer(CLASSLOCALNAME, new HtmlLowerStopAnalyzer());
+        analyzer.addAnalyzer(CLASSLOCALNAMELOWERCASE, new HtmlLowerStopAnalyzer());
+        
         return analyzer;
     }
         

@@ -76,6 +76,10 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         public static final String THUMBNAIL = "THUMBNAIL";        
         /** Should individual be included in full text search results? 1=yes 0=no */
         public static final String PROHIBITED_FROM_TEXT_RESULTS = "PROHIBITED_FROM_TEXT_RESULTS";
+        /** class names in human readable form of an individual*/
+        public static final String CLASSLOCALNAMELOWERCASE = "classLocalNameLowerCase";
+        /** class names in human readable form of an individual*/
+        public static final String CLASSLOCALNAME = "classLocalName";        
     }
 
     private static final Log log = LogFactory.getLog(Entity2LuceneDoc.class.getName());
@@ -152,10 +156,15 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
                 if( clz.getSearchBoost() != null )
                     doc.setBoost( doc.getBoost() + clz.getSearchBoost() );
                 
-                Field typeField = new Field (term.RDFTYPE, clz.getURI(), Field.Store.YES, Field.Index.NOT_ANALYZED);
-                //typeField.setBoost(2*FIELD_BOOST);
-                
+                Field typeField = new Field (term.RDFTYPE, clz.getURI(), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS);
                 doc.add( typeField);
+                
+                if(clz.getLocalName() != null){
+                	Field classLocalName = new Field(term.CLASSLOCALNAME, clz.getLocalName(), Field.Store.YES, Field.Index.ANALYZED);
+                	Field classLocalNameLowerCase = new Field(term.CLASSLOCALNAMELOWERCASE, clz.getLocalName().toLowerCase(), Field.Store.YES, Field.Index.ANALYZED);
+                	doc.add(classLocalName);
+                	doc.add(classLocalNameLowerCase);
+                }
                 
                 if( clz.getName() != null )
                     classPublicNames = classPublicNames + " " + clz.getName();
@@ -163,7 +172,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
                 //Classgroup URI
                 if( clz.getGroupURI() != null ){
                 	Field classGroupField = new Field(term.CLASSGROUP_URI, clz.getGroupURI(), 
-                            Field.Store.YES, Field.Index.NOT_ANALYZED);
+                            Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS);
                 //	classGroupField.setBoost(FIELD_BOOST);
                     doc.add(classGroupField);
                 }
@@ -174,13 +183,13 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         
         /* lucene DOCID */
         doc.add( new Field(term.DOCID, entClassName + id,
-                            Field.Store.YES, Field.Index.NOT_ANALYZED));
+                            Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
 
         //vitro Id        
-        doc.add(  new Field(term.URI, id, Field.Store.YES, Field.Index.NOT_ANALYZED));        
+        doc.add(  new Field(term.URI, id, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));        
         
         //java class
-        doc.add( new  Field(term.JCLASS, entClassName, Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add( new  Field(term.JCLASS, entClassName, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
 
         //Entity Name        
         if( ent.getRdfsLabel() != null )
@@ -225,14 +234,14 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         } else {
             value=  (new DateTime()).toString(LuceneIndexer.MODTIME_DATE_FORMAT) ;
         }
-        doc.add(  new Field(term.MODTIME, value , Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(  new Field(term.MODTIME, value , Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
         
         /* timekey */
         try{
             value = null;
             if( ent.getTimekey() != null ){
                 value = (new DateTime(ent.getTimekey().getTime())).toString(LuceneIndexer.DATE_FORMAT);
-                doc.add(new Field(term.TIMEKEY, value, Field.Store.YES, Field.Index.NOT_ANALYZED));
+                doc.add(new Field(term.TIMEKEY, value, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
             }
         }catch(Exception ex){            
             log.error("could not save timekey " + ex);            
@@ -242,9 +251,9 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         try{
             value = null;
             if( ent.hasThumb() )
-                doc.add(new Field(term.THUMBNAIL, "1", Field.Store.YES, Field.Index.NOT_ANALYZED));
+                doc.add(new Field(term.THUMBNAIL, "1", Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
             else
-                doc.add(new Field(term.THUMBNAIL, "0", Field.Store.YES, Field.Index.NOT_ANALYZED));
+                doc.add(new Field(term.THUMBNAIL, "0", Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
         }catch(Exception ex){
             log.debug("could not index thumbnail: " + ex);
         }
@@ -253,7 +262,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         //time of index in millis past epoc
         Object anon[] =  { new Long((new DateTime() ).getMillis())  };
         doc.add(  new Field(term.INDEXEDTIME, String.format( "%019d", anon ),
-                            Field.Store.YES, Field.Index.NOT_ANALYZED));                 
+                            Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));                 
         
         if( ! prohibited ){
             //ALLTEXT, all of the 'full text'
