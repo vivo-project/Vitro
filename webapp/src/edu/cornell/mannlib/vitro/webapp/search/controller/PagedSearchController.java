@@ -33,8 +33,10 @@ import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.WildcardQuery;
@@ -237,6 +239,18 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
             	//query.setBoost(QUERY_BOOST);
                 
             	topDocs = searcherForRequest.search(query,null,maxHitSize);
+            	
+            	log.debug("Total hits for the query are "+ topDocs.totalHits);
+            	for(ScoreDoc scoreDoc : topDocs.scoreDocs){
+            		
+            		Document document = searcherForRequest.doc(scoreDoc.doc);
+            		Explanation explanation = searcherForRequest.explain(query, scoreDoc.doc);
+            		
+            		log.debug("Document title: "+ document.get(Entity2LuceneDoc.VitroLuceneTermNames.NAME) + " score: " +scoreDoc.score);
+            		log.debug("Scoring of the doc explained " + explanation.toString());
+            	
+            	}
+            	
             }catch(Throwable t){
                 log.error("in first pass at search: " + t);
                 // this is a hack to deal with odd cases where search and index threads interact
