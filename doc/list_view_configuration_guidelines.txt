@@ -69,41 +69,69 @@ other assertions, but DISTINCT provides a start at uniqueness.
 also be named as such. For a custom list view, the object can be given any name, but it must be 
 included in the SELECT terms retrieved by the query. This is the statement that will be edited 
 from the edit links.
-      
-- In a custom list view, it is generally necessary to provide for a missing linked individual, 
-due to the possibility of incomplete data. Make sure the query does the following:
-    - Enclose the clause for the linked individual in an OPTIONAL block. 
+
+
+------------------------------------------------------------
+Data which is required in public view, optional when editing
+------------------------------------------------------------
+
+- Incomplete data can result in a missing linked individual or other critical data (such as
+  a URL or anchor text on a link object). When the user has editing privileges on the page,
+  these statements are displayed so that the user can edit them and provide the missing data.
+  They should be hidden from non-editors. Follow these steps in the select query to ensure
+  this behavior:
+
+    - Enclose the clause for the linked individual in an OPTIONAL block.
+     
     - Select the object's localname using the ARQ localname function, so that the template can 
       display the local name in the absence of the linked individual. Alternatively, this can be 
       retrieved in the template using the localname(uri) method. 
+      
+    - Require the optional information in the public view by adding a filter clause which ensures
+      that the variable has been bound, inside tag <critical-data-required>. For example:
+      
+      OPTIONAL { ?authorship core:linkedInformationResource ?infoResource }
+      
+      This statement is optional because when editing we want to display an authorship that
+      is missing a link to an information resource.
+      
+      Then add:
+      
+      <critical-data-required>
+      FILTER ( bound(?infoResource) )
+      </critical-data-required>
+      
+      The Java code will preprocess the query to remove the <critical-data-required> tag, 
+      either retaining its text content (in public view) or removing the content (when
+      editing), so that the appropriate query is executed.
       
     
 -------------------------------
 Collated vs. uncollated queries
 -------------------------------
 
-- The query should contain <collation-fragment> elements, which are used when the property is 
+- The query should contain <collated> elements, which are used when the property is 
 collated. For uncollated queries, the fragments are removed by a query preprocessor. Since any 
 ontology property can be collated in the Ontology Editor, all queries should contain the 
-following <collation-fragment> elements:
+following <collated> elements:
 
     - A ?subclass variable, named as such, in the SELECT clause. If the ?subclass variable
     is missing, the property will be displayed without collation.
 
-        SELECT DISTINCT <collation-fragment> ?subclass </collation-fragment> ...
+        SELECT DISTINCT <collated> ?subclass </collated> ...
 
     - ?subclass must be the first term in the ORDER BY clause.
 
-        ORDER BY <collation-fragment> ?subclass </collation-fragment> ...
+        ORDER BY <collated> ?subclass </collated> ...
 
     - Include the following in the WHERE clause, substituting in the relevant variables for
     ?infoResource and core:InformationResource:
 
-        <collation-fragment>
+        <collated>
         OPTIONAL { ?subclass rdfs:subClassOf core:InformationResource .
                    ?infoResource a ?subclass 
         }  
-        </collation-fragment>
+        </collated>
     
 - Postprocessing removes all but the most specific subclass value from the query result set.
 
