@@ -18,6 +18,9 @@
             OPTIONAL { ?link vitro:linkAnchor ?anchor }
             OPTIONAL { ?link vitro:linkURL ?url }
             OPTIONAL { ?link vitro:linkDisplayRank ?rank }
+        <linked-individual-required>
+        FILTER ( bound(?anchor) &amp;&amp; bound(?url) )    
+        </linked-individual-required>
         } ORDER BY ?rank
     </query-select>
 

@@ -13,12 +13,16 @@
           
         SELECT <collated> ?subclass </collated>
                ?object ?name ?moniker WHERE {
+               
             ?subject ?property ?object
             <collated> OPTIONAL { ?object a ?subclass } 
             FILTER ( afn:namespace(?subclass) != "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" )   
             </collated>
             OPTIONAL { ?object rdfs:label ?name }
-            OPTIONAL { ?object vitro:moniker ?moniker }               
+            OPTIONAL { ?object vitro:moniker ?moniker }      
+            <linked-individual-required>
+            FILTER ( bound(?name) )
+            </linked-individual-required>
         } ORDER BY <collated> ?subclass </collated> ?name ?object  
     </query-select>
 

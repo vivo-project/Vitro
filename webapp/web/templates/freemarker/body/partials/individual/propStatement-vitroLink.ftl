@@ -11,5 +11,5 @@
 <#if statement.url??>
     <a href="${statement.url}">${linkText}</a> 
 <#else>
-    <a href="${profileUrl(statement.link)}">${linkText}</a> (no url provided for link)    
+    ${linkText} (no url provided for link)    
 </#if>

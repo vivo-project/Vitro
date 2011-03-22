@@ -64,24 +64,6 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
         }
     }
     
-    /* This is a temporary measure to handle the fact that the current Individual.getMoniker()
-     * method returns the individual's VClass if moniker is null. We want to replicate that
-     * behavior here, but in future the moniker property (along with other Vitro namespace
-     * properties) will be removed. In addition, this type of logic (display x if it exists, otherwise y)
-     * will be moved into the display modules (Editing and Display Configuration Improvements).
-     */
-// rjy7 Now Individual.getMoniker() returns only the moniker, not the VClass, so no reason to call the method
-// if the sparql query returns a null moniker.
-//    protected void addMoniker(Map<String, String> map, String monikerKey, String objectKey) {
-//        String moniker = map.get(monikerKey);
-//        if (moniker == null) {
-//            Individual ind = getIndividual(map.get(objectKey));
-//            if (ind != null) {
-//                map.put(monikerKey, ind.getMoniker());
-//            }
-//        }
-//    }
-    
     protected Individual getIndividual(String uri) {
         return wdf.getIndividualDao().getIndividualByURI(uri);
     }
