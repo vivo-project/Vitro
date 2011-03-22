@@ -21,14 +21,14 @@
 #admin a.edit-individual {
     padding-left: 0;
     border-left: none;
-    padding-top: 7px;
+    padding-top: 8px;
 }
-#verbosePropertyForm{
+#verbose-mode {
     float: right;
     padding-left: 10px;
 }
-#verbosePropertyForm .small {
-    padding: 2px 4px 3px;
+#verbose-mode .small {
+    padding: 5px 6px 4px;
 }
 /* <------ INDIVIDUAL INTRO FOR ANY CLASS*/
 #individual-intro {
@@ -211,7 +211,7 @@ h1.fn .preferred-title {
 }
 /* <------ INDIVIDUAL VISUALIZATION */
 #visualization {
-    padding: 0 0 40px 30px;
+    padding: 0 0 20px 30px;
     padding-top: 0;
     float: right;
     background-color: #fff;
