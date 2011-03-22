@@ -210,7 +210,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         //Moniker
         
         if(ent.getMoniker() != null){
-        	Field moniker = new Field(term.MONIKER, ent.getMoniker(), Field.Store.YES, Field.Index.ANALYZED);
+        	Field moniker = new Field(term.MONIKER, ent.getMoniker(), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS);
         	doc.add(moniker);
         }
         
