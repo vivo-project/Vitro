@@ -24,6 +24,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.util.Version;
 
 import com.hp.hpl.jena.ontology.OntModel;
 
@@ -230,14 +231,14 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
      * @return
      */
     private Analyzer getAnalyzer() {
-        PerFieldAnalyzerWrapper analyzer = new PerFieldAnalyzerWrapper( new StandardAnalyzer());
+        PerFieldAnalyzerWrapper analyzer = new PerFieldAnalyzerWrapper( new StandardAnalyzer(Version.LUCENE_29));
     	analyzer.addAnalyzer(ALLTEXT, new HtmlLowerStopStemAnalyzer());
     	analyzer.addAnalyzer(NAME, new HtmlLowerStopStemAnalyzer());
         analyzer.addAnalyzer(ALLTEXTUNSTEMMED, new HtmlLowerStopAnalyzer());
         analyzer.addAnalyzer(NAMEUNSTEMMED, new HtmlLowerStopAnalyzer());      
-        analyzer.addAnalyzer(NAME, new StandardAnalyzer());
-        analyzer.addAnalyzer(MONIKER, new StandardAnalyzer());
-        analyzer.addAnalyzer(RDFTYPE, new StandardAnalyzer());
+        analyzer.addAnalyzer(NAME, new StandardAnalyzer(Version.LUCENE_29));
+        analyzer.addAnalyzer(MONIKER, new StandardAnalyzer(Version.LUCENE_29));
+        analyzer.addAnalyzer(RDFTYPE, new StandardAnalyzer(Version.LUCENE_29));
          
         return analyzer;
     }

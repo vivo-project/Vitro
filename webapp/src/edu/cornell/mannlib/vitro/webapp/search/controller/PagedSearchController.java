@@ -38,6 +38,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.WildcardQuery;
+import org.apache.lucene.util.Version;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
@@ -690,7 +691,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
 //        map.put(Entity2LuceneDoc.term.ALLTEXT,Entity2LuceneDoc.term.ALLTEXTUNSTEMMED);
 //        qp.setStemmedToUnstemmed(map);
     	
-    	MultiFieldQueryParser qp = new MultiFieldQueryParser(new String[]{ "name", "nameunstemmed", "type", "moniker", "ALLTEXT", "ALLTEXTUNSTEMMED", "nameraw" }, analyzer);
+    	MultiFieldQueryParser qp = new MultiFieldQueryParser(Version.LUCENE_29, new String[]{ "name", "nameunstemmed", "type", "moniker", "ALLTEXT", "ALLTEXTUNSTEMMED", "nameraw" }, analyzer);
         qp.setDefaultOperator(QueryParser.AND_OPERATOR);
 
     	

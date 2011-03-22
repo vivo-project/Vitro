@@ -3,14 +3,19 @@
 package edu.cornell.mannlib.vitro.webapp.search.lucene;
 
 import java.io.Reader;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
+import org.apache.lucene.analysis.ASCIIFoldingFilter;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.ISOLatin1AccentFilter;
 import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
+import org.apache.lucene.util.Version;
 
 public class HtmlLowerStopAnalyzer extends Analyzer {
     /* much of this code is from
@@ -18,7 +23,7 @@ public class HtmlLowerStopAnalyzer extends Analyzer {
      * bdc34
      */
 
-    private static String[] _stopWords;
+    private static Set<String> _stopWords;
 
     /**
      * An array containing some common English words
@@ -52,13 +57,16 @@ public class HtmlLowerStopAnalyzer extends Analyzer {
         "j", "k", "l", "m", "n", "o", "p", "q", "r",
         "s", "t", "u", "v", "w", "x", "y", "z"
     };
-
+    
+    public static final List<String> stopWordsList = Arrays.asList(STOP_WORDS); 
+    public static final Set<String> STOP_WORDS_SET = new HashSet<String>(stopWordsList);
+    
     /**
      * Builds an analyzer.
      */
     public HtmlLowerStopAnalyzer()
     {
-        this(STOP_WORDS);
+        this(STOP_WORDS_SET);
     }
 
     /**
@@ -66,9 +74,9 @@ public class HtmlLowerStopAnalyzer extends Analyzer {
      *
      * @param stopWords a String array of stop words
      */
-    public HtmlLowerStopAnalyzer(String[] stopWords)
+    public HtmlLowerStopAnalyzer(Set<String> stopWords)
     {
-        _stopWords = stopWords;
+        _stopWords = STOP_WORDS_SET;
     }
 
     /**
@@ -99,15 +107,16 @@ public class HtmlLowerStopAnalyzer extends Analyzer {
 //        return stopFilter;
 //        
         
-        TokenStream result = new StandardTokenizer(arg0); 
+        TokenStream result = new StandardTokenizer(Version.LUCENE_29, arg0); 
         result = new StandardFilter(result);  //break into tokens
         result = new LowerCaseFilter(result);  //lower case
-        result = new StopFilter(result, _stopWords, IGNORE_CASE);  //remove stop words
-        result = new ISOLatin1AccentFilter(result); //ISO-8859-1 accented chars are replace by unaccented 
+        result = new StopFilter(ENABLE_POSITION_INCREMENTS, result, STOP_WORDS_SET, IGNORE_CASE);  //remove stop words
+        result = new ASCIIFoldingFilter(result); //this class converts alphabetic, symbolic and numerical characters into their ASCII equivalents. 
         return result;
     
     }
     
     private static final boolean IGNORE_CASE = true;
+    private static final boolean ENABLE_POSITION_INCREMENTS = false;
 
 }

@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.search.lucene;
 
 import java.io.Reader;
+import java.util.Set;
 
 import org.apache.lucene.analysis.PorterStemFilter;
 import org.apache.lucene.analysis.TokenStream;
@@ -19,7 +20,7 @@ public class HtmlLowerStopStemAnalyzer extends HtmlLowerStopAnalyzer {
         super();
     }
 
-    public HtmlLowerStopStemAnalyzer(String[] stopWords){
+    public HtmlLowerStopStemAnalyzer(Set<String> stopWords){
         super(stopWords);
     }
 
