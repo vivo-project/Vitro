@@ -25,15 +25,21 @@ public class TermsOfUseController extends FreemarkerHttpServlet {
     protected ResponseValues processRequest(VitroRequest vreq) {
         Portal portal = vreq.getPortal();
         
-        Map<String, Object> body = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, String> termsOfUse = new HashMap<String, String>();
         
         String rootBreadCrumbAnchor = portal.getRootBreadCrumbAnchor();
-        String websiteName = StringUtils.isEmpty(rootBreadCrumbAnchor) ? portal.getAppName() : rootBreadCrumbAnchor; 
-        body.put("websiteName", websiteName);
+        String siteName = StringUtils.isEmpty(rootBreadCrumbAnchor) ? portal.getAppName() : rootBreadCrumbAnchor; 
+        termsOfUse.put("siteName", siteName);
         
-        body.put("copyrightAnchor", portal.getCopyrightAnchor());
+        String siteHost = portal.getCopyrightAnchor();
+        if (siteHost == null) {
+            siteHost = "the hosting institution";
+        }
+        termsOfUse.put("siteHost", siteHost);
         
-        return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
+        map.put("termsOfUse", termsOfUse);
+        return new TemplateResponseValues(TEMPLATE_DEFAULT, map);
     }
     
     @Override
