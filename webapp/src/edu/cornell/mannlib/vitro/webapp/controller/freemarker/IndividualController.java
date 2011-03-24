@@ -127,7 +127,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     		body.put("temporalVisualizationEnabled", getTemporalVisualizationFlag());
     		body.put("verbosePropertySwitch", getVerbosePropertyValues(vreq));
     		
-    		IndividualTemplateModel itm = getIndividualTemplateModel(vreq, individual);
+    		IndividualTemplateModel itm = getIndividualTemplateModel(individual, vreq);
     		/* We need to expose non-getters in displaying the individual's property list, 
     		 * since it requires calls to methods with parameters.
     		 * This is still safe, because we are only putting BaseTemplateModel objects
@@ -248,7 +248,7 @@ public class IndividualController extends FreemarkerHttpServlet {
         return linkTag;
     }
     
-	private IndividualTemplateModel getIndividualTemplateModel(VitroRequest vreq, Individual individual) 
+	private IndividualTemplateModel getIndividualTemplateModel(Individual individual, VitroRequest vreq) 
 	    throws ServletException, IOException {
 		
     	IndividualDao iwDao = vreq.getWebappDaoFactory().getIndividualDao();

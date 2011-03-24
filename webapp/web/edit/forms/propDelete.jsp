@@ -20,6 +20,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils" %>
 <%@ page import="com.hp.hpl.jena.rdf.model.Model" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfigurationLoader"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper"%>
@@ -116,6 +117,11 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
     String statementDisplay = null;
     if (! statement.isEmpty()) {
         Map<String, Object> map = new HashMap<String, Object>();
+        /* Some propStatements (propStatement-educationalTraining.ftl) make reference to the individual,  
+         * but instead of adding it to the data model we'll test in the template for non-existence. IF
+         * this becomes more common, add it here instead.
+         */
+        //map.put("individual", new IndividualTemplateModel(subject, vreq));
         map.put("statement", statement);
         map.putAll(FreemarkerHttpServlet.getDirectives());
         map.putAll(FreemarkerHttpServlet.getMethods());
