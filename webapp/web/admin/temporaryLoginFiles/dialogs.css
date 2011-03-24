@@ -1,0 +1,84 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+img {
+	padding: 0;
+	margin: 0;
+}
+#chpassbox {
+        width:450px;
+}
+#guestloginbox {
+	width: 300px;
+}
+#webloginbox {
+	width: 325px;
+}
+td#infocell {
+	padding-left: 30px;
+	height: 100%;
+	vertical-align: middle;
+}
+td#loginboxcell {
+	vertical-align: middle;
+}
+td #loginboxtitle {
+	font-size: x-large;
+	line-height: 1.1em;
+}
+.loginbox {
+	border-collapse: collapse;
+	border: 1px solid #bbb;
+}
+.loginbox td {
+	background: #dfdfdf;
+}
+#toprow img {
+	margin-bottom: 5px;
+}
+#toprow td {
+	padding-top: 6px;
+	vertical-align: top;
+	text-align: center;
+	line-height: 1.3em;
+}
+#entrybox {
+	margin: 6px;
+	padding: 2px;
+}
+#entrybox td {
+	width: 100%;
+	text-align: right;
+}
+#entrybox input {
+	width: 240px;
+}
+
+#entrybox2 {
+        margin: 6px;
+        padding: 2px;
+}
+#entrybox2 td {
+        width: 100%;
+        text-align: right;
+}
+#entrybox2 input {
+        width: 45px;
+        height: 1.7em;
+}
+
+
+#buttoncell {
+	padding: 0 6px 6px 0;
+	width: 100%;
+	text-align: right;
+}
+#buttoncell input {
+	width: 5.5em;
+}
+#reasonbox{
+	background: #dfdfdf;
+        border-collapse: collapse;
+        border: 1px solid #bbb;
+        color: #AB1A2A;
+     
+}

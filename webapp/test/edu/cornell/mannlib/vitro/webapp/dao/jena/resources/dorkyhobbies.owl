@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<!DOCTYPE owl [
+<!ENTITY test.mannlib "http://test.mannlib.cornell.edu#">
+<!ENTITY dc "http://purl.org/dc/elements/1.1/">
+<!ENTITY xsd "http://www.w3.org/2001/XMLSchema#">
+<!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<!ENTITY owl "http://www.w3.org/2002/07/owl#">
+<!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#">
+]>
+<rdf:RDF
+ xmlns:test.mannlib="http://test.mannlib.cornell.edu#"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns:owl="http://www.w3.org/2002/07/owl#"
+ xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+ xml:base="http://test.mannlib.cornell.edu"
+>
+<owl:Ontology rdf:about="http://test.mannlib.cornell.edu">
+<owl:versionInfo>test-0.01</owl:versionInfo>
+<rdfs:label>testing ontology</rdfs:label>
+</owl:Ontology>
+<owl:Class rdf:about="http://test.mannlib.cornell.edu#dork">
+  <rdfs:label>dork</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://test.mannlib.cornell.edu#dorkyhobby">
+  <rdfs:label>dorky hobby</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://test.mannlib.cornell.edu#verydorkyhobby">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://test.mannlib.cornell.edu#dorkyhobby">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>very dorky hobby</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://www.w3.org/2002/07/owl#Thing">
+</owl:Class>
+<owl:ObjectProperty rdf:about="http://test.mannlib.cornell.edu#hasHobby">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://test.mannlib.cornell.edu#dork">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://test.mannlib.cornell.edu#dorkyhobby">
+    </owl:Class>
+  </rdfs:range>
+  <rdfs:label>has hobby</rdfs:label>
+</owl:ObjectProperty>
+
+
+<rdf:Description rdf:about="http://test.mannlib.cornell.edu#baseballcardcollecting">
+  <rdf:type>
+    <owl:Class rdf:about="http://test.mannlib.cornell.edu#dorkyhobby">
+    </owl:Class>
+  </rdf:type>
+  <rdfs:label>baseball card collecting</rdfs:label>
+</rdf:Description>
+<rdf:Description rdf:about="http://test.mannlib.cornell.edu#bob">
+  <rdf:type>
+    <owl:Class rdf:about="http://test.mannlib.cornell.edu#dork">
+    </owl:Class>
+  </rdf:type>
+</rdf:Description>
+<rdf:Description rdf:about="http://test.mannlib.cornell.edu#comicbookcollecting">
+  <rdf:type>
+    <owl:Class rdf:about="http://test.mannlib.cornell.edu#verydorkyhobby">
+    </owl:Class>
+  </rdf:type>
+  <rdfs:label>comic book collecting</rdfs:label>
+</rdf:Description>
+<rdf:Description rdf:about="http://test.mannlib.cornell.edu#cooking">
+  <rdf:type>
+    <owl:Class rdf:about="http://test.mannlib.cornell.edu#dorkyhobby">
+    </owl:Class>
+  </rdf:type>
+  <rdfs:label>cooking</rdfs:label>
+</rdf:Description>
+<rdf:Description rdf:about="http://test.mannlib.cornell.edu#jeff">
+  <rdf:type>
+    <owl:Class rdf:about="http://test.mannlib.cornell.edu#dork">
+    </owl:Class>
+  </rdf:type>
+</rdf:Description>
+<rdf:Description rdf:about="http://test.mannlib.cornell.edu#sam">
+  <rdf:type>
+    <owl:Class rdf:about="http://test.mannlib.cornell.edu#dork">
+    </owl:Class>
+  </rdf:type>
+</rdf:Description>
+<rdf:Description rdf:about="http://test.mannlib.cornell.edu#sewinghats">
+  <rdf:type>
+    <owl:Class rdf:about="http://test.mannlib.cornell.edu#verydorkyhobby">
+    </owl:Class>
+  </rdf:type>
+  <rdfs:label>sewing hats</rdfs:label>
+</rdf:Description>
+
+</rdf:RDF>

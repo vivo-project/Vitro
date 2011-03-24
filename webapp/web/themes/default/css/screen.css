@@ -1,0 +1,705 @@
+/****************************************
+ CSS for default Vitro application / VIVO
+ main site styles
+ 
+ This version
+ 2006-06-21 bjl23
+ 
+ Original version
+ 2006-01-05 bdc34
+*****************************************/
+
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+@import url("tab.css");
+/*@import url("editBanner.css");*/
+/*@import url("inlineEdit.css");*/
+@import url("vivo.css");
+
+body {
+	font-family:"Lucida Grande", Verdana, Lucida, Arial, Helvetica, sans-serif;
+	background-color:white;
+	color:black;
+	font-size:82%; 
+	line-height:120%;
+	margin-top:1ex ;
+	margin-bottom:1ex;
+	margin-left:0.5em;
+	margin-right:0.5em;
+}
+
+img {
+	border:0 hidden;
+}
+
+img.closecrop {
+	margin  : 0;
+	padding : 0;
+}
+
+h2 {
+	font-size:1.15em;
+	margin-top:0.7em;
+	margin-bottom:0.7em;
+}
+
+h3 {
+	font-size:1.15em;
+	margin-top:0.6em;
+	margin-bottom:0.6em;
+}
+
+h4 {
+	font-size:1.0em;
+	margin-top:0.5em;
+	margin-bottom:0.5em;
+	font-weight:500;
+}
+
+h5 {
+	margin-top:0.5ex;
+	margin-bottom:0.5ex;
+	padding-top:0.5ex;
+	padding-bottom:0.5ex;		
+}
+
+.description h2,
+.description h3,
+.description h4,
+.description h5 {
+  font-weight: bold;
+  margin: 1em 0 .5em 0;
+}
+
+.description h2 { font-size: 1.5em; }
+.description h3 { font-size: 1.3em; }
+.description h4 { font-size: 1.2em; }
+.description h5 { font-size: 1.2em; }
+
+table{
+	border-collapse:collapse;
+}
+
+table tr td {
+	font-size:1em;
+}
+
+li {
+    margin-top:0.3ex;
+    margin-bottom:0.3ex;
+    padding-top:0.3ex;
+    padding-bottom:0.3ex;	
+    list-style-type:square;
+}
+
+hr {
+  display: none;
+}
+
+/************************ links ********************************/
+
+a { 
+	text-decoration:none; 
+	color:#6A5ACD;
+	background-color:inherit;
+} 
+
+a:visited { 
+	color:#6A5ACD; 
+	background-color:inherit;
+} 
+
+a:hover {
+	text-decoration:underline; 
+	color:#C25D04; 
+	background-color:inherit;
+} 
+
+a:active { 
+	text-decoration:none; 
+	color:#BC6015; 
+	background-color:inherit;
+}
+
+a img {
+	border:none;
+}
+
+a.externalLink{
+	font-style:italic;
+}
+
+/*************************** forms ****************************/
+
+form {
+	margin:0;
+}
+
+textarea {
+	width:95%;
+}
+
+.form-button{
+	background-color:#CCCCFF; /* #f1f1d1 */
+	color:inherit;
+	font-family:Verdana,Arial,Helvetica,sans-serif;
+	margin-top:0.2ex;
+	margin-bottom:0.2ex;
+	padding-left:0.5em;
+	padding-right:0.5em;
+	width:auto;
+	overflow:visible;
+}
+
+.logout-button {
+	background-color : #F1F1D1; /* #DEB887; */
+	color:inherit;
+	border-color : #F1F1D1; /*#2E440C; */
+	font-size:0.8em;
+	padding-left:0.6em;
+	padding-right:0.6em;
+	margin-top:0.5ex;
+	margin-bottom:0.5ex;
+	margin-left:0;
+	margin-right:0;
+	border-width:1px;
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	width:auto;
+	overflow:visible;
+}
+
+.add-action-button {
+	background-color : #F1F1D1; /* #DEB887; */
+	color:inherit;
+	border-color : #F1F1D1; /*#2E440C; */
+	font-size:0.8em;
+	padding-left:0.6em;
+	padding-right:0.6em;
+	margin-top:0.5ex;
+	margin-bottom:0.5ex;
+	margin-left:0;
+	margin-right:0;
+	border-width:1px;
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	width:auto;
+	overflow:visible;
+}
+
+.form-item{
+	background-color:#fafad2;
+	color:inherit;
+	font-size:0.8em;
+	margin-top:0.5ex;
+	margin-bottom:0.3ex;
+	padding-left:0.2em;
+}
+
+/********************** header ************************************/
+
+div#header {
+	width:100%;
+	clear:both; /* jc55 2008-07-18 */
+}
+
+#header a{
+	margin:0;
+	padding:0;
+}
+
+table#head{
+	width:100%;
+}
+
+#header td{
+	margin:0;
+	padding:0;
+}
+
+#header img{
+	margin:0;
+}
+
+/************** header search form *********************************/
+
+td#SearchArea {
+	text-align:center;
+	padding-left:2.4em;
+	padding-right:2.4em;
+}
+
+td#SearchArea .searchForm {
+	text-align:center;
+	font-size:1.1em;
+	margin-top:0.6ex;
+	margin-bottom:0.6ex;
+}
+
+.searchForm table {
+	margin-left:auto;
+	margin-right:auto;
+	width:50%;
+}
+
+.searchForm select {
+	margin-left:0.5em;
+	margin-right:0.5em;
+	font-size:0.8em;
+}
+
+.searchForm a.formlink {
+	font-size:0.75em;
+	line-height:2ex;
+	margin-top:1ex;
+}
+
+.searchForm label {
+	color:#C25D04;  /* ORANGE */
+	background-color:inherit;
+	font-size:0.95em;
+	margin-bottom:1ex;
+}
+
+.search-form-item {
+	background-color:#fafad2;
+	color:inherit;
+	font-family:Verdana,Arial,Helvetica,sans-serif;
+	font-size:0.8em;
+	margin-top:0.5ex;
+	margin-bottom:0.4ex;
+	margin-left:0.5em;
+	margin-right:0.5em;
+	padding-left:0.2em;
+}
+
+.search-form-button {
+	background-color : #CCCCFF; /* #DEB887; */
+	color:inherit;
+	border-color : #CCFFFF; /*#2E440C; */
+	font-size:0.8em;
+	padding-top:0.1ex;
+	padding-bottom:0.1ex;
+	padding-left:0.5em;
+	padding-right:0.5em;
+	border-width:1px;
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	width:auto;
+	overflow:visible;
+}
+
+/*********************** Menu ****************************************/
+
+#menu *{
+	padding:0px;
+	margin:0px;
+}
+
+#menu{
+	padding:0px;
+	margin:0px;
+	display:block;
+	background-color:rgb(241,241,209);
+	color:inherit;
+}
+
+#primaryAndOther{
+	padding:0px;
+	margin:0px;
+	background-color:rgb(241,241,209);
+	color:inherit;
+	border-bottom: 1px solid gray;
+	height:2em;
+}
+
+#menu ul li a td{
+	font-weight: bold;
+}
+
+#otherMenu{
+	float:right;
+}
+
+#otherMenu ul, #primary ul, #otherMenu, #primary{
+	font-weight: bold;
+	line-height:2em; 
+}
+
+#secondaryTabMenu{
+	clear:both;
+	background-color: rgb(57, 82, 107);
+	color:inherit;
+	width:100%;
+	min-height:1.7em; 
+	padding-top:0;
+	padding-bottom:0;
+}
+
+#secondaryTabMenu table#secondary {
+	border-collapse:collapse;
+	margin-left:auto;
+	margin-right:auto;
+	margin-top:0;
+	margin-bottom:0;
+	padding-top:0;
+	padding-bottom:0;
+	min-height:1.7em;
+}
+
+#menu li {
+	display:block;
+	list-style-type: none;
+	float:left;
+	line-height:2em;
+	max-height:2em;
+	padding-left:0.4em;
+	padding-right:0.4em;
+}
+
+#primary li{
+	background-color: rgb(51, 166, 199);
+	color:inherit;
+	border-right: 2px solid rgb(222, 184, 135);
+}
+
+#primary li.activePrimaryTab{
+	background-color: rgb(57, 82, 107);
+	color:inherit;
+	border-right: 2px solid rgb(222, 184, 135);
+}
+
+#secondary td{
+	font-weight:bold;
+	margin-left:0px;
+	margin-right:0px;
+	margin-top:0px;
+	margin-bottom:0px;
+	padding-top:0.25em;
+	padding-bottom:0.25em;
+	padding-left:0.4em;
+	padding-right:0.3em;
+	background-color: rgb(57, 82, 107);
+	color:inherit;
+	border-left: 2px solid gray;
+	border-right: 2px solid gray;
+	min-height:1.7em;
+	line-height:1.2em; 
+}
+
+#otherMenu li{
+	background-color: rgb(238, 238, 153);
+	color:inherit;
+	border-left: 2px solid rgb(222, 184, 135);
+}
+
+#otherMenu a:hover{
+	color:#C25D04;
+	background-color:inherit;
+}
+
+#menu a{
+	text-decoration: none;
+}
+
+#otherMenu a {
+	color: gray;
+	background-color:inherit;
+}
+
+#primary a {
+	color: white;
+	background-color:inherit;
+}
+
+#primary a:hover {
+	color: yellow;
+	background-color:inherit;
+}
+
+#secondary a {
+	color: white;
+	background-color:inherit;
+}
+
+#secondary a:hover {
+	color:yellow;
+	background-color:inherit;
+	text-decoration:underline;
+}
+
+#secondaryTabMenu td.activeSecondaryTab {
+	color: black;
+	background-color: rgb(197, 197, 163);
+	padding-left:1em;
+	padding-right:1em;
+}
+
+#secondaryTabMenu td.activeSecondaryTab a{
+	color: #C25D04;
+	background-color:inherit;
+}
+
+/*********** bread crumbs *****************/
+
+.breadCrumbs a{
+	text-decoration:none;
+}
+
+div.breadCrumbs {
+	clear:both;
+	background-color: rgb(241,241,209);  
+	color:inherit;
+	font-family: Helvetica, Verdana, Arial, sans-serif;
+	font-size:0.9em;
+	min-height:3.3ex;
+	line-height:3.2ex;
+	padding-left:0.3em;
+	margin-top:0px;
+	margin-bottom:0px;
+}
+
+div.content {
+	margin-top: 2em;
+}
+
+/************************** main ******************************/
+
+#contentwrap {
+	/* padding-bottom:1ex; */
+}
+
+#contentwrap img {
+/*  margin-top:0.4em;*/
+/*  margin-bottom:0.4em;*/
+/*  margin-right:0.4em;*/
+/*  margin-left:0;*/
+	border:0px hidden;
+}
+
+#aboutControlPane {
+	padding-bottom:3ex;
+}
+
+#aboutControlPane img {
+	margin-top:0em;
+	margin-bottom:0em;
+	margin-right:0.1em;
+	margin-left:0;
+	border:0px hidden;
+}
+
+#aboutControlPane div {
+	padding-top:0.3ex;
+	padding-bottom:0.3ex;
+}
+
+#aboutControlPane form {
+	padding-top:0.6ex;
+	padding-bottom:0.6ex;
+}
+
+
+/**************************************************************/
+
+.contents{
+	padding:0.5em;
+}
+
+.blurb {
+	margin-top:0.2ex;
+	margin-bottom:0.6ex;
+	line-height:2.5ex;
+	/* font-size:0.85em; */
+	color:gray;
+	background-color:inherit;
+}
+
+.nowrap {
+	text-align:left;
+	white-space:nowrap;
+}
+   
+/********** browsegroup *****************/
+
+.contentsBrowseGroup .searchTOC{
+	margin-top:1em;
+	margin-left:0.3em;
+	padding:0.4em;
+	line-height:2.5em;
+}
+
+.contentsBrowseGroup .searchTOC a{
+	border-width:1px;
+	border-style:dotted;
+	background-color:#eeeeee;
+	color:inherit;
+	padding-top:0.3em;
+	padding-bottom:0.3em;
+	padding-right:0.6em;
+	padding-left:0.6em;
+	margin-top:0;
+	margin-left:0.2em;
+	margin-right:0.2em;
+}
+
+.contentsBrowseGroup a{
+	text-decoration:none;
+}
+
+.contentsBrowseGroup ul{
+	margin-top:0.4em;
+	margin-bottom:0.4em;
+}
+
+.contentsBrowseGroup li{
+	margin-top:0.7em;
+	margin-bottom:0.7em;
+}
+
+.contentsBrowseGroup li div{
+	font-size:0.9em;
+	color:gray;
+	background-color:inherit;
+}
+
+.contentsBrowseGroup h2{
+	font-size:1.3em;
+	font-weight:500;
+	color:black;
+	background-color:#E4E4C8;
+	padding-left:0.2em;
+	padding-top:0.3em;
+	padding-bottom:0.3em;
+}
+
+.contentsBrowseGroup h3{
+	margin-left:0.6em;
+}
+
+.SearchTerm{
+	color:red;
+	background-color:inherit;
+	font-weight:bold;
+}
+
+/*********** Entity List ****************/
+
+.entityList ul{
+	list-style-type:none;
+	margin-bottom:0.6em;
+}
+
+.entityList li{
+	margin-top:0.7em;
+	margin-bottom:0.7em;
+}
+
+.entityList h3{
+	font-weight:bold;
+}
+
+
+/**************************** footer ***************************/
+
+div.footer{
+	clear:both;
+	font-size:0.9em;
+	padding-top:0.4ex;
+	padding-bottom:0.4ex;
+	margin-top: 0;
+	background-color: rgb(197, 197, 163);
+	color: rgb(57, 82, 107);
+	text-align: center;
+}
+
+/*************** these are from portal.css.jsp ****************/
+/******* for maintaining compatibility with older pages *******/
+
+.lightbackground {
+	background-color:#A0C5CE; 
+	color:inherit;
+}
+
+.lightbackground2 {
+	background-color:#F8F8C8; 
+	color:inherit;
+}
+
+.pageGroupBody {
+	padding:1em;
+}
+
+.pageGroupBody p{
+	padding-left:0.8em;
+	padding-right:0.4em;
+}
+
+/***************************************************/
+
+.staticPageBackground{
+	background-color:#e0e0e0;
+	color:inherit;
+	margin:0;
+	padding-left:0.45em;
+	padding-right:0.45em;
+	padding-top:0.45em;
+	padding-bottom:0.45em;
+}
+
+.staticPageBackground table{
+	border-width:1px;
+	border-color:black;
+	padding:0.45em; 
+}
+
+.staticPageBackground td{
+	padding:0.45em;
+}
+
+.feedbackForm{
+	padding:0.45em;
+	border:1px solid black;
+}
+
+/***************************************************/
+
+.warning{
+	color:red;
+	background-color:inherit;
+}
+  
+/***************************************************/
+
+/* Column styles from Blueprint's liquid.css
+-------------------------------------------------------------- */
+
+/* Use this class together with the .span-x classes
+   to create any composition of columns in a layout. */
+.column		{float: left;}
+
+/* The last column in a row needs this class. */
+.last 		{ margin-right: 0; }
+
+/* Use these classes to set the width of a column. */
+.span-1		{ width: 4%; }
+.span-2		{ width: 8%; }
+.span-3		{ width: 12%; }
+.span-4		{ width: 16%; }
+.span-5		{ width: 20%; }
+.span-6		{ width: 25%; }
+.span-7		{ width: 29%; }
+.span-8		{ width: 33%; }
+.span-9		{ width: 37%; }
+.span-10	{ width: 41%; }
+.span-11	{ width: 45%; }
+.span-12	{ width: 50%; }
+.span-13	{ width: 54%; }
+.span-14	{ width: 58%; }
+.span-15	{ width: 62%; }
+.span-16	{ width: 66%; }
+.span-17	{ width: 70%; }
+.span-18	{ width: 75%; }
+.span-19	{ width: 79%; }
+.span-20	{ width: 83%; }
+.span-21	{ width: 87%; }
+.span-22	{ width: 91%; }
+.span-23	{ width: 95%; }
+.span-24	{ width: 100%; margin-right: 0; }

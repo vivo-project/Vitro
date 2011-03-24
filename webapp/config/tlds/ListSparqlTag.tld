@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<taglib 
+ xmlns="http://java.sun.com/xml/ns/j2ee" 
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+ xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd" 
+ version="2.0">
+  <description></description>
+  <display-name>List SPARQL JSP taglib</display-name>    
+  <tlib-version>1.0</tlib-version>
+  <short-name>sparql</short-name>
+  <uri>http://mannlib.cornell.edu/vitro/ListSparqlTag/0.1/</uri>
+  
+  <tag>
+    <description>SPARQL select tag.  (Must be nested inside sparql:sparql)</description>
+    <display-name>SPARQL select tag</display-name>
+    <name>select</name>
+    <tag-class>edu.cornell.mannlib.vitro.webapp.web.jsptags.ListSparqlTag</tag-class>
+    <body-content>tagdependent</body-content>
+    
+    <variable>
+      <name-from-attribute>var</name-from-attribute>
+      <variable-class>java.util.List</variable-class>      
+      <scope>AT_BEGIN</scope>
+    </variable>
+
+    <attribute>
+      <description></description>
+      <name>model</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>com.hp.hpl.jena.rdf.model.Model</type>
+    </attribute>
+    
+    <attribute>
+      <description></description>
+      <name>var</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+    </attribute>
+
+    <dynamic-attributes>true</dynamic-attributes>
+
+    <example>
+      
+    </example>
+    
+  </tag>      
+  
+  </taglib>

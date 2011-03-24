@@ -1,0 +1,15 @@
+;; Object webservices/
+;; SEMANTICDB Tags save file
+(semanticdb-project-database-file "webservices/"
+  :tables (list 
+    (semanticdb-table "VitroWs.java"
+    :major-mode 'jde-mode
+    :tags '(("edu.cornell.mannlib.vitro.webservices" package nil nil [1 47]) ("edu.cornell.mannlib.vitro.db.dao.VitroFacade" include nil nil [49 101]) ("edu.cornell.mannlib.vitro.beans.Tab" include nil nil [102 145]) ("edu.cornell.mannlib.vitro.flags.PortalFlag" include nil nil [146 196]) ("formbeans.ApplicationBean" include nil nil [197 230]) ("edu.cornell.mannlib.vitro.beans.Entity" include nil nil [231 277]) ("java.util.List" include nil nil [278 300]) ("VitroWs" type (:typemodifiers ("public") :members (("VitroWs" function (:constructor-flag t :typemodifiers ("public")) (reparse-symbol class_member_declaration) [394 413]) ("getFullTab" function (:typemodifiers ("public") :arguments (("tabid" variable (:type "int") (reparse-symbol formal_parameters) [559 568]) ("portalid" variable (:type "int") (reparse-symbol formal_parameters) [570 582])) :type "Tab") (reparse-symbol class_member_declaration) [537 848]) ("getFullEntityById" function (:typemodifiers ("public") :arguments (("entityId" variable (:type "int") (reparse-symbol formal_parameters) [948 960]) ("portalid" variable (:type "int") (reparse-symbol formal_parameters) [962 974])) :type "Entity") (reparse-symbol class_member_declaration) [916 1175]) ("getTabsForPortal" function (:typemodifiers ("public") :arguments (("portalid" variable (:type "int") (reparse-symbol formal_parameters) [1211 1223])) :type "List") (reparse-symbol class_member_declaration) [1181 1330])) :type "class") nil [366 1532]))
+    :file "VitroWs.java"
+    :pointmax 1533
+    )
+   )
+  :file "semantic.cache"
+  :semantic-tag-version "2.0pre3"
+  :semanticdb-version "2.0pre3"
+  )
