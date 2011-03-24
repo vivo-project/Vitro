@@ -170,14 +170,10 @@ public class EntityListController extends VitroHttpServlet {
     */
     public static Map<String,Object> getResultsForVClass(String vclassURI, int page, String alpha, Portal portal, boolean isSinglePortal, IndividualDao indDao, ServletContext context) 
     throws CorruptIndexException, IOException, ServletException{
-        Map<String,Object> rvMap = new HashMap<String,Object>();
-                        
-        int portalId = 1;
-        if( portal != null )
-            portalId = portal.getPortalId();        
+        Map<String,Object> rvMap = new HashMap<String,Object>();                      
                                  
         //make lucene query for this rdf:type
-        Query query = getQuery(vclassURI,alpha, isSinglePortal, portalId);        
+        Query query = getQuery(vclassURI,alpha, true, 0);        
         
         //execute lucene query for individuals of the specified type
         IndexSearcher index = LuceneIndexFactory.getIndexSearcher(context);
@@ -252,22 +248,22 @@ public class EntityListController extends VitroHttpServlet {
                    BooleanClause.Occur.MUST );                          
                                          
            //check for portal filtering 
-           if( ! isSinglePortal ){               
-               if( portalId < 16 ){ //could be a normal portal
-               query.add(
-                       new TermQuery( new Term(Entity2LuceneDoc.term.PORTAL, Integer.toString(1 << portalId ))),
-                       BooleanClause.Occur.MUST);
-           }else{ //could be a combined portal
-                   BooleanQuery tabQueries = new BooleanQuery();
-                   Long[] ids= FlagMathUtils.numeric2numerics(portalId);
-                   for( Long id : ids){                       
-                       tabQueries.add(
-                               new TermQuery( new Term(Entity2LuceneDoc.term.PORTAL,id.toString()) ),
-                               BooleanClause.Occur.SHOULD);
-                   }
-                   query.add(tabQueries,BooleanClause.Occur.MUST);
-               }
-           }
+           //           if( ! isSinglePortal ){               
+           //               if( portalId < 16 ){ //could be a normal portal
+           //               query.add(
+           //                       new TermQuery( new Term(Entity2LuceneDoc.term.PORTAL, Integer.toString(1 << portalId ))),
+           //                       BooleanClause.Occur.MUST);
+           //           }else{ //could be a combined portal
+           //                   BooleanQuery tabQueries = new BooleanQuery();
+           //                   Long[] ids= FlagMathUtils.numeric2numerics(portalId);
+           //                   for( Long id : ids){                       
+           //                       tabQueries.add(
+           //                               new TermQuery( new Term(Entity2LuceneDoc.term.PORTAL,id.toString()) ),
+           //                               BooleanClause.Occur.SHOULD);
+           //                   }
+           //                   query.add(tabQueries,BooleanClause.Occur.MUST);
+           //               }
+           //           }
                                       
            //Add alpha filter if it is needed
            Query alphaQuery = null;
