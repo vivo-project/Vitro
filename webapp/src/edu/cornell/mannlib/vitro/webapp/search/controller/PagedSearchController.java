@@ -113,24 +113,6 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
     static{
         templateTable = setupTemplateTable();
     }
-    
-//    protected enum SearchTemplate {
-//        PAGED_RESULTS("search-pagedResults.ftl"),
-//        FORM("search-form.ftl"),
-//        ERROR("search-error.ftl"),
-//        BAD_QUERY("search-badQuery.ftl"),
-//        XML_RESULT("search-xmlResults.ftl");
-//        
-//        private final String filename;
-//        
-//        SearchTemplate(String filename) {
-//            this.filename = filename;
-//        }
-//
-//        public String toString() {
-//            return filename;
-//        }
-//    }
          
     /**
      * Overriding doGet from FreemarkerHttpController to do a page template (as
@@ -141,7 +123,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
-        boolean wasXmlRequested = isRequesedFormatXml(request);
+        boolean wasXmlRequested = isRequestedFormatXml(request);
         if( ! wasXmlRequested ){
             super.doGet(request,response);
         }else{
@@ -877,7 +859,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
         throw new Error("PagedSearchController.search() is unimplemented");
     }
 
-    protected boolean isRequesedFormatXml(HttpServletRequest req){
+    protected boolean isRequestedFormatXml(HttpServletRequest req){
         if( req != null ){
             String param = req.getParameter(XML_REQUEST_PARAM);
             if( param != null && "1".equals(param)){

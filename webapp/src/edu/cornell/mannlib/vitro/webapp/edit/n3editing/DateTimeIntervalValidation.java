@@ -31,10 +31,10 @@ public class DateTimeIntervalValidation implements N3Validator {
     public DateTimeIntervalValidation(String startFieldName, String endFieldName){
         this.startFieldName = startFieldName;
         this.endFieldName = endFieldName;
-        startValueName = startFieldName + ".value";
-        endValueName = endFieldName + ".value";
-        startPrecisionName = startFieldName + ".precision";
-        endPrecisionName = endFieldName + ".precision";
+        startValueName = startFieldName + "-value";
+        endValueName = endFieldName + "-value";
+        startPrecisionName = startFieldName + "-precision";
+        endPrecisionName = endFieldName + "-precision";
     }
     
     public Map<String, String> validate(EditConfiguration editConfig,
@@ -128,8 +128,8 @@ public class DateTimeIntervalValidation implements N3Validator {
                  }
              }
         }catch(ClassCastException cce){
-            errors.put(startFieldName, "could not format star or end date");
-            errors.put(endFieldName, "could not format star or end date");
+            errors.put(startFieldName, "could not format start or end date");
+            errors.put(endFieldName, "could not format start or end date");
             log.debug("could not format dates " + cce);
         }
             
