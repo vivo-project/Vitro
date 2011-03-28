@@ -10,7 +10,8 @@
 [ 
 <#if results??>
     <#list results as result>
-        { "label": "${result.label}", "uri": "${result.uri}" }<#if result_has_next>,</#if>       
+        <#-- result.label and result.uri are already quoted -->
+        { "label": ${result.label}, "uri": ${result.uri} }<#if result_has_next>,</#if>       
     </#list>
 </#if>
 ]

@@ -29,6 +29,8 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.WildcardQuery;
 
+import com.hp.hpl.jena.sparql.lib.org.json.JSONObject;
+
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
@@ -151,7 +153,7 @@ public class AutocompleteController extends VitroAjaxController {
     private Analyzer getAnalyzer(ServletContext servletContext) throws SearchException {
         Object obj = servletContext.getAttribute(LuceneSetup.ANALYZER);
         if( obj == null || !(obj instanceof Analyzer) )
-            throw new SearchException("Could not get anlyzer");
+            throw new SearchException("Could not get analyzer");
         else
             return (Analyzer)obj;        
     }
@@ -292,9 +294,9 @@ public class AutocompleteController extends VitroAjaxController {
         private String label;
         private String uri;
         
-        SearchResult(String label, String value) {
-            this.label = label;
-            this.uri = value;
+        SearchResult(String label, String uri) {
+            this.label = JSONObject.quote(label);
+            this.uri = JSONObject.quote(uri);
         }
         
         public String getLabel() {
