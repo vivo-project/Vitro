@@ -117,12 +117,14 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
     String statementDisplay = null;
     if (! statement.isEmpty()) {
         Map<String, Object> map = new HashMap<String, Object>();
+        map.put("statement", statement);
+ 
         /* Some propStatements (propStatement-educationalTraining.ftl) make reference to the individual,  
-         * but instead of adding it to the data model we'll test in the template for non-existence. IF
+         * but instead of adding it to the data model we'll test in the template for non-existence. If
          * this becomes more common, add it here instead.
          */
         //map.put("individual", new IndividualTemplateModel(subject, vreq));
-        map.put("statement", statement);
+
         map.putAll(FreemarkerHttpServlet.getDirectives());
         map.putAll(FreemarkerHttpServlet.getMethods());
         ServletContext context = getServletContext();

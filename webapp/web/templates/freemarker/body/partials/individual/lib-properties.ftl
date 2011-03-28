@@ -38,7 +38,7 @@
         <@collatedObjectPropertyList property editable template />
     <#else> <#-- uncollated -->
         <#-- We pass property.statements and property.template even though we are also
-             passing property, because objecctPropertyList can get other values, and
+             passing property, because objectPropertyList can get other values, and
              doesn't necessarily use property.statements and property.template -->
         <@objectPropertyList property editable property.statements template />
     </#if>
