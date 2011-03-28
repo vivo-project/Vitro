@@ -28,22 +28,22 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.WildcardQuery;
+import org.apache.lucene.util.Version;
+import org.json.JSONArray;
 
 import com.hp.hpl.jena.sparql.lib.org.json.JSONObject;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
-import freemarker.template.Configuration;
 
 /**
- * AutocompleteController is used to generate autocomplete content
+ * AutocompleteController generates autocomplete content
  * through a Lucene search. 
  */
 
@@ -52,7 +52,7 @@ public class AutocompleteController extends VitroAjaxController {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(AutocompleteController.class);
     
-    private static final String TEMPLATE_DEFAULT = "autocompleteResults.ftl";
+    //private static final String TEMPLATE_DEFAULT = "autocompleteResults.ftl";
     
     private static String QUERY_PARAMETER_NAME = "term";
     
@@ -68,10 +68,7 @@ public class AutocompleteController extends VitroAjaxController {
     @Override
     protected void doRequest(VitroRequest vreq, HttpServletResponse response)
         throws IOException, ServletException {
-        
-        Map<String, Object> map = new HashMap<String, Object>();
 
-        Configuration config = getFreemarkerConfiguration(vreq);
         PortalFlag portalFlag = vreq.getPortalFlag();
         
         try {
@@ -84,7 +81,7 @@ public class AutocompleteController extends VitroAjaxController {
             Query query = getQuery(vreq, portalFlag, analyzer, qtxt);             
             if (query == null ) {
                 log.debug("query for '" + qtxt +"' is null.");
-                doNoQuery(map, config, vreq, response);
+                doNoQuery(response);
                 return;
             }
             log.debug("query for '" + qtxt +"' is " + query.toString());
@@ -100,22 +97,22 @@ public class AutocompleteController extends VitroAjaxController {
                 try{
                     wait(150);
                     topDocs = searcherForRequest.search(query,null,maxHitSize);
-                }catch (Exception ex){
-                    log.error(ex);
-                    doFailedSearch(map, config, vreq, response);
+                }catch (Exception e){
+                    log.error(e, e);
+                    doNoSearchResults(response);
                     return;
                 }
             }
 
             if( topDocs == null || topDocs.scoreDocs == null){
                 log.error("topDocs for a search was null");                
-                doFailedSearch(map, config, vreq, response);
+                doNoSearchResults(response);
                 return;
             }
             
             int hitsLength = topDocs.scoreDocs.length;
             if ( hitsLength < 1 ){                
-                doFailedSearch(map, config, vreq, response);
+                doNoSearchResults(response);
                 return;
             }            
             log.debug("found "+hitsLength+" hits"); 
@@ -135,18 +132,20 @@ public class AutocompleteController extends VitroAjaxController {
             }   
 
             Collections.sort(results);
-            map.put("results", results);
-            writeTemplate(TEMPLATE_DEFAULT, map, config, vreq, response);
-        
-        } catch (TemplateProcessingException e) {
-            log.error(e, e);
-        } catch (Throwable e) {
-            log.error("AutocompleteController(): " + e);            
-            try {
-                doSearchError(map, config, vreq, response);
-            } catch (TemplateProcessingException e1) {
-                log.error(e1.getMessage(), e1);
+            
+            // map.put("results", results);
+            // writeTemplate(TEMPLATE_DEFAULT, map, config, vreq, response);
+            
+            JSONArray jsonArray = new JSONArray();
+            for (SearchResult result : results) {
+                jsonArray.put(result.toMap());
             }
+            response.getWriter().write(jsonArray.toString());
+
+        
+        } catch (Throwable e) {
+            log.error(e, e);            
+            doSearchError(response);
         }
     }
 
@@ -265,29 +264,28 @@ public class AutocompleteController extends VitroAjaxController {
         // indicated in the query string.
         // The analyzer is needed so that we use the same analyzer on the search queries as
         // was used on the text that was indexed.
-        QueryParser qp = new QueryParser(searchField,analyzer);
+        QueryParser qp = new QueryParser(Version.LUCENE_29, searchField,analyzer);
         //this sets the query parser to AND all of the query terms it finds.
         qp.setDefaultOperator(QueryParser.AND_OPERATOR);
         return qp;
     }
 
-    private void doNoQuery(Map<String, Object> map, Configuration config, HttpServletRequest request, 
-            HttpServletResponse response) throws TemplateProcessingException {
-        writeTemplate(TEMPLATE_DEFAULT, map, config, request, response);
-    }
-
-    private void doFailedSearch(Map<String, Object> map, Configuration config, HttpServletRequest request, 
-            HttpServletResponse response) throws TemplateProcessingException {
-        writeTemplate(TEMPLATE_DEFAULT, map, config, request, response);
-    }
- 
-    private void doSearchError(Map<String, Object> map, Configuration config, HttpServletRequest request, 
-            HttpServletResponse response) throws TemplateProcessingException {
+    private void doNoQuery(HttpServletResponse response) throws IOException  {
         // For now, we are not sending an error message back to the client because with the default autocomplete configuration it
         // chokes.
-        writeTemplate(TEMPLATE_DEFAULT, map, config, request, response);
+        doNoSearchResults(response);
     }
 
+    private void doSearchError(HttpServletResponse response) throws IOException {
+        // For now, we are not sending an error message back to the client because with the default autocomplete configuration it
+        // chokes.
+        doNoSearchResults(response);
+    }
+
+    private void doNoSearchResults(HttpServletResponse response) throws IOException {
+        response.getWriter().write("[]");
+    }
+    
     public static final int MAX_QUERY_LENGTH = 500;
 
     public class SearchResult implements Comparable<Object> {
@@ -295,20 +293,31 @@ public class AutocompleteController extends VitroAjaxController {
         private String uri;
         
         SearchResult(String label, String uri) {
-            this.label = JSONObject.quote(label);
-            this.uri = JSONObject.quote(uri);
+            this.label = label;
+            this.uri = uri;
         }
         
         public String getLabel() {
             return label;
         }
         
+        public String getJsonLabel() {
+            return JSONObject.quote(label);
+        }
+        
         public String getUri() {
             return uri;
         }
         
-        public String getJson() {
-            return "{ \"label\": \"" + label + "\", " + "\"uri\": \"" + uri + "\" }";
+        public String getJsonUri() {
+            return JSONObject.quote(uri);
+        }
+        
+        Map<String, String> toMap() {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("label", label);
+            map.put("uri", uri);
+            return map;
         }
 
         public int compareTo(Object o) throws ClassCastException {
@@ -316,7 +325,7 @@ public class AutocompleteController extends VitroAjaxController {
                 throw new ClassCastException("Error in SearchResult.compareTo(): expected SearchResult object.");
             }
             SearchResult sr = (SearchResult) o;
-            return label.compareTo(sr.getLabel());
+            return label.compareToIgnoreCase(sr.getLabel());
         }
     }
 
