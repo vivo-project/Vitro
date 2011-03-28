@@ -13,6 +13,10 @@ $(document).ready(function(){
       alert('Please enter a value for Individual URI 2.');
       return false;
     }
+    if ($('#uri1').val() == $('#uri2').val()){
+      alert('Primary and duplicate URI cannot be same.');
+      return false;
+    }
   });
   
 });
