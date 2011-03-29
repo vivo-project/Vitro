@@ -200,20 +200,21 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
             log.debug("Using local name for individual with rdfs:label " + ent.getURI());
             value = ent.getLocalName();
         }
-        Field name =new Field(term.NAME, value, 
-                               Field.Store.YES, Field.Index.ANALYZED);
+        Field name = new Field(term.NAME, value, Field.Store.YES, Field.Index.ANALYZED);
         doc.add( name );
         
-        Field nameUn = new Field(term.NAMEUNSTEMMED, value, 
-        						Field.Store.NO, Field.Index.ANALYZED);        
+        Field nameUn = new Field(term.NAMEUNSTEMMED, value, Field.Store.NO, Field.Index.ANALYZED);  
+        nameUn.setBoost(NAME_BOOST);
         doc.add( nameUn );
-
+        
         // BK nameunanalyzed is used by IndividualListController
-        Field nameUnanalyzed = new Field(term.NAMELOWERCASE, value.toLowerCase(), 
-				Field.Store.YES, Field.Index.NOT_ANALYZED);        
+        Field nameUnanalyzed = new Field(term.NAMELOWERCASE, value.toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED);        
+        nameUnanalyzed.setBoost(NAME_BOOST);
         doc.add( nameUnanalyzed );
         
-        doc.add( new Field(term.NAMERAW, value, Field.Store.YES, Field.Index.NOT_ANALYZED));
+        Field nameRaw = new Field(term.NAMERAW, value, Field.Store.YES, Field.Index.NOT_ANALYZED);
+        nameRaw.setBoost(NAME_BOOST);
+        doc.add(nameRaw);
         
         
         //Moniker

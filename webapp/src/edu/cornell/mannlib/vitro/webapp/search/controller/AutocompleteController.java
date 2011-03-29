@@ -227,7 +227,7 @@ public class AutocompleteController extends VitroAjaxController {
         // operator: e.g., +(name:tales name:tales*)
         try {
             log.debug("Adding non-wildcard query for " + querystr);
-            Query query = parser.parse(querystr);  
+            Query query = parser.parse(querystr);
             boolQuery.add(query, BooleanClause.Occur.SHOULD);
 
             // Prevent ParseException here when adding * after a space.

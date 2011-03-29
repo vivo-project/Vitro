@@ -131,6 +131,7 @@ public class LuceneIndexer implements IndexerIface {
                 String offLineDir = getOffLineBuildDir();
                 this.currentOffLineDir = offLineDir;
                 writer = new IndexWriter(offLineDir, analyzer, true, MAX_FIELD_LENGTH);
+                writer.setSimilarity(new CustomSimilarity());
             }else{                
                 writer = getLiveIndexWriter(false);                
             }

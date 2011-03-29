@@ -70,6 +70,7 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.Searcher;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroHighlighter;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryFactory;
+import edu.cornell.mannlib.vitro.webapp.search.lucene.CustomSimilarity;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
@@ -211,6 +212,16 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
 
             IndexSearcher searcherForRequest = LuceneIndexFactory.getIndexSearcher(getServletContext());
                                                 
+            /* using the CustomSimilarity to override effects such as 
+             * 1) rarity of a term doesn't affect the document score.
+             * 2) number of instances of a query term in the matched document doesn't affect the document score
+             * 3) field length doesn't affect the document score 
+             * 
+             * 3/29/2011 bk392
+             */
+            CustomSimilarity customSimilarity = new CustomSimilarity();
+            searcherForRequest.setSimilarity(customSimilarity);
+            
             TopDocs topDocs = null;
             try{
             	log.debug("Searching for query term in the Index with maxHitSize "+ maxHitSize);
@@ -382,8 +393,8 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
             return doSearchError(e,format);
         }        
     }
-    
-    private void alphaSortIndividuals(List<Individual> beans) {
+
+	private void alphaSortIndividuals(List<Individual> beans) {
         Collections.sort(beans, new Comparator< Individual >(){
             public int compare(Individual o1, Individual o2) {
                 if( o1 == null || o1.getName() == null )
@@ -605,9 +616,8 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
             
             QueryParser parser = getQueryParser(analyzer);
             query = parser.parse(querystr);
-
+                  
             String alpha = request.getParameter("alpha");
-            
             
             if( alpha != null && !"".equals(alpha) && alpha.length() == 1){
             	
@@ -688,9 +698,14 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
 //        map.put(Entity2LuceneDoc.term.ALLTEXT,Entity2LuceneDoc.term.ALLTEXTUNSTEMMED);
 //        qp.setStemmedToUnstemmed(map);
     	
-    	MultiFieldQueryParser qp = new MultiFieldQueryParser(Version.LUCENE_29, new String[]{ 
-    				"name", "nameunstemmed", "type", "moniker", "ALLTEXT", "ALLTEXTUNSTEMMED", "nameraw" , "classLocalName", "classLocalNameLowerCase" }, analyzer);
-        qp.setDefaultOperator(QueryParser.AND_OPERATOR);
+//    	MultiFieldQueryParser qp = new MultiFieldQueryParser(Version.LUCENE_29, new String[]{ 
+//    				"name", "nameunstemmed", "type", "moniker", "ALLTEXT", "ALLTEXTUNSTEMMED", "nameraw" , "classLocalName", "classLocalNameLowerCase" }, analyzer); 
+    	
+    	QueryParser qp = new QueryParser(Version.LUCENE_29, "name", analyzer); 
+    	
+    	//AND_OPERATOR returns documents even if the terms in the query lie in different fields.
+    	//The only requirement is that they exist in a single document.
+        //qp.setDefaultOperator(QueryParser.AND_OPERATOR);
 
     	
     	return qp;
