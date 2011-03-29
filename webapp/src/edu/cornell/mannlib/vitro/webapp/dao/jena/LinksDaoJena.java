@@ -74,7 +74,18 @@ public class LinksDaoJena extends JenaBaseDao implements LinksDao {
                             Collator collator = Collator.getInstance();
                             int compval = collator.compare(first.getDisplayRank(),second.getDisplayRank());
                             if (compval == 0) {
-                                compval = collator.compare(first.getAnchor(),second.getAnchor());
+                                String firstAnchor = first.getAnchor();
+                                String secondAnchor = second.getAnchor();
+                                if (firstAnchor == null) {
+                                    if (secondAnchor == null) {
+                                        return 0;
+                                    }
+                                    return 1;
+                                } 
+                                if (secondAnchor == null) {
+                                    return -1;
+                                }
+                                compval = collator.compare(firstAnchor, secondAnchor);
                             }
                             return compval;
                         }
@@ -117,7 +128,18 @@ public class LinksDaoJena extends JenaBaseDao implements LinksDao {
                             Collator collator = Collator.getInstance();
                             int compval = collator.compare(first.getDisplayRank(),second.getDisplayRank());
                             if (compval == 0) {
-                                compval = collator.compare(first.getAnchor(),second.getAnchor());
+                                String firstAnchor = first.getAnchor();
+                                String secondAnchor = second.getAnchor();
+                                if (firstAnchor == null) {
+                                    if (secondAnchor == null) {
+                                        return 0;
+                                    }
+                                    return 1;
+                                } 
+                                if (secondAnchor == null) {
+                                    return -1;
+                                }                                
+                                compval = collator.compare(firstAnchor, secondAnchor);
                             }
                             return compval;
                         }
