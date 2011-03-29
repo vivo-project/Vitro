@@ -94,6 +94,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        // Check to see if the request is for a non-information resource, redirect if it is.
 	        String redirectURL = checkForRedirect ( url, vreq );
 	        if( redirectURL != null ){
+	            redirectURL = UrlBuilder.getUrl(redirectURL);
 	            return new RedirectResponseValues(redirectURL);
 	        }            	                                         
 	
