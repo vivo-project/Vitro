@@ -142,18 +142,22 @@ public class HiddenFromDisplayBelowRoleLevelFilter extends VitroFiltersImpl {
             log.debug("checking hidden status for data property statement \"" + dPropStmt.getDatapropURI() + "\"");
             try {
                 String propUri = dPropStmt.getDatapropURI();
-                DataProperty prop = null;                
-                if( dataPropertyMap.containsKey(propUri) ){
-                    prop = dataPropertyMap.get(propUri);
-                }else{
-                    prop = wdf.getDataPropertyDao().getDataPropertyByURI(propUri);                    
-                    dataPropertyMap.put(propUri, prop);
-                }
-                if( prop == null ) {
-                    if( ! canViewOddItems() ){ return false; }
-                }else{
-                    if( sameLevelOrHigher( prop.getHiddenFromDisplayBelowRoleLevel() ) == false)
-                        return false;
+                if (propUri == null) {
+                	if ( ! canViewOddItems() ){ return false; }
+                } else {
+	                DataProperty prop = null;                
+	                if( dataPropertyMap.containsKey(propUri) ){
+	                    prop = dataPropertyMap.get(propUri);
+	                }else{
+	                    prop = wdf.getDataPropertyDao().getDataPropertyByURI(propUri);                    
+	                    dataPropertyMap.put(propUri, prop);
+	                }
+	                if( prop == null ) {
+	                    if( ! canViewOddItems() ){ return false; }
+	                }else{
+	                    if( sameLevelOrHigher( prop.getHiddenFromDisplayBelowRoleLevel() ) == false)
+	                        return false;
+	                }
                 }
 
                 Individual subject = dPropStmt.getIndividual();
@@ -238,7 +242,7 @@ public class HiddenFromDisplayBelowRoleLevelFilter extends VitroFiltersImpl {
                         return false;
                     }
                 } else {
-                    if (sameLevelOrHigher(subject
+                    if (sameLevelOrHigher(object
                             .getHiddenFromDisplayBelowRoleLevel()) == false)
                         return false;
                 }
