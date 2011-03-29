@@ -181,7 +181,7 @@
 
 <c:if test="${requestScope.predicate.offerCreateNewOption == true}">
  	<c:if test="${requestScope.rangeOptionsExist == true }">
-    	<p style="margin-top: 2em">If you don't find the appropriate entry on the selection list:</p>
+    	<p style="margin-top: 2.2em">If you don't find the appropriate entry on the selection list above:</p>
   	</c:if>
   	<c:if test="${requestScope.rangeOptionsExist == false }">
   		<p style="margin-top: 5em">Please create a new entry.</p>  		    
@@ -193,7 +193,7 @@
         <input type="hidden" value="${param.objectUri}" name="objectUri"/>        
 		<input type="hidden" value="create" name="cmd"/>        
 		<v:input type="typesForCreateNew" id="typeOfNew" />
-        <v:input type="submit" id="submit" value="add a new item to this list" cancel="${offerCancel}"/>
+        <v:input type="submit" id="submit" value="add a new item of this type" cancel="${offerCancel}"/>
 	</form>                            
 </c:if>
 
