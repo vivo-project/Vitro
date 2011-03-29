@@ -86,8 +86,8 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     protected static final String DATA_PROPERTY_QUERY_STRING = 
         prefixes + "\n" +
         "SELECT DISTINCT ?property WHERE { \n" +
-        "   GRAPH ?g1 { ?subject ?property ?object } \n" + 
-        "   GRAPH ?g2 { ?property rdf:type owl:DatatypeProperty } \n" +
+        "   ?subject ?property ?object . \n" + 
+        "   ?property rdf:type owl:DatatypeProperty . \n" +
         propertyFilters +
         "}";
     

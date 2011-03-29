@@ -80,8 +80,8 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     protected static final String OBJECT_PROPERTY_QUERY_STRING = 
         prefixes + "\n" +
         "SELECT DISTINCT ?property WHERE { \n" +
-        "   GRAPH ?g1 { ?subject ?property ?object } \n" + 
-        "   GRAPH ?g2 { ?property rdf:type owl:ObjectProperty } \n" +
+        "   ?subject ?property ?object . \n" + 
+        "   ?property rdf:type owl:ObjectProperty . \n" +
         propertyFilters +
         "}";
 

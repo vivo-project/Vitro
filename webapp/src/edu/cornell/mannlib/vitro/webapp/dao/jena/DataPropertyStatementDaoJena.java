@@ -44,9 +44,7 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
     
     protected static final String DATA_PROPERTY_VALUE_QUERY_STRING = 
         "SELECT ?value WHERE { \n" +
-        "   GRAPH ?g {\n" + 
-        "       ?subject ?property ?value . \n" +        
-        "   }\n" +
+        "    ?subject ?property ?value . \n" +        
         "}";
     
     static protected Query dataPropertyValueQuery;
