@@ -94,8 +94,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        // Check to see if the request is for a non-information resource, redirect if it is.
 	        String redirectURL = checkForRedirect ( url, vreq );
 	        if( redirectURL != null ){
-	            redirectURL = UrlBuilder.getUrl(redirectURL);
-	            return new RedirectResponseValues(redirectURL);
+	            return new RedirectResponseValues(UrlBuilder.getUrl(redirectURL));
 	        }            	                                         
 	
 	        Individual individual = null;
@@ -117,7 +116,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        // If this is an uploaded file, redirect to its "alias URL".
 	        String aliasUrl = getAliasUrlForBytestreamIndividual(vreq, individual);
 	        if (aliasUrl != null) {
-	        	return new RedirectResponseValues(UrlBuilder.getUrl(vreq.getContextPath() + aliasUrl));
+	        	return new RedirectResponseValues(UrlBuilder.getUrl(aliasUrl));
 	        }
 
 	        Map<String, Object> body = new HashMap<String, Object>();
@@ -480,7 +479,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 				}//else send them to html													
 			}
 			//else redirect to HTML representation
-			return UrlBuilder.getUrl("display/" + m.group(1));
+			return "display/" + m.group(1);
 		}else{			
 			return null;
 		}
