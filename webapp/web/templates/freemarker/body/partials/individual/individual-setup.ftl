@@ -8,3 +8,5 @@
 <#assign editable = individual.editable>
 
 <#assign propertyGroups = individual.propertyList>
+<#assign allProperties = individual.fullPropertyList>
+
