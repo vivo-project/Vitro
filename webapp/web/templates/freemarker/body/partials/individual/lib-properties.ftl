@@ -172,11 +172,11 @@ name will be used as the label. -->
      Currently the page displays the vitro namespace links properties. Future versions 
      will use the vivo core ontology links property, eliminating the need for special handling.
      
-     Note that this macro has a side-effect in the calls to propertyGroups.getPropertyAndRemoveFromList().
+     Note that this macro has a side-effect in the calls to propertyGroups.pullProperty().
 -->
 <#macro vitroLinks propertyGroups namespaces editable linkListClass="individual-urls">
-    <#local primaryLink = propertyGroups.getPropertyAndRemoveFromList("${namespaces.vitro}primaryLink")!>
-    <#local additionalLinks = propertyGroups.getPropertyAndRemoveFromList("${namespaces.vitro}additionalLink")!>
+    <#local primaryLink = propertyGroups.pullProperty("${namespaces.vitro}primaryLink")!>
+    <#local additionalLinks = propertyGroups.pullProperty("${namespaces.vitro}additionalLink")!>
 
     <#if (primaryLink?has_content || additionalLinks?has_content)> <#-- true when the property is in the list, even if not populated (when editing) -->
         <nav role="navigation">
@@ -205,10 +205,10 @@ name will be used as the label. -->
 
      Values for showPlaceholder: "always", "never", "with_add_link" 
      
-     Note that this macro has a side-effect in the call to propertyGroups.getPropertyAndRemoveFromList().
+     Note that this macro has a side-effect in the call to propertyGroups.pullProperty().
 -->
 <#macro image individual propertyGroups namespaces editable showPlaceholder="never" placeholder="">
-    <#local mainImage = propertyGroups.getPropertyAndRemoveFromList("${namespaces.vitroPublic}mainImage")!>
+    <#local mainImage = propertyGroups.pullProperty("${namespaces.vitroPublic}mainImage")!>
     <#local extraParams = "">
     <#if placeholder?has_content>
         <#local extraParams = { "placeholder" : placeholder } >
