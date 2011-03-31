@@ -166,5 +166,10 @@ public interface Individual extends ResourceBean, VitroTimeWindowedResource, Com
     Float getSearchBoost();
     void setSearchBoost( Float boost );
     
+    /**
+     * Return the individual that is wrapped by this individual.  Implementations that do not wrap an individual should
+     * simply "return this;".  Those which wrap an individual should "return wrapped.getBaseIndividual();".
+     * @return the wrapped individual
+     */
     Individual getBaseIndividual();
 }
