@@ -29,6 +29,7 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
     protected VitroRequest vreq;
     protected UrlBuilder urlBuilder;
     protected GroupedPropertyList propertyList = null;
+    protected GroupedPropertyList fullPropertyList = null;
     protected LoginStatusBean loginStatusBean = null;
     private EditingPolicyHelper policyHelper = null;
 
@@ -112,6 +113,12 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
             propertyList = new GroupedPropertyList(individual, vreq, policyHelper);
         }
         return propertyList;
+    }
+    public GroupedPropertyList getFullPropertyList() {
+        if (fullPropertyList == null) {
+            fullPropertyList = new GroupedPropertyList(individual.getBaseIndividual(), vreq, policyHelper); //get individual without filtering
+        }
+        return fullPropertyList;
     }
     
     public boolean isEditable() {

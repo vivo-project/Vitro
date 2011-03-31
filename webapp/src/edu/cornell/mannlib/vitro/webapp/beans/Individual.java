@@ -165,4 +165,6 @@ public interface Individual extends ResourceBean, VitroTimeWindowedResource, Com
     
     Float getSearchBoost();
     void setSearchBoost( Float boost );
+    
+    Individual getBaseIndividual();
 }
