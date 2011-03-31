@@ -91,8 +91,7 @@ public class FakeExternalAuthController extends FreemarkerHttpServlet {
 	}
 
 	private RedirectResponseValues makeRedirectResponse() {
-		return new RedirectResponseValues(
-				UrlBuilder.getUrl(URL_EXTERNAL_AUTH_RETURN));
+		return new RedirectResponseValues(URL_EXTERNAL_AUTH_RETURN);
 	}
 
 	/**

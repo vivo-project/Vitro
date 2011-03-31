@@ -30,7 +30,7 @@ public class SimpleReasonerRecomputeController extends FreemarkerHttpServlet {
         // Due to requiresLoginLevel(), we don't get here unless logged in as DBA
         if (!LoginStatusBean.getBean(vreq)
                 .isLoggedInAtLeast(LoginStatusBean.DBA)) {
-            return new RedirectResponseValues(UrlBuilder.getUrl(Route.LOGIN));
+            return new RedirectResponseValues(Route.LOGIN);
         }
         Map<String, Object> body = new HashMap<String, Object>();
         

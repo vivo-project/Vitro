@@ -163,8 +163,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 
 			// If they aren't authorized to do this, send them to login.
 			if (!checkAuthorized(vreq)) {
-				String loginPage = request.getContextPath() + Controllers.LOGIN;
-				return new RedirectResponseValues(loginPage);
+				return new RedirectResponseValues(Controllers.LOGIN);
 			}
 
 			return buildTheResponse(vreq);
@@ -464,7 +463,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	/**
 	 * When we complete the process, by success or by cancellation, go to the
 	 * initial referring page. If there wasn't one, go to the individual display
-	 * page,
+	 * page.
 	 */
 	private String exitPageUrl(VitroRequest vreq, String entityUri) {
 		String referrer = (String) vreq.getSession().getAttribute(
