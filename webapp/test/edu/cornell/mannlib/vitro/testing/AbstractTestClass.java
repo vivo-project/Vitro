@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.testing;
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
 
 import java.io.BufferedReader;
@@ -21,6 +22,8 @@ import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -358,6 +361,27 @@ public abstract class AbstractTestClass {
 			fail(e.toString());
 		}
 		return result.toString().replaceAll(">\\s+<", "><");
+	}
+
+	protected <T extends Comparable<T>> void assertEqualSets(String label,
+			Set<T> expected, Set<T> actual) {
+		if (expected.equals(actual)) {
+			return;
+		}
+
+		Set<T> missing = new TreeSet<T>(expected);
+		missing.removeAll(actual);
+		Set<T> extras = new TreeSet<T>(actual);
+		extras.removeAll(expected);
+
+		String message = label;
+		if (!missing.isEmpty()) {
+			message += ", missing: " + missing;
+		}
+		if (!extras.isEmpty()) {
+			message += ", extra: " + extras;
+		}
+		assertEquals(message, expected, actual);
 	}
 
 }

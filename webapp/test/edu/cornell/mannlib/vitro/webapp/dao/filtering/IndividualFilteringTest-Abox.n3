@@ -1,0 +1,105 @@
+# $This file is distributed under the terms of the license in /doc/license.txt$ 
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix bib: <http://purl.org/ontology/bibo/> .
+@prefix core: <http://vivoweb.org/ontology/core#> .
+@prefix mydomain: <http://vivo.mydomain.edu/individual/> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix role: <http://vitro.mannlib.cornell.edu/ns/vitro/role#> .
+
+### This file is for the test IndividualFilteringTest.java.
+
+#
+# Bozo
+#
+mydomain:bozo
+	a foaf:Person ;
+	
+	foaf:firstName "Bozo" ;
+	foaf:lastName "Person" ;
+	core:hrJobTitle "Clown" ;
+	core:primaryEmail "bozo@Comedy.com" ;
+	core:phoneNumber "555-9999" ;
+	core:email "bozo@clowncollege.edu";
+    
+    core:editorOf mydomain:publicObject ;
+    core:editorOf mydomain:selfObject ;
+    core:editorOf mydomain:editorObject ;
+    core:editorOf mydomain:curatorObject ;
+    core:editorOf mydomain:dbaObject ;
+    core:editorOf mydomain:hiddenObject ;
+    
+    core:roleIn mydomain:publicObject ;
+    core:roleIn mydomain:selfObject ;
+    core:roleIn mydomain:editorObject ;
+    core:roleIn mydomain:curatorObject ;
+    core:roleIn mydomain:dbaObject ;
+    core:roleIn mydomain:hiddenObject ;
+    
+    core:roleOf mydomain:publicObject ;
+    core:roleOf mydomain:selfObject ;
+    core:roleOf mydomain:editorObject ;
+    core:roleOf mydomain:curatorObject ;
+    core:roleOf mydomain:dbaObject ;
+    core:roleOf mydomain:hiddenObject ;
+    
+    core:partOf mydomain:publicObject ;
+    core:partOf mydomain:selfObject ;
+    core:partOf mydomain:editorObject ;
+    core:partOf mydomain:curatorObject ;
+    core:partOf mydomain:dbaObject ;
+    core:partOf mydomain:hiddenObject ;
+    
+    core:offers mydomain:publicObject ;
+    core:offers mydomain:selfObject ;
+    core:offers mydomain:editorObject ;
+    core:offers mydomain:curatorObject ;
+    core:offers mydomain:dbaObject ;
+    core:offers mydomain:hiddenObject ;
+    
+    core:featuredIn mydomain:publicObject ;
+    core:featuredIn mydomain:selfObject ;
+    core:featuredIn mydomain:editorObject ;
+    core:featuredIn mydomain:curatorObject ;
+    core:featuredIn mydomain:dbaObject ;
+    core:featuredIn mydomain:hiddenObject ;
+	.
+
+#
+# public Homepage
+#
+mydomain:publicHomepage
+	a foaf:Document ;
+	rdfs:label "public homepage" ;
+	.
+	
+#
+# Objects of object properties
+#
+mydomain:publicObject
+	a core:Student ;
+	rdfs:label "public file" ;
+	.
+mydomain:selfObject
+	a core:Presentation ;
+	rdfs:label "self file" ;
+	.
+mydomain:editorObject
+	a core:SeminarSeries ;
+	rdfs:label "editor file" ;
+	.
+mydomain:curatorObject
+	a core:Video ;
+	rdfs:label "curator file" ;
+	.
+mydomain:dbaObject
+	a core:ClinicalRole ;
+	rdfs:label "dba file" ;
+	.
+mydomain:hiddenObject
+	a core:Facility ;
+	rdfs:label "hidden file" ;
+	.
