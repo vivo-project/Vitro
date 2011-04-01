@@ -1,11 +1,6 @@
 # $This file is distributed under the terms of the license in /doc/license.txt$ 
 
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix foaf: <http://xmlns.com/foaf/0.1/> .
-@prefix bib: <http://purl.org/ontology/bibo/> .
-@prefix core: <http://vivoweb.org/ontology/core#> .
 @prefix mydomain: <http://vivo.mydomain.edu/individual/> .
 @prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
 @prefix role: <http://vitro.mannlib.cornell.edu/ns/vitro/role#> .
@@ -14,31 +9,100 @@
 ### This file is for the test IndividualFilteringTest.java.
 
 #
-# restrict the data properties.
+# create the data properties
 #
-foaf:lastName          vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public .
-foaf:firstName         vitro:hiddenFromDisplayBelowRoleLevelAnnot role:selfEditor .
-core:email             vitro:hiddenFromDisplayBelowRoleLevelAnnot role:editor .
-core:hrJobTitle        vitro:hiddenFromDisplayBelowRoleLevelAnnot role:curator .
-core:phoneNumber       vitro:hiddenFromDisplayBelowRoleLevelAnnot role:dbAdmin .
-core:primaryEmail      vitro:hiddenFromDisplayBelowRoleLevelAnnot role:nobody .
+mydomain:publicDataProperty 
+	a owl:DatatypeProperty ;
+	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
+	.
+		
+mydomain:selfDataProperty 
+	a owl:DatatypeProperty ;
+	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:selfEditor ;
+	.
+		
+mydomain:editorDataProperty 
+	a owl:DatatypeProperty ;
+	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:editor ;
+	.
+		
+mydomain:curatorDataProperty 
+	a owl:DatatypeProperty ;
+	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:curator ;
+	.
+		
+mydomain:dbaDataProperty 
+	a owl:DatatypeProperty ;
+	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:dbAdmin ;
+	.
+		
+mydomain:hiddenDataProperty 
+	a owl:DatatypeProperty ;
+	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:nobody ;
+	.
+		
+#
+# create the object properties
+#
+mydomain:publicObjectProperty 
+	a owl:ObjectProperty ;
+	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
+	.
+		
+mydomain:selfObjectProperty 
+	a owl:ObjectProperty ;
+	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:selfEditor ;
+	.
+		
+mydomain:editorObjectProperty 
+	a owl:ObjectProperty ;
+	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:editor ;
+	.
+		
+mydomain:curatorObjectProperty 
+	a owl:ObjectProperty ;
+	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:curator ;
+	.
+		
+mydomain:dbaObjectProperty 
+	a owl:ObjectProperty ;
+	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:dbAdmin ;
+	.
+		
+mydomain:hiddenObjectProperty 
+	a owl:ObjectProperty ;
+	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:nobody ;
+	.
 
 #
-# restrict the object properties.
+# create the object classes
 #
-core:editorOf          vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public .
-core:roleIn            vitro:hiddenFromDisplayBelowRoleLevelAnnot role:selfEditor .
-core:roleOf            vitro:hiddenFromDisplayBelowRoleLevelAnnot role:editor .
-core:partOf            vitro:hiddenFromDisplayBelowRoleLevelAnnot role:curator .
-core:offers            vitro:hiddenFromDisplayBelowRoleLevelAnnot role:dbAdmin .
-core:featuredIn        vitro:hiddenFromDisplayBelowRoleLevelAnnot role:nobody .
-
-#
-# restrict the classes of the objects.
-#
-core:Student           vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public .
-core:Presentation      vitro:hiddenFromDisplayBelowRoleLevelAnnot role:selfEditor .
-core:SeminarSeries     vitro:hiddenFromDisplayBelowRoleLevelAnnot role:editor .
-core:Video             vitro:hiddenFromDisplayBelowRoleLevelAnnot role:curator .
-core:ClinicalRole      vitro:hiddenFromDisplayBelowRoleLevelAnnot role:dbAdmin .
-core:Facility          vitro:hiddenFromDisplayBelowRoleLevelAnnot role:nobody .
+mydomain:publicClass 
+	a owl:Class ;
+	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
+	.
+		
+mydomain:selfClass 
+	a owl:Class ;
+	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:selfEditor ;
+	.
+		
+mydomain:editorClass 
+	a owl:Class ;
+	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:editor ;
+	.
+		
+mydomain:curatorClass 
+	a owl:Class ;
+	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:curator ;
+	.
+		
+mydomain:dbaClass 
+	a owl:Class ;
+	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:dbAdmin ;
+	.
+		
+mydomain:hiddenClass 
+	a owl:Class ;
+	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:nobody ;
+	.

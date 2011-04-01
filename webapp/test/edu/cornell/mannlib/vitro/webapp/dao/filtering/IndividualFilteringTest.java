@@ -49,7 +49,19 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 
 /**
- * TODO
+ * Test the filtering of IndividualFiltering.
+ * 
+ * There are 6 levels of data hiding - public, selfEditor, editor, curator,
+ * dbAdmin and nobody.
+ * 
+ * The data files for this test describe an Individual with 6 data properties,
+ * each with a different hiding level, and 36 object properties, showing all
+ * combinations of hiding levels for the property and for the class of the
+ * object.
+ * 
+ * There is a flag in HiddenFromDisplayBelowRoleLevelFilter which
+ * enables/disables filtering based on the class of the object. These tests
+ * should work regardless of how that flag is set.
  */
 @RunWith(value = Parameterized.class)
 public class IndividualFilteringTest extends AbstractTestClass {
@@ -61,11 +73,9 @@ public class IndividualFilteringTest extends AbstractTestClass {
 	// ----------------------------------------------------------------------
 
 	/**
-	 * Files that will create the TBOX.
+	 * Where the ontology statements are stored for this test.
 	 */
-	private static final String TBOX_VITRO_CORE_FILENAME = "vitro-0.7.owl";
-	private static final String TBOX_VIVO_CORE_FILENAME = "vivo-core-1.2.owl";
-	private static final String TBOX_ANNOTATIONS_FILENAME = "IndividualFilteringTest-TBoxAnnotations.n3";
+	private static final String TBOX_DATA_FILENAME = "IndividualFilteringTest-TBoxAnnotations.n3";
 
 	/**
 	 * Where the model statements are stored for this test.
@@ -73,20 +83,24 @@ public class IndividualFilteringTest extends AbstractTestClass {
 	private static final String ABOX_DATA_FILENAME = "IndividualFilteringTest-Abox.n3";
 
 	/**
-	 * The individual we are reading.
+	 * The domain where all of the objects and properties are defined.
 	 */
 	private static final String NS = "http://vivo.mydomain.edu/individual/";
-	private static final String INDIVIDUAL_URI = NS + "bozo";
+
+	/**
+	 * The individual we are reading.
+	 */
+	private static final String INDIVIDUAL_URI = mydomain("bozo");
 
 	/**
 	 * Data properties to look for.
 	 */
-	private static final String PUBLIC_DATA_PROPERTY = "http://xmlns.com/foaf/0.1/lastName";
-	private static final String SELF_DATA_PROPERTY = "http://xmlns.com/foaf/0.1/firstName";
-	private static final String EDITOR_DATA_PROPERTY = "http://vivoweb.org/ontology/core#email";
-	private static final String CURATOR_DATA_PROPERTY = "http://vivoweb.org/ontology/core#hrJobTitle";
-	private static final String DBA_DATA_PROPERTY = "http://vivoweb.org/ontology/core#phoneNumber";
-	private static final String HIDDEN_DATA_PROPERTY = "http://vivoweb.org/ontology/core#primaryEmail";
+	private static final String PUBLIC_DATA_PROPERTY = mydomain("publicDataProperty");
+	private static final String SELF_DATA_PROPERTY = mydomain("selfDataProperty");
+	private static final String EDITOR_DATA_PROPERTY = mydomain("editorDataProperty");
+	private static final String CURATOR_DATA_PROPERTY = mydomain("curatorDataProperty");
+	private static final String DBA_DATA_PROPERTY = mydomain("dbaDataProperty");
+	private static final String HIDDEN_DATA_PROPERTY = mydomain("hiddenDataProperty");
 	private static final String[] DATA_PROPERTIES = { PUBLIC_DATA_PROPERTY,
 			SELF_DATA_PROPERTY, EDITOR_DATA_PROPERTY, CURATOR_DATA_PROPERTY,
 			DBA_DATA_PROPERTY, HIDDEN_DATA_PROPERTY };
@@ -94,12 +108,12 @@ public class IndividualFilteringTest extends AbstractTestClass {
 	/**
 	 * Object properties to look for.
 	 */
-	private static final String PUBLIC_OBJECT_PROPERTY = "http://vivoweb.org/ontology/core#editorOf";
-	private static final String SELF_OBJECT_PROPERTY = "http://vivoweb.org/ontology/core#roleIn";
-	private static final String EDITOR_OBJECT_PROPERTY = "http://vivoweb.org/ontology/core#roleOf";
-	private static final String CURATOR_OBJECT_PROPERTY = "http://vivoweb.org/ontology/core#partOf";
-	private static final String DBA_OBJECT_PROPERTY = "http://vivoweb.org/ontology/core#offers";
-	private static final String HIDDEN_OBJECT_PROPERTY = "http://vivoweb.org/ontology/core#featuredIn";
+	private static final String PUBLIC_OBJECT_PROPERTY = mydomain("publicObjectProperty");
+	private static final String SELF_OBJECT_PROPERTY = mydomain("selfObjectProperty");
+	private static final String EDITOR_OBJECT_PROPERTY = mydomain("editorObjectProperty");
+	private static final String CURATOR_OBJECT_PROPERTY = mydomain("curatorObjectProperty");
+	private static final String DBA_OBJECT_PROPERTY = mydomain("dbaObjectProperty");
+	private static final String HIDDEN_OBJECT_PROPERTY = mydomain("hiddenObjectProperty");
 	private static final String[] OBJECT_PROPERTIES = { PUBLIC_OBJECT_PROPERTY,
 			SELF_OBJECT_PROPERTY, EDITOR_OBJECT_PROPERTY,
 			CURATOR_OBJECT_PROPERTY, DBA_OBJECT_PROPERTY,
@@ -108,12 +122,12 @@ public class IndividualFilteringTest extends AbstractTestClass {
 	/**
 	 * Objects to look for.
 	 */
-	private static final String PUBLIC_OBJECT = "http://vivo.mydomain.edu/individual/publicObject";
-	private static final String SELF_OBJECT = "http://vivo.mydomain.edu/individual/selfObject";
-	private static final String EDITOR_OBJECT = "http://vivo.mydomain.edu/individual/editorObject";
-	private static final String CURATOR_OBJECT = "http://vivo.mydomain.edu/individual/curatorObject";
-	private static final String DBA_OBJECT = "http://vivo.mydomain.edu/individual/dbaObject";
-	private static final String HIDDEN_OBJECT = "http://vivo.mydomain.edu/individual/hiddenObject";
+	private static final String PUBLIC_OBJECT = mydomain("publicObject");
+	private static final String SELF_OBJECT = mydomain("selfObject");
+	private static final String EDITOR_OBJECT = mydomain("editorObject");
+	private static final String CURATOR_OBJECT = mydomain("curatorObject");
+	private static final String DBA_OBJECT = mydomain("dbaObject");
+	private static final String HIDDEN_OBJECT = mydomain("hiddenObject");
 	private static final String[] OBJECTS = { PUBLIC_OBJECT, SELF_OBJECT,
 			EDITOR_OBJECT, CURATOR_OBJECT, DBA_OBJECT, HIDDEN_OBJECT };
 
@@ -123,6 +137,10 @@ public class IndividualFilteringTest extends AbstractTestClass {
 		data.addExpectedObjectProperties(PUBLIC_OBJECT_PROPERTY);
 		data.addExpectedObjects(PUBLIC_OBJECT);
 		return data;
+	}
+
+	private static String mydomain(String localname) {
+		return NS + localname;
 	}
 
 	private static TestData selfTestData() {
@@ -193,9 +211,7 @@ public class IndividualFilteringTest extends AbstractTestClass {
 		OntModel ontModel = ModelFactory
 				.createOntologyModel(OntModelSpec.OWL_DL_MEM);
 
-		readFileIntoModel(ontModel, TBOX_VITRO_CORE_FILENAME, "RDF/XML");
-		readFileIntoModel(ontModel, TBOX_VIVO_CORE_FILENAME, "RDF/XML");
-		readFileIntoModel(ontModel, TBOX_ANNOTATIONS_FILENAME, "N3");
+		readFileIntoModel(ontModel, TBOX_DATA_FILENAME, "N3");
 
 		return ontModel;
 	}
