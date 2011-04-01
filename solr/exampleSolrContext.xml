@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
-
 <Context docBase="${solr.docbase}" 
-   debug="0" crossContext="true">
+    crossContext="true" override="true">
 
-   <Environment 
-        name="solr/home" 
+   <Environment
         type="java.lang.String" 
+        name="solr/home"  
         value="${solr.home}" override="true"/>
 
+   <!-- Disable persist sessions on shut down.-->
+   <Manager pathname="" />
 </Context>
