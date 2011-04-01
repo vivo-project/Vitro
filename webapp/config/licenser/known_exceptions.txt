@@ -164,3 +164,6 @@ webapp/web/js/raphael/*
 
 # See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/js/sparql/prototype.js
+
+solr/**/*
+solr/*
