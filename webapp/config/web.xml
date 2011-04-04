@@ -1105,12 +1105,7 @@
     <servlet-name>individual</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualController</servlet-class>
   </servlet>
-  
-  <servlet>
-    <servlet-name>updateEntityFlags</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.UpdateEntityFlagServlet</servlet-class>
-  </servlet>
-
+    
   <servlet>
     <servlet-name>authenticate</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate</servlet-class>
