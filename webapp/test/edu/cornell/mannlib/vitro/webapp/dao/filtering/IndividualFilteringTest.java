@@ -76,7 +76,7 @@ public class IndividualFilteringTest extends AbstractTestClass {
 	/**
 	 * Where the ontology statements are stored for this test.
 	 */
-	private static final String TBOX_DATA_FILENAME = "IndividualFilteringTest-TBoxAnnotations.n3";
+	private static final String TBOX_DATA_FILENAME = "IndividualFilteringTest-TBox.n3";
 
 	/**
 	 * Where the model statements are stored for this test.
@@ -251,7 +251,6 @@ public class IndividualFilteringTest extends AbstractTestClass {
 
 	@Parameters
 	public static Collection<Object[]> data() {
-		// return Arrays.asList(new Object[][] { { dbaTestData() } });
 		return Arrays.asList(new Object[][] { { publicTestData() },
 				{ selfTestData() }, { editorTestData() },
 				{ curatorTestData() }, { dbaTestData() } });
