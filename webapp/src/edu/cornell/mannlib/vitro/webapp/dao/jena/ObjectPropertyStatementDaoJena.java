@@ -25,6 +25,7 @@ import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -254,10 +255,10 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
     public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
             String subjectUri, 
             String propertyUri, 
-            String queryString) {
+            String objectKey, String queryString) {
         
         return getObjectPropertyStatementsForIndividualByProperty(
-                subjectUri, propertyUri, null);
+                subjectUri, propertyUri, objectKey, objectKey, null);
         
     }
     
@@ -272,8 +273,8 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
     public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
             String subjectUri, 
             String propertyUri, 
-            String queryString, 
-            Set<String> constructQueryStrings ) {  
+            String objectKey, 
+            String queryString, Set<String> constructQueryStrings ) {  
         
         Model constructedModel = constructModelForSelectQueries(
                 subjectUri, propertyUri, constructQueryStrings);
@@ -313,7 +314,10 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 
             while (results.hasNext()) {
                 QuerySolution soln = results.nextSolution();
-                list.add(QueryUtils.querySolutionToStringValueMap(soln));
+                RDFNode node = soln.get(objectKey);
+                if (node.isResource()) {
+                    list.add(QueryUtils.querySolutionToStringValueMap(soln));
+                }
             }
             
         } finally {

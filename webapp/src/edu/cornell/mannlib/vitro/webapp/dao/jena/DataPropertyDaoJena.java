@@ -27,6 +27,7 @@ import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -75,31 +76,14 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
      * This is a hack to throw out properties in the vitro, rdf, rdfs, and owl namespaces.
      * It will be implemented in a better way in v1.3 (Editing and Display Configuration).
      */
-    protected static String propertyFilters = null;
+    protected static final String PROPERTY_FILTERS;
     static {
         List<String> namespaceFilters = new ArrayList<String>();
-        for (String s : EXCLUDED_NAMESPACES) {
-            namespaceFilters.add("(afn:namespace(?property) != \"" + s + "\")");
+        for (String namespace : EXCLUDED_NAMESPACES) {
+            namespaceFilters.add("( afn:namespace(?property) != \"" + namespace + "\" )");
         }
-        propertyFilters = "FILTER (" + StringUtils.join(namespaceFilters, " && ") + ")\n";
+        PROPERTY_FILTERS = StringUtils.join(namespaceFilters, " && ");
     } 
-    protected static final String DATA_PROPERTY_QUERY_STRING = 
-        prefixes + "\n" +
-        "SELECT DISTINCT ?property WHERE { \n" +
-        "   ?subject ?property ?object . \n" + 
-        "   ?property rdf:type owl:DatatypeProperty . \n" +
-        propertyFilters +
-        "}";
-    
-    protected static Query dataPropertyQuery;
-    static {
-        try {
-            dataPropertyQuery = QueryFactory.create(DATA_PROPERTY_QUERY_STRING);
-        } catch(Throwable th){
-            log.error("could not create SPARQL query for DATA_PROPERTY_QUERY_STRING " + th.getMessage());
-            log.error(DATA_PROPERTY_QUERY_STRING);
-        }             
-    }
     
     private class DataPropertyRanker implements Comparator {
         public int compare (Object o1, Object o2) {
@@ -767,9 +751,32 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
      * into the new one in a future release.
      */
     public List<DataProperty> getDataPropertyList(String subjectUri) {
-        log.debug("Data property query string:\n" + DATA_PROPERTY_QUERY_STRING);         
-        log.debug("Data property query:\n" + dataPropertyQuery);        
-        Iterator<QuerySolution> results = getPropertyQueryResults(subjectUri, dataPropertyQuery);
+
+        // Due to a Jena bug, prebinding on ?subject combined with the isLiteral()
+        // filter causes the query to fail. Using string concatenation to insert the
+        // subject uri instead.
+        String queryString = 
+            prefixes + "\n" +
+            "SELECT DISTINCT ?property WHERE { \n" +
+            "   <" + subjectUri + "> ?property ?object . \n" + 
+            "   ?property a owl:DatatypeProperty . \n" +
+            "   FILTER ( \n" +
+            "       isLiteral(?object) && \n" +
+                    PROPERTY_FILTERS + "\n" +
+            "   ) \n" +
+            "}";
+        
+        Query query = null;
+        try {
+            query = QueryFactory.create(queryString);
+        } catch(Throwable th){
+            log.error("could not create SPARQL query for query string " + th.getMessage());
+            log.error(queryString);
+            return null;
+        }                     
+        log.debug("Data property query string:\n" + query);         
+     
+        Iterator<QuerySolution> results = getPropertyQueryResults(subjectUri, query);
         List<DataProperty> properties = new ArrayList<DataProperty>();
         while (results.hasNext()) {
             QuerySolution sol = results.next();

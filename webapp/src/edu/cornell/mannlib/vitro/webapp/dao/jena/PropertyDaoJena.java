@@ -404,18 +404,20 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
      
     protected Iterator<QuerySolution> getPropertyQueryResults(String subjectUri, Query query) {        
         log.debug("SPARQL query:\n" + query.toString());
-        // Bind the subject's uri to the ?subject query term
-        QuerySolutionMap subjectBinding = new QuerySolutionMap();
-        subjectBinding.add("subject", 
-                ResourceFactory.createResource(subjectUri));
-
+        
+        // RY Removing prebinding due to Jena bug: when isLiteral(?object) or 
+        // isURI(?object) is added to the query as a filter, the query fails with prebinding
+        // but succeeds when the subject uri is concatenated into the query string.
+        //QuerySolutionMap subjectBinding = new QuerySolutionMap();
+        //subjectBinding.add("subject", ResourceFactory.createResource(subjectUri));
+                
         // Run the SPARQL query to get the properties
         DatasetWrapper w = dwf.getDatasetWrapper();
         Dataset dataset = w.getDataset();
         dataset.getLock().enterCriticalSection(Lock.READ);
         try {
             QueryExecution qexec = QueryExecutionFactory.create(
-                    query, dataset, subjectBinding);
+                    query, dataset); //, subjectBinding);
             try {
                 ResultSet rs = qexec.execSelect();
                 // consume iterator before wrapper w is closed in finally block
