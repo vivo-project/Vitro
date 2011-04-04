@@ -41,7 +41,7 @@ deploy   - Deploy solr service for use by vitro.
 		</copy>
 		
 		<!-- Add the war file. -->
-		<copy todir="${solr.docbase}">
+		<copy tofile="${solr.docbase}">
 		  <fileset file="${solr.war}"/>
 		</copy>
 		
