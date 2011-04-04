@@ -46,12 +46,7 @@ public class VitroFilterUtils {
      */
     public static VitroFilters getDisplayFilterByRoleLevel(RoleLevel role, WebappDaoFactory wdf){        
         return new HiddenFromDisplayBelowRoleLevelFilter(role, wdf);
-    }
-    
-    /* bdc34: Currently, this is not called from anywhere in the code. */
-    public static VitroFilters getUpdateFilterByRoleLevel(RoleLevel role, WebappDaoFactory wdf){    
-        return new ProhibitedFromUpdateBelowRoleLevelFilter(role, wdf);
-    }
+    }    
 
     /** this filter accepts only objects which have sunset dates of the given date or
      * earlier and sunset dates after the given date.  sunrise <= givenDate < sunset.
