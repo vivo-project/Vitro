@@ -52,10 +52,11 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
  * Test the filtering of IndividualFiltering.
  * 
  * There are 6 levels of data hiding - public, selfEditor, editor, curator,
- * dbAdmin and nobody.
+ * dbAdmin and nobody. We add a 7th case for data which has no explicit hiding
+ * level - it should be treated as public.
  * 
- * The data files for this test describe an Individual with 6 data properties,
- * each with a different hiding level, and 36 object properties, showing all
+ * The data files for this test describe an Individual with 7 data properties,
+ * each with a different hiding level, and 49 object properties, showing all
  * combinations of hiding levels for the property and for the class of the
  * object.
  * 
@@ -95,95 +96,105 @@ public class IndividualFilteringTest extends AbstractTestClass {
 	/**
 	 * Data properties to look for.
 	 */
+	private static final String OPEN_DATA_PROPERTY = mydomain("openDataProperty");
 	private static final String PUBLIC_DATA_PROPERTY = mydomain("publicDataProperty");
 	private static final String SELF_DATA_PROPERTY = mydomain("selfDataProperty");
 	private static final String EDITOR_DATA_PROPERTY = mydomain("editorDataProperty");
 	private static final String CURATOR_DATA_PROPERTY = mydomain("curatorDataProperty");
 	private static final String DBA_DATA_PROPERTY = mydomain("dbaDataProperty");
 	private static final String HIDDEN_DATA_PROPERTY = mydomain("hiddenDataProperty");
-	private static final String[] DATA_PROPERTIES = { PUBLIC_DATA_PROPERTY,
-			SELF_DATA_PROPERTY, EDITOR_DATA_PROPERTY, CURATOR_DATA_PROPERTY,
-			DBA_DATA_PROPERTY, HIDDEN_DATA_PROPERTY };
+	private static final String[] DATA_PROPERTIES = { OPEN_DATA_PROPERTY,
+			PUBLIC_DATA_PROPERTY, SELF_DATA_PROPERTY, EDITOR_DATA_PROPERTY,
+			CURATOR_DATA_PROPERTY, DBA_DATA_PROPERTY, HIDDEN_DATA_PROPERTY };
 
 	/**
 	 * Object properties to look for.
 	 */
+	private static final String OPEN_OBJECT_PROPERTY = mydomain("openObjectProperty");
 	private static final String PUBLIC_OBJECT_PROPERTY = mydomain("publicObjectProperty");
 	private static final String SELF_OBJECT_PROPERTY = mydomain("selfObjectProperty");
 	private static final String EDITOR_OBJECT_PROPERTY = mydomain("editorObjectProperty");
 	private static final String CURATOR_OBJECT_PROPERTY = mydomain("curatorObjectProperty");
 	private static final String DBA_OBJECT_PROPERTY = mydomain("dbaObjectProperty");
 	private static final String HIDDEN_OBJECT_PROPERTY = mydomain("hiddenObjectProperty");
-	private static final String[] OBJECT_PROPERTIES = { PUBLIC_OBJECT_PROPERTY,
-			SELF_OBJECT_PROPERTY, EDITOR_OBJECT_PROPERTY,
-			CURATOR_OBJECT_PROPERTY, DBA_OBJECT_PROPERTY,
-			HIDDEN_OBJECT_PROPERTY };
+	private static final String[] OBJECT_PROPERTIES = { OPEN_OBJECT_PROPERTY,
+			PUBLIC_OBJECT_PROPERTY, SELF_OBJECT_PROPERTY,
+			EDITOR_OBJECT_PROPERTY, CURATOR_OBJECT_PROPERTY,
+			DBA_OBJECT_PROPERTY, HIDDEN_OBJECT_PROPERTY };
 
 	/**
 	 * Objects to look for.
 	 */
+	private static final String OPEN_OBJECT = mydomain("openObject");
 	private static final String PUBLIC_OBJECT = mydomain("publicObject");
 	private static final String SELF_OBJECT = mydomain("selfObject");
 	private static final String EDITOR_OBJECT = mydomain("editorObject");
 	private static final String CURATOR_OBJECT = mydomain("curatorObject");
 	private static final String DBA_OBJECT = mydomain("dbaObject");
 	private static final String HIDDEN_OBJECT = mydomain("hiddenObject");
-	private static final String[] OBJECTS = { PUBLIC_OBJECT, SELF_OBJECT,
-			EDITOR_OBJECT, CURATOR_OBJECT, DBA_OBJECT, HIDDEN_OBJECT };
-
-	private static TestData publicTestData() {
-		TestData data = new TestData(PUBLIC);
-		data.addExpectedDataProperties(PUBLIC_DATA_PROPERTY);
-		data.addExpectedObjectProperties(PUBLIC_OBJECT_PROPERTY);
-		data.addExpectedObjects(PUBLIC_OBJECT);
-		return data;
-	}
+	private static final String[] OBJECTS = { OPEN_OBJECT, PUBLIC_OBJECT,
+			SELF_OBJECT, EDITOR_OBJECT, CURATOR_OBJECT, DBA_OBJECT,
+			HIDDEN_OBJECT };
 
 	private static String mydomain(String localname) {
 		return NS + localname;
 	}
 
+	private static TestData publicTestData() {
+		TestData data = new TestData(PUBLIC);
+		data.addExpectedDataProperties(OPEN_DATA_PROPERTY, PUBLIC_DATA_PROPERTY);
+		data.addExpectedObjectProperties(OPEN_OBJECT_PROPERTY,
+				PUBLIC_OBJECT_PROPERTY);
+		data.addExpectedObjects(OPEN_OBJECT, PUBLIC_OBJECT);
+		return data;
+	}
+
 	private static TestData selfTestData() {
 		TestData data = new TestData(SELF);
-		data.addExpectedDataProperties(PUBLIC_DATA_PROPERTY, SELF_DATA_PROPERTY);
-		data.addExpectedObjectProperties(PUBLIC_OBJECT_PROPERTY,
-				SELF_OBJECT_PROPERTY);
-		data.addExpectedObjects(PUBLIC_OBJECT, SELF_OBJECT);
+		data.addExpectedDataProperties(OPEN_DATA_PROPERTY,
+				PUBLIC_DATA_PROPERTY, SELF_DATA_PROPERTY);
+		data.addExpectedObjectProperties(OPEN_OBJECT_PROPERTY,
+				PUBLIC_OBJECT_PROPERTY, SELF_OBJECT_PROPERTY);
+		data.addExpectedObjects(OPEN_OBJECT, PUBLIC_OBJECT, SELF_OBJECT);
 		return data;
 	}
 
 	private static TestData editorTestData() {
 		TestData data = new TestData(EDITOR);
-		data.addExpectedDataProperties(PUBLIC_DATA_PROPERTY,
-				SELF_DATA_PROPERTY, EDITOR_DATA_PROPERTY);
-		data.addExpectedObjectProperties(PUBLIC_OBJECT_PROPERTY,
-				SELF_OBJECT_PROPERTY, EDITOR_OBJECT_PROPERTY);
-		data.addExpectedObjects(PUBLIC_OBJECT, SELF_OBJECT, EDITOR_OBJECT);
+		data.addExpectedDataProperties(OPEN_DATA_PROPERTY,
+				PUBLIC_DATA_PROPERTY, SELF_DATA_PROPERTY, EDITOR_DATA_PROPERTY);
+		data.addExpectedObjectProperties(OPEN_OBJECT_PROPERTY,
+				PUBLIC_OBJECT_PROPERTY, SELF_OBJECT_PROPERTY,
+				EDITOR_OBJECT_PROPERTY);
+		data.addExpectedObjects(OPEN_OBJECT, PUBLIC_OBJECT, SELF_OBJECT,
+				EDITOR_OBJECT);
 		return data;
 	}
 
 	private static TestData curatorTestData() {
 		TestData data = new TestData(CURATOR);
-		data.addExpectedDataProperties(PUBLIC_DATA_PROPERTY,
-				SELF_DATA_PROPERTY, EDITOR_DATA_PROPERTY, CURATOR_DATA_PROPERTY);
-		data.addExpectedObjectProperties(PUBLIC_OBJECT_PROPERTY,
-				SELF_OBJECT_PROPERTY, EDITOR_OBJECT_PROPERTY,
-				CURATOR_OBJECT_PROPERTY);
-		data.addExpectedObjects(PUBLIC_OBJECT, SELF_OBJECT, EDITOR_OBJECT,
-				CURATOR_OBJECT);
+		data.addExpectedDataProperties(OPEN_DATA_PROPERTY,
+				PUBLIC_DATA_PROPERTY, SELF_DATA_PROPERTY, EDITOR_DATA_PROPERTY,
+				CURATOR_DATA_PROPERTY);
+		data.addExpectedObjectProperties(OPEN_OBJECT_PROPERTY,
+				PUBLIC_OBJECT_PROPERTY, SELF_OBJECT_PROPERTY,
+				EDITOR_OBJECT_PROPERTY, CURATOR_OBJECT_PROPERTY);
+		data.addExpectedObjects(OPEN_OBJECT, PUBLIC_OBJECT, SELF_OBJECT,
+				EDITOR_OBJECT, CURATOR_OBJECT);
 		return data;
 	}
 
 	private static TestData dbaTestData() {
 		TestData data = new TestData(DB_ADMIN);
-		data.addExpectedDataProperties(PUBLIC_DATA_PROPERTY,
-				SELF_DATA_PROPERTY, EDITOR_DATA_PROPERTY,
+		data.addExpectedDataProperties(OPEN_DATA_PROPERTY,
+				PUBLIC_DATA_PROPERTY, SELF_DATA_PROPERTY, EDITOR_DATA_PROPERTY,
 				CURATOR_DATA_PROPERTY, DBA_DATA_PROPERTY);
-		data.addExpectedObjectProperties(PUBLIC_OBJECT_PROPERTY,
-				SELF_OBJECT_PROPERTY, EDITOR_OBJECT_PROPERTY,
-				CURATOR_OBJECT_PROPERTY, DBA_OBJECT_PROPERTY);
-		data.addExpectedObjects(PUBLIC_OBJECT, SELF_OBJECT, EDITOR_OBJECT,
-				CURATOR_OBJECT, DBA_OBJECT);
+		data.addExpectedObjectProperties(OPEN_OBJECT_PROPERTY,
+				PUBLIC_OBJECT_PROPERTY, SELF_OBJECT_PROPERTY,
+				EDITOR_OBJECT_PROPERTY, CURATOR_OBJECT_PROPERTY,
+				DBA_OBJECT_PROPERTY);
+		data.addExpectedObjects(OPEN_OBJECT, PUBLIC_OBJECT, SELF_OBJECT,
+				EDITOR_OBJECT, CURATOR_OBJECT, DBA_OBJECT);
 		return data;
 	}
 

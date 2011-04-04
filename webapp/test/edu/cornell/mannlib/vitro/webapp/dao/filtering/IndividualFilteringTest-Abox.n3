@@ -11,6 +11,7 @@
 mydomain:bozo
 	a mydomain:publicClass ;
 	
+	mydomain:openDataProperty "open info" ;
 	mydomain:publicDataProperty "public info" ;
 	mydomain:selfDataProperty "self info" ;
 	mydomain:editorDataProperty "editor info" ;
@@ -18,6 +19,15 @@ mydomain:bozo
 	mydomain:dbaDataProperty "dba info" ;
 	mydomain:hiddenDataProperty "hidden info" ;
     
+    mydomain:openObjectProperty mydomain:openObject ;
+    mydomain:openObjectProperty mydomain:publicObject ;
+    mydomain:openObjectProperty mydomain:selfObject ;
+    mydomain:openObjectProperty mydomain:editorObject ;
+    mydomain:openObjectProperty mydomain:curatorObject ;
+    mydomain:openObjectProperty mydomain:dbaObject ;
+    mydomain:openObjectProperty mydomain:hiddenObject ;
+    
+    mydomain:publicObjectProperty mydomain:openObject ;
     mydomain:publicObjectProperty mydomain:publicObject ;
     mydomain:publicObjectProperty mydomain:selfObject ;
     mydomain:publicObjectProperty mydomain:editorObject ;
@@ -25,6 +35,7 @@ mydomain:bozo
     mydomain:publicObjectProperty mydomain:dbaObject ;
     mydomain:publicObjectProperty mydomain:hiddenObject ;
     
+    mydomain:selfObjectProperty mydomain:openObject ;
     mydomain:selfObjectProperty mydomain:publicObject ;
     mydomain:selfObjectProperty mydomain:selfObject ;
     mydomain:selfObjectProperty mydomain:editorObject ;
@@ -32,6 +43,7 @@ mydomain:bozo
     mydomain:selfObjectProperty mydomain:dbaObject ;
     mydomain:selfObjectProperty mydomain:hiddenObject ;
     
+    mydomain:editorObjectProperty mydomain:openObject ;
     mydomain:editorObjectProperty mydomain:publicObject ;
     mydomain:editorObjectProperty mydomain:selfObject ;
     mydomain:editorObjectProperty mydomain:editorObject ;
@@ -39,6 +51,7 @@ mydomain:bozo
     mydomain:editorObjectProperty mydomain:dbaObject ;
     mydomain:editorObjectProperty mydomain:hiddenObject ;
     
+    mydomain:curatorObjectProperty mydomain:openObject ;
     mydomain:curatorObjectProperty mydomain:publicObject ;
     mydomain:curatorObjectProperty mydomain:selfObject ;
     mydomain:curatorObjectProperty mydomain:editorObject ;
@@ -46,6 +59,7 @@ mydomain:bozo
     mydomain:curatorObjectProperty mydomain:dbaObject ;
     mydomain:curatorObjectProperty mydomain:hiddenObject ;
     
+    mydomain:dbaObjectProperty mydomain:openObject ;
     mydomain:dbaObjectProperty mydomain:publicObject ;
     mydomain:dbaObjectProperty mydomain:selfObject ;
     mydomain:dbaObjectProperty mydomain:editorObject ;
@@ -53,6 +67,7 @@ mydomain:bozo
     mydomain:dbaObjectProperty mydomain:dbaObject ;
     mydomain:dbaObjectProperty mydomain:hiddenObject ;
     
+    mydomain:hiddenObjectProperty mydomain:openObject ;
     mydomain:hiddenObjectProperty mydomain:publicObject ;
     mydomain:hiddenObjectProperty mydomain:selfObject ;
     mydomain:hiddenObjectProperty mydomain:editorObject ;
@@ -64,6 +79,10 @@ mydomain:bozo
 #
 # Objects of object properties
 #
+mydomain:openObject
+	a mydomain:openClass ;
+	rdfs:label "open file" ;
+	.
 mydomain:publicObject
 	a mydomain:publicClass ;
 	rdfs:label "public file" ;

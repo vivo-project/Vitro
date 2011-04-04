@@ -11,6 +11,10 @@
 #
 # create the data properties
 #
+mydomain:openDataProperty 
+	a owl:DatatypeProperty ;
+	.
+		
 mydomain:publicDataProperty 
 	a owl:DatatypeProperty ;
 	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
@@ -44,31 +48,29 @@ mydomain:hiddenDataProperty
 #
 # create the object properties
 #
+mydomain:openObjectProperty 
+	a owl:ObjectProperty ;
+	.
 mydomain:publicObjectProperty 
 	a owl:ObjectProperty ;
 	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
 	.
-		
 mydomain:selfObjectProperty 
 	a owl:ObjectProperty ;
 	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:selfEditor ;
 	.
-		
 mydomain:editorObjectProperty 
 	a owl:ObjectProperty ;
 	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:editor ;
 	.
-		
 mydomain:curatorObjectProperty 
 	a owl:ObjectProperty ;
 	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:curator ;
 	.
-		
 mydomain:dbaObjectProperty 
 	a owl:ObjectProperty ;
 	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:dbAdmin ;
 	.
-		
 mydomain:hiddenObjectProperty 
 	a owl:ObjectProperty ;
 	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:nobody ;
@@ -77,31 +79,29 @@ mydomain:hiddenObjectProperty
 #
 # create the object classes
 #
+mydomain:openClass 
+	a owl:Class ;
+	.
 mydomain:publicClass 
 	a owl:Class ;
 	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:public ;
 	.
-		
 mydomain:selfClass 
 	a owl:Class ;
 	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:selfEditor ;
 	.
-		
 mydomain:editorClass 
 	a owl:Class ;
 	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:editor ;
 	.
-		
 mydomain:curatorClass 
 	a owl:Class ;
 	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:curator ;
 	.
-		
 mydomain:dbaClass 
 	a owl:Class ;
 	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:dbAdmin ;
 	.
-		
 mydomain:hiddenClass 
 	a owl:Class ;
 	vitro:hiddenFromDisplayBelowRoleLevelAnnot role:nobody ;
