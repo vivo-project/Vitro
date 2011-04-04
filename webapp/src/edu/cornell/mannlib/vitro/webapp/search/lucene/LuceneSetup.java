@@ -4,13 +4,12 @@ package edu.cornell.mannlib.vitro.webapp.search.lucene;
 
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.ALLTEXT;
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.ALLTEXTUNSTEMMED;
-import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.NAME;
-import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.NAMEUNSTEMMED;
-import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.MONIKER;
-import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.RDFTYPE;
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.CLASSLOCALNAME;
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.CLASSLOCALNAMELOWERCASE;
-
+import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.MONIKER;
+import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.NAME;
+import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.NAMEUNSTEMMED;
+import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.RDFTYPE;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +24,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
-import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.util.Version;
@@ -70,7 +68,10 @@ import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
  *
  */
 public class LuceneSetup implements javax.servlet.ServletContextListener {        
-    private static final Log log = LogFactory.getLog(LuceneSetup.class.getName());
+	private static final Log log = LogFactory.getLog(LuceneSetup.class.getName());
+
+	private static final String PROPERTY_VITRO_HOME = "vitro.home.directory";
+	private static final String LUCENE_SUBDIRECTORY_NAME = "luceneIndex";
         
 	/**
 	 * Gets run to set up DataSource when the webapp servlet context gets
@@ -192,40 +193,46 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 	public static void setBoolMax() {
 		BooleanQuery.setMaxClauseCount(16384);
 	}
-       
+
 	/**
 	 * Gets the name of the directory to store the lucene index in. The
 	 * {@link ConfigurationProperties} should have a property named
-	 * 'LuceneSetup.indexDir' which has the directory to store the lucene index
-	 * for this clone in. If the property is not found, an exception will be
-	 * thrown.
+	 * 'vitro.home.directory' which has the parent directory of the directory to
+	 * store the lucene index for this clone in. If the property is not found,
+	 * an exception will be thrown.
 	 * 
 	 * @return a string that is the directory to store the lucene index.
 	 * @throws IllegalStateException
-	 *             if the property is not found.
+	 *             if the property is not found, or if the home directory does
+	 *             not exist.
 	 * @throws IOException
 	 *             if the directory doesn't exist and we fail to create it.
 	 */
-	private String getBaseIndexDirName(ServletContext ctx)
-			throws IOException {
-		String dirName = ConfigurationProperties.getBean(ctx)
-				.getProperty("LuceneSetup.indexDir");
-		if (dirName == null) {
-			throw new IllegalStateException(
-					"LuceneSetup.indexDir not found in properties file.");
+	private String getBaseIndexDirName(ServletContext ctx) throws IOException {
+		String homeDirName = ConfigurationProperties.getBean(ctx).getProperty(
+				PROPERTY_VITRO_HOME);
+		if (homeDirName == null) {
+			throw new IllegalStateException(PROPERTY_VITRO_HOME
+					+ " not found in properties file.");
 		}
 
-		File dir = new File(dirName);
-		if (!dir.exists()) {
-			boolean created = dir.mkdir();
+		File homeDir = new File(homeDirName);
+		if (!homeDir.exists()) {
+			throw new IllegalStateException("Vitro home directory '"
+					+ homeDir.getAbsolutePath() + "' does not exist.");
+		}
+
+		File luceneDir = new File(homeDir, LUCENE_SUBDIRECTORY_NAME);
+		if (!luceneDir.exists()) {
+			boolean created = luceneDir.mkdir();
 			if (!created) {
 				throw new IOException(
-						"Unable to create Lucene index directory at '" + dir
-								+ "'");
+						"Unable to create Lucene index directory at '"
+								+ luceneDir + "'");
 			}
 		}
 
-		return dirName;
+		return luceneDir.getPath();
 	}
 
     /**

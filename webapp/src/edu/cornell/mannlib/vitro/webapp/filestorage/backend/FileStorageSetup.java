@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.filestorage.backend;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -30,9 +31,11 @@ public class FileStorageSetup implements ServletContextListener {
 
 	/**
 	 * The default implementation will use this key to ask
-	 * {@link ConfigurationProperties} for the file storage base directory.
+	 * {@link ConfigurationProperties} for the vivo home directory. The file
+	 * storage base directory is in a subdirectory below this one.
 	 */
-	public static final String PROPERTY_FILE_STORAGE_BASE_DIR = "upload.directory";
+	public static final String PROPERTY_VITRO_HOME_DIR = "vitro.home.directory";
+	public static final String FILE_STORAGE_SUBDIRECTORY = "uploads";
 
 	/**
 	 * The default implementation will use this key to ask
@@ -65,15 +68,31 @@ public class FileStorageSetup implements ServletContextListener {
 	 * 
 	 * For use by the constructor in implementations of {@link FileStorage}.
 	 */
-	private File figureBaseDir(ServletContextEvent sce) {
-		String baseDirPath = ConfigurationProperties.getBean(sce)
-			.getProperty(PROPERTY_FILE_STORAGE_BASE_DIR);
-		if (baseDirPath == null) {
+	private File figureBaseDir(ServletContextEvent sce) throws IOException {
+		String homeDirPath = ConfigurationProperties.getBean(sce)
+			.getProperty(PROPERTY_VITRO_HOME_DIR);
+		if (homeDirPath == null) {
 			throw new IllegalArgumentException(
 					"Configuration properties must contain a value for '"
-							+ PROPERTY_FILE_STORAGE_BASE_DIR + "'");
+							+ PROPERTY_VITRO_HOME_DIR + "'");
 		}
-		return new File(baseDirPath);
+		
+		File homeDir = new File(homeDirPath);
+		if (!homeDir.exists()) {
+			throw new IllegalStateException("Vitro home directory '"
+					+ homeDir.getAbsolutePath() + "' does not exist.");
+		}
+
+		File baseDir = new File(homeDir, FILE_STORAGE_SUBDIRECTORY);
+		if (!baseDir.exists()) {
+			boolean created = baseDir.mkdir();
+			if (!created) {
+				throw new IOException(
+						"Unable to create uploads directory at '"
+								+ baseDir + "'");
+			}
+		}
+		return baseDir;
 	}
 
 	/**

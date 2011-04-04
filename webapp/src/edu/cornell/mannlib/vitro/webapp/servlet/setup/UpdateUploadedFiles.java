@@ -94,16 +94,27 @@ public class UpdateUploadedFiles implements ServletContextListener {
 						+ "UpdateUploadedFiles?");
 			}
 
-			String uploadDirectoryName = ConfigurationProperties.getBean(ctx)
-					.getProperty(FileStorageSetup.PROPERTY_FILE_STORAGE_BASE_DIR);
-			if (uploadDirectoryName == null) {
+			String vitroHomeDirectoryName = ConfigurationProperties
+					.getBean(ctx).getProperty(
+							FileStorageSetup.PROPERTY_VITRO_HOME_DIR);
+			if (vitroHomeDirectoryName == null) {
 				throw new IllegalStateException("Upload directory name is null");
 			}
-			File uploadDirectory = new File(uploadDirectoryName);
-			if (!uploadDirectory.exists()) {
-				throw new IllegalStateException("Upload directory '"
-						+ uploadDirectory.getAbsolutePath()
+			File vitroHomeDirectory = new File(vitroHomeDirectoryName);
+			if (!vitroHomeDirectory.exists()) {
+				throw new IllegalStateException("Vitro home directory '"
+						+ vitroHomeDirectory.getAbsolutePath()
 						+ "' does not exist.");
+			}
+			File uploadDirectory = new File(vitroHomeDirectory,
+					FileStorageSetup.FILE_STORAGE_SUBDIRECTORY);
+			if (!uploadDirectory.exists()) {
+				uploadDirectory.mkdir();
+				if (!uploadDirectory.exists()) {
+					throw new IllegalStateException(
+							"Failed to create the file uploads directory: "
+									+ uploadDirectory.getAbsolutePath());
+				}
 			}
 
 			String vivoDefaultNamespace = ConfigurationProperties.getBean(ctx)

@@ -30,6 +30,7 @@ public class FileStorageSetupTest extends AbstractTestClass {
 	// ----------------------------------------------------------------------
 
 	private static File tempDir;
+	private static File vivoHomeDir;
 	private static File fsBaseDir;
 
 	private FileStorageSetup fss;
@@ -50,7 +51,9 @@ public class FileStorageSetupTest extends AbstractTestClass {
 	@Before
 	public void createBaseDirectory() throws IOException {
 		tempDir = createTempDirectory("FileStorageFactoryTest");
-		fsBaseDir = new File(tempDir, "fsBaseDirectory");
+		vivoHomeDir = new File(tempDir, "fsBaseDirectory");
+		vivoHomeDir.mkdir();
+		fsBaseDir = new File(vivoHomeDir, FileStorageSetup.FILE_STORAGE_SUBDIRECTORY);
 		fsBaseDir.mkdir();
 	}
 
@@ -85,7 +88,7 @@ public class FileStorageSetupTest extends AbstractTestClass {
 	@Test
 	public void defaultNamespaceNotSpecified() {
 		setLoggerLevel(FileStorageSetup.class, Level.OFF);
-		setConfigurationProperties(fsBaseDir.getPath(), null);
+		setConfigurationProperties(vivoHomeDir.getPath(), null);
 		fss.contextInitialized(sce);
 		assertNull("no default namespace",
 				sc.getAttribute(FileStorageSetup.ATTRIBUTE_NAME));
@@ -95,7 +98,7 @@ public class FileStorageSetupTest extends AbstractTestClass {
 	@Test
 	public void defaultNamespaceIsBogus() {
 		setLoggerLevel(FileStorageSetup.class, Level.ERROR);
-		setConfigurationProperties(fsBaseDir.getPath(), "namespace");
+		setConfigurationProperties(vivoHomeDir.getPath(), "namespace");
 		fss.contextInitialized(sce);
 
 		Object o = sc.getAttribute(FileStorageSetup.ATTRIBUTE_NAME);
@@ -107,7 +110,7 @@ public class FileStorageSetupTest extends AbstractTestClass {
 
 	@Test
 	public void success() {
-		setConfigurationProperties(fsBaseDir.getPath(),
+		setConfigurationProperties(vivoHomeDir.getPath(),
 				"http://vivo.myDomain.edu/individual/");
 		fss.contextInitialized(sce);
 
@@ -127,7 +130,7 @@ public class FileStorageSetupTest extends AbstractTestClass {
 		ConfigurationPropertiesStub props = new ConfigurationPropertiesStub();
 
 		if (baseDir != null) {
-			props.setProperty(FileStorageSetup.PROPERTY_FILE_STORAGE_BASE_DIR,
+			props.setProperty(FileStorageSetup.PROPERTY_VITRO_HOME_DIR,
 					baseDir);
 		}
 		if (defaultNamespace != null) {

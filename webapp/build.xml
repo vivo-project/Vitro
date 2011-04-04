@@ -102,10 +102,8 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		      message="${deploy.properties.file} must contain a value for tomcat.home" />
 		<fail unless="webapp.name"
 		      message="${deploy.properties.file} must contain a value for webapp.name" />
-		<fail unless="upload.directory"
-		      message="${deploy.properties.file} must contain a value for upload.directory" />
-		<fail unless="LuceneSetup.indexDir"
-		      message="${deploy.properties.file} must contain a value for LuceneSetup.indexDir" />
+		<fail unless="vitro.home.directory"
+		      message="${deploy.properties.file} must contain a value for vitro.home.directory" />
 		<fail unless="Vitro.defaultNamespace"
 		      message="${deploy.properties.file} must contain a value for Vitro.defaultNamespace" />
 		<fail unless="Vitro.smtpHost"

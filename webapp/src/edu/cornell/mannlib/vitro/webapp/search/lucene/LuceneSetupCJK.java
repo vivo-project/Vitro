@@ -55,8 +55,10 @@ import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
  *
  */
 public class LuceneSetupCJK implements javax.servlet.ServletContextListener {
-        private static String indexDir = null;
+		private static String indexDir = null;
         private static final Log log = LogFactory.getLog(LuceneSetupCJK.class.getName());
+        private static final String PROPERTY_VITRO_HOME = "vitro.home.directory";
+    	private static final String LUCENE_SUBDIRECTORY_NAME = "luceneIndex";
 
         /**
          * Gets run to set up DataSource when the webapp servlet context gets created.
@@ -152,37 +154,43 @@ public class LuceneSetupCJK implements javax.servlet.ServletContextListener {
     	/**
     	 * Gets the name of the directory to store the lucene index in. The
     	 * {@link ConfigurationProperties} should have a property named
-    	 * 'LuceneSetup.indexDir' which has the directory to store the lucene index
-    	 * for this clone in. If the property is not found, an exception will be
-    	 * thrown.
+    	 * 'vitro.home.directory' which has the parent directory of the directory to
+    	 * store the lucene index for this clone in. If the property is not found,
+    	 * an exception will be thrown.
     	 * 
     	 * @return a string that is the directory to store the lucene index.
     	 * @throws IllegalStateException
-    	 *             if the property is not found.
+    	 *             if the property is not found, 
+    	 *             or if the home directory does not exist.
     	 * @throws IOException
     	 *             if the directory doesn't exist and we fail to create it.
     	 */
-    	private String getIndexDirName(ServletContextEvent sce)
-    			throws IOException {
-    		String dirName = ConfigurationProperties.getBean(sce)
-    				.getProperty("LuceneSetup.indexDir");
-    		if (dirName == null) {
-    			throw new IllegalStateException(
-    					"LuceneSetup.indexDir not found in properties file.");
-    		}
-
-    		File dir = new File(dirName);
-    		if (!dir.exists()) {
-    			boolean created = dir.mkdir();
-    			if (!created) {
-    				throw new IOException(
-    						"Unable to create Lucene index directory at '" + dir
-    								+ "'");
-    			}
-    		}
-
-    		return dirName;
-    	}
+		private String getIndexDirName(ServletContextEvent cte) throws IOException {
+			String homeDirName = ConfigurationProperties.getBean(cte).getProperty(
+					PROPERTY_VITRO_HOME);
+			if (homeDirName == null) {
+				throw new IllegalStateException(PROPERTY_VITRO_HOME
+						+ " not found in properties file.");
+			}
+	
+			File homeDir = new File(homeDirName);
+			if (!homeDir.exists()) {
+				throw new IllegalStateException("Vitro home directory '"
+						+ homeDir.getAbsolutePath() + "' does not exist.");
+			}
+	
+			File luceneDir = new File(homeDir, LUCENE_SUBDIRECTORY_NAME);
+			if (!luceneDir.exists()) {
+				boolean created = luceneDir.mkdir();
+				if (!created) {
+					throw new IOException(
+							"Unable to create Lucene index directory at '"
+									+ luceneDir + "'");
+				}
+			}
+	
+			return luceneDir.getPath();
+		}
 
     /**
      * Gets the analyzer that will be used when building the indexing
