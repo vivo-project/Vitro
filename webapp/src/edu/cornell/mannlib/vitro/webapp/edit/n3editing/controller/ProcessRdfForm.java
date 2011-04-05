@@ -351,8 +351,13 @@ public class ProcessRdfForm extends VitroHttpServlet{
 //        requiredAssertions = requiredFieldAssertions;
 //        requiredRetractions = requiredFieldRetractions;
 //        optionalAssertions = Collections.emptyList();
+        
+        AdditionsAndRetractions delta = new AdditionsAndRetractions();
+        delta.setAdditions(requiredFieldAssertions);
+        delta.setRetractions(requiredFieldRetractions);
  
-        throw new Error("need to be implemented by Deepak");        
+        return delta;
+        // throw new Error("need to be implemented by Deepak");        
 
 	}
 
