@@ -42,7 +42,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualUpdateEvent;
 
 public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements ObjectPropertyStatementDao {
 
-    protected static final Log log = LogFactory.getLog(ObjectPropertyStatementDaoJena.class);
+    private static final Log log = LogFactory.getLog(ObjectPropertyStatementDaoJena.class);
     
     private DatasetWrapperFactory dwf;
     
