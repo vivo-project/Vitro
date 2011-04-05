@@ -4,10 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
 
 import java.util.List;
 
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
-import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -16,6 +12,11 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class RdfLiteralHash {
     
@@ -27,7 +28,7 @@ public class RdfLiteralHash {
      * @param stmt
      * @return a value between MIN_INTEGER and MAX_INTEGER 
      */
-    public  static int makeRdfLiteralHash( DataPropertyStatement stmt ){
+    public static int makeRdfLiteralHash( DataPropertyStatement stmt ){
         if( (stmt.getLanguage() != null && stmt.getLanguage().trim().length() > 0) 
             && 
             (stmt.getDatatypeURI() != null && stmt.getDatatypeURI().trim().length() > 0  ) )
@@ -76,23 +77,23 @@ public class RdfLiteralHash {
     }
     
     /**
-     * Forward to either getDataPropertyStmtByHash or getVitroNsPropByHash, depending on the type of property.
+     * Forward to either getDataPropertyStmtByHash or getRdfsLabelStatementByHash, depending on the property.
      * @param ind
      * @param hash
      * @param model
-     * @param isVitroNsProp
      * @return a DataPropertyStatement if found or null if not found
      */
-    // RY Instead of a code fork here, we should have a method of Individual getAllDataPropertyStatements() which
-    // doesn't filter out the vitro ns property statements. This would also simplify the front end editing of the vitro ns
-    // properties, because they wouldn't have to be a special case.
-    public static DataPropertyStatement getPropertyStmtByHash(Individual ind, String predicateUri, int hash, Model model, boolean isVitroNsProp) {
+
+    public static DataPropertyStatement getPropertyStmtByHash(Individual ind, String predicateUri, int hash, Model model) {
         
         if (ind == null) return null;
-        
-        DataPropertyStatement dps = isVitroNsProp ? RdfLiteralHash.getVitroNsPropertyStmtByHash(ind, predicateUri, model, hash) :
-            RdfLiteralHash.getDataPropertyStmtByHash(ind, hash);
 
+        // RY Instead of a code fork here, we should have a method of Individual getAllDataPropertyStatements() which
+        // doesn't filter out rdfs:label. 
+        DataPropertyStatement dps = predicateUri.equals(VitroVocabulary.LABEL) 
+            ? getRdfsLabelStatementByHash(ind, model, hash) 
+            : getDataPropertyStmtByHash(ind, hash);
+            
         return dps;
     }
     
@@ -110,12 +111,14 @@ public class RdfLiteralHash {
 
     /**
      * 
-     * @param ind, may be null and getDataPropertyStatements() may return null.
+     * @param ind, may be null 
      * @param hash
      * @return a DataPropertyStatement if found or null if not found
      */
-    public static DataPropertyStatement getVitroNsPropertyStmtByHash(Individual ind, String predicateUri, Model model, int hash) {
+    public static DataPropertyStatement getRdfsLabelStatementByHash(Individual ind, Model model, int hash) {
 
+        String predicateUri = VitroVocabulary.LABEL;
+        
         DataPropertyStatement dps = null;
         StmtIterator stmts = model.listStatements(model.createResource(ind.getURI()),  
                                                   model.getProperty(predicateUri),
@@ -139,9 +142,10 @@ public class RdfLiteralHash {
             return null;
         }
     
-    public static int makeVitroNsLiteralHash( Individual subject, String predicateUri, String value, Model  model) { 
+    public static int makeRdfsLabelLiteralHash( Individual subject, String value, Model  model) { 
         
         String subjectUri = subject.getURI();
+        String predicateUri = VitroVocabulary.LABEL;
         
         StmtIterator stmts = model.listStatements(model.createResource(subjectUri), 
                                                   model.getProperty(predicateUri), 

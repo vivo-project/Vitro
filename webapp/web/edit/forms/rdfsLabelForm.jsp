@@ -30,8 +30,7 @@
 %>
 <%
     org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger("edu.cornell.mannlib.vitro.jsp.edit.forms.defaultVitroNsPropForm.jsp");
-    log.debug("Starting defaultVitroNsPropForm.jsp");
-    
+
     VitroRequest vreq = new VitroRequest(request);
     WebappDaoFactory wdf = vreq.getWebappDaoFactory();
     vreq.setAttribute("defaultNamespace", wdf.getDefaultNamespace());
@@ -40,7 +39,9 @@
     String predicateUri = vreq.getParameter("predicateUri");
     String propertyName = predicateUri.substring(predicateUri.lastIndexOf("#")+1);
     vreq.setAttribute("propertyName", propertyName);
- 
+
+    log.debug("Starting defaultVitroNsPropForm.jsp for property " + predicateUri);
+    
     DataPropertyStatement dps = (DataPropertyStatement)vreq.getAttribute("dataprop");
      
     String datapropKeyStr = vreq.getParameter("datapropKey");

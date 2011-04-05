@@ -40,7 +40,6 @@
       ************************************** */
 
     final String DEFAULT_DATA_FORM = "defaultDatapropForm.jsp";
-    final String DEFAULT_VITRO_NS_FORM = "defaultVitroNsDataPropForm.jsp";
     final String DEFAULT_ERROR_FORM = "error.jsp";
     
     VitroRequest vreq = new VitroRequest(request);
@@ -58,14 +57,6 @@
     String formParam    = vreq.getParameter("editForm");
     String command      = vreq.getParameter("cmd");
     
-    String vitroNsProp = (String) vreq.getParameter("vitroNsProp");
-    
-    boolean isVitroNsProp = false;
-    // On new Freemarker individual page, the editing link for rdfs:label doesn't get this url param attached
-    if ( "true".equals(vitroNsProp) || predicateUri.equals(VitroVocabulary.LABEL) ) {
-        isVitroNsProp = true;
-    }
-
     if( subjectUri == null || subjectUri.trim().length() == 0 ) {
         log.error("required subjectUri parameter missing");
         throw new Error("subjectUri was empty, it is required by editDatapropStmtRequestDispatch");
@@ -92,8 +83,9 @@
 
     DataProperty dataproperty = wdf.getDataPropertyDao().getDataPropertyByURI( predicateUri );
     if( dataproperty == null) {
-        // No dataproperty will be returned for a vitro ns prop, but we shouldn't throw an error.
-        if (!isVitroNsProp) {
+        // No dataproperty will be returned for rdfs:label, but we shouldn't throw an error.
+        // RY ** Consider instead getting rdfs:label included in what's returned
+        if (! predicateUri.equals(VitroVocabulary.LABEL)) {
             log.error("Could not find data property '"+predicateUri+"' in model");
             throw new Error("editDatapropStmtRequest.jsp: Could not find DataProperty in model: " + predicateUri);
         }
@@ -120,7 +112,7 @@
     DataPropertyStatement dps = null;
     if( dataHash != 0) {
         Model model = (Model)application.getAttribute("jenaOntModel");
-        dps = RdfLiteralHash.getPropertyStmtByHash(subject, predicateUri, dataHash, model, isVitroNsProp);
+        dps = RdfLiteralHash.getPropertyStmtByHash(subject, predicateUri, dataHash, model);
                               
         if (dps==null) {
             log.error("No match to existing data property \""+predicateUri+"\" statement for subject \""+subjectUri+"\" via key "+datapropKeyStr);
@@ -160,8 +152,8 @@
     if (formParam != null) {
         form = formParam;
     }   
-    else if (isVitroNsProp) {  // dataproperty is null here
-        form = DEFAULT_VITRO_NS_FORM; 
+    else if (predicateUri.equals(VitroVocabulary.LABEL)) {  // dataproperty is null here
+        form = "rdfsLabelForm.jsp"; 
     }
     else {
         form = dataproperty.getCustomEntryForm();

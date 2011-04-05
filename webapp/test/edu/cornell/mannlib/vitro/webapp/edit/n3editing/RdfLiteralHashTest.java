@@ -188,33 +188,30 @@ public class RdfLiteralHashTest {
     }
     
     @Test
-    public void testGetVitroNsPropertyStatement(){
+    public void testGetRdfsLabelStatementByHash(){
 
         String n3 =
-            "@prefix vitro: <" + VitroVocabulary.vitroURI + "> . \n" +
             "@prefix ex: <http://example.com/> . \n" +
             "@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . \n"+
             "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n"+
-            " ex:bob vitro:moniker \"great\"^^<"+XSD.xstring.getURI()+"> ." ;
+            " ex:bob rdfs:label \"Smith, Bob\"^^<"+XSD.xstring.getURI()+"> ." ;
                
         Model model = (ModelFactory.createDefaultModel()).read(new StringReader(n3), "", "N3");
 
         Individual bob = new IndividualImpl();
         bob.setURI("http://example.com/bob");
-        
-        String propertyUri = VitroVocabulary.MONIKER;
 
-        int hash = RdfLiteralHash.makeVitroNsLiteralHash(bob, propertyUri, "great", model);
-        DataPropertyStatement stmt = RdfLiteralHash.getVitroNsPropertyStmtByHash(bob, propertyUri, model, hash);
+        int hash = RdfLiteralHash.makeRdfsLabelLiteralHash(bob, "Smith, Bob", model);
+        DataPropertyStatement stmt = RdfLiteralHash.getRdfsLabelStatementByHash(bob, model, hash);
         
         String data = stmt.getData();
         String datatypeUri = stmt.getDatatypeURI();
         String predicateUri = stmt.getDatapropURI();
         String subjectUri = stmt.getIndividualURI();
         
-        Assert.assertEquals("great", data);
+        Assert.assertEquals("Smith, Bob", data);
         Assert.assertEquals(XSD.xstring.getURI(), datatypeUri);
-        Assert.assertEquals(VitroVocabulary.MONIKER, predicateUri);
+        Assert.assertEquals(VitroVocabulary.LABEL, predicateUri);
         Assert.assertEquals("http://example.com/bob", subjectUri);
       
     }

@@ -374,9 +374,7 @@ and set a flag in the request to indicate "back button confusion"
         
         Model model = (Model)application.getAttribute("jenaOntModel");
         int dpropHash = Integer.parseInt(editConfig.getDatapropKey());
-        String vitroNsProp = vreq.getParameter("vitroNsProp");
-        boolean isVitroNsProp = vitroNsProp != null && vitroNsProp.equals("true");
-        DataPropertyStatement dps = RdfLiteralHash.getPropertyStmtByHash(subject, editConfig.getPredicateUri(), dpropHash, model, isVitroNsProp);
+        DataPropertyStatement dps = RdfLiteralHash.getPropertyStmtByHash(subject, editConfig.getPredicateUri(), dpropHash, model);
 
         if (dps != null)
             return false;
