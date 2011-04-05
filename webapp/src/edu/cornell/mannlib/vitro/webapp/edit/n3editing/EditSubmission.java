@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
@@ -28,7 +29,6 @@ import com.hp.hpl.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 import edu.cornell.mannlib.vitro.webapp.edit.elements.EditElement;
-import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
 public class EditSubmission {
     private String editKey;

@@ -21,7 +21,7 @@ public class TestController extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(TestController.class);
-    private static final String TEMPLATE_DEFAULT = "test.ftl";
+    private static final String TEMPLATE_DEFAULT = "test1.ftl";
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {

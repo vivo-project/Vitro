@@ -3,7 +3,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.utils.StringUtils" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@page import="org.apache.commons.logging.Log"%>
 <%@page import="org.apache.commons.logging.LogFactory"%>
 <%@page import="com.hp.hpl.jena.rdf.model.ResourceFactory"%>

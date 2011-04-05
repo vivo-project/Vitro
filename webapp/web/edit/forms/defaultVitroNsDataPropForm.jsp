@@ -14,7 +14,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.utils.StringUtils" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core"%>
@@ -23,16 +23,14 @@
 
 <%! 
     private String getInputType(String propertyName) {
-        String inputType = StringUtils.equalsOneOf(propertyName, "blurb", "description") ? "textarea" : "text";
+        String inputType = ( propertyName.equals("blurb") || propertyName.equals("desription") ) ? "textarea" : "text";
         return  inputType;
     }
-    String thisPage = "defaultVitroNsPropForm.jsp";
-    String inThisPage = " in " + thisPage;
 
 %>
 <%
-    org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger("edu.cornell.mannlib.vitro.jsp.edit.forms." + thisPage);
-    log.debug("Starting " + thisPage);
+    org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger("edu.cornell.mannlib.vitro.jsp.edit.forms.defaultVitroNsPropForm.jsp");
+    log.debug("Starting defaultVitroNsPropForm.jsp");
     
     VitroRequest vreq = new VitroRequest(request);
     WebappDaoFactory wdf = vreq.getWebappDaoFactory();
@@ -49,7 +47,7 @@
     
     Individual subject = (Individual)vreq.getAttribute("subject");
     if( subject == null ) {
-        throw new Error("In " + thisPage + ", could not find subject " + subjectUri);
+        throw new Error("In defaultVitroNsPropForm.jsp, could not find subject " + subjectUri);
     }
     
     Model model =  (Model)application.getAttribute("jenaOntModel");
@@ -62,17 +60,17 @@
         
         rangeDatatypeUri = dps.getDatatypeURI();        
         if (rangeDatatypeUri == null) {
-            log.debug("no range datatype uri set on vitro namespace property statement for property " + predicateUri + inThisPage);
+            log.debug("no range datatype uri set on vitro namespace property statement for property " + predicateUri + "in defaultVitroNsPropForm.jsp");
         } else {
-            log.debug("range datatype uri of [" + rangeDatatypeUri + "] on vitro namespace property statement for property " + predicateUri + inThisPage);
+            log.debug("range datatype uri of [" + rangeDatatypeUri + "] on vitro namespace property statement for property " + predicateUri + "in defaultVitroNsPropForm.jsp");
         }        
         
         rangeLang = dps.getLanguage();
         if( rangeLang == null ) {            
-            log.debug("no language attribute on vitro namespace property statement for property " + predicateUri + inThisPage);
+            log.debug("no language attribute on vitro namespace property statement for property " + predicateUri + "in defaultVitroNsPropForm.jsp");
             rangeLang = "";
         } else {
-            log.debug("language attribute of ["+rangeLang+"] on vitro namespace property statement for property " + predicateUri + inThisPage);
+            log.debug("language attribute of ["+rangeLang+"] on vitro namespace property statement for property " + predicateUri + "in defaultVitroNsPropForm.jsp");
         }
         
     } else {
@@ -88,12 +86,12 @@
     // Create list of validators
     ArrayList<String> validatorList = new ArrayList<String>();
     if (predicateUri.equals(VitroVocabulary.LABEL) || predicateUri.equals(VitroVocabulary.RDF_TYPE)) {
-        validatorList.add("nonempty");       
+        validatorList.add("\"nonempty\"");       
     }
     if (!StringUtils.isEmpty(rangeDatatypeUriJson)) {
-        validatorList.add("datatype:" + rangeDatatypeUriJson);
+        validatorList.add("\"datatype:" + rangeDatatypeUriJson + "\"");
     }
-    vreq.setAttribute("validators", StringUtils.quotedList(validatorList, ","));
+    vreq.setAttribute("validators", StringUtils.join(validatorList, ","));
 
 %>
 
@@ -177,9 +175,9 @@
     String title = actionText + "<em>" + propertyLabel + "</em> for " + subject.getName();
     
     String inputType = getInputType(propertyName);
-    log.debug(propertyName + " needs input type " + inputType + inThisPage);
+    log.debug(propertyName + " needs input type " + inputType + "in defaultVitroNsPropForm.jsp");
     boolean useTinyMCE = inputType.equals("textarea");
-    log.debug( (useTinyMCE ? "" : "not ") + "using tinyMCE to edit " + propertyName + inThisPage);
+    log.debug( (useTinyMCE ? "" : "not ") + "using tinyMCE to edit " + propertyName + "in defaultVitroNsPropForm.jsp");
   
 %>
 

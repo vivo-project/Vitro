@@ -9,20 +9,18 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 import edu.cornell.mannlib.vitro.webapp.web.directives.BaseTemplateDirectiveModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 import freemarker.core.Environment;
@@ -210,7 +208,7 @@ public class DumpHelper {
                 typeName = typeName.substring(0,1).toLowerCase() + typeName.substring(1);
                 paramTypeList.add(typeName);
             }
-            methodName += "(" + StringUtils.join(paramTypeList) + ")";
+            methodName += "(" + StringUtils.join(paramTypeList, ", ") + ")";
         } else {
             methodName = methodName.replaceAll("^(get|is)", "");
             methodName = methodName.substring(0, 1).toLowerCase() + methodName.substring(1);           

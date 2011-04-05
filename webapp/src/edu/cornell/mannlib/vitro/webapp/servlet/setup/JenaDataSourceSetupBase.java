@@ -12,6 +12,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,7 +33,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.RegeneratingGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SDBGraphGenerator;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
-import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
 public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     
