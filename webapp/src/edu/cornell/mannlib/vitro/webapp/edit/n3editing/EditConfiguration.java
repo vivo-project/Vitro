@@ -823,10 +823,16 @@ public class EditConfiguration {
     	this.varNameForObject = varName;
     }
     
+    /**If this is set to true, then dependent resources should be deleted on edits that
+     * remove the parent resource.
+     */
     public boolean isUseDependentResourceDelete() {
 		return useDependentResourceDelete;
 	}
 
+    /**If this is set to true, then dependent resources should be deleted on edits that
+     * remove the parent resource.
+     */
 	public void setUseDependentResourceDelete(boolean useDependentResourceDelete) {
 		this.useDependentResourceDelete = useDependentResourceDelete;
 	}
@@ -964,5 +970,9 @@ public class EditConfiguration {
 
     public void setSubmitToUrl(String submitToUrl) {
         this.submitToUrl = submitToUrl;
+    }
+    
+    public boolean isUpdate(){
+        return this.getObject() != null && this.getObject().trim().length() > 0;  
     }
 }
