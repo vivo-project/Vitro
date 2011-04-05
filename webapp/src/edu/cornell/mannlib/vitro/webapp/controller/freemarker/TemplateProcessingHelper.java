@@ -89,7 +89,15 @@ public class TemplateProcessingHelper {
         try {
             template = config.getTemplate(templateName);
         } catch (IOException e) {
-            throw new TemplateProcessingException("Cannot find template " + templateName);
+            String msg;
+            if (e instanceof freemarker.core.ParseException) {
+                msg = "Syntax error in template " + templateName;
+            } else if (e instanceof java.io.FileNotFoundException) {
+                msg = "Cannot find template " + templateName;                  
+            } else {
+                msg = "IOException getting template " + templateName;
+            }
+            throw new TemplateProcessingException(msg);
         }  
         return template;
     }
