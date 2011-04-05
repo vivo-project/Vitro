@@ -77,7 +77,7 @@ public class FrontEndEditingUtils {
         String displayName = null;
                 
         // These are the only Vitro namespace object properties that are editable on the front end at this point.
-        if (StringUtils.equalsOneOf(predicateUri, VitroVocabulary.PRIMARY_LINK, VitroVocabulary.ADDITIONAL_LINK)) {            
+        if ( predicateUri.equals(VitroVocabulary.PRIMARY_LINK) || predicateUri.equals(VitroVocabulary.ADDITIONAL_LINK) ) {       
             String linkAnchor = getLiteralValue(model, object, VitroVocabulary.LINK_ANCHOR);
             String linkUrl = getLiteralValue(model, object, VitroVocabulary.LINK_URL);            
             displayName = "<a class='externalLink' href='" + linkUrl + "'>" + linkAnchor + "</a>";                       
