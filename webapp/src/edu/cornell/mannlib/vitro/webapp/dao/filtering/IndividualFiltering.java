@@ -714,9 +714,4 @@ public class IndividualFiltering implements Individual {
     public boolean hasThumb() {
         return _innerIndividual.hasThumb();
     }
-
-	@Override
-	public Individual getBaseIndividual() {
-		return _innerIndividual.getBaseIndividual();
-	}
 }
