@@ -84,7 +84,7 @@
     DataProperty dataproperty = wdf.getDataPropertyDao().getDataPropertyByURI( predicateUri );
     if( dataproperty == null) {
         // No dataproperty will be returned for rdfs:label, but we shouldn't throw an error.
-        // RY ** Consider instead getting rdfs:label included in what's returned
+        // This is controlled by the Jena layer, so we can't change the behavior.
         if (! predicateUri.equals(VitroVocabulary.LABEL)) {
             log.error("Could not find data property '"+predicateUri+"' in model");
             throw new Error("editDatapropStmtRequest.jsp: Could not find DataProperty in model: " + predicateUri);
