@@ -11,8 +11,8 @@ import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.listener.ChangeListener;
-import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 
 /**
  * Add this ChangeListener to your EditProcessObject when modifying the
@@ -37,7 +37,7 @@ public class PropertyRestrictionListener implements ChangeListener {
 		Property p = (Property) oldObj;
 		if (eitherRoleChanged(p.getHiddenFromDisplayBelowRoleLevel(),
 				p.getProhibitedFromUpdateBelowRoleLevel(), null, null)) {
-			log.debug("replacing all prohibition policies after deletion");
+			log.debug("rebuilding the PropertyRestrictionPolicyHelper after deletion");
 			createAndSetBean();
 		}
 	}
@@ -51,7 +51,7 @@ public class PropertyRestrictionListener implements ChangeListener {
 		if (eitherRoleChanged(null, null,
 				p.getHiddenFromDisplayBelowRoleLevel(),
 				p.getProhibitedFromUpdateBelowRoleLevel())) {
-			log.debug("replacing all prohibition policies after insertion");
+			log.debug("rebuilding the PropertyRestrictionPolicyHelper after insertion");
 			createAndSetBean();
 		}
 	}
@@ -67,7 +67,7 @@ public class PropertyRestrictionListener implements ChangeListener {
 				oldP.getProhibitedFromUpdateBelowRoleLevel(),
 				newP.getHiddenFromDisplayBelowRoleLevel(),
 				newP.getProhibitedFromUpdateBelowRoleLevel())) {
-			log.debug("replacing all prohibition policies after update");
+			log.debug("rebuilding the PropertyRestrictionPolicyHelper after update");
 			createAndSetBean();
 		}
 	}
@@ -91,6 +91,8 @@ public class PropertyRestrictionListener implements ChangeListener {
 
 	private void createAndSetBean() {
 		OntModel model = (OntModel) ctx.getAttribute("jenaOntModel");
-		PropertyRestrictionPolicyHelper.createAndSetBean(ctx, model);
+		PropertyRestrictionPolicyHelper bean = PropertyRestrictionPolicyHelper
+				.createBean(model);
+		PropertyRestrictionPolicyHelper.setBean(ctx, bean);
 	}
 }

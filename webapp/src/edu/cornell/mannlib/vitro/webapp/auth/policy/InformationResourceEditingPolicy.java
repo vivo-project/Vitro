@@ -5,6 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -23,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractDataPropertyAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractObjectPropertyAction;
+import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 /**
@@ -44,12 +47,10 @@ public class InformationResourceEditingPolicy extends BaseSelfEditingPolicy
 			+ "linkedAuthor";
 
 	private final OntModel model;
-	private final AdministrativeUriRestrictor restrictor;
 
-	public InformationResourceEditingPolicy(OntModel model,
-			AdministrativeUriRestrictor restrictor) {
+	public InformationResourceEditingPolicy(ServletContext ctx, OntModel model) {
+		super(ctx, RoleLevel.SELF);
 		this.model = model;
-		this.restrictor = restrictor;
 	}
 
 	@Override
@@ -91,10 +92,10 @@ public class InformationResourceEditingPolicy extends BaseSelfEditingPolicy
 		String subject = action.getSubjectUri();
 		String predicate = action.getPredicateUri();
 
-		if (!restrictor.canModifyResource(subject)) {
+		if (!canModifyResource(subject)) {
 			return cantModifyResource(subject);
 		}
-		if (!restrictor.canModifyPredicate(predicate)) {
+		if (!canModifyPredicate(predicate)) {
 			return cantModifyPredicate(predicate);
 		}
 
@@ -120,13 +121,13 @@ public class InformationResourceEditingPolicy extends BaseSelfEditingPolicy
 		String predicate = action.getUriOfPredicate();
 		String object = action.getUriOfObject();
 
-		if (!restrictor.canModifyResource(subject)) {
+		if (!canModifyResource(subject)) {
 			return cantModifyResource(subject);
 		}
-		if (!restrictor.canModifyPredicate(predicate)) {
+		if (!canModifyPredicate(predicate)) {
 			return cantModifyPredicate(predicate);
 		}
-		if (!restrictor.canModifyResource(object)) {
+		if (!canModifyResource(object)) {
 			return cantModifyResource(object);
 		}
 
@@ -286,34 +287,4 @@ public class InformationResourceEditingPolicy extends BaseSelfEditingPolicy
 	private PolicyDecision authorizedObjectAuthor() {
 		return authorizedDecision("User is author of the object of the statement");
 	}
-
-	/**
-	 * TODO
-	 * 
-	 * <pre>
-	 * We don't need to do resource operations.
-	 * 
-	 * We can do data or object property operations 
-	 *    if not restricted
-	 *    if the subject or object is an information resource
-	 *    if that information resource has an author or editor who is an active self-editor.
-	 * </pre>
-	 */
-
-	/**
-	 * TODO
-	 * 
-	 * <pre>
-	 * If the request is an object property operation
-	 * 
-	 * Check restrictions. If restricted, we are done.
-	 * Get the URIs of self-editors identifiers. If none, we are done.
-	 * Get the list of editors and authors for this document. Is 
-	 * Get the list of information resources that these self-editors author or edit.
-	 * If subject or object is in that set, approve.
-	 * 
-	 * If the request is a data property operations, same except there is no object.
-	 * </pre>
-	 */
-
 }

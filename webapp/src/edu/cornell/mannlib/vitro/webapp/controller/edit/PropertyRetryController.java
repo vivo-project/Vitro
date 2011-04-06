@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -28,10 +27,8 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
 import edu.cornell.mannlib.vedit.util.FormUtils;
-import edu.cornell.mannlib.vedit.validator.ValidationObject;
-import edu.cornell.mannlib.vedit.validator.Validator;
-import edu.cornell.mannlib.vedit.validator.impl.EnumValuesValidator;
 import edu.cornell.mannlib.vedit.validator.impl.XMLNameValidator;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionListener;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
@@ -43,13 +40,13 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
-import edu.cornell.mannlib.vitro.webapp.edit.listener.impl.EditProhibitionListener;
 
 public class PropertyRetryController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(PropertyRetryController.class.getName());
 	
-    public void doPost (HttpServletRequest req, HttpServletResponse response) {
+    @Override
+	public void doPost (HttpServletRequest req, HttpServletResponse response) {
     	VitroRequest request = new VitroRequest(req);
         if (!checkLoginStatus(request,response))
             return;
@@ -87,7 +84,7 @@ public class PropertyRetryController extends BaseEditController {
             String uri = request.getParameter("uri");
             if (uri != null) {
                 try {
-                    propertyForEditing = (ObjectProperty)propDao.getObjectPropertyByURI(uri);
+                    propertyForEditing = propDao.getObjectPropertyByURI(uri);
                     action = "update";
                     epo.setAction("update");
                 } catch (NullPointerException e) {
@@ -125,7 +122,7 @@ public class PropertyRetryController extends BaseEditController {
         //set up any listeners
         List changeListenerList = new ArrayList();
         //changeListenerList.add(new HiddenFromDisplayListener(getServletContext()));
-        changeListenerList.add(new EditProhibitionListener(getServletContext()));
+        changeListenerList.add(new PropertyRestrictionListener(getServletContext()));
         epo.setChangeListenerList(changeListenerList);
 
         //set portal flag to current portal

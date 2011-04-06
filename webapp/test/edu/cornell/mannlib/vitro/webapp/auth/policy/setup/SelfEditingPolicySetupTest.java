@@ -11,6 +11,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import stubs.edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelperStub;
+import stubs.javax.servlet.ServletContextStub;
+
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.impl.RDFDefaultErrorHandler;
@@ -21,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.SelfEditingPolicy;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropStmt;
@@ -80,7 +84,12 @@ public class SelfEditingPolicySetupTest extends AbstractTestClass {
 		Assert.assertNotNull(model);
 		Assert.assertTrue(model.size() > 0);
 
-		policy = SelfEditingPolicySetup.makeSelfEditPolicyFromModel(model);
+		ServletContextStub ctx = new ServletContextStub();
+		PropertyRestrictionPolicyHelper.setBean(ctx,
+				PropertyRestrictionPolicyHelperStub
+						.getInstance(new String[] { ADMIN_NS }));
+		
+		policy = new SelfEditingPolicy(ctx);
 		Assert.assertNotNull(policy);
 
 		seIndividual = new IndividualImpl();
@@ -116,8 +125,7 @@ public class SelfEditingPolicySetupTest extends AbstractTestClass {
 	@Test
 	public void noSelfEditorIdentifier() {
 		ids.clear();
-		ids.add(new Identifier() {
-		});
+		ids.add(new Identifier() { /* empty identifier */ });
 		assertAddObjectPropStmt(SELFEDITOR_URI, SAFE_PREDICATE, SAFE_RESOURCE,
 				Authorization.INCONCLUSIVE);
 	}
@@ -308,5 +316,4 @@ public class SelfEditingPolicySetupTest extends AbstractTestClass {
 		Assert.assertNotNull(dec);
 		Assert.assertEquals(expectedAuthorization, dec.getAuthorized());
 	}
-
 }

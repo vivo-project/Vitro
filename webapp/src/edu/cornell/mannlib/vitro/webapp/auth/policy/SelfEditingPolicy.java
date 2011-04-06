@@ -3,12 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
 import java.util.List;
-import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import com.hp.hpl.jena.ontology.OntModel;
+import javax.servlet.ServletContext;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
@@ -17,6 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractDataPropertyAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractObjectPropertyAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.resource.AbstractResourceAction;
+import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 
 /**
  * Policy to use for Vivo Self-Editing based on NetId for use at Cornell. All
@@ -24,19 +21,11 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.resource.AbstractRe
  */
 public class SelfEditingPolicy extends BaseSelfEditingPolicy implements
 		PolicyIface {
-	protected static Log log = LogFactory.getLog(SelfEditingPolicy.class);
-
-	protected final OntModel model;
-	private final AdministrativeUriRestrictor restrictor;
-
-	public SelfEditingPolicy(Set<String> prohibitedProperties,
-			Set<String> prohibitedResources, Set<String> prohibitedNamespaces,
-			Set<String> editableVitroUris, OntModel model) {
-		this.model = model;
-		this.restrictor = new AdministrativeUriRestrictor(prohibitedProperties,
-				prohibitedResources, prohibitedNamespaces, editableVitroUris);
+	public SelfEditingPolicy(ServletContext ctx) {
+		super(ctx, RoleLevel.SELF);
 	}
 
+	@Override
 	public PolicyDecision isAuthorized(IdentifierBundle whoToAuth,
 			RequestedAction whatToAuth) {
 		if (whoToAuth == null) {
@@ -80,13 +69,13 @@ public class SelfEditingPolicy extends BaseSelfEditingPolicy implements
 		String predicate = action.getUriOfPredicate();
 		String object = action.getUriOfObject();
 
-		if (!restrictor.canModifyResource(subject)) {
+		if (!canModifyResource(subject)) {
 			return cantModifyResource(subject);
 		}
-		if (!restrictor.canModifyPredicate(predicate)) {
+		if (!canModifyPredicate(predicate)) {
 			return cantModifyPredicate(predicate);
 		}
-		if (!restrictor.canModifyResource(object)) {
+		if (!canModifyResource(object)) {
 			return cantModifyResource(object);
 		}
 
@@ -106,10 +95,10 @@ public class SelfEditingPolicy extends BaseSelfEditingPolicy implements
 		String subject = action.getSubjectUri();
 		String predicate = action.getPredicateUri();
 
-		if (!restrictor.canModifyResource(subject)) {
+		if (!canModifyResource(subject)) {
 			return cantModifyResource(subject);
 		}
-		if (!restrictor.canModifyPredicate(predicate)) {
+		if (!canModifyPredicate(predicate)) {
 			return cantModifyPredicate(predicate);
 		}
 
@@ -126,7 +115,7 @@ public class SelfEditingPolicy extends BaseSelfEditingPolicy implements
 	private PolicyDecision isAuthorizedForResourceAction(
 			AbstractResourceAction action) {
 		String uri = action.getSubjectUri();
-		if (!restrictor.canModifyResource(uri)) {
+		if (!canModifyResource(uri)) {
 			return cantModifyResource(uri);
 		} else {
 			return authorizedDecision("May add/remove resource.");
@@ -162,7 +151,7 @@ public class SelfEditingPolicy extends BaseSelfEditingPolicy implements
 
 	@Override
 	public String toString() {
-		return "SelfEditingPolicy " + hashCode() + "[" + restrictor + "]";
+		return "SelfEditingPolicy - " + hashCode();
 	}
 
 }

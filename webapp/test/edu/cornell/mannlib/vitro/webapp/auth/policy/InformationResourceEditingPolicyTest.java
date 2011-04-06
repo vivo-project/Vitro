@@ -16,6 +16,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import stubs.edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelperStub;
+import stubs.javax.servlet.ServletContextStub;
+
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -28,6 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.SelfEditing;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.ServerStatus;
@@ -105,9 +109,12 @@ public class InformationResourceEditingPolicyTest extends AbstractTestClass {
 
 	@Before
 	public void setupPolicy() {
-		AdministrativeUriRestrictor restrictor = new AdministrativeUriRestrictor(
-				null, null, null, null);
-		policy = new InformationResourceEditingPolicy(ontModel, restrictor);
+		ServletContextStub ctx = new ServletContextStub();
+		PropertyRestrictionPolicyHelper prph = PropertyRestrictionPolicyHelperStub
+				.getInstance(new String[] { NS_RESTRICTED });
+		PropertyRestrictionPolicyHelper.setBean(ctx, prph);
+
+		policy = new InformationResourceEditingPolicy(ctx, ontModel);
 	}
 
 	private IdentifierBundle idNobody;

@@ -2,12 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy.bean;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -27,63 +27,59 @@ import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
 
 /**
  * Assists the role-based policies in determining whether a property or resource
  * may be displayed or modified.
+ * 
+ * There is a bean in the context that holds the current threshold role levels
+ * for displaying and modifying restricted properties.
+ * 
+ * Create this bean after the Jena model is in place in the context.
+ * 
+ * Add PropertyRestrictionListener to your EditProcessObject if you are editing
+ * a property, to ensure that the bean stays current.
  */
 public class PropertyRestrictionPolicyHelper {
 	private static final Log log = LogFactory
 			.getLog(PropertyRestrictionPolicyHelper.class);
 
-	private static final Collection<String> PROHIBITED_NAMESPACES = setProhibitedNamespaces();
-	private static final Collection<String> PERMITTED_EXCEPTIONS = setPermittedExceptions();
+	private static final Collection<String> PROHIBITED_NAMESPACES = Arrays
+			.asList(new String[] { VitroVocabulary.vitroURI,
+					VitroVocabulary.OWL, "" });
 
-	private static Collection<String> setProhibitedNamespaces() {
-		Set<String> prohibitedNs = new HashSet<String>();
-		prohibitedNs.add(VitroVocabulary.vitroURI);
-		prohibitedNs.add(VitroVocabulary.OWL);
-		prohibitedNs.add("");
-		return Collections.unmodifiableSet(prohibitedNs);
-	}
+	private static final Collection<String> PERMITTED_EXCEPTIONS = Arrays
+			.asList(new String[] {
+					VitroVocabulary.MONIKER,
+					VitroVocabulary.BLURB,
+					VitroVocabulary.DESCRIPTION,
+					VitroVocabulary.MODTIME,
+					VitroVocabulary.TIMEKEY,
 
-	private static Collection<String> setPermittedExceptions() {
-		Set<String> editableVitroUris = new HashSet<String>();
+					VitroVocabulary.CITATION,
+					VitroVocabulary.IND_MAIN_IMAGE,
 
-		editableVitroUris.add(VitroVocabulary.MONIKER);
-		editableVitroUris.add(VitroVocabulary.BLURB);
-		editableVitroUris.add(VitroVocabulary.DESCRIPTION);
-		editableVitroUris.add(VitroVocabulary.MODTIME);
-		editableVitroUris.add(VitroVocabulary.TIMEKEY);
+					VitroVocabulary.LINK,
+					VitroVocabulary.PRIMARY_LINK,
+					VitroVocabulary.ADDITIONAL_LINK,
+					VitroVocabulary.LINK_ANCHOR,
+					VitroVocabulary.LINK_URL,
 
-		editableVitroUris.add(VitroVocabulary.CITATION);
-		editableVitroUris.add(VitroVocabulary.IND_MAIN_IMAGE);
-
-		editableVitroUris.add(VitroVocabulary.LINK);
-		editableVitroUris.add(VitroVocabulary.PRIMARY_LINK);
-		editableVitroUris.add(VitroVocabulary.ADDITIONAL_LINK);
-		editableVitroUris.add(VitroVocabulary.LINK_ANCHOR);
-		editableVitroUris.add(VitroVocabulary.LINK_URL);
-
-		editableVitroUris.add(VitroVocabulary.KEYWORD_INDIVIDUALRELATION);
-		editableVitroUris
-				.add(VitroVocabulary.KEYWORD_INDIVIDUALRELATION_INVOLVESKEYWORD);
-		editableVitroUris
-				.add(VitroVocabulary.KEYWORD_INDIVIDUALRELATION_INVOLVESINDIVIDUAL);
-		editableVitroUris.add(VitroVocabulary.KEYWORD_INDIVIDUALRELATION_MODE);
-
-		return Collections.unmodifiableSet(editableVitroUris);
-	}
-
-	// ----------------------------------------------------------------------
-	// static methods
-	// ----------------------------------------------------------------------
+					VitroVocabulary.KEYWORD_INDIVIDUALRELATION,
+					VitroVocabulary.KEYWORD_INDIVIDUALRELATION_INVOLVESKEYWORD,
+					VitroVocabulary.KEYWORD_INDIVIDUALRELATION_INVOLVESINDIVIDUAL,
+					VitroVocabulary.KEYWORD_INDIVIDUALRELATION_MODE });
 
 	/**
 	 * The bean is attached to the ServletContext using this attribute name.
 	 */
 	private static final String ATTRIBUTE_NAME = PropertyRestrictionPolicyHelper.class
 			.getName();
+
+	// ----------------------------------------------------------------------
+	// static methods
+	// ----------------------------------------------------------------------
 
 	public static PropertyRestrictionPolicyHelper getBean(ServletContext ctx) {
 		Object attribute = ctx.getAttribute(ATTRIBUTE_NAME);
@@ -98,11 +94,19 @@ public class PropertyRestrictionPolicyHelper {
 		ctx.removeAttribute(ATTRIBUTE_NAME);
 	}
 
+	public static void setBean(ServletContext ctx,
+			PropertyRestrictionPolicyHelper bean) {
+		if (bean == null) {
+			throw new NullPointerException("bean may not be null.");
+		}
+		ctx.setAttribute(ATTRIBUTE_NAME, bean);
+	}
+
 	/**
 	 * Initialize the bean with the standard prohibitions and exceptions, and
 	 * with the thresholds obtained from the model.
 	 */
-	public static void createAndSetBean(ServletContext ctx, OntModel model) {
+	public static PropertyRestrictionPolicyHelper createBean(OntModel model) {
 		Map<String, RoleLevel> displayThresholdMap = new HashMap<String, RoleLevel>();
 		Map<String, RoleLevel> modifyThresholdMap = new HashMap<String, RoleLevel>();
 
@@ -119,12 +123,12 @@ public class PropertyRestrictionPolicyHelper {
 				PROHIBITED_NAMESPACES, PERMITTED_EXCEPTIONS,
 				displayThresholdMap, modifyThresholdMap);
 
-		ctx.setAttribute(ATTRIBUTE_NAME, bean);
+		return bean;
 	}
 
 	/**
 	 * Find all the resources that possess this property, and map the resource
-	 * URI to the require RoleLevel.
+	 * URI to the required RoleLevel.
 	 */
 	private static void populateThresholdMap(OntModel model,
 			Map<String, RoleLevel> map, String propertyUri) {
@@ -167,22 +171,22 @@ public class PropertyRestrictionPolicyHelper {
 	private final Collection<String> modifyExceptionsAllowedUris;
 
 	/**
-	 * URIs in here can be displayed only if the user's role is at least as high
+	 * These URIs can be displayed only if the user's role is at least as high
 	 * as the threshold role.
 	 */
 	private final Map<String, RoleLevel> displayThresholdMap;
 
 	/**
-	 * URIs in here can be modified only if the user's role is at least as high
-	 * as the threshold role.
+	 * These URIs can be modified only if the user's role is at least as high as
+	 * the threshold role.
 	 */
 	private final Map<String, RoleLevel> modifyThresholdMap;
 
 	/**
 	 * Store unmodifiable versions of the inputs.
 	 * 
-	 * Protected access: should only be created by the static methods, or by
-	 * unit tests.
+	 * Protected access: the bean should only be created by the static methods,
+	 * or by unit tests.
 	 */
 	protected PropertyRestrictionPolicyHelper(
 			Collection<String> modifyProhibitedNamespaces,
@@ -193,9 +197,9 @@ public class PropertyRestrictionPolicyHelper {
 		this.modifyExceptionsAllowedUris = unmodifiable(modifyExceptionsAllowedUris);
 		this.displayThresholdMap = unmodifiable(displayThresholdMap);
 		this.modifyThresholdMap = unmodifiable(modifyThresholdMap);
-		
+
 		if (log.isDebugEnabled()) {
-			log.debug("prohibited namespaces: " + this.modifyProhibitedNamespaces);
+			log.debug("prohibited: " + this.modifyProhibitedNamespaces);
 			log.debug("exceptions: " + this.modifyExceptionsAllowedUris);
 			log.debug("display thresholds: " + this.displayThresholdMap);
 			log.debug("modify thresholds: " + this.modifyThresholdMap);
@@ -347,8 +351,27 @@ public class PropertyRestrictionPolicyHelper {
 		@Override
 		public void contextInitialized(ServletContextEvent sce) {
 			ServletContext ctx = sce.getServletContext();
-			OntModel model = (OntModel) ctx.getAttribute("jenaOntModel");
-			createAndSetBean(ctx, model);
+
+			if (AbortStartup.isStartupAborted(ctx)) {
+				return;
+			}
+
+			try {
+				OntModel model = (OntModel) ctx.getAttribute("jenaOntModel");
+				if (model == null) {
+					throw new NullPointerException(
+							"jenaOntModel has not been initialized.");
+				}
+
+				PropertyRestrictionPolicyHelper bean = PropertyRestrictionPolicyHelper
+						.createBean(model);
+				PropertyRestrictionPolicyHelper.setBean(ctx, bean);
+			} catch (Exception e) {
+				log.error("could not run PropertyRestrictionPolicyHelper$Setup: "
+						+ e);
+				AbortStartup.abortStartup(ctx);
+				throw new RuntimeException(e);
+			}
 		}
 
 		@Override

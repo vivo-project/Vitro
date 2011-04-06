@@ -23,13 +23,11 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
 import edu.cornell.mannlib.vedit.util.FormUtils;
-import edu.cornell.mannlib.vedit.validator.impl.EnumValuesValidator;
 import edu.cornell.mannlib.vedit.validator.impl.IntValidator;
 import edu.cornell.mannlib.vedit.validator.impl.XMLNameValidator;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionListener;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.RoleLevelOptionsSetup;
@@ -37,14 +35,14 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
-import edu.cornell.mannlib.vitro.webapp.edit.listener.impl.EditProhibitionListener;
 
 
 public class DatapropRetryController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(DatapropRetryController.class.getName());
 
-    public void doPost (HttpServletRequest request, HttpServletResponse response) {
+    @Override
+	public void doPost (HttpServletRequest request, HttpServletResponse response) {
 
         if (!checkLoginStatus(request,response))
             return;
@@ -134,7 +132,7 @@ public class DatapropRetryController extends BaseEditController {
 
         //set up any listeners
         List changeListenerList = new ArrayList();
-        changeListenerList.add(new EditProhibitionListener(getServletContext()));
+        changeListenerList.add(new PropertyRestrictionListener(getServletContext()));
         epo.setChangeListenerList(changeListenerList);
 
 
