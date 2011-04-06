@@ -3,11 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.AdminRequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 
-public class RebuildTextIndex implements AdminRequestedAction{
-    @Override
-	public String getURI() {
-        return RequestActionConstants.actionNamespace + this.getClass().getName();
-    }
+public class RebuildTextIndex extends RequestedAction implements AdminRequestedAction{
+	// no members
 }

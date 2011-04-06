@@ -3,17 +3,9 @@
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.AdminRequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 
-/**
- * Represents a request to view information about the server status.
- * @author bdc34
- *
- */
-public class ServerStatus implements AdminRequestedAction {
-
-    @Override
-	public String getURI() {
-        return RequestActionConstants.actionNamespace + this.getClass().getName();
-    }
+/** Should we allow the user to view information about the server status? */
+public class ServerStatus extends RequestedAction implements AdminRequestedAction {
+	// no members
 }

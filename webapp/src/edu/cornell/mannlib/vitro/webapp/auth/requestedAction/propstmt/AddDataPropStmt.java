@@ -2,9 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 
-
+/** Should we allow the user to add this DataPropertyStatement? */
 public class AddDataPropStmt extends AbstractDataPropertyAction {
-
     protected String data;
     protected String dataType;
     protected String lang;

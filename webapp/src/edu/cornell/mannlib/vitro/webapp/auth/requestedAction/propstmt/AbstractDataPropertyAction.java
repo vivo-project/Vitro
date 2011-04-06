@@ -2,13 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 
 /**
  * A base class for requestion actions that relate to data properties.
  */
-public abstract class AbstractDataPropertyAction implements RequestedAction {
+public abstract class AbstractDataPropertyAction extends RequestedAction {
 	private final String subjectUri;
 	private final String predicateUri;
 
@@ -23,12 +22,6 @@ public abstract class AbstractDataPropertyAction implements RequestedAction {
 
 	public String getPredicateUri() {
 		return predicateUri;
-	}
-
-	@Override
-	public String getURI() {
-		return RequestActionConstants.actionNamespace
-				+ this.getClass().getName();
 	}
 
 	@Override

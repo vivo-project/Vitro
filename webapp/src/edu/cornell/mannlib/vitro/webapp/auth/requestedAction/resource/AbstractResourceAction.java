@@ -2,13 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.resource;
 
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 
 /**
  * A common base class for resource-related actions.
  */
-public abstract class AbstractResourceAction implements RequestedAction {
+public abstract class AbstractResourceAction extends RequestedAction {
 	private final String typeUri;
 	private final String subjectUri;
 
@@ -28,14 +27,7 @@ public abstract class AbstractResourceAction implements RequestedAction {
 	}
 
 	@Override
-	public String getURI() {
-		return RequestActionConstants.actionNamespace
-				+ this.getClass().getName();
-	}
-
-	@Override
 	public String toString() {
 		return this.getClass().getSimpleName() + " <" + subjectUri + ">";
 	}
-
 }

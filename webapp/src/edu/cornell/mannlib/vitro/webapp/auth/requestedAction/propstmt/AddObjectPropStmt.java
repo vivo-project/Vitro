@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 
-
+/** Should we allow the user to add this ObjectPropertyStatement? */
 public class AddObjectPropStmt extends AbstractObjectPropertyAction {
 
 	public AddObjectPropStmt(String uriOfSub, String uriOfPred, String uriOfObj) {

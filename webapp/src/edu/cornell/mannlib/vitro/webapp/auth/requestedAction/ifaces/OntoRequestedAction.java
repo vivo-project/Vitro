@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces;
 
-public interface OntoRequestedAction extends RequestedAction {
+/** Denotes an action that relates to manipulating the ontology. */
+public interface OntoRequestedAction {
 	/** marker interface */
 }

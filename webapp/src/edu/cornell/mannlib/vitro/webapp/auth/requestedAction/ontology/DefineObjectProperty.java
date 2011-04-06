@@ -3,13 +3,9 @@
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.OntoRequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.SingleParameterAction;
 
+/** Should we allow the user to define a new object property in the ontology? */
 public class DefineObjectProperty extends SingleParameterAction implements OntoRequestedAction{
-
-    @Override
-	public String getURI() {
-        return RequestActionConstants.actionNamespace + this.getClass().getName();
-    }
+	// no fields
 }

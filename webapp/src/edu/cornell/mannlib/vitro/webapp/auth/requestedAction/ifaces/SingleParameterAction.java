@@ -2,7 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces;
 
-public abstract class SingleParameterAction implements RequestedAction {
+/**
+ * A base class for actions that involve a single URI.
+ */
+public abstract class SingleParameterAction extends RequestedAction {
     protected String subjectUri;
 
     public String getSubjectUri() {

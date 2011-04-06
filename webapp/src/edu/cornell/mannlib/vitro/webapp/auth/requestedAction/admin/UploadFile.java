@@ -3,9 +3,10 @@
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.AdminRequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 
-public class UploadFile implements AdminRequestedAction{
+/** Should we allow the user to upload a file? */
+public class UploadFile extends RequestedAction implements AdminRequestedAction{
     protected String subjectUri;
     protected String predicateUri;
 
@@ -13,10 +14,5 @@ public class UploadFile implements AdminRequestedAction{
         super();
         this.subjectUri = subjectUri;
         this.predicateUri = predicateUri;
-    }
-
-    @Override
-	public String getURI() {
-        return RequestActionConstants.actionNamespace + this.getClass().getName();
     }
 }

@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 
+/** Should we allow the user to delete this DataPropertyStatement? */
 public class DropDataPropStmt extends AbstractDataPropertyAction {
 
     private final DataPropertyStatement dataPropStmt;

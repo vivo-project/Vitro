@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 
+/** Should we allow the user to edit this ObjectPropertyStatement? */
 public class EditObjPropStmt extends AbstractObjectPropertyAction {
 
 	public EditObjPropStmt(ObjectPropertyStatement ops) {
