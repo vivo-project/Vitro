@@ -23,19 +23,9 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DefaultInconclusivePolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.AddNewUser;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.LoadOntology;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.RebuildTextIndex;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.RemoveUser;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.ServerStatus;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.UpdateTextIndex;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.UploadFile;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.CreateOwlClass;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.DefineDataProperty;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.DefineObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.RemoveOwlClass;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropDataPropStmt;
@@ -55,7 +45,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.resource.DropResour
  * @author bdc34
  *
  */
-public class SparqlPolicy extends DefaultInconclusivePolicy implements VisitingPolicyIface{
+public class SparqlPolicy extends DefaultInconclusivePolicy implements PolicyIface{
     protected  Model model = ModelFactory.createDefaultModel();
     private  HashMap<String,Query> queryStrToQuery = new HashMap<String,Query>();
 
@@ -101,7 +91,7 @@ public class SparqlPolicy extends DefaultInconclusivePolicy implements VisitingP
         this.name = jnip.name;
         try{
             policySpec.close();
-        }catch(Throwable th){}    
+        }catch(Throwable th){/*ignore it?*/}    
     }
 
     /* *********************** Methods ************************************ */
@@ -117,8 +107,27 @@ public class SparqlPolicy extends DefaultInconclusivePolicy implements VisitingP
             return new BasicPolicyDecision(Authorization.INCONCLUSIVE,
                     "no queryies found for action" + whatToAuth.getClass().getName());
 
-        //kick off the visitor pattern which generally just calls doQueries()
-        return whatToAuth.accept(this, whoToAuth);
+		if (whoToAuth instanceof AddObjectPropStmt) {
+			return visit(whoToAuth, (AddObjectPropStmt) whatToAuth);
+		} else if (whoToAuth instanceof DropResource) {
+			return visit(whoToAuth, (DropResource) whatToAuth);
+		} else if (whoToAuth instanceof DropDataPropStmt) {
+			return visit(whoToAuth, (DropDataPropStmt) whatToAuth);
+		} else if (whoToAuth instanceof DropObjectPropStmt) {
+			return visit(whoToAuth, (DropObjectPropStmt) whatToAuth);
+		} else if (whoToAuth instanceof AddResource) {
+			return visit(whoToAuth, (AddResource) whatToAuth);
+		} else if (whoToAuth instanceof AddDataPropStmt) {
+			return visit(whoToAuth, (AddDataPropStmt) whatToAuth);
+		} else if (whoToAuth instanceof UploadFile) {
+			return visit(whoToAuth, (UploadFile) whatToAuth);
+		} else if (whoToAuth instanceof EditDataPropStmt) {
+			return visit(whoToAuth, (EditDataPropStmt) whatToAuth);
+		} else if (whoToAuth instanceof EditObjPropStmt) {
+			return visit(whoToAuth, (EditObjPropStmt) whatToAuth);
+		} else {
+			return UNAUTH;
+		}
     }
 
     private PolicyDecision doQueries(List<String>queryStrs, IdentifierBundle ids, RequestedAction action){
@@ -162,109 +171,48 @@ public class SparqlPolicy extends DefaultInconclusivePolicy implements VisitingP
 
     /* ***************** Visit methods ********************** */
     private final String pkg = "edu.cornell.mannlib.vitro.webapp.auth.requestedAction.";
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, AddObjectPropStmt action) {
+
+    private PolicyDecision visit(IdentifierBundle ids, AddObjectPropStmt action) {
         return doQueries(actionToQueryStr.get(pkg +"AddObjectPropStmt"),ids,action);
     }
 
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, DropResource action) {
+    private PolicyDecision visit(IdentifierBundle ids, DropResource action) {
         return doQueries(actionToQueryStr.get(pkg +"DropResource"),ids,action);
     }
 
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, DropDataPropStmt action) {
+	private PolicyDecision visit(IdentifierBundle ids, DropDataPropStmt action) {
         return doQueries(actionToQueryStr.get(pkg +"DropDataPropStmt"),ids,action);
     }
 
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, DropObjectPropStmt action) {
+	private PolicyDecision visit(IdentifierBundle ids, DropObjectPropStmt action) {
         return doQueries(actionToQueryStr.get(pkg +"DropObjectPropStmt"),ids,action);
     }
 
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, AddResource action) {
+	private PolicyDecision visit(IdentifierBundle ids, AddResource action) {
         return doQueries(actionToQueryStr.get(pkg +"AddResource"),ids,action);
     }
 
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, AddDataPropStmt action) {
+	private PolicyDecision visit(IdentifierBundle ids, AddDataPropStmt action) {
         return doQueries(actionToQueryStr.get(pkg +"AddDataPropStmt"),ids,action);
     }
 
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, UploadFile action) {
+	private PolicyDecision visit(IdentifierBundle ids, UploadFile action) {
         return doQueries(actionToQueryStr.get(pkg +"UploadFile"),ids,action);
     }
 
-
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, EditDataPropStmt action) {
+	private PolicyDecision visit(IdentifierBundle ids, EditDataPropStmt action) {
         return doQueries(actionToQueryStr.get(pkg +"EditDataPropStmt"),ids,action);
     }
 
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, EditObjPropStmt action) {
+	private PolicyDecision visit(IdentifierBundle ids, EditObjPropStmt action) {
         return doQueries(actionToQueryStr.get(pkg +"EditObjPropStmt"),ids,action);
-    }
-
-    /* **** Currently the following actions are unauthorized by this policy **** */
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, CreateOwlClass action) {
-        return UNAUTH;
-    }
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, RemoveOwlClass action) {
-        return UNAUTH;
-    }
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, DefineDataProperty action) {
-        return UNAUTH;
-    }
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids,
-            DefineObjectProperty action) {
-        return UNAUTH;
-    }
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, ServerStatus action) {
-        return UNAUTH;
-    }
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, AddNewUser action) {
-        return UNAUTH;
-    }
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, RemoveUser action) {
-        return UNAUTH;
-    }
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, LoadOntology action) {
-        return UNAUTH;
-    }
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, RebuildTextIndex action) {
-        return UNAUTH;
-    }
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, UpdateTextIndex action) {
-        return UNAUTH;
     }
 
     private static final Log log = LogFactory.getLog(SparqlPolicy.class.getName());
     
-    private final PolicyDecision UNAUTH = new PolicyDecision(){
-        @Override
-		public Authorization getAuthorized() {return Authorization.UNAUTHORIZED; }
-        @Override
-		public String getMessage() {
-            return name + " SparqlPolicy doesn't authorize admin or onto editing actions";
-        }
-        @Override
-		public String getDebuggingInfo() { return ""; }
-        @Override
-		public String getStackTrace() { return ""; }
-    };
+	private final PolicyDecision UNAUTH = new BasicPolicyDecision(
+			Authorization.UNAUTHORIZED,
+			name + " SparqlPolicy doesn't authorize admin or onto editing actions");
 
 /*
  * example of how to set up the xml:

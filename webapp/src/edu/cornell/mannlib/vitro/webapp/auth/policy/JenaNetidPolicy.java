@@ -31,25 +31,12 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFac
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.DefaultInconclusivePolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.AddNewUser;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.LoadOntology;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.RebuildTextIndex;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.RemoveUser;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.ServerStatus;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.UpdateTextIndex;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.UploadFile;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.CreateOwlClass;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.DefineDataProperty;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.DefineObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.RemoveOwlClass;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropDataPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditDataPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.resource.AddResource;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.resource.DropResource;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -111,7 +98,7 @@ PREFIX vitro: &lt;http://lowe.mannlib.cornell.edu/ns/vitro/0.1/vitro.owl#&gt;
  * @author bdc34
  *
  */
-public class JenaNetidPolicy extends DefaultInconclusivePolicy implements VisitingPolicyIface {
+public class JenaNetidPolicy extends DefaultInconclusivePolicy implements PolicyIface {
 
 
     protected  transient Model model = ModelFactory.createDefaultModel();
@@ -190,13 +177,25 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Visiti
         if (netid == null)
             return pd.setMessage("Unable to get netid from IdBundle");
 
-        //kick off the visitor pattern
-        return whatToAuth.accept(this, whoToAuth);
+		if (whoToAuth instanceof AddResource) {
+			return visit(whoToAuth, (AddResource) whatToAuth);
+		} else if (whoToAuth instanceof DropResource) {
+			return visit(whoToAuth, (DropResource) whatToAuth);
+		} else if (whoToAuth instanceof AddObjectPropStmt) {
+			return visit(whoToAuth, (AddObjectPropStmt) whatToAuth);
+		} else if (whoToAuth instanceof DropObjectPropStmt) {
+			return visit(whoToAuth, (DropObjectPropStmt) whatToAuth);
+		} else if (whoToAuth instanceof AddDataPropStmt) {
+			return visit(whoToAuth, (AddDataPropStmt) whatToAuth);
+		} else if (whoToAuth instanceof DropDataPropStmt) {
+			return visit(whoToAuth, (DropDataPropStmt) whatToAuth);
+		} else {
+			return UNAUTH;
+		}
     }
 
     /* ************************* visit methods ************************** */
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, AddResource action) {
+    private PolicyDecision visit(IdentifierBundle ids, AddResource action) {
         log.debug("doing AddResource");
 
         List<String> queryStrs = actionToQueryStr.get(action.getClass().getName());
@@ -211,8 +210,7 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Visiti
         return doQueries(queryStrs,parameters,action);
     }
 
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, DropResource action) {
+	private PolicyDecision visit(IdentifierBundle ids, DropResource action) {
         log.debug("doing DropResource");
 
         List<String> queryStrs = actionToQueryStr.get(action.getClass().getName());
@@ -227,8 +225,7 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Visiti
         return doQueries(queryStrs,parameters,action);
     }
 
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, AddObjectPropStmt action) {
+	private PolicyDecision visit(IdentifierBundle ids, AddObjectPropStmt action) {
         log.debug("doing AddObjectPropStmt in visit()");
 
         List<String> queryStrs = actionToQueryStr.get(action.getClass().getName());
@@ -245,8 +242,7 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Visiti
         return doQueries(queryStrs,parameters,action);
     }
 
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, DropObjectPropStmt action) {
+	private PolicyDecision visit(IdentifierBundle ids, DropObjectPropStmt action) {
         log.debug("doing DropObjectPropStmt");
 
         List<String> queryStrs = actionToQueryStr.get(action.getClass().getName());
@@ -263,8 +259,7 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Visiti
         return doQueries(queryStrs,parameters,action);
     }
 
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, AddDataPropStmt action) {
+	private PolicyDecision visit(IdentifierBundle ids, AddDataPropStmt action) {
         log.debug("doing AddDataPropStmt");
 
         List<String> queryStrs = actionToQueryStr.get(action.getClass().getName());
@@ -280,8 +275,7 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Visiti
         return doQueries(queryStrs,parameters,action);
     }
 
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, DropDataPropStmt action) {
+	private PolicyDecision visit(IdentifierBundle ids, DropDataPropStmt action) {
         log.debug("doing DropDataPropStmt");
 
         List<String> queryStrs = actionToQueryStr.get(action.getClass().getName());
@@ -427,81 +421,8 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Visiti
     "PREFIX vivo: <http://vivo.library.cornell.edu/ns/0.1#>\n"+
     "PREFIX vitro: <"+ VitroVocabulary.vitroURI+">\n";
 
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, CreateOwlClass action) {
-        return UNAUTH;
-    }
+	private final PolicyDecision UNAUTH = new BasicPolicyDecision(
+			Authorization.UNAUTHORIZED,
+			"JenaNetidPolicy doesn't authorize admin or onto editing actions");
 
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, RemoveOwlClass action) {
-        return UNAUTH;
-    }
-
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, DefineDataProperty action) {
-        return UNAUTH;
-    }
-
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, DefineObjectProperty action){
-        return UNAUTH;
-    }
-
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, AddNewUser action) {
-        return UNAUTH;
-    }
-
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, RemoveUser action) {
-        return UNAUTH;
-    }
-
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, LoadOntology action) {
-        return UNAUTH;
-    }
-
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, RebuildTextIndex action) {
-        return UNAUTH;
-    }
-
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, UpdateTextIndex action) {
-        return UNAUTH;
-    }
-
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, UploadFile action) {
-        return UNAUTH;
-    }
-
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, ServerStatus action) {
-        return UNAUTH;
-    }
-
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, EditDataPropStmt action) {
-        return UNAUTH;
-    }
-
-    @Override
-	public PolicyDecision visit(IdentifierBundle ids, EditObjPropStmt action) {
-        return UNAUTH;
-    }
-
-    private final PolicyDecision UNAUTH = new PolicyDecision(){
-        @Override
-		public Authorization getAuthorized() {return Authorization.UNAUTHORIZED; }
-        @Override
-		public String getMessage() {
-            return "JenaNetidPolicy doesn't authorize admin or onto editing actions";
-        }
-        @Override
-		public String getDebuggingInfo() { return ""; }
-        @Override
-		public String getStackTrace() { return ""; }
-    };
 }

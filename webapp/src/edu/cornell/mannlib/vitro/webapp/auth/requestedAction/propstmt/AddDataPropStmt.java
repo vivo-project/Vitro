@@ -2,9 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
 
 public class AddDataPropStmt extends AbstractDataPropertyAction {
 
@@ -29,10 +26,5 @@ public class AddDataPropStmt extends AbstractDataPropertyAction {
 
     public String getLang() {
         return lang;
-    }
-
-    @Override
-    public PolicyDecision accept(VisitingPolicyIface policy, IdentifierBundle ids ){
-        return policy.visit(ids, this );
     }
 }

@@ -2,9 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 
 public class EditDataPropStmt extends AbstractDataPropertyAction {
@@ -16,11 +13,6 @@ public class EditDataPropStmt extends AbstractDataPropertyAction {
         this.dataPropStmt = dps;
     }
     
-    @Override
-    public PolicyDecision accept(VisitingPolicyIface policy, IdentifierBundle whoToAuth) {
-        return policy.visit(whoToAuth,this);
-    }
-
     public String data(){ return dataPropStmt.getData(); }
     public String lang(){ return dataPropStmt.getLanguage(); }
     public String datatype(){return dataPropStmt.getDatatypeURI(); }
