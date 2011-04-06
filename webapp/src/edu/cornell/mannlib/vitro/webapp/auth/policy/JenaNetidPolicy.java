@@ -177,7 +177,8 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Visiti
     }
 
     /* *********************** Methods ************************************ */
-    public PolicyDecision isAuthorized(IdentifierBundle whoToAuth,
+    @Override
+	public PolicyDecision isAuthorized(IdentifierBundle whoToAuth,
             RequestedAction whatToAuth) {
         BasicPolicyDecision pd = new BasicPolicyDecision(Authorization.INCONCLUSIVE,"not yet set");
         if( whoToAuth == null )
@@ -194,7 +195,8 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Visiti
     }
 
     /* ************************* visit methods ************************** */
-    public PolicyDecision visit(IdentifierBundle ids, AddResource action) {
+    @Override
+	public PolicyDecision visit(IdentifierBundle ids, AddResource action) {
         log.debug("doing AddResource");
 
         List<String> queryStrs = actionToQueryStr.get(action.getClass().getName());
@@ -209,9 +211,9 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Visiti
         return doQueries(queryStrs,parameters,action);
     }
 
-    public PolicyDecision visit(IdentifierBundle ids, DropResource action) {
+    @Override
+	public PolicyDecision visit(IdentifierBundle ids, DropResource action) {
         log.debug("doing DropResource");
-        BasicPolicyDecision pd = new BasicPolicyDecision(Authorization.INCONCLUSIVE, "");
 
         List<String> queryStrs = actionToQueryStr.get(action.getClass().getName());
         if( queryStrs == null || queryStrs.size() ==0 )
@@ -225,7 +227,8 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Visiti
         return doQueries(queryStrs,parameters,action);
     }
 
-    public PolicyDecision visit(IdentifierBundle ids, AddObjectPropStmt action) {
+    @Override
+	public PolicyDecision visit(IdentifierBundle ids, AddObjectPropStmt action) {
         log.debug("doing AddObjectPropStmt in visit()");
 
         List<String> queryStrs = actionToQueryStr.get(action.getClass().getName());
@@ -242,7 +245,8 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Visiti
         return doQueries(queryStrs,parameters,action);
     }
 
-    public PolicyDecision visit(IdentifierBundle ids, DropObjectPropStmt action) {
+    @Override
+	public PolicyDecision visit(IdentifierBundle ids, DropObjectPropStmt action) {
         log.debug("doing DropObjectPropStmt");
 
         List<String> queryStrs = actionToQueryStr.get(action.getClass().getName());
@@ -259,7 +263,8 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Visiti
         return doQueries(queryStrs,parameters,action);
     }
 
-    public PolicyDecision visit(IdentifierBundle ids, AddDataPropStmt action) {
+    @Override
+	public PolicyDecision visit(IdentifierBundle ids, AddDataPropStmt action) {
         log.debug("doing AddDataPropStmt");
 
         List<String> queryStrs = actionToQueryStr.get(action.getClass().getName());
@@ -275,7 +280,8 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Visiti
         return doQueries(queryStrs,parameters,action);
     }
 
-    public PolicyDecision visit(IdentifierBundle ids, DropDataPropStmt action) {
+    @Override
+	public PolicyDecision visit(IdentifierBundle ids, DropDataPropStmt action) {
         log.debug("doing DropDataPropStmt");
 
         List<String> queryStrs = actionToQueryStr.get(action.getClass().getName());
@@ -330,18 +336,6 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Visiti
         return q;
     }
 
-    private QuerySolutionMap idsToSolutionMap(IdentifierBundle id){
-        // right now we can only turn netids into QSMs
-        String netid = getNetid(id);
-        if( netid == null || netid.length() == 0)
-            return null;
-
-        QuerySolutionMap qsm = new QuerySolutionMap();
-        Model m = ModelFactory.createDefaultModel();
-        qsm.add("netid",m.createLiteral(netid));
-        return qsm;
-    }
-
     private String getNetid(IdentifierBundle whoToAuth) {
         String netidStr = null;
         for(Identifier id : whoToAuth){
@@ -364,7 +358,7 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Visiti
      * @author bdc34
      *
      */
-    public class ContextSetup implements ServletContextListener {
+    public static class ContextSetup implements ServletContextListener {
         @Override
 		public void contextInitialized(ServletContextEvent sce) {
             try{
@@ -433,64 +427,81 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Visiti
     "PREFIX vivo: <http://vivo.library.cornell.edu/ns/0.1#>\n"+
     "PREFIX vitro: <"+ VitroVocabulary.vitroURI+">\n";
 
-    public PolicyDecision visit(IdentifierBundle ids, CreateOwlClass action) {
+    @Override
+	public PolicyDecision visit(IdentifierBundle ids, CreateOwlClass action) {
         return UNAUTH;
     }
 
-    public PolicyDecision visit(IdentifierBundle ids, RemoveOwlClass action) {
+    @Override
+	public PolicyDecision visit(IdentifierBundle ids, RemoveOwlClass action) {
         return UNAUTH;
     }
 
-    public PolicyDecision visit(IdentifierBundle ids, DefineDataProperty action) {
+    @Override
+	public PolicyDecision visit(IdentifierBundle ids, DefineDataProperty action) {
         return UNAUTH;
     }
 
-    public PolicyDecision visit(IdentifierBundle ids, DefineObjectProperty action){
+    @Override
+	public PolicyDecision visit(IdentifierBundle ids, DefineObjectProperty action){
         return UNAUTH;
     }
 
-    public PolicyDecision visit(IdentifierBundle ids, AddNewUser action) {
+    @Override
+	public PolicyDecision visit(IdentifierBundle ids, AddNewUser action) {
         return UNAUTH;
     }
 
-    public PolicyDecision visit(IdentifierBundle ids, RemoveUser action) {
+    @Override
+	public PolicyDecision visit(IdentifierBundle ids, RemoveUser action) {
         return UNAUTH;
     }
 
-    public PolicyDecision visit(IdentifierBundle ids, LoadOntology action) {
+    @Override
+	public PolicyDecision visit(IdentifierBundle ids, LoadOntology action) {
         return UNAUTH;
     }
 
-    public PolicyDecision visit(IdentifierBundle ids, RebuildTextIndex action) {
+    @Override
+	public PolicyDecision visit(IdentifierBundle ids, RebuildTextIndex action) {
         return UNAUTH;
     }
 
-    public PolicyDecision visit(IdentifierBundle ids, UpdateTextIndex action) {
+    @Override
+	public PolicyDecision visit(IdentifierBundle ids, UpdateTextIndex action) {
         return UNAUTH;
     }
 
-    public PolicyDecision visit(IdentifierBundle ids, UploadFile action) {
+    @Override
+	public PolicyDecision visit(IdentifierBundle ids, UploadFile action) {
         return UNAUTH;
     }
 
-    public PolicyDecision visit(IdentifierBundle ids, ServerStatus action) {
+    @Override
+	public PolicyDecision visit(IdentifierBundle ids, ServerStatus action) {
         return UNAUTH;
     }
 
-    public PolicyDecision visit(IdentifierBundle ids, EditDataPropStmt action) {
+    @Override
+	public PolicyDecision visit(IdentifierBundle ids, EditDataPropStmt action) {
         return UNAUTH;
     }
 
-    public PolicyDecision visit(IdentifierBundle ids, EditObjPropStmt action) {
+    @Override
+	public PolicyDecision visit(IdentifierBundle ids, EditObjPropStmt action) {
         return UNAUTH;
     }
 
     private final PolicyDecision UNAUTH = new PolicyDecision(){
-        public Authorization getAuthorized() {return Authorization.UNAUTHORIZED; }
-        public String getMessage() {
+        @Override
+		public Authorization getAuthorized() {return Authorization.UNAUTHORIZED; }
+        @Override
+		public String getMessage() {
             return "JenaNetidPolicy doesn't authorize admin or onto editing actions";
         }
-        public String getDebuggingInfo() { return ""; }
-        public String getStackTrace() { return ""; }
+        @Override
+		public String getDebuggingInfo() { return ""; }
+        @Override
+		public String getStackTrace() { return ""; }
     };
 }
