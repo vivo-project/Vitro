@@ -177,17 +177,17 @@ public class JenaNetidPolicy extends DefaultInconclusivePolicy implements Policy
         if (netid == null)
             return pd.setMessage("Unable to get netid from IdBundle");
 
-		if (whoToAuth instanceof AddResource) {
+		if (whatToAuth instanceof AddResource) {
 			return visit(whoToAuth, (AddResource) whatToAuth);
-		} else if (whoToAuth instanceof DropResource) {
+		} else if (whatToAuth instanceof DropResource) {
 			return visit(whoToAuth, (DropResource) whatToAuth);
-		} else if (whoToAuth instanceof AddObjectPropStmt) {
+		} else if (whatToAuth instanceof AddObjectPropStmt) {
 			return visit(whoToAuth, (AddObjectPropStmt) whatToAuth);
-		} else if (whoToAuth instanceof DropObjectPropStmt) {
+		} else if (whatToAuth instanceof DropObjectPropStmt) {
 			return visit(whoToAuth, (DropObjectPropStmt) whatToAuth);
-		} else if (whoToAuth instanceof AddDataPropStmt) {
+		} else if (whatToAuth instanceof AddDataPropStmt) {
 			return visit(whoToAuth, (AddDataPropStmt) whatToAuth);
-		} else if (whoToAuth instanceof DropDataPropStmt) {
+		} else if (whatToAuth instanceof DropDataPropStmt) {
 			return visit(whoToAuth, (DropDataPropStmt) whatToAuth);
 		} else {
 			return UNAUTH;
