@@ -21,19 +21,19 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field;
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.shared.Lock;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ForwardResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena;
@@ -42,135 +42,128 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Generator;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.ModelChangePreprocessor;
 
 /**
  * This servlet will process EditConfigurations with query parameters
  * to perform an edit.
- * 
- * The general steps involved are:
- * get edit configuration
- * get edit submission
- * 
- * 
+ *  
  */
-public class ProcessRdfForm extends VitroHttpServlet{
+public class ProcessRdfForm extends FreemarkerHttpServlet{
 	
-    //bdc34: How will we change this so it is not a jsp?
-	public static final String NO_EDITCONFIG_FOUND_JSP = "/edit/messages/noEditConfigFound.jsp" ;
-	
-	//bdc34: this is likely to become a servlet instead of a jsp
-	// you can get a servlet from the context.
-	public static final String POST_EDIT_CLEANUP_JSP = "postEditCleanUp.jsp";
-	
-	private Log log = LogFactory.getLog(ProcessRdfForm.class);
-    
-	//we should get this from the application, ConfigurationProperties?	
-    static String defaultUriPrefix = "http://vivo.library.cornell.edu/ns/0.1#individual";    
+    private Log log = LogFactory.getLog(ProcessRdfForm.class);
     	
-	/* entity to return to may be a variable */
-	List<String> entToReturnTo = new ArrayList<String>(1);	
+	//bdc34: this is likely to become a servlet instead of a jsp.
+	// You can get a reference to the servlet from the context.
+	// this will need to be converted from a jsp to something else
+	public static final String POST_EDIT_CLEANUP_JSP = "postEditCleanUp.jsp";	   	    
+    	
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws
+    ServletException, IOException{
+	    doGet(request, response);
+	}
 	
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws
-									ServletException, IOException{
-		
+									ServletException, IOException{		
 		VitroRequest vreq = new VitroRequest(request);
-		RequestDispatcher requestDispatcher;
 		
 		//get the EditConfiguration 
-		EditConfiguration editConfiguration = getEditConfiguration(request);
-        if(editConfiguration == null){
-            requestDispatcher = request.getRequestDispatcher(NO_EDITCONFIG_FOUND_JSP);
-            requestDispatcher.forward(request, response);
+		EditConfiguration configuration = getEditConfiguration(request);
+        if(configuration == null){
+            doEditConfigNotFound( vreq, response);            
             return;
         }
 
         //get the EditSubmission
-        EditSubmission submission = new EditSubmission(vreq.getParameterMap(), editConfiguration);        	
+        EditSubmission submission = new EditSubmission(vreq.getParameterMap(), configuration);        	
 		EditSubmission.putEditSubmissionInSession(request.getSession(), submission);
 
-		boolean hasErrors = processValidationErrors(vreq, editConfiguration, submission, response);
+		boolean hasErrors = processValidationErrors(vreq, configuration, submission, response);
 		if( hasErrors)
 		    return; //processValidationErrors() already forwarded to redisplay the form with validation messages 		
-		
-		OntModel queryModel = editConfiguration.getQueryModelSelector().getModel(request, getServletContext());		
-	    
-		// get the model to write to here in case a preprocessor has switched the write layer
-	    OntModel writeModel = editConfiguration.getWriteModelSelector().getModel(request,getServletContext());  
+
+        // get the models to work with in case the write model and query model are not the defaults 
+		OntModel queryModel = configuration.getQueryModelSelector().getModel(request, getServletContext());		
+	    OntModel writeModel = configuration.getWriteModelSelector().getModel(request,getServletContext());  
 	    
 	    AdditionsAndRetractions changes;
-		if(editConfiguration.isUpdate()){
-		    changes = editExistingResource(editConfiguration, submission);
+		if(configuration.isUpdate()){
+		    changes = editExistingResource(configuration, submission);
 		}else{
-		    changes = createNewResource(editConfiguration, submission);
+		    changes = createNewResource(configuration, submission);
 		}
 		
-		applyChanges(changes, editConfiguration, request, queryModel, writeModel);
+		changes = getMinimalChanges( changes );
 		
-		/* what about entity to return to? */
+		if( configuration.isUseDependentResourceDelete() )
+		    changes = addDependentDeletes(changes, queryModel);		
 		
-		requestDispatcher = vreq.getRequestDispatcher(POST_EDIT_CLEANUP_JSP);
-		requestDispatcher.forward(vreq, response);
+		preprocessModels(changes, configuration, vreq);
+		
+		applyChangesToWriteModel(changes, queryModel, writeModel, EditN3Utils.getEditorUri(vreq) );
+		
+		//Here we are trying to get the entity to return to URL, 
+		//Maybe this should be in POST_EDIT_CLEANUP? 
+        if( configuration.getEntityToReturnTo() != null ){      
+            request.setAttribute("entityToReturnTo", substitueForURL( configuration, submission));                   
+        }      
+        
+        doPostEdit(vreq,response);		
 	}
 
-    private void applyChanges(AdditionsAndRetractions changes, EditConfiguration editConfiguration, HttpServletRequest request, OntModel queryModel, OntModel writeModel) {    
+    /**
+     * Execute any modelChangePreprocessors in the editConfiguration;
+     */
+	protected void preprocessModels(AdditionsAndRetractions changes, EditConfiguration editConfiguration, VitroRequest request){
+
+        List<ModelChangePreprocessor> modelChangePreprocessors = editConfiguration.getModelChangePreprocessors();
+        if ( modelChangePreprocessors != null ) {
+            for ( ModelChangePreprocessor pp : modelChangePreprocessors ) {
+                //these work by side effect
+                pp.preprocess( changes.getRetractions(), changes.getAdditions(), request );
+            }
+        }           	    
+	}
+		
+	protected AdditionsAndRetractions getMinimalChanges( AdditionsAndRetractions changes ){
 	    //make a model with all the assertions and a model with all the 
-	    //retractions, do a diff on those and then only add those to the jenaOntModel
-	    Model allPossibleAssertions = ModelFactory.createDefaultModel();
-	    Model allPossibleRetractions = ModelFactory.createDefaultModel();
-	    
-	    for( Model model : changes.getAdditions() ) {
-	        allPossibleAssertions.add( model );
-	    }
-	    for( Model model : changes.getRetractions() ){
-	        allPossibleRetractions.add( model );
-	    }
-	    
-	    //find the minimal change set
-	    Model actualAssertions = allPossibleAssertions.difference( allPossibleRetractions );    
-	    Model actualRetractions = allPossibleRetractions.difference( allPossibleAssertions );
-	    
+        //retractions, do a diff on those and then only add those to the jenaOntModel
+        Model allPossibleAssertions = changes.getAdditions();
+        Model allPossibleRetractions = changes.getRetractions();        
+        
+        //find the minimal change set
+        Model assertions = allPossibleAssertions.difference( allPossibleRetractions );    
+        Model retractions = allPossibleRetractions.difference( allPossibleAssertions );        
+        return new AdditionsAndRetractions(assertions,retractions);
+	}
+	
+	protected AdditionsAndRetractions addDependentDeletes( AdditionsAndRetractions changes, Model queryModel){
 	    //Add retractions for dependent resource delete if that is configured and 
-	    //if there are any dependent resources.
-	    if( editConfiguration.isUseDependentResourceDelete() ){
-	    	Model depResRetractions = 
-	    		DependentResourceDeleteJena
-	    		.getDependentResourceDeleteForChange(actualAssertions,actualRetractions,queryModel);
-	    	actualRetractions.add( depResRetractions );
-	    }
-	    
-	    //execute any modelChangePreprocessors
-	    List<ModelChangePreprocessor> modelChangePreprocessors = editConfiguration.getModelChangePreprocessors();
-	    if ( modelChangePreprocessors != null ) {
-	        for ( ModelChangePreprocessor pp : modelChangePreprocessors ) {
-	        	pp.preprocess( actualRetractions, actualAssertions, request );
-	        }
-	    }
-	   
-	    //side effect: modify the write model with the changes
-	    String editorUri = EditN3Utils.getEditorUri(new VitroRequest(request)); 
+        //if there are any dependent resources.        	            
+        Model depResRetractions = 
+            DependentResourceDeleteJena
+            .getDependentResourceDeleteForChange(changes.getAdditions(),changes.getRetractions(),queryModel);                
+
+        changes.getRetractions().add(depResRetractions);        
+        return changes; 
+	}
+	
+    protected void applyChangesToWriteModel(AdditionsAndRetractions changes, OntModel queryModel, OntModel writeModel, String editorUri) {    	   		    	   	   
+	    //side effect: modify the write model with the changes	    
 	    Lock lock = null;
 	    try{
 	        lock =  writeModel.getLock();
 	        lock.enterCriticalSection(Lock.WRITE);
 	        writeModel.getBaseModel().notifyEvent(new EditEvent(editorUri,true));   
-	        writeModel.add( actualAssertions );
-	        writeModel.remove( actualRetractions );
+	        writeModel.add( changes.getAdditions() );
+	        writeModel.remove( changes.getRetractions() );
 	    }catch(Throwable t){
 	        log.error("error adding edit change n3required model to in memory model \n"+ t.getMessage() );
 	    }finally{
 	        writeModel.getBaseModel().notifyEvent(new EditEvent(editorUri,false));
 	        lock.leaveCriticalSection();
-	    }
-	    
-	    //Here we are trying to get the entity to return to URL set up correctly.
-	    //The problme is that subInURI will add < and > around URIs for the N3 syntax.
-	    //for the URL to return to, replace < and > from URI additions.  
-	    //This should happen somewhere else...  
-	    if( entToReturnTo.size() >= 1 && entToReturnTo.get(0) != null){
-	        request.setAttribute("entityToReturnTo",
-	                entToReturnTo.get(0).trim().replaceAll("<","").replaceAll(">",""));
-	    }	   
+	    }	   	   
 	}
 
 	private EditConfiguration getEditConfiguration(HttpServletRequest request) {
@@ -202,7 +195,6 @@ public class ProcessRdfForm extends VitroHttpServlet{
         if(log.isDebugEnabled()) {
         	Utilities.logRequiredOpt("substituted in URIs  off from ",n3Required,n3Optional);
         }
-        entToReturnTo = n3Subber.subInUris(submission.getUrisFromForm(), entToReturnTo);
         
         //sub in literals from form
         n3Required = n3Subber.subInLiterals(submission.getLiteralsFromForm(), n3Required);
@@ -217,7 +209,6 @@ public class ProcessRdfForm extends VitroHttpServlet{
         if(log.isDebugEnabled()) {
         	Utilities.logRequiredOpt("substituted in URIs from scope ",n3Required,n3Optional);
         }
-        entToReturnTo = n3Subber.subInUris(editConfiguration.getUrisInScope(), entToReturnTo);
         
         n3Required = n3Subber.subInLiterals( editConfiguration.getLiteralsInScope(), n3Required);
         n3Optional = n3Subber.subInLiterals( editConfiguration.getLiteralsInScope(), n3Optional);
@@ -258,18 +249,13 @@ public class ProcessRdfForm extends VitroHttpServlet{
                 model.read(reader, "", "N3");
                 optionalNewModels.add(model);
             }catch(Throwable t){
-                //if an optional N3 block fails to parse it will be ignored 
-//                errorMessages.add("error processing optional n3 string  \n"+
-//                        t.getMessage() + '\n' +
-//                        "n3: \n" + n3);
+                //if an optional N3 block fails to parse it will be ignored
+                //this is what is meant by optional.
             }
         }
         requiredAssertions.addAll( optionalNewModels );
         
-        AdditionsAndRetractions delta = new AdditionsAndRetractions();
-        delta.setAdditions(requiredAssertions);
-        delta.setRetractions(Collections.<Model>emptyList());
-        return delta;
+        return new AdditionsAndRetractions(requiredAssertions, Collections.<Model>emptyList());
  	}
 
 	@SuppressWarnings("static-access")
@@ -279,24 +265,18 @@ public class ProcessRdfForm extends VitroHttpServlet{
 		Map<String, List<String>> fieldRetractions = Utilities.fieldsToRetractionMap(editConfiguration.getFields());
 		EditN3Generator n3Subber = editConfiguration.getN3Generator();
 
-		if(editConfiguration.getEntityToReturnTo() != null){
-			entToReturnTo.add(" " + editConfiguration.getEntityToReturnTo() + " ");
-		}
-	
         /* ********** URIs and Literals on Form/Parameters *********** */
 		fieldAssertions = n3Subber.substituteIntoValues(submission.getUrisFromForm(), submission.getLiteralsFromForm(), fieldAssertions);
         if(log.isDebugEnabled()) {
         	Utilities.logAddRetract("substituted in literals from form",fieldAssertions,fieldRetractions);
-        }
-        entToReturnTo = n3Subber.subInUris(submission.getUrisFromForm(),entToReturnTo); 
+        }        
         
         /* ****************** URIs and Literals in Scope ************** */
         fieldAssertions = n3Subber.substituteIntoValues(editConfiguration.getUrisInScope(), editConfiguration.getLiteralsInScope(), fieldAssertions );
         fieldRetractions = n3Subber.substituteIntoValues(editConfiguration.getUrisInScope(), editConfiguration.getLiteralsInScope(), fieldRetractions);
         if(log.isDebugEnabled()) {
         	Utilities.logAddRetract("substituted in URIs and Literals from scope",fieldAssertions,fieldRetractions);
-        }
-        entToReturnTo = n3Subber.subInUris(editConfiguration.getUrisInScope(),entToReturnTo);
+        }        
         
         //do edits ever need new resources? (YES)
 /*        Map<String,String> varToNewResource = newToUriMap(editConfiguration.getNewResources(),wdf);
@@ -348,18 +328,19 @@ public class ProcessRdfForm extends VitroHttpServlet{
     		}        
         }
         
-//        requiredAssertions = requiredFieldAssertions;
-//        requiredRetractions = requiredFieldRetractions;
-//        optionalAssertions = Collections.emptyList();
-        
-        AdditionsAndRetractions delta = new AdditionsAndRetractions();
-        delta.setAdditions(requiredFieldAssertions);
-        delta.setRetractions(requiredFieldRetractions);
- 
-        return delta;
-        // throw new Error("need to be implemented by Deepak");        
-
+        return new AdditionsAndRetractions(requiredFieldAssertions, requiredFieldRetractions);
 	}
+	
+    private void doEditConfigNotFound(VitroRequest request, HttpServletResponse response) {
+        HashMap<String,Object>map = new HashMap<String,Object>();
+        map.put("message", "No editing configuration found, cannot process edit.");
+        ResponseValues values = new TemplateResponseValues("message.ftl", map);        
+        try {
+            doResponse(request,response,values);
+        } catch (TemplateProcessingException e) {
+            log.error("Could not process template for doEditConfigNotFound()",e);
+        }        
+    }
 
 	private boolean processValidationErrors(VitroRequest vreq,
 			EditConfiguration editConfiguration, EditSubmission submission,
@@ -370,8 +351,8 @@ public class ProcessRdfForm extends VitroHttpServlet{
 		if(errors != null && !errors.isEmpty()){
 			String form = editConfiguration.getFormUrl();
 			vreq.setAttribute("formUrl", form);
-			vreq.setAttribute("view", vreq.getParameter("view"));
-
+			vreq.setAttribute("view", vreq.getParameter("view"));			
+						
 	        RequestDispatcher requestDispatcher = vreq.getRequestDispatcher(editConfiguration.getFormUrl());
 	        requestDispatcher.forward(vreq, response);
 	        return true;    
@@ -379,10 +360,12 @@ public class ProcessRdfForm extends VitroHttpServlet{
 		return false;		
 	}
 
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws
-									ServletException, IOException{
-		doGet(request, response);
-	}
+    private void doPostEdit(VitroRequest vreq, HttpServletResponse response) throws ServletException, IOException {
+        RequestDispatcher requestDispatcher = vreq.getRequestDispatcher(POST_EDIT_CLEANUP_JSP);
+        requestDispatcher.forward(vreq, response);
+    }
+    
+	
 	
 	public static class Utilities {
 		
@@ -474,103 +457,69 @@ public class ProcessRdfForm extends VitroHttpServlet{
 	         if( required != null ) log.debug( "required: " + required.toString() );
 	         if( optional != null ) log.debug( "optional: " +  optional.toString() );
 	         return true;
-	     }
+	     }	     	      	     
 	     
-	     
-	     /* What are the posibilities and what do they mean?
-	     field is a Uri:
-	      orgValue  formValue
-	      null      null       Optional object property, maybe a un-filled out checkbox or radio button.
-	      non-null  null       There was an object property and it was unset on the form
-	      null      non-null   There was an objProp that was not set and is now set.
-	      non-null  non-null    If they are the same then there was no edit, if the differ then form field was changed
-
-	      field is a Literal:
-	      orgValue  formValue
-	      null      null      Optional value that was not set.
-	      non-null  null      Optional value that was unset on form
-	      null      non-null  Optional value that was unset but was set on form
-	      non-null  non-null  If same, there was no edit, if different, there was a change to the form field.
-
-	      What about checkboxes?
-	    */
-	    private boolean hasFieldChanged(String fieldName, EditConfiguration editConfig, EditSubmission submission) {
-	        String orgValue = editConfig.getUrisInScope().get(fieldName);
-	        String newValue = submission.getUrisFromForm().get(fieldName);
-	               
-	        // see possibilities list in comments just above
-	        if (orgValue == null && newValue != null) {
-	            log.debug("Note: Setting previously null object property for field '"+fieldName+"' to new value ["+newValue+"]");
-	            return true;
-	        }
-
-	        if( orgValue != null && newValue != null){
-	            if( orgValue.equals(newValue))
-	              return false;
-	            else
-	              return true;
-	        }
-	       
-	        //This does NOT use the semantics of the literal's Datatype or the language.
-	        Literal orgLit = editConfig.getLiteralsInScope().get(fieldName);
-	        Literal newLit = submission.getLiteralsFromForm().get(fieldName);
-	        
-	        if( orgLit != null ) {
-	            orgValue = orgLit.getValue().toString();
-	        } 
-	        if( newLit != null ) {
-	            newValue = newLit.getValue().toString();
-	        }
-	        
-	        // added for links, where linkDisplayRank will frequently come in null
-	        if (orgValue == null && newValue != null) {
-	            return true;
-	        }
-	        
-	        if( orgValue != null && newValue != null ){
-	            if( orgValue.equals(newValue)) {
-	            	return false;
-	            }
-	                
-	            else {
-	                return true;
-	            }
-	        }
-	        //value wasn't set originally because the field is optional
-	        return false;
-	    }
+	}
+		
+	/**
+	 * This is intended to substitute vars from the EditConfiguration and
+	 * EditSubmission into the URL to return to.
+	 */
+	protected String substitueForURL(EditConfiguration configuration, EditSubmission submission){
 	    
-	    private void dump(String name, Object fff){
-	        XStream xstream = new XStream(new DomDriver());
-	        System.out.println( "*******************************************************************" );
-	        System.out.println( name );
-	        System.out.println(xstream.toXML( fff ));
-	    } 
-	     
-	     
-	}
-
-	
-	private String subInValues(String in /* what else is needed? */){
-	
-	    return in;
-	}
-	
-	
-	private class AdditionsAndRetractions {
-	    List<Model> additions;
-        List<Model> retractions;
+	    List<String> entToReturnTo = new ArrayList<String>(1);
+	    entToReturnTo.add(configuration.getEntityToReturnTo());
+	    
+	    EditN3Generator n3Subber = configuration.getN3Generator();
+	    // Substitute in URIs from the submission
+	    entToReturnTo = n3Subber.subInUris(submission.getUrisFromForm(), entToReturnTo);                       
         
-	    public List<Model> getAdditions() {
+        // Substitute in URIs from the scope of the EditConfiguration                
+	    entToReturnTo = n3Subber.subInUris(configuration.getUrisInScope(), entToReturnTo);                
+        
+        //The problem is that subInURI will add < and > around URIs for the N3 syntax.
+        //for the URL to return to, replace < and > from URI additions.  
+	    return entToReturnTo.get(0).trim().replaceAll("<","").replaceAll(">","");        
+	}
+	
+	/**
+	 * This is a data structure to allow a method to return
+	 * a pair of Model objects for additions and retractions.	 
+	 */
+	protected class AdditionsAndRetractions {
+	    Model additions;
+        Model retractions;
+        
+        public AdditionsAndRetractions(List<Model>adds, List<Model>retractions){
+            Model allAdds = ModelFactory.createDefaultModel();
+            Model allRetractions = ModelFactory.createDefaultModel();
+            
+            for( Model model : adds ) {
+                allAdds.add( model );
+            }
+            for( Model model : retractions ){
+                allRetractions.add( model );
+            }
+            
+            this.setAdditions(allAdds);
+            this.setRetractions(allRetractions);
+        }
+        
+        public AdditionsAndRetractions(Model add, Model retract){
+            this.additions = add;
+            this.retractions = retract;
+        }
+        
+	    public Model getAdditions() {
             return additions;
         }
-        public void setAdditions(List<Model> additions) {
+        public void setAdditions(Model additions) {
             this.additions = additions;
         }
-        public List<Model> getRetractions() {
+        public Model getRetractions() {
             return retractions;
         }
-        public void setRetractions(List<Model> retractions) {
+        public void setRetractions(Model retractions) {
             this.retractions = retractions;
         }        
 	}

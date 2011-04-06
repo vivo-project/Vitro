@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.dao.filtering.filters;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import net.sf.jga.algorithms.Sort;
@@ -18,6 +19,7 @@ import org.joda.time.DateTime;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
@@ -35,25 +37,6 @@ public class FiltersForTabs {
 
         DateTime now = new DateTime();
         UnaryFunctor<Individual,Boolean> entFilter = getTimeFilter(tab, now);
-        UnaryFunctor<Individual,Boolean> tabPortalFilter = getPortalFilter(tab);
-                        
-        if( isFlag1Filtering &&
-        	tabPortalFilter != null   &&
-            portalThatTabIsIn != null && 
-            portalThatTabIsIn.isFlag1Filtering() )
-                entFilter = AdaptorFunctors.and( entFilter, tabPortalFilter );
-
-        String flag2set = tab.getFlag2Set();
-        if( flag2set != null && flag2set.trim().length() > 0 ){
-            String[] flags = flag2set.split(",");
-            if( "OMIT".equalsIgnoreCase(tab.getFlag2Mode()) ){
-                UnaryFunctor<Individual,Boolean> negate = LogicalFunctors.unaryNegate( getCollegeFilter(flags));
-                entFilter = AdaptorFunctors.and( entFilter, negate);
-            }   else {
-                entFilter = AdaptorFunctors.and( entFilter, getCollegeFilter(flags));
-            }
-
-        }
 
         /* need more?
         entFilter = AdaptorFunctors.and( getSomeFilter(tab), entFilter);
@@ -69,7 +52,7 @@ public class FiltersForTabs {
         UnaryFunctor<Individual,Boolean> out = null;
 
         if( tab.getDayLimit() == 0){
-          out = VitroFilterUtils.getSunsetWindowFilter( now.toDate() ).getIndividualFilter();
+          out = getSunsetWindowFilter( now.toDate() ).getIndividualFilter();
 
         } else if( tab.getDayLimit() > 0 ) {
             out = new UnaryFunctor<Individual,Boolean>(){
@@ -106,45 +89,6 @@ public class FiltersForTabs {
         }
 
         return out;
-    }
-
-    /**
-     * Filter the entities based on the specifications of the tab.
-     */
-    protected static UnaryFunctor<Individual,Boolean> getPortalFilter(Tab tab){
-        ApplicationBean appBean = new ApplicationBean();
-        if( tab.getPortalId()  == appBean.getSharedPortalFlagNumeric()){
-            return VitroFilterUtils.getCalsPortalFilter().getIndividualFilter();
-        //} else if (tab.getPortalId() == appBean.getAllPortalFlagNumeric()){
-         } else if (tab.getPortalId() == 65535){
-            return VitroFilterUtils.t;
-        }else {
-            return VitroFilterUtils.getFlag1ExclusiveFilter( FlagMathUtils.portalId2Numeric( tab.getPortalId() ) );
-        }
-    }
-
-    public static UnaryFunctor<Individual,Boolean>getCollegeFilter(final String[] flags){
-
-        return new UnaryFunctor<Individual,Boolean> (){
-
-            final String [] accetableColleges = flags;
-
-            public Boolean fn(Individual individual) {
-                String flags =  individual.getFlag2Set() ;
-                if( flags == null || flags.trim().length() ==0 )
-                    return Boolean.FALSE;
-
-                String[] collegesForInd = flags.split(",");
-                for( String accetable : accetableColleges){
-                    for( String forInd : collegesForInd){
-                        if( accetable.equalsIgnoreCase(forInd)) {
-                            return Boolean.TRUE;
-                        }
-                    }
-                }
-                return Boolean.FALSE;
-            }
-        };
     }
 
 
@@ -247,4 +191,75 @@ public class FiltersForTabs {
             }
         }
     }
+    
+    /** this filter accepts only objects which have sunset dates of the given date or
+     * earlier and sunset dates after the given date.  sunrise <= givenDate < sunset.
+     * 
+     * It is no longer in general use.  It is only used by FitlersForTabs.
+     * @param givenDate - if null, use current date.
+     * */
+    @SuppressWarnings("unchecked")
+    public static VitroFilters getSunsetWindowFilter(final  Date givenDate ){              
+        
+        UnaryFunctor<Individual,Boolean> fn = 
+            new UnaryFunctor<Individual, Boolean>(){
+            Date given = givenDate;            
+            //@Override
+            public Boolean fn(Individual arg) {
+                if( arg == null) return true;                
+                return checkSunriseSunset(givenDate, arg.getSunrise(), arg.getSunset());
+            }
+            public String toString(){ return "Individual time window filter " + given; }; 
+        };
+        
+        UnaryFunctor<ObjectPropertyStatement,Boolean> objPropfn = 
+            new UnaryFunctor<ObjectPropertyStatement, Boolean>(){
+            Date given = givenDate;
+            
+            //@Override
+            public Boolean fn(ObjectPropertyStatement arg) {                
+                if( arg == null) return true;
+                if( checkSunriseSunset(givenDate, arg.getSunrise(), arg.getSunset()) == false)
+                    return false;
+                
+                if( arg.getObject() != null ) {                    
+                    Individual obj = arg.getObject();
+                    if( checkSunriseSunset(givenDate, obj.getSunrise(), obj.getSunset()) == false)
+                        return false;
+                }
+                if( arg.getSubject() != null ){
+                    Individual sub = arg.getSubject();                 
+                    if( checkSunriseSunset(givenDate, sub.getSunrise(), sub.getSunset()) == false )
+                        return false;   
+                }
+                return true;
+            }
+            public String toString(){ return "ObjectPropertyStatement time window filter " + given; };  
+        };
+
+        //we need these casts because of javac
+        VitroFiltersImpl vfilter = VitroFilterUtils.getNoOpFilter();
+        vfilter.setIndividualFilter( fn );                      
+        vfilter.setObjectPropertyStatementFilter(objPropfn);
+        return vfilter;
+    }
+
+
+    private static boolean checkSunriseSunset( Date now, Date sunrise, Date sunset){
+        if( sunrise == null && sunset == null ) 
+            return true;
+        
+        DateTime nowDt = (now!=null?new DateTime(now):new DateTime());        
+        DateTime sunriseDt = (sunrise != null ? new DateTime(sunrise): nowDt.minusDays(356));
+        DateTime sunsetDt = (sunset   != null ? new DateTime(sunset) : nowDt.plusDays(356));
+        
+        if( ( nowDt.isBefore( sunsetDt ) )
+                &&
+            ( nowDt.isAfter( sunriseDt ) 
+              || nowDt.toDateMidnight().isEqual( sunriseDt.toDateMidnight()))
+           )   
+            return true;
+        else
+            return false;        
+    }    
 }

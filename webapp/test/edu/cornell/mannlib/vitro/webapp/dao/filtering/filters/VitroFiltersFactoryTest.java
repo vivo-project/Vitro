@@ -18,10 +18,10 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.BaseFiltering;
+import edu.cornell.mannlib.vitro.webapp.dao.filtering.tabFactory.TabEntityFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 
 public class VitroFiltersFactoryTest {
@@ -35,7 +35,7 @@ public class VitroFiltersFactoryTest {
         DateTime easyDate = new org.joda.time.DateTime(2005,1,1,0,0,0,0); //2005-01-01        
         Date givenDate = easyDate.toDate();
         
-        VitroFilters vf = VitroFilterUtils.getSunsetWindowFilter(givenDate);
+        VitroFilters vf = FiltersForTabs.getSunsetWindowFilter(givenDate);
         Assert.assertNotNull(vf);
         checkFilterForNull(vf);
         
@@ -87,7 +87,7 @@ public class VitroFiltersFactoryTest {
         DateTime easyDate = new org.joda.time.DateTime(2005,1,1,0,0,0,0); //2005-01-01        
         Date givenDate = easyDate.toDate();
         
-        VitroFilters vf = VitroFilterUtils.getSunsetWindowFilter(givenDate);
+        VitroFilters vf = FiltersForTabs.getSunsetWindowFilter(givenDate);
         Assert.assertNotNull(vf);
         checkFilterForNull(vf);
         
@@ -196,39 +196,7 @@ public class VitroFiltersFactoryTest {
     
     private int portalId2Numeric(long i) {
         return (int)FlagMathUtils.portalId2Numeric( i);
-    }
-    
-    @Test
-    public void testCalsFilter(){
-        VitroFilters vf = VitroFilterUtils.getCalsPortalFilter();
-        IndividualImpl ind = new IndividualImpl();
-        
-        ind.setFlag1Numeric(0);
-        Assert.assertTrue(vf.getIndividualFilter().fn(ind) == REJECT);
-        
-        ind.setFlag1Numeric( portalId2Numeric(1) );
-        Assert.assertTrue(vf.getIndividualFilter().fn(ind) == REJECT);
-        
-        ind.setFlag1Numeric( portalId2Numeric(2));        
-        Assert.assertTrue(vf.getIndividualFilter().fn(ind) == ACCEPT);
-        
-        ind.setFlag1Numeric( portalId2Numeric(3));        
-        Assert.assertTrue(vf.getIndividualFilter().fn(ind) == ACCEPT);
-        ind.setFlag1Numeric( portalId2Numeric(4));        
-        Assert.assertTrue(vf.getIndividualFilter().fn(ind) == ACCEPT);
-        ind.setFlag1Numeric( portalId2Numeric(5));        
-        Assert.assertTrue(vf.getIndividualFilter().fn(ind) == ACCEPT);
-        ind.setFlag1Numeric( portalId2Numeric(6));        
-        Assert.assertTrue(vf.getIndividualFilter().fn(ind) == REJECT);
-        ind.setFlag1Numeric( portalId2Numeric(7));        
-        Assert.assertTrue(vf.getIndividualFilter().fn(ind) == REJECT);
-        
-        ind.setFlag1Numeric( portalId2Numeric(2) + portalId2Numeric(1));        
-        Assert.assertTrue(vf.getIndividualFilter().fn(ind) == ACCEPT);
-        
-        
-    }
-    
+    }           
     
     public void checkFilterForNull(VitroFilters vf){
         Assert.assertNotNull("filter was null", vf);

@@ -230,6 +230,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 
 <%!
 
+    //bdc34: This isn't used anywhere, don't migrate forward to java code in 1.3
     private static synchronized void setEditReferer(String editKey, String refererUrl, HttpSession session) {
 	     if (refererUrl != null) { 
 	    	 Object editRefererObj = session.getAttribute("editRefererMap");

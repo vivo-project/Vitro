@@ -176,6 +176,7 @@ public class VitroRequestPrep implements Filter {
 			        
 	        filters = getFiltersFromContextFilterFactory((HttpServletRequest)request, wdf);
 	        
+	        /*  bdc34:to be removed in vivo 1.3	        
 	        if( wdf.getApplicationDao().isFlag1Active() && (portalFlag != null) ){
 	            VitroFilters portalFilter = 
 	                VitroFilterUtils.getFilterFromPortalFlag(portalFlag);
@@ -184,6 +185,7 @@ public class VitroRequestPrep implements Filter {
 	            else
 	                filters = portalFilter;	            
 	        }
+	        */
 	        
 	        if( filters != null ){
 	            log.debug("Wrapping WebappDaoFactory in portal filters");
