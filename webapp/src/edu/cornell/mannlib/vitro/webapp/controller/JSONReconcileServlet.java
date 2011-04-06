@@ -30,6 +30,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.WildcardQuery;
+import org.apache.lucene.util.Version;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,7 +46,7 @@ import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 
 /**
- * This servlet is for servicing JSON requests for Google Refine's
+ * This servlet is for servicing JSON requests from Google Refine's
  * Reconciliation Service.
  * 
  * @author Eliza Chan (elc2013@med.cornell.edu)
@@ -53,8 +54,6 @@ import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
  */
 public class JSONReconcileServlet extends VitroHttpServlet {
 
-	private String defaultNamespace;
-	private String defaultTypeList;
 	private static String QUERY_PARAMETER_NAME = "term";
 	public static final int MAX_QUERY_LENGTH = 500;
 	private static final Log log = LogFactory.getLog(JSONReconcileServlet.class.getName());
@@ -62,6 +61,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+		//resp.setContentType("application/json");
 		super.doPost(req, resp);
 	}
 
@@ -69,9 +69,10 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		super.doGet(req, resp);
+		resp.setContentType("application/json");
 		VitroRequest vreq = new VitroRequest(req);
-		this.defaultNamespace = vreq.getWebappDaoFactory().getDefaultNamespace();
-		this.defaultTypeList = ConfigurationProperties.getBean(req).getProperty("Vitro.reconcile.defaultTypeList");
+		System.out.println("vreq");
+		System.out.println(vreq.getWebappDaoFactory());
 
 		try {
 			if (vreq.getParameter("query") != null
@@ -81,14 +82,22 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 				String responseStr = (vreq.getParameter("callback") == null) ? qJson
 						.toString() : vreq.getParameter("callback") + "("
 						+ qJson.toString() + ")";
-				resp.setContentType("application/json");
 				ServletOutputStream out = resp.getOutputStream();
 				out.print(responseStr);
 			} else { // metadata
-				JSONObject metaJson = getMetadata(req, resp);
+				String defaultNamespace = null;
+				String defaultTypeList = null;
+				String serverName = null;
+				int serverPort = req.getServerPort();
+
+				if (vreq.getWebappDaoFactory() != null) {
+					defaultNamespace = vreq.getWebappDaoFactory().getDefaultNamespace();	
+				}
+				defaultTypeList = ConfigurationProperties.getBean(req).getProperty("Vitro.reconcile.defaultTypeList");
+				serverName = req.getServerName();
+				JSONObject metaJson = getMetadata(req, resp, defaultNamespace, defaultTypeList, serverName, serverPort);
 				String callbackStr = (vreq.getParameter("callback") == null) ? ""
 						: vreq.getParameter("callback");
-				resp.setContentType("application/json");
 				ServletOutputStream out = resp.getOutputStream();
 				out.print(callbackStr + "(" + metaJson.toString() + ")");
 			}
@@ -97,7 +106,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 		}
 	}
 
-	private JSONObject getResult(VitroRequest vreq, HttpServletRequest req,
+	protected JSONObject getResult(VitroRequest vreq, HttpServletRequest req,
 			HttpServletResponse resp) throws ServletException {
 
 		HashMap<String, JSONObject> searchWithTypeMap = new HashMap<String, JSONObject>();
@@ -173,20 +182,21 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 	 * @return
 	 * @throws ServletException
 	 */
-	private JSONObject getMetadata(HttpServletRequest req,
-			HttpServletResponse resp) throws ServletException {
+	protected JSONObject getMetadata(HttpServletRequest req, HttpServletResponse resp, String defaultNamespace,
+			String defaultTypeList, String serverName, int serverPort) throws ServletException {
+
 		JSONObject json = new JSONObject();
 		try {
 			json.put("name", "VIVO Reconciliation Service");
-			if (this.defaultNamespace != null) {
-				json.put("identifierSpace", this.defaultNamespace);
-				json.put("schemaSpace", this.defaultNamespace);
+			if (defaultNamespace != null) {
+				json.put("identifierSpace", defaultNamespace);
+				json.put("schemaSpace", defaultNamespace);
 			}
 			JSONObject viewJson = new JSONObject();
 			StringBuffer urlBuf = new StringBuffer();
-			urlBuf.append("http://" + req.getServerName());
-			if (req.getServerPort() == 8080) {
-				urlBuf.append(":" + req.getServerPort());
+			urlBuf.append("http://" + serverName);
+			if (serverPort == 8080) {
+				urlBuf.append(":" + serverPort);
 			}
 			if (req.getContextPath() != null) {
 				urlBuf.append(req.getContextPath());
@@ -195,8 +205,8 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 			json.put("view", viewJson);
 
 			// parse defaultTypeList from deploy.properties
-			if (this.defaultTypeList != null) {
-				String[] splitList = this.defaultTypeList.split(";");
+			if (defaultTypeList != null) {
+				String[] splitList = defaultTypeList.split(";");
 				String[][] idNameArray = new String[splitList.length][splitList.length];
 				for(int i = 0; i<splitList.length; i++) {
 					idNameArray[i] = splitList[i].split(",");
@@ -215,6 +225,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 			throw new ServletException(
 					"JSONReconcileServlet: Could not create metadata: " + ex);
 		}
+
 		return json;
 	}
 
@@ -284,8 +295,8 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 							Individual ind = iDao.getIndividualByURI(uri);
 							if (ind != null) {
 								String name = ind.getName();
-								// encode e.g. # to %23
-								String modUri = java.net.URLEncoder.encode(uri, "ISO-8859-1");
+								// encode # to %23
+								String modUri = uri.replace("#", "%23");
 								resultJson.put("id", modUri);
 								resultJson.put("name", name);
 							}
@@ -421,7 +432,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
         // indicated in the query string.
         // The analyzer is needed so that we use the same analyzer on the search queries as
         // was used on the text that was indexed.
-        QueryParser qp = new QueryParser(searchField,analyzer);
+    	QueryParser qp = new QueryParser(Version.LUCENE_29, searchField,analyzer);
         //this sets the query parser to AND all of the query terms it finds.
         qp.setDefaultOperator(QueryParser.AND_OPERATOR);
         return qp;
