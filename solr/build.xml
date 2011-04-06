@@ -29,7 +29,7 @@ deploy   - Deploy solr service for use by vitro.
 	     ================================= -->
 
 	<target name="deploy" depends="properties" description="Deploy solr service for use by vitro.">
-		<property name="solr.home" location="${Vitro.home.directory}/solr"/>
+		<property name="solr.home" location="${vitro.home.directory}/solr"/>
 		<property name="solr.docbase" location="${solr.home}/solr.war"/>
 		<property name="solr.context.name" value="${webapp.name}solr"/>
 		<property name="solr.context.config" location="${solr.home}/${solr.context.name}.xml"/>
@@ -83,8 +83,8 @@ deploy   - Deploy solr service for use by vitro.
               message="${deploy.properties.file} must contain a value for tomcat.home" />
 		<fail unless="webapp.name"
               message="${deploy.properties.file} must contain a value for webapp.name" />
-		<fail unless="Vitro.home.directory"
-		      message="${deploy.properties.file} must contain a value for Vitro.home.directory"/>
+		<fail unless="vitro.home.directory"
+		      message="${deploy.properties.file} must contain a value for vitro.home.directory"/>
 		
 	</target>
 
