@@ -246,7 +246,7 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
     	PerFieldAnalyzerWrapper analyzer = new PerFieldAnalyzerWrapper( new StandardAnalyzer(Version.LUCENE_29));
     	
     	analyzer.addAnalyzer(ALLTEXT, new HtmlLowerStopStemAnalyzer());
-    	analyzer.addAnalyzer(NAME, new HtmlLowerStopStemAnalyzer());
+//    	analyzer.addAnalyzer(NAME, new HtmlLowerStopStemAnalyzer());
         analyzer.addAnalyzer(ALLTEXTUNSTEMMED, new HtmlLowerStopAnalyzer());
         analyzer.addAnalyzer(NAMEUNSTEMMED, new HtmlLowerStopAnalyzer());      
         analyzer.addAnalyzer(NAME, new StandardAnalyzer(Version.LUCENE_29));
