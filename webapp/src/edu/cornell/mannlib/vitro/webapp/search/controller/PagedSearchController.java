@@ -29,6 +29,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanClause;
@@ -234,7 +235,10 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
             		log.debug("Document title: "+ document.get(Entity2LuceneDoc.VitroLuceneTermNames.NAME) + " score: " +scoreDoc.score);
             		log.debug("Scoring of the doc explained " + explanation.toString());
             		log.debug("Explanation's description "+ explanation.getDescription());
-            	
+            		log.debug("ALLTEXT: " + document.get(Entity2LuceneDoc.VitroLuceneTermNames.ALLTEXT));
+            		log.debug("ALLTEXTUNSTEMMED: " + document.get(Entity2LuceneDoc.VitroLuceneTermNames.ALLTEXTUNSTEMMED));
+            		
+            		
             	}
             	
             }catch(Throwable t){
@@ -690,10 +694,10 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
 //        map.put(Entity2LuceneDoc.term.ALLTEXT,Entity2LuceneDoc.term.ALLTEXTUNSTEMMED);
 //        qp.setStemmedToUnstemmed(map);
     	
-//    	MultiFieldQueryParser qp = new MultiFieldQueryParser(Version.LUCENE_29, new String[]{ 
-//    				"name", "nameunstemmed", "type", "moniker", "ALLTEXT", "ALLTEXTUNSTEMMED", "nameraw" , "classLocalName", "classLocalNameLowerCase" }, analyzer); 
+    	MultiFieldQueryParser qp = new MultiFieldQueryParser(Version.LUCENE_29, new String[]{ 
+    				"name", "nameunstemmed", "type", "moniker", "ALLTEXT", "ALLTEXTUNSTEMMED", "nameraw" , "classLocalName", "classLocalNameLowerCase" }, analyzer); 
     	
-    	QueryParser qp = new QueryParser(Version.LUCENE_29, "name", analyzer); 
+    //	QueryParser qp = new QueryParser(Version.LUCENE_29, "name", analyzer); 
     	
     	//AND_OPERATOR returns documents even if the terms in the query lie in different fields.
     	//The only requirement is that they exist in a single document.
