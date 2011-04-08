@@ -2,6 +2,9 @@
 
 package freemarker.ext.dump;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.fail;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -10,9 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.fail;
-
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -39,6 +41,8 @@ public class DumpDirectiveTest {
         } catch (Exception e) {
             fail(e.getMessage());
         }
+        // Turn off log messages to console
+        Logger.getLogger(BaseDumpDirective.class).setLevel(Level.OFF);
     }
 
     @Test
@@ -54,13 +58,7 @@ public class DumpDirectiveTest {
         expected.put("type", "String");
         expected.put("value", value);
 
-        try {           
-            Environment env = template.createProcessingEnvironment(dataModel, new StringWriter());
-            Map<String, Object> dumpData = new DumpDirective().getTemplateVariableData(varName, env);
-            assertEquals(expected, dumpData);           
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+        test(varName, dataModel, expected);
     }
     
     @Test
@@ -76,13 +74,7 @@ public class DumpDirectiveTest {
         expected.put("type", "Boolean");
         expected.put("value", value);
 
-        try {           
-            Environment env = template.createProcessingEnvironment(dataModel, new StringWriter());
-            Map<String, Object> dumpData = new DumpDirective().getTemplateVariableData(varName, env);
-            assertEquals(expected, dumpData);           
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }       
+        test(varName, dataModel, expected);     
     }
     
     @Test
@@ -98,13 +90,7 @@ public class DumpDirectiveTest {
         expected.put("type", "Number");
         expected.put("value", value);
 
-        try {           
-            Environment env = template.createProcessingEnvironment(dataModel, new StringWriter());
-            Map<String, Object> dumpData = new DumpDirective().getTemplateVariableData(varName, env);
-            assertEquals(expected, dumpData);           
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }           
+        test(varName, dataModel, expected);         
     }
     
     @Test
@@ -120,13 +106,7 @@ public class DumpDirectiveTest {
         expected.put("type", "Number");
         expected.put("value", value);
 
-        try {           
-            Environment env = template.createProcessingEnvironment(dataModel, new StringWriter());
-            Map<String, Object> dumpData = new DumpDirective().getTemplateVariableData(varName, env);
-            assertEquals(expected, dumpData);           
-        } catch (Exception e) {
-            fail(e.getMessage());
-        } 
+        test(varName, dataModel, expected);
     }
      
    // RY test method and directive types with and without help methods
@@ -144,13 +124,7 @@ public class DumpDirectiveTest {
        expected.put("type", "Method");
        expected.put("help", null);
 
-       try {           
-           Environment env = template.createProcessingEnvironment(dataModel, new StringWriter());
-           Map<String, Object> dumpData = new DumpDirective().getTemplateVariableData(varName, env);
-           assertEquals(expected, dumpData);           
-       } catch (Exception e) {
-           fail(e.getMessage());
-       } 
+       test(varName, dataModel, expected); 
    }
 
    @Test
@@ -166,13 +140,7 @@ public class DumpDirectiveTest {
        expected.put("type", "Method");
        expected.put("help", getMethodHelp(varName));
 
-       try {           
-           Environment env = template.createProcessingEnvironment(dataModel, new StringWriter());
-           Map<String, Object> dumpData = new DumpDirective().getTemplateVariableData(varName, env);
-           assertEquals(expected, dumpData);           
-       } catch (Exception e) {
-           fail(e.getMessage());
-       } 
+       test(varName, dataModel, expected);
    }
 
    @Test
@@ -188,14 +156,9 @@ public class DumpDirectiveTest {
        expected.put("type", "Method");
        expected.put("help", null);
 
-       try {           
-           Environment env = template.createProcessingEnvironment(dataModel, new StringWriter());
-           Map<String, Object> dumpData = new DumpDirective().getTemplateVariableData(varName, env);
-           assertEquals(expected, dumpData);           
-       } catch (Exception e) {
-           fail(e.getMessage());
-       } 
+       test(varName, dataModel, expected);
    }
+   
    @Test
    public void dumpHelplessDirective() {
 
@@ -209,13 +172,7 @@ public class DumpDirectiveTest {
        expected.put("type", "Directive");
        expected.put("help", null);
 
-       try {           
-           Environment env = template.createProcessingEnvironment(dataModel, new StringWriter());
-           Map<String, Object> dumpData = new DumpDirective().getTemplateVariableData(varName, env);
-           assertEquals(expected, dumpData);           
-       } catch (Exception e) {
-           fail(e.getMessage());
-       } 
+       test(varName, dataModel, expected);
    }
 
    @Test
@@ -231,13 +188,7 @@ public class DumpDirectiveTest {
        expected.put("type", "Directive");
        expected.put("help", getDirectiveHelp(varName));
 
-       try {           
-           Environment env = template.createProcessingEnvironment(dataModel, new StringWriter());
-           Map<String, Object> dumpData = new DumpDirective().getTemplateVariableData(varName, env);
-           assertEquals(expected, dumpData);           
-       } catch (Exception e) {
-           fail(e.getMessage());
-       } 
+       test(varName, dataModel, expected); 
    }
  
    @Test
@@ -253,17 +204,41 @@ public class DumpDirectiveTest {
        expected.put("type", "Directive");
        expected.put("help", null);
 
-       try {           
-           Environment env = template.createProcessingEnvironment(dataModel, new StringWriter());
-           Map<String, Object> dumpData = new DumpDirective().getTemplateVariableData(varName, env);
-           assertEquals(expected, dumpData); 
-       } catch (Exception e) {
-           fail(e.getMessage());
-       } 
+       test(varName, dataModel, expected);
    } 
     // RY Do these with different BeansWrappers
     @Test
-    public void dumpSequence() {
+    public void dumpScalarList() {
+        
+        String varName = "fruit";
+        Map<String, Object> dataModel = new HashMap<String, Object>();
+        List<String> list = new ArrayList<String>();
+        list.add("apples");
+        list.add("bananas");
+        list.add("oranges");
+        dataModel.put(varName, list);
+        
+        Map<String, Object> expected = new HashMap<String, Object>();
+        expected.put("name", varName);
+        expected.put("type", "Sequence");
+        List<Map<String, Object>> listDump = new ArrayList<Map<String, Object>>();
+        for ( String str : list) {
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("type", "String");
+            map.put("value", str);
+            listDump.add(map);
+        }
+        expected.put("value", listDump);
+
+        test(varName, dataModel, expected);
+        
+    }
+ 
+    // RY Do these with different BeansWrappers
+    @Test
+    public void dumpScalarArray() {
+        
+
         
     }
     
@@ -275,6 +250,18 @@ public class DumpDirectiveTest {
     @Test
     public void dumpHashEx() {
         
+    }
+    
+    /////////////////////////// Private helper classes and methods  ///////////////////////////
+    
+    private void test(String varName, Map<String, Object> dataModel, Map<String, Object> expected) {
+        try {           
+            Environment env = template.createProcessingEnvironment(dataModel, new StringWriter());
+            Map<String, Object> dumpData = new DumpDirective().getTemplateVariableData(varName, env);
+            assertEquals(expected, dumpData); 
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }        
     }
     
     private class HelplessMethod implements TemplateMethodModel {

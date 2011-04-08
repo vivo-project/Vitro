@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -136,7 +138,13 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     private Map<String, Object> getTemplateModelData(TemplateSequenceModel model) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("type", "Sequence");
-        //map.put("value", model.getAsNumber());
+        int itemCount = model.size();
+        List<Map<String, Object>> items = new ArrayList<Map<String, Object>>(itemCount);
+        for ( int i = 0; i < itemCount; i++ ) {
+            TemplateModel item = model.get(i);
+            items.add(getData(item));
+        }
+        map.put("value", items);
         return map;
     }
     
