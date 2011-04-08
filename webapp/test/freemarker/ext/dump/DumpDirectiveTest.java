@@ -5,11 +5,14 @@ package freemarker.ext.dump;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.fail;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -34,7 +37,7 @@ public class DumpDirectiveTest {
         try {
             template = new Template("template", new StringReader(templateStr), config);
         } catch (Exception e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
     }
 
@@ -54,9 +57,9 @@ public class DumpDirectiveTest {
         try {           
             Environment env = template.createProcessingEnvironment(dataModel, new StringWriter());
             Map<String, Object> dumpData = new DumpDirective().getTemplateVariableData(varName, env);
-            Assert.assertEquals(expected, dumpData);           
+            assertEquals(expected, dumpData);           
         } catch (Exception e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
     }
     
@@ -76,9 +79,9 @@ public class DumpDirectiveTest {
         try {           
             Environment env = template.createProcessingEnvironment(dataModel, new StringWriter());
             Map<String, Object> dumpData = new DumpDirective().getTemplateVariableData(varName, env);
-            Assert.assertEquals(expected, dumpData);           
+            assertEquals(expected, dumpData);           
         } catch (Exception e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }       
     }
     
@@ -98,9 +101,9 @@ public class DumpDirectiveTest {
         try {           
             Environment env = template.createProcessingEnvironment(dataModel, new StringWriter());
             Map<String, Object> dumpData = new DumpDirective().getTemplateVariableData(varName, env);
-            Assert.assertEquals(expected, dumpData);           
+            assertEquals(expected, dumpData);           
         } catch (Exception e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }           
     }
     
@@ -120,58 +123,144 @@ public class DumpDirectiveTest {
         try {           
             Environment env = template.createProcessingEnvironment(dataModel, new StringWriter());
             Map<String, Object> dumpData = new DumpDirective().getTemplateVariableData(varName, env);
-            Assert.assertEquals(expected, dumpData);           
+            assertEquals(expected, dumpData);           
         } catch (Exception e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         } 
     }
      
    // RY test method and directive types with and without help methods
     
    @Test
-   public void dumpMethod() {
+   public void dumpHelplessMethod() {
 
-       String varName = "profileUri";
-       TemplateMethodModel value = new StubMethodModel();
+       String varName = "square";
+       TemplateMethodModel value = new HelplessMethod();
        Map<String, Object> dataModel = new HashMap<String, Object>();
        dataModel.put(varName, value);
         
        Map<String, Object> expected = new HashMap<String, Object>();
        expected.put("name", varName);
        expected.put("type", "Method");
-       //expected.put("value", value);
+       expected.put("help", null);
 
        try {           
            Environment env = template.createProcessingEnvironment(dataModel, new StringWriter());
            Map<String, Object> dumpData = new DumpDirective().getTemplateVariableData(varName, env);
-           Assert.assertEquals(expected, dumpData);           
+           assertEquals(expected, dumpData);           
        } catch (Exception e) {
-           Assert.fail(e.getMessage());
+           fail(e.getMessage());
        } 
    }
 
    @Test
-   public void dumpDirective() {
+   public void dumpHelpfulMethod() {
 
-       String varName = "widget";
-       TemplateDirectiveModel value = new StubDirectiveModel();
+       String varName = "square";
+       TemplateMethodModel value = new HelpfulMethod();
+       Map<String, Object> dataModel = new HashMap<String, Object>();
+       dataModel.put(varName, value);
+        
+       Map<String, Object> expected = new HashMap<String, Object>();
+       expected.put("name", varName);
+       expected.put("type", "Method");
+       expected.put("help", getMethodHelp(varName));
+
+       try {           
+           Environment env = template.createProcessingEnvironment(dataModel, new StringWriter());
+           Map<String, Object> dumpData = new DumpDirective().getTemplateVariableData(varName, env);
+           assertEquals(expected, dumpData);           
+       } catch (Exception e) {
+           fail(e.getMessage());
+       } 
+   }
+
+   @Test
+   public void dumpMethodWithBadHelp() {
+
+       String varName = "square";
+       TemplateMethodModel value = new MethodWithBadHelp();
+       Map<String, Object> dataModel = new HashMap<String, Object>();
+       dataModel.put(varName, value);
+        
+       Map<String, Object> expected = new HashMap<String, Object>();
+       expected.put("name", varName);
+       expected.put("type", "Method");
+       expected.put("help", null);
+
+       try {           
+           Environment env = template.createProcessingEnvironment(dataModel, new StringWriter());
+           Map<String, Object> dumpData = new DumpDirective().getTemplateVariableData(varName, env);
+           assertEquals(expected, dumpData);           
+       } catch (Exception e) {
+           fail(e.getMessage());
+       } 
+   }
+   @Test
+   public void dumpHelplessDirective() {
+
+       String varName = "dump";
+       TemplateDirectiveModel value = new HelplessDirective();
        Map<String, Object> dataModel = new HashMap<String, Object>();
        dataModel.put(varName, value);
         
        Map<String, Object> expected = new HashMap<String, Object>();
        expected.put("name", varName);
        expected.put("type", "Directive");
-       //expected.put("value", value);
+       expected.put("help", null);
 
        try {           
            Environment env = template.createProcessingEnvironment(dataModel, new StringWriter());
            Map<String, Object> dumpData = new DumpDirective().getTemplateVariableData(varName, env);
-           Assert.assertEquals(expected, dumpData);           
+           assertEquals(expected, dumpData);           
        } catch (Exception e) {
-           Assert.fail(e.getMessage());
+           fail(e.getMessage());
        } 
    }
-   
+
+   @Test
+   public void dumpHelpfulDirective() {
+
+       String varName = "dump";
+       TemplateDirectiveModel value = new HelpfulDirective();
+       Map<String, Object> dataModel = new HashMap<String, Object>();
+       dataModel.put(varName, value);
+        
+       Map<String, Object> expected = new HashMap<String, Object>();
+       expected.put("name", varName);
+       expected.put("type", "Directive");
+       expected.put("help", getDirectiveHelp(varName));
+
+       try {           
+           Environment env = template.createProcessingEnvironment(dataModel, new StringWriter());
+           Map<String, Object> dumpData = new DumpDirective().getTemplateVariableData(varName, env);
+           assertEquals(expected, dumpData);           
+       } catch (Exception e) {
+           fail(e.getMessage());
+       } 
+   }
+ 
+   @Test
+   public void dumpDirectiveWithBadHelp() {
+
+       String varName = "dump";
+       TemplateDirectiveModel value = new DirectiveWithBadHelp();
+       Map<String, Object> dataModel = new HashMap<String, Object>();
+       dataModel.put(varName, value);
+        
+       Map<String, Object> expected = new HashMap<String, Object>();
+       expected.put("name", varName);
+       expected.put("type", "Directive");
+       expected.put("help", null);
+
+       try {           
+           Environment env = template.createProcessingEnvironment(dataModel, new StringWriter());
+           Map<String, Object> dumpData = new DumpDirective().getTemplateVariableData(varName, env);
+           assertEquals(expected, dumpData); 
+       } catch (Exception e) {
+           fail(e.getMessage());
+       } 
+   } 
     // RY Do these with different BeansWrappers
     @Test
     public void dumpSequence() {
@@ -188,22 +277,108 @@ public class DumpDirectiveTest {
         
     }
     
-    private class StubMethodModel implements TemplateMethodModel {
+    private class HelplessMethod implements TemplateMethodModel {
 
         @Override
         public Object exec(List arg0) throws TemplateModelException {
             return null;
         }        
     }
+
+    private class HelpfulMethod implements TemplateMethodModel {
+
+        @Override
+        public Object exec(List arg0) throws TemplateModelException {
+            return null;
+        } 
+        
+        public Map<String, Object> help(String name) {
+            return getMethodHelp(name);
+        }
+    }
+
+    private class MethodWithBadHelp implements TemplateMethodModel {
+
+        @Override
+        public Object exec(List arg0) throws TemplateModelException {
+            return null;
+        } 
+        
+        public Map<String, Object> help() {
+            return new HashMap<String, Object>();
+        }
+    }
     
-    private class StubDirectiveModel implements TemplateDirectiveModel {
+    private class HelplessDirective implements TemplateDirectiveModel {
 
         @Override
         public void execute(Environment arg0, Map arg1, TemplateModel[] arg2,
                 TemplateDirectiveBody arg3) throws TemplateException,
-                IOException {
-            
+                IOException {            
+        }
+    }
+
+    private class HelpfulDirective implements TemplateDirectiveModel {
+
+        @Override
+        public void execute(Environment arg0, Map arg1, TemplateModel[] arg2,
+                TemplateDirectiveBody arg3) throws TemplateException,
+                IOException {            
         }
         
+        public Map<String, Object> help(String name) {
+            return getDirectiveHelp(name);
+        }
     }
+    
+    private class DirectiveWithBadHelp implements TemplateDirectiveModel {
+
+        @Override
+        public void execute(Environment arg0, Map arg1, TemplateModel[] arg2,
+                TemplateDirectiveBody arg3) throws TemplateException,
+                IOException {            
+        }
+        
+        public String help(String name) {
+            return "help";
+        }
+    }
+    
+    private Map<String, Object> getDirectiveHelp(String name) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        
+        map.put("effect", "Dump the contents of a template variable.");
+        
+        map.put("comments", "Sequences (lists and arrays) are enclosed in square brackets. Hashes are enclosed in curly braces.");
+        
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("var", "name of variable to dump");
+        map.put("params", params);
+        
+        List<String> examples = new ArrayList<String>();
+        examples.add("<@" + name + " var=\"urls\" />");
+        map.put("examples", examples);
+        
+        return map;        
+    }
+ 
+    private Map<String, Object> getMethodHelp(String name) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        
+        map.put("name", name);
+        
+        map.put("returns", "The square of the argument");
+
+        List<String>params = new ArrayList<String>();
+        params.add("Integer to square");
+        map.put("params", params);
+        
+        List<String> examples = new ArrayList<String>();
+        examples.add(name + "(4)");
+        map.put("examples", examples);
+        
+        return map;     
+    }
+    
+
 }
