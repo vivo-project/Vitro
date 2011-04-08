@@ -69,7 +69,7 @@ public class ListedIndividualTemplateModel extends BaseTemplateModel {
         Link primaryLink = null;
         String anchor = individual.getAnchor();
         String url = individual.getUrl();
-        if (anchor != null && url != null) {
+        if ( !(StringUtils.isEmpty(anchor)) && !(StringUtils.isEmpty(url)) ) {
             primaryLink = new Link();
             primaryLink.setAnchor(anchor);
             primaryLink.setUrl(url);           
