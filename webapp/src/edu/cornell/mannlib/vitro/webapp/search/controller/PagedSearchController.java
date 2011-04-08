@@ -334,7 +334,9 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
                     List<VClassGroup> classgroups = getClassGroups(grpDao, topDocs, searcherForRequest);
                     List<VClassGroupSearchLink> classGroupLinks = new ArrayList<VClassGroupSearchLink>(classgroups.size());
                     for (VClassGroup vcg : classgroups) {
-                        classGroupLinks.add(new VClassGroupSearchLink(qtxt, vcg));
+                        if (vcg.getPublicName() != null) {
+                            classGroupLinks.add(new VClassGroupSearchLink(qtxt, vcg));
+                        }
                     }
                     body.put("classGroupLinks", classGroupLinks);                       
      
