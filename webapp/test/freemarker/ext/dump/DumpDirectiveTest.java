@@ -93,6 +93,7 @@ public class DumpDirectiveTest {
         test(varName, dataModel, expected);         
     }
     
+    // RY Test different datetime types
     @Test
     public void dumpDate() {
 
@@ -206,7 +207,7 @@ public class DumpDirectiveTest {
 
        test(varName, dataModel, expected);
    } 
-    // RY Do these with different BeansWrappers
+   
     @Test
     public void dumpScalarList() {
         
@@ -230,29 +231,96 @@ public class DumpDirectiveTest {
         }
         expected.put("value", listDump);
 
-        test(varName, dataModel, expected);
-        
-    }
- 
-    // RY Do these with different BeansWrappers
-    @Test
-    public void dumpScalarArray() {
-        
-
-        
+        test(varName, dataModel, expected);       
     }
     
+    @Test
+    public void dumpScalarArray() {
+        String varName = "fruit";
+        Map<String, Object> dataModel = new HashMap<String, Object>();
+        String[] list = { "apples", "bananas", "oranges" };
+        dataModel.put(varName, list);
+        
+        Map<String, Object> expected = new HashMap<String, Object>();
+        expected.put("name", varName);
+        expected.put("type", "Sequence");
+        List<Map<String, Object>> listDump = new ArrayList<Map<String, Object>>();
+        for ( String str : list) {
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("type", "String");
+            map.put("value", str);
+            listDump.add(map);
+        }
+        expected.put("value", listDump);
+
+        test(varName, dataModel, expected);       
+    }    
+    
+    @Test
+    public void dumpMixedList() {
+        
+//        String varName = "stuff";
+//        Map<String, Object> dataModel = new HashMap<String, Object>();
+//        List<Object> list = new ArrayList<Object>();
+//        list.add("apples");
+//        list.add(4);
+//        list.add(false);
+//        List<String> animals = new ArrayList<String>();
+//        animals.add("dog");
+//        animals.add("cat");
+//        animals.add("elephant");
+//        Collections.sort(animals);
+//        list.add(animals);
+//        dataModel.put(varName, list);
+//        
+//        Map<String, Object> expected = new HashMap<String, Object>();
+//        expected.put("name", varName);
+//        expected.put("type", "Sequence");
+//        
+//        List<Map<String, Object>> listDump = new ArrayList<Map<String, Object>>();
+//        
+//        Map<String, Object> stringMap = new HashMap<String, Object>();        
+//        stringMap.put("type", "String");
+//        stringMap.put("value", "apples");
+//        listDump.add(stringMap);
+// 
+//        Map<String, Object> numberMap = new HashMap<String, Object>();  
+//        numberMap.put("type", "Number");
+//        numberMap.put("value", 4);
+//        listDump.add(numberMap);
+//        
+//        Map<String, Object> booleanMap = new HashMap<String, Object>();  
+//        booleanMap.put("type", "Boolean");
+//        booleanMap.put("value", false);
+//        listDump.add(booleanMap);
+//        
+//        Map<String, Object> sequenceMap = new HashMap<String, Object>();  
+//        sequenceMap.put("type", "Sequence");        
+//        for ( String animal : animals ) {
+//            Map<String, Object> animalMap = new HashMap<String, Object>();
+//            animalMap.put("type", "String");
+//            animalMap.put("value", animal);
+//            sequenceMap.put("value", animalMap);
+//        }        
+//        listDump.add(sequenceMap);
+//        
+//        expected.put("value", listDump);
+//
+//        test(varName, dataModel, expected);       
+    }    
+
     @Test
     public void dumpHash() {
         
     }
-    
+
+    // RY Do these with different BeansWrappers
     @Test
     public void dumpHashEx() {
         
     }
     
-    /////////////////////////// Private helper classes and methods  ///////////////////////////
+    /////////////////////////// Private helper classes and methods ///////////////////////////
     
     private void test(String varName, Map<String, Object> dataModel, Map<String, Object> expected) {
         try {           
