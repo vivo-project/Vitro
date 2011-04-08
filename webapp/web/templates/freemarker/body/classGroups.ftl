@@ -9,7 +9,9 @@
         <#list classGroups as classGroup>
             <#-- Only render classgroups that have at least one class with individuals -->
             <#if (classGroup.individualCount > 0)>
-                <h2>${classGroup.publicName}</h2>
+                <#if classGroup.publicName?has_content>               
+                    <h2>${classGroup.publicName}</h2>
+                </#if>
                 <ul role="list">
                     <#list classGroup.classes as class> 
                         <#-- Only render classes with individuals -->
