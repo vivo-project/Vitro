@@ -172,16 +172,7 @@ public class RequestToPortalFlag {
             return;
         }
 
-        /* JCR 1/30/2007 pulled user auth level out here so always show full array 
-         * of choices for filtering to editors when logged in */
-        /* BDC 12/18/2008 editors no longer automatically get SHOW_ALL_PORTALS */
-        int currentUserSecurityLevel=0;
-        AuthFlag authFlag=(AuthFlag)request.getAttribute("authFlag");
-        if (authFlag!=null) {
-            currentUserSecurityLevel=authFlag.getUserSecurityLevel();
-        } else {
-        	currentUserSecurityLevel=LoginStatusBean.getBean(request).getSecurityLevel();
-        }
+        int currentUserSecurityLevel=LoginStatusBean.getBean(request).getSecurityLevel();
 
         if (portalFlag.isFilteringActive() ){
             // flag1

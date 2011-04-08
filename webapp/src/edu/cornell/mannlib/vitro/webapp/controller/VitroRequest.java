@@ -6,7 +6,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,7 +25,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
-import edu.cornell.mannlib.vitro.webapp.flags.AuthFlag;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.flags.SunsetFlag;
 
@@ -188,13 +186,6 @@ public class VitroRequest implements HttpServletRequest {
     }
     public void setAppBean(ApplicationBean ab){
         setAttribute("appBean",ab);
-    }
-
-    public AuthFlag getAuthFlag(){
-        return (AuthFlag)getAttribute("authFlag");
-    }
-    public void setAuthFlag(AuthFlag af){
-        setAttribute("authFlag",af);
     }
 
     /* These methods are overridden so that we might convert URL-encoded request parameters to UTF-8

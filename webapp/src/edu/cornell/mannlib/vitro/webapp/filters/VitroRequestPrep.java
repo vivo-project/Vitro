@@ -35,13 +35,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.FilterFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.HiddenFromDisplayBelowRoleLevelFilter;
-import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
-import edu.cornell.mannlib.vitro.webapp.flags.AuthFlag;
 import edu.cornell.mannlib.vitro.webapp.flags.FlagException;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
-import edu.cornell.mannlib.vitro.webapp.flags.RequestToAuthFlag;
 import edu.cornell.mannlib.vitro.webapp.flags.SunsetFlag;
 
 /**
@@ -83,26 +80,28 @@ public class VitroRequestPrep implements Filter {
                           ServletResponse response,
                           FilterChain     chain)
     throws IOException, ServletException {
+    	// If this isn't an HttpServletRequest, we might as well fail now.
+    	HttpServletRequest req = (HttpServletRequest) request;
 
         //don't waste time running this filter again.
-        if( request.getAttribute("VitroRequestPrep.setup") != null ){
+        if( req.getAttribute("VitroRequestPrep.setup") != null ){
             log.debug("VitroRequestPrep has already been executed at least once, not re-executing.");
-            Integer a =(Integer) request.getAttribute("VitroRequestPrep.setup");
-            request.setAttribute("VitroRequestPrep.setup", new Integer( a + 1 ) );
-            chain.doFilter(request, response);
+            Integer a =(Integer) req.getAttribute("VitroRequestPrep.setup");
+            req.setAttribute("VitroRequestPrep.setup", new Integer( a + 1 ) );
+            chain.doFilter(req, response);
             return;
         }
 
         for( Pattern skipPattern : skipPatterns){
-            Matcher match =skipPattern.matcher( ((HttpServletRequest)request).getRequestURI() );
+            Matcher match =skipPattern.matcher( req.getRequestURI() );
             if( match.matches()  ){
                 log.debug("request matched a skipPattern, skipping VitroRequestPrep"); 
-                chain.doFilter(request, response);
+                chain.doFilter(req, response);
                 return;
             }
         }
         
-        VitroRequest vreq = new VitroRequest((HttpServletRequest)request);
+        VitroRequest vreq = new VitroRequest(req);
 
 		if (log.isDebugEnabled()) {
 			try {
@@ -120,10 +119,6 @@ public class VitroRequestPrep implements Filter {
         //-- setup appBean --//
         vreq.setAppBean(_appbean);
 
-        //-- setup Authorization flag --/
-        AuthFlag authFlag = RequestToAuthFlag.makeAuthFlag((HttpServletRequest)request);
-        vreq.setAuthFlag(authFlag);
-        
         //-- setup sunserFlag --//
         SunsetFlag sunsetFlag = new SunsetFlag();
         if( _appbean != null )
@@ -139,30 +134,25 @@ public class VitroRequestPrep implements Filter {
         PortalFlag portalFlag = null;
         PortalDao portalDao = wdf.getPortalDao();
         try{
-            if( request instanceof HttpServletRequest){
-                portal = getCurrentPortalBean((HttpServletRequest)request, true, portalDao);
-                if ( (portal == null) && (response instanceof HttpServletResponse) ) {
-                	((HttpServletResponse)response).sendError(404);
-                	return;
-                }
-                vreq.setPortal(portal);
-                portalFlag = new PortalFlag((HttpServletRequest)request,_appbean, portal, wdf);
-                vreq.setPortalFlag(portalFlag);
+            portal = getCurrentPortalBean(req, true, portalDao);
+            if ( (portal == null) && (response instanceof HttpServletResponse) ) {
+            	((HttpServletResponse)response).sendError(404);
+            	return;
             }
+            vreq.setPortal(portal);
+            portalFlag = new PortalFlag(req,_appbean, portal, wdf);
+            vreq.setPortalFlag(portalFlag);
         }catch(FlagException ex){
             System.out.println("could not make portal flag" + ex);
         }
                        
         WebappDaoFactory sessionDaoFactory = null;
-        if (request instanceof HttpServletRequest) {
-        	Object o = ((HttpServletRequest)request).getSession().getAttribute("webappDaoFactory");
-        	if ( (o != null) && (o instanceof WebappDaoFactory) ) {
-        		sessionDaoFactory = (WebappDaoFactory) o;
-        	}
-        }
+    	Object o = req.getSession().getAttribute("webappDaoFactory");
+    	if ( (o != null) && (o instanceof WebappDaoFactory) ) {
+    		sessionDaoFactory = (WebappDaoFactory) o;
+    	}
         
-        RoleLevel role = RoleLevel.getRoleFromAuth(authFlag);
-        role = role!=null ? role : RoleLevel.PUBLIC;
+        RoleLevel role = RoleLevel.getRoleFromLoginStatus(req);
         log.debug("setting role to "+role.getShorthand());
         
         if (sessionDaoFactory != null) {
@@ -174,7 +164,7 @@ public class VitroRequestPrep implements Filter {
         } else {        	
 	        VitroFilters filters = null;
 			        
-	        filters = getFiltersFromContextFilterFactory((HttpServletRequest)request, wdf);
+	        filters = getFiltersFromContextFilterFactory(req, wdf);
 	        
 	        /*  bdc34:to be removed in vivo 1.3	        
 	        if( wdf.getApplicationDao().isFlag1Active() && (portalFlag != null) ){
@@ -194,6 +184,7 @@ public class VitroRequestPrep implements Filter {
         }                          
 
         /* display filtering happens now at any level, all the time; editing pages get their WebappDaoFactories differently */
+        // TODO -- We can put a HidenFromDisplayByPolicyFilter here, since ID bundles are available from ActiveIdenfierBundleFactor and Policy is available from ServletPolicyList
         WebappDaoFactory roleFilteredFact = 
             new WebappDaoFactoryFiltering(wdf, new HiddenFromDisplayBelowRoleLevelFilter( role, wdf ));
         wdf = roleFilteredFact;        
@@ -208,8 +199,8 @@ public class VitroRequestPrep implements Filter {
         	vreq.setDataset(dataset);
         }
         
-        request.setAttribute("VitroRequestPrep.setup", new Integer(1));
-        chain.doFilter(request, response);
+        req.setAttribute("VitroRequestPrep.setup", new Integer(1));
+        chain.doFilter(req, response);
     }
 
     private WebappDaoFactory getWebappDaoFactory(VitroRequest vreq){

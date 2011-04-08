@@ -2,13 +2,14 @@
 
 package edu.cornell.mannlib.vitro.webapp.beans;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openrdf.model.impl.URIImpl;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.flags.AuthFlag;
 
 public class BaseResourceBean implements ResourceBean {
 	
@@ -67,8 +68,8 @@ public class BaseResourceBean implements ResourceBean {
             return RoleLevel.values()[0];            
         }
         
-        public static RoleLevel getRoleFromAuth(AuthFlag ar){
-            int level = ar.getUserSecurityLevel();
+        public static RoleLevel getRoleFromLoginStatus(HttpServletRequest req) {
+            int level = LoginStatusBean.getBean(req).getSecurityLevel();
             if( level == LoginStatusBean.ANYBODY)    // 0
                 return PUBLIC;
             if( level == LoginStatusBean.NON_EDITOR) // 1
@@ -80,7 +81,7 @@ public class BaseResourceBean implements ResourceBean {
             if( level == LoginStatusBean.DBA )       // 50
                 return DB_ADMIN;
             else
-                return null;
+                return PUBLIC;
         }
     }
 
