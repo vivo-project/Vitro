@@ -123,7 +123,24 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     private Map<String, Object> getTemplateModelData(TemplateDateModel model) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("type", "Date");
-        map.put("dateType", model.getDateType());
+        int dateType = model.getDateType();
+
+        String type;
+        switch (dateType) {
+        case TemplateDateModel.DATE: 
+            type = "Date";
+            break;
+        case TemplateDateModel.DATETIME:
+            type = "DateTime";
+            break;
+        case TemplateDateModel.TIME:
+            type = "Time";
+            break;
+        default:
+            type = "Unknown";
+        }
+        map.put("dateType", type);
+        
         map.put("value", model.getAsDate());
         return map;
     }

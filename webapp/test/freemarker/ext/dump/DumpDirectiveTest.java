@@ -8,7 +8,10 @@ import static junit.framework.Assert.fail;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,23 +96,74 @@ public class DumpDirectiveTest {
         test(varName, dataModel, expected);         
     }
     
-    // RY Test different datetime types
     @Test
-    public void dumpDate() {
+    public void dumpSimpleDate() {
 
-        String varName = "tabCount";
-        int value = 7;
+        String varName = "now";
+        Date now = new Date();
         Map<String, Object> dataModel = new HashMap<String, Object>();
-        dataModel.put(varName, value);
+        dataModel.put(varName, now);
          
         Map<String, Object> expected = new HashMap<String, Object>();
         expected.put("name", varName);
-        expected.put("type", "Number");
-        expected.put("value", value);
+        expected.put("type", "Date");
+        expected.put("dateType", "Unknown");
+        expected.put("value", now);
 
         test(varName, dataModel, expected);
     }
-     
+
+    @Test
+    public void dumpDateTime() {
+        
+        String varName = "timestamp";
+        Timestamp ts = new Timestamp(1302297332043L);
+        Map<String, Object> dataModel = new HashMap<String, Object>();
+        dataModel.put(varName, ts);
+         
+        Map<String, Object> expected = new HashMap<String, Object>();
+        expected.put("name", varName);
+        expected.put("type", "Date");
+        expected.put("dateType", "DateTime");
+        expected.put("value", ts);
+
+        test(varName, dataModel, expected);
+    }
+
+    @Test
+    public void dumpSqlDate() {
+        
+        String varName = "date";
+        java.sql.Date date = new java.sql.Date(1302297332043L);
+        Map<String, Object> dataModel = new HashMap<String, Object>();
+        dataModel.put(varName, date);
+         
+        Map<String, Object> expected = new HashMap<String, Object>();
+        expected.put("name", varName);
+        expected.put("type", "Date");
+        expected.put("dateType", "Date");
+        expected.put("value", date);
+
+        test(varName, dataModel, expected);
+    }
+    
+    @Test
+    public void dumpTime() {
+        
+        String varName = "time";
+        Time time = new Time(1302297332043L);
+        Map<String, Object> dataModel = new HashMap<String, Object>();
+        dataModel.put(varName, time);
+         
+        Map<String, Object> expected = new HashMap<String, Object>();
+        expected.put("name", varName);
+        expected.put("type", "Date");
+        expected.put("dateType", "Time");
+        expected.put("value", time);
+
+        test(varName, dataModel, expected);
+    }
+    
    // RY test method and directive types with and without help methods
     
    @Test
@@ -209,7 +263,7 @@ public class DumpDirectiveTest {
    } 
    
     @Test
-    public void dumpScalarList() {
+    public void dumpStringList() {
         
         String varName = "fruit";
         Map<String, Object> dataModel = new HashMap<String, Object>();
@@ -235,7 +289,7 @@ public class DumpDirectiveTest {
     }
     
     @Test
-    public void dumpScalarArray() {
+    public void dumpStringArray() {
         String varName = "fruit";
         Map<String, Object> dataModel = new HashMap<String, Object>();
         String[] list = { "apples", "bananas", "oranges" };
