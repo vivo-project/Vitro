@@ -87,7 +87,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             // get objects to index. It is filtered so that non-public text
             // does not get into the search index.
             WebappDaoFactory wadf = (WebappDaoFactory) context.getAttribute("webappDaoFactory");
-            VitroFilters vf = VitroFilterUtils.getDisplayFilterByRoleLevel(RoleLevel.PUBLIC, wadf);
+            VitroFilters vf = VitroFilterUtils.getPublicFilter(context);
             wadf = new WebappDaoFactoryFiltering(wadf, vf);
             List<ObjectSourceIface> sources = new ArrayList<ObjectSourceIface>();
             sources.add(wadf.getIndividualDao());
