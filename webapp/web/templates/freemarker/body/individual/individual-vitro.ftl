@@ -41,7 +41,7 @@
         
         <nav role="navigation">
             <ul id ="individual-tools" role="list">                          
-                <li role="listitem"><img title="${individual.uri}" class="middle" src="${urls.images}/individual/uriIcon.gif" alt="uri icon" /></li>
+                <li role="listitem"><img id="uriIcon" title="${individual.uri}" onmouseover="javascript:this.style.cursor='pointer'" class="middle" src="${urls.images}/individual/uriIcon.gif" alt="uri icon"/></li>
                 
                 <#assign rdfUrl = individual.rdfUrl>
                 <#if rdfUrl??>
@@ -73,6 +73,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/individual/indi
 ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/jquery_plugins/getURLParam.js"></script>',
                   '<script type="text/javascript" src="${urls.base}/js/jquery_plugins/colorAnimations.js"></script>',
                   '<script type="text/javascript" src="${urls.base}/js/jquery_plugins/jquery.form.js"></script>',
+                  '<script type="text/javascript" src="${urls.base}/js/jquery_plugins/qtip/jquery.qtip-1.0.0-rc3.min.js"></script>',
                   '<script type="text/javascript" src="${urls.base}/js/tiny_mce/tiny_mce.js"></script>',
                   '<script type="text/javascript" src="${urls.base}/js/controls.js"></script>',
                   '<script type="text/javascript" src="${urls.base}/js/toggle.js"></script>')}
