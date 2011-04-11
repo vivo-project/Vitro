@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import freemarker.core.Environment;
 import freemarker.template.Template;
 import freemarker.template.TemplateBooleanModel;
+import freemarker.template.TemplateCollectionModel;
 import freemarker.template.TemplateDateModel;
 import freemarker.template.TemplateDirectiveModel;
 import freemarker.template.TemplateException;
@@ -25,6 +27,7 @@ import freemarker.template.TemplateHashModelEx;
 import freemarker.template.TemplateMethodModel;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
+import freemarker.template.TemplateModelIterator;
 import freemarker.template.TemplateNumberModel;
 import freemarker.template.TemplateScalarModel;
 import freemarker.template.TemplateSequenceModel;
@@ -91,6 +94,11 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
             } else if (model instanceof TemplateSequenceModel){
                 map.putAll( getTemplateModelData( ( TemplateSequenceModel)model ) );
 
+            } else if (model instanceof TemplateCollectionModel) {
+                map.putAll( getTemplateModelData( ( TemplateCollectionModel)model ) );
+                
+            // Nodes and transforms not included here
+                
             } else {
                 map.putAll( getTemplateModelData( (TemplateModel)model ) );
             }
@@ -146,6 +154,8 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     }
 
     private Map<String, Object> getTemplateModelData(TemplateHashModel model) throws TemplateModelException {
+        // The data model is a hash; when else do we get here?
+        log.debug("Dumping model " + model);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("type", "Hash");
         //map.put("value", model.getAsBoolean());
@@ -167,11 +177,33 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     
     private Map<String, Object> getTemplateModelData(TemplateHashModelEx model) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("type", "HashModelEx");;
-        //map.put("value", model.getAsDate());
+        map.put("type", "HashEx");
+        Map<String, Object> items = new HashMap<String, Object>();
+        // keys() gets only values visible to template
+        TemplateCollectionModel keys = model.keys();
+        TemplateModelIterator iModel = keys.iterator();
+        while (iModel.hasNext()) {
+            String key = iModel.next().toString();
+            TemplateModel value = model.get(key);
+            items.put(key, getData(value));
+        }
+        map.put("value", items);  
         return map;
     }
- 
+
+    private Map<String, Object> getTemplateModelData(TemplateCollectionModel model) throws TemplateModelException {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("type", "Collection");
+        List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+        TemplateModelIterator iModel = model.iterator();
+        while (iModel.hasNext()) {
+            TemplateModel m = iModel.next();
+            items.add(getData(m));
+        }
+        map.put("value", items);  
+        return map;
+    }
+    
     private Map<String, Object> getTemplateModelData(TemplateMethodModel model, String varName) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("type", "Method");
@@ -181,7 +213,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     
     private Map<String, Object> getTemplateModelData(TemplateDirectiveModel model, String varName) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("type", "Directive");;
+        map.put("type", "Directive");
         map.put("help", getHelp(model, varName));
         return map;
     }
@@ -227,5 +259,5 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         out.write(sw.toString());
                 
     }
-    
+
 }

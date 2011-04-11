@@ -14,8 +14,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -24,7 +26,9 @@ import org.junit.Test;
 
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
+import freemarker.template.SimpleCollection;
 import freemarker.template.Template;
+import freemarker.template.TemplateCollectionModel;
 import freemarker.template.TemplateDirectiveBody;
 import freemarker.template.TemplateDirectiveModel;
 import freemarker.template.TemplateException;
@@ -53,8 +57,9 @@ public class DumpDirectiveTest {
     public void dumpString() {
         
         String varName = "dog";
-        String value = "Rover";
         Map<String, Object> dataModel = new HashMap<String, Object>();
+        
+        String value = "Rover";
         dataModel.put(varName, value);
          
         Map<String, Object> expected = new HashMap<String, Object>();
@@ -68,9 +73,10 @@ public class DumpDirectiveTest {
     @Test
     public void dumpBoolean() {
 
-        String varName = "hasSiteAdminAccess";
-        boolean value = true;
+        String varName = "isLoggedIn";
         Map<String, Object> dataModel = new HashMap<String, Object>();
+        
+        boolean value = true;
         dataModel.put(varName, value);
          
         Map<String, Object> expected = new HashMap<String, Object>();
@@ -85,8 +91,9 @@ public class DumpDirectiveTest {
     public void dumpNumber() {
         
         String varName = "tabCount";
-        int value = 7;
         Map<String, Object> dataModel = new HashMap<String, Object>();
+        
+        int value = 7;
         dataModel.put(varName, value);
          
         Map<String, Object> expected = new HashMap<String, Object>();
@@ -101,8 +108,9 @@ public class DumpDirectiveTest {
     public void dumpSimpleDate() {
 
         String varName = "now";
-        Date now = new Date();
         Map<String, Object> dataModel = new HashMap<String, Object>();
+        
+        Date now = new Date();
         dataModel.put(varName, now);
          
         Map<String, Object> expected = new HashMap<String, Object>();
@@ -118,8 +126,9 @@ public class DumpDirectiveTest {
     public void dumpDateTime() {
         
         String varName = "timestamp";
-        Timestamp ts = new Timestamp(1302297332043L);
         Map<String, Object> dataModel = new HashMap<String, Object>();
+        
+        Timestamp ts = new Timestamp(1302297332043L);
         dataModel.put(varName, ts);
          
         Map<String, Object> expected = new HashMap<String, Object>();
@@ -135,8 +144,9 @@ public class DumpDirectiveTest {
     public void dumpSqlDate() {
         
         String varName = "date";
-        java.sql.Date date = new java.sql.Date(1302297332043L);
         Map<String, Object> dataModel = new HashMap<String, Object>();
+        
+        java.sql.Date date = new java.sql.Date(1302297332043L);
         dataModel.put(varName, date);
          
         Map<String, Object> expected = new HashMap<String, Object>();
@@ -152,8 +162,9 @@ public class DumpDirectiveTest {
     public void dumpTime() {
         
         String varName = "time";
-        Time time = new Time(1302297332043L);
         Map<String, Object> dataModel = new HashMap<String, Object>();
+        
+        Time time = new Time(1302297332043L);
         dataModel.put(varName, time);
          
         Map<String, Object> expected = new HashMap<String, Object>();
@@ -171,8 +182,9 @@ public class DumpDirectiveTest {
    public void dumpHelplessMethod() {
 
        String varName = "square";
-       TemplateMethodModel value = new HelplessMethod();
        Map<String, Object> dataModel = new HashMap<String, Object>();
+       
+       TemplateMethodModel value = new HelplessMethod();
        dataModel.put(varName, value);
         
        Map<String, Object> expected = new HashMap<String, Object>();
@@ -187,8 +199,9 @@ public class DumpDirectiveTest {
    public void dumpHelpfulMethod() {
 
        String varName = "square";
-       TemplateMethodModel value = new HelpfulMethod();
        Map<String, Object> dataModel = new HashMap<String, Object>();
+       
+       TemplateMethodModel value = new HelpfulMethod();
        dataModel.put(varName, value);
         
        Map<String, Object> expected = new HashMap<String, Object>();
@@ -203,8 +216,9 @@ public class DumpDirectiveTest {
    public void dumpMethodWithBadHelp() {
 
        String varName = "square";
-       TemplateMethodModel value = new MethodWithBadHelp();
        Map<String, Object> dataModel = new HashMap<String, Object>();
+       
+       TemplateMethodModel value = new MethodWithBadHelp();
        dataModel.put(varName, value);
         
        Map<String, Object> expected = new HashMap<String, Object>();
@@ -219,8 +233,9 @@ public class DumpDirectiveTest {
    public void dumpHelplessDirective() {
 
        String varName = "dump";
-       TemplateDirectiveModel value = new HelplessDirective();
        Map<String, Object> dataModel = new HashMap<String, Object>();
+       
+       TemplateDirectiveModel value = new HelplessDirective();
        dataModel.put(varName, value);
         
        Map<String, Object> expected = new HashMap<String, Object>();
@@ -234,9 +249,10 @@ public class DumpDirectiveTest {
    @Test
    public void dumpHelpfulDirective() {
 
-       String varName = "dump";
-       TemplateDirectiveModel value = new HelpfulDirective();
+       String varName = "dump";   
        Map<String, Object> dataModel = new HashMap<String, Object>();
+       
+       TemplateDirectiveModel value = new HelpfulDirective();
        dataModel.put(varName, value);
         
        Map<String, Object> expected = new HashMap<String, Object>();
@@ -251,8 +267,9 @@ public class DumpDirectiveTest {
    public void dumpDirectiveWithBadHelp() {
 
        String varName = "dump";
-       TemplateDirectiveModel value = new DirectiveWithBadHelp();
        Map<String, Object> dataModel = new HashMap<String, Object>();
+       
+       TemplateDirectiveModel value = new DirectiveWithBadHelp();
        dataModel.put(varName, value);
         
        Map<String, Object> expected = new HashMap<String, Object>();
@@ -266,8 +283,9 @@ public class DumpDirectiveTest {
     @Test
     public void dumpStringList() {
         
-        String varName = "fruit";
+        String varName = "fruit";        
         Map<String, Object> dataModel = new HashMap<String, Object>();
+        
         List<String> list = new ArrayList<String>();
         list.add("apples");
         list.add("bananas");
@@ -277,36 +295,38 @@ public class DumpDirectiveTest {
         Map<String, Object> expected = new HashMap<String, Object>();
         expected.put("name", varName);
         expected.put("type", "Sequence");
-        List<Map<String, Object>> listDump = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> dump = new ArrayList<Map<String, Object>>();
         for ( String str : list) {
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("type", "String");
             map.put("value", str);
-            listDump.add(map);
+            dump.add(map);
         }
-        expected.put("value", listDump);
+        expected.put("value", dump);
 
         test(varName, dataModel, expected);       
     }
     
     @Test
     public void dumpStringArray() {
-        String varName = "fruit";
+        
+        String varName = "fruit";        
         Map<String, Object> dataModel = new HashMap<String, Object>();
+        
         String[] list = { "apples", "bananas", "oranges" };
         dataModel.put(varName, list);
         
         Map<String, Object> expected = new HashMap<String, Object>();
         expected.put("name", varName);
         expected.put("type", "Sequence");
-        List<Map<String, Object>> listDump = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> dump = new ArrayList<Map<String, Object>>();
         for ( String str : list) {
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("type", "String");
             map.put("value", str);
-            listDump.add(map);
+            dump.add(map);
         }
-        expected.put("value", listDump);
+        expected.put("value", dump);
 
         test(varName, dataModel, expected);       
     }    
@@ -314,8 +334,9 @@ public class DumpDirectiveTest {
     @Test
     public void dumpMixedList() {
         
-        String varName = "stuff";
+        String varName = "stuff";        
         Map<String, Object> dataModel = new HashMap<String, Object>();
+        
         List<Object> list = new ArrayList<Object>();
         list.add("apples");
         list.add(4);
@@ -332,40 +353,99 @@ public class DumpDirectiveTest {
         expected.put("name", varName);
         expected.put("type", "Sequence");
         
-        List<Map<String, Object>> listValue = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> dump = new ArrayList<Map<String, Object>>();
         
         Map<String, Object> stringMap = new HashMap<String, Object>();        
         stringMap.put("type", "String");
         stringMap.put("value", "apples");
-        listValue.add(stringMap);
+        dump.add(stringMap);
  
         Map<String, Object> numberMap = new HashMap<String, Object>();  
         numberMap.put("type", "Number");
         numberMap.put("value", 4);
-        listValue.add(numberMap);
+        dump.add(numberMap);
         
         Map<String, Object> booleanMap = new HashMap<String, Object>();  
         booleanMap.put("type", "Boolean");
         booleanMap.put("value", false);
-        listValue.add(booleanMap);
+        dump.add(booleanMap);
         
         Map<String, Object> sequenceMap = new HashMap<String, Object>();
         sequenceMap.put("type", "Sequence"); 
-        List<Map<String, Object>> animalList = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> animalDump = new ArrayList<Map<String, Object>>();
         for ( String animal : animals ) {
             Map<String, Object> animalMap = new HashMap<String, Object>();
             animalMap.put("type", "String");
             animalMap.put("value", animal);
-            animalList.add(animalMap);
+            animalDump.add(animalMap);            
         }        
-        sequenceMap.put("value", animalList);
-        listValue.add(sequenceMap);
+        sequenceMap.put("value", animalDump);
+        dump.add(sequenceMap);
         
-        expected.put("value", listValue);
+        expected.put("value", dump);
 
         test(varName, dataModel, expected);       
     }    
 
+    @Test
+    public void dumpNumberSet() {
+
+        String varName = "oddNums";
+        Map<String, Object> dataModel = new HashMap<String, Object>();
+        
+        Set<Integer> odds = new HashSet<Integer>();
+        for (int i=0; i <= 10; i++) {
+            if (i % 2 == 1) {
+                odds.add(i);
+            }
+        }
+        dataModel.put(varName, odds);
+        
+        Map<String, Object> expected = new HashMap<String, Object>();
+        expected.put("name", varName);
+        expected.put("type", "Sequence");
+        List<Map<String, Object>> dump = new ArrayList<Map<String, Object>>();
+        for ( int i : odds ) {
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("type", "Number");
+            map.put("value", i);
+            dump.add(map);
+        }
+        expected.put("value", dump);
+
+        test(varName, dataModel, expected); 
+    }
+    
+    @Test
+    public void dumpNumberCollection() {
+
+        String varName = "oddNums";
+        Map<String, Object> dataModel = new HashMap<String, Object>();
+        
+        Set<Integer> odds = new HashSet<Integer>();
+        for (int i=0; i <= 10; i++) {
+            if (i % 2 == 1) {
+                odds.add(i);
+            }
+        }
+        TemplateCollectionModel collection = new SimpleCollection(odds);
+        dataModel.put(varName, collection);
+        
+        Map<String, Object> expected = new HashMap<String, Object>();
+        expected.put("name", varName);
+        expected.put("type", "Collection");
+        List<Map<String, Object>> dump = new ArrayList<Map<String, Object>>();
+        for ( int i : odds ) {
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("type", "Number");
+            map.put("value", i);
+            dump.add(map);
+        }
+        expected.put("value", dump);
+
+        test(varName, dataModel, expected); 
+    }    
+    
     @Test
     public void dumpHash() {
         
@@ -373,11 +453,35 @@ public class DumpDirectiveTest {
 
     // RY Do these with different BeansWrappers
     @Test
-    public void dumpHashEx() {
+    public void dumpStringToStringMap() {
+
+        String varName = "capitals";        
+        Map<String, Object> dataModel = new HashMap<String, Object>();
         
+        Map<String, String> capitals = new HashMap<String, String>();
+        capitals.put("Albany", "New York");
+        capitals.put("St. Paul", "Minnesota");
+        capitals.put("Austin", "Texas");
+        capitals.put("Sacramento", "California");
+        capitals.put("Richmond", "Virginia");
+        dataModel.put(varName, capitals);
+        
+        Map<String, Object> expected = new HashMap<String, Object>();
+        expected.put("name", varName);
+        expected.put("type", "HashEx");
+        Map<String, Object> dump = new HashMap<String, Object>();
+        for ( String key : capitals.keySet() ) {
+            Map<String, String> capitalDump = new HashMap<String, String>();
+            capitalDump.put("type", "String");
+            capitalDump.put("value", capitals.get(key));
+            dump.put(key, capitalDump);
+        }
+        expected.put("value", dump);
+
+        test(varName, dataModel, expected);  
     }
     
-    /////////////////////////// Private helper classes and methods ///////////////////////////
+    /////////////////////////// Private stub classes and helper methods ///////////////////////////
     
     private void test(String varName, Map<String, Object> dataModel, Map<String, Object> expected) {
         try {           
