@@ -46,14 +46,6 @@
 -->
 
 <schema name="example" version="1.2">
-  <!-- attribute "name" is the name of this schema and is only used for display purposes.
-       Applications should change this to reflect the nature of the search collection.
-       version="1.2" is Solr's version number for the schema syntax and semantics.  It should
-       not normally be changed by applications.
-       1.0: multiValued attribute did not exist, all fields are multiValued by nature
-       1.1: multiValued attribute introduced, false by default 
-       1.2: omitTermFreqAndPositions attribute introduced, true by default except for text fields.
-     -->
 
   <types>
     <!-- field type definitions. The "name" attribute is
@@ -426,36 +418,37 @@
        when adding a document.
    -->
 
-   <field name="id" type="string" indexed="true" stored="true" required="true" /> 
-   <field name="sku" type="textTight" indexed="true" stored="true" omitNorms="true"/>
-   <field name="name" type="textgen" indexed="true" stored="true"/>
-   <field name="alphaNameSort" type="alphaOnlySort" indexed="true" stored="false"/>
-   <field name="manu" type="textgen" indexed="true" stored="true" omitNorms="true"/>
-   <field name="cat" type="text_ws" indexed="true" stored="true" multiValued="true" omitNorms="true" />
-   <field name="features" type="text" indexed="true" stored="true" multiValued="true"/>
-   <field name="includes" type="text" indexed="true" stored="true" termVectors="true" termPositions="true" termOffsets="true" />
-
-   <field name="weight" type="float" indexed="true" stored="true"/>
-   <field name="price"  type="float" indexed="true" stored="true"/>
-   <field name="popularity" type="int" indexed="true" stored="true" />
-   <field name="inStock" type="boolean" indexed="true" stored="true" />
 
 
-   <!-- Common metadata fields, named specifically to match up with
-     SolrCell metadata when parsing rich documents such as Word, PDF.
-     Some fields are multiValued only because Tika currently may return
-     multiple values for them.
-   -->
-   <field name="title" type="text" indexed="true" stored="true" multiValued="true"/>
-   <field name="subject" type="text" indexed="true" stored="true"/>
-   <field name="description" type="text" indexed="true" stored="true"/>
-   <field name="comments" type="text" indexed="true" stored="true"/>
-   <field name="author" type="textgen" indexed="true" stored="true"/>
-   <field name="keywords" type="textgen" indexed="true" stored="true"/>
-   <field name="category" type="textgen" indexed="true" stored="true"/>
-   <field name="content_type" type="string" indexed="true" stored="true" multiValued="true"/>
-   <field name="last_modified" type="date" indexed="true" stored="true"/>
-   <field name="links" type="string" indexed="true" stored="true" multiValued="true"/>
+
+<!-- ****************************  Vitro Fields *************************** -->
+
+
+
+<field name="DocId" type="string" indexed="true" stored="true" required="true" /> 
+
+<field name="type" type="string" indexed="true" stored="true" omitNorms="ture" multiValued="true"/>
+<field name="classLocalName" type="text" indexed="true" stored="true" multiValued="true"/>
+<field name="classLocalNameLowerCase" type="text" indexed="true" stored="false" multiValued="true"/>
+<field name="classgroup" type="string" indexed="true" stored="true" multiValued="true"/>
+<field name="PROHIBITED_FROM_TEXT_RESULTS" type="string" indexed="true" stored="false" multiValued="false"/>
+<field name="URI" type="string" indexed="true" stored="true" multiValued="false" omitNorms="true"/>
+<field name="name" type="text" indexed="true" stored="true" multiValued="true"/>
+<field name="nameunstemmed" type="text" indexed="true" stored="false" multiValued="true"/>
+<field name="nameunanalyzed" type="string" indexed="true" stored="false" multiValued="true"/>
+<field name="nameraw" type="string" indexed="true" stored="true" multiValued="true"/>
+<field name="indexedTime" type="string" indexed="true" stored="true" multiValued="true"/>
+<field name="ALLTEXT" type="text" indexed="true" stored="false" multiValued="true"/>
+<field name="ALLTEXTUNSTEMMED" type="textgen" indexed="true" stored="false" multiValued="true"/>
+<field name="THUMBNAIL" type="string" indexed="true" stored="true"/>
+
+
+<field name="moniker" type="ignored" />
+<field name="modType" type="ignored"/>
+<field name="JCLASS" type="ignored"/>
+
+
+
 
 
    <!-- catchall field, containing all other searchable text fields (implemented
@@ -466,19 +459,7 @@
         leading wildcard queries. -->
    <field name="text_rev" type="text_rev" indexed="true" stored="false" multiValued="true"/>
 
-   <!-- non-tokenized version of manufacturer to make it easier to sort or group
-        results by manufacturer.  copied from "manu" via copyField -->
-   <field name="manu_exact" type="string" indexed="true" stored="false"/>
-
-   <field name="payloads" type="payloads" indexed="true" stored="true"/>
-
-   <!-- Uncommenting the following will create a "timestamp" field using
-        a default value of "NOW" to indicate when each document was indexed.
-     -->
-   <!--
-   <field name="timestamp" type="date" indexed="true" stored="true" default="NOW" multiValued="false"/>
-     -->
-   
+   <field name="timestamp" type="date" indexed="true" stored="true" default="NOW" multiValued="false"/>   
 
    <!-- Dynamic field definitions.  If a field name is not found, dynamicFields
         will be used if the name matches any of the patterns.
@@ -521,10 +502,10 @@
  <!-- Field to use to determine and enforce document uniqueness. 
       Unless this field is marked with required="false", it will be a required field
    -->
- <uniqueKey>id</uniqueKey>
+ <uniqueKey>DocId</uniqueKey>
 
  <!-- field for the QueryParser to use when an explicit fieldname is absent -->
- <defaultSearchField>text</defaultSearchField>
+ <defaultSearchField>ALLTEXT</defaultSearchField>
 
  <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
  <solrQueryParser defaultOperator="OR"/>
@@ -533,12 +514,7 @@
         is added to the index.  It's used either to index the same field differently,
         or to add multiple fields to the same field for easier/faster searching.  -->
 
-   <copyField source="cat" dest="text"/>
-   <copyField source="name" dest="text"/>
-   <copyField source="manu" dest="text"/>
-   <copyField source="features" dest="text"/>
-   <copyField source="includes" dest="text"/>
-   <copyField source="manu" dest="manu_exact"/>
+<!--   <copyField source="name" dest="text"/> -->
 	
    <!-- Above, multiple source fields are copied to the [text] field. 
 	  Another way to map multiple source fields to the same 
