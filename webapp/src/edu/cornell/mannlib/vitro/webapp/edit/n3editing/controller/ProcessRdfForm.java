@@ -31,7 +31,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ForwardResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
@@ -48,7 +47,8 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.ModelChangePreprocessor;
 /**
  * This servlet will process EditConfigurations with query parameters
  * to perform an edit.
- *  
+ * 
+ * TODO: rename this class ProcessN3Edit  
  */
 public class ProcessRdfForm extends FreemarkerHttpServlet{
 	
@@ -114,6 +114,7 @@ public class ProcessRdfForm extends FreemarkerHttpServlet{
 
     /**
      * Execute any modelChangePreprocessors in the editConfiguration;
+     * Move to EditN3Utils
      */
 	protected void preprocessModels(AdditionsAndRetractions changes, EditConfiguration editConfiguration, VitroRequest request){
 
@@ -125,7 +126,8 @@ public class ProcessRdfForm extends FreemarkerHttpServlet{
             }
         }           	    
 	}
-		
+	
+	//Move to EditN3Utils	
 	protected AdditionsAndRetractions getMinimalChanges( AdditionsAndRetractions changes ){
 	    //make a model with all the assertions and a model with all the 
         //retractions, do a diff on those and then only add those to the jenaOntModel
@@ -137,7 +139,7 @@ public class ProcessRdfForm extends FreemarkerHttpServlet{
         Model retractions = allPossibleRetractions.difference( allPossibleAssertions );        
         return new AdditionsAndRetractions(assertions,retractions);
 	}
-	
+		
 	protected AdditionsAndRetractions addDependentDeletes( AdditionsAndRetractions changes, Model queryModel){
 	    //Add retractions for dependent resource delete if that is configured and 
         //if there are any dependent resources.        	            
@@ -148,6 +150,7 @@ public class ProcessRdfForm extends FreemarkerHttpServlet{
         changes.getRetractions().add(depResRetractions);        
         return changes; 
 	}
+	
 	
     protected void applyChangesToWriteModel(AdditionsAndRetractions changes, OntModel queryModel, OntModel writeModel, String editorUri) {    	   		    	   	   
 	    //side effect: modify the write model with the changes	    
@@ -167,10 +170,8 @@ public class ProcessRdfForm extends FreemarkerHttpServlet{
 	}
 
 	private EditConfiguration getEditConfiguration(HttpServletRequest request) {
-		
 		HttpSession session = request.getSession();
-		EditConfiguration editConfiguration = EditConfiguration.getConfigFromSession(session, request);
-		
+		EditConfiguration editConfiguration = EditConfiguration.getConfigFromSession(session, request);		
 		return editConfiguration;
 	}
 	
@@ -363,10 +364,9 @@ public class ProcessRdfForm extends FreemarkerHttpServlet{
     private void doPostEdit(VitroRequest vreq, HttpServletResponse response) throws ServletException, IOException {
         RequestDispatcher requestDispatcher = vreq.getRequestDispatcher(POST_EDIT_CLEANUP_JSP);
         requestDispatcher.forward(vreq, response);
-    }
-    
+    }    
 	
-	
+	//Move to EditN3Utils but keep make new uris here
 	public static class Utilities {
 		
 		private static Log log = LogFactory.getLog(ProcessRdfForm.class);
@@ -484,7 +484,9 @@ public class ProcessRdfForm extends FreemarkerHttpServlet{
 	
 	/**
 	 * This is a data structure to allow a method to return
-	 * a pair of Model objects for additions and retractions.	 
+	 * a pair of Model objects for additions and retractions.
+	 * 
+	 * Move this to its own class	 
 	 */
 	protected class AdditionsAndRetractions {
 	    Model additions;
