@@ -2,14 +2,10 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.ServletContext;
@@ -23,17 +19,14 @@ import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
-import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
 
 public class VClassGroupCache{
@@ -153,15 +146,8 @@ public class VClassGroupCache{
                 return Collections.emptyList();
             }
             
-            VitroFilters vFilters = null;
-            vFilters = VitroFilterUtils.getDisplayFilterByRoleLevel(RoleLevel.PUBLIC, wdFactory);
-            
-            WebappDaoFactory filteringDaoFactory ;
-            if( vFilters !=null ){
-                filteringDaoFactory = new WebappDaoFactoryFiltering(wdFactory,vFilters);
-            }else{
-                filteringDaoFactory = wdFactory;
-            }        
+            VitroFilters vFilters = VitroFilterUtils.getPublicFilter(context);
+            WebappDaoFactory filteringDaoFactory = new WebappDaoFactoryFiltering(wdFactory,vFilters);
         
             // BJL23:  You may be wondering, why this extra method?  
             // Can't we just use the filtering DAO?

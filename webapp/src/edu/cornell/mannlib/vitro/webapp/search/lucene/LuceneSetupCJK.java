@@ -19,7 +19,6 @@ import org.apache.lucene.search.BooleanQuery;
 
 import com.hp.hpl.jena.ontology.OntModel;
 
-import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -103,8 +102,7 @@ public class LuceneSetupCJK implements javax.servlet.ServletContextListener {
             //does not get into the search index.            
             WebappDaoFactory wadf = 
                 (WebappDaoFactory) context.getAttribute("webappDaoFactory");
-            VitroFilters vf = 
-                VitroFilterUtils.getDisplayFilterByRoleLevel(RoleLevel.PUBLIC, wadf); 
+			VitroFilters vf = VitroFilterUtils.getPublicFilter(context);
             wadf = new WebappDaoFactoryFiltering(wadf,vf);
             
             List sources = new ArrayList();

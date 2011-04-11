@@ -26,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.SelfEditing;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
@@ -34,7 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.FilterFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.HiddenFromDisplayBelowRoleLevelFilter;
+import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.HideFromDisplayByPolicyFilter;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.flags.FlagException;
@@ -76,7 +77,8 @@ public class VitroRequestPrep implements Filter {
 
     private static final Log log = LogFactory.getLog(VitroRequestPrep.class.getName());
 
-    public void doFilter(ServletRequest  request,
+    @Override
+	public void doFilter(ServletRequest  request,
                           ServletResponse response,
                           FilterChain     chain)
     throws IOException, ServletException {
@@ -166,32 +168,21 @@ public class VitroRequestPrep implements Filter {
 			        
 	        filters = getFiltersFromContextFilterFactory(req, wdf);
 	        
-	        /*  bdc34:to be removed in vivo 1.3	        
-	        if( wdf.getApplicationDao().isFlag1Active() && (portalFlag != null) ){
-	            VitroFilters portalFilter = 
-	                VitroFilterUtils.getFilterFromPortalFlag(portalFlag);
-	            if( filters != null ) 	                
-	                filters = filters.and(portalFilter);
-	            else
-	                filters = portalFilter;	            
-	        }
-	        */
-	        
 	        if( filters != null ){
 	            log.debug("Wrapping WebappDaoFactory in portal filters");
 	            wdf = new WebappDaoFactoryFiltering(wdf, filters);
 	        }
         }                          
 
-        /* display filtering happens now at any level, all the time; editing pages get their WebappDaoFactories differently */
-        // TODO -- We can put a HidenFromDisplayByPolicyFilter here, since ID bundles are available from ActiveIdenfierBundleFactor and Policy is available from ServletPolicyList
-        WebappDaoFactory roleFilteredFact = 
-            new WebappDaoFactoryFiltering(wdf, new HiddenFromDisplayBelowRoleLevelFilter( role, wdf ));
-        wdf = roleFilteredFact;        
-        if( log.isDebugEnabled() ) log.debug("setting role-based WebappDaoFactory filter for role " + role.toString());             
-
-        vreq.setWebappDaoFactory(wdf);
-        
+		/*
+		 * display filtering happens now at any level, all the time; editing
+		 * pages get their WebappDaoFactories differently
+		 */
+		HideFromDisplayByPolicyFilter filter = new HideFromDisplayByPolicyFilter(
+				RequestIdentifiers.getIdBundleForRequest(req),
+				ServletPolicyList.getPolicies(_context));
+		vreq.setWebappDaoFactory(new WebappDaoFactoryFiltering(wdf, filter));
+		
         // support for Dataset interface if using Jena in-memory model
         if (vreq.getDataset() == null) {
         	Dataset dataset = WebappDaoFactoryJena.makeInMemoryDataset(
@@ -209,14 +200,13 @@ public class VitroRequestPrep implements Filter {
         	(WebappDaoFactory) _context.getAttribute("webappDaoFactory");
     }
 
-    public void init(FilterConfig filterConfig) throws ServletException {
+    @Override
+	public void init(FilterConfig filterConfig) throws ServletException {
         _context = filterConfig.getServletContext();
-        ApplicationBean a = null;
-        try {
-            a = (ApplicationBean) _context.getAttribute("applicationBean");
-        } catch (Exception e) {}
-        if ( a != null ) {
-            _appbean = (ApplicationBean) a; 
+
+        Object o =  _context.getAttribute("applicationBean");
+        if (o instanceof ApplicationBean) {
+            _appbean = (ApplicationBean) o; 
         } else {
             _appbean = new ApplicationBean();
         }
@@ -359,7 +349,7 @@ public class VitroRequestPrep implements Filter {
             if( request.getAttribute("home") != null)
                 idStr = (String)request.getAttribute("home");
             else if( request.getParameter("home") != null)
-                idStr = (String)request.getParameter("home");
+                idStr = request.getParameter("home");
             else if( request.getAttribute("home") != null)
                 idStr = (String)request.getAttribute("home");
             else
@@ -428,7 +418,9 @@ public class VitroRequestPrep implements Filter {
 		return true;
 	}
 
-    public void destroy() {       
+    @Override
+	public void destroy() {
+    	// Nothing to do.
     }
 
 

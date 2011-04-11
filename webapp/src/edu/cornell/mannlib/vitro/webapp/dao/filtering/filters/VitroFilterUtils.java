@@ -8,36 +8,28 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import net.sf.jga.fn.UnaryFunctor;
-import net.sf.jga.fn.adaptor.AdaptorFunctors;
 import net.sf.jga.fn.adaptor.ChainUnary;
 import net.sf.jga.fn.property.GetProperty;
 import net.sf.jga.fn.string.Match;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.DisplayRestrictedDataByRoleLevelPolicy;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 /**
  * Static methods to help create commonly used filters.
- *
- * @author bdc34
- *
  */
 public class VitroFilterUtils {
-    protected static UnaryFunctor t = AdaptorFunctors.constantUnary(Boolean.TRUE);
-    
-    private static final Log log = LogFactory.getLog(VitroFilterUtils.class.getName());
-
-    /**
-     * Gets a filter that filters out any resource
-     * that has a annotation of hiddenFromDisplayBelowRoleLevel higher than current user's role level
-     */
-    public static VitroFilters getDisplayFilterByRoleLevel(RoleLevel role, WebappDaoFactory wdf){        
-        return new HiddenFromDisplayBelowRoleLevelFilter(role, wdf);
-    }     
+	/**
+	 * Gets a filter that hides any property or resource that is restricted from
+	 * public view.
+	 */
+	public static VitroFilters getPublicFilter(ServletContext ctx) {
+		return new HideFromDisplayByPolicyFilter(
+				new ArrayIdentifierBundle(),
+				new DisplayRestrictedDataByRoleLevelPolicy(ctx));
+	}
 
     /** Gets a VitroFilters that permits all objects */
     protected static VitroFiltersImpl getNoOpFilter(){
@@ -55,21 +47,19 @@ public class VitroFilterUtils {
 
     public static UnaryFunctor<Individual,String> FirstLetterOfIndividuals(){
         return new UnaryFunctor<Individual,String>(){
-            public String fn(Individual arg){
+            @Override
+			public String fn(Individual arg){
                 return arg.getName().substring(0,1);
             }
-            public String toString(){ return "filter: FirstLetterOfIndividuals"; }
+            @Override
+			public String toString(){ return "filter: FirstLetterOfIndividuals"; }
         };
     }
 
     public static class EntitySortTransform extends UnaryFunctor<List<Individual>,List<Individual>>{
-        private final String fieldName;
-        private final boolean ascending;
         private final Comparator<? super Individual> comparator;
 
         public EntitySortTransform( String fieldName, boolean ascending){
-            this.fieldName = fieldName;
-            this.ascending = ascending;
             if ( "timekey".equalsIgnoreCase( fieldName )){
                 if( ascending )
                     comparator = timekeyComp;
@@ -95,14 +85,16 @@ public class VitroFilterUtils {
             }
         }
 
-        public List<Individual> fn(List<Individual> individuals) {
+        @Override
+		public List<Individual> fn(List<Individual> individuals) {
             Collections.sort(individuals,comparator);
             return individuals;
         }
 
         private static Comparator<? super Individual> timekeyComp =
                 new Comparator<Individual>(){
-                    public int compare(Individual o1, Individual o2) {
+                    @Override
+					public int compare(Individual o1, Individual o2) {
                         Date time1 = o1.getTimekey();
                         Date time2 = o2.getTimekey();
                         if( time1 == null && time2 == null )
@@ -113,11 +105,13 @@ public class VitroFilterUtils {
                             return -1;
                         return time1.compareTo(time2);
                     }
-                    public String toString(){ return "timekeyComp"; }
+                    @Override
+					public String toString(){ return "timekeyComp"; }
                 };
         private static Comparator<? super Individual> sunsetComp =
                 new Comparator<Individual>(){
-                    public int compare(Individual o1, Individual o2) {
+                    @Override
+					public int compare(Individual o1, Individual o2) {
                         Date time1 = o1.getSunset();
                         Date time2 = o2.getSunset();
                         if( time1 == null && time2 == null )
@@ -128,11 +122,13 @@ public class VitroFilterUtils {
                             return -1;
                         return time1.compareTo(time2);
                     }
-                    public String toString(){ return "sunsetComp"; }
+                    @Override
+					public String toString(){ return "sunsetComp"; }
                 };
         private static Comparator<? super Individual> sunriseComp =
                 new Comparator<Individual>(){
-                    public int compare(Individual o1, Individual o2) {
+                    @Override
+					public int compare(Individual o1, Individual o2) {
                         Date time1 = o1.getSunrise();
                         Date time2 = o2.getSunrise();
                         if( time1 == null && time2 == null )
@@ -143,13 +139,15 @@ public class VitroFilterUtils {
                             return -1;
                         return time1.compareTo(time2);
                     }
-                    public String toString(){ return "sunriseComp"; }
+                    @Override
+					public String toString(){ return "sunriseComp"; }
                 };
         private static Comparator<? super Individual> nameComp =
                 new Comparator<Individual>(){
             // return ((Individual)o1).getName().compareTo(((Individual)o2).getName());
 
-                    public int compare(Individual o1, Individual o2) {
+                    @Override
+					public int compare(Individual o1, Individual o2) {
                         String name1 = o1.getName();
                         String name2 = o2.getName();
                         if( name1 == null && name2 == null )
@@ -162,12 +160,14 @@ public class VitroFilterUtils {
                         return collator.compare(name1,name2);
                         //return name1.compareTo(name2);
                     }
-                    public String toString(){ return "nameComp"; }
+                    @Override
+					public String toString(){ return "nameComp"; }
                 };
 
                private static Comparator<? super Individual> timekeyCompDesc =
                 new Comparator<Individual>(){
-                    public int compare(Individual o1, Individual o2) {
+                    @Override
+					public int compare(Individual o1, Individual o2) {
                         Date time1 = o1.getTimekey();
                         Date time2 = o2.getTimekey();
                         if( time1 == null && time2 == null )
@@ -178,11 +178,13 @@ public class VitroFilterUtils {
                             return 1;
                         return time2.compareTo(time1);
                     }
-                    public String toString(){ return "timkeyCompDesc"; }
+                    @Override
+					public String toString(){ return "timkeyCompDesc"; }
                 };
         private static Comparator<? super Individual> sunsetCompDesc =
                 new Comparator<Individual>(){
-                    public int compare(Individual o1, Individual o2) {
+                    @Override
+					public int compare(Individual o1, Individual o2) {
                         Date time1 = o1.getSunset();
                         Date time2 = o2.getSunset();
                         if( time1 == null && time2 == null )
@@ -193,11 +195,13 @@ public class VitroFilterUtils {
                             return 1;
                         return time2.compareTo(time1);
                     }
-                    public String toString(){ return "sunsetCompDesc"; }
+                    @Override
+					public String toString(){ return "sunsetCompDesc"; }
                 };
         private static Comparator<? super Individual> sunriseCompDesc =
                 new Comparator<Individual>(){
-                    public int compare(Individual o1, Individual o2) {
+                    @Override
+					public int compare(Individual o1, Individual o2) {
                         Date time1 = o1.getSunrise();
                         Date time2 = o2.getSunrise();
                         if( time1 == null && time2 == null )
@@ -208,11 +212,13 @@ public class VitroFilterUtils {
                             return 1;
                         return time2.compareTo(time1);
                     }
-                    public String toString(){ return "sunriseCompDesc"; }
+                    @Override
+					public String toString(){ return "sunriseCompDesc"; }
                 };
         private static Comparator<? super Individual> nameCompDesc =
                 new Comparator<Individual>(){
-                    public int compare(Individual o1, Individual o2) {
+                    @Override
+					public int compare(Individual o1, Individual o2) {
                         String name1 = o1.getName();
                         String name2 = o2.getName();
                         if( name1 == null && name2 == null )
@@ -225,7 +231,8 @@ public class VitroFilterUtils {
                         return collator.compare(name1,name2);
                         //return name2.compareTo(name1);
                     }
-                    public String toString(){ return "nameCompDesc"; }
+                    @Override
+					public String toString(){ return "nameCompDesc"; }
                 };
 
     }   
