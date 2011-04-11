@@ -229,24 +229,24 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
             doc.setBoost(ent.getSearchBoost());
        
         //Modification time
-        if( ent.getModTime() != null){
-            value = (new DateTime(ent.getModTime().getTime()))
-                .toString(LuceneIndexer.MODTIME_DATE_FORMAT) ;
-        } else {
-            value=  (new DateTime()).toString(LuceneIndexer.MODTIME_DATE_FORMAT) ;
-        }
-        doc.add(  new Field(term.MODTIME, value , Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
+//        if( ent.getModTime() != null){
+//            value = (new DateTime(ent.getModTime().getTime()))
+//                .toString(LuceneIndexer.MODTIME_DATE_FORMAT) ;
+//        } else {
+//            value=  (new DateTime()).toString(LuceneIndexer.MODTIME_DATE_FORMAT) ;
+//        }
+//        doc.add(  new Field(term.MODTIME, value , Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
         
         /* timekey */
-        try{
-            value = null;
-            if( ent.getTimekey() != null ){
-                value = (new DateTime(ent.getTimekey().getTime())).toString(LuceneIndexer.DATE_FORMAT);
-                doc.add(new Field(term.TIMEKEY, value, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
-            }
-        }catch(Exception ex){            
-            log.error("could not save timekey " + ex);            
-        }        
+//        try{
+//            value = null;
+//            if( ent.getTimekey() != null ){
+//                value = (new DateTime(ent.getTimekey().getTime())).toString(LuceneIndexer.DATE_FORMAT);
+//                doc.add(new Field(term.TIMEKEY, value, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
+//            }
+//        }catch(Exception ex){            
+//            log.error("could not save timekey " + ex);            
+//        }        
         
         /* thumbnail */
         try{
