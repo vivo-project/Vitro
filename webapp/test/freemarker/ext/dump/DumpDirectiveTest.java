@@ -592,16 +592,16 @@ public class DumpDirectiveTest {
         
         Calendar c = Calendar.getInstance();
         c.set(75, Calendar.MAY, 5);
-        Employee jdoe = new Employee("John Doe", c.getTime(), 34523);
+        Employee jdoe = new Employee("John", "Doe", c.getTime(), 34523);
         
         c.set(65, Calendar.AUGUST, 10);
-        Employee jsmith = new Employee("Jane Smith", c.getTime(), 11111);
+        Employee jsmith = new Employee("Jane", "Smith", c.getTime(), 78234);
         
         c.set(80, Calendar.JUNE, 20);
-        Employee mjones = new Employee("Michael Jones", c.getTime(), 22222);
+        Employee mjones = new Employee("Michael", "Jones", c.getTime(), 65432);
         
         c.set(81, Calendar.NOVEMBER, 30);
-        Employee mturner = new Employee("Mary Turner", c.getTime(), 33333);
+        Employee mturner = new Employee("Mary", "Turner", c.getTime(), 89531);
         
         List<Employee> supervisees = new ArrayList<Employee>();
         supervisees.add(mjones);
@@ -613,7 +613,10 @@ public class DumpDirectiveTest {
         dataModel.put("employee", jdoe);
         
         Map<String, Object> expectedDump = new HashMap<String, Object>();
+        expectedDump.put(Key.NAME.toString(), varName);
+        expectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
         
+        //test(varName, dataModel, expectedDump); 
     }
     
     /////////////////////////// Private stub classes and helper methods ///////////////////////////
@@ -731,55 +734,86 @@ public class DumpDirectiveTest {
         return map;     
     }
     
-    private class Employee {
+    public static class Employee {
         
-        private String name;
+        private static int count = 0;
+        
+        private String firstName;
+        private String lastName;
+        private String nickname;
         private Date birthdate;
         private int id;
         private Employee supervisor;
         private List<Employee> supervisees;
         private float salary;
         
-        Employee(String name, Date birthdate, int id) {
-            this.name = name;
+        Employee(String firstName, String lastName, Date birthdate, int id) {
+            this.firstName = firstName;
+            this.lastName = lastName;
             this.birthdate = birthdate;
             this.id = id;
-        }
-        
-        String getName() {
-            return name;
-        }
-        
-        Date getBirthdate() {
-            return birthdate;
-        }
-        
-        int getId() {
-            return id;
+            this.nickname = "";
+            count++;
         }
 
         void setSupervisor(Employee supervisor) {
             this.supervisor = supervisor;
         }
 
-        public Employee getSupervisor() {
-            return supervisor;
-        }
-
         void setSupervisees(List<Employee> supervisees) {
             this.supervisees = supervisees;
-        }
-
-        public List<Employee> getSupervisees() {
-            return supervisees;
         }
 
         void setSalary(float salary) {
             this.salary = salary;
         }
+        
+        public void setNickname(String nickname) {
+            this.nickname = nickname;
+        }
 
+        // Not available to templates
         float getSalary() {
             return salary;
+        }
+        
+        public static int getEmployeeCount() {
+            return count;
+        }
+        
+        /*  Public accessor methods for templates */
+        
+        public String getFullName() {
+            return firstName + " " + lastName;
+        }
+        
+        public String getName(String which) {
+            return which == "first" ? firstName : lastName;
+        }
+
+        public String getNickname() {
+            return nickname;
+        }
+        
+        public Date getBirthdate() {
+            return birthdate;
+        }
+        
+        public int getId() {
+            return id;
+        }      
+ 
+        @Deprecated
+        public int getFormerId() {
+            return id % 10000;
+        }
+
+        public Employee getSupervisor() {
+            return supervisor;
+        }
+        
+        public List<Employee> getSupervisees() {
+            return supervisees;
         }
     }
 }

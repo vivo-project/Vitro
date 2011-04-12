@@ -20,8 +20,8 @@ div.dump.var p {
     <p><strong>Variable name:</strong> ${var.name}</p>
     <p><strong>Type:</strong> ${var.type}</p>
     
-  
-    <p><strong>Value:</strong> ${var.value}</p>
+    <#-- What to do here depends on time. Test either ${var.type} or ${var.value} -->
+    <#-- <p><strong>Value:</strong> ${var.value}</p> -->
 </div>
 
 <#-- This will work after we move stylesheets to Configuration sharedVariables 
