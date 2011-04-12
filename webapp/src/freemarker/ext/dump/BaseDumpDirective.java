@@ -275,6 +275,9 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
             String methodDisplayName = getMethodDisplayName(method);
             if ( ! methodDisplayName.endsWith(")") ) {
                 try {
+                    // See note in getAvailableMethods: when we have the keys, we can get the values without
+                    // now invoking the method. Then getMethodsAvailableToTemplate should pass back
+                    // a map of keys to values. 
                     Object result = method.invoke(object);
                     log.debug("Result of invoking method " + method.getName() + " is an object of type " + result.getClass().getName());
                     if (result instanceof TemplateModel) {
@@ -354,7 +357,9 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
             
             // Include only methods included in keys(). This factors in visibility
             // defined by the model's BeansWrapper.
-            if (keySet.contains(method.getName())) {            
+            if (keySet.contains(method.getName())) {   
+                // if the key has a value, we could add it here rather than invoking the
+                // method later
                 availableMethods.add(method);
             }
         }

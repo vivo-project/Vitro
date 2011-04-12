@@ -25,9 +25,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import freemarker.core.Environment;
-import freemarker.ext.dump.BaseDumpDirective.Type;
+import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.dump.BaseDumpDirective.DateType;
 import freemarker.ext.dump.BaseDumpDirective.Key;
+import freemarker.ext.dump.BaseDumpDirective.Type;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleCollection;
 import freemarker.template.Template;
@@ -463,8 +464,6 @@ public class DumpDirectiveTest {
         
     }
 
-    // RY Do these with different BeansWrappers
-    
     @Test
     public void dumpStringToStringMap() {
 
@@ -583,42 +582,86 @@ public class DumpDirectiveTest {
    
         test(varName, dataModel, expectedDump);  
     }    
-    
+
     @Test
-    public void dumpObject() {
+    public void dumpObjectWithExposeNothingWrapper() {
         
         String varName = "employee";
         Map<String, Object> dataModel = new HashMap<String, Object>();
-        
-        Calendar c = Calendar.getInstance();
-        c.set(75, Calendar.MAY, 5);
-        Employee jdoe = new Employee("John", "Doe", c.getTime(), 34523);
-        
-        c.set(65, Calendar.AUGUST, 10);
-        Employee jsmith = new Employee("Jane", "Smith", c.getTime(), 78234);
-        
-        c.set(80, Calendar.JUNE, 20);
-        Employee mjones = new Employee("Michael", "Jones", c.getTime(), 65432);
-        
-        c.set(81, Calendar.NOVEMBER, 30);
-        Employee mturner = new Employee("Mary", "Turner", c.getTime(), 89531);
-        
-        List<Employee> supervisees = new ArrayList<Employee>();
-        supervisees.add(mjones);
-        supervisees.add(mturner);
-        jdoe.setSupervisor(jsmith);
-        jdoe.setSupervisees(supervisees);
-        jdoe.setSalary(65000);
-        
-        dataModel.put("employee", jdoe);
+        BeansWrapper wrapper = new BeansWrapper();
+        wrapper.setExposureLevel(BeansWrapper.EXPOSE_NOTHING);
+        try {
+            dataModel.put("employee", wrapper.wrap(getEmployee()));
+        } catch (TemplateModelException e) {
+            // ??
+        }
         
         Map<String, Object> expectedDump = new HashMap<String, Object>();
         expectedDump.put(Key.NAME.toString(), varName);
         expectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
+        expectedDump.put(Key.VALUE.toString(), new HashMap<String, Object>());
+        test(varName, dataModel, expectedDump);         
+    }
+ 
+    @Test
+    public void dumpObjectWithExposePropertiesOnlyWrapper() {
         
-        //test(varName, dataModel, expectedDump); 
+        String varName = "employee";
+        Map<String, Object> dataModel = new HashMap<String, Object>();
+        BeansWrapper wrapper = new BeansWrapper();
+        wrapper.setExposureLevel(BeansWrapper.EXPOSE_NOTHING);
+        try {
+            dataModel.put("employee", wrapper.wrap(getEmployee()));
+        } catch (TemplateModelException e) {
+            // ??
+        }
+        
+        Map<String, Object> expectedDump = new HashMap<String, Object>();
+        expectedDump.put(Key.NAME.toString(), varName);
+        expectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
+        expectedDump.put(Key.VALUE.toString(), new HashMap<String, Object>());
+        test(varName, dataModel, expectedDump);         
     }
     
+    @Test
+    public void dumpObjectWithExposeSafeWrapper() {
+        
+        String varName = "employee";
+        Map<String, Object> dataModel = new HashMap<String, Object>();
+        BeansWrapper wrapper = new BeansWrapper();
+        wrapper.setExposureLevel(BeansWrapper.EXPOSE_NOTHING);
+        try {
+            dataModel.put("employee", wrapper.wrap(getEmployee()));
+        } catch (TemplateModelException e) {
+            // ??
+        }
+        
+        Map<String, Object> expectedDump = new HashMap<String, Object>();
+        expectedDump.put(Key.NAME.toString(), varName);
+        expectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
+        expectedDump.put(Key.VALUE.toString(), new HashMap<String, Object>());
+        test(varName, dataModel, expectedDump);         
+    }
+    
+    @Test
+    public void dumpObjectWithExposeAllWrapper() {
+        
+        String varName = "employee";
+        Map<String, Object> dataModel = new HashMap<String, Object>();
+        BeansWrapper wrapper = new BeansWrapper();
+        wrapper.setExposureLevel(BeansWrapper.EXPOSE_NOTHING);
+        try {
+            dataModel.put("employee", wrapper.wrap(getEmployee()));
+        } catch (TemplateModelException e) {
+            // ??
+        }
+        
+        Map<String, Object> expectedDump = new HashMap<String, Object>();
+        expectedDump.put(Key.NAME.toString(), varName);
+        expectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
+        expectedDump.put(Key.VALUE.toString(), new HashMap<String, Object>());
+        test(varName, dataModel, expectedDump);         
+    }
     /////////////////////////// Private stub classes and helper methods ///////////////////////////
     
     private void test(String varName, Map<String, Object> dataModel, Map<String, Object> expectedDump) {
@@ -815,5 +858,29 @@ public class DumpDirectiveTest {
         public List<Employee> getSupervisees() {
             return supervisees;
         }
+    }
+    
+    private Employee getEmployee() {
+        Calendar c = Calendar.getInstance();
+        c.set(75, Calendar.MAY, 5);
+        Employee jdoe = new Employee("John", "Doe", c.getTime(), 34523);
+        
+        c.set(65, Calendar.AUGUST, 10);
+        Employee jsmith = new Employee("Jane", "Smith", c.getTime(), 78234);
+        
+        c.set(80, Calendar.JUNE, 20);
+        Employee mjones = new Employee("Michael", "Jones", c.getTime(), 65432);
+        
+        c.set(81, Calendar.NOVEMBER, 30);
+        Employee mturner = new Employee("Mary", "Turner", c.getTime(), 89531);
+        
+        List<Employee> supervisees = new ArrayList<Employee>();
+        supervisees.add(mjones);
+        supervisees.add(mturner);
+        jdoe.setSupervisor(jsmith);
+        jdoe.setSupervisees(supervisees);
+        jdoe.setSalary(65000);
+        
+        return jdoe;
     }
 }
