@@ -43,9 +43,9 @@ public class AllClassGroupsListingController extends BaseEditController {
 
         VClassGroupDao dao = vreq.getFullWebappDaoFactory().getVClassGroupDao();
 
-        List<?> groups = dao.getPublicGroupsWithVClasses(); // uses an unfiltered dao so will see all classes
+        List<VClassGroup> groups = dao.getPublicGroupsWithVClasses(); // uses an unfiltered dao so will see all classes
 
-        ArrayList<String> results = new ArrayList<String>();
+        List<String> results = new ArrayList<String>();
         results.add("XX");
         results.add("Group");
         results.add("display rank");
@@ -53,12 +53,12 @@ public class AllClassGroupsListingController extends BaseEditController {
         results.add("XX");
 
         if (groups != null) {
-            Iterator<?> groupsIt = groups.iterator();
+            Iterator<VClassGroup> groupsIt = groups.iterator();
             while (groupsIt.hasNext()) {
                 VClassGroup vcg = (VClassGroup) groupsIt.next();
                 results.add("XX");
                 String publicName = vcg.getPublicName();
-                if ( StringUtils.isEmpty(publicName) ) {
+                if ( StringUtils.isBlank(publicName) ) {
                     publicName = "(unnamed group)";
                 }           
                 try {
@@ -69,7 +69,7 @@ public class AllClassGroupsListingController extends BaseEditController {
                 results.add(Integer.valueOf(vcg.getDisplayRank()).toString());
                 results.add("???"); // VClassGroup doesn't yet supprt getModTime()
                 results.add("XX");
-                List<?> classList = vcg.getVitroClassList();
+                List<VClass> classList = vcg.getVitroClassList();
                 if (classList != null && classList.size()>0) {
                     results.add("+");
                     results.add("XX");
@@ -77,7 +77,7 @@ public class AllClassGroupsListingController extends BaseEditController {
                     results.add("example");
                     results.add("description");
                     results.add("@@entities");
-                    Iterator<?> classIt = classList.iterator();
+                    Iterator<VClass> classIt = classList.iterator();
                     while (classIt.hasNext()) {
                         VClass vcw = (VClass) classIt.next();
                         results.add("XX");
