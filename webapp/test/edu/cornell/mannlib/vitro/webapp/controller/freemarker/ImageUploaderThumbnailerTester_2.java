@@ -74,7 +74,7 @@ public class ImageUploaderThumbnailerTester_2 extends Frame {
 
 		setTitle("Cropping edging test");
 		addWindowListener(new CloseWindowListener());
-		setLayout(createLayout());
+		setLayout(new GridLayout(ROWS, COLUMNS));
 
 		for (CropData cropData : cropDataSet.crops()) {
 			add(createImagePanel(cropData));
@@ -87,10 +87,6 @@ public class ImageUploaderThumbnailerTester_2 extends Frame {
 	private Component createImagePanel(CropData cropData) {
 		RenderedOp image = createCroppedImage(cropData);
 
-//		Set<String> blackSides = checkBlackPixels(image);
-//		if (!blackSides.isEmpty()) {
-//			log.warn("pixels at " + cropData + ", " + blackSides);
-//		}
 
 		Set<String> blackSides = checkBlackEdges(image);
 		if (!blackSides.isEmpty()) {
@@ -159,64 +155,30 @@ public class ImageUploaderThumbnailerTester_2 extends Frame {
 	private boolean isBlackEdge(int fromX, int toX, int fromY, int toY,
 			Raster imageData) {
 		int edgeTotal = 0;
-		for (int col = fromX; col <= toX; col++) {
-			for (int row = fromY; row <= toY; row++) {
-				edgeTotal += sumPixel(imageData, row, col);
+		try {
+			for (int col = fromX; col <= toX; col++) {
+				for (int row = fromY; row <= toY; row++) {
+					edgeTotal += sumPixel(imageData, col, row);
+				}
 			}
+		} catch (Exception e) {
+			log.error("can't sum edge: fromX=" + fromX + ", toX=" + toX
+					+ ", fromY=" + fromY + ", toY=" + toY + ", imageWidth="
+					+ imageData.getWidth() + ", imageHeight="
+					+ imageData.getHeight() + ": " + e);
 		}
 
 		log.debug("edge total = " + edgeTotal);
 		return edgeTotal < EDGE_THRESHOLD;
 	}
 
-	private int sumPixel(Raster imageData, int row, int col) {
-		int[] pixel = imageData.getPixel(row, col, new int[3]);
+	private int sumPixel(Raster imageData, int col, int row) {
 		int pixelSum = 0;
+		int[] pixel = imageData.getPixel(col, row, new int[0]);
 		for (int value : pixel) {
 			pixelSum += value;
 		}
 		return pixelSum;
-	}
-
-//	private Set<String> checkBlackPixels(RenderedOp image) {
-//		Raster imageData = image.getData();
-//
-//		int minX = imageData.getMinX();
-//		int minY = imageData.getMinY();
-//		int width = imageData.getWidth();
-//		int height = imageData.getHeight();
-//		int centerX = (minX + width) / 2;
-//		int centerY = (minY + height) / 2;
-//
-//		int[] leftBorderPixel = imageData.getPixel(minX, centerY, new int[3]);
-//		int[] topBorderPixel = imageData.getPixel(centerX, minY, new int[3]);
-//		int[] rightBorderPixel = imageData.getPixel(minX + width - 1, centerY,
-//				new int[3]);
-//		int[] bottomBorderPixel = imageData.getPixel(centerX,
-//				minY + height - 1, new int[3]);
-//
-//		Set<String> blackSides = new HashSet<String>();
-//		checkPixel(blackSides, leftBorderPixel, "left");
-//		checkPixel(blackSides, topBorderPixel, "top");
-//		checkPixel(blackSides, rightBorderPixel, "right");
-//		checkPixel(blackSides, bottomBorderPixel, "bottom");
-//
-//		return blackSides;
-//	}
-
-//	private void checkPixel(Set<String> blackSides, int[] pixel, String string) {
-//		int pixelSum = 0;
-//		for (int i = 0; i < pixel.length; i++) {
-//			pixelSum += pixel[i];
-//		}
-//		if (pixelSum <= 20) {
-//			blackSides.add(string);
-//		}
-//	}
-
-	private GridLayout createLayout() {
-		GridLayout layout = new GridLayout(ROWS, COLUMNS);
-		return layout;
 	}
 
 	/**
@@ -238,20 +200,27 @@ public class ImageUploaderThumbnailerTester_2 extends Frame {
 				.nextElement();
 		appender.setLayout(new PatternLayout("%-5p [%c{1}] %m%n"));
 
-		// Logger.getLogger(ImageUploadThumbnailer.class).setLevel(Level.DEBUG);
+		Logger.getLogger(ImageUploadThumbnailer.class).setLevel(Level.DEBUG);
 		Logger.getLogger(ImageUploaderThumbnailerTester_2.class).setLevel(
 				Level.INFO);
 
 		CropDataSet cropDataSet = new CropDataSet();
 		for (int i = 0; i < ROWS * COLUMNS; i++) {
-			cropDataSet.add(0 + i, 0 + i, 201 + i);
+//			cropDataSet.add(i, i, 201 + i);
+			cropDataSet.add(0, 0, 201 + i);
 		}
 
 		new ImageUploaderThumbnailerTester_2(
-				"C:/Development/JIRA issues/NIHVIVO-2477 Black borders on thumbnails/"
-						+ "images from Alex/uploads/file_storage_root/a~n/411/9/"
-						+ "De^20Bartolome^2c^20Charles^20A^20M_100037581.jpg",
-				cropDataSet);
+				"C:/Users/jeb228/Pictures/wheel.png", cropDataSet);
+
+//		new ImageUploaderThumbnailerTester_2(
+//				"C:/Users/jeb228/Pictures/DSC04203w-trans.jpg", cropDataSet);
+
+		//		new ImageUploaderThumbnailerTester_2(
+//				"C:/Development/JIRA issues/NIHVIVO-2477 Black borders on thumbnails/"
+//				+ "images from Alex/uploads/file_storage_root/a~n/411/9/"
+//				+ "De^20Bartolome^2c^20Charles^20A^20M_100037581.jpg",
+//				cropDataSet);
 	}
 
 	// ----------------------------------------------------------------------
