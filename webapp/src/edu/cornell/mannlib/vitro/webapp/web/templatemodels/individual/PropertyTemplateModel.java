@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -62,10 +63,17 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         }
         
         verboseDisplay = new HashMap<String, Object>();
-        verboseDisplay.put("displayLevel", property.getHiddenFromDisplayBelowRoleLevel().getLabel());
-        verboseDisplay.put("updateLevel", property.getProhibitedFromUpdateBelowRoleLevel().getLabel());   
+        
+        RoleLevel roleLevel = property.getHiddenFromDisplayBelowRoleLevel();
+        String roleLevelLabel = roleLevel != null ? roleLevel.getLabel() : "";
+        verboseDisplay.put("displayLevel", roleLevelLabel);
+
+        roleLevel = property.getHiddenFromDisplayBelowRoleLevel();
+        roleLevelLabel = roleLevel != null ? roleLevel.getLabel() : "";
+        verboseDisplay.put("updateLevel", roleLevelLabel);   
+        
         verboseDisplay.put("localName", property.getLocalNameWithPrefix());
-        verboseDisplay.put("displayTier", getPropertyDisplayTier(property));
+        verboseDisplay.put("displayRank", getPropertyDisplayTier(property));
         
         UrlBuilder urlBuilder = new UrlBuilder(vreq.getPortal());
         String editUrl = urlBuilder.getPortalUrl(getPropertyEditRoute(), "uri", property.getURI());

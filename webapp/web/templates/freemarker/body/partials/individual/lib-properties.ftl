@@ -156,7 +156,7 @@ name will be used as the label. -->
         <section class="verbosePropertyListing">
             <a class="propertyLink" href="${verboseDisplay.propertyEditUrl}">${verboseDisplay.localName}</a> 
             (<span>${property.type?lower_case}</span> property);
-            order in group: <span>${verboseDisplay.displayTier};</span> 
+            order in group: <span>${verboseDisplay.displayRank};</span> 
             display level: <span>${verboseDisplay.displayLevel};</span>
             update level: <span>${verboseDisplay.updateLevel}</span>
         </section>
