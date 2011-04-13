@@ -2,24 +2,23 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.media.jai.InterpolationBilinear;
+import javax.imageio.ImageIO;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.operator.BandSelectDescriptor;
-import javax.media.jai.operator.CropDescriptor;
-import javax.media.jai.operator.EncodeDescriptor;
-import javax.media.jai.operator.ScaleDescriptor;
 import javax.media.jai.operator.StreamDescriptor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.sun.media.jai.codec.JPEGEncodeParam;
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.CropRectangle;
@@ -28,9 +27,19 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadControl
  * Crop the main image as specified, and scale it to the correct size for a
  * thumbnail.
  * 
- * The JAI library has a problem when writing a JPEG from a source image with an
- * alpha channel (transparency). The colors come out inverted. We throw in a
- * step that will remove transparency from a PNG, but it won't touch a GIF.
+ * Use the JAI library to read the file because the javax.imageio package
+ * doesn't read extended JPEG properly. Use JAI to remove transparency from
+ * JPEGs and PNGs, simply by removing the alpha channel. Annoyingly, this will
+ * not work with GIFs with transparent pixels.
+ * 
+ * The transforms in the JAI library are buggy, so standard AWT operations do
+ * the scaling and cropping. The most obvious problem in the JAI library is the
+ * refusal to crop after scaling an image.
+ * 
+ * Scale first to avoid the boundary error that produces black lines along the
+ * edge of the image.
+ * 
+ * Use the javax.imagio pacakge to write the thumbnail image as a JPEG file.
  */
 public class ImageUploadThumbnailer {
 	/** If an image has 3 color bands and 1 alpha band, we want these. */
@@ -59,13 +68,40 @@ public class ImageUploadThumbnailer {
 		try {
 			RenderedOp mainImage = loadImage(mainImageStream);
 			RenderedOp opaqueImage = makeImageOpaque(mainImage);
-			RenderedOp croppedImage = cropImage(opaqueImage, crop);
-			RenderedOp scaledImage = scaleImage(croppedImage);
-			byte[] jpegBytes = encodeAsJpeg(scaledImage);
+
+			BufferedImage bufferedImage = opaqueImage.getAsBufferedImage();
+			log.debug("initial image: " + imageSize(bufferedImage));
+
+			log.debug("initial crop: " + crop);
+			CropRectangle boundedCrop = limitCropRectangleToImageBounds(
+					bufferedImage, crop);
+			log.debug("bounded crop: " + boundedCrop);
+
+			float scaleFactor = figureScaleFactor(boundedCrop);
+			log.debug("scale factor: " + scaleFactor);
+
+			BufferedImage scaledImage = scaleImage(bufferedImage, scaleFactor);
+			log.debug("scaled image: " + imageSize(scaledImage));
+
+			CropRectangle rawScaledCrop = adjustCropRectangleToScaledImage(
+					boundedCrop, scaleFactor);
+			log.debug("scaled crop: " + rawScaledCrop);
+			CropRectangle scaledCrop = limitCropRectangleToImageBounds(
+					scaledImage, rawScaledCrop);
+			log.debug("bounded scaled crop: " + scaledCrop);
+
+			BufferedImage croppedImage = cropImage(scaledImage, scaledCrop);
+			log.debug("cropped image: " + imageSize(croppedImage));
+
+			byte[] jpegBytes = encodeAsJpeg(croppedImage);
 			return new ByteArrayInputStream(jpegBytes);
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to scale the image", e);
 		}
+	}
+
+	private String imageSize(BufferedImage image) {
+		return image.getWidth() + " by " + image.getHeight();
 	}
 
 	private RenderedOp loadImage(InputStream imageStream) {
@@ -91,37 +127,8 @@ public class ImageUploadThumbnailer {
 		return image;
 	}
 
-	private RenderedOp cropImage(RenderedOp image, CropRectangle crop) {
-		CropRectangle boundedCrop = limitCropRectangleToImageBounds(image, crop);
-		return CropDescriptor.create(image, (float) boundedCrop.x,
-				(float) boundedCrop.y, (float) boundedCrop.width,
-				(float) boundedCrop.height, null);
-	}
-
-	private RenderedOp scaleImage(RenderedOp image) {
-		float horizontalScale = ((float) thumbnailWidth)
-				/ ((float) image.getWidth());
-		float verticalScale = ((float) thumbnailHeight)
-				/ ((float) image.getHeight());
-		log.debug("Generating a thumbnail, scales: " + horizontalScale + ", "
-				+ verticalScale);
-
-		return ScaleDescriptor.create(image, horizontalScale, verticalScale,
-				0.0F, 0.0F, new InterpolationBilinear(), null);
-	}
-
-	private byte[] encodeAsJpeg(RenderedOp image) throws IOException {
-		JPEGEncodeParam encodeParam = new JPEGEncodeParam();
-		encodeParam.setQuality(1.0F);
-
-		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-		EncodeDescriptor.create(image, bytes, "JPEG", encodeParam, null);
-		return bytes.toByteArray();
-	}
-
-	private CropRectangle limitCropRectangleToImageBounds(RenderedOp image,
+	private CropRectangle limitCropRectangleToImageBounds(BufferedImage image,
 			CropRectangle crop) {
-		log.debug("Generating a thumbnail, initial crop info: " + crop);
 
 		int imageWidth = image.getWidth();
 		int imageHeight = image.getHeight();
@@ -140,10 +147,40 @@ public class ImageUploadThumbnailer {
 		int w = Math.max(MINIMUM_CROP_SIZE, Math.min(greatestW, crop.width));
 		int h = Math.max(MINIMUM_CROP_SIZE, Math.min(greatestH, crop.height));
 
-		CropRectangle bounded = new CropRectangle(x, y, h, w);
-		log.debug("Generating a thumbnail, bounded crop info: " + bounded);
-
-		return bounded;
+		return new CropRectangle(x, y, h, w);
 	}
 
+	private float figureScaleFactor(CropRectangle boundedCrop) {
+		float horizontalScale = ((float) thumbnailWidth)
+				/ ((float) boundedCrop.width);
+		float verticalScale = ((float) thumbnailHeight)
+				/ ((float) boundedCrop.height);
+		return Math.min(horizontalScale, verticalScale);
+	}
+
+	private BufferedImage cropImage(BufferedImage image, CropRectangle crop) {
+		return image.getSubimage(crop.x, crop.y, crop.width, crop.height);
+	}
+
+	private BufferedImage scaleImage(BufferedImage image, float scaleFactor) {
+		AffineTransform transform = AffineTransform.getScaleInstance(
+				scaleFactor, scaleFactor);
+		AffineTransformOp atoOp = new AffineTransformOp(transform, null);
+		return atoOp.filter(image, null);
+	}
+
+	private CropRectangle adjustCropRectangleToScaledImage(CropRectangle crop,
+			float scaleFactor) {
+		int newX = (int) (crop.x * scaleFactor);
+		int newY = (int) (crop.y * scaleFactor);
+		int newHeight = (int) (crop.height * scaleFactor);
+		int newWidth = (int) (crop.width * scaleFactor);
+		return new CropRectangle(newX, newY, newHeight, newWidth);
+	}
+
+	private byte[] encodeAsJpeg(BufferedImage image) throws IOException {
+		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+		ImageIO.write(image, "JPG", bytes);
+		return bytes.toByteArray();
+	}
 }
