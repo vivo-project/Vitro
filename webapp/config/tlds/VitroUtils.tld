@@ -49,4 +49,33 @@
 		</attribute>   
 	</tag>
 
+	<tag>
+		<name>requiresAuthorizationFor</name>
+        <display-name>Confirm that the user is authorized for the actions that this page requires.</display-name>
+        <description>
+        	Confirm that the user is authorized to perform all of the RequestedActions that
+        	this page requires. A check is done for each such action, to see whether the 
+        	current policy will authorize that action for the current user. If any of the 
+        	actions is not authorized, the user will be redirected to the appropriate page.
+        	
+        	If the user is not authorized because he is not logged in, he will be directed
+        	to the login page, with the current request stored as a post-login destination.
+        	
+        	If the user is logged in but without sufficient authorization, he will be
+        	directed to the home page, which will display an "insufficient authorization" 
+        	message.
+        	
+        	The requested actions are specified as a comma delimited list of names (with
+        	optional spaces). These names must match against the map of classes in 
+        	JspPolicyHelper, or an error will be logged and the authorization will fail.
+        </description>
+        <tag-class>edu.cornell.mannlib.vitro.webapp.web.jsptags.RequiresAuthorizationFor</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<name>actions</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>   
+	</tag>
+
 </taglib>

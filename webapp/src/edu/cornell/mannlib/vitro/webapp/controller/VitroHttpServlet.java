@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LogoutRedirector;
 
@@ -43,6 +44,38 @@ public class VitroHttpServlet extends HttpServlet {
 														// unregistered
 	public final static String TTL_MIMETYPE = "text/turtle"; // unofficial and
 																// unregistered
+
+	/**
+	 * Check that any required authorizations are satisfied before processing
+	 * the request.
+	 */
+	@Override
+	public final void service(ServletRequest req, ServletResponse resp)
+			throws ServletException, IOException {
+		if ((req instanceof HttpServletRequest)
+				&& (resp instanceof HttpServletResponse)) {
+			HttpServletRequest hreq = (HttpServletRequest) req;
+			HttpServletResponse hresp = (HttpServletResponse) resp;
+
+			if (log.isTraceEnabled()) {
+				dumpRequestHeaders(hreq);
+			}
+
+			if (PolicyHelper.isRestrictedPage(this)) {
+				LogoutRedirector.recordRestrictedPageUri(hreq);
+			}
+
+			if (!PolicyHelper.areRequiredAuthorizationsSatisfied(hreq, this)) {
+				if (LoginStatusBean.getBean(hreq).isLoggedIn()) {
+					redirectToInsufficientAuthorizationPage(hreq, hresp);
+				} else {
+					redirectToLoginPage(hreq, hresp);
+				}
+			}
+		}
+
+		super.service(req, resp);
+	}
 
 	/**
 	 * Show this to the user if they are logged in, but still not authorized to
@@ -87,6 +120,8 @@ public class VitroHttpServlet extends HttpServlet {
 
 	/**
 	 * If not logged in, redirect them to the login page.
+	 * 
+	 * TODO this goes away as it is replace by annotations.
 	 */
 	public static boolean checkLoginStatus(HttpServletRequest request,
 			HttpServletResponse response) {
@@ -104,6 +139,8 @@ public class VitroHttpServlet extends HttpServlet {
 	/**
 	 * If not logged in at the required level, redirect them to the appropriate
 	 * page.
+	 * 
+	 * TODO this goes away as it is replace by annotations.
 	 */
 	public static boolean checkLoginStatus(HttpServletRequest request,
 			HttpServletResponse response, int minimumLevel) {
@@ -183,24 +220,17 @@ public class VitroHttpServlet extends HttpServlet {
 	 * If logging is set to the TRACE level, dump the HTTP headers on the
 	 * request.
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public void service(ServletRequest req, ServletResponse resp)
-			throws ServletException, IOException {
-		if (log.isTraceEnabled()) {
-			HttpServletRequest request = (HttpServletRequest) req;
-			Enumeration<String> names = request.getHeaderNames();
-			log.trace("----------------------request:"
-					+ request.getRequestURL());
-			while (names.hasMoreElements()) {
-				String name = names.nextElement();
-				if (!BORING_HEADERS.contains(name)) {
-					log.trace(name + "=" + request.getHeader(name));
-				}
+	private void dumpRequestHeaders(HttpServletRequest req) {
+		@SuppressWarnings("unchecked")
+		Enumeration<String> names = req.getHeaderNames();
+
+		log.trace("----------------------request:" + req.getRequestURL());
+		while (names.hasMoreElements()) {
+			String name = names.nextElement();
+			if (!BORING_HEADERS.contains(name)) {
+				log.trace(name + "=" + req.getHeader(name));
 			}
 		}
-
-		super.service(req, resp);
 	}
 
 	/** Don't dump the contents of these headers, even if log.trace is enabled. */

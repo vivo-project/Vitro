@@ -12,4 +12,8 @@ public abstract class RequestedAction {
         return RequestActionConstants.actionNamespace + this.getClass().getName();
     }
 
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName();
+	}
 }

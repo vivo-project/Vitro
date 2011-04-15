@@ -16,13 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LogoutRedirector
 import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
 
 /**
- * JSP tag to generate the HTML of links for edit, delete or add of a Property.
- * 
- * Maybe we should have a mode where it just sets a var to a map with "href" =
- * "edit/editDatapropDispatch.jsp?subjectUri=..." and "type" = "delete"
- * 
- * @author bdc34
- * 
+ * TODO This should go away as it is replaced by vitro:requiresAuthorizationFor
  */
 public class ConfirmLoginStatus extends BodyTagSupport {
 	private static final Log log = LogFactory.getLog(ConfirmLoginStatus.class);
