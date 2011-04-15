@@ -243,7 +243,9 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     
     private Map<String, Object> getTemplateModelData(TemplateHashModelEx model) throws TemplateModelException {
         Object unwrappedModel = DeepUnwrap.permissiveUnwrap(model);
-        // A key-value mapping.
+        // This seems to be the most reliable way of distinguishing a wrapped map from a wrapped object.
+        // A map may be wrapped as a SimpleHash, and an object may be wrapped as a StringModel, but they could
+        // be wrapped as other types as well.
         if ( unwrappedModel instanceof Map ) {
             return getMapData(model);
         }
@@ -255,50 +257,78 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         Map<String, Object> map = new HashMap<String, Object>();        
         map.put(Key.TYPE.toString(), Type.HASH_EX);
         SortedMap<String, Object> items = new TreeMap<String, Object>();
-        // keys() gets only values visible to template
         TemplateCollectionModel keys = model.keys();
         TemplateModelIterator iModel = keys.iterator();
         while (iModel.hasNext()) {
             String key = iModel.next().toString();
             TemplateModel value = model.get(key);
             items.put(key, getData(value));
-        }
-        // *** RY SORT keys alphabetically
+        }        
         map.put(Key.VALUE.toString(), items);  
         return map;
     }
 
     private Map<String, Object> getObjectData(TemplateHashModelEx model, Object object) throws TemplateModelException {
+        
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), object.getClass().getName());
-        Set<Method> availableMethods = getMethodsAvailableToTemplate(model, object);
-        Map<String, Object> methods = new HashMap<String, Object>(availableMethods.size());
-        for ( Method method : availableMethods ) {
-            String methodDisplayName = getMethodDisplayName(method);
-            if ( ! methodDisplayName.endsWith(")") ) {
-                try {
-                    // See note in getAvailableMethods: when we have the keys, we can get the values without
-                    // now invoking the method. Then getMethodsAvailableToTemplate should pass back
-                    // a map of keys to values. 
-                    Object result = method.invoke(object);
-                    log.debug("Result of invoking method " + method.getName() + " is an object of type " + result.getClass().getName());
-                    if (result instanceof TemplateModel) {
-                        log.debug("Sending result of invoking method " + method.getName() + " back through getData().");
-                        methods.put(methodDisplayName, getData((TemplateModel)result));   
-                    } else {
-                        log.debug("No further analysis on result of invoking method " + method.getName() + " is possible");
-                        methods.put(methodDisplayName, result.toString());
-                    }
-                } catch (Exception e) {
-                    log.error("Error invoking method " + method.getName() + ". Cannot dump value.");
-                } 
-            } else {
-                methods.put(methodDisplayName, "");  // or null ?
-            }
-        } 
-  
-        // ***  SORT methods alphabetically
-        map.put(Key.VALUE.toString(), methods);
+        
+        // Compile the set of properties and methods available to model
+        SortedMap<String, Object> availableMethods = new TreeMap<String, Object>();
+        
+        // keys() gets only values visible to template based on the BeansWrapper used.
+        // Note: if the BeansWrapper exposure level > BeansWrapper.EXPOSE_PROPERTIES_ONLY,
+        // keys() returns both method and property name for any available method with no
+        // parameters: e.g., both name and getName(). We are going to eliminate the latter.
+        TemplateCollectionModel keys = model.keys();
+        TemplateModelIterator iModel = keys.iterator();
+        
+        // Create a Set from keys so we can use the Set API.
+        Set<String> keySet = new HashSet<String>();
+        while (iModel.hasNext()) {
+            String key = iModel.next().toString();
+            keySet.add(key);
+        }
+        
+        if (keySet.size() > 0) {
+            
+            Class<?> cls = object.getClass();
+            Method[] methods = cls.getMethods(); 
+    
+            // Iterate through the methods rather than the keys, so that we can remove
+            // some keys based on reflection on the methods. We also want to remove duplicates
+            // like name/getName - we'll keep only the first form.
+            for ( Method method : methods ) {
+    
+                // Eliminate methods declared on Object
+                Class<?> c = method.getDeclaringClass();
+                if (c.equals(java.lang.Object.class)) {
+                    continue;
+                }
+                
+                // Eliminate deprecated methods
+                if (method.isAnnotationPresent(Deprecated.class)) {
+                    continue;
+                }
+
+                // Include only methods included in keys(). This factors in visibility
+                // defined by the model's BeansWrapper.                 
+                String methodName = method.getName();
+                String propertyName = getPropertyName(methodName);
+ 
+                // If the method is available as a property, use that
+                if (keySet.contains(propertyName)) {   
+                    TemplateModel value = model.get(propertyName);
+                    availableMethods.put(propertyName, getData(value));
+                // Else look for the entire methodName in the key set
+                } else if (keySet.contains(methodName)) {               
+                    String methodDisplayName = getMethodDisplayName(method);
+                    availableMethods.put(methodDisplayName, "");
+                }
+            }           
+        }
+        
+        map.put(Key.VALUE.toString(), availableMethods);
         return map;
     }
     
@@ -321,58 +351,12 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         }
         
         return methodName;               
-    }
-    
-    private Set<Method> getMethodsAvailableToTemplate(TemplateHashModelEx model, Object object) throws TemplateModelException {
-        
-        // keys() gets only values visible to template based on the BeansWrapper used.
-        // Note: if the BeansWrapper exposure level > BeansWrapper.EXPOSE_PROPERTIES_ONLY,
-        // keys() returns both method and property name for any available method with no
-        // parameters: e.g., both name and getName(). We are going to eliminate the latter.
-        TemplateCollectionModel keys = model.keys();
-        TemplateModelIterator iModel = keys.iterator();
-        Set<String> keySet = new HashSet<String>();
-        while (iModel.hasNext()) {
-            keySet.add(iModel.next().toString());
-        }
-        
-        Class<?> cls = object.getClass();
-        Method[] methods = cls.getMethods(); 
-        Set<Method> availableMethods = new HashSet<Method>();
-        for ( Method method : methods ) {
- 
-            // Exclude static methods.
-//            int mod = method.getModifiers();            
-//            if (Modifier.isStatic(mod)) {
-//                continue;
-//            }
+    }    
 
-            // Eliminate methods declared on Object
-            Class<?> c = method.getDeclaringClass();
-            if (c.equals(java.lang.Object.class)) {
-                continue;
-            }
-            
-            // Eliminate deprecated methods
-            if (method.isAnnotationPresent(Deprecated.class)) {
-                continue;
-            }
-            
-            // Include only methods included in keys(). This factors in visibility
-            // defined by the model's BeansWrapper.
-            
-            //*** This has to be method.getMethodDisplayName() ****
-//            SO: we have to get the display name now
-//            and we should get the value now too
-//            so method => { displayName => ..., value => ... }
-            if (keySet.contains(method.getName())) {   
-                // if the key has a value, we could add it here rather than invoking the
-                // method later
-                availableMethods.add(method);
-            }
-        }
-        
-        return availableMethods;
+    // Return the method name as it is represented in TemplateHashModelEx.keys()
+    private String getPropertyName(String methodName) {
+        String keyName = methodName.replaceAll("^(get|is)", "");
+        return StringUtils.uncapitalize(keyName);        
     }
     
     private Map<String, Object> getTemplateModelData(TemplateCollectionModel model) throws TemplateModelException {
