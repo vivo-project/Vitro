@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy;
 import java.util.ListIterator;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,6 +20,14 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 public class ServletPolicyList {
 	private static final String ATTRIBUTE_POLICY_LIST = ServletPolicyList.class.getName();
 	private static final Log log = LogFactory.getLog(ServletPolicyList.class);
+
+	/**
+	 * Get a copy of the current list of policies. This method may return an
+	 * empty list, but it never returns null.
+	 */
+	public static PolicyIface getPolicies(HttpServletRequest hreq) {
+		return getPolicies(hreq.getSession().getServletContext());
+	}
 
 	/**
 	 * Get a copy of the current list of policies. This method may return an
