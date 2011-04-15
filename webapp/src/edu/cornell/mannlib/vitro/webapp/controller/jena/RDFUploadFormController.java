@@ -10,15 +10,19 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
+@RequiresAuthorizationFor(UseAdvancedDataToolsPages.class)
 public class RDFUploadFormController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(RDFUploadFormController.class.getName());
 
-    public void doPost (HttpServletRequest request, HttpServletResponse response) {
+    @Override
+	public void doPost (HttpServletRequest request, HttpServletResponse response) {
 
         if (!checkLoginStatus(request,response))
             return;
@@ -49,7 +53,8 @@ public class RDFUploadFormController extends BaseEditController {
 
     }
 
-    public void doGet (HttpServletRequest request, HttpServletResponse response) {
+    @Override
+	public void doGet (HttpServletRequest request, HttpServletResponse response) {
         doPost(request,response);
     }
 

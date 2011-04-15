@@ -6,6 +6,8 @@
 <%@ page import="java.net.URLEncoder"%>
 <%@ page import="java.util.List"%>
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<vitro:requiresAuthorizationFor classNames="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" />
 
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript" src="js/jenaIngest/ingestUtils.js"></script>
@@ -21,7 +23,7 @@ to follow the established "n" + random integer naming convention.</p>
 
 <form id="takeuri" action="ingest" method="get">
 <input type="hidden" name="action" value="renameResource"/>
-<p>Old Namespace  <input id="uri1" type="text" size="52" name="uri1"/></p>
-<p>New Namespace  <input id="uri2" type="text" size="52" name="uri2"/></p>
+<p>Old Namespaceï¿½ <input id="uri1" type="text" size="52" name="uri1"/></p>
+<p>New Namespaceï¿½ <input id="uri2" type="text" size="52" name="uri2"/></p>
 <p><input id="submit" type="submit" name="submit" value="Change namespace" /></p>
 </form>

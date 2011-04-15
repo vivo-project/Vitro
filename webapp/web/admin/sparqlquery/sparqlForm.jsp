@@ -5,6 +5,9 @@
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
 
+<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<vitro:requiresAuthorizationFor classNames="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" />
+
 <body>
 <div id="content" class="sparqlform">
 <h2>SPARQL Query</h2>

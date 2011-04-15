@@ -6,6 +6,9 @@
 <%@ page import="java.net.URLEncoder"%>
 <%@ page import="java.util.List"%>
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<vitro:requiresAuthorizationFor classNames="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" />
+
 <%
 
     ModelMaker maker = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");

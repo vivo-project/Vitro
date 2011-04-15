@@ -47,6 +47,8 @@ import com.hp.hpl.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
@@ -59,6 +61,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
  * @author bdc34
  *
  */
+@RequiresAuthorizationFor(UseAdvancedDataToolsPages.class)
 public class SparqlQueryServlet extends BaseEditController {
     private static final Log log = LogFactory.getLog(SparqlQueryServlet.class.getName());
 
