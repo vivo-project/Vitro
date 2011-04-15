@@ -3,9 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.web.jsptags;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,33 +18,24 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 
 /**
  * Confirm that the user is authorized to perform each of the RequestedActions.
  * 
- * The user specifies the actions as a comma delimited list of names (with
- * optional spaces). These names are matched against the map of recognized
- * names. If no match is found, an error is logged and the authorization fails.
+ * The user specifies the actions as a comma delimited list of class names (with
+ * optional spaces). The classes named must be extensions of RequestedAction
+ * (usually implementations of UsePagesRequestedAction), and each class must
+ * have a no-argument public constructor.
  */
 public class RequiresAuthorizationFor extends BodyTagSupport {
 	private static final Log log = LogFactory
 			.getLog(RequiresAuthorizationFor.class);
 
-	/**
-	 * These are the only action names that we recognize.
-	 */
-	private static final Map<String, RequestedAction> actionMap = new HashMap<String, RequestedAction>();
-	static {
-		actionMap.put("UseAdvancedDataToolsPages",
-				new UseAdvancedDataToolsPages());
-	}
+	String classNamesString = "";
 
-	String actionNames = "";
-
-	public void setActions(String actionNames) {
-		this.actionNames = actionNames;
+	public void setClassNames(String classNamesString) {
+		this.classNamesString = classNamesString;
 	}
 
 	/**
@@ -67,7 +57,7 @@ public class RequiresAuthorizationFor extends BodyTagSupport {
 	 * are authorized for those actions.
 	 */
 	private boolean isAuthorized() {
-		Collection<RequestedAction> actions = parseActionNames();
+		Collection<RequestedAction> actions = instantiateActions();
 		if (actions == null) {
 			return false;
 		}
@@ -76,25 +66,66 @@ public class RequiresAuthorizationFor extends BodyTagSupport {
 	}
 
 	/**
-	 * Parse the string and pull the corresponding actions from the map. If we
-	 * can't do that, complain and return null.
+	 * Break the string into class names. Confirm that each class is
+	 * RequestedAction or a subclass of it. Create an instance of each class.
+	 * 
+	 * If we can't do all of that, complain and return null.
 	 */
-	private Collection<RequestedAction> parseActionNames() {
-		Set<RequestedAction> actions = new HashSet<RequestedAction>();
+	private Set<RequestedAction> instantiateActions() {
+		Set<String> classNames = parseClassNames();
+		if (classNames.isEmpty()) {
+			return Collections.emptySet();
+		}
 
-		for (String part : actionNames.split("[\\s],[\\s]")) {
-			String key = part.trim();
-			if (key.isEmpty()) {
-				continue;
+		Set<Class<? extends RequestedAction>> actionClasses = loadClassesAndCheckTypes(classNames);
+		if (actionClasses == null) {
+			return null;
+		}
+
+		return getInstancesFromClasses(actionClasses);
+	}
+
+	private Set<String> parseClassNames() {
+		Set<String> names = new HashSet<String>();
+		for (String part : classNamesString.split("[\\s],[\\s]")) {
+			String name = part.trim();
+			if (!name.isEmpty()) {
+				names.add(name);
 			}
+		}
+		return names;
+	}
 
-			if (actionMap.containsKey(key)) {
-				log.debug("checking authorization for '" + key + "'");
-				actions.add(actionMap.get(key));
-			} else {
-				log.error("JSP requested authorization for unknown action: '"
-						+ key + "'");
+	private Set<Class<? extends RequestedAction>> loadClassesAndCheckTypes(
+			Set<String> classNames) {
+		Set<Class<? extends RequestedAction>> classes = new HashSet<Class<? extends RequestedAction>>();
+		for (String className : classNames) {
+			try {
+				Class<?> clazz = Class.forName(className);
+				classes.add(clazz.asSubclass(RequestedAction.class));
+			} catch (ClassNotFoundException e) {
+				log.error("Can't load action class: '" + className + "'");
 				return null;
+			} catch (ClassCastException e) {
+				log.error("Action class is not a subclass of RequestedAction: '"
+						+ className + "'");
+				return null;
+			}
+		}
+		return classes;
+	}
+
+	private Set<RequestedAction> getInstancesFromClasses(
+			Set<Class<? extends RequestedAction>> actionClasses) {
+		Set<RequestedAction> actions = new HashSet<RequestedAction>();
+		for (Class<? extends RequestedAction> actionClass : actionClasses) {
+			try {
+				RequestedAction action = actionClass.newInstance();
+				actions.add(action);
+			} catch (Exception e) {
+				log.error("Failed to create an instance of '"
+						+ actionClass.getName()
+						+ "'. Does it have a public zero-argument constructor?");
 			}
 		}
 		return actions;

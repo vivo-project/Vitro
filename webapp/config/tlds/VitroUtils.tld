@@ -65,14 +65,14 @@
         	directed to the home page, which will display an "insufficient authorization" 
         	message.
         	
-        	The requested actions are specified as a comma delimited list of names (with
-        	optional spaces). These names must match against the map of classes in 
-        	JspPolicyHelper, or an error will be logged and the authorization will fail.
+        	The requested actions are specified as a comma delimited list of class names.
+        	These must be RequestedAction classes, each with a no-argument public 
+        	constructor.
         </description>
         <tag-class>edu.cornell.mannlib.vitro.webapp.web.jsptags.RequiresAuthorizationFor</tag-class>
 		<body-content>empty</body-content>
 		<attribute>
-			<name>actions</name>
+			<name>classNames</name>
 			<required>true</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>   
