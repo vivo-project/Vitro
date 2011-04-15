@@ -67,3 +67,10 @@
 .siteMap h2 {
     padding-bottom: 0;
 }
+.class-group {
+    margin-right:25px;
+}
+#isotope-container {
+    height:620px;
+    overflow:visible;
+}

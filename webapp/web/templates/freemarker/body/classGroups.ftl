@@ -6,10 +6,12 @@
 
 <#if (!noData)>
     <section class="siteMap" role="region">
+    <div id="isotope-container">
         <#list classGroups as classGroup>
             <#-- Only render classgroups that have at least one class with individuals -->
             <#if (classGroup.individualCount > 0)>
                 <#if classGroup.publicName?has_content>               
+                  <div class="class-group">
                     <h2>${classGroup.publicName}</h2>
                 </#if>
                 <ul role="list">
@@ -20,9 +22,22 @@
                         </#if>
                     </#list>
                 </ul>
+                </div>
             </#if>
         </#list>
+      </div> <!-- end isotope-container -->
     </section>
+
+
+${headScripts.add('<script type="text/javascript" src="${urls.base}/js/jquery_plugins/isotope/jquery.isotope.min.js"></script>')}
+<script>
+    $('#isotope-container').isotope({
+      // options
+      itemSelector : '.class-group',
+      layoutMode : 'fitColumns'
+    });
+</script>
+    
 <#else>
     ${noDataNotification}
 </#if>
