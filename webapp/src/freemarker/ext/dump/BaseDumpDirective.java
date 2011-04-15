@@ -5,7 +5,6 @@ package freemarker.ext.dump;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +12,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -253,7 +254,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     private Map<String, Object> getMapData(TemplateHashModelEx model) throws TemplateModelException {        
         Map<String, Object> map = new HashMap<String, Object>();        
         map.put(Key.TYPE.toString(), Type.HASH_EX);
-        Map<String, Object> items = new HashMap<String, Object>();
+        SortedMap<String, Object> items = new TreeMap<String, Object>();
         // keys() gets only values visible to template
         TemplateCollectionModel keys = model.keys();
         TemplateModelIterator iModel = keys.iterator();
@@ -262,6 +263,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
             TemplateModel value = model.get(key);
             items.put(key, getData(value));
         }
+        // *** RY SORT keys alphabetically
         map.put(Key.VALUE.toString(), items);  
         return map;
     }
@@ -293,7 +295,9 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
             } else {
                 methods.put(methodDisplayName, "");  // or null ?
             }
-        }        
+        } 
+  
+        // ***  SORT methods alphabetically
         map.put(Key.VALUE.toString(), methods);
         return map;
     }
@@ -316,8 +320,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
             methodName = methodName.substring(0, 1).toLowerCase() + methodName.substring(1);           
         }
         
-        return methodName;       
-        
+        return methodName;               
     }
     
     private Set<Method> getMethodsAvailableToTemplate(TemplateHashModelEx model, Object object) throws TemplateModelException {
@@ -357,6 +360,11 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
             
             // Include only methods included in keys(). This factors in visibility
             // defined by the model's BeansWrapper.
+            
+            //*** This has to be method.getMethodDisplayName() ****
+//            SO: we have to get the display name now
+//            and we should get the value now too
+//            so method => { displayName => ..., value => ... }
             if (keySet.contains(method.getName())) {   
                 // if the key has a value, we could add it here rather than invoking the
                 // method later
