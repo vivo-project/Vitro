@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit.listing;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -20,7 +19,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 
 public class OntologiesListingController extends BaseEditController {
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response) {
+    @Override
+	public void doGet(HttpServletRequest request, HttpServletResponse response) {
         VitroRequest vrequest = new VitroRequest(request);
         Portal portal = vrequest.getPortal();
 
@@ -39,18 +39,16 @@ public class OntologiesListingController extends BaseEditController {
 
         OntologyDao dao = vrequest.getFullWebappDaoFactory().getOntologyDao();
 
-        List onts = dao.getAllOntologies();
+        List<Ontology> onts = dao.getAllOntologies();
 
-        ArrayList results = new ArrayList();
+        ArrayList<String> results = new ArrayList<String>();
         results.add("XX");
         results.add("Ontology");
         results.add("Namespace");
         results.add("Prefix");
 
         if (onts != null && onts.size()>0) {
-            Iterator ontsIt = onts.iterator();
-            while (ontsIt.hasNext()) {
-                Ontology ont = (Ontology) ontsIt.next();
+        	for (Ontology ont: onts) {
                 results.add("XX");
                 if (ont.getName() != null) {
                     try {
@@ -89,7 +87,8 @@ public class OntologiesListingController extends BaseEditController {
 
     }
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response) {
+    @Override
+	public void doPost(HttpServletRequest request, HttpServletResponse response) {
         doGet(request,response);
     }
 
