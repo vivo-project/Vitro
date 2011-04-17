@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -62,13 +61,12 @@ public class RestrictionRetryController extends BaseEditController {
 			// default to object property restriction
 			boolean propertyType = ("data".equals(request.getParameter("propertyType"))) ? DATA : OBJECT ;
 			
-			List<Property> pList = (propertyType == OBJECT) 
+			List<? extends Property> pList = (propertyType == OBJECT) 
 				? request.getFullWebappDaoFactory().getObjectPropertyDao().getAllObjectProperties()
 			    : request.getFullWebappDaoFactory().getDataPropertyDao().getAllDataProperties();
 			List<Option> onPropertyList = new LinkedList<Option>(); 
 			Collections.sort(pList, new PropSorter());
-			for (Iterator<Property> i = pList.iterator(); i.hasNext(); ) {
-				Property p = i.next(); 
+			for (Property p: pList) {
 				onPropertyList.add( new Option(p.getURI(),p.getLocalNameWithPrefix()) );
 			}
 					
@@ -123,8 +121,7 @@ public class RestrictionRetryController extends BaseEditController {
 	private List<Option> getValueClassOptionList(VitroRequest request) {
 		List<Option> valueClassOptionList = new LinkedList<Option>();
 		VClassDao vcDao = request.getFullWebappDaoFactory().getVClassDao();
-		for (Iterator i = vcDao.getAllVclasses().iterator(); i.hasNext(); ) {
-			VClass vc = (VClass) i.next();
+		for (VClass vc: vcDao.getAllVclasses()) {
 			valueClassOptionList.add(new Option(vc.getURI(), vc.getLocalNameWithPrefix()));
 		}
 		return valueClassOptionList;
@@ -133,8 +130,7 @@ public class RestrictionRetryController extends BaseEditController {
 	private List<Option> getValueDatatypeOptionList(VitroRequest request) {
 		List<Option> valueDatatypeOptionList = new LinkedList<Option>();
 		DatatypeDao dtDao = request.getFullWebappDaoFactory().getDatatypeDao();
-		for (Iterator i = dtDao.getAllDatatypes().iterator(); i.hasNext(); ) {
-			Datatype dt = (Datatype) i.next();
+		for (Datatype dt: dtDao.getAllDatatypes()) {
 			valueDatatypeOptionList.add(new Option(dt.getUri(), dt.getName()));
 		}
 		valueDatatypeOptionList.add(new Option(RDFS.Literal.getURI(), "rdfs:Literal"));
