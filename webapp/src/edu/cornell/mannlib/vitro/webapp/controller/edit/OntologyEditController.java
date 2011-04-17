@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
@@ -14,11 +15,11 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
+import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -27,7 +28,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntologyDaoJena;
 public class OntologyEditController extends BaseEditController {
     private static final Log log = LogFactory.getLog(OntologyEditController.class.getName());
 
-    public void doPost (HttpServletRequest req, HttpServletResponse response) {
+    @Override
+	public void doPost (HttpServletRequest req, HttpServletResponse response) {
 
     	VitroRequest request = new VitroRequest(req);
         if (!checkLoginStatus(request,response))
@@ -47,7 +49,7 @@ public class OntologyEditController extends BaseEditController {
         if (request.getParameter("uri")==null){
             log.error("doPost() expects non-null uri parameter");
         } else {
-            o = (Ontology)oDao.getOntologyByURI(request.getParameter("uri"));
+            o = oDao.getOntologyByURI(request.getParameter("uri"));
             if (o == null){
                 if (!VitroVocabulary.vitroURI.equals(request.getParameter("uri"))) {
                     log.debug("doPost(): no ontology object found for the namespace "+request.getParameter("uri"));
@@ -56,7 +58,7 @@ public class OntologyEditController extends BaseEditController {
                 request.setAttribute("Ontology",o);
             }
         }
-        ArrayList results = new ArrayList();
+        ArrayList<String> results = new ArrayList<String>();
         results.add("Ontology");
         results.add("Namespace");
         results.add("Prefix");
@@ -72,7 +74,7 @@ public class OntologyEditController extends BaseEditController {
 
         epo.setDataAccessObject(oDao);
         FormObject foo = new FormObject();
-        HashMap OptionMap = new HashMap();
+        HashMap<String, List<Option>> OptionMap = new HashMap<String, List<Option>>();
 
         HashMap formSelect = new HashMap(); // tells the JSP what select lists are populated, and thus should be displayed
         request.setAttribute("formSelect",formSelect);
@@ -105,7 +107,8 @@ public class OntologyEditController extends BaseEditController {
 
     }
 
-    public void doGet (HttpServletRequest request, HttpServletResponse response) {
+    @Override
+	public void doGet (HttpServletRequest request, HttpServletResponse response) {
         doPost(request,response);
     }
 
