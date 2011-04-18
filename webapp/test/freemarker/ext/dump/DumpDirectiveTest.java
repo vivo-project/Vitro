@@ -635,95 +635,38 @@ public class DumpDirectiveTest {
 
     @Test
     public void dumpObjectWithExposeNothingWrapper() {
-        
-        String varName = "employee";
-        Map<String, Object> dataModel = new HashMap<String, Object>();
-        BeansWrapper wrapper = new BeansWrapper();
-        wrapper.setExposureLevel(BeansWrapper.EXPOSE_NOTHING);
-        try {
-            dataModel.put("employee", wrapper.wrap(getEmployee()));
-        } catch (TemplateModelException e) {
-            // logging is suppressed, so what do we do here?
-        }
-        
-        Map<String, Object> expectedDump = new HashMap<String, Object>();
-        expectedDump.put(Key.NAME.toString(), varName);
-        expectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
-        expectedDump.put(Key.VALUE.toString(), new TreeMap<String, Object>());
-        test(varName, dataModel, expectedDump);         
+        dumpObject(BeansWrapper.EXPOSE_NOTHING);       
     }
  
     @Test
     public void dumpObjectWithExposePropertiesOnlyWrapper() {
-        
-        String varName = "employee";
-        Map<String, Object> dataModel = new HashMap<String, Object>();
-        BeansWrapper wrapper = new BeansWrapper();
-        wrapper.setExposureLevel(BeansWrapper.EXPOSE_PROPERTIES_ONLY);
-        try {
-            dataModel.put("employee", wrapper.wrap(getEmployee()));
-        } catch (TemplateModelException e) {
-            // logging is suppressed, so what do we do here?
-        }
-        
-        Map<String, Object> expectedDump = new HashMap<String, Object>();
-        expectedDump.put(Key.NAME.toString(), varName);
-        expectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
-        
-        SortedMap<String, Object> propertiesExpectedDump = getJohnDoePropertiesExpectedDump();
-
-        expectedDump.put(Key.VALUE.toString(), propertiesExpectedDump);
-        
-        Map<String, Object> dump = getDump(varName, dataModel);
-        assertEquals(expectedDump, dump);         
-        
-        // Test the sorting of the methods
-        List<String> expectedKeys = new ArrayList<String>(propertiesExpectedDump.keySet());
-        @SuppressWarnings("unchecked")
-        Map<String, Object> methodsActualDump = (Map<String, Object>) dump.get(Key.VALUE.toString());      
-        List<String> actualKeys = new ArrayList<String>(methodsActualDump.keySet());
-        assertEquals(expectedKeys, actualKeys);         
+        dumpObject(BeansWrapper.EXPOSE_PROPERTIES_ONLY);  
     }
     
     @Test
     public void dumpObjectWithExposeSafeWrapper() {
-        
-        String varName = "employee";
-        Map<String, Object> dataModel = new HashMap<String, Object>();
-        BeansWrapper wrapper = new BeansWrapper();
-        wrapper.setExposureLevel(BeansWrapper.EXPOSE_SAFE);
-        try {
-            dataModel.put("employee", wrapper.wrap(getEmployee()));
-        } catch (TemplateModelException e) {
-            // logging is suppressed, so what do we do here?
-        }
-        
-        Map<String, Object> expectedDump = new HashMap<String, Object>();
-        expectedDump.put(Key.NAME.toString(), varName);
-        expectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
-        
-        SortedMap<String, Object> methodsExpectedDump = getJohnDoePropertiesExpectedDump();
-        // methodsExpectedDump.putAll(...);
-        expectedDump.put(Key.VALUE.toString(), methodsExpectedDump);
-        
-        //Map<String, Object> dump = getDump(varName, dataModel);
-        //assertEquals(expectedDump, dump);         
-        
-        // Test the sorting of the methods
-//        List<String> expectedKeys = new ArrayList<String>(properties.keySet());
-//        @SuppressWarnings("unchecked")
-//        Map<String, Object> methodsActualDump = (Map<String, Object>) dump.get(Key.VALUE.toString());      
-//        List<String> actualKeys = new ArrayList<String>(methodsActualDump.keySet());
-        //assertEquals(expectedKeys, actualKeys);             
+        //dumpObject(BeansWrapper.EXPOSE_SAFE);            
     }
     
     @Test
     public void dumpObjectWithExposeAllWrapper() {
+        //dumpObject(BeansWrapper.EXPOSE_ALL);    
+    }
+    
+    
+    /////////////////////////// Private stub classes and helper methods ///////////////////////////
+
+    private void test(String varName, Map<String, Object> dataModel, Map<String, Object> expectedDump) {
+        Map<String, Object> dump = getDump(varName, dataModel);
+        assertEquals(expectedDump, dump);        
+    }
+    
+    private void dumpObject(int exposureLevel) {
         
         String varName = "employee";
         Map<String, Object> dataModel = new HashMap<String, Object>();
         BeansWrapper wrapper = new BeansWrapper();
-        wrapper.setExposureLevel(BeansWrapper.EXPOSE_ALL);
+        wrapper.setExposureLevel(exposureLevel);
         try {
             dataModel.put("employee", wrapper.wrap(getEmployee()));
         } catch (TemplateModelException e) {
@@ -733,28 +676,39 @@ public class DumpDirectiveTest {
         Map<String, Object> expectedDump = new HashMap<String, Object>();
         expectedDump.put(Key.NAME.toString(), varName);
         expectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
+        expectedDump.put(Key.VALUE.toString(), getJohnDoeExpectedDump(exposureLevel));
         
-        SortedMap<String, Object> methodsExpectedDump = getJohnDoePropertiesExpectedDump();
-        // methodsExpectedDump.putAll(...);
-        expectedDump.put(Key.VALUE.toString(), methodsExpectedDump);
-        
-        //Map<String, Object> dump = getDump(varName, dataModel);
-        //assertEquals(expectedDump, dump);         
-        
-        // Test the sorting of the methods
-//        List<String> expectedKeys = new ArrayList<String>(properties.keySet());
-//        @SuppressWarnings("unchecked")
-//        Map<String, Object> methodsActualDump = (Map<String, Object>) dump.get(Key.VALUE.toString());      
-//        List<String> actualKeys = new ArrayList<String>(methodsActualDump.keySet());
-        //assertEquals(expectedKeys, actualKeys);             
+        testObjectDump(varName, dataModel, expectedDump);         
     }
-    
-    
-    /////////////////////////// Private stub classes and helper methods ///////////////////////////
-    
-    private void test(String varName, Map<String, Object> dataModel, Map<String, Object> expectedDump) {
+
+    private void testObjectDump(String varName, Map<String, Object> dataModel, Map<String, Object> expectedDump) {
+        
         Map<String, Object> dump = getDump(varName, dataModel);
-        assertEquals(expectedDump, dump);        
+        assertEquals(expectedDump, dump);         
+        
+        // Test the sorting of the properties and methods
+        @SuppressWarnings("unchecked")
+        Map<String, Object> valueExpectedDump = (Map<String, Object>) expectedDump.get(Key.VALUE.toString());
+        @SuppressWarnings("unchecked")
+        Map<String, Object> valueActualDump =  (Map<String, Object>) dump.get(Key.VALUE.toString());
+        
+        @SuppressWarnings("unchecked")
+        Map<String, Object> propertiesExpectedDump = (Map<String, Object>) valueExpectedDump.get(Key.PROPERTIES.toString());
+        List<String> propertyKeysExpected = new ArrayList<String>(propertiesExpectedDump.keySet());
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> propertiesActualDump = (Map<String, Object>) valueActualDump.get(Key.PROPERTIES.toString());      
+        List<String> propertyKeysActual = new ArrayList<String>(propertiesActualDump.keySet());
+        assertEquals(propertyKeysExpected, propertyKeysActual);   
+        
+        @SuppressWarnings("unchecked")
+        Map<String, Object> methodsExpectedDump = (Map<String, Object>) valueExpectedDump.get(Key.METHODS.toString());
+        List<String> methodKeysExpected = new ArrayList<String>(methodsExpectedDump.keySet());
+        @SuppressWarnings("unchecked")
+        Map<String, Object> methodsActualDump = (Map<String, Object>) valueActualDump.get(Key.METHODS.toString());      
+        List<String> methodKeysActual = new ArrayList<String>(methodsActualDump.keySet());
+        assertEquals(methodKeysExpected, methodKeysActual);   
+        
     }
     
     private Map<String, Object> getDump(String varName, Map<String, Object> dataModel) {
@@ -766,6 +720,8 @@ public class DumpDirectiveTest {
             return null;
         }             
     }
+    
+
     
     private class HelplessMethod implements TemplateMethodModel {
 
@@ -982,117 +938,144 @@ public class DumpDirectiveTest {
         return jdoe;
     }
     
-    private SortedMap<String, Object> getJohnDoePropertiesExpectedDump() {
+    private Map<String, Object> getJohnDoeExpectedDump(int exposureLevel) {
+
+        Map<String, Object> expectedDump = new HashMap<String, Object>();
+        
+        // Properties
         SortedMap<String, Object> propertiesExpectedDump = new TreeMap<String, Object>();
         
-//        Map<String, Object> birthdateExpectedDump = new HashMap<String, Object>();
-//        birthdateExpectedDump.put(Key.TYPE.toString(), Type.DATE);
-//        birthdateExpectedDump.put(Key.DATE_TYPE.toString(), DateType.UNKNOWN);
-//        Calendar c = Calendar.getInstance();
-//        c.set(75, Calendar.MAY, 5);
-//        birthdateExpectedDump.put(Key.VALUE.toString(), c.getTime());
-//        propertiesExpectedDump.put("birthdate", birthdateExpectedDump);
+        if (exposureLevel != BeansWrapper.EXPOSE_NOTHING) {           
+    
+//          Map<String, Object> birthdateExpectedDump = new HashMap<String, Object>();
+//          birthdateExpectedDump.put(Key.TYPE.toString(), Type.DATE);
+//          birthdateExpectedDump.put(Key.DATE_TYPE.toString(), DateType.UNKNOWN);
+//          Calendar c = Calendar.getInstance();
+//          c.set(75, Calendar.MAY, 5);
+//          birthdateExpectedDump.put(Key.VALUE.toString(), c.getTime());
+//          propertiesExpectedDump.put("birthdate", birthdateExpectedDump);
+    
+            Map<String, Object> fullNameExpectedDump = new HashMap<String, Object>();
+            fullNameExpectedDump.put(Key.TYPE.toString(), Type.STRING);
+            fullNameExpectedDump.put(Key.VALUE.toString(), "John Doe");
+            propertiesExpectedDump.put("fullName", fullNameExpectedDump);
+    
+            Map<String, Object> idExpectedDump = new HashMap<String, Object>();
+            idExpectedDump.put(Key.TYPE.toString(), Type.NUMBER);
+            idExpectedDump.put(Key.VALUE.toString(), 34523);
+            propertiesExpectedDump.put("id", idExpectedDump);
+    
+            Map<String, Object> nicknameExpectedDump = new HashMap<String, Object>();
+            nicknameExpectedDump.put(Key.TYPE.toString(), Type.STRING);
+            nicknameExpectedDump.put(Key.VALUE.toString(), "");
+            propertiesExpectedDump.put("nickname", nicknameExpectedDump);
+    
+            Map<String, Object> middleNameExpectedDump = new HashMap<String, Object>();
+            middleNameExpectedDump.put(Key.VALUE.toString(), "null");
+            propertiesExpectedDump.put("middleName", middleNameExpectedDump);
+            
+            Map<String, Object> marriedExpectedDump = new HashMap<String, Object>();
+            marriedExpectedDump.put(Key.TYPE.toString(), Type.BOOLEAN);
+            marriedExpectedDump.put(Key.VALUE.toString(), true);
+            propertiesExpectedDump.put("married", marriedExpectedDump);
+    
+            Map<String, Object> supervisorExpectedDump = new HashMap<String, Object>();
+            supervisorExpectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
 
-        Map<String, Object> fullNameExpectedDump = new HashMap<String, Object>();
-        fullNameExpectedDump.put(Key.TYPE.toString(), Type.STRING);
-        fullNameExpectedDump.put(Key.VALUE.toString(), "John Doe");
-        propertiesExpectedDump.put("fullName", fullNameExpectedDump);
-
-        Map<String, Object> idExpectedDump = new HashMap<String, Object>();
-        idExpectedDump.put(Key.TYPE.toString(), Type.NUMBER);
-        idExpectedDump.put(Key.VALUE.toString(), 34523);
-        propertiesExpectedDump.put("id", idExpectedDump);
-
-        Map<String, Object> nicknameExpectedDump = new HashMap<String, Object>();
-        nicknameExpectedDump.put(Key.TYPE.toString(), Type.STRING);
-        nicknameExpectedDump.put(Key.VALUE.toString(), "");
-        propertiesExpectedDump.put("nickname", nicknameExpectedDump);
-
-        Map<String, Object> middleNameExpectedDump = new HashMap<String, Object>();
-        middleNameExpectedDump.put(Key.VALUE.toString(), "null");
-        propertiesExpectedDump.put("middleName", middleNameExpectedDump);
+            supervisorExpectedDump.put(Key.VALUE.toString(), getJaneSmithExpectedDump(exposureLevel));               
+            propertiesExpectedDump.put("supervisor", supervisorExpectedDump);    
+            
+            Map<String, Object> favoriteColorsExpectedDump = new HashMap<String, Object>(); 
+            favoriteColorsExpectedDump.put(Key.TYPE.toString(), Type.SEQUENCE);
+            List<Map<String, Object>> favoriteColorListExpectedDump = new ArrayList<Map<String, Object>>();
+            Map<String, Object> color1ExpectedDump = new HashMap<String, Object>();
+            color1ExpectedDump.put(Key.TYPE.toString(), Type.STRING);
+            color1ExpectedDump.put(Key.VALUE.toString(), "blue");
+            favoriteColorListExpectedDump.add(color1ExpectedDump);
+            Map<String, Object> color2ExpectedDump = new HashMap<String, Object>();
+            color2ExpectedDump.put(Key.TYPE.toString(), Type.STRING); 
+            color2ExpectedDump.put(Key.VALUE.toString(), "green"); 
+            favoriteColorListExpectedDump.add(color2ExpectedDump);
+            favoriteColorsExpectedDump.put(Key.VALUE.toString(), favoriteColorListExpectedDump);        
+            propertiesExpectedDump.put("favoriteColors", favoriteColorsExpectedDump);
+        }        
         
-        Map<String, Object> marriedExpectedDump = new HashMap<String, Object>();
-        marriedExpectedDump.put(Key.TYPE.toString(), Type.BOOLEAN);
-        marriedExpectedDump.put(Key.VALUE.toString(), true);
-        propertiesExpectedDump.put("married", marriedExpectedDump);
-
-        Map<String, Object> supervisorExpectedDump = new HashMap<String, Object>();
-        supervisorExpectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
-        supervisorExpectedDump.put(Key.VALUE.toString(), getJaneSmithPropertiesExpectedDump());               
-        propertiesExpectedDump.put("supervisor", supervisorExpectedDump);    
+        expectedDump.put(Key.PROPERTIES.toString(), propertiesExpectedDump);
         
-        Map<String, Object> favoriteColorsExpectedDump = new HashMap<String, Object>(); 
-        favoriteColorsExpectedDump.put(Key.TYPE.toString(), Type.SEQUENCE);
-        List<Map<String, Object>> favoriteColorListExpectedDump = new ArrayList<Map<String, Object>>();
-        Map<String, Object> color1ExpectedDump = new HashMap<String, Object>();
-        color1ExpectedDump.put(Key.TYPE.toString(), Type.STRING);
-        color1ExpectedDump.put(Key.VALUE.toString(), "blue");
-        favoriteColorListExpectedDump.add(color1ExpectedDump);
-        Map<String, Object> color2ExpectedDump = new HashMap<String, Object>();
-        color2ExpectedDump.put(Key.TYPE.toString(), Type.STRING); 
-        color2ExpectedDump.put(Key.VALUE.toString(), "green"); 
-        favoriteColorListExpectedDump.add(color2ExpectedDump);
-        favoriteColorsExpectedDump.put(Key.VALUE.toString(), favoriteColorListExpectedDump);        
-        propertiesExpectedDump.put("favoriteColors", favoriteColorsExpectedDump);
+        // Methods
         
-        return propertiesExpectedDump;
+        SortedMap<String, Object> methodsExpectedDump = new TreeMap<String, Object>();
+        expectedDump.put(Key.METHODS.toString(), methodsExpectedDump); 
+        
+        return expectedDump;
     }
     
-    private SortedMap<String, Object> getJaneSmithPropertiesExpectedDump() {
+    private Map<String, Object> getJaneSmithExpectedDump(int exposureLevel) {
 
+        Map<String, Object> expectedDump = new HashMap<String, Object>();
+        
         SortedMap<String, Object> propertiesExpectedDump = new TreeMap<String, Object>();
         
-//      Map<String, Object> birthdateExpectedDump = new HashMap<String, Object>();
-//      birthdateExpectedDump.put(Key.TYPE.toString(), Type.DATE);
-//      birthdateExpectedDump.put(Key.DATE_TYPE.toString(), DateType.UNKNOWN);
-//      Calendar c = Calendar.getInstance();
-//      c.set(75, Calendar.MAY, 5);
-//      birthdateExpectedDump.put(Key.VALUE.toString(), c.getTime());
-//      propertiesExpectedDump.put("birthdate", birthdateExpectedDump);
+        // Properties 
+        if (exposureLevel != BeansWrapper.EXPOSE_NOTHING) {
+            
+//          Map<String, Object> birthdateExpectedDump = new HashMap<String, Object>();
+//          birthdateExpectedDump.put(Key.TYPE.toString(), Type.DATE);
+//          birthdateExpectedDump.put(Key.DATE_TYPE.toString(), DateType.UNKNOWN);
+//          Calendar c = Calendar.getInstance();
+//          c.set(75, Calendar.MAY, 5);
+//          birthdateExpectedDump.put(Key.VALUE.toString(), c.getTime());
+//          propertiesExpectedDump.put("birthdate", birthdateExpectedDump);
 
-        Map<String, Object> fullNameExpectedDump = new HashMap<String, Object>();
-        fullNameExpectedDump.put(Key.TYPE.toString(), Type.STRING);
-        fullNameExpectedDump.put(Key.VALUE.toString(), "Jane Smith");
-        propertiesExpectedDump.put("fullName", fullNameExpectedDump);
-    
-        Map<String, Object> idExpectedDump = new HashMap<String, Object>();
-        idExpectedDump.put(Key.TYPE.toString(), Type.NUMBER);
-        idExpectedDump.put(Key.VALUE.toString(), 78234);
-        propertiesExpectedDump.put("id", idExpectedDump);
-    
-        Map<String, Object> nicknameExpectedDump = new HashMap<String, Object>();
-        nicknameExpectedDump.put(Key.TYPE.toString(), Type.STRING);
-        nicknameExpectedDump.put(Key.VALUE.toString(), "");
-        propertiesExpectedDump.put("nickname", nicknameExpectedDump);
-    
-        Map<String, Object> middleNameExpectedDump = new HashMap<String, Object>();
-        middleNameExpectedDump.put(Key.VALUE.toString(), "null");
-        propertiesExpectedDump.put("middleName", middleNameExpectedDump);
-          
-        Map<String, Object> marriedExpectedDump = new HashMap<String, Object>();
-        marriedExpectedDump.put(Key.TYPE.toString(), Type.BOOLEAN);
-        marriedExpectedDump.put(Key.VALUE.toString(), true);
-        propertiesExpectedDump.put("married", marriedExpectedDump);      
-    
-        Map<String, Object> supervisorExpectedDump = new HashMap<String, Object>();
-        supervisorExpectedDump.put(Key.VALUE.toString(), "null");
-        propertiesExpectedDump.put("supervisor", supervisorExpectedDump);             
-
-        Map<String, Object> favoriteColorsExpectedDump = new HashMap<String, Object>(); 
-        favoriteColorsExpectedDump.put(Key.TYPE.toString(), Type.SEQUENCE);
-        List<Map<String, Object>> favoriteColorListExpectedDump = new ArrayList<Map<String, Object>>();
-        Map<String, Object> color1ExpectedDump = new HashMap<String, Object>();
-        color1ExpectedDump.put(Key.TYPE.toString(), Type.STRING);
-        color1ExpectedDump.put(Key.VALUE.toString(), "red"); 
-        favoriteColorListExpectedDump.add(color1ExpectedDump);
-        Map<String, Object> color2ExpectedDump = new HashMap<String, Object>();
-        color2ExpectedDump.put(Key.TYPE.toString(), Type.STRING); 
-        color2ExpectedDump.put(Key.VALUE.toString(), "orange"); 
-        favoriteColorListExpectedDump.add(color2ExpectedDump);
-        favoriteColorsExpectedDump.put(Key.VALUE.toString(), favoriteColorListExpectedDump);        
-        propertiesExpectedDump.put("favoriteColors", favoriteColorsExpectedDump);
+            Map<String, Object> fullNameExpectedDump = new HashMap<String, Object>();
+            fullNameExpectedDump.put(Key.TYPE.toString(), Type.STRING);
+            fullNameExpectedDump.put(Key.VALUE.toString(), "Jane Smith");
+            propertiesExpectedDump.put("fullName", fullNameExpectedDump);
         
-        return propertiesExpectedDump;
+            Map<String, Object> idExpectedDump = new HashMap<String, Object>();
+            idExpectedDump.put(Key.TYPE.toString(), Type.NUMBER);
+            idExpectedDump.put(Key.VALUE.toString(), 78234);
+            propertiesExpectedDump.put("id", idExpectedDump);
+        
+            Map<String, Object> nicknameExpectedDump = new HashMap<String, Object>();
+            nicknameExpectedDump.put(Key.TYPE.toString(), Type.STRING);
+            nicknameExpectedDump.put(Key.VALUE.toString(), "");
+            propertiesExpectedDump.put("nickname", nicknameExpectedDump);
+        
+            Map<String, Object> middleNameExpectedDump = new HashMap<String, Object>();
+            middleNameExpectedDump.put(Key.VALUE.toString(), "null");
+            propertiesExpectedDump.put("middleName", middleNameExpectedDump);
+              
+            Map<String, Object> marriedExpectedDump = new HashMap<String, Object>();
+            marriedExpectedDump.put(Key.TYPE.toString(), Type.BOOLEAN);
+            marriedExpectedDump.put(Key.VALUE.toString(), true);
+            propertiesExpectedDump.put("married", marriedExpectedDump);      
+        
+            Map<String, Object> supervisorExpectedDump = new HashMap<String, Object>();
+            supervisorExpectedDump.put(Key.VALUE.toString(), "null");
+            propertiesExpectedDump.put("supervisor", supervisorExpectedDump);             
+    
+            Map<String, Object> favoriteColorsExpectedDump = new HashMap<String, Object>(); 
+            favoriteColorsExpectedDump.put(Key.TYPE.toString(), Type.SEQUENCE);
+            List<Map<String, Object>> favoriteColorListExpectedDump = new ArrayList<Map<String, Object>>();
+            Map<String, Object> color1ExpectedDump = new HashMap<String, Object>();
+            color1ExpectedDump.put(Key.TYPE.toString(), Type.STRING);
+            color1ExpectedDump.put(Key.VALUE.toString(), "red"); 
+            favoriteColorListExpectedDump.add(color1ExpectedDump);
+            Map<String, Object> color2ExpectedDump = new HashMap<String, Object>();
+            color2ExpectedDump.put(Key.TYPE.toString(), Type.STRING); 
+            color2ExpectedDump.put(Key.VALUE.toString(), "orange"); 
+            favoriteColorListExpectedDump.add(color2ExpectedDump);
+            favoriteColorsExpectedDump.put(Key.VALUE.toString(), favoriteColorListExpectedDump);        
+            propertiesExpectedDump.put("favoriteColors", favoriteColorsExpectedDump);
+        }
+        expectedDump.put(Key.PROPERTIES.toString(), propertiesExpectedDump);
+        
+        // Methods
+        SortedMap<String, Object> methodsExpectedDump = new TreeMap<String, Object>();
+        expectedDump.put(Key.METHODS.toString(), methodsExpectedDump);
+        
+        return expectedDump;
     }
+    
 }

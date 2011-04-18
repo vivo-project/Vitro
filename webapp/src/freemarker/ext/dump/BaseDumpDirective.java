@@ -48,7 +48,9 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     private static final Log log = LogFactory.getLog(BaseDumpDirective.class);
     
     enum Key {
+        METHODS("methods"),
         NAME("name"),
+        PROPERTIES(Key.METHODS.toString()),
         TYPE("type"),
         VALUE("value"),
         DATE_TYPE("dateType");
@@ -285,8 +287,9 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), object.getClass().getName());
         
-        // Compile the set of properties and methods available to model
-        SortedMap<String, Object> availableMethods = new TreeMap<String, Object>();
+        // Compile the sets of properties and methods available to template
+        SortedMap<String, Object> properties = new TreeMap<String, Object>();
+        SortedMap<String, Object> methods = new TreeMap<String, Object>();
         
         // keys() gets only values visible to template based on the BeansWrapper used.
         // Note: if the BeansWrapper exposure level > BeansWrapper.EXPOSE_PROPERTIES_ONLY,
@@ -305,12 +308,12 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         if (keySet.size() > 0) {
             
             Class<?> cls = object.getClass();
-            Method[] methods = cls.getMethods(); 
+            Method[] classMethods = cls.getMethods(); 
     
             // Iterate through the methods rather than the keys, so that we can remove
             // some keys based on reflection on the methods. We also want to remove duplicates
             // like name/getName - we'll keep only the first form.
-            for ( Method method : methods ) {
+            for ( Method method : classMethods ) {
     
                 // Eliminate methods declared on Object
                 Class<?> c = method.getDeclaringClass();
@@ -331,16 +334,19 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                 // If the method is available as a property, use that
                 if (keySet.contains(propertyName)) {   
                     TemplateModel value = model.get(propertyName);
-                    availableMethods.put(propertyName, getData(value));
+                    properties.put(propertyName, getData(value));
                 // Else look for the entire methodName in the key set
                 } else if (keySet.contains(methodName)) {               
                     String methodDisplayName = getMethodDisplayName(method);
-                    availableMethods.put(methodDisplayName, "");
+                    methods.put(methodDisplayName, "");
                 }
             }           
         }
         
-        map.put(Key.VALUE.toString(), availableMethods);
+        Map<String, Object> objectValue = new HashMap<String, Object>(2);
+        objectValue.put(Key.PROPERTIES.toString(), properties);
+        objectValue.put(Key.METHODS.toString(), methods);
+        map.put(Key.VALUE.toString(), objectValue);
         return map;
     }
     
