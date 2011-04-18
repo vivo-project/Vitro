@@ -43,8 +43,8 @@ public class DumpDirective extends BaseDumpDirective {
         
         String varName = ((SimpleScalar)o).getAsString();       
         Map<String, Object> map = new HashMap<String, Object>();      
-        map.put("var", getTemplateVariableData(varName, env));
+        map.put("var", getTemplateVariableDump(varName, env));
 
-        dump("dumpvar.ftl", map, varName, env);   
+        dump("dumpvar.ftl", map, env);   
     }
 }

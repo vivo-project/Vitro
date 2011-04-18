@@ -112,78 +112,82 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         } 
     }
     
-    
-    protected Map<String, Object> getTemplateVariableData(String varName, Environment env) 
+    protected Map<String, Object> getTemplateVariableDump(String varName, Environment env) 
     throws TemplateModelException {
-        
+
+        TemplateHashModel dataModel = env.getDataModel();       
+        TemplateModel model = dataModel.get(varName);
+        return getTemplateVariableDump(varName, model);
+    }
+
+    protected Map<String, Object> getTemplateVariableDump(String varName, TemplateModel model) 
+    throws TemplateModelException {
+
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.NAME.toString(), varName);
         
-        TemplateHashModel dataModel = env.getDataModel();       
-        TemplateModel model =  dataModel.get(varName);
-
         // Don't return null if model == null. We still want to send the map to the template.
         if (model != null) {
             // TemplateMethodModel and TemplateDirectiveModel objects can only be
             // included in the data model at the top level.
             if (model instanceof TemplateMethodModel) {
-                map.putAll( getTemplateModelData( ( TemplateMethodModel)model, varName ) );
+                map.putAll( getTemplateModelDump( ( TemplateMethodModel)model, varName ) );
                 
             } else if (model instanceof TemplateDirectiveModel) {
-                map.putAll( getTemplateModelData( ( TemplateDirectiveModel)model, varName ) );
+                map.putAll( getTemplateModelDump( ( TemplateDirectiveModel)model, varName ) );
                 
             } else {
-                map.putAll(getData(model));
+                map.putAll(getDump(model));
             }
         }
         
-        return map;
+        return map;        
     }
 
-    private Map<String, Object> getData(TemplateModel model) throws TemplateModelException {
+    private Map<String, Object> getDump(TemplateModel model) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         
         // Don't return null if model == null. We still want to send the map to the template.
         if (model != null) {
             
             if ( model instanceof TemplateSequenceModel ) {
-                map.putAll( getTemplateModelData( ( TemplateSequenceModel)model ) );
+                map.putAll( getTemplateModelDump( ( TemplateSequenceModel)model ) );
                 
             } else if ( model instanceof TemplateNumberModel ) {
-                map.putAll( getTemplateModelData( (TemplateNumberModel)model ) );
+                map.putAll( getTemplateModelDump( (TemplateNumberModel)model ) );
                 
             } else if ( model instanceof TemplateBooleanModel ) {
-                map.putAll( getTemplateModelData( (TemplateBooleanModel)model ) );
+                map.putAll( getTemplateModelDump( (TemplateBooleanModel)model ) );
 
             } else if ( model instanceof TemplateDateModel ) { 
-                map.putAll( getTemplateModelData( (TemplateDateModel)model ) );
+                map.putAll( getTemplateModelDump( (TemplateDateModel)model ) );
 
             } else if ( model instanceof TemplateCollectionModel ) {
-                map.putAll( getTemplateModelData( ( TemplateCollectionModel)model ) );
+                map.putAll( getTemplateModelDump( ( TemplateCollectionModel)model ) );
                 
             } else if ( model instanceof StringModel ) {
 
                 Object unwrappedModel = DeepUnwrap.permissiveUnwrap(model);
 
                 if (unwrappedModel instanceof String) {
-                    map.putAll( getTemplateModelData( (TemplateScalarModel)model ) );
+                    map.putAll( getTemplateModelDump( (TemplateScalarModel)model ) );
                 } else {
-                    map.putAll( getTemplateModelData( ( TemplateHashModelEx)model ) );
+                    map.putAll( getTemplateModelDump( ( TemplateHashModelEx)model ) );
                 }
              
             } else if ( model instanceof TemplateScalarModel ) {
-                    map.putAll( getTemplateModelData( (TemplateScalarModel)model ) );
+                    map.putAll( getTemplateModelDump( (TemplateScalarModel)model ) );
 
             } else if ( model instanceof TemplateHashModelEx ) {
-                map.putAll( getTemplateModelData( ( TemplateHashModelEx)model ) );
+                map.putAll( getTemplateModelDump( ( TemplateHashModelEx)model ) );
                 
             } else if  (model instanceof TemplateHashModel ) {
-                map.putAll( getTemplateModelData( ( TemplateHashModel)model ) );
+                map.putAll( getTemplateModelDump( ( TemplateHashModel)model ) );
 
             // Nodes and transforms not included here     
                 
             } else {
-                map.putAll( getTemplateModelData( (TemplateModel)model ) );
+                map.putAll( getTemplateModelDump( (TemplateModel)model ) );
             }
         } else {
             map.put(Key.VALUE.toString(), "null");
@@ -192,28 +196,28 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         return map;
     }    
     
-    private Map<String, Object> getTemplateModelData(TemplateScalarModel model) throws TemplateModelException {
+    private Map<String, Object> getTemplateModelDump(TemplateScalarModel model) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), Type.STRING);
         map.put(Key.VALUE.toString(), model.getAsString());
         return map;
     }
     
-    private Map<String, Object> getTemplateModelData(TemplateBooleanModel model) throws TemplateModelException {
+    private Map<String, Object> getTemplateModelDump(TemplateBooleanModel model) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), Type.BOOLEAN);
         map.put(Key.VALUE.toString(), model.getAsBoolean());
         return map;
     }
 
-    private Map<String, Object> getTemplateModelData(TemplateNumberModel model) throws TemplateModelException {
+    private Map<String, Object> getTemplateModelDump(TemplateNumberModel model) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), Type.NUMBER);
         map.put(Key.VALUE.toString(), model.getAsNumber());
         return map;
     }
     
-    private Map<String, Object> getTemplateModelData(TemplateDateModel model) throws TemplateModelException {
+    private Map<String, Object> getTemplateModelDump(TemplateDateModel model) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), Type.DATE);
         int dateType = model.getDateType();
@@ -238,7 +242,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         return map;
     }
 
-    private Map<String, Object> getTemplateModelData(TemplateHashModel model) throws TemplateModelException {
+    private Map<String, Object> getTemplateModelDump(TemplateHashModel model) throws TemplateModelException {
         // The data model is a hash; when else do we get here?
         log.debug("Dumping model " + model);
         Map<String, Object> map = new HashMap<String, Object>();
@@ -247,32 +251,32 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         return map;
     }
 
-    private Map<String, Object> getTemplateModelData(TemplateSequenceModel model) throws TemplateModelException {
+    private Map<String, Object> getTemplateModelDump(TemplateSequenceModel model) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), Type.SEQUENCE);
         int itemCount = model.size();
         List<Map<String, Object>> items = new ArrayList<Map<String, Object>>(itemCount);
         for ( int i = 0; i < itemCount; i++ ) {
             TemplateModel item = model.get(i);
-            items.add(getData(item));
+            items.add(getDump(item));
         }
         map.put(Key.VALUE.toString(), items);
         return map;
     }
     
-    private Map<String, Object> getTemplateModelData(TemplateHashModelEx model) throws TemplateModelException {
+    private Map<String, Object> getTemplateModelDump(TemplateHashModelEx model) throws TemplateModelException {
         Object unwrappedModel = DeepUnwrap.permissiveUnwrap(model);
         // This seems to be the most reliable way of distinguishing a wrapped map from a wrapped object.
         // A map may be wrapped as a SimpleHash, and an object may be wrapped as a StringModel, but they could
         // be wrapped as other types as well.
         if ( unwrappedModel instanceof Map ) {
-            return getMapData(model);
+            return getMapDump(model);
         }
         // Java objects are wrapped as TemplateHashModelEx-s.
-        return getObjectData(model, unwrappedModel);
+        return getObjectDump(model, unwrappedModel);
     }
     
-    private Map<String, Object> getMapData(TemplateHashModelEx model) throws TemplateModelException {        
+    private Map<String, Object> getMapDump(TemplateHashModelEx model) throws TemplateModelException {        
         Map<String, Object> map = new HashMap<String, Object>();        
         map.put(Key.TYPE.toString(), Type.HASH_EX);
         SortedMap<String, Object> items = new TreeMap<String, Object>();
@@ -281,13 +285,13 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         while (iModel.hasNext()) {
             String key = iModel.next().toString();
             TemplateModel value = model.get(key);
-            items.put(key, getData(value));
+            items.put(key, getDump(value));
         }        
         map.put(Key.VALUE.toString(), items);  
         return map;
     }
 
-    private Map<String, Object> getObjectData(TemplateHashModelEx model, Object object) throws TemplateModelException {
+    private Map<String, Object> getObjectDump(TemplateHashModelEx model, Object object) throws TemplateModelException {
         
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), object.getClass().getName());
@@ -344,7 +348,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                     // The method is available as a property
                     if (keySet.contains(propertyName)) {   
                         TemplateModel value = model.get(propertyName);
-                        properties.put(propertyName, getData(value));
+                        properties.put(propertyName, getDump(value));
                         continue;
                     }
                 }
@@ -391,27 +395,27 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         return StringUtils.uncapitalize(keyName);        
     }
     
-    private Map<String, Object> getTemplateModelData(TemplateCollectionModel model) throws TemplateModelException {
+    private Map<String, Object> getTemplateModelDump(TemplateCollectionModel model) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), Type.COLLECTION);
         List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
         TemplateModelIterator iModel = model.iterator();
         while (iModel.hasNext()) {
             TemplateModel m = iModel.next();
-            items.add(getData(m));
+            items.add(getDump(m));
         }
         map.put(Key.VALUE.toString(), items);  
         return map;
     }
     
-    private Map<String, Object> getTemplateModelData(TemplateMethodModel model, String varName) throws TemplateModelException {
+    private Map<String, Object> getTemplateModelDump(TemplateMethodModel model, String varName) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), Type.METHOD);
         map.put("help", getHelp(model, varName));       
         return map;
     }
     
-    private Map<String, Object> getTemplateModelData(TemplateDirectiveModel model, String varName) throws TemplateModelException {
+    private Map<String, Object> getTemplateModelDump(TemplateDirectiveModel model, String varName) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), Type.DIRECTIVE);
         map.put("help", getHelp(model, varName));
@@ -439,7 +443,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         return map;
     }
     
-    private Map<String, Object> getTemplateModelData(TemplateModel model) throws TemplateModelException {
+    private Map<String, Object> getTemplateModelDump(TemplateModel model) throws TemplateModelException {
         // One of the above cases should have applied. Track whether this actually occurs.
         log.debug("Found model with no known type"); 
         Map<String, Object> map = new HashMap<String, Object>();
@@ -449,7 +453,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         return map;        
     }
     
-    protected void dump(String templateName, Map<String, Object> map, String modelName, Environment env) 
+    protected void dump(String templateName, Map<String, Object> map, Environment env) 
     throws TemplateException, IOException {
         
         Template template = env.getConfiguration().getTemplate(templateName);
