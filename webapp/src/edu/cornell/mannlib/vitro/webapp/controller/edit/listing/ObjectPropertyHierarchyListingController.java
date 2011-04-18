@@ -22,6 +22,8 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.ButtonForm;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
@@ -32,6 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 
+@RequiresAuthorizationFor(UseOntologyEditorPages.class)
 public class ObjectPropertyHierarchyListingController extends BaseEditController {
 
 	private static final Log log = LogFactory.getLog(ObjectPropertyHierarchyListingController.class.getName());
@@ -47,9 +50,6 @@ public class ObjectPropertyHierarchyListingController extends BaseEditController
         VitroRequest vrequest = new VitroRequest(request);
         Portal portal = vrequest.getPortal();
         try {
-
-        if (!checkLoginStatus(request,response))
-            return;
 
         try {
             super.doGet(request, response);

@@ -17,6 +17,7 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
@@ -72,10 +73,10 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         if (loginBean.isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
             body.put("siteConfig", getSiteConfigurationData(vreq, urlBuilder));
         }
-        if (loginBean.isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
+        if (PolicyHelper.isActionAuthorized(vreq, UseOntologyEditorPages.class)) {
         	body.put("ontologyEditor", getOntologyEditorData(vreq, urlBuilder));
         }
-		if (PolicyHelper.isActionAuthorized(vreq,	UseAdvancedDataToolsPages.class)) {
+		if (PolicyHelper.isActionAuthorized(vreq, UseAdvancedDataToolsPages.class)) {
             body.put("dataTools", getDataToolsData(vreq, urlBuilder));
             
             // Only for DataStar. Should handle without needing a DataStar-specific version of this controller.

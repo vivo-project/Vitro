@@ -6,8 +6,6 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Ontology"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.OntologyDao"%>
-<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
-<vitro:requiresAuthorizationFor classNames="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" />
 
 <div class="staticPageBackground">
 

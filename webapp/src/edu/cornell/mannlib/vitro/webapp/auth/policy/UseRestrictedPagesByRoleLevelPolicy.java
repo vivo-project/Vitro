@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -15,6 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 
 /**
@@ -40,6 +39,8 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		PolicyDecision result;
 		if (whatToAuth instanceof UseAdvancedDataToolsPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
+		} else if (whatToAuth instanceof UseOntologyEditorPages) {
+			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
 		} else {
 			result = defaultDecision("Unrecognized action");
 		}
@@ -48,6 +49,7 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		return result;
 	}
 
+	/** Authorize if user's role is at least as high as the required role. */
 	private PolicyDecision isAuthorized(RequestedAction whatToAuth,
 			RoleLevel requiredRole, RoleLevel currentRole) {
 		if (isRoleAtLeast(requiredRole, currentRole)) {

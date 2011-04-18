@@ -23,6 +23,8 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vedit.beans.ButtonForm;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -36,6 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroModelProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 
+@RequiresAuthorizationFor(UseOntologyEditorPages.class)
 public class ClassHierarchyListingController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(ClassHierarchyListingController.class.getName());
@@ -50,9 +53,6 @@ public class ClassHierarchyListingController extends BaseEditController {
         Portal portal = vrequest.getPortal();
 
         try {
-
-        if (!checkLoginStatus(request,response))
-            return;
 
         try {
             super.doGet(request, response);
