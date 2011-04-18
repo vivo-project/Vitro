@@ -48,19 +48,12 @@ public class ClassHierarchyListingController extends BaseEditController {
 
     private VClassDao vcDao = null;
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response) {
+    @Override
+	public void doGet(HttpServletRequest request, HttpServletResponse response) {
         VitroRequest vrequest = new VitroRequest(request);
         Portal portal = vrequest.getPortal();
 
         try {
-
-        try {
-            super.doGet(request, response);
-        } catch (Exception e) {
-            log.error("Exception calling super.doGet() from "+this.getClass().getName()+":");
-            e.printStackTrace();
-        }
-
         boolean inferred = (vrequest.getParameter("inferred") != null);
         
         if (vrequest.getAssertionsWebappDaoFactory() != null && !inferred) {
@@ -69,7 +62,7 @@ public class ClassHierarchyListingController extends BaseEditController {
         	vcDao = vrequest.getFullWebappDaoFactory().getVClassDao();
         }
 
-        ArrayList results = new ArrayList();
+        ArrayList<String> results = new ArrayList<String>();
         results.add("XX");            // column 1
         results.add("class");         // column 2
         results.add("shortdef");      // column 3
@@ -83,7 +76,7 @@ public class ClassHierarchyListingController extends BaseEditController {
         String ontologyUri = request.getParameter("ontologyUri");
         String startClassUri = request.getParameter("vclassUri");
 
-        List roots = null;
+        List<VClass> roots = null;
 
         if (ontologyUri != null) {
             roots = vcDao.getOntologyRootClasses(ontologyUri);

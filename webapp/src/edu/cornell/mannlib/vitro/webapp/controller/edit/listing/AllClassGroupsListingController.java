@@ -28,17 +28,8 @@ public class AllClassGroupsListingController extends BaseEditController {
 
     private static final long serialVersionUID = 1L;
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response) {
-
-        if(!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request, response);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-        
+    @Override
+	public void doGet(HttpServletRequest request, HttpServletResponse response) {
         VitroRequest vreq = new VitroRequest(request);
         Portal portal = vreq.getPortal();
 
@@ -56,9 +47,7 @@ public class AllClassGroupsListingController extends BaseEditController {
         results.add("XX");
 
         if (groups != null) {
-            Iterator<VClassGroup> groupsIt = groups.iterator();
-            while (groupsIt.hasNext()) {
-                VClassGroup vcg = (VClassGroup) groupsIt.next();
+        	for(VClassGroup vcg: groups) {
                 results.add("XX");
                 String publicName = vcg.getPublicName();
                 if ( StringUtils.isBlank(publicName) ) {
@@ -82,7 +71,7 @@ public class AllClassGroupsListingController extends BaseEditController {
                     results.add("@@entities");
                     Iterator<VClass> classIt = classList.iterator();
                     while (classIt.hasNext()) {
-                        VClass vcw = (VClass) classIt.next();
+                        VClass vcw = classIt.next();
                         results.add("XX");
                         if (vcw.getName() != null && vcw.getURI() != null) {
                             try {

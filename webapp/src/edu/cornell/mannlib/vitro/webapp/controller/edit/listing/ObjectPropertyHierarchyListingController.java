@@ -46,23 +46,17 @@ public class ObjectPropertyHierarchyListingController extends BaseEditController
     private VClassDao vcDao = null;
     private PropertyGroupDao pgDao = null;
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response) {
+    @Override
+	public void doGet(HttpServletRequest request, HttpServletResponse response) {
         VitroRequest vrequest = new VitroRequest(request);
         Portal portal = vrequest.getPortal();
         try {
-
-        try {
-            super.doGet(request, response);
-        } catch (Exception e) {
-            log.error("Exception calling super.doGet() from "+this.getClass().getName()+":");
-            e.printStackTrace();
-        }
 
         opDao = vrequest.getAssertionsWebappDaoFactory().getObjectPropertyDao();
         vcDao = vrequest.getAssertionsWebappDaoFactory().getVClassDao();
         pgDao = vrequest.getAssertionsWebappDaoFactory().getPropertyGroupDao();
 
-        ArrayList results = new ArrayList();
+        ArrayList<String> results = new ArrayList<String>();
         results.add("XX");            // column 1
         results.add("property");      // column 2
         results.add("domain vclass"); // column 3
@@ -76,7 +70,7 @@ public class ObjectPropertyHierarchyListingController extends BaseEditController
         String ontologyUri = request.getParameter("ontologyUri");
         String startPropertyUri = request.getParameter("propertyUri");
 
-        List roots = null;
+        List<ObjectProperty> roots = null;
 
         if (startPropertyUri != null) {
         	roots = new LinkedList<ObjectProperty>();
@@ -89,7 +83,7 @@ public class ObjectPropertyHierarchyListingController extends BaseEditController
         }
 
         if (roots!=null) {
-            Iterator rootIt = roots.iterator();
+            Iterator<ObjectProperty> rootIt = roots.iterator();
             if (!rootIt.hasNext()) {
                 ObjectProperty op = new ObjectProperty();
                 op.setURI(ontologyUri+"fake");
@@ -98,7 +92,7 @@ public class ObjectPropertyHierarchyListingController extends BaseEditController
                 results.addAll(addObjectPropertyDataToResultsList(op,0,ontologyUri));
             } else {
                 while (rootIt.hasNext()) {
-                    ObjectProperty root = (ObjectProperty) rootIt.next();
+                    ObjectProperty root = rootIt.next();
                     if ( (ontologyUri==null) || ( (ontologyUri!=null) && (root.getNamespace()!=null) && (ontologyUri.equals(root.getNamespace())) ) ) {
                     	ArrayList childResults = new ArrayList();
                     	addChildren(root, childResults, 0, ontologyUri);

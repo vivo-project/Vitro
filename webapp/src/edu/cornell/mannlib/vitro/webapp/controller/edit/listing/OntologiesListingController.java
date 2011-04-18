@@ -27,12 +27,6 @@ public class OntologiesListingController extends BaseEditController {
         VitroRequest vrequest = new VitroRequest(request);
         Portal portal = vrequest.getPortal();
 
-        try {
-            super.doGet(request, response);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-
         //need to figure out how to structure the results object to put the classes underneath
 
 	    String noResultsMsgStr = "No ontologies found";

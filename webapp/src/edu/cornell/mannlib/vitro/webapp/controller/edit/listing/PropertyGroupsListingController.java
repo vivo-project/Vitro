@@ -28,14 +28,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 @RequiresAuthorizationFor(UseOntologyEditorPages.class)
 public class PropertyGroupsListingController extends BaseEditController {
 
+   @Override
    public void doGet(HttpServletRequest request, HttpServletResponse response) {
-
-        try {
-            super.doGet(request, response);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-        
         VitroRequest vrequest = new VitroRequest(request);
         Portal portal = vrequest.getPortal();
 
@@ -43,9 +37,9 @@ public class PropertyGroupsListingController extends BaseEditController {
 
         PropertyGroupDao dao = vrequest.getFullWebappDaoFactory().getPropertyGroupDao();
 
-        List groups = dao.getPublicGroups(true);
+        List<PropertyGroup> groups = dao.getPublicGroups(true);
 
-        ArrayList results = new ArrayList();
+        ArrayList<String> results = new ArrayList<String>();
         results.add("XX");
         results.add("Group");
         results.add("Public description");
@@ -139,12 +133,13 @@ public class PropertyGroupsListingController extends BaseEditController {
 
     }
    
-    private class PropertyGroupDisplayComparator implements Comparator {
-        public int compare (Object o1, Object o2) {
+    private class PropertyGroupDisplayComparator implements Comparator<PropertyGroup> {
+        @Override
+		public int compare (PropertyGroup o1, PropertyGroup o2) {
             try {
-                int diff = ((PropertyGroup)o1).getDisplayRank() - ((PropertyGroup)o2).getDisplayRank();
+                int diff = o1.getDisplayRank() - o2.getDisplayRank();
                 if (diff==0) {
-                    return ((PropertyGroup)o1).getName().compareToIgnoreCase(((PropertyGroup)o2).getName());
+                    return o1.getName().compareToIgnoreCase(o2.getName());
                 }
                 return diff;
             } catch (Exception e) {

@@ -48,24 +48,18 @@ public class DataPropertyHierarchyListingController extends BaseEditController {
     private PropertyGroupDao pgDao = null;
     private DatatypeDao dDao = null;
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response) {
+    @Override
+	public void doGet(HttpServletRequest request, HttpServletResponse response) {
         VitroRequest vrequest = new VitroRequest(request);
         Portal portal = vrequest.getPortal();
         try {
-
-        try {
-            super.doGet(request, response);
-        } catch (Exception e) {
-            log.error("Exception calling super.doGet() from "+this.getClass().getName()+":");
-            e.printStackTrace();
-        }
 
         dpDao = vrequest.getAssertionsWebappDaoFactory().getDataPropertyDao();
         vcDao = vrequest.getAssertionsWebappDaoFactory().getVClassDao();
         pgDao = vrequest.getAssertionsWebappDaoFactory().getPropertyGroupDao();
         dDao = vrequest.getAssertionsWebappDaoFactory().getDatatypeDao();
 
-        ArrayList results = new ArrayList();
+        ArrayList<String> results = new ArrayList<String>();
         results.add("XX");            // column 1
         results.add("property");      // column 2
         results.add("domain vclass"); // column 3
@@ -79,7 +73,7 @@ public class DataPropertyHierarchyListingController extends BaseEditController {
         String ontologyUri = request.getParameter("ontologyUri");
         String startPropertyUri = request.getParameter("propertyUri");
 
-        List roots = null;
+        List<DataProperty> roots = null;
 
         if (startPropertyUri != null) {
         	roots = new LinkedList<DataProperty>();
@@ -92,7 +86,7 @@ public class DataPropertyHierarchyListingController extends BaseEditController {
         }
 
         if (roots!=null) {
-            Iterator rootIt = roots.iterator();
+            Iterator<DataProperty> rootIt = roots.iterator();
             if (!rootIt.hasNext()) {
                 DataProperty dp = new DataProperty();
                 dp.setURI(ontologyUri+"fake");
@@ -102,7 +96,7 @@ public class DataPropertyHierarchyListingController extends BaseEditController {
                 results.addAll(addDataPropertyDataToResultsList(dp,0,ontologyUri));
             } else {
                 while (rootIt.hasNext()) {
-                    DataProperty root = (DataProperty) rootIt.next();
+                    DataProperty root = rootIt.next();
                     if ( (ontologyUri==null) || ( (ontologyUri!=null) && (root.getNamespace()!=null) && (ontologyUri.equals(root.getNamespace())) ) ) {
                     	ArrayList childResults = new ArrayList();
                     	addChildren(root, childResults, 0, ontologyUri);
