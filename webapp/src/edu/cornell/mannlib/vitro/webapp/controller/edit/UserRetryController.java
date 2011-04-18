@@ -27,13 +27,16 @@ import edu.cornell.mannlib.vedit.listener.ChangeListener;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vedit.validator.ValidationObject;
 import edu.cornell.mannlib.vedit.validator.Validator;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.setup.SelfEditingPolicySetup;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseEditUserAccountsPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 
+@RequiresAuthorizationFor(UseEditUserAccountsPages.class)
 public class UserRetryController extends BaseEditController {
 
     private static final String ROLE_PROTOCOL = "role:/";  // this is weird; need to revisit
@@ -43,21 +46,10 @@ public class UserRetryController extends BaseEditController {
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
 
     	VitroRequest request = new VitroRequest(req);
-    	
-        if (!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error(this.getClass().getName()+" encountered exception calling super.doGet()");
-        }
-
-        VitroRequest vreq = new VitroRequest(request);
 
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
-        epo.setDataAccessObject(vreq.getFullWebappDaoFactory().getVClassDao());
+        epo.setDataAccessObject(request.getFullWebappDaoFactory().getVClassDao());
 
         String action = null;
         if (epo.getAction() == null) {
@@ -67,7 +59,7 @@ public class UserRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        UserDao uDao = vreq.getFullWebappDaoFactory().getUserDao();
+        UserDao uDao = request.getFullWebappDaoFactory().getUserDao();
         epo.setDataAccessObject(uDao);
 
         User userForEditing = null;
@@ -90,7 +82,7 @@ public class UserRetryController extends BaseEditController {
             userForEditing = (User) epo.getNewBean();
         }
 
-        populateBeanFromParams(userForEditing, vreq);
+        populateBeanFromParams(userForEditing, request);
 
         //validators
         Validator v = new PairedPasswordValidator();

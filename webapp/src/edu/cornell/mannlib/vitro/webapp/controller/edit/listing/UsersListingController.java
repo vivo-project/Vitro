@@ -13,12 +13,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseEditUserAccountsPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 
+@RequiresAuthorizationFor(UseEditUserAccountsPages.class)
 public class UsersListingController extends BaseEditController {
 
     private String[] roleNameStr = new String[51];
@@ -30,18 +33,10 @@ public class UsersListingController extends BaseEditController {
         roleNameStr[50] = "system administrator";
     }
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response) {
+    @Override
+	public void doGet(HttpServletRequest request, HttpServletResponse response) {
         VitroRequest vrequest = new VitroRequest(request);
         Portal portal = vrequest.getPortal();
-
-        if(!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request, response);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
 
         UserDao dao = vrequest.getFullWebappDaoFactory().getUserDao();
 
@@ -119,7 +114,8 @@ public class UsersListingController extends BaseEditController {
 
     }
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response) {
+    @Override
+	public void doPost(HttpServletRequest request, HttpServletResponse response) {
         doGet(request,response);
     }
 

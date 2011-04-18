@@ -20,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvance
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.edit.listing.UsersListingController;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
@@ -68,8 +69,6 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         // of step with the levels required by the pages themselves. We should implement a 
         // mechanism similar to what's used on the front end to display links to Site Admin
         // and Revision Info iff the user has access to those pages.
-        // jeb228 This could be done with
-        //           PolicyHelper.areRequiredAuthorizationsSatisfied(req, SomeServlet.class);
         if (loginBean.isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
             body.put("siteConfig", getSiteConfigurationData(vreq, urlBuilder));
         }
@@ -129,7 +128,7 @@ public class SiteAdminController extends FreemarkerHttpServlet {
 
         urls.put("tabs", urlBuilder.getPortalUrl("/listTabs"));
         
-        if (LoginStatusBean.getBean(vreq).isLoggedInAtLeast(LoginStatusBean.DBA)) {                
+        if (PolicyHelper.areRequiredAuthorizationsSatisfied(vreq, UsersListingController.class)) {                
             urls.put("users", urlBuilder.getPortalUrl("/listUsers"));
         }
 

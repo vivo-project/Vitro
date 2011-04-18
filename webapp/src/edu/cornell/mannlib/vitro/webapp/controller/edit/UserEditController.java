@@ -15,6 +15,8 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseEditUserAccountsPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
@@ -27,6 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
+@RequiresAuthorizationFor(UseEditUserAccountsPages.class)
 public class UserEditController extends BaseEditController {
 
     private String[] roleNameStr = new String[51];
@@ -39,17 +42,8 @@ public class UserEditController extends BaseEditController {
         roleNameStr[50] = "system administrator";
     }
 
-    public void doPost (HttpServletRequest request, HttpServletResponse response) throws ServletException {
-
-    	if (!checkLoginStatus(request,response, LoginStatusBean.DBA))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error(this.getClass().getName()+" caught exception calling doGet()");
-        }
-
+    @Override
+	public void doPost (HttpServletRequest request, HttpServletResponse response) throws ServletException {
         VitroRequest vreq = new VitroRequest(request);
         Portal portal = vreq.getPortal();
 

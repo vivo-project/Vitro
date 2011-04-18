@@ -6,6 +6,9 @@
 <jsp:directive.page import="edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary"/>
 <jsp:directive.page import="edu.cornell.mannlib.vitro.webapp.beans.User"/>
 
+<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<vitro:requiresAuthorizationFor classNames="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseEditUserAccountsPages" />
+
 <div class="editingForm">
 
 <jsp:include page="/templates/edit/fetch/vertical.jsp"/>
