@@ -30,7 +30,6 @@ public class DumpDirective extends BaseDumpDirective {
             throw new TemplateModelException(
                 "The dump directive doesn't allow loop variables.");
         }
-        
         if (body != null) {
             throw new TemplateModelException(
                 "The dump directive doesn't allow nested content.");
@@ -44,8 +43,8 @@ public class DumpDirective extends BaseDumpDirective {
         
         String varName = ((SimpleScalar)o).getAsString();       
         Map<String, Object> map = new HashMap<String, Object>();      
-        map.put("var", getTemplateVariableDump(varName, env));
+        map.put("var", getTemplateVariableData(varName, env));
 
-        dump("dumpvar.ftl", map, env);   
+        dump("dumpvar.ftl", map, varName, env);   
     }
 }
