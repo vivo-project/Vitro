@@ -24,7 +24,6 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LogoutRedirector;
 
@@ -62,10 +61,13 @@ public class VitroHttpServlet extends HttpServlet {
 				dumpRequestHeaders(hreq);
 			}
 
+			// Record restricted pages so we won't return to them on logout
 			if (PolicyHelper.isRestrictedPage(this)) {
 				LogoutRedirector.recordRestrictedPageUri(hreq);
 			}
 
+			// If the @RequiresAuthenticationFor actions are not authorized,
+			// don't show them the page.
 			if (!PolicyHelper.areRequiredAuthorizationsSatisfied(hreq, this)) {
 				if (LoginStatusBean.getBean(hreq).isLoggedIn()) {
 					redirectToInsufficientAuthorizationPage(hreq, hresp);
@@ -74,6 +76,12 @@ public class VitroHttpServlet extends HttpServlet {
 					redirectToLoginPage(hreq, hresp);
 					return;
 				}
+			}
+			
+			// check to see if VitroRequestPrep filter was run
+			if (hreq.getAttribute("appBean") == null
+					|| hreq.getAttribute("webappDaoFactory") == null) {
+				log.warn("request scope was not prepared by VitroRequestPrep");
 			}
 		}
 
@@ -88,25 +96,6 @@ public class VitroHttpServlet extends HttpServlet {
 			+ "but you are not authorized to view the page you requested. "
 			+ "If you think this is an error, "
 			+ "please contact us and we'll be happy to help.";
-
-	/**
-	 * Setup the auth flag, portal flag and portal bean objects. Put them in the
-	 * request attributes.
-	 */
-	@Override
-	protected void doGet(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
-		setup(request);
-	}
-
-	protected final void setup(HttpServletRequest request) {
-
-		// check to see if VitroRequestPrep filter was run
-		if (request.getAttribute("appBean") == null
-				|| request.getAttribute("webappDaoFactory") == null) {
-			log.warn("request scope was not prepared by VitroRequestPrep");
-		}
-	}
 
 	/**
 	 * doPost does the same thing as the doGet method
