@@ -12,7 +12,6 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -139,6 +138,25 @@ public class DumpDirectiveTest {
         test(varName, dataModel, expectedDump);
     }
 
+    @Test
+    public void dumpCalendarDate() {
+
+        String varName = "myDate";
+        Map<String, Object> dataModel = new HashMap<String, Object>();
+        
+        Calendar c = Calendar.getInstance();
+        c.set(91, Calendar.MAY, 5);
+        Date myDate = c.getTime();
+        dataModel.put("myDate", myDate);
+         
+        Map<String, Object> expectedDump = new HashMap<String, Object>();
+        expectedDump.put(Key.NAME.toString(), varName);
+        expectedDump.put(Key.TYPE.toString(), Type.DATE);
+        expectedDump.put(Key.DATE_TYPE.toString(), DateType.UNKNOWN);
+        expectedDump.put(Key.VALUE.toString(), myDate);
+
+        test(varName, dataModel, expectedDump);
+    }
     @Test
     public void dumpDateTime() {
         
@@ -652,27 +670,19 @@ public class DumpDirectiveTest {
         expectedDump.put(Key.NAME.toString(), varName);
         expectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
         
-        SortedMap<String, Object> properties = new TreeMap<String, Object>();
-        Calendar c = Calendar.getInstance();
-        c.set(75, Calendar.MAY, 5);
-        properties.put("birthdate", c.getTime());
-        properties.put("fullName", "John Doe");
-        properties.put("id", 34523);   
-        properties.put("nickname", "");
-        properties.put("supervisees", "");  
-        properties.put("supervisor", "");
+        SortedMap<String, Object> propertiesExpectedDump = getPropertiesExpectedDump();
 
-        expectedDump.put(Key.VALUE.toString(), properties);
+        expectedDump.put(Key.VALUE.toString(), propertiesExpectedDump);
         
-        //Map<String, Object> dump = getDump(varName, dataModel);
-        //assertEquals(expectedDump, dump);         
+        Map<String, Object> dump = getDump(varName, dataModel);
+        assertEquals(expectedDump, dump);         
         
         // Test the sorting of the methods
-//        List<String> expectedKeys = new ArrayList<String>(properties.keySet());
-//        @SuppressWarnings("unchecked")
-//        Map<String, Object> methodsActualDump = (Map<String, Object>) dump.get(Key.VALUE.toString());      
-//        List<String> actualKeys = new ArrayList<String>(methodsActualDump.keySet());
-        //assertEquals(expectedKeys, actualKeys);         
+        List<String> expectedKeys = new ArrayList<String>(propertiesExpectedDump.keySet());
+        @SuppressWarnings("unchecked")
+        Map<String, Object> methodsActualDump = (Map<String, Object>) dump.get(Key.VALUE.toString());      
+        List<String> actualKeys = new ArrayList<String>(methodsActualDump.keySet());
+        assertEquals(expectedKeys, actualKeys);         
     }
     
     @Test
@@ -692,17 +702,9 @@ public class DumpDirectiveTest {
         expectedDump.put(Key.NAME.toString(), varName);
         expectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
         
-        SortedMap<String, Object> properties = new TreeMap<String, Object>();
-        Calendar c = Calendar.getInstance();
-        c.set(75, Calendar.MAY, 5);
-        properties.put("birthdate", c.getTime());
-        properties.put("fullName", "John Doe");
-        properties.put("id", 34523);   
-        properties.put("nickname", "");
-        properties.put("supervisees", "");  
-        properties.put("supervisor", "");
-
-        expectedDump.put(Key.VALUE.toString(), properties);
+        SortedMap<String, Object> methodsExpectedDump = getPropertiesExpectedDump();
+        // methodsExpectedDump.putAll(...);
+        expectedDump.put(Key.VALUE.toString(), methodsExpectedDump);
         
         //Map<String, Object> dump = getDump(varName, dataModel);
         //assertEquals(expectedDump, dump);         
@@ -732,17 +734,9 @@ public class DumpDirectiveTest {
         expectedDump.put(Key.NAME.toString(), varName);
         expectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
         
-        SortedMap<String, Object> properties = new TreeMap<String, Object>();
-        Calendar c = Calendar.getInstance();
-        c.set(75, Calendar.MAY, 5);
-        properties.put("birthdate", c.getTime());
-        properties.put("fullName", "John Doe");
-        properties.put("id", 34523);   
-        properties.put("nickname", "");
-        properties.put("supervisees", "");  
-        properties.put("supervisor", "");
-
-        expectedDump.put(Key.VALUE.toString(), properties);
+        SortedMap<String, Object> methodsExpectedDump = getPropertiesExpectedDump();
+        // methodsExpectedDump.putAll(...);
+        expectedDump.put(Key.VALUE.toString(), methodsExpectedDump);
         
         //Map<String, Object> dump = getDump(varName, dataModel);
         //assertEquals(expectedDump, dump);         
@@ -884,7 +878,9 @@ public class DumpDirectiveTest {
         private String lastName;
         private String nickname;
         private Date birthdate;
+        private boolean married;
         private int id;
+        private String middleName;
         private Employee supervisor;
         private List<Employee> supervisees;
         private float salary;
@@ -892,7 +888,9 @@ public class DumpDirectiveTest {
         Employee(String firstName, String lastName, Date birthdate, int id) {
             this.firstName = firstName;
             this.lastName = lastName;
+            this.middleName = null; // test a null value
             this.birthdate = birthdate;
+            this.married = true;
             this.id = id;
             this.nickname = "";
             count++;
@@ -932,18 +930,26 @@ public class DumpDirectiveTest {
         public String getName(String which) {
             return which == "first" ? firstName : lastName;
         }
+        
+        public String getMiddleName() {
+            return middleName;
+        }
 
         public String getNickname() {
             return nickname;
         }
         
-        public Date getBirthdate() {
-            return birthdate;
-        }
+//        public Date getBirthdate() {
+//            return birthdate;
+//        }
         
         public int getId() {
             return id;
         }      
+        
+        public boolean isMarried() {
+            return married;
+        }
  
         @Deprecated
         public int getFormerId() {
@@ -964,22 +970,72 @@ public class DumpDirectiveTest {
         c.set(75, Calendar.MAY, 5);
         Employee jdoe = new Employee("John", "Doe", c.getTime(), 34523);
         
-        c.set(65, Calendar.AUGUST, 10);
-        Employee jsmith = new Employee("Jane", "Smith", c.getTime(), 78234);
-        
-        c.set(80, Calendar.JUNE, 20);
-        Employee mjones = new Employee("Michael", "Jones", c.getTime(), 65432);
-        
-        c.set(81, Calendar.NOVEMBER, 30);
-        Employee mturner = new Employee("Mary", "Turner", c.getTime(), 89531);
+//        c.set(65, Calendar.AUGUST, 10);
+//        Employee jsmith = new Employee("Jane", "Smith", c.getTime(), 78234);
+//        
+//        c.set(80, Calendar.JUNE, 20);
+//        Employee mjones = new Employee("Michael", "Jones", c.getTime(), 65432);
+//        
+//        c.set(81, Calendar.NOVEMBER, 30);
+//        Employee mturner = new Employee("Mary", "Turner", c.getTime(), 89531);
         
         List<Employee> supervisees = new ArrayList<Employee>();
-        supervisees.add(mjones);
-        supervisees.add(mturner);
+//        supervisees.add(mjones);
+//        supervisees.add(mturner);
         //jdoe.setSupervisor(jsmith);
         //jdoe.setSupervisees(supervisees);
         jdoe.setSalary(65000);
         
         return jdoe;
     }
+    
+    private SortedMap<String, Object> getPropertiesExpectedDump() {
+        SortedMap<String, Object> propertiesExpectedDump = new TreeMap<String, Object>();
+        
+        Map<String, Object> birthdateExpectedDump = new HashMap<String, Object>();
+        birthdateExpectedDump.put(Key.TYPE.toString(), Type.DATE);
+        birthdateExpectedDump.put(Key.DATE_TYPE.toString(), DateType.UNKNOWN);
+        Calendar c = Calendar.getInstance();
+        c.set(75, Calendar.MAY, 5);
+        birthdateExpectedDump.put(Key.VALUE.toString(), c.getTime());
+        //propertiesExpectedDump.put("birthdate", birthdateExpectedDump);
+
+        Map<String, Object> fullNameExpectedDump = new HashMap<String, Object>();
+        fullNameExpectedDump.put(Key.TYPE.toString(), Type.STRING);
+        fullNameExpectedDump.put(Key.VALUE.toString(), "John Doe");
+        propertiesExpectedDump.put("fullName", fullNameExpectedDump);
+
+        Map<String, Object> idExpectedDump = new HashMap<String, Object>();
+        idExpectedDump.put(Key.TYPE.toString(), Type.NUMBER);
+        idExpectedDump.put(Key.VALUE.toString(), 34523);
+        propertiesExpectedDump.put("id", idExpectedDump);
+
+        Map<String, Object> nicknameExpectedDump = new HashMap<String, Object>();
+        nicknameExpectedDump.put(Key.TYPE.toString(), Type.STRING);
+        nicknameExpectedDump.put(Key.VALUE.toString(), "");
+        propertiesExpectedDump.put("nickname", nicknameExpectedDump);
+
+        Map<String, Object> middleNameExpectedDump = new HashMap<String, Object>();
+        middleNameExpectedDump.put(Key.VALUE.toString(), "null");
+        propertiesExpectedDump.put("middleName", middleNameExpectedDump);
+        
+        Map<String, Object> marriedExpectedDump = new HashMap<String, Object>();
+        marriedExpectedDump.put(Key.TYPE.toString(), Type.BOOLEAN);
+        marriedExpectedDump.put(Key.VALUE.toString(), true);
+        propertiesExpectedDump.put("married", marriedExpectedDump);
+        
+        Map<String, Object> superviseesExpectedDump = new HashMap<String, Object>();
+        //superviseesExpectedDump.put(Key.TYPE.toString(), Type.SEQUENCE);
+        superviseesExpectedDump.put(Key.VALUE.toString(), "null");
+        propertiesExpectedDump.put("supervisees", superviseesExpectedDump);
+        
+        Map<String, Object> supervisorExpectedDump = new HashMap<String, Object>();
+        //supervisorExpectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
+        supervisorExpectedDump.put(Key.VALUE.toString(), "null");
+        propertiesExpectedDump.put("supervisor", supervisorExpectedDump);        
+
+        return propertiesExpectedDump;
+    }
+
+
 }

@@ -137,16 +137,23 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         
         // Don't return null if model == null. We still want to send the map to the template.
         if (model != null) {
-            // Do TemplateHashModel cases first, because models of some Java objects are
-            // StringModels, and so are both TemplateScalarModels and TemplateHashModelExs.
-            if (model instanceof TemplateHashModelEx) {
-                map.putAll( getTemplateModelData( ( TemplateHashModelEx)model ) );
-            
-            } else if (model instanceof TemplateHashModel) {
-                map.putAll( getTemplateModelData( ( TemplateHashModel)model ) );
-                
-            } else if (model instanceof TemplateScalarModel) {
-                map.putAll( getTemplateModelData( (TemplateScalarModel)model ) );
+            // NumberModel is both TemplateNumberModel and TemplateHashModelEx. Similarly for
+            // BooleanModel, DateModel, etc. These are the types used for property values obtained 
+            // via getObjectData(). So the TemplateHashModelEx case has to follow TemplateNumberModel, 
+            // etc. 
+            if (model instanceof TemplateScalarModel) {
+                if (! (model instanceof TemplateHashModelEx)) {
+                    map.putAll( getTemplateModelData( (TemplateScalarModel)model ) );
+                } else {
+                    Object unwrappedModel = DeepUnwrap.permissiveUnwrap(model);
+                    // StringModel can wrap either a String or a complex Java object. We have to
+                    // unwrap the model to find out which it is.
+                    if (unwrappedModel instanceof String) {
+                        map.putAll( getTemplateModelData( (TemplateScalarModel)model ) );
+                    } else {
+                        map.putAll( getTemplateModelData( ( TemplateHashModelEx)model ) );
+                    }
+                }
 
             } else if (model instanceof TemplateBooleanModel) {
                 map.putAll( getTemplateModelData( (TemplateBooleanModel)model ) );
@@ -162,16 +169,24 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
 
             } else if (model instanceof TemplateCollectionModel) {
                 map.putAll( getTemplateModelData( ( TemplateCollectionModel)model ) );
-                
-            // Nodes and transforms not included here
+
+            } else if (model instanceof TemplateHashModelEx) {
+                map.putAll( getTemplateModelData( ( TemplateHashModelEx)model ) );
+            
+            } else if (model instanceof TemplateHashModel) {
+                map.putAll( getTemplateModelData( ( TemplateHashModel)model ) );
+
+            // Nodes and transforms not included here     
                 
             } else {
                 map.putAll( getTemplateModelData( (TemplateModel)model ) );
             }
+        } else {
+            map.put(Key.VALUE.toString(), "null");
         }
         
         return map;
-    }
+    }    
     
     private Map<String, Object> getTemplateModelData(TemplateScalarModel model) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
