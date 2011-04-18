@@ -670,7 +670,7 @@ public class DumpDirectiveTest {
         expectedDump.put(Key.NAME.toString(), varName);
         expectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
         
-        SortedMap<String, Object> propertiesExpectedDump = getPropertiesExpectedDump();
+        SortedMap<String, Object> propertiesExpectedDump = getJohnDoePropertiesExpectedDump();
 
         expectedDump.put(Key.VALUE.toString(), propertiesExpectedDump);
         
@@ -702,7 +702,7 @@ public class DumpDirectiveTest {
         expectedDump.put(Key.NAME.toString(), varName);
         expectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
         
-        SortedMap<String, Object> methodsExpectedDump = getPropertiesExpectedDump();
+        SortedMap<String, Object> methodsExpectedDump = getJohnDoePropertiesExpectedDump();
         // methodsExpectedDump.putAll(...);
         expectedDump.put(Key.VALUE.toString(), methodsExpectedDump);
         
@@ -734,7 +734,7 @@ public class DumpDirectiveTest {
         expectedDump.put(Key.NAME.toString(), varName);
         expectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
         
-        SortedMap<String, Object> methodsExpectedDump = getPropertiesExpectedDump();
+        SortedMap<String, Object> methodsExpectedDump = getJohnDoePropertiesExpectedDump();
         // methodsExpectedDump.putAll(...);
         expectedDump.put(Key.VALUE.toString(), methodsExpectedDump);
         
@@ -877,31 +877,28 @@ public class DumpDirectiveTest {
         private String firstName;
         private String lastName;
         private String nickname;
-        private Date birthdate;
+        //private Date birthdate;
         private boolean married;
         private int id;
         private String middleName;
+        private List<String> favoriteColors;
         private Employee supervisor;
-        private List<Employee> supervisees;
         private float salary;
         
-        Employee(String firstName, String lastName, Date birthdate, int id) {
+        Employee(String firstName, String lastName, int id) {
             this.firstName = firstName;
             this.lastName = lastName;
             this.middleName = null; // test a null value
-            this.birthdate = birthdate;
+            //this.birthdate = birthdate;
             this.married = true;
             this.id = id;
             this.nickname = "";
+            this.favoriteColors = new ArrayList<String>();
             count++;
         }
 
         void setSupervisor(Employee supervisor) {
             this.supervisor = supervisor;
-        }
-
-        void setSupervisees(List<Employee> supervisees) {
-            this.supervisees = supervisees;
         }
 
         void setSalary(float salary) {
@@ -910,6 +907,12 @@ public class DumpDirectiveTest {
         
         public void setNickname(String nickname) {
             this.nickname = nickname;
+        }
+        
+        public void setFavoriteColors(String...colors) {
+            for (String color : colors) {
+                favoriteColors.add(color);
+            }
         }
 
         // Not available to templates
@@ -960,45 +963,35 @@ public class DumpDirectiveTest {
             return supervisor;
         }
         
-        public List<Employee> getSupervisees() {
-            return supervisees;
+        public List<String> getFavoriteColors() {
+            return favoriteColors;
         }
     }
     
     private Employee getEmployee() {
-        Calendar c = Calendar.getInstance();
-        c.set(75, Calendar.MAY, 5);
-        Employee jdoe = new Employee("John", "Doe", c.getTime(), 34523);
-        
-//        c.set(65, Calendar.AUGUST, 10);
-//        Employee jsmith = new Employee("Jane", "Smith", c.getTime(), 78234);
-//        
-//        c.set(80, Calendar.JUNE, 20);
-//        Employee mjones = new Employee("Michael", "Jones", c.getTime(), 65432);
-//        
-//        c.set(81, Calendar.NOVEMBER, 30);
-//        Employee mturner = new Employee("Mary", "Turner", c.getTime(), 89531);
-        
-        List<Employee> supervisees = new ArrayList<Employee>();
-//        supervisees.add(mjones);
-//        supervisees.add(mturner);
-        //jdoe.setSupervisor(jsmith);
-        //jdoe.setSupervisees(supervisees);
+
+        Employee jdoe = new Employee("John", "Doe", 34523);
+        jdoe.setFavoriteColors("blue", "green");
         jdoe.setSalary(65000);
         
+        Employee jsmith = new Employee("Jane", "Smith", 78234);
+        jsmith.setFavoriteColors("red", "orange");
+        
+        jdoe.setSupervisor(jsmith);
+
         return jdoe;
     }
     
-    private SortedMap<String, Object> getPropertiesExpectedDump() {
+    private SortedMap<String, Object> getJohnDoePropertiesExpectedDump() {
         SortedMap<String, Object> propertiesExpectedDump = new TreeMap<String, Object>();
         
-        Map<String, Object> birthdateExpectedDump = new HashMap<String, Object>();
-        birthdateExpectedDump.put(Key.TYPE.toString(), Type.DATE);
-        birthdateExpectedDump.put(Key.DATE_TYPE.toString(), DateType.UNKNOWN);
-        Calendar c = Calendar.getInstance();
-        c.set(75, Calendar.MAY, 5);
-        birthdateExpectedDump.put(Key.VALUE.toString(), c.getTime());
-        //propertiesExpectedDump.put("birthdate", birthdateExpectedDump);
+//        Map<String, Object> birthdateExpectedDump = new HashMap<String, Object>();
+//        birthdateExpectedDump.put(Key.TYPE.toString(), Type.DATE);
+//        birthdateExpectedDump.put(Key.DATE_TYPE.toString(), DateType.UNKNOWN);
+//        Calendar c = Calendar.getInstance();
+//        c.set(75, Calendar.MAY, 5);
+//        birthdateExpectedDump.put(Key.VALUE.toString(), c.getTime());
+//        propertiesExpectedDump.put("birthdate", birthdateExpectedDump);
 
         Map<String, Object> fullNameExpectedDump = new HashMap<String, Object>();
         fullNameExpectedDump.put(Key.TYPE.toString(), Type.STRING);
@@ -1023,19 +1016,83 @@ public class DumpDirectiveTest {
         marriedExpectedDump.put(Key.TYPE.toString(), Type.BOOLEAN);
         marriedExpectedDump.put(Key.VALUE.toString(), true);
         propertiesExpectedDump.put("married", marriedExpectedDump);
-        
-        Map<String, Object> superviseesExpectedDump = new HashMap<String, Object>();
-        //superviseesExpectedDump.put(Key.TYPE.toString(), Type.SEQUENCE);
-        superviseesExpectedDump.put(Key.VALUE.toString(), "null");
-        propertiesExpectedDump.put("supervisees", superviseesExpectedDump);
-        
-        Map<String, Object> supervisorExpectedDump = new HashMap<String, Object>();
-        //supervisorExpectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
-        supervisorExpectedDump.put(Key.VALUE.toString(), "null");
-        propertiesExpectedDump.put("supervisor", supervisorExpectedDump);        
 
+        Map<String, Object> supervisorExpectedDump = new HashMap<String, Object>();
+        supervisorExpectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
+        supervisorExpectedDump.put(Key.VALUE.toString(), getJaneSmithPropertiesExpectedDump());               
+        propertiesExpectedDump.put("supervisor", supervisorExpectedDump);    
+        
+        Map<String, Object> favoriteColorsExpectedDump = new HashMap<String, Object>(); 
+        favoriteColorsExpectedDump.put(Key.TYPE.toString(), Type.SEQUENCE);
+        List<Map<String, Object>> favoriteColorListExpectedDump = new ArrayList<Map<String, Object>>();
+        Map<String, Object> color1ExpectedDump = new HashMap<String, Object>();
+        color1ExpectedDump.put(Key.TYPE.toString(), Type.STRING);
+        color1ExpectedDump.put(Key.VALUE.toString(), "blue");
+        favoriteColorListExpectedDump.add(color1ExpectedDump);
+        Map<String, Object> color2ExpectedDump = new HashMap<String, Object>();
+        color2ExpectedDump.put(Key.TYPE.toString(), Type.STRING); 
+        color2ExpectedDump.put(Key.VALUE.toString(), "green"); 
+        favoriteColorListExpectedDump.add(color2ExpectedDump);
+        favoriteColorsExpectedDump.put(Key.VALUE.toString(), favoriteColorListExpectedDump);        
+        propertiesExpectedDump.put("favoriteColors", favoriteColorsExpectedDump);
+        
         return propertiesExpectedDump;
     }
+    
+    private SortedMap<String, Object> getJaneSmithPropertiesExpectedDump() {
 
+        SortedMap<String, Object> propertiesExpectedDump = new TreeMap<String, Object>();
+        
+//      Map<String, Object> birthdateExpectedDump = new HashMap<String, Object>();
+//      birthdateExpectedDump.put(Key.TYPE.toString(), Type.DATE);
+//      birthdateExpectedDump.put(Key.DATE_TYPE.toString(), DateType.UNKNOWN);
+//      Calendar c = Calendar.getInstance();
+//      c.set(75, Calendar.MAY, 5);
+//      birthdateExpectedDump.put(Key.VALUE.toString(), c.getTime());
+//      propertiesExpectedDump.put("birthdate", birthdateExpectedDump);
 
+        Map<String, Object> fullNameExpectedDump = new HashMap<String, Object>();
+        fullNameExpectedDump.put(Key.TYPE.toString(), Type.STRING);
+        fullNameExpectedDump.put(Key.VALUE.toString(), "Jane Smith");
+        propertiesExpectedDump.put("fullName", fullNameExpectedDump);
+    
+        Map<String, Object> idExpectedDump = new HashMap<String, Object>();
+        idExpectedDump.put(Key.TYPE.toString(), Type.NUMBER);
+        idExpectedDump.put(Key.VALUE.toString(), 78234);
+        propertiesExpectedDump.put("id", idExpectedDump);
+    
+        Map<String, Object> nicknameExpectedDump = new HashMap<String, Object>();
+        nicknameExpectedDump.put(Key.TYPE.toString(), Type.STRING);
+        nicknameExpectedDump.put(Key.VALUE.toString(), "");
+        propertiesExpectedDump.put("nickname", nicknameExpectedDump);
+    
+        Map<String, Object> middleNameExpectedDump = new HashMap<String, Object>();
+        middleNameExpectedDump.put(Key.VALUE.toString(), "null");
+        propertiesExpectedDump.put("middleName", middleNameExpectedDump);
+          
+        Map<String, Object> marriedExpectedDump = new HashMap<String, Object>();
+        marriedExpectedDump.put(Key.TYPE.toString(), Type.BOOLEAN);
+        marriedExpectedDump.put(Key.VALUE.toString(), true);
+        propertiesExpectedDump.put("married", marriedExpectedDump);      
+    
+        Map<String, Object> supervisorExpectedDump = new HashMap<String, Object>();
+        supervisorExpectedDump.put(Key.VALUE.toString(), "null");
+        propertiesExpectedDump.put("supervisor", supervisorExpectedDump);             
+
+        Map<String, Object> favoriteColorsExpectedDump = new HashMap<String, Object>(); 
+        favoriteColorsExpectedDump.put(Key.TYPE.toString(), Type.SEQUENCE);
+        List<Map<String, Object>> favoriteColorListExpectedDump = new ArrayList<Map<String, Object>>();
+        Map<String, Object> color1ExpectedDump = new HashMap<String, Object>();
+        color1ExpectedDump.put(Key.TYPE.toString(), Type.STRING);
+        color1ExpectedDump.put(Key.VALUE.toString(), "red"); 
+        favoriteColorListExpectedDump.add(color1ExpectedDump);
+        Map<String, Object> color2ExpectedDump = new HashMap<String, Object>();
+        color2ExpectedDump.put(Key.TYPE.toString(), Type.STRING); 
+        color2ExpectedDump.put(Key.VALUE.toString(), "orange"); 
+        favoriteColorListExpectedDump.add(color2ExpectedDump);
+        favoriteColorsExpectedDump.put(Key.VALUE.toString(), favoriteColorListExpectedDump);        
+        propertiesExpectedDump.put("favoriteColors", favoriteColorsExpectedDump);
+        
+        return propertiesExpectedDump;
+    }
 }

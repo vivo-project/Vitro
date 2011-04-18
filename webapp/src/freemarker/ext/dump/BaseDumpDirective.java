@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import freemarker.core.Environment;
+import freemarker.ext.beans.StringModel;
 import freemarker.template.Template;
 import freemarker.template.TemplateBooleanModel;
 import freemarker.template.TemplateCollectionModel;
@@ -137,43 +138,39 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         
         // Don't return null if model == null. We still want to send the map to the template.
         if (model != null) {
-            // NumberModel is both TemplateNumberModel and TemplateHashModelEx. Similarly for
-            // BooleanModel, DateModel, etc. These are the types used for property values obtained 
-            // via getObjectData(). So the TemplateHashModelEx case has to follow TemplateNumberModel, 
-            // etc. 
-            if (model instanceof TemplateScalarModel) {
-                if (! (model instanceof TemplateHashModelEx)) {
-                    map.putAll( getTemplateModelData( (TemplateScalarModel)model ) );
-                } else {
-                    Object unwrappedModel = DeepUnwrap.permissiveUnwrap(model);
-                    // StringModel can wrap either a String or a complex Java object. We have to
-                    // unwrap the model to find out which it is.
-                    if (unwrappedModel instanceof String) {
-                        map.putAll( getTemplateModelData( (TemplateScalarModel)model ) );
-                    } else {
-                        map.putAll( getTemplateModelData( ( TemplateHashModelEx)model ) );
-                    }
-                }
-
-            } else if (model instanceof TemplateBooleanModel) {
-                map.putAll( getTemplateModelData( (TemplateBooleanModel)model ) );
+            
+            if ( model instanceof TemplateSequenceModel ) {
+                map.putAll( getTemplateModelData( ( TemplateSequenceModel)model ) );
                 
-            } else if (model instanceof TemplateNumberModel) {
+            } else if ( model instanceof TemplateNumberModel ) {
                 map.putAll( getTemplateModelData( (TemplateNumberModel)model ) );
                 
-            } else if (model instanceof TemplateDateModel) { 
+            } else if ( model instanceof TemplateBooleanModel ) {
+                map.putAll( getTemplateModelData( (TemplateBooleanModel)model ) );
+
+            } else if ( model instanceof TemplateDateModel ) { 
                 map.putAll( getTemplateModelData( (TemplateDateModel)model ) );
-                
-            } else if (model instanceof TemplateSequenceModel){
-                map.putAll( getTemplateModelData( ( TemplateSequenceModel)model ) );
 
-            } else if (model instanceof TemplateCollectionModel) {
+            } else if ( model instanceof TemplateCollectionModel ) {
                 map.putAll( getTemplateModelData( ( TemplateCollectionModel)model ) );
+                
+            } else if ( model instanceof StringModel ) {
 
-            } else if (model instanceof TemplateHashModelEx) {
+                Object unwrappedModel = DeepUnwrap.permissiveUnwrap(model);
+
+                if (unwrappedModel instanceof String) {
+                    map.putAll( getTemplateModelData( (TemplateScalarModel)model ) );
+                } else {
+                    map.putAll( getTemplateModelData( ( TemplateHashModelEx)model ) );
+                }
+             
+            } else if ( model instanceof TemplateScalarModel ) {
+                    map.putAll( getTemplateModelData( (TemplateScalarModel)model ) );
+
+            } else if ( model instanceof TemplateHashModelEx ) {
                 map.putAll( getTemplateModelData( ( TemplateHashModelEx)model ) );
-            
-            } else if (model instanceof TemplateHashModel) {
+                
+            } else if  (model instanceof TemplateHashModel ) {
                 map.putAll( getTemplateModelData( ( TemplateHashModel)model ) );
 
             // Nodes and transforms not included here     
