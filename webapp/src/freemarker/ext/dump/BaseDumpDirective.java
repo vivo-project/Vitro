@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +15,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -47,10 +50,12 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
 
     private static final Log log = LogFactory.getLog(BaseDumpDirective.class);
     
+    Pattern PROPERTY_NAME_PATTERN = Pattern.compile("^(get|is)\\w");
+    
     enum Key {
         METHODS("methods"),
         NAME("name"),
-        PROPERTIES(Key.METHODS.toString()),
+        PROPERTIES("properties"),
         TYPE("type"),
         VALUE("value"),
         DATE_TYPE("dateType");
@@ -289,7 +294,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         
         // Compile the sets of properties and methods available to template
         SortedMap<String, Object> properties = new TreeMap<String, Object>();
-        SortedMap<String, Object> methods = new TreeMap<String, Object>();
+        List<String> methods = new ArrayList<String>();
         
         // keys() gets only values visible to template based on the BeansWrapper used.
         // Note: if the BeansWrapper exposure level > BeansWrapper.EXPOSE_PROPERTIES_ONLY,
@@ -329,23 +334,35 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                 // Include only methods included in keys(). This factors in visibility
                 // defined by the model's BeansWrapper.                 
                 String methodName = method.getName();
-                String propertyName = getPropertyName(methodName);
- 
-                // If the method is available as a property, use that
-                if (keySet.contains(propertyName)) {   
-                    TemplateModel value = model.get(propertyName);
-                    properties.put(propertyName, getData(value));
-                // Else look for the entire methodName in the key set
-                } else if (keySet.contains(methodName)) {               
+
+                Matcher matcher = PROPERTY_NAME_PATTERN.matcher(methodName);
+                // If the method name starts with "get" or "is", check if it's available
+                // as a property
+                if (matcher.find()) {
+                    String propertyName = getPropertyName(methodName);
+                    
+                    // The method is available as a property
+                    if (keySet.contains(propertyName)) {   
+                        TemplateModel value = model.get(propertyName);
+                        properties.put(propertyName, getData(value));
+                        continue;
+                    }
+                }
+                // Else look for the entire methodName in the key set. Include those 
+                // starting with "get" or "is" that were not found above.
+                if (keySet.contains(methodName)) {               
                     String methodDisplayName = getMethodDisplayName(method);
-                    methods.put(methodDisplayName, "");
+                    methods.add(methodDisplayName);
                 }
             }           
         }
         
         Map<String, Object> objectValue = new HashMap<String, Object>(2);
         objectValue.put(Key.PROPERTIES.toString(), properties);
+        
+        Collections.sort(methods);
         objectValue.put(Key.METHODS.toString(), methods);
+        
         map.put(Key.VALUE.toString(), objectValue);
         return map;
     }
@@ -363,9 +380,6 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                 paramTypeList.add(typeName);
             }
             methodName += "(" + StringUtils.join(paramTypeList, ", ") + ")";
-        } else {
-            methodName = methodName.replaceAll("^(get|is)", "");
-            methodName = methodName.substring(0, 1).toLowerCase() + methodName.substring(1);           
         }
         
         return methodName;               

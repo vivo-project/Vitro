@@ -12,6 +12,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -645,12 +646,12 @@ public class DumpDirectiveTest {
     
     @Test
     public void dumpObjectWithExposeSafeWrapper() {
-        //dumpObject(BeansWrapper.EXPOSE_SAFE);            
+        dumpObject(BeansWrapper.EXPOSE_SAFE);            
     }
     
     @Test
     public void dumpObjectWithExposeAllWrapper() {
-        //dumpObject(BeansWrapper.EXPOSE_ALL);    
+        dumpObject(BeansWrapper.EXPOSE_ALL);    
     }
     
     
@@ -686,7 +687,7 @@ public class DumpDirectiveTest {
         Map<String, Object> dump = getDump(varName, dataModel);
         assertEquals(expectedDump, dump);         
         
-        // Test the sorting of the properties and methods
+        // Test the sorting of the properties
         @SuppressWarnings("unchecked")
         Map<String, Object> valueExpectedDump = (Map<String, Object>) expectedDump.get(Key.VALUE.toString());
         @SuppressWarnings("unchecked")
@@ -700,15 +701,7 @@ public class DumpDirectiveTest {
         Map<String, Object> propertiesActualDump = (Map<String, Object>) valueActualDump.get(Key.PROPERTIES.toString());      
         List<String> propertyKeysActual = new ArrayList<String>(propertiesActualDump.keySet());
         assertEquals(propertyKeysExpected, propertyKeysActual);   
-        
-        @SuppressWarnings("unchecked")
-        Map<String, Object> methodsExpectedDump = (Map<String, Object>) valueExpectedDump.get(Key.METHODS.toString());
-        List<String> methodKeysExpected = new ArrayList<String>(methodsExpectedDump.keySet());
-        @SuppressWarnings("unchecked")
-        Map<String, Object> methodsActualDump = (Map<String, Object>) valueActualDump.get(Key.METHODS.toString());      
-        List<String> methodKeysActual = new ArrayList<String>(methodsActualDump.keySet());
-        assertEquals(methodKeysExpected, methodKeysActual);   
-        
+   
     }
     
     private Map<String, Object> getDump(String varName, Map<String, Object> dataModel) {
@@ -720,8 +713,6 @@ public class DumpDirectiveTest {
             return null;
         }             
     }
-    
-
     
     private class HelplessMethod implements TemplateMethodModel {
 
@@ -853,7 +844,7 @@ public class DumpDirectiveTest {
             count++;
         }
 
-        void setSupervisor(Employee supervisor) {
+        protected void setSupervisor(Employee supervisor) {
             this.supervisor = supervisor;
         }
 
@@ -1002,11 +993,22 @@ public class DumpDirectiveTest {
         
         expectedDump.put(Key.PROPERTIES.toString(), propertiesExpectedDump);
         
-        // Methods
+        // Methods       
+        expectedDump.put(Key.METHODS.toString(), getEmployeeMethodsExpectedDump(exposureLevel)); 
         
-        SortedMap<String, Object> methodsExpectedDump = new TreeMap<String, Object>();
-        expectedDump.put(Key.METHODS.toString(), methodsExpectedDump); 
+        return expectedDump;
+    }
+    
+    private List<String> getEmployeeMethodsExpectedDump(int exposureLevel) {
         
+        List<String> expectedDump = new ArrayList<String>();
+        if (exposureLevel == BeansWrapper.EXPOSE_SAFE || exposureLevel == BeansWrapper.EXPOSE_ALL) {
+            expectedDump.add("getEmployeeCount");
+            expectedDump.add("getName(String)");
+            expectedDump.add("setFavoriteColors(Strings)");
+            expectedDump.add("setNickname(String)");
+        }   
+        Collections.sort(expectedDump);
         return expectedDump;
     }
     
@@ -1072,8 +1074,7 @@ public class DumpDirectiveTest {
         expectedDump.put(Key.PROPERTIES.toString(), propertiesExpectedDump);
         
         // Methods
-        SortedMap<String, Object> methodsExpectedDump = new TreeMap<String, Object>();
-        expectedDump.put(Key.METHODS.toString(), methodsExpectedDump);
+        expectedDump.put(Key.METHODS.toString(), getEmployeeMethodsExpectedDump(exposureLevel)); 
         
         return expectedDump;
     }
