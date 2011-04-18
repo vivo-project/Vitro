@@ -61,36 +61,22 @@ public class PolicyHelper {
 	}
 
 	/**
-	 * What RequestedActions does this servlet require authorization for?
-	 */
-	public static Set<RequestedAction> getRequiredAuthorizationsForServlet(
-			Class<? extends VitroHttpServlet> clazz) {
-		Set<RequestedAction> result = new HashSet<RequestedAction>();
-
-		RequiresAuthorizationFor annotation = clazz
-				.getAnnotation(RequiresAuthorizationFor.class);
-
-		if (annotation != null) {
-			for (Class<? extends RequestedAction> actionClass : annotation
-					.value()) {
-				if (NoAction.class != actionClass) {
-					RequestedAction action = instantiateAction(actionClass);
-					if (action != null) {
-						result.add(action);
-					}
-				}
-			}
-		}
-		return result;
-	}
-
-	/**
 	 * Are the actions that this servlet requires authorized for the current
 	 * user by the current policies?
 	 */
 	public static boolean areRequiredAuthorizationsSatisfied(
 			HttpServletRequest req, VitroHttpServlet servlet) {
 		Class<? extends VitroHttpServlet> servletClass = servlet.getClass();
+		return areRequiredAuthorizationsSatisfied(req, servletClass);
+	}
+
+	/**
+	 * Are the actions that this servlet class requires authorized for the
+	 * current user by the current policies?
+	 */
+	public static boolean areRequiredAuthorizationsSatisfied(
+			HttpServletRequest req,
+			Class<? extends VitroHttpServlet> servletClass) {
 		return areRequiredAuthorizationsSatisfied(req,
 				getRequiredAuthorizationsForServlet(servletClass));
 	}
@@ -155,6 +141,34 @@ public class PolicyHelper {
 				+ decision);
 		return (decision == null)
 				|| (decision.getAuthorized() != Authorization.AUTHORIZED);
+	}
+
+	/**
+	 * What RequestedActions does this servlet require authorization for?
+	 * 
+	 * Keep this private, since it reveals how the Annotation is implemented. If
+	 * we change the Annotation to include "or" and "and", then this method
+	 * becomes meaningless with its current return type.
+	 */
+	private static Set<RequestedAction> getRequiredAuthorizationsForServlet(
+			Class<? extends VitroHttpServlet> clazz) {
+		Set<RequestedAction> result = new HashSet<RequestedAction>();
+
+		RequiresAuthorizationFor annotation = clazz
+				.getAnnotation(RequiresAuthorizationFor.class);
+
+		if (annotation != null) {
+			for (Class<? extends RequestedAction> actionClass : annotation
+					.value()) {
+				if (NoAction.class != actionClass) {
+					RequestedAction action = instantiateAction(actionClass);
+					if (action != null) {
+						result.add(action);
+					}
+				}
+			}
+		}
+		return result;
 	}
 
 	/**
