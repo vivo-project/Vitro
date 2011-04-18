@@ -20,6 +20,7 @@ import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor.Or;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -28,16 +29,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
-@RequiresAuthorizationFor(/* either-or; see call to checkIfAnyActionsAreAuthorized */)
+@RequiresAuthorizationFor(or={@Or(UseAdvancedDataToolsPages.class), @Or(UseOntologyEditorPages.class)})
 public class JenaExportController extends BaseEditController {
 
+	@Override
 	public void doGet( HttpServletRequest request, HttpServletResponse response ) {
 		VitroRequest vreq = new VitroRequest(request);
-		
-		if (!checkIfAnyActionsAreAuthorized(vreq, response,
-				UseAdvancedDataToolsPages.class, UseOntologyEditorPages.class)) {
-			return;
-		}
 		
 		if ( vreq.getRequestURL().indexOf("/download/") > -1 ) { 
 			outputRDF( vreq, response );

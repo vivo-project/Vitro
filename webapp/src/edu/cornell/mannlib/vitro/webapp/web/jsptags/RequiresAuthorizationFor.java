@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.jsptags;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -57,12 +56,12 @@ public class RequiresAuthorizationFor extends BodyTagSupport {
 	 * are authorized for those actions.
 	 */
 	private boolean isAuthorized() {
-		Collection<RequestedAction> actions = instantiateActions();
-		if (actions == null) {
+		Set<Class<? extends RequestedAction>> classes = instantiateActionClasses();
+		if (classes == null) {
 			return false;
 		}
 		return PolicyHelper.areRequiredAuthorizationsSatisfied(getRequest(),
-				actions);
+				classes);
 	}
 
 	/**
@@ -71,18 +70,13 @@ public class RequiresAuthorizationFor extends BodyTagSupport {
 	 * 
 	 * If we can't do all of that, complain and return null.
 	 */
-	private Set<RequestedAction> instantiateActions() {
+	private Set<Class<? extends RequestedAction>> instantiateActionClasses() {
 		Set<String> classNames = parseClassNames();
 		if (classNames.isEmpty()) {
 			return Collections.emptySet();
 		}
 
-		Set<Class<? extends RequestedAction>> actionClasses = loadClassesAndCheckTypes(classNames);
-		if (actionClasses == null) {
-			return null;
-		}
-
-		return getInstancesFromClasses(actionClasses);
+		return loadClassesAndCheckTypes(classNames);
 	}
 
 	private Set<String> parseClassNames() {

@@ -7,8 +7,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor.NoAction;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor.Or;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
@@ -41,6 +44,17 @@ public class PolicyHelper {
 	 * 
 	 * Any RequestedAction can be specified, but the most common use will be to
 	 * specify implementations of UsePagesRequestedAction.
+	 * 
+	 * Note that a combination of AND and OR relationships can be created
+	 * (at-signs converted to #-signs, so Javadoc won't try to actually apply
+	 * the annotations):
+	 * 
+	 * <pre>
+	 * #RequiresAuthorizationFor(This.class)
+	 * #RequiresAuthorizationFor({This.class, That.class})
+	 * #RequiresAuthorizationFor(value=This.class, or=#Or(That.class))
+	 * #RequiresAuthorizationFor(or={#Or(One_A.class, One_B.class), #Or(Two.class)})
+	 * </pre>
 	 */
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
@@ -49,7 +63,14 @@ public class PolicyHelper {
 			/* no fields */
 		}
 
+		@Retention(RetentionPolicy.RUNTIME)
+		public static @interface Or {
+			Class<? extends RequestedAction>[] value() default NoAction.class;
+		}
+
 		Class<? extends RequestedAction>[] value() default NoAction.class;
+
+		Or[] or() default @Or();
 	}
 
 	/**
@@ -57,7 +78,11 @@ public class PolicyHelper {
 	 */
 	public static boolean isRestrictedPage(VitroHttpServlet servlet) {
 		Class<? extends VitroHttpServlet> servletClass = servlet.getClass();
-		return !getRequiredAuthorizationsForServlet(servletClass).isEmpty();
+		try {
+			return !ActionClauses.forServletClass(servletClass).isEmpty();
+		} catch (PolicyHelperException e) {
+			return true;
+		}
 	}
 
 	/**
@@ -66,8 +91,7 @@ public class PolicyHelper {
 	 */
 	public static boolean areRequiredAuthorizationsSatisfied(
 			HttpServletRequest req, VitroHttpServlet servlet) {
-		Class<? extends VitroHttpServlet> servletClass = servlet.getClass();
-		return areRequiredAuthorizationsSatisfied(req, servletClass);
+		return areRequiredAuthorizationsSatisfied(req, servlet.getClass());
 	}
 
 	/**
@@ -77,8 +101,12 @@ public class PolicyHelper {
 	public static boolean areRequiredAuthorizationsSatisfied(
 			HttpServletRequest req,
 			Class<? extends VitroHttpServlet> servletClass) {
-		return areRequiredAuthorizationsSatisfied(req,
-				getRequiredAuthorizationsForServlet(servletClass));
+		try {
+			return isActionClausesAuthorized(req,
+					ActionClauses.forServletClass(servletClass));
+		} catch (PolicyHelperException e) {
+			return false;
+		}
 	}
 
 	/**
@@ -87,132 +115,183 @@ public class PolicyHelper {
 	 */
 	public static boolean areRequiredAuthorizationsSatisfied(
 			HttpServletRequest req,
-			Class<? extends RequestedAction>... actionClasses) {
-		List<Class<? extends RequestedAction>> classList = Arrays
-				.asList(actionClasses);
-
-		Set<RequestedAction> actions = instantiateActions(classList);
-		if (actions == null) {
-			log.debug("not authorized: failed to instantiate actions");
+			Collection<Class<? extends RequestedAction>> actionClasses) {
+		try {
+			return isActionClausesAuthorized(req, new ActionClauses(
+					actionClasses));
+		} catch (PolicyHelperException e) {
 			return false;
 		}
-
-		return areRequiredAuthorizationsSatisfied(req, actions);
-	}
-
-	/**
-	 * Are these actions authorized for the current user by the current
-	 * policies?
-	 */
-	public static boolean areRequiredAuthorizationsSatisfied(
-			HttpServletRequest req,
-			Collection<? extends RequestedAction> actions) {
-		PolicyIface policy = ServletPolicyList.getPolicies(req);
-		IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(req);
-
-		for (RequestedAction action : actions) {
-			if (isAuthorized(policy, ids, action)) {
-				log.debug("not authorized");
-				return false;
-			}
-		}
-
-		log.debug("authorized");
-		return true;
 	}
 
 	/**
 	 * Is this action class authorized for the current user by the current
 	 * policies?
 	 */
-	@SuppressWarnings("unchecked")
-	public static boolean isAuthorized(HttpServletRequest req,
+	public static boolean isActionAuthorized(HttpServletRequest req,
 			Class<? extends RequestedAction> actionClass) {
-		return areRequiredAuthorizationsSatisfied(req, actionClass);
+		try {
+			return isActionClausesAuthorized(req,
+					new ActionClauses(actionClass));
+		} catch (PolicyHelperException e) {
+			return false;
+		}
+	}
+
+	/**
+	 * Actions must be authorized for the current user by the current policies.
+	 * If no actions, no problem.
+	 */
+	private static boolean isActionClausesAuthorized(HttpServletRequest req,
+			ActionClauses actionClauses) {
+		PolicyIface policy = ServletPolicyList.getPolicies(req);
+		IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(req);
+
+		return actionClauses.isEmpty()
+				|| isActionClausesAuthorized(policy, ids, actionClauses);
+	}
+
+	/** Any clause in an ActionClauses may be authorized. */
+	private static boolean isActionClausesAuthorized(PolicyIface policy,
+			IdentifierBundle ids, ActionClauses actionClauses) {
+		for (Set<RequestedAction> clause : actionClauses.getClauseList()) {
+			if (isClauseAuthorized(policy, ids, clause)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** All actions in a clause must be authorized. */
+	private static boolean isClauseAuthorized(PolicyIface policy,
+			IdentifierBundle ids, Set<RequestedAction> clause) {
+		for (RequestedAction action : clause) {
+			if (!isActionAuthorized(policy, ids, action)) {
+				log.debug("not authorized");
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
 	 * Is this action authorized for these IDs by this policy?
 	 */
-	private static boolean isAuthorized(PolicyIface policy,
+	private static boolean isActionAuthorized(PolicyIface policy,
 			IdentifierBundle ids, RequestedAction action) {
 		PolicyDecision decision = policy.isAuthorized(ids, action);
 		log.debug("decision for '" + action.getClass().getName() + "' was: "
 				+ decision);
-		return (decision == null)
-				|| (decision.getAuthorized() != Authorization.AUTHORIZED);
+		return (decision != null)
+				&& (decision.getAuthorized() == Authorization.AUTHORIZED);
 	}
 
 	/**
-	 * What RequestedActions does this servlet require authorization for?
+	 * This helper class embodies the list of OR and AND relationships for the
+	 * required authorizations. A group of AND relationships is a "clause", and
+	 * the list of clauses are in an OR relationship.
 	 * 
-	 * Keep this private, since it reveals how the Annotation is implemented. If
-	 * we change the Annotation to include "or" and "and", then this method
-	 * becomes meaningless with its current return type.
+	 * Authorization is successful if ALL of the actions in ANY of the clauses
+	 * are authorized, or if there are NO clauses.
+	 * 
+	 * If any action can't be instantiated, throw an exception so authorization
+	 * will fail.
 	 */
-	private static Set<RequestedAction> getRequiredAuthorizationsForServlet(
-			Class<? extends VitroHttpServlet> clazz) {
-		Set<RequestedAction> result = new HashSet<RequestedAction>();
+	private static class ActionClauses {
+		static ActionClauses forServletClass(
+				Class<? extends VitroHttpServlet> servletClass)
+				throws PolicyHelperException {
+			return new ActionClauses(
+					servletClass.getAnnotation(RequiresAuthorizationFor.class));
+		}
 
-		RequiresAuthorizationFor annotation = clazz
-				.getAnnotation(RequiresAuthorizationFor.class);
+		private final List<Set<RequestedAction>> clauseList;
 
-		if (annotation != null) {
-			for (Class<? extends RequestedAction> actionClass : annotation
-					.value()) {
-				if (NoAction.class != actionClass) {
-					RequestedAction action = instantiateAction(actionClass);
-					if (action != null) {
-						result.add(action);
-					}
+		ActionClauses(RequiresAuthorizationFor annotation)
+				throws PolicyHelperException {
+			List<Set<RequestedAction>> list = new ArrayList<Set<RequestedAction>>();
+			if (annotation != null) {
+				addClause(list, annotation.value());
+				for (Or orAnnotation : annotation.or()) {
+					addClause(list, orAnnotation.value());
 				}
 			}
+			this.clauseList = Collections.unmodifiableList(list);
 		}
-		return result;
-	}
 
-	/**
-	 * Instantiate actions from their classes. If any one of the classes cannot
-	 * be instantiated, return null.
-	 */
-	private static Set<RequestedAction> instantiateActions(
-			Collection<Class<? extends RequestedAction>> actionClasses) {
-		Set<RequestedAction> actions = new HashSet<RequestedAction>();
-		for (Class<? extends RequestedAction> actionClass : actionClasses) {
-			RequestedAction action = instantiateAction(actionClass);
-			if (action == null) {
-				return null;
-			} else {
-				actions.add(action);
+		ActionClauses(Collection<Class<? extends RequestedAction>> actionClasses)
+				throws PolicyHelperException {
+			this.clauseList = Collections
+					.singletonList(buildClause(actionClasses));
+		}
+
+		ActionClauses(Class<? extends RequestedAction> actionClass)
+				throws PolicyHelperException {
+			this.clauseList = Collections.singletonList(Collections
+					.singleton(instantiateAction(actionClass)));
+		}
+
+		private void addClause(List<Set<RequestedAction>> list,
+				Class<? extends RequestedAction>[] actionClasses)
+				throws PolicyHelperException {
+			Set<RequestedAction> clause = buildClause(Arrays
+					.asList(actionClasses));
+			if (!clause.isEmpty()) {
+				list.add(clause);
 			}
 		}
-		return actions;
+
+		private Set<RequestedAction> buildClause(
+				Collection<Class<? extends RequestedAction>> actionClasses)
+				throws PolicyHelperException {
+			Set<RequestedAction> clause = new HashSet<RequestedAction>();
+			for (Class<? extends RequestedAction> actionClass : actionClasses) {
+				if (!NoAction.class.equals(actionClass)) {
+					clause.add(instantiateAction(actionClass));
+				}
+			}
+			return Collections.unmodifiableSet(clause);
+		}
+
+		/**
+		 * Get an instance of the RequestedAction, from its class, or throw an
+		 * exception.
+		 */
+		private RequestedAction instantiateAction(
+				Class<? extends RequestedAction> actionClass)
+				throws PolicyHelperException {
+			try {
+				Constructor<? extends RequestedAction> constructor = actionClass
+						.getConstructor();
+				RequestedAction instance = constructor.newInstance();
+				return instance;
+			} catch (NoSuchMethodException e) {
+				log.error("'" + actionClass.getName()
+						+ "' does not have a no-argument constructor.");
+				throw new PolicyHelperException();
+			} catch (IllegalAccessException e) {
+				log.error("The no-argument constructor for '"
+						+ actionClass.getName() + "' is not public.");
+				throw new PolicyHelperException();
+			} catch (Exception e) {
+				log.error("Failed to instantiate '" + actionClass.getName()
+						+ "'", e);
+				throw new PolicyHelperException();
+			}
+		}
+
+		boolean isEmpty() {
+			return this.clauseList.isEmpty();
+		}
+
+		List<Set<RequestedAction>> getClauseList() {
+			return this.clauseList;
+		}
 	}
 
-	/**
-	 * Get an instance of the RequestedAction, from its class. If the class
-	 * cannot be instantiated, return null.
-	 */
-	private static RequestedAction instantiateAction(
-			Class<? extends RequestedAction> actionClass) {
-		try {
-			Constructor<? extends RequestedAction> constructor = actionClass
-					.getConstructor();
-			RequestedAction instance = constructor.newInstance();
-			return instance;
-		} catch (NoSuchMethodException e) {
-			log.error("'" + actionClass.getName()
-					+ "' does not have a no-argument constructor.");
-			return null;
-		} catch (IllegalAccessException e) {
-			log.error("The no-argument constructor for '"
-					+ actionClass.getName() + "' is not public.");
-			return null;
-		} catch (Exception e) {
-			log.error("Failed to instantiate '" + actionClass.getName() + "'",
-					e);
-			return null;
-		}
+	/** We failed to instantiate a RequestedAction */
+	private static class PolicyHelperException extends Exception {
+		// no members
 	}
 
 	/**

@@ -2,7 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -18,6 +19,7 @@ import stubs.javax.servlet.http.HttpSessionStub;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor.Or;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
@@ -80,21 +82,70 @@ public class PolicyHelperTest extends AbstractTestClass {
 	public void twoRequirementsFailOne() {
 		createPolicy(new Action1());
 		assertExpectedAuthorization("requires Actions 1 and 2",
-				Action1Action2Servlet.class, false);
+				Action1AndAction2Servlet.class, false);
 	}
 
 	@Test
 	public void twoRequirementsFailTwo() {
 		createPolicy(new Action2());
 		assertExpectedAuthorization("requires Actions 1 and 2",
-				Action1Action2Servlet.class, false);
+				Action1AndAction2Servlet.class, false);
 	}
 
 	@Test
 	public void twoRequirementsSucceed() {
 		createPolicy(new Action2(), new Action1());
 		assertExpectedAuthorization("requires Actions 1 and 2",
-				Action1Action2Servlet.class, true);
+				Action1AndAction2Servlet.class, true);
+	}
+
+	@Test
+	public void oneOrTwoFail() {
+		createPolicy();
+		assertExpectedAuthorization("requires Action 1 or 2",
+				Action1OrAction2Servlet.class, false);
+	}
+
+	@Test
+	public void oneOrTwoSucceedOne() {
+		createPolicy(new Action1());
+		assertExpectedAuthorization("requires Action 1 or 2",
+				Action1OrAction2Servlet.class, true);
+	}
+
+	@Test
+	public void oneOrTwoSucceedTwo() {
+		createPolicy(new Action2());
+		assertExpectedAuthorization("requires Action 1 or 2",
+				Action1OrAction2Servlet.class, true);
+	}
+
+	@Test
+	public void oneOrTwoOrThreeFail() {
+		createPolicy();
+		assertExpectedAuthorization("requires Action 1 or 2 or 3",
+				Action1OrAction2OrAction3Servlet.class, false);
+	}
+
+	@Test
+	public void oneOrTwoOrThreeSucceedOne() {
+		createPolicy(new Action1());
+		assertExpectedAuthorization("requires Action 1 or 2 or 3",
+				Action1OrAction2OrAction3Servlet.class, true);
+	}
+
+	@Test
+	public void oneOrTwoOrThreeSucceedTwo() {
+		createPolicy(new Action2());
+		assertExpectedAuthorization("requires Action 1 or 2 or 3",
+				Action1OrAction2OrAction3Servlet.class, true);
+	}
+
+	@Test
+	public void oneOrTwoOrThreeSucceedThree() {
+		createPolicy(new Action3());
+		assertExpectedAuthorization("requires Action 1 or 2 or 3",
+				Action1OrAction2OrAction3Servlet.class, true);
 	}
 
 	// ----------------------------------------------------------------------
@@ -124,6 +175,10 @@ public class PolicyHelperTest extends AbstractTestClass {
 		// actions must be public, with public constructor
 	}
 
+	public static class Action3 extends RequestedAction {
+		// actions must be public, with public constructor
+	}
+
 	// no annotation
 	private static class NoAnnotationServlet extends VitroHttpServlet {
 		/* no body */
@@ -140,7 +195,19 @@ public class PolicyHelperTest extends AbstractTestClass {
 	}
 
 	@RequiresAuthorizationFor({ Action1.class, Action2.class })
-	private static class Action1Action2Servlet extends VitroHttpServlet {
+	private static class Action1AndAction2Servlet extends VitroHttpServlet {
+		/* no body */
+	}
+
+	@RequiresAuthorizationFor(value = Action1.class, or = @Or(Action2.class))
+	private static class Action1OrAction2Servlet extends VitroHttpServlet {
+		/* no body */
+	}
+
+	@RequiresAuthorizationFor(value = Action1.class, or = { @Or(Action2.class),
+			@Or(Action3.class) })
+	private static class Action1OrAction2OrAction3Servlet extends
+			VitroHttpServlet {
 		/* no body */
 	}
 
