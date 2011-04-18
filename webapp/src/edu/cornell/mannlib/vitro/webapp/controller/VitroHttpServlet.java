@@ -98,6 +98,15 @@ public class VitroHttpServlet extends HttpServlet {
 			+ "please contact us and we'll be happy to help.";
 
 	/**
+	 * doGet does nothing.
+	 */
+	@Override
+	protected void doGet(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+		// nothing to do
+	}
+
+	/**
 	 * doPost does the same thing as the doGet method
 	 */
 	@Override
