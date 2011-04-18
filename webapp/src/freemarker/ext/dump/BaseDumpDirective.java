@@ -41,11 +41,6 @@ import freemarker.template.TemplateScalarModel;
 import freemarker.template.TemplateSequenceModel;
 import freemarker.template.utility.DeepUnwrap;
 
-/* TODO
- * - Check error messages generated for TemplateModelException-s. If too generic, need to catch, create specific
- * error message, and rethrow.
- */
-
 public abstract class BaseDumpDirective implements TemplateDirectiveModel {
 
     private static final Log log = LogFactory.getLog(BaseDumpDirective.class);
@@ -112,16 +107,20 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         } 
     }
     
-    
-    protected Map<String, Object> getTemplateVariableData(String varName, Environment env) 
+    protected Map<String, Object> getTemplateVariableDump(String varName, Environment env) 
     throws TemplateModelException {
-        
+
+        TemplateHashModel dataModel = env.getDataModel();       
+        TemplateModel model = dataModel.get(varName);
+        return getTemplateVariableDump(varName, model);
+    }
+
+    protected Map<String, Object> getTemplateVariableDump(String varName, TemplateModel model) 
+    throws TemplateModelException {
+
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.NAME.toString(), varName);
         
-        TemplateHashModel dataModel = env.getDataModel();       
-        TemplateModel model =  dataModel.get(varName);
-
         // Don't return null if model == null. We still want to send the map to the template.
         if (model != null) {
             // TemplateMethodModel and TemplateDirectiveModel objects can only be
@@ -133,14 +132,14 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                 map.putAll( getTemplateModelData( ( TemplateDirectiveModel)model, varName ) );
                 
             } else {
-                map.putAll(getData(model));
+                map.putAll(getDump(model));
             }
         }
         
-        return map;
+        return map;        
     }
-
-    private Map<String, Object> getData(TemplateModel model) throws TemplateModelException {
+    
+    private Map<String, Object> getDump(TemplateModel model) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         
         // Don't return null if model == null. We still want to send the map to the template.
@@ -254,7 +253,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         List<Map<String, Object>> items = new ArrayList<Map<String, Object>>(itemCount);
         for ( int i = 0; i < itemCount; i++ ) {
             TemplateModel item = model.get(i);
-            items.add(getData(item));
+            items.add(getDump(item));
         }
         map.put(Key.VALUE.toString(), items);
         return map;
@@ -281,7 +280,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         while (iModel.hasNext()) {
             String key = iModel.next().toString();
             TemplateModel value = model.get(key);
-            items.put(key, getData(value));
+            items.put(key, getDump(value));
         }        
         map.put(Key.VALUE.toString(), items);  
         return map;
@@ -344,7 +343,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                     // The method is available as a property
                     if (keySet.contains(propertyName)) {   
                         TemplateModel value = model.get(propertyName);
-                        properties.put(propertyName, getData(value));
+                        properties.put(propertyName, getDump(value));
                         continue;
                     }
                 }
@@ -398,7 +397,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         TemplateModelIterator iModel = model.iterator();
         while (iModel.hasNext()) {
             TemplateModel m = iModel.next();
-            items.add(getData(m));
+            items.add(getDump(m));
         }
         map.put(Key.VALUE.toString(), items);  
         return map;
@@ -449,7 +448,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         return map;        
     }
     
-    protected void dump(String templateName, Map<String, Object> map, String modelName, Environment env) 
+    protected void dump(String templateName, Map<String, Object> map, Environment env) 
     throws TemplateException, IOException {
         
         Template template = env.getConfiguration().getTemplate(templateName);
