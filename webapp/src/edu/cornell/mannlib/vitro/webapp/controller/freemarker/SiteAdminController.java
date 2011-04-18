@@ -67,16 +67,19 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         // of step with the levels required by the pages themselves. We should implement a 
         // mechanism similar to what's used on the front end to display links to Site Admin
         // and Revision Info iff the user has access to those pages.
+        // jeb228 This could be done with
+        //           PolicyHelper.areRequiredAuthorizationsSatisfied(req, SomeServlet.class);
         if (loginBean.isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
             body.put("siteConfig", getSiteConfigurationData(vreq, urlBuilder));
-            body.put("ontologyEditor", getOntologyEditorData(vreq, urlBuilder));
+        }
+        if (loginBean.isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
+        	body.put("ontologyEditor", getOntologyEditorData(vreq, urlBuilder));
+        }
+		if (PolicyHelper.isActionAuthorized(vreq,	UseAdvancedDataToolsPages.class)) {
+            body.put("dataTools", getDataToolsData(vreq, urlBuilder));
             
-			if (PolicyHelper.isAuthorized(vreq,	UseAdvancedDataToolsPages.class)) {
-                body.put("dataTools", getDataToolsData(vreq, urlBuilder));
-                
-                // Only for DataStar. Should handle without needing a DataStar-specific version of this controller.
-                //body.put("customReports", getCustomReportsData(vreq));
-            }
+            // Only for DataStar. Should handle without needing a DataStar-specific version of this controller.
+            //body.put("customReports", getCustomReportsData(vreq));
         }
         
         return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
