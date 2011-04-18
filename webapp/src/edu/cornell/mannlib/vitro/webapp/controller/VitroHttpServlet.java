@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LogoutRedirector;
 
@@ -163,6 +164,37 @@ public class VitroHttpServlet extends HttpServlet {
 		}
 	}
 
+	/**
+	 * If none of these actions are authorized by the current policy, redirect
+	 * them to the appropriate page.
+	 * 
+	 * Currently the RequiresAuthorizationFor annotation can't handle "or"
+	 * situations, so we need to do an explicit call to this method. You should
+	 * still use the annotation with no actions, so we know this is a restricted
+	 * page when we logout.
+	 */
+	public static boolean checkIfAnyActionsAreAuthorized(
+			HttpServletRequest request, HttpServletResponse response,
+			Class<? extends RequestedAction>... actionClasses) {
+		for (Class<? extends RequestedAction> actionClass : actionClasses) {
+			if (PolicyHelper.isAuthorized(request, actionClass)) {
+				log.trace("Authorized for '" + actionClass.getSimpleName()
+						+ "'");
+				return true;
+			}
+		}
+		LoginStatusBean statusBean = LoginStatusBean.getBean(request);
+		if (statusBean.isLoggedIn()) {
+			log.trace("Authorization is insufficient for requested actions");
+			redirectToInsufficientAuthorizationPage(request, response);
+			return false;
+		} else {
+			log.trace("Not logged in; not sufficient for requested actions");
+			redirectToLoginPage(request, response);
+			return false;
+		}
+	}
+	
 	/**
 	 * Logged in, but with insufficent authorization. Send them to the home page
 	 * with a message. They won't be coming back.
