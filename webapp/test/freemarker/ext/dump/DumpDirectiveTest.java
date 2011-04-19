@@ -707,7 +707,7 @@ public class DumpDirectiveTest {
     private Map<String, Object> getDump(String varName, Map<String, Object> dataModel) {
         try {
             Environment env = template.createProcessingEnvironment(dataModel, new StringWriter());
-            return new DumpDirective().getTemplateVariableData(varName, env);     
+            return new DumpDirective().getTemplateVariableDump(varName, env);     
         } catch (Exception e) {
             fail(e.getMessage());
             return null;
