@@ -14,9 +14,11 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseEditUserAccountsPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseIndividualEditorPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMenuEditorPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UsePortalEditorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseSiteAdminPage;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseTabEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 
@@ -53,6 +55,10 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
 		} else if (whatToAuth instanceof UseTabEditorPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
+		} else if (whatToAuth instanceof UseIndividualEditorPages) {
+			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
+		} else if (whatToAuth instanceof UseSiteAdminPage) {
+			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
 		} else {
 			result = defaultDecision("Unrecognized action");
 		}

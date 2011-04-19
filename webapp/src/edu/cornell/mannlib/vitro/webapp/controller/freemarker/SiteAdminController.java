@@ -13,11 +13,13 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseIndividualEditorPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseSiteAdminPage;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseSiteInfoEditingPage;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -30,43 +32,27 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 
+@RequiresAuthorizationFor(UseSiteAdminPage.class)
 public class SiteAdminController extends FreemarkerHttpServlet {
 	
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(SiteAdminController.class);
     private static final String TEMPLATE_DEFAULT = "siteAdmin-main.ftl";
-    private static final int REQUIRED_LOGIN_LEVEL = LoginStatusBean.EDITOR;
     
     @Override
 	public String getTitle(String siteName, VitroRequest vreq) {
         return siteName + " Site Administration";
 	}
 
-    /* requiredLoginLevel() must be an instance method, else, due to the way sublcass
-     * hiding works, when called from FreemarkerHttpServlet we will get its own method,
-     * rather than the subclass method. To figure out whether to display links at the
-     * page level, we need another, static method.
-     */
-    public static int staticRequiredLoginLevel() {
-        return REQUIRED_LOGIN_LEVEL;
-    }
-
-    @Override
-    protected int requiredLoginLevel() {
-        return staticRequiredLoginLevel();
-    }
-    
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
-        // Note that we don't get here unless logged in at least at editor level, due
-        // to requiresLoginLevel().
-    	LoginStatusBean loginBean = LoginStatusBean.getBean(vreq);
-    	
         Map<String, Object> body = new HashMap<String, Object>();        
 
         UrlBuilder urlBuilder = new UrlBuilder(vreq.getPortal());
         
-        body.put("dataInput", getDataInputData(vreq));
+    	if (PolicyHelper.isAuthorizedForAction(vreq, UseIndividualEditorPages.class)) {
+    		body.put("dataInput", getDataInputData(vreq));
+    	}
 
         body.put("siteConfig", getSiteConfigurationData(vreq, urlBuilder));
 

@@ -2,13 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.RevisionInfoController;
@@ -19,7 +17,6 @@ public class User extends BaseTemplateModel {
     private static final Log log = LogFactory.getLog(User.class);
     
     private enum Access {
-        SITE_ADMIN(SiteAdminController.staticRequiredLoginLevel()),
         REVISION_INFO(RevisionInfoController.staticRequiredLoginLevel()),
         FILTER_SECURITY(LoginStatusBean.EDITOR);
         
@@ -51,7 +48,7 @@ public class User extends BaseTemplateModel {
     }
     
     public boolean getHasSiteAdminAccess() {
-        return loginBean.isLoggedInAtLeast(Access.SITE_ADMIN.requiredLoginLevel());
+    	return PolicyHelper.isAuthorizedForServlet(vreq, SiteAdminController.class);
     }
     
     public boolean getHasRevisionInfoAccess() {

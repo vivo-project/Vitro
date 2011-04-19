@@ -4,7 +4,7 @@
 
 <#import "lib-form.ftl" as form>
 
-<#if dataInput??>
+<#if dataInput?hasContent>
     <div class="pageBodyGroup">
         
         <h3>Data Input</h3>
