@@ -5,10 +5,13 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMenuEditorPages;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 
+@RequiresAuthorizationFor(UseMenuEditorPages.class)
 public class MenuN3EditController extends FreemarkerHttpServlet {
 
     protected final static String N3MENU_FORM = "menuN3Edit.ftl"; 

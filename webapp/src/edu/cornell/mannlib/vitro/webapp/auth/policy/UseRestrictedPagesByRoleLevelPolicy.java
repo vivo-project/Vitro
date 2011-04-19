@@ -14,6 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseEditUserAccountsPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMenuEditorPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UsePortalEditorPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseTabEditorPages;
@@ -43,6 +44,8 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		if (whatToAuth instanceof UseAdvancedDataToolsPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
 		} else if (whatToAuth instanceof UseEditUserAccountsPages) {
+			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
+		} else if (whatToAuth instanceof UseMenuEditorPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
 		} else if (whatToAuth instanceof UseOntologyEditorPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);

@@ -68,13 +68,12 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         
         body.put("dataInput", getDataInputData(vreq));
 
+        body.put("siteConfig", getSiteConfigurationData(vreq, urlBuilder));
+
         // rjy7 There is a risk that the login levels required to show the links will get out
         // of step with the levels required by the pages themselves. We should implement a 
         // mechanism similar to what's used on the front end to display links to Site Admin
         // and Revision Info iff the user has access to those pages.
-        if (loginBean.isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
-            body.put("siteConfig", getSiteConfigurationData(vreq, urlBuilder));
-        }
         if (PolicyHelper.isAuthorizedForAction(vreq, UseOntologyEditorPages.class)) {
         	body.put("ontologyEditor", getOntologyEditorData(vreq, urlBuilder));
         }
@@ -137,17 +136,17 @@ public class SiteAdminController extends FreemarkerHttpServlet {
             urls.put("users", urlBuilder.getPortalUrl("/listUsers"));
         }
 
-        boolean multiplePortals = !vreq.getFullWebappDaoFactory().getPortalDao().isSinglePortal();
-		boolean mayEditPortals = PolicyHelper.isAuthorizedForServlet(vreq, PortalsListingController.class);
-		if (multiplePortals && mayEditPortals) {
-            urls.put("portals", urlBuilder.getPortalUrl("/listPortals"));
-        }
+        if (PolicyHelper.isAuthorizedForServlet(vreq, PortalsListingController.class)) {
+        	if ((!vreq.getFullWebappDaoFactory().getPortalDao().isSinglePortal())) {
+				urls.put("portals", urlBuilder.getPortalUrl("/listPortals"));
+			}
+		}
  
 		if (PolicyHelper.isAuthorizedForAction(vreq, UseSiteInfoEditingPage.class)) {
 			urls.put("siteInfo", urlBuilder.getPortalUrl("/editForm", new ParamMap("controller", "Portal", "id", String.valueOf(urlBuilder.getPortalId()))));
 		}
 
-        if (LoginStatusBean.getBean(vreq).isLoggedInAtLeast(LoginStatusBean.DBA)) {
+		if (PolicyHelper.isAuthorizedForServlet(vreq, MenuN3EditController.class)) {
             urls.put("menuN3Editor", urlBuilder.getPortalUrl("/menuN3Editor"));            
         }
         
