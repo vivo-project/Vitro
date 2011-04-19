@@ -62,13 +62,12 @@ public class VitroHttpServlet extends HttpServlet {
 			}
 
 			// Record restricted pages so we won't return to them on logout
-			if (PolicyHelper.isRestrictedPage(this)) {
+			if (PolicyHelper.isServletRestricted(this)) {
 				LogoutRedirector.recordRestrictedPageUri(hreq);
 			}
 
-			// If the @RequiresAuthenticationFor actions are not authorized,
-			// don't show them the page.
-			if (!PolicyHelper.areRequiredAuthorizationsSatisfied(hreq, this)) {
+			// If the user isn't authorized for this servlet, don't show it.
+			if (!PolicyHelper.isAuthorizedForServlet(hreq, this)) {
 				if (LoginStatusBean.getBean(hreq).isLoggedIn()) {
 					redirectToInsufficientAuthorizationPage(hreq, hresp);
 					return;

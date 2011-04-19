@@ -76,7 +76,7 @@ public class PolicyHelper {
 	/**
 	 * Does this servlet require authorization?
 	 */
-	public static boolean isRestrictedPage(VitroHttpServlet servlet) {
+	public static boolean isServletRestricted(VitroHttpServlet servlet) {
 		Class<? extends VitroHttpServlet> servletClass = servlet.getClass();
 		try {
 			return !ActionClauses.forServletClass(servletClass).isEmpty();
@@ -89,20 +89,19 @@ public class PolicyHelper {
 	 * Are the actions that this servlet requires authorized for the current
 	 * user by the current policies?
 	 */
-	public static boolean areRequiredAuthorizationsSatisfied(
-			HttpServletRequest req, VitroHttpServlet servlet) {
-		return areRequiredAuthorizationsSatisfied(req, servlet.getClass());
+	public static boolean isAuthorizedForServlet(HttpServletRequest req,
+			VitroHttpServlet servlet) {
+		return isAuthorizedForServlet(req, servlet.getClass());
 	}
 
 	/**
 	 * Are the actions that this servlet class requires authorized for the
 	 * current user by the current policies?
 	 */
-	public static boolean areRequiredAuthorizationsSatisfied(
-			HttpServletRequest req,
+	public static boolean isAuthorizedForServlet(HttpServletRequest req,
 			Class<? extends VitroHttpServlet> servletClass) {
 		try {
-			return isActionClausesAuthorized(req,
+			return isAuthorizedForActionClauses(req,
 					ActionClauses.forServletClass(servletClass));
 		} catch (PolicyHelperException e) {
 			return false;
@@ -113,11 +112,10 @@ public class PolicyHelper {
 	 * Are these action classes authorized for the current user by the current
 	 * policies?
 	 */
-	public static boolean areRequiredAuthorizationsSatisfied(
-			HttpServletRequest req,
+	public static boolean isAuthorizedForActions(HttpServletRequest req,
 			Collection<Class<? extends RequestedAction>> actionClasses) {
 		try {
-			return isActionClausesAuthorized(req, new ActionClauses(
+			return isAuthorizedForActionClauses(req, new ActionClauses(
 					actionClasses));
 		} catch (PolicyHelperException e) {
 			return false;
@@ -128,11 +126,11 @@ public class PolicyHelper {
 	 * Is this action class authorized for the current user by the current
 	 * policies?
 	 */
-	public static boolean isActionAuthorized(HttpServletRequest req,
+	public static boolean isAuthorizedForAction(HttpServletRequest req,
 			Class<? extends RequestedAction> actionClass) {
 		try {
-			return isActionClausesAuthorized(req,
-					new ActionClauses(actionClass));
+			return isAuthorizedForActionClauses(req, new ActionClauses(
+					actionClass));
 		} catch (PolicyHelperException e) {
 			return false;
 		}
@@ -142,20 +140,20 @@ public class PolicyHelper {
 	 * Actions must be authorized for the current user by the current policies.
 	 * If no actions, no problem.
 	 */
-	private static boolean isActionClausesAuthorized(HttpServletRequest req,
+	private static boolean isAuthorizedForActionClauses(HttpServletRequest req,
 			ActionClauses actionClauses) {
 		PolicyIface policy = ServletPolicyList.getPolicies(req);
 		IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(req);
 
 		return actionClauses.isEmpty()
-				|| isActionClausesAuthorized(policy, ids, actionClauses);
+				|| isAuthorizedForActionClauses(policy, ids, actionClauses);
 	}
 
 	/** Any clause in an ActionClauses may be authorized. */
-	private static boolean isActionClausesAuthorized(PolicyIface policy,
+	private static boolean isAuthorizedForActionClauses(PolicyIface policy,
 			IdentifierBundle ids, ActionClauses actionClauses) {
 		for (Set<RequestedAction> clause : actionClauses.getClauseList()) {
-			if (isClauseAuthorized(policy, ids, clause)) {
+			if (isAuthorizedForClause(policy, ids, clause)) {
 				return true;
 			}
 		}
@@ -163,10 +161,10 @@ public class PolicyHelper {
 	}
 
 	/** All actions in a clause must be authorized. */
-	private static boolean isClauseAuthorized(PolicyIface policy,
+	private static boolean isAuthorizedForClause(PolicyIface policy,
 			IdentifierBundle ids, Set<RequestedAction> clause) {
 		for (RequestedAction action : clause) {
-			if (!isActionAuthorized(policy, ids, action)) {
+			if (!isAuthorizedForAction(policy, ids, action)) {
 				log.debug("not authorized");
 				return false;
 			}
@@ -177,7 +175,7 @@ public class PolicyHelper {
 	/**
 	 * Is this action authorized for these IDs by this policy?
 	 */
-	private static boolean isActionAuthorized(PolicyIface policy,
+	private static boolean isAuthorizedForAction(PolicyIface policy,
 			IdentifierBundle ids, RequestedAction action) {
 		PolicyDecision decision = policy.isAuthorized(ids, action);
 		log.debug("decision for '" + action.getClass().getName() + "' was: "

@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -158,8 +157,7 @@ public class PolicyHelperTest extends AbstractTestClass {
 
 	private void assertExpectedAuthorization(String label,
 			Class<? extends VitroHttpServlet> servletClass, boolean expected) {
-		boolean actual = PolicyHelper.areRequiredAuthorizationsSatisfied(req,
-				servletClass);
+		boolean actual = PolicyHelper.isAuthorizedForServlet(req, servletClass);
 		assertEquals(label, expected, actual);
 	}
 

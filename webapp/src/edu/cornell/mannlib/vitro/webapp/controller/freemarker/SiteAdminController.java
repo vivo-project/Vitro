@@ -72,10 +72,10 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         if (loginBean.isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
             body.put("siteConfig", getSiteConfigurationData(vreq, urlBuilder));
         }
-        if (PolicyHelper.isActionAuthorized(vreq, UseOntologyEditorPages.class)) {
+        if (PolicyHelper.isAuthorizedForAction(vreq, UseOntologyEditorPages.class)) {
         	body.put("ontologyEditor", getOntologyEditorData(vreq, urlBuilder));
         }
-		if (PolicyHelper.isActionAuthorized(vreq, UseAdvancedDataToolsPages.class)) {
+		if (PolicyHelper.isAuthorizedForAction(vreq, UseAdvancedDataToolsPages.class)) {
             body.put("dataTools", getDataToolsData(vreq, urlBuilder));
             
             // Only for DataStar. Should handle without needing a DataStar-specific version of this controller.
@@ -128,7 +128,7 @@ public class SiteAdminController extends FreemarkerHttpServlet {
 
         urls.put("tabs", urlBuilder.getPortalUrl("/listTabs"));
         
-        if (PolicyHelper.areRequiredAuthorizationsSatisfied(vreq, UsersListingController.class)) {                
+        if (PolicyHelper.isAuthorizedForServlet(vreq, UsersListingController.class)) {                
             urls.put("users", urlBuilder.getPortalUrl("/listUsers"));
         }
 

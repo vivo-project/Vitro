@@ -60,8 +60,7 @@ public class RequiresAuthorizationFor extends BodyTagSupport {
 		if (classes == null) {
 			return false;
 		}
-		return PolicyHelper.areRequiredAuthorizationsSatisfied(getRequest(),
-				classes);
+		return PolicyHelper.isAuthorizedForActions(getRequest(), classes);
 	}
 
 	/**
