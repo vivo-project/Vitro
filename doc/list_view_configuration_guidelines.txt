@@ -1,6 +1,18 @@
 List view configuration guidelines
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+-------------------------
+REGISTERING THE LIST VIEW
+-------------------------
+
+A custom list view is associated with an object property lin the file /vivo/productMods/WEB-INF/ontologies/app/listViewConfig.owl.
+Example:
+
+    <rdf:Description rdf:about="http://vivoweb.org/ontology/core#authorInAuthorship">
+        <display:listViewConfigFile rdf:datatype="http://www.w3.org/2001/XMLSchema#string">listViewConfig-authorInAuthorship.xml</display:listViewConfigFile>
+    </rdf:Description>
+
+
 -----------------
 REQUIRED ELEMENTS
 -----------------
