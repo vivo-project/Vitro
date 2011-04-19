@@ -24,7 +24,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseClassGrou
                 <#elseif classGroup.uri == group.uri>
                     <#assign activeGroup = selected />
                 </#if>
-                <li role="listitem"><a ${activeGroup}href="${urls.currentPage}?classgroupUri=${group.uri?url}#browse" title="Browse ${group.publicName?capitalize}" data-uri="${group.uri}" data-count="${group.individualCount}">${group.publicName?capitalize} <span class="count-classes">(${group.individualCount})</span></a></li>
+                <li role="listitem"><a ${activeGroup}href="${urls.currentPage}?classgroupUri=${group.uri?url}#browse" title="Browse ${group.displayName?capitalize}" data-uri="${group.uri}" data-count="${group.individualCount}">${group.displayName?capitalize} <span class="count-classes">(${group.individualCount})</span></a></li>
             </#if>
         </#list>
     </#assign>

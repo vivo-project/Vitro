@@ -17,7 +17,7 @@
         <ul id="browse-classgroups" role="list">
         <#list vclassGroupList as group>
             <#if (group.individualCount > 0)>
-                <li role="listitem"><a href="${urls.currentPage}?classgroupUri=${group.uri?url}">${group.publicName?capitalize} <span class="count-classes">(${group.individualCount})</span></a></li>
+                <li role="listitem"><a href="${urls.currentPage}?classgroupUri=${group.uri?url}">${group.displayName?capitalize} <span class="count-classes">(${group.individualCount})</span></a></li>
             </#if>
         </#list>
         </ul>
@@ -48,7 +48,7 @@
     <section id="browse" role="region">
     <h4>Browse</h4>    
         <div>
-            vclass ${class.name} from ${classGroup.publicName}
+            vclass ${class.name} from ${classGroup.displayName}
             This has classGroup, classes, individualsInClass and class.
         </div> 
          

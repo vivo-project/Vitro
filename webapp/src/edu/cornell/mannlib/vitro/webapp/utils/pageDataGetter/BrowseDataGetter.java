@@ -174,7 +174,6 @@ public class BrowseDataGetter implements PageDataGetter {
         map.put("classes", classes);
         
         map.put("classGroup", new VClassGroupTemplateModel(vcg));
-        map.put("classGroupName", vcg.getPublicName());
         map.put("classGroupUri", vcg.getURI());
         
         return map;
