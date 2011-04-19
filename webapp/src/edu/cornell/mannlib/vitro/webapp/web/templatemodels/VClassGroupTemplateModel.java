@@ -3,9 +3,9 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -41,6 +41,15 @@ public class VClassGroupTemplateModel extends BaseTemplateModel {
 
     public String getPublicName() {
     	return vClassGroup.getPublicName();
+    }
+    
+    // Protect the template against a group without a name.
+    public String getDisplayName() {
+        String displayName = getPublicName();
+        if (StringUtils.isBlank(displayName)) {
+            displayName = getLocalName().replaceFirst("vitroClassGroup", "");
+        }
+        return displayName;
     }
     
     public List<VClassTemplateModel> getClasses() {
