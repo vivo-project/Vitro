@@ -54,7 +54,6 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     
     enum Key {
         METHODS("methods"),
-        NAME("name"),
         PROPERTIES("properties"),
         TYPE("type"),
         VALUE("value"),
@@ -123,25 +122,26 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     protected Map<String, Object> getTemplateVariableDump(String varName, TemplateModel model) 
     throws TemplateModelException {
 
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put(Key.NAME.toString(), varName);
+        Map<String, Object> value = new HashMap<String, Object>();
         
         // Don't return null if model == null. We still want to send the map to the template.
         if (model != null) {
             // TemplateMethodModel and TemplateDirectiveModel objects can only be
             // included in the data model at the top level.
             if (model instanceof TemplateMethodModel) {
-                map.putAll( getTemplateModelDump( ( TemplateMethodModel)model, varName ) );
+                value.putAll( getTemplateModelDump( ( TemplateMethodModel)model, varName ) );
                 
             } else if (model instanceof TemplateDirectiveModel) {
-                map.putAll( getTemplateModelDump( ( TemplateDirectiveModel)model, varName ) );
+                value.putAll( getTemplateModelDump( ( TemplateDirectiveModel)model, varName ) );
                 
             } else {
-                map.putAll(getDump(model));
+                value.putAll(getDump(model));
             }
         }
         
-        return map;        
+        Map<String, Object> dump = new HashMap<String, Object>();
+        dump.put(varName, value);
+        return dump;        
     }
 
     private Map<String, Object> getDump(TemplateModel model) throws TemplateModelException {
