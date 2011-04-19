@@ -17,7 +17,6 @@ public class User extends BaseTemplateModel {
     private static final Log log = LogFactory.getLog(User.class);
     
     private enum Access {
-        REVISION_INFO(RevisionInfoController.staticRequiredLoginLevel()),
         FILTER_SECURITY(LoginStatusBean.EDITOR);
         
         private final int requiredLoginLevel;
@@ -52,7 +51,7 @@ public class User extends BaseTemplateModel {
     }
     
     public boolean getHasRevisionInfoAccess() {
-        return loginBean.isLoggedInAtLeast(Access.REVISION_INFO.requiredLoginLevel());
+    	return PolicyHelper.isAuthorizedForServlet(vreq, RevisionInfoController.class);
     }
     
     public boolean getShowFlag1SearchField() {
