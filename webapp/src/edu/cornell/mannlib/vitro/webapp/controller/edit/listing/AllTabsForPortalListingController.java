@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -14,31 +13,25 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseTabEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
 
+@RequiresAuthorizationFor(UseTabEditorPages.class)
 public class AllTabsForPortalListingController extends BaseEditController {
     
     private static final int NUM_COLS = 11;
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response) {
+    @Override
+	public void doGet(HttpServletRequest request, HttpServletResponse response) {
         VitroRequest vrequest = new VitroRequest(request);
         Portal portal = vrequest.getPortal();
 
-        if(!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request, response);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-
-        HashMap types = new HashMap();
+        HashMap<Integer, String> types = new HashMap<Integer, String>();
         types.put(18,"subcollection category");
         types.put(20,"subcollection");
         types.put(22,"collection");
@@ -47,10 +40,10 @@ public class AllTabsForPortalListingController extends BaseEditController {
         types.put(28,"primary tab");
 
         TabDao dao = vrequest.getFullWebappDaoFactory().getTabDao();
-        List tabs = dao.getTabsForPortal(portal.getPortalId());
+        List<Tab> tabs = dao.getTabsForPortal(portal.getPortalId());
         Collections.sort(tabs, new TabComparator());
         
-        ArrayList results = new ArrayList();
+        ArrayList<String> results = new ArrayList<String>();
         results.add("XX");
         results.add("title");
         results.add("tab id");
@@ -66,16 +59,14 @@ public class AllTabsForPortalListingController extends BaseEditController {
 
 
         if (tabs != null) {
-            Iterator tabIt = tabs.iterator();
-            while (tabIt.hasNext()) {
-                Tab tab = (Tab) tabIt.next();
+        	for (Tab tab : tabs) {
                 results.add("XX");
                 if (tab.getTitle() != null)
                     results.add("<a href=\"./tabEdit?id="+tab.getTabId()+"&amp;home="+portal.getPortalId()+"\">"+tab.getTitle()+"</a>");
                 else
                     results.add("");
                 results.add(String.valueOf(tab.getTabId()));
-                String tabtype = (String) types.get(tab.getTabtypeId());
+                String tabtype = types.get(tab.getTabtypeId());
                 results.add(tabtype!=null ? tabtype : "-");
                 //results.add(tab.getDescription()!=null ? tab.getDescription() : "-");
                 results.add(Integer.valueOf(tab.getDisplayRank()).toString());
@@ -107,10 +98,9 @@ public class AllTabsForPortalListingController extends BaseEditController {
 
     }
     
-    private class TabComparator implements Comparator {
-        public int compare (Object o1, Object o2) {
-        	Tab tab1 = (Tab)o1;
-        	Tab tab2 = (Tab)o2;
+    private class TabComparator implements Comparator<Tab> {
+        @Override
+		public int compare (Tab tab1, Tab tab2) {
         	if(tab1 == null && tab2 == null) return 0;
         	int diff = tab1.getTabId() - tab2.getTabId(); // tab1.getDisplayRank() - tab2.getDisplayRank()
         	if(diff == 0)

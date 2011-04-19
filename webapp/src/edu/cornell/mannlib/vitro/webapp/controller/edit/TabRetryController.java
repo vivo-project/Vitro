@@ -21,12 +21,15 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
 import edu.cornell.mannlib.vedit.util.FormUtils;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseTabEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
 
+@RequiresAuthorizationFor(UseTabEditorPages.class)
 public class TabRetryController extends BaseEditController {
 
     static final int[] tabtypeIds = {0,18,20,22,24,26,28};
@@ -35,18 +38,9 @@ public class TabRetryController extends BaseEditController {
                         "primary tab content", "primary tab"};
     private static final Log log = LogFactory.getLog(TabRetryController.class.getName());
 
-    public void doPost (HttpServletRequest req, HttpServletResponse response) {
-
+    @Override
+	public void doPost (HttpServletRequest req, HttpServletResponse response) {
     	VitroRequest request = new VitroRequest(req);
-    	
-        if (!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error("TabRetryController encountered exception calling super.doGet()");
-        }
 
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
@@ -72,7 +66,7 @@ public class TabRetryController extends BaseEditController {
                 int id = Integer.parseInt(request.getParameter("id"));
                 if (id > 0) {
                     try {
-                        tabForEditing = (Tab)tDao.getTab(id);
+                        tabForEditing = tDao.getTab(id);
                         action = "update";
                     } catch (NullPointerException e) {
                         log.error("Need to implement 'record not found' error message.");

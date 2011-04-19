@@ -20,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvance
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.edit.listing.AllTabsForPortalListingController;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.listing.PortalsListingController;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.listing.UsersListingController;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
@@ -127,7 +128,9 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         Map<String, Object> map = new HashMap<String, Object>();
         Map<String, String> urls = new HashMap<String, String>();
 
-        urls.put("tabs", urlBuilder.getPortalUrl("/listTabs"));
+		if (PolicyHelper.isAuthorizedForServlet(vreq, AllTabsForPortalListingController.class)) {
+			urls.put("tabs", urlBuilder.getPortalUrl("/listTabs"));
+		}
         
         if (PolicyHelper.isAuthorizedForServlet(vreq, UsersListingController.class)) {                
             urls.put("users", urlBuilder.getPortalUrl("/listUsers"));

@@ -9,18 +9,22 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseTabEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
 
+@RequiresAuthorizationFor(UseTabEditorPages.class)
 public class TabHierarchyOperationController extends BaseEditController {
 
-
-    public void doGet(HttpServletRequest request, HttpServletResponse response) {
+    @Override
+	public void doGet(HttpServletRequest request, HttpServletResponse response) {
         doPost(request, response);
     }
 
-    public void doPost(HttpServletRequest req, HttpServletResponse response) {
+    @Override
+	public void doPost(HttpServletRequest req, HttpServletResponse response) {
 
     	VitroRequest request = new VitroRequest(req);
     	String defaultLandingPage = getDefaultLandingPage(request);

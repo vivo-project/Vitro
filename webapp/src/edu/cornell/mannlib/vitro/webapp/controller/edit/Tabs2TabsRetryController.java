@@ -18,31 +18,23 @@ import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.util.FormUtils;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseTabEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
 
+@RequiresAuthorizationFor(UseTabEditorPages.class)
 public class Tabs2TabsRetryController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(Tabs2TabsRetryController.class.getName());
 
-    public void doPost (HttpServletRequest req, HttpServletResponse response) {
-
+    @Override
+	public void doPost (HttpServletRequest req, HttpServletResponse response) {
     	VitroRequest request = new VitroRequest(req);
-    	
-        if(!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error("Tabs2TabsRetryController encountered exception calling super.doGet()");
-        }
-
-        VitroRequest vreq = new VitroRequest(request);
-        Portal portal = vreq.getPortal();
+        Portal portal = request.getPortal();
 
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);

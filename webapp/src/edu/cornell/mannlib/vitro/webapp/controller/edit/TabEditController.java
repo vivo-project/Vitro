@@ -22,6 +22,8 @@ import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.util.FormUtils;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseTabEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
@@ -37,22 +39,14 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
+@RequiresAuthorizationFor(UseTabEditorPages.class)
 public class TabEditController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(TabEditController.class.getName());
 	private static final int NUM_COLS = 11;
 
-    public void doPost (HttpServletRequest request, HttpServletResponse response) {
-
-        if (!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error("TabEditController caught exception calling doGet()");
-        }
-
+    @Override
+	public void doPost (HttpServletRequest request, HttpServletResponse response) {
         VitroRequest vreq = new VitroRequest(request);
         Portal portal = vreq.getPortal();
 
@@ -99,7 +93,7 @@ public class TabEditController extends BaseEditController {
                             "subcollection", "collection", "secondary tab",
                             "primary tab content", "primary tab"};
         */
-        HashMap tabTypes = new HashMap();
+        HashMap<Integer, String> tabTypes = new HashMap<Integer, String>();
         tabTypes.put(18,"subcollection category");
         tabTypes.put(20,"subcollection");
         tabTypes.put(22,"collection");
@@ -107,7 +101,7 @@ public class TabEditController extends BaseEditController {
         tabTypes.put(26,"primary tab content");
         tabTypes.put(28,"primary tab");
 
-        String tabtype = (String) tabTypes.get(t.getTabtypeId());
+        String tabtype = tabTypes.get(t.getTabtypeId());
         results.add(tabtype!=null ? tabtype : "unspecified");        
         results.add(t.getEntityLinkMethod()!=null ? t.getEntityLinkMethod() : "unspecified");
         results.add(String.valueOf(t.getDisplayRank()));
@@ -158,12 +152,10 @@ public class TabEditController extends BaseEditController {
         foo.getCheckboxLists().put("childTabs",childList);
 
         HashMap OptionMap = new HashMap();
-        List classGroups = vcgDao.getPublicGroupsWithVClasses(true,false,false); // order by displayRank, include uninstantiated classes, don't get the counts of individuals
-        Iterator classGroupIt = classGroups.iterator();
+        List<VClassGroup> classGroups = vcgDao.getPublicGroupsWithVClasses(true,false,false); // order by displayRank, include uninstantiated classes, don't get the counts of individuals
         ListOrderedMap optGroupMap = new ListOrderedMap();
-        while (classGroupIt.hasNext()) {
-            VClassGroup group = (VClassGroup)classGroupIt.next();
-            List classes = group.getVitroClassList();
+        for (VClassGroup group : classGroups) {
+            List<VClass> classes = group.getVitroClassList();
             optGroupMap.put(group.getPublicName(),FormUtils.makeOptionListFromBeans(classes,"URI","Name",null,null,false));
         }
         OptionMap.put("VClassURI", optGroupMap);
@@ -174,7 +166,7 @@ public class TabEditController extends BaseEditController {
         List<String> typeURIs = tDao.getTabAutoLinkedVClassURIs(tabId);
         Iterator<String> typeURIt = typeURIs.iterator();
         while (typeURIt.hasNext()) {
-            String typeURI = (String) typeURIt.next();
+            String typeURI = typeURIt.next();
             VClass type = vcDao.getVClassByURI(typeURI);
             if (type != null) {
                 types.add(type);
