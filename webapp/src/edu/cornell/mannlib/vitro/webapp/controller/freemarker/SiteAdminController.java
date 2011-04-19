@@ -18,6 +18,7 @@ import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseSiteInfoEditingPage;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.listing.AllTabsForPortalListingController;
@@ -142,7 +143,9 @@ public class SiteAdminController extends FreemarkerHttpServlet {
             urls.put("portals", urlBuilder.getPortalUrl("/listPortals"));
         }
  
-        urls.put("siteInfo", urlBuilder.getPortalUrl("/editForm", new ParamMap("controller", "Portal", "id", String.valueOf(urlBuilder.getPortalId()))));  
+		if (PolicyHelper.isAuthorizedForAction(vreq, UseSiteInfoEditingPage.class)) {
+			urls.put("siteInfo", urlBuilder.getPortalUrl("/editForm", new ParamMap("controller", "Portal", "id", String.valueOf(urlBuilder.getPortalId()))));
+		}
 
         if (LoginStatusBean.getBean(vreq).isLoggedInAtLeast(LoginStatusBean.DBA)) {
             urls.put("menuN3Editor", urlBuilder.getPortalUrl("/menuN3Editor"));            
