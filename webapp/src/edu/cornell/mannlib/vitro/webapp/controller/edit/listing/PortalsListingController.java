@@ -2,42 +2,34 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit.listing;
 
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UsePortalEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
 
+@RequiresAuthorizationFor(UsePortalEditorPages.class)
 public class PortalsListingController extends BaseEditController {
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response) {
+    @Override
+	public void doGet(HttpServletRequest request, HttpServletResponse response) {
         VitroRequest vrequest = new VitroRequest(request);
         Portal portal = vrequest.getPortal();
 
-        if(!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request, response);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-
         PortalDao dao = vrequest.getFullWebappDaoFactory().getPortalDao();
 
-        Collection portals = dao.getAllPortals();
+        Collection<Portal> portals = dao.getAllPortals();
 
-        ArrayList results = new ArrayList();
+        ArrayList<String> results = new ArrayList<String>();
         results.add("XX");
         results.add("ID number");
         results.add("Portal");
@@ -45,9 +37,7 @@ public class PortalsListingController extends BaseEditController {
         
 
         if (portals != null) {
-            Iterator portalIt = portals.iterator();
-            while (portalIt.hasNext()) {
-                Portal p = (Portal) portalIt.next();
+			for (Portal p : portals) {
                 results.add("XX");
                 results.add(Integer.toString(p.getPortalId()));
                 if (p.getAppName() != null)

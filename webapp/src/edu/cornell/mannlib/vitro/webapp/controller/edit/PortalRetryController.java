@@ -5,9 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Iterator;
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -24,6 +23,8 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.listener.ChangeListener;
 import edu.cornell.mannlib.vedit.util.FormUtils;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UsePortalEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -32,21 +33,14 @@ import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
 import edu.cornell.mannlib.vitro.webapp.filters.PortalPickerFilter;
 import edu.cornell.mannlib.vitro.webapp.utils.ThemeUtils;
 
+@RequiresAuthorizationFor(UsePortalEditorPages.class)
 public class PortalRetryController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(PortalRetryController.class.getName());
 	
-    public void doPost (HttpServletRequest req, HttpServletResponse response) {
-
+    @Override
+	public void doPost (HttpServletRequest req, HttpServletResponse response) {
     	VitroRequest request = new VitroRequest(req);
-        if (!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error("PortalRetryController encountered exception calling super.doGet()");
-        }
 
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
@@ -66,7 +60,7 @@ public class PortalRetryController extends BaseEditController {
                 int id = Integer.parseInt(request.getParameter("id"));
                 if (id >= 0) {
                     try {
-                        portalForEditing = (Portal)pDao.getPortal(id);
+                        portalForEditing = pDao.getPortal(id);
                         action = "update";
                     } catch (NullPointerException e) {
                         log.error("Need to implement 'record not found' error message.");

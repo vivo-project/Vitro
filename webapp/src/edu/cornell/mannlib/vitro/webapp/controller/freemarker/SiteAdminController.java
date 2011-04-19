@@ -20,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvance
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.edit.listing.PortalsListingController;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.listing.UsersListingController;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -132,7 +133,9 @@ public class SiteAdminController extends FreemarkerHttpServlet {
             urls.put("users", urlBuilder.getPortalUrl("/listUsers"));
         }
 
-        if (!vreq.getFullWebappDaoFactory().getPortalDao().isSinglePortal()) {
+        boolean multiplePortals = !vreq.getFullWebappDaoFactory().getPortalDao().isSinglePortal();
+		boolean mayEditPortals = PolicyHelper.isAuthorizedForServlet(vreq, PortalsListingController.class);
+		if (multiplePortals && mayEditPortals) {
             urls.put("portals", urlBuilder.getPortalUrl("/listPortals"));
         }
  
