@@ -192,4 +192,10 @@ public class HasAssociatedIndividual implements Identifier {
 	public boolean isBlacklisted() {
 		return reasonForBlacklisting != NOT_BLACKLISTED;
 	}
+
+	@Override
+	public String toString() {
+		return "HasAssociatedIndividual['" + associatedIndividualUri
+				+ "', blacklist='" + reasonForBlacklisting + "']";
+	}
 }

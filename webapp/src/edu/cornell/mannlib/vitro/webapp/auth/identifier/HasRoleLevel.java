@@ -17,4 +17,9 @@ public class HasRoleLevel implements Identifier {
 	public RoleLevel getRoleLevel() {
 		return roleLevel;
 	}
+
+	@Override
+	public String toString() {
+		return "HasRoleLevel[" + roleLevel + "]";
+	}
 }
