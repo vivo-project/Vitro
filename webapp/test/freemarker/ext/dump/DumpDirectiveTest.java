@@ -228,9 +228,7 @@ public class DumpDirectiveTest {
         
         test(varName, dataModel, expectedDump);
     }
-    
-   // RY test method and directive types with and without help methods
-    
+
    @Test
    public void dumpHelplessMethod() {
 

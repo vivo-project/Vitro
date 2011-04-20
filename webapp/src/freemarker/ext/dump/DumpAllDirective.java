@@ -48,7 +48,7 @@ public class DumpAllDirective extends BaseDumpDirective {
         }
 
         SortedMap<String, Object> dataModelDump = getDataModelDump(env);
-        dump("dumpAll.ftl", dataModelDump, env); 
+        dump("dump-all.ftl", dataModelDump, env); 
     }
     
     SortedMap<String, Object> getDataModelDump(Environment env) throws TemplateModelException {
@@ -66,5 +66,21 @@ public class DumpAllDirective extends BaseDumpDirective {
         return dump;
         
     }
-    
+
+    @Override
+    protected Map<String, Object> help(String name) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        
+        //map.put("name", name);
+        
+        map.put("effect", "Dump the contents of the template data model.");
+      
+        //map.put("comments", "");
+        
+        List<String> examples = new ArrayList<String>();
+        examples.add("<@" + name + " />");
+        map.put("examples", examples);
+        
+        return map;
+    }
 }

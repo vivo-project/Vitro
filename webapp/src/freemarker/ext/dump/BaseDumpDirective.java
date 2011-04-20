@@ -465,4 +465,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         out.write(sw.toString());                
     }
 
+    protected Map<String, Object> help(String name) {
+        return new HashMap<String, Object>();        
+    }
 }

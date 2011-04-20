@@ -3,7 +3,9 @@
 package freemarker.ext.dump;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -42,9 +44,30 @@ public class DumpDirective extends BaseDumpDirective {
         }
         
         String varName = ((SimpleScalar)o).getAsString();       
-        Map<String, Object> map = new HashMap<String, Object>();      
-        map.put("var", getTemplateVariableDump(varName, env));
+        Map<String, Object> map = getTemplateVariableDump(varName, env); 
 
         dump("dumpvar.ftl", map, env);   
+    }
+    
+    @Override
+    protected Map<String, Object> help(String name) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        
+        //map.put("name", name);
+        
+        map.put("effect", "Dump the contents of a template variable.");
+        
+        //map.put("comments", "");
+        
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("var", "name of variable to dump");
+        map.put("params", params);
+        
+        List<String> examples = new ArrayList<String>();
+        examples.add("<@" + name + " var=\"urls\" />");
+        map.put("examples", examples);
+        
+        return map;
+
     }
 }
