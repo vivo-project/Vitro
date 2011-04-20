@@ -83,8 +83,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         METHOD("Method"),        
         NUMBER("Number"),
         SEQUENCE("Sequence"),
-        STRING("String"),
-        UNDEFINED("Undefined");
+        STRING("String");
         
         private final String type;
         
@@ -128,7 +127,6 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         Map<String, Object> value = new HashMap<String, Object>();
         
         if (model == null) {
-            value.put(Key.TYPE.toString(), Type.UNDEFINED);
             value.put(Key.VALUE.toString(), VALUE_UNDEFINED);
 
         // TemplateMethodModel and TemplateDirectiveModel objects can only be

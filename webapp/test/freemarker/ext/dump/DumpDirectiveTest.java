@@ -78,7 +78,6 @@ public class DumpDirectiveTest {
         Map<String, Object> dataModel = new HashMap<String, Object>();
         
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
-        expectedDumpValue.put(Key.TYPE.toString(), Type.UNDEFINED);
         expectedDumpValue.put(Key.VALUE.toString(), BaseDumpDirective.VALUE_UNDEFINED);
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();

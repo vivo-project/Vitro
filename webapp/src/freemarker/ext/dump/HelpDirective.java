@@ -40,8 +40,13 @@ public class HelpDirective extends BaseDumpDirective {
             throw new TemplateModelException(
                 "Must specify 'for' argument.");
         }
-
-        String varName = params.get("var").toString(); 
+        
+        if ( !(o instanceof SimpleScalar)) {
+            throw new TemplateModelException(
+               "Value of parameter 'for' must be a string.");     
+        }
+        
+        String varName = o.toString(); //((SimpleScalar)o).getAsString();  
         TemplateHashModel dataModel = env.getDataModel();    
         Object templateModel = dataModel.get(varName);
 

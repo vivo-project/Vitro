@@ -37,7 +37,19 @@ public class DumpDirective extends BaseDumpDirective {
                 "The dump directive doesn't allow nested content.");
         }
         
-        String varName = params.get("var").toString();  
+        Object o = params.get("var");
+        
+        if ( o == null) {
+            throw new TemplateModelException(
+                "Must specify 'var' argument.");
+        }     
+        
+        if ( !(o instanceof SimpleScalar)) {
+            throw new TemplateModelException(
+               "Value of parameter 'var' must be a string.");     
+        }
+        
+        String varName = o.toString(); //((SimpleScalar)o).getAsString();   
         Map<String, Object> map = getTemplateVariableDump(varName, env); 
 
         dump(TEMPLATE_DEFAULT, map, env);   
