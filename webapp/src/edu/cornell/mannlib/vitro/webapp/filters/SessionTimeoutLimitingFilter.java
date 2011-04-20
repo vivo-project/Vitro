@@ -27,9 +27,12 @@ public class SessionTimeoutLimitingFilter implements Filter {
 	/** Maximum inactive interval for a trivial session object, in seconds. */
 	private static final int TRIVIAL_SESSION_LIFETIME = 120;
 
+	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
+		// nothing to do here.
 	}
 
+	@Override
 	public void doFilter(ServletRequest servletRequest,
 			ServletResponse servletResponse, FilterChain filterChain)
 			throws IOException, ServletException {
@@ -60,15 +63,12 @@ public class SessionTimeoutLimitingFilter implements Filter {
 			return;
 		}
 
-		// If self-editing, leave it alone.
-		if (VitroRequestPrep.isSelfEditing(request)) {
-			return;
-		}
-
 		// Otherwise, it's trivial, so shorten its life-span.
 		session.setMaxInactiveInterval(TRIVIAL_SESSION_LIFETIME);
 	}
 
+	@Override
 	public void destroy() {
+		// nothing to clean up.
 	}
 }
