@@ -41,12 +41,7 @@ public class HelpDirective extends BaseDumpDirective {
                 "Must specify 'for' argument.");
         }
 
-        if ( !(o instanceof SimpleScalar)) {
-            throw new TemplateModelException(
-               "Value of parameter 'for' must be a string.");     
-        }  
-        
-        String varName = ((SimpleScalar)o).getAsString();  
+        String varName = params.get("var").toString(); 
         TemplateHashModel dataModel = env.getDataModel();    
         Object templateModel = dataModel.get(varName);
 
@@ -61,7 +56,7 @@ public class HelpDirective extends BaseDumpDirective {
         }
 
         Map<String, Object> map = getTemplateVariableDump(varName, env);
-        dump("dumpvar.ftl", map, env);         
+        dump(TEMPLATE_DEFAULT, map, env);         
     }
     
     @Override

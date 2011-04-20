@@ -72,6 +72,22 @@ public class DumpDirectiveTest {
     }
 
     @Test
+    public void dumpUndefinedValue() {
+        
+        String varName = "dog";
+        Map<String, Object> dataModel = new HashMap<String, Object>();
+        
+        Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
+        expectedDumpValue.put(Key.TYPE.toString(), Type.UNDEFINED);
+        expectedDumpValue.put(Key.VALUE.toString(), BaseDumpDirective.VALUE_UNDEFINED);
+
+        Map<String, Object> expectedDump = new HashMap<String, Object>();
+        expectedDump.put(varName, expectedDumpValue);
+        
+        test(varName, dataModel, expectedDump);
+    }
+    
+    @Test
     public void dumpString() {
         
         String varName = "dog";

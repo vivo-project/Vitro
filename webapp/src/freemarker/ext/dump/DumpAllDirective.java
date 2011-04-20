@@ -4,7 +4,6 @@ package freemarker.ext.dump;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +47,7 @@ public class DumpAllDirective extends BaseDumpDirective {
         }
 
         SortedMap<String, Object> dataModelDump = getDataModelDump(env);
-        dump("dump-all.ftl", dataModelDump, env); 
+        dump(TEMPLATE_DEFAULT, dataModelDump, env); 
     }
     
     SortedMap<String, Object> getDataModelDump(Environment env) throws TemplateModelException {

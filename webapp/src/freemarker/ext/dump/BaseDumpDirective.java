@@ -50,15 +50,17 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
 
     private static final Log log = LogFactory.getLog(BaseDumpDirective.class);
     
-    Pattern PROPERTY_NAME_PATTERN = Pattern.compile("^(get|is)\\w");
+    protected static final String TEMPLATE_DEFAULT = "dump1.ftl";  // change to dump.ftl when old dump is removed  
+    protected static final String VALUE_UNDEFINED = "Undefined";
+    protected static final Pattern PROPERTY_NAME_PATTERN = Pattern.compile("^(get|is)\\w");
     
     enum Key {
+        DATE_TYPE("dateType"),
         METHODS("methods"),
         PROPERTIES("properties"),
         TYPE("type"),
-        VALUE("value"),
-        DATE_TYPE("dateType");
-                
+        VALUE("value");
+    
         private final String key;
         
         Key(String key) {
@@ -71,17 +73,18 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     }
     
     enum Type {
-        STRING("String"),
-        NUMBER("Number"),
         BOOLEAN("Boolean"),
+        COLLECTION("Collection"),
         DATE("Date"),
-        SEQUENCE("Sequence"),
+        DIRECTIVE("Directive"),
         HASH("Hash"),
         // Technically it's a HashEx, but for the templates call it a Hash
         HASH_EX("Hash"), // ("HashEx")
-        COLLECTION("Collection"),
-        METHOD("Method"),
-        DIRECTIVE("Directive");
+        METHOD("Method"),        
+        NUMBER("Number"),
+        SEQUENCE("Sequence"),
+        STRING("String"),
+        UNDEFINED("Undefined");
         
         private final String type;
         
@@ -124,21 +127,22 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
 
         Map<String, Object> value = new HashMap<String, Object>();
         
-        // Don't return null if model == null. We still want to send the map to the template.
-        if (model != null) {
-            // TemplateMethodModel and TemplateDirectiveModel objects can only be
-            // included in the data model at the top level.
-            if (model instanceof TemplateMethodModel) {
-                value.putAll( getTemplateModelDump( ( TemplateMethodModel)model, varName ) );
-                
-            } else if (model instanceof TemplateDirectiveModel) {
-                value.putAll( getTemplateModelDump( ( TemplateDirectiveModel)model, varName ) );
-                
-            } else {
-                value.putAll(getDump(model));
-            }
+        if (model == null) {
+            value.put(Key.TYPE.toString(), Type.UNDEFINED);
+            value.put(Key.VALUE.toString(), VALUE_UNDEFINED);
+
+        // TemplateMethodModel and TemplateDirectiveModel objects can only be
+        // included in the data model at the top level.
+        } else if (model instanceof TemplateMethodModel) {
+            value.putAll( getTemplateModelDump( ( TemplateMethodModel)model, varName ) );
+            
+        } else if (model instanceof TemplateDirectiveModel) {
+            value.putAll( getTemplateModelDump( ( TemplateDirectiveModel)model, varName ) );
+            
+        } else {
+            value.putAll(getDump(model));
         }
-        
+
         Map<String, Object> dump = new HashMap<String, Object>();
         dump.put(varName, value);
         return dump;        
@@ -455,9 +459,13 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         return map;        
     }
     
-    protected void dump(String templateName, Map<String, Object> map, Environment env) 
+    protected void dump(String templateName, Map<String, Object> dump, Environment env) 
     throws TemplateException, IOException {
         
+        // Wrap the dump in another map so the template has a handle to iterate through
+        // the values: <#list dump?keys as key>...</#list>
+        Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
+        map.put("dump", dump);
         Template template = env.getConfiguration().getTemplate(templateName);
         StringWriter sw = new StringWriter();
         template.process(map, sw);     
