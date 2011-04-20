@@ -17,9 +17,12 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvance
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseEditUserAccountsPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseIndividualEditorPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMenuEditorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousCuratorPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UsePortalEditorPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseSiteAdminPage;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseSiteInfoEditingPage;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseTabEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 
@@ -46,22 +49,40 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		PolicyDecision result;
 		if (whatToAuth instanceof UseAdvancedDataToolsPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
+
 		} else if (whatToAuth instanceof UseEditUserAccountsPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
+
 		} else if (whatToAuth instanceof UseMenuEditorPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
+
+		} else if (whatToAuth instanceof UseMiscellaneousAdminPages) {
+			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
+
 		} else if (whatToAuth instanceof UseOntologyEditorPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
+
 		} else if (whatToAuth instanceof UsePortalEditorPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
+
 		} else if (whatToAuth instanceof UseTabEditorPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
+
+		} else if (whatToAuth instanceof UseSiteInfoEditingPage) {
+			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
+			
+		} else if (whatToAuth instanceof UseMiscellaneousCuratorPages) {
+			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
+
 		} else if (whatToAuth instanceof UseIndividualEditorPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
+
 		} else if (whatToAuth instanceof UseSiteAdminPage) {
 			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
+
 		} else if (whatToAuth instanceof SeeRevisionInfo) {
 			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
+
 		} else {
 			result = defaultDecision("Unrecognized action");
 		}

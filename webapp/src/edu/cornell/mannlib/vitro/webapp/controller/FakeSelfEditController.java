@@ -13,9 +13,12 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.FakeSelfEditingIdentifierFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
 
+@RequiresAuthorizationFor(/* restricted page, but checking is done internally. */)
 /**
  * TODO This is caught in the middle of the transition from LoginFormBean to LoginStatusBean.
  */
@@ -30,6 +33,7 @@ public class FakeSelfEditController extends VitroHttpServlet {
 	private static final Log log = LogFactory
 			.getLog(FakeSelfEditController.class.getName());
 
+	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
 		
@@ -39,7 +43,7 @@ public class FakeSelfEditController extends VitroHttpServlet {
 			VitroRequest vreq = new VitroRequest(request);
 			HttpSession session = request.getSession();
 
-			if (!isAuthorized(session)) {
+			if (!isAuthorized(vreq, session)) {
 				redirectToLoginPage(request, response);
 			} else if (vreq.getParameter("force") != null) {
 				startFaking(vreq, response);
@@ -54,9 +58,9 @@ public class FakeSelfEditController extends VitroHttpServlet {
 		}
 	}
 
-	private boolean isAuthorized(HttpSession session) {
+	private boolean isAuthorized(VitroRequest vreq, HttpSession session) {
 		boolean isFakingAlready = (session.getAttribute(ATTRIBUTE_LOGIN_STATUS_SAVE) != null);
-		boolean isAdmin = LoginStatusBean.getBean(session).isLoggedInAtLeast(LoginStatusBean.CURATOR);
+		boolean isAdmin = PolicyHelper.isAuthorizedForAction(vreq, UseMiscellaneousAdminPages.class);
 		log.debug("isFakingAlready: " + isFakingAlready + ", isAdmin: "	+ isAdmin);
 		return isAdmin || isFakingAlready;
 	}
@@ -134,6 +138,7 @@ public class FakeSelfEditController extends VitroHttpServlet {
 		}
 	}
 	
+	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		doGet(request, response);

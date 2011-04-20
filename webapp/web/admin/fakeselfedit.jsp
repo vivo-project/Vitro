@@ -2,6 +2,8 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 
+<%-- doesn't use <vitro:requiresAuthorizationFor> becuase the controller does complex authorization. -->
+
 <div id="content">
 
 <h2>Configure Self-Edit Testing</h2>

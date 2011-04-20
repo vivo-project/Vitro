@@ -6,7 +6,7 @@
 
 <%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 
-<vitro:confirmLoginStatus level="CURATOR" />
+<vitro:requiresAuthorizationFor classNames="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousCuratorPages" />
 
 <%
     String conceptIdStr = request.getParameter("conceptId");
