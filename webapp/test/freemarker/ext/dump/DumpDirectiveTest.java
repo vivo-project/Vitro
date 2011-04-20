@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Before;
@@ -154,7 +155,7 @@ public class DumpDirectiveTest {
         Map<String, Object> dataModel = new HashMap<String, Object>();
         
         Calendar c = Calendar.getInstance();
-        c.set(91, Calendar.MAY, 5);
+        c.set(1991, Calendar.MAY, 5);
         Date myDate = c.getTime();
         dataModel.put("myDate", myDate);
          
@@ -880,7 +881,7 @@ public class DumpDirectiveTest {
         private String firstName;
         private String lastName;
         private String nickname;
-        //private Date birthdate;
+        private Date birthdate;
         private boolean married;
         private int id;
         private String middleName;
@@ -888,11 +889,11 @@ public class DumpDirectiveTest {
         private Employee supervisor;
         private float salary;
         
-        Employee(String firstName, String lastName, int id) {
+        Employee(String firstName, String lastName, int id, Date birthdate) {
             this.firstName = firstName;
             this.lastName = lastName;
             this.middleName = null; // test a null value
-            //this.birthdate = birthdate;
+            this.birthdate = birthdate;
             this.married = true;
             this.id = id;
             this.nickname = "";
@@ -911,14 +912,13 @@ public class DumpDirectiveTest {
         public void setNickname(String nickname) {
             this.nickname = nickname;
         }
-        
+         
         public void setFavoriteColors(String...colors) {
             for (String color : colors) {
                 favoriteColors.add(color);
             }
         }
 
-        // Not available to templates
         float getSalary() {
             return salary;
         }
@@ -945,9 +945,9 @@ public class DumpDirectiveTest {
             return nickname;
         }
         
-//        public Date getBirthdate() {
-//            return birthdate;
-//        }
+        public Date getBirthdate() {
+            return birthdate;
+        }
         
         public int getId() {
             return id;
@@ -973,13 +973,19 @@ public class DumpDirectiveTest {
     
     private Employee getEmployee() {
 
-        Employee jdoe = new Employee("John", "Doe", 34523);
+        Calendar c = Calendar.getInstance();
+        c.set(1982, Calendar.MAY, 5);
+        c = DateUtils.truncate(c, Calendar.DATE);
+        Employee jdoe = new Employee("John", "Doe", 34523, c.getTime());
         jdoe.setFavoriteColors("blue", "green");
         jdoe.setSalary(65000);
-        
-        Employee jsmith = new Employee("Jane", "Smith", 78234);
+
+        c.clear();
+        c.set(1975, Calendar.OCTOBER, 25);
+        c = DateUtils.truncate(c, Calendar.DATE);
+        Employee jsmith = new Employee("Jane", "Smith", 78234, c.getTime());
         jsmith.setFavoriteColors("red", "orange");
-        
+
         jdoe.setSupervisor(jsmith);
 
         return jdoe;
@@ -994,13 +1000,14 @@ public class DumpDirectiveTest {
         
         if (exposureLevel != BeansWrapper.EXPOSE_NOTHING) {           
     
-//          Map<String, Object> birthdateExpectedDump = new HashMap<String, Object>();
-//          birthdateExpectedDump.put(Key.TYPE.toString(), Type.DATE);
-//          birthdateExpectedDump.put(Key.DATE_TYPE.toString(), DateType.UNKNOWN);
-//          Calendar c = Calendar.getInstance();
-//          c.set(75, Calendar.MAY, 5);
-//          birthdateExpectedDump.put(Key.VALUE.toString(), c.getTime());
-//          propertiesExpectedDump.put("birthdate", birthdateExpectedDump);
+            Map<String, Object> birthdateExpectedDump = new HashMap<String, Object>();
+            birthdateExpectedDump.put(Key.TYPE.toString(), Type.DATE);
+            birthdateExpectedDump.put(Key.DATE_TYPE.toString(), DateType.UNKNOWN);
+            Calendar c = Calendar.getInstance();
+            c.set(1982, Calendar.MAY, 5);
+            c = DateUtils.truncate(c, Calendar.DATE);
+            birthdateExpectedDump.put(Key.VALUE.toString(), c.getTime());
+            propertiesExpectedDump.put("birthdate", birthdateExpectedDump);
     
             Map<String, Object> fullNameExpectedDump = new HashMap<String, Object>();
             fullNameExpectedDump.put(Key.TYPE.toString(), Type.STRING);
@@ -1077,13 +1084,14 @@ public class DumpDirectiveTest {
         // Properties 
         if (exposureLevel != BeansWrapper.EXPOSE_NOTHING) {
             
-//          Map<String, Object> birthdateExpectedDump = new HashMap<String, Object>();
-//          birthdateExpectedDump.put(Key.TYPE.toString(), Type.DATE);
-//          birthdateExpectedDump.put(Key.DATE_TYPE.toString(), DateType.UNKNOWN);
-//          Calendar c = Calendar.getInstance();
-//          c.set(75, Calendar.MAY, 5);
-//          birthdateExpectedDump.put(Key.VALUE.toString(), c.getTime());
-//          propertiesExpectedDump.put("birthdate", birthdateExpectedDump);
+            Map<String, Object> birthdateExpectedDump = new HashMap<String, Object>();
+            birthdateExpectedDump.put(Key.TYPE.toString(), Type.DATE);
+            birthdateExpectedDump.put(Key.DATE_TYPE.toString(), DateType.UNKNOWN);
+            Calendar c = Calendar.getInstance();
+            c.set(1975, Calendar.OCTOBER, 25);
+            c = DateUtils.truncate(c, Calendar.DATE);
+            birthdateExpectedDump.put(Key.VALUE.toString(), c.getTime());
+            propertiesExpectedDump.put("birthdate", birthdateExpectedDump);
 
             Map<String, Object> fullNameExpectedDump = new HashMap<String, Object>();
             fullNameExpectedDump.put(Key.TYPE.toString(), Type.STRING);

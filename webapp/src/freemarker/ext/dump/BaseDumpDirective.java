@@ -166,7 +166,8 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                 map.putAll( getTemplateModelDump( ( TemplateCollectionModel)model ) );
                 
             } else if ( model instanceof StringModel ) {
-
+                // A StringModel can wrap either a String or a plain Java object.
+                // Unwrap it to figure out what to do.
                 Object unwrappedModel = DeepUnwrap.permissiveUnwrap(model);
 
                 if (unwrappedModel instanceof String) {
@@ -187,6 +188,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
             // Nodes and transforms not included here     
                 
             } else {
+                // We shouldn't get here; provide as a safety net.
                 map.putAll( getTemplateModelDump( (TemplateModel)model ) );
             }
         } else {
@@ -444,7 +446,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     }
     
     private Map<String, Object> getTemplateModelDump(TemplateModel model) throws TemplateModelException {
-        // One of the above cases should have applied. Track whether this actually occurs.
+        // One of the more specific cases should have applied. Track whether this actually occurs.
         log.debug("Found model with no known type"); 
         Map<String, Object> map = new HashMap<String, Object>();
         Object unwrappedModel = DeepUnwrap.permissiveUnwrap(model);
