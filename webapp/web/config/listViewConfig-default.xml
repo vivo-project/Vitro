@@ -20,9 +20,6 @@
             </collated>
             OPTIONAL { ?object rdfs:label ?name }
             OPTIONAL { ?object vitro:moniker ?moniker }      
-            <critical-data-required>
-            FILTER ( bound(?name) )
-            </critical-data-required>
         } ORDER BY <collated> ?subclass </collated> ?name ?object  
     </query-select>
 
