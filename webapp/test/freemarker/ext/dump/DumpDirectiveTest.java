@@ -358,14 +358,14 @@ public class DumpDirectiveTest {
         
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
         expectedDumpValue.put(Key.TYPE.toString(), Type.SEQUENCE);
-        List<Map<String, Object>> myListexpectedDumpValue = new ArrayList<Map<String, Object>>(myList.size());
+        List<Map<String, Object>> myListItemsExpectedDump = new ArrayList<Map<String, Object>>(myList.size());
         for ( String str : myList) {
             Map<String, Object> itemDump = new HashMap<String, Object>();
             itemDump.put(Key.TYPE.toString(), Type.STRING);
             itemDump.put(Key.VALUE.toString(), str);
-            myListexpectedDumpValue.add(itemDump);
+            myListItemsExpectedDump.add(itemDump);
         }
-        expectedDumpValue.put(Key.VALUE.toString(), myListexpectedDumpValue);
+        expectedDumpValue.put(Key.VALUE.toString(), myListItemsExpectedDump);
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
         expectedDump.put(varName, expectedDumpValue);
@@ -707,7 +707,7 @@ public class DumpDirectiveTest {
     }
     
     
-    /////////////////////////// Private stub classes and helper methods ///////////////////////////
+    /////////////////////////// Private test classes and helper methods ///////////////////////////
 
     private void test(String varName, Map<String, Object> dataModel, Map<String, Object> expectedDump) {
         Map<String, Object> dump = getDump(varName, dataModel);

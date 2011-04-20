@@ -8,6 +8,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,32 +47,24 @@ public class DumpAllDirective extends BaseDumpDirective {
                 "The dump directive doesn't allow nested content.");
         }
 
+        SortedMap<String, Object> dataModelDump = getDataModelDump(env);
+        dump("dumpAll.ftl", dataModelDump, env); 
+    }
+    
+    SortedMap<String, Object> getDataModelDump(Environment env) throws TemplateModelException {
+        SortedMap<String, Object> dump = new TreeMap<String, Object>();
         TemplateHashModel dataModel = env.getDataModel();  
         // Need to unwrap in order to iterate through the variables
         @SuppressWarnings("unchecked")
         Map<String, Object> unwrappedDataModel = (Map<String, Object>) DeepUnwrap.permissiveUnwrap(dataModel);        
-        List<String> varNames = new ArrayList<String>(unwrappedDataModel.keySet()); 
-        Collections.sort(varNames);        
+        List<String> varNames = new ArrayList<String>(unwrappedDataModel.keySet());  
 
-        // *** RY Change data structure so it's
-        // "employee" => { type =>..., value => ...}
-        // rather than { name => "employee", type => ..., value => ...}
-        // Then this will be a SortedMap
-        // Otherwise we need a Comparator to sort on the "name" key. Yuck!
-        // The first data structure seems more natural
-        List<Map<String, Object>> models = new ArrayList<Map<String, Object>>();
         for (String varName : varNames) {
-            models.add(getTemplateVariableDump(varName, dataModel.get(varName)));
+            dump.putAll(getTemplateVariableDump(varName, dataModel.get(varName)));
         }
         
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("templateName", env.getTemplate().getName());
+        return dump;
         
-        
-        map.put("models", models);
-
-        dump("dumpAll.ftl", map, env); 
     }
-
     
 }
