@@ -16,8 +16,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
-import edu.cornell.mannlib.vitro.webapp.auth.AuthorizationHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropStmt;
@@ -38,18 +38,18 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
-import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
 
 /**
  * Handle adding, replacing or deleting the main image on an Individual.
  */
+@RequiresAuthorizationFor(/* restricted page, but checking is done internally. */)
 public class ImageUploadController extends FreemarkerHttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Log log = LogFactory
 			.getLog(ImageUploadController.class);
 
 	private static final String ATTRIBUTE_REFERRING_PAGE = "ImageUploadController.referringPage";
-    
+
 	/** Limit file size to 6 megabytes. */
 	public static final int MAXIMUM_FILE_SIZE = 6 * 1024 * 1024;
 
@@ -65,9 +65,10 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 
 	/** The form field of the uploaded file; use as a key to the FileItem map. */
 	public static final String PARAMETER_UPLOADED_FILE = "datafile";
-	
-	/** The image to use as a placeholder when the individual has no image. Determined
-	 * by the template.
+
+	/**
+	 * The image to use as a placeholder when the individual has no image.
+	 * Determined by the template.
 	 */
 	public static final String PARAMETER_PLACEHOLDER_URL = "placeholder";
 
@@ -155,8 +156,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	protected ResponseValues processRequest(VitroRequest vreq) {
 		try {
 			// Parse the multi-part request.
-			FileUploadServletRequest request = FileUploadServletRequest
-					.parseRequest(vreq, MAXIMUM_FILE_SIZE);
+			FileUploadServletRequest.parseRequest(vreq, MAXIMUM_FILE_SIZE);
 			if (log.isTraceEnabled()) {
 				dumpRequestDetails(vreq);
 			}
@@ -382,16 +382,15 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private TemplateResponseValues showAddImagePage(VitroRequest vreq,
 			Individual entity) {
-	    
-	    String placeholderUrl = (String) vreq.getParameter(PARAMETER_PLACEHOLDER_URL);
-	       
+
+		String placeholderUrl = vreq.getParameter(PARAMETER_PLACEHOLDER_URL);
+
 		String formAction = (entity == null) ? "" : formAction(entity.getURI(),
 				ACTION_UPLOAD, placeholderUrl);
 		String cancelUrl = (entity == null) ? "" : exitPageUrl(vreq,
 				entity.getURI());
 
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_NEW);
-
 
 		rv.put(BODY_THUMBNAIL_URL, placeholderUrl);
 		rv.put(BODY_FORM_ACTION, formAction);
@@ -413,7 +412,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private TemplateResponseValues showReplaceImagePage(VitroRequest vreq,
 			Individual entity, ImageInfo imageInfo) {
-	    String placeholderUrl = (String) vreq.getParameter(PARAMETER_PLACEHOLDER_URL);
+		String placeholderUrl = vreq.getParameter(PARAMETER_PLACEHOLDER_URL);
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_REPLACE);
 		rv.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(imageInfo.getThumbnail()
 				.getBytestreamAliasUrl()));
@@ -441,7 +440,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private TemplateResponseValues showCropImagePage(VitroRequest vreq,
 			Individual entity, String imageUrl, Dimensions dimensions) {
-        String placeholderUrl = (String) vreq.getParameter(PARAMETER_PLACEHOLDER_URL);	    
+		String placeholderUrl = vreq.getParameter(PARAMETER_PLACEHOLDER_URL);
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_CROP);
 		rv.put(BODY_MAIN_IMAGE_URL, UrlBuilder.getUrl(imageUrl));
 		rv.put(BODY_MAIN_IMAGE_HEIGHT, dimensions.height);
@@ -491,9 +490,11 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 * back to this controller, along with the desired action and the Entity
 	 * URI.
 	 */
-	private String formAction(String entityUri, String action, String placeholderUrl) {
+	private String formAction(String entityUri, String action,
+			String placeholderUrl) {
 		UrlBuilder.ParamMap params = new UrlBuilder.ParamMap(
-				PARAMETER_ENTITY_URI, entityUri, PARAMETER_ACTION, action, PARAMETER_PLACEHOLDER_URL, placeholderUrl);
+				PARAMETER_ENTITY_URI, entityUri, PARAMETER_ACTION, action,
+				PARAMETER_PLACEHOLDER_URL, placeholderUrl);
 		return UrlBuilder.getPath(URL_HERE, params);
 	}
 
@@ -601,17 +602,6 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private boolean checkAuthorized(VitroRequest vreq)
 			throws UserMistakeException {
-		if (LoginStatusBean.getBean(vreq).isLoggedInAtLeast(
-				LoginStatusBean.EDITOR)) {
-			log.debug("Authorized because logged in as Editor");
-			return true;
-		}
-
-		if (!VitroRequestPrep.isSelfEditing(vreq)) {
-			log.debug("Not Authorized because not self-editing");
-			return false;
-		}
-
 		String action = vreq.getParameter(PARAMETER_ACTION);
 		Individual entity = validateEntityUri(vreq);
 		String imageUri = entity.getMainImageUri();
@@ -630,17 +620,12 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 					RequestActionConstants.SOME_LITERAL, null, null);
 		}
 
-		AuthorizationHelper helper = new AuthorizationHelper(vreq);
-		boolean authorized = helper.isAuthorizedForRequestedAction(ra);
-		log.debug((authorized ? "" : "Not ") + "Authorized for '" + action
-				+ "' as self-editor;  requested action = " + ra);
-		return authorized;
+		return PolicyHelper.isAuthorizedForAction(vreq, ra);
 	}
 
 	private String getDefaultNamespace() {
 		return ConfigurationProperties.getBean(getServletContext())
 				.getProperty("Vitro.defaultNamespace");
 	}
-
 
 }

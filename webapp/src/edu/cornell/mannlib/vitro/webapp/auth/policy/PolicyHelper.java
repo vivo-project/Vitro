@@ -137,6 +137,15 @@ public class PolicyHelper {
 	}
 
 	/**
+	 * Are these actions authorized for the current user by the current
+	 * policies?
+	 */
+	public static boolean isAuthorizedForAction(HttpServletRequest req,
+			RequestedAction... actions) {
+		return isAuthorizedForActionClauses(req, new ActionClauses(actions));
+	}
+
+	/**
 	 * Actions must be authorized for the current user by the current policies.
 	 * If no actions, no problem.
 	 */
@@ -227,6 +236,13 @@ public class PolicyHelper {
 				throws PolicyHelperException {
 			this.clauseList = Collections.singletonList(Collections
 					.singleton(instantiateAction(actionClass)));
+		}
+
+		ActionClauses(RequestedAction[] actions) {
+			HashSet<RequestedAction> actionSet = new HashSet<RequestedAction>(
+					Arrays.asList(actions));
+			this.clauseList = Collections.singletonList(Collections
+					.unmodifiableSet(actionSet));
 		}
 
 		private void addClause(List<Set<RequestedAction>> list,
