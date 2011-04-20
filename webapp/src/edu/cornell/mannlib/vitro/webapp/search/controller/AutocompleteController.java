@@ -33,7 +33,8 @@ import org.json.JSONArray;
 
 import com.hp.hpl.jena.sparql.lib.org.json.JSONObject;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
 import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
@@ -46,7 +47,7 @@ import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
  * AutocompleteController generates autocomplete content
  * through a Lucene search. 
  */
-
+@RequiresAuthorizationFor(UseBasicAjaxControllers.class)
 public class AutocompleteController extends VitroAjaxController {
 
     private static final long serialVersionUID = 1L;
@@ -59,12 +60,6 @@ public class AutocompleteController extends VitroAjaxController {
     String NORESULT_MSG = "";    
     private int defaultMaxSearchSize= 1000;
 
-
-    @Override
-    protected boolean testIsAuthorized(HttpServletRequest request) {
-        return LoginStatusBean.getBean(request).isLoggedIn();
-    }
-    
     @Override
     protected void doRequest(VitroRequest vreq, HttpServletResponse response)
         throws IOException, ServletException {

@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
@@ -28,7 +29,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 
 /**
  * A collection of static methods to help determine whether requested actions
@@ -76,8 +76,8 @@ public class PolicyHelper {
 	/**
 	 * Does this servlet require authorization?
 	 */
-	public static boolean isServletRestricted(VitroHttpServlet servlet) {
-		Class<? extends VitroHttpServlet> servletClass = servlet.getClass();
+	public static boolean isServletRestricted(HttpServlet servlet) {
+		Class<? extends HttpServlet> servletClass = servlet.getClass();
 		try {
 			return !ActionClauses.forServletClass(servletClass).isEmpty();
 		} catch (PolicyHelperException e) {
@@ -90,7 +90,7 @@ public class PolicyHelper {
 	 * user by the current policies?
 	 */
 	public static boolean isAuthorizedForServlet(HttpServletRequest req,
-			VitroHttpServlet servlet) {
+			HttpServlet servlet) {
 		return isAuthorizedForServlet(req, servlet.getClass());
 	}
 
@@ -99,7 +99,7 @@ public class PolicyHelper {
 	 * current user by the current policies?
 	 */
 	public static boolean isAuthorizedForServlet(HttpServletRequest req,
-			Class<? extends VitroHttpServlet> servletClass) {
+			Class<? extends HttpServlet> servletClass) {
 		try {
 			return isAuthorizedForActionClauses(req,
 					ActionClauses.forServletClass(servletClass));
@@ -197,7 +197,7 @@ public class PolicyHelper {
 	 */
 	private static class ActionClauses {
 		static ActionClauses forServletClass(
-				Class<? extends VitroHttpServlet> servletClass)
+				Class<? extends HttpServlet> servletClass)
 				throws PolicyHelperException {
 			return new ActionClauses(
 					servletClass.getAnnotation(RequiresAuthorizationFor.class));

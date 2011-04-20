@@ -14,6 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeRevisionInfo;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseEditUserAccountsPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseIndividualEditorPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMenuEditorPages;
@@ -83,6 +84,9 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		} else if (whatToAuth instanceof SeeRevisionInfo) {
 			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
 
+		} else if (whatToAuth instanceof UseBasicAjaxControllers) {
+			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
+			
 		} else {
 			result = defaultDecision("Unrecognized action");
 		}

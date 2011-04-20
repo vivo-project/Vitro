@@ -15,14 +15,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfigurationLoader;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
-import edu.cornell.mannlib.vitro.webapp.search.controller.AutocompleteController;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import freemarker.template.TemplateException;
 
 /**
  * A base class for servlets that handle AJAX requests.
@@ -30,12 +27,6 @@ import freemarker.template.TemplateException;
 public abstract class VitroAjaxController extends HttpServlet {
     
     private static final Log log = LogFactory.getLog(VitroAjaxController.class);
-    
-	/**
-	 * Sub-classes must implement this method to verify that the user is
-	 * authorized to execute this request.
-	 */
-	protected abstract boolean testIsAuthorized(HttpServletRequest request);
 
 	/**
 	 * Sub-classes must implement this method to handle both GET and POST
@@ -51,7 +42,7 @@ public abstract class VitroAjaxController extends HttpServlet {
 	protected final void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		VitroRequest vreq = new VitroRequest(req);
-		if (testIsAuthorized(vreq)) {
+		if (PolicyHelper.isAuthorizedForServlet(vreq, this)) {
 			doRequest(vreq, resp);
 		} else {
 			resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Not authorized");

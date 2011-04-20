@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
@@ -26,7 +25,8 @@ import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
 /**
@@ -35,20 +35,13 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
  * 
  * The result is delivered in JSON format.
  */
+@RequiresAuthorizationFor(UseBasicAjaxControllers.class)
 public class SparqlQueryAjaxController extends VitroAjaxController {
 	private static final Log log = LogFactory
 			.getLog(SparqlQueryAjaxController.class);
 
 	private static final String PARAMETER_QUERY = "query";
 	private static final String RESPONSE_MIME_TYPE = "application/javascript";
-
-	/**
-	 * If you are logged in, you can use this servlet.
-	 */
-	@Override
-	protected boolean testIsAuthorized(HttpServletRequest request) {
-		return LoginStatusBean.getBean(request).isLoggedIn();
-	}
 
 	@Override
 	protected void doRequest(VitroRequest vreq, HttpServletResponse response)

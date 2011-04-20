@@ -21,20 +21,18 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils;
 
+@RequiresAuthorizationFor(UseBasicAjaxControllers.class)
 public class PrimitiveRdfEdit extends VitroAjaxController {
 
     private static final long serialVersionUID = 1L;
-
-    @Override
-    protected boolean testIsAuthorized(HttpServletRequest request) {
-        return LoginStatusBean.getBean(request).isLoggedIn();
-    }
 
     @Override
     protected void doRequest(VitroRequest vreq,

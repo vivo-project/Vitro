@@ -2,14 +2,14 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
@@ -24,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  * @author rjy7
  *
  */
+@RequiresAuthorizationFor(UseBasicAjaxControllers.class)
 public class ReorderController extends VitroAjaxController {
 
     private static final long serialVersionUID = 1L;
@@ -32,12 +33,6 @@ public class ReorderController extends VitroAjaxController {
     private static String RANK_PREDICATE_PARAMETER_NAME = "predicate";
     private static String INDIVIDUAL_PREDICATE_PARAMETER_NAME = "individuals";
 
-
-    @Override
-    protected boolean testIsAuthorized(HttpServletRequest request) {
-        return LoginStatusBean.getBean(request).isLoggedIn();
-    }
-    
     @Override
     protected void doRequest(VitroRequest vreq, HttpServletResponse response) {
 
