@@ -45,7 +45,6 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.sparql.resultset.ResultSetFormat;
 import com.hp.hpl.jena.vocabulary.XSD;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
@@ -107,10 +106,6 @@ public class SparqlQueryServlet extends BaseEditController {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException
     {    	    	   	
-        if( !checkLoginStatus(request, response, LoginStatusBean.DBA) ) {
-        	return;
-        }
-        
         VitroRequest vreq = new VitroRequest(request);
 
         Model model = vreq.getJenaOntModel(); 

@@ -75,12 +75,7 @@ public class SparqlQueryBuilderServlet extends BaseEditController {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException
     {    	    	   	
-        super.doGet(request, response);
-        if( !checkLoginStatus(request, response) )
-        	return;
-        
         VitroRequest vreq = new VitroRequest(request);
-        
         
         Model model = vreq.getJenaOntModel(); // getModel()
         if( model == null ){

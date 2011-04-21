@@ -23,17 +23,7 @@ public class RDFUploadFormController extends BaseEditController {
 
     @Override
 	public void doPost (HttpServletRequest request, HttpServletResponse response) {
-
-        if (!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error(this.getClass().getName()+" caught exception calling doGet()");
-        }
         VitroRequest vreq = new VitroRequest(request);
-
         
         Portal portal = vreq.getPortal();
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
