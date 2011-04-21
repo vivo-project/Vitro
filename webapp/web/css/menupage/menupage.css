@@ -192,9 +192,10 @@ ul#browse-classes a {
 /* ALPHA BROWSE------>  */
 ul#alpha-browse-individuals {
     float: left;
-    width: 620px;
+    width: 619px;
     padding-left: 10px;
     list-style: none;
+    margin-left: 1px;
 }
 ul#alpha-browse-individuals li {
     float: left;
