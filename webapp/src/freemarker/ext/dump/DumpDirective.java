@@ -51,8 +51,8 @@ public class DumpDirective extends BaseDumpDirective {
         
         String varName = o.toString(); //((SimpleScalar)o).getAsString();   
         Map<String, Object> map = getTemplateVariableDump(varName, env); 
-
-        dump(TEMPLATE_DEFAULT, map, env);   
+        String title = "Template variable dump";
+        dump(map, env, title);   
     }
     
     @Override

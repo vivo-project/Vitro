@@ -46,8 +46,9 @@ public class DumpAllDirective extends BaseDumpDirective {
                 "The dump directive doesn't allow nested content.");
         }
 
-        SortedMap<String, Object> dataModelDump = getDataModelDump(env);
-        dump(TEMPLATE_DEFAULT, dataModelDump, env); 
+        SortedMap<String, Object> dump = getDataModelDump(env);
+        String title = "Template data model dump for " + env.getTemplate().getName();
+        dump(dump, env, title);
     }
     
     SortedMap<String, Object> getDataModelDump(Environment env) throws TemplateModelException {

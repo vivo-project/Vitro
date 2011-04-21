@@ -50,9 +50,10 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
 
     private static final Log log = LogFactory.getLog(BaseDumpDirective.class);
     
-    protected static final String TEMPLATE_DEFAULT = "dump1.ftl";  // change to dump.ftl when old dump is removed  
+    private static final String TEMPLATE_DEFAULT = "dump1.ftl";  // change to dump.ftl when old dump is removed  
+    private static final Pattern PROPERTY_NAME_PATTERN = Pattern.compile("^(get|is)\\w");
+
     protected static final String VALUE_UNDEFINED = "Undefined";
-    protected static final Pattern PROPERTY_NAME_PATTERN = Pattern.compile("^(get|is)\\w");
     
     enum Key {
         DATE_TYPE("dateType"),
@@ -449,7 +450,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     
     private Map<String, Object> getTemplateModelDump(TemplateModel model) throws TemplateModelException {
         // One of the more specific cases should have applied. Track whether this actually occurs.
-        log.debug("Found model with no known type"); 
+        log.debug("Found template model of type " + model.getClass().getName()); 
         Map<String, Object> map = new HashMap<String, Object>();
         Object unwrappedModel = DeepUnwrap.permissiveUnwrap(model);
         map.put(Key.TYPE.toString(), unwrappedModel.getClass().getName());
@@ -457,18 +458,29 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         return map;        
     }
     
-    protected void dump(String templateName, Map<String, Object> dump, Environment env) 
+    protected void dump(Map<String, Object> dump, Environment env, String title) 
+    throws TemplateException, IOException {
+        dump(dump, env, title, TEMPLATE_DEFAULT);
+    }
+    
+    protected void dump(Map<String, Object> dump, Environment env, String title, String templateName) 
     throws TemplateException, IOException {
         
         // Wrap the dump in another map so the template has a handle to iterate through
         // the values: <#list dump?keys as key>...</#list>
-        Map<String, Map<String, Object>> map = new HashMap<String, Map<String, Object>>();
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("dump", dump);
+        map.put("title", title);
+        writeDump(map, env, templateName);      
+    }
+    
+    protected void writeDump(Map<String, Object> map, Environment env, String templateName) 
+    throws TemplateException, IOException {
         Template template = env.getConfiguration().getTemplate(templateName);
         StringWriter sw = new StringWriter();
         template.process(map, sw);     
         Writer out = env.getOut();
-        out.write(sw.toString());                
+        out.write(sw.toString());        
     }
 
     protected Map<String, Object> help(String name) {

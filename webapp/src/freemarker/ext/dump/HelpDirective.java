@@ -50,18 +50,16 @@ public class HelpDirective extends BaseDumpDirective {
         TemplateHashModel dataModel = env.getDataModel();    
         Object templateModel = dataModel.get(varName);
 
-        if (templateModel == null) {
-            throw new TemplateModelException(
-                "Value of parameter '" + varName + "' must be the name of a directive or method");              
-        }
-
         if (! (templateModel instanceof TemplateMethodModel || templateModel instanceof TemplateDirectiveModel)) {
             throw new TemplateModelException(
                 "Value of parameter '" + varName + "' must be the name of a directive or method");            
         }
 
         Map<String, Object> map = getTemplateVariableDump(varName, env);
-        dump(TEMPLATE_DEFAULT, map, env);         
+        
+        String type = templateModel instanceof TemplateMethodModel ? "method" : "directive";
+        String title = "Help for " + type;
+        dump(map, env, title);         
     }
     
     @Override

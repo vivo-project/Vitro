@@ -2,37 +2,90 @@
 
 <#-- Template for dump directives -->
 
-<#-- Styles here are temporary; move to css file once stylesheets.add() works -->
+<#-- Styles here are temporary; use stylesheets.add() once that's working (see below) -->
 <style>
-ul.dump {
-    padding-top: .75em;
-    padding-bottom: .75em;
+div.dump {
+    margin-bottom: .5em;
     border-top: 1px solid #ccc;
     border-bottom: 1px solid #ccc; 
-    margin-bottom: .5em;
+    padding-top: .75em;
+    padding-bottom: .75em;
 }
 
-ul.dump li p {
-    margin-bottom: .5em;
+.dump ul ul {
+    margin-left: 1.5em;
+}
+
+.dump ul li {
+    list-style: none;
+}
+
+.dump ul li p {
+    margin-bottom: .25em;  
+}
+
+.dump ul.sequence li.list_item {
+    margin-bottom: 1.25em;
 }
 </style>
 
-<#-- <pre><@dumper.dump dump /></pre> -->
+<#--
+<#import "lib-dump.ftl" as dumper>
+<pre><@dumper.dump dump /></pre> 
+-->
 
-<#if dump?keys?has_content>
-    <ul class="dump">
-        <#list dump?keys as key>
-            <li>
-                <#assign value = dump[key] />
-                <p><strong>Variable name:</strong> ${key}</p>
-                <#if value.type??><p><strong>Type:</strong> ${value.type}</p></#if>   
-                <#-- <p><strong>Value:</strong> ${value.value}</p> -->
-                <#-- What to do here depends on time. Test either ${var.type} or ${var.value} -->
-                <#-- <p><strong>Value:</strong> ${var.value}</p> -->
-            </li>       
-        </#list>
-    </ul> 
-</#if>
+<div class="dump">
+    <h3>${title}</h3>
+    
+    <@doDump dump />
+</div>
+
+<#macro doDump dump>
+    <#if dump?keys?has_content>
+        <ul>
+            <#list dump?keys as key>
+                <li>
+                    <#local dumpVal = dump[key] />
+                    <p><strong>Variable name:</strong> ${key}</p>
+                    
+                    <@doMap dumpVal />
+                </li>       
+            </#list>
+        </ul> 
+    </#if>
+</#macro>
+
+<#macro doMap map>
+    <#if map.type?has_content>
+        <p><strong>Type:</strong> ${map.type}</p>
+        
+        <#if map.dateType?has_content>
+            <p><strong>Date type:</strong> ${map.dateType}</p>
+        </#if>
+    </#if>   
+    
+    <#if map.value?has_content>
+        <p>
+            <strong>Value:</strong>
+            <#local value = map.value>
+            <#if value?is_string || value?is_number>${value}
+            <#elseif value?is_boolean || value?is_number>${value?string}
+            <#elseif value?is_date>${value?string("EEEE, MMMM dd, yyyy hh:mm:ss a zzz")}
+            <#elseif value?is_sequence><@doSequence value />
+            </#if>
+        </p>
+    </#if>
+</#macro>
+
+<#macro doSequence seq>
+    <#if seq?has_content>
+        <ul class="sequence">
+            <#list seq as item>
+                <li class="list_item">Item ${item_index}: <@doMap item /></li>
+            </#list>
+        </ul>
+    </#if>
+</#macro>
 
 <#-- This will work after we move stylesheets to Configuration sharedVariables 
 ${stylesheets.add('<link rel="stylesheet" href="/css/fmdump.css">')}
