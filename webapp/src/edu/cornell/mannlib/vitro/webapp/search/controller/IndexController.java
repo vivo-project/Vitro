@@ -8,13 +8,13 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 
 /**
@@ -29,6 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
  *
  * @author bdc34
  */
+@RequiresAuthorizationFor(UseMiscellaneousAdminPages.class)
 public class IndexController extends FreemarkerHttpServlet {
 	
 	private static final Log log = LogFactory.getLog(IndexController.class);
@@ -36,12 +37,6 @@ public class IndexController extends FreemarkerHttpServlet {
     @Override
     protected String getTitle(String siteName, VitroRequest vreq) {
         return "Full Search Index Rebuild";
-    }
-    
-    @Override
-    protected int requiredLoginLevel() {
-        // User must be logged in to view this page.
-        return LoginStatusBean.DBA;
     }
     
     @Override
