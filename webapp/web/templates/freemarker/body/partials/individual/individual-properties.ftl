@@ -5,7 +5,7 @@
 <#import "lib-properties.ftl" as p>
 
 <#list propertyGroups.all as group>
-    <#assign groupName = group.name(nameForOtherGroup)>
+    <#assign groupName = group.getName(nameForOtherGroup)>
     
     <section class="property-group" role="region">
         <nav class="scroll-up" role="navigation">

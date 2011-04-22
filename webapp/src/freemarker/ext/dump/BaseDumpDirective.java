@@ -52,8 +52,6 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     
     private static final String TEMPLATE_DEFAULT = "dump1.ftl";  // change to dump.ftl when old dump is removed  
     private static final Pattern PROPERTY_NAME_PATTERN = Pattern.compile("^(get|is)\\w");
-
-    protected static final String VALUE_UNDEFINED = "Undefined";
     
     enum Key {
         DATE_TYPE("dateType"),
@@ -71,6 +69,21 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         
         public String toString() {
             return key;
+        }
+    }
+
+    enum Value {
+        NULL("[null]"),
+        UNDEFINED("[undefined]");
+    
+        private final String value;
+        
+        Value(String value) {
+            this.value = value;
+        }
+        
+        public String toString() {
+            return value;
         }
     }
     
@@ -129,7 +142,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         Map<String, Object> value = new HashMap<String, Object>();
         
         if (model == null) {
-            value.put(Key.VALUE.toString(), VALUE_UNDEFINED);
+            value.put(Key.VALUE.toString(), Value.UNDEFINED);
 
         // TemplateMethodModel and TemplateDirectiveModel objects can only be
         // included in the data model at the top level.
@@ -196,7 +209,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                 map.putAll( getTemplateModelDump( (TemplateModel)model ) );
             }
         } else {
-            map.put(Key.VALUE.toString(), "null");
+            map.put(Key.VALUE.toString(), Value.NULL);
         }
         
         return map;

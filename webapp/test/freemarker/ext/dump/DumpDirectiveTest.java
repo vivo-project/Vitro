@@ -32,6 +32,7 @@ import freemarker.core.Environment;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.dump.BaseDumpDirective.DateType;
 import freemarker.ext.dump.BaseDumpDirective.Key;
+import freemarker.ext.dump.BaseDumpDirective.Value;
 import freemarker.ext.dump.BaseDumpDirective.Type;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleCollection;
@@ -78,7 +79,7 @@ public class DumpDirectiveTest {
         Map<String, Object> dataModel = new HashMap<String, Object>();
         
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
-        expectedDumpValue.put(Key.VALUE.toString(), BaseDumpDirective.VALUE_UNDEFINED);
+        expectedDumpValue.put(Key.VALUE.toString(), Value.UNDEFINED);
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
         expectedDump.put(varName, expectedDumpValue);
@@ -1038,7 +1039,7 @@ public class DumpDirectiveTest {
             propertiesExpectedDump.put("nickname", nicknameExpectedDump);
     
             Map<String, Object> middleNameExpectedDump = new HashMap<String, Object>();
-            middleNameExpectedDump.put(Key.VALUE.toString(), "null");
+            middleNameExpectedDump.put(Key.VALUE.toString(), Value.NULL);
             propertiesExpectedDump.put("middleName", middleNameExpectedDump);
             
             Map<String, Object> marriedExpectedDump = new HashMap<String, Object>();
@@ -1122,7 +1123,7 @@ public class DumpDirectiveTest {
             propertiesExpectedDump.put("nickname", nicknameExpectedDump);
         
             Map<String, Object> middleNameExpectedDump = new HashMap<String, Object>();
-            middleNameExpectedDump.put(Key.VALUE.toString(), "null");
+            middleNameExpectedDump.put(Key.VALUE.toString(), Value.NULL);
             propertiesExpectedDump.put("middleName", middleNameExpectedDump);
               
             Map<String, Object> marriedExpectedDump = new HashMap<String, Object>();
@@ -1131,7 +1132,7 @@ public class DumpDirectiveTest {
             propertiesExpectedDump.put("married", marriedExpectedDump);      
         
             Map<String, Object> supervisorExpectedDump = new HashMap<String, Object>();
-            supervisorExpectedDump.put(Key.VALUE.toString(), "null");
+            supervisorExpectedDump.put(Key.VALUE.toString(), Value.NULL);
             propertiesExpectedDump.put("supervisor", supervisorExpectedDump);             
     
             Map<String, Object> favoriteColorsExpectedDump = new HashMap<String, Object>(); 

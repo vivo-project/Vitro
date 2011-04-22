@@ -120,7 +120,7 @@ div.dump {
                 </@liItem>
             </#list>
         </ul>
-     <#else>no values
+     <#else>[none]
      </#if>
 </#macro>
 
@@ -134,14 +134,17 @@ div.dump {
                 </@liItem>
             </#list>
         </ul>
-    <#else>no values
+    <#else>[none]
     </#if>
 </#macro>
 
 <#macro doScalarValue value>
     <strong>Value:</strong>
     
-    <#if value?is_string>${value}
+    <#if value?is_string>
+        <#if value?has_content>${value}
+        <#else>[empty]
+        </#if>    
     <#elseif value?is_number>${value?c}
     <#elseif value?is_boolean>${value?string}
     <#elseif value?is_date>${value?string("EEEE, MMMM dd, yyyy hh:mm:ss a zzz")}

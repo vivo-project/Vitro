@@ -11,7 +11,7 @@
         <nav id="property-group-menu" role="navigation">
             <ul role="list">
                 <#list groups as group>
-                    <#assign groupname = group.name(nameForOtherGroup)>
+                    <#assign groupname = group.getName(nameForOtherGroup)>
                     <#if groupname?has_content>
                         <#-- capitalize will capitalize each word in the name; cap_first only the first. We may need a custom
                         function to capitalize all except function words. -->
