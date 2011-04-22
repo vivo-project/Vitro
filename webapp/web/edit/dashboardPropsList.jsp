@@ -1,7 +1,6 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
-<%@ taglib uri="http://vitro.mannlib.cornell.edu/vitro/tags/PropertyEditLink" prefix="edLnk" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory" %>
