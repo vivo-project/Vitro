@@ -77,8 +77,6 @@ public class SamplesController extends FreemarkerHttpServlet {
         body.put("trueStatement", true);
         body.put("falseStatement", false);
         
-        body.put("pojo", new EditConfiguration());
-        
         getBerries(body);
         
         body.put("bookTitle", "Pride and Prejudice");

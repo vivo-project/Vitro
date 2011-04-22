@@ -5,8 +5,13 @@
 <#-- Styles here are temporary; use stylesheets.add() once that's working (see below) -->
 <style>
 div.dump {
+    margin-top: 1em;
+    border-top: 2px solid #ccc; 
+    padding-top: .75em;
+}
+
+.dump ul li.variable {
     margin-bottom: .5em;
-    border-top: 1px solid #ccc;
     border-bottom: 1px solid #ccc; 
     padding-top: .75em;
     padding-bottom: .75em;
@@ -47,7 +52,7 @@ div.dump {
     <#if dump?keys?has_content>
         <ul>
             <#list dump?keys as key>
-                <li>
+                <li class="variable">
                     <p><strong>Variable name:</strong> ${key}</p>  
                     
                     <#local type = dump[key].type>
@@ -153,7 +158,7 @@ div.dump {
 
 <#macro doMethod method>
     <p><strong>Type:</strong> ${method.type}</p>
-    <#local help = method.help>
+    <#local help = method.help!>
     <#if help?has_content>
         <p><strong>Help:</strong><p>
         <ul class="help">

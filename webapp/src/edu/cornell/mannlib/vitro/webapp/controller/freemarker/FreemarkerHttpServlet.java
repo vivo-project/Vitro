@@ -286,12 +286,9 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
      */    
     public static Map<String, Object> getDirectives() {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("dump", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.DumpDirective());
-        map.put("dumpAll", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.DumpAllDirective());  
-        map.put("help", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.HelpDirective()); 
-        map.put("dump1", new freemarker.ext.dump.DumpDirective());
-        map.put("dumpAll1", new freemarker.ext.dump.DumpAllDirective());  
-        map.put("help1", new freemarker.ext.dump.HelpDirective()); 
+        map.put("dump", new freemarker.ext.dump.DumpDirective());
+        map.put("dumpAll", new freemarker.ext.dump.DumpAllDirective());  
+        map.put("help", new freemarker.ext.dump.HelpDirective()); 
         map.put("url", new edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective()); 
         map.put("widget", new edu.cornell.mannlib.vitro.webapp.web.directives.WidgetDirective());
         return map;

@@ -127,7 +127,6 @@ ${s2} => ${str.unCamelCase(s2)}<br />
 <@dump var="fruit" />
 <@dump var="trueStatement" />
 <@dump var="zoo1" />
-<@dump var="pojo" />
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/script1.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/script2.js"></script>',
@@ -139,6 +138,6 @@ ${scripts.add('<script type="text/javascript" src="${urls.base}/js/script1.js"><
 
 <@help for="profileUrl" />
 
-<@describe var="stylesheets" />
+
 
 
