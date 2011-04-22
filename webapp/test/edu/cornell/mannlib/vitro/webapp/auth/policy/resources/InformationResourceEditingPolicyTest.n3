@@ -87,6 +87,19 @@ mydomain:bozoEditedIt
 	.
 
 #
+# info resource with Bozo featured 
+#
+mydomain:bozoFeaturedInIt
+	a core:BlogPosting ;
+	a core:InformationResource ;
+	a bib:Article ;
+	a bib:Document ;
+	a owl:Thing ;
+	rdfs:label "Bozo is featured" ;
+	core:features mydomain:bozo ;
+	.
+
+#
 # info resource with Joe as author
 #
 mydomain:joeWroteIt
@@ -118,4 +131,17 @@ mydomain:joeEditedIt
 	a owl:Thing ;
 	rdfs:label "Joe is editor" ;
 	bib:editor mydomain:joe ;
+	.
+
+#
+# info resource with Joe featured 
+#
+mydomain:joeFeaturedInIt
+	a core:BlogPosting ;
+	a core:InformationResource ;
+	a bib:Article ;
+	a bib:Document ;
+	a owl:Thing ;
+	rdfs:label "Joe is featured" ;
+	core:features mydomain:joe ;
 	.

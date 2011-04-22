@@ -45,6 +45,7 @@ public class InformationResourceEditingPolicy extends BaseSelfEditingPolicy
 			+ "informationResourceInAuthorship";
 	private static final String URI_LINKED_AUTHOR_PROPERTY = NS_CORE
 			+ "linkedAuthor";
+	private static final String URI_FEATURES_PROPERTY = NS_CORE + "features";
 
 	private final OntModel model;
 
@@ -85,7 +86,8 @@ public class InformationResourceEditingPolicy extends BaseSelfEditingPolicy
 
 	/**
 	 * The user can edit a data property if it is not restricted and if it is
-	 * about an information resource which he authored or edited.
+	 * about an information resource which he authored or edited, or in which he
+	 * is featured.
 	 */
 	private PolicyDecision isAuthorizedForDataPropertyAction(
 			List<String> userUris, AbstractDataPropertyAction action) {
@@ -106,6 +108,9 @@ public class InformationResourceEditingPolicy extends BaseSelfEditingPolicy
 			if (anyUrisInCommon(userUris, getUrisOfAuthors(subject))) {
 				return authorizedSubjectAuthor();
 			}
+			if (anyUrisInCommon(userUris, getUrisOfFeatured(subject))) {
+				return authorizedSubjectFeatured();
+			}
 		}
 
 		return userNotAuthorizedToStatement();
@@ -113,7 +118,8 @@ public class InformationResourceEditingPolicy extends BaseSelfEditingPolicy
 
 	/**
 	 * The user can edit an object property if it is not restricted and if it is
-	 * about an information resource which he authored or edited.
+	 * about an information resource which he authored or edited, or in which he
+	 * is featured.
 	 */
 	private PolicyDecision isAuthorizedForObjectPropertyAction(
 			List<String> userUris, AbstractObjectPropertyAction action) {
@@ -138,6 +144,9 @@ public class InformationResourceEditingPolicy extends BaseSelfEditingPolicy
 			if (anyUrisInCommon(userUris, getUrisOfAuthors(subject))) {
 				return authorizedSubjectAuthor();
 			}
+			if (anyUrisInCommon(userUris, getUrisOfFeatured(subject))) {
+				return authorizedSubjectFeatured();
+			}
 		}
 
 		if (isInformationResource(object)) {
@@ -146,6 +155,9 @@ public class InformationResourceEditingPolicy extends BaseSelfEditingPolicy
 			}
 			if (anyUrisInCommon(userUris, getUrisOfAuthors(object))) {
 				return authorizedObjectAuthor();
+			}
+			if (anyUrisInCommon(userUris, getUrisOfFeatured(object))) {
+				return authorizedObjectFeatured();
 			}
 		}
 
@@ -224,6 +236,28 @@ public class InformationResourceEditingPolicy extends BaseSelfEditingPolicy
 		}
 	}
 
+	private List<String> getUrisOfFeatured(String infoResourceUri) {
+		List<String> list = new ArrayList<String>();
+
+		Selector selector = createSelector(infoResourceUri,
+				URI_FEATURES_PROPERTY, null);
+
+		StmtIterator stmts = null;
+		model.enterCriticalSection(Lock.READ);
+		try {
+			stmts = model.listStatements(selector);
+			while (stmts.hasNext()) {
+				list.add(stmts.next().getObject().toString());
+			}
+			return list;
+		} finally {
+			if (stmts != null) {
+				stmts.close();
+			}
+			model.leaveCriticalSection();
+		}
+	}
+
 	/** Note that we must already be in a critical section! */
 	private List<String> getUrisOfAuthors(Resource authorship) {
 		List<String> list = new ArrayList<String>();
@@ -286,5 +320,13 @@ public class InformationResourceEditingPolicy extends BaseSelfEditingPolicy
 
 	private PolicyDecision authorizedObjectAuthor() {
 		return authorizedDecision("User is author of the object of the statement");
+	}
+	
+	private PolicyDecision authorizedSubjectFeatured() {
+		return authorizedDecision("User is featured in the subject of the statement");
+	}
+	
+	private PolicyDecision authorizedObjectFeatured() {
+		return authorizedDecision("User is featured in the object of the statement");
 	}
 }

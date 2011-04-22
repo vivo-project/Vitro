@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
 import static edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization.AUTHORIZED;
 import static edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization.INCONCLUSIVE;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -84,9 +85,13 @@ public class InformationResourceEditingPolicyTest extends AbstractTestClass {
 			+ "bozoWroteIt";
 	private static final String URI_BOZO_EDITED_IT = NS_PERMITTED
 			+ "bozoEditedIt";
+	private static final String URI_BOZO_FEATURED_IN_IT = NS_PERMITTED
+			+ "bozoFeaturedInIt";
 	private static final String URI_JOE_WROTE_IT = NS_PERMITTED + "joeWroteIt";
 	private static final String URI_JOE_EDITED_IT = NS_PERMITTED
 			+ "joeEditedIt";
+	private static final String URI_JOE_FEATURED_IN_IT = NS_PERMITTED
+			+ "joeFeaturedInIt";
 
 	private static OntModel ontModel;
 
@@ -199,7 +204,7 @@ public class InformationResourceEditingPolicyTest extends AbstractTestClass {
 	}
 
 	@Test
-	public void dataPropSubjectIsInfoResourceButNoAuthorsOrEditors() {
+	public void dataPropSubjectIsInfoResourceButNoAuthorsOrEditorsOrFeatured() {
 		action = new AddDataPropStmt(URI_NOBODY_WROTE_IT,
 				URI_PERMITTED_PREDICATE, "junk", null, null);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(idJoe, action));
@@ -221,6 +226,13 @@ public class InformationResourceEditingPolicyTest extends AbstractTestClass {
 	}
 
 	@Test
+	public void dataPropSubjectIsInfoResourceButWrongFeatured() {
+		action = new AddDataPropStmt(URI_BOZO_FEATURED_IN_IT,
+				URI_PERMITTED_PREDICATE, "junk", null, null);
+		assertDecision(INCONCLUSIVE, policy.isAuthorized(idJoe, action));
+	}
+
+	@Test
 	public void dataPropSubjectIsInfoResourceWithSelfEditingAuthor() {
 		action = new AddDataPropStmt(URI_JOE_WROTE_IT, URI_PERMITTED_PREDICATE,
 				"junk", null, null);
@@ -231,6 +243,14 @@ public class InformationResourceEditingPolicyTest extends AbstractTestClass {
 	@Test
 	public void dataPropSubjectIsInfoResourceWithSelfEditingEditor() {
 		action = new AddDataPropStmt(URI_JOE_EDITED_IT,
+				URI_PERMITTED_PREDICATE, "junk", null, null);
+		assertDecision(AUTHORIZED, policy.isAuthorized(idJoe, action));
+		assertDecision(AUTHORIZED, policy.isAuthorized(idBozoAndJoe, action));
+	}
+
+	@Test
+	public void dataPropSubjectIsInfoResourceWithSelfEditingFeatured() {
+		action = new AddDataPropStmt(URI_JOE_FEATURED_IN_IT,
 				URI_PERMITTED_PREDICATE, "junk", null, null);
 		assertDecision(AUTHORIZED, policy.isAuthorized(idJoe, action));
 		assertDecision(AUTHORIZED, policy.isAuthorized(idBozoAndJoe, action));
@@ -272,7 +292,7 @@ public class InformationResourceEditingPolicyTest extends AbstractTestClass {
 	}
 
 	@Test
-	public void objectPropSubjectIsInfoResourceButNoAuthorsOrEditors() {
+	public void objectPropSubjectIsInfoResourceButNoAuthorsOrEditorsOrFeatured() {
 		action = new AddObjectPropStmt(URI_NOBODY_WROTE_IT,
 				URI_PERMITTED_PREDICATE, URI_PERMITTED_RESOURCE);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(idJoe, action));
@@ -294,6 +314,13 @@ public class InformationResourceEditingPolicyTest extends AbstractTestClass {
 	}
 
 	@Test
+	public void objectPropSubjectIsInfoResourceButWrongFeatured() {
+		action = new AddObjectPropStmt(URI_BOZO_FEATURED_IN_IT,
+				URI_PERMITTED_PREDICATE, URI_PERMITTED_RESOURCE);
+		assertDecision(INCONCLUSIVE, policy.isAuthorized(idJoe, action));
+	}
+
+	@Test
 	public void objectPropSubjectIsInfoResourceWithSelfEditingAuthor() {
 		action = new AddObjectPropStmt(URI_JOE_WROTE_IT,
 				URI_PERMITTED_PREDICATE, URI_PERMITTED_RESOURCE);
@@ -304,6 +331,14 @@ public class InformationResourceEditingPolicyTest extends AbstractTestClass {
 	@Test
 	public void objectPropSubjectIsInfoResourceWithSelfEditingEditor() {
 		action = new AddObjectPropStmt(URI_JOE_EDITED_IT,
+				URI_PERMITTED_PREDICATE, URI_PERMITTED_RESOURCE);
+		assertDecision(AUTHORIZED, policy.isAuthorized(idJoe, action));
+		assertDecision(AUTHORIZED, policy.isAuthorized(idBozoAndJoe, action));
+	}
+
+	@Test
+	public void objectPropSubjectIsInfoResourceWithSelfEditingFeatured() {
+		action = new AddObjectPropStmt(URI_JOE_FEATURED_IN_IT,
 				URI_PERMITTED_PREDICATE, URI_PERMITTED_RESOURCE);
 		assertDecision(AUTHORIZED, policy.isAuthorized(idJoe, action));
 		assertDecision(AUTHORIZED, policy.isAuthorized(idBozoAndJoe, action));
@@ -339,6 +374,13 @@ public class InformationResourceEditingPolicyTest extends AbstractTestClass {
 	}
 
 	@Test
+	public void objectPropObjectIsInfoResourceButWrongFeatured() {
+		action = new AddObjectPropStmt(URI_PERMITTED_RESOURCE,
+				URI_PERMITTED_PREDICATE, URI_BOZO_FEATURED_IN_IT);
+		assertDecision(INCONCLUSIVE, policy.isAuthorized(idJoe, action));
+	}
+
+	@Test
 	public void objectPropObjectIsInfoResourceWithSelfEditingAuthor() {
 		action = new AddObjectPropStmt(URI_PERMITTED_RESOURCE,
 				URI_PERMITTED_PREDICATE, URI_JOE_WROTE_IT);
@@ -350,6 +392,14 @@ public class InformationResourceEditingPolicyTest extends AbstractTestClass {
 	public void objectPropObjectIsInfoResourceWithSelfEditingEditor() {
 		action = new AddObjectPropStmt(URI_PERMITTED_RESOURCE,
 				URI_PERMITTED_PREDICATE, URI_JOE_EDITED_IT);
+		assertDecision(AUTHORIZED, policy.isAuthorized(idJoe, action));
+		assertDecision(AUTHORIZED, policy.isAuthorized(idBozoAndJoe, action));
+	}
+
+	@Test
+	public void objectPropObjectIsInfoResourceWithSelfEditingFeatured() {
+		action = new AddObjectPropStmt(URI_PERMITTED_RESOURCE,
+				URI_PERMITTED_PREDICATE, URI_JOE_FEATURED_IN_IT);
 		assertDecision(AUTHORIZED, policy.isAuthorized(idJoe, action));
 		assertDecision(AUTHORIZED, policy.isAuthorized(idBozoAndJoe, action));
 	}
