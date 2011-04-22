@@ -36,6 +36,8 @@
 	<property name="war-lib.dir" location="${war-webinf.dir}/lib" />
 	<property name="test-classes.dir" location="${build.dir}/testclasses" />
 	<property name="servletjars.dir" location="${build.dir}/servletjars" />
+	
+	<property name="javac.deprecation" value="true" />
 
 
 	<!-- Is there a "src" directory in the product? -->
@@ -141,7 +143,7 @@
 		<javac srcdir="${product.source.dir}"
 		       destdir="${product.classes.dir}"
 		       debug="true"
-		       deprecation="true"
+		       deprecation="${javac.deprecation}"
 		       encoding="UTF8"
 			   includeantruntime="false"
 		       optimize="true"

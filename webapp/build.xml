@@ -25,6 +25,8 @@
 	<property name="test-classes.dir" location="${build.dir}/testclasses" />
 
 	<property name="servletjars.dir" location="${build.dir}/servletjars" />
+	
+	<property name="javac.deprecation" value="true" />
 
 	<!-- - - - - - - - - - - - - - - - - - 
           paths: for compiling and running                      
@@ -217,7 +219,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<javac srcdir="${webapp.dir}/src"
 		       destdir="${war-classes.dir}"
 		       debug="true"
-		       deprecation="true"
+		       deprecation="${javac.deprecation}"
 		       encoding="UTF8"
 			   includeantruntime="false"
 		       optimize="true"
@@ -233,7 +235,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<javac srcdir="${webapp.dir}/test"
 		       destdir="${test-classes.dir}"
 		       debug="true"
-		       deprecation="true"
+		       deprecation="${javac.deprecation}"
 		       encoding="UTF8"
 			   includeantruntime="false"
 		       optimize="false"
@@ -268,7 +270,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<javac srcdir="${webapp.dir}/../utilities/buildutils/revisioninfo"
 		       destdir="${test-classes.dir}"
 		       debug="true"
-		       deprecation="true"
+		       deprecation="${javac.deprecation}"
 		       encoding="UTF8"
 			   includeantruntime="false"
 		       optimize="false"
