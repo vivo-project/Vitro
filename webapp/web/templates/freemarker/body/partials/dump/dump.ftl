@@ -166,9 +166,9 @@ div.dump {
                 <li>
                     <#local value = help[key]>
                     <@divValue>                        
-                        <#if value?is_string><p><strong>${key?capitalize}:</strong> ${value}</p>
+                        <#if value?is_string><p><strong>${key?cap_first}:</strong> ${value}</p>
                         <#else>
-                            <p><strong>${key?capitalize}:</strong></p>
+                            <p><strong>${key?cap_first}:</strong></p>
                             <ul>
                                 <#if value?is_sequence>
                                     <#list value as item>

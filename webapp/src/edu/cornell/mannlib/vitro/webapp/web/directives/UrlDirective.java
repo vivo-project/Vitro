@@ -60,24 +60,22 @@ public class UrlDirective extends BaseTemplateDirectiveModel {
         out.write(url);
     }
 
-    public String help(String name, Environment env) {
+    public Map<String, Object> help(String name) {
         Map<String, Object> map = new HashMap<String, Object>();
-        
-        map.put("name", name);
-        
+
         map.put("effect", "Generate a full url from a path by prepending the servlet context path. Use for generating src attribute of image tags, href attribute of anchor tags, etc.");
         
         map.put("comments", "The path should be an absolute path, starting with \"/\".");
         
         Map<String, String> params = new HashMap<String, String>();
         params.put("path", "path");
-        map.put("params", params);
+        map.put("parameters", params);
         
         List<String> examples = new ArrayList<String>();
         examples.add("&lt;img src=\"<@url path=\"/images/placeholders/person.thumbnail.jpg\" />\" /&gt;" );
         map.put("examples", examples);
         
-        return mergeToHelpTemplate(map, env);
+        return map;
     }
 
     

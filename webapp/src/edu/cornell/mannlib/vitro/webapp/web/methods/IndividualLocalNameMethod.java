@@ -36,22 +36,20 @@ public class IndividualLocalNameMethod extends BaseTemplateMethodModel {
     }
 
     @Override
-    public String help(String name, Environment env) {
+    public Map<String, Object> help(String name) {
         Map<String, Object> map = new HashMap<String, Object>();
-        
-        map.put("name", name);
-        
-        map.put("returnValue", "The local name of the individual");
+
+        map.put("return value", "The local name of the individual");
 
         List<String>params = new ArrayList<String>();
         params.add("Uri of individual");
-        map.put("params", params);
+        map.put("parameters", params);
         
         List<String> examples = new ArrayList<String>();
         examples.add(name + "(individual.uri)");
         map.put("examples", examples);
         
-        return mergeToHelpTemplate(map, env);
+        return map;
     }
     
 }

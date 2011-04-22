@@ -22,17 +22,7 @@ public abstract class BaseTemplateDirectiveModel implements TemplateDirectiveMod
 
     private static final Log log = LogFactory.getLog(BaseTemplateDirectiveModel.class);
     
-    public String help(String name, Environment env) {
-        Map<String, Object> map = new HashMap<String, Object>();
-        
-        map.put("name", name);
-        
-        return mergeToHelpTemplate(map, env);
-    }
-    
-    protected String mergeToHelpTemplate(Map<String, Object> map, Environment env) {
-        return processTemplateToString("help-directive.ftl", map, env);        
-    }
+    public abstract Map<String, Object> help(String name);
     
     public static String processTemplateToString(String templateName, Map<String, Object> map, Environment env) {
         Template template = getTemplate(templateName, env);

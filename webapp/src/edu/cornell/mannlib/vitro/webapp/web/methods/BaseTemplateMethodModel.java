@@ -19,13 +19,7 @@ public abstract class BaseTemplateMethodModel implements TemplateMethodModel {
 
     private static final Log log = LogFactory.getLog(BaseTemplateMethodModel.class);
     
-    public String help(String name, Environment env) {
-        Map<String, Object> map = new HashMap<String, Object>();
-
-        map.put("name", name);
-        
-        return mergeToHelpTemplate(map, env);
-    }
+    public abstract Map<String, Object> help(String name);
     
     protected String mergeToHelpTemplate(Map<String, Object> map, Environment env) {
         return processTemplateToString("help-method.ftl", map, env);        

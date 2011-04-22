@@ -93,11 +93,9 @@ public class WidgetDirective extends BaseTemplateDirectiveModel {
         
     }
 
-    public String help(String name, Environment env) {
+    public Map<String, Object> help(String name) {
         Map<String, Object> map = new HashMap<String, Object>();
 
-        map.put("name", name);
-        
         map.put("effect", "Add a reuseable block of markup and functionality to the template, with associated scripts and stylesheets injected into the page &lt;head&gt; element.");
         
         map.put("comments", "From a body template, insert widget directive in desired location with no include value or include=\"markup\". Both assets and markup will be included. " +
@@ -108,7 +106,7 @@ public class WidgetDirective extends BaseTemplateDirectiveModel {
         params.put("name", "name of widget");
         params.put("include", "values: \"assets\" to include scripts and stylesheets associated with the widget; \"markup\" to include the markup. " +
                               "\"markup\" is default value, so does not need to be specified.");
-        map.put("params", params);
+        map.put("parameters", params);
         
         List<String> examples = new ArrayList<String>();
         examples.add("<@" + name + " name=\"login\" /> (use in body and page templates where markup should be inserted)");
@@ -117,7 +115,7 @@ public class WidgetDirective extends BaseTemplateDirectiveModel {
         
         map.put("examples", examples);
         
-        return mergeToHelpTemplate(map, env);
+        return map;
     }
 
 }
