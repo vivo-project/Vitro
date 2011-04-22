@@ -2,7 +2,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 
-<%-- doesn't use <vitro:requiresAuthorizationFor> becuase the controller does complex authorization. -->
+<%-- doesn't use <vitro:requiresAuthorizationFor> becuase the controller does complex authorization. --%>
 
 <div id="content">
 
