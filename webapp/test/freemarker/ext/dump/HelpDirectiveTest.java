@@ -57,7 +57,9 @@ public class HelpDirectiveTest {
         dataModel.put(varName, methodModel);
          
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
+        
         expectedDumpValue.put(Key.TYPE.toString(), Type.METHOD);
+        expectedDumpValue.put(Key.CLASS.toString(), methodModel.getClass().getName());
         expectedDumpValue.put(Key.HELP.toString(), null);
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
@@ -77,6 +79,7 @@ public class HelpDirectiveTest {
          
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
         expectedDumpValue.put(Key.TYPE.toString(), Type.METHOD);
+        expectedDumpValue.put(Key.CLASS.toString(), methodModel.getClass().getName());
         expectedDumpValue.put(Key.HELP.toString(), getMethodHelp(varName));
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
@@ -96,6 +99,7 @@ public class HelpDirectiveTest {
          
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
         expectedDumpValue.put(Key.TYPE.toString(), Type.METHOD);
+        expectedDumpValue.put(Key.CLASS.toString(), methodModel.getClass().getName());
         expectedDumpValue.put(Key.HELP.toString(), null);
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
@@ -115,6 +119,7 @@ public class HelpDirectiveTest {
          
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
         expectedDumpValue.put(Key.TYPE.toString(), Type.DIRECTIVE);
+        expectedDumpValue.put(Key.CLASS.toString(), directiveModel.getClass().getName());
         expectedDumpValue.put(Key.HELP.toString(), null);
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
@@ -134,6 +139,7 @@ public class HelpDirectiveTest {
          
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
         expectedDumpValue.put(Key.TYPE.toString(), Type.DIRECTIVE);
+        expectedDumpValue.put(Key.CLASS.toString(), directiveModel.getClass().getName());
         expectedDumpValue.put(Key.HELP.toString(), getDirectiveHelp(varName));
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
@@ -153,6 +159,7 @@ public class HelpDirectiveTest {
          
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
         expectedDumpValue.put(Key.TYPE.toString(), Type.DIRECTIVE);
+        expectedDumpValue.put(Key.CLASS.toString(), directiveModel.getClass().getName());
         expectedDumpValue.put(Key.HELP.toString(), null);
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();

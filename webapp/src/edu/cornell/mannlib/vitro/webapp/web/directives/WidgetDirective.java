@@ -7,6 +7,7 @@ import java.io.Writer;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -94,7 +95,7 @@ public class WidgetDirective extends BaseTemplateDirectiveModel {
     }
 
     public Map<String, Object> help(String name) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
 
         map.put("effect", "Add a reuseable block of markup and functionality to the template, with associated scripts and stylesheets injected into the page &lt;head&gt; element.");
         

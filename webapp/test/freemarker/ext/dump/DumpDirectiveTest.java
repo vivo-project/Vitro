@@ -256,6 +256,7 @@ public class DumpDirectiveTest {
         
        Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
        expectedDumpValue.put(Key.TYPE.toString(), Type.METHOD);
+       expectedDumpValue.put(Key.CLASS.toString(), methodModel.getClass().getName());
        expectedDumpValue.put(Key.HELP.toString(), null);
 
        Map<String, Object> expectedDump = new HashMap<String, Object>();
@@ -275,6 +276,7 @@ public class DumpDirectiveTest {
         
        Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
        expectedDumpValue.put(Key.TYPE.toString(), Type.METHOD);
+       expectedDumpValue.put(Key.CLASS.toString(), methodModel.getClass().getName());
        expectedDumpValue.put(Key.HELP.toString(), getMethodHelp(varName));
 
        Map<String, Object> expectedDump = new HashMap<String, Object>();
@@ -294,6 +296,7 @@ public class DumpDirectiveTest {
         
        Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
        expectedDumpValue.put(Key.TYPE.toString(), Type.METHOD);
+       expectedDumpValue.put(Key.CLASS.toString(), methodModel.getClass().getName());
        expectedDumpValue.put(Key.HELP.toString(), null);
 
        Map<String, Object> expectedDump = new HashMap<String, Object>();
@@ -313,6 +316,7 @@ public class DumpDirectiveTest {
         
        Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
        expectedDumpValue.put(Key.TYPE.toString(), Type.DIRECTIVE);
+       expectedDumpValue.put(Key.CLASS.toString(), directiveModel.getClass().getName());
        expectedDumpValue.put(Key.HELP.toString(), null);
 
        Map<String, Object> expectedDump = new HashMap<String, Object>();
@@ -332,6 +336,7 @@ public class DumpDirectiveTest {
         
        Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
        expectedDumpValue.put(Key.TYPE.toString(), Type.DIRECTIVE);
+       expectedDumpValue.put(Key.CLASS.toString(), directiveModel.getClass().getName());
        expectedDumpValue.put(Key.HELP.toString(), getDirectiveHelp(varName));
 
        Map<String, Object> expectedDump = new HashMap<String, Object>();
@@ -351,6 +356,7 @@ public class DumpDirectiveTest {
         
        Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
        expectedDumpValue.put(Key.TYPE.toString(), Type.DIRECTIVE);
+       expectedDumpValue.put(Key.CLASS.toString(), directiveModel.getClass().getName());
        expectedDumpValue.put(Key.HELP.toString(), null);
 
        Map<String, Object> expectedDump = new HashMap<String, Object>();
@@ -735,14 +741,15 @@ public class DumpDirectiveTest {
         Map<String, Object> dataModel = new HashMap<String, Object>();
         BeansWrapper wrapper = new BeansWrapper();
         wrapper.setExposureLevel(exposureLevel);
+        Employee employee = getEmployee();
         try {
-            dataModel.put("employee", wrapper.wrap(getEmployee()));
+            dataModel.put("employee", wrapper.wrap(employee));
         } catch (TemplateModelException e) {
             // logging is suppressed, so what do we do here?
         }
         
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
-        expectedDumpValue.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
+        expectedDumpValue.put(Key.TYPE.toString(), employee.getClass().getName());
         expectedDumpValue.put(Key.VALUE.toString(), getJohnDoeExpectedDump(exposureLevel));
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();

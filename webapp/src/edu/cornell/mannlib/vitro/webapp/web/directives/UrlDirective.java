@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +15,6 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import freemarker.core.Environment;
-import freemarker.template.Configuration;
 import freemarker.template.TemplateDirectiveBody;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
@@ -61,7 +61,7 @@ public class UrlDirective extends BaseTemplateDirectiveModel {
     }
 
     public Map<String, Object> help(String name) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
 
         map.put("effect", "Generate a full url from a path by prepending the servlet context path. Use for generating src attribute of image tags, href attribute of anchor tags, etc.");
         

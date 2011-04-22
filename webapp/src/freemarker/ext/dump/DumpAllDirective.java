@@ -4,7 +4,7 @@ package freemarker.ext.dump;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -69,12 +69,10 @@ public class DumpAllDirective extends BaseDumpDirective {
 
     @Override
     public Map<String, Object> help(String name) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
 
         map.put("effect", "Dumps the contents of the template data model.");
-      
-        //map.put("comments", "");
-        
+
         List<String> examples = new ArrayList<String>();
         examples.add("<@" + name + " />");
         map.put("examples", examples);

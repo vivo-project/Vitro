@@ -5,6 +5,7 @@ package freemarker.ext.dump;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +18,6 @@ import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateMethodModel;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
-import freemarker.template.utility.DeepUnwrap;
 
 public class HelpDirective extends BaseDumpDirective {
 
@@ -64,12 +64,10 @@ public class HelpDirective extends BaseDumpDirective {
     
     @Override
     public Map<String, Object> help(String name) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
         
         map.put("effect", "Outputs help for a directive or method.");
-        
-        //map.put("comments", "");
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("for", "name of directive or method");
         map.put("parameters", params);

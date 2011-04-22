@@ -5,6 +5,7 @@ package freemarker.ext.dump;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,12 +58,10 @@ public class DumpDirective extends BaseDumpDirective {
     
     @Override
     public Map<String, Object> help(String name) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
         
         map.put("effect", "Dumps the contents of a template variable.");
-        
-        //map.put("comments", "");
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("var", "name of variable to dump");
         map.put("parameters", params);

@@ -157,7 +157,7 @@ div.dump {
 </#macro>
 
 <#macro doMethod method>
-    <p><strong>Type:</strong> ${method.type}</p>
+    <p><strong>Type:</strong> ${method.type} (${method.class})</p>
     <#local help = method.help!>
     <#if help?has_content>
         <p><strong>Help:</strong><p>

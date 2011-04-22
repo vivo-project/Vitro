@@ -54,6 +54,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     private static final Pattern PROPERTY_NAME_PATTERN = Pattern.compile("^(get|is)\\w");
     
     enum Key {
+        CLASS("class"),
         DATE_TYPE("dateType"),
         HELP("help"),
         METHODS("methods"),
@@ -430,6 +431,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     private Map<String, Object> getTemplateModelDump(TemplateMethodModel model, String varName) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), Type.METHOD);
+        map.put(Key.CLASS.toString(), model.getClass().getName());
         map.put(Key.HELP.toString(), getHelp(model, varName));       
         return map;
     }
@@ -437,6 +439,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     private Map<String, Object> getTemplateModelDump(TemplateDirectiveModel model, String varName) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), Type.DIRECTIVE);
+        map.put(Key.CLASS.toString(), model.getClass().getName());
         map.put(Key.HELP.toString(), getHelp(model, varName));
         return map;
     }
