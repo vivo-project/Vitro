@@ -15,6 +15,7 @@
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers"%>
 <%@page import="java.io.IOException"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundleFactory"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyList"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.policy.SelfEditingPolicy"%>
