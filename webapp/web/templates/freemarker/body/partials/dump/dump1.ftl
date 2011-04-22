@@ -24,15 +24,14 @@ div.dump {
     margin-bottom: .25em;  
 }
 
-.dump ul.sequence li.list_item {
+.dump ul li.item {
     margin-bottom: 1.25em;
 }
-</style>
 
-<#--
-<#import "lib-dump.ftl" as dumper>
-<pre><@dumper.dump dump /></pre> 
--->
+.dump ul li.item .value { 
+    margin-left: 1.5em;
+}
+</style>
 
 <div class="dump">
     <h3>${title}</h3>
@@ -45,10 +44,8 @@ div.dump {
         <ul>
             <#list dump?keys as key>
                 <li>
-                    <#local dumpVal = dump[key] />
-                    <p><strong>Variable name:</strong> ${key}</p>
-                    
-                    <@doMap dumpVal />
+                    <p><strong>Variable name:</strong> ${key}</p>                   
+                    <@doMap dump[key] />
                 </li>       
             </#list>
         </ul> 
@@ -64,53 +61,83 @@ div.dump {
         </#if>
     </#if>   
     
-    <#if map.value?has_content>
-        <div>
-            <strong>Value:</strong>
-            <#local value = map.value>
-            <#if value?is_string || value?is_number>${value}
-            <#elseif value?is_boolean>${value?string}
-            <#elseif value?is_date>${value?string("EEEE, MMMM dd, yyyy hh:mm:ss a zzz")}
-            <#-- At this point both types and collections have sequence values. We need to
-                 reference the type of the original object to know whether it's indexable
-                 or not. -->
-            <#elseif value?is_sequence><@doSequenceItems value map.type/>
-
-            <#elseif value?is_method || value?is_directive><@doMethod value />
-            <#elseif value?is_hash_ex><@doMapItems value />
-            <#else>
-            </#if>
-        </div>
+    <#if map.type == "Directive" || map.type == "Method">
+        <@doHelp map.help! />
+    <#else>
+        <@doValue map.type map.value! />
     </#if>
+    
 </#macro>
 
-<#macro doSequenceItems seq type>
+<#macro doValue type value="">
+    <div class="values">
+        <#if value??>
+            <#if value?is_sequence><@doSequenceValue value type/>
+            <#elseif value?is_hash_ex><@doMapValue value />            
+            <#else><@doScalarValue type value />
+            </#if>
+       </#if>             
+    </div>
+</#macro>
+
+<#macro doSequenceValue seq type>
+    <strong>Values:</strong>
     <#if seq?has_content>
         <ul class="sequence">
             <#list seq as item>
-                <li class="list_item">
-                    <#if type == "Sequence">Item ${item_index}: </#if>
-                    <@doMap item />
+                <li class="item">
+                    <#if type == "Sequence">
+                        Item ${item_index}: 
+                        <@valueDiv item />
+                    <#else><@doMap item />
+                    </#if>
+                    
                 </li>
             </#list>
         </ul>
-    </#if>
+     <#else>no values
+     </#if>
 </#macro>
 
-<#macro doMapItems map>
+<#macro doMapValue map>
+    <strong>Values:</strong>
     <#if map?has_content>
         <ul class="map">
             <#list map?keys as key>
-                <li class="map_item">
-                    ${key} => <@doMap map[key] />
+                <li class="item">
+                    ${key} => <@valueDiv map[key] />
                 </li>
             </#list>
+        </ul>
+    <#else>no values
+    </#if>
+</#macro>
+
+<#macro doScalarValue type value>
+    <strong>Value:</strong>
+    
+    <#if value?is_string || value?is_number>${value}
+    <#elseif value?is_boolean>${value?string}
+    <#elseif value?is_date>${value?string("EEEE, MMMM dd, yyyy hh:mm:ss a zzz")}
+    <#else>no value
+    </#if>    
+</#macro>
+
+<#macro doHelp help="">
+    <#if help?has_content>
+        <ul class="help">
+            <#list help?keys as key>
+                <li>
+                    <p><strong>${key}</strong></p>
+                    <#--<@valueDiv help[key] />--> 
+                </li>
+            </#list>        
         </ul>
     </#if>
 </#macro>
 
-<#macro doMethod method>
-
+<#macro valueDiv value>
+    <div class="value"><@doMap value /></div>
 </#macro>
 
 <#-- This will work after we move stylesheets to Configuration sharedVariables 
