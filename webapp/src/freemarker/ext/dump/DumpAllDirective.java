@@ -68,12 +68,10 @@ public class DumpAllDirective extends BaseDumpDirective {
     }
 
     @Override
-    protected Map<String, Object> help(String name) {
+    public Map<String, Object> help(String name) {
         Map<String, Object> map = new HashMap<String, Object>();
-        
-        //map.put("name", name);
-        
-        map.put("effect", "Dump the contents of the template data model.");
+
+        map.put("effect", "Dumps the contents of the template data model.");
       
         //map.put("comments", "");
         

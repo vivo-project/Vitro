@@ -58,7 +58,7 @@ public class HelpDirectiveTest {
          
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
         expectedDumpValue.put(Key.TYPE.toString(), Type.METHOD);
-        expectedDumpValue.put("help", null);
+        expectedDumpValue.put(Key.HELP.toString(), null);
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
         expectedDump.put(varName, expectedDumpValue);
@@ -77,7 +77,7 @@ public class HelpDirectiveTest {
          
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
         expectedDumpValue.put(Key.TYPE.toString(), Type.METHOD);
-        expectedDumpValue.put("help", getMethodHelp(varName));
+        expectedDumpValue.put(Key.HELP.toString(), getMethodHelp(varName));
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
         expectedDump.put(varName, expectedDumpValue);
@@ -96,7 +96,7 @@ public class HelpDirectiveTest {
          
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
         expectedDumpValue.put(Key.TYPE.toString(), Type.METHOD);
-        expectedDumpValue.put("help", null);
+        expectedDumpValue.put(Key.HELP.toString(), null);
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
         expectedDump.put(varName, expectedDumpValue);
@@ -115,7 +115,7 @@ public class HelpDirectiveTest {
          
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
         expectedDumpValue.put(Key.TYPE.toString(), Type.DIRECTIVE);
-        expectedDumpValue.put("help", null);
+        expectedDumpValue.put(Key.HELP.toString(), null);
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
         expectedDump.put(varName, expectedDumpValue);
@@ -134,7 +134,7 @@ public class HelpDirectiveTest {
          
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
         expectedDumpValue.put(Key.TYPE.toString(), Type.DIRECTIVE);
-        expectedDumpValue.put("help", getDirectiveHelp(varName));
+        expectedDumpValue.put(Key.HELP.toString(), getDirectiveHelp(varName));
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
         expectedDump.put(varName, expectedDumpValue);
@@ -153,7 +153,7 @@ public class HelpDirectiveTest {
          
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
         expectedDumpValue.put(Key.TYPE.toString(), Type.DIRECTIVE);
-        expectedDumpValue.put("help", null);
+        expectedDumpValue.put(Key.HELP.toString(), null);
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
         expectedDump.put(varName, expectedDumpValue);
@@ -237,9 +237,9 @@ public class HelpDirectiveTest {
         
         map.put("comments", "Sequences (lists and arrays) are enclosed in square brackets. Hashes are enclosed in curly braces.");
         
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("var", "name of variable to dump");
-        map.put("params", params);
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put("var", "name of variable to dump");
+        map.put("parameters", parameters);
         
         List<String> examples = new ArrayList<String>();
         examples.add("<@" + name + " var=\"urls\" />");
@@ -253,9 +253,9 @@ public class HelpDirectiveTest {
         
         map.put("returns", "The square of the argument");
 
-        List<String>params = new ArrayList<String>();
+        List<String> params = new ArrayList<String>();
         params.add("Integer to square");
-        map.put("params", params);
+        map.put("parameters", params);
         
         List<String> examples = new ArrayList<String>();
         examples.add(name + "(4)");

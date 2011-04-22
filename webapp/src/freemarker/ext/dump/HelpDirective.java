@@ -58,23 +58,21 @@ public class HelpDirective extends BaseDumpDirective {
         Map<String, Object> map = getTemplateVariableDump(varName, env);
         
         String type = templateModel instanceof TemplateMethodModel ? "method" : "directive";
-        String title = "Help for " + type;
+        String title = "Template " + type + " help";
         dump(map, env, title);         
     }
     
     @Override
-    protected Map<String, Object> help(String name) {
+    public Map<String, Object> help(String name) {
         Map<String, Object> map = new HashMap<String, Object>();
-
-        //map.put("name", name);
         
-        map.put("effect", "Output help for a directive or method.");
+        map.put("effect", "Outputs help for a directive or method.");
         
         //map.put("comments", "");
         
         Map<String, String> params = new HashMap<String, String>();
         params.put("for", "name of directive or method");
-        map.put("params", params);
+        map.put("parameters", params);
         
         List<String> examples = new ArrayList<String>();
         examples.add("<@" + name + " for=\"dump\" />");

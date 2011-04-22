@@ -88,7 +88,7 @@ div.dump {
                 <li class="item">
                     <#if type == "Sequence">
                         Item ${item_index}: 
-                        <@valueDiv item />
+                        <@valueDiv><@doMap item /></@valueDiv>
                     <#else><@doMap item />
                     </#if>
                     
@@ -105,7 +105,7 @@ div.dump {
         <ul class="map">
             <#list map?keys as key>
                 <li class="item">
-                    ${key} => <@valueDiv map[key] />
+                    ${key} => <@valueDiv><@doMap map[key] /></@valueDiv>
                 </li>
             </#list>
         </ul>
@@ -125,20 +125,38 @@ div.dump {
 
 <#macro doHelp help="">
     <#if help?has_content>
+        <p><strong>Help:</strong><p>
         <ul class="help">
             <#list help?keys as key>
                 <li>
-                    <p><strong>${key}</strong></p>
-                    <#--<@valueDiv help[key] />--> 
+                    <#local value = help[key]>
+                    <@valueDiv>                        
+                        <#if value?is_string><p><strong>${key?capitalize}:</strong> ${value}</p>
+                        <#else>
+                            <p><strong>${key?capitalize}:</strong></p>
+                            <ul>
+                                <#if value?is_sequence>
+                                    <#list value as item>
+                                        <li>${item}</li>
+                                    </#list>
+                                <#elseif value?is_hash_ex>
+                                    <#list value?keys as key>
+                                        <li><strong>${key}:</strong> ${value[key]}</li>
+                                    </#list>
+                                </#if>
+                            </ul>
+                        </#if>
+                    </@valueDiv>
                 </li>
             </#list>        
         </ul>
     </#if>
 </#macro>
 
-<#macro valueDiv value>
-    <div class="value"><@doMap value /></div>
+<#macro valueDiv>
+    <div class="value"><#nested></div>
 </#macro>
+
 
 <#-- This will work after we move stylesheets to Configuration sharedVariables 
 ${stylesheets.add('<link rel="stylesheet" href="/css/fmdump.css">')}

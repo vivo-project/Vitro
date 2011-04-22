@@ -57,6 +57,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     
     enum Key {
         DATE_TYPE("dateType"),
+        HELP("help"),
         METHODS("methods"),
         PROPERTIES("properties"),
         TYPE("type"),
@@ -416,36 +417,39 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     private Map<String, Object> getTemplateModelDump(TemplateMethodModel model, String varName) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), Type.METHOD);
-        map.put("help", getHelp(model, varName));       
+        map.put(Key.HELP.toString(), getHelp(model, varName));       
         return map;
     }
     
     private Map<String, Object> getTemplateModelDump(TemplateDirectiveModel model, String varName) throws TemplateModelException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), Type.DIRECTIVE);
-        map.put("help", getHelp(model, varName));
+        map.put(Key.HELP.toString(), getHelp(model, varName));
         return map;
     }
     
     @SuppressWarnings("unchecked")
     private Map<String, Object> getHelp(TemplateModel model, String varName) {
-        Map<String, Object> map = null;
         if ( model instanceof TemplateMethodModel || model instanceof TemplateDirectiveModel ) {
+            String modelClass = model instanceof TemplateMethodModel ? "TemplateMethodModel" : "TemplateDirectiveModel";
             Class<?> cls = model.getClass();
-            Method[] methods = cls.getMethods();
-            for (Method method : methods) {
-                if ( method.getName().equals("help") ) {
-                    try {
-                        map = (Map<String, Object>) method.invoke(model, varName);
-                    } catch (Exception e) {    
-                        String modelClass = model instanceof TemplateMethodModel ? "TemplateMethodModel" : "TemplateDirectiveModel";
-                        log.error("Error invoking method help() on " + modelClass + " of class " + cls.getName());
-                    } 
-                    break;
-                }
-            }            
+            try {
+                Method help = cls.getMethod("help", String.class);
+                try {
+                    return (Map<String, Object>) help.invoke(model, varName);
+                } catch (Exception e) {                        
+                    log.error("Error invoking method help() on " + modelClass + " of class " + cls.getName());
+                    return null;
+                } 
+            } catch (NoSuchMethodException e) {
+                log.info("No help() method defined for " + modelClass + " of class " + cls.getName());
+                return null;
+            } catch (Exception e) {
+                log.error("Error getting method help() for " + modelClass + " " + cls.getName());
+                return null;
+            }
         }
-        return map;
+        return null;
     }
     
     private Map<String, Object> getTemplateModelDump(TemplateModel model) throws TemplateModelException {
@@ -483,7 +487,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         out.write(sw.toString());        
     }
 
-    protected Map<String, Object> help(String name) {
+    public Map<String, Object> help(String name) {
         return new HashMap<String, Object>();        
     }
 }

@@ -56,18 +56,16 @@ public class DumpDirective extends BaseDumpDirective {
     }
     
     @Override
-    protected Map<String, Object> help(String name) {
+    public Map<String, Object> help(String name) {
         Map<String, Object> map = new HashMap<String, Object>();
         
-        //map.put("name", name);
-        
-        map.put("effect", "Dump the contents of a template variable.");
+        map.put("effect", "Dumps the contents of a template variable.");
         
         //map.put("comments", "");
         
         Map<String, String> params = new HashMap<String, String>();
         params.put("var", "name of variable to dump");
-        map.put("params", params);
+        map.put("parameters", params);
         
         List<String> examples = new ArrayList<String>();
         examples.add("<@" + name + " var=\"urls\" />");
