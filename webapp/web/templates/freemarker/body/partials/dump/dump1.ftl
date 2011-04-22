@@ -31,6 +31,10 @@ div.dump {
 .dump ul li.item .value { 
     margin-left: 1.5em;
 }
+
+.dump ul.methods li {
+    margin-bottom: .25em;
+}
 </style>
 
 <div class="dump">
@@ -44,40 +48,62 @@ div.dump {
         <ul>
             <#list dump?keys as key>
                 <li>
-                    <p><strong>Variable name:</strong> ${key}</p>                   
-                    <@doMap dump[key] />
+                    <p><strong>Variable name:</strong> ${key}</p>  
+                    
+                    <#local type = dump[key].type>
+                    <#if type == "Directive" || type == "Method"> 
+                        <@doMethod dump[key] />
+                    <#else>                
+                        <@doTypeAndValue dump[key] />
+                    </#if>
                 </li>       
             </#list>
         </ul> 
     </#if>
 </#macro>
 
-<#macro doMap map>
-    <#if map.type?has_content>
-        <p><strong>Type:</strong> ${map.type}</p>
+<#macro doTypeAndValue map>
+    <#local type = map.type!>
+    <#if type?has_content>
+        <p><strong>Type:</strong> ${type}</p>
         
         <#if map.dateType?has_content>
             <p><strong>Date type:</strong> ${map.dateType}</p>
         </#if>
     </#if>   
-    
-    <#if map.type == "Directive" || map.type == "Method">
-        <@doHelp map.help! />
-    <#else>
-        <@doValue map.type map.value! />
-    </#if>
-    
+
+    <#local value = map.value!>    
+    <#if value??>
+        <div class="values">
+            <#if type?contains(".")><@doObjectValue value />
+            <#elseif value?is_sequence><@doSequenceValue value type />
+            <#elseif value?is_hash_ex><@doMapValue value />            
+            <#else><@doScalarValue value />
+            </#if>
+       </div>
+   </#if>                    
 </#macro>
 
-<#macro doValue type value="">
-    <div class="values">
-        <#if value??>
-            <#if value?is_sequence><@doSequenceValue value type/>
-            <#elseif value?is_hash_ex><@doMapValue value />            
-            <#else><@doScalarValue type value />
-            </#if>
-       </#if>             
-    </div>
+<#macro doObjectValue obj>
+    <#if obj.properties?has_content>
+        <p><strong>Properties:</strong></p>
+        <ul class="properties">
+            <#list obj.properties?keys as property>
+                <@liItem>
+                    ${property} => <@divValue><@doTypeAndValue obj.properties[property] /></@divValue>
+                </@liItem>
+            </#list>
+        </ul>
+    </#if>
+    
+    <#if obj.methods?has_content>
+        <p><strong>Methods:</strong</p>
+        <ul class="methods">
+            <#list obj.methods as method>
+                <@liItem>${method}</@liItem>
+            </#list>
+        </ul>
+    </#if>
 </#macro>
 
 <#macro doSequenceValue seq type>
@@ -85,14 +111,13 @@ div.dump {
     <#if seq?has_content>
         <ul class="sequence">
             <#list seq as item>
-                <li class="item">
+                <@liItem>
                     <#if type == "Sequence">
                         Item ${item_index}: 
-                        <@valueDiv><@doMap item /></@valueDiv>
-                    <#else><@doMap item />
-                    </#if>
-                    
-                </li>
+                        <@divValue><@doTypeAndValue item /></@divValue>
+                    <#else><@doTypeAndValue item />
+                    </#if>                    
+                </@liItem>
             </#list>
         </ul>
      <#else>no values
@@ -104,33 +129,35 @@ div.dump {
     <#if map?has_content>
         <ul class="map">
             <#list map?keys as key>
-                <li class="item">
-                    ${key} => <@valueDiv><@doMap map[key] /></@valueDiv>
-                </li>
+                <@liItem>
+                    ${key} => <@divValue><@doTypeAndValue map[key] /></@divValue>
+                </@liItem>
             </#list>
         </ul>
     <#else>no values
     </#if>
 </#macro>
 
-<#macro doScalarValue type value>
+<#macro doScalarValue value>
     <strong>Value:</strong>
     
-    <#if value?is_string || value?is_number>${value}
+    <#if value?is_string>${value}
+    <#elseif value?is_number>${value?c}
     <#elseif value?is_boolean>${value?string}
     <#elseif value?is_date>${value?string("EEEE, MMMM dd, yyyy hh:mm:ss a zzz")}
-    <#else>no value
     </#if>    
 </#macro>
 
-<#macro doHelp help="">
+<#macro doMethod method>
+    <p><strong>Type:</strong> ${method.type}</p>
+    <#local help = method.help>
     <#if help?has_content>
         <p><strong>Help:</strong><p>
         <ul class="help">
             <#list help?keys as key>
                 <li>
                     <#local value = help[key]>
-                    <@valueDiv>                        
+                    <@divValue>                        
                         <#if value?is_string><p><strong>${key?capitalize}:</strong> ${value}</p>
                         <#else>
                             <p><strong>${key?capitalize}:</strong></p>
@@ -146,15 +173,19 @@ div.dump {
                                 </#if>
                             </ul>
                         </#if>
-                    </@valueDiv>
+                    </@divValue>
                 </li>
             </#list>        
         </ul>
     </#if>
 </#macro>
 
-<#macro valueDiv>
+<#macro divValue>
     <div class="value"><#nested></div>
+</#macro>
+
+<#macro liItem>
+    <li class="item"><#nested></li>
 </#macro>
 
 

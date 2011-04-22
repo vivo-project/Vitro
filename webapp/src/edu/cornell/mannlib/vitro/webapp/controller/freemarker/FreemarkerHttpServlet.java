@@ -255,7 +255,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return UrlBuilder.getUrl(path);
     }
 
-    protected TemplateModel wrap(int exposureLevel, Object obj) throws TemplateModelException {
+    protected TemplateModel wrap(Object obj, int exposureLevel) throws TemplateModelException {
         BeansWrapper wrapper = getBeansWrapper(exposureLevel);
         return wrapper.wrap(obj);
     }
@@ -271,7 +271,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         // instead of the configuration's object wrapper, which doesn't. The templates can
         // add stylesheets and scripts to the lists by calling their add() methods.
         try {
-            return wrap(BeansWrapper.EXPOSE_SAFE, new Tags());
+            return wrap(new Tags(), BeansWrapper.EXPOSE_SAFE);
         } catch (TemplateModelException e) {
             log.error("Error creating Tags template model");
             return null;

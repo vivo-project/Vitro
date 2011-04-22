@@ -1011,7 +1011,7 @@ public class DumpDirectiveTest {
         // Properties
         SortedMap<String, Object> propertiesExpectedDump = new TreeMap<String, Object>();
         
-        if (exposureLevel != BeansWrapper.EXPOSE_NOTHING) {           
+        if (exposureLevel < BeansWrapper.EXPOSE_NOTHING) {           
     
             Map<String, Object> birthdateExpectedDump = new HashMap<String, Object>();
             birthdateExpectedDump.put(Key.TYPE.toString(), Type.DATE);
@@ -1078,7 +1078,7 @@ public class DumpDirectiveTest {
     private List<String> getEmployeeMethodsExpectedDump(int exposureLevel) {
         
         List<String> expectedDump = new ArrayList<String>();
-        if (exposureLevel == BeansWrapper.EXPOSE_SAFE || exposureLevel == BeansWrapper.EXPOSE_ALL) {
+        if (exposureLevel <= BeansWrapper.EXPOSE_SAFE) {
             expectedDump.add("getEmployeeCount");
             expectedDump.add("getName(String)");
             expectedDump.add("setFavoriteColors(Strings)");
@@ -1095,7 +1095,7 @@ public class DumpDirectiveTest {
         SortedMap<String, Object> propertiesExpectedDump = new TreeMap<String, Object>();
         
         // Properties 
-        if (exposureLevel != BeansWrapper.EXPOSE_NOTHING) {
+        if (exposureLevel < BeansWrapper.EXPOSE_NOTHING) {
             
             Map<String, Object> birthdateExpectedDump = new HashMap<String, Object>();
             birthdateExpectedDump.put(Key.TYPE.toString(), Type.DATE);
