@@ -50,7 +50,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
 
     private static final Log log = LogFactory.getLog(BaseDumpDirective.class);
     
-    private static final String TEMPLATE_DEFAULT = "dump1.ftl";  // change to dump.ftl when old dump is removed  
+    private static final String TEMPLATE_DEFAULT = "dump.ftl";  // change to dump.ftl when old dump is removed  
     private static final Pattern PROPERTY_NAME_PATTERN = Pattern.compile("^(get|is)\\w");
     
     enum Key {
