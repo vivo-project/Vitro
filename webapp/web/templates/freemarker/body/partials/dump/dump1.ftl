@@ -65,26 +65,52 @@ div.dump {
     </#if>   
     
     <#if map.value?has_content>
-        <p>
+        <div>
             <strong>Value:</strong>
             <#local value = map.value>
             <#if value?is_string || value?is_number>${value}
-            <#elseif value?is_boolean || value?is_number>${value?string}
+            <#elseif value?is_boolean>${value?string}
             <#elseif value?is_date>${value?string("EEEE, MMMM dd, yyyy hh:mm:ss a zzz")}
-            <#elseif value?is_sequence><@doSequence value />
+            <#-- At this point both types and collections have sequence values. We need to
+                 reference the type of the original object to know whether it's indexable
+                 or not. -->
+            <#elseif value?is_sequence><@doSequenceItems value map.type/>
+
+            <#elseif value?is_method || value?is_directive><@doMethod value />
+            <#elseif value?is_hash_ex><@doMapItems value />
+            <#else>
             </#if>
-        </p>
+        </div>
     </#if>
 </#macro>
 
-<#macro doSequence seq>
+<#macro doSequenceItems seq type>
     <#if seq?has_content>
         <ul class="sequence">
             <#list seq as item>
-                <li class="list_item">Item ${item_index}: <@doMap item /></li>
+                <li class="list_item">
+                    <#if type == "Sequence">Item ${item_index}: </#if>
+                    <@doMap item />
+                </li>
             </#list>
         </ul>
     </#if>
+</#macro>
+
+<#macro doMapItems map>
+    <#if map?has_content>
+        <ul class="map">
+            <#list map?keys as key>
+                <li class="map_item">
+                    ${key} => <@doMap map[key] />
+                </li>
+            </#list>
+        </ul>
+    </#if>
+</#macro>
+
+<#macro doMethod method>
+
 </#macro>
 
 <#-- This will work after we move stylesheets to Configuration sharedVariables 
