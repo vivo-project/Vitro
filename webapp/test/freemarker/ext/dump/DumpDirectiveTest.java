@@ -286,18 +286,38 @@ public class DumpDirectiveTest {
    }
 
    @Test
-   public void dumpMethodWithBadHelp() {
+   public void dumpMethodWithStringHelp() {
 
        String varName = "square";
        Map<String, Object> dataModel = new HashMap<String, Object>();
        
-       TemplateMethodModel methodModel = new MethodWithBadHelp();
+       TemplateMethodModel methodModel = new MethodWithStringHelp();
        dataModel.put(varName, methodModel);
         
        Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
        expectedDumpValue.put(Key.TYPE.toString(), Type.METHOD);
        expectedDumpValue.put(Key.CLASS.toString(), methodModel.getClass().getName());
        expectedDumpValue.put(Key.HELP.toString(), null);
+
+       Map<String, Object> expectedDump = new HashMap<String, Object>();
+       expectedDump.put(varName, expectedDumpValue);
+       
+       test(varName, dataModel, expectedDump);
+   }
+
+   @Test
+   public void dumpMethodWithStringStringMapHelp() {
+
+       String varName = "square";
+       Map<String, Object> dataModel = new HashMap<String, Object>();
+       
+       TemplateMethodModel methodModel = new MethodWithStringStringMapHelp();
+       dataModel.put(varName, methodModel);
+        
+       Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
+       expectedDumpValue.put(Key.TYPE.toString(), Type.METHOD);
+       expectedDumpValue.put(Key.CLASS.toString(), methodModel.getClass().getName());
+       expectedDumpValue.put(Key.HELP.toString(), new HashMap<String, Object>());
 
        Map<String, Object> expectedDump = new HashMap<String, Object>();
        expectedDump.put(varName, expectedDumpValue);
@@ -346,18 +366,38 @@ public class DumpDirectiveTest {
    }
  
    @Test
-   public void dumpDirectiveWithBadHelp() {
+   public void dumpDirectiveWithStringHelp() {
 
        String varName = "dump";
        Map<String, Object> dataModel = new HashMap<String, Object>();
        
-       TemplateDirectiveModel directiveModel = new DirectiveWithBadHelp();
+       TemplateDirectiveModel directiveModel = new DirectiveWithStringHelp();
        dataModel.put(varName, directiveModel);
         
        Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
        expectedDumpValue.put(Key.TYPE.toString(), Type.DIRECTIVE);
        expectedDumpValue.put(Key.CLASS.toString(), directiveModel.getClass().getName());
        expectedDumpValue.put(Key.HELP.toString(), null);
+
+       Map<String, Object> expectedDump = new HashMap<String, Object>();
+       expectedDump.put(varName, expectedDumpValue);
+       
+       test(varName, dataModel, expectedDump);
+   } 
+
+   @Test
+   public void dumpDirectiveWithStringStringMapHelp() {
+
+       String varName = "dump";
+       Map<String, Object> dataModel = new HashMap<String, Object>();
+       
+       TemplateDirectiveModel directiveModel = new DirectiveWithStringStringMapHelp();
+       dataModel.put(varName, directiveModel);
+        
+       Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
+       expectedDumpValue.put(Key.TYPE.toString(), Type.DIRECTIVE);
+       expectedDumpValue.put(Key.CLASS.toString(), directiveModel.getClass().getName());
+       expectedDumpValue.put(Key.HELP.toString(), new HashMap<String, Object>());
 
        Map<String, Object> expectedDump = new HashMap<String, Object>();
        expectedDump.put(varName, expectedDumpValue);
@@ -814,15 +854,27 @@ public class DumpDirectiveTest {
         }
     }
 
-    private class MethodWithBadHelp implements TemplateMethodModel {
+    private class MethodWithStringHelp implements TemplateMethodModel {
 
         @Override
         public Object exec(List arg0) throws TemplateModelException {
             return null;
         } 
         
-        public Map<String, Object> help() {
-            return new HashMap<String, Object>();
+        public String help(String name) {
+            return "help";
+        }
+    }
+
+    private class MethodWithStringStringMapHelp implements TemplateMethodModel {
+
+        @Override
+        public Object exec(List arg0) throws TemplateModelException {
+            return null;
+        } 
+        
+        public Map<String, String> help(String name) {
+            return new HashMap<String, String>();
         }
     }
     
@@ -848,7 +900,7 @@ public class DumpDirectiveTest {
         }
     }
     
-    private class DirectiveWithBadHelp implements TemplateDirectiveModel {
+    private class DirectiveWithStringHelp implements TemplateDirectiveModel {
 
         @Override
         public void execute(Environment arg0, Map arg1, TemplateModel[] arg2,
@@ -858,6 +910,19 @@ public class DumpDirectiveTest {
         
         public String help(String name) {
             return "help";
+        }
+    }
+
+    private class DirectiveWithStringStringMapHelp implements TemplateDirectiveModel {
+
+        @Override
+        public void execute(Environment arg0, Map arg1, TemplateModel[] arg2,
+                TemplateDirectiveBody arg3) throws TemplateException,
+                IOException {            
+        }
+        
+        public Map<String, String> help(String name) {
+            return new HashMap<String, String>();
         }
     }
     

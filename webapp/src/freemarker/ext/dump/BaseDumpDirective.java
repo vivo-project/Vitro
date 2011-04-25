@@ -453,7 +453,11 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                 Method help = cls.getMethod("help", String.class);
                 try {
                     return (Map<String, Object>) help.invoke(model, varName);
-                } catch (Exception e) {                        
+                } catch (ClassCastException e) {
+                    log.error("Method help() of " + modelClass + " of class " + cls.getName() + " has incorrect return type.");
+                    return null;
+                } catch (Exception e) {
+                    // 
                     log.error("Error invoking method help() on " + modelClass + " of class " + cls.getName());
                     return null;
                 } 
