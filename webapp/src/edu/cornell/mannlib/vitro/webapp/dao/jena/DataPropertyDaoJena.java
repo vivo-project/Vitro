@@ -776,7 +776,9 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             Resource resource = sol.getResource("property");
             String uri = resource.getURI();
             DataProperty property = getDataPropertyByURI(uri);
-            properties.add(property);
+            if (property != null) {
+                properties.add(property);
+            }
         }
         return properties; 
     }
