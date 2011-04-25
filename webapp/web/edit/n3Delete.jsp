@@ -58,7 +58,7 @@
     
     List<String>  errorMessages = new ArrayList<String>();    
 
-    EditConfiguration editConfig = EditConfiguration.getConfigFromSession(session,request,queryParameters);
+    EditConfiguration editConfig = EditConfiguration.getConfigFromSession(session,request);
     if( editConfig == null ){
         %><jsp:forward page="/edit/messages/noEditConfigFound.jsp"/><%
     }

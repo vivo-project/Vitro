@@ -5,6 +5,7 @@
 
 <%@ page import="com.hp.hpl.jena.rdf.model.Literal"%>
 <%@ page import="com.hp.hpl.jena.rdf.model.Model"%>
+<%@ page import="com.hp.hpl.jena.vocabulary.XSD"%>
 
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary"%>
@@ -48,7 +49,7 @@
     
     Individual subject = (Individual)vreq.getAttribute("subject");
     if( subject == null ) {
-        throw new Error("In defaultVitroNsPropForm.jsp, could not find subject " + subjectUri);
+        throw new Error("In rdfsLabelForm.jsp, could not find subject " + subjectUri);
     }
     
     Model model =  (Model)application.getAttribute("jenaOntModel");
@@ -61,22 +62,22 @@
         
         rangeDatatypeUri = dps.getDatatypeURI();        
         if (rangeDatatypeUri == null) {
-            log.debug("no range datatype uri set on vitro namespace property statement for property " + predicateUri + "in defaultVitroNsPropForm.jsp");
+            log.debug("no range datatype uri set on rdfs:label statement for property " + predicateUri + "in rdfsLabelForm.jsp");
         } else {
-            log.debug("range datatype uri of [" + rangeDatatypeUri + "] on vitro namespace property statement for property " + predicateUri + "in defaultVitroNsPropForm.jsp");
+            log.debug("range datatype uri of [" + rangeDatatypeUri + "] on rdfs:label statement for property " + predicateUri + "in rdfsLabelForm.jsp");
         }        
         
         rangeLang = dps.getLanguage();
         if( rangeLang == null ) {            
-            log.debug("no language attribute on vitro namespace property statement for property " + predicateUri + "in defaultVitroNsPropForm.jsp");
+            log.debug("no language attribute on rdfs:label statement for property " + predicateUri + "in rdfsLabelForm.jsp");
             rangeLang = "";
         } else {
-            log.debug("language attribute of ["+rangeLang+"] on vitro namespace property statement for property " + predicateUri + "in defaultVitroNsPropForm.jsp");
+            log.debug("language attribute of ["+rangeLang+"] on rdfs:label statement for property " + predicateUri + "in rdfsLabelForm.jsp");
         }
         
     } else {
-        log.debug("No incoming vitro namespace property statement for property "+predicateUri+"; adding a new statement");  
-        rangeDatatypeUri = FrontEndEditingUtils.getVitroNsPropDatatypeUri(predicateUri);   
+        log.debug("No incoming rdfs:label statement for property "+predicateUri+"; adding a new statement");  
+        rangeDatatypeUri = XSD.xstring.getURI();
     }
     
     String rangeDatatypeUriJson = rangeDatatypeUri == null ? "" : MiscWebUtils.escape(rangeDatatypeUri);

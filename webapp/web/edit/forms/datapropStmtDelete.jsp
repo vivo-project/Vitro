@@ -59,9 +59,8 @@
     Model model = (Model)application.getAttribute("jenaOntModel");
     
     String vitroNsProp  = vreq.getParameter("vitroNsProp");
-    boolean isVitroNsProp = vitroNsProp != null && vitroNsProp.equals("true") ? true : false;
     
-    DataPropertyStatement dps = RdfLiteralHash.getPropertyStmtByHash(subject, predicateUri, dataHash, model, isVitroNsProp);
+    DataPropertyStatement dps = RdfLiteralHash.getPropertyStmtByHash(subject, predicateUri, dataHash, model);
     
     if( log.isDebugEnabled() ){
         log.debug("attempting to delete dataPropertyStatement: subjectURI <" + dps.getIndividualURI() +">");
@@ -84,21 +83,8 @@
         
       	//do the delete
         if( request.getParameter("y") != null ) {
-        	if( isVitroNsProp ){
-        			OntModel writeModel = (new StandardModelSelector()).getModel(request, application);        			
-        			writeModel.enterCriticalSection(Lock.WRITE);
-        			try{
-        			    writeModel.getBaseModel().notifyEvent(new EditEvent(editorUri,true));
-        				writeModel.remove(
-        						writeModel.getResource(subjectUri), 
-        						writeModel.getProperty(predicateUri),
-        						writeModel.createTypedLiteral(dps.getData(), dps.getDatatypeURI()));
-        			}finally{
-        				writeModel.leaveCriticalSection();
-        			}        			        			
-        	}else{
-            	wdf.getDataPropertyStatementDao().deleteDataPropertyStatement(dps);
-        	}        	                
+
+            wdf.getDataPropertyStatementDao().deleteDataPropertyStatement(dps);      	                
             %>
 
 			<%-- grab the predicate URI and trim it down to get the Local Name so we can send the user back to the appropriate property --%>
