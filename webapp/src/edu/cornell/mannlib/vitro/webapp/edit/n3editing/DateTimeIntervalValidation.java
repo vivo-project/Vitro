@@ -52,10 +52,11 @@ public class DateTimeIntervalValidation implements N3Validator {
         
         Map<String, String> errors = new HashMap<String, String>();
 
-        if( formStartYear == null && formEndYear != null ){                               
-            errors.put(startFieldName, "If there is an end date, there should be a start date");
-            return errors;              
-        }
+        // NIHVIVO-2541 Commented out to allow end date with no start date
+//        if( formStartYear == null && formEndYear != null ){                               
+//            errors.put(startFieldName, "If there is an end date, there should be a start date");
+//            return errors;              
+//        }
         
         if (formStartYear != null && formEndYear != null) {
             errors.putAll(checkDateLiterals(formStartYear, formEndYear, startPrecision, endPrecision));
