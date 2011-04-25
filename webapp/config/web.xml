@@ -149,11 +149,6 @@
 		</listener-class>
 	</listener>  -->
 
-<!--  
-  <listener>
-    <listener-class> edu.cornell.mannlib.vitro.webapp.auth.policy.setup.InformationResourceEditingPolicySetup</listener-class>
-  </listener> --> 
-    
     <listener>
         <listener-class>
             edu.cornell.mannlib.vitro.webapp.auth.identifier.UserToIndIdentifierFactorySetup

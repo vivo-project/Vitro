@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.auth.policy;
+package edu.cornell.mannlib.vitro.webapp.auth.policy.specialrelationships;
 
 import static edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization.AUTHORIZED;
 import static edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization.INCONCLUSIVE;
@@ -28,9 +28,8 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.HasAssociatedIndividual;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.SelfEditing;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
@@ -39,15 +38,19 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.resource.AddResource;
-import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 /**
- * TODO
+ * Check the relationships in the SelfEditorRelationshipPolicy.
+ * 
+ * This only checks the relationships that deal with InformationResources.
+ * Testing the others seems too redundant. If we generalize this to use
+ * configurable relationships, then we'll be able to make more general tests as
+ * well.
  */
-public class InformationResourceEditingPolicyTest extends AbstractTestClass {
+public class SelfEditorRelationshipPolicyTest extends AbstractTestClass {
 	private static final Log log = LogFactory
-			.getLog(InformationResourceEditingPolicyTest.class);
+			.getLog(SelfEditorRelationshipPolicyTest.class);
 
 	/** Can edit properties or resources in this namespace. */
 	private static final String NS_PERMITTED = "http://vivo.mydomain.edu/individual/";
@@ -71,7 +74,8 @@ public class InformationResourceEditingPolicyTest extends AbstractTestClass {
 	/**
 	 * Where the model statements are stored for this test.
 	 */
-	private static final String N3_DATA_FILENAME = "resources/InformationResourceEditingPolicyTest.n3";
+	private static final String N3_DATA_FILENAME = "SelfEditorRelationship"
+			+ "PolicyTest.n3";
 
 	/**
 	 * These URIs must match the data in the N3 file.
@@ -96,7 +100,7 @@ public class InformationResourceEditingPolicyTest extends AbstractTestClass {
 
 	@BeforeClass
 	public static void setupModel() throws IOException {
-		InputStream stream = InformationResourceEditingPolicyTest.class
+		InputStream stream = SelfEditorRelationshipPolicyTest.class
 				.getResourceAsStream(N3_DATA_FILENAME);
 		Model model = ModelFactory.createDefaultModel();
 		model.read(stream, null, "N3");
@@ -108,7 +112,7 @@ public class InformationResourceEditingPolicyTest extends AbstractTestClass {
 		dumpModel();
 	}
 
-	private InformationResourceEditingPolicy policy;
+	private SelfEditorRelationshipPolicy policy;
 	private RequestedAction action;
 
 	@Before
@@ -118,7 +122,7 @@ public class InformationResourceEditingPolicyTest extends AbstractTestClass {
 				.getInstance(new String[] { NS_RESTRICTED });
 		PropertyRestrictionPolicyHelper.setBean(ctx, prph);
 
-		policy = new InformationResourceEditingPolicy(ctx, ontModel);
+		policy = new SelfEditorRelationshipPolicy(ctx, ontModel);
 	}
 
 	private IdentifierBundle idNobody;
@@ -148,7 +152,7 @@ public class InformationResourceEditingPolicyTest extends AbstractTestClass {
 	}
 
 	// ----------------------------------------------------------------------
-	// the tests
+	// boilerplate tests
 	// ----------------------------------------------------------------------
 
 	@Test
@@ -189,11 +193,29 @@ public class InformationResourceEditingPolicyTest extends AbstractTestClass {
 	}
 
 	@Test
-	public void dataPropSubjectIsNotInfoResource() {
-		action = new AddDataPropStmt(URI_PERMITTED_RESOURCE,
-				URI_PERMITTED_PREDICATE, "junk", null, null);
+	public void objectPropSubjectIsRestricted() {
+		action = new AddObjectPropStmt(URI_RESTRICTED_RESOURCE,
+				URI_PERMITTED_PREDICATE, URI_JOE_EDITED_IT);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(idJoe, action));
 	}
+
+	@Test
+	public void objectPropPredicateIsRestricted() {
+		action = new AddObjectPropStmt(URI_PERMITTED_RESOURCE,
+				URI_RESTRICTED_PREDICATE, URI_JOE_EDITED_IT);
+		assertDecision(INCONCLUSIVE, policy.isAuthorized(idJoe, action));
+	}
+
+	@Test
+	public void objectPropObjectIsRestricted() {
+		action = new AddObjectPropStmt(URI_JOE_EDITED_IT,
+				URI_PERMITTED_PREDICATE, URI_RESTRICTED_RESOURCE);
+		assertDecision(INCONCLUSIVE, policy.isAuthorized(idJoe, action));
+	}
+
+	// ----------------------------------------------------------------------
+	// InformationResource tests
+	// ----------------------------------------------------------------------
 
 	@Test
 	public void dataPropSubjectIsInfoResourceButNobodyIsSelfEditing() {
@@ -253,34 +275,6 @@ public class InformationResourceEditingPolicyTest extends AbstractTestClass {
 				URI_PERMITTED_PREDICATE, "junk", null, null);
 		assertDecision(AUTHORIZED, policy.isAuthorized(idJoe, action));
 		assertDecision(AUTHORIZED, policy.isAuthorized(idBozoAndJoe, action));
-	}
-
-	@Test
-	public void objectPropSubjectIsRestricted() {
-		action = new AddObjectPropStmt(URI_RESTRICTED_RESOURCE,
-				URI_PERMITTED_PREDICATE, URI_JOE_EDITED_IT);
-		assertDecision(INCONCLUSIVE, policy.isAuthorized(idJoe, action));
-	}
-
-	@Test
-	public void objectPropPredicateIsRestricted() {
-		action = new AddObjectPropStmt(URI_PERMITTED_RESOURCE,
-				URI_RESTRICTED_PREDICATE, URI_JOE_EDITED_IT);
-		assertDecision(INCONCLUSIVE, policy.isAuthorized(idJoe, action));
-	}
-
-	@Test
-	public void objectPropObjectIsRestricted() {
-		action = new AddObjectPropStmt(URI_JOE_EDITED_IT,
-				URI_PERMITTED_PREDICATE, URI_RESTRICTED_RESOURCE);
-		assertDecision(INCONCLUSIVE, policy.isAuthorized(idJoe, action));
-	}
-
-	@Test
-	public void objectPropNeitherSubjectOrObjectIsInfoResource() {
-		action = new AddObjectPropStmt(URI_PERMITTED_RESOURCE,
-				URI_PERMITTED_PREDICATE, URI_PERMITTED_RESOURCE);
-		assertDecision(INCONCLUSIVE, policy.isAuthorized(idJoe, action));
 	}
 
 	@Test
@@ -404,15 +398,29 @@ public class InformationResourceEditingPolicyTest extends AbstractTestClass {
 	}
 
 	// ----------------------------------------------------------------------
+	// Other tests
+	// ----------------------------------------------------------------------
+
+	@Test
+	public void dataPropSubjectIsNotInfoResource() {
+		action = new AddDataPropStmt(URI_PERMITTED_RESOURCE,
+				URI_PERMITTED_PREDICATE, "junk", null, null);
+		assertDecision(INCONCLUSIVE, policy.isAuthorized(idJoe, action));
+	}
+
+	@Test
+	public void objectPropNeitherSubjectOrObjectIsInfoResource() {
+		action = new AddObjectPropStmt(URI_PERMITTED_RESOURCE,
+				URI_PERMITTED_PREDICATE, URI_PERMITTED_RESOURCE);
+		assertDecision(INCONCLUSIVE, policy.isAuthorized(idJoe, action));
+	}
+
+	// ----------------------------------------------------------------------
 	// helper methods
 	// ----------------------------------------------------------------------
 
-	private SelfEditing makeSelfEditingId(String uri) {
-		IndividualImpl ind = new IndividualImpl();
-		ind.setURI(uri);
-		SelfEditing selfEditing = new SelfEditing(ind,
-				SelfEditingIdentifierFactory.NOT_BLACKLISTED);
-		return selfEditing;
+	private HasAssociatedIndividual makeSelfEditingId(String uri) {
+		return new HasAssociatedIndividual(uri, null);
 	}
 
 	private void assertDecision(Authorization expected, PolicyDecision decision) {
