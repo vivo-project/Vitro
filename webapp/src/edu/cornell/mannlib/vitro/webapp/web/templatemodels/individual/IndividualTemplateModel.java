@@ -2,25 +2,24 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Collection;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
-import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
-import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 public class IndividualTemplateModel extends BaseTemplateModel {
@@ -161,6 +160,22 @@ public class IndividualTemplateModel extends BaseTemplateModel {
         }
         
         return dpstm;
+    }
+    
+    public String getSelfEditingId() {
+        String id = null;
+        String idMatchingProperty = ConfigurationProperties.getProperty("selfEditing.idMatchingProperty");
+        if (! StringUtils.isBlank(idMatchingProperty)) {
+            // Use assertions model to side-step filtering. We need to get the value regardless of whether the property
+            // is visible to the current user.
+            WebappDaoFactory wdf = vreq.getAssertionsWebappDaoFactory();
+            Collection<DataPropertyStatement> ids = 
+                wdf.getDataPropertyStatementDao().getDataPropertyStatementsForIndividualByDataPropertyURI(individual, idMatchingProperty);
+            if (ids.size() > 0) {
+                id = ids.iterator().next().getData();
+            }
+        }
+        return id;
     }
     
     /* These methods simply forward to the methods of the wrapped individual. It would be desirable to 
