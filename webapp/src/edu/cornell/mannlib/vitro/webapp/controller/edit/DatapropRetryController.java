@@ -26,6 +26,8 @@ import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vedit.validator.impl.IntValidator;
 import edu.cornell.mannlib.vedit.validator.impl.XMLNameValidator;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionListener;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -43,14 +45,8 @@ public class DatapropRetryController extends BaseEditController {
 
     @Override
 	public void doPost (HttpServletRequest request, HttpServletResponse response) {
-
-        if (!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error("DatapropRetryController encountered exception calling super.doGet()");
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseOntologyEditorPages()))) {
+        	return;
         }
 
         //create an EditProcessObject for this and put it in the session

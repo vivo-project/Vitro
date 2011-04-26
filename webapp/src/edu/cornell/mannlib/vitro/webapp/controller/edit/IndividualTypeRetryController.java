@@ -25,6 +25,8 @@ import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseIndividualEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -39,14 +41,8 @@ public class IndividualTypeRetryController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(IndividualTypeRetryController.class.getName());
 
 	public void doGet (HttpServletRequest request, HttpServletResponse response) {
-		
-        if(!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error("Classes2ClassesRetryController encountered exception calling super.doGet()");
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseIndividualEditorPages()))) {
+        	return;
         }
 
         //create an EditProcessObject for this and put it in the session

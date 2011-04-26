@@ -21,6 +21,8 @@ import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Datatype;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -36,17 +38,12 @@ public class RestrictionRetryController extends BaseEditController {
 	private static final boolean OBJECT = false;
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse response) {
-		
+        if (!isAuthorizedToDisplayPage(req, response, new Actions(new UseOntologyEditorPages()))) {
+        	return;
+        }
+
 		VitroRequest request = new VitroRequest(req);
-		if (!checkLoginStatus(request,response))
-		    return;
-		
-		try {
-		    super.doGet(request,response);
-		} catch (Exception e) {
-		    log.error("PropertyRetryController encountered exception calling super.doGet()");
-		}
-		
+
 		try {
 			
 			EditProcessObject epo = createEpo(request);

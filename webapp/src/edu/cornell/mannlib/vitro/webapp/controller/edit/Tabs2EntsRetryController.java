@@ -19,6 +19,8 @@ import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.util.FormUtils;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManagePortals;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
@@ -35,18 +37,12 @@ public class Tabs2EntsRetryController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(Tabs2EntsRetryController.class.getName());
 
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
+        if (!isAuthorizedToDisplayPage(req, response, new Actions(new ManagePortals()))) {
+        	return;
+        }
 
     	VitroRequest request = new VitroRequest(req);
     	
-        if(!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error("Tabs2EntsRetryController encountered exception calling super.doGet()");
-        }
-
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
 

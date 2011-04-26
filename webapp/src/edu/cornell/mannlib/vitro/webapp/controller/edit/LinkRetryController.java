@@ -18,6 +18,8 @@ import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.util.FormUtils;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseIndividualEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Link;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
@@ -33,16 +35,11 @@ public class LinkRetryController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(LinkRetryController.class.getName());
 
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
-    	
-    	VitroRequest request = new VitroRequest(req);
-        if (!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error("LinkRetryController encountered exception calling super.doGet()");
+        if (!isAuthorizedToDisplayPage(req, response, new Actions(new UseIndividualEditorPages()))) {
+        	return;
         }
+
+    	VitroRequest request = new VitroRequest(req);
 
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);

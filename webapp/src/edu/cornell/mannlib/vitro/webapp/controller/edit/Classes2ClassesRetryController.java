@@ -15,6 +15,8 @@ import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.util.FormUtils;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Classes2Classes;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -26,15 +28,11 @@ public class Classes2ClassesRetryController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(Classes2ClassesRetryController.class.getName());
 
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
-    	VitroRequest request = new VitroRequest(req);
-        if(!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error("Classes2ClassesRetryController encountered exception calling super.doGet()");
+        if (!isAuthorizedToDisplayPage(req, response, new Actions(new UseOntologyEditorPages()))) {
+        	return;
         }
+
+    	VitroRequest request = new VitroRequest(req);
 
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);

@@ -41,6 +41,8 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -406,36 +408,18 @@ public class RefactorOperationController extends BaseEditController {
 	}
 	
     public void doPost(HttpServletRequest req, HttpServletResponse response) {
-    	VitroRequest request = new VitroRequest(req);
-    	String defaultLandingPage = getDefaultLandingPage(request);
-    	
-        if(!checkLoginStatus(request,response))
-        {
-        	RequestDispatcher rd = request.getRequestDispatcher(Controllers.SITE_ADMIN);
-           
-            try {
-                rd.forward(request, response);
-            } catch (Exception e) {
-                log.error(this.getClass().getName()+" could not forward to view.");
-                log.error(e.getMessage());
-                log.error(e.getStackTrace());
-            }
-            return;
+        if (!isAuthorizedToDisplayPage(req, response, new Actions(new UseOntologyEditorPages()))) {
+        	return;
         }
-        
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error(this.getClass().getName()+" encountered exception calling super.doGet()");
-        }
-        
-        VitroRequest vreq = new VitroRequest(request);
 
+    	VitroRequest vreq = new VitroRequest(req);
+    	String defaultLandingPage = getDefaultLandingPage(vreq);
+    	
         HashMap epoHash = null;
         EditProcessObject epo = null;
         try {
-            epoHash = (HashMap) request.getSession().getAttribute("epoHash");
-            epo = (EditProcessObject) epoHash.get(request.getParameter("_epoKey"));
+            epoHash = (HashMap) vreq.getSession().getAttribute("epoHash");
+            epo = (EditProcessObject) epoHash.get(vreq.getParameter("_epoKey"));
         } catch (NullPointerException e) {
             //session or edit process expired
             try {
@@ -450,14 +434,14 @@ public class RefactorOperationController extends BaseEditController {
         if (epo == null) 
         {
         	// Handles the case where we want to a type check on objects of datatype properties
-        	handleConsistencyCheckRequest(request, response);
+        	handleConsistencyCheckRequest(vreq, response);
         	return;
         }
         else modeStr = (String)epo.getAttribute("modeStr");
         
         String redirectStr = null;
         
-        if (request.getParameter("_cancel") == null) {
+        if (vreq.getParameter("_cancel") == null) {
 	        if (modeStr != null) {
 	        	
 	        	if (modeStr.equals("renameResource")) {

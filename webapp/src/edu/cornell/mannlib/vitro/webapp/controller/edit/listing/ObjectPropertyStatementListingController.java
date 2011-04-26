@@ -13,11 +13,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vedit.beans.ButtonForm;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
@@ -28,18 +29,13 @@ public class ObjectPropertyStatementListingController extends
 		BaseEditController {
 	
    public void doGet(HttpServletRequest request, HttpServletResponse response) {
+       if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseOntologyEditorPages()))) {
+       	return;
+       }
+
         VitroRequest vrequest = new VitroRequest(request);
         Portal portal = vrequest.getPortal();
 
-        if(!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request, response);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-        
         boolean assertedStatementsOnly = false;
      
         String assertParam = request.getParameter("assertedStmts");

@@ -8,11 +8,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,6 +18,8 @@ import org.joda.time.DateTime;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseIndividualEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -42,20 +42,15 @@ public class CloneEntityServlet extends BaseEditController {
     private static final Log log = LogFactory.getLog(CloneEntityServlet.class.getName());
 
     public void doPost(HttpServletRequest req, HttpServletResponse response) {
+        if (!isAuthorizedToDisplayPage(req, response, new Actions(new UseIndividualEditorPages()))) {
+        	return;
+        }
+
     	VitroRequest request = new VitroRequest(req);
-        HttpSession session = req.getSession();
-        ServletContext context = getServletContext();
         try {
             String portalIdStr = (portalIdStr = request.getParameter("home")) == null ? String
                     .valueOf(DEFAULT_PORTAL_ID)
                     : portalIdStr;
-
-            if (!checkLoginStatus(request,response)) {
-//                getServletConfig().getServletContext().getRequestDispatcher(
-//                "/index.jsp?home=" + portalIdStr).forward(request,
-//                 response);
-                 return;
-            }
 
             //attempt to clone a tab but if we don't find the parameter 'tabId' the clone a entity
             try{

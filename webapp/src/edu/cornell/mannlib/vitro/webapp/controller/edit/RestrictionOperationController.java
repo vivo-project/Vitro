@@ -24,6 +24,8 @@ import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 
@@ -32,19 +34,13 @@ public class RestrictionOperationController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(RestrictionOperationController.class.getName());
 	
 	public void doPost(HttpServletRequest req, HttpServletResponse response) {
-		
+        if (!isAuthorizedToDisplayPage(req, response, new Actions(new UseOntologyEditorPages()))) {
+        	return;
+        }
+
 		VitroRequest request = new VitroRequest(req);
 		String defaultLandingPage = getDefaultLandingPage(request);
 		
-	    if (!checkLoginStatus(request,response))
-	        return;
-	    
-	    try {
-	        super.doGet(request,response);
-	    } catch (Exception e) {
-	        log.error(this.getClass().getName()+" encountered exception calling super.doGet()");
-	    }
-	    
 	    try {
 	    	
 	    	OntModel ontModel = getOntModel(request, getServletContext());

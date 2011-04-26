@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -31,6 +30,8 @@ import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -51,7 +52,10 @@ public class RDFUploadController extends BaseEditController {
 	
 	public void doPost(HttpServletRequest rawRequest,
 			HttpServletResponse response) throws ServletException, IOException {
-	    
+        if (!isAuthorizedToDisplayPage(rawRequest, response, new Actions(new UseAdvancedDataToolsPages()))) {
+        	return;
+        }
+
 		FileUploadServletRequest req = FileUploadServletRequest.parseRequest(rawRequest,
 				maxFileSizeInBytes);
 		if (req.hasFileUploadException()) {
@@ -62,18 +66,7 @@ public class RDFUploadController extends BaseEditController {
 		Map<String, List<FileItem>> fileStreams = req.getFiles();
 	    
 		VitroRequest request = new VitroRequest(req);		
-		if (!checkLoginStatus(request,response) ){
-		    return;
-		}		
-		
 		LoginStatusBean loginBean = LoginStatusBean.getBean(request);
-		
-		try {
-			super.doGet(request,response);
-		} catch (Exception e) {
-		    forwardToFileUploadError(e.getLocalizedMessage(), req, response);
-			return;
-		}
 		
 		String modelName = req.getParameter("modelName");
 		if(modelName!=null){

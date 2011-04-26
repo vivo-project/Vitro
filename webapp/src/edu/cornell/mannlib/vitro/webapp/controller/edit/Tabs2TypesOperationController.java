@@ -13,6 +13,8 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManagePortals;
 import edu.cornell.mannlib.vitro.webapp.beans.TabVClassRelation;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.TabVClassRelationDao;
@@ -22,19 +24,13 @@ public class Tabs2TypesOperationController extends BaseEditController {
     private static final Log log = LogFactory.getLog(Tabs2TypesOperationController.class.getName());
 
     public void doGet(HttpServletRequest req, HttpServletResponse response) {
-    	
+        if (!isAuthorizedToDisplayPage(req, response, new Actions(new ManagePortals()))) {
+        	return;
+        }
+
     	VitroRequest request = new VitroRequest(req);
     	String defaultLandingPage = getDefaultLandingPage(request);
     	
-        if(!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error(this.getClass().getName()+" encountered exception calling super.doGet()");
-        }
-
         HashMap epoHash = null;
         EditProcessObject epo = null;
         try {

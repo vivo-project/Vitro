@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vedit.beans.ButtonForm;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -32,18 +34,13 @@ public class VClassWebappsListingController extends BaseEditController {
     private int NUM_COLS = 9;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseOntologyEditorPages()))) {
+        	return;
+        }
+
         VitroRequest vrequest = new VitroRequest(request);
         Portal portal = vrequest.getPortal();
 
-        if(!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request, response);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-       
         //need to figure out how to structure the results object to put the classes underneath
         
         List<VClass> classes = null;

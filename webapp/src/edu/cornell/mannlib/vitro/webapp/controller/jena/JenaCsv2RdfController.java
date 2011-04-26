@@ -5,8 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.jena;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -19,14 +17,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileItem;
 
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
-import com.hp.hpl.jena.shared.JenaException;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -44,6 +41,10 @@ public class JenaCsv2RdfController extends BaseEditController{
 	
 	public void doPost(HttpServletRequest rawRequest,
 			HttpServletResponse response) throws ServletException, IOException {
+        if (!isAuthorizedToDisplayPage(rawRequest, response, new Actions(new UseAdvancedDataToolsPages()))) {
+        	return;
+        }
+
 		FileUploadServletRequest req = FileUploadServletRequest.parseRequest(rawRequest,
 				maxFileSizeInBytes);
 		if (req.hasFileUploadException()) {
@@ -52,15 +53,6 @@ public class JenaCsv2RdfController extends BaseEditController{
 		}
 
 		VitroRequest request = new VitroRequest(req);		
-		if (!checkLoginStatus(request,response) ){
-		    try {
-                response.sendRedirect(getDefaultLandingPage(request));
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-		    return;
-		}		
 		Map<String, List<FileItem>> fileStreams = req.getFiles();
 		FileItem fileStream = fileStreams.get("filePath").get(0);
 		String filePath = fileStreams.get("filePath").get(0).getName();

@@ -14,6 +14,8 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManagePortals;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -23,14 +25,8 @@ public class PortalEditController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(PortalEditController.class.getName());
 
     public void doPost (HttpServletRequest request, HttpServletResponse response) {
-
-        if (!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error("PortalEditController caught exception calling doGet()");
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new ManagePortals()))) {
+        	return;
         }
 
         // we need to extract the keyword id from a Fetch parameter

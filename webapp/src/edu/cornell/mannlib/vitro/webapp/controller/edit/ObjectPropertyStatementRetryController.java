@@ -23,6 +23,8 @@ import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.util.FormUtils;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseIndividualEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
@@ -40,17 +42,11 @@ public class ObjectPropertyStatementRetryController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(ObjectPropertyStatementRetryController.class.getName());
 
     public void doPost (HttpServletRequest request, HttpServletResponse response) {
-
-        if (!checkLoginStatus(request,response))
-            return;
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseIndividualEditorPages()))) {
+        	return;
+        }
 
         VitroRequest vreq = new VitroRequest(request);
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error("ObjectPropertyStatementRetryController encountered exception calling super.doGet()");
-        }
 
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);

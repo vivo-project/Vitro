@@ -19,6 +19,8 @@ import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.util.FormUtils;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseIndividualEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -34,16 +36,8 @@ public class ExternalIdRetryController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(ExternalIdRetryController.class.getName());
 
     public void doPost (HttpServletRequest request, HttpServletResponse response) {
-    	
-    	
-
-        if (!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error("ExternalIdRetryController encountered exception calling super.doGet()");
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseIndividualEditorPages()))) {
+        	return;
         }
 
         VitroRequest vreq = new VitroRequest(request);

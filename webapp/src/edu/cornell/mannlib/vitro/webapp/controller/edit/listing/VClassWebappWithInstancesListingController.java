@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
@@ -28,19 +30,12 @@ public class VClassWebappWithInstancesListingController extends BaseEditControll
     private int NUM_COLS = 6;
     
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
-        
-        VitroRequest vrequest = new VitroRequest(request);
-        Portal portal = vrequest.getPortal();
-
-        if(!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request, response);
-        } catch (Throwable t) {
-            t.printStackTrace();
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseOntologyEditorPages()))) {
+        	return;
         }
 
+        VitroRequest vrequest = new VitroRequest(request);
+        Portal portal = vrequest.getPortal();
 
         String uriStr = request.getParameter("uri");
 

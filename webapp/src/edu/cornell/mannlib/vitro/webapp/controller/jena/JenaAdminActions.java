@@ -45,6 +45,8 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
@@ -252,13 +254,11 @@ public class JenaAdminActions extends BaseEditController {
     }
     
     public void doGet(HttpServletRequest req, HttpServletResponse response) {
+        if (!isAuthorizedToDisplayPage(req, response, new Actions(new UseMiscellaneousAdminPages()))) {
+        	return;
+        }
 
-    VitroRequest request = new VitroRequest(req);
-    	
-	if (!checkLoginStatus(request,response)) {
-		return;
-	}
-
+        VitroRequest request = new VitroRequest(req);
         String actionStr = request.getParameter("action");
 
         if (actionStr.equals("printRestrictions")) {

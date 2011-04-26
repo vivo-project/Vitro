@@ -25,6 +25,8 @@ import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
 import edu.cornell.mannlib.vedit.listener.ChangeListener;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vedit.validator.impl.XMLNameValidator;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Classes2Classes;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -41,18 +43,12 @@ public class VclassRetryController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(VclassRetryController.class.getName());
 
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
+        if (!isAuthorizedToDisplayPage(req, response, new Actions(new UseOntologyEditorPages()))) {
+        	return;
+        }
 
     	VitroRequest request = new VitroRequest(req);
     	
-        if (!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error("VclassRetryController encountered exception calling super.doGet()");
-        }
-
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
         epo.setDataAccessObject(request.getFullWebappDaoFactory().getVClassDao());
