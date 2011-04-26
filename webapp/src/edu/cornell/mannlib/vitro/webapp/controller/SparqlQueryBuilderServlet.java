@@ -19,7 +19,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.sparql.resultset.ResultSetFormat;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 
@@ -28,7 +28,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.Portal;
  *  This servlet works as a RequestDispatcher to direct to the sparl query builder page.
  *  @author yuysun
  */
-@RequiresAuthorizationFor(UseAdvancedDataToolsPages.class)
 public class SparqlQueryBuilderServlet extends BaseEditController {
 
     private static final Log log = LogFactory.getLog(SparqlQueryBuilderServlet.class.getName());
@@ -75,7 +74,11 @@ public class SparqlQueryBuilderServlet extends BaseEditController {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException
     {    	    	   	
-        VitroRequest vreq = new VitroRequest(request);
+    	if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseAdvancedDataToolsPages()))) {
+    		return;
+    	}
+
+    	VitroRequest vreq = new VitroRequest(request);
         
         Model model = vreq.getJenaOntModel(); // getModel()
         if( model == null ){

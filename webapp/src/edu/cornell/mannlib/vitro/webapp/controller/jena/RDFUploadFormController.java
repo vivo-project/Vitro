@@ -10,19 +10,22 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
-@RequiresAuthorizationFor(UseAdvancedDataToolsPages.class)
 public class RDFUploadFormController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(RDFUploadFormController.class.getName());
 
     @Override
 	public void doPost (HttpServletRequest request, HttpServletResponse response) {
+    	if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseAdvancedDataToolsPages()))) {
+    		return;
+    	}
+
         VitroRequest vreq = new VitroRequest(request);
         
         Portal portal = vreq.getPortal();

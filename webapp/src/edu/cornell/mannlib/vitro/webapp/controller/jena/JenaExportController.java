@@ -19,8 +19,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor.Or;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -29,11 +28,16 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
-@RequiresAuthorizationFor(or={@Or(UseAdvancedDataToolsPages.class), @Or(UseOntologyEditorPages.class)})
 public class JenaExportController extends BaseEditController {
+	private static final Actions REQUIRED_ACTIONS = new Actions(
+			new UseAdvancedDataToolsPages()).or(new UseOntologyEditorPages());
 
 	@Override
 	public void doGet( HttpServletRequest request, HttpServletResponse response ) {
+		if (!isAuthorizedToDisplayPage(request, response, REQUIRED_ACTIONS)) {
+			return;
+		}
+
 		VitroRequest vreq = new VitroRequest(request);
 		
 		if ( vreq.getRequestURL().indexOf("/download/") > -1 ) { 

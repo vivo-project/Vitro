@@ -27,8 +27,8 @@ import edu.cornell.mannlib.vedit.listener.ChangeListener;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vedit.validator.ValidationObject;
 import edu.cornell.mannlib.vedit.validator.Validator;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.setup.SelfEditingPolicySetup;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseEditUserAccountsPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
@@ -36,7 +36,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 
-@RequiresAuthorizationFor(UseEditUserAccountsPages.class)
 public class UserRetryController extends BaseEditController {
 
     private static final String ROLE_PROTOCOL = "role:/";  // this is weird; need to revisit
@@ -44,6 +43,9 @@ public class UserRetryController extends BaseEditController {
 
     @Override
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
+    	if (!isAuthorizedToDisplayPage(req, response, new Actions(new UseEditUserAccountsPages()))) {
+    		return;
+    	}
 
     	VitroRequest request = new VitroRequest(req);
 

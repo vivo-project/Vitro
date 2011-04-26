@@ -23,7 +23,7 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.listener.ChangeListener;
 import edu.cornell.mannlib.vedit.util.FormUtils;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UsePortalEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -33,13 +33,16 @@ import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
 import edu.cornell.mannlib.vitro.webapp.filters.PortalPickerFilter;
 import edu.cornell.mannlib.vitro.webapp.utils.ThemeUtils;
 
-@RequiresAuthorizationFor(UsePortalEditorPages.class)
 public class PortalRetryController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(PortalRetryController.class.getName());
 	
     @Override
 	public void doPost (HttpServletRequest req, HttpServletResponse response) {
+    	if (!isAuthorizedToDisplayPage(req, response, new Actions(new UsePortalEditorPages()))) {
+    		return;
+    	}
+
     	VitroRequest request = new VitroRequest(req);
 
         //create an EditProcessObject for this and put it in the session

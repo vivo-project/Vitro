@@ -2,11 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
@@ -43,50 +38,6 @@ public class PolicyHelper {
 		PolicyIface policy = ServletPolicyList.getPolicies(req);
 		IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(req);
 		return Actions.notNull(actions).isAuthorized(policy, ids);
-	}
-
-	// ----------------------------------------------------------------------
-	// ----------------------------------------------------------------------
-	// ----------------------------------------------------------------------
-	// Obsolete ????????
-	// ----------------------------------------------------------------------
-	// ----------------------------------------------------------------------
-	// ----------------------------------------------------------------------
-	
-	/**
-	 * A subclass of VitroHttpServlet may be annotated to say what actions
-	 * should be checked for authorization before permitting the user to view
-	 * the page that the servlet would create.
-	 * 
-	 * Any RequestedAction can be specified, but the most common use will be to
-	 * specify implementations of UsePagesRequestedAction.
-	 * 
-	 * Note that a combination of AND and OR relationships can be created
-	 * (at-signs converted to #-signs, so Javadoc won't try to actually apply
-	 * the annotations):
-	 * 
-	 * <pre>
-	 * #RequiresAuthorizationFor(This.class)
-	 * #RequiresAuthorizationFor({This.class, That.class})
-	 * #RequiresAuthorizationFor(value=This.class, or=#Or(That.class))
-	 * #RequiresAuthorizationFor(or={#Or(One_A.class, One_B.class), #Or(Two.class)})
-	 * </pre>
-	 */
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target(ElementType.TYPE)
-	public static @interface RequiresAuthorizationFor {
-		static class NoAction extends RequestedAction {
-			/* no fields */
-		}
-
-		@Retention(RetentionPolicy.RUNTIME)
-		public static @interface Or {
-			Class<? extends RequestedAction>[] value() default NoAction.class;
-		}
-
-		Class<? extends RequestedAction>[] value() default NoAction.class;
-
-		Or[] or() default @Or();
 	}
 
 	/**

@@ -13,9 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseEditUserAccountsPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
@@ -29,7 +28,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
-@RequiresAuthorizationFor(UseEditUserAccountsPages.class)
 public class UserEditController extends BaseEditController {
 
     private String[] roleNameStr = new String[51];
@@ -44,6 +42,10 @@ public class UserEditController extends BaseEditController {
 
     @Override
 	public void doPost (HttpServletRequest request, HttpServletResponse response) throws ServletException {
+    	if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseEditUserAccountsPages()))) {
+    		return;
+    	}
+
         VitroRequest vreq = new VitroRequest(request);
         Portal portal = vreq.getPortal();
 

@@ -21,7 +21,7 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
 import edu.cornell.mannlib.vedit.util.FormUtils;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseTabEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
@@ -29,7 +29,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
 
-@RequiresAuthorizationFor(UseTabEditorPages.class)
 public class TabRetryController extends BaseEditController {
 
     static final int[] tabtypeIds = {0,18,20,22,24,26,28};
@@ -40,6 +39,10 @@ public class TabRetryController extends BaseEditController {
 
     @Override
 	public void doPost (HttpServletRequest req, HttpServletResponse response) {
+    	if (!isAuthorizedToDisplayPage(req, response, new Actions(new UseTabEditorPages()))) {
+    		return;
+    	}
+
     	VitroRequest request = new VitroRequest(req);
 
         //create an EditProcessObject for this and put it in the session

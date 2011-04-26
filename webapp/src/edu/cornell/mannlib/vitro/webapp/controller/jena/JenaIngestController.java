@@ -61,7 +61,7 @@ import com.hp.hpl.jena.util.ResourceUtils;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
@@ -80,7 +80,6 @@ import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestWorkflowProcessor;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.WorkflowOntology;
 
-@RequiresAuthorizationFor(UseAdvancedDataToolsPages.class)
 public class JenaIngestController extends BaseEditController {
 
 	private static final Log log = LogFactory.getLog(JenaIngestController.class);
@@ -113,6 +112,10 @@ public class JenaIngestController extends BaseEditController {
 
 	@Override
 	public void doGet (HttpServletRequest request, HttpServletResponse response) {
+    	if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseAdvancedDataToolsPages()))) {
+    		return;
+    	}
+    	
 		VitroRequest vreq = new VitroRequest(request);
 		
 		ModelMaker maker = getVitroJenaModelMaker(vreq);
