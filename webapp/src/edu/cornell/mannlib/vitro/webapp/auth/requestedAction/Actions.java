@@ -30,8 +30,12 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
 public class Actions {
 	private static final Log log = LogFactory.getLog(Actions.class);
 
+	public static final Actions EMPTY = new Actions();
+	public static final Actions UNAUTHORIZED = new Actions(
+			new UnauthorizedAction());
+
 	public static Actions notNull(Actions actions) {
-		return (actions == null) ? new Actions() : actions;
+		return (actions == null) ? EMPTY : actions;
 	}
 
 	private final List<Set<RequestedAction>> clauseList;
@@ -60,7 +64,7 @@ public class Actions {
 	public Actions or(RequestedAction... newActions) {
 		return or(Arrays.asList(newActions));
 	}
-	
+
 	public Actions or(Collection<RequestedAction> newActions) {
 		return new Actions(this.clauseList, newActions);
 	}
@@ -76,7 +80,11 @@ public class Actions {
 
 	/** No clauses means everything is authorized */
 	public boolean isAuthorized(PolicyIface policy, IdentifierBundle ids) {
-		return clauseList.isEmpty() || isAuthorizedForClauseList(policy, ids);
+		if (clauseList.isEmpty()) {
+			log.debug("Empty Actions is authorized");
+			return true;
+		}
+		return isAuthorizedForClauseList(policy, ids);
 	}
 
 	/** Any entire clause is good enough. */
@@ -110,5 +118,13 @@ public class Actions {
 				+ decision);
 		return (decision != null)
 				&& (decision.getAuthorized() == Authorization.AUTHORIZED);
+	}
+
+	/**
+	 * Nobody knows about this action class, so only the root user should be
+	 * authorized for it.
+	 */
+	private static class UnauthorizedAction extends RequestedAction {
+		// no members
 	}
 }

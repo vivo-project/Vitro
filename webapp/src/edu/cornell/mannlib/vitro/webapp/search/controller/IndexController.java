@@ -8,7 +8,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
@@ -29,10 +29,14 @@ import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
  *
  * @author bdc34
  */
-@RequiresAuthorizationFor(UseMiscellaneousAdminPages.class)
 public class IndexController extends FreemarkerHttpServlet {
 	
 	private static final Log log = LogFactory.getLog(IndexController.class);
+	
+	@Override
+	protected Actions requiredActions(VitroRequest vreq) {
+		return new Actions(new UseMiscellaneousAdminPages());
+	}
 	
     @Override
     protected String getTitle(String siteName, VitroRequest vreq) {

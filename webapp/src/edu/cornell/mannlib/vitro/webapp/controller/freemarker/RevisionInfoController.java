@@ -5,7 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeRevisionInfo;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -15,10 +15,16 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 /**
  * Display the detailed revision information.
  */
-@RequiresAuthorizationFor(SeeRevisionInfo.class)
 public class RevisionInfoController extends FreemarkerHttpServlet {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
     private static final String TEMPLATE_DEFAULT = "revisionInfo.ftl";
+    
+    public static final Actions REQUIRED_ACTIONS = new Actions(new SeeRevisionInfo());
+    
+    @Override
+    protected Actions requiredActions(VitroRequest vreq) {
+    	return REQUIRED_ACTIONS;
+    }
     
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {

@@ -15,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseIndividualEditorPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
@@ -32,14 +32,20 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 
-@RequiresAuthorizationFor(UseSiteAdminPage.class)
 public class SiteAdminController extends FreemarkerHttpServlet {
 	
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(SiteAdminController.class);
     private static final String TEMPLATE_DEFAULT = "siteAdmin-main.ftl";
+
+    public static final Actions REQUIRED_ACTIONS = new Actions(new UseSiteAdminPage());
     
     @Override
+	protected Actions requiredActions(VitroRequest vreq) {
+    	return REQUIRED_ACTIONS;
+	}
+
+	@Override
 	public String getTitle(String siteName, VitroRequest vreq) {
         return siteName + " Site Administration";
 	}
@@ -114,25 +120,25 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         Map<String, Object> map = new HashMap<String, Object>();
         Map<String, String> urls = new HashMap<String, String>();
 
-		if (PolicyHelper.isAuthorizedForServlet(vreq, AllTabsForPortalListingController.class)) {
+		if (PolicyHelper.isAuthorizedForActions(vreq, AllTabsForPortalListingController.REQUIRED_ACTIONS)) {
 			urls.put("tabs", urlBuilder.getPortalUrl("/listTabs"));
 		}
         
-        if (PolicyHelper.isAuthorizedForServlet(vreq, UsersListingController.class)) {                
+        if (PolicyHelper.isAuthorizedForActions(vreq, UsersListingController.REQUIRED_ACTIONS)) {                
             urls.put("users", urlBuilder.getPortalUrl("/listUsers"));
         }
 
-        if (PolicyHelper.isAuthorizedForServlet(vreq, PortalsListingController.class)) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, PortalsListingController.REQUIRED_ACTIONS)) {
         	if ((!vreq.getFullWebappDaoFactory().getPortalDao().isSinglePortal())) {
 				urls.put("portals", urlBuilder.getPortalUrl("/listPortals"));
 			}
 		}
  
-		if (PolicyHelper.isAuthorizedForAction(vreq, UseSiteInfoEditingPage.class)) {
+		if (PolicyHelper.isAuthorizedForActions(vreq, new UseSiteInfoEditingPage())) {
 			urls.put("siteInfo", urlBuilder.getPortalUrl("/editForm", new ParamMap("controller", "Portal", "id", String.valueOf(urlBuilder.getPortalId()))));
 		}
 
-		if (PolicyHelper.isAuthorizedForServlet(vreq, MenuN3EditController.class)) {
+		if (PolicyHelper.isAuthorizedForActions(vreq, MenuN3EditController.REQUIRED_ACTIONS)) {
             urls.put("menuN3Editor", urlBuilder.getPortalUrl("/menuN3Editor"));            
         }
         

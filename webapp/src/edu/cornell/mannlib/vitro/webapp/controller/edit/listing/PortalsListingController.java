@@ -10,18 +10,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UsePortalEditorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
 
-@RequiresAuthorizationFor(UsePortalEditorPages.class)
 public class PortalsListingController extends BaseEditController {
+	public static final Actions REQUIRED_ACTIONS = new Actions(new UsePortalEditorPages());
 
     @Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
+    	if (!isAuthorizedToDisplayPage(request, response, REQUIRED_ACTIONS)) {
+    		return;
+    	}
+    	
         VitroRequest vrequest = new VitroRequest(request);
         Portal portal = vrequest.getPortal();
 

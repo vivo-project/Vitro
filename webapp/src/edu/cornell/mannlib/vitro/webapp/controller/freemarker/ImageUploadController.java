@@ -16,8 +16,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropStmt;
@@ -25,11 +24,9 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObject
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ForwardResponseValues;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -42,7 +39,6 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServ
 /**
  * Handle adding, replacing or deleting the main image on an Individual.
  */
-@RequiresAuthorizationFor(/* restricted page, but checking is done internally. */)
 public class ImageUploadController extends FreemarkerHttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Log log = LogFactory
@@ -131,6 +127,34 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	}
 
 	/**
+	 * The required action depends on what we are trying to do.
+	 */
+	@Override
+	protected Actions requiredActions(VitroRequest vreq) {
+		try {
+			String action = vreq.getParameter(PARAMETER_ACTION);
+			Individual entity = validateEntityUri(vreq);
+			String imageUri = entity.getMainImageUri();
+
+			RequestedAction ra;
+			if (ACTION_DELETE.equals(action) || ACTION_DELETE_EDIT.equals(action)) {
+				ra = new DropObjectPropStmt(entity.getURI(),
+						VitroVocabulary.IND_MAIN_IMAGE, imageUri);
+			} else if (imageUri != null) {
+				ra = new EditObjPropStmt(entity.getURI(),
+						VitroVocabulary.IND_MAIN_IMAGE, imageUri);
+			} else {
+				ra = new AddDataPropStmt(entity.getURI(),
+						VitroVocabulary.IND_MAIN_IMAGE,
+						RequestActionConstants.SOME_LITERAL, null, null);
+			}
+			return new Actions(ra);
+		} catch (UserMistakeException e) {
+			return Actions.UNAUTHORIZED;
+		}
+	}
+	
+	/**
 	 * <p>
 	 * Parse the multi-part request, process the request, and produce the
 	 * output.
@@ -161,13 +185,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 				dumpRequestDetails(vreq);
 			}
 
-			// If they aren't authorized to do this, send them to login.
-			if (!checkAuthorized(vreq)) {
-				return new RedirectResponseValues(Controllers.LOGIN);
-			}
-
 			return buildTheResponse(vreq);
-
 		} catch (Exception e) {
 			// log.error("Could not produce response page", e);
 			return new ExceptionResponseValues(e);
@@ -593,39 +611,8 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 		}
 	}
 
-	/**
-	 * If they are logged in as an Editor or better, they can do whatever they
-	 * want.
-	 * 
-	 * Otherwise, they will need to be self-editing, and will need to have
-	 * authorization for this specific operation they are requesting.
-	 */
-	private boolean checkAuthorized(VitroRequest vreq)
-			throws UserMistakeException {
-		String action = vreq.getParameter(PARAMETER_ACTION);
-		Individual entity = validateEntityUri(vreq);
-		String imageUri = entity.getMainImageUri();
-
-		// What are we trying to do? Check if authorized.
-		RequestedAction ra;
-		if (ACTION_DELETE.equals(action) || ACTION_DELETE_EDIT.equals(action)) {
-			ra = new DropObjectPropStmt(entity.getURI(),
-					VitroVocabulary.IND_MAIN_IMAGE, imageUri);
-		} else if (imageUri != null) {
-			ra = new EditObjPropStmt(entity.getURI(),
-					VitroVocabulary.IND_MAIN_IMAGE, imageUri);
-		} else {
-			ra = new AddDataPropStmt(entity.getURI(),
-					VitroVocabulary.IND_MAIN_IMAGE,
-					RequestActionConstants.SOME_LITERAL, null, null);
-		}
-
-		return PolicyHelper.isAuthorizedForAction(vreq, ra);
-	}
-
 	private String getDefaultNamespace() {
 		return ConfigurationProperties.getBean(getServletContext())
 				.getProperty("Vitro.defaultNamespace");
 	}
-
 }

@@ -18,6 +18,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
@@ -73,7 +74,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         }
     }
     
-    public void doGet( HttpServletRequest request, HttpServletResponse response )
+    @Override
+	public void doGet( HttpServletRequest request, HttpServletResponse response )
         throws IOException, ServletException {
         
         super.doGet(request,response);   
@@ -84,7 +86,15 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 	        Configuration config = getConfig(vreq);
 	        vreq.setAttribute("freemarkerConfig", config);
 	        
-	        ResponseValues responseValues = processRequest(vreq);
+	        ResponseValues responseValues;
+	        
+	        // This method does a redirect if the required authorizations are not met, so just return.
+	    	if (!isAuthorizedToDisplayPage(request, response, requiredActions(vreq))) {
+	            return; 
+	        } else {
+	            responseValues = processRequest(vreq);
+	        }
+
 	        doResponse(vreq, response, responseValues);	 
 	        
     	} catch (TemplateProcessingException e) {
@@ -94,8 +104,9 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         }
     }
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+    @Override
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
         doGet(request, response);
     }
    
@@ -105,6 +116,21 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return loader.getConfig(vreq);
     }
 
+    /**
+     * By default, a page requires authorization for no actions.
+     * Subclasses that require authorization to process their page will override 
+	 *    to return the actions that require authorization.
+	 * In some cases, the choice of actions will depend on the contents of the request.
+	 *
+     * NB This method can't be static, because then the superclass method gets called rather than
+     * the subclass method. For the same reason, it can't refer to a static or instance field
+     * REQUIRED_ACTIONS which is overridden in the subclass.
+     */
+    @SuppressWarnings("unused")
+	protected Actions requiredActions(VitroRequest vreq) {
+        return Actions.EMPTY;
+    }
+    
     // Subclasses will override
     protected ResponseValues processRequest(VitroRequest vreq) {
         return null;

@@ -47,11 +47,11 @@ public class User extends BaseTemplateModel {
     }
     
     public boolean getHasSiteAdminAccess() {
-    	return PolicyHelper.isAuthorizedForServlet(vreq, SiteAdminController.class);
+    	return PolicyHelper.isAuthorizedForActions(vreq, SiteAdminController.REQUIRED_ACTIONS);
     }
     
     public boolean getHasRevisionInfoAccess() {
-    	return PolicyHelper.isAuthorizedForServlet(vreq, RevisionInfoController.class);
+    	return PolicyHelper.isAuthorizedForActions(vreq, RevisionInfoController.REQUIRED_ACTIONS);
     }
     
     public boolean getShowFlag1SearchField() {

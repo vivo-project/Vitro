@@ -39,8 +39,17 @@ public class PolicyHelper {
 	private static final Log log = LogFactory.getLog(PolicyHelper.class);
 
 	/**
-	 * Are the actions that this servlet requires authorized for the current
-	 * user by the current policies?
+	 * Are these actions authorized for the current user by the current
+	 * policies?
+	 */
+	public static boolean isAuthorizedForActions(HttpServletRequest req,
+			RequestedAction... actions) {
+		return isAuthorizedForActions(req, new Actions(actions));
+	}
+	
+	/**
+	 * Are these actions authorized for the current user by the current
+	 * policies?
 	 */
 	public static boolean isAuthorizedForActions(HttpServletRequest req,
 			Actions actions) {
