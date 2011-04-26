@@ -28,6 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthori
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 
 /**
@@ -37,6 +38,25 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
 public class PolicyHelper {
 	private static final Log log = LogFactory.getLog(PolicyHelper.class);
 
+	/**
+	 * Are the actions that this servlet requires authorized for the current
+	 * user by the current policies?
+	 */
+	public static boolean isAuthorizedForActions(HttpServletRequest req,
+			Actions actions) {
+		PolicyIface policy = ServletPolicyList.getPolicies(req);
+		IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(req);
+		return Actions.notNull(actions).isAuthorized(policy, ids);
+	}
+
+	// ----------------------------------------------------------------------
+	// ----------------------------------------------------------------------
+	// ----------------------------------------------------------------------
+	// Obsolete ????????
+	// ----------------------------------------------------------------------
+	// ----------------------------------------------------------------------
+	// ----------------------------------------------------------------------
+	
 	/**
 	 * A subclass of VitroHttpServlet may be annotated to say what actions
 	 * should be checked for authorization before permitting the user to view
@@ -74,18 +94,6 @@ public class PolicyHelper {
 	}
 
 	/**
-	 * Does this servlet require authorization?
-	 */
-	public static boolean isServletRestricted(HttpServlet servlet) {
-		Class<? extends HttpServlet> servletClass = servlet.getClass();
-		try {
-			return !ActionClauses.forServletClass(servletClass).isEmpty();
-		} catch (PolicyHelperException e) {
-			return true;
-		}
-	}
-
-	/**
 	 * Are the actions that this servlet requires authorized for the current
 	 * user by the current policies?
 	 */
@@ -103,20 +111,6 @@ public class PolicyHelper {
 		try {
 			return isAuthorizedForActionClauses(req,
 					ActionClauses.forServletClass(servletClass));
-		} catch (PolicyHelperException e) {
-			return false;
-		}
-	}
-
-	/**
-	 * Are these action classes authorized for the current user by the current
-	 * policies?
-	 */
-	public static boolean isAuthorizedForActions(HttpServletRequest req,
-			Collection<Class<? extends RequestedAction>> actionClasses) {
-		try {
-			return isAuthorizedForActionClauses(req, new ActionClauses(
-					actionClasses));
 		} catch (PolicyHelperException e) {
 			return false;
 		}

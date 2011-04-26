@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 
@@ -60,7 +61,8 @@ public class RequiresAuthorizationFor extends BodyTagSupport {
 		if (classes == null) {
 			return false;
 		}
-		return PolicyHelper.isAuthorizedForActions(getRequest(), classes);
+		Set<RequestedAction> actionSet = getInstancesFromClasses(classes);
+		return PolicyHelper.isAuthorizedForActions(getRequest(), new Actions(actionSet));
 	}
 
 	/**
@@ -134,7 +136,7 @@ public class RequiresAuthorizationFor extends BodyTagSupport {
 		return SKIP_PAGE;
 	}
 
-	private int redirectToLoginPage() throws JspException {
+	private int redirectToLoginPage() {
 		VitroHttpServlet.redirectToLoginPage(getRequest(), getResponse());
 		return SKIP_PAGE;
 	}

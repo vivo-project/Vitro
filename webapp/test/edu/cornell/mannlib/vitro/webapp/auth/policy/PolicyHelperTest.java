@@ -22,6 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthori
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 
@@ -48,6 +49,73 @@ public class PolicyHelperTest extends AbstractTestClass {
 		req = new HttpServletRequestStub();
 		req.setSession(session);
 	}
+
+	@Test
+	public void authorizedForActionsNull() {
+		createPolicy();
+		assertEquals("null actions", true,
+				PolicyHelper.isAuthorizedForActions(req, null));
+	}
+
+	@Test
+	public void authorizedForActionsEmpty() {
+		createPolicy();
+		assertEquals("empty actions", true,
+				PolicyHelper.isAuthorizedForActions(req, new Actions()));
+	}
+
+	@Test
+	public void authorizedForActionsOneClausePass() {
+		createPolicy(new Action1(), new Action2());
+		assertEquals("one clause pass", true,
+				PolicyHelper.isAuthorizedForActions(req, new Actions(
+						new Action1(), new Action2())));
+	}
+
+	@Test
+	public void authorizedForActionsOneClauseFail() {
+		createPolicy(new Action2());
+		assertEquals("one clause fail", false,
+				PolicyHelper.isAuthorizedForActions(req, new Actions(
+						new Action1(), new Action2())));
+	}
+
+	@Test
+	public void authorizedForActionsMultipleClausesPass() {
+		createPolicy(new Action3());
+		assertEquals("multiple clauses pass", true,
+				PolicyHelper.isAuthorizedForActions(req, new Actions(
+						new Action1(), new Action2()).or(new Action3())));
+	}
+
+	@Test
+	public void authorizedForActionsMultipleClausesFail() {
+		createPolicy(new Action1());
+		assertEquals("multiple clauses fail", false,
+				PolicyHelper.isAuthorizedForActions(req, new Actions(
+						new Action1(), new Action2()).or(new Action3())));
+	}
+
+	/**
+	 * <pre>
+	 * actions is null, 
+	 * actions is empty
+	 * actions has one clause with multiple actions
+	 * 	   all pass
+	 *     some pass
+	 * action has multiple clauses
+	 *     one passes
+	 *     none pass (but partial passes)
+	 * </pre>
+	 */
+
+	// ----------------------------------------------------------------------
+	// ----------------------------------------------------------------------
+	// ----------------------------------------------------------------------
+	// Obsolete???
+	// ----------------------------------------------------------------------
+	// ----------------------------------------------------------------------
+	// ----------------------------------------------------------------------
 
 	@Test
 	public void noAnnotation() {

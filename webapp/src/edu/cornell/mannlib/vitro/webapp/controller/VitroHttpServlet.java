@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LogoutRedirector;
 
@@ -40,15 +41,9 @@ public class VitroHttpServlet extends HttpServlet {
 	public final static String HTML_MIMETYPE = "text/html";
 
 	public final static String RDFXML_MIMETYPE = "application/rdf+xml";
-	public final static String N3_MIMETYPE = "text/n3"; // unofficial and
-														// unregistered
-	public final static String TTL_MIMETYPE = "text/turtle"; // unofficial and
-																// unregistered
+	public final static String N3_MIMETYPE = "text/n3"; // unofficial and unregistered
+	public final static String TTL_MIMETYPE = "text/turtle"; // unofficial and unregistered
 
-	/**
-	 * Check that any required authorizations are satisfied before processing
-	 * the request.
-	 */
 	@Override
 	public final void service(ServletRequest req, ServletResponse resp)
 			throws ServletException, IOException {
@@ -61,22 +56,6 @@ public class VitroHttpServlet extends HttpServlet {
 				dumpRequestHeaders(hreq);
 			}
 
-			// Record restricted pages so we won't return to them on logout
-			if (PolicyHelper.isServletRestricted(this)) {
-				LogoutRedirector.recordRestrictedPageUri(hreq);
-			}
-
-			// If the user isn't authorized for this servlet, don't show it.
-			if (!PolicyHelper.isAuthorizedForServlet(hreq, this)) {
-				if (LoginStatusBean.getBean(hreq).isLoggedIn()) {
-					redirectToInsufficientAuthorizationPage(hreq, hresp);
-					return;
-				} else {
-					redirectToLoginPage(hreq, hresp);
-					return;
-				}
-			}
-			
 			// check to see if VitroRequestPrep filter was run
 			if (hreq.getAttribute("appBean") == null
 					|| hreq.getAttribute("webappDaoFactory") == null) {
@@ -112,6 +91,36 @@ public class VitroHttpServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
+	}
+
+	/**
+	 * Don't display a page that the user isn't authorized to see.
+	 * 
+	 * @param actions
+	 *            the RequestedActions that need to be authorized.
+	 */
+	protected boolean isAuthorizedToDisplayPage(HttpServletRequest request,
+			HttpServletResponse response, Actions actions) {
+		// Record restricted pages so we won't return to them on logout
+		LogoutRedirector.recordRestrictedPageUri(request);
+
+		if (PolicyHelper.isAuthorizedForActions(request, actions)) {
+			log.debug("Servlet '" + this.getClass().getSimpleName()
+					+ "' is authorized for actions: " + actions);
+			return true;
+		}
+		
+		log.debug("Servlet '" + this.getClass().getSimpleName()
+				+ "' is not authorized for actions: " + actions);
+
+		LoginStatusBean statusBean = LoginStatusBean.getBean(request);
+		if (statusBean.isLoggedIn()) {
+			redirectToInsufficientAuthorizationPage(request, response);
+			return false;
+		} else {
+			redirectToLoginPage(request, response);
+			return false;
+		}
 	}
 
 	// ----------------------------------------------------------------------
