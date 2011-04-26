@@ -3,6 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.reasoner;
 
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +23,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.reasoner.support.SimpleReasonerTBoxListener;
+import freemarker.ext.dump.BaseDumpDirective;
 
 
 public class SimpleReasonerTest extends AbstractTestClass {
@@ -31,6 +34,8 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	@Before
 	public void suppressErrorOutput() {
 		suppressSyserr();
+        // Turn off log messages to console
+		setLoggerLevel(SimpleReasoner.class, Level.OFF);
 	}
 
 	/*
