@@ -25,7 +25,7 @@ import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
 
-import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
@@ -35,7 +35,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
  * 
  * The result is delivered in JSON format.
  */
-@RequiresAuthorizationFor(UseBasicAjaxControllers.class)
 public class SparqlQueryAjaxController extends VitroAjaxController {
 	private static final Log log = LogFactory
 			.getLog(SparqlQueryAjaxController.class);
@@ -43,6 +42,11 @@ public class SparqlQueryAjaxController extends VitroAjaxController {
 	private static final String PARAMETER_QUERY = "query";
 	private static final String RESPONSE_MIME_TYPE = "application/javascript";
 
+    @Override
+    protected Actions requiredActions(VitroRequest vreq) {
+    	return new Actions(new UseBasicAjaxControllers());
+    }
+    
 	@Override
 	protected void doRequest(VitroRequest vreq, HttpServletResponse response)
 			throws ServletException, IOException {

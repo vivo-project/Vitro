@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -114,10 +115,32 @@ public class Actions {
 	private static boolean isAuthorizedForAction(PolicyIface policy,
 			IdentifierBundle ids, RequestedAction action) {
 		PolicyDecision decision = policy.isAuthorized(ids, action);
-		log.debug("decision for '" + action.getClass().getName() + "' was: "
+		log.debug("decision for '" + action.getClass().getSimpleName() + "' was: "
 				+ decision);
 		return (decision != null)
 				&& (decision.getAuthorized() == Authorization.AUTHORIZED);
+	}
+
+	@Override
+	public String toString() {
+		StringBuffer sb = new StringBuffer("Actions[");
+		for (Iterator<Set<RequestedAction>> cit = clauseList.iterator(); cit.hasNext();) {
+			Set<RequestedAction> clause = cit.next();
+			sb.append("(");
+			for (Iterator<RequestedAction> it = clause.iterator(); it.hasNext();) {
+				RequestedAction action = it.next();
+				sb.append(action.getClass().getSimpleName());
+				if (it.hasNext()) {
+					sb.append(", ");
+				}
+			}
+			sb.append(")");
+			if (cit.hasNext()) {
+				sb.append(" or ");
+			}
+		}
+		sb.append("]");
+		return sb.toString();
 	}
 
 	/**

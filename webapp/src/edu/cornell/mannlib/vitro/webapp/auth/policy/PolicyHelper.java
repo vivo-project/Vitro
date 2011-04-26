@@ -103,29 +103,6 @@ public class PolicyHelper {
 	}
 
 	/**
-	 * Are the actions that this servlet requires authorized for the current
-	 * user by the current policies?
-	 */
-	public static boolean isAuthorizedForServlet(HttpServletRequest req,
-			HttpServlet servlet) {
-		return isAuthorizedForServlet(req, servlet.getClass());
-	}
-
-	/**
-	 * Are the actions that this servlet class requires authorized for the
-	 * current user by the current policies?
-	 */
-	public static boolean isAuthorizedForServlet(HttpServletRequest req,
-			Class<? extends HttpServlet> servletClass) {
-		try {
-			return isAuthorizedForActionClauses(req,
-					ActionClauses.forServletClass(servletClass));
-		} catch (PolicyHelperException e) {
-			return false;
-		}
-	}
-
-	/**
 	 * Is this action class authorized for the current user by the current
 	 * policies?
 	 */

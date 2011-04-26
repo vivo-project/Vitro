@@ -16,6 +16,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfigurationLoader;
 import freemarker.template.Configuration;
@@ -42,7 +43,7 @@ public abstract class VitroAjaxController extends HttpServlet {
 	protected final void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		VitroRequest vreq = new VitroRequest(req);
-		if (PolicyHelper.isAuthorizedForServlet(vreq, this)) {
+		if (PolicyHelper.isAuthorizedForActions(vreq, requiredActions(vreq))) {
 			doRequest(vreq, resp);
 		} else {
 			resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Not authorized");
@@ -58,6 +59,17 @@ public abstract class VitroAjaxController extends HttpServlet {
 		doGet(req, resp);
 	}
 	
+    /**
+     * By default, a controller requires authorization for no actions.
+     * Subclasses that require authorization to process their page will override 
+	 *    to return the actions that require authorization.
+	 * In some cases, the choice of actions will depend on the contents of the request.
+     */
+    @SuppressWarnings("unused")
+	protected Actions requiredActions(VitroRequest vreq) {
+        return Actions.EMPTY;
+    }
+    
 	/** 
 	 * Returns the current Freemarker Configuration so the controller can process
 	 * its data through a template.
