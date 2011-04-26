@@ -18,7 +18,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper.RequiresAuthorizationFor;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
 
-@RequiresAuthorizationFor(/* restricted page, but checking is done internally. */)
 /**
  * TODO This is caught in the middle of the transition from LoginFormBean to LoginStatusBean.
  */
@@ -60,7 +59,7 @@ public class FakeSelfEditController extends VitroHttpServlet {
 
 	private boolean isAuthorized(VitroRequest vreq, HttpSession session) {
 		boolean isFakingAlready = (session.getAttribute(ATTRIBUTE_LOGIN_STATUS_SAVE) != null);
-		boolean isAdmin = PolicyHelper.isAuthorizedForAction(vreq, UseMiscellaneousAdminPages.class);
+		boolean isAdmin = PolicyHelper.isAuthorizedForActions(vreq, new UseMiscellaneousAdminPages());
 		log.debug("isFakingAlready: " + isFakingAlready + ", isAdmin: "	+ isAdmin);
 		return isAdmin || isFakingAlready;
 	}

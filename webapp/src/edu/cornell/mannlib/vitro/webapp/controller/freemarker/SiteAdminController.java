@@ -56,7 +56,7 @@ public class SiteAdminController extends FreemarkerHttpServlet {
 
         UrlBuilder urlBuilder = new UrlBuilder(vreq.getPortal());
         
-    	if (PolicyHelper.isAuthorizedForAction(vreq, UseIndividualEditorPages.class)) {
+    	if (PolicyHelper.isAuthorizedForActions(vreq, new UseIndividualEditorPages())) {
     		body.put("dataInput", getDataInputData(vreq));
     	}
 
@@ -66,10 +66,10 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         // of step with the levels required by the pages themselves. We should implement a 
         // mechanism similar to what's used on the front end to display links to Site Admin
         // and Revision Info iff the user has access to those pages.
-        if (PolicyHelper.isAuthorizedForAction(vreq, UseOntologyEditorPages.class)) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, new UseOntologyEditorPages())) {
         	body.put("ontologyEditor", getOntologyEditorData(vreq, urlBuilder));
         }
-		if (PolicyHelper.isAuthorizedForAction(vreq, UseAdvancedDataToolsPages.class)) {
+		if (PolicyHelper.isAuthorizedForActions(vreq, new UseAdvancedDataToolsPages())) {
             body.put("dataTools", getDataToolsData(vreq, urlBuilder));
             
             // Only for DataStar. Should handle without needing a DataStar-specific version of this controller.
