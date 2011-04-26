@@ -4,8 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 
-/** Should we allow the user to use the pages for editing portals? */
-public class UsePortalEditorPages extends RequestedAction implements
+/** Should we allow the user to create, edit, or delete user accounts? */
+public class ManageUserAccounts extends RequestedAction implements
 		UsePagesRequestedAction {
 	// no fields
 }

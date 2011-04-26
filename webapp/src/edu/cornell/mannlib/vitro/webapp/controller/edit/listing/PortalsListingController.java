@@ -11,14 +11,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UsePortalEditorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManagePortals;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
 
 public class PortalsListingController extends BaseEditController {
-	public static final Actions REQUIRED_ACTIONS = new Actions(new UsePortalEditorPages());
+	public static final Actions REQUIRED_ACTIONS = new Actions(new ManagePortals());
 
     @Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {

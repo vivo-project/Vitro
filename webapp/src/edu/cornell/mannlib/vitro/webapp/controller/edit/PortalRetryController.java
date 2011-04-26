@@ -24,7 +24,7 @@ import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.listener.ChangeListener;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UsePortalEditorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManagePortals;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -39,7 +39,7 @@ public class PortalRetryController extends BaseEditController {
 	
     @Override
 	public void doPost (HttpServletRequest req, HttpServletResponse response) {
-    	if (!isAuthorizedToDisplayPage(req, response, new Actions(new UsePortalEditorPages()))) {
+    	if (!isAuthorizedToDisplayPage(req, response, new Actions(new ManagePortals()))) {
     		return;
     	}
 

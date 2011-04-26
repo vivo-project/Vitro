@@ -15,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseEditUserAccountsPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
@@ -42,7 +42,7 @@ public class UserEditController extends BaseEditController {
 
     @Override
 	public void doPost (HttpServletRequest request, HttpServletResponse response) throws ServletException {
-    	if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseEditUserAccountsPages()))) {
+    	if (!isAuthorizedToDisplayPage(request, response, new Actions(new ManageUserAccounts()))) {
     		return;
     	}
 

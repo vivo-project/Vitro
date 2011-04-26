@@ -29,7 +29,7 @@ import edu.cornell.mannlib.vedit.validator.ValidationObject;
 import edu.cornell.mannlib.vedit.validator.Validator;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.setup.SelfEditingPolicySetup;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseEditUserAccountsPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -43,7 +43,7 @@ public class UserRetryController extends BaseEditController {
 
     @Override
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
-    	if (!isAuthorizedToDisplayPage(req, response, new Actions(new UseEditUserAccountsPages()))) {
+    	if (!isAuthorizedToDisplayPage(req, response, new Actions(new ManageUserAccounts()))) {
     		return;
     	}
 

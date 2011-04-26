@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseEditUserAccountsPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -22,7 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 
 public class UsersListingController extends BaseEditController {
-	public static final Actions REQUIRED_ACTIONS = new Actions(new UseEditUserAccountsPages());
+	public static final Actions REQUIRED_ACTIONS = new Actions(new ManageUserAccounts());
 
 	private String[] roleNameStr = new String[51];
 

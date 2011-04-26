@@ -15,16 +15,16 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeRevisionInfo;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseEditUserAccountsPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseIndividualEditorPages;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMenuEditorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousCuratorPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UsePortalEditorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManagePortals;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseSiteAdminPage;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseSiteInfoEditingPage;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseTabEditorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageTabs;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 
 /**
@@ -51,10 +51,10 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		if (whatToAuth instanceof UseAdvancedDataToolsPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
 
-		} else if (whatToAuth instanceof UseEditUserAccountsPages) {
+		} else if (whatToAuth instanceof ManageUserAccounts) {
 			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
 
-		} else if (whatToAuth instanceof UseMenuEditorPages) {
+		} else if (whatToAuth instanceof ManageMenus) {
 			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
 
 		} else if (whatToAuth instanceof UseMiscellaneousAdminPages) {
@@ -63,10 +63,10 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		} else if (whatToAuth instanceof UseOntologyEditorPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
 
-		} else if (whatToAuth instanceof UsePortalEditorPages) {
+		} else if (whatToAuth instanceof ManagePortals) {
 			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
 
-		} else if (whatToAuth instanceof UseTabEditorPages) {
+		} else if (whatToAuth instanceof ManageTabs) {
 			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
 
 		} else if (whatToAuth instanceof UseSiteInfoEditingPage) {

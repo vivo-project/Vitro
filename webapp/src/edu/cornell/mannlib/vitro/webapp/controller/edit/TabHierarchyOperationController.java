@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseTabEditorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageTabs;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
@@ -24,7 +24,7 @@ public class TabHierarchyOperationController extends BaseEditController {
 
     @Override
 	public void doPost(HttpServletRequest req, HttpServletResponse response) {
-    	if (!isAuthorizedToDisplayPage(req, response, new Actions(new UseTabEditorPages()))) {
+    	if (!isAuthorizedToDisplayPage(req, response, new Actions(new ManageTabs()))) {
     		return;
     	}
 
