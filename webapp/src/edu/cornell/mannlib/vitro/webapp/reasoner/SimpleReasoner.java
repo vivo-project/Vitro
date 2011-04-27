@@ -670,53 +670,26 @@ public class SimpleReasoner extends StatementListener {
 	 * inference models.	  
 	 */
 	public synchronized void recomputeABox() {
-				
-		// recompute the ABox inferences 
+		
+		// recompute the inferences 
 		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);	
 		aboxModel.enterCriticalSection(Lock.READ);
-		tboxModel.enterCriticalSection(Lock.READ);
 		
 		try {
 			inferenceRebuildModel.removeAll();
-			
-		    // compute the class-based inferences
-			log.info("Computing class-based ABox inferences");
-			
 			StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, (RDFNode) null);
 			
 			while (iter.hasNext()) {				
 				Statement stmt = iter.next();
 				addedABoxTypeAssertion(stmt, inferenceRebuildModel);
 			}
-							
-			// compute the property-based inferences
-			log.info("Computing property-based ABox inferences");			
-			iter = tboxModel.listStatements((Resource) null, RDFS.subPropertyOf, (RDFNode) null);
-			int numStmts = 0;
-			
-			while (iter.hasNext()) {
-				numStmts++;
-                if ((numStmts % 400) == 0) {
-                    log.info("Still computing property-based ABox inferences...");
-                }
-				
-				Statement stmt = iter.next();
-				addedTBoxStatement(stmt, inferenceRebuildModel);
-			}
-			
-			iter = tboxModel.listStatements((Resource) null, OWL.equivalentProperty, (RDFNode) null);
-
-			while (iter.hasNext()) {
-				Statement stmt = iter.next();
-				addedTBoxStatement(stmt, inferenceRebuildModel);
-			}
 		} catch (Exception e) {
 			 log.error("Exception while recomputing ABox inference model", e);
 		} finally {
-		  	 aboxModel.leaveCriticalSection();
-			 tboxModel.leaveCriticalSection();
-			 inferenceRebuildModel.leaveCriticalSection();
+			aboxModel.leaveCriticalSection();
+			inferenceRebuildModel.leaveCriticalSection();
 		}			
+		
 		
 		// reflect the recomputed inferences into the application inference
 		// model.
