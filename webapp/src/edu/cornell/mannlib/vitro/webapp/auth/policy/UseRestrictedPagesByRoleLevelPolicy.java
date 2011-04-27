@@ -12,6 +12,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeIndividualEditingPanel;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeRevisionInfo;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
@@ -84,6 +85,9 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		} else if (whatToAuth instanceof SeeRevisionInfo) {
 			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
 
+		} else if (whatToAuth instanceof SeeIndividualEditingPanel) {
+			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
+			
 		} else if (whatToAuth instanceof UseBasicAjaxControllers) {
 			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
 			

@@ -10,6 +10,12 @@ import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeIndividualEditingPanel;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -17,7 +23,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
@@ -114,15 +119,22 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         return propertyList;
     }
     
+	/**
+	 * This page is editable if the user is authorized to add a data property or
+	 * an object property to the Individual being shown.
+	 */
     public boolean isEditable() {
-        // RY This will be improved later. What is important is not whether the user is a self-editor,
-        // but whether he has editing privileges on this profile. This is just a crude way of determining
-        // whether to even bother looking at the editing policies.
-        return VitroRequestPrep.isSelfEditing(vreq) || loginStatusBean.isLoggedIn();            
+		AddDataPropStmt adps = new AddDataPropStmt(individual.getURI(),
+				RequestActionConstants.SOME_URI,
+				RequestActionConstants.SOME_LITERAL, null, null);
+		AddObjectPropStmt aops = new AddObjectPropStmt(individual.getURI(),
+				RequestActionConstants.SOME_URI,
+				RequestActionConstants.SOME_URI);
+    	return PolicyHelper.isAuthorizedForActions(vreq, new Actions(adps).or(aops));
     }
     
     public boolean getShowAdminPanel() {
-        return loginStatusBean.isLoggedInAtLeast(LoginStatusBean.EDITOR);
+    	return PolicyHelper.isAuthorizedForActions(vreq, new SeeIndividualEditingPanel());
     }
  
     /* rdfs:label needs special treatment, because it is not possible to construct a 
