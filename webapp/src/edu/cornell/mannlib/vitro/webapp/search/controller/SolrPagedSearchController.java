@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.search.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -62,7 +61,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroHighlighter;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
@@ -70,20 +68,19 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
-import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.LinkTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividualTemplateModel;
 import freemarker.template.Configuration;
 
 /**
- * PagedSearchController is the new search controller that interacts 
- * directly with the lucene API and returns paged, relevance ranked results.
+ * Paged search controller that uses Solr
  *  
- * @author bdc34
+ * @author bdc34, rjy7
  * 
- * Rewritten to use Freemarker: rjy7
- *
  */
+
+// This will be renamed to PagedSearchController once everything is using Solr and we can
+// delete the Lucene version. 
 public class SolrPagedSearchController extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -149,7 +146,6 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
         
         try {
             Portal portal = vreq.getPortal();
-            PortalFlag portalFlag = vreq.getPortalFlag();
             
             //make sure an IndividualDao is available 
             if( vreq.getWebappDaoFactory() == null 
@@ -198,9 +194,19 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             log.debug("Query text: " + qtxt);
 
             SolrQuery parameters = new SolrQuery(qtxt);
+
+            parameters.set("start", startIndex);
+            parameters.set("rows", hitsPerPage);
+
+            // ** For xml requested, add version=2.2 for xml version 
+            // is that enough, or do we also have to add wt param?
+            
             SolrServer solr = SolrSetup.getSolrServer(getServletContext());
-            QueryResponse response = solr.query(parameters);
-            SolrDocumentList docs = response.getResults();
+            QueryResponse response = null;
+            
+            try {
+                response = solr.query(parameters);
+
             
             //log.debug("Query text is "+ qtxt + " Analyzer is "+ analyzer.toString());
             
@@ -250,57 +256,54 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
 //            		
 //            	}
 //            	
-//            }catch(Throwable t){
-//                log.error("in first pass at search: " + t);
-//                // this is a hack to deal with odd cases where search and index threads interact
-//                try{
-//                    wait(150);
-//                    topDocs = searcherForRequest.search(query,null,maxHitSize);
-//                }catch (Exception ex){
-//                    log.error(ex);
-//                    String msg = makeBadSearchMessage(qtxt,ex.getMessage());
-//                    if (msg == null) {
-//                        msg = "The search request contained errors.";
-//                    }
-//                    return doFailedSearch(msg, qtxt,format);
-//                }
-//            }
-//
-//            if( topDocs == null || topDocs.scoreDocs == null){
-//                log.error("topDocs for a search was null");                
-//                String msg = "The search request contained errors.";
-//                return doFailedSearch(msg, qtxt,format);
-//            }
-//            
-//            
-            long hitCount = docs.getNumFound();
-            //int hitCount = topDocs.scoreDocs.length;
-            log.debug("No. of hits "+ hitCount);
-            if ( hitCount < 1 ){                
-                return doNoHits(qtxt,format);
-            }            
-            log.debug("found "+hitCount+" hits");
-
-            long lastHitToShow = 0;
-            if((startIndex + hitsPerPage) > hitCount ) {
-                lastHitToShow = hitCount;
-            } else {
-                lastHitToShow = startIndex + hitsPerPage - 1;
+            } catch (Throwable t) {
+                log.error("in first pass at search: " + t);
+                // this is a hack to deal with odd cases where search and index threads interact
+                try{
+                    wait(150);
+                    response = solr.query(parameters);
+                } catch (Exception ex) {
+                    log.error(ex);
+                    String msg = makeBadSearchMessage(qtxt, ex.getMessage());
+                    if (msg == null) {
+                        msg = "The search request contained errors.";
+                    }
+                    return doFailedSearch(msg, qtxt, format);
+                }
             }
             
-            List<Individual> beans = new LinkedList<Individual>();                        
-            for(int i=startIndex; i<lastHitToShow; i++){
+            if (response == null) {
+                log.error("Search response was null");                
+                String msg = "The search request contained errors.";
+                return doFailedSearch(msg, qtxt, format);
+            }
+            
+            SolrDocumentList docs = response.getResults();
+
+            if (docs == null) {
+                log.error("Document list for a search was null");                
+                String msg = "The search request contained errors.";
+                return doFailedSearch(msg, qtxt,format);
+            }
+                       
+            long hitCount = docs.getNumFound();
+            log.debug("Number of hits = " + hitCount);
+            if ( hitCount < 1 ) {                
+                return doNoHits(qtxt,format);
+            }            
+            
+            List<Individual> individuals = new LinkedList<Individual>();      
+            Iterator<SolrDocument> docIterator = docs.iterator();
+            while (docIterator.hasNext()) {
                 try{                    
-                    //Document doc = searcherForRequest.doc(topDocs.scoreDocs[i].doc); 
-                    SolrDocument doc = docs.get(i);
-                    //String uri = doc.get(Entity2LuceneDoc.term.URI);
+                    SolrDocument doc = (SolrDocument) docIterator.next();
                     String uri = doc.get(Entity2LuceneDoc.term.URI).toString();
-                    log.debug("Retrieving entity with uri "+ uri);
+                    log.debug("Retrieving individual with uri "+ uri);
                     Individual ent = new IndividualImpl();
                     ent.setURI(uri);
                     ent = iDao.getIndividualByURI(uri);
                     if(ent!=null)
-                        beans.add(ent);
+                        individuals.add(ent);
                 }catch(Exception e){
                     log.error("problem getting usable Individuals from search " +
                             "hits" + e.getMessage());
@@ -315,7 +318,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
                 pagingLinkParams.put(XML_REQUEST_PARAM,"1");                
             }
             
-            /* Start putting together the data for the templates */
+            /* Compile the data for the templates */
             
             Map<String, Object> body = new HashMap<String, Object>();
             
@@ -374,7 +377,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             // RY If this diverges significantly from what's used on the index page,
             // create a different template model.
             body.put("individuals", ListedIndividualTemplateModel
-                    .getIndividualTemplateModelList(beans, vreq));
+                    .getIndividualTemplateModelList(individuals, vreq));
 
             body.put("querytext", qtxt);
             body.put("title", qtxt + " - " + portal.getAppName()
@@ -607,7 +610,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             return (Analyzer)obj;        
     }
 
-    private Query getQuery(VitroRequest request, PortalFlag portalState,
+    private Query getQuery(VitroRequest request, 
                        Analyzer analyzer, String querystr ) throws SearchException, ParseException {
         Query query = null;
         try{
@@ -672,17 +675,6 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
                                 BooleanClause.Occur.MUST);
                 query = boolQuery;
             }
-
-            //if we have a flag/portal query then we add
-            //it by making a BooelanQuery.
-            Query flagQuery = makeFlagQuery( portalState );
-            if( flagQuery != null ){
-            	log.debug("Firing Flag query ");
-                BooleanQuery boolQuery = new BooleanQuery();
-                boolQuery.add( query, BooleanClause.Occur.MUST);
-                boolQuery.add( flagQuery, BooleanClause.Occur.MUST);
-                query = boolQuery;
-            }
             
             log.debug("Query: " + query);
             
@@ -720,59 +712,6 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
     	
     	return qp;
     }
- 
-    /**
-     * Makes a flag based query clause.  This is where searches can filtered
-     * by portal.
-     *
-     * If you think that search is not working correctly with protals and
-     * all that kruft then this is a method you want to look at.
-     *
-     * It only takes into account "the portal flag" and flag1Exclusive must
-     * be set.  Where does that stuff get set?  Look in vitro.flags.PortalFlag
-     * 
-     * One thing to keep in mind with portal filtering and search is that if
-     * you want to search a portal that is different then the portal the user
-     * is 'in' then the home parameter should be set to force the user into
-     * the new portal.  
-     * 
-     * Ex.  Bob requests the search page for vivo in portal 3.  You want to
-     * have a drop down menu so bob can search the all CALS protal, id 60.
-     * You need to have a home=60 on your search form. If you don't set 
-     * home=60 with your search query, then the search will not be in the
-     * all portal AND the WebappDaoFactory will be filtered to only show 
-     * things in portal 3.    
-     * 
-     * Notice: flag1 as a parameter is ignored. bdc34 2009-05-22.
-     */
-    @SuppressWarnings("static-access")
-    private Query makeFlagQuery( PortalFlag flag){        
-        if( flag == null || !flag.isFilteringActive() 
-                || flag.getFlag1DisplayStatus() == flag.SHOW_ALL_PORTALS )
-            return null;
-
-        // make one term for each bit in the numeric flag that is set
-        Collection<TermQuery> terms = new LinkedList<TermQuery>();
-        int portalNumericId = flag.getFlag1Numeric();        
-        Long[] bits = FlagMathUtils.numeric2numerics(portalNumericId);
-        for (Long bit : bits) {
-            terms.add(new TermQuery(new Term(Entity2LuceneDoc.term.PORTAL, Long
-                    .toString(bit))));
-        }
-
-        // make a boolean OR query for all of those terms
-        BooleanQuery boolQuery = new BooleanQuery();
-        if (terms.size() > 0) {
-            for (TermQuery term : terms) {
-                    boolQuery.add(term, BooleanClause.Occur.SHOULD);
-            }
-            return boolQuery;
-        } else {
-            //we have no flags set, so no flag filtering
-            return null;
-        }
-    } 
-    
 
     private ExceptionResponseValues doSearchError(Throwable e, Format f) {
         Map<String, Object> body = new HashMap<String, Object>();
