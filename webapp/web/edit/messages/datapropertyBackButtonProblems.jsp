@@ -24,7 +24,6 @@
 <%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.RdfLiteralHash"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.beans.DataProperty"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
-<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 
 <%--
 Current stop gap solution for back button problems
@@ -42,7 +41,10 @@ and set a flag in the request to indicate "back button confusion"
     log.debug("Starting datapropertyBackButtonProblems.jsp");
 %>
 
-<vitro:confirmLoginStatus level="CURATOR" allowSelfEditing="true" />
+<%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousPages" %>
+<% request.setAttribute("requestedActions", new UseMiscellaneousPages()); %>
+<vitro:confirmAuthorization />
 
 <%
     List<String> errorMessages = new ArrayList<String>();

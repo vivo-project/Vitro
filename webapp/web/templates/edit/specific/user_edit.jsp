@@ -6,8 +6,11 @@
 <jsp:directive.page import="edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary"/>
 <jsp:directive.page import="edu.cornell.mannlib.vitro.webapp.beans.User"/>
 
-<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
-<vitro:requiresAuthorizationFor classNames="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts" />
+<%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts" %>
+<% request.setAttribute("requestedActions", new ManageUserAccounts()); %>
+<vitro:confirmAuthorization />
+
 
 <div class="editingForm">
 

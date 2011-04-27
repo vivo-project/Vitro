@@ -4,9 +4,11 @@
 
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 
-<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousCuratorPages" %>
+<% request.setAttribute("requestedActions", new UseMiscellaneousCuratorPages()); %>
+<vitro:confirmAuthorization />
 
-<vitro:requiresAuthorizationFor classNames="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousCuratorPages" />
 
 <%
     String conceptIdStr = request.getParameter("conceptId");

@@ -5,7 +5,7 @@
 <%@page
    import="java.util.List"%>
 
-<%-- doesn't use vitro:requiresAuthorizationFor becuase the we want to be able to see IDs for any user. --%>
+<%-- doesn't use vitro:confirmAuthorization becuase the we want to be able to see IDs for any user. --%>
 <%-- uses "security through obscurity", and doesn't give away much information. --%>
 
 <%

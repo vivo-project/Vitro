@@ -9,8 +9,11 @@
 <%@ page import="java.net.URLEncoder"%>
 
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
-<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
-<vitro:requiresAuthorizationFor classNames="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" />
+
+<%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" %>
+<% request.setAttribute("requestedActions", new UseAdvancedDataToolsPages()); %>
+<vitro:confirmAuthorization />
 
 <%
 

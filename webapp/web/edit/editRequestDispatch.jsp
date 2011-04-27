@@ -14,13 +14,15 @@
 <%@ page import="org.apache.commons.logging.LogFactory" %>
 <%@ page errorPage="/error.jsp" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"  %>
-<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 
 <%! 
 public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.editRequestDispatch.jsp");
 %>
 
-<vitro:confirmLoginStatus allowSelfEditing="true" />
+<%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousPages" %>
+<% request.setAttribute("requestedActions", new UseMiscellaneousPages()); %>
+<vitro:confirmAuthorization />
 
 <%
     /*

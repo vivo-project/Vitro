@@ -2,8 +2,11 @@
 
 <%@ taglib prefix="form" uri="http://vitro.mannlib.cornell.edu/edit/tags" %> 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
-<vitro:requiresAuthorizationFor classNames="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageTabs" />
+
+<%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageTabs" %>
+<% request.setAttribute("requestedActions", new ManageTabs()); %>
+<vitro:confirmAuthorization />
 
 <div class="editingForm">
 

@@ -12,9 +12,10 @@
   Brian Cauros bdc34@cornell.edu
   based on work by Volker Mentzner. --%>
 
-<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
-
-<vitro:requiresAuthorizationFor classNames="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages" />
+<%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages" %>
+<% request.setAttribute("requestedActions", new UseMiscellaneousAdminPages()); %>
+<vitro:confirmAuthorization />
 
 <%
 try {

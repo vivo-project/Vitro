@@ -29,7 +29,6 @@
 <%@page import="edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
-<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 
 <%-- 2nd prototype of processing, adapted for data property editing
 
@@ -61,11 +60,13 @@ and set a flag in the request to indicate "back button confusion"
  
 --%>
 <%! 
-
     final Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.processDatapropRdfForm.jsp");
 %>
 
-<vitro:confirmLoginStatus allowSelfEditing="true" />
+<%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousPages" %>
+<% request.setAttribute("requestedActions", new UseMiscellaneousPages()); %>
+<vitro:confirmAuthorization />
 
 <%    
     log.debug("Starting processDatapropRdfForm.jsp");

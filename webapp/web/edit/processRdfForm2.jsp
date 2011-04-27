@@ -47,7 +47,6 @@
 <%@page import="edu.cornell.mannlib.vitro.webapp.dao.InsertException"%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
-<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 
 <%-- 2nd prototype of processing.
 
@@ -58,7 +57,10 @@ The optional n3 blocks will proccessed if their variables are bound and
 are well formed.
 --%>
 
-<vitro:confirmLoginStatus allowSelfEditing="true" />
+<%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousPages" %>
+<% request.setAttribute("requestedActions", new UseMiscellaneousPages()); %>
+<vitro:confirmAuthorization />
 
 <%
     VitroRequest vreq = new VitroRequest(request);

@@ -12,9 +12,11 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
-<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 
-<vitro:requiresAuthorizationFor classNames="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages" />
+<%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages" %>
+<% request.setAttribute("requestedActions", new UseMiscellaneousAdminPages()); %>
+<vitro:confirmAuthorization />
 
 <%!
 

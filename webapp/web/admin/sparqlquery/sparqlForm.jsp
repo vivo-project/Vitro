@@ -5,8 +5,10 @@
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
 
-<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
-<vitro:requiresAuthorizationFor classNames="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManagePortals" />
+<%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManagePortals" %>
+<% request.setAttribute("requestedActions", new ManagePortals()); %>
+<vitro:confirmAuthorization />
 
 <body>
 <div id="content" class="sparqlform">
