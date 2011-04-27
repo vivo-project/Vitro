@@ -7,17 +7,13 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet.Template;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
-import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
-import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 
 public class SimpleReasonerRecomputeController extends FreemarkerHttpServlet {
 
@@ -26,12 +22,12 @@ public class SimpleReasonerRecomputeController extends FreemarkerHttpServlet {
     
     private static final String RECOMPUTE_INFERENCES_FTL = "recomputeInferences.ftl";
     
-    protected ResponseValues processRequest(VitroRequest vreq) { 
-        // Due to requiresLoginLevel(), we don't get here unless logged in as DBA
-        if (!LoginStatusBean.getBean(vreq)
-                .isLoggedInAtLeast(LoginStatusBean.DBA)) {
-            return new RedirectResponseValues(Route.LOGIN);
-        }
+    @Override
+	protected Actions requiredActions(VitroRequest vreq) {
+    	return new Actions(new UseMiscellaneousAdminPages());
+	}
+
+	protected ResponseValues processRequest(VitroRequest vreq) { 
         Map<String, Object> body = new HashMap<String, Object>();
         
         String messageStr = "";

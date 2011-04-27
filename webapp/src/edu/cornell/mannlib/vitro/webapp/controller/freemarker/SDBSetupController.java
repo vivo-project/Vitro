@@ -18,11 +18,10 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupSDB;
@@ -34,12 +33,12 @@ public class SDBSetupController extends FreemarkerHttpServlet {
     
     private static final String SDB_SETUP_FTL = "sdbSetup.ftl";
     
+    @Override
+	protected Actions requiredActions(VitroRequest vreq) {
+    	return new Actions(new UseMiscellaneousAdminPages());
+	}
+
     protected ResponseValues processRequest(VitroRequest vreq) { 
-        // Due to requiresLoginLevel(), we don't get here unless logged in as DBA
-        if (!LoginStatusBean.getBean(vreq)
-                .isLoggedInAtLeast(LoginStatusBean.DBA)) {
-            return new RedirectResponseValues(Route.LOGIN);
-        }
         Map<String, Object> body = new HashMap<String, Object>();
         
         String messageStr = "";
