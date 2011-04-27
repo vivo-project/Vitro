@@ -102,7 +102,9 @@ public class VitroHttpServlet extends HttpServlet {
 	protected boolean isAuthorizedToDisplayPage(HttpServletRequest request,
 			HttpServletResponse response, Actions actions) {
 		// Record restricted pages so we won't return to them on logout
-		LogoutRedirector.recordRestrictedPageUri(request);
+		if (!actions.isEmpty()) {
+			LogoutRedirector.recordRestrictedPageUri(request);
+		}
 
 		if (PolicyHelper.isAuthorizedForActions(request, actions)) {
 			log.debug("Servlet '" + this.getClass().getSimpleName()

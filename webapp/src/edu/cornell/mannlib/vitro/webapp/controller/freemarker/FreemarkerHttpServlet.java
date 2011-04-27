@@ -86,15 +86,12 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 	        Configuration config = getConfig(vreq);
 	        vreq.setAttribute("freemarkerConfig", config);
 	        
-	        ResponseValues responseValues;
-	        
-	        // This method does a redirect if the required authorizations are not met, so just return.
-	    	if (!isAuthorizedToDisplayPage(request, response, requiredActions(vreq))) {
-	            return; 
-	        } else {
-	            responseValues = processRequest(vreq);
-	        }
+			// This method does a redirect if the required authorizations are not met, so just return. 
+			if (!isAuthorizedToDisplayPage(request, response, requiredActions(vreq))) {
+				return;
+			}
 
+			ResponseValues responseValues = processRequest(vreq);
 	        doResponse(vreq, response, responseValues);	 
 	        
     	} catch (TemplateProcessingException e) {
