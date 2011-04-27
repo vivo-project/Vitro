@@ -130,51 +130,6 @@ public class VitroHttpServlet extends HttpServlet {
 	// ----------------------------------------------------------------------
 
 	/**
-	 * If not logged in, redirect them to the login page.
-	 * 
-	 * TODO this goes away as it is replace by annotations.
-	 */
-	public static boolean checkLoginStatus(HttpServletRequest request,
-			HttpServletResponse response) {
-		LogoutRedirector.recordRestrictedPageUri(request);
-		if (LoginStatusBean.getBean(request).isLoggedIn()) {
-			log.trace("Logged in. No minimum level.");
-			return true;
-		} else {
-			log.trace("Not logged in. No minimum level.");
-			redirectToLoginPage(request, response);
-			return false;
-		}
-	}
-
-	/**
-	 * If not logged in at the required level, redirect them to the appropriate
-	 * page.
-	 * 
-	 * TODO this goes away as it is replace by annotations.
-	 */
-	public static boolean checkLoginStatus(HttpServletRequest request,
-			HttpServletResponse response, int minimumLevel) {
-		LogoutRedirector.recordRestrictedPageUri(request);
-		LoginStatusBean statusBean = LoginStatusBean.getBean(request);
-		if (statusBean.isLoggedInAtLeast(minimumLevel)) {
-			log.trace("Security level " + statusBean.getSecurityLevel()
-					+ " is sufficient for minimum of " + minimumLevel);
-			return true;
-		} else if (statusBean.isLoggedIn()) {
-			log.trace("Security level " + statusBean.getSecurityLevel()
-					+ " is insufficient for minimum of " + minimumLevel);
-			redirectToInsufficientAuthorizationPage(request, response);
-			return false;
-		} else {
-			log.trace("Not logged in; not sufficient for minimum of "
-					+ minimumLevel);
-			redirectToLoginPage(request, response);
-			return false;
-		}
-	}
-
-	/**
 	 * Logged in, but with insufficent authorization. Send them to the home page
 	 * with a message. They won't be coming back.
 	 */

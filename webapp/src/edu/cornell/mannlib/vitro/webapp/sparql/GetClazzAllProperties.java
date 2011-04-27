@@ -21,6 +21,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousPages;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
@@ -43,14 +45,10 @@ public class GetClazzAllProperties extends BaseEditController {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
-		try {
-			super.doGet(request, response);
-		} catch (Exception e) {
-			e.printStackTrace();
+		if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseMiscellaneousPages()))) {
+        	return;
 		}
-		if (!checkLoginStatus(request, response))
-			return;
+
 		VitroRequest vreq = new VitroRequest(request);
 
 		String vClassURI = vreq.getParameter("vClassURI");
