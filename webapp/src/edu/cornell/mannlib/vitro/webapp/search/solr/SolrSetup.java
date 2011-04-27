@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.search.solr;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -16,7 +15,6 @@ import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 
 import com.hp.hpl.jena.ontology.OntModel;
 
-import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -53,7 +51,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             if( solrServerUrl == null ){
                 log.error("Could not find vitro.local.solr.url in deploy.properties.  "+
                         "Vitro application needs a URL of a solr server that it can use to index its data. " +
-                        "The it should be something like http://localhost:${port}" + context.getContextPath() + "solr" 
+                        "It should be something like http://localhost:${port}" + context.getContextPath() + "solr" 
                         );
                 return;
             }            
