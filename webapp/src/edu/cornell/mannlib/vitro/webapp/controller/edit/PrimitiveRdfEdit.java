@@ -20,7 +20,6 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.shared.Lock;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -165,11 +164,5 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
     }
     
     Log log = LogFactory.getLog(PrimitiveRdfEdit.class.getName());
-
-
-    static public boolean checkLoginStatus(HttpServletRequest request){
-    	return LoginStatusBean.getBean(request).isLoggedIn();
-    }
-
 
 }
