@@ -21,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseIndivid
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousCuratorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManagePortals;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseSiteAdminPage;
@@ -89,6 +90,9 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
 			
 		} else if (whatToAuth instanceof UseBasicAjaxControllers) {
+			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
+			
+		} else if (whatToAuth instanceof UseMiscellaneousPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
 			
 		} else {
