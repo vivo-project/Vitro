@@ -5,7 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 
 /** Should we allow the user to use the pages for editing individuals? */
-public class UseIndividualEditorPages extends RequestedAction implements
+public class EditIndividuals extends RequestedAction implements
 		UsePagesRequestedAction {
 	// no fields
 }

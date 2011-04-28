@@ -27,7 +27,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -47,7 +47,7 @@ public class StatementChangeListingController extends BaseEditController {
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
-        if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseOntologyEditorPages()))) {
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new EditOntology()))) {
         	return;
         }
 

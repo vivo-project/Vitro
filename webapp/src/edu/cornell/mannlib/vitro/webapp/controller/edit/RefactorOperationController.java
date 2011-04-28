@@ -42,7 +42,7 @@ import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -408,7 +408,7 @@ public class RefactorOperationController extends BaseEditController {
 	}
 	
     public void doPost(HttpServletRequest req, HttpServletResponse response) {
-        if (!isAuthorizedToDisplayPage(req, response, new Actions(new UseOntologyEditorPages()))) {
+        if (!isAuthorizedToDisplayPage(req, response, new Actions(new EditOntology()))) {
         	return;
         }
 

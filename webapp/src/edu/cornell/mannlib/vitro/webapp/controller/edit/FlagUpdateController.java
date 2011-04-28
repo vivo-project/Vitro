@@ -13,7 +13,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseIndividualEditorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndividuals;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
@@ -27,7 +27,7 @@ public class FlagUpdateController extends BaseEditController {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) {
-        if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseIndividualEditorPages()))) {
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new EditIndividuals()))) {
         	return;
         }
 

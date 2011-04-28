@@ -17,7 +17,7 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.Datatype;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -29,7 +29,7 @@ public class DatatypeRetryController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(DatatypeRetryController.class.getName());
 	
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
-        if (!isAuthorizedToDisplayPage(req, response, new Actions(new UseOntologyEditorPages()))) {
+        if (!isAuthorizedToDisplayPage(req, response, new Actions(new EditOntology()))) {
         	return;
         }
 

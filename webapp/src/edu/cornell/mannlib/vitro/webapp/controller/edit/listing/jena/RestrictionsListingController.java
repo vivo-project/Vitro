@@ -27,7 +27,7 @@ import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
@@ -45,7 +45,7 @@ public class RestrictionsListingController extends BaseEditController {
 	private EditProcessObject epo = null;
 	
     public void doGet(HttpServletRequest request, HttpServletResponse response) {    	
-        if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseOntologyEditorPages()))) {
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new EditOntology()))) {
         	return;
         }
 

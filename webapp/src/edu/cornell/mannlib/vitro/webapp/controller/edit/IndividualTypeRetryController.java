@@ -26,7 +26,7 @@ import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseIndividualEditorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndividuals;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -41,7 +41,7 @@ public class IndividualTypeRetryController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(IndividualTypeRetryController.class.getName());
 
 	public void doGet (HttpServletRequest request, HttpServletResponse response) {
-        if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseIndividualEditorPages()))) {
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new EditIndividuals()))) {
         	return;
         }
 

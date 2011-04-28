@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import edu.cornell.mannlib.vedit.beans.ButtonForm;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
@@ -29,7 +29,7 @@ public class ObjectPropertyStatementListingController extends
 		BaseEditController {
 	
    public void doGet(HttpServletRequest request, HttpServletResponse response) {
-       if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseOntologyEditorPages()))) {
+       if (!isAuthorizedToDisplayPage(request, response, new Actions(new EditOntology()))) {
        	return;
        }
 

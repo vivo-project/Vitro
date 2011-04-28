@@ -12,21 +12,21 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndividuals;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditSiteInformation;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManagePortals;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageTabs;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeIndividualEditingPanel;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeRevisionInfo;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeSiteAdminPage;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseIndividualEditorPages;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousCuratorPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousPages;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManagePortals;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseSiteAdminPage;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseSiteInfoEditingPage;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageTabs;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 
 /**
@@ -62,7 +62,7 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		} else if (whatToAuth instanceof UseMiscellaneousAdminPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
 
-		} else if (whatToAuth instanceof UseOntologyEditorPages) {
+		} else if (whatToAuth instanceof EditOntology) {
 			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
 
 		} else if (whatToAuth instanceof ManagePortals) {
@@ -71,16 +71,16 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		} else if (whatToAuth instanceof ManageTabs) {
 			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
 
-		} else if (whatToAuth instanceof UseSiteInfoEditingPage) {
+		} else if (whatToAuth instanceof EditSiteInformation) {
 			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
 			
 		} else if (whatToAuth instanceof UseMiscellaneousCuratorPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
 
-		} else if (whatToAuth instanceof UseIndividualEditorPages) {
+		} else if (whatToAuth instanceof EditIndividuals) {
 			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
 
-		} else if (whatToAuth instanceof UseSiteAdminPage) {
+		} else if (whatToAuth instanceof SeeSiteAdminPage) {
 			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
 
 		} else if (whatToAuth instanceof SeeRevisionInfo) {

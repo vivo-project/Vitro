@@ -29,7 +29,7 @@ import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseIndividualEditorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndividuals;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -56,7 +56,7 @@ public class EntityEditController extends BaseEditController {
     private final static int MIN_SHARED_PORTAL_ID = 16; // will this be available from the AppBean?
 
     public void doGet (HttpServletRequest request, HttpServletResponse response) {
-        if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseIndividualEditorPages()))) {
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new EditIndividuals()))) {
         	return;
         }
 

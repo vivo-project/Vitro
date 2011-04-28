@@ -21,7 +21,7 @@ import com.hp.hpl.jena.shared.Lock;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
@@ -30,7 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 public class JenaExportController extends BaseEditController {
 	private static final Actions REQUIRED_ACTIONS = new Actions(
-			new UseAdvancedDataToolsPages()).or(new UseOntologyEditorPages());
+			new UseAdvancedDataToolsPages()).or(new EditOntology());
 
 	@Override
 	public void doGet( HttpServletRequest request, HttpServletResponse response ) {

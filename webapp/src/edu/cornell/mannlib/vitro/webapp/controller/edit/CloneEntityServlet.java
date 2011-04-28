@@ -19,7 +19,7 @@ import org.joda.time.DateTime;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseIndividualEditorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndividuals;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -42,7 +42,7 @@ public class CloneEntityServlet extends BaseEditController {
     private static final Log log = LogFactory.getLog(CloneEntityServlet.class.getName());
 
     public void doPost(HttpServletRequest req, HttpServletResponse response) {
-        if (!isAuthorizedToDisplayPage(req, response, new Actions(new UseIndividualEditorPages()))) {
+        if (!isAuthorizedToDisplayPage(req, response, new Actions(new EditIndividuals()))) {
         	return;
         }
 

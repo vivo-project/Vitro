@@ -16,11 +16,11 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndividuals;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditSiteInformation;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeSiteAdminPage;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseIndividualEditorPages;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseOntologyEditorPages;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseSiteAdminPage;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseSiteInfoEditingPage;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.listing.AllTabsForPortalListingController;
@@ -38,7 +38,7 @@ public class SiteAdminController extends FreemarkerHttpServlet {
     private static final Log log = LogFactory.getLog(SiteAdminController.class);
     private static final String TEMPLATE_DEFAULT = "siteAdmin-main.ftl";
 
-    public static final Actions REQUIRED_ACTIONS = new Actions(new UseSiteAdminPage());
+    public static final Actions REQUIRED_ACTIONS = new Actions(new SeeSiteAdminPage());
     
     @Override
 	protected Actions requiredActions(VitroRequest vreq) {
@@ -56,7 +56,7 @@ public class SiteAdminController extends FreemarkerHttpServlet {
 
         UrlBuilder urlBuilder = new UrlBuilder(vreq.getPortal());
         
-    	if (PolicyHelper.isAuthorizedForActions(vreq, new UseIndividualEditorPages())) {
+    	if (PolicyHelper.isAuthorizedForActions(vreq, new EditIndividuals())) {
     		body.put("dataInput", getDataInputData(vreq));
     	}
 
@@ -66,7 +66,7 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         // of step with the levels required by the pages themselves. We should implement a 
         // mechanism similar to what's used on the front end to display links to Site Admin
         // and Revision Info iff the user has access to those pages.
-        if (PolicyHelper.isAuthorizedForActions(vreq, new UseOntologyEditorPages())) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, new EditOntology())) {
         	body.put("ontologyEditor", getOntologyEditorData(vreq, urlBuilder));
         }
 		if (PolicyHelper.isAuthorizedForActions(vreq, new UseAdvancedDataToolsPages())) {
@@ -134,7 +134,7 @@ public class SiteAdminController extends FreemarkerHttpServlet {
 			}
 		}
  
-		if (PolicyHelper.isAuthorizedForActions(vreq, new UseSiteInfoEditingPage())) {
+		if (PolicyHelper.isAuthorizedForActions(vreq, new EditSiteInformation())) {
 			urls.put("siteInfo", urlBuilder.getPortalUrl("/editForm", new ParamMap("controller", "Portal", "id", String.valueOf(urlBuilder.getPortalId()))));
 		}
 

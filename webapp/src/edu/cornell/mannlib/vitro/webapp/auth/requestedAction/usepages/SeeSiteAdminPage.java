@@ -4,8 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 
-/** Should we allow the user to use the pages for the Ontology Editor? */
-public class UseOntologyEditorPages extends RequestedAction implements
+/** Should we allow the user to use the Site Admin page? */
+public class SeeSiteAdminPage extends RequestedAction implements
 		UsePagesRequestedAction {
 	// no fields
 }

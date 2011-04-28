@@ -21,7 +21,7 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.listener.ChangeListener;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseIndividualEditorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndividuals;
 import edu.cornell.mannlib.vitro.webapp.beans.Keyword;
 import edu.cornell.mannlib.vitro.webapp.beans.KeywordIndividualRelation;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
@@ -37,7 +37,7 @@ public class KeywordRetryController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(KeywordRetryController.class.getName());
 
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
-        if (!isAuthorizedToDisplayPage(req, response, new Actions(new UseIndividualEditorPages()))) {
+        if (!isAuthorizedToDisplayPage(req, response, new Actions(new EditIndividuals()))) {
         	return;
         }
 
