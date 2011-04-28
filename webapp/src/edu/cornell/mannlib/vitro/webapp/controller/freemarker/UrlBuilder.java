@@ -46,6 +46,7 @@ public class UrlBuilder {
         SITE_ADMIN("/siteAdmin"),
         TERMS_OF_USE("/termsOfUse"),
         VISUALIZATION("/visualization"),
+        VISUALIZATION_SHORT("/vis"),
         VISUALIZATION_AJAX("/visualizationAjax"),
         VISUALIZATION_DATA("/visualizationData");
 
