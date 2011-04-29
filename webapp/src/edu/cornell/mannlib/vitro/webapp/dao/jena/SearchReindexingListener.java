@@ -44,7 +44,7 @@ public class SearchReindexingListener implements ModelChangedListener {
 		        pred = stmt.getPredicate().getURI();
 		    }
 	        if( stmt.getObject().isURIResource() ){          
-	            obj =  ((Resource) (stmt.getPredicate().as(Resource.class))).getURI();
+	            obj =  ((Resource) (stmt.getObject().as(Resource.class))).getURI();
 	        }else{
 	            obj = stmt.getObject().toString();
 	        }
