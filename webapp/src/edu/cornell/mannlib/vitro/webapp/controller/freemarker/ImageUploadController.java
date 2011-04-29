@@ -19,7 +19,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -90,6 +90,9 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	public static final String BODY_DELETE_URL = "deleteUrl";
 	public static final String BODY_FORM_ACTION = "formAction";
 	public static final String BODY_ERROR_MESSAGE = "errorMessage";
+	public static final String BODY_MAX_FILE_SIZE = "maxFileSize";
+	public static final String BODY_THUMBNAIL_WIDTH = "thumbnailWidth";
+	public static final String BODY_THUMBNAIL_HEIGHT = "thumbnailHeight";
 
 	public static final String TEMPLATE_NEW = "imageUpload-newImage.ftl";
 	public static final String TEMPLATE_REPLACE = "imageUpload-replaceImage.ftl";
@@ -144,9 +147,9 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 				ra = new EditObjPropStmt(entity.getURI(),
 						VitroVocabulary.IND_MAIN_IMAGE, imageUri);
 			} else {
-				ra = new AddDataPropStmt(entity.getURI(),
+				ra = new AddObjectPropStmt(entity.getURI(),
 						VitroVocabulary.IND_MAIN_IMAGE,
-						RequestActionConstants.SOME_LITERAL, null, null);
+						RequestActionConstants.SOME_URI);
 			}
 			return new Actions(ra);
 		} catch (UserMistakeException e) {
@@ -414,6 +417,9 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 		rv.put(BODY_FORM_ACTION, formAction);
 		rv.put(BODY_CANCEL_URL, cancelUrl);
 		rv.put(BODY_TITLE, "Upload image" + forName(entity));
+		rv.put(BODY_MAX_FILE_SIZE, MAXIMUM_FILE_SIZE);
+		rv.put(BODY_THUMBNAIL_HEIGHT, THUMBNAIL_HEIGHT);
+		rv.put(BODY_THUMBNAIL_WIDTH, THUMBNAIL_WIDTH);
 		return rv;
 	}
 
@@ -438,6 +444,9 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_UPLOAD, placeholderUrl));
 		rv.put(BODY_CANCEL_URL, exitPageUrl(vreq, entity.getURI()));
 		rv.put(BODY_TITLE, "Replace image" + forName(entity));
+		rv.put(BODY_MAX_FILE_SIZE, MAXIMUM_FILE_SIZE);
+		rv.put(BODY_THUMBNAIL_HEIGHT, THUMBNAIL_HEIGHT);
+		rv.put(BODY_THUMBNAIL_WIDTH, THUMBNAIL_WIDTH);
 		return rv;
 	}
 
