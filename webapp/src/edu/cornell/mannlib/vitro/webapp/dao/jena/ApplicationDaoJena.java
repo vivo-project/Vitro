@@ -78,7 +78,7 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
                     // namespace with a final slash, so this makes matching easier.
                     // It also accords with the way the default namespace is defined.
                     if (!namespace.endsWith("/")) {
-                        namespace = namespace + "/";
+                        namespace += "/";
                     }
                     externallyLinkedNamespaces.add(namespace);
                 }

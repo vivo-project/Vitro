@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.search.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -159,9 +160,6 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             
             log.debug("IndividualDao is " + iDao.toString() + " Public classes in the classgroup are " + grpDao.getPublicGroupsWithVClasses().toString());
             log.debug("VClassDao is "+ vclassDao.toString() );            
-                                           
-            // RY Not sure where/how this is used ***
-            //String alphaFilter = vreq.getParameter("alpha");
             
             int startIndex = 0;
             try{ 
@@ -182,10 +180,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             int maxHitSize = DEFAULT_MAX_SEARCH_SIZE ;
             if( startIndex >= DEFAULT_MAX_SEARCH_SIZE  - hitsPerPage )
                 maxHitSize = startIndex + DEFAULT_MAX_SEARCH_SIZE ;
-//            if( alphaFilter != null ){
-//                maxHitSize = maxHitSize * 2;
-//                hitsPerPage = maxHitSize;
-//            }
+
             log.debug("maxHitSize is " + maxHitSize);
 
             String qtxt = vreq.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
@@ -339,40 +334,36 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
                 if (type != null && type.getName() != null)
                     body.put("typeName", type.getName());
             }
-//            
-//            /* Add classgroup and type refinement links to body */
-//            if( wasHtmlRequested ){                                
-//                // Search request includes no classgroup and no type, so add classgroup search refinement links.
-//                if ( !classGroupFilterRequested && !typeFiltereRequested ) { 
-//                    List<VClassGroup> classgroups = getClassGroups(grpDao, topDocs, searcherForRequest);
-//                    List<VClassGroupSearchLink> classGroupLinks = new ArrayList<VClassGroupSearchLink>(classgroups.size());
-//                    for (VClassGroup vcg : classgroups) {
-//                        if (vcg.getPublicName() != null) {
-//                            classGroupLinks.add(new VClassGroupSearchLink(qtxt, vcg));
-//                        }
-//                    }
-//                    body.put("classGroupLinks", classGroupLinks);                       
-//     
-//                // Search request is for a classgroup, so add rdf:type search refinement links
-//                // but try to filter out classes that are subclasses
-//                } else if ( classGroupFilterRequested && !typeFiltereRequested ) {  
-//                    List<VClass> vClasses = getVClasses(vclassDao,topDocs,searcherForRequest);
-//                    List<VClassSearchLink> vClassLinks = new ArrayList<VClassSearchLink>(vClasses.size());
-//                    for (VClass vc : vClasses) {
-//                        vClassLinks.add(new VClassSearchLink(qtxt, vc));
-//                    }
-//                    body.put("classLinks", vClassLinks);                       
-//                    pagingLinkParams.put("classgroup", classGroupParam);
-//    
-//                // This case is never displayed
-////                } else if (!StringUtils.isEmpty(alphaFilter)) {
-////                    body.put("alphas", getAlphas(topDocs, searcherForRequest));
-////                    alphaSortIndividuals(beans);
-//                } else {
-//                    pagingLinkParams.put("type", typeParam);
-//                }
-//            }           
-//
+            
+            /* Add classgroup and type refinement links to body */
+            if( wasHtmlRequested ){                                
+                // Search request includes no classgroup and no type, so add classgroup search refinement links.
+                if ( !classGroupFilterRequested && !typeFiltereRequested ) { 
+                    List<VClassGroup> classgroups = getClassGroups(grpDao, docs);
+                    List<VClassGroupSearchLink> classGroupLinks = new ArrayList<VClassGroupSearchLink>(classgroups.size());
+                    for (VClassGroup vcg : classgroups) {
+                        if (vcg.getPublicName() != null) {
+                            classGroupLinks.add(new VClassGroupSearchLink(qtxt, vcg));
+                        }
+                    }
+                    body.put("classGroupLinks", classGroupLinks);                       
+     
+                // Search request is for a classgroup, so add rdf:type search refinement links
+                // but try to filter out classes that are subclasses
+                } else if ( classGroupFilterRequested && !typeFiltereRequested ) {  
+                    List<VClass> vClasses = getVClasses(vclassDao, docs);
+                    List<VClassSearchLink> vClassLinks = new ArrayList<VClassSearchLink>(vClasses.size());
+                    for (VClass vc : vClasses) {
+                        vClassLinks.add(new VClassSearchLink(qtxt, vc));
+                    }
+                    body.put("classLinks", vClassLinks);                       
+                    pagingLinkParams.put("classgroup", classGroupParam);
+
+                } else {
+                    pagingLinkParams.put("type", typeParam);
+                }
+            }           
+
             // Convert search result individuals to template model objects
             // RY If this diverges significantly from what's used on the index page,
             // create a different template model.
@@ -407,62 +398,34 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
         }        
     }
 
-	private void alphaSortIndividuals(List<Individual> beans) {
-        Collections.sort(beans, new Comparator< Individual >(){
-            public int compare(Individual o1, Individual o2) {
-                if( o1 == null || o1.getName() == null )
-                    return 1;
-                else
-                    return o1.getName().compareTo(o2.getName());
-            }});        
-    }
-
-    private List<String> getAlphas(TopDocs topDocs, IndexSearcher searcher) {
-        Set<String> alphas = new HashSet<String>();
-        for(int i=0;i<topDocs.scoreDocs.length; i++){
-            Document doc;
-            try {
-                doc = searcher.doc(topDocs.scoreDocs[i].doc);
-                String name =doc.get(Entity2LuceneDoc.term.NAME);
-                if( name != null && name.length() > 0)
-                    alphas.add( name.substring(0, 1));                
-            } catch (CorruptIndexException e) {
-                log.debug("Could not get alphas for document",e);
-            } catch (IOException e) {
-                log.debug("Could not get alphas for document",e);
-            }
-        
-        }
-        return new ArrayList<String>(alphas);
-    }
 
     /**
      * Get the class groups represented for the individuals in the topDocs.
      */
-    private List<VClassGroup> getClassGroups(VClassGroupDao grpDao, TopDocs topDocs,
-            IndexSearcher searcherForRequest) {        
+    private List<VClassGroup> getClassGroups(VClassGroupDao grpDao, SolrDocumentList docs) {        
         LinkedHashMap<String,VClassGroup> grpMap = grpDao.getClassGroupMap();
         int n = grpMap.size();
         
         HashSet<String> classGroupsInHits = new HashSet<String>(n);
         int grpsFound = 0;
         
-        for(int i=0; i<topDocs.scoreDocs.length && n > grpsFound ;i++){
+        long hitCount = docs.getNumFound();
+        for(int i=0; i<hitCount && n > grpsFound ;i++){
             try{
-                Document doc = searcherForRequest.doc(topDocs.scoreDocs[i].doc);                    
-                Field[] grps = doc.getFields(Entity2LuceneDoc.term.CLASSGROUP_URI);                
-                if(grps != null || grps.length > 0){
-                    for(int j=0;j<grps.length;j++){
-                        String groupUri = grps[j].stringValue();
+                SolrDocument doc = docs.get(i);        
+                Collection<Object> grps = doc.getFieldValues(Entity2LuceneDoc.term.CLASSGROUP_URI);     
+                if (grps != null) {
+                    for (Object o : grps) {                            
+                        String groupUri = o.toString();
                         if( groupUri != null && ! classGroupsInHits.contains(groupUri)){
                             classGroupsInHits.add(groupUri);
                             grpsFound++;
                             if( grpsFound >= n )
                                 break;
                         }                        
-                    }                    
+                    }
                 }
-            }catch(Exception e){
+            } catch(Exception e) {
                 log.error("problem getting VClassGroups from search hits " 
                         + e.getMessage());
             }
@@ -485,78 +448,9 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
         return classgroups;
     }
 
-    private class VClassGroupSearchLink extends LinkTemplateModel {
- 
-        VClassGroupSearchLink(String querytext, VClassGroup classgroup) {
-            super(classgroup.getPublicName(), "/search", "querytext", querytext, "classgroup", classgroup.getURI());
-        }
-    }
-    
-    private class VClassSearchLink extends LinkTemplateModel {
-        
-        VClassSearchLink(String querytext, VClass type) {
-            super(type.getName(), "/search", "querytext", querytext, "type", type.getURI());
-        }
-    }
-    
-    private List<PagingLink> getPagingLinks(int startIndex, int hitsPerPage, long hitCount, int maxHitSize, String baseUrl, ParamMap params) {
 
-        List<PagingLink> pagingLinks = new ArrayList<PagingLink>();
-        
-        // No paging links if only one page of results
-        if (hitCount <= hitsPerPage) {
-            return pagingLinks;
-        }
-        
-        for (int i = 0; i < hitCount; i += hitsPerPage) {
-            params.put("startIndex", String.valueOf(i));
-            if ( i < maxHitSize - hitsPerPage) {
-                int pageNumber = i/hitsPerPage + 1;
-                if (i >= startIndex && i < (startIndex + hitsPerPage)) {
-                    pagingLinks.add(new PagingLink(pageNumber));
-                } else {
-                    pagingLinks.add(new PagingLink(pageNumber, baseUrl, params));
-                }
-            } else {
-                pagingLinks.add(new PagingLink("more...", baseUrl, params));
-            }
-        }   
-        
-        return pagingLinks;
-    }
-    
-    private String getPreviousPageLink(int startIndex, int hitsPerPage, String baseUrl, ParamMap params) {
-        params.put("startIndex", String.valueOf(startIndex-hitsPerPage));
-        //return new PagingLink("Previous", baseUrl, params);
-        return UrlBuilder.getUrl(baseUrl, params);
-    }
-    
-    private String getNextPageLink(int startIndex, int hitsPerPage, String baseUrl, ParamMap params) {
-        params.put("startIndex", String.valueOf(startIndex+hitsPerPage));
-        //return new PagingLink("Next", baseUrl, params);
-        return UrlBuilder.getUrl(baseUrl, params);
-    }
-    
-    private class PagingLink extends LinkTemplateModel {
-        
-        PagingLink(int pageNumber, String baseUrl, ParamMap params) {
-            super(String.valueOf(pageNumber), baseUrl, params);
-        }
-        
-        // Constructor for current page item: not a link, so no url value.
-        PagingLink(int pageNumber) {
-            setText(String.valueOf(pageNumber));
-        }
-        
-        // Constructor for "more..." item
-        PagingLink(String text, String baseUrl, ParamMap params) {
-            super(text, baseUrl, params);
-        }
-    }
-   
-    private List<VClass> getVClasses(VClassDao vclassDao, TopDocs topDocs,
-            IndexSearcher searherForRequest){        
-        HashSet<String> typesInHits = getVClassUrisForHits(topDocs,searherForRequest);                                
+    private List<VClass> getVClasses(VClassDao vclassDao, SolrDocumentList docs){        
+        HashSet<String> typesInHits = getVClassUrisForHits(docs);                                
         List<VClass> classes = new ArrayList<VClass>(typesInHits.size());
         
         Iterator<String> it = typesInHits.iterator();
@@ -582,20 +476,18 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
         return classes;
     }       
         
-    private HashSet<String> getVClassUrisForHits(TopDocs topDocs, 
-            IndexSearcher searcherForRequest){
-        HashSet<String> typesInHits = new HashSet<String>();        
-        for(int i=0; i<topDocs.scoreDocs.length; i++){
-            try{
-                Document doc=searcherForRequest.doc(topDocs.scoreDocs[i].doc);
-                Field[] types = doc.getFields(Entity2LuceneDoc.term.RDFTYPE);
-                if(types != null ){
-                    for(int j=0;j<types.length;j++){
-                        String typeUri = types[j].stringValue();
+    private HashSet<String> getVClassUrisForHits(SolrDocumentList docs){
+        HashSet<String> typesInHits = new HashSet<String>();  
+        for (SolrDocument doc : docs) {
+            try {
+                Collection<Object> types = doc.getFieldValues(Entity2LuceneDoc.term.RDFTYPE);     
+                if (types != null) {
+                    for (Object o : types) {
+                        String typeUri = o.toString();
                         typesInHits.add(typeUri);
                     }
                 }
-            }catch(Exception e){
+            } catch (Exception e) {
                 log.error("problems getting rdf:type for search hits",e);
             }
         }
@@ -629,21 +521,6 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             
             QueryParser parser = getQueryParser(analyzer);
             query = parser.parse(querystr);
-                  
-            String alpha = request.getParameter("alpha");
-            
-            if( alpha != null && !"".equals(alpha) && alpha.length() == 1){
-            	
-            	log.debug("Firing alpha query ");
-            	log.debug("request.getParameter(alpha) is " + alpha);
-            	
-                BooleanQuery boolQuery = new BooleanQuery();
-                boolQuery.add( query, BooleanClause.Occur.MUST );
-                boolQuery.add( 
-                    new WildcardQuery(new Term(Entity2LuceneDoc.term.NAME, alpha+'*')),
-                    BooleanClause.Occur.MUST);
-                query = boolQuery;
-            }
             
             //check if this is classgroup filtered
             Object param = request.getParameter("classgroup");
@@ -713,6 +590,75 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
     	return qp;
     }
 
+    private class VClassGroupSearchLink extends LinkTemplateModel {
+        
+        VClassGroupSearchLink(String querytext, VClassGroup classgroup) {
+            super(classgroup.getPublicName(), "/search", "querytext", querytext, "classgroup", classgroup.getURI());
+        }
+    }
+    
+    private class VClassSearchLink extends LinkTemplateModel {
+        
+        VClassSearchLink(String querytext, VClass type) {
+            super(type.getName(), "/search", "querytext", querytext, "type", type.getURI());
+        }
+    }
+    
+    private List<PagingLink> getPagingLinks(int startIndex, int hitsPerPage, long hitCount, int maxHitSize, String baseUrl, ParamMap params) {
+
+        List<PagingLink> pagingLinks = new ArrayList<PagingLink>();
+        
+        // No paging links if only one page of results
+        if (hitCount <= hitsPerPage) {
+            return pagingLinks;
+        }
+        
+        for (int i = 0; i < hitCount; i += hitsPerPage) {
+            params.put("startIndex", String.valueOf(i));
+            if ( i < maxHitSize - hitsPerPage) {
+                int pageNumber = i/hitsPerPage + 1;
+                if (i >= startIndex && i < (startIndex + hitsPerPage)) {
+                    pagingLinks.add(new PagingLink(pageNumber));
+                } else {
+                    pagingLinks.add(new PagingLink(pageNumber, baseUrl, params));
+                }
+            } else {
+                pagingLinks.add(new PagingLink("more...", baseUrl, params));
+            }
+        }   
+        
+        return pagingLinks;
+    }
+    
+    private String getPreviousPageLink(int startIndex, int hitsPerPage, String baseUrl, ParamMap params) {
+        params.put("startIndex", String.valueOf(startIndex-hitsPerPage));
+        //return new PagingLink("Previous", baseUrl, params);
+        return UrlBuilder.getUrl(baseUrl, params);
+    }
+    
+    private String getNextPageLink(int startIndex, int hitsPerPage, String baseUrl, ParamMap params) {
+        params.put("startIndex", String.valueOf(startIndex+hitsPerPage));
+        //return new PagingLink("Next", baseUrl, params);
+        return UrlBuilder.getUrl(baseUrl, params);
+    }
+    
+    private class PagingLink extends LinkTemplateModel {
+        
+        PagingLink(int pageNumber, String baseUrl, ParamMap params) {
+            super(String.valueOf(pageNumber), baseUrl, params);
+        }
+        
+        // Constructor for current page item: not a link, so no url value.
+        PagingLink(int pageNumber) {
+            setText(String.valueOf(pageNumber));
+        }
+        
+        // Constructor for "more..." item
+        PagingLink(String text, String baseUrl, ParamMap params) {
+            super(text, baseUrl, params);
+        }
+    }
+   
     private ExceptionResponseValues doSearchError(Throwable e, Format f) {
         Map<String, Object> body = new HashMap<String, Object>();
         body.put("message", "Search failed: " + e.getMessage());  
