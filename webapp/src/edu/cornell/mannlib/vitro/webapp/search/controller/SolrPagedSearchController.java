@@ -14,7 +14,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -25,20 +24,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
-import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.util.Version;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
@@ -177,21 +164,27 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             }                        
             log.debug("hitsPerPage is " + hitsPerPage);
             
-            int maxHitSize = DEFAULT_MAX_SEARCH_SIZE ;
+            int maxHitCount = DEFAULT_MAX_SEARCH_SIZE ;
             if( startIndex >= DEFAULT_MAX_SEARCH_SIZE  - hitsPerPage )
-                maxHitSize = startIndex + DEFAULT_MAX_SEARCH_SIZE ;
+                maxHitCount = startIndex + DEFAULT_MAX_SEARCH_SIZE ;
 
-            log.debug("maxHitSize is " + maxHitSize);
+            log.debug("maxHitSize is " + maxHitCount);
 
             String qtxt = vreq.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
+            
+            // RY *** Analyzer
             //Analyzer analyzer = getAnalyzer(getServletContext());
             
             log.debug("Query text: " + qtxt);
 
-            SolrQuery parameters = new SolrQuery(qtxt);
+            SolrQuery query = getQuery(qtxt, maxHitCount, vreq);
 
-            parameters.set("start", startIndex);
-            parameters.set("rows", hitsPerPage);
+            // We need Solr to send us the entire result set back, otherwise we may not get all the
+            // right refinement links. For example, if all individuals on pg 1 are Persons, and on 
+            // pg 2 there are FacultyMembers, we need to show the FacultyMember refinement link on 
+            // both pages.
+            //parameters.set("start", startIndex);
+            //parameters.set("rows", hitsPerPage);
 
             // ** For xml requested, add version=2.2 for xml version 
             // is that enough, or do we also have to add wt param?
@@ -200,7 +193,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             QueryResponse response = null;
             
             try {
-                response = solr.query(parameters);
+                response = solr.query(query);
 
             
             //log.debug("Query text is "+ qtxt + " Analyzer is "+ analyzer.toString());
@@ -256,7 +249,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
                 // this is a hack to deal with odd cases where search and index threads interact
                 try{
                     wait(150);
-                    response = solr.query(parameters);
+                    response = solr.query(query);
                 } catch (Exception ex) {
                     log.error(ex);
                     String msg = makeBadSearchMessage(qtxt, ex.getMessage());
@@ -286,12 +279,18 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             if ( hitCount < 1 ) {                
                 return doNoHits(qtxt,format);
             }            
+
+            long lastHitToShow = 0;
+            if ((startIndex + hitsPerPage) > hitCount ) {
+                lastHitToShow = hitCount - 1;
+            } else {
+                lastHitToShow = startIndex + hitsPerPage - 1;
+            }
             
             List<Individual> individuals = new LinkedList<Individual>();      
-            Iterator<SolrDocument> docIterator = docs.iterator();
-            while (docIterator.hasNext()) {
-                try{                    
-                    SolrDocument doc = (SolrDocument) docIterator.next();
+            for(int i = startIndex; i < lastHitToShow; i++){
+                try {                    
+                    SolrDocument doc = docs.get(i);
                     String uri = doc.get(Entity2LuceneDoc.term.URI).toString();
                     log.debug("Retrieving individual with uri "+ uri);
                     Individual ent = new IndividualImpl();
@@ -299,9 +298,9 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
                     ent = iDao.getIndividualByURI(uri);
                     if(ent!=null)
                         individuals.add(ent);
-                }catch(Exception e){
-                    log.error("problem getting usable Individuals from search " +
-                            "hits" + e.getMessage());
+                } catch(Exception e) {
+                    log.error("Problem getting usable Individuals from search hits. " +
+                            e.getMessage());
                 }
             }            
   
@@ -378,7 +377,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             body.put("startIndex", startIndex);
             
             body.put("pagingLinks", getPagingLinks(startIndex, hitsPerPage,
-                    hitCount, maxHitSize, vreq.getServletPath(),
+                    hitCount, maxHitCount, vreq.getServletPath(),
                     pagingLinkParams));
 
             if (startIndex != 0) {
@@ -502,65 +501,81 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             return (Analyzer)obj;        
     }
 
-    private Query getQuery(VitroRequest request, 
-                       Analyzer analyzer, String querystr ) throws SearchException, ParseException {
-        Query query = null;
-        try{
-            //String querystr = request.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
-            if( querystr == null){
-                log.error("There was no Parameter '"+VitroQuery.QUERY_PARAMETER_NAME            
-                    +"' in the request.");                
-                return null;
-            }else if( querystr.length() > MAX_QUERY_LENGTH ){
-                log.debug("The search was too long. The maximum " +
-                        "query length is " + MAX_QUERY_LENGTH );
-                return null;
-            }               
-            
-            log.debug("Parsing query using QueryParser ");
-            
-            QueryParser parser = getQueryParser(analyzer);
-            query = parser.parse(querystr);
-            
-            //check if this is classgroup filtered
-            Object param = request.getParameter("classgroup");
-            if( param != null && !"".equals(param)){
-            	
-            	log.debug("Firing classgroup query ");
-                log.debug("request.getParameter(classgroup) is "+ param.toString());
-
-                  BooleanQuery boolQuery = new BooleanQuery();
-                  boolQuery.add( query, BooleanClause.Occur.MUST);
-                  boolQuery.add(  new TermQuery(
-                                      new Term(Entity2LuceneDoc.term.CLASSGROUP_URI, 
-                                              (String)param)),
-                                  BooleanClause.Occur.MUST);
-                  query = boolQuery;
-            }
-
-            //check if this is rdf:type filtered
-            param = request.getParameter("type");
-            if(  param != null && !"".equals(param)){                         
-            	log.debug("Firing type query ");
-            	log.debug("request.getParameter(type) is "+ param.toString());   
-                
-            	BooleanQuery boolQuery = new BooleanQuery();
-                boolQuery.add( query, BooleanClause.Occur.MUST);
-                boolQuery.add(  new TermQuery(
-                                    new Term(Entity2LuceneDoc.term.RDFTYPE, 
-                                            (String)param)),
-                                BooleanClause.Occur.MUST);
-                query = boolQuery;
-            }
-            
-            log.debug("Query: " + query);
-            
-        } catch (ParseException e) {
-            throw new ParseException(e.getMessage());
-        } catch (Exception ex){
-            throw new SearchException(ex.getMessage());
-        }
-
+//    private Query getQuery(VitroRequest request, 
+//                       Analyzer analyzer, String querystr ) throws SearchException, ParseException {
+//        Query query = null;
+//        try{
+//            //String querystr = request.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
+//            if( querystr == null){
+//                log.error("There was no Parameter '"+VitroQuery.QUERY_PARAMETER_NAME            
+//                    +"' in the request.");                
+//                return null;
+//            }else if( querystr.length() > MAX_QUERY_LENGTH ){
+//                log.debug("The search was too long. The maximum " +
+//                        "query length is " + MAX_QUERY_LENGTH );
+//                return null;
+//            }               
+//            
+//            log.debug("Parsing query using QueryParser ");
+//            
+//            QueryParser parser = getQueryParser(analyzer);
+//            query = parser.parse(querystr);
+//            
+//            //check if this is classgroup filtered
+//            Object param = request.getParameter("classgroup");
+//            if( param != null && !"".equals(param)){
+//            	
+//            	log.debug("Firing classgroup query ");
+//                log.debug("request.getParameter(classgroup) is "+ param.toString());
+//
+//                  BooleanQuery boolQuery = new BooleanQuery();
+//                  boolQuery.add( query, BooleanClause.Occur.MUST);
+//                  boolQuery.add(  new TermQuery(
+//                                      new Term(Entity2LuceneDoc.term.CLASSGROUP_URI, 
+//                                              (String)param)),
+//                                  BooleanClause.Occur.MUST);
+//                  query = boolQuery;
+//            }
+//
+//            //check if this is rdf:type filtered
+//            param = request.getParameter("type");
+//            if(  param != null && !"".equals(param)){                         
+//            	log.debug("Firing type query ");
+//            	log.debug("request.getParameter(type) is "+ param.toString());   
+//                
+//            	BooleanQuery boolQuery = new BooleanQuery();
+//                boolQuery.add( query, BooleanClause.Occur.MUST);
+//                boolQuery.add(  new TermQuery(
+//                                    new Term(Entity2LuceneDoc.term.RDFTYPE, 
+//                                            (String)param)),
+//                                BooleanClause.Occur.MUST);
+//                query = boolQuery;
+//            }
+//            
+//            log.debug("Query: " + query);
+//            
+//        } catch (ParseException e) {
+//            throw new ParseException(e.getMessage());
+//        } catch (Exception ex){
+//            throw new SearchException(ex.getMessage());
+//        }
+//
+//        return query;
+//    }
+    
+    private SolrQuery getQuery(String queryText, int maxHitCount, VitroRequest vreq) {
+        SolrQuery query = new SolrQuery(queryText);
+        
+        // Solr requires these values, but we don't want them to be the real values for this page
+        // of results, else the refinement links won't work correctly: if only Persons are on pg 1,
+        // but there are FacultyMembers on pg 2, we still need to show the FacultyMember refinement
+        // link on pg 1, which won't happen if we have retrieved only one page of results from Solr.
+        query.set("start", 0);
+        query.set("rows", maxHitCount);
+        
+        // RY Add other stuff here
+        // classgroups, type params
+        
         return query;
     }
     
@@ -604,7 +619,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
         }
     }
     
-    private List<PagingLink> getPagingLinks(int startIndex, int hitsPerPage, long hitCount, int maxHitSize, String baseUrl, ParamMap params) {
+    private List<PagingLink> getPagingLinks(int startIndex, int hitsPerPage, long hitCount, int maxHitCount, String baseUrl, ParamMap params) {
 
         List<PagingLink> pagingLinks = new ArrayList<PagingLink>();
         
@@ -615,7 +630,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
         
         for (int i = 0; i < hitCount; i += hitsPerPage) {
             params.put("startIndex", String.valueOf(i));
-            if ( i < maxHitSize - hitsPerPage) {
+            if ( i < maxHitCount - hitsPerPage) {
                 int pageNumber = i/hitsPerPage + 1;
                 if (i >= startIndex && i < (startIndex + hitsPerPage)) {
                     pagingLinks.add(new PagingLink(pageNumber));
