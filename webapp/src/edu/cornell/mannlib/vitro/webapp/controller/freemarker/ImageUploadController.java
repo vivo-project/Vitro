@@ -417,7 +417,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 		rv.put(BODY_FORM_ACTION, formAction);
 		rv.put(BODY_CANCEL_URL, cancelUrl);
 		rv.put(BODY_TITLE, "Upload image" + forName(entity));
-		rv.put(BODY_MAX_FILE_SIZE, MAXIMUM_FILE_SIZE);
+		rv.put(BODY_MAX_FILE_SIZE, MAXIMUM_FILE_SIZE / (1024 * 1024));
 		rv.put(BODY_THUMBNAIL_HEIGHT, THUMBNAIL_HEIGHT);
 		rv.put(BODY_THUMBNAIL_WIDTH, THUMBNAIL_WIDTH);
 		return rv;
@@ -444,7 +444,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_UPLOAD, placeholderUrl));
 		rv.put(BODY_CANCEL_URL, exitPageUrl(vreq, entity.getURI()));
 		rv.put(BODY_TITLE, "Replace image" + forName(entity));
-		rv.put(BODY_MAX_FILE_SIZE, MAXIMUM_FILE_SIZE);
+		rv.put(BODY_MAX_FILE_SIZE, MAXIMUM_FILE_SIZE / (1024 * 1024));
 		rv.put(BODY_THUMBNAIL_HEIGHT, THUMBNAIL_HEIGHT);
 		rv.put(BODY_THUMBNAIL_WIDTH, THUMBNAIL_WIDTH);
 		return rv;
