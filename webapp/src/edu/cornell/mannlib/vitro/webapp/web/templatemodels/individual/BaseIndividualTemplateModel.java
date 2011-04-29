@@ -94,18 +94,9 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         
         String individualUri = getUri();
         String profileUrl = getProfileUrl();
-        
-        URI uri = new URIImpl(individualUri);
-        String namespace = uri.getNamespace();
-        
-        // Individuals in the default namespace
-        // e.g., http://vivo.cornell.edu/individual/n2345/n2345.rdf
-        // where default namespace = http://vivo.cornell.edu/individual/ 
-        // Other individuals: http://some.other.namespace/n2345?format=rdfxml
-        String defaultNamespace = vreq.getWebappDaoFactory().getDefaultNamespace();
-        return (defaultNamespace.equals(namespace)) ? profileUrl + "/" + getLocalName() + ".rdf" 
-                                                    : UrlBuilder.addParams(profileUrl, "format", "rdfxml");
-
+        boolean isUriInDefaultNamespace = UrlBuilder.isUriInDefaultNamespace(individualUri, vreq);
+        return isUriInDefaultNamespace ? profileUrl + "/" + getLocalName() + ".rdf" 
+                                       : UrlBuilder.addParams(profileUrl, "format", "rdfxml");
     }
     
     public String getEditUrl() {

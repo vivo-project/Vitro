@@ -18,6 +18,7 @@ import org.openrdf.model.impl.URIImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.filters.PortalPickerFilter;
 
@@ -317,6 +318,22 @@ public class UrlBuilder {
             return null;
         }
         return profileUrl;        
+    }
+    
+    public static boolean isUriInDefaultNamespace(String individualUri, VitroRequest vreq) {
+        return isUriInDefaultNamespace(individualUri, vreq.getWebappDaoFactory());
+    }
+    
+    public static boolean isUriInDefaultNamespace(String individualUri, WebappDaoFactory wadf) {       
+        try {
+            URI uri = new URIImpl(individualUri); // throws exception if individualUri is invalid
+            String namespace = uri.getNamespace();
+            String defaultNamespace = wadf.getDefaultNamespace();  
+            return defaultNamespace.equals(namespace);
+        } catch (Exception e) {
+            log.warn(e);
+            return false;
+        }
     }
     
     public static String urlEncode(String str) {
