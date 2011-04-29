@@ -223,15 +223,12 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
     }
     
     private String getSubclassName(String subclassUri, VitroRequest vreq) {
-        String subclassName = null;
         if (subclassUri.isEmpty()) {
-            subclassName = "";
-        } else {
-            VClassDao vclassDao = vreq.getWebappDaoFactory().getVClassDao();
-            VClass vclass = vclassDao.getVClassByURI(subclassUri);
-            subclassName = vclass.getName();
-        }
-        return subclassName;
+           return "";
+        }         
+        VClassDao vclassDao = vreq.getWebappDaoFactory().getVClassDao();
+        VClass vclass = vclassDao.getVClassByURI(subclassUri);
+        return vclass != null ? vclass.getName() : "";
     }
     
     /* Access methods for templates */
