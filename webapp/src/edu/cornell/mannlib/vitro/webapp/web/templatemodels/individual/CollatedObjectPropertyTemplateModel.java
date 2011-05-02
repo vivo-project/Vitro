@@ -67,12 +67,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
             postprocess(statementData, wdf);
             
             /* Collate the data */
-            Map<String, List<ObjectPropertyStatementTemplateModel>> unsortedSubclasses = 
-                collate(subjectUri, propertyUri, statementData, vreq, policyHelper);
-    
-            /* Sort by subclass name */
-            subclasses = new TreeMap<String, List<ObjectPropertyStatementTemplateModel>>();
-            subclasses.putAll(unsortedSubclasses); 
+           subclasses = collate(subjectUri, propertyUri, statementData, vreq, policyHelper);
             
             for (List<ObjectPropertyStatementTemplateModel> list : subclasses.values()) {
                 postprocessStatementList(list);
@@ -124,7 +119,9 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
             logData(statementData);
         }
         
-        List<Map<String, String>> filteredList = new ArrayList<Map<String, String>>();  
+        // Compile a list of the statements with less specific subclasses, which should be removed
+        // from the statement data
+        List<Map<String, String>> statementsToRemove = new ArrayList<Map<String, String>>();  
         Set<String> processedObjects = new HashSet<String>();
         for (Map<String, String> outerMap : statementData) {
             String objectUri = outerMap.get(objectVariableName);
@@ -139,12 +136,17 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
                 }                
             }
             // Sort the data for this object from most to least specific subclass, with nulls at end
-            Collections.sort(dataForThisObject, new SubclassComparator(wdf));
-            filteredList.add(dataForThisObject.get(0));
+            Collections.sort(dataForThisObject, new SubclassComparator(wdf)); 
+            dataForThisObject.remove(0); // Keep only the first one (most specific subclass)
+            statementsToRemove.addAll(dataForThisObject);
         }
 
-        statementData.clear();
-        statementData.addAll(filteredList);
+        // We remove statements from the original list, rather than returning a new list,
+        // in order to preserve the subclass orderings, since the collation depends on the
+        // statements being ordered first by subclass.
+        for (Map<String, String> map : statementsToRemove) {
+            statementData.remove(map);
+        }
         
         if (log.isDebugEnabled()) {
             log.debug("Data after subclass filtering");
@@ -196,11 +198,13 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         }       
     }
     
-    private Map<String, List<ObjectPropertyStatementTemplateModel>> collate(String subjectUri, String propertyUri,
+    // Collate the statements by subclass. NB It is assumed that the statements in statementData 
+    // are ordered by subclass.
+    private SortedMap<String, List<ObjectPropertyStatementTemplateModel>> collate(String subjectUri, String propertyUri,
             List<Map<String, String>> statementData, VitroRequest vreq, EditingPolicyHelper policyHelper) {
     
-        Map<String, List<ObjectPropertyStatementTemplateModel>> subclassMap = 
-            new HashMap<String, List<ObjectPropertyStatementTemplateModel>>();
+        SortedMap<String, List<ObjectPropertyStatementTemplateModel>> subclassMap = 
+            new TreeMap<String, List<ObjectPropertyStatementTemplateModel>>();
         String currentSubclassUri = null;
         List<ObjectPropertyStatementTemplateModel> currentList = null;
         String objectKey = getObjectKey();
