@@ -35,10 +35,6 @@ webapp/web/js/tiny_mce/*
 webapp/web/js/tiny_mce/**/*
 
 # See /doc/3rd-party-licenses.txt for LICENSE file
-webapp/web/admin/axis/SOAPMonitorApplet.java
-services/additions/admin/axis/SOAPMonitorApplet.java
-
-# See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/js/jquery.js
 webapp/web/js/jquery-ui/*
 webapp/web/js/jquery_plugins/*
