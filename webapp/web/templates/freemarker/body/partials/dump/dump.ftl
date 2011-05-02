@@ -55,7 +55,7 @@ div.dump {
                 <li class="variable">
                     <p><strong>Variable name:</strong> ${key}</p>  
                     
-                    <#local type = dump[key].type>
+                    <#local type = dump[key].type!>
                     <#if type == "Directive" || type == "Method"> 
                         <@doMethod dump[key] />
                     <#else>                
