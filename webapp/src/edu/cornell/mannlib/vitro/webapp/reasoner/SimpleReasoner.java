@@ -15,6 +15,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -45,6 +46,11 @@ public class SimpleReasoner extends StatementListener {
 	private Model inferenceModel;
 	private Model inferenceRebuildModel;
 	private Model scratchpadModel;
+	
+	private static final String topObjectPropertyURI = "http://www.w3.org/2002/07/owl#topObjectProperty";
+	private static final String bottomObjectPropertyURI = "http://www.w3.org/2002/07/owl#bottomObjectProperty";
+	private static final String topDataPropertyURI = "http://www.w3.org/2002/07/owl#topDataProperty";
+	private static final String bottomDataPropertyURI = "http://www.w3.org/2002/07/owl#bottomDataProperty";
 	
 	/**
 	 * @param tboxModel - input.  This model contains both asserted and inferred TBox axioms
@@ -279,7 +285,14 @@ public class SimpleReasoner extends StatementListener {
 			
 			if (prop != null) {
 				
-                //TODO: have trouble parametizing the template with ? extends OntProperty
+				// not reasoning on properties in the OWL, RDF or RDFS namespace
+				if ((prop.getNameSpace()).equals(OWL.NS) || 
+					(prop.getNameSpace()).equals("http://www.w3.org/2000/01/rdf-schema#") ||
+					(prop.getNameSpace()).equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#")) {
+					return;
+				}
+				
+                //TODO: have trouble paramterizing the template with ? extends OntProperty
 				List superProperties = prop.listSuperProperties(false).toList();
 				superProperties.addAll(prop.listEquivalentProperties().toList());
 				Iterator<OntProperty> superIt = superProperties.iterator();
@@ -288,15 +301,18 @@ public class SimpleReasoner extends StatementListener {
 					OntProperty superProp = superIt.next();
 					
 					if ( !((prop.isObjectProperty() && superProp.isObjectProperty()) || (prop.isDatatypeProperty() && superProp.isDatatypeProperty())) ) {
-						   log.warn("sub-property and super-property do not have the same type. No inferencing will be performed. sub-property: " + prop.getURI() + " super-property:" + superProp.getURI());
-						   return;
+						log.warn("sub-property and super-property do not have the same type. No inferencing will be performed. sub-property: " + prop.getURI() + " super-property:" + superProp.getURI());
+						continue;
+					}
+					
+					if (superProp.getURI().equals(topObjectPropertyURI) || superProp.getURI().equals(topDataPropertyURI)) {
+						continue;
 					}
 					
 					Statement infStmt = ResourceFactory.createStatement(stmt.getSubject(), superProp, stmt.getObject());
 					inferenceModel.enterCriticalSection(Lock.WRITE);
 					try {
 						if (!inferenceModel.contains(infStmt) && !infStmt.equals(stmt) ) {
-						    //log.debug("Adding this inferred statement:  " + infStmt.toString() );
 							inferenceModel.add(infStmt);
 						}
 					} finally {
@@ -404,7 +420,6 @@ public class SimpleReasoner extends StatementListener {
 					inferenceModel.enterCriticalSection(Lock.WRITE);
 					try {
 						if (inferenceModel.contains(infStmt)) {
-							//log.debug("Removing this inferred statement:  " + infStmt.toString() + " - " + infStmt.getSubject().toString() + " - " + infStmt.getPredicate().toString() + " - " + infStmt.getObject().toString());
 							inferenceModel.remove(infStmt);
 						}
 					} finally {
@@ -494,7 +509,6 @@ public class SimpleReasoner extends StatementListener {
 				inferenceModel.enterCriticalSection(Lock.WRITE);
 				
 				if (!inferenceModel.contains(infStmt)) {
-					//log.debug("Adding this inferred statement:  " + infStmt.toString() );
 					inferenceModel.add(infStmt);
 				} 
 			}
@@ -537,7 +551,6 @@ public class SimpleReasoner extends StatementListener {
 				inferenceModel.enterCriticalSection(Lock.WRITE);
 				
 				if (inferenceModel.contains(infStmt)) {
-					//log.debug("Removing this inferred statement:  " + infStmt.toString() );
 					inferenceModel.remove(infStmt);
 				} 
 			}
@@ -579,7 +592,6 @@ public class SimpleReasoner extends StatementListener {
 				inferenceModel.enterCriticalSection(Lock.WRITE);
 				
 				if (!inferenceModel.contains(infStmt)) {
-					//log.debug("Adding this inferred statement:  " + infStmt.toString() );
 					inferenceModel.add(infStmt);
 				} 
 			}
@@ -628,7 +640,6 @@ public class SimpleReasoner extends StatementListener {
 				inferenceModel.enterCriticalSection(Lock.WRITE);
 				
 				if (inferenceModel.contains(infStmt)) {
-					//log.debug("Adding this inferred statement:  " + infStmt.toString() );
 					inferenceModel.remove(infStmt);
 				} 
 			}
@@ -674,31 +685,75 @@ public class SimpleReasoner extends StatementListener {
 		// recompute the inferences 
 		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);	
 		aboxModel.enterCriticalSection(Lock.READ);
+		tboxModel.enterCriticalSection(Lock.READ);
 		
 		try {
 			inferenceRebuildModel.removeAll();
 			StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, (RDFNode) null);
 			
+			log.info("Computing class-based ABox inferences");
 			while (iter.hasNext()) {				
 				Statement stmt = iter.next();
 				addedABoxTypeAssertion(stmt, inferenceRebuildModel);
 			}
+			
+			log.info("Computing property-based ABox inferences");			
+			iter = tboxModel.listStatements((Resource) null, RDFS.subPropertyOf, (RDFNode) null);
+			int numStmts = 0;
+			
+			while (iter.hasNext()) {
+				Statement stmt = iter.next();
+
+				if (stmt.getSubject().getURI().equals(bottomObjectPropertyURI) || stmt.getSubject().getURI().equals(bottomDataPropertyURI) ||
+					(stmt.getObject().isResource() && (stmt.getObject().asResource().getURI().equals(topObjectPropertyURI) || 
+							                            stmt.getObject().asResource().getURI().equals(topDataPropertyURI))) ) {
+				     continue;
+				}
+
+				if ( stmt.getSubject().equals(stmt.getObject()) ) {
+				    continue;
+				}
+
+				addedTBoxStatement(stmt, inferenceRebuildModel);
+				
+				numStmts++;
+                if ((numStmts % 500) == 0) {
+                    log.info("Still computing property-based ABox inferences...");
+                }
+			}
+			
+			iter = tboxModel.listStatements((Resource) null, OWL.equivalentProperty, (RDFNode) null);
+
+			while (iter.hasNext()) {
+				Statement stmt = iter.next();
+
+				if ( stmt.getSubject().equals(stmt.getObject()) ) {
+				    continue;
+				}
+
+				addedTBoxStatement(stmt, inferenceRebuildModel);
+				
+				numStmts++;
+                if ((numStmts % 500) == 0) {
+                    log.info("Still computing property-based ABox inferences...");
+                }
+			}
 		} catch (Exception e) {
 			 log.error("Exception while recomputing ABox inference model", e);
 		} finally {
-			aboxModel.leaveCriticalSection();
-			inferenceRebuildModel.leaveCriticalSection();
+   			 aboxModel.leaveCriticalSection();
+			 tboxModel.leaveCriticalSection();
+			 inferenceRebuildModel.leaveCriticalSection();
 		}			
-		
 		
 		// reflect the recomputed inferences into the application inference
 		// model.
 		inferenceRebuildModel.enterCriticalSection(Lock.READ);
 		scratchpadModel.enterCriticalSection(Lock.WRITE);
-		
+        log.info("Updating ABox inference model");
+		// Remove everything from the current inference model that is not
+		// in the recomputed inference model		
 		try {
-			// Remove everything from the current inference model that is not
-			// in the recomputed inference model		
 			inferenceModel.enterCriticalSection(Lock.READ);
 			
 			try {
@@ -759,7 +814,7 @@ public class SimpleReasoner extends StatementListener {
 			scratchpadModel.leaveCriticalSection();			
 		}
 		
-		log.info("ABox inferences recomputed.");
+		log.info("ABox inference model updated");
 	}
 				
 	public static SimpleReasoner getSimpleReasonerFromServletContext(ServletContext ctx) {
@@ -775,4 +830,11 @@ public class SimpleReasoner extends StatementListener {
 	public static boolean isABoxReasoningAsynchronous(ServletContext ctx) {
 	   return (getSimpleReasonerFromServletContext(ctx) == null);	
 	}	
+	
+    public static String stmtString(Statement statement) {
+    	return  " [subject = " + statement.getSubject().getURI() +
+    			"] [property = " + statement.getPredicate().getURI() +
+                "] [object = " + (statement.getObject().isLiteral() ? ((Literal)statement.getObject()).getLexicalForm() + " (Literal)"
+                		                                          : ((Resource)statement.getObject()).getURI() + " (Resource)") + "]";	
+    }    
 }
