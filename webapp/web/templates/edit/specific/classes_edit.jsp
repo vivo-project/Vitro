@@ -29,25 +29,20 @@
 <tr valign="bottom" align="center">
 	<td valign="bottom">
 		<form action="listVClassWebapps" method="get">
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="submit" class="form-button" value="Show All Classes"/>
 		</form>
                 <form action="showClassHierarchy" method="get">
-                        <input type="hidden" name="home" value="${portalBean.portalId}" />
                         <input type="submit" class="form-button" value="Show Class Hierarchy"/>
                 </form>
                 <form action="showClassHierarchy" method="get">
-                        <input type="hidden" name="home" value="${portalBean.portalId}" />
                         <input type="hidden" name="vclassUri" value="${VClass.URI}"/>
                         <input type="submit" class="form-button" value="Show Hierarchy below This Class"/>
                 </form>
                 <form action="listIndividuals" method="get">
-                    <input type="hidden" name="home" value="${portalBean.portalId}" />
                     <input type="hidden" name="VClassURI" value="${VClass.URI}" />
                     <input type="submit" class="form-button" value="Show All Individuals in This Class"/>
                 </form>
                 <form action="listIndividuals" method="get">
-                    <input type="hidden" name="home" value="${portalBean.portalId}" />
                     <input type="hidden" name="VClassURI" value="${VClass.URI}" />
                     <input type="hidden" name="assertedOnly" value="true"/>
                     <input type="submit" class="form-button" value="Show Individuals Asserted To Be in This Class"/>
@@ -55,32 +50,27 @@
 	</td>
 	<td valign="bottom" align="center">
 		<form action="vclass_retry" method="get">
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input name="uri" type = "hidden" value="${VClass.URI}" />
 			<input type="submit" class="form-button" value="Edit Class"/>
 		</form>
 	</td>
 	<td valign="bottom">
 		<form action="vclass_retry" method="get">
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="submit" class="form-button" value="Add New Class"/>
 		</form>
 		<form action="editForm" method="get">
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="submit" class="form-button" value="Add New Individual in This Class"/>
        		<input type="hidden" name="controller" value="Entity"/>
        		<input type="hidden" name="VClassURI" value="${VClass.URI}"/>
 		</form>
 		<form action="editForm" method="get">
            	<input type="submit" class="form-button" value="Change URI"/>
-           	<input type="hidden" name="home" value="${portalBean.portalId}" />
            	<input type="hidden" name="oldURI" value="${VClass.URI}"/>
            	<input type="hidden" name="mode" value="renameResource"/>
           	<input type="hidden" name="controller" value="Refactor"/>
         </form>
        	<form action="editForm" method="get">
            	<input type="submit" class="form-button" value="Move Instances to Another Class"/>
-           	<input type="hidden" name="home" value="${portalBean.portalId}" />
            	<input type="hidden" name="VClassURI" value="${VClass.URI}"/>
 			<c:choose>
 				<c:when test="${VClass.namespace eq 'http://vitro.mannlib.cornell.edu/ns/bnode#'}">
@@ -104,7 +94,6 @@
 			<ul style="list-style-type:none;">
 			<c:forEach var="superclass" items="${superclasses}">
 			<c:url var="superclassURL" value="vclassEdit">
-				<c:param name="home" value="${portalBean.portalId}"/>
 				<c:param name="uri" value="${superclass.URI}"/>
 			</c:url>
 				<li><input type="checkbox" name="SuperclassURI" value="${superclass.URI}" class="form-item"/>
@@ -120,7 +109,6 @@
 			</c:forEach>
 			</ul>
 			<input type="hidden" name="SubclassURI" value="${VClass.URI}"/>
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="hidden" name="operation" value="remove"/>
 			<input type="hidden" name="_epoKey" value="${epoKey}"/>
 			<input type="submit" class="form-button" value="Remove Checked Superclass Links"/>
@@ -129,7 +117,6 @@
 	</td>
 	<td>
 		<form action="editForm" method="get">
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="hidden" name="SubclassURI" value="${VClass.URI}"/>
 			<input type="hidden" name="controller" value="Classes2Classes"/>
 			<input type="submit" class="form-button" value="New Link to Superclass"/>
@@ -145,7 +132,6 @@
 			<ul style="list-style-type:none;">
 			<c:forEach var="subclass" items="${subclasses}">
 				<c:url var="subclassURL" value="vclassEdit">
-					<c:param name="home" value="${portalBean.portalId}"/>
 					<c:param name="uri" value="${subclass.URI}"/>
 				</c:url>
 				<li><input type="checkbox" name="SubclassURI" value="${subclass.URI}" class="form-item"/>
@@ -162,7 +148,6 @@
 			</ul>
 			<input type="hidden" name="SuperclassURI" value="${VClass.URI}"/>
 			<input type="submit" class="form-button" value="Remove Checked Subclass Links"/>
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="hidden" name="operation" value="remove"/>
 			<input type="hidden" name="_epoKey" value="${epoKey}"/>
 		</form>
@@ -171,12 +156,10 @@
 	<td valign="bottom">
 		<form action="editForm" method="get">
 			<input type="hidden" name="controller" value="Classes2Classes"/>
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="hidden" name="SuperclassURI" value="${VClass.URI}"/>
 			<input type="submit" class="form-button" value="New Link to Subclass"/>
 		</form>
 		<form action="vclass_retry" method="get">
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="hidden" name="superclassUri" value="${VClass.URI}" />
 			<input type="submit" class="form-button" value="Add New Subclass of This Class"/>
 		</form>
@@ -193,7 +176,6 @@
 			<ul style="list-style-type:none;">
 			<c:forEach var="subclass" items="${equivalentClasses}">
 				<c:url var="subclassURL" value="vclassEdit">
-					<c:param name="home" value="${portalBean.portalId}"/>
 					<c:param name="uri" value="${subclass.URI}"/>
 				</c:url>
 				<li><input type="checkbox" name="SubclassURI" value="${subclass.URI}" class="form-item"/>
@@ -210,7 +192,6 @@
 			</ul>
 			<input type="hidden" name="SuperclassURI" value="${VClass.URI}"/>
 			<input type="submit" class="form-button" value="Remove Checked Equivalent Classes"/>
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="hidden" name="operation" value="remove"/>
 			<input type="hidden" name="_epoKey" value="${epoKey}"/>
 		</form>
@@ -219,7 +200,6 @@
 	<td valign="bottom">
 		<form action="editForm" method="get">
 			<input type="hidden" name="controller" value="Classes2Classes"/>
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="hidden" name="SuperclassURI" value="${VClass.URI}"/>
 			<input type="hidden" name="opMode" value="equivalentClass"/>
 			<input type="submit" class="form-button" value="Assert Class Equivalence"/>
@@ -238,7 +218,6 @@
 			<ul style="list-style-type:none;">
 			<c:forEach var="subclass" items="${disjointClasses}">
 				<c:url var="subclassURL" value="vclassEdit">
-					<c:param name="home" value="${portalBean.portalId}"/>
 					<c:param name="uri" value="${subclass.URI}"/>
 				</c:url>
 				<li><input type="checkbox" name="SubclassURI" value="${subclass.URI}" class="form-item"/>
@@ -255,7 +234,6 @@
 			</ul>
 			<input type="hidden" name="SuperclassURI" value="${VClass.URI}"/>
 			<input type="submit" class="form-button" value="Remove Checked Disjoint Classes"/>
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="hidden" name="operation" value="remove"/>
 			<input type="hidden" name="_epoKey" value="${epoKey}"/>
 		</form>
@@ -264,7 +242,6 @@
 	<td valign="bottom">
 		<form action="editForm" method="get">
 			<input type="hidden" name="controller" value="Classes2Classes"/>
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="hidden" name="SuperclassURI" value="${VClass.URI}"/>
 			<input type="hidden" name="opMode" value="disjointWith"/>
 			<input type="submit" class="form-button" value="New Disjointness Axiom"/>
@@ -277,13 +254,11 @@
 <tr valign="top" align="center">
 	<td>
 		<form action="listPropertyWebapps" method="get">
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="submit" class="form-button" value="Show All Object Properties Applicable to This Class"/>
 			<input type="hidden" name="vclassUri" value="${VClass.URI}"/>
 			<input type="hidden" name="propsForClass" value="true"/>
 		</form><br/>
 		<form action="listDatatypeProperties" method="get">
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="submit" class="form-button" value="Show All Data Properties Applicable to This Class"/>
 			<input type="hidden" name="vclassUri" value="${VClass.URI}"/>
 			<input type="hidden" name="propsForClass" value="true"/>
@@ -292,7 +267,6 @@
 	<td></td>
 	<td valign="bottom">
 		<form action="editForm" method="get">
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="hidden" name="domainClassUri" value="${VClass.URI}"/>
 			<input type="hidden" name="controller" value="Property"/>
 			<input type="submit" class="form-button" value="Define New Domain Property at This Class"/>
@@ -311,7 +285,6 @@
                         <option value="maxCardinality">maximum cardinality</option>
                         <option value="cardinality">exact cardinality</option>
                     </select>
-                    <input type="hidden" name="home" value="${portalBean.portalId}" />
                     <input type="submit" class="form-button" value="Apply Restriction"/>
                     <input type="hidden" name="VClassURI" value="${VClass.URI}"/>
                     <p>Restrict: 

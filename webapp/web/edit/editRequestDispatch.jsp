@@ -8,7 +8,6 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Portal" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>

@@ -26,9 +26,9 @@ import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 
 public class InitialJenaModelUtils {
 
@@ -91,19 +91,17 @@ public class InitialJenaModelUtils {
 		OntModel essentialInterfaceData = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
         Resource portalClass = essentialInterfaceData.getResource(VitroVocabulary.PORTAL);
         Property themeDirProperty = essentialInterfaceData.getProperty(VitroVocabulary.PORTAL_THEMEDIR);
-        Property flag1FilteringProperty = essentialInterfaceData.getProperty(VitroVocabulary.PORTAL_FLAG1FILTERING);
         Resource tabClass = essentialInterfaceData.getResource(VitroVocabulary.TAB);
         Resource primaryTabClass = essentialInterfaceData.getResource(VitroVocabulary.TAB_PRIMARYTAB);
         Property rootTabProperty = essentialInterfaceData.getProperty(VitroVocabulary.PORTAL_ROOTTAB);
         Property tabInPortalProperty = essentialInterfaceData.getProperty(VitroVocabulary.TAB_PORTAL);
 
         Individual portal1 = essentialInterfaceData.createIndividual(defaultNamespace+"portal1",portalClass);
-        String defaultThemeStr = Portal.DEFAULT_THEME_DIR_FROM_CONTEXT;
+        String defaultThemeStr = ApplicationBean.DEFAULT_THEME_DIR_FROM_CONTEXT;
         if (defaultThemeStr == null) {
         	throw new RuntimeException("No default theme has been set; unable to create default portal.");      	
         }
         portal1.setPropertyValue(themeDirProperty,ResourceFactory.createPlainLiteral(defaultThemeStr));
-		portal1.setPropertyValue(flag1FilteringProperty, essentialInterfaceData.createTypedLiteral(true));
 		portal1.setLabel("New Vitro Portal", null);
 		Individual rootTab = essentialInterfaceData.createIndividual(defaultNamespace+"tab1",tabClass);
 		rootTab.setLabel("Home", null);

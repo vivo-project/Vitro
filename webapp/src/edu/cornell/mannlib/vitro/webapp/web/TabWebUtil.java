@@ -10,10 +10,8 @@ import javax.servlet.jsp.JspException;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
 /**
  * This is a collecton of method that deal tabs and
@@ -24,7 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  * @author bdc34
  */
 public class TabWebUtil {
-    final static int ROOT_TAB_ID=Portal.DEFAULT_ROOT_TAB_ID; //Most likely vivo
+    final static int ROOT_TAB_ID = 1;
 
      static String [] tabDepthNames =
     {"primary","secondary","collection","subcollection","more"};
@@ -39,6 +37,8 @@ public class TabWebUtil {
      final static int     TAB_FILTER_FLAG2               = 2; // see beans.Tab
      final static int     TAB_FILTER_FLAG3               = 3; // see beans.Tab
      final static int     TAB_FILTER_FLAG_BOTH           = 5; // see beans.Tab
+     
+     final static int     DEFAULT_ROOT_TAB_ID            = 1;
 
     private static int getPrimaryTabIdFromRequest(HttpServletRequest request){
         return getNdepthTabId(request,tabDepthNames[PRIMARY],0);
@@ -122,11 +122,7 @@ public class TabWebUtil {
 
     public static int getRootTabId(HttpServletRequest request){
         VitroRequest vreq = new VitroRequest(request);
-        Portal portal = (new VitroRequest(request)).getPortal();
-        if( portal != null )
-            return portal.getRootTabId();
-        else
-            return Portal.DEFAULT_ROOT_TAB_ID;
+        return DEFAULT_ROOT_TAB_ID;
     }
 
     public final static String STASHED_KEY="stashTabsInRequestCalled";
@@ -184,20 +180,6 @@ public class TabWebUtil {
                     obj.getClass().getName());
         return (Tab)obj;
     }
-
-
-
-    /**
-     * Gets the page name of the jsp or whatever is needed in the
-     * tab HTTP request, it will have the query ? ex: index.jsp?home=23
-     *
-     * @param req
-     * @return
-     *
-     static String getIndexPage(VitroRequest vreq ){
-        Portal p=RequestToPortal.getCurrent
-        return "index.jsp?home="+RequestToPortal.getCurrentPortal(vreq,false);
-    } */
 
     /**
      * Makes an anchor/link HTML element for the tab menu tag for the given tab.

@@ -12,17 +12,12 @@ import net.sf.jga.algorithms.Sort;
 import net.sf.jga.algorithms.Transform;
 import net.sf.jga.algorithms.Unique;
 import net.sf.jga.fn.UnaryFunctor;
-import net.sf.jga.fn.adaptor.AdaptorFunctors;
-import net.sf.jga.fn.logical.LogicalFunctors;
 
 import org.joda.time.DateTime;
 
-import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
-import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 
 /**
  * Static methods to help create commonly used filters.
@@ -33,7 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
  */
 public class FiltersForTabs {
     public static final UnaryFunctor<Individual,String> firstLetterOfName = new FirstLetterOfEnt();
-    public static UnaryFunctor<Individual,Boolean> getFilterForTab( final Tab tab, final Portal portalThatTabIsIn, final boolean isFlag1Filtering ){
+    public static UnaryFunctor<Individual,Boolean> getFilterForTab( final Tab tab, final boolean isFlag1Filtering ){
 
         DateTime now = new DateTime();
         UnaryFunctor<Individual,Boolean> entFilter = getTimeFilter(tab, now);

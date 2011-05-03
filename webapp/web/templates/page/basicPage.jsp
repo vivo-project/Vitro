@@ -7,7 +7,6 @@
 <%@ page errorPage="/error.jsp"%>
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Portal"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet" %>
 
 <%  /***********************************************
@@ -22,7 +21,6 @@
             "css" - optional additional css for page
             "scripts" - optional name of file containing <script> elements to be included in the page
             "bodyAttr" - optional attributes for the <body> tag, e.g. 'onload': use leading space
-            "portalBean" - PortalBean object for request.
             
           Consider sticking < % = MiscWebUtils.getReqInfo(request) % > in the html output
           for debugging info.
@@ -39,9 +37,6 @@
         }
         if (request.getAttribute("css") == null){
             e+="basicPage.jsp expects that request parameter 'css' be set to css to include in page.\n";
-        }
-        if( request.getAttribute("portalBean") == null){
-            e+="basicPage.jsp expects that request attribute 'portalBean' be set.\n";
         }
         if( request.getAttribute("appBean") == null){
             e+="basicPage.jsp expects that request attribute 'appBean' be set.\n";

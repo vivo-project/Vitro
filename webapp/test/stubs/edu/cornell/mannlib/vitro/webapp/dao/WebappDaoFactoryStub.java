@@ -24,7 +24,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
-import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
@@ -191,12 +190,6 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	public ApplicationDao getApplicationDao() {
 		throw new RuntimeException(
 				"WebappDaoFactory.getApplicationDao() not implemented.");
-	}
-
-	@Override
-	public PortalDao getPortalDao() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getPortalDao() not implemented.");
 	}
 
 	@Override

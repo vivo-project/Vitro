@@ -28,8 +28,6 @@
     vreq.setAttribute("rangeClassUri",prop.getRangeVClassURI());
     vreq.setAttribute("curatorReviewUri","http://vivo.library.cornell.edu/ns/0.1#CuratorReview");
     
-    //get the current portal and make this new individual a member of that portal
-    vreq.setAttribute("portalUri", vreq.getPortal().getTypeUri());
 %>
 
 <v:jsonset var="queryForInverse" >
@@ -106,12 +104,6 @@
     ?newIndividual vitro:moniker ?moniker .
 </v:jsonset>
 
-<%-- set the portal of the new individual to the current portal. --%>
-<v:jsonset  var="n3portal">
-   @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-   ?newIndividual rdf:type <${portalUri}> .
-</v:jsonset>
-
 <%-- note that it's safer to have multiple distinct optional blocks so that a failure in one
      will not prevent correct sections from being inserted --%>
 <v:jsonset var="n3link" >
@@ -138,7 +130,7 @@
     "object"    : [ "newIndividual", "${objectUriJson}", "URI" ],
     
     "n3required"                : [ "${n3ForEdit}" ],
-    "n3optional"                : [ "${n3optional}", "${n3Inverse}", "${n3link}", "${n3portal}" ],
+    "n3optional"                : [ "${n3optional}", "${n3Inverse}", "${n3link}" ],
     "newResources" : {
         "newIndividual"         : "http://vivo.library.cornell.edu/ns/0.1#individual",
         "newLink"               : "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Link"

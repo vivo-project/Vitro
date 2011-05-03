@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageTabs;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -33,7 +32,6 @@ public class AllTabsForPortalListingController extends BaseEditController {
     	}
     	
         VitroRequest vrequest = new VitroRequest(request);
-        Portal portal = vrequest.getPortal();
 
         HashMap<Integer, String> types = new HashMap<Integer, String>();
         types.put(18,"subcollection category");
@@ -44,7 +42,7 @@ public class AllTabsForPortalListingController extends BaseEditController {
         types.put(28,"primary tab");
 
         TabDao dao = vrequest.getFullWebappDaoFactory().getTabDao();
-        List<Tab> tabs = dao.getTabsForPortal(portal.getPortalId());
+        List<Tab> tabs = dao.getTabsForPortal(1);
         Collections.sort(tabs, new TabComparator());
         
         ArrayList<String> results = new ArrayList<String>();
@@ -66,7 +64,7 @@ public class AllTabsForPortalListingController extends BaseEditController {
         	for (Tab tab : tabs) {
                 results.add("XX");
                 if (tab.getTitle() != null)
-                    results.add("<a href=\"./tabEdit?id="+tab.getTabId()+"&amp;home="+portal.getPortalId()+"\">"+tab.getTitle()+"</a>");
+                    results.add("<a href=\"./tabEdit?id="+tab.getTabId()+"\">"+tab.getTitle()+"</a>");
                 else
                     results.add("");
                 results.add(String.valueOf(tab.getTabId()));
@@ -87,12 +85,10 @@ public class AllTabsForPortalListingController extends BaseEditController {
         request.setAttribute("columncount",new Integer(NUM_COLS));
         request.setAttribute("suppressquery","true");
         request.setAttribute("title","Tabs");
-        request.setAttribute("portalBean",portal);
         request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
         request.setAttribute("horizontalJspAddButtonUrl", Controllers.RETRY_URL);
         request.setAttribute("horizontalJspAddButtonText", "Add new tab");
         request.setAttribute("horizontalJspAddButtonControllerParam", "Tab");
-        request.setAttribute("home",portal.getPortalId());
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         try {
             rd.forward(request,response);

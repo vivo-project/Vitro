@@ -6,14 +6,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
 /**
  * Intended to generate the hierarchal tab menu.
@@ -35,6 +32,9 @@ public class TabMenu {
     static String primaryActiveClass = "activePrimaryTab";
     static String secondaryActiveClass ="activeSecondaryTab";
 
+    static final int DEFAULT_PORTAL_ID = 1;
+    static final int DEFAULT_ROOT_TAB_ID = 1;
+    
     /**
      * The is the method you should call to get an html element for the
      * tab menu of a page.  There must be a better way to do this, call
@@ -49,15 +49,7 @@ public class TabMenu {
         String ret = primaryOpen;
         String label = null;
         try {
-            int portalId=Portal.DEFAULT_PORTAL_ID;
-            Portal portal=null;
-            Object obj = vreq.getAttribute("portalBean");
-            if( obj == null ) {
-                log.error("getPrimaryTabMenu() must have attribute 'portalBean' in vitro request");
-            } else {
-                portal = (Portal)obj;
-                portalId=portal.getPortalId();
-            }
+            int portalId = DEFAULT_PORTAL_ID;
             List primaryTabs = vreq.getWebappDaoFactory().getTabDao().getPrimaryTabs(portalId);
             if (primaryTabs != null) {
                 Iterator itPrime = primaryTabs.iterator();
@@ -66,12 +58,7 @@ public class TabMenu {
                     boolean active = isTabActive(vreq, tab.getTabId());
                     boolean isRootTab = false;
                     //are we at the root tab for the portal?
-                    if (portal!=null){
-                        isRootTab = (portal.getRootTabId()==tab.getTabId());
-                    }else{
-                        isRootTab = (tab.getTabId() == Portal.DEFAULT_ROOT_TAB_ID);
-                    }
-
+                    isRootTab = (tab.getTabId() == DEFAULT_ROOT_TAB_ID);
                     label = isRootTab?"Home":null;
                     ret +=  "\t";
                     if (active) {
@@ -107,14 +94,7 @@ public class TabMenu {
             if( pathToRoot != null && pathToRoot.size() > 0 ){
                 primaryTabId = ((Integer)pathToRoot.get(0)).intValue();
             } else {
-                //default to home tab?
-                Portal portal=(Portal)vreq.getAttribute("portalBean");
-                if( portal == null ) {
-                    log.error("getSecondaryTabMenu() must have attribute 'portalBean' in vitro request");
-                    primaryTabId=Portal.DEFAULT_ROOT_TAB_ID;
-                } else {
-                    primaryTabId = portal.getRootTabId();
-                }
+                primaryTabId = DEFAULT_ROOT_TAB_ID;
              }
             return getSecondaryTabMenu(vreq,primaryTabId);
         } catch (Throwable t) {
@@ -125,15 +105,7 @@ public class TabMenu {
 
     private static String getSecondaryTabMenu(VitroRequest vreq, int primaryTabId){
         try {
-            int portalId=Portal.DEFAULT_PORTAL_ID;
-            Portal portal=null;
-            Object obj = vreq.getAttribute("portalBean");
-            if( obj == null ) {
-                log.error("getPrimaryTabMenu() must have attribute 'portalBean' in vitro request");
-            } else {
-                portal = (Portal)obj;
-                portalId=portal.getPortalId();
-            }
+            int portalId = DEFAULT_PORTAL_ID;
             String ret="";
             List secondaryTabs = vreq.getWebappDaoFactory().getTabDao().getSecondaryTabs( primaryTabId );
             if (secondaryTabs != null && secondaryTabs.size()>0){

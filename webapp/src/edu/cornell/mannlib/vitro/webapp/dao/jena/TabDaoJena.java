@@ -543,7 +543,7 @@ public class TabDaoJena extends JenaBaseDao implements TabDao {
         String nameStr = tab.getTitle();
         Individual tabInd = null;
         if (tab.getTabId() < 0)
-            tab.setTabId(Math.abs((nameStr+tab.getPortalId()).hashCode()));
+            tab.setTabId(Math.abs((nameStr).hashCode()));
         boolean inserted=false;
         while (!inserted) {
             ontModel.enterCriticalSection(Lock.READ);
@@ -555,7 +555,7 @@ public class TabDaoJena extends JenaBaseDao implements TabDao {
             }
             if (dupTestInd != null) {
                 nameStr+="a";
-                tab.setTabId(Math.abs((nameStr+tab.getPortalId()).hashCode()));
+                tab.setTabId(Math.abs((nameStr).hashCode()));
             } else {
                 ontModel.enterCriticalSection(Lock.WRITE);
                 try {
@@ -600,11 +600,6 @@ public class TabDaoJena extends JenaBaseDao implements TabDao {
             		tabInd.addRDFType(tabTypeRes);
             	}
             } catch (Exception e) {log.error("error setting tabtype for tab "+tabInd.getURI());}
-            if (tab.getPortalId() > 0) {
-                try {
-                    tabInd.addProperty(TAB_PORTAL, ontModel.getResource(DEFAULT_NAMESPACE+"portal"+tab.getPortalId()));
-                } catch (Exception e) {log.error("error setting portal for tab "+tabInd.getURI());}
-            }
             return tab.getTabId();
         } finally {
             ontModel.leaveCriticalSection();
@@ -663,11 +658,6 @@ public class TabDaoJena extends JenaBaseDao implements TabDao {
                     		tabInd.addRDFType(tabTypeRes);
                     	}
                     } catch (Exception e) {log.error("error setting tabtype for tab "+tabInd.getURI());}
-                    if (tab.getPortalId() > 0) {
-                        try {
-                            tabInd.addProperty(TAB_PORTAL, ontModel.getResource(DEFAULT_NAMESPACE+"portal"+tab.getPortalId()));
-                        } catch (Exception e) {log.error("error setting portal for tab "+tabInd.getURI());}
-                    }
                 }
             }
         } finally {
@@ -698,7 +688,6 @@ public class TabDaoJena extends JenaBaseDao implements TabDao {
         tab.setEntitySortDirection(getPropertyStringValue(tabInd, TAB_ENTITYSORTDIRECTION));
         tab.setFlag2Mode(getPropertyStringValue(tabInd, TAB_FLAG2MODE));
         tab.setFlag2Set(getPropertyStringValue(tabInd, TAB_FLAG2SET));
-        tab.setPortalId( makePortalIdFromIndividual( tabInd ) );
         try {
             Iterator typesIt = tabInd.listRDFTypes(false);
             while (typesIt.hasNext()) {

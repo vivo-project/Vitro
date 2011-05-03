@@ -37,7 +37,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  * */
 public class CloneEntityServlet extends BaseEditController {
     private static final String NO_PROPERTY_RESTRICTION = null;
-    private static final int DEFAULT_PORTAL_ID=1;
     private static final int MIN_EDIT_ROLE=4;
     private static final Log log = LogFactory.getLog(CloneEntityServlet.class.getName());
 
@@ -48,29 +47,25 @@ public class CloneEntityServlet extends BaseEditController {
 
     	VitroRequest request = new VitroRequest(req);
         try {
-            String portalIdStr = (portalIdStr = request.getParameter("home")) == null ? String
-                    .valueOf(DEFAULT_PORTAL_ID)
-                    : portalIdStr;
 
             //attempt to clone a tab but if we don't find the parameter 'tabId' the clone a entity
             try{
                 int id = doCloneTab(request, response);
                 if( id >= 0){
-                    response.sendRedirect("tabEdit?home=" + portalIdStr
-                        + "&id=" + id);
+                    response.sendRedirect("tabEdit?id=" + id);
                     return;
                 }
             }catch(Exception ex){
                 log.error("Could not clone tab: " + ex);
                 getServletConfig().getServletContext().getRequestDispatcher(
-                    "/index.jsp?home=" + portalIdStr).forward(request,
+                    "/index.jsp").forward(request,
                     response);
                 return;
             }
 
         String individualURI=request.getParameter("uri");
         if (individualURI == null || individualURI.equals("")){
-            getServletConfig().getServletContext().getRequestDispatcher("/index.jsp?home="+portalIdStr).forward( request, response );
+            getServletConfig().getServletContext().getRequestDispatcher("/index.jsp").forward( request, response );
             return;
         }
         
@@ -123,7 +118,7 @@ public class CloneEntityServlet extends BaseEditController {
         // addIndividualToLuceneIndex( context, cloneURI );
 
         String encodedCloneURI = URLEncoder.encode(cloneURI, "UTF-8");
-        response.sendRedirect("entityEdit?home="+portalIdStr+"&uri="+encodedCloneURI);
+        response.sendRedirect("entityEdit?uri="+encodedCloneURI);
         //response.sendRedirect("entity?home="+portalIdStr+"&id="+newEntityId);
 
     } catch (Exception ex) {

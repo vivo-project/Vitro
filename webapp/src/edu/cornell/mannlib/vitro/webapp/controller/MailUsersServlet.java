@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 
@@ -50,7 +49,6 @@ public class MailUsersServlet extends VitroHttpServlet {
 	public void doGet( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException {
         VitroRequest vreq = new VitroRequest(request);
-        Portal portal = vreq.getPortal();
 
         String   confirmpage    = "/confirmUserMail.jsp";
         String   errpage        = "/contact_err.jsp";
@@ -59,7 +57,7 @@ public class MailUsersServlet extends VitroHttpServlet {
         if (smtpHost==null || smtpHost.equals("")){
             status = "This application has not yet been configured to send mail " +
             		"-- smtp host has not been identified in the Configuration Properties file.";
-            response.sendRedirect( "test?bodyJsp=" + errpage + "&ERR=" + status + "&home=" + portal.getPortalId() );
+            response.sendRedirect( "test?bodyJsp=" + errpage + "&ERR=" + status );
             return;
         }
 
@@ -219,10 +217,10 @@ public class MailUsersServlet extends VitroHttpServlet {
         // Redirect to the appropriate confirmation page
         if (status == null && !probablySpam) {
             // message was sent successfully
-            response.sendRedirect( "test?bodyJsp=" + confirmpage + "&home=" + portal.getPortalId() );
+            response.sendRedirect( "test?bodyJsp=" + confirmpage );
         } else {
             // exception occurred
-            response.sendRedirect( "test?bodyJsp=" + errpage + "&ERR=" + status + "&home=" + portal.getPortalId() );
+            response.sendRedirect( "test?bodyJsp=" + errpage + "&ERR=" + status );
         }
 
     }

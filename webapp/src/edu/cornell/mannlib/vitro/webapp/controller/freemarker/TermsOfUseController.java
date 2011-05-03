@@ -5,11 +5,10 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
@@ -22,16 +21,15 @@ public class TermsOfUseController extends FreemarkerHttpServlet {
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
-        Portal portal = vreq.getPortal();
         
         Map<String, Object> map = new HashMap<String, Object>();
         Map<String, String> termsOfUse = new HashMap<String, String>();
+         
+        ApplicationBean appBean = vreq.getAppBean();
         
-        String rootBreadCrumbAnchor = portal.getRootBreadCrumbAnchor();
-        String siteName = StringUtils.isEmpty(rootBreadCrumbAnchor) ? portal.getAppName() : rootBreadCrumbAnchor; 
-        termsOfUse.put("siteName", siteName);
+        termsOfUse.put("siteName", appBean.getApplicationName());
         
-        String siteHost = portal.getCopyrightAnchor();
+        String siteHost = appBean.getCopyrightAnchor();
         if (siteHost == null) {
             siteHost = "the hosting institution";
         }

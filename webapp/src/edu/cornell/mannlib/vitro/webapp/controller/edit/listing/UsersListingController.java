@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -40,7 +39,6 @@ public class UsersListingController extends BaseEditController {
     	}
     	
         VitroRequest vrequest = new VitroRequest(request);
-        Portal portal = vrequest.getPortal();
 
         UserDao dao = vrequest.getFullWebappDaoFactory().getUserDao();
 
@@ -68,7 +66,7 @@ public class UsersListingController extends BaseEditController {
                 results.add("XX");
                 if (user.getUsername() != null) {
                     try {
-                        results.add("<a href=\"./userEdit?uri="+URLEncoder.encode(user.getURI(),"UTF-8")+"&amp;home="+portal.getPortalId()+"\">"+user.getUsername()+"</a>");
+                        results.add("<a href=\"./userEdit?uri="+URLEncoder.encode(user.getURI(),"UTF-8")+"\">"+user.getUsername()+"</a>");
                     } catch (Exception e) {
                         results.add(user.getUsername());
                     }
@@ -103,12 +101,10 @@ public class UsersListingController extends BaseEditController {
         request.setAttribute("columncount", width);
         request.setAttribute("suppressquery","true");
         request.setAttribute("title","User Accounts");
-        request.setAttribute("portalBean",portal);
         request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
         request.setAttribute("horizontalJspAddButtonUrl", Controllers.RETRY_URL);
         request.setAttribute("horizontalJspAddButtonText", "Add new user account");
         request.setAttribute("horizontalJspAddButtonControllerParam", "User");
-        request.setAttribute("home", portal.getPortalId());
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         try {
             rd.forward(request,response);

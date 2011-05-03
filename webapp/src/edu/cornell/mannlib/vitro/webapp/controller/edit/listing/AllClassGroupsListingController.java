@@ -16,7 +16,6 @@ import org.apache.commons.lang.StringUtils;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -34,13 +33,11 @@ public class AllClassGroupsListingController extends BaseEditController {
     	}
     	
         VitroRequest vreq = new VitroRequest(request);
-        Portal portal = vreq.getPortal();
-
-        //need to figure out how to structure the results object to put the classes underneath
 
         VClassGroupDao dao = vreq.getFullWebappDaoFactory().getVClassGroupDao();
 
-        List<VClassGroup> groups = dao.getPublicGroupsWithVClasses(); // uses an unfiltered dao so will see all classes
+        List<VClassGroup> groups = dao.getPublicGroupsWithVClasses(); 
+        // uses an unfiltered dao so will see all classes
 
         List<String> results = new ArrayList<String>();
         results.add("XX");
@@ -57,7 +54,7 @@ public class AllClassGroupsListingController extends BaseEditController {
                     publicName = "(unnamed group)";
                 }           
                 try {
-                    results.add("<a href=\"./editForm?uri="+URLEncoder.encode(vcg.getURI(),"UTF-8")+"&amp;home="+portal.getPortalId()+"&amp;controller=Classgroup\">"+publicName+"</a>");
+                    results.add("<a href=\"./editForm?uri="+URLEncoder.encode(vcg.getURI(),"UTF-8")+"&amp;controller=Classgroup\">"+publicName+"</a>");
                 } catch (Exception e) {
                     results.add(publicName);
                 }
@@ -100,12 +97,10 @@ public class AllClassGroupsListingController extends BaseEditController {
         request.setAttribute("columncount",new Integer(5));
         request.setAttribute("suppressquery","true");
         request.setAttribute("title","Class Groups");
-        request.setAttribute("portalBean",portal);
         request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
         request.setAttribute("horizontalJspAddButtonUrl", Controllers.RETRY_URL);
         request.setAttribute("horizontalJspAddButtonText", "Add new class group");
         request.setAttribute("horizontalJspAddButtonControllerParam", "Classgroup");
-        request.setAttribute("home", portal.getPortalId());
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         try {
             rd.forward(request,response);

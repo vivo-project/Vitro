@@ -14,7 +14,6 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
@@ -28,7 +27,6 @@ public class OntologiesListingController extends BaseEditController {
     	}
     	
         VitroRequest vrequest = new VitroRequest(request);
-        Portal portal = vrequest.getPortal();
 
         //need to figure out how to structure the results object to put the classes underneath
 
@@ -50,7 +48,7 @@ public class OntologiesListingController extends BaseEditController {
                 if (ont.getName() != null) {
                     try {
                         String ontologyName = (ont.getName()==null || ont.getName().length()==0) ? ont.getURI() : ont.getName();
-                        results.add("<a href=\"./ontologyEdit?uri="+URLEncoder.encode(ont.getURI(),"UTF-8")+"&amp;home="+portal.getPortalId()+"\">"+ontologyName+"</a>");
+                        results.add("<a href=\"./ontologyEdit?uri="+URLEncoder.encode(ont.getURI(),"UTF-8")+"\">"+ontologyName+"</a>");
                     } catch (Exception e) {
                         results.add(ont.getName());
                     }
@@ -69,12 +67,10 @@ public class OntologiesListingController extends BaseEditController {
         request.setAttribute("columncount",new Integer(4));
         request.setAttribute("suppressquery","true");
         request.setAttribute("title","Ontologies");
-        request.setAttribute("portalBean",portal);
         request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
         request.setAttribute("horizontalJspAddButtonUrl", Controllers.RETRY_URL);
         request.setAttribute("horizontalJspAddButtonText", "Add new ontology");
         request.setAttribute("horizontalJspAddButtonControllerParam", "Ontology");
-        request.setAttribute("home", portal.getPortalId());
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         try {
             rd.forward(request,response);

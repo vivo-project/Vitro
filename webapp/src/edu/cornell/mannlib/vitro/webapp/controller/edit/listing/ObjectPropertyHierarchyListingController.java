@@ -25,7 +25,6 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -52,7 +51,6 @@ public class ObjectPropertyHierarchyListingController extends BaseEditController
     	}
     	
         VitroRequest vrequest = new VitroRequest(request);
-        Portal portal = vrequest.getPortal();
         try {
 
         opDao = vrequest.getAssertionsWebappDaoFactory().getObjectPropertyDao();
@@ -109,19 +107,15 @@ public class ObjectPropertyHierarchyListingController extends BaseEditController
         request.setAttribute("columncount",NUM_COLS);
         request.setAttribute("suppressquery","true");
         request.setAttribute("title", "Object Property Hierarchy");
-        request.setAttribute("portalBean", portal);
         request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
-        request.setAttribute("home", portal.getPortalId());
         
         // new way of adding more than one button
         List <ButtonForm> buttons = new ArrayList<ButtonForm>();
         HashMap<String,String> newPropParams=new HashMap<String,String>();
         newPropParams.put("controller", "Property");
-        newPropParams.put("home", String.valueOf(portal.getPortalId()));
         ButtonForm newPropButton = new ButtonForm(Controllers.RETRY_URL,"buttonForm","Add new object property",newPropParams);
         buttons.add(newPropButton);
         HashMap<String,String> allPropParams=new HashMap<String,String>();
-        allPropParams.put("home", String.valueOf(portal.getPortalId()));
         String temp;
         if ( (temp=vrequest.getParameter("ontologyUri")) != null) {
         	allPropParams.put("ontologyUri",temp);

@@ -21,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
 import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
@@ -35,7 +34,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Red
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.web.BreadCrumbsUtil;
-import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.Tags;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
@@ -236,8 +234,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         doTemplate(vreq, response, trv);
     }
 
-    public String getThemeDir(Portal portal) {
-        return portal.getThemeDir().replaceAll("/$", "");
+    public String getThemeDir(ApplicationBean appBean) {
+        return appBean.getThemeDir().replaceAll("/$", "");
     }
 
     // Define the URLs that are accessible to the templates. Note that we do not create menus here,
@@ -332,19 +330,18 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
         Map<String, Object> map = new HashMap<String, Object>();
 
-        Portal portal = vreq.getPortal();
+        ApplicationBean appBean = vreq.getAppBean();
         // Ideally, templates wouldn't need portal id. Currently used as a hidden input value
         // in the site search box, so needed for now.
-        map.put("portalId", portal.getPortalId());
         
-        String siteName = portal.getAppName();
+        String siteName = appBean.getApplicationName();
         map.put("siteName", siteName);
         
         // This may be overridden by the body data model received from the subcontroller.
         map.put("title", getTitle(siteName, vreq));
 
-        String themeDir = getThemeDir(portal);
-        UrlBuilder urlBuilder = new UrlBuilder(portal);
+        String themeDir = getThemeDir(appBean);
+        UrlBuilder urlBuilder = new UrlBuilder(appBean);
         
         map.put("urls", getUrls(themeDir, urlBuilder, vreq)); 
 
@@ -360,25 +357,21 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         map.put("tabMenu", getTabMenu(vreq));
         map.put("menu", getDisplayModelMenu(vreq));
         
-        ApplicationBean appBean = vreq.getAppBean();
-        PortalWebUtil.populateSearchOptions(portal, appBean, vreq.getWebappDaoFactory().getPortalDao());
-        PortalWebUtil.populateNavigationChoices(portal, vreq, appBean, vreq.getWebappDaoFactory().getPortalDao()); 
-        
         map.put("user", new User(vreq));
         
         map.put("version", getRevisionInfo(urlBuilder));
         
-        map.put("copyright", getCopyrightInfo(portal));    
-        map.put("siteTagline", portal.getShortHand());
+        map.put("copyright", getCopyrightInfo(appBean));    
+        map.put("siteTagline", appBean.getShortHand());
         map.put("breadcrumbs", BreadCrumbsUtil.getBreadCrumbsDiv(vreq));
 
         // This value is used only in stylesheets.ftl and already contains the context path.
         map.put("stylesheetPath", UrlBuilder.getUrl(themeDir + "/css"));  
 
-        String bannerImage = portal.getBannerImage();  
-        if ( ! StringUtils.isEmpty(bannerImage)) {
-            map.put("bannerImage", UrlBuilder.getUrl(themeDir + "site_icons/" + bannerImage));
-        }
+//        String bannerImage = portal.getBannerImage();  
+//        if ( ! StringUtils.isEmpty(bannerImage)) {
+//            map.put("bannerImage", UrlBuilder.getUrl(themeDir + "site_icons/" + bannerImage));
+//        }
 
         String flashMessage = DisplayMessage.getMessageAndClear(vreq);
         if (! flashMessage.isEmpty()) {
@@ -402,8 +395,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     }
 
     private TabMenu getTabMenu(VitroRequest vreq) {
-        int portalId = vreq.getPortal().getPortalId();
-        return new TabMenu(vreq, portalId);
+        return new TabMenu(vreq, 1);
     }
     
     protected MainMenu getDisplayModelMenu(VitroRequest vreq){
@@ -411,10 +403,10 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return vreq.getWebappDaoFactory().getMenuDao().getMainMenu(url);
     }
     
-    private final Map<String, Object> getCopyrightInfo(Portal portal) {
+    private final Map<String, Object> getCopyrightInfo(ApplicationBean appBean) {
 
         Map<String, Object> copyright = null;
-        String copyrightText = portal.getCopyrightAnchor();
+        String copyrightText = appBean.getCopyrightAnchor();
         if ( ! StringUtils.isEmpty(copyrightText) ) {
             copyright =  new HashMap<String, Object>();
             copyright.put("text", copyrightText);
@@ -422,7 +414,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             //String thisYear = ((Integer)Calendar.getInstance().get(Calendar.YEAR)).toString(); // use ${copyrightYear} in template
             //SimpleDate thisYear = new SimpleDate(Calendar.getInstance().getTime(), TemplateDateModel.DATE); // use ${copyrightYear?string("yyyy")} in template
             copyright.put("year", thisYear);
-            copyright.put("url", portal.getCopyrightURL());
+            copyright.put("url", appBean.getCopyrightURL());
         } 
         return copyright;
     }

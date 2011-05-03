@@ -15,21 +15,19 @@ import org.apache.commons.logging.LogFactory;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
 
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.filters.PortalPickerFilter;
 
 public class UrlBuilder {
 
     private static final Log log = LogFactory.getLog(UrlBuilder.class.getName());
 
     protected static String contextPath = null;   
-    private static boolean addPortalParam = PortalPickerFilter.isPortalPickingActive();
     
-    private Portal portal;
+    private ApplicationBean application;
         
     public enum Route {
         ABOUT("/about"),
@@ -114,18 +112,15 @@ public class UrlBuilder {
         }
     }
     
-    public UrlBuilder(Portal portal) {
-        this.portal = portal;
-    }
-    
-    public int getPortalId() {
-        return portal.getPortalId();
+    public UrlBuilder(ApplicationBean application) {
+        this.application = application;
     }
     
     public String getHomeUrl() {
-        String rootBreadCrumbUrl = portal.getRootBreadCrumbURL();
-        String path = StringUtils.isEmpty(rootBreadCrumbUrl) ? "" : rootBreadCrumbUrl;
-        return getUrl(path);
+        //String rootBreadCrumbUrl = application.getRootBreadCrumbURL();
+        //String path = StringUtils.isEmpty(rootBreadCrumbUrl) ? "" : rootBreadCrumbUrl;
+        //return getUrl(path);
+    	return getUrl("");
     }
     
     // Used by templates to build urls.
@@ -140,19 +135,12 @@ public class UrlBuilder {
     public String getLogoutUrl() {
         return getPortalUrl(Route.LOGOUT);
     }
-    
-    public ParamMap getPortalParam() {
-        return new ParamMap("home", "" + portal.getPortalId());    
-    }
 
     public String getPortalUrl(String path) {
-        return addPortalParam ? getUrl(path, getPortalParam()) : getUrl(path);
+        return getUrl(path);
     }
     
     public String getPortalUrl(String path, ParamMap params) {
-        if (addPortalParam) {
-            params.putAll(getPortalParam());
-        }
         return getUrl(path, params);
     }
 

@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Literal;
@@ -14,8 +15,9 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.shared.Lock;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
@@ -35,29 +37,90 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
         getOntModelSelector().getDisplayModel().register(modelChangedListener);
     }
     
+    private String getApplicationResourceURI() {
+    	// TODO migrate to "application" in the resource URI
+    	return super.DEFAULT_NAMESPACE + "portal" + 1;
+    }
+    
+    public ApplicationBean getApplicationBean() {
+    	ApplicationBean application = new ApplicationBean();
+    	OntModel ontModel = getOntModelSelector().getApplicationMetadataModel();
+    	Individual appInd = ontModel.getIndividual(
+    			getApplicationResourceURI());
+    	if (appInd == null) {
+    		return application;
+    	}
+    	ontModel.enterCriticalSection(Lock.READ);
+    	try {
+    		
+    		application.setApplicationName(appInd.getLabel(null));
+	        application.setAboutText(getPropertyStringValue(
+	        		appInd, APPLICATION_ABOUTTEXT));
+	        application.setAcknowledgeText(getPropertyStringValue(
+	        		appInd, APPLICATION_ACKNOWLEGETEXT));
+	        application.setContactMail(getPropertyStringValue(
+	        		appInd, APPLICATION_CONTACTMAIL));
+	        application.setCorrectionMail(getPropertyStringValue(
+	        		appInd, APPLICATION_CORRECTIONMAIL));
+	        application.setCopyrightAnchor(getPropertyStringValue(
+	        		appInd, APPLICATION_COPYRIGHTANCHOR));
+            application.setCopyrightURL(getPropertyStringValue(
+            		appInd, APPLICATION_COPYRIGHTURL)); 
+            application.setThemeDir(getPropertyStringValue(
+            		appInd, APPLICATION_THEMEDIR));
+        } catch (Exception e) {
+    		log.error(e, e);
+    	} finally {
+    		ontModel.leaveCriticalSection();
+    	}
+        return application;
+    }
+    
+    public void updateApplicationBean(ApplicationBean application) {
+    	// TODO migrate to "application" in the resource URI
+    	OntModel ontModel = getOntModelSelector().getApplicationMetadataModel();
+    	Individual appInd = ontModel.getIndividual(
+    			getApplicationResourceURI());
+    	if (appInd == null) {
+    		appInd = getOntModel().createIndividual(
+    				getApplicationResourceURI(), PORTAL);
+    	}
+    	ontModel.enterCriticalSection(Lock.WRITE);
+    	try {
+    		appInd.setLabel(application.getApplicationName(), null);
+	        updatePropertyStringValue(
+	        		appInd, APPLICATION_ABOUTTEXT, application.getAboutText(), 
+	        		    ontModel);
+	        updatePropertyStringValue(
+	        		appInd, APPLICATION_ACKNOWLEGETEXT, 
+	        		    application.getAcknowledgeText(), ontModel);
+	        updatePropertyStringValue(
+	        		appInd, APPLICATION_CONTACTMAIL, 
+	        		    application.getContactMail(), ontModel); 
+	        updatePropertyStringValue(
+	        		appInd, APPLICATION_CORRECTIONMAIL, 
+	        		    application.getCorrectionMail(), ontModel);
+	        updatePropertyStringValue(
+	        		appInd, APPLICATION_COPYRIGHTANCHOR, 
+	        		    application.getCopyrightAnchor(), ontModel);
+            updatePropertyStringValue(
+            		appInd, APPLICATION_COPYRIGHTURL, 
+            		    application.getCopyrightURL(), ontModel); 
+            updatePropertyStringValue(
+            		appInd, APPLICATION_THEMEDIR, 
+            		    application.getThemeDir(), ontModel);
+        } catch (Exception e) {
+    		log.error(e, e);
+    	} finally {
+    		ontModel.leaveCriticalSection();
+    	}
+    }
+    
     public void close() {
         if (modelChangedListener != null) {
             getOntModelSelector().getDisplayModel().unregister(modelChangedListener);
         }
     }
-	   	
-	public boolean isFlag1Active() {
-		boolean somePortalIsFiltering=false;		
-		if (portalCount == null) {
-			boolean active = false;
-			for (Portal p : getWebappDaoFactory().getPortalDao().getAllPortals()) {
-				if (p.isFlag1Filtering()) {
-					somePortalIsFiltering = true;
-				}
-			}
-		}		
-		return somePortalIsFiltering && getWebappDaoFactory().getPortalDao().getAllPortals().size() > 1;		
-	}
-
-	
-	public boolean isFlag2Active() {
-		return (getFlag2ValueMap().isEmpty()) ? false : true;
-	}
 
 	private static final boolean CLEAR_CACHE = true;
 	

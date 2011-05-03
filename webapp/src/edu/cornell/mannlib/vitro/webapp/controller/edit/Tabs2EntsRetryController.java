@@ -22,7 +22,6 @@ import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManagePortals;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
 import edu.cornell.mannlib.vitro.webapp.beans.TabIndividualRelation;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -45,13 +44,6 @@ public class Tabs2EntsRetryController extends BaseEditController {
     	
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
-
-        //set portal flag to current portal
-        Portal currPortal = (Portal) request.getAttribute("portalBean");
-        int currPortalId = 1;
-        if (currPortal != null) {
-            currPortalId = currPortal.getPortalId();
-        }
 
         String action = "insert";
 
@@ -107,7 +99,7 @@ public class Tabs2EntsRetryController extends BaseEditController {
         }
 
         HashMap optionMap = new HashMap();
-        List<Tab> tabList = tDao.getAllManuallyLinkableTabs(currPortalId);
+        List<Tab> tabList = tDao.getAllManuallyLinkableTabs(1);
         Collections.sort(tabList);
         optionMap.put("TabId", FormUtils.makeOptionListFromBeans(tabList, "TabId", "Title", Integer.toString(objectForEditing.getTabId()), null));
         if (objectForEditing.getEntURI() != null) {
@@ -142,7 +134,6 @@ public class Tabs2EntsRetryController extends BaseEditController {
 
         String html = FormUtils.htmlFormFromBean(objectForEditing,action,foo);
 
-        Portal portal = (new VitroRequest(request)).getPortal();
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("formHtml",html);
         request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");

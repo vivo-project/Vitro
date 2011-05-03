@@ -38,7 +38,6 @@ import org.json.JSONObject;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames;
@@ -233,7 +232,6 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 			VitroRequest vreq) throws ServletException {
 		JSONObject qJson = new JSONObject();
 		try {
-			PortalFlag portalFlag = vreq.getPortalFlag();
 			Analyzer analyzer = getAnalyzer(getServletContext());
 			IndexSearcher searcherForRequest = LuceneIndexFactory
 					.getIndexSearcher(getServletContext());
@@ -275,7 +273,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 
 				// begin search
 				JSONArray resultJsonArr = new JSONArray();
-				Query query = getReconcileQuery(vreq, portalFlag, analyzer,
+				Query query = getReconcileQuery(vreq, analyzer,
 						queryVal, searchType, propertiesList);
 
 				TopDocs topDocs = searcherForRequest.search(query, null, limit);
@@ -438,8 +436,8 @@ public class JSONReconcileServlet extends VitroHttpServlet {
         return qp;
     }
 
-    private Query getReconcileQuery(VitroRequest request, PortalFlag portalState,
-    		Analyzer analyzer, String querystr, String typeParam, ArrayList<String[]> propertiesList) throws SearchException{
+    private Query getReconcileQuery(VitroRequest request, Analyzer analyzer, 
+    				String querystr, String typeParam, ArrayList<String[]> propertiesList) throws SearchException{
 
     	Query query = null;
     	try {

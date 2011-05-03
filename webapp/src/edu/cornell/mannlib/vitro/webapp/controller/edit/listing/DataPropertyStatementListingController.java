@@ -15,7 +15,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntolo
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
@@ -30,7 +29,6 @@ public class DataPropertyStatementListingController extends BaseEditController {
        }
 
         VitroRequest vrequest = new VitroRequest(request);
-        Portal portal = vrequest.getPortal();
 
         String noResultsMsgStr = "No data properties found";
 
@@ -89,7 +87,7 @@ public class DataPropertyStatementListingController extends BaseEditController {
         	DataPropertyStatement dps = i.next();
         	Individual subj = iDao.getIndividualByURI(dps.getIndividualURI());
         	results.add("XX");
-        	results.add(ListingControllerWebUtils.formatIndividualLink(subj, portal));
+        	results.add(ListingControllerWebUtils.formatIndividualLink(subj));
         	results.add(dp.getPublicName());
         	results.add(dps.getData());
         }
@@ -104,9 +102,7 @@ public class DataPropertyStatementListingController extends BaseEditController {
         request.setAttribute("columncount",new Integer(4));
         request.setAttribute("suppressquery","true");
         request.setAttribute("title","Data Property Statements");
-        request.setAttribute("portalBean",portal);
         request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
-        request.setAttribute("home", portal.getPortalId());
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         try {
             rd.forward(request,response);

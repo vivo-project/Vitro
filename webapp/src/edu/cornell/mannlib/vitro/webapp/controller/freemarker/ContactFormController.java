@@ -10,7 +10,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -36,8 +35,9 @@ public class ContactFormController extends FreemarkerHttpServlet {
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
 
+        ApplicationBean appBean = vreq.getAppBean();
+    	
         String templateName;
-        Portal portal = vreq.getPortal();
         Map<String, Object> body = new HashMap<String, Object>();
         
         if (!ContactMailServlet.isSmtpHostConfigured(vreq)) {
@@ -47,35 +47,16 @@ public class ContactFormController extends FreemarkerHttpServlet {
             templateName = TEMPLATE_ERROR;
         }
         
-        else if (StringUtils.isEmpty(portal.getContactMail())) {
+        else if (StringUtils.isEmpty(appBean.getContactMail())) {
             body.put("errorMessage", 
-            		"The feedback form is currently disabled. In order to activate the form, a site administrator must provide a contact email address in the <a href='editForm?home=1&amp;controller=Portal&amp;id=1'>Site Configuration</a>");
+            		"The feedback form is currently disabled. In order to activate the form, a site administrator must provide a contact email address in the <a href='editForm?home=1&amp;controller=ApplicationBean&amp;id=1'>Site Configuration</a>");
             
             templateName = TEMPLATE_ERROR;          
         }
         
         else {
-
-            ApplicationBean appBean = vreq.getAppBean();          
-            String portalType = null;
-            int portalId = portal.getPortalId();
-            String appName = portal.getAppName();
-            
-            if ( (appBean.getMaxSharedPortalId()-appBean.getMinSharedPortalId()) > 1
-                  && ( (portalId  >= appBean.getMinSharedPortalId()
-                  && portalId <= appBean.getMaxSharedPortalId() )
-                  || portalId == appBean.getSharedPortalFlagNumeric() ) ) {
-                portalType = "CALSResearch";
-            } else if (appName.equalsIgnoreCase("CALS Impact")) {
-                portalType = "CALSImpact";
-            } else if (appName.equalsIgnoreCase("VIVO")){
-                portalType = "VIVO";
-            } else {
-                portalType = "clone";
-            }
-            body.put("portalType", portalType);
-            
-            body.put("portalId", portalId);
+          
+            String appName = appBean.getApplicationName();
             body.put("formAction", "submitFeedback");
 
             if (vreq.getHeader("Referer") == null) {

@@ -11,7 +11,6 @@ import java.util.Set;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
-import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
 import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.FiltersForTabs;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
@@ -22,11 +21,9 @@ public class TabDaoFiltering extends BaseFiltering implements TabDao{
 
     final TabDao innerDao;
     final VitroFilters filters;
-    private PortalDao innerPortalDao;    
     private ApplicationDao applicationDao;
     
-    public TabDaoFiltering(TabDao tabDao, PortalDao portalDao, ApplicationDao applicationDao, VitroFilters filters) {
-        this.innerPortalDao = portalDao;
+    public TabDaoFiltering(TabDao tabDao, ApplicationDao applicationDao, VitroFilters filters) {
         this.innerDao = tabDao;        
         this.applicationDao = applicationDao;
         this.filters = filters;
@@ -198,7 +195,6 @@ public class TabDaoFiltering extends BaseFiltering implements TabDao{
             if( in.grabEntityFactory() == null )
                 return in;
             else{
-            	boolean flag1Filtering = applicationDao.isFlag1Active(); //( !applicationDao.isFlag1Active() || innerPortalDao.getAllPortals().size() == 1 );
             	
                 /* NOTICE: this does not use the individualFilter that was passed in the constructor
                    it uses one based on the parameters of the tab. */
@@ -206,7 +202,7 @@ public class TabDaoFiltering extends BaseFiltering implements TabDao{
                 TabEntityFactoryFiltering filteringFact =
                         new TabEntityFactoryFiltering(
                                 in.grabEntityFactory(),
-                                 FiltersForTabs.getFilterForTab( in, innerPortalDao.getPortal(in.getPortalId()), flag1Filtering ),
+                                 FiltersForTabs.getFilterForTab( in, false ),
                                 new VitroFilterUtils.EntitySortTransform( in.getEntitySortField(),ascendingSort));
                 in.placeEntityFactory(filteringFact);
             }

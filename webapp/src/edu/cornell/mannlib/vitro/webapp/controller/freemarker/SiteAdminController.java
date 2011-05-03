@@ -24,7 +24,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvance
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.listing.AllTabsForPortalListingController;
-import edu.cornell.mannlib.vitro.webapp.controller.edit.listing.PortalsListingController;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.listing.UsersListingController;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -54,7 +53,7 @@ public class SiteAdminController extends FreemarkerHttpServlet {
     protected ResponseValues processRequest(VitroRequest vreq) {
         Map<String, Object> body = new HashMap<String, Object>();        
 
-        UrlBuilder urlBuilder = new UrlBuilder(vreq.getPortal());
+        UrlBuilder urlBuilder = new UrlBuilder(vreq.getAppBean());
         
     	if (PolicyHelper.isAuthorizedForActions(vreq, new EditIndividuals())) {
     		body.put("dataInput", getDataInputData(vreq));
@@ -127,15 +126,9 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         if (PolicyHelper.isAuthorizedForActions(vreq, UsersListingController.REQUIRED_ACTIONS)) {                
             urls.put("users", urlBuilder.getPortalUrl("/listUsers"));
         }
-
-        if (PolicyHelper.isAuthorizedForActions(vreq, PortalsListingController.REQUIRED_ACTIONS)) {
-        	if ((!vreq.getFullWebappDaoFactory().getPortalDao().isSinglePortal())) {
-				urls.put("portals", urlBuilder.getPortalUrl("/listPortals"));
-			}
-		}
  
 		if (PolicyHelper.isAuthorizedForActions(vreq, new EditSiteInformation())) {
-			urls.put("siteInfo", urlBuilder.getPortalUrl("/editForm", new ParamMap("controller", "Portal", "id", String.valueOf(urlBuilder.getPortalId()))));
+			urls.put("siteInfo", urlBuilder.getPortalUrl("/editForm", new ParamMap("controller", "ApplicationBean")));
 		}
 
 		if (PolicyHelper.isAuthorizedForActions(vreq, MenuN3EditController.REQUIRED_ACTIONS)) {

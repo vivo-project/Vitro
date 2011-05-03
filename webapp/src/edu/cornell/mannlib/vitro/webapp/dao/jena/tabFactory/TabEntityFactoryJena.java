@@ -32,10 +32,6 @@ public abstract class TabEntityFactoryJena extends JenaBaseDao implements
     WebappDaoFactory webappDaoFactory;
     String current_str = "";
     int auth_level = 0;
-    int portal_id = 1;
-    boolean flag1active = true;
-    boolean flag2active = true;
-    boolean flag3active = true;
     
     transient final UnaryFunctor<Individual,String> firstLetterOfName = new FirstLetterOfEnt();
     private static final Log log = LogFactory.getLog(TabEntityFactoryJena.class.getName());
@@ -54,15 +50,8 @@ public TabEntityFactoryJena(Tab tab, int auth_level,
         this.tab = tab;
 
         this.auth_level = auth_level;
-        this.portal_id = tab.getPortalId();
 
         this.appBean = appBean;
-        if( appBean != null){
-            this.current_str = appBean.isOnlyCurrent() ? "now()":"";
-            this.flag1active = appBean.isFlag1Active();
-            this.flag2active = appBean.isFlag2Active();
-            this.flag3active = appBean.isFlag3Active();
-        }
 
         this.webappDaoFactory = wadf;
     }

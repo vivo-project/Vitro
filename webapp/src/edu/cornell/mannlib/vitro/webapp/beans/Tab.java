@@ -6,11 +6,8 @@ package edu.cornell.mannlib.vitro.webapp.beans;
  * @version 1 2005-08-27
  * @authors Jon Corson-Rikert, Brian Caruso
  *
- * A tab is a browsing facet within a single portal.  While it might sometimes be
- * convenient to share tabs across portals, curators often prefer to be able to
- * tweak display controls on their own, as for example to adjust the dayLimit field
- * to control how many news releases show up in a given portal during busy or dry news spells
- *
+ * A tab is a browsing facet within the application. 
+ * 
  * UPDATES
  * BDC 2005-12-02 : updated to work with refactored db
  * 2005-10-19 jc55   changed test on date of entity sunrise field to <= from < when looking at sunrise (a negative value in tab dayLimit)
@@ -82,10 +79,6 @@ public class Tab implements java.io.Serializable, Comparable<Tab> {  // class to
     private int     tabId=0;         // primary key
     public void     setTabId(int val) {tabId=val;}
     public int      getTabId()        {return tabId;}
-
-    private int     portalId=0;   // each tab belongs to a different portal
-    public void     setPortalId(int val) {portalId=val;}
-    public int      getPortalId()        {return portalId;}
 
     private int     tabtypeId=0;
 //  0 unspecified, 28 primary tab,26 primary tab content,24 secondary tab,22 collection,20 subcollection,18 subcollection category
@@ -272,7 +265,6 @@ public class Tab implements java.io.Serializable, Comparable<Tab> {  // class to
     public Tab() {
         // identifiers
         tabId        = -1; // primary key of tabs table is auto_increment so this could be 0;
-        portalId     = 0;
         tabtypeId    = 0;
         userId       = 0;
         statusId     = 0;
@@ -316,7 +308,6 @@ public class Tab implements java.io.Serializable, Comparable<Tab> {  // class to
     public String toHTML() {
         String output = "<p>Tab:<ul>";
         output += "<li>tab id:               [" + tabId               + "]</li>";
-        output += "<li>portal id:            [" + portalId            + "]</li>";
         output += "<li>tabtype id:           [" + tabtypeId           + "]</li>";
         output += "<li>user id:              [" + userId              + "]</li>";
         output += "<li>day limit:            [" + dayLimit            + "]</li>";

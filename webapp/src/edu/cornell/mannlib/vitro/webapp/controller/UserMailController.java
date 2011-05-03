@@ -10,8 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
 
 /**
  *  Controller for comments ("contact us") page
@@ -41,24 +39,8 @@ public class UserMailController extends VitroHttpServlet{
                 errd.forward(request, response);
             }
             ApplicationBean appBean=vreq.getAppBean();
-            Portal portalBean=vreq.getPortal();
 
-            if ( (appBean.getMaxSharedPortalId()-appBean.getMinSharedPortalId()) > 1
-                    && ( (portalBean.getPortalId()    >= appBean.getMinSharedPortalId()
-                          && portalBean.getPortalId() <= appBean.getMaxSharedPortalId() )
-                          || portalBean.getPortalId() == appBean.getSharedPortalFlagNumeric() )
-                ) {
-                request.setAttribute("portalType","CALSResearch");
-            } else
-                if (portalBean.getAppName().equalsIgnoreCase("CALS Impact")){
-                request.setAttribute("portalType", "CALSImpact");
-            } else if (portalBean.getAppName().equalsIgnoreCase("VIVO")) {
-                request.setAttribute("portalType", "VIVO");
-            } else {
-                request.setAttribute("portalType", "clone");
-            }
-
-            request.setAttribute("siteName",portalBean.getAppName());
+            request.setAttribute("siteName", appBean.getApplicationName());
             request.setAttribute("scripts","/js/commentsForm.js");
 
             if (request.getHeader("Referer") == null)
@@ -66,12 +48,8 @@ public class UserMailController extends VitroHttpServlet{
             else
                 request.getSession().setAttribute("commentsFormReferer",request.getHeader("Referer"));
 
-
-            request.setAttribute("portalId",Integer.valueOf(portalBean.getPortalId()));
-
-            request.setAttribute("title", portalBean.getAppName()+" Mail Users Form");
+            request.setAttribute("title", appBean.getApplicationName()+" Mail Users Form");
             request.setAttribute("bodyJsp", "/templates/parts/emailUsers.jsp");// <<< this is where the body gets set
-            request.setAttribute("portalBean",portalBean);
 
             RequestDispatcher rd =
                 request.getRequestDispatcher(Controllers.BASIC_JSP);

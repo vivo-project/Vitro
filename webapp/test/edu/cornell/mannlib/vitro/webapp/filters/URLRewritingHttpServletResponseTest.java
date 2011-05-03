@@ -26,12 +26,9 @@ public class URLRewritingHttpServletResponseTest {
         URLRewritingHttpServletResponse urhsr = new URLRewritingHttpServletResponse();
         
         List<String>externalNamespaces = new ArrayList();
-        externalNamespaces.add("http://vivo.med.cornell.edu/individual/");
-        
-        PortalPickerFilter portalPickerFilter = new PortalPickerFilter();        
+        externalNamespaces.add("http://vivo.med.cornell.edu/individual/");        
                 
-        String actual = urhsr.encodeForVitro(urlToEncode, "UTF-8", 
-                new PortalPickerFilter(), 
+        String actual = urhsr.encodeForVitro(urlToEncode, "UTF-8",  
                 true, 1, 
                 getMockNamespaceMapper(), 
                 "http://vivo.cornell.edu/individual/", 
@@ -47,12 +44,9 @@ public class URLRewritingHttpServletResponseTest {
         URLRewritingHttpServletResponse urhsr = new URLRewritingHttpServletResponse();
         
         List<String>externalNamespaces = new ArrayList();
-        externalNamespaces.add("http://vivo.med.cornell.edu/individual/");
-        
-        PortalPickerFilter portalPickerFilter = new PortalPickerFilter();        
+        externalNamespaces.add("http://vivo.med.cornell.edu/individual/");        
                 
         String actual = urhsr.encodeForVitro(urlToEncode, "UTF-8", 
-                new PortalPickerFilter(), 
                 true, 0, 
                 getMockNamespaceMapper(), 
                 "http://vivo.cornell.edu/individual/", 
@@ -89,7 +83,7 @@ public class URLRewritingHttpServletResponseTest {
     "/vivo/js/tiny_mce/tiny_mce.js", "/vivo/js/tiny_mce/tiny_mce.js"); }
     @Test
     public void test41133(){ urlEncodingStyleA(
-    "/vivo/entityEdit?home=1&uri=http%3a%2f%2fbogus.com%2findividual%2fn3671",
+    "/vivo/entityEdit?uri=http%3a%2f%2fbogus.com%2findividual%2fn3671",
     "/vivo/entityEdit?uri=http%3A%2F%2Fbogus.com%2Findividual%2Fn3671"); }
     @Test
     public void test41464(){ urlEncodingStyleA(
@@ -106,157 +100,157 @@ public class URLRewritingHttpServletResponseTest {
     "/vivo/js/imageUpload/imageUploadUtils.js"); }
     @Test
     public void test57982(){ urlEncodingStyleA(
-    "entityEdit?home=1&uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fAgent",
-    "entityEdit?home=1&uri=http%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2FAgent");
+    "entityEdit?uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fAgent",
+    "entityEdit?uri=http%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2FAgent");
     }
     @Test
     public void test57983(){ urlEncodingStyleA(
-    "/vivo/vclassEdit?home=1&uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fAgent",
+    "/vivo/vclassEdit?uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fAgent",
     "/vivo/vclassEdit?uri=http%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2FAgent"); }
     @Test
     public void test57986(){ urlEncodingStyleA(
-    "entityEdit?home=1&uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fPerson",
-    "entityEdit?home=1&uri=http%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2FPerson");
+    "entityEdit?uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fPerson",
+    "entityEdit?uri=http%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2FPerson");
     }
     @Test
     public void test57987(){ urlEncodingStyleA(
-    "/vivo/vclassEdit?home=1&uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fPerson",
+    "/vivo/vclassEdit?uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fPerson",
     "/vivo/vclassEdit?uri=http%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2FPerson");
     }
     @Test
     public void test57988(){ urlEncodingStyleA(
-    "entityEdit?home=1&uri=http%3a%2f%2fwww.w3.org%2f2002%2f07%2fowl%23Thing",
-    "entityEdit?home=1&uri=http%3A%2F%2Fwww.w3.org%2F2002%2F07%2Fowl%23Thing");
+    "entityEdit?uri=http%3a%2f%2fwww.w3.org%2f2002%2f07%2fowl%23Thing",
+    "entityEdit?uri=http%3A%2F%2Fwww.w3.org%2F2002%2F07%2Fowl%23Thing");
     }
     @Test
     public void test57989(){ urlEncodingStyleA(
-    "/vivo/vclassEdit?home=1&uri=http%3a%2f%2fwww.w3.org%2f2002%2f07%2fowl%23Thing",
+    "/vivo/vclassEdit?uri=http%3a%2f%2fwww.w3.org%2f2002%2f07%2fowl%23Thing",
     "/vivo/vclassEdit?uri=http%3A%2F%2Fwww.w3.org%2F2002%2F07%2Fowl%23Thing");
     }
     @Test
     public void test42083(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23Address",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23Address");
+    "vclassEdit?uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23Address",
+    "vclassEdit?uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23Address");
     }
     @Test
     public void test42084(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23DateTimeInterval",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23DateTimeInterval");
+    "vclassEdit?uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23DateTimeInterval",
+    "vclassEdit?uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23DateTimeInterval");
     }
     @Test
     public void test42085(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23URLLink",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23URLLink");
+    "vclassEdit?uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23URLLink",
+    "vclassEdit?uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23URLLink");
     }
     @Test
     public void test42086(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23AcademicDegree",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23AcademicDegree");
+    "vclassEdit?uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23AcademicDegree",
+    "vclassEdit?uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23AcademicDegree");
     }
     @Test
     public void test42087(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fpurl.org%2fontology%2fbibo%2fDocumentStatus",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fpurl.org%2Fontology%2Fbibo%2FDocumentStatus");
+    "vclassEdit?uri=http%3a%2f%2fpurl.org%2fontology%2fbibo%2fDocumentStatus",
+    "vclassEdit?uri=http%3A%2F%2Fpurl.org%2Fontology%2Fbibo%2FDocumentStatus");
     }
     @Test
     public void test42088(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23DateTimeValuePrecision",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23DateTimeValuePrecision");
+    "vclassEdit?uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23DateTimeValuePrecision",
+    "vclassEdit?uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23DateTimeValuePrecision");
     }
     @Test
     public void test42089(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23DateTimeValue",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23DateTimeValue");
+    "vclassEdit?uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23DateTimeValue",
+    "vclassEdit?uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23DateTimeValue");
     }
     @Test
     public void test42090(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23Award",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23Award");
+    "vclassEdit?uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23Award",
+    "vclassEdit?uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23Award");
     }
     @Test
     public void test42091(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23Authorship",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23Authorship");
+    "vclassEdit?uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23Authorship",
+    "vclassEdit?uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23Authorship");
     }
     @Test
     public void test48256(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fPerson",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2FPerson");
+    "vclassEdit?uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fPerson",
+    "vclassEdit?uri=http%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2FPerson");
     }
     @Test
     public void test11309(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-43882498%3a12c1825c819%3a-7df6",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-43882498%3A12c1825c819%3A-7df6");
+    "vclassEdit?uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-43882498%3a12c1825c819%3a-7df6",
+    "vclassEdit?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-43882498%3A12c1825c819%3A-7df6");
     }
     @Test
     public void test11310(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-43882498%3a12c1825c819%3a-7e02",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-43882498%3A12c1825c819%3A-7e02");
+    "vclassEdit?uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-43882498%3a12c1825c819%3a-7e02",
+    "vclassEdit?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-43882498%3A12c1825c819%3A-7e02");
     }
     @Test
     public void test11311(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-43882498%3a12c1825c819%3a-7e09",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-43882498%3A12c1825c819%3A-7e09");
+    "vclassEdit?uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-43882498%3a12c1825c819%3a-7e09",
+    "vclassEdit?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-43882498%3A12c1825c819%3A-7e09");
     }
     @Test
     public void test11312(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-43882498%3a12c1825c819%3a-7df5",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-43882498%3A12c1825c819%3A-7df5");
+    "vclassEdit?uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-43882498%3a12c1825c819%3a-7df5",
+    "vclassEdit?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-43882498%3A12c1825c819%3A-7df5");
     }
     @Test
     public void test11313(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-43882498%3a12c1825c819%3a-7df4",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-43882498%3A12c1825c819%3A-7df4");
+    "vclassEdit?uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-43882498%3a12c1825c819%3a-7df4",
+    "vclassEdit?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-43882498%3A12c1825c819%3A-7df4");
     }
     @Test
     public void test11314(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-43882498%3a12c1825c819%3a-7df9",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-43882498%3A12c1825c819%3A-7df9");
+    "vclassEdit?uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-43882498%3a12c1825c819%3a-7df9",
+    "vclassEdit?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-43882498%3A12c1825c819%3A-7df9");
     }
     @Test
     public void test11315(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-43882498%3a12c1825c819%3a-7df8",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-43882498%3A12c1825c819%3A-7df8");
+    "vclassEdit?uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-43882498%3a12c1825c819%3a-7df8",
+    "vclassEdit?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-43882498%3A12c1825c819%3A-7df8");
     }
     @Test
     public void test11317(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-43882498%3a12c1825c819%3a-7df7",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-43882498%3A12c1825c819%3A-7df7");
+    "vclassEdit?uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-43882498%3a12c1825c819%3a-7df7",
+    "vclassEdit?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-43882498%3A12c1825c819%3A-7df7");
     }
     @Test
     public void test11318(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fAgent",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2FAgent");
+    "vclassEdit?uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fAgent",
+    "vclassEdit?uri=http%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2FAgent");
     }
     @Test
     public void test11319(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23Librarian",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23Librarian");
+    "vclassEdit?uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23Librarian",
+    "vclassEdit?uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23Librarian");
     }
     @Test
     public void test11320(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23Student",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23Student");
+    "vclassEdit?uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23Student",
+    "vclassEdit?uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23Student");
     }
     @Test
     public void test11321(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23NonAcademic",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23NonAcademic");
+    "vclassEdit?uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23NonAcademic",
+    "vclassEdit?uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23NonAcademic");
     }
     @Test
     public void test11322(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23NonFacultyAcademic",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23NonFacultyAcademic");
+    "vclassEdit?uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23NonFacultyAcademic",
+    "vclassEdit?uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23NonFacultyAcademic");
     }
     @Test
     public void test113222(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23FacultyMember",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23FacultyMember");
+    "vclassEdit?uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23FacultyMember",
+    "vclassEdit?uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23FacultyMember");
     }
     @Test
     public void test11323(){ urlEncodingStyleA(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23EmeritusProfessor",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23EmeritusProfessor");
+    "vclassEdit?uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23EmeritusProfessor",
+    "vclassEdit?uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23EmeritusProfessor");
     }
     @Test
     public void test53543(){ urlEncodingStyleA(
@@ -334,7 +328,7 @@ public class URLRewritingHttpServletResponseTest {
     "/vivo/js/tiny_mce/tiny_mce.js", "/vivo/js/tiny_mce/tiny_mce.js"); }
     @Test
     public void test14999(){ urlEncodingStyleA(
-    "/vivo/entityEdit?home=1&uri=http%3a%2f%2fbogus.com%2findividual%2fn3671",
+    "/vivo/entityEdit?uri=http%3a%2f%2fbogus.com%2findividual%2fn3671",
     "/vivo/entityEdit?uri=http%3A%2F%2Fbogus.com%2Findividual%2Fn3671"); }
     @Test
     public void test15011(){ urlEncodingStyleA(
@@ -628,7 +622,7 @@ public class URLRewritingHttpServletResponseTest {
     "/js/tiny_mce/tiny_mce.js", "/js/tiny_mce/tiny_mce.js"); }
     @Test
     public void test37150(){ urlEncodingStyleB(
-    "/entityEdit?home=1&uri=http%3a%2f%2fbogus.com%2findividual%2fn3671",
+    "/entityEdit?uri=http%3a%2f%2fbogus.com%2findividual%2fn3671",
     "/entityEdit?uri=http%3A%2F%2Fbogus.com%2Findividual%2Fn3671"); }
     @Test
     public void test37402(){ urlEncodingStyleB(
@@ -645,126 +639,126 @@ public class URLRewritingHttpServletResponseTest {
     "/js/imageUpload/imageUploadUtils.js"); }
     @Test
     public void test47087(){ urlEncodingStyleB(
-    "entityEdit?home=1&uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fAgent",
-    "entityEdit?home=1&uri=http%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2FAgent");
+    "entityEdit?uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fAgent",
+    "entityEdit?uri=http%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2FAgent");
     }
     @Test
     public void test47088(){ urlEncodingStyleB(
-    "/vclassEdit?home=1&uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fAgent",
+    "/vclassEdit?uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fAgent",
     "/vclassEdit?uri=http%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2FAgent"); }
     @Test
     public void test470910(){ urlEncodingStyleB(
-    "entityEdit?home=1&uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fPerson",
-    "entityEdit?home=1&uri=http%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2FPerson");
+    "entityEdit?uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fPerson",
+    "entityEdit?uri=http%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2FPerson");
     }
     @Test
     public void test47091(){ urlEncodingStyleB(
-    "/vclassEdit?home=1&uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fPerson",
+    "/vclassEdit?uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fPerson",
     "/vclassEdit?uri=http%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2FPerson"); }
     @Test
     public void test470930(){ urlEncodingStyleB(
-    "entityEdit?home=1&uri=http%3a%2f%2fwww.w3.org%2f2002%2f07%2fowl%23Thing",
-    "entityEdit?home=1&uri=http%3A%2F%2Fwww.w3.org%2F2002%2F07%2Fowl%23Thing");
+    "entityEdit?uri=http%3a%2f%2fwww.w3.org%2f2002%2f07%2fowl%23Thing",
+    "entityEdit?uri=http%3A%2F%2Fwww.w3.org%2F2002%2F07%2Fowl%23Thing");
     }
     @Test
     public void test47093(){ urlEncodingStyleB(
-    "/vclassEdit?home=1&uri=http%3a%2f%2fwww.w3.org%2f2002%2f07%2fowl%23Thing",
+    "/vclassEdit?uri=http%3a%2f%2fwww.w3.org%2f2002%2f07%2fowl%23Thing",
     "/vclassEdit?uri=http%3A%2F%2Fwww.w3.org%2F2002%2F07%2Fowl%23Thing");
     }
     @Test
     public void test04993(){ urlEncodingStyleB(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-20981c46%3a12c18866689%3a-7d2e",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-20981c46%3A12c18866689%3A-7d2e");
+    "vclassEdit?uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-20981c46%3a12c18866689%3a-7d2e",
+    "vclassEdit?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-20981c46%3A12c18866689%3A-7d2e");
     }
     @Test
     public void test04994(){ urlEncodingStyleB(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-20981c46%3a12c18866689%3a-7dad",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-20981c46%3A12c18866689%3A-7dad");
+    "vclassEdit?uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-20981c46%3a12c18866689%3a-7dad",
+    "vclassEdit?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-20981c46%3A12c18866689%3A-7dad");
     }
     @Test
     public void test04995(){ urlEncodingStyleB(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-20981c46%3a12c18866689%3a-7d31",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-20981c46%3A12c18866689%3A-7d31");
+    "vclassEdit?uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-20981c46%3a12c18866689%3a-7d31",
+    "vclassEdit?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-20981c46%3A12c18866689%3A-7d31");
     }
     @Test
     public void test04996(){ urlEncodingStyleB(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-20981c46%3a12c18866689%3a-7db7",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-20981c46%3A12c18866689%3A-7db7");
+    "vclassEdit?uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-20981c46%3a12c18866689%3a-7db7",
+    "vclassEdit?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-20981c46%3A12c18866689%3A-7db7");
     }
     @Test
     public void test04997(){ urlEncodingStyleB(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-20981c46%3a12c18866689%3a-7df2",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-20981c46%3A12c18866689%3A-7df2");
+    "vclassEdit?uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-20981c46%3a12c18866689%3a-7df2",
+    "vclassEdit?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-20981c46%3A12c18866689%3A-7df2");
     }
     @Test
     public void test04999(){ urlEncodingStyleB(
-    "vclassEdit?home=1&uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fOrganization",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2FOrganization");
+    "vclassEdit?uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fOrganization",
+    "vclassEdit?uri=http%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2FOrganization");
     }
     @Test
     public void test05000(){ urlEncodingStyleB(
-    "vclassEdit?home=1&uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fPerson",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2FPerson");
+    "vclassEdit?uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fPerson",
+    "vclassEdit?uri=http%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2FPerson");
     }
     @Test
     public void test13898(){ urlEncodingStyleB(
-    "entityEdit?home=1&uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fvitro%2fpublic%23File",
-    "entityEdit?home=1&uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fvitro%2Fpublic%23File");
+    "entityEdit?uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fvitro%2fpublic%23File",
+    "entityEdit?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fvitro%2Fpublic%23File");
     }
     @Test
     public void test13899(){ urlEncodingStyleB(
-    "/vclassEdit?home=1&uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fvitro%2fpublic%23File",
+    "/vclassEdit?uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fvitro%2fpublic%23File",
     "/vclassEdit?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fvitro%2Fpublic%23File");
     }
     @Test
     public void test28454(){ urlEncodingStyleB(
-    "entityEdit?home=1&uri=http%3a%2f%2fwww.w3.org%2f2002%2f07%2fowl%23Thing",
-    "entityEdit?home=1&uri=http%3A%2F%2Fwww.w3.org%2F2002%2F07%2Fowl%23Thing");
+    "entityEdit?uri=http%3a%2f%2fwww.w3.org%2f2002%2f07%2fowl%23Thing",
+    "entityEdit?uri=http%3A%2F%2Fwww.w3.org%2F2002%2F07%2Fowl%23Thing");
     }
     @Test
     public void test28458(){ urlEncodingStyleB(
-    "/vclassEdit?home=1&uri=http%3a%2f%2fwww.w3.org%2f2002%2f07%2fowl%23Thing",
+    "/vclassEdit?uri=http%3a%2f%2fwww.w3.org%2f2002%2f07%2fowl%23Thing",
     "/vclassEdit?uri=http%3A%2F%2Fwww.w3.org%2F2002%2F07%2Fowl%23Thing");
     }
     @Test
     public void test38687(){ urlEncodingStyleB(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-20981c46%3a12c18866689%3a-7d75",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-20981c46%3A12c18866689%3A-7d75");
+    "vclassEdit?uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-20981c46%3a12c18866689%3a-7d75",
+    "vclassEdit?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-20981c46%3A12c18866689%3A-7d75");
     }
     @Test
     public void test38693(){ urlEncodingStyleB(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-20981c46%3a12c18866689%3a-7d76",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-20981c46%3A12c18866689%3A-7d76");
+    "vclassEdit?uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-20981c46%3a12c18866689%3a-7d76",
+    "vclassEdit?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-20981c46%3A12c18866689%3A-7d76");
     }
     @Test
     public void test38694(){ urlEncodingStyleB(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23AbstractInformation",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23AbstractInformation");
+    "vclassEdit?uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23AbstractInformation",
+    "vclassEdit?uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23AbstractInformation");
     }
     @Test
     public void test38695(){ urlEncodingStyleB(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-20981c46%3a12c18866689%3a-7d77",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-20981c46%3A12c18866689%3A-7d77");
+    "vclassEdit?uri=http%3a%2f%2fvitro.mannlib.cornell.edu%2fns%2fbnode%23-20981c46%3a12c18866689%3a-7d77",
+    "vclassEdit?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fns%2Fbnode%23-20981c46%3A12c18866689%3A-7d77");
     }
     @Test
     public void test38696(){ urlEncodingStyleB(
-    "vclassEdit?home=1&uri=http%3a%2f%2fpurl.org%2fontology%2fbibo%2fThesisDegree",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fpurl.org%2Fontology%2Fbibo%2FThesisDegree");
+    "vclassEdit?uri=http%3a%2f%2fpurl.org%2fontology%2fbibo%2fThesisDegree",
+    "vclassEdit?uri=http%3A%2F%2Fpurl.org%2Fontology%2Fbibo%2FThesisDegree");
     }
     @Test
     public void test43123(){ urlEncodingStyleB(
-    "vclassEdit?home=1&uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fPerson",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2FPerson");
+    "vclassEdit?uri=http%3a%2f%2fxmlns.com%2ffoaf%2f0.1%2fPerson",
+    "vclassEdit?uri=http%3A%2F%2Fxmlns.com%2Ffoaf%2F0.1%2FPerson");
     }
     @Test
     public void test43124(){ urlEncodingStyleB(
-    "vclassEdit?home=1&uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23Postdoc",
-    "vclassEdit?home=1&uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23Postdoc");
+    "vclassEdit?uri=http%3a%2f%2fvivoweb.org%2fontology%2fcore%23Postdoc",
+    "vclassEdit?uri=http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23Postdoc");
     }
     @Test
     public void test59983(){ urlEncodingStyleB(
-    "propertyEdit?home=1&uri=http%3a%2f%2fpurl.org%2fdc%2fterms%2fcontributor",
-    "propertyEdit?home=1&uri=http%3A%2F%2Fpurl.org%2Fdc%2Fterms%2Fcontributor");
+    "propertyEdit?uri=http%3a%2f%2fpurl.org%2fdc%2fterms%2fcontributor",
+    "propertyEdit?uri=http%3A%2F%2Fpurl.org%2Fdc%2Fterms%2Fcontributor");
     }
     @Test
     public void test17004(){ urlEncodingStyleB(

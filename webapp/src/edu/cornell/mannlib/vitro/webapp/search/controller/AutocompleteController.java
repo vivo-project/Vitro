@@ -37,7 +37,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
-import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
@@ -67,8 +66,6 @@ public class AutocompleteController extends VitroAjaxController {
     @Override
     protected void doRequest(VitroRequest vreq, HttpServletResponse response)
         throws IOException, ServletException {
-
-        PortalFlag portalFlag = vreq.getPortalFlag();
         
         try {
 
@@ -77,7 +74,7 @@ public class AutocompleteController extends VitroAjaxController {
             String qtxt = vreq.getParameter(QUERY_PARAMETER_NAME);
             Analyzer analyzer = getAnalyzer(getServletContext());
             
-            Query query = getQuery(vreq, portalFlag, analyzer, qtxt);             
+            Query query = getQuery(vreq, analyzer, qtxt);             
             if (query == null ) {
                 log.debug("query for '" + qtxt +"' is null.");
                 doNoQuery(response);
@@ -156,8 +153,8 @@ public class AutocompleteController extends VitroAjaxController {
             return (Analyzer)obj;        
     }
 
-    private Query getQuery(VitroRequest vreq, PortalFlag portalState,
-                       Analyzer analyzer, String querystr) throws SearchException{
+    private Query getQuery(VitroRequest vreq, Analyzer analyzer, 
+    			String querystr) throws SearchException{
         
         Query query = null;
         try {

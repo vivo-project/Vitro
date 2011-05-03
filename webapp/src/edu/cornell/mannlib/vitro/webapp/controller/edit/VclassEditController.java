@@ -22,7 +22,6 @@ import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -212,15 +211,13 @@ public class VclassEditController extends BaseEditController {
 
         boolean instantiable = (vcl.getURI().equals(OWL.Nothing.getURI())) ? false : true;
         
-        Portal portal = (new VitroRequest(request)).getPortal();
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("epoKey",epo.getKey());
         request.setAttribute("vclassWebapp", vcl);
         request.setAttribute("instantiable", instantiable);
         request.setAttribute("bodyJsp","/templates/edit/specific/classes_edit.jsp");
-        request.setAttribute("portalBean",portal);
         request.setAttribute("title","Class Control Panel");
-        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
+        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+request.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
             rd.forward(request, response);

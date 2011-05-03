@@ -39,15 +39,13 @@ public class BrowseController extends FreemarkerHttpServlet {
         if ( vreq.getParameter("clearcache") != null ) //mainly for debugging
             clearGroupCache();
         
-        int portalId = vreq.getPortalId();
-        
         List<VClassGroup> groups = null;
         VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(getServletContext());
         if ( vcgc == null ) {
             log.error("Could not get VClassGroupCache");
             message = "The system is not configured correctly. Please check your logs for error messages.";
         } else {
-            groups =vcgc.getGroups( vreq.getPortalId());
+            groups =vcgc.getGroups();
             List<VClassGroupTemplateModel> vcgroups = new ArrayList<VClassGroupTemplateModel>(groups.size());
             for (VClassGroup group : groups) {
                 vcgroups.add(new VClassGroupTemplateModel(group));

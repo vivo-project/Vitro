@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,12 +30,10 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
-import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
@@ -679,72 +675,6 @@ public class IndividualController extends FreemarkerHttpServlet {
     }
     
     private ResponseValues doNotFound(VitroRequest vreq) throws IOException, ServletException {
-        Portal portal = vreq.getPortal();
-        ApplicationBean appBean = ApplicationBean.getAppBean(getServletContext());
-        int allPortalId = appBean.getAllPortalFlagNumeric();
-        
-        //If an Individual is not found, there is possibility that it
-        //was requested from a portal where it was not visible.
-        //In this case redirect to the all portal.    
-        try{      
-            Portal allPortal = 
-                vreq.getWebappDaoFactory().getPortalDao().getPortal(allPortalId);
-            // there must be a portal defined with the ID of the all portal
-            // for this to work
-            if( portal.getPortalId() !=  allPortalId && allPortal != null ) {            
-                                
-                //bdc34: 
-                // this is hard coded to get the all portal 
-                // I didn't find a way to get the id of the all portal
-                // it is likely that redirecting will not work in non VIVO clones
-                String portalPrefix = null;
-                String portalParam  = null;
-                if( allPortal != null && allPortal.getUrlprefix() != null )              
-                    portalPrefix = allPortal.getUrlprefix();
-                else
-                    portalParam = "home=" + allPortalId; 
-                                        
-                String queryStr = vreq.getQueryString();
-                if( queryStr == null && portalParam != null && !"".equals(portalParam)){
-                    queryStr = portalParam;
-                } else {                
-                    if( portalParam != null && !"".equals(portalParam))
-                        queryStr = queryStr + "&" + portalParam;
-                }   
-                if( queryStr != null && !queryStr.startsWith("?") )
-                    queryStr = "?" + queryStr;
-                           
-                StringBuilder url = new StringBuilder();
-//                url.append( vreq.getContextPath() );                                
-//                if( vreq.getContextPath() != null && !vreq.getContextPath().endsWith("/"))
-//                    url.append('/');
-                
-                if( portalPrefix != null && !"".equals(portalPrefix)) 
-                    url.append( portalPrefix ).append('/');            
-                    
-                String servletPath = vreq.getServletPath();
-                String spath = "";
-                if( servletPath != null ){ 
-                    if( servletPath.startsWith("/") )
-                        spath = servletPath.substring(1);
-                    else
-                        spath = servletPath;
-                }
-                                
-                if( spath != null && !"".equals(spath))
-                    url.append( spath );
-                
-                if( vreq.getPathInfo() != null )
-                    url.append( vreq.getPathInfo() );
-                
-                if( queryStr != null && !"".equals(queryStr ))
-                    url.append( queryStr );
-                
-                return new RedirectResponseValues(url.toString());
-            }
-        }catch(Throwable th){
-            log.error("could not do a redirect", th);
-        }
 
         //set title before we do the highlighting so we don't get markup in it.
         Map<String, Object> body = new HashMap<String, Object>();

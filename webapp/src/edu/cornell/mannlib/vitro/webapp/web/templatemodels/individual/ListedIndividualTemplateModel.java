@@ -33,7 +33,7 @@ public class ListedIndividualTemplateModel extends BaseTemplateModel {
         this.individual = individual;
         this.vreq = vreq;
         // Needed for getting portal-sensitive urls. Remove if multi-portal support is removed.
-        this.urlBuilder = new UrlBuilder(vreq.getPortal());
+        this.urlBuilder = new UrlBuilder(vreq.getAppBean());
     }
     
     public static List<ListedIndividualTemplateModel> getIndividualTemplateModelList(List<Individual> individuals, VitroRequest vreq) {

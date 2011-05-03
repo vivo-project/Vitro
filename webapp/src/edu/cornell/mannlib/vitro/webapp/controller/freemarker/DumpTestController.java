@@ -37,7 +37,6 @@ public class DumpTestController extends FreemarkerHttpServlet {
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
-        //Portal portal = vreq.getPortal();
         
         Map<String, Object> body = new HashMap<String, Object>();
         

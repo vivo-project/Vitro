@@ -29,7 +29,6 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.TabEntitiesController;
@@ -41,7 +40,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
-import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividualTemplateModel;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.TemplateModel;
@@ -100,8 +98,6 @@ public class IndividualListController extends FreemarkerHttpServlet {
                         vclass.getURI(), 
                         page, 
                         alpha, 
-                        vreq.getPortal(), 
-                        vreq.getWebappDaoFactory().getPortalDao().isSinglePortal(), 
                         vreq.getWebappDaoFactory().getIndividualDao(), 
                         getServletContext());                                
                 body.putAll(map);
@@ -180,16 +176,12 @@ public class IndividualListController extends FreemarkerHttpServlet {
      * This method is now called in a couple of places.  It should be refactored
      * into a DAO or similar object.
      */
-     public static Map<String,Object> getResultsForVClass(String vclassURI, int page, String alpha, Portal portal, boolean isSinglePortal, IndividualDao indDao, ServletContext context) 
+     public static Map<String,Object> getResultsForVClass(String vclassURI, int page, String alpha, IndividualDao indDao, ServletContext context) 
      throws CorruptIndexException, IOException, ServletException{
-         Map<String,Object> rvMap = new HashMap<String,Object>();
-                         
-         int portalId = 1;
-         if( portal != null )
-             portalId = portal.getPortalId();        
+         Map<String,Object> rvMap = new HashMap<String,Object>();      
                                   
          //make lucene query for this rdf:type
-         Query query = getQuery(vclassURI,alpha, isSinglePortal, portalId);        
+         Query query = getQuery(vclassURI, alpha);        
          
          //execute lucene query for individuals of the specified type
          IndexSearcher index = LuceneIndexFactory.getIndexSearcher(context);
@@ -255,31 +247,13 @@ public class IndividualListController extends FreemarkerHttpServlet {
          return rvMap;
      }
      
-     private static BooleanQuery getQuery(String vclassUri,  String alpha , boolean isSinglePortal, int portalId){
+     private static BooleanQuery getQuery(String vclassUri,  String alpha){
          BooleanQuery query = new BooleanQuery();
          try{      
             //query term for rdf:type
             query.add(
                     new TermQuery( new Term(Entity2LuceneDoc.term.RDFTYPE, vclassUri)),
                     BooleanClause.Occur.MUST );                          
-                                          
-            //check for portal filtering 
-            if( ! isSinglePortal ){               
-                if( portalId < 16 ){ //could be a normal portal
-                query.add(
-                        new TermQuery( new Term(Entity2LuceneDoc.term.PORTAL, Integer.toString(1 << portalId ))),
-                        BooleanClause.Occur.MUST);
-            }else{ //could be a combined portal
-                    BooleanQuery tabQueries = new BooleanQuery();
-                    Long[] ids= FlagMathUtils.numeric2numerics(portalId);
-                    for( Long id : ids){                       
-                        tabQueries.add(
-                                new TermQuery( new Term(Entity2LuceneDoc.term.PORTAL,id.toString()) ),
-                                BooleanClause.Occur.SHOULD);
-                    }
-                    query.add(tabQueries,BooleanClause.Occur.MUST);
-                }
-            }
                                        
             //Add alpha filter if it is needed
             Query alphaQuery = null;
@@ -291,7 +265,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
                             
             log.debug("Query: " + query);
             return query;
-        }catch (Exception ex){
+        } catch (Exception ex){
             log.error(ex,ex);
             return new BooleanQuery();        
         }        

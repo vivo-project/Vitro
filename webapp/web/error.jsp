@@ -5,19 +5,14 @@
 <%@ page import="com.oreilly.servlet.ServletUtils,edu.cornell.mannlib.vitro.webapp.web.*" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.beans.Portal"%>
 <%
             VitroRequest vreq = new VitroRequest(request);
             ApplicationBean appBean = vreq.getAppBean();
-            Portal portal = vreq.getPortal();
-
-            String themeDir = portal!=null ? portal.getThemeDir() : Portal.DEFAULT_THEME_DIR_FROM_CONTEXT;                        
-            
+            String themeDir = appBean.getThemeDir();                        
             
             request.setAttribute("bodyJsp", "/errorbody.jsp");
             request.setAttribute("title", "Error");
             request.setAttribute("css", "");
-            request.setAttribute("portalBean", portal);
             request.setAttribute("appBean", appBean);
             request.setAttribute("themeDir", themeDir);
             %>

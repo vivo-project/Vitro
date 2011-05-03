@@ -34,7 +34,6 @@ if (LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.EDITOR)) 
 	log.debug("curator editing inactive");
 }%>
 <c:set var='entity' value='${requestScope.entity}'/><%-- just moving this into page scope for easy use --%>
-<c:set var='portal' value='${requestScope.portalBean}'/><%-- likewise --%>
 <%
 	log.debug("Starting dashboardPropsList.jsp");
 

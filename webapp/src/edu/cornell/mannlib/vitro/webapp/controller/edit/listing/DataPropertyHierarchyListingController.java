@@ -25,7 +25,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Datatype;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -54,7 +53,6 @@ public class DataPropertyHierarchyListingController extends BaseEditController {
     	}
     	
         VitroRequest vrequest = new VitroRequest(request);
-        Portal portal = vrequest.getPortal();
         try {
 
         dpDao = vrequest.getAssertionsWebappDaoFactory().getDataPropertyDao();
@@ -113,19 +111,17 @@ public class DataPropertyHierarchyListingController extends BaseEditController {
         request.setAttribute("columncount",NUM_COLS);
         request.setAttribute("suppressquery","true");
         request.setAttribute("title", "Data Property Hierarchy");
-        request.setAttribute("portalBean", portal);
         request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
-        request.setAttribute("home", portal.getPortalId());
         
         // new way of adding more than one button
         List <ButtonForm> buttons = new ArrayList<ButtonForm>();
         HashMap<String,String> newPropParams=new HashMap<String,String>();
         newPropParams.put("controller", "Dataprop");
-        newPropParams.put("home", String.valueOf(portal.getPortalId()));
+        
         ButtonForm newPropButton = new ButtonForm(Controllers.RETRY_URL,"buttonForm","Add new data property",newPropParams);
         buttons.add(newPropButton);
         HashMap<String,String> allPropParams=new HashMap<String,String>();
-        allPropParams.put("home", String.valueOf(portal.getPortalId()));
+   
         String temp;
         if ( (temp=vrequest.getParameter("ontologyUri")) != null) {
         	allPropParams.put("ontologyUri",temp);
@@ -192,7 +188,7 @@ public class DataPropertyHierarchyListingController extends BaseEditController {
 
             String nameStr = dp.getPublicName()==null ? dp.getName()==null ? dp.getURI()==null ? "(no name)" : dp.getURI() : dp.getName() : dp.getPublicName();
             try {
-                numCols=addColToResults("<a href=\"datapropEdit?uri="+URLEncoder.encode(dp.getURI(),"UTF-8")/*+"&amp;home="+portal.getPortalId()*/+"\">"+nameStr+"</a> <span style='font-style:italic; color:\"grey\";'>"+dp.getLocalNameWithPrefix()+"</span>",results,numCols); // column 2
+                numCols=addColToResults("<a href=\"datapropEdit?uri="+URLEncoder.encode(dp.getURI(),"UTF-8")+"\">"+nameStr+"</a> <span style='font-style:italic; color:\"grey\";'>"+dp.getLocalNameWithPrefix()+"</span>",results,numCols); // column 2
             } catch (Exception e) {
                 numCols=addColToResults(nameStr + " <i>" + dp.getLocalNameWithPrefix() + "</i>",results,numCols); // column 2
             }

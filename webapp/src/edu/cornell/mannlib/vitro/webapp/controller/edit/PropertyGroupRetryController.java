@@ -19,7 +19,6 @@ import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -77,16 +76,10 @@ public class PropertyGroupRetryController extends BaseEditController {
             propertyGroupForEditing = (PropertyGroup) epo.getNewBean();
         }
 
-        //set portal flag to current portal
-        Portal currPortal = (Portal) request.getAttribute("portalBean");
-        int currPortalId = 1;
-        if (currPortal != null) {
-            currPortalId = currPortal.getPortalId();
-        }
         //make a postinsert pageforwarder that will send us to a new class's fetch screen
-        epo.setPostInsertPageForwarder(new PropertyGroupInsertPageForwarder(currPortalId));
+        epo.setPostInsertPageForwarder(new PropertyGroupInsertPageForwarder());
         //make a postdelete pageforwarder that will send us to the list of classes
-        epo.setPostDeletePageForwarder(new UrlForwarder("listPropertyGroups?home="+currPortalId));
+        epo.setPostDeletePageForwarder(new UrlForwarder("listPropertyGroups"));
 
         //set the getMethod so we can retrieve a new bean after we've inserted it
         try {
@@ -128,14 +121,9 @@ public class PropertyGroupRetryController extends BaseEditController {
     }
 
     class PropertyGroupInsertPageForwarder implements PageForwarder {
-        private int portalId = 1;
-
-        public PropertyGroupInsertPageForwarder(int currPortalId) {
-            portalId = currPortalId;
-        }
 
         public void doForward(HttpServletRequest request, HttpServletResponse response, EditProcessObject epo){
-            String newPropertyGroupUrl = "listPropertyGroups?home="+portalId;
+            String newPropertyGroupUrl = "listPropertyGroups";
             try {
                 response.sendRedirect(newPropertyGroupUrl);
             } catch (IOException ioe) {

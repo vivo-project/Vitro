@@ -18,7 +18,6 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -39,7 +38,6 @@ public class VClassWebappsListingController extends BaseEditController {
         }
 
         VitroRequest vrequest = new VitroRequest(request);
-        Portal portal = vrequest.getPortal();
 
         //need to figure out how to structure the results object to put the classes underneath
         
@@ -82,7 +80,7 @@ public class VClassWebappsListingController extends BaseEditController {
 	                if (cls.getName() != null)
 	                    try {
 	                        //String className = (cls.getName()==null || cls.getName().length()==0) ? cls.getURI() : cls.getName();
-	                        results.add("<a href=\"./vclassEdit?uri="+URLEncoder.encode(cls.getURI(),"UTF-8")+"&amp;home="+portal.getPortalId()+"\">"+cls.getLocalNameWithPrefix()+"</a>");
+	                        results.add("<a href=\"./vclassEdit?uri="+URLEncoder.encode(cls.getURI(),"UTF-8")+"\">"+cls.getLocalNameWithPrefix()+"</a>");
 	                    } catch (Exception e) {
 	                        results.add(cls.getLocalNameWithPrefix());
 	                    }
@@ -134,12 +132,10 @@ public class VClassWebappsListingController extends BaseEditController {
         request.setAttribute("columncount",new Integer(NUM_COLS));
         request.setAttribute("suppressquery","true");
         request.setAttribute("title","Classes");
-        request.setAttribute("portalBean",portal);
         request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
         // new way of adding more than one button
         List <ButtonForm> buttons = new ArrayList<ButtonForm>();
         HashMap<String,String> newClassParams=new HashMap<String,String>();
-        newClassParams.put("home", String.valueOf(portal.getPortalId()));
         String temp;
         if ( (temp=vrequest.getParameter("ontologyUri")) != null) {
         	newClassParams.put("ontologyUri",temp);
@@ -147,7 +143,6 @@ public class VClassWebappsListingController extends BaseEditController {
         ButtonForm newClassButton = new ButtonForm(Controllers.VCLASS_RETRY_URL,"buttonForm","Add new class",newClassParams);
         buttons.add(newClassButton);
         HashMap<String,String> hierClassParams=new HashMap<String,String>();
-        hierClassParams.put("home", String.valueOf(portal.getPortalId()));
         if ( (temp=vrequest.getParameter("ontologyUri")) != null) {
         	hierClassParams.put("ontologyUri",temp);
         }

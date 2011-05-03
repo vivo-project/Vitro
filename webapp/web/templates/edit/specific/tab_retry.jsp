@@ -8,7 +8,7 @@
 				<font size="2" color="red"><form:error name="Title"/></font>
 		</td>
 		<td valign="bottom" colspan="1">
-			<b>Tab Shorthand</b> <i>(an alternate phrase for display as <strong>More ...</strong> in the home portal)</i><br/>
+			<b>Tab Shorthand</b> <i>(an alternate phrase for display as <strong>More ...</strong> in the application)</i><br/>
 				<input type="text" name="ShortHand" value="<form:value name="MoreTag"/>" style="width:80%;" maxlength="80" />
 				<font size="2" color="red"><form:error name="MoreTag"/></font>
 		</td>
@@ -59,16 +59,6 @@
 				<font size="2" color="red"><form:error name="RssURL"/></font>
 		</td>
 	</tr>
-	
-	<tr class="editformcell">
-		<td valign="top" colspan="3">
-		
-			<b>Portal</b> <i>(like-named tabs in multiple portals are created and modified separately)</i><br />
-				<input type="text" name="PortalId" value="<form:value name="PortalId"/>">
-				<br><font size="2" color="red"><form:error name="PortalId"/></font>
-		</td>
-
-	</tr>
 
 	*/ %>
 	
@@ -117,14 +107,4 @@
 				<input type="text" name="ImageWidth" value="<form:value name="ImageWidth"/>" size="5" maxlength="11" />
 				<font size="2" color="red"><form:error name="ImageWidth"/></font>
 		</td>
-	</tr>
-	<tr class="editformcell">
-	    <td valign="bottom" colspan="1">
-	      <b>Flag 2 Mode</b><em> to support legacy applications - ignore</em><br/>
-	      <input type="text" name="Flag2Mode" value="<form:value name="Flag2Mode"/>" size="10"/>  
-	    </td>
-	    <td valign="bottom" colspan="2">
-	      <b>Flag 2 Set</b><br/>
-	      <input type="text" name="Flag2Set" value="<form:value name="Flag2Set"/>" size="50"/>  
-	    </td>
 	</tr>

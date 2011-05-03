@@ -126,30 +126,6 @@ public interface Individual extends ResourceBean, VitroTimeWindowedResource, Com
     Link getPrimaryLink();
     void setPrimaryLink(Link link);
 
-    String getFlag1Set();
-    void setFlag1Set(String in);
-    int getFlag1Numeric();
-    void setFlag1Numeric(int i);
-
-    /* Consider the flagBitMask as a mask to & with flags.
-    if flagBitMask bit zero is set then return true if
-    the individual is in portal 2,
-    if flagBitMask bit 1 is set then return true if
-    the individual is in portal 4
-    etc.
-     */
-    boolean doesFlag1Match(int flagBitMask);
-
-    String getFlag2Set();
-    void setFlag2Set(String in);
-    int getFlag2Numeric();
-    void setFlag2Numeric(int i);
-
-    String getFlag3Set();
-    void setFlag3Set(String in);
-    int getFlag3Numeric();
-    void setFlag3Numeric(int i);
-
     List<String> getKeywords();
     void setKeywords(List<String> keywords);
     String getKeywordString();

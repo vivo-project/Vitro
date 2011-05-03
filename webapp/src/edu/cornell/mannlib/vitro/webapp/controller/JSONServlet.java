@@ -98,7 +98,7 @@ public class JSONServlet extends VitroHttpServlet {
         }
         
         VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(getServletContext());
-        VClassGroup vcg = vcgc.getGroup(vreq.getPortalId(), vcgUri);
+        VClassGroup vcg = vcgc.getGroup(vcgUri);
         if( vcg == null ){
             log.debug("Could not find vclassgroup: " + vcgUri);
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -226,8 +226,6 @@ public class JSONServlet extends VitroHttpServlet {
                     vclass.getURI(), 
                     page, 
                     alpha, 
-                    vreq.getPortal(), 
-                    vreq.getWebappDaoFactory().getPortalDao().isSinglePortal(), 
                     vreq.getWebappDaoFactory().getIndividualDao(), 
                     context);                                                
             

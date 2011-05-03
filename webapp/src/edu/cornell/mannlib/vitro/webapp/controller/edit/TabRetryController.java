@@ -23,7 +23,6 @@ import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageTabs;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -56,13 +55,6 @@ public class TabRetryController extends BaseEditController {
         TabDao tDao = request.getFullWebappDaoFactory().getTabDao();
         epo.setDataAccessObject(tDao);
 
-        //set portal flag to current portal
-        Portal currPortal = (Portal) request.getAttribute("portalBean");
-        int currPortalId = 1;
-        if (currPortal != null) {
-            currPortalId = currPortal.getPortalId();
-        }
-
         Tab tabForEditing = null;
         if (!epo.getUseRecycledBean()){
             if (request.getParameter("id") != null) {
@@ -77,7 +69,6 @@ public class TabRetryController extends BaseEditController {
                 }
             } else {
                 tabForEditing = new Tab();
-                tabForEditing.setPortalId(currPortalId);
             }
             epo.setOriginalBean(tabForEditing);
         } else {
@@ -86,24 +77,10 @@ public class TabRetryController extends BaseEditController {
             log.error("using newBean");
         }
 
-
-
-        //make a simple mask for the class's id
-        Object[] simpleMaskPair = new Object[2];
-        simpleMaskPair[0]="Id";
-        simpleMaskPair[1]=Integer.valueOf(tabForEditing.getPortalId());
-        epo.getSimpleMask().add(simpleMaskPair);
-
-
-        //set any validators
-
-        //set up any listeners
-
-
         //make a postinsert pageforwarder that will send us to a new class's fetch screen
-        epo.setPostInsertPageForwarder(new TabInsertPageForwarder(currPortalId));
+        epo.setPostInsertPageForwarder(new TabInsertPageForwarder());
         //make a postdelete pageforwarder that will send us to the list of properties
-        epo.setPostDeletePageForwarder(new UrlForwarder("listTabs?home="+currPortalId));
+        epo.setPostDeletePageForwarder(new UrlForwarder("listTabs"));
 
         //set the getMethod so we can retrieve a new bean after we've inserted it
         try {
@@ -167,14 +144,8 @@ public class TabRetryController extends BaseEditController {
 
     class TabInsertPageForwarder implements PageForwarder {
 
-        private int portalId = 1;
-
-        public TabInsertPageForwarder(int currPortalId) {
-            portalId = currPortalId;
-        }
-
         public void doForward(HttpServletRequest request, HttpServletResponse response, EditProcessObject epo){
-            String newTabUrl = "tabEdit?home="+portalId+"&id=";
+            String newTabUrl = "tabEdit?id=";
             Tab tab = (Tab) epo.getNewBean();
             newTabUrl += tab.getTabId();
             try {

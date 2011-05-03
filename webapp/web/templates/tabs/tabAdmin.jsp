@@ -31,17 +31,14 @@
 
 <% if ( LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.EDITOR))  {  %>   	
   <c:set var='tab' value='${requestScope.leadingTab}'/><%/* just moving this into page scope for easy use */ %>
-   	<c:set var='portal' value='${requestScope.portalBean.portalId}'/>
 	<div class='admin bottom'>  	
 		<c:url var="editHref" value="tabEdit">
-			<c:param name="home" value="${currentPortalId}"/>
 			<c:param name="controller" value="Tab"/>
 			<c:param name="id" value="${tab.tabId}"/>	
 		</c:url>
 		<c:set var="editHref">
 			<c:out value="${editHref}" escapeXml="true"/>
 		</c:set>
-    	<a href="${editHref}">edit tab: <em>${tab.title}</em></a> 
-    	<% /* | <a href='<c:url value="cloneEntity?home=${portal}&tabId=${tab.tabId}"/>'> <i>clone tab</i> ${tab.title}</a> */ %>      
+    	<a href="${editHref}">edit tab: <em>${tab.title}</em></a>       
     </div>
 <% } %>

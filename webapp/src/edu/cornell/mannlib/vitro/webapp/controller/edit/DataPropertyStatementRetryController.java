@@ -24,7 +24,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
@@ -88,7 +87,6 @@ public class DataPropertyStatementRetryController extends BaseEditController {
 
         String html = FormUtils.htmlFormFromBean(objectForEditing,action,foo);
 
-        Portal portal = (new VitroRequest(request)).getPortal();
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("formHtml",html);
         request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");

@@ -3,20 +3,16 @@
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
-import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetter;
 
 public class HomePageController extends FreemarkerHttpServlet {
@@ -55,9 +51,7 @@ public class HomePageController extends FreemarkerHttpServlet {
 
     // Get the home tab content for themes that display deprecated tabs
     private String getHomeTabContent(VitroRequest vreq) {
-        Portal portal = vreq.getPortal();
-        int tabId = portal.getRootTabId();
-        Tab tab = vreq.getWebappDaoFactory().getTabDao().getTab(tabId,0,vreq.getAppBean());
+        Tab tab = vreq.getWebappDaoFactory().getTabDao().getTab(1,0,vreq.getAppBean());
         String body = tab.getBody();
         if (body == null) {
             body = "";

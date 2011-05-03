@@ -12,7 +12,6 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
@@ -22,19 +21,17 @@ public class RDFUploadFormController extends BaseEditController {
 
     @Override
 	public void doPost (HttpServletRequest request, HttpServletResponse response) {
+
     	if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseAdvancedDataToolsPages()))) {
     		return;
     	}
 
-        VitroRequest vreq = new VitroRequest(request);
-        
-        Portal portal = vreq.getPortal();
+        VitroRequest vreq = new VitroRequest(request);        
+
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("bodyJsp","/templates/edit/specific/upload_rdf.jsp");
-        request.setAttribute("portalBean",portal);
-        request.setAttribute("singlePortal", new Boolean(vreq.getWebappDaoFactory().getPortalDao().isSinglePortal() ));
         request.setAttribute("title","Ingest RDF Data");
-        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
+        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
             rd.forward(request, response);

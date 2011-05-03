@@ -140,24 +140,15 @@ public class VitroVocabulary {
     // ================== Vitro Application vocabulary =====================
 
     public static final String APPLICATION = vitroURI + "Application";
-    public static final String APPLICATION_FLAG1NAME = vitroURI+"flag1Name";
-    public static final String APPLICATION_FLAG2NAME = vitroURI+"flag2Name";
-    public static final String APPLICATION_FLAG3NAME = vitroURI+"flag3Name";
-    public static final String APPLICATION_MINSHAREDPORTALID = vitroURI+"minSharedPortalId";
-    public static final String APPLICATION_MAXSHAREDPORTALID = vitroURI+"maxSharedPortalId";
     public static final String APPLICATION_KEYWORDHEADING = vitroURI+"keywordHeading";
     public static final String APPLICATION_ROOTLOGOTYPEIMAGE = vitroURI+"rootLogotypeImage";
-    public static final String APPLICATION_ONLYCURRENT = vitroURI+"onlyCurrent";
-    public static final String APPLICATION_MAXPORTALID = vitroURI+"maxPortalId";
-
+    
     // ================== Vitro Portal vocabulary ===========================
 
     public static final String PORTAL = vitroURI+"Portal";
     public static final String PORTAL_ROOTTAB = vitroURI+"rootTab";
     public static final String PORTAL_THEMEDIR = vitroURI+"themeDir";
     public static final String PORTAL_BANNERIMAGE = vitroURI+"bannerImage";
-    public static final String PORTAL_FLAG2VALUES = vitroURI+"flag2Values";
-    public static final String PORTAL_FLAG1VALUES = vitroURI+"flag1Values";
     public static final String PORTAL_CONTACTMAIL = vitroURI+"contactMail";
     public static final String PORTAL_CORRECTIONMAIL = vitroURI+"correctionMail";
     public static final String PORTAL_SHORTHAND = vitroURI+"shortHand";
@@ -165,9 +156,6 @@ public class VitroVocabulary {
     public static final String PORTAL_ACKNOWLEGETEXT = vitroURI+"acknowledgeText";
     public static final String PORTAL_BANNERWIDTH = vitroURI+"bannerWidth";
     public static final String PORTAL_BANNERHEIGHT = vitroURI+"bannerHeight";
-    public static final String PORTAL_FLAG3VALUES = vitroURI+"flag3Values";
-    public static final String PORTAL_FLAG2NUMERIC = vitroURI+"flag2Numeric";
-    public static final String PORTAL_FLAG3NUMERIC = vitroURI+"flag3Numeric";
     public static final String PORTAL_COPYRIGHTURL = vitroURI+"copyrightURL";
     public static final String PORTAL_COPYRIGHTANCHOR = vitroURI+"copyrightAnchor";
     public static final String PORTAL_ROOTBREADCRUMBURL = vitroURI+"rootBreadCrumbURL";
@@ -177,11 +165,7 @@ public class VitroVocabulary {
     public static final String PORTAL_LOGOTYPEWIDTH = vitroURI+"logotypeWidth";
     public static final String PORTAL_IMAGETHUMBWIDTH = vitroURI+"imageThumbWidth";
     // reusing displayRank property above
-    public static final String PORTAL_FLAG1SEARCHFILTERING = vitroURI+"flag1SearchFiltering";
-    public static final String PORTAL_FLAG2SEARCHFILTERING = vitroURI+"flag2SearchFiltering";
-    public static final String PORTAL_FLAG3SEARCHFILTERING = vitroURI+"flag3SearchFiltering";
     public static final String PORTAL_URLPREFIX = vitroURI + "urlPrefix";
-    public static final String PORTAL_FLAG1FILTERING = vitroURI+"flag1Filtering";
 
     // ================ Vitro Tab vocabulary ================================
 

@@ -25,7 +25,6 @@ import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageTabs;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
 import edu.cornell.mannlib.vitro.webapp.beans.TabIndividualRelation;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -51,7 +50,6 @@ public class TabEditController extends BaseEditController {
     	}
 
         VitroRequest vreq = new VitroRequest(request);
-        Portal portal = vreq.getPortal();
 
         // we need to extract the keyword id from a Fetch parameter
         String tabIdStr = request.getParameter("id");
@@ -133,7 +131,7 @@ public class TabEditController extends BaseEditController {
             Tab parent = parentIt.next();
             Checkbox cb = new Checkbox();
             //cb.setBody(parent.getTitle());
-            cb.setBody("<a href=\"tabEdit?home="+portal.getPortalId()+"&amp;id="+parent.getTabId()+"\">"+parent.getTitle()+"</a>");
+            cb.setBody("<a href=\"tabEdit?id="+parent.getTabId()+"\">"+parent.getTitle()+"</a>");
             cb.setValue(Integer.toString(parent.getTabId()));
             cb.setChecked(false);
             parentList.add(cb);
@@ -148,7 +146,7 @@ public class TabEditController extends BaseEditController {
             Checkbox cb = new Checkbox();
             cb.setValue(Integer.toString(child.getTabId()));
             //cb.setBody(child.getTitle());
-            cb.setBody("<a href=\"tabEdit?home="+portal.getPortalId()+"&amp;id="+child.getTabId()+"\">"+child.getTitle()+"</a>");
+            cb.setBody("<a href=\"tabEdit?id="+child.getTabId()+"\">"+child.getTitle()+"</a>");
             cb.setChecked(false);
             childList.add(cb);
         }
@@ -199,9 +197,8 @@ public class TabEditController extends BaseEditController {
         request.setAttribute("epoKey",epo.getKey());
         request.setAttribute("tab", t);
         request.setAttribute("bodyJsp","/templates/edit/specific/tabs_edit.jsp");
-        request.setAttribute("portalBean",portal);
         request.setAttribute("title","Tab Control Panel");
-        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
+        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
             rd.forward(request, response);

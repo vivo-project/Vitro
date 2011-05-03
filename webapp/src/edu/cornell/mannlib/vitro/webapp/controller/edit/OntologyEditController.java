@@ -20,7 +20,6 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
@@ -86,13 +85,11 @@ public class OntologyEditController extends BaseEditController {
         request.setAttribute("realURI", realURI);
         request.setAttribute("exportURL", request.getContextPath() + Controllers.EXPORT_RDF);
         
-        Portal portal = (new VitroRequest(request)).getPortal();
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("epoKey",epo.getKey());
         request.setAttribute("bodyJsp","/templates/edit/specific/ontologies_edit.jsp");
-        request.setAttribute("portalBean",portal);
         request.setAttribute("title","Ontology Control Panel");
-        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
+        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+request.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
             rd.forward(request, response);

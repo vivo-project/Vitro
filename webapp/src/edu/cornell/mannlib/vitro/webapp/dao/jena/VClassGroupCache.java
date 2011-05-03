@@ -86,21 +86,6 @@ public class VClassGroupCache{
         _groupList.clear();
     }   
     
-    /**
-     * May return null.
-     * @deprecated use getGroup(String vlCassGroupURI) instead.
-     */
-    public VClassGroup getGroup( int portalId, String vClassGroupURI ){
-        if( vClassGroupURI == null || vClassGroupURI.isEmpty() )
-            return null;
-        List<VClassGroup> cgList = getGroups(portalId);
-        for( VClassGroup cg : cgList ){
-            if( vClassGroupURI.equals( cg.getURI()))
-                return cg;
-        }
-        return null;
-    }
-    
     public VClassGroup getGroup(  String vClassGroupURI ){
         if( vClassGroupURI == null || vClassGroupURI.isEmpty() )
             return null;

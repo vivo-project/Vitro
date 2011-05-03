@@ -4,11 +4,13 @@ package edu.cornell.mannlib.vitro.webapp.dao;
 
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+
 public interface ApplicationDao {
 
-	public boolean isFlag1Active();
-	
-	public boolean isFlag2Active();
+    public ApplicationBean getApplicationBean();
+    
+    public void updateApplicationBean(ApplicationBean appBean);
 	
 	public List<String> getExternallyLinkedNamespaces();
 	

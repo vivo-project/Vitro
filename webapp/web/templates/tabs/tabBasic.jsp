@@ -4,7 +4,6 @@
 <%@ page import="org.apache.commons.logging.LogFactory" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.web.TabWebUtil" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Tab" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Portal" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 <%@ page errorPage="/error.jsp"%>
 <% /***********************************************
@@ -44,15 +43,9 @@
     /***************************************************
     nac26 2008-05-08 following brian's lead from menu.jsp to get the portalId so it can be added to the tab links */
     final Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.web.tabBasic.jsp");
-    
-    Portal portal = (Portal)request.getAttribute("portalBean");
-    int portalId = -1;
-    if (portal==null) {
-        log.error("Attribute 'portalBean' missing or null; portalId defaulted to 1");
-        portalId=1;
-    } else {
-        portalId=portal.getPortalId();
-    }
+
+    int portalId = 1;
+
     /**************************************************/
 
     String tabId = request.getParameter("tabId");

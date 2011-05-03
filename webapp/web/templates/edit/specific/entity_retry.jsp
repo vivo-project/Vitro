@@ -20,22 +20,6 @@
         </td>
     </tr>
 
-    
-    <tr class='editformcell' id='specificTypeTr'>
-
-        <td style="width:50%;" valign="top" id="specificTypeTd" colspan="1">
-	        <b>Specific Type</b><br/>
-				<select style="width:80%;" name="Moniker" id="Moniker">
-					<form:option name="Moniker"/>
-				</select>
-				<p class="error"><form:error name="Moniker"/></p>
-		</td>
-		
-		<td id="newMonikerTd" valign="top">If [new moniker] is selected, enter here:<br/>
-                <input id="MonikerSelectAlt" name="Moniker" value="<form:value name="Moniker"/>" disabled="disabled" />
-                <i>otherwise leave this field blank</i>
-        </td>
-    </tr>
     <tr class="editformcell" id='urlTr'>
         <td id="urlTd" valign="bottom" colspan="1">
 			<b>URL</b><br />
@@ -74,25 +58,6 @@
         	<b>Description</b> <em>Optional.  Consider using more specific datatype properties where possible.</em><br/>
                 <textarea id="Description" name="Description" ROWS="15" COLS="115" wrap="physical"><form:value name="Description"/></textarea>
                 <p class="error"><form:error name="Description"/></p>
-        </td>
-    </tr>
-    <tr class="editformcell" id='sunriseTr'>
-        <td id="sunriseTd" valign="bottom">
-			<b>Sunrise</b>, or date first visible (e.g., 2004-09-17) <br/><em>Optional; populated primarily for entities such as new releases that are auto-linked to tabs for a spcified number of days following their release date</em><br/>
-                <input type="text" name="Sunrise" value="<form:value name="Sunrise"/>" size="14" maxlength="14"><br>
-                <p class="error"><form:error name="Sunrise"/></p>
-        </td>
-        <td id="sunsetTd" valign="bottom">
-			<b>Sunset</b>, or date stops being visible (e.g., 2004-09-18) <br/><em>Optional; used only to hide entities based on a date rather than the Display Status specified above.<br/>After this date, an entity will disappear except when searching in "entire database" mode</em><br/>
-                <input type="text" name="Sunset" value="<form:value name="Sunset"/>" size="19" maxlength="19"><br>
-                <p class="error"><form:error name="Sunset"/></p>
-        </td>
-    </tr>
-    <tr class="editformcell" id='timekeyTr'>
-        <td id="timekeyTd" valign="bottom">
-			<b>Timekey</b>, or date and time for event sort order (e.g., 2004-09-17 09:30:00) <br/><em>Optional; populated primarily for entities such as seminars that are auto-linked to tabs for a specified number of days leading up to the event</em><br/>
-                <input type="text" name="Timekey" value="<form:value name="Timekey"/>" size="19" maxlength="19"><br>
-                <p class="error"><form:error name="Timekey"/></p>
         </td>
     </tr>
 

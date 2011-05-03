@@ -20,7 +20,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Datatype;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -40,7 +39,6 @@ public class DatatypePropertiesListingController extends BaseEditController {
         }
 
         VitroRequest vrequest = new VitroRequest(request);
-        Portal portal = vrequest.getPortal();
 
         String noResultsMsgStr = "No data properties found";
 
@@ -114,7 +112,7 @@ public class DatatypePropertiesListingController extends BaseEditController {
                     results.add("XX"); // column 1
                     String nameStr = prop.getPublicName()==null ? prop.getName()==null ? prop.getURI()==null ? "(no name)" : prop.getURI() : prop.getName() : prop.getPublicName();
                     try {
-                        results.add("<a href=\"datapropEdit?uri="+URLEncoder.encode(prop.getURI(),"UTF-8")+"&amp;home="+portal.getPortalId()+"\">"+nameStr+"</a> <span style='font-style:italic; color:\"grey\";'>"+prop.getLocalNameWithPrefix()+"</span>"); // column 2
+                        results.add("<a href=\"datapropEdit?uri="+URLEncoder.encode(prop.getURI(),"UTF-8")+"\">"+nameStr+"</a> <span style='font-style:italic; color:\"grey\";'>"+prop.getLocalNameWithPrefix()+"</span>"); // column 2
                     } catch (Exception e) {
                         results.add(nameStr + " <span style='font-style:italic; color:\"grey\";'>" + prop.getLocalNameWithPrefix() + "</span>"); // column 2
                     }
@@ -124,7 +122,7 @@ public class DatatypePropertiesListingController extends BaseEditController {
                         vc = vcDao.getVClassByURI(prop.getDomainClassURI());
                         if (vc != null) {
                             try {
-                                domainStr="<a href=\"vclassEdit?uri="+URLEncoder.encode(prop.getDomainClassURI(),"UTF-8")+"&amp;home="+portal.getPortalId()+"\">"+vc.getName()+"</a>";
+                                domainStr="<a href=\"vclassEdit?uri="+URLEncoder.encode(prop.getDomainClassURI(),"UTF-8")+"\">"+vc.getName()+"</a>";
                             } catch (UnsupportedEncodingException e) {
                                 e.printStackTrace();
                             }
@@ -153,12 +151,10 @@ public class DatatypePropertiesListingController extends BaseEditController {
         request.setAttribute("columncount",new Integer(NUM_COLS));
         request.setAttribute("suppressquery","true");
         request.setAttribute("title","Data Properties");
-        request.setAttribute("portalBean",portal);
         request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
         request.setAttribute("horizontalJspAddButtonUrl", Controllers.RETRY_URL);
         request.setAttribute("horizontalJspAddButtonText", "Add new data property");
         request.setAttribute("horizontalJspAddButtonControllerParam", "Dataprop");
-        request.setAttribute("home", portal.getPortalId());
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         try {
             rd.forward(request,response);

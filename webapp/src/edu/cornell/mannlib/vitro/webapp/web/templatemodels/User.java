@@ -54,14 +54,4 @@ public class User extends BaseTemplateModel {
     	return PolicyHelper.isAuthorizedForActions(vreq, RevisionInfoController.REQUIRED_ACTIONS);
     }
     
-    public boolean getShowFlag1SearchField() {
-        boolean showFlag1SearchField = false;
-        if (loginBean.isLoggedInAtLeast(Access.FILTER_SECURITY.requiredLoginLevel)) {
-            ApplicationBean appBean = vreq.getAppBean();            
-            if (appBean.isFlag1Active()) {
-                showFlag1SearchField = true;
-            }
-        }
-        return showFlag1SearchField;
-    }
 }

@@ -9,10 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 /**
  * Intended to generate the bread crumb html element.
@@ -46,17 +44,17 @@ public class BreadCrumbsUtil {
             int rootId = TabWebUtil.getRootTabId(request); // also has to be able to find a portal to get a root tab is if none in request
             int depth = 0;
             // this is a third, final shot at getting a populated portal if none was in the request
-            Portal portal= vreq.getPortal();
+            
+            ApplicationBean application = vreq.getAppBean();
 
             //get the "RootBreadCrumb" if there is one
-            ret += getRootBreadCrumb(vreq, separator, portal);
+            ret += getRootBreadCrumb(vreq, separator, application);
 
             List chain = vreq.getWebappDaoFactory().getTabDao().getTabHierarchy(tabId,rootId);
             for(int i=0; i<chain.size(); i++){
                 Integer id = (Integer)chain.get(i);
                 if( rootId == id.intValue() ){
                     depth = TabWebUtil.PRIMARY;
-                    label = portal.getAppName();
                     spacer = "";
                 } else {
                     depth =  i-1;
@@ -76,15 +74,15 @@ public class BreadCrumbsUtil {
      * @param req
      * @return
      */
-    public static String getRootBreadCrumb(VitroRequest vreq,String spacer,Portal portal){
+    public static String getRootBreadCrumb(VitroRequest vreq,String spacer,ApplicationBean application){
         String crumb = "";
-        if (portal==null){
+        if (application==null){
             log.error("getRootBreadCrumb() was passed a null portal");
-        } else if (portal.getRootBreadCrumbURL() != null &&
-            portal.getRootBreadCrumbAnchor() != null) {
+        } else if (application.getRootBreadCrumbURL() != null &&
+            application.getRootBreadCrumbAnchor() != null) {
             spacer = (spacer == null)? "": spacer;
-            crumb="<a href='"+portal.getRootBreadCrumbURL()
-                + "' > " + portal.getRootBreadCrumbAnchor() + "</a>"
+            crumb="<a href='"+application.getRootBreadCrumbURL()
+                + "' > " + application.getRootBreadCrumbAnchor() + "</a>"
                 + spacer;
         }
         return crumb;

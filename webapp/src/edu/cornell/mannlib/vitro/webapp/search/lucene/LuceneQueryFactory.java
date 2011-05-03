@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.search.lucene;
 import org.apache.lucene.analysis.Analyzer;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryFactory;
@@ -21,7 +20,7 @@ public class LuceneQueryFactory implements VitroQueryFactory {
         this.defaultField = defaultField;
     }    
 
-    public VitroQuery getQuery(VitroRequest request, PortalFlag portalState) throws SearchException {
+    public VitroQuery getQuery(VitroRequest request) throws SearchException {
         //there should be a better way to integrate this with LuceneQuery
         //here we check that the request has the parameters that we need to
         //make the query.  If it does not then we return null.    	
@@ -31,7 +30,7 @@ public class LuceneQueryFactory implements VitroQueryFactory {
         if( txt.length() > MAX_QUERY_LENGTH )
             throw new SearchException("The search was too long. The maximum " +
             		"query length is " + MAX_QUERY_LENGTH );
-        LuceneQuery query = new LuceneQuery(request, portalState, analyzer, defaultField );
+        LuceneQuery query = new LuceneQuery(request, analyzer, defaultField );
         return query;
     }
 

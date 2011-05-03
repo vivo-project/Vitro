@@ -43,7 +43,6 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
@@ -60,13 +59,11 @@ public class RefactorOperationController extends BaseEditController {
             log.error(this.getClass().getName()+" caught exception calling doGet()");
         }
 		VitroRequest vreq = new VitroRequest(request);
-		Portal portal = vreq.getPortal();
 
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("bodyJsp", Controllers.CHECK_DATATYPE_PROPERTIES);
-        request.setAttribute("portalBean",portal);
         request.setAttribute("title","Check Datatype Properties");
-        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
+        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
         
 		OntModel ontModel = (OntModel) getServletContext().getAttribute("baseOntModel");
 		ontModel.enterCriticalSection(Lock.WRITE);
@@ -267,14 +264,10 @@ public class RefactorOperationController extends BaseEditController {
 				}
 			}
 			if (controllerStr != null) {
-				int portalId = -1;
-				try {
-					portalId = request.getPortalId();
-				} catch (Throwable t) {}
 				try {
 					newURIStr = URLEncoder.encode(newURIStr, "UTF-8");
 				} catch (UnsupportedEncodingException e) {}
-				redirectStr = controllerStr+"?home="+((portalId>-1) ? portalId : "" )+"&uri="+newURIStr;
+				redirectStr = controllerStr+"?uri="+newURIStr;
 			}
 		}
 		

@@ -18,7 +18,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -34,7 +33,6 @@ public class PropertyGroupsListingController extends BaseEditController {
 	    }
 	
         VitroRequest vrequest = new VitroRequest(request);
-        Portal portal = vrequest.getPortal();
 
         //need to figure out how to structure the results object to put the classes underneath
 
@@ -57,7 +55,7 @@ public class PropertyGroupsListingController extends BaseEditController {
                 results.add("XX");
                 if (pg.getName() != null) {
                     try {
-                        results.add("<a href=\"./editForm?uri="+URLEncoder.encode(pg.getURI(),"UTF-8")+"&amp;home="+portal.getPortalId()+"&amp;controller=PropertyGroup\">"+pg.getName()+"</a>");
+                        results.add("<a href=\"./editForm?uri="+URLEncoder.encode(pg.getURI(),"UTF-8")+"&amp;controller=PropertyGroup\">"+pg.getName()+"</a>");
                     } catch (Exception e) {
                         results.add(pg.getName());
                     }
@@ -121,12 +119,10 @@ public class PropertyGroupsListingController extends BaseEditController {
         request.setAttribute("columncount",new Integer(5));
         request.setAttribute("suppressquery","true");
         request.setAttribute("title","Property Groups");
-        request.setAttribute("portalBean",portal);
         request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
         request.setAttribute("horizontalJspAddButtonUrl", Controllers.RETRY_URL);
         request.setAttribute("horizontalJspAddButtonText", "Add new property group");
         request.setAttribute("horizontalJspAddButtonControllerParam", "PropertyGroup");
-        request.setAttribute("home", portal.getPortalId());
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         try {
             rd.forward(request,response);

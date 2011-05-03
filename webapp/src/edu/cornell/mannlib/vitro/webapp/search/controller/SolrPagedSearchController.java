@@ -27,15 +27,15 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.util.Version;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -133,7 +133,6 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
         boolean wasHtmlRequested = ! wasXmlRequested; 
         
         try {
-            Portal portal = vreq.getPortal();
             
             //make sure an IndividualDao is available 
             if( vreq.getWebappDaoFactory() == null 
@@ -144,6 +143,8 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             IndividualDao iDao = vreq.getWebappDaoFactory().getIndividualDao();
             VClassGroupDao grpDao = vreq.getWebappDaoFactory().getVClassGroupDao();
             VClassDao vclassDao = vreq.getWebappDaoFactory().getVClassDao();
+            
+            ApplicationBean appBean = vreq.getAppBean();
             
             log.debug("IndividualDao is " + iDao.toString() + " Public classes in the classgroup are " + grpDao.getPublicGroupsWithVClasses().toString());
             log.debug("VClassDao is "+ vclassDao.toString() );            
@@ -370,7 +371,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
                     .getIndividualTemplateModelList(individuals, vreq));
 
             body.put("querytext", qtxt);
-            body.put("title", qtxt + " - " + portal.getAppName()
+            body.put("title", qtxt + " - " + appBean.getApplicationName()
                     + " Search Results");
             
             body.put("hitsLength", hitCount);
@@ -680,9 +681,9 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
         return new ExceptionResponseValues(getTemplate(f,Result.ERROR), body, e);
     }
     
-    private TemplateResponseValues doBadQuery(Portal portal, String query, Format f) {
+    private TemplateResponseValues doBadQuery(ApplicationBean appBean, String query, Format f) {
         Map<String, Object> body = new HashMap<String, Object>();
-        body.put("title", "Search " + portal.getAppName());
+        body.put("title", "Search " + appBean.getApplicationName());
         body.put("query", query);
         return new TemplateResponseValues(getTemplate(f,Result.BAD_QUERY), body);
     }

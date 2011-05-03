@@ -21,7 +21,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -47,7 +46,6 @@ public class UserEditController extends BaseEditController {
     	}
 
         VitroRequest vreq = new VitroRequest(request);
-        Portal portal = vreq.getPortal();
 
         UserDao uDao = vreq.getFullWebappDaoFactory().getUserDao();
 
@@ -120,9 +118,8 @@ public class UserEditController extends BaseEditController {
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("user", u);
         request.setAttribute("bodyJsp","/templates/edit/specific/user_edit.jsp");
-        request.setAttribute("portalBean",portal);
         request.setAttribute("title","User Account Control Panel");
-        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
+        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
             rd.forward(request, response);

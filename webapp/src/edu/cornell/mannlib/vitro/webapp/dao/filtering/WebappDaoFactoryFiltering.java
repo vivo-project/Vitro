@@ -24,7 +24,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
-import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
@@ -134,7 +133,7 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
     public TabDao getTabDao() {
         if( filteringTabDao == null)
             filteringTabDao =
-                new TabDaoFiltering(innerWebappDaoFactory.getTabDao(),innerWebappDaoFactory.getPortalDao(),innerWebappDaoFactory.getApplicationDao(),filters);
+                new TabDaoFiltering(innerWebappDaoFactory.getTabDao(),innerWebappDaoFactory.getApplicationDao(),filters);
         return filteringTabDao;
     }
 
@@ -211,10 +210,6 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
 
     public ApplicationDao getApplicationDao() {
     	return innerWebappDaoFactory.getApplicationDao();
-    }
-    
-    public PortalDao getPortalDao() {
-        return innerWebappDaoFactory.getPortalDao();
     }
 
 ///////////////////////////////////////////////////////////////////

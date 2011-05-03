@@ -21,8 +21,6 @@ import com.hp.hpl.jena.sparql.resultset.ResultSetFormat;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-
 
 /**
  *  This servlet works as a RequestDispatcher to direct to the sparl query builder page.
@@ -106,11 +104,9 @@ public class SparqlQueryBuilderServlet extends BaseEditController {
             //res.setStatus(HttpServletResponse.SC_BAD_REQUEST);        	            
             
             VitroRequest vreq = new VitroRequest(req);
-            Portal portal = vreq.getPortal();
             
             /* Code change completed */
             
-            req.setAttribute("portalBean",portal);
             // nac26: 2009-09-25 - this was causing problems in safari on localhost installations because the href did not include the context.  The edit.css is not being used here anyway (or anywhere else for that matter)
             // req.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
             req.setAttribute("title","SPARQL Query Builder");

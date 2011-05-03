@@ -37,9 +37,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexer;
-import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 import edu.cornell.mannlib.vitro.webapp.web.TabWebUtil;
-import freemarker.template.TemplateModel;
 
 /**
  * Produces the entity lists for tabs.
@@ -213,14 +211,14 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
 
         //try to get the URIs of the required individuals from the lucene index
         IndexSearcher index = LuceneIndexFactory.getIndexSearcher(getServletContext());
-        boolean isSinglePortal = request.getWebappDaoFactory().getPortalDao().isSinglePortal();
+        
         BooleanQuery query = null;
         if( tab.isAutoLinked() ){
-            query = getQuery(tab, autoLinkedUris, null, alpha, isSinglePortal);
+            query = getQuery(tab, autoLinkedUris, null, alpha);
         }else if (tab.isManualLinked() ){
-            query = getQuery(tab, null, manuallyLinkedUris, alpha, isSinglePortal);
+            query = getQuery(tab, null, manuallyLinkedUris, alpha);
         }else if ( tab.isMixedLinked() ){
-            query = getQuery(tab, autoLinkedUris, manuallyLinkedUris, alpha, isSinglePortal);
+            query = getQuery(tab, autoLinkedUris, manuallyLinkedUris, alpha);
         }else{
            log.error("Tab " + tab.getTabId() + " is neither manually, auto nor mixed. ");   
         }
@@ -390,7 +388,7 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
      * get their individuals using lucene, see doManual(). 
      * 
      */
-    private BooleanQuery getQuery(Tab tab, List<String> vclassUris, List<String> manualUris, String alpha , boolean isSinglePortal){
+    private BooleanQuery getQuery(Tab tab, List<String> vclassUris, List<String> manualUris, String alpha){
         BooleanQuery query = new BooleanQuery();
         try{
             
@@ -408,25 +406,7 @@ public void doGet( HttpServletRequest req, HttpServletResponse response )
                        }
                    }
                    typeQuery.add(queryForTypes, BooleanClause.Occur.MUST);                    
-                   
-                   //check for portal filtering only on auto linked queries
-                   if( ! isSinglePortal ){
-                       int tabPortal = tab.getPortalId();
-                       if( tabPortal < 16 ){ //could be a normal portal
-                           typeQuery.add(
-                                   new TermQuery( new Term(Entity2LuceneDoc.term.PORTAL, Integer.toString(1 << tab.getPortalId() ))),
-                                   BooleanClause.Occur.MUST);
-                       }else{ //could be a combined portal
-                           BooleanQuery tabQueries = new BooleanQuery();
-                           Long[] ids= FlagMathUtils.numeric2numerics(tabPortal);
-                           for( Long id : ids){                               
-                               tabQueries.add(
-                                       new TermQuery( new Term(Entity2LuceneDoc.term.PORTAL,id.toString()) ),
-                                       BooleanClause.Occur.SHOULD);
-                           }
-                           typeQuery.add(tabQueries,BooleanClause.Occur.MUST);
-                       }
-                   }                                      
+                                
             }
            
             //make query for manually linked individuals

@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 
 public class ContactMailServlet extends VitroHttpServlet {
@@ -64,13 +64,15 @@ public class ContactMailServlet extends VitroHttpServlet {
         throws ServletException, IOException {
     	
         VitroRequest vreq = new VitroRequest(request);
-        Portal portal = vreq.getPortal();
+        
+        ApplicationBean appBean = vreq.getAppBean();
+        
         String statusMsg = null; // holds the error status
         
         if (smtpHost==null || smtpHost.equals("")){
             statusMsg = "This application has not yet been configured to send mail " +
             		"-- smtp host has not been identified in the Configuration Properties file.";
-            redirectToError(response, statusMsg, portal);
+            redirectToError(response, statusMsg);
             return;
         }
 
@@ -81,7 +83,7 @@ public class ContactMailServlet extends VitroHttpServlet {
         String validationMessage = validateInput(webusername, webuseremail,
         		comments); 
         if (validationMessage != null) {
-        	redirectToError(response, validationMessage, portal);
+        	redirectToError(response, validationMessage);
         	return;
         }
         webusername = webusername.trim();
@@ -121,29 +123,29 @@ public class ContactMailServlet extends VitroHttpServlet {
         String deliveryfrom = null;
 
         if ("comment".equals(formType)) {
-            if (portal.getContactMail() == null || portal.getContactMail().trim().length()==0) {
-            	log.error("No contact mail address defined in current portal "+portal.getPortalId());
+            if (appBean.getContactMail() == null || appBean.getContactMail().trim().length()==0) {
+            	log.error("No contact mail address defined in current application");
                 throw new Error(
                         "To establish the Contact Us mail capability the system administrators must  "
                         + "specify an email address in the current portal.");
             } else {
-                deliverToArray = portal.getContactMail().split(",");
+                deliverToArray = appBean.getContactMail().split(",");
             }
-            deliveryfrom   = "Message from the "+portal.getAppName()+" Contact Form";
+            deliveryfrom   = "Message from the "+appBean.getApplicationName()+" Contact Form";
         } else if ("correction".equals(formType)) {
-            if (portal.getCorrectionMail() == null || portal.getCorrectionMail().trim().length()==0) {
-            	log.error("Expecting one or more correction email addresses to be specified in current portal "+portal.getPortalId()+"; will attempt to use contact mail address");
-                if (portal.getContactMail() == null || portal.getContactMail().trim().length()==0) {
-                	log.error("No contact mail address or correction mail address defined in current portal "+portal.getPortalId());
+            if (appBean.getCorrectionMail() == null || appBean.getCorrectionMail().trim().length()==0) {
+            	log.error("Expecting one or more correction email addresses to be specified in current application; will attempt to use contact mail address");
+                if (appBean.getContactMail() == null || appBean.getContactMail().trim().length()==0) {
+                	log.error("No contact mail address or correction mail address defined in current application");
                 } else {
-                    deliverToArray = portal.getContactMail().split(",");
+                    deliverToArray = appBean.getContactMail().split(",");
                 }
             } else {
-                deliverToArray = portal.getCorrectionMail().split(",");
+                deliverToArray = appBean.getCorrectionMail().split(",");
             }
-            deliveryfrom   = "Message from the "+portal.getAppName()+" Correction Form (ARMANN-nospam)";
+            deliveryfrom   = "Message from the "+appBean.getApplicationName()+" Correction Form (ARMANN-nospam)";
         } else {
-            deliverToArray = portal.getContactMail().split(",");
+            deliverToArray = appBean.getContactMail().split(",");
             statusMsg = SPAM_MESSAGE ;
             spamReason = "The form specifies no delivery type.";
         }
@@ -197,10 +199,10 @@ public class ContactMailServlet extends VitroHttpServlet {
         // Redirect to the appropriate confirmation page
         if (statusMsg == null && spamReason == null) {
             // message was sent successfully
-            redirectToConfirmation(response, statusMsg, portal);
+            redirectToConfirmation(response, statusMsg);
         } else {
             // exception occurred
-            redirectToError( response, statusMsg, portal);
+            redirectToError( response, statusMsg);
         }
 
     }
@@ -213,15 +215,13 @@ public class ContactMailServlet extends VitroHttpServlet {
     }
 
     private void redirectToConfirmation(HttpServletResponse response,
-    		String statusMsg, Portal portal) throws IOException {
-    	response.sendRedirect( "test?bodyJsp=" + CONFIRM_PAGE + "&home=" + 
-    			portal.getPortalId() );
+    		String statusMsg) throws IOException {
+    	response.sendRedirect( "test?bodyJsp=" + CONFIRM_PAGE + "&home=" );
     }
     
-    private void redirectToError(HttpServletResponse response, String statusMsg, 
-    		Portal portal) throws IOException {
-    	response.sendRedirect( "test?bodyJsp=" + ERR_PAGE + "&ERR=" + statusMsg 
-    			+ "&home=" + portal.getPortalId() );
+    private void redirectToError(HttpServletResponse response, String statusMsg) 
+            throws IOException {
+    	response.sendRedirect("test?bodyJsp=" + ERR_PAGE + "&ERR=" + statusMsg);
     }
     
     /** Intended to mangle url so it can get through spam filtering

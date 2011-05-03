@@ -235,36 +235,6 @@ public class IndividualFiltering implements Individual {
         return _innerIndividual.getField(fieldName);
     }
 
-    @Override
-    public int getFlag1Numeric() {
-        return _innerIndividual.getFlag1Numeric();
-    }
-
-    @Override
-    public String getFlag1Set() {
-        return _innerIndividual.getFlag1Set();
-    }
-
-    @Override
-    public int getFlag2Numeric() {
-        return _innerIndividual.getFlag2Numeric();
-    }
-
-    @Override
-    public String getFlag2Set() {
-        return _innerIndividual.getFlag2Set();
-    }
-
-    @Override
-    public int getFlag3Numeric() {
-        return _innerIndividual.getFlag3Numeric();
-    }
-
-    @Override
-    public String getFlag3Set() {
-        return _innerIndividual.getFlag3Set();
-    }
-
 	@Override
 	public String getMainImageUri() {
 		return _innerIndividual.getMainImageUri();
@@ -424,36 +394,6 @@ public class IndividualFiltering implements Individual {
     }
 
     @Override
-    public void setFlag1Numeric(int i) {
-        _innerIndividual.setFlag1Numeric(i);
-    }
-
-    @Override
-    public void setFlag1Set(String in) {
-        _innerIndividual.setFlag1Set(in);
-    }
-
-    @Override
-    public void setFlag2Numeric(int i) {
-        _innerIndividual.setFlag2Numeric(i);
-    }
-
-    @Override
-    public void setFlag2Set(String in) {
-        _innerIndividual.setFlag2Set(in);
-    }
-
-    @Override
-    public void setFlag3Numeric(int i) {
-        _innerIndividual.setFlag3Numeric(i);
-    }
-
-    @Override
-    public void setFlag3Set(String in) {
-        _innerIndividual.setFlag3Set(in);
-    }
-
-    @Override
 	public void setMainImageUri(String mainImageUri) {
     	_innerIndividual.setMainImageUri(mainImageUri);
 	}
@@ -560,11 +500,6 @@ public class IndividualFiltering implements Individual {
     @Override
     public void sortForDisplay() {
         _innerIndividual.sortForDisplay();
-    }
-
-    @Override
-    public boolean doesFlag1Match(int flagBitMask) {
-        return _innerIndividual.doesFlag1Match(flagBitMask);
     }
 
     @Override

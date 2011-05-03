@@ -30,7 +30,6 @@ import edu.cornell.mannlib.vedit.validator.Validator;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.setup.SelfEditingPolicySetup;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -99,16 +98,10 @@ public class UserRetryController extends BaseEditController {
         //set up any listeners
         epo.setChangeListenerList(Collections.singletonList(new UserPasswordChangeListener()));
 
-        //set portal flag to current portal
-        Portal currPortal = (Portal) request.getAttribute("portalBean");
-        int currPortalId = 1;
-        if (currPortal != null) {
-            currPortalId = currPortal.getPortalId();
-        }
         //make a postinsert pageforwarder that will send us to a new class's fetch screen
-        epo.setPostInsertPageForwarder(new UserInsertPageForwarder(currPortalId));
+        epo.setPostInsertPageForwarder(new UserInsertPageForwarder());
         //make a postdelete pageforwarder that will send us to the list of classes
-        epo.setPostDeletePageForwarder(new UrlForwarder("listUsers?home="+currPortalId));
+        epo.setPostDeletePageForwarder(new UrlForwarder("listUsers"));
 
         //set the getMethod so we can retrieve a new bean after we've inserted it
         try {
@@ -197,15 +190,10 @@ public class UserRetryController extends BaseEditController {
     }
 
     class UserInsertPageForwarder implements PageForwarder {
-        private int portalId = 1;
-
-        public UserInsertPageForwarder(int currPortalId) {
-            portalId = currPortalId;
-        }
 
         @Override
 		public void doForward(HttpServletRequest request, HttpServletResponse response, EditProcessObject epo){
-            String newUserUrl = "userEdit?home="+portalId+"&uri=";
+            String newUserUrl = "userEdit?uri=";
             User u = (User) epo.getNewBean();
             try {
                 newUserUrl += URLEncoder.encode(u.getURI(),"UTF-8");

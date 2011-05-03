@@ -28,7 +28,6 @@ import edu.cornell.mannlib.vedit.validator.impl.XMLNameValidator;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.Classes2Classes;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -117,16 +116,10 @@ public class VclassRetryController extends BaseEditController {
         }
         epo.setChangeListenerList(changeListenerList);
 
-        //set portal flag to current portal
-        Portal currPortal = (Portal) request.getAttribute("portalBean");
-        int currPortalId = 1;
-        if (currPortal != null) {
-            currPortalId = currPortal.getPortalId();
-        }
         //make a postinsert pageforwarder that will send us to a new class's fetch screen
-        epo.setPostInsertPageForwarder(new VclassInsertPageForwarder(currPortalId));
+        epo.setPostInsertPageForwarder(new VclassInsertPageForwarder());
         //make a postdelete pageforwarder that will send us to the list of classes
-        epo.setPostDeletePageForwarder(new UrlForwarder("showClassHierarchy?home="+currPortalId));
+        epo.setPostDeletePageForwarder(new UrlForwarder("showClassHierarchy"));
 
         //set the getMethod so we can retrieve a new bean after we've inserted it
         try {
@@ -218,14 +211,9 @@ public class VclassRetryController extends BaseEditController {
     }
 
     class VclassInsertPageForwarder implements PageForwarder {
-        private int portalId = 1;
-
-        public VclassInsertPageForwarder(int currPortalId) {
-            portalId = currPortalId;
-        }
 
         public void doForward(HttpServletRequest request, HttpServletResponse response, EditProcessObject epo){
-            String newVclassUrl = "vclassEdit?home="+portalId+"&uri=";
+            String newVclassUrl = "vclassEdit?uri=";
             VClass vcl = (VClass) epo.getNewBean();
             try {
                 newVclassUrl += URLEncoder.encode(vcl.getURI(),"UTF-8");

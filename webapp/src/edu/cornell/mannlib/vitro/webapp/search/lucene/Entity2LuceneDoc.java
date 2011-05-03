@@ -53,8 +53,6 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         public static String NAMEUNSTEMMED       = "nameunstemmed";
         /** Unaltered name of individual, un-lowercased, un-stemmed, un-tokenized" */
         public static String NAMERAW      = "nameraw";
-        /** portal ( 2 ^ portalId ) */
-        public static String PORTAL     = "portal";
         /** time of index in msec since epoc */
         public static String INDEXEDTIME= "indexedTime";
         /** timekey of entity in yyyymmddhhmm  */
@@ -307,7 +305,6 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
             doc.add( new Field(term.ALLTEXTUNSTEMMED, value, Field.Store.NO, Field.Index.ANALYZED));
         }
         
-        //flagX and portal flags are no longer indexed.
         return doc;
     }           
 

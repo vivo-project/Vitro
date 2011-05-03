@@ -125,7 +125,7 @@ public class BrowseWidget extends Widget {
         VitroRequest vreq = new VitroRequest(request);
         
         VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
-        List<VClassGroup> cgList = vcgc.getGroups(vreq.getPortalId());
+        List<VClassGroup> cgList = vcgc.getGroups();
         
 //        List<VClassGroup> classGroups =
 //            vreq.getWebappDaoFactory().getVClassGroupDao().getPublicGroupsWithVClasses();
@@ -188,7 +188,7 @@ public class BrowseWidget extends Widget {
         //VClassGroup vcg = vreq.getWebappDaoFactory().getVClassGroupDao().getGroupByURI(vcgUri);
         
         VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
-        VClassGroup vcg = vcgc.getGroup(vreq.getPortalId(), vcgUri);        
+        VClassGroup vcg = vcgc.getGroup(vcgUri);        
         
         //vreq.getWebappDaoFactory().getVClassDao().addVClassesToGroup(vcg, false, true);
         ArrayList<VClassTemplateModel> classes = new ArrayList<VClassTemplateModel>(vcg.size());

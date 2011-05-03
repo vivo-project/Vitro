@@ -111,7 +111,6 @@ public interface WebappDaoFactory {
     /* ======================== DAOs for other objects ======================== */
 
     public ApplicationDao getApplicationDao();
-    public PortalDao getPortalDao();
 
     public TabDao getTabDao();
     public TabIndividualRelationDao getTabs2EntsDao();

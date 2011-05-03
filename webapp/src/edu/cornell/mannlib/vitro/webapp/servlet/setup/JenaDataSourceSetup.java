@@ -109,7 +109,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
             ctx.setAttribute("webappDaoFactory",wadf);
             ModelContext.setUnionOntModelSelector(unionOms, ctx);
             
-            ApplicationBean appBean = getApplicationBeanFromOntModel(memModel,wadf);
+            ApplicationBean appBean = wadf.getApplicationDao().getApplicationBean();
             if (appBean != null) {
             	ctx.setAttribute("applicationBean", appBean);
             }
@@ -187,33 +187,6 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
     @Override
 	public void contextDestroyed(ServletContextEvent sce) {
     	// Nothing to do
-    }
-
-    private ApplicationBean getApplicationBeanFromOntModel(OntModel ontModel,WebappDaoFactory wadf) {
-       ClosableIterator appIt = ontModel.listIndividuals(ResourceFactory.createResource(VitroVocabulary.APPLICATION));
-        try {
-              if (appIt.hasNext()) {
-                  Individual appInd = (Individual) appIt.next();
-                  ApplicationBean appBean = new ApplicationBean();
-                  try {
-                      appBean.setMaxPortalId(Integer.decode( ((Literal)appInd.getPropertyValue(ResourceFactory.createProperty(VitroVocabulary.APPLICATION_MAXPORTALID))).getLexicalForm()));
-                  } catch (Exception e) { /* ignore bad value */ }
-                  try {
-                      appBean.setMinSharedPortalId(Integer.decode( ((Literal)appInd.getPropertyValue(ResourceFactory.createProperty(VitroVocabulary.APPLICATION_MINSHAREDPORTALID))).getLexicalForm()));
-                  } catch (Exception e) { /* ignore bad value */ }
-                  try {
-                     appBean.setMaxSharedPortalId(Integer.decode( ((Literal)appInd.getPropertyValue(ResourceFactory.createProperty(VitroVocabulary.APPLICATION_MAXSHAREDPORTALID))).getLexicalForm()));
-                  } catch (Exception e) { /* ignore bad value */}
-                  if( ! wadf.getApplicationDao().isFlag1Active() ){
-                	  appBean.setMaxPortalId(1);
-                  }
-                 return appBean;
-             } else {
-            	 return null;
-             }
-         } finally {
-             appIt.close();
-         }
     }
     
     private void ensureEssentialInterfaceData(OntModel memModel, ServletContextEvent sce, WebappDaoFactory wadf) {

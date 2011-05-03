@@ -28,12 +28,10 @@ import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vedit.validator.impl.XMLNameValidator;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionListener;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -120,19 +118,13 @@ public class PropertyRetryController extends BaseEditController {
         //set up any listeners
         List changeListenerList = new ArrayList();
         //changeListenerList.add(new HiddenFromDisplayListener(getServletContext()));
-        changeListenerList.add(new PropertyRestrictionListener(getServletContext()));
+        //changeListenerList.add(new PropertyRestrictionListener(getServletContext()));
         epo.setChangeListenerList(changeListenerList);
 
-        //set portal flag to current portal
-        Portal currPortal = (Portal) request.getAttribute("portalBean");
-        int currPortalId = 1;
-        if (currPortal != null) {
-            currPortalId = currPortal.getPortalId();
-        }
         //make a postinsert pageforwarder that will send us to a new class's fetch screen
-        epo.setPostInsertPageForwarder(new PropertyInsertPageForwarder(currPortalId));
+        epo.setPostInsertPageForwarder(new PropertyInsertPageForwarder());
         //make a postdelete pageforwarder that will send us to the list of properties
-        epo.setPostDeletePageForwarder(new UrlForwarder("listPropertyWebapps?home="+currPortalId));
+        epo.setPostDeletePageForwarder(new UrlForwarder("listPropertyWebapps"));
 
         //set the getMethod so we can retrieve a new bean after we've inserted it
         try {
@@ -251,14 +243,8 @@ public class PropertyRetryController extends BaseEditController {
     
     class PropertyInsertPageForwarder implements PageForwarder {
 
-        private int portalId = 1;
-
-        public PropertyInsertPageForwarder(int currPortalId) {
-            portalId = currPortalId;
-        }
-
         public void doForward(HttpServletRequest request, HttpServletResponse response, EditProcessObject epo){
-            String newPropertyUrl = "propertyEdit?home="+portalId+"&uri=";
+            String newPropertyUrl = "propertyEdit?uri=";
             ObjectProperty p = (ObjectProperty) epo.getNewBean();
             try {
                 newPropertyUrl += URLEncoder.encode(p.getURI(),"UTF-8");

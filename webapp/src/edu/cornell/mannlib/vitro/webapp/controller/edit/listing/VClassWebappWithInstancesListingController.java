@@ -18,7 +18,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -35,7 +34,6 @@ public class VClassWebappWithInstancesListingController extends BaseEditControll
         }
 
         VitroRequest vrequest = new VitroRequest(request);
-        Portal portal = vrequest.getPortal();
 
         String uriStr = request.getParameter("uri");
 
@@ -108,7 +106,6 @@ public class VClassWebappWithInstancesListingController extends BaseEditControll
         request.setAttribute("columncount",new Integer(NUM_COLS));
         request.setAttribute("suppressquery","true");
         request.setAttribute("title","Class Groups");
-        request.setAttribute("portalBean",portal);
         request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         try {

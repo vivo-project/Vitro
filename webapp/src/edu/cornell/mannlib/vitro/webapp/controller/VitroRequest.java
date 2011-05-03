@@ -22,11 +22,8 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Dataset;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
-import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
-import edu.cornell.mannlib.vitro.webapp.flags.SunsetFlag;
 
 public class VitroRequest implements HttpServletRequest {
 
@@ -139,50 +136,9 @@ public class VitroRequest implements HttpServletRequest {
     	return jenaOntModel;    	
     }
 
-    public Portal getPortal(){
-        return(Portal) getAttribute("portalBean");
-    }
-    public void setPortal(Portal p){
-        setAttribute("portalBean", p);
-        setAttribute("portal", p);
-    }
-    
-    public int getPortalId(){        
-        String idstr =  (String)getAttribute("home");
-        
-        if( idstr == null ){
-            WebappDaoFactory wdf = getWebappDaoFactory();        
-            Portal[] portals = wdf.getPortalDao().getAllPortals().toArray(new Portal[0]);
-            return portals[0].getPortalId();            
-        }
-        
-        try{
-            return Integer.parseInt(idstr);
-        }catch( Throwable th){
-            throw new Error("home parameter was not set in request");
-        }
-        
-    }
-    public void setPortalId(String in){
-        setAttribute("home",in);
-    }
-
-    public PortalFlag getPortalFlag(){
-        return(PortalFlag) getAttribute("portalFlag");
-    }
-    public void setPortalFlag(PortalFlag pf){
-        setAttribute("portalFlag", pf);
-    }
-
-    public SunsetFlag getSunsetFlag(){
-        return (SunsetFlag) getAttribute("sunsetFlag");
-    }
-    public void setSunsetFlag(SunsetFlag sf){
-        setAttribute("sunsetFlag",sf);
-    }
-
     public ApplicationBean getAppBean(){
-        return (ApplicationBean) getAttribute("appBean");
+        //return (ApplicationBean) getAttribute("appBean");
+    	return getWebappDaoFactory().getApplicationDao().getApplicationBean();
     }
     public void setAppBean(ApplicationBean ab){
         setAttribute("appBean",ab);

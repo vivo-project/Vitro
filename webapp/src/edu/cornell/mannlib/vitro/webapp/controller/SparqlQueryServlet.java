@@ -49,7 +49,6 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 
 
@@ -326,7 +325,6 @@ public class SparqlQueryServlet extends BaseEditController {
     
     private void doHelp(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
             VitroRequest vreq = new VitroRequest(req);
-            Portal portal = vreq.getPortal();
             
             OntologyDao daoObj = vreq.getFullWebappDaoFactory().getOntologyDao();
             List<Ontology> ontologiesObj = daoObj.getAllOntologies();
@@ -345,7 +343,6 @@ public class SparqlQueryServlet extends BaseEditController {
             
             req.setAttribute("prefixList", prefixList);
             
-            req.setAttribute("portalBean",portal);
             // nac26: 2009-09-25 - this was causing problems in safari on localhost installations because the href did not include the context.  The edit.css is not being used here anyway (or anywhere else for that matter)
             // req.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
             req.setAttribute("title","SPARQL Query");

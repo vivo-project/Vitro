@@ -13,7 +13,7 @@ import javax.servlet.ServletContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import freemarker.cache.ClassTemplateLoader;
@@ -55,12 +55,17 @@ public class FreemarkerConfigurationLoader {
     }
     
     public Configuration getConfig(VitroRequest vreq) {       
-        String themeDir = getThemeDir(vreq.getPortal());
+        String themeDir = getThemeDir(vreq.getAppBean());
         return getConfigForTheme(themeDir);
     }
 
-    protected String getThemeDir(Portal portal) {
-        return portal.getThemeDir().replaceAll("/$", "");
+    protected String getThemeDir(ApplicationBean appBean) {
+    	if (appBean == null) {
+    		log.error("Cannot get themeDir from null application bean");
+    	} else if (appBean.getThemeDir() == null) {
+    		log.error("themeDir is null");
+    	}
+        return appBean.getThemeDir().replaceAll("/$", "");
     }
 
     

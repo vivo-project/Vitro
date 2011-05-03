@@ -10,42 +10,18 @@
 <% request.setAttribute("requestedActions", new ManagePortals()); %>
 <vitro:confirmAuthorization />
 
-<c:set var="singlePortal" value="${requestScope.singlePortal}"/>
-<c:set var="creatingNewPortal" value="${requestScope.creatingNewPortal}"/>
-<c:set var="multiPortal" value = "${!singlePortal || creatingNewPortal}"/>
-<c:set var="appNameLabel" value="${ !multiPortal ? 'Site Name' : 'Portal Application Name' }"/> 
+<c:set var="appNameLabel" value="Site Name"/> 
+
 
 <c:set var="smallCell" value="style='width: 33%;'" />
-<c:set var="longField" value="${multiPortal == true ? \"style='width: 90%;'\" : \"style='width: 75%;'\"}" />
+<c:set var="longField" value="style='width: 75%;'" />
  
 <tr class="editformcell">
     <td valign="top" colspan="2">
         <b>${appNameLabel}</b> <i>(max 50 characters)</i><br />
-            <input type="text" name="AppName" value="<form:value name="AppName"/>" ${longField} maxlength="50" />
-            <font color="red"><form:error name="AppName"/></font>
+            <input type="text" name="ApplicationName" value="<form:value name="ApplicationName"/>" ${longField} maxlength="50" />
+            <font color="red"><form:error name="ApplicationName"/></font>
     </td>
-
-    <c:if test="${multiPortal}">
-        <td valign="top" colspan="1">
-            <b>Portal ID number</b><br />            
-            <c:choose>
-                <c:when test="${_action == 'insert'}">
-                  <input type="text" name="PortalId" ${smallCell}
-                         value="<form:value name="PortalId"/>" maxlength="5" />
-                </c:when>
-                <c:otherwise>
-                  <input type="text" name="PortalId" disabled="disabled" ${smallCell}
-                         value="<form:value name="PortalId"/>" maxlength="5" />
-                </c:otherwise>
-            </c:choose>
-            <font color="red"><form:error name="PortalId" /> </font>
-        </td>
-        <td valign="top" colspan="1">
-            <b>URL ending</b><br/>
-            <input type="text" name="Urlprefix" ${smallCell} value="<form:value name="Urlprefix"/>"/>
-            <font color="red"><form:error name="PortalId"/><font>
-        </td>
-    </c:if>     
 </tr>
 
 <!-- With introduction of new logo that includes tagline as part of the image, hiding this field for now to reduce user confusion -->        
@@ -65,14 +41,7 @@
 
 </tr>
 <tr class="editformcell">
-    <td valign="bottom" colspan="1">
-        <b>Root Tab</b><br />
-        <select name="RootTabId">
-            <form:option name="RootTabId"/>
-        </select>
-        <font color="red"><form:error name="RootTabId"/></font>
-    </td>
-    <td valign="top" colspan="1">
+    <td valign="top" colspan="2">
         <b>Theme</b><br />
         <select id="ThemeDir" name="ThemeDir">
             <form:option name="ThemeDir" />
@@ -110,15 +79,6 @@
     </td>
 </tr>
 
-<tr class="editformcell hideFromVivoWeb">
-    <td valign="bottom" colspan="2">
-        <b>Flag 1 Filtering</b> <i>if true, then filter pages generated for this portal by flag1</i><br/>
-        <select name="Flag1Filtering" >
-            <form:option name="Flag1Filtering"/>
-        </select>
-        <font color="red"><form:error name="Flag1Filtering"/></font>
-    </td>
-</tr>
 <tr class="editformcell hideFromVivoWeb">   
     <td valign="bottom" colspan="1">
         <b>Banner image</b><br />
@@ -161,47 +121,3 @@ $(function() {
         });
 });
 </script>
-<% /*
-
-<tr class="editformcell">
-    <!-- this needs to be added to the bean -->
-    <td valign="bottom" colspan="1">
-        <b>Flag 1 values</b><br/>
-            <input disabled="disabled" type="text" name="field9Value" value="" style="width:60" maxlength="255" />
-            <font color="red"></font>
-    </td>
-    <td valign="bottom" colspan="1">
-        <b>Flag 2 numeric equivalent</b> <i>THIS FILTERING HAS BEEN TRANSFERRED TO TABS</i><br />
-            <input type="text" name="Flag2Numeric" value="<form:value name="Flag2Numeric"/>" style="width:33%" maxlength="11" />
-            <font color="red"><form:error name="Flag2Numeric"/></font>
-    </td>
-    <td valign="bottom" colspan="1">
-        <b>Flag 3 numeric equivalent</b> <i>THIS FILTERING HAS BEEN TRANSFERRED TO TABS</i><br />
-            <input type="text" name="Flag3Numeric" value="<form:value name="Flag3Numeric"/>" style="width:33%" maxlength="11" />
-            <font color="red"><form:error name="Flag3Numeric"/></font>
-    </td>
-</tr>
-<tr class="editformcell">
-    <td valign="bottom" colspan="1">
-        <b>Filter by XXXX on Advanced Search form?</b><br />
-            <select disabled="disabled" name="field23Value">
-                    <option selected value="false">false</option>
-            </select>
-            <font color="red"></font>
-    </td>
-    <td valign="bottom" colspan="1">
-        <b>Filter by XXXY on Advanced Search form?</b><br />
-            <select disabled="disabled" name="field24Value">
-                    <option value="false">false</option>
-            </select>
-            <font color="red"></font>
-    </td>
-    <td valign="bottom" colspan="1">
-        <b>Filter by XXYX on Advanced Search form?</b><br />
-            <select disabled="disabled" name="field25Value">
-                    <option value="false">false</option>
-            </select>
-            <font color="red"></font>
-    </td>
-</tr>
-*/ %>

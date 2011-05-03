@@ -21,8 +21,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.BaseFiltering;
-import edu.cornell.mannlib.vitro.webapp.dao.filtering.tabFactory.TabEntityFactoryFiltering;
-import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 
 public class VitroFiltersFactoryTest {
 
@@ -192,11 +190,7 @@ public class VitroFiltersFactoryTest {
         List<Individual> filteredEnts = bf.filter(ents,vf.getIndividualFilter());
         Assert.assertNotNull(filteredEnts);
         Assert.assertEquals("did not filter correctly", 2, filteredEnts.size());        
-    }
-    
-    private int portalId2Numeric(long i) {
-        return (int)FlagMathUtils.portalId2Numeric( i);
-    }           
+    }         
     
     public void checkFilterForNull(VitroFilters vf){
         Assert.assertNotNull("filter was null", vf);

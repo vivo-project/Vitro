@@ -74,15 +74,7 @@
     //}
     vreq.setAttribute("n3AssertedTypesUnescaped",n3AssertedTypesUnescapedBuffer.toString());
     
-    // if we don't check it into the portal, we won't be able to see it
-    vreq.setAttribute("portalUri", vreq.getPortal().getTypeUri());
-
-    String flagURI = null;
-    if (vreq.getAppBean().isFlag1Active()) {
-        flagURI = VitroVocabulary.vitroURI+"Flag1Value"+vreq.getPortal().getPortalId()+"Thing";
-    } else {
-        flagURI = wdf.getVClassDao().getTopConcept().getURI();  // fall back to owl:Thing if not portal filtering
-    }
+    String flagURI = wdf.getVClassDao().getTopConcept().getURI(); 
     vreq.setAttribute("flagURI",flagURI);
 
     VClass rangeClass = null;

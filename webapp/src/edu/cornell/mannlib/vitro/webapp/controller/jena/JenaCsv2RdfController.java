@@ -24,7 +24,6 @@ import com.hp.hpl.jena.rdf.model.ModelMaker;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
@@ -82,20 +81,17 @@ public class JenaCsv2RdfController extends BaseEditController{
 			}
 		}
 		
-		 Portal portal = request.getPortal();
-			RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);      
-	        request.setAttribute("portalBean",portal);
-	        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
 
-	        try {
-	            rd.forward(request, response);
-	        } catch (Exception e) {
-	            System.out.println(this.getClass().getName()+" could not forward to view.");
-	            System.out.println(e.getMessage());
-	            System.out.println(e.getStackTrace());
-	        }
-		
-		
+		RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);      
+        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+request.getAppBean().getThemeDir()+"css/edit.css\"/>");
+
+        try {
+            rd.forward(request, response);
+        } catch (Exception e) {
+            System.out.println(this.getClass().getName()+" could not forward to view.");
+            System.out.println(e.getMessage());
+            System.out.println(e.getStackTrace());
+        }		
 		
     }
 	

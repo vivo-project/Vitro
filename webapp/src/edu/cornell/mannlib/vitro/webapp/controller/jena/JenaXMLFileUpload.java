@@ -36,7 +36,6 @@ import com.hp.hpl.jena.shared.Lock;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
@@ -140,10 +139,8 @@ public class JenaXMLFileUpload  extends BaseEditController  {
 		
 		request.setAttribute("fileItems",request.getFiles());				
 
-        Portal portal = vreq.getPortal();
 		RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);      
-        request.setAttribute("portalBean",portal);
-        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
+        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
             rd.forward(request, resp);
@@ -169,10 +166,8 @@ public class JenaXMLFileUpload  extends BaseEditController  {
 		
 		request.setAttribute("models", null);				
 
-        Portal portal = vreq.getPortal();
 		RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);      
-        request.setAttribute("portalBean",portal);
-        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
+        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
             rd.forward(request, response);

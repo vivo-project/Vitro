@@ -56,50 +56,6 @@ public class JenaModelUtils {
 		nonIndividualTypeURIs.add(RDF.Property.getURI());
 	}
 	
-	// We used to use Jena's listIndividuals() but, at least in certain cases,
-	// this missed some individuals, possibly due to the absence of a TBox
-	public synchronized static void checkAllIndividualsInModelIntoPortal(Model baseModel, Model vitroInternalsSubmodel, int portalId) {
-		OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM,baseModel);
-		OntModel tempModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);
-		Resource portalClassResource = ResourceFactory.createResource(VitroVocabulary.vitroURI+"Flag1Value"+portalId+"Thing");
-		ontModel.enterCriticalSection(Lock.READ);
-		int indCount = 0;
-		try {
-			Iterator<Resource> typedResIt = ontModel.listSubjectsWithProperty(RDF.type);
-			while (typedResIt.hasNext()) {
-				Resource typedRes = typedResIt.next();
-				boolean isIndividual = true;
-				StmtIterator typeIt = ontModel.listStatements(typedRes, RDF.type, (RDFNode) null);
-				try {
-					while (typeIt.hasNext()) {
-						Statement stmt = typeIt.nextStatement();
-						if (stmt.getObject().isResource()) {
-							Resource ind = stmt.getSubject();
-							Resource objRes = (Resource) stmt.getObject();
-							if (!objRes.isAnon() && nonIndividualTypeURIs.contains(objRes.getURI())) {
-								isIndividual = false;
-								break;
-							}
-						}
-					}
-				} finally {
-					typeIt.close();
-				}
-				if (isIndividual) {
-					tempModel.add(typedRes, RDF.type, portalClassResource);
-				}
-			}
-		} finally {
-			ontModel.leaveCriticalSection();
-		}
-		vitroInternalsSubmodel.enterCriticalSection(Lock.WRITE);
-		try {
-			vitroInternalsSubmodel.add(tempModel);
-		} finally {
-			vitroInternalsSubmodel.leaveCriticalSection();
-		}
-	}
-	
 	public synchronized static void makeClassGroupsFromRootClasses(WebappDaoFactory wadf, Model ontModel) {
 	    makeClassGroupsFromRootClasses(wadf, ontModel, ontModel);
 	}

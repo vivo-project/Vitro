@@ -21,7 +21,6 @@ import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -34,7 +33,6 @@ public class NamespacesListingController extends BaseEditController {
         }
 
         VitroRequest vrequest = new VitroRequest(request);
-        Portal portal = vrequest.getPortal();
                
         OntModel ontModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
                
@@ -91,9 +89,7 @@ public class NamespacesListingController extends BaseEditController {
         request.setAttribute("columncount",new Integer(3));
         request.setAttribute("suppressquery","true");
         request.setAttribute("title","Recognized Namespaces");
-        request.setAttribute("portalBean",portal);
         request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
-        request.setAttribute("home", portal.getPortalId());
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         try {
             rd.forward(request,response);

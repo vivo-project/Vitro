@@ -36,25 +36,20 @@
                 <form action="./" method="get">
                     <input type="submit" class="form-button" value="Display This Tab (Public)"/>
                     <input type="hidden" name="primary" value="${tab.tabId}" />
-                    <input type="hidden" name="home" value="${portal.portalId}" />
                 </form>
 		<form action="listTabs" method="get">
 			<input type="submit" class="form-button" value="See All Tabs"/>
-			<input type="hidden" name="home" value="${portal.portalId}" />
 		</form>
 	</td>
 	<td valign="bottom" align="center">
 		<form action="editForm" method="get">
 			<input name="id" type = "hidden" value="<%=request.getAttribute("tabId")%>" />
 			<input type="submit" class="form-button" value="Edit Tab Details"/>
-			<input type="hidden" name="home" value=""${portal.portalId}" />
 			<input type="hidden" name="controller" value="Tab"/>
 		</form>
 	</td>
 	<td valign="bottom">
 		<form action="editForm" method="get">
-			<input type="hidden" name="portalId" value="${portal.portalId}"/>
-			<input type="hidden" name="home" value="${portal.portalId}" />
 			<input type="submit" class="form-button" value="Add New Tab"/>
 			<input type="hidden" name="controller" value="Tab"/>
 		</form>
@@ -75,7 +70,6 @@
 								</c:forEach>
 							</ul>
 							<input type="submit" class="form-button" value="Remove checked parent tabs"/>
-							<input type="hidden" name="home" value="${portal.portalId}" />
 							<input type="hidden" name="ChildId" value="${tab.tabId}"/>
 							<input type="hidden" name="primaryAction" value="_remove"/>
 							<input type="hidden" name="_epoKey" value="${tabHierarchyEpoKey}"/>
@@ -84,7 +78,6 @@
 		</td>
 		<td>
 			<form action="editForm" method="get">
-				<input type="hidden" name="home" value="${portal.portalId}" />
 				<input type="hidden" name="ChildId" value="${tab.tabId}">
 				<input type="hidden" name="controller" value="Tabs2Tabs"/>
 				<input type="submit" class="form-button" value="Add existing tab as parent tab"/>
@@ -93,7 +86,7 @@
 	</tr>
 </c:when>
 <c:otherwise>
-	<tr><td colspan="3" align="center">This is the highest level tab for any portal, so no links to higher tabs are possible.</td></tr>
+	<tr><td colspan="3" align="center">This is the highest level tab, so no links to higher tabs are possible.</td></tr>
 </c:otherwise>
 </c:choose>
 <tr><td colspan="3"><hr/></td></tr>
@@ -111,7 +104,6 @@
 					  </ul>
 					    <input type="hidden" name="ParentId" value="${tab.tabId}"/>
 						<input type="submit" class="form-button" value="Remove checked child tabs"/>
-						<input type="hidden" name="home" value="${portal.portalId}" />
 						<input type="hidden" name="primaryAction" value="_remove"/>
 						<input type="hidden" name="_epoKey" value="${tabHierarchyEpoKey}"/>
 					</form>
@@ -119,7 +111,6 @@
 		</td>
 		<td>
 			<form action="editForm" method="get">
-				<input type="hidden" name="home" value="${portal.portalId}" />
 				<input type="hidden" name="ParentId" value="${tab.tabId}">
 				<input type="hidden" name="controller" value="Tabs2Tabs">
 				<input type="submit" class="form-button" value="Add existing tab as child tab"/>
@@ -128,7 +119,7 @@
 	</tr>
 </c:when>
 <c:otherwise>
-	<tr><td colspan="3" align="center">This is the lowest level tab for any portal, so no links to lower tabs are possible.</td></tr>
+	<tr><td colspan="3" align="center">This is the lowest level tab, so no links to lower tabs are possible.</td></tr>
 </c:otherwise>
 </c:choose>
 <tr><td colspan="3"><hr/></td></tr>
@@ -145,7 +136,6 @@
     		</c:forEach>
 			</ul>
 			<input type="hidden" name="TabId" value="${tab.tabId}"/>
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="hidden" name="operation" value="remove"/>
 			<input type="hidden" name="_epoKey" value="${epoKey}"/>
 			<input type="submit" class="form-button" value="Remove Checked Class Autolinks"/>
@@ -154,7 +144,6 @@
 	</td>
 	<td>
 		<form action="editForm" method="get">
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="hidden" name="TabId" value="${tab.tabId}"/>
 			<input type="hidden" name="controller" value="Tabs2Types"/>
 			<input type="submit" class="form-button" value="Add Class Autolink"/>
@@ -178,7 +167,6 @@
 			</c:forEach>
 			</ul>
 			<input type="hidden" name="TabId" value="${tab.tabId}"/>
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="hidden" name="operation" value="remove"/>
 			<input type="hidden" name="_epoKey" value="${epoKey}"/>
 			<input type="submit" class="form-button" value="Remove Checked Individuals"/>
@@ -191,7 +179,6 @@
 		    	<form:option name="VClassURI"/>
 		    </select><br/>
 		    <p>Select class of individual</p>
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="hidden" name="TabId" value="${tab.tabId}"/>
 			<input type="hidden" name="controller" value="Tabs2Ents"/>
 			<input type="submit" class="form-button" value="Add an individual to this tab"/>

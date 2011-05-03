@@ -91,7 +91,7 @@ public class BrowseDataGetter implements PageDataGetter {
         Map<String,Object> values = new HashMap<String,Object>();              
                 
         VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
-        List<VClassGroup> cgList = vcgc.getGroups(vreq.getPortalId());        
+        List<VClassGroup> cgList = vcgc.getGroups();        
         LinkedList<VClassGroupTemplateModel> cgtmList = new LinkedList<VClassGroupTemplateModel>();
         for( VClassGroup classGroup : cgList){
             cgtmList.add( new VClassGroupTemplateModel( classGroup ));
@@ -165,7 +165,7 @@ public class BrowseDataGetter implements PageDataGetter {
         VitroRequest vreq = new VitroRequest(request);        
         
         VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
-        VClassGroup vcg = vcgc.getGroup(vreq.getPortalId(), vcgUri);        
+        VClassGroup vcg = vcgc.getGroup(vcgUri);        
         
         ArrayList<VClassTemplateModel> classes = new ArrayList<VClassTemplateModel>(vcg.size());
         for( VClass vc : vcg){

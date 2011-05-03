@@ -8,7 +8,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.utils.ThemeUtils;
 
 public class DefaultThemeSetup implements ServletContextListener {
@@ -38,7 +38,7 @@ public class DefaultThemeSetup implements ServletContextListener {
         
         String defaultThemeDir = "themes/" + defaultTheme + "/";
         // Define as a static variable of Portal so getThemeDir() method of portal can access it.
-        Portal.DEFAULT_THEME_DIR_FROM_CONTEXT = defaultThemeDir;
+        ApplicationBean.DEFAULT_THEME_DIR_FROM_CONTEXT = defaultThemeDir;
         
 	}
 

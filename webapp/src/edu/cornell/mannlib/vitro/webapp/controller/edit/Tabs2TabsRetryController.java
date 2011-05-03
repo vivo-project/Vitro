@@ -20,7 +20,6 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageTabs;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -37,7 +36,6 @@ public class Tabs2TabsRetryController extends BaseEditController {
     	}
 
     	VitroRequest request = new VitroRequest(req);
-        Portal portal = request.getPortal();
 
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
@@ -68,12 +66,12 @@ public class Tabs2TabsRetryController extends BaseEditController {
         HashMap hash = new HashMap();
         foo.setOptionLists(hash);
         if (parent != null ) {
-            hash.put("ChildId", FormUtils.makeOptionListFromBeans(tDao.getTabsForPortalByTabtypes(portal.getPortalId(),false, parent.getTabtypeId()),"TabId","Title",null,null));
+            hash.put("ChildId", FormUtils.makeOptionListFromBeans(tDao.getTabsForPortalByTabtypes(1,false, parent.getTabtypeId()),"TabId","Title",null,null));
             List parentList = new LinkedList();
             parentList.add(new Option(Integer.toString(parent.getTabId()),parent.getTitle(),true));
             hash.put("ParentId", parentList);
         } else if (child != null){
-            hash.put("ParentId", FormUtils.makeOptionListFromBeans(tDao.getTabsForPortalByTabtypes(portal.getPortalId(),true,child.getTabtypeId()),"TabId","Title",null,null));
+            hash.put("ParentId", FormUtils.makeOptionListFromBeans(tDao.getTabsForPortalByTabtypes(1,true,child.getTabtypeId()),"TabId","Title",null,null));
             List childList = new LinkedList();
             childList.add(new Option(Integer.toString(child.getTabId()),child.getTitle(),true));
             hash.put("ChildId", childList);

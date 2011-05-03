@@ -17,7 +17,6 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndividuals;
 import edu.cornell.mannlib.vitro.webapp.beans.Keyword;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
@@ -44,14 +43,12 @@ public class KeywordEditController extends BaseEditController {
         foo.setOptionLists(OptionMap);
         epo.setFormObject(foo);
 
-        Portal portal = vreq.getPortal();
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("epoKey",epo.getKey());
         request.setAttribute("keyword", k);
         request.setAttribute("bodyJsp","/templates/edit/specific/keyterms_edit.jsp");
-        request.setAttribute("portalBean",portal);
         request.setAttribute("title","Keyword Control Panel");
-        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
+        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
             rd.forward(request, response);

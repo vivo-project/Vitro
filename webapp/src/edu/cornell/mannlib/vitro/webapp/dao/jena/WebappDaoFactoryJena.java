@@ -51,7 +51,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
-import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
@@ -74,7 +73,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     protected LinksDao linksDao;
     protected LinktypeDao linktypeDao;
     protected ApplicationDaoJena applicationDao;
-    protected PortalDao portalDao;
     protected TabDao tabDao;
     protected TabIndividualRelationDao tabs2EntsDao;
 
@@ -492,13 +490,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     	} else {
     		return applicationDao = new ApplicationDaoJena(this);
     	}
-    }
-
-    public PortalDao getPortalDao() {
-        if (portalDao != null)
-            return portalDao;
-        else
-            return portalDao = new PortalDaoJena(this);
     }
 
     public TabDao getTabDao() {

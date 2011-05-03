@@ -6,7 +6,6 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Tab" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest" %>
 <%@ page import="java.util.Collection" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Portal" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Link" %>
 <%@ page import="java.net.URLEncoder" %>
@@ -28,13 +27,9 @@ if (leadingTab == null) {
 }
 Collection<Individual> individuals = leadingTab.getRelatedEntities();
 Collection<Tab> tabs = leadingTab.getChildTabs();
-Portal portal = (Portal)request.getAttribute("portalBean");
-int portalId = -1;
-if (portal==null) {
-    portalId=1;
-} else {
-    portalId=portal.getPortalId();
-}
+
+int portalId = 1;
+
 DateTime dt = new DateTime();
 DateTimeFormatter dtf = ISODateTimeFormat.basicDateTimeNoMillis();
 String time = dtf.print(dt.getMillis());

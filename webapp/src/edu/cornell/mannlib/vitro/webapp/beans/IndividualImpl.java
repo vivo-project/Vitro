@@ -334,51 +334,6 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
         primaryLink = link;
     }
     
-    
-    /* look at PortalFlag.numeric2numerics if you want to know which
-     * bits are set in a numeric flag.
-     *
-     * NOTICE:
-     * Values set Entity.getFlagXNumeric() will NOT be saved to the model.
-     *
-     * Also, changes to an entity flag state using Entity.setFlagXNumeric()
-     * are not reflected in Entity.getFlagXSet() and vice versa.
-     */
-    protected String flag1Set = null;
-    public String getFlag1Set(){return flag1Set;}
-    public void setFlag1Set(String in){flag1Set=in;}
-
-    protected int flag1Numeric = -1;
-    public int getFlag1Numeric(){return flag1Numeric;}
-    public void setFlag1Numeric(int i){flag1Numeric=i;}
-
-    /* Consider the flagBitMask as a mask to & with flags.
-   if flagBitMask bit zero is set then return true if
-   the individual is in portal 2,
-   if flagBitMask bit 1 is set then return true if
-   the individua is in portal 4
-   etc.
-    */
-    public boolean doesFlag1Match(int flagBitMask) {
-        return (flagBitMask & getFlag1Numeric()) != 0;
-    }
-
-    protected String flag2Set = null;
-    public String getFlag2Set(){return flag2Set;}
-    public void setFlag2Set(String in){flag2Set=in;}
-
-    protected int flag2Numeric = -1;
-    public int getFlag2Numeric(){return flag2Numeric;}
-    public void setFlag2Numeric(int i){flag2Numeric=i;}
-
-    protected String flag3Set = null;
-    public String getFlag3Set(){return flag3Set;}
-    public void setFlag3Set(String in){flag3Set=in;}
-
-    protected int flag3Numeric = -1;
-    public int getFlag3Numeric(){return flag3Numeric;}
-    public void setFlag3Numeric(int i){flag3Numeric=i;}
-
     public List<String> getKeywords() {     return keywords;    }
     public void setKeywords(List<String> keywords) {this.keywords = keywords;}
     public String getKeywordString(){

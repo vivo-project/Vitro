@@ -42,7 +42,7 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         this.vreq = vreq;
         this.loginStatusBean = LoginStatusBean.getBean(vreq);
         // Needed for getting portal-sensitive urls. Remove if multi-portal support is removed.
-        this.urlBuilder = new UrlBuilder(vreq.getPortal());
+        this.urlBuilder = new UrlBuilder(vreq.getAppBean());
         
         // If editing, create a helper object to check requested actions against policies
         if (isEditable()) {

@@ -2,26 +2,17 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.lucene;
 
-import java.util.Collection;
-import java.util.LinkedList;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
-import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 
 /**
  * Creates a query that can be used to search a Lucene index.
@@ -49,9 +40,10 @@ public class LuceneQuery extends VitroQuery {
     
     private static final Log log = LogFactory.getLog(LuceneQuery.class.getName());
 
-    public LuceneQuery(VitroRequest request, PortalFlag portalState,
-                       Analyzer analyzer, String defualtField ){    	
-        super(request,portalState); //the super class will stash the parameters for us.
+    public LuceneQuery(VitroRequest request, 
+                       Analyzer analyzer, 
+                       String defaultField ){    	
+        super(request); //the super class will stash the parameters for us.
         this.analyzer = analyzer;
 
         if( isAdvancedQuery( request ) ){
@@ -92,16 +84,6 @@ public class LuceneQuery extends VitroQuery {
             if( SIMPLE == queryType ){
                 QueryParser parser= getQueryParser();
                 this.query = parser.parse(querystr);
-
-                //if we have a flag/portal query then we add
-                //it by making a BooelanQuery.
-                Query flagQuery = makeFlagQuery();
-                if( flagQuery != null ){
-                    BooleanQuery boolQuery = new BooleanQuery();
-                    boolQuery.add( this.query, BooleanClause.Occur.MUST);
-                    boolQuery.add( flagQuery, BooleanClause.Occur.MUST);
-                    this.query = boolQuery;
-                }
             } else if( ADVANCED == queryType ){
                 this.query = null;
             }
@@ -110,53 +92,6 @@ public class LuceneQuery extends VitroQuery {
         }
 
         return this.query;
-    }
-  
-    /**
-     * Makes a flag based query clause.  This is where searches can filter by portal.
-     *
-     * If you think that search is not working correctly with protals and
-     * all that kruft then this is a method you want to look at.
-     *
-     * It only takes into account "the portal flag" and flag1Exclusive must
-     * be set.  Where does that stuff get set?  Look in vitro.flags.PortalFlag
-     *
-     */
-    @SuppressWarnings("static-access")
-    private Query makeFlagQuery(){
-        PortalFlag flag = super.getPortalState();
-        if( flag == null || !flag.isFilteringActive() )
-            return null;
-
-//bdc34 - this is commented out because the exclusive flags are not property set when
-// the portalFlag gets made.
-//      if( !flag.getFlag1Exclusive() )
-            //Q: what does it mean for flag1exclusive to be false?
-            //A: it means we don't take it into account
-//          return null;
-
-//      System.out.println("in LuceneQuery and we are trying to figure out what is in the portalFlag:\n"+flag);
-
-        // make one term for each bit in the numeric flag that is set
-        Collection<TermQuery> terms = new LinkedList<TermQuery>();
-        int portalNumericId = flag.getFlag1Numeric();
-        Long[] bits = FlagMathUtils.numeric2numerics(portalNumericId);
-        for (Long bit : bits) {
-            terms.add(new TermQuery(new Term(Entity2LuceneDoc.term.PORTAL, Long
-                    .toString(bit))));
-        }
-
-        // make a boolean OR query for all of those terms
-        BooleanQuery boolQuery = new BooleanQuery();
-        if (terms.size() > 0) {
-            for (TermQuery term : terms) {
-                    boolQuery.add(term, BooleanClause.Occur.SHOULD);
-            }
-            return boolQuery;
-        } else {
-            //we have no flags set, very odd, abort filtering
-            return null;
-        }
     }
 
     /**

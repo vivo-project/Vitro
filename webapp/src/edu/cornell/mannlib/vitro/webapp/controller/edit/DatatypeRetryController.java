@@ -114,8 +114,7 @@ public class DatatypeRetryController extends BaseEditController {
 
     class DatatypeInsertPageForwarder implements PageForwarder {
         public void doForward(HttpServletRequest request, HttpServletResponse response, EditProcessObject epo){
-            int portalId = (new VitroRequest(request)).getPortal().getPortalId();
-            String newDtpUrl = "fetch?home="+portalId+"&queryspec=private_datatypev&postGenLimit=-1&linkwhere=datatypes.id=";
+            String newDtpUrl = "fetch?queryspec=private_datatypev&postGenLimit=-1&linkwhere=datatypes.id=";
             Datatype dtp = (Datatype) epo.getNewBean();
             newDtpUrl += dtp.getId();
             try {
@@ -128,8 +127,7 @@ public class DatatypeRetryController extends BaseEditController {
 
     class DatatypeDeletePageForwarder implements PageForwarder {
         public void doForward(HttpServletRequest request, HttpServletResponse response, EditProcessObject epo){
-            int portalId = (new VitroRequest(request)).getPortal().getPortalId();
-            String newDtpUrl = "fetch?home="+portalId+"&queryspec=private_datatypes";
+            String newDtpUrl = "fetch?queryspec=private_datatypes";
             Datatype dtp = (Datatype) epo.getNewBean();
             try {
                 response.sendRedirect(newDtpUrl);

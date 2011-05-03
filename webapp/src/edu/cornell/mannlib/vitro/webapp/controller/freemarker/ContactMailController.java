@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -72,10 +72,11 @@ public class ContactMailController extends FreemarkerHttpServlet {
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
-    	
-        Portal portal = vreq.getPortal();
+
         String templateName = null;
         Map<String, Object> body = new HashMap<String, Object>();
+        
+        ApplicationBean appBean = vreq.getAppBean();
         
         String statusMsg = null; // holds the error status
         
@@ -139,17 +140,17 @@ public class ContactMailController extends FreemarkerHttpServlet {
                 String deliveryfrom = null;
         
                 if ("contact".equals(formType)) {
-                    if (portal.getContactMail() == null || portal.getContactMail().trim().length()==0) {
-                    	log.error("No contact mail address defined in current portal "+portal.getPortalId());
+                    if (appBean.getContactMail() == null || appBean.getContactMail().trim().length()==0) {
+                    	log.error("No contact mail address defined");
                         throw new Error(
                                 "To establish the Contact Us mail capability the system administrators must  "
-                                + "specify an email address in the current portal.");
+                                + "specify an email address.");
                     } else {
-                        deliverToArray = portal.getContactMail().split(",");
+                        deliverToArray = appBean.getContactMail().split(",");
                     }
-                    deliveryfrom   = "Message from the "+portal.getAppName()+" Contact Form";
+                    deliveryfrom   = "Message from the " + appBean.getApplicationName() + " Contact Form";
                 } else {
-                    deliverToArray = portal.getContactMail().split(",");
+                    deliverToArray = appBean.getContactMail().split(",");
                     statusMsg = SPAM_MESSAGE ;
                     spamReason = "The form specifies no delivery type.";
                 }
@@ -158,7 +159,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
                 	log.error("recipientCount is 0 when DeliveryType specified as \""+formType+"\"");
                     throw new Error(
                             "To establish the Contact Us mail capability the system administrators must  "
-                            + "specify at least one email address in the current portal.");
+                            + "specify at least one email address.");
                 }
                 
                 Configuration config = (Configuration) vreq.getAttribute("freemarkerConfig");

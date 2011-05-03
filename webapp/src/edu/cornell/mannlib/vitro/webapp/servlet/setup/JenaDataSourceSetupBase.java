@@ -42,9 +42,9 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     protected final static int DEFAULT_MAXWAIT = 10000, // ms
             DEFAULT_MAXACTIVE = 40,
             DEFAULT_MAXIDLE = 10,
-            DEFAULT_TIMEBETWEENEVICTIONS = 30 * 60 * 1000, // ms
-            DEFAULT_TESTSPEREVICTION = 3,
-            DEFAULT_MINEVICTIONIDLETIME = 1000 * 60 * 30; // ms
+            DEFAULT_TIMEBETWEENEVICTIONS =  3 * 1000, // ms
+            DEFAULT_TESTSPEREVICTION = DEFAULT_MAXACTIVE,
+            DEFAULT_MINEVICTIONIDLETIME = 3 * 1000; // ms
 
     protected final static boolean DEFAULT_TESTONBORROW = true,
             DEFAULT_TESTONRETURN = true, DEFAULT_TESTWHILEIDLE = true;
@@ -234,7 +234,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
        ds.setTestOnBorrow(DEFAULT_TESTONBORROW);
        ds.setTestOnReturn(DEFAULT_TESTONRETURN);
        ds.setMinEvictableIdleTimeMillis(DEFAULT_MINEVICTIONIDLETIME);
-       ds.setNumTestsPerEvictionRun(DEFAULT_TESTSPEREVICTION);
+       ds.setNumTestsPerEvictionRun(maxActiveInt);
        ds.setTimeBetweenEvictionRunsMillis(DEFAULT_TIMEBETWEENEVICTIONS);
 
        try {

@@ -10,18 +10,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 
 public class ListingControllerWebUtils {
 	
 	private static final Log log = LogFactory.getLog(ListingControllerWebUtils.class.getName());
 
-	public static synchronized String formatIndividualLink(Individual ind, Portal portal) {
+	public static synchronized String formatIndividualLink(Individual ind) {
 		try {
 			System.out.println(ind.getURI());
 			String nameStr = (ind.getName() != null) ? ind.getName() : ind.getURI();
-    		return "<a href=\"entityEdit?uri="+URLEncoder.encode(ind.getURI(),"UTF-8")+"&amp;home="+portal.getPortalId()+"\">"+nameStr+"</a>";
+    		return "<a href=\"entityEdit?uri="+URLEncoder.encode(ind.getURI(),"UTF-8")+"\">"+nameStr+"</a>";
 		} catch (NullPointerException npe) {
 			return "?";
     	} catch (UnsupportedEncodingException e) {
@@ -29,7 +28,7 @@ public class ListingControllerWebUtils {
     	}
 	}
 	
-	public static synchronized String formatVClassLinks(List<VClass> vList, Portal portal) {
+	public static synchronized String formatVClassLinks(List<VClass> vList) {
 	    String linksStr="";
 	    if (vList!=null) {
 	        int count=0;
@@ -38,7 +37,7 @@ public class ListingControllerWebUtils {
 	                if (count>0) linksStr += " | ";
 		            VClass vclass = (VClass) obj;
 		            try {
-		                linksStr += "<a href=\"vclassEdit?uri="+URLEncoder.encode(vclass.getURI(),"UTF-8")+"&amp;home="+portal.getPortalId()+"\">"+vclass.getName()+"</a>";
+		                linksStr += "<a href=\"vclassEdit?uri="+URLEncoder.encode(vclass.getURI(),"UTF-8")+"\">"+vclass.getName()+"</a>";
 		            } catch (UnsupportedEncodingException e) {
 		                linksStr += vclass.getName();
 		            }

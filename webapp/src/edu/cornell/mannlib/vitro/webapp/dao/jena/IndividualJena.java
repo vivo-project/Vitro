@@ -25,7 +25,6 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
@@ -43,12 +42,10 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
-import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 
 public class IndividualJena extends IndividualImpl implements Individual {
 
@@ -156,165 +153,39 @@ public class IndividualJena extends IndividualImpl implements Individual {
         }
     }
 
+    @Deprecated
     public int getFlag1Numeric() {
-        if (flag1Numeric > -1) {
-            return flag1Numeric;
-        } else {
-            doFlag1();
-            return flag1Numeric;
-        }
+    	return 1;
     }
 
+    @Deprecated
     public String getFlag1Set() {
-        if (flag1Set != null) {
-            return flag1Set;
-        } else {
-            doFlag1();
-            return flag1Set;
-        }
+    	return "1";
     }
 
+    @Deprecated
     public String getFlag2Set() {
-        if (flag2Set != null) {
-            return flag2Set;
-        } else {
-            doFlag2();
-            return flag2Set;
-        }
+    	return "";
     }
 
-    /* Consider the flagBitMask as a mask to & with flags.
-   if flagBitMask bit zero is set then return true if
-   the individual is in portal 2,
-   if flagBitMask bit 1 is set then return true if
-   the individua is in portal 4
-   etc.
-   Portal uris look like this:
-   "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing"
-    */
+    @Deprecated
     public boolean doesFlag1Match(int flagBitMask) {
-        Long [] numerics = FlagMathUtils.numeric2numerics(flagBitMask);
-        ind.getOntModel().enterCriticalSection(Lock.READ);
-        try{
-            for( Long numericPortal : numerics){
-                int portalid = FlagMathUtils.numeric2Portalid(numericPortal);
-                String portalTypeUri = VitroVocabulary.vitroURI + "Flag1Value" + portalid + "Thing";
-                Resource portalType = ResourceFactory.createResource(portalTypeUri);
-                if( ! ind.getOntModel().contains(ind,RDF.type,portalType))
-                    return false;
-            }
-        }finally{
-            ind.getOntModel().leaveCriticalSection();
-        }
-        return true;
+    	return true;
     }
 
-    private void doFlag1() {
-        ind.getOntModel().enterCriticalSection(Lock.READ);
-
-        try {
-            ClosableIterator typeIt=null;
-            int portalNumeric = 0;
-            String portalSet = "";
-            try{
-                typeIt = ind.getOntModel().listStatements(ind, RDF.type ,(String) null);
-
-                while (typeIt.hasNext()) {
-                    Statement stmt = (Statement) typeIt.next();
-                    Resource type = (Resource)stmt.getObject();
-                    String typeName = type.getLocalName();
-                    if(type.getNameSpace() != null && type.getNameSpace().equals(VitroVocabulary.vitroURI) && typeName.indexOf("Flag1Value")==0) {
-                        try {
-                            int portalNumber = Integer.decode(typeName.substring(10,typeName.length()-5));
-                            portalNumeric = portalNumeric | (1 << portalNumber);
-                            if (portalSet.length() > 0) {
-                                portalSet+=",";
-                            }
-                            portalSet+=Integer.toString(portalNumber);
-                        } catch (Exception e) {}
-                    }
-                }
-            }finally{
-                if( typeIt != null ) typeIt.close() ;
-            }
-            flag1Set = portalSet;
-            flag1Numeric = portalNumeric;
-        } finally {
-            ind.getOntModel().leaveCriticalSection();
-        }
-    }
-
-    private void doFlag2() {
-        ind.getOntModel().enterCriticalSection(Lock.READ);
-        try {
-            ClosableIterator typeIt=null;
-            String flagSet = "";
-            try{
-                typeIt = ind.getOntModel().listStatements(ind, RDF.type ,(String) null);
-                while (typeIt.hasNext()) {
-                    Statement stmt = (Statement) typeIt.next();
-                    Resource type = (Resource)stmt.getObject();
-                    String typeName = type.getLocalName();
-                    if(type.getNameSpace() != null && type.getNameSpace().equals(VitroVocabulary.vitroURI) && typeName.indexOf("Flag2Value")==0) {
-                        try {
-                            String flagValue = ((WebappDaoFactoryJena)webappDaoFactory).getFlag2ClassLabelMap().get(type);
-                            if (flagSet.length() > 0) {
-                                flagSet+=",";
-                            }
-                            flagSet+=flagValue;
-                        } catch (Exception e) {}
-                    }
-                }
-            }finally{
-                if( typeIt != null ) typeIt.close() ;
-            }
-            flag2Set = flagSet;
-        } finally {
-            ind.getOntModel().leaveCriticalSection();
-        }
-    }
-
-
+    @Deprecated
     public Date getSunrise() {
-        if (sunrise != null) {
-            return sunrise;
-        } else {
-            ind.getOntModel().enterCriticalSection(Lock.READ);
-            try {
-                sunrise = webappDaoFactory.getJenaBaseDao().getPropertyDateTimeValue(ind,webappDaoFactory.getJenaBaseDao().SUNRISE);
-                return sunrise;
-            } finally {
-                ind.getOntModel().leaveCriticalSection();
-            }
-        }
+    	return null;
     }
 
+    @Deprecated
     public Date getSunset() {
-        if (sunset != null) {
-            return sunset;
-        } else {
-            ind.getOntModel().enterCriticalSection(Lock.READ);
-            try {
-                sunset = webappDaoFactory.getJenaBaseDao().getPropertyDateTimeValue(ind,webappDaoFactory.getJenaBaseDao().SUNSET);
-                return sunset;
-            } finally {
-                ind.getOntModel().leaveCriticalSection();
-            }
-        }
+    	return null;
     }
 
+    @Deprecated
     public Date getTimekey() {
-        if (timekey != null) {
-            return timekey;
-        } else {
-            ind.getOntModel().enterCriticalSection(Lock.READ);
-            try {
-                timekey = webappDaoFactory.getJenaBaseDao().getPropertyDateTimeValue(ind,webappDaoFactory.getJenaBaseDao().TIMEKEY);
-                return timekey;
-            } finally {
-                ind.getOntModel().leaveCriticalSection();
-            }
-        }
+    	return null;
     }
 
     public Timestamp getModTime() {

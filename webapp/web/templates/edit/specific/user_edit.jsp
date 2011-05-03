@@ -21,19 +21,16 @@
 <tr align="center">
     <td valign="bottom">
         <form action="listUsers" method="get">
-        <input type="hidden" name="home" value="${portalBean.portalId}" />
             <input type="submit" class="form-button" value="See All User Accounts"/>
         </form>
     </td>
     <td valign="bottom" align="center">
         <form action="editForm" method="get">
-            <input name="home" type="hidden" value="${portalBean.portalId}" />
             <input name="uri" type = "hidden" value="${user.URI}" />
             <input type="submit" class="form-button" value="Edit User Account"/>
         <input type="hidden" name="controller" value="User"/>
         </form>
          <form action="editForm" method="get">
-            <input name="home" type="hidden" value="${portalBean.portalId}" />
             <input name="uri" type = "hidden" value="${user.URI}" />
             <input name="Md5password" type="hidden" value=""/>
             <input name="OldPassword" type="hidden" value=""/>
@@ -43,7 +40,6 @@
     </td>
     <td valign="bottom">
         <form action="editForm" method="get">
-            <input name="home" type="hidden" value="${portalBean.portalId}" />
         <input type="hidden" name="controller" value="User"/>
             <input type="submit" class="form-button" value="Add New User Account"/>
         </form>

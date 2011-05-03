@@ -258,26 +258,6 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                         ind.addRDFType(ResourceFactory.createResource(vc.getURI()));
                     }
                 }
-                String flag1Set = ent.getFlag1Set();
-                if (flag1Set != null) {
-                    String[] flag1Value = flag1Set.split(",");
-                    for (int i=0; i<flag1Value.length; i++) {
-                        Resource flag1Type = getOntModel().getResource(VitroVocabulary.vitroURI+"Flag1Value"+flag1Value[i]+"Thing");
-                        if (flag1Type != null) {
-                            ind.addRDFType(flag1Type);
-                        }
-                    }
-                }
-                String flag2Set = ent.getFlag2Set();
-                if (flag2Set != null) {
-                    String[] flag2Value = flag2Set.split(",");
-                    for (int i=0; i<flag2Value.length; i++) {
-                        Resource flag2Type = getFlag2ValueMap().get(flag2Value[i]);
-                        if (flag2Type != null) {
-                            ind.addRDFType(flag2Type);
-                        }
-                    }
-                }
                 addPropertyStringValue(ind,MONIKER,ent.getMoniker(),ontModel);
                 addPropertyStringValue(ind,BLURB,ent.getBlurb(),ontModel);
                 addPropertyStringValue(ind,DESCRIPTION,ent.getDescription(),ontModel);
@@ -349,9 +329,6 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         ent.getDataPropertyStatements();
         ent.getDescription();
         ent.getExternalIds();
-        ent.getFlag1Numeric();
-        ent.getFlag1Set();
-        ent.getFlag2Set();
         ent.getMainImageUri();
         ent.getImageUrl();
         ent.getThumbUrl();
@@ -408,22 +385,6 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                }
-                String flag1Set = ent.getFlag1Set();
-                if (flag1Set != null) {
-                    String[] flag1Value = flag1Set.split(",");
-                    for (int i=0; i<flag1Value.length; i++) {
-                        newTypeURIsSet.add(VitroVocabulary.vitroURI+"Flag1Value"+flag1Value[i]+"Thing");
-                    }
-                }
-                String flag2Set = ent.getFlag2Set();
-                if (flag2Set != null) {
-                    String[] flag2Value = flag2Set.split(",");
-                    for (int i=0; i<flag2Value.length; i++) {
-                        try {
-                            newTypeURIsSet.add(getFlag2ValueMap().get(flag2Value[i]).getURI());
-                        } catch (NullPointerException e) {}
-                    }
                 }
                 for (Iterator<String> oldIt = oldTypeURIsSet.iterator(); oldIt.hasNext();) {
                     String uri = oldIt.next();

@@ -14,7 +14,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.Tab;
 import edu.cornell.mannlib.vitro.webapp.web.TabWebUtil;
 
@@ -48,10 +47,9 @@ public class TabController extends VitroHttpServlet {
 
             //get tab and subtabs.
             Tab leadingTab = populateLeadingTab(request);
-            request.setAttribute("leadingTab",leadingTab);            
+            request.setAttribute("leadingTab",leadingTab);           
 
-            Portal portal = vreq.getPortal();
-
+            /*
             if (leadingTab.getTabId()==portal.getRootTabId()) {
             	request.setAttribute("homePageRequested", "true");
                 request.setAttribute("title", portal.getAppName());
@@ -59,9 +57,9 @@ public class TabController extends VitroHttpServlet {
                 rd.forward(request, response);
                 return;
             }
-            else {
+            else { */
                 request.setAttribute("title",leadingTab.getTitle());
-            }
+            /* } */
 
             String body = leadingTab.getBody();
             if( body != null && body.startsWith("JSPBody:") )                 

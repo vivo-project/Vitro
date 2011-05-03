@@ -32,7 +32,7 @@ public class ClassGroupPageData implements PageDataGetter{
         data.put("classGroupUri", classGroupUri);
 
         VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
-        List<VClassGroup> vcgList = vcgc.getGroups(vreq.getPortalId());
+        List<VClassGroup> vcgList = vcgc.getGroups();
         VClassGroup group = null;
         for( VClassGroup vcg : vcgList){
             if( vcg.getURI() != null && vcg.getURI().equals(classGroupUri)){
@@ -71,7 +71,7 @@ public class ClassGroupPageData implements PageDataGetter{
     public static VClassGroupTemplateModel getClassGroup(String classGroupUri, ServletContext context, VitroRequest vreq){
         
         VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
-        List<VClassGroup> vcgList = vcgc.getGroups(vreq.getPortalId());
+        List<VClassGroup> vcgList = vcgc.getGroups();
         VClassGroup group = null;
         for( VClassGroup vcg : vcgList){
             if( vcg.getURI() != null && vcg.getURI().equals(classGroupUri)){
