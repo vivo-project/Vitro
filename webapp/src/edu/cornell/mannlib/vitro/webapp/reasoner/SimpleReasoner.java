@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.reasoner;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -10,6 +11,8 @@ import javax.servlet.ServletContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.ontology.AnnotationProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
@@ -41,16 +44,20 @@ public class SimpleReasoner extends StatementListener {
 	private static final Log log = LogFactory.getLog(SimpleReasoner.class);
 	//private static final MyTempLogger log = new MyTempLogger();
 	
-	private OntModel tboxModel;
-	private OntModel aboxModel;
-	private Model inferenceModel;
-	private Model inferenceRebuildModel;
-	private Model scratchpadModel;
+	private OntModel tboxModel;             // asserted and inferred TBox axioms
+	private OntModel aboxModel;             // ABox assertions
+	private Model inferenceModel;           // ABox inferences
+	private Model inferenceRebuildModel;    // work area for re-computing all ABox inferences
+	private Model scratchpadModel;          // work area for re-computing all ABox inferences
 	
 	private static final String topObjectPropertyURI = "http://www.w3.org/2002/07/owl#topObjectProperty";
 	private static final String bottomObjectPropertyURI = "http://www.w3.org/2002/07/owl#bottomObjectProperty";
 	private static final String topDataPropertyURI = "http://www.w3.org/2002/07/owl#topDataProperty";
 	private static final String bottomDataPropertyURI = "http://www.w3.org/2002/07/owl#bottomDataProperty";
+	private static final String mostSpecificTypePropertyURI = "http://vivoweb.org/ontology/core#mostSpecificType";
+	
+	private AnnotationProperty mostSpecificType = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createAnnotationProperty(mostSpecificTypePropertyURI);
+	
 	
 	/**
 	 * @param tboxModel - input.  This model contains both asserted and inferred TBox axioms
@@ -647,6 +654,106 @@ public class SimpleReasoner extends StatementListener {
 			aboxModel.leaveCriticalSection();
 			inferenceModel.leaveCriticalSection();
 		}
+	}
+		
+	/*
+     * Find the most specific types (classes) of an individual and
+     * indicate them for the individual with the core:mostSpecificType
+     * annotation.
+	 */
+	public void setMostSpecificTypes(Resource individual) {
+	
+		aboxModel.enterCriticalSection(Lock.READ);
+		inferenceModel.enterCriticalSection(Lock.READ);
+		tboxModel.enterCriticalSection(Lock.READ);
+		
+		try {
+			OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+			unionModel.addSubModel(aboxModel);
+			unionModel.addSubModel(inferenceModel);
+					
+			HashSet<String> typeURIs = new HashSet<String>();
+			StmtIterator iter = unionModel.listStatements((Resource) null, RDF.type, (RDFNode) null);
+			
+			while (iter.hasNext()) {
+				
+				Statement stmt = iter.next();
+				
+				if ( !stmt.getObject().isResource() ) {
+					log.warn("The object of this rdf:type assertion is expected to be a resource: " + stmtString(stmt));
+					continue;
+				}
+				
+				OntClass ontClass = tboxModel.getOntClass(stmt.getObject().asResource().getURI()); 
+				
+				if (ontClass == null) {
+					log.warn("Didn't find target class (the object of the added rdf:type statement) in the TBox: " + (stmt.getObject().asResource()).getURI());
+					continue;
+				}
+					
+				if (ontClass.isAnon()) continue;
+	
+                if (ontClass.hasSubClass()) continue;
+
+                typeURIs.add(ontClass.getURI());
+                
+                Iterator<OntClass> eIter = ontClass.listEquivalentClasses();
+                
+                while (eIter.hasNext()) {
+                	OntClass equivClass = eIter.next();
+                	if (equivClass.isAnon()) continue;
+                	typeURIs.add(equivClass.getURI());
+                }    
+			}
+			
+			setMostSpecificTypes(individual, typeURIs);
+			
+		} finally {
+			aboxModel.leaveCriticalSection();
+			tboxModel.leaveCriticalSection();
+			inferenceModel.leaveCriticalSection();
+		}
+	
+	    return;	
+	}
+	
+	public void setMostSpecificTypes(Resource individual, HashSet<String> typeURIs) {
+		
+		aboxModel.enterCriticalSection(Lock.WRITE);
+		
+		try {
+			// remove obsolete most-specific-type assertions
+			StmtIterator iter = aboxModel.listStatements((Resource) null, mostSpecificType, (RDFNode) null);
+			
+			while (iter.hasNext()) {
+				Statement stmt = iter.next();
+				
+				if ( !stmt.getObject().isLiteral() ) {
+					log.warn("The object of this assertion is expected to be a literal: " + stmtString(stmt));
+					continue;
+				}
+				
+				if (!typeURIs.contains(stmt.getObject().asLiteral().getLexicalForm())) {
+					aboxModel.remove(stmt);
+				}
+			}
+			
+			// add new most-specific-type assertions 
+			Iterator<String> typeIter = typeURIs.iterator();
+			
+			while (typeIter.hasNext()) {
+				String typeURI = typeIter.next();
+				Literal uriLiteral = ResourceFactory.createTypedLiteral(typeURI, XSDDatatype.XSDanyURI);
+				
+				if (!aboxModel.contains(individual, mostSpecificType, uriLiteral)) {
+					aboxModel.add(individual, mostSpecificType, uriLiteral);
+				}
+			}			
+		} finally {
+			aboxModel.leaveCriticalSection();
+		}
+	
+	    return;	
 	}
 	
 	private boolean recomputing = false;
