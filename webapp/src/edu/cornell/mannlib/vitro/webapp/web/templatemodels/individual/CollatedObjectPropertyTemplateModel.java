@@ -124,9 +124,8 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
             logData(statementData);
         }
         
-        // Compile a list of the statements with less specific subclasses, which should be removed
-        // from the statement data
-        List<Map<String, String>> statementsToRemove = new ArrayList<Map<String, String>>();  
+        // Compile a list of the statements with most specific subclasses; others will be removed
+        List<Map<String, String>> filteredList = new ArrayList<Map<String, String>>();  
         Set<String> processedObjects = new HashSet<String>();
         for (Map<String, String> outerMap : statementData) {
             String objectUri = outerMap.get(objectVariableName);
@@ -142,16 +141,15 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
             }
             // Sort the data for this object from most to least specific subclass, with nulls at end
             Collections.sort(dataForThisObject, new SubclassComparator(wdf)); 
-            dataForThisObject.remove(0); // Keep only the first one (most specific subclass)
-            statementsToRemove.addAll(dataForThisObject);
+            filteredList.add(dataForThisObject.get(0));
         }
 
-        // We remove statements from the original list, rather than returning a new list,
-        // in order to preserve the subclass orderings, since the collation depends on the
-        // statements being ordered first by subclass.
-        for (Map<String, String> map : statementsToRemove) {
-            statementData.remove(map);
-        }
+        // Use retainAll() rather than clear() plus addAll() in order to retain the subclass ordering
+        // of statementData. Otherwise the list is now ordered by author, whereas collate() assumes
+        // the list is ordered by subclass.
+        //statementData.clear();
+        //statementData.addAll(filteredList);
+        statementData.retainAll(filteredList);
         
         if (log.isDebugEnabled()) {
             log.debug("Data after subclass filtering");
