@@ -571,8 +571,8 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
         // of results, else the refinement links won't work correctly: if only Persons are on pg 1,
         // but there are FacultyMembers on pg 2, we still need to show the FacultyMember refinement
         // link on pg 1, which won't happen if we have retrieved only one page of results from Solr.
-        query.set("start", 0);
-        query.set("rows", maxHitCount);
+        query.setStart(0);
+        query.setRows(maxHitCount);
         
         // RY Add other stuff here
         // classgroups, type params
