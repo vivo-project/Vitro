@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -144,11 +143,6 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
             filteredList.add(dataForThisObject.get(0));
         }
 
-        // Use retainAll() rather than clear() plus addAll() in order to retain the subclass ordering
-        // of statementData. Otherwise the list is now ordered by author, whereas collate() assumes
-        // the list is ordered by subclass.
-        //statementData.clear();
-        //statementData.addAll(filteredList);
         statementData.retainAll(filteredList);
         
         if (log.isDebugEnabled()) {
@@ -201,31 +195,50 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         }       
     }
     
-    // Collate the statements by subclass. NB It is assumed that the statements in statementData 
-    // are ordered by subclass.
+    // Collate the statements by subclass. 
     private SortedMap<String, List<ObjectPropertyStatementTemplateModel>> collate(String subjectUri, String propertyUri,
             List<Map<String, String>> statementData, VitroRequest vreq, EditingPolicyHelper policyHelper) {
     
         SortedMap<String, List<ObjectPropertyStatementTemplateModel>> subclassMap = 
             new TreeMap<String, List<ObjectPropertyStatementTemplateModel>>();
-        String currentSubclassUri = null;
-        List<ObjectPropertyStatementTemplateModel> currentList = null;
+        
         String objectKey = getObjectKey();
+        
+        Map<String, String> subclassUrisToNames = new HashMap<String, String>();
+        
         for (Map<String, String> map : statementData) {
+            
             String subclassUri = map.get(SUBCLASS_VARIABLE_NAME);
+            
             // Rows with no subclass are put into a subclass map with an empty name.
             if (subclassUri == null) {
                 subclassUri = "";
             }
-            if (!subclassUri.equals(currentSubclassUri)) {
-                currentSubclassUri = subclassUri;
-                currentList = new ArrayList<ObjectPropertyStatementTemplateModel>();
-                String subclassName = getSubclassName(subclassUri, vreq);
-                subclassMap.put(subclassName, currentList);
+            
+            // Keep a map of subclass uris to subclass names, so we don't have
+            // to keep recomputing from the dao each time we hit the same subclass.
+            String subclassName;  
+            if (subclassUri.isEmpty()) {
+                subclassName = "";
+            } else if ( subclassUrisToNames.containsKey(subclassUri) ) {
+                subclassName = subclassUrisToNames.get(subclassUri);
+            } else {
+                subclassName = getSubclassName(subclassUri, vreq);
+                subclassUrisToNames.put(subclassUri, subclassName);
             }
-            currentList.add(new ObjectPropertyStatementTemplateModel(subjectUri, 
+
+            List<ObjectPropertyStatementTemplateModel> listForThisSubclass;
+            if ( subclassMap.containsKey(subclassName) ) {
+                listForThisSubclass = subclassMap.get(subclassName);              
+            } else {
+                listForThisSubclass = new ArrayList<ObjectPropertyStatementTemplateModel>();  
+                subclassMap.put(subclassName, listForThisSubclass);
+            }
+            
+            listForThisSubclass.add(new ObjectPropertyStatementTemplateModel(subjectUri, 
                     propertyUri, objectKey, map, policyHelper, getTemplateName()));
-        }   
+        } 
+ 
         return subclassMap; 
     }
     
