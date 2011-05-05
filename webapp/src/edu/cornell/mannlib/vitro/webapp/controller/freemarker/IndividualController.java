@@ -5,8 +5,10 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -36,6 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -47,6 +51,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
@@ -56,7 +61,6 @@ import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
-import edu.cornell.mannlib.vitro.webapp.web.functions.IndividualLocalNameMethod;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividualTemplateModel;
 import freemarker.ext.beans.BeansWrapper;
@@ -80,7 +84,6 @@ public class IndividualController extends FreemarkerHttpServlet {
     
     private static final String TEMPLATE_INDIVIDUAL_DEFAULT = "individual.ftl";
     private static final String TEMPLATE_HELP = "individual-help.ftl";
-    
     
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
@@ -132,7 +135,9 @@ public class IndividualController extends FreemarkerHttpServlet {
     		 * into the data model: no real data can be modified. 
     		 */
 	        body.put("individual", getNonDefaultBeansWrapper(BeansWrapper.EXPOSE_SAFE).wrap(itm));
-	        body.put("headContent", getRdfLinkTag(itm));	       
+	        body.put("headContent", getRdfLinkTag(itm));	    
+	        
+	        body.put("rdfaNamespaces", vreq.getWebappDaoFactory().getApplicationDao().getRdfaNamespaces());
 	        
 	        String template = getIndividualTemplate(individual, vreq);
 	                
@@ -704,5 +709,5 @@ public class IndividualController extends FreemarkerHttpServlet {
         
         return new TemplateResponseValues(Template.TITLED_ERROR_MESSAGE.toString(), body);
     }
-
+    
 }
