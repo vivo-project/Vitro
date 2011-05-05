@@ -283,9 +283,9 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
 
             long lastHitToShow = 0;
             if ((startIndex + hitsPerPage) > hitCount ) {
-                lastHitToShow = hitCount - 1;
+                lastHitToShow = hitCount;
             } else {
-                lastHitToShow = startIndex + hitsPerPage - 1;
+                lastHitToShow = startIndex + hitsPerPage;
             }
             
             List<Individual> individuals = new LinkedList<Individual>();      
