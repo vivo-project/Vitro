@@ -104,18 +104,13 @@ public class SparqlQueryServlet extends BaseEditController {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException
     {    	    	   	
-        if( !checkLoginStatus(request, response, LoginStatusBean.DBA) ) {
-        	return;
-        }
-        
+        if( ! hasPermission(request, response) ) 
+        	return;                      
+
+        if( noModelInContext(request,response))
+            return;               
+
         VitroRequest vreq = new VitroRequest(request);
-
-        Model model = vreq.getJenaOntModel(); 
-        if( model == null ){
-            doNoModelInContext(response);
-            return;
-        }
-
         String queryParam = vreq.getParameter("query");
         log.debug("queryParam was : " + queryParam);
 
@@ -143,7 +138,9 @@ public class SparqlQueryServlet extends BaseEditController {
         return;
     }
     
-	private Dataset chooseDatasetForQuery(VitroRequest vreq) {
+
+
+    protected Dataset chooseDatasetForQuery(VitroRequest vreq) {
 		Map<String, Model> modelMap = getModelsFromRequest(vreq);
 		if (!modelMap.isEmpty()) {
 			return buildDataSetFromNamedModels(modelMap);
@@ -168,7 +165,7 @@ public class SparqlQueryServlet extends BaseEditController {
 		return dataSource;
 	}
     
-	private Map<String, Model> getModelsFromRequest(HttpServletRequest request) {
+    protected Map<String, Model> getModelsFromRequest(HttpServletRequest request) {
 		String modelNames[] = request.getParameterValues("sourceModelName");
 		if ((modelNames == null) || (modelNames.length == 0)) {
 			return Collections.emptyMap();
@@ -188,7 +185,7 @@ public class SparqlQueryServlet extends BaseEditController {
 		return map;
 	}
 
-	private Dataset buildDataSetFromNamedModels(Map<String, Model> modelMap) {
+	protected Dataset buildDataSetFromNamedModels(Map<String, Model> modelMap) {
 		DataSource dataSource = DatasetFactory.create();
 		for (String name : modelMap.keySet()) {
 			Model model = modelMap.get(name);
@@ -209,7 +206,7 @@ public class SparqlQueryServlet extends BaseEditController {
 	}
 
     
-    private void executeQuery(HttpServletResponse response, String resultFormatParam, String rdfResultFormatParam, String queryParam, Dataset dataset ) throws IOException {
+	protected void executeQuery(HttpServletResponse response, String resultFormatParam, String rdfResultFormatParam, String queryParam, Dataset dataset ) throws IOException {
         
     	ResultSetFormat rsf = null;
     	/* BJL23 2008-11-06
@@ -256,7 +253,23 @@ public class SparqlQueryServlet extends BaseEditController {
         }        
     }
 
-    private void doNoModelInContext(HttpServletResponse res){
+    protected boolean hasPermission(HttpServletRequest request, HttpServletResponse response){
+        //This is split out to allow it to be overridden by classes that extend this.
+        return checkLoginStatus(request, response, LoginStatusBean.DBA) ;
+    }
+    
+    protected boolean noModelInContext(HttpServletRequest request,
+            HttpServletResponse response) {
+        VitroRequest vreq = new VitroRequest(request);
+        Model model = vreq.getJenaOntModel(); 
+        if( model == null ){
+            doNoModelInContext(response);
+            return true;
+        }        
+        return false;
+    }
+    
+    protected void doNoModelInContext(HttpServletResponse res){
         try {
             res.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
             ServletOutputStream sos = res.getOutputStream();
@@ -343,7 +356,7 @@ public class SparqlQueryServlet extends BaseEditController {
             }
             
             req.setAttribute("prefixList", prefixList);
-            
+            req.setAttribute("queryServlet", req.getRequestURI());
             req.setAttribute("portalBean",portal);
             // nac26: 2009-09-25 - this was causing problems in safari on localhost installations because the href did not include the context.  The edit.css is not being used here anyway (or anywhere else for that matter)
             // req.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");

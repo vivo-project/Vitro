@@ -8,7 +8,7 @@
 <body>
 <div id="content" class="sparqlform">
 <h2>SPARQL Query</h2>
-<form action='sparqlquery'>
+<form action='${queryServlet}'>
 <h3>Query:</h3>
 <div>
 <textarea name='query' rows ='30' cols='100' class="span-23 maxWidth">
