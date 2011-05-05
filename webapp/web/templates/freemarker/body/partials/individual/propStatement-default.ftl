@@ -2,4 +2,4 @@
 
 <#-- Default object property statement template -->
 
-<a href="${profileUrl(statement.object)}" rel="${statement.property}">${statement.name!}</a> ${statement.moniker!} 
+<a href="${profileUrl(statement.object)}">${statement.name!}</a> ${statement.moniker!} 

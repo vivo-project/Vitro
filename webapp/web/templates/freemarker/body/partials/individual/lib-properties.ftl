@@ -27,27 +27,11 @@
     Macros for generating property lists
 ------------------------------------------------------------------------------>
 
-<#--- Data properties --->
-
 <#macro dataPropertyList property editable>
     <#list property.statements as statement>
-        <@dataPropertyListItem property statement editable>${statement.value}</@dataPropertyListItem>
+        <@propertyListItem property statement editable>${statement.value}</@propertyListItem>
     </#list> 
 </#macro>
-
-<#macro dataPropertyListItem property statement editable>
-    <li role="listitem">  
-        <@dataPropertyStatement property><#nested></@dataPropertyStatement>          
-        <@editingLinks "${property.localName}" statement editable />
-    </li>
-</#macro>
-
-<#macro dataPropertyStatement property>
-    <span property="${property.uri}"><#nested></span>
-</#macro>
-
-
-<#--- Object properties --->
 
 <#macro objectProperty property editable template=property.template>
     <#if property.collatedBySubclass> <#-- collated -->
@@ -89,25 +73,9 @@ Assumes property is non-null. -->
 
 <#macro objectPropertyList property editable statements=property.statements template=property.template>
     <#list statements as statement>
-        <@objectPropertyListItem property statement editable><#include "${template}"></@objectPropertyListItem>
+        <@propertyListItem property statement editable><#include "${template}"></@propertyListItem>
     </#list>
 </#macro>
-
-<#macro objectPropertyListItem property statement editable>
-    <li role="listitem">  
-        <#nested>      
-        <@editingLinks "${property.localName}" statement editable />
-    </li>
-</#macro>
-
-
-<#--- Property label --->
-
-<#macro propertyLabel property label="${property.name?capitalize}">
-    <h2 id="${property.localName}">${label}</h2> 
-</#macro>
-
-<#--- Editing links --->
 
 <#-- Some properties usually display without a label. But if there's an add link, 
 we need to also show the property label. If no label is specified, the property
@@ -126,6 +94,17 @@ name will be used as the label. -->
             <a class="add-${property.localName}" href="${url}" title="Add new ${label?lower_case} entry"><img class="add-individual" src="${urls.images}/individual/addIcon.gif" alt="add" /></a>
         </#if>
     </#if>
+</#macro>
+
+<#macro propertyLabel property label="${property.name?capitalize}">
+    <h2 id="${property.localName}">${label}</h2> 
+</#macro>
+
+<#macro propertyListItem property statement editable>
+    <li role="listitem">    
+        <#nested>        
+        <@editingLinks "${property.localName}" statement editable />
+    </li>
 </#macro>
 
 <#macro editingLinks propertyLocalName statement editable>
@@ -195,13 +174,12 @@ name will be used as the label. -->
      Note that this macro has a side-effect in the call to propertyGroups.getPropertyAndRemoveFromList().
 -->
 <#macro image individual propertyGroups namespaces editable showPlaceholder="never" placeholder="">
-    <#local property = "${namespaces.vitroPublic}mainImage">
-    <#local mainImage = propertyGroups.getPropertyAndRemoveFromList(property)!>
+    <#local mainImage = propertyGroups.getPropertyAndRemoveFromList("${namespaces.vitroPublic}mainImage")!>
     <#local thumbUrl = individual.thumbUrl!>
     <#-- Don't assume that if the mainImage property is populated, there is a thumbnail image (though that is the general case).
          If there's a mainImage statement but no thumbnail image, treat it as if there is no image. -->
     <#if (mainImage.statements)?has_content && thumbUrl?has_content>
-        <a href="${individual.imageUrl}" rel="${property}"><img class="individual-photo" src="${thumbUrl}" title="click to view larger image" alt="${individual.name}" width="160" /></a>
+        <a href="${individual.imageUrl}"><img class="individual-photo" src="${thumbUrl}" title="click to view larger image" alt="${individual.name}" width="160" /></a>
         <@p.editingLinks "${mainImage.localName}" mainImage.first editable />
     <#else>
         <#local imageLabel><@p.addLinkWithLabel mainImage editable "Photo" /></#local>
@@ -217,6 +195,6 @@ name will be used as the label. -->
 <#-- Label -->
 <#macro label individual editable>
     <#local label = individual.nameStatement>
-    <span property="${namespaces.rdfs}label">${label.value}</span>
+    ${label.value}
     <@p.editingLinks "label" label editable />
 </#macro>
