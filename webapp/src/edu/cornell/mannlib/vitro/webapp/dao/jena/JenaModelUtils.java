@@ -51,6 +51,7 @@ public class JenaModelUtils {
 		nonIndividualTypeURIs.add(OWL.Restriction.getURI());
 		nonIndividualTypeURIs.add(OWL.ObjectProperty.getURI());
 		nonIndividualTypeURIs.add(OWL.DatatypeProperty.getURI());
+		nonIndividualTypeURIs.add(OWL.AnnotationProperty.getURI());
 		nonIndividualTypeURIs.add(OWL.Ontology.getURI());
 		nonIndividualTypeURIs.add(RDFS.Class.getURI());
 		nonIndividualTypeURIs.add(RDF.Property.getURI());
@@ -122,6 +123,7 @@ private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
 		queryStrList.add( makeDescribeQueryStr( OWL.Class.getURI(), namespace, graphURI ) );
 		queryStrList.add( makeDescribeQueryStr( OWL.ObjectProperty.getURI(), namespace, graphURI ) );
 		queryStrList.add( makeDescribeQueryStr( OWL.DatatypeProperty.getURI(), namespace, graphURI ) );
+		queryStrList.add( makeDescribeQueryStr( OWL.AnnotationProperty.getURI(), namespace, graphURI ) );
 		// if we're using to a hash namespace, the URI of the Ontology resource will be
 		// that namespace minus the final hash mark.
 		if ( namespace != null && namespace.endsWith("#") ) {
