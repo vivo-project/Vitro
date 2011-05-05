@@ -74,6 +74,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     private static final Log log = LogFactory.getLog(IndividualController.class);
     
     private static final Map<String, String> namespaces = new HashMap<String, String>() {{
+        put("rdfs", VitroVocabulary.RDFS);
         put("vitro", VitroVocabulary.vitroURI);
         put("vitroPublic", VitroVocabulary.VITRO_PUBLIC);
     }};

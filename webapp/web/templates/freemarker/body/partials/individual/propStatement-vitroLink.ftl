@@ -2,14 +2,23 @@
 
 <#-- Template for vitro:primaryLink and vitro:additionalLink -->
 
-<#assign linkText>
-    <#if statement.anchor??>${statement.anchor}
-    <#else>${statement.linkName} (no anchor text provided for link)
-    </#if>    
-</#assign>
+<@showLink statement />
 
-<#if statement.url??>
-    <a href="${statement.url}">${linkText}</a> 
-<#else>
-    <a href="${profileUrl(statement.link)}">${linkText}</a> (no url provided for link)    
-</#if>
+<#-- Use a macro to keep variable assignments local; otherwise the values carry over to the
+     next statement -->
+<#macro showLink statement>
+    <#if statement.anchor??>
+        <#local linkText = statement.anchor>
+        <#local attr = "rel=\"${statement.property} ${namespaces.vitro}linkAnchor\"">
+    <#else>
+        <#local linkText = "${statement.linkName} (no anchor text provided for link)">
+        <#local attr = "property=\"${statement.property}\"">
+    </#if>
+
+    <#if statement.url??>
+        <a href="${statement.url}" ${attr}>${linkText}</a> 
+    <#else>
+        <a href="${profileUrl(statement.link)}">${linkText}</a> (no url provided for link)    
+    </#if>
+</#macro>
+
