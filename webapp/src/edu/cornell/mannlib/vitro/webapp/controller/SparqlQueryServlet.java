@@ -50,6 +50,7 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
+import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 
 
 /**
@@ -114,7 +115,9 @@ public class SparqlQueryServlet extends BaseEditController {
         String queryParam = vreq.getParameter("query");
         log.debug("queryParam was : " + queryParam);
 
-        String resultFormatParam = vreq.getParameter("resultFormat");
+        String resultFormatParam = getFomratFromContentHeader(request);
+        if( resultFormatParam == null )
+            resultFormatParam = vreq.getParameter("resultFormat");        
         log.debug("resultFormat was: " + resultFormatParam);
         
         String rdfResultFormatParam = vreq.getParameter("rdfResultFormat");
@@ -139,6 +142,36 @@ public class SparqlQueryServlet extends BaseEditController {
     }
     
 
+
+    private String getFomratFromContentHeader(HttpServletRequest request) {        
+        //check the accept header
+        
+        String acceptHeader = request.getHeader("accept");
+        if (acceptHeader != null) {
+            ContentType contentType = null;
+            List<ContentType> actualContentTypes = new ArrayList<ContentType>();
+            actualContentTypes.add( ContentType.ANY );
+            actualContentTypes.add(new ContentType( RDFXML_MIMETYPE ));
+            actualContentTypes.add(new ContentType( N3_MIMETYPE ));
+            actualContentTypes.add(new ContentType( TTL_MIMETYPE ));
+            actualContentTypes.add( ContentType.JSON );            
+                    
+            contentType = ContentType.getBestContentType(acceptHeader,actualContentTypes);
+            
+            if (RDFXML_MIMETYPE.equals(contentType.getMediaType() )){
+                return ResultSetFormat.syntaxRDF_XML.getSymbol();
+            }else if( N3_MIMETYPE.equals(contentType.getMediaType()) ){
+                return ResultSetFormat.syntaxRDF_N3.getSymbol();
+            }else if( ContentType.JSON.getMediaType().equals( contentType.getMediaType() )){
+                return ResultSetFormat.syntaxJSON.getSymbol();
+            }else if ( TTL_MIMETYPE.equals(contentType.getMediaType())){
+                return ResultSetFormat.syntaxRDF_TURTLE.getSymbol();
+            }else if( ContentType.TEXT_PLAIN.getMediaType().equals(contentType.getMediaType())){
+                return ResultSetFormat.syntaxText.getSymbol();
+            }
+        }
+        return null;
+    }
 
     protected Dataset chooseDatasetForQuery(VitroRequest vreq) {
 		Map<String, Model> modelMap = getModelsFromRequest(vreq);
