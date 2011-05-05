@@ -1,8 +1,8 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.controller.freemarker.accountmanagement;
+package edu.cornell.mannlib.vitro.webapp.controller.accounts;
 
-import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.accountmanagement.UserAccountsOrdering.DEFAULT_ORDERING;
+import static edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.DEFAULT_ORDERING;
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -26,8 +26,12 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.accountmanagement.UserAccountsOrdering.Direction;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.accountmanagement.UserAccountsOrdering.Field;
+import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering;
+import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsSelection;
+import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsSelectionCriteria;
+import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsSelector;
+import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.Direction;
+import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.Field;
 
 public class UserAccountsSelectorTest extends AbstractTestClass {
 	/**
@@ -55,7 +59,7 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 
 	@Before
 	public void setLoggingLevel() {
-		setLoggerLevel(UserAccountsSelector.class, Level.DEBUG);
+		setLoggerLevel(UserAccountsSelector.class, Level.ERROR); // TODO
 	}
 
 	// ----------------------------------------------------------------------

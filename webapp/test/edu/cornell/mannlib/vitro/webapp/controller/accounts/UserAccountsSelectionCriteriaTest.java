@@ -1,11 +1,14 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.controller.freemarker.accountmanagement;
+package edu.cornell.mannlib.vitro.webapp.controller.accounts;
 
-import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.accountmanagement.UserAccountsOrdering.DEFAULT_ORDERING;
+import static edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.DEFAULT_ORDERING;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+
+import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering;
+import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsSelectionCriteria;
 
 public class UserAccountsSelectionCriteriaTest {
 	private UserAccountsSelectionCriteria criteria;

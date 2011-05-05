@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.controller.freemarker.accountmanagement;
+package edu.cornell.mannlib.vitro.webapp.controller.accounts;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,7 +25,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.accountmanagement.UserAccountsOrdering.Field;
+import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.Field;
 
 /**
  * Pull some UserAccounts from the model, based on a set of criteria.
