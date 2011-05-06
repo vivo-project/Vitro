@@ -148,18 +148,8 @@ public class IndividualTemplateModel extends BaseTemplateModel {
      * DataProperty from it. It cannot be handled the way the vitro links and vitro public image
      * are handled like ordinary ObjectProperty instances.
      */
-    public DataPropertyStatementTemplateModel getNameStatement() {
-        String propertyUri = VitroVocabulary.LABEL; // rdfs:label
-        DataPropertyStatementTemplateModel dpstm = new DataPropertyStatementTemplateModel(getUri(), propertyUri, vreq, policyHelper);
-        
-        // If the individual has no rdfs:label, return the local name. It will not be editable (this replicates previous behavior;
-        // perhaps we would want to allow a label to be added. But such individuals do not usually have their profiles viewed or
-        // edited directly.
-        if (dpstm.getValue() == null) {
-            dpstm.setValue(getLocalName());
-        }
-        
-        return dpstm;
+    public NameStatementTemplateModel getNameStatement() {
+        return new NameStatementTemplateModel(getUri(), vreq, policyHelper);
     }
     
     public String getSelfEditingId() {

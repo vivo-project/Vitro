@@ -213,7 +213,7 @@ public class OntologyDaoJena extends JenaBaseDao implements OntologyDao {
                     String prefix = o.getPrefix();
                     if (prefix == null) {
                         if (VitroVocabulary.VITRO_PUBLIC.equals(uri)) {
-                            prefix = "vpub";
+                            prefix = "vpub";                        
                         } else {
                             prefix = "";
                         }
@@ -222,8 +222,9 @@ public class OntologyDaoJena extends JenaBaseDao implements OntologyDao {
                     ontNamespaceToPrefix.put(uri, prefix);
                 }
             }
-            // Removed by getAllOntologies()
+            // Not returned by getAllOntologies()
             ontNamespaceToPrefix.put(VitroVocabulary.vitroURI, "vitro");
+            ontNamespaceToPrefix.put(VitroVocabulary.RDFS, "rdfs");
         }
         
         return ontNamespaceToPrefix;

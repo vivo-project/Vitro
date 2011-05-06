@@ -27,11 +27,33 @@
     Macros for generating property lists
 ------------------------------------------------------------------------------>
 
+<#----- Data properties ----->
+
 <#macro dataPropertyList property editable>
     <#list property.statements as statement>
-        <@propertyListItem property statement editable>${statement.value}</@propertyListItem>
+        <@dataPropertyListItem property statement editable>${statement.value}</@dataPropertyListItem>
     </#list> 
 </#macro>
+
+<#macro dataPropertyListItem property statement editable>
+    <li role="listitem">
+        <@rdfaDataValue property><#nested></@rdfaDataValue>      
+        <@editingLinks "${property.localName}" statement editable />
+    </li>
+</#macro>
+
+<#-- Wrap the data property statement in a span to provide rdfa property attribute -->
+<#macro rdfaDataValue property>
+    <span property="${property.curie}"><#nested></span>
+</#macro>
+
+<#-- Expose rdfa without a display element -->
+<#macro rdfaDataContent property statement>
+    <span property="${property.curie}" content="${statement.value}" />
+</#macro>
+
+
+<#----- Object properties ----->
 
 <#macro objectProperty property editable template=property.template>
     <#if property.collatedBySubclass> <#-- collated -->
@@ -73,9 +95,26 @@ Assumes property is non-null. -->
 
 <#macro objectPropertyList property editable statements=property.statements template=property.template>
     <#list statements as statement>
-        <@propertyListItem property statement editable><#include "${template}"></@propertyListItem>
+        <@objectPropertyListItem property statement editable><#include "${template}"></@objectPropertyListItem>
     </#list>
 </#macro>
+
+<#macro objectPropertyListItem property statement editable>
+    <li role="listitem">
+        <#nested>     
+        <@editingLinks "${property.localName}" statement editable />
+    </li>
+</#macro>
+
+
+<#----- Property label ----->
+
+<#macro propertyLabel property label="${property.name?capitalize}">
+    <h2 id="${property.localName}">${label}</h2> 
+</#macro>
+
+
+<#----- Editing links ----->
 
 <#-- Some properties usually display without a label. But if there's an add link, 
 we need to also show the property label. If no label is specified, the property
@@ -96,16 +135,9 @@ name will be used as the label. -->
     </#if>
 </#macro>
 
-<#macro propertyLabel property label="${property.name?capitalize}">
-    <h2 id="${property.localName}">${label}</h2> 
-</#macro>
 
-<#macro propertyListItem property statement editable>
-    <li role="listitem">    
-        <#nested>        
-        <@editingLinks "${property.localName}" statement editable />
-    </li>
-</#macro>
+
+
 
 <#macro editingLinks propertyLocalName statement editable>
     <#if editable>
@@ -195,6 +227,10 @@ name will be used as the label. -->
 <#-- Label -->
 <#macro label individual editable>
     <#local label = individual.nameStatement>
-    ${label.value}
+    <#if label.curie?has_content>
+        <span property="${label.curie}">${label.value}</span>
+    <#else>
+        ${label.value}
+    </#if>
     <@p.editingLinks "label" label editable />
 </#macro>

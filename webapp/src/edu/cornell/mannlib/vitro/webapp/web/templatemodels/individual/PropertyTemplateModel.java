@@ -52,6 +52,11 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     }
 
     private void setCurie(VitroRequest vreq) {
+        curie = getCurieForUri(propertyUri, vreq);
+    }
+    
+    protected static String getCurieForUri(String propertyUri, VitroRequest vreq) {
+        String curie = null;
         try {
             Map<String, String> ontologyNamespaces = vreq.getWebappDaoFactory()
                                                          .getOntologyDao()
@@ -60,15 +65,14 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
             String namespace = uri.getNamespace();
             String prefix = ontologyNamespaces.get(namespace);
             if (prefix == null) {
-                curie = null;
             } else {
                 String localName = uri.getLocalName();
                 curie = prefix + ":" + localName;
             }
         } catch (Exception e) {
             log.error(e, e);
-            curie = null;
         }
+        return curie;
     }
     
     /* Access methods for templates */

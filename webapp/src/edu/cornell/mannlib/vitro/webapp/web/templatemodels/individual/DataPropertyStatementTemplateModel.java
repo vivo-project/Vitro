@@ -26,7 +26,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
     private static final Log log = LogFactory.getLog(DataPropertyStatementTemplateModel.class); 
     private static final String EDIT_PATH = "edit/editDatapropStmtRequestDispatch.jsp";  
     
-    private String value = null;
+    protected String value = null;
     
     // Used for editing
     private String dataPropHash = null;
@@ -46,25 +46,11 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
      * to handle rdfs:label like vitro links and vitroPublic image, because it is not possible to construct a DataProperty from
      * rdfs:label. 
      */
-    DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, VitroRequest vreq, EditingPolicyHelper policyHelper) {
+    DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, EditingPolicyHelper policyHelper) {
         super(subjectUri, propertyUri, policyHelper);
-        
-        DataPropertyStatementDao dpsDao = vreq.getWebappDaoFactory().getDataPropertyStatementDao();
-        List<Literal> literals = dpsDao.getDataPropertyValuesForIndividualByProperty(subjectUri, propertyUri);
-        
-        // Make sure the subject has a value for this property 
-        if (literals.size() > 0) {
-            Literal literal = literals.get(0);
-            value = literal.getLexicalForm();
-            setEditAccess(literal, policyHelper);
-        } 
     }
     
-    protected void setValue(String value) {
-        this.value = value;
-    }
-    
-    private void setEditAccess(Literal value, EditingPolicyHelper policyHelper) {
+    protected void setEditAccess(Literal value, EditingPolicyHelper policyHelper) {
         
         if (policyHelper != null) { // we're editing         
             DataPropertyStatement dps = new DataPropertyStatementImpl(subjectUri, propertyUri, value.getLexicalForm());
