@@ -31,9 +31,10 @@ public class JenaBaseDaoCon {
         ADDITIONAL_LINK.addProperty(PROPERTY_SELECTFROMEXISTINGANNOT, _constModel.createTypedLiteral(false));
     }
 
-    /* ***************** Vitro ontology constants ***************** */
-
+    
     private OntModel _constModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);
+    
+    /* ***************** Vitro ontology constants ***************** */
 
     public    DatatypeProperty   SUNRISE = _constModel.createDatatypeProperty(VitroVocabulary.SUNRISE);
     public    DatatypeProperty   SUNSET = _constModel.createDatatypeProperty(VitroVocabulary.SUNSET);
@@ -103,6 +104,7 @@ public class JenaBaseDaoCon {
     protected DatatypeProperty   LINK_TYPE = _constModel.createDatatypeProperty(VitroVocabulary.LINK_TYPE);
     protected DatatypeProperty   LINK_DISPLAYRANK = _constModel.createDatatypeProperty(VitroVocabulary.LINK_DISPLAYRANK_URL);
 
+    // TODO This goes away when the UserAccount stuff is fully implemented - jblake
     protected OntClass           USER = _constModel.createClass(VitroVocabulary.USER);
 
 //    protected  OntClass           APPLICATION = null;
@@ -187,6 +189,26 @@ public class JenaBaseDaoCon {
 
     protected  ObjectProperty     IND_MAIN_IMAGE = _constModel.createObjectProperty(VitroVocabulary.IND_MAIN_IMAGE);
     protected  ObjectProperty     IND_IMAGE = _constModel.createObjectProperty(VitroVocabulary.IND_IMAGE);
+
+    /* ***************** User Account Model constants ***************** */
+
+    protected  OntClass           USERACCOUNT = _constModel.createClass(VitroVocabulary.USERACCOUNT);
+    protected  DatatypeProperty   USERACCOUNT_EMAIL_ADDRESS = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_EMAIL_ADDRESS);
+    protected  DatatypeProperty   USERACCOUNT_FIRST_NAME = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_FIRST_NAME);
+    protected  DatatypeProperty   USERACCOUNT_LAST_NAME = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_LAST_NAME);
+    protected  DatatypeProperty   USERACCOUNT_MD5_PASSWORD = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_MD5_PASSWORD);
+    protected  DatatypeProperty   USERACCOUNT_OLD_PASSWORD = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_OLD_PASSWORD);
+    protected  DatatypeProperty   USERACCOUNT_LOGIN_COUNT = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_LOGIN_COUNT);
+    protected  DatatypeProperty   USERACCOUNT_STATUS = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_STATUS);
+    protected  DatatypeProperty   USERACCOUNT_PASSWORD_LINK_EXPIRES = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_PASSWORD_LINK_EXPIRES);
+    protected  DatatypeProperty   USERACCOUNT_PASSWORD_CHANGE_REQUIRED = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_PASSWORD_CHANGE_REQUIRED);
+    protected  ObjectProperty     USERACCOUNT_HAS_PERMISSION_SET = _constModel.createObjectProperty(VitroVocabulary.USERACCOUNT_HAS_PERMISSION_SET);
+
+    protected  OntClass           PERMISSIONSET = _constModel.createClass(VitroVocabulary.PERMISSIONSET);
+    protected  ObjectProperty     PERMISSIONSET_HAS_PERMISSION = _constModel.createObjectProperty(VitroVocabulary.PERMISSIONSET_HAS_PERMISSION);
+
+    protected  OntClass           PERMISSION = _constModel.createClass(VitroVocabulary.PERMISSION);
+    
 
     public OntModel getConstModel() {
         return _constModel;

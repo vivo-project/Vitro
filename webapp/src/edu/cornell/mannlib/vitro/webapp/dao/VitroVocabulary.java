@@ -8,6 +8,7 @@ public class VitroVocabulary {
 	
     public static final String vitroURI = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#";
     
+    public static final String VITRO_AUTH = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#";
     public static final String VITRO_PUBLIC = "http://vitro.mannlib.cornell.edu/ns/vitro/public#";
     
     
@@ -207,6 +208,7 @@ public class VitroVocabulary {
 
     // =============== Vitro User vocabulary =================================
 
+    // TODO - these go away when the UserAccount stuff is fully implemented - jblake
     public static final String USER = vitroURI+"User";
     public static final String USER_USERNAME = vitroURI+"username";
     public static final String USER_MD5PASSWORD = vitroURI+"md5password";
@@ -217,6 +219,25 @@ public class VitroVocabulary {
     public static final String USER_LASTNAME = vitroURI+"lastName";
     public static final String USER_FIRSTNAME = vitroURI+"firstName";
     public static final String MAY_EDIT_AS = vitroURI+"mayEditAs";
+
+    // =============== Vitro UserAccount and PermissionSet vocabulary ===========
+    
+    public static final String USERACCOUNT = VITRO_AUTH + "UserAccount";
+    public static final String USERACCOUNT_EMAIL_ADDRESS = VITRO_AUTH + "emailAddress";
+    public static final String USERACCOUNT_FIRST_NAME = VITRO_AUTH + "firstName";
+    public static final String USERACCOUNT_LAST_NAME = VITRO_AUTH + "lastName";
+    public static final String USERACCOUNT_MD5_PASSWORD = VITRO_AUTH + "md5password";
+    public static final String USERACCOUNT_OLD_PASSWORD = VITRO_AUTH + "oldpassword";
+    public static final String USERACCOUNT_LOGIN_COUNT = VITRO_AUTH + "loginCount";
+    public static final String USERACCOUNT_STATUS = VITRO_AUTH + "status";
+    public static final String USERACCOUNT_PASSWORD_LINK_EXPIRES = VITRO_AUTH + "passwordLinkExpires";
+    public static final String USERACCOUNT_PASSWORD_CHANGE_REQUIRED = VITRO_AUTH + "passwordChangeRequired";
+    public static final String USERACCOUNT_HAS_PERMISSION_SET = VITRO_AUTH + "hasPermissionSet";
+
+    public static final String PERMISSIONSET = VITRO_AUTH + "PermissionSet";
+    public static final String PERMISSIONSET_HAS_PERMISSION = VITRO_AUTH + "hasPermission";
+
+    public static final String PERMISSION = VITRO_AUTH + "Permission";
 
     // =============== model auditing vocabulary =============================
 
