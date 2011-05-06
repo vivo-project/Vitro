@@ -227,9 +227,9 @@ name will be used as the label. -->
 <#-- Label -->
 <#macro label individual editable>
     <#local label = individual.nameStatement>
-    <#if label.curie?has_content>
+    <#if label.curie?has_content> <#-- rdfs:label -->
         <span property="${label.curie}">${label.value}</span>
-    <#else>
+    <#else> <#-- local name -->
         ${label.value}
     </#if>
     <@p.editingLinks "label" label editable />

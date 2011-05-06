@@ -2,73 +2,78 @@
 
 <#-- Default individual profile page template -->
 
-<section id="individual-intro" class="vcard" role="region">
-    <#-- Image -->
-    <#assign individualImage>
-        <@p.image individual=individual 
-                  propertyGroups=propertyGroups 
-                  namespaces=namespaces 
-                  editable=editable 
-                  showPlaceholder="with_add_link" 
-                  placeholder="${urls.images}/placeholders/non.person.thumbnail.jpg" />
-    </#assign>
-    
-    <#if ( individualImage?contains('<img class="individual-photo"') )>
-        <#assign infoClass = 'class="withThumb"'/>
-    </#if>
-    
-    <div id="photo-wrapper">${individualImage}</div>
-    
-    <section id="individual-info" ${infoClass!} role="region">
-        <#if individual.showAdminPanel>
-               <#include "individual-adminPanel.ftl">
+<div about="${individual.uri}"
+    <#list rdfaNamespaces as ns>${ns}</#list>
+>
+    <section id="individual-intro" class="vcard" role="region">
+        <#-- Image -->
+        <#assign individualImage>
+            <@p.image individual=individual 
+                      propertyGroups=propertyGroups 
+                      namespaces=namespaces 
+                      editable=editable 
+                      showPlaceholder="with_add_link" 
+                      placeholder="${urls.images}/placeholders/non.person.thumbnail.jpg" />
+        </#assign>
+        
+        <#if ( individualImage?contains('<img class="individual-photo"') )>
+            <#assign infoClass = 'class="withThumb"'/>
         </#if>
         
-        <header>
-            <#if relatedSubject??>
-                <h2>${relatedSubject.relatingPredicateDomainPublic} for ${relatedSubject.name}</h2>
-                <p><a href="${relatedSubject.url}">&larr; return to ${relatedSubject.name}</a></p>                
-            <#else>                
-                <h1 class="fn">
-                    <#-- Label -->
-                    <@p.label individual editable />
-                        
-                    <#-- Moniker -->
-                    <#if individual.moniker?has_content>
-                        <span class="preferred-title">${individual.moniker}</span>                  
-                    </#if>
-                </h1>
-            </#if>
-        </header>
+        <div id="photo-wrapper">${individualImage}</div>
         
-        <nav role="navigation">
-            <ul id ="individual-tools" role="list">                          
-                <li role="listitem"><img title="${individual.uri}" class="middle" src="${urls.images}/individual/uriIcon.gif" alt="uri icon" /></li>
-                
-                <#assign rdfUrl = individual.rdfUrl>
-                <#if rdfUrl??>
-                    <li role="listitem"><a title="View this individual in RDF format" class="icon-rdf" href="${rdfUrl}">RDF</a></li>
+        <section id="individual-info" ${infoClass!} role="region">
+            <#if individual.showAdminPanel>
+                   <#include "individual-adminPanel.ftl">
+            </#if>
+            
+            <header>
+                <#if relatedSubject??>
+                    <h2>${relatedSubject.relatingPredicateDomainPublic} for ${relatedSubject.name}</h2>
+                    <p><a href="${relatedSubject.url}">&larr; return to ${relatedSubject.name}</a></p>                
+                <#else>                
+                    <h1 class="fn">
+                        <#-- Label -->
+                        <@p.label individual editable />
+                            
+                        <#-- Moniker -->
+                        <#if individual.moniker?has_content>
+                            <span class="preferred-title">${individual.moniker}</span>                  
+                        </#if>
+                    </h1>
                 </#if>
-            </ul>
-        </nav>
-                
-        <#-- Links -->
-        <@p.vitroLinks propertyGroups namespaces editable  />
+            </header>
+            
+            <nav role="navigation">
+                <ul id ="individual-tools" role="list">                          
+                    <li role="listitem"><img title="${individual.uri}" class="middle" src="${urls.images}/individual/uriIcon.gif" alt="uri icon" /></li>
+                    
+                    <#assign rdfUrl = individual.rdfUrl>
+                    <#if rdfUrl??>
+                        <li role="listitem"><a title="View this individual in RDF format" class="icon-rdf" href="${rdfUrl}">RDF</a></li>
+                    </#if>
+                </ul>
+            </nav>
+                    
+            <#-- Links -->
+            <@p.vitroLinks propertyGroups namespaces editable  />
+    
+        <#if individualProductExtension??>
+            ${individualProductExtension}
+        <#else>
+                </section> <!-- individual-info -->
+            </section> <!-- individual-intro -->
+        </#if>
+    
+    <#assign nameForOtherGroup = "other"> <#-- used by both individual-propertyGroupMenu.ftl and individual-properties.ftl -->
+    
+    <#-- Property group menu -->
+    <#include "individual-propertyGroupMenu.ftl">
+    
+    <#-- Ontology properties -->
+    <#include "individual-properties.ftl">
 
-    <#if individualProductExtension??>
-        ${individualProductExtension}
-    <#else>
-            </section> <!-- individual-info -->
-        </section> <!-- individual-intro -->
-    </#if>
-
-<#assign nameForOtherGroup = "other"> <#-- used by both individual-propertyGroupMenu.ftl and individual-properties.ftl -->
-
-<#-- Property group menu -->
-<#include "individual-propertyGroupMenu.ftl">
-
-<#-- Ontology properties -->
-<#include "individual-properties.ftl">
+</div>
 
 ${stylesheets.add("/css/individual/individual.css")}
                            
