@@ -9,5 +9,5 @@
         <#else>
             <span about="${statement.object}">${statement.localname}</span><#t>
         </#if>
-    </span>
+    </span><#t>
 </a> ${statement.moniker!} 
