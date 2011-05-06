@@ -171,11 +171,11 @@ public class UserAccountsSelector {
 	private String ordering() {
 		UserAccountsOrdering orderBy = criteria.getOrderBy();
 		String keyword = orderBy.getDirection().keyword;
-		String variable = orderBy.getField().variableName;
+		String variable = orderBy.getField().name;
 		if (orderBy.getField() == Field.EMAIL) {
 			return keyword + "(?" + variable + ")";
 		} else {
-			return keyword + "(?" + variable + ") ?" + Field.EMAIL.variableName;
+			return keyword + "(?" + variable + ") ?" + Field.EMAIL.name;
 		}
 	}
 
@@ -272,7 +272,7 @@ public class UserAccountsSelector {
 			user.setMd5password(ifLiteralPresent(solution, "pwd", ""));
 			user.setPasswordChangeExpires(ifLongPresent(solution, "expire", 0L));
 			user.setLoginCount(ifIntPresent(solution, "count", 0));
-			user.setStatus(parseStatus(solution, "status", Status.INACTIVE));
+			user.setStatus(parseStatus(solution, "status", null));
 			return user;
 		}
 

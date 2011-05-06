@@ -2,12 +2,29 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts;
 
+
 /**
  * How are the accounts to be sorted?
  */
 public class UserAccountsOrdering {
 	public enum Direction {
 		ASCENDING("ASC"), DESCENDING("DESC");
+
+		public static Direction DEFAULT_DIRECTION = ASCENDING;
+
+		public static Direction fromKeyword(String keyword) {
+			if (keyword == null) {
+				return DEFAULT_DIRECTION;
+			}
+
+			for (Direction d : Direction.values()) {
+				if (d.keyword.equals(keyword)) {
+					return d;
+				}
+			}
+
+			return DEFAULT_DIRECTION;
+		}
 
 		public final String keyword;
 
@@ -20,15 +37,31 @@ public class UserAccountsOrdering {
 		EMAIL("email"), FIRST_NAME("firstName"), LAST_NAME("lastName"), STATUS(
 				"status"), ROLE("ps"), LOGIN_COUNT("count");
 
-		public final String variableName;
+		public static Field DEFAULT_FIELD = EMAIL;
 
-		Field(String variableName) {
-			this.variableName = variableName;
+		public static Field fromName(String name) {
+			if (name == null) {
+				return DEFAULT_FIELD;
+			}
+
+			for (Field f : Field.values()) {
+				if (f.name.equals(name)) {
+					return f;
+				}
+			}
+
+			return DEFAULT_FIELD;
+		}
+
+		public final String name;
+
+		Field(String name) {
+			this.name = name;
 		}
 	}
 
 	public static final UserAccountsOrdering DEFAULT_ORDERING = new UserAccountsOrdering(
-			Field.EMAIL, Direction.ASCENDING);
+			Field.DEFAULT_FIELD, Direction.DEFAULT_DIRECTION);
 
 	private final Field field;
 	private final Direction direction;

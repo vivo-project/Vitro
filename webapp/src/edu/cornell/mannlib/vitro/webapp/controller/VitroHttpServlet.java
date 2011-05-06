@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -205,4 +206,16 @@ public class VitroHttpServlet extends HttpServlet {
 					"accept-language", "accept-encoding", "accept-charset",
 					"keep-alive", "connection" }));
 
+	/**
+	 * A child class may call this if logging is set to debug level.
+	 */
+	protected void dumpRequestParameters(HttpServletRequest req) {
+		@SuppressWarnings("unchecked")
+		Map<String, String[]> map = req.getParameterMap();
+		for (String key : map.keySet()) {
+			String[] values = map.get(key);
+			log.debug("Parameter '" + key + "' = "
+					+ Arrays.deepToString(values));
+		}
+	}
 }

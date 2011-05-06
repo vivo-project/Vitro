@@ -19,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndividuals;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditSiteInformation;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeSiteAdminPage;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
@@ -123,8 +124,12 @@ public class SiteAdminController extends FreemarkerHttpServlet {
 			urls.put("tabs", urlBuilder.getPortalUrl("/listTabs"));
 		}
         
+		// TODO remove this when the UserAccounts are fully implemented. -- jblake
         if (PolicyHelper.isAuthorizedForActions(vreq, UsersListingController.REQUIRED_ACTIONS)) {                
             urls.put("users", urlBuilder.getPortalUrl("/listUsers"));
+        }
+        if (PolicyHelper.isAuthorizedForActions(vreq, new ManageUserAccounts())) {
+        	urls.put("userList", urlBuilder.getPortalUrl("/listUserAccounts"));
         }
  
 		if (PolicyHelper.isAuthorizedForActions(vreq, new EditSiteInformation())) {

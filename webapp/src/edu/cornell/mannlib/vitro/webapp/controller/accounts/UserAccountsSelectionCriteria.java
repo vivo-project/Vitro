@@ -7,6 +7,8 @@ package edu.cornell.mannlib.vitro.webapp.controller.accounts;
  * On what basis are we selecting user accounts?
  */
 public class UserAccountsSelectionCriteria {
+	public static final int DEFAULT_ACCOUNTS_PER_PAGE = 25;
+
 	/** How many accounts should we bring back, at most? */
 	private final int accountsPerPage;
 
@@ -66,4 +68,5 @@ public class UserAccountsSelectionCriteria {
 	private <T> T nonNull(T t, T nullValue) {
 		return (t == null) ? nullValue : t;
 	}
+
 }
