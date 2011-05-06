@@ -42,7 +42,7 @@ public interface VitroFilters {
 
     public UnaryFunctor<VClassGroup, Boolean> getVClassGroupFilter();
 
-
+    // TODO This goes away when the UserAccounts stuff is fully implemented -- jb
     public UnaryFunctor<User, Boolean> getUserFilter();
     
     public UnaryFunctor<PropertyGroup, Boolean> getPropertyGroupFilter();

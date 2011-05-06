@@ -269,8 +269,8 @@ public class UserAccountsSelector {
 			user.setEmailAddress(solution.getLiteral("email").getString());
 			user.setFirstName(ifLiteralPresent(solution, "firstName", ""));
 			user.setLastName(ifLiteralPresent(solution, "lastName", ""));
-			user.setMd5password(ifLiteralPresent(solution, "pwd", ""));
-			user.setPasswordChangeExpires(ifLongPresent(solution, "expire", 0L));
+			user.setMd5Password(ifLiteralPresent(solution, "pwd", ""));
+			user.setPasswordLinkExpires(ifLongPresent(solution, "expire", 0L));
 			user.setLoginCount(ifIntPresent(solution, "count", 0));
 			user.setStatus(parseStatus(solution, "status", null));
 			return user;

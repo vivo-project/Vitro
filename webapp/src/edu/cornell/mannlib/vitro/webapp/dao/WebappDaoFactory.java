@@ -124,7 +124,10 @@ public interface WebappDaoFactory {
 
     public FlagDao getFlagDao();
 
+    // TODO This goes away when the UserAccounts stuff is fully implemented - jblake.
     public UserDao getUserDao();
+    
+    public UserAccountsDao getUserAccountsDao();
 
     public VClassGroupDao getVClassGroupDao();
 

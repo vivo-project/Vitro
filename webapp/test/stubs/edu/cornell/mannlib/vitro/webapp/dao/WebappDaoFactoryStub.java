@@ -29,6 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
 import edu.cornell.mannlib.vitro.webapp.dao.TabIndividualRelationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.TabVClassRelationDao;
+import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
@@ -240,12 +241,19 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 				"WebappDaoFactory.getFlagDao() not implemented.");
 	}
 
+    // TODO This goes away when the UserAccounts stuff is fully implemented -- jb
 	@Override
 	public UserDao getUserDao() {
 		throw new RuntimeException(
 				"WebappDaoFactory.getUserDao() not implemented.");
 	}
 
+	@Override
+	public UserAccountsDao getUserAccountsDao() {
+		throw new RuntimeException(
+		"WebappDaoFactory.getUserAccountsDao() not implemented.");
+	}
+	
 	@Override
 	public VClassGroupDao getVClassGroupDao() {
 		throw new RuntimeException(

@@ -93,8 +93,8 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 		assertEquals("email", "email@jones.edu", acct.getEmailAddress());
 		assertEquals("firstName", "Brian", acct.getFirstName());
 		assertEquals("lastName", "Caruso", acct.getLastName());
-		assertEquals("password", "garbage", acct.getMd5password());
-		assertEquals("expires", 1100234965897L, acct.getPasswordChangeExpires());
+		assertEquals("password", "garbage", acct.getMd5Password());
+		assertEquals("expires", 1100234965897L, acct.getPasswordLinkExpires());
 		assertEquals("loginCount", 50, acct.getLoginCount());
 		assertEquals("status", UserAccount.Status.ACTIVE, acct.getStatus());
 		assertEqualSets(

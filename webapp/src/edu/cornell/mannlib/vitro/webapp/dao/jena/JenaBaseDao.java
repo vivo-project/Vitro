@@ -5,8 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -31,8 +31,6 @@ import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.rdf.model.Literal;
@@ -119,10 +117,10 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     protected String getPropertyStringValue(OntResource res, Property dataprop) {
         if (dataprop != null) {
             try {
-                ClosableIterator stateIt = res.getModel().listStatements(res,dataprop,(Literal)null);
+                ClosableIterator<Statement> stateIt = res.getModel().listStatements(res,dataprop,(Literal)null);
                 try {
                     if (stateIt.hasNext())
-                        return ((Literal)((Statement)stateIt.next()).getObject()).getString();
+                        return ((Literal)stateIt.next().getObject()).getString();
                     else
                         return null;
                 } finally {
@@ -323,6 +321,21 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     /**
      * convenience method
      */
+    protected long getPropertyLongValue(OntResource res, Property dataprop) {
+        if (dataprop != null) {
+            try {
+                return ((Literal)res.getPropertyValue(dataprop)).getLong();
+            } catch (Exception e) {
+                return -1L;
+            }
+        } else {
+            return -1L;
+        }
+    }
+
+    /**
+     * convenience method
+     */
     protected void addPropertyFloatValue(Resource res, Property dataprop, Float value, Model model) {
         if (dataprop != null && value!= null) {
             model.add(res, dataprop, Float.toString(value), XSDDatatype.XSDfloat);
@@ -441,9 +454,6 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 
     /**
      * convenience method
-     * @param ind
-     * @param dataprop
-     * @param value
      */
     protected synchronized void addPropertyDateTimeValue(Resource res, Property dataprop, Date value, Model model) {
         if (dataprop != null && value != null) {
@@ -479,6 +489,28 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         }
     }
 
+    /**
+     * convenience method for use with functional object properties
+     */
+    protected Collection<String> getPropertyResourceURIValues(Resource res, ObjectProperty prop) {
+    	List<String> list = new ArrayList<String>();
+    	if (prop != null) {
+    		try {
+    			ClosableIterator<Statement> stateIt = res.getModel().listStatements(res,prop,(Literal)null);
+    			try {
+    				while(stateIt.hasNext()) {
+    					list.add(stateIt.next().getObject().asResource().getURI());
+    				}
+    			} finally {
+    				stateIt.close();
+    			}
+    		} catch (Exception e) {
+    			log.debug("can't get object property URI values: ", e);
+    		}
+    	}
+    	return list;
+    }
+    
     /**
      * convenience method for use with functional object properties
      */

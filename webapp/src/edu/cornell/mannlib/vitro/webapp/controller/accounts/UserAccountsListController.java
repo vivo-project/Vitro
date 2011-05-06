@@ -18,9 +18,9 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 
-import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
+import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -30,8 +30,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServ
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.dao.PermissionSetDao;
-import edu.cornell.mannlib.vitro.webapp.dao.UserAccountDao;
+import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 
 /**
@@ -55,18 +55,19 @@ public class UserAccountsListController extends FreemarkerHttpServlet {
 	private static final String TEMPLATE_NAME = "userAccounts-list.ftl";
 
 	private OntModel userAccountsModel;
-	private PermissionSetDao permissionSetDao;
-	private UserAccountDao userAccountDao;
+	private UserAccountsDao userAccountsDao;
 
 	@Override
 	public void init() throws ServletException {
 		super.init();
+
 		OntModelSelector oms = (OntModelSelector) getServletContext()
 				.getAttribute("baseOntModelSelector");
 		userAccountsModel = oms.getUserAccountsModel();
 
-		// TODO Fix this when we have a real framework for PermissionSetDao
-		permissionSetDao = new BogusPermissionSetDao();
+		WebappDaoFactory wdf = (WebappDaoFactory) getServletContext()
+				.getAttribute("webappDaoFactory");
+		userAccountsDao = wdf.getUserAccountsDao();
 	}
 
 	@Override
@@ -83,7 +84,7 @@ public class UserAccountsListController extends FreemarkerHttpServlet {
 		if (log.isDebugEnabled()) {
 			dumpRequestParameters(vreq);
 		}
-		
+
 		Map<String, Object> body = new HashMap<String, Object>();
 
 		UserAccountsSelectionCriteria criteria = buildCriteria(vreq);
@@ -181,7 +182,7 @@ public class UserAccountsListController extends FreemarkerHttpServlet {
 
 	private List<PermissionSet> buildRolesList() {
 		List<PermissionSet> list = new ArrayList<PermissionSet>();
-		list.addAll(permissionSetDao.getAllPermissionSets());
+		list.addAll(userAccountsDao.getAllPermissionSets());
 		Collections.sort(list, new Comparator<PermissionSet>() {
 			@Override
 			public int compare(PermissionSet ps1, PermissionSet ps2) {
@@ -223,7 +224,7 @@ public class UserAccountsListController extends FreemarkerHttpServlet {
 			return null;
 		}
 
-		return userAccountDao.getUserAccountByUri(uri);
+		return userAccountsDao.getUserAccountByUri(uri);
 	}
 
 	private boolean isFlagOnRequest(VitroRequest vreq, String key) {
@@ -248,7 +249,7 @@ public class UserAccountsListController extends FreemarkerHttpServlet {
 	private List<String> findPermissionSetLabels(UserAccount account) {
 		List<String> labels = new ArrayList<String>();
 		for (String uri : account.getPermissionSetUris()) {
-			PermissionSet pSet = permissionSetDao.getPermissionSetByUri(uri);
+			PermissionSet pSet = userAccountsDao.getPermissionSetByUri(uri);
 			if (pSet != null) {
 				labels.add(pSet.getLabel());
 			}

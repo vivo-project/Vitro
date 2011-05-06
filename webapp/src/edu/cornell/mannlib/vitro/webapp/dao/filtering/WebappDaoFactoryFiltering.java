@@ -29,6 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
 import edu.cornell.mannlib.vitro.webapp.dao.TabIndividualRelationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.TabVClassRelationDao;
+import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
@@ -72,7 +73,8 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
     transient private VClassDao                filteringVClassDao=null;
 
     transient private TabDao filteringTabDao=null;
-    transient private UserDao filteringUserDao=null;
+    transient private UserDao filteringUserDao=null;     // TODO This goes away when the UserAccounts stuff is fully implemented - jblake.
+    transient private UserAccountsDao filteringUserAccountsDao=null;
     transient private VClassGroupDao filteringVClassGroupDao=null;
     transient private PropertyGroupDao filteringPropertyGroupDao=null;
     transient private PropertyInstanceDao filteringPropertyInstanceDao=null;
@@ -137,6 +139,7 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
         return filteringTabDao;
     }
 
+    // TODO This goes away when the UserAccounts stuff is fully implemented - jblake.
     public UserDao getUserDao() {
         if( filteringUserDao == null)
             filteringUserDao =
@@ -144,6 +147,13 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
         return filteringUserDao;
     }
 
+    public UserAccountsDao getUserAccountsDao() {
+    	if( filteringUserAccountsDao == null)
+    		filteringUserAccountsDao =
+    			new UserAccountsDaoFiltering(innerWebappDaoFactory.getUserAccountsDao(),filters);                                     
+    	return filteringUserAccountsDao;
+    }
+    
     public VClassGroupDao getVClassGroupDao() {
         if( filteringVClassGroupDao == null)
             filteringVClassGroupDao =
