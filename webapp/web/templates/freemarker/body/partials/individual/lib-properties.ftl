@@ -47,7 +47,6 @@
     <span property="${property.curie}"><#nested></span>
 </#macro>
 
-<#-- Expose rdfa without a display element -->
 <#macro rdfaDataContent property statement>
     <span property="${property.curie}" content="${statement.value}" />
 </#macro>

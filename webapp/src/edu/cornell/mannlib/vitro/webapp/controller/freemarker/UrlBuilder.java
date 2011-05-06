@@ -18,6 +18,7 @@ import org.openrdf.model.impl.URIImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.filters.PortalPickerFilter;
 
@@ -328,4 +329,23 @@ public class UrlBuilder {
         return decodedUrl;
     }
 
+    public static String getCurie(String propertyUri, VitroRequest vreq) {
+        String curie = null;
+        try {
+            Map<String, String> ontologyNamespaces = vreq.getWebappDaoFactory()
+                                                         .getOntologyDao()
+                                                         .getOntNsToPrefixMap();
+            URI uri = new URIImpl(propertyUri); 
+            String namespace = uri.getNamespace();
+            String prefix = ontologyNamespaces.get(namespace);
+            if (prefix == null) {
+            } else {
+                String localName = uri.getLocalName();
+                curie = prefix + ":" + localName;
+            }
+        } catch (Exception e) {
+            log.error(e, e);
+        }
+        return curie;
+    }
 }

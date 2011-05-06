@@ -336,6 +336,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("profileUrl", new edu.cornell.mannlib.vitro.webapp.web.functions.IndividualProfileUrlMethod());
         map.put("localName", new edu.cornell.mannlib.vitro.webapp.web.functions.IndividualLocalNameMethod());
+        map.put("curie", new edu.cornell.mannlib.vitro.webapp.web.functions.CurieMethod());
         return map;
     }
     

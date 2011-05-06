@@ -12,6 +12,7 @@ import org.openrdf.model.impl.URIImpl;
 import com.hp.hpl.jena.rdf.model.Literal;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
@@ -40,7 +41,7 @@ public class NameStatementTemplateModel extends
             Literal literal = literals.get(0);
             value = literal.getLexicalForm();
             setEditAccess(literal, policyHelper);
-            curie = PropertyTemplateModel.getCurieForUri(propertyUri, vreq);
+            curie = UrlBuilder.getCurie(propertyUri, vreq);
         } else {
             // If the individual has no rdfs:label, use the local name. It will not be editable (this replicates previous behavior;
             // perhaps we would want to allow a label to be added. But such individuals do not usually have their profiles viewed or

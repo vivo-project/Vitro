@@ -2,9 +2,12 @@
 
 <#-- Default object property statement template -->
 
-<a href="${profileUrl(statement.object)}" rel="${property.curie}">
-    <#if statement.label?has_content>
-        <span property="rdfs:label">${statement.label}</span><#t>
-    <#else>${statement.localname}<#t>
-    </#if>
+<a href="${profileUrl(statement.object)}" >
+    <span about="${individual.uri}" rel="${property.curie}">
+        <#if statement.label?has_content>            
+            <span about="${statement.object}" property="rdfs:label">${statement.label}</span><#t>           
+        <#else>
+            <span about="${statement.object}">${statement.localname}</span><#t>
+        </#if>
+    </span>
 </a> ${statement.moniker!} 

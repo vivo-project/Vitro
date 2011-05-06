@@ -2,16 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 /** 
@@ -52,28 +49,9 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     }
 
     private void setCurie(VitroRequest vreq) {
-        curie = getCurieForUri(propertyUri, vreq);
+        curie = UrlBuilder.getCurie(propertyUri, vreq);
     }
     
-    protected static String getCurieForUri(String propertyUri, VitroRequest vreq) {
-        String curie = null;
-        try {
-            Map<String, String> ontologyNamespaces = vreq.getWebappDaoFactory()
-                                                         .getOntologyDao()
-                                                         .getOntNsToPrefixMap();
-            URI uri = new URIImpl(propertyUri); 
-            String namespace = uri.getNamespace();
-            String prefix = ontologyNamespaces.get(namespace);
-            if (prefix == null) {
-            } else {
-                String localName = uri.getLocalName();
-                curie = prefix + ":" + localName;
-            }
-        } catch (Exception e) {
-            log.error(e, e);
-        }
-        return curie;
-    }
     
     /* Access methods for templates */
     
