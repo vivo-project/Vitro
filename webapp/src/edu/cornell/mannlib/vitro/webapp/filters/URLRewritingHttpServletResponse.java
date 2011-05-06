@@ -2,19 +2,16 @@
 
 package edu.cornell.mannlib.vitro.webapp.filters;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,7 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
 
-public class URLRewritingHttpServletResponse implements HttpServletResponse {
+public class URLRewritingHttpServletResponse extends HttpServletResponseWrapper/*implements HttpServletResponse */{
 
 	private final static Log log = LogFactory.getLog(URLRewritingHttpServletResponse.class);
 	
@@ -36,37 +33,18 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 	private Pattern slashPattern = Pattern.compile("/");
 	
 	public URLRewritingHttpServletResponse(HttpServletResponse response, HttpServletRequest request, ServletContext context) {
+	    super(response);
 		this._response = response;
 		this._context = context;
 		this.wadf = (WebappDaoFactory) context.getAttribute("webappDaoFactory");
 		this.contextPathDepth = slashPattern.split(request.getContextPath()).length-1;
 	}
-
-	/**
-	 * For use in testing only.
-	 */
-	protected URLRewritingHttpServletResponse(){ }
+		
+	/** for testing. */
+	protected URLRewritingHttpServletResponse(HttpServletResponse res){
+	    super(res);
+	}
 	
-	public void addCookie(Cookie arg0) {
-		_response.addCookie(arg0);
-	}
-
-	public void addDateHeader(String arg0, long arg1) {
-		_response.addDateHeader(arg0, arg1);
-	}
-
-	public void addHeader(String arg0, String arg1) {
-		_response.addHeader(arg0, arg1);
-	}
-
-	public void addIntHeader(String arg0, int arg1) {
-		_response.addIntHeader(arg0, arg1);
-	}
-
-	public boolean containsHeader(String arg0) {
-		return _response.containsHeader(arg0);
-	}
-
 	/**
 	 * @deprecated
 	 */
@@ -221,102 +199,7 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
             log.error("Encoded as  '"+rv+"'");
 			return rv;
 		}
-	}
-
-	public void flushBuffer() throws IOException {
-		_response.flushBuffer();
-	}
-
-	public int getBufferSize() {
-		return _response.getBufferSize();
-	}
-
-	public String getCharacterEncoding() {
-		return _response.getCharacterEncoding();
-	}
-
-	public String getContentType() {
-		return _response.getContentType();
-	}
-
-	public Locale getLocale() {
-		return _response.getLocale();
-	}
-
-	public ServletOutputStream getOutputStream() throws IOException {
-		return _response.getOutputStream();
-	}
-
-	public PrintWriter getWriter() throws IOException {
-		return _response.getWriter();
-	}
-
-	public boolean isCommitted() {
-		return _response.isCommitted();
-	}
-
-	public void reset() {
-		_response.reset();
-	}
-
-	public void resetBuffer() {
-		_response.resetBuffer();
-	}
-
-	public void sendError(int arg0, String arg1) throws IOException {
-		_response.sendError(arg0, arg1);
-	}
-
-	public void sendError(int arg0) throws IOException {
-		_response.sendError(arg0);
-	}
-
-	public void sendRedirect(String arg0) throws IOException {
-		_response.sendRedirect(arg0);
-	}
-
-	public void setBufferSize(int arg0) {
-		_response.setBufferSize(arg0);
-	}
-
-	public void setCharacterEncoding(String arg0) {
-		_response.setCharacterEncoding(arg0);
-	}
-
-	public void setContentLength(int arg0) {
-		_response.setContentLength(arg0);
-	}
-
-	public void setContentType(String arg0) {
-		_response.setContentType(arg0);
-	}
-
-	public void setDateHeader(String arg0, long arg1) {
-		_response.setDateHeader(arg0, arg1);
-	}
-
-	public void setHeader(String arg0, String arg1) {
-		_response.setHeader(arg0, arg1);
-	}
-
-	public void setIntHeader(String arg0, int arg1) {
-		_response.setIntHeader(arg0, arg1);
-	}
-
-	public void setLocale(Locale arg0) {
-		_response.setLocale(arg0);
-	}
-
-	/**
-	 * @deprecated
-	 */
-	public void setStatus(int arg0, String arg1) {
-		_response.setStatus(arg0, arg1);
-	}
-
-	public void setStatus(int arg0) {
-		_response.setStatus(arg0);
-	}		
+	}	
 	
 	private boolean isExternallyLinkedNamespace(String namespace,List<String> externallyLinkedNamespaces) {	    
 	    return externallyLinkedNamespaces.contains(namespace);

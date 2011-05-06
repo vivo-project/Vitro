@@ -5,6 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.filters;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.ServletResponse;
+
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -23,7 +25,7 @@ public class URLRewritingHttpServletResponseTest {
      * with no portals.
      */
     protected void urlEncodingStyleA(String urlToEncode, String expectedUrlResult ){
-        URLRewritingHttpServletResponse urhsr = new URLRewritingHttpServletResponse();
+        URLRewritingHttpServletResponse urhsr = new URLRewritingHttpServletResponse(new stubs.javax.servlet.http.HttpServletResponseStub());
         
         List<String>externalNamespaces = new ArrayList();
         externalNamespaces.add("http://vivo.med.cornell.edu/individual/");        
@@ -41,7 +43,7 @@ public class URLRewritingHttpServletResponseTest {
      * URL like http://caruso.mannlib.cornell.edu/ with no portals.
      */
     protected void urlEncodingStyleB(String urlToEncode, String expectedUrlResult){
-        URLRewritingHttpServletResponse urhsr = new URLRewritingHttpServletResponse();
+        URLRewritingHttpServletResponse urhsr = new URLRewritingHttpServletResponse(new stubs.javax.servlet.http.HttpServletResponseStub());
         
         List<String>externalNamespaces = new ArrayList();
         externalNamespaces.add("http://vivo.med.cornell.edu/individual/");        
