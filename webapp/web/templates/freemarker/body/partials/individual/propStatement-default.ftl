@@ -5,7 +5,7 @@
 <a href="${profileUrl(statement.object)}" >
     <span about="${individual.uri}" rel="${property.curie}">
         <#if statement.label?has_content>            
-            <span about="${statement.object}" property="rdfs:label">${statement.label}</span><#t>           
+            <span class="link" about="${statement.object}" property="rdfs:label">${statement.label}</span><#t>           
         <#else>
             <span about="${statement.object}">${statement.localname}</span><#t>
         </#if>
