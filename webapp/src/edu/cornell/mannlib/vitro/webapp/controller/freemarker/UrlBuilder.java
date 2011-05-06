@@ -345,5 +345,16 @@ public class UrlBuilder {
         }
         return decodedUrl;
     }
+    
+    public static String getCompleteRequestURL(VitroRequest vreq) {
+    	
+    	String mainRequestURL = vreq.getRequestURL().toString();
+    	
+    	if (StringUtils.isNotBlank(vreq.getQueryString())) {
+    		mainRequestURL += "?" + vreq.getQueryString();
+    	}
+    	
+    	return mainRequestURL;
+    }
 
 }
