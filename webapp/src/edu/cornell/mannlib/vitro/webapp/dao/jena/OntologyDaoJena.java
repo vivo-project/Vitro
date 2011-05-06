@@ -2,26 +2,48 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.ontology.ProfileException;
+import com.hp.hpl.jena.rdf.listeners.StatementListener;
+import com.hp.hpl.jena.rdf.model.ModelChangedListener;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class OntologyDaoJena extends JenaBaseDao implements OntologyDao {
 
+    private static final Property ONTOLOGY_PREFIX_PROP = 
+        ResourceFactory.createProperty(VitroVocabulary.vitroURI + "ontologyPrefixAnnot");
+
+    Map<String, String> ontNamespaceToPrefix = null;
+    ModelChangedListener ontologyChangeListener = null;
+    
     public OntologyDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
+        
+        ontologyChangeListener = new OntologyChangeListener();
+        getOntModelSelector().getTBoxModel().register(ontologyChangeListener);
+    }
+    
+    public void close() {
+        if (ontologyChangeListener != null) {
+            getOntModelSelector().getTBoxModel().unregister(ontologyChangeListener);
+        }        
     }
     
     // TODO: add model-per-ontology support
@@ -170,5 +192,66 @@ public class OntologyDaoJena extends JenaBaseDao implements OntologyDao {
         return ontology;
     }
 
+    private static final boolean CLEAR_CACHE = true;
+    
+    @Override
+    public synchronized Map<String, String> getOntNsToPrefixMap() {
+        return getOntNsToPrefixMap(!CLEAR_CACHE);
+    }
+
+    private synchronized Map<String, String> getOntNsToPrefixMap(boolean clearCache) {
+        
+        if (clearCache || ontNamespaceToPrefix == null) {            
+            ontNamespaceToPrefix = new HashMap<String, String>();
+            List<Ontology> ontologies = getAllOntologies();
+            if (ontologies != null) {
+                for (Ontology o : ontologies) {
+                    String uri = o.getURI();
+                    if (StringUtils.isBlank(uri)) {
+                        continue;
+                    }
+                    String prefix = o.getPrefix();
+                    if (prefix == null) {
+                        if (VitroVocabulary.VITRO_PUBLIC.equals(uri)) {
+                            prefix = "vpub";
+                        } else {
+                            prefix = "";
+                        }
+                    }
+
+                    ontNamespaceToPrefix.put(uri, prefix);
+                }
+            }
+            // Removed by getAllOntologies()
+            ontNamespaceToPrefix.put(VitroVocabulary.vitroURI, "vitro");
+        }
+        
+        return ontNamespaceToPrefix;
+    }
+        
+    private class OntologyChangeListener extends StatementListener {
+        
+        @Override
+        public void addedStatement(Statement stmt) {
+            process(stmt);
+        }
+        
+        @Override
+        public void removedStatement(Statement stmt) {
+            process(stmt);
+        }
+        
+        // We could also listen for end-of-edit events,
+        // but there should be so few of these statements that
+        // it won't be very expensive to run this method multiple
+        // times when the model is updated.
+        
+        private void process(Statement stmt) {
+            if (stmt.getPredicate().equals(ONTOLOGY_PREFIX_PROP)) {
+                getOntNsToPrefixMap(CLEAR_CACHE);
+            }
+        }        
+    }
+    
 
 }

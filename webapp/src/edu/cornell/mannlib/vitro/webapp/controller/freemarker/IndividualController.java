@@ -137,7 +137,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        body.put("individual", getNonDefaultBeansWrapper(BeansWrapper.EXPOSE_SAFE).wrap(itm));
 	        body.put("headContent", getRdfLinkTag(itm));	    
 	        
-	        body.put("rdfaNamespaces", vreq.getWebappDaoFactory().getApplicationDao().getRdfaNamespaces());
+	        body.put("rdfaNamespaces", getRdfaNamespaces(vreq));
 	        
 	        String template = getIndividualTemplate(individual, vreq);
 	                
@@ -708,6 +708,24 @@ public class IndividualController extends FreemarkerHttpServlet {
         body.put("errorMessage", "The individual was not found in the system.");
         
         return new TemplateResponseValues(Template.TITLED_ERROR_MESSAGE.toString(), body);
+    }
+    
+    private Set<String> getRdfaNamespaces(VitroRequest vreq) {
+        Set<String> rdfaNamespaces = new HashSet<String>();
+        Map<String, String> ontologyNamespaces = vreq.getWebappDaoFactory()
+                                                      .getOntologyDao()
+                                                      .getOntNsToPrefixMap();
+        
+        for ( String uri : ontologyNamespaces.keySet() ) {
+            if (StringUtils.isBlank(uri)) {
+                continue;
+            }
+            String prefix = ontologyNamespaces.get(uri);
+            if ( ! StringUtils.isBlank(prefix) ) {
+                rdfaNamespaces.add("xmlns:" + prefix + "=\"" + uri + "\"");
+            } // if no prefix...?
+        }
+        return rdfaNamespaces;
     }
     
 }

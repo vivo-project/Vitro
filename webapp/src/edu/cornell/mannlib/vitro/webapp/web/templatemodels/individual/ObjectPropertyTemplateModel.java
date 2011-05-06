@@ -94,7 +94,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             EditingPolicyHelper policyHelper)
         throws InvalidConfigurationException {
         
-        super(op, subject, policyHelper);
+        super(op, subject, policyHelper, vreq);
         
         log.debug("Creating template model for object property " + op.getURI());
         

@@ -3,9 +3,9 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -31,16 +31,10 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
             ResourceFactory.createProperty(
                     VitroVocabulary.DISPLAY + "linkedNamespace");
     
-    private static final Property ONTOLOGY_PREFIX_PROP = 
-        ResourceFactory.createProperty(VitroVocabulary.vitroURI + "ontologyPrefixAnnot");
-    
 	Integer portalCount = null;
 	
 	List<String> externallyLinkedNamespaces = null;
     ModelChangedListener externalNamespaceChangeListener = null;
-    
-    Set<String> rdfaNamespaces = null;
-    ModelChangedListener ontologyChangeListener = null;
 	
     public ApplicationDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
@@ -48,17 +42,12 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
         externalNamespaceChangeListener = new ExternalNamespaceChangeListener();
         getOntModelSelector().getDisplayModel().register(externalNamespaceChangeListener);
         
-        ontologyChangeListener = new OntologyChangeListener();
-        getOntModelSelector().getDisplayModel().register(ontologyChangeListener);
     }
     
     public void close() {
         if (externalNamespaceChangeListener != null) {
             getOntModelSelector().getDisplayModel().unregister(externalNamespaceChangeListener);
-        }
-        if (ontologyChangeListener != null) {
-            getOntModelSelector().getDisplayModel().unregister(ontologyChangeListener);
-        }        
+        }     
     }
 	   	
 	public boolean isFlag1Active() {
@@ -86,7 +75,7 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
 	    return getExternallyLinkedNamespaces(!CLEAR_CACHE);
 	}
 
-    public synchronized List<String> getExternallyLinkedNamespaces(boolean clearCache) {
+    private synchronized List<String> getExternallyLinkedNamespaces(boolean clearCache) {
         if (clearCache || externallyLinkedNamespaces == null) {            
             externallyLinkedNamespaces = new ArrayList<String>();
             OntModel ontModel = getOntModelSelector().getDisplayModel();
@@ -139,64 +128,4 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
         
     }
 
-    @Override
-    public synchronized Set<String> getRdfaNamespaces() {
-        return getRdfaNamespaces(!CLEAR_CACHE);
-    }
-
-    @Override
-    public synchronized Set<String> getRdfaNamespaces(boolean clearCache) {
-        
-        if (clearCache || rdfaNamespaces == null) {            
-            rdfaNamespaces = new HashSet<String>();
-            OntologyDao ontDao = getWebappDaoFactory().getOntologyDao();
-            List<Ontology> ontologies = ontDao.getAllOntologies();
-            if (ontologies != null) {
-                for (Ontology o : ontologies) {
-                    String uri = o.getURI();
-                    if (StringUtils.isBlank(uri)) {
-                        continue;
-                    }
-                    String prefix = o.getPrefix();
-                    if (prefix == null) {
-                        if (VitroVocabulary.VITRO_PUBLIC.equals(uri)) {
-                            prefix = "vpub";
-                        }                 
-                    }
-                    if ( ! StringUtils.isBlank(prefix) ) {
-                        rdfaNamespaces.add("xmlns:" + prefix + "=\"" + uri + "\"");
-                    }
-                }
-            }
-            // Removed by ontDao.getAllOntologies()
-            rdfaNamespaces.add("xmlns:vitro=\"" + VitroVocabulary.vitroURI + "\"");
-        }
-        
-        return rdfaNamespaces;
-    }
-        
-    private class OntologyChangeListener extends StatementListener {
-        
-        @Override
-        public void addedStatement(Statement stmt) {
-            process(stmt);
-        }
-        
-        @Override
-        public void removedStatement(Statement stmt) {
-            process(stmt);
-        }
-        
-        //We could also listen for end-of-edit events,
-        //but there should be so few of these statements that
-        //it won't be very expensive to run this method multiple
-        //times when the model is updated.
-        
-        private void process(Statement stmt) {
-            if (stmt.getPredicate().equals(ONTOLOGY_PREFIX_PROP)) {
-                getExternallyLinkedNamespaces(CLEAR_CACHE);
-            }
-        }        
-    }
-    
 }

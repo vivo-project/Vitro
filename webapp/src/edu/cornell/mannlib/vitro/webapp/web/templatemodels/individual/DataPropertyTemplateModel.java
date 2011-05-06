@@ -32,7 +32,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     DataPropertyTemplateModel(DataProperty dp, Individual subject, VitroRequest vreq, 
             EditingPolicyHelper policyHelper, List<DataProperty> populatedDataPropertyList) {
         
-        super(dp, subject, policyHelper);
+        super(dp, subject, policyHelper, vreq);
         setName(dp.getPublicName());
         statements = new ArrayList<DataPropertyStatementTemplateModel>();
         

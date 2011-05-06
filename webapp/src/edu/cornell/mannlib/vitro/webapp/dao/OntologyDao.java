@@ -2,9 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
-
 import java.util.List;
+import java.util.Map;
+
+import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 
 public interface OntologyDao {
 
@@ -17,5 +18,7 @@ public interface OntologyDao {
     void updateOntology(Ontology ontology);
 
     void deleteOntology(Ontology ontology);
+    
+    public Map<String, String> getOntNsToPrefixMap();
 
 }

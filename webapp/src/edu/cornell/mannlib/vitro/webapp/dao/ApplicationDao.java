@@ -12,13 +12,7 @@ public interface ApplicationDao {
 	public boolean isFlag2Active();
 	
 	public List<String> getExternallyLinkedNamespaces();
-	
-	public List<String> getExternallyLinkedNamespaces(boolean clearCache);
 
 	public boolean isExternallyLinkedNamespace(String namespace);
-	   
-	public Set<String> getRdfaNamespaces();
-	
-	public Set<String> getRdfaNamespaces(boolean clearCache);
 	
 }
