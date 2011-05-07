@@ -125,7 +125,7 @@ mydomain:user09
 mydomain:user10
 	a auth:UserAccount ;
 	auth:emailAddress "email@jones.edu" ;
-	auth:firstName "Brian" ;
+	auth:firstName "Bob" ;
 	auth:lastName "Caruso" ;
 	auth:md5password "garbage" ;
 	auth:passwordChangeExpires "1100234965897" ;

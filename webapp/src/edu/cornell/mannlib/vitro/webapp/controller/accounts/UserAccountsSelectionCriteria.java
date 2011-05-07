@@ -2,9 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts;
 
-
 /**
  * On what basis are we selecting user accounts?
+ * 
+ * Search terms are matched against email, and against firstName combined with
+ * lastName. Searches are case-insensitive.
  */
 public class UserAccountsSelectionCriteria {
 	public static final int DEFAULT_ACCOUNTS_PER_PAGE = 25;

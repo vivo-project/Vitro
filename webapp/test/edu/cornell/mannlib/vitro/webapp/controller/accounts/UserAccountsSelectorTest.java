@@ -3,9 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.controller.accounts;
 
 import static edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.DEFAULT_ORDERING;
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,10 +24,6 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
-import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering;
-import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsSelection;
-import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsSelectionCriteria;
-import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsSelector;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.Direction;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.Field;
 
@@ -38,6 +32,8 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 	 * Where the model statements are stored for this test.
 	 */
 	private static final String N3_DATA_FILENAME = "UserAccountsSelectorTest.n3";
+
+	private static final String NS_MINE = "http://vivo.mydomain.edu/individual/";
 
 	private static OntModel ontModel;
 
@@ -67,7 +63,6 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 	// ----------------------------------------------------------------------
 
 	@Test(expected = NullPointerException.class)
-	@SuppressWarnings("unused")
 	public void modelIsNull() {
 		UserAccountsSelector.select(null,
 				criteria(10, 1, DEFAULT_ORDERING, "", ""));
@@ -91,7 +86,7 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 		assertEquals("uri", "http://vivo.mydomain.edu/individual/user10",
 				acct.getUri());
 		assertEquals("email", "email@jones.edu", acct.getEmailAddress());
-		assertEquals("firstName", "Brian", acct.getFirstName());
+		assertEquals("firstName", "Bob", acct.getFirstName());
 		assertEquals("lastName", "Caruso", acct.getLastName());
 		assertEquals("password", "garbage", acct.getMd5Password());
 		assertEquals("expires", 1100234965897L, acct.getPasswordLinkExpires());
@@ -196,8 +191,8 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 
 	@Test
 	public void sortByStatusAscending() {
-		UserAccountsOrdering orderBy = new UserAccountsOrdering(
-				Field.STATUS, Direction.ASCENDING);
+		UserAccountsOrdering orderBy = new UserAccountsOrdering(Field.STATUS,
+				Direction.ASCENDING);
 		selectOnCriteria(3, 1, orderBy, "", "");
 		// user07 has no status: collates as least value.
 		assertSelectedUris(10, "user07", "user01", "user04");
@@ -205,8 +200,8 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 
 	@Test
 	public void sortByStatusDescending() {
-		UserAccountsOrdering orderBy = new UserAccountsOrdering(
-				Field.STATUS, Direction.DESCENDING);
+		UserAccountsOrdering orderBy = new UserAccountsOrdering(Field.STATUS,
+				Direction.DESCENDING);
 		selectOnCriteria(3, 1, orderBy, "", "");
 		assertSelectedUris(10, "user02", "user03", "user06");
 	}
@@ -228,28 +223,75 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 		assertSelectedUris(10, "user10", "user04", "user08");
 	}
 
+	// ----------------------------------------------------------------------
+	// filtering tests
+	// ----------------------------------------------------------------------
+
+	@Test
+	public void filterAgainstRole1() {
+		setLoggerLevel(UserAccountsSelector.class, Level.DEBUG);
+		selectOnCriteria(20, 1, DEFAULT_ORDERING, NS_MINE + "role1", "");
+		assertSelectedUris(6, "user01", "user02", "user03", "user05", "user06",
+				"user09");
+	}
+
+	@Test
+	public void filterAgainstNoSuchRole() {
+		selectOnCriteria(20, 1, DEFAULT_ORDERING, "BogusRole", "");
+		assertSelectedUris(0);
+	}
+
+	// ----------------------------------------------------------------------
+	// search tests
+	// ----------------------------------------------------------------------
+
+	@Test
+	public void searchTermFoundInAllThreeFields() {
+		setLoggerLevel(UserAccountsSelector.class, Level.DEBUG);
+		selectOnCriteria(20, 1, DEFAULT_ORDERING, "", "bob");
+		assertSelectedUris(3, "user02", "user05", "user10");
+	}
+
+	@Test
+	public void searchTermNotFound() {
+		setLoggerLevel(UserAccountsSelector.class, Level.DEBUG);
+		selectOnCriteria(20, 1, DEFAULT_ORDERING, "", "bogus");
+		assertSelectedUris(0);
+	}
+
 	/**
-	 * Test plan
-	 * 
-	 * <pre>
-	 * -- searching (match against first, last, email)
-	 * app=10, pi=1, orderBy=email,A, search=bob
-	 * app=10, pi=1, orderBy=email,A, search=nomatch
-	 * 
-	 * -- filter
-	 * app=10, pi=1, orderBy=email,A, filter=role1Uri
-	 * app=10, pi=1, orderBy=email,A, filter=noSuchRole
-	 * 
-	 * -- combine
-	 * app=10, pi=1, orderBy=email,A,    search=bob, filter=role1Uri;
-	 * app=2, pi=2,  orderBy=lastName,D, search=bob, filter=role1Uri;
-	 * </pre>
+	 * If the special characters were allowed into the Regex, this would have 3
+	 * matches. If they are escaped properly, it will have none.
 	 */
+	@Test
+	public void searchTermContainsSpecialRegexCharacters() {
+		setLoggerLevel(UserAccountsSelector.class, Level.DEBUG);
+		selectOnCriteria(20, 1, DEFAULT_ORDERING, "", "b.b");
+		assertSelectedUris(0);
+	}
+
+	// ----------------------------------------------------------------------
+	// combination tests
+	// ----------------------------------------------------------------------
+
+	@Test
+	public void searchWithFilter() {
+		selectOnCriteria(20, 1, DEFAULT_ORDERING, NS_MINE + "role1", "bob");
+		assertSelectedUris(2, "user02", "user05");
+	}
+
+	@Test
+	public void searchWithFilterPaginatedWithFunkySortOrder() {
+		selectOnCriteria(1, 2, new UserAccountsOrdering(Field.STATUS,
+				Direction.ASCENDING), NS_MINE + "role1", "bob");
+		assertSelectedUris(2, "user02");
+	}
 
 	// ----------------------------------------------------------------------
 	// helper methods
 	// ----------------------------------------------------------------------
 
+	/** Create a new criteria object */
 	private UserAccountsSelectionCriteria criteria(int accountsPerPage,
 			int pageIndex, UserAccountsOrdering orderBy, String roleFilterUri,
 			String searchTerm) {
@@ -257,6 +299,7 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 				orderBy, roleFilterUri, searchTerm);
 	}
 
+	/** Create a criteria object and select against it. */
 	private void selectOnCriteria(int accountsPerPage, int pageIndex,
 			UserAccountsOrdering orderBy, String roleFilterUri,
 			String searchTerm) {
@@ -265,14 +308,7 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 		selection = UserAccountsSelector.select(ontModel, criteria);
 	}
 
-	private void assertExpectedCount(int expected) {
-		int actual = selection.getResultCount();
-		assertEquals("count", expected, actual);
-	}
-
-	/**
-	 * Give us just the list of local names from the URIs we should expect.
-	 */
+	/** How many URIs should we expect, and which ones (local names only). */
 	private void assertSelectedUris(int resultCount, String... uris) {
 		assertEquals("result count", resultCount, selection.getResultCount());
 

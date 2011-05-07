@@ -36,6 +36,7 @@ public class UserAccountsSelector {
 
 	private static final String PREFIX_LINES = ""
 			+ "PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n"
+			+ "PREFIX fn: <http://www.w3.org/2005/xpath-functions#> \n"
 			+ "PREFIX auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> \n";
 
 	private static final String ALL_VARIABLES = "?uri ?email ?firstName ?lastName ?pwd ?expire ?count ?status";
@@ -59,6 +60,7 @@ public class UserAccountsSelector {
 			+ "SELECT count(DISTINCT %countVariable%) \n" //
 			+ "WHERE {\n" //
 			+ "    %requiredClauses% \n" //
+			+ "    %optionalClauses% \n" //
 			+ "    %filterClauses% \n" //
 			+ "} \n";
 
@@ -70,6 +72,13 @@ public class UserAccountsSelector {
 			+ "} \n";
 
 	private static final Syntax SYNTAX = Syntax.syntaxARQ;
+
+	/**
+	 * If the user enters any of these characters in a search term, escape it
+	 * with a backslash.
+	 */
+	private static final char[] REGEX_SPECIAL_CHARACTERS = "[\\^$.|?*+()]"
+			.toCharArray();
 
 	/**
 	 * Convenience method.
@@ -124,6 +133,7 @@ public class UserAccountsSelector {
 				.replace("%prefixes%", PREFIX_LINES)
 				.replace("%countVariable%", COUNT_VARIABLE)
 				.replace("%requiredClauses%", requiredClauses())
+				.replace("%optionalClauses%", optionalClauses())
 				.replace("%filterClauses%", filterClauses());
 		log.debug("count query: " + qString);
 
@@ -163,8 +173,52 @@ public class UserAccountsSelector {
 	}
 
 	private String filterClauses() {
-		log.warn("UserAccountsSelector.filterClauses() not implemented.");
-		return "";
+		String filters = "";
+
+		String roleFilterUri = criteria.getRoleFilterUri();
+		String searchTerm = criteria.getSearchTerm();
+
+		if (!roleFilterUri.isEmpty()) {
+			String clean = escapeForRegex(roleFilterUri);
+			filters += "OPTIONAL { ?uri auth:hasPermissionSet ?role } \n"
+					+ "    FILTER (REGEX(str(?role), '" + clean + "'))";
+		}
+
+		if ((!roleFilterUri.isEmpty()) && (!searchTerm.isEmpty())) {
+			filters += " \n    ";
+		}
+
+		if (!searchTerm.isEmpty()) {
+			String clean = escapeForRegex(searchTerm);
+			filters += "FILTER ("
+					+ ("REGEX(?email, '" + clean + "', 'i')")
+					+ " || "
+					+ ("REGEX(fn:concat(?firstName, ' ', ?lastName), '" + clean + "', 'i')")
+					+ ")";
+		}
+
+		return filters;
+	}
+
+	/**
+	 * Escape any regex special characters in the string. 
+	 * 
+	 * Note that the SPARQL
+	 * parser requires two backslashes, in order to pass a single backslash to
+	 * the REGEX function.
+	 */
+	private String escapeForRegex(String raw) {
+		StringBuilder clean = new StringBuilder();
+		outer: for (char c : raw.toCharArray()) {
+			for (char special : REGEX_SPECIAL_CHARACTERS) {
+				if (c == special) {
+					clean.append('\\').append('\\').append(c);
+					continue outer;
+				}
+			}
+			clean.append(c);
+		}
+		return clean.toString();
 	}
 
 	/** Sort as desired, and within ties, sort by EMail address. */
