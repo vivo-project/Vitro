@@ -10,7 +10,8 @@
         PREFIX vitro: &lt;http://vitro.mannlib.cornell.edu/ns/vitro/0.7#&gt;
         PREFIX afn:  &lt;http://jena.hpl.hp.com/ARQ/function#&gt;   
               
-        SELECT ?link 
+        SELECT ?property
+               ?link 
                (afn:localname(?link) AS ?linkName) 
                ?anchor 
                ?url WHERE {
