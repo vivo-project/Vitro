@@ -2,6 +2,7 @@
 
 <#-- Template for vitro:primaryLink and vitro:additionalLink -->
 
+<#--
 <#if statement.url?? & statement.anchor??>
     <a href="${statement.url}">
         <span about="${individual.uri}" rel="${curie(statement.property)}" resource="${statement.link}">
@@ -35,3 +36,26 @@
         </span><#t>
     </a><#t>
 </#if>
+-->
+
+
+<#if statement.url??>
+    <a href="${statement.url}">
+<#else>
+    <a href="${profileUrl(statement.link)}">
+</#if>
+        <span about="${individual.uri}" rel="${curie(statement.property)}" resource="${statement.link}">
+        <#if statement.url??>
+            <span about="${statement.link}" property="vitro:linkURL" content="${statement.url}">
+        </#if>
+        <#if statement.anchor??>
+            <span class="link" about="${statement.link}" property="vitro:linkText">
+                ${statement.anchor}<#t>
+            </span><#t>
+        <#else> 
+            missing link anchor text<#t>       
+        </#if>
+        <#if statement.url??>
+            </span>
+        </#if>
+</a><#t>
