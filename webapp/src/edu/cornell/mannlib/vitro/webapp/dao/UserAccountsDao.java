@@ -21,6 +21,45 @@ public interface UserAccountsDao {
 	UserAccount getUserAccountByUri(String uri);
 
 	/**
+	 * Create a new UserAccount in the model.
+	 * 
+	 * On entry, the URI of the UserAccount should be empty. On exit, the URI
+	 * which was created for this UserAccount will be stored in the UserAccount,
+	 * as well as being returned by the method.
+	 * 
+	 * Does not confirm that PermissionSet objects already exist for the
+	 * PermissionSet URIs referenced by the UserAcocunt.
+	 * 
+	 * @throws NullPointerException
+	 *             if the UserAccount is null.
+	 * @throws IllegalArgumentException
+	 *             if the URI of the UserAccount is not empty.
+	 */
+	String insertUserAccount(UserAccount userAccount);
+
+	/**
+	 * Update the values on a UserAccount that already exists in the model.
+	 * 
+	 * Does not confirm that PermissionSet objects already exist for the
+	 * PermissionSet URIs referenced by the UserAcocunt.
+	 * 
+	 * @throws NullPointerException
+	 *             if the UserAccount is null.
+	 * @throws IllegalArgumentException
+	 *             if a UserAccount with this URI does not already exist in the
+	 *             model.
+	 */
+	void updateUserAccount(UserAccount userAccount);
+
+	/**
+	 * Remove the UserAccount with this URI from the model.
+	 * 
+	 * If the URI is null, or if no UserAccount with this URI is found in the
+	 * model, no action is taken.
+	 */
+	void deleteUserAccount(String userAccountUri);
+
+	/**
 	 * Get the PermissionSet for this URI.
 	 * 
 	 * @return null if the URI is null, or if there is no such PermissionSet.

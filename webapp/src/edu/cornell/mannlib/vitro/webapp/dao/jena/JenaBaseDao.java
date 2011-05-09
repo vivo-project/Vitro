@@ -258,6 +258,16 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         }
     }
 
+	/**
+	 * convenience method
+	 */
+	protected void addPropertyLongValue(Resource res, Property dataprop,
+			long value, Model model) {
+		if (dataprop != null) {
+			model.add(res, dataprop, Long.toString(value), XSDDatatype.XSDlong);
+		}
+	}
+	
     /**
      * convenience method for use with functional datatype properties
      */
@@ -318,6 +328,33 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         
     }
 
+	/**
+	 * convenience method for use with functional datatype properties
+	 */
+	protected void updatePropertyLongValue(Resource res, Property dataprop,
+			Long value, Model model) {
+		
+		if (dataprop != null) {
+			Long existingValue = null;
+			Statement stmt = res.getProperty(dataprop);
+			if (stmt != null) {
+				RDFNode object = stmt.getObject();
+				if (object != null && object.isLiteral()) {
+					existingValue = ((Literal) object).getLong();
+				}
+			}
+			
+			if (existingValue == null) {
+				model.add(res, dataprop, value.toString(),
+						XSDDatatype.XSDlong);
+			} else if (existingValue.longValue() != value) {
+				model.removeAll(res, dataprop, null);
+				model.add(res, dataprop, value.toString(),
+						XSDDatatype.XSDlong);
+			}
+		}
+	}
+	
     /**
      * convenience method
      */
@@ -622,6 +659,59 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         }
     }
     
+	/**
+	 * convenience method to update the value(s) of a one-to-many object
+	 * property
+	 * 
+	 * NOTE: this should be run from within a CriticalSection(WRITE)
+	 */
+	protected void updatePropertyResourceURIValues(Resource res, Property prop,
+			Collection<String> uris, Model model) {
+		log.debug("updatePropertyResourceURIValues(), resource="
+				+ (res == null ? "null" : res.getURI()) + ", property="
+				+ (prop == null ? "null" : prop.getURI()) + ", uris=" + uris);
+
+		if ((res == null) || (prop == null)) {
+			return;
+		}
+
+		// figure existing URIs
+		Set<String> existingUris = new HashSet<String>();
+		StmtIterator stmts = model.listStatements(res, prop, (RDFNode) null);
+		while (stmts.hasNext()) {
+			Statement stmt = stmts.next();
+			RDFNode o = stmt.getObject();
+			if (o instanceof Resource) {
+				existingUris.add(((Resource) o).getURI());
+			}
+		}
+
+		// figure which to add and which to remove
+		Set<String> addingUris = new HashSet<String>(uris);
+		addingUris.removeAll(existingUris);
+		Set<String> removingUris = new HashSet<String>(existingUris);
+		removingUris.removeAll(uris);
+
+		// for each to remove, remove it.
+		for (String removeUri : removingUris) {
+			Resource o = model.getResource(removeUri);
+			model.remove(res, prop, o);
+		}
+
+		// for each to add, add it, unless it is null, empty, or invalid.
+		for (String addUri : addingUris) {
+			if ((addUri != null) && (!addUri.isEmpty())) {
+				String badUriErrorStr = checkURI(addUri);
+				if (badUriErrorStr == null) {
+					Resource o = model.getResource(addUri);
+					model.add(res, prop, o);
+				} else {
+					log.warn(badUriErrorStr);
+				}
+			}
+		}
+	}
+
     /**
      * convenience method for updating the RDFS label
      */

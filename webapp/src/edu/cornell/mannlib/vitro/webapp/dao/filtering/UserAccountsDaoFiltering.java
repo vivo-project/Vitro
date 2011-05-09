@@ -33,6 +33,21 @@ public class UserAccountsDaoFiltering extends BaseFiltering implements
 	}
 
 	@Override
+	public String insertUserAccount(UserAccount userAccount) {
+		return innerDao.insertUserAccount(userAccount);
+	}
+
+	@Override
+	public void updateUserAccount(UserAccount userAccount) {
+		innerDao.updateUserAccount(userAccount);
+	}
+
+	@Override
+	public void deleteUserAccount(String userAccountUri) {
+		innerDao.deleteUserAccount(userAccountUri);
+	}
+
+	@Override
 	public PermissionSet getPermissionSetByUri(String uri) {
 		return innerDao.getPermissionSetByUri(uri);
 	}

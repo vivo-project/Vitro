@@ -21,6 +21,8 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
@@ -382,6 +384,10 @@ public abstract class AbstractTestClass {
 			message += ", extra: " + extras;
 		}
 		assertEquals(message, expected, actual);
+	}
+
+	protected <T> Set<T> buildSet(T... array) {
+		return new HashSet<T>(Arrays.asList(array));
 	}
 
 }
