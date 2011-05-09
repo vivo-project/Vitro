@@ -8,7 +8,8 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeVerbosePropertyInformation;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -57,8 +58,7 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
             return;
         }
         
-        LoginStatusBean loginStatusBean = LoginStatusBean.getBean(vreq);
-        if (! loginStatusBean.isLoggedInAtLeast(LoginStatusBean.CURATOR)) {
+        if (!PolicyHelper.isAuthorizedForActions(vreq, new SeeVerbosePropertyInformation())) {
             return;
         }
         

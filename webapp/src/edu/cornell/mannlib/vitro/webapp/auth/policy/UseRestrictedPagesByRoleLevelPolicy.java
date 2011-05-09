@@ -22,6 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUser
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeIndividualEditingPanel;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeRevisionInfo;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeSiteAdminPage;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeVerbosePropertyInformation;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
@@ -72,6 +73,9 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
 
 		} else if (whatToAuth instanceof EditSiteInformation) {
+			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
+			
+		} else if (whatToAuth instanceof SeeVerbosePropertyInformation) {
 			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
 			
 		} else if (whatToAuth instanceof UseMiscellaneousCuratorPages) {
