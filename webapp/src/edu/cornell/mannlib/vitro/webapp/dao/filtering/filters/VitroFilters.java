@@ -9,7 +9,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
-import edu.cornell.mannlib.vitro.webapp.beans.Tab;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
@@ -37,13 +36,11 @@ public interface VitroFilters {
     public UnaryFunctor<VClass, Boolean> getClassFilter();
 
 
-    public UnaryFunctor<Tab, Boolean> getTabFilter();
-
-
     public UnaryFunctor<VClassGroup, Boolean> getVClassGroupFilter();
 
     // TODO This goes away when the UserAccounts stuff is fully implemented -- jb
     public UnaryFunctor<User, Boolean> getUserFilter();
+    
     
     public UnaryFunctor<PropertyGroup, Boolean> getPropertyGroupFilter();
 

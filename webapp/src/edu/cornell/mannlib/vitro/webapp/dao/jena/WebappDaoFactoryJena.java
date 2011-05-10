@@ -53,9 +53,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
-import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
-import edu.cornell.mannlib.vitro.webapp.dao.TabIndividualRelationDao;
-import edu.cornell.mannlib.vitro.webapp.dao.TabVClassRelationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
@@ -74,10 +71,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     protected LinksDao linksDao;
     protected LinktypeDao linktypeDao;
     protected ApplicationDaoJena applicationDao;
-    protected TabDao tabDao;
-    protected TabIndividualRelationDao tabs2EntsDao;
-
-    protected TabVClassRelationDao tabs2TypesDao;
     protected UserDao userDao; // TODO This goes away when the UserAccounts stuff is fully implemented -- jb
     protected UserAccountsDao userAccountsDao;
     protected VClassGroupDao vClassGroupDao;
@@ -492,28 +485,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     	} else {
     		return applicationDao = new ApplicationDaoJena(this);
     	}
-    }
-
-    public TabDao getTabDao() {
-        if (tabDao != null)
-            return tabDao;
-        else
-            return tabDao = new TabDaoJena(this);
-    }
-
-    public TabIndividualRelationDao getTabs2EntsDao() {
-        if (tabs2EntsDao != null)
-            return tabs2EntsDao;
-        else
-            return tabs2EntsDao = new TabIndividualRelationDaoJena(this);
-    }
-
-
-    public TabVClassRelationDao getTabs2TypesDao() {
-        if (tabs2TypesDao != null)
-            return tabs2TypesDao;
-        else
-            return tabs2TypesDao = new TabVClassRelationDaoJena(this);
     }
 
     public VClassGroupDao getVClassGroupDao() {

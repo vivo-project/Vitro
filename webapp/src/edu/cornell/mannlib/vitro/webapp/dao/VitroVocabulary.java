@@ -147,7 +147,6 @@ public class VitroVocabulary {
     // ================== Vitro Portal vocabulary ===========================
 
     public static final String PORTAL = vitroURI+"Portal";
-    public static final String PORTAL_ROOTTAB = vitroURI+"rootTab";
     public static final String PORTAL_THEMEDIR = vitroURI+"themeDir";
     public static final String PORTAL_BANNERIMAGE = vitroURI+"bannerImage";
     public static final String PORTAL_CONTACTMAIL = vitroURI+"contactMail";
@@ -167,44 +166,6 @@ public class VitroVocabulary {
     public static final String PORTAL_IMAGETHUMBWIDTH = vitroURI+"imageThumbWidth";
     // reusing displayRank property above
     public static final String PORTAL_URLPREFIX = vitroURI + "urlPrefix";
-
-    // ================ Vitro Tab vocabulary ================================
-
-    public static final String TAB = vitroURI+"Tab";
-    public static final String TAB_AUTOLINKABLETAB = vitroURI+"AutoLinkableTab";
-    public static final String TAB_MANUALLYLINKABLETAB = vitroURI+"ManuallyLinkableTab";
-    public static final String TAB_MIXEDTAB = vitroURI+"MixedTab";
-    public static final String TAB_PRIMARYTAB = vitroURI+"PrimaryTab";
-    public static final String TAB_SUBCOLLECTIONCATEGORY = vitroURI+"SubcollectionCategory";
-    public static final String TAB_SECONDARYTAB = vitroURI+"SecondaryTab";
-    public static final String TAB_PRIMARYTABCONTENT = vitroURI+"PrimaryTabContent";
-    public static final String TAB_SUBCOLLECTION = vitroURI+"Subcollection";
-    public static final String TAB_SUBTABOF = vitroURI+"subTabOf";
-    public static final String TAB_COLLECTION = vitroURI+"Collection";
-
-    public static final String TAB_INDIVIDUALRELATION= vitroURI+"TabIndividualRelation";
-    public static final String TAB_INDIVIDUALRELATION_INVOLVESINDIVIDUAL= vitroURI+"involvesIndividual";
-    public static final String TAB_INDIVIDUALRELATION_INVOLVESTAB = vitroURI+"involvesTab";
-
-
-    public static final String TAB_AUTOLINKEDTOTAB = vitroURI + "autoLinkedToTab"; // annotation on class
-    public static final String TAB_TABTYPE = vitroURI+"tabType";
-    public static final String TAB_STATUSID = vitroURI+"statusId";
-    public static final String TAB_DAYLIMIT = vitroURI+"dayLimit";
-    public static final String TAB_BODY = vitroURI+"tabBody";
-    public static final String TAB_GALLERYROWS = vitroURI+"galleryRows";
-    public static final String TAB_GALLERYCOLS = vitroURI+"galleryCols";
-    public static final String TAB_MORETAG = vitroURI+"moreTag";
-    public static final String TAB_IMAGEWIDTH = vitroURI+"imageWidth";
-    public static final String TAB_PORTAL = vitroURI+"inPortal";
-    public static final String TAB_ENTITYSORTFIELD = vitroURI+"individualSortField";
-    public static final String TAB_ENTITYSORTDIRECTION = vitroURI+"individualSortDirection";
-    public static final String TAB_ENTITYLINKMETHOD = vitroURI+"individualLinkMethod";
-    public static final String TAB_RSSURL = vitroURI+"rssUrl";
-    public static final String TAB_FLAG2SET = vitroURI+"flag2Set";
-    public static final String TAB_FLAG3SET = vitroURI+"flag3Set";
-    public static final String TAB_FLAG2MODE = vitroURI+"flag2Mode";
-    public static final String TAB_FLAG3MODE = vitroURI+"flag3Mode";
 
     // =============== Vitro User vocabulary =================================
 

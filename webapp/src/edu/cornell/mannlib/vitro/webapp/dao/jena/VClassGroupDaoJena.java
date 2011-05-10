@@ -36,7 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
 
-    private static final Log log = LogFactory.getLog(TabDaoJena.class.getName());
+    private static final Log log = LogFactory.getLog(VClassGroupDao.class.getName());
 
     public VClassGroupDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);

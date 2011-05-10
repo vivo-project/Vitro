@@ -299,11 +299,11 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             
             ensureEssentialInterfaceData(unionOms.getApplicationMetadataModel(), sce, wadf);        
             
-            log.info("Setting up namespace mapper");
+            //log.info("Setting up namespace mapper");
             
-            NamespaceMapper namespaceMapper = new NamespaceMapperJena(masterUnion, masterUnion, defaultNamespace);
-            ctx.setAttribute("NamespaceMapper", namespaceMapper);
-            unionOms.getFullModel().getBaseModel().register(namespaceMapper);
+            //NamespaceMapper namespaceMapper = new NamespaceMapperJena(masterUnion, masterUnion, defaultNamespace);
+            //ctx.setAttribute("NamespaceMapper", namespaceMapper);
+            //unionOms.getFullModel().getBaseModel().register(namespaceMapper);
             
             ctx.setAttribute("defaultNamespace", defaultNamespace);
             
@@ -389,10 +389,11 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
                 memModel.getResource(VitroVocabulary.PORTAL));
         try {
             if (!portalIt.hasNext()) {
-                log.debug("Loading initial site configuration");
+                log.info("Loading initial site configuration");
                 essentialInterfaceData = InitialJenaModelUtils.loadInitialModel(sce.getServletContext(), defaultNamespace);
                 if (essentialInterfaceData.size() == 0) {
-                    essentialInterfaceData = InitialJenaModelUtils.basicPortalAndRootTab(defaultNamespace);
+                	log.info("Using basic initial site configuration.");
+                    essentialInterfaceData = InitialJenaModelUtils.basicInterfaceData(defaultNamespace);
                     essentialInterfaceData.add(InitialJenaModelUtils.basicClassgroup(wadf.getDefaultNamespace()));
                 }
                 //JenaModelUtils.makeClassGroupsFromRootClasses(wadf,memModel,essentialInterfaceData);       
@@ -507,7 +508,6 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
              	
         String amdQuery = "DESCRIBE ?x WHERE { " +
                     "{?x a <" + VitroVocabulary.PORTAL +"> } UNION " +
-                    "{?x a <" + VitroVocabulary.TAB +"> } UNION " +
                     "{?x a <" + VitroVocabulary.PROPERTYGROUP +"> } UNION " +
                     "{?x a <" + VitroVocabulary.CLASSGROUP +"> } } ";
         

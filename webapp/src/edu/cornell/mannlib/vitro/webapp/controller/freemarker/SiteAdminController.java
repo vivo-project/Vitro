@@ -24,7 +24,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeSiteAdm
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.edit.listing.AllTabsForPortalListingController;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.listing.UsersListingController;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -119,10 +118,6 @@ public class SiteAdminController extends FreemarkerHttpServlet {
 
         Map<String, Object> map = new HashMap<String, Object>();
         Map<String, String> urls = new HashMap<String, String>();
-
-		if (PolicyHelper.isAuthorizedForActions(vreq, AllTabsForPortalListingController.REQUIRED_ACTIONS)) {
-			urls.put("tabs", urlBuilder.getPortalUrl("/listTabs"));
-		}
         
 		// TODO remove this when the UserAccounts are fully implemented. -- jblake
         if (PolicyHelper.isAuthorizedForActions(vreq, UsersListingController.REQUIRED_ACTIONS)) {                

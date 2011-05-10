@@ -197,7 +197,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         		log.debug("Loading initial site configuration");
 	        	essentialInterfaceData = InitialJenaModelUtils.loadInitialModel(sce.getServletContext(), defaultNamespace);
 	        	if (essentialInterfaceData.size() == 0) {
-	        		essentialInterfaceData = InitialJenaModelUtils.basicPortalAndRootTab(defaultNamespace);
+	        		essentialInterfaceData = InitialJenaModelUtils.basicInterfaceData(defaultNamespace);
 	        		essentialInterfaceData.add(InitialJenaModelUtils.basicClassgroup(wadf.getDefaultNamespace()));
 	        	}
 	            //JenaModelUtils.makeClassGroupsFromRootClasses(wadf,memModel,essentialInterfaceData);       

@@ -26,9 +26,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
-import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
-import edu.cornell.mannlib.vitro.webapp.dao.TabIndividualRelationDao;
-import edu.cornell.mannlib.vitro.webapp.dao.TabVClassRelationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
@@ -191,24 +188,6 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	public ApplicationDao getApplicationDao() {
 		throw new RuntimeException(
 				"WebappDaoFactory.getApplicationDao() not implemented.");
-	}
-
-	@Override
-	public TabDao getTabDao() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getTabDao() not implemented.");
-	}
-
-	@Override
-	public TabIndividualRelationDao getTabs2EntsDao() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getTabs2EntsDao() not implemented.");
-	}
-
-	@Override
-	public TabVClassRelationDao getTabs2TypesDao() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getTabs2TypesDao() not implemented.");
 	}
 
 	@Override

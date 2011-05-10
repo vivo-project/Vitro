@@ -33,11 +33,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Rdf
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.web.BreadCrumbsUtil;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.Tags;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.TabMenu;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -354,7 +352,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         map.putAll(getDirectives());
         map.putAll(getMethods());
         
-        map.put("tabMenu", getTabMenu(vreq));
         map.put("menu", getDisplayModelMenu(vreq));
         
         map.put("user", new User(vreq));
@@ -363,7 +360,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
         map.put("copyright", getCopyrightInfo(appBean));    
         map.put("siteTagline", appBean.getShortHand());
-        map.put("breadcrumbs", BreadCrumbsUtil.getBreadCrumbsDiv(vreq));
 
         // This value is used only in stylesheets.ftl and already contains the context path.
         map.put("stylesheetPath", UrlBuilder.getUrl(themeDir + "/css"));  
@@ -392,10 +388,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         // Note that if servletName is "index.jsp", it must be the home page,
         // since we don't get here on other tabs.
         return (name.length() == 0 || name.equals("index.jsp")) ? "home" : name;
-    }
-
-    private TabMenu getTabMenu(VitroRequest vreq) {
-        return new TabMenu(vreq, 1);
     }
     
     protected MainMenu getDisplayModelMenu(VitroRequest vreq){

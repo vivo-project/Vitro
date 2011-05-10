@@ -2,9 +2,17 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.filtering.filters;
 
-import edu.cornell.mannlib.vitro.webapp.beans.*;
 import net.sf.jga.fn.UnaryFunctor;
 import net.sf.jga.fn.adaptor.AdaptorFunctors;
+import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
+import edu.cornell.mannlib.vitro.webapp.beans.User;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 
 /**
  * A object to hold all the filters commonly used by the vitro webapp.
@@ -32,9 +40,6 @@ public class VitroFiltersImpl extends VitroFiltersBase {
     UnaryFunctor<VClass,Boolean>                  classFilter;
 
     /* *************** filters only used by Webapp ******************* */
-    /** filter for Tab objects */
-    UnaryFunctor<Tab,Boolean>                  tabFilter;
-
     /** filter for VClassGroup objects */
     UnaryFunctor<VClassGroup,Boolean>          vClassGroupFilter;
 
@@ -58,7 +63,6 @@ public class VitroFiltersImpl extends VitroFiltersBase {
         dataPropertyStatementFilter  = FILTER_OUT_NOTHING;
         objectPropertyStatementFilter= FILTER_OUT_NOTHING;
         classFilter= FILTER_OUT_NOTHING;
-        tabFilter= FILTER_OUT_NOTHING;
         vClassGroupFilter = FILTER_OUT_NOTHING;
         userFilter= FILTER_OUT_NOTHING;
         propertyGroupFilter = FILTER_OUT_NOTHING;
@@ -71,7 +75,6 @@ public class VitroFiltersImpl extends VitroFiltersBase {
             UnaryFunctor<DataPropertyStatement, Boolean> dataPropertyStatementFilter,
             UnaryFunctor<ObjectPropertyStatement, Boolean> objectPropertyStatementFilter,
             UnaryFunctor<VClass, Boolean> classFilter,
-            UnaryFunctor<Tab, Boolean> tabFilter,
             UnaryFunctor<VClassGroup, Boolean> classGroupFilter,
             UnaryFunctor<User, Boolean> userFilter,
             UnaryFunctor<PropertyGroup,Boolean>propertyGroupFilter) {
@@ -82,7 +85,6 @@ public class VitroFiltersImpl extends VitroFiltersBase {
         this.dataPropertyStatementFilter = dataPropertyStatementFilter;
         this.objectPropertyStatementFilter = objectPropertyStatementFilter;
         this.classFilter = classFilter;
-        this.tabFilter = tabFilter;
         vClassGroupFilter = classGroupFilter;
         this.userFilter = userFilter;
         this.propertyGroupFilter = propertyGroupFilter;
@@ -162,18 +164,6 @@ public class VitroFiltersImpl extends VitroFiltersBase {
 
     public VitroFilters setClassFilter(UnaryFunctor<VClass, Boolean> classFilter) {
         this.classFilter = classFilter;
-        return this;
-    }
-
-    /* (non-Javadoc)
-     * @see edu.cornell.mannlib.vitro.webapp.dao.filtering.VitroFilters#getTabFilter()
-     */
-    public UnaryFunctor<Tab, Boolean> getTabFilter() {
-        return tabFilter;
-    }
-
-    public VitroFilters setTabFilter(UnaryFunctor<Tab, Boolean> tabFilter) {
-        this.tabFilter = tabFilter;
         return this;
     }
 

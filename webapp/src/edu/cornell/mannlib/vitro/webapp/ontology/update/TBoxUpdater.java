@@ -125,12 +125,6 @@ public class TBoxUpdater {
 				 // namespace
 				 continue;
 			 }
-			 
-			 if (VitroVocabulary.TAB_AUTOLINKEDTOTAB.equals(predicate.getURI())) {
-				 continue;
-				 // the tab autolinks are not like the other annotations
-				 // and should never be updated automatically
-			 }
 			 			 
 			 NodeIterator newObjects = newTboxAnnotationsModel.listObjectsOfProperty(subject, predicate);
 			 

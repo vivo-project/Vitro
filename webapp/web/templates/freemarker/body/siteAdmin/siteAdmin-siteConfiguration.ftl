@@ -17,10 +17,6 @@
                 <li><a href="${siteConfig.urls.menuN3Editor}">Menu management</a></li>  
             </#if>
             
-            <#if siteConfig.urls.tabs??>
-                <li><a href="${siteConfig.urls.tabs}">Tab management</a></li>
-            </#if>
-            
             <#if siteConfig.urls.users??>
                 <li><a href="${siteConfig.urls.users}">User accounts</a></li>  
             </#if>

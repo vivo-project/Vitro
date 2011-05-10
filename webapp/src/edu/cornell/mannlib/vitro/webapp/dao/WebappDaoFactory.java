@@ -112,10 +112,6 @@ public interface WebappDaoFactory {
 
     public ApplicationDao getApplicationDao();
 
-    public TabDao getTabDao();
-    public TabIndividualRelationDao getTabs2EntsDao();
-    public TabVClassRelationDao getTabs2TypesDao();
-
     public KeywordIndividualRelationDao getKeys2EntsDao();
     public KeywordDao getKeywordDao();
 

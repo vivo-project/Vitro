@@ -119,7 +119,6 @@ public class JenaBaseDaoCon {
 //    protected  DatatypeProperty   APPLICATION_MAXPORTALID = null;
 
     protected  OntClass           PORTAL = _constModel.createClass(VitroVocabulary.PORTAL);
-    protected  ObjectProperty     PORTAL_ROOTTAB = _constModel.createObjectProperty(VitroVocabulary.PORTAL_ROOTTAB);
     protected  DatatypeProperty   APPLICATION_THEMEDIR = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_THEMEDIR);
     protected  DatatypeProperty   PORTAL_BANNERIMAGE = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_BANNERIMAGE);
     //protected  DatatypeProperty   PORTAL_FLAG2VALUES = null;
@@ -142,40 +141,6 @@ public class JenaBaseDaoCon {
     protected  DatatypeProperty   PORTAL_IMAGETHUMBWIDTH = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_IMAGETHUMBWIDTH);
     protected  DatatypeProperty   PORTAL_URLPREFIX = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_URLPREFIX);
 
-    protected  OntClass           TAB = _constModel.createClass(VitroVocabulary.TAB);
-    protected  OntClass           TAB_AUTOLINKABLETAB = _constModel.createClass(VitroVocabulary.TAB_AUTOLINKABLETAB);
-    protected  OntClass           TAB_MANUALLYLINKABLETAB = _constModel.createClass(VitroVocabulary.TAB_MANUALLYLINKABLETAB);
-    protected  OntClass           TAB_MIXEDTAB = _constModel.createClass(VitroVocabulary.TAB_MIXEDTAB);
-    protected  OntClass           TAB_PRIMARYTAB = _constModel.createClass(VitroVocabulary.TAB_PRIMARYTAB);
-    protected  OntClass           TAB_SUBCOLLECTIONCATEGORY = _constModel.createClass(VitroVocabulary.TAB_SUBCOLLECTIONCATEGORY);
-    protected  OntClass           TAB_SECONDARYTAB = _constModel.createClass(VitroVocabulary.TAB_SECONDARYTAB);
-    protected  OntClass           TAB_PRIMARYTABCONTENT = _constModel.createClass(VitroVocabulary.TAB_PRIMARYTABCONTENT);
-    protected  OntClass           TAB_SUBCOLLECTION = _constModel.createClass(VitroVocabulary.TAB_SUBCOLLECTION);
-    protected  ObjectProperty     TAB_SUBTABOF = _constModel.createObjectProperty(VitroVocabulary.TAB_SUBTABOF);
-    protected  OntClass           TAB_COLLECTION = _constModel.createClass(VitroVocabulary.TAB_COLLECTION);
-    // protected  ObjectProperty     TAB_LINKEDENTITY = null;
-    protected  AnnotationProperty TAB_AUTOLINKEDTOTAB = _constModel.createAnnotationProperty(VitroVocabulary.TAB_AUTOLINKEDTOTAB);
-    protected  DatatypeProperty   TAB_STATUSID = _constModel.createDatatypeProperty(VitroVocabulary.TAB_STATUSID);
-    protected  DatatypeProperty   TAB_DAYLIMIT = _constModel.createDatatypeProperty(VitroVocabulary.TAB_DAYLIMIT);
-    protected  DatatypeProperty   TAB_BODY = _constModel.createDatatypeProperty(VitroVocabulary.TAB_BODY);
-    protected  DatatypeProperty   TAB_GALLERYROWS = _constModel.createDatatypeProperty(VitroVocabulary.TAB_GALLERYROWS);
-    protected  DatatypeProperty   TAB_GALLERYCOLS = _constModel.createDatatypeProperty(VitroVocabulary.TAB_GALLERYCOLS);
-    protected  DatatypeProperty   TAB_MORETAG = _constModel.createDatatypeProperty(VitroVocabulary.TAB_MORETAG);
-    protected  DatatypeProperty   TAB_IMAGEWIDTH = _constModel.createDatatypeProperty(VitroVocabulary.TAB_IMAGEWIDTH);
-    protected  ObjectProperty     TAB_PORTAL = _constModel.createObjectProperty(VitroVocabulary.TAB_PORTAL);
-    protected  DatatypeProperty   TAB_ENTITYSORTFIELD = _constModel.createDatatypeProperty(VitroVocabulary.TAB_ENTITYSORTFIELD);
-    protected  DatatypeProperty   TAB_ENTITYSORTDIRECTION = _constModel.createDatatypeProperty(VitroVocabulary.TAB_ENTITYSORTDIRECTION);
-    //protected  DatatypeProperty   TAB_ENTITYLINKMETHOD = null;
-    protected  DatatypeProperty   TAB_RSSURL = _constModel.createDatatypeProperty(VitroVocabulary.TAB_RSSURL);
-    protected  DatatypeProperty   TAB_FLAG2SET = _constModel.createDatatypeProperty(VitroVocabulary.TAB_FLAG2SET);
-    protected  DatatypeProperty   TAB_FLAG3SET = _constModel.createDatatypeProperty(VitroVocabulary.TAB_FLAG3SET);
-    protected  DatatypeProperty   TAB_FLAG2MODE = _constModel.createDatatypeProperty(VitroVocabulary.TAB_FLAG2MODE);
-    protected  DatatypeProperty   TAB_FLAG3MODE = _constModel.createDatatypeProperty(VitroVocabulary.TAB_FLAG3MODE);
-
-    protected  OntClass           TAB_INDIVIDUALRELATION = _constModel.createClass(VitroVocabulary.TAB_INDIVIDUALRELATION);
-    protected  ObjectProperty     TAB_INDIVIDUALRELATION_INVOLVESINDIVIDUAL = _constModel.createObjectProperty(VitroVocabulary.TAB_INDIVIDUALRELATION_INVOLVESINDIVIDUAL);
-    protected  ObjectProperty     TAB_INDIVIDUALRELATION_INVOLVESTAB = _constModel.createObjectProperty(VitroVocabulary.TAB_INDIVIDUALRELATION_INVOLVESTAB);
-    
     protected AnnotationProperty  ONTOLOGY_PREFIX_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.ONTOLOGY_PREFIX_ANNOT);
     
     protected  OntClass           FS_FILE = _constModel.createClass(VitroVocabulary.FS_FILE_CLASS);

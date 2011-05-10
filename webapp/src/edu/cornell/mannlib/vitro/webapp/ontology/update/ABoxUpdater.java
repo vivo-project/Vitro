@@ -145,8 +145,6 @@ public class ABoxUpdater {
 		   // the autolinking annotation should be rewritten using the 
 		   // new class name.
 		   
-		   Property autoLinkedToTab = ResourceFactory.createProperty(VitroVocabulary.TAB_AUTOLINKEDTOTAB);
-		   
 		   StmtIterator iter = aboxModel.listStatements(oldClass, (Property) null, (RDFNode) null);
 
 		   int renameCount = 0;
@@ -160,12 +158,6 @@ public class ABoxUpdater {
 				   // This happens in cases where a class hasn't really
 				   // been removed, but we just want to map any ABox
 				   // data using it to use a different class instead.
-			   }
-			   if (autoLinkedToTab.equals(oldStatement.getPredicate())) {
-				   renameCount++;
-				   Statement newStatement = ResourceFactory.createStatement(newClass, oldStatement.getPredicate(), oldStatement.getObject());
-				   additions.add(newStatement);
-				   retractions.add(oldStatement);
 			   } else {
 				   removeCount++;
 				   retractions.add(oldStatement);

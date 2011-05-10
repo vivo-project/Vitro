@@ -68,47 +68,21 @@ public class InitialJenaModelUtils {
 			ResourceUtils.renameResource(portalResource, defaultNamespace + "portal1");
 		}
 		
-		//rename tabs
-		List<AnonId> tabIds = new ArrayList<AnonId>();
-		Iterator<Resource> tabResIt = initialModel.listSubjectsWithProperty(RDF.type, initialModel.getResource(VitroVocabulary.TAB));
-		while (tabResIt.hasNext()) {
-			Resource tabRes = tabResIt.next();
-			if (tabRes.isAnon()) {
-				tabIds.add(tabRes.getId());
-			}
-		}
-		int tabIdInt = 0;
-		for (AnonId tabId : tabIds) {
-			tabIdInt++;
-			ResourceUtils.renameResource(initialModel.createResource(tabId), defaultNamespace + "tab" + tabIdInt);
-		}
-		
 		return initialModel;
 		
 	}
 	
-	public static Model basicPortalAndRootTab(String defaultNamespace) {
+	public static Model basicInterfaceData(String defaultNamespace) {
 		OntModel essentialInterfaceData = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
         Resource portalClass = essentialInterfaceData.getResource(VitroVocabulary.PORTAL);
         Property themeDirProperty = essentialInterfaceData.getProperty(VitroVocabulary.PORTAL_THEMEDIR);
-        Resource tabClass = essentialInterfaceData.getResource(VitroVocabulary.TAB);
-        Resource primaryTabClass = essentialInterfaceData.getResource(VitroVocabulary.TAB_PRIMARYTAB);
-        Property rootTabProperty = essentialInterfaceData.getProperty(VitroVocabulary.PORTAL_ROOTTAB);
-        Property tabInPortalProperty = essentialInterfaceData.getProperty(VitroVocabulary.TAB_PORTAL);
-
         Individual portal1 = essentialInterfaceData.createIndividual(defaultNamespace+"portal1",portalClass);
         String defaultThemeStr = ApplicationBean.DEFAULT_THEME_DIR_FROM_CONTEXT;
         if (defaultThemeStr == null) {
         	throw new RuntimeException("No default theme has been set; unable to create default portal.");      	
         }
         portal1.setPropertyValue(themeDirProperty,ResourceFactory.createPlainLiteral(defaultThemeStr));
-		portal1.setLabel("New Vitro Portal", null);
-		Individual rootTab = essentialInterfaceData.createIndividual(defaultNamespace+"tab1",tabClass);
-		rootTab.setLabel("Home", null);
-		rootTab.addProperty(RDF.type, primaryTabClass);
-		rootTab.addProperty(tabInPortalProperty, portal1);
-		portal1.addProperty(rootTabProperty, rootTab);
-		
+		portal1.setLabel("New Vitro Portal", null);	
 		return essentialInterfaceData;		
 	}
 	

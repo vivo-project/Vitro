@@ -114,7 +114,8 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     	    		"SELECT DISTINCT ?ind ?label ?moniker " +
     	    		"WHERE " +
     	    		 "{ \n" +
-    	    		 	"{ \n" +
+                        "{   ?ind a <" + theClass.getURI() + "> } \n" +
+    	    		 	"UNION { \n" +
                         "    ?ind a <" + theClass.getURI() + "> . \n" +
     	    		 	"    ?ind  <" + RDFS.label.getURI() + "> ?label \n" +
     	    		 	"} \n" +

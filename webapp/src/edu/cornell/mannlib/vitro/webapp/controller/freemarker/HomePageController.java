@@ -8,7 +8,6 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Tab;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
@@ -42,21 +41,8 @@ public class HomePageController extends FreemarkerHttpServlet {
             if(pageData != null)
                 body.putAll(pageData);            
         }
-
-        // Get the home tab content for themes that display deprecated tabs
-        body.put("homeTabContent", getHomeTabContent(vreq));
         
         return new TemplateResponseValues(BODY_TEMPLATE, body);
-    }
-
-    // Get the home tab content for themes that display deprecated tabs
-    private String getHomeTabContent(VitroRequest vreq) {
-        Tab tab = vreq.getWebappDaoFactory().getTabDao().getTab(1,0,vreq.getAppBean());
-        String body = tab.getBody();
-        if (body == null) {
-            body = "";
-        }
-        return body;
     }
     
     @Override

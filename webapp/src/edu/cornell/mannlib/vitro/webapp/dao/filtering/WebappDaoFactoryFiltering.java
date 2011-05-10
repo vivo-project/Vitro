@@ -26,9 +26,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
-import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
-import edu.cornell.mannlib.vitro.webapp.dao.TabIndividualRelationDao;
-import edu.cornell.mannlib.vitro.webapp.dao.TabVClassRelationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
@@ -72,7 +69,6 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
     transient private ObjectPropertyStatementDao filteringObjectPropertyStatementDao=null;
     transient private VClassDao                filteringVClassDao=null;
 
-    transient private TabDao filteringTabDao=null;
     transient private UserDao filteringUserDao=null;     // TODO This goes away when the UserAccounts stuff is fully implemented - jblake.
     transient private UserAccountsDao filteringUserAccountsDao=null;
     transient private VClassGroupDao filteringVClassGroupDao=null;
@@ -132,13 +128,6 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
         return filteringIndividualDao;
     }
 
-    public TabDao getTabDao() {
-        if( filteringTabDao == null)
-            filteringTabDao =
-                new TabDaoFiltering(innerWebappDaoFactory.getTabDao(),innerWebappDaoFactory.getApplicationDao(),filters);
-        return filteringTabDao;
-    }
-
     // TODO This goes away when the UserAccounts stuff is fully implemented - jblake.
     public UserDao getUserDao() {
         if( filteringUserDao == null)
@@ -188,14 +177,6 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
 
     public String getUserURI() {
         return innerWebappDaoFactory.getUserURI();
-    }
-
-    public TabIndividualRelationDao getTabs2EntsDao() {
-        return innerWebappDaoFactory.getTabs2EntsDao();
-    }
-
-    public TabVClassRelationDao getTabs2TypesDao() {
-        return innerWebappDaoFactory.getTabs2TypesDao();
     }
 
     public FlagDao getFlagDao() {

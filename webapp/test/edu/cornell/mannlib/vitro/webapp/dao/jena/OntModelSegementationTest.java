@@ -6,24 +6,17 @@ import junit.framework.Assert;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
-import edu.cornell.mannlib.vitro.webapp.beans.Link;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
-import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
-import edu.cornell.mannlib.vitro.webapp.beans.Tab;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
-import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 /**

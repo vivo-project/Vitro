@@ -31,8 +31,6 @@ import org.apache.lucene.search.TopDocs;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.controller.TabEntitiesController;
-import edu.cornell.mannlib.vitro.webapp.controller.TabEntitiesController.PageRecord;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -54,6 +52,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
 
     public static final int ENTITY_LIST_CONTROLLER_MAX_RESULTS = 30000;
     public static final int INDIVIDUALS_PER_PAGE = 30;
+    public static final int MAX_PAGES = 40; //must be even
     
     private static final String TEMPLATE_DEFAULT = "individualList.ftl";
 
@@ -230,7 +229,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
          
          if( size > INDIVIDUALS_PER_PAGE ){
              rvMap.put("showPages", Boolean.TRUE);
-             List<PageRecord> pageRecords = TabEntitiesController.makePagesList(size, INDIVIDUALS_PER_PAGE, page);
+             List<PageRecord> pageRecords = makePagesList(size, INDIVIDUALS_PER_PAGE, page);
              rvMap.put("pages", pageRecords);                    
          }else{
              rvMap.put("showPages", Boolean.FALSE);
@@ -271,4 +270,68 @@ public class IndividualListController extends FreemarkerHttpServlet {
         }        
      }    
 
+     public static List<PageRecord> makePagesList( int count, int pageSize,  int selectedPage){        
+         
+         List<PageRecord> records = new ArrayList<PageRecord>( MAX_PAGES + 1 );
+         int requiredPages = count/pageSize ;
+         int remainder = count % pageSize ; 
+         if( remainder > 0 )
+             requiredPages++;
+         
+         if( selectedPage < MAX_PAGES && requiredPages > MAX_PAGES ){
+             //the selected pages is within the first maxPages, just show the normal pages up to maxPages.
+             for(int page = 1; page < requiredPages && page <= MAX_PAGES ; page++ ){
+                 records.add( new PageRecord( "page=" + page, Integer.toString(page), Integer.toString(page), selectedPage == page ) );            
+             }
+             records.add( new PageRecord( "page="+ (MAX_PAGES+1), Integer.toString(MAX_PAGES+1), "more...", false));
+         }else if( requiredPages > MAX_PAGES && selectedPage+1 > MAX_PAGES && selectedPage < requiredPages - MAX_PAGES){
+             //the selected pages is in the middle of the list of page
+             int startPage = selectedPage - MAX_PAGES / 2;
+             int endPage = selectedPage + MAX_PAGES / 2;            
+             for(int page = startPage; page <= endPage ; page++ ){
+                 records.add( new PageRecord( "page=" + page, Integer.toString(page), Integer.toString(page), selectedPage == page ) );            
+             }
+             records.add( new PageRecord( "page="+ endPage+1, Integer.toString(endPage+1), "more...", false));
+         }else if ( requiredPages > MAX_PAGES && selectedPage > requiredPages - MAX_PAGES ){
+             //the selected page is in the end of the list 
+             int startPage = requiredPages - MAX_PAGES;      
+             double max = Math.ceil(count/pageSize);
+             for(int page = startPage; page <= max; page++ ){
+                 records.add( new PageRecord( "page=" + page, Integer.toString(page), Integer.toString(page), selectedPage == page ) );            
+             }          
+         }else{
+             //there are fewer than maxPages pages.            
+             for(int i = 1; i <= requiredPages; i++ ){
+                 records.add( new PageRecord( "page=" + i, Integer.toString(i), Integer.toString(i), selectedPage == i ) );            
+             }    
+         }                
+         return records;
+     }
+     
+     public static class PageRecord  {
+         public PageRecord(String param, String index, String text, boolean selected) {            
+             this.param = param;
+             this.index = index;
+             this.text = text;
+             this.selected = selected;
+         }
+         public String param;
+         public String index;
+         public String text;        
+         public boolean selected=false;
+         
+         public String getParam() {
+             return param;
+         }
+         public String getIndex() {
+             return index;
+         }
+         public String getText() {
+             return text;
+         }
+         public boolean getSelected(){
+             return selected;
+         }
+     }
+     
 }

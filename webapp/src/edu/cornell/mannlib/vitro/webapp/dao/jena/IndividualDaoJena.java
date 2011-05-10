@@ -875,8 +875,6 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                             String type = typeRes.getURI();
                             // brute forcing this until we implement a better strategy
                             if (VitroVocabulary.PORTAL.equals(type) || 
-                            	VitroVocabulary.TAB.equals(type) ||
-                            	VitroVocabulary.TAB_INDIVIDUALRELATION.equals(type) ||
                             	VitroVocabulary.LINK.equals(type) ||
                             	VitroVocabulary.KEYWORD.equals(type) ||
                             	VitroVocabulary.KEYWORD_INDIVIDUALRELATION.equals(type) ||
