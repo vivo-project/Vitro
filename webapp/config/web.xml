@@ -236,6 +236,15 @@
   </filter-mapping>
 
   <filter>
+     <filter-name>WebappDaoFactorySDBPrep</filter-name>
+     <filter-class>edu.cornell.mannlib.vitro.webapp.filters.WebappDaoFactorySDBPrep</filter-class>
+  </filter>
+  <filter-mapping>
+     <filter-name>WebappDaoFactorySDBPrep</filter-name>
+     <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <filter>
     <filter-name>VitroRequestPrep</filter-name>
     <filter-class>edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep</filter-class>
   </filter>
@@ -244,6 +253,16 @@
     <url-pattern>/*</url-pattern>
     <dispatcher>request</dispatcher>
     <dispatcher>forward</dispatcher>
+  </filter-mapping>
+
+  <filter>
+    <filter-name>PageRoutingFilter</filter-name>
+    <filter-class>edu.cornell.mannlib.vitro.webapp.filters.PageRoutingFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>PageRoutingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>request</dispatcher>
   </filter-mapping>
 
   <!--  Spring setup ****************************************************  -->
@@ -605,33 +624,6 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>Tabs2TypesOperationController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.Tabs2TypesOperationController</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>Tabs2TypesOperationController</servlet-name>
-    <url-pattern>/tabs2TypesOp</url-pattern>
-  </servlet-mapping>
-
-  <servlet>
-    <servlet-name>TabIndividualRelationOperationController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.TabIndividualRelationOperationController</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>TabIndividualRelationOperationController</servlet-name>
-    <url-pattern>/tabIndividualRelationOp</url-pattern>
-  </servlet-mapping>
-
-  <servlet>
-    <servlet-name>TabHierarchyOperationController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.TabHierarchyOperationController</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>TabHierarchyOperationController</servlet-name>
-    <url-pattern>/doTabHierarchyOperation</url-pattern>
-  </servlet-mapping>
-
-  <servlet>
     <servlet-name>DatapropEditController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.DatapropEditController</servlet-class>
   </servlet>
@@ -648,15 +640,6 @@
   <servlet-mapping>
     <servlet-name>KeywordEditController</servlet-name>
     <url-pattern>/keywordEdit</url-pattern>
-  </servlet-mapping>
-
-  <servlet>
-    <servlet-name>TabEditController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.TabEditController</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>TabEditController</servlet-name>
-    <url-pattern>/tabEdit</url-pattern>
   </servlet-mapping>
 
   <servlet>
@@ -711,15 +694,6 @@
   <servlet-mapping>
     <servlet-name>DatatypeRetryController</servlet-name>
     <url-pattern>/datatype_retry</url-pattern>
-  </servlet-mapping>
-
-  <servlet>
-    <servlet-name>AllTabsForPortalListingController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.listing.AllTabsForPortalListingController</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>AllTabsForPortalListingController</servlet-name>
-    <url-pattern>/listTabs</url-pattern>
   </servlet-mapping>
 
   <servlet>
@@ -992,27 +966,6 @@
     <servlet-name>JSON Service</servlet-name>
     <url-pattern>/dataservice</url-pattern>
   </servlet-mapping>
-
-  <servlet>
-    <servlet-name>TabEntitiesController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.TabEntitiesController</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>TabEntitiesController</servlet-name>
-    <url-pattern>/TabEntitiesController</url-pattern>
-  </servlet-mapping>
-
-  <!--  NOTICE: index.jsp is mapped to TabController so that we 
-            can have the urls that use to be in the system still work even 
-              though we no longer use index.jsp           -->
-    <servlet>
-      <servlet-name>TabController</servlet-name>
-      <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.TabController</servlet-class>
-    </servlet>
-    <servlet-mapping>
-      <servlet-name>TabController</servlet-name>
-      <url-pattern>/index.jsp</url-pattern>
-    </servlet-mapping>
 
   <servlet>
     <servlet-name>DashboardPropertyListController</servlet-name>

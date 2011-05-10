@@ -96,15 +96,21 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setDefaultNamespace(wadf.getDefaultNamespace());
 				
 			settings.setOntModelSelector(oms);
-			OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_MODEL_DIR));
-			settings.setOldTBoxModel(oldTBoxModel);
-			OntModel newTBoxModel = loadModelFromDirectory(ctx.getRealPath(NEW_TBOX_MODEL_DIR));
-			settings.setNewTBoxModel(newTBoxModel);
-			OntModel oldTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_ANNOTATIONS_DIR));
-			settings.setOldTBoxAnnotationsModel(oldTBoxAnnotationsModel);
-			OntModel newTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(NEW_TBOX_ANNOTATIONS_DIR));
-			settings.setNewTBoxAnnotationsModel(newTBoxAnnotationsModel);
-			
+			try {
+				OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_MODEL_DIR));
+				settings.setOldTBoxModel(oldTBoxModel);
+				OntModel newTBoxModel = loadModelFromDirectory(ctx.getRealPath(NEW_TBOX_MODEL_DIR));
+				settings.setNewTBoxModel(newTBoxModel);
+				OntModel oldTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_ANNOTATIONS_DIR));
+				settings.setOldTBoxAnnotationsModel(oldTBoxAnnotationsModel);
+				OntModel newTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(NEW_TBOX_ANNOTATIONS_DIR));
+				settings.setNewTBoxAnnotationsModel(newTBoxAnnotationsModel);
+			} catch (ModelDirectoryNotFoundException e) {
+				log.info("Knowledge base update directories not found.  " +
+						 "No update will be performed.");
+				return;
+			}
+				
 			try {
 				
 			  KnowledgeBaseUpdater ontologyUpdater = new KnowledgeBaseUpdater(settings);
@@ -211,7 +217,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		File directory = new File(directoryPath);
 		if (!directory.isDirectory()) {
-			throw new RuntimeException(directoryPath + " must be a directory " +
+			throw new ModelDirectoryNotFoundException(directoryPath + " must be a directory " +
 					"containing RDF files.");
 		}
 		File[] rdfFiles = directory.listFiles();
@@ -251,4 +257,10 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		return ctx.getRealPath(ASK_EMPTY_QUERY_FILE);
 	
     }
+	
+	private class ModelDirectoryNotFoundException extends RuntimeException {
+		public ModelDirectoryNotFoundException(String msg) {
+			super(msg);
+		}
+	}
 }
