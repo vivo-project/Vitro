@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.reasoner;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -35,8 +36,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 /**
  * Allows for real-time incremental materialization or retraction of RDFS-
  * style class and property subsumption based ABox inferences as statements
- * are added to or removed from the (ABox or TBox) knowledge base.
- *  
+ * are added to or removed from the (ABox or TBox) knowledge base. 
  */
 
 public class SimpleReasoner extends StatementListener {
@@ -101,6 +101,7 @@ public class SimpleReasoner extends StatementListener {
 		try {
 			if (stmt.getPredicate().equals(RDF.type)) {
 			    addedABoxTypeAssertion(stmt, inferenceModel);
+			    setMostSpecificTypes(stmt.getSubject(), inferenceModel);
 			} else {
 			    addedABoxAssertion(stmt,inferenceModel);
 			}
@@ -121,6 +122,7 @@ public class SimpleReasoner extends StatementListener {
 		try {
 			if (stmt.getPredicate().equals(RDF.type)) {
 			    removedABoxTypeAssertion(stmt, inferenceModel);
+			    setMostSpecificTypes(stmt.getSubject(), inferenceModel);
 			} else {
 				removedABoxAssertion(stmt, inferenceModel);
 			}
@@ -156,22 +158,22 @@ public class SimpleReasoner extends StatementListener {
 				OntClass object = tboxModel.getOntClass(((Resource)stmt.getObject()).getURI()); 
 				
 				if (stmt.getPredicate().equals(RDFS.subClassOf)) {
-				   addedSubClass(subject,object);
+				   addedSubClass(subject,object,inferenceModel);
 				} else {
 					// equivalent class is the same as subclass in both directions
-				   addedSubClass(subject,object);
-				   addedSubClass(object,subject);
+				   addedSubClass(subject,object,inferenceModel);
+				   addedSubClass(object,subject,inferenceModel);
 				}
 			} else if (stmt.getPredicate().equals(RDFS.subPropertyOf) || stmt.getPredicate().equals(OWL.equivalentProperty)) {
 				OntProperty subject = tboxModel.getOntProperty((stmt.getSubject()).getURI());
 				OntProperty object = tboxModel.getOntProperty(((Resource)stmt.getObject()).getURI()); 
 				
 				if (stmt.getPredicate().equals(RDFS.subPropertyOf)) {
-				   addedSubProperty(subject, object, inferenceModel);
+				   addedSubProperty(subject,object,inferenceModel);
 				} else {
 					// equivalent property is the same as subProperty in both directions
-				   addedSubProperty(subject, object, inferenceModel);
-				   addedSubProperty(object, subject, inferenceModel);
+				   addedSubProperty(subject,object,inferenceModel);
+				   addedSubProperty(object,subject,inferenceModel);
 				}				
 			}
 		} catch (Exception e) {
@@ -202,11 +204,11 @@ public class SimpleReasoner extends StatementListener {
 				OntClass object = tboxModel.getOntClass(((Resource)stmt.getObject()).getURI()); 
 				
 				if (stmt.getPredicate().equals(RDFS.subClassOf)) {
-				   removedSubClass(subject,object);
+				   removedSubClass(subject,object,inferenceModel);
 				} else {
 					// equivalent class is the same as subclass in both directions
-				   removedSubClass(subject,object);
-				   removedSubClass(object,subject);
+				   removedSubClass(subject,object,inferenceModel);
+				   removedSubClass(object,subject,inferenceModel);
 				}
 			} else if (stmt.getPredicate().equals(RDFS.subPropertyOf) || stmt.getPredicate().equals(OWL.equivalentProperty)) {
 				OntProperty subject = tboxModel.getOntProperty((stmt.getSubject()).getURI());
@@ -494,11 +496,11 @@ public class SimpleReasoner extends StatementListener {
 	 * individual that is typed as B, either in the ABox or in the
 	 * inferred model, assert that it is of type A.
 	 */
-	public void addedSubClass(OntClass subClass, OntClass superClass) {
+	public void addedSubClass(OntClass subClass, OntClass superClass, Model inferenceModel) {
 		
 		log.debug("subClass = " + subClass.getURI() + " superClass = " + superClass.getURI());
 		
-		aboxModel.enterCriticalSection(Lock.READ);
+		aboxModel.enterCriticalSection(Lock.WRITE);
 		inferenceModel.enterCriticalSection(Lock.WRITE);
 		
 		try {
@@ -517,6 +519,7 @@ public class SimpleReasoner extends StatementListener {
 				
 				if (!inferenceModel.contains(infStmt)) {
 					inferenceModel.add(infStmt);
+					setMostSpecificTypes(infStmt.getSubject(), inferenceModel);
 				} 
 			}
 		} finally {
@@ -532,11 +535,11 @@ public class SimpleReasoner extends StatementListener {
 	 * UNLESS the individual is of some type C that is a subClass 
 	 * of A (including A itself)
 	 */
-	public void removedSubClass(OntClass subClass, OntClass superClass) {
+	public void removedSubClass(OntClass subClass, OntClass superClass, Model inferenceModel) {
 		
 		log.debug("subClass = " + subClass.getURI() + ". superClass = " + superClass.getURI());
 
-		aboxModel.enterCriticalSection(Lock.READ);
+		aboxModel.enterCriticalSection(Lock.WRITE);
 		inferenceModel.enterCriticalSection(Lock.WRITE);
 		
 		try {
@@ -559,6 +562,7 @@ public class SimpleReasoner extends StatementListener {
 				
 				if (inferenceModel.contains(infStmt)) {
 					inferenceModel.remove(infStmt);
+					setMostSpecificTypes(infStmt.getSubject(), inferenceModel);
 				} 
 			}
 		} finally {
@@ -661,9 +665,9 @@ public class SimpleReasoner extends StatementListener {
      * indicate them for the individual with the core:mostSpecificType
      * annotation.
 	 */
-	public void setMostSpecificTypes(Resource individual) {
+	public void setMostSpecificTypes(Resource individual, Model inferenceModel) {
 	
-		aboxModel.enterCriticalSection(Lock.READ);
+		aboxModel.enterCriticalSection(Lock.WRITE);
 		inferenceModel.enterCriticalSection(Lock.READ);
 		tboxModel.enterCriticalSection(Lock.READ);
 		
@@ -672,12 +676,13 @@ public class SimpleReasoner extends StatementListener {
 			unionModel.addSubModel(aboxModel);
 			unionModel.addSubModel(inferenceModel);
 					
-			HashSet<String> typeURIs = new HashSet<String>();
-			StmtIterator iter = unionModel.listStatements((Resource) null, RDF.type, (RDFNode) null);
+			List<OntClass> types = new ArrayList<OntClass>();
+						
+			StmtIterator stmtIter = unionModel.listStatements(individual, RDF.type, (RDFNode) null);
 			
-			while (iter.hasNext()) {
+			while (stmtIter.hasNext()) {
 				
-				Statement stmt = iter.next();
+				Statement stmt = stmtIter.next();
 				
 				if ( !stmt.getObject().isResource() ) {
 					log.warn("The object of this rdf:type assertion is expected to be a resource: " + stmtString(stmt));
@@ -692,21 +697,48 @@ public class SimpleReasoner extends StatementListener {
 				}
 					
 				if (ontClass.isAnon()) continue;
-	
-                if (ontClass.hasSubClass()) continue;
-
-                typeURIs.add(ontClass.getURI());
-                
-                Iterator<OntClass> eIter = ontClass.listEquivalentClasses();
-                
-                while (eIter.hasNext()) {
-                	OntClass equivClass = eIter.next();
-                	if (equivClass.isAnon()) continue;
-                	typeURIs.add(equivClass.getURI());
-                }    
+				
+				types.add(ontClass);
 			}
+	
+			HashSet<String> typeURIs = new HashSet<String>();
+			List<OntClass> types2 = new ArrayList<OntClass>();
+			types2.addAll(types);
 			
-			setMostSpecificTypes(individual, typeURIs);
+			Iterator<OntClass> typeIter = types.iterator();
+			
+			while (typeIter.hasNext()) {
+			    OntClass type = typeIter.next();
+			    			    
+			    boolean add = true;
+			    Iterator<OntClass> typeIter2 = types2.iterator();
+			    while (typeIter2.hasNext()) {
+			    	OntClass type2 = typeIter2.next();
+			    				    	
+			    	if (type.equals(type2)) { 
+			    		continue;
+			    	}
+			    	
+			    	if (type.hasSubClass(type2, false) && !type2.hasSubClass(type, false)) {
+			    		add = false;
+			    		break;
+			    	}
+			    }	
+			    
+			    if (add) {
+			    	typeURIs.add(type.getURI());
+			    	
+		            Iterator<OntClass> eIter = type.listEquivalentClasses();
+		                
+		            while (eIter.hasNext()) {
+		                OntClass equivClass = eIter.next();
+		                if (equivClass.isAnon()) continue;
+		                typeURIs.add(equivClass.getURI());
+		            }    
+			    }    	
+			}
+							
+			setMostSpecificTypes(individual, typeURIs, inferenceModel);
 			
 		} finally {
 			aboxModel.leaveCriticalSection();
@@ -717,26 +749,29 @@ public class SimpleReasoner extends StatementListener {
 	    return;	
 	}
 	
-	public void setMostSpecificTypes(Resource individual, HashSet<String> typeURIs) {
+	public void setMostSpecificTypes(Resource individual, HashSet<String> typeURIs, Model inferenceModel) {
 		
 		aboxModel.enterCriticalSection(Lock.WRITE);
 		
 		try {
+		    Model retractions = ModelFactory.createDefaultModel();
 			// remove obsolete most-specific-type assertions
-			StmtIterator iter = aboxModel.listStatements((Resource) null, mostSpecificType, (RDFNode) null);
+			StmtIterator iter = aboxModel.listStatements(individual, mostSpecificType, (RDFNode) null);
 			
 			while (iter.hasNext()) {
 				Statement stmt = iter.next();
-				
+								
 				if ( !stmt.getObject().isLiteral() ) {
 					log.warn("The object of this assertion is expected to be a literal: " + stmtString(stmt));
 					continue;
 				}
-				
+								
 				if (!typeURIs.contains(stmt.getObject().asLiteral().getLexicalForm())) {
-					aboxModel.remove(stmt);
+					retractions.add(stmt);
 				}
 			}
+			
+			aboxModel.remove(retractions);
 			
 			// add new most-specific-type assertions 
 			Iterator<String> typeIter = typeURIs.iterator();
@@ -746,6 +781,7 @@ public class SimpleReasoner extends StatementListener {
 				Literal uriLiteral = ResourceFactory.createTypedLiteral(typeURI, XSDDatatype.XSDanyURI);
 				
 				if (!aboxModel.contains(individual, mostSpecificType, uriLiteral)) {
+					Statement toAdd = ResourceFactory.createStatement(individual, mostSpecificType, uriLiteral);
 					aboxModel.add(individual, mostSpecificType, uriLiteral);
 				}
 			}			
@@ -791,7 +827,7 @@ public class SimpleReasoner extends StatementListener {
 		
 		// recompute the inferences 
 		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);	
-		aboxModel.enterCriticalSection(Lock.READ);
+		aboxModel.enterCriticalSection(Lock.WRITE);	
 		tboxModel.enterCriticalSection(Lock.READ);
 		
 		try {
@@ -802,6 +838,7 @@ public class SimpleReasoner extends StatementListener {
 			while (iter.hasNext()) {				
 				Statement stmt = iter.next();
 				addedABoxTypeAssertion(stmt, inferenceRebuildModel);
+				setMostSpecificTypes(stmt.getSubject(), inferenceRebuildModel);
 			}
 			
 			log.info("Computing property-based ABox inferences");			

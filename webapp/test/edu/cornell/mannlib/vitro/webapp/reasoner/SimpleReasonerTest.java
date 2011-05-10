@@ -9,15 +9,20 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mindswap.pellet.jena.PelletReasonerFactory;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.ontology.AnnotationProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
@@ -28,6 +33,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	
 	
 	private Resource objectProperty = ResourceFactory.createResource("http://www.w3.org/2002/07/owl#ObjectProperty");
+	private static final String mostSpecificTypePropertyURI = "http://vivoweb.org/ontology/core#mostSpecificType";
   
 	@Before
 	public void suppressErrorOutput() {
@@ -35,7 +41,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
         // Turn off log messages to console
 		setLoggerLevel(SimpleReasoner.class, Level.OFF);
 	}
-
+	
 	/*
 	* Test that when an individual is asserted to be of a type,
 	* its asserted type is not added to the inference graph
@@ -46,6 +52,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Create a Tbox with a simple class hierarchy. B is a subclass of A.
 		// Pellet will compute TBox inferences
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		
 		OntClass classA = tBox.createClass("http://test.vivo/A");
 	    classA.setLabel("class A", "en-US");
@@ -84,6 +91,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Create a Tbox with a simple class hierarchy. D and E are subclasses
 		// of C. B and C are subclasses of A. Pellet will compute TBox inferences.
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		
 		OntClass classA = tBox.createClass("http://test.vivo/A");
 	    classA.setLabel("class A", "en-US");
@@ -137,6 +145,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
@@ -184,6 +193,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
@@ -223,6 +233,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
@@ -271,6 +282,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// and B is a subclass of A. Pellet will compute TBox inferences.
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		
 		OntClass classA = tBox.createClass("http://test.vivo/A");
 	    classA.setLabel("class A", "en-US");
@@ -336,6 +348,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
@@ -403,6 +416,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
@@ -462,6 +476,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
@@ -547,6 +562,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
@@ -589,6 +605,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
@@ -630,6 +647,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
@@ -684,6 +702,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
@@ -726,6 +745,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
@@ -782,6 +802,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
@@ -849,6 +870,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
@@ -933,6 +955,209 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	}
 	
 	
+	@Test
+	/*
+     * Test computation of mostSpecificType annotations in response
+     * to an added/removed ABox type assertion.
+	 */
+	public void mstTest1(){
+		// Create TBox, ABox and Inference models and register
+		// the ABox reasoner listeners with the ABox and TBox
+		// Pellet will compute TBox inferences
+		
+		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+        Model inf = ModelFactory.createDefaultModel();
+		
+        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+		aBox.register(simpleReasoner);
+		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
+		
+		// Set up the Tbox with a class hierarchy. C is a subclass of A
+		// and Y. D and E are subclasses C. B is a subclass of D.
+		// Pellet will compute TBox inferences.
+
+		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
+		
+		OntClass classA = tBox.createClass("http://test.vivo/A");
+	    classA.setLabel("class A", "en-US");
+
+		OntClass classB = tBox.createClass("http://test.vivo/B");
+	    classB.setLabel("class B", "en-US");
+
+		OntClass classC = tBox.createClass("http://test.vivo/C");
+	    classC.setLabel("class C", "en-US");
+
+	    OntClass classD = tBox.createClass("http://test.vivo/D");
+	    classD.setLabel("class D", "en-US");
+	    
+	    OntClass classE = tBox.createClass("http://test.vivo/E");
+	    classE.setLabel("class E", "en-US");
+
+	    OntClass classY = tBox.createClass("http://test.vivo/Y");
+	    classE.setLabel("class Y", "en-US");
+
+	    classY.addSubClass(classC);
+	    classA.addSubClass(classC);	   
+	    
+	    classC.addSubClass(classD);
+	    classC.addSubClass(classE);
+	    
+	    classD.addSubClass(classB);
+  
+        // Add the statement individual x is of type Y to the ABox
+		Resource ind_x = aBox.createResource("http://test.vivo/x");
+		aBox.add(ind_x, RDF.type, classD);		
+		
+		// Verify ind_x mostSpecificType annotation for D
+		Assert.assertTrue(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classD.getURI(), XSDDatatype.XSDanyURI)));	
+	
+		// Verify ind_x doesn't have a mostSpecificType annotation for 
+		// A, Y, C, E or B.
+		Assert.assertFalse(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classA.getURI(), XSDDatatype.XSDanyURI)));	
+		Assert.assertFalse(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classY.getURI(), XSDDatatype.XSDanyURI)));
+		Assert.assertFalse(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classC.getURI(), XSDDatatype.XSDanyURI)));	
+		Assert.assertFalse(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classE.getURI(), XSDDatatype.XSDanyURI)));
+		Assert.assertFalse(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classB.getURI(), XSDDatatype.XSDanyURI)));	
+		
+		aBox.remove(ind_x, RDF.type, classD); // retract assertion that x is of type D.
+		// Verify that D is not longer the most specific type
+		Assert.assertFalse(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classD.getURI(), XSDDatatype.XSDanyURI)));	
+	}
+	
+	@Test
+	/*
+     * Test computation of mostSpecificType annotations in response
+     * to an added ABox type assertion.
+	 */
+	public void mstTest2(){
+		// Create TBox, ABox and Inference models and register
+		// the ABox reasoner listeners with the ABox and TBox
+		// Pellet will compute TBox inferences
+		
+		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+        Model inf = ModelFactory.createDefaultModel();
+		
+        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+		aBox.register(simpleReasoner);
+		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
+		
+		// Set up the Tbox with a class hierarchy. B is a subclass of A,
+		// C is a subclass of B, and A is a subclass of C.
+		// Pellet should infer these three classes to be equivalent.
+
+		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
+		
+		OntClass classA = tBox.createClass("http://test.vivo/A");
+	    classA.setLabel("class A", "en-US");
+
+		OntClass classB = tBox.createClass("http://test.vivo/B");
+	    classB.setLabel("class B", "en-US");
+
+		OntClass classC = tBox.createClass("http://test.vivo/C");
+	    classC.setLabel("class C", "en-US");
+
+	    classA.addSubClass(classB);
+	    classB.addSubClass(classC);	   
+	    classC.addSubClass(classA);
+
+	    // Add the statement individual x is of type B to the ABox
+		Resource ind_x = aBox.createResource("http://test.vivo/x");
+		aBox.add(ind_x, RDF.type, classB);		
+	    
+		StmtIterator stmtIterator = aBox.listStatements(ind_x, mostSpecificType, (RDFNode)null);
+				
+		// Verify ind_x mostSpecificType annotation for A, B and C
+		Assert.assertTrue(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classA.getURI(), XSDDatatype.XSDanyURI)));	
+		Assert.assertTrue(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classB.getURI(), XSDDatatype.XSDanyURI)));	
+		Assert.assertTrue(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classC.getURI(), XSDDatatype.XSDanyURI)));	
+	}
+		
+	@Test
+	/*
+     * Test computation of mostSpecificType annotations in response
+     * to an added/removed TBox assertions.
+	 */
+	public void mstTest3(){
+		// Create TBox, ABox and Inference models and register
+		// the ABox reasoner listeners with the ABox and TBox
+		// Pellet will compute TBox inferences
+		
+		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+        Model inf = ModelFactory.createDefaultModel();
+		
+        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+		aBox.register(simpleReasoner);
+		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
+		
+		OntClass OWL_THING = tBox.createClass(OWL.Thing.getURI());
+		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
+
+		// Set up the Tbox with classes A, B, C, D,
+		// E, F and G
+		
+		OntClass classA = tBox.createClass("http://test.vivo/A");
+	    classA.setLabel("class A", "en-US");
+
+		OntClass classB = tBox.createClass("http://test.vivo/B");
+	    classB.setLabel("class B", "en-US");
+
+		OntClass classC = tBox.createClass("http://test.vivo/C");
+	    classC.setLabel("class C", "en-US");
+
+	    OntClass classD = tBox.createClass("http://test.vivo/D");
+	    classD.setLabel("class D", "en-US");
+	    
+	    OntClass classE = tBox.createClass("http://test.vivo/E");
+	    classE.setLabel("class E", "en-US");
+
+	    OntClass classF = tBox.createClass("http://test.vivo/F");
+	    classE.setLabel("class F", "en-US");
+
+	    OntClass classG = tBox.createClass("http://test.vivo/G");
+	    classE.setLabel("class G", "en-US");
+		
+		// add individuals x, y and z to the aBox
+		Resource ind_x = aBox.createResource("http://test.vivo/x");
+		Resource ind_y = aBox.createResource("http://test.vivo/y");
+		
+		aBox.add(ind_x, RDF.type, OWL_THING);	
+		aBox.add(ind_y, RDF.type, classD);	
+	
+		Assert.assertTrue(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(OWL.Thing.getURI(), XSDDatatype.XSDanyURI)));	
+		Assert.assertTrue(aBox.contains(ind_y, mostSpecificType, ResourceFactory.createTypedLiteral(classD.getURI(), XSDDatatype.XSDanyURI)));
+		
+		aBox.add(ind_x, RDF.type, classC);
+		aBox.add(ind_y, RDF.type, classF);
+		
+		Assert.assertFalse(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(OWL.Thing.getURI(), XSDDatatype.XSDanyURI)));	
+		Assert.assertTrue(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classC.getURI(), XSDDatatype.XSDanyURI)));	
+		Assert.assertTrue(aBox.contains(ind_y, mostSpecificType, ResourceFactory.createTypedLiteral(classD.getURI(), XSDDatatype.XSDanyURI)));
+		Assert.assertTrue(aBox.contains(ind_y, mostSpecificType, ResourceFactory.createTypedLiteral(classF.getURI(), XSDDatatype.XSDanyURI)));
+		
+		// Set up a class hierarchy. 
+		// Pellet will compute TBox inferences.
+		
+	    classA.addSubClass(classB);
+	    classA.addSubClass(classC);
+	    classA.addSubClass(classD);
+	   
+	    classC.addSubClass(classE);
+	    
+	    classD.addSubClass(classF);
+	    classD.addSubClass(classG);
+	    
+		Assert.assertFalse(aBox.contains(ind_y, mostSpecificType, ResourceFactory.createTypedLiteral(classD.getURI(), XSDDatatype.XSDanyURI)));
+		Assert.assertTrue(aBox.contains(ind_y, mostSpecificType, ResourceFactory.createTypedLiteral(classF.getURI(), XSDDatatype.XSDanyURI)));
+	    
+		// If F is removed as a subclass of D, then D should once again be a most specific type
+		// for y.
+		classD.removeSubClass(classF);
+		Assert.assertTrue(aBox.contains(ind_y, mostSpecificType, ResourceFactory.createTypedLiteral(classD.getURI(), XSDDatatype.XSDanyURI)));
+		
+	}
 	// To help in debugging the unit test
 	void printModels(OntModel ontModel) {
 	    
