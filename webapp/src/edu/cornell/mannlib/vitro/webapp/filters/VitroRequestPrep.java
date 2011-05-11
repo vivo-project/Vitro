@@ -14,17 +14,13 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.query.Dataset;
 
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.SelfEditing;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
@@ -193,25 +189,6 @@ public class VitroRequestPrep implements Filter {
     public static void setFilterFactory(ServletContext sc, FilterFactory ff){
         sc.setAttribute("FilterFactory", ff);
     }
-
-	/**
-	 * Check to see whether any of the current identifiers is a SelfEditing
-	 * identifier.
-	 */
-	public static boolean isSelfEditing(HttpServletRequest request) {
-		HttpSession session = request.getSession(false);
-		if (session == null) {
-			return false;
-		}
-
-		IdentifierBundle idBundle = RequestIdentifiers.getIdBundleForRequest(request);
-		SelfEditing selfId = SelfEditingIdentifierFactory.getSelfEditingIdentifier(idBundle);
-		if (selfId == null) {
-			return false;
-		}
-		
-		return true;
-	}
 
     @Override
 	public void destroy() {
