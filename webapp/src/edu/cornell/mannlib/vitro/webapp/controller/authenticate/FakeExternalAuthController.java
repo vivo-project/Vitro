@@ -19,7 +19,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 
 /**
- * This allows a DBA to pretend that he's logged in with an external username.
+ * This allows J. Random User to pretend that he's passed external authentication.
+ * 
+ * This should not be included in web.xml in a production deployment!!!
  */
 public class FakeExternalAuthController extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory
