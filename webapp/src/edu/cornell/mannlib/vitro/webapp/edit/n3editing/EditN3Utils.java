@@ -10,23 +10,24 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RoleIdentifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory;
-import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
 
 public class EditN3Utils {
 
-    public static String getEditorUri(HttpServletRequest request){
-        String editorUri = "Unknown N3 Editor";
-        boolean selfEditing = VitroRequestPrep.isSelfEditing(request);
-        IdentifierBundle ids =
-        	RequestIdentifiers.getIdBundleForRequest(request);           
-        
-        if( selfEditing )
-            editorUri = SelfEditingIdentifierFactory.getSelfEditingUri(ids);
-        else
-            editorUri = RoleIdentifier.getUri(ids);
-        
-        return editorUri;        
-    }
+	public static String getEditorUri(HttpServletRequest request) {
+		IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(request);
+
+		String editorUri = SelfEditingIdentifierFactory.getSelfEditingUri(ids);
+
+		if (editorUri == null) {
+			editorUri = RoleIdentifier.getUri(ids);
+		}
+
+		if (editorUri == null) {
+			editorUri = "Unknown N3 Editor";
+		}
+
+		return editorUri;
+	}
     
     /**
      * Strips from a string any characters that are not valid in XML 1.0

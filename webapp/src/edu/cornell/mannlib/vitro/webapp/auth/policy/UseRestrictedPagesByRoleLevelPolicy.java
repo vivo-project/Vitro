@@ -27,6 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvance
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousCuratorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousEditorPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousPages;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 
@@ -91,6 +92,9 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
 
 		} else if (whatToAuth instanceof SeeIndividualEditingPanel) {
+			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
+			
+		} else if (whatToAuth instanceof UseMiscellaneousEditorPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
 			
 		} else if (whatToAuth instanceof UseBasicAjaxControllers) {
