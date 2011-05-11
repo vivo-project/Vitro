@@ -6,7 +6,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.HasRoleLevel;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
@@ -49,7 +48,7 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 			return defaultDecision("whatToAuth was null");
 		}
 
-		RoleLevel userRole = getUsersRoleLevel(whoToAuth);
+		RoleLevel userRole = HasRoleLevel.getUsersRoleLevel(whoToAuth);
 
 		PolicyDecision result;
 		if (whatToAuth instanceof UseAdvancedDataToolsPages) {
@@ -141,16 +140,4 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		return new BasicPolicyDecision(Authorization.INCONCLUSIVE, message);
 	}
 
-	/**
-	 * The user is nobody unless they have a HasRoleLevel identifier.
-	 */
-	private RoleLevel getUsersRoleLevel(IdentifierBundle whoToAuth) {
-		RoleLevel userRole = RoleLevel.PUBLIC;
-		for (Identifier id : whoToAuth) {
-			if (id instanceof HasRoleLevel) {
-				userRole = ((HasRoleLevel) id).getRoleLevel();
-			}
-		}
-		return userRole;
-	}
 }

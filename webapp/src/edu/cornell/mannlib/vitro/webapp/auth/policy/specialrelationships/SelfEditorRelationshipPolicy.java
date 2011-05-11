@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy.specialrelationships;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -13,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.HasAssociatedIndividual;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
@@ -128,7 +130,8 @@ public class SelfEditorRelationshipPolicy extends AbstractRelationshipPolicy
 
 	private PolicyDecision isAuthorized(IdentifierBundle ids,
 			DistilledAction action) {
-		List<String> userUris = getUrisOfSelfEditor(ids);
+		List<String> userUris = new ArrayList<String>(
+				HasAssociatedIndividual.getIndividualUris(ids));
 
 		if (userUris.isEmpty()) {
 			return inconclusiveDecision("Not self-editing.");

@@ -41,7 +41,7 @@ public class CommonPolicyFamilySetup implements ServletContextListener {
 					new UseRestrictedPagesByRoleLevelPolicy());
 
 			// This factory creates Identifiers for all of the above policies.
-			CommonIdentifierBundleFactory factory = new CommonIdentifierBundleFactory();
+			CommonIdentifierBundleFactory factory = new CommonIdentifierBundleFactory(ctx);
 
 			ActiveIdentifierBundleFactories.addFactory(sce, factory);
 		} catch (Exception e) {

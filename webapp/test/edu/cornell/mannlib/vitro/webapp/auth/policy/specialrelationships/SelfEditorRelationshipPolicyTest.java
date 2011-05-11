@@ -420,7 +420,7 @@ public class SelfEditorRelationshipPolicyTest extends AbstractTestClass {
 	// ----------------------------------------------------------------------
 
 	private HasAssociatedIndividual makeSelfEditingId(String uri) {
-		return new HasAssociatedIndividual(uri, null);
+		return new HasAssociatedIndividual(uri);
 	}
 
 	private void assertDecision(Authorization expected, PolicyDecision decision) {

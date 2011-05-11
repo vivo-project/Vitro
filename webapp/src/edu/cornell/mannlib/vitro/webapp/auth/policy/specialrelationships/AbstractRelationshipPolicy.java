@@ -19,9 +19,6 @@ import com.hp.hpl.jena.rdf.model.SimpleSelector;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.HasAssociatedIndividual;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.BasicPolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
@@ -45,24 +42,6 @@ public abstract class AbstractRelationshipPolicy implements PolicyIface {
 	public AbstractRelationshipPolicy(ServletContext ctx, OntModel model) {
 		this.ctx = ctx;
 		this.model = model;
-	}
-
-	/**
-	 * Check to see whether we are self-editing, and for which Individuals.
-	 */
-	protected List<String> getUrisOfSelfEditor(IdentifierBundle ids) {
-		List<String> uris = new ArrayList<String>();
-		if (ids != null) {
-			for (Identifier id : ids) {
-				if (id instanceof HasAssociatedIndividual) {
-					HasAssociatedIndividual selfEditId = (HasAssociatedIndividual) id;
-					if (!selfEditId.isBlacklisted()) {
-						uris.add(selfEditId.getAssociatedIndividualUri());
-					}
-				}
-			}
-		}
-		return uris;
 	}
 
 	protected boolean canModifyResource(String uri) {
