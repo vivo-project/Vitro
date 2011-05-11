@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.log4j.Level;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -52,11 +51,6 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 
 	private UserAccountsSelection selection;
 	private UserAccountsSelectionCriteria criteria;
-
-	@Before
-	public void setLoggingLevel() {
-		setLoggerLevel(UserAccountsSelector.class, Level.ERROR); // TODO
-	}
 
 	// ----------------------------------------------------------------------
 	// exceptions tests
@@ -229,7 +223,6 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 
 	@Test
 	public void filterAgainstRole1() {
-		setLoggerLevel(UserAccountsSelector.class, Level.DEBUG);
 		selectOnCriteria(20, 1, DEFAULT_ORDERING, NS_MINE + "role1", "");
 		assertSelectedUris(6, "user01", "user02", "user03", "user05", "user06",
 				"user09");
@@ -247,14 +240,12 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 
 	@Test
 	public void searchTermFoundInAllThreeFields() {
-		setLoggerLevel(UserAccountsSelector.class, Level.DEBUG);
 		selectOnCriteria(20, 1, DEFAULT_ORDERING, "", "bob");
 		assertSelectedUris(3, "user02", "user05", "user10");
 	}
 
 	@Test
 	public void searchTermNotFound() {
-		setLoggerLevel(UserAccountsSelector.class, Level.DEBUG);
 		selectOnCriteria(20, 1, DEFAULT_ORDERING, "", "bogus");
 		assertSelectedUris(0);
 	}
@@ -265,7 +256,6 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 	 */
 	@Test
 	public void searchTermContainsSpecialRegexCharacters() {
-		setLoggerLevel(UserAccountsSelector.class, Level.DEBUG);
 		selectOnCriteria(20, 1, DEFAULT_ORDERING, "", "b.b");
 		assertSelectedUris(0);
 	}
