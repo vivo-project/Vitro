@@ -2,10 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletContext;
 
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.HasAssociatedIndividual;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
@@ -35,7 +37,8 @@ public class SelfEditingPolicy extends BaseSelfEditingPolicy implements
 			return inconclusiveDecision("whatToAuth was null");
 		}
 
-		List<String> userUris = getUrisOfSelfEditor(whoToAuth);
+		List<String> userUris = new ArrayList<String>(
+				HasAssociatedIndividual.getIndividualUris(whoToAuth));
 
 		if (userUris.isEmpty()) {
 			return inconclusiveDecision("Not self-editing.");
