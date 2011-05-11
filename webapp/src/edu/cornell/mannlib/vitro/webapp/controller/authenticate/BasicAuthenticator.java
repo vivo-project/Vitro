@@ -72,6 +72,16 @@ public class BasicAuthenticator extends Authenticator {
 	}
 
 	@Override
+	public boolean isPasswordChangeRequired(String username) {
+		User user = getUserDao().getUserByUsername(username);
+		if ((user != null) && (user.getLoginCount() == 0)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	@Override
 	public void recordNewPassword(String username, String newClearTextPassword) {
 		User user = getUserByUsername(username);
 		if (user == null) {

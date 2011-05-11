@@ -73,6 +73,11 @@ public abstract class Authenticator {
 	public abstract List<String> getAssociatedIndividualUris(String username);
 
 	/**
+	 * Is a password change needed when the user logs in?
+	 */
+	public abstract boolean isPasswordChangeRequired(String username);
+
+	/**
 	 * Record a new password for the user.
 	 */
 	public abstract void recordNewPassword(String username,

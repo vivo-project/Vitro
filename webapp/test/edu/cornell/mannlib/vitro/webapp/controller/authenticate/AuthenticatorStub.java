@@ -193,4 +193,10 @@ public class AuthenticatorStub extends Authenticator {
 				"AuthenticatorStub.recordLoginWithoutUserAccount() not implemented.");
 	}
 
+	@Override
+	public boolean isPasswordChangeRequired(String username) {
+		throw new RuntimeException(
+				"AuthenticatorStub.isPasswordChangeRequired() not implemented.");
+	}
+
 }
