@@ -20,9 +20,9 @@ import com.hp.hpl.jena.rdf.model.impl.RDFDefaultErrorHandler;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.HasAssociatedIndividual;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.SelfEditingPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
@@ -88,7 +88,7 @@ public class SelfEditingPolicySetupTest extends AbstractTestClass {
 		PropertyRestrictionPolicyHelper.setBean(ctx,
 				PropertyRestrictionPolicyHelperStub
 						.getInstance(new String[] { ADMIN_NS }));
-		
+
 		policy = new SelfEditingPolicy(ctx);
 		Assert.assertNotNull(policy);
 
@@ -96,8 +96,7 @@ public class SelfEditingPolicySetupTest extends AbstractTestClass {
 		seIndividual.setURI(SELFEDITOR_URI);
 
 		ids = new ArrayIdentifierBundle();
-		ids.add(new SelfEditingIdentifierFactory.SelfEditing(seIndividual,
-				SelfEditingIdentifierFactory.NOT_BLACKLISTED));
+		ids.add(new HasAssociatedIndividual(SELFEDITOR_URI));
 
 		// setLoggerLevel(SelfEditingPolicySetupTest.class, Level.DEBUG);
 	}
@@ -125,16 +124,8 @@ public class SelfEditingPolicySetupTest extends AbstractTestClass {
 	@Test
 	public void noSelfEditorIdentifier() {
 		ids.clear();
-		ids.add(new Identifier() { /* empty identifier */ });
-		assertAddObjectPropStmt(SELFEDITOR_URI, SAFE_PREDICATE, SAFE_RESOURCE,
-				Authorization.INCONCLUSIVE);
-	}
-
-	@Test
-	public void blacklistedSelfEditor() {
-		ids.clear();
-		ids.add(new SelfEditingIdentifierFactory.SelfEditing(seIndividual,
-				"Don't like this guy."));
+		ids.add(new Identifier() { /* empty identifier */
+		});
 		assertAddObjectPropStmt(SELFEDITOR_URI, SAFE_PREDICATE, SAFE_RESOURCE,
 				Authorization.INCONCLUSIVE);
 	}

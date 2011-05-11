@@ -2,31 +2,31 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.xerces.util.XMLChar;
 
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.HasAssociatedIndividual;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.HasRoleLevel;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.IsUser;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.RoleIdentifier;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory;
 
 public class EditN3Utils {
 
+	/** Several places could give an editor URI. Return the first one. */
 	public static String getEditorUri(HttpServletRequest request) {
 		IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(request);
 
-		String editorUri = SelfEditingIdentifierFactory.getSelfEditingUri(ids);
-
-		if (editorUri == null) {
-			editorUri = RoleIdentifier.getUri(ids);
-		}
-
-		if (editorUri == null) {
-			editorUri = "Unknown N3 Editor";
-		}
-
-		return editorUri;
+		List<String> uris = new ArrayList<String>();
+		uris.addAll(IsUser.getUserUris(ids));
+		uris.addAll(HasAssociatedIndividual.getIndividualUris(ids));
+		uris.addAll(HasRoleLevel.getRoleLevelUris(ids));
+		uris.add("Unknown N3 Editor");
+		return uris.get(0);
 	}
     
     /**
