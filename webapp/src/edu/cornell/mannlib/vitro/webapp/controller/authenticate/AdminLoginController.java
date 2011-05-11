@@ -97,7 +97,7 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 			if (auth.isCurrentPassword(username, password)) {
 				auth.recordLoginAgainstUserAccount(username, INTERNAL);
 
-				if (auth.isPasswordChangeRequired(username)) {
+				if (!newPassword.isEmpty()) {
 					auth.recordNewPassword(username, newPassword);
 				}
 
