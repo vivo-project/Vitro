@@ -39,7 +39,7 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 
 	@Override
 	protected Actions requiredActions(VitroRequest vreq) {
-		return Actions.EMPTY; // No requirements to use this page.
+		return Actions.AUTHORIZED; // No requirements to use this page.
 	}
 
 	@Override
