@@ -1,10 +1,13 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
+package edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit;
 import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
+
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -82,7 +85,7 @@ public class SparqlEvaluate {
 //        return varToUris;
 //    }
 
-    protected  Map<String,Literal> sparqlEvaluateForLiterals( EditConfiguration editConfig, Map<String,String> varToSparql)  {
+    public  Map<String,Literal> sparqlEvaluateForLiterals( EditConfiguration editConfig, Map<String,String> varToSparql)  {
         Map<String,String> uriScope = editConfig.getUrisInScope();
         Map<String,Literal> literalScope = editConfig.getLiteralsInScope();
 
@@ -104,7 +107,7 @@ public class SparqlEvaluate {
         return varToLiterals;
     }
 
-    protected Map<String,String> sparqlEvaluateForUris( EditConfiguration editConfig, Map<String,String>varToSparql) {
+    public Map<String,String> sparqlEvaluateForUris( EditConfiguration editConfig, Map<String,String>varToSparql) {
         Map<String,String> uriScope = editConfig.getUrisInScope();
         Map<String,Literal> literalScope = editConfig.getLiteralsInScope();
 
@@ -133,7 +136,7 @@ public class SparqlEvaluate {
         return varToUris;
     }
 
-//    protected Map<String,Literal> sparqlEvaluateForAdditionalLiterals( EditConfiguration editConfig)  {
+//    public Map<String,Literal> sparqlEvaluateForAdditionalLiterals( EditConfiguration editConfig)  {
 //        Map<String,String> varToSpqrql = editConfig.getSparqlForAdditionalLiteralsInScope();
 //        Map<String,String> uriScope = editConfig.getUrisInScope();
 //        Map<String,Literal> literalScope = editConfig.getLiteralsInScope();
@@ -156,7 +159,7 @@ public class SparqlEvaluate {
 //        return varToLiterals;
 //    }
     
-    protected  String queryToUri(String querystr){
+    public  String queryToUri(String querystr){
         String value = null;
         QueryExecution qe = null;
         try{
@@ -192,7 +195,7 @@ public class SparqlEvaluate {
     }
 
 
-    protected  Literal queryToLiteral(String querystr){
+    public  Literal queryToLiteral(String querystr){
         Literal value = null;
         QueryExecution qe = null;
         try{

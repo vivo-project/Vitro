@@ -1,7 +1,7 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditSubmission" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>

@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
+package edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -29,6 +29,10 @@ import com.hp.hpl.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 import edu.cornell.mannlib.vitro.webapp.edit.elements.EditElement;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.BasicValidation;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.N3Validator;
 
 public class EditSubmission {
     private String editKey;
@@ -209,7 +213,7 @@ public class EditSubmission {
     	validationErrors.putAll(this.basicValidation.validateFiles( fileItems ) );
 	}
 
-	protected Literal createLiteral(String value, String datatypeUri, String lang) {
+	public Literal createLiteral(String value, String datatypeUri, String lang) {
         if( datatypeUri != null ){            
             if( "http://www.w3.org/2001/XMLSchema:anyURI".equals(datatypeUri) ){
                 try {

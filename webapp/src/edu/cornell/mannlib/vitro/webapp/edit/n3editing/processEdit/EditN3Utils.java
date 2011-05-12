@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
+package edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,18 +16,17 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.IsUser;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 
 public class EditN3Utils {
+    /** Several places could give an editor URI. Return the first one. */
+    public static String getEditorUri(HttpServletRequest request) {
+        IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(request);
 
-	/** Several places could give an editor URI. Return the first one. */
-	public static String getEditorUri(HttpServletRequest request) {
-		IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(request);
-
-		List<String> uris = new ArrayList<String>();
-		uris.addAll(IsUser.getUserUris(ids));
-		uris.addAll(HasAssociatedIndividual.getIndividualUris(ids));
-		uris.addAll(HasRoleLevel.getRoleLevelUris(ids));
-		uris.add("Unknown N3 Editor");
-		return uris.get(0);
-	}
+        List<String> uris = new ArrayList<String>();
+        uris.addAll(IsUser.getUserUris(ids));
+        uris.addAll(HasAssociatedIndividual.getIndividualUris(ids));
+        uris.addAll(HasRoleLevel.getRoleLevelUris(ids));
+        uris.add("Unknown N3 Editor");
+        return uris.get(0);
+    }   
     
     /**
      * Strips from a string any characters that are not valid in XML 1.0

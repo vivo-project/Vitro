@@ -10,6 +10,8 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.BasicValidation;
+
 public class BasicValidationTest {
 
 	@Test

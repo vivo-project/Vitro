@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
+package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -15,6 +15,8 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.Precision;
 import edu.cornell.mannlib.vitro.webapp.edit.elements.DateTimeWithPrecision;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditSubmission;
 
 public class DateTimeIntervalValidation implements N3Validator {
     private static Log log = LogFactory.getLog(DateTimeIntervalValidation.class);

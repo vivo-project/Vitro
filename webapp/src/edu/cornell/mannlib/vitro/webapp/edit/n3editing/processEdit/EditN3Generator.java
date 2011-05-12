@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
+package edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -18,6 +18,8 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.XSD;
+
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
 
 /**
  * Builds the N3 strings for the given EditConfiguration, model
@@ -107,7 +109,7 @@ public class EditN3Generator {
      * references, Matcher.quoteReplacement() serves the purpose.
      *
      */
-    protected  String subInLiterals(String var, Literal literal, String target){
+    public  String subInLiterals(String var, Literal literal, String target){
         String varRegex = "\\?" + var + "(?=\\.\\p{Space}|\\p{Space})";
         if (target==null ) {
             log.error("subInLiterals was passed a null target");

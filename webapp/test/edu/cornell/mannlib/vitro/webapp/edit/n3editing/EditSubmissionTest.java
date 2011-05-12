@@ -14,6 +14,8 @@ import stubs.javax.servlet.http.HttpServletRequestStub;
 import com.hp.hpl.jena.rdf.model.Literal;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditSubmission;
 
 public class EditSubmissionTest extends AbstractTestClass {
 	HttpServletRequestStub request;

@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
@@ -12,8 +15,9 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils;
 
 /**
@@ -26,11 +30,11 @@ import edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils;
  * form.  Try adding the behavior logic to the code that generates the
  * EditConfiguration for the form.  
  */
-public class EditRequestDispatch extends FreemarkerHttpServlet {
+public class EditRequestDispatchController extends FreemarkerHttpServlet {
     private static final long serialVersionUID = 1L;
-    public static Log log = LogFactory.getLog(EditRequestDispatch.class);
+    public static Log log = LogFactory.getLog(EditRequestDispatchController.class);
     
-    final String DEFAULT_OBJ_FORM = "defaultObjPropForm.jsp";
+    final String DEFAULT_OBJ_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultPropertyFormGenerator";
     final String DEFAULT_ERROR_FORM = "error.jsp";
     final String DEFAULT_ADD_INDIVIDUAL = "defaultAddMissingIndividualForm.jsp";
     @Override
@@ -117,15 +121,12 @@ public class EditRequestDispatch extends FreemarkerHttpServlet {
 
         // Keep track of what form we are using so it can be returned to after a failed validation 
         // I'd like to get this from the request but sometimes that doesn't work well, internal forwards etc.
-         String url = "/edit/editRequestDispatch.jsp"; 
-         vreq.setAttribute("formUrl", url + "?" + vreq.getQueryString());
-
-         //this are only used by the old jsp forms
-         vreq.setAttribute("preForm", "/edit/formPrefix.jsp");
-         vreq.setAttribute("postForm", "/edit/formSuffix.jsp");
+         //TODO: this needs to be the same as the mapping in web.xml 
+         vreq.setAttribute("formUrl", "/edit/editRequest?" + vreq.getQueryString());
 
          if ("delete".equals(command)) {
-            // %><jsp:forward page="/edit/forms/propDelete.jsp"/><%
+             //TODO: delete command is used with the defualt delete form
+             //maybe it doesn't need to be in here?
              return null;
          }
 
@@ -138,6 +139,7 @@ public class EditRequestDispatch extends FreemarkerHttpServlet {
          // so maybe this logic shouldn't be here?
          if ( isEditOfExistingStmt && (wdf.getObjectPropertyDao().skipEditForm(predicateUri)) ) {
              log.debug("redirecting to object for predicate " + predicateUri);
+             //TODO: implement this feature
 //             %><c:redirect url="/individual">
 //                   <c:param name="uri" value="${param.objectUri}"/>
 //                   <c:param name="relatedSubjectUri" value="${param.subjectUri}"/>
@@ -146,19 +148,15 @@ public class EditRequestDispatch extends FreemarkerHttpServlet {
 //             <%
              return null;
          }
-                   
 
-         String form = DEFAULT_OBJ_FORM;
+         //use default object property form if nothing else works
+         String editConfGeneratorName = DEFAULT_OBJ_FORM;
           
          // *** handle the case where the form is specified as a request parameter ***
          if( predicateUri == null && ( formParam != null && !formParam.isEmpty()) ){
-             //case where a form was passed as a http parameter
-             form = formParam;              
-             vreq.setAttribute("form", form);              
-             //followed by <jsp:foward page="/edit/forms/${form}"/>              
-             return null;
+             //form parameter must be a fully qualified java class name of a EditConfigurationGenerator implementation.
+             editConfGeneratorName = formParam;              
          }
-
          
          // *** handle the case where the form is decided by the predicate parameter ***
 
@@ -170,34 +168,48 @@ public class EditRequestDispatch extends FreemarkerHttpServlet {
          ObjectProperty objectProp = wdf.getObjectPropertyDao().getObjectPropertyByURI(predicateUri);
          if( objectProp != null ){
              vreq.setAttribute("predicate", objectProp);
+             //custom entry form use to be a jsp but it should now be a fully qualified java class name of a 
+             //EditConfigurationGenerator implementation.
              customForm = objectProp.getCustomEntryForm();
+             if (customForm != null && customForm.length() > 0) {                            
+                 //if there is a custom form on the predicate, use that
+                 editConfGeneratorName = objectProp.getCustomEntryForm();
+             }
          }
 
          // Forward to create new is part of the default object property form
          // it should be handled in that form's EditConfiguration, not here.
          // The code that sets up the EditConfiguration should decide on 
-         // different configurations and templates to use based on isForwardToCreateNew.         
+         // different configurations and templates to use based on isForwardToCreateNew. 
+         //TODO: make sure that forward to create new works on the default object property form
          if( isFowardToCreateNew(vreq, objectProp, command)){
              return handleForwardToCreateNew(vreq, command, objectProp, isEditOfExistingStmt);
          }
-                  
-         //Offer create new and select from existing are ignored if there is a custom form
-         if (customForm != null && customForm.length() > 0) {                            
-             //if there is a custom form on the predicate, use that
-             form = objectProp.getCustomEntryForm();                                   
-         } else {
-             //if it is nothing special, then use the default object property form              
-             form = DEFAULT_OBJ_FORM ;                  
-         }          
-         vreq.setAttribute("form", form);
+                     
+         vreq.setAttribute("form", editConfGeneratorName);
          
-         // Now here we can no longer forward to a JSP.
-         // Somehow we need to be able to specify some java code that generates the          
-         // EditConfiguration and the do the freemarker template merge.
-                          
-         return null;
+         /****  make the edit configuration ***/
+         EditConfiguration editConfig = makeEditConfiguration( editConfGeneratorName, vreq, session);
+         
+         //what template?
+         String template = editConfig.getTemplate();
+         
+         //what goes in the map for templates?
+         Map<String,Object> templateData = new HashMap<String,Object>();
+         templateData.put("editConfiguration", editConfig);
+         
+         return new TemplateResponseValues(editConfig.getTemplate(), templateData);
     }
     
+    private EditConfiguration makeEditConfiguration(
+            String editConfGeneratorName, VitroRequest vreq, HttpSession session) {
+
+        //TODO: instianciate generator obj
+        //TODO: call getEditConfiguration()
+               
+        return null;
+    }
+
     /*
          Forward to create new is part of the default object property form
          it should be handled in that form's EditConfiguration, not here.

@@ -48,8 +48,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
@@ -144,11 +142,8 @@ public class IndividualController extends FreemarkerHttpServlet {
     }
 
     private void cleanUpSession(VitroRequest vreq) {
-		// Session cleanup: any time we are at an entity page we shouldn't have an editing config or submission
-        HttpSession session = vreq.getSession();
-	    session.removeAttribute("editjson");
-	    EditConfiguration.clearAllConfigsInSession(session);
-	    EditSubmission.clearAllEditSubmissionsInSession(session);
+		// We should not remove edit configurations from the session because the user
+        // may resubmit the forms via the back button and the system is setup to handle this.         
     }
     
     private Map<String, Object> getVerbosePropertyValues(VitroRequest vreq) {

@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
+package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -187,8 +187,8 @@ public class SelectListGenerator {
                         for( Individual ind : individuals ){
                             String uri = ind.getURI();
                             if( uri != null ){              
-                        		optionsMap.put(uri,ind.getName().trim());                        
-                        		++optionsCount;             	
+                                optionsMap.put(uri,ind.getName().trim());                        
+                                ++optionsCount;                 
                             }
                         }
                         
@@ -212,13 +212,13 @@ public class SelectListGenerator {
                     // individuals asserted in subclasses
                     boolean inferenceAvailable = false;
                     if (wDaoFact instanceof WebappDaoFactoryJena) {
-                    	PelletListener pl = ((WebappDaoFactoryJena) wDaoFact)
-                    			.getPelletListener();
-                    	if (pl != null && pl.isConsistent() 
-                    	    && !pl.isInErrorState() 
-                    	    && !pl.isReasoning()) {
-                    		inferenceAvailable = true;
-                    	}
+                        PelletListener pl = ((WebappDaoFactoryJena) wDaoFact)
+                                .getPelletListener();
+                        if (pl != null && pl.isConsistent() 
+                            && !pl.isInErrorState() 
+                            && !pl.isReasoning()) {
+                            inferenceAvailable = true;
+                        }
                     }
                     
                     VClass vclass = wDaoFact.getVClassDao().getVClassByURI( vclassUri );
@@ -227,41 +227,41 @@ public class SelectListGenerator {
                         optionsMap.put("", "Could not find class " + vclassUri);
                     }else{                
                         Map<String, Individual> individualMap = new HashMap<String, Individual>();
-                		
+                        
                         for (Individual ind : wDaoFact.getIndividualDao().getIndividualsByVClassURI(vclass.getURI(),-1,-1)) {
-                        	if (ind.getURI() != null) {                        		
-                            	individualMap.put(ind.getURI(), ind);
-                        	}
+                            if (ind.getURI() != null) {                             
+                                individualMap.put(ind.getURI(), ind);
+                            }
                         }
                         
                         if (!inferenceAvailable) {
-                        	for (String subclassURI : wDaoFact.getVClassDao().getAllSubClassURIs(vclass.getURI())) {
-                        		 for (Individual ind : wDaoFact.getIndividualDao().getIndividualsByVClassURI(subclassURI,-1,-1)) {
-                                 	if (ind.getURI() != null) {
-                                 		individualMap.put(ind.getURI(), ind);
-                                 	}
+                            for (String subclassURI : wDaoFact.getVClassDao().getAllSubClassURIs(vclass.getURI())) {
+                                 for (Individual ind : wDaoFact.getIndividualDao().getIndividualsByVClassURI(subclassURI,-1,-1)) {
+                                    if (ind.getURI() != null) {
+                                        individualMap.put(ind.getURI(), ind);
+                                    }
                                  }
-                        	}
+                            }
                         }
                         
                         List<Individual> individuals = new ArrayList<Individual>();
                         individuals.addAll(individualMap.values());
                         Collections.sort(individuals);
-                		
+                        
                         for (Individual ind : wDaoFact.getIndividualDao().getIndividualsByVClassURI(vclass.getURI(),-1,-1)) {
-                        	if (ind.getURI() != null) {                        		
-                            	individualMap.put(ind.getURI(), ind);
-                        	}
+                            if (ind.getURI() != null) {                             
+                                individualMap.put(ind.getURI(), ind);
+                            }
                         }
                         
                         if (!inferenceAvailable) {
-                        	for (String subclassURI : wDaoFact.getVClassDao().getAllSubClassURIs(vclass.getURI())) {
-                        		 for (Individual ind : wDaoFact.getIndividualDao().getIndividualsByVClassURI(subclassURI,-1,-1)) {
-                                 	if (ind.getURI() != null) {
-                                 		individualMap.put(ind.getURI(), ind);
-                                 	}
+                            for (String subclassURI : wDaoFact.getVClassDao().getAllSubClassURIs(vclass.getURI())) {
+                                 for (Individual ind : wDaoFact.getIndividualDao().getIndividualsByVClassURI(subclassURI,-1,-1)) {
+                                    if (ind.getURI() != null) {
+                                        individualMap.put(ind.getURI(), ind);
+                                    }
                                  }
-                        	}
+                            }
                         }
                         
                         individuals.addAll(individualMap.values());
@@ -274,8 +274,8 @@ public class SelectListGenerator {
                             for( Individual ind : individuals ) {
                                 String uri = ind.getURI();
                                 if( uri != null ) {       
-                                	optionsMap.put(uri,ind.getName().trim());                        
-                            		++optionsCount;
+                                    optionsMap.put(uri,ind.getName().trim());                        
+                                    ++optionsCount;
                                 }
                             }
                         }

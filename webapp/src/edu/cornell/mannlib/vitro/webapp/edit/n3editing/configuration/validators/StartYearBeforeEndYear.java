@@ -1,11 +1,14 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
+package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import com.hp.hpl.jena.rdf.model.Literal;
+
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditSubmission;
 
 public class StartYearBeforeEndYear implements N3Validator {
 	private String startFieldName;
