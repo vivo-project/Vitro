@@ -17,7 +17,19 @@
         <#assign errorMessage = "Email or Password was incorrect." />
     </#if>
     
-    <#if (errorNoUser?? || errorNoPassword?? || errorLoginFailed?? )>
+    <#if errorNewPasswordWrongLength??>
+        <#assign errorMessage = "Password must be between 6 and 12 characters." />
+    </#if>
+    
+    <#if errorNewPasswordsDontMatch??>
+        <#assign errorMessage = "Passwords do not match." />
+    </#if>
+    
+    <#if errorNewPasswordMatchesOld??>
+        <#assign errorMessage = "Your new password must be different from your existing password." />
+    </#if>
+    
+    <#if errorMessage?has_content>
         <section id="error-alert" role="alert">
             <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon"/>
             <p>${errorMessage}</p>
@@ -33,12 +45,12 @@
 	<form method="post" action="${controllerUrl}">
         <#if newPasswordRequired??>
             <label for="newPassword">New Password</label>
-            <input name="password" id="password" class="text-field" type="password" required autofocus />
+            <input name="newPassword" id="newPassword" class="text-field" type="password" value="${newPassword!}" required autofocus />
             
             <p class="password-note">Minimum of 6 characters in length.</p>
             
             <label for="confirmPassword">Confirm Password</label>
-            <input id="confirmPassword" name="confirmPassword" class="text-field" type="password" required />
+            <input id="confirmPassword" name="confirmPassword" class="text-field" type="password" value="${confirmPassword!}" required />
             
             <input id="username" name="username" type="hidden" value="${username!}" />
             <input id="password" name="password" type="hidden" value="${password!}" />
