@@ -1,38 +1,55 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#-- Template for the Fake External Authentication page. -->
+<#-- Template for login using internal vitro account (even when external auth is enabled). Accessible at /admin/login -->
 
-<section role="region">
+<section id="internalLogin" role="region">
     <h2>Internal Login</h2>
 
     <#if errorNoUser??>
-        <h3>No username supplied.</h3>
+        <#assign errorMessage = "No email supplied." />
     </#if>
     
     <#if errorNoPassword??>
-        <h3>No password supplied</h3>
+        <#assign errorMessage = "No password supplied." />
     </#if>
     
     <#if errorLoginFailed??>
-        <h3>Username or Password was incorrect.</h3>
+        <#assign errorMessage = "Email or Password was incorrect." />
     </#if>
     
-    <#if newPasswordRequired??>
-        <h3>This is your first time logging in. You must supply a new password.</h3>
+    <#if (errorNoUser?? || errorNoPassword?? || errorLoginFailed?? )>
+        <section id="error-alert" role="alert">
+            <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon"/>
+            <p>${errorMessage}</p>
+        </section>
     </#if>
     
-    <p>
-      Enter the username and password for your internal VIVO account.
-    </p>
+    <#if ( !newPasswordRequired?? )>
+        <p>Enter the email address and password for your internal Vitro account.</p>
+    <#else>
+        <p>You must change your password to log in.</p>
+    </#if>
 
-	<form action="${controllerUrl}">
-    	<div> Username:	<input type="text" name="username" value="${username}"/> </div>
-    	<div> Password:	<input type="text" name="password" /> </div>
-
+	<form method="post" action="${controllerUrl}">
         <#if newPasswordRequired??>
-            <div>New Password:	<input type="text" name="newPassword" /> </div>
+            <label for="newPassword">New Password</label>
+            <input name="password" id="password" class="text-field" type="password" required autofocus />
+            
+            <p class="password-note">Minimum of 6 characters in length.</p>
+            
+            <label for="confirmPassword">Confirm Password</label>
+            <input id="confirmPassword" name="confirmPassword" class="text-field" type="password" required />
+            
+            <input id="username" name="username" type="hidden" value="${username!}" />
+            <input id="password" name="password" type="hidden" value="${password!}" />
+        <#else>
+            <label for="username">Email</label>
+            <input id="username" name="username" class="text-field focus" type="text" value="${username!}" required autofocus />
+
+        	<label for="password">Password</label>
+            <input id="password" name="password" class="text-field" type="password" required />
         </#if>
 
-		<input type="submit" value="submit" /> 
+		<p class="submit"><input name="loginForm" type="submit" class="green button" value="Log in"/></p>
 	</form>
 </section>
