@@ -364,7 +364,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
             body.put("title", qtxt + " - " + appBean.getApplicationName()
                     + " Search Results");
             
-            body.put("hitsLength",hitsLength);
+            body.put("hitCount",hitsLength);
             body.put("startIndex", startIndex);
             
             body.put("pagingLinks", getPagingLinks(startIndex, hitsPerPage,

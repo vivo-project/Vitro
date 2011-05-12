@@ -73,10 +73,17 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(SolrPagedSearchController.class);
     
-    private static final String XML_REQUEST_PARAM = "xml";
+
     private static final int DEFAULT_HITS_PER_PAGE = 25;
     private static final int DEFAULT_MAX_SEARCH_SIZE = 1000;   
-    
+
+    private static final String PARAM_XML_REQUEST = "xml";
+    private static final String PARAM_START_INDEX = "startIndex";
+    private static final String PARAM_HITS_PER_PAGE = "hitsPerPage";
+    private static final String PARAM_CLASSGROUP = "classgroup";
+    private static final String PARAM_RDFTYPE = "type";
+    private static final String PARAM_QUERY_TEXT = "querytext";
+
     protected static final Map<Format,Map<Result,String>> templateTable;
 
     protected enum Format { 
@@ -148,7 +155,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             
             int startIndex = 0;
             try{ 
-                startIndex = Integer.parseInt(vreq.getParameter("startIndex")); 
+                startIndex = Integer.parseInt(vreq.getParameter(PARAM_START_INDEX)); 
             }catch (Throwable e) { 
                 startIndex = 0; 
             }            
@@ -156,7 +163,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             
             int hitsPerPage = DEFAULT_HITS_PER_PAGE;
             try{ 
-                hitsPerPage = Integer.parseInt(vreq.getParameter("hitsPerPage")); 
+                hitsPerPage = Integer.parseInt(vreq.getParameter(PARAM_HITS_PER_PAGE)); 
             } catch (Throwable e) { 
                 hitsPerPage = DEFAULT_HITS_PER_PAGE; 
             }                        
@@ -244,18 +251,18 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             }            
   
             ParamMap pagingLinkParams = new ParamMap();
-            pagingLinkParams.put("querytext", qtxt);
-            pagingLinkParams.put("hitsPerPage", String.valueOf(hitsPerPage));
+            pagingLinkParams.put(PARAM_QUERY_TEXT, qtxt);
+            pagingLinkParams.put(PARAM_HITS_PER_PAGE, String.valueOf(hitsPerPage));
             
             if( wasXmlRequested ){
-                pagingLinkParams.put(XML_REQUEST_PARAM,"1");                
+                pagingLinkParams.put(PARAM_XML_REQUEST,"1");                
             }
             
             /* Compile the data for the templates */
             
             Map<String, Object> body = new HashMap<String, Object>();
             
-            String classGroupParam = vreq.getParameter("classgroup");    
+            String classGroupParam = vreq.getParameter(PARAM_CLASSGROUP);    
             boolean classGroupFilterRequested = false;
             if (!StringUtils.isEmpty(classGroupParam)) {
                 VClassGroup grp = grpDao.getGroupByURI(classGroupParam);
@@ -264,7 +271,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
                     body.put("classGroupName", grp.getPublicName());
             }
             
-            String typeParam = vreq.getParameter("type");
+            String typeParam = vreq.getParameter(PARAM_RDFTYPE);
             boolean typeFilterRequested = false;
             if (!StringUtils.isEmpty(typeParam)) {
                 VClass type = vclassDao.getVClassByURI(typeParam);
@@ -295,10 +302,10 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
                         vClassLinks.add(new VClassSearchLink(qtxt, vc));
                     }
                     body.put("classLinks", vClassLinks);                       
-                    pagingLinkParams.put("classgroup", classGroupParam);
+                    pagingLinkParams.put(PARAM_CLASSGROUP, classGroupParam);
 
                 } else {
-                    pagingLinkParams.put("type", typeParam);
+                    pagingLinkParams.put(PARAM_RDFTYPE, typeParam);
                 }
             }           
 
@@ -312,7 +319,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             body.put("title", qtxt + " - " + appBean.getApplicationName()
                     + " Search Results");
             
-            body.put("hitsLength", hitCount);
+            body.put("hitCount", hitCount);
             body.put("startIndex", startIndex);
             
             body.put("pagingLinks", getPagingLinks(startIndex, hitsPerPage,
@@ -443,7 +450,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
         query.setRows(maxHitCount);
 
         // Classgroup filtering
-        Object param = vreq.getParameter("classgroup");
+        Object param = vreq.getParameter(PARAM_CLASSGROUP);
         if( param != null && !"".equals(param)){           
             log.debug("Firing classgroup query ");
             log.debug("request.getParameter(classgroup) is "+ param.toString());
@@ -451,7 +458,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
         }
 
         // rdf:type filtering
-        param = vreq.getParameter("type");
+        param = vreq.getParameter(PARAM_RDFTYPE);
         if(  param != null && !"".equals(param)){                         
             log.debug("Firing type query ");
             log.debug("request.getParameter(type) is "+ param.toString());   
@@ -483,14 +490,14 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
     private class VClassGroupSearchLink extends LinkTemplateModel {
         
         VClassGroupSearchLink(String querytext, VClassGroup classgroup) {
-            super(classgroup.getPublicName(), "/search", "querytext", querytext, "classgroup", classgroup.getURI());
+            super(classgroup.getPublicName(), "/search", PARAM_QUERY_TEXT, querytext, PARAM_CLASSGROUP, classgroup.getURI());
         }
     }
     
     private class VClassSearchLink extends LinkTemplateModel {
         
         VClassSearchLink(String querytext, VClass type) {
-            super(type.getName(), "/search", "querytext", querytext, "type", type.getURI());
+            super(type.getName(), "/search", PARAM_QUERY_TEXT, querytext, PARAM_RDFTYPE, type.getURI());
         }
     }
     
@@ -504,7 +511,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
         }
         
         for (int i = 0; i < hitCount; i += hitsPerPage) {
-            params.put("startIndex", String.valueOf(i));
+            params.put(PARAM_START_INDEX, String.valueOf(i));
             if ( i < maxHitCount - hitsPerPage) {
                 int pageNumber = i/hitsPerPage + 1;
                 if (i >= startIndex && i < (startIndex + hitsPerPage)) {
@@ -521,12 +528,12 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
     }
     
     private String getPreviousPageLink(int startIndex, int hitsPerPage, String baseUrl, ParamMap params) {
-        params.put("startIndex", String.valueOf(startIndex-hitsPerPage));
+        params.put(PARAM_START_INDEX, String.valueOf(startIndex-hitsPerPage));
         return UrlBuilder.getUrl(baseUrl, params);
     }
     
     private String getNextPageLink(int startIndex, int hitsPerPage, String baseUrl, ParamMap params) {
-        params.put("startIndex", String.valueOf(startIndex+hitsPerPage));
+        params.put(PARAM_START_INDEX, String.valueOf(startIndex+hitsPerPage));
         return UrlBuilder.getUrl(baseUrl, params);
     }
     
@@ -650,7 +657,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
 
     protected boolean isRequestedFormatXml(HttpServletRequest req){
         if( req != null ){
-            String param = req.getParameter(XML_REQUEST_PARAM);
+            String param = req.getParameter(PARAM_XML_REQUEST);
             if( param != null && "1".equals(param)){
                 return true;
             }else{
