@@ -143,12 +143,20 @@
     <listener-class> edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup </listener-class>
   </listener>
   
-	<!--<listener>
-		<listener-class>
-	        edu.cornell.mannlib.vitro.webapp.auth.policy.setup.SelfEditingPolicySetup
-		</listener-class>
-	</listener>  -->
-
+  <!--
+  <listener>
+    <listener-class>
+      edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup
+    </listener-class>
+  </listener>
+  -->
+  
+  <!--<listener>
+  	<listener-class>
+          edu.cornell.mannlib.vitro.webapp.auth.policy.setup.SelfEditingPolicySetup
+  	</listener-class>
+  </listener>  -->
+  
     <listener>
         <listener-class>
             edu.cornell.mannlib.vitro.webapp.auth.identifier.UserToIndIdentifierFactorySetup
@@ -890,7 +898,13 @@
   <servlet>
     <servlet-name>SearchController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.PagedSearchController</servlet-class>
+  </servlet> 
+  <!--   
+  <servlet>
+    <servlet-name>SearchController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.SolrPagedSearchController</servlet-class>
   </servlet>
+  -->
   <servlet-mapping>
     <servlet-name>SearchController</servlet-name>
     <url-pattern>/search</url-pattern>
