@@ -40,8 +40,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.SelectListGenerator;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.SelectListGenerator;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
 
@@ -51,6 +51,8 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.Individual
  * @author bdc34
  *
  */
+
+// RY Rename to JsonServlet once the transition to Solr is complete.
 public class SolrJsonServlet extends VitroHttpServlet {
 
     @Override
