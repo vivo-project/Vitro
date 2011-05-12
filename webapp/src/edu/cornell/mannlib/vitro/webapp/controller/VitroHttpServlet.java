@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LogoutRedirector;
 
@@ -98,7 +99,19 @@ public class VitroHttpServlet extends HttpServlet {
 	 * Don't display a page that the user isn't authorized to see.
 	 * 
 	 * @param actions
-	 *            the RequestedActions that need to be authorized.
+	 *            the RequestedActions that must be authorized.
+	 */
+	protected boolean isAuthorizedToDisplayPage(HttpServletRequest request,
+			HttpServletResponse response, RequestedAction... actions) {
+		return isAuthorizedToDisplayPage(request, response,
+				new Actions(Arrays.asList(actions)));
+	}
+
+	/**
+	 * Don't display a page that the user isn't authorized to see.
+	 * 
+	 * @param actions
+	 *            the combination of RequestedActions that must be authorized.
 	 */
 	protected boolean isAuthorizedToDisplayPage(HttpServletRequest request,
 			HttpServletResponse response, Actions actions) {
@@ -112,7 +125,7 @@ public class VitroHttpServlet extends HttpServlet {
 					+ "' is authorized for actions: " + actions);
 			return true;
 		}
-		
+
 		log.debug("Servlet '" + this.getClass().getSimpleName()
 				+ "' is not authorized for actions: " + actions);
 
