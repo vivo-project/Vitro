@@ -28,15 +28,13 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.UserToIndIdentifierFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.EditSubmissionPreprocessor;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.ModelChangePreprocessor;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.N3Validator;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Generator;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.SparqlEvaluate;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
@@ -262,22 +260,9 @@ public class EditConfiguration {
                 throw new Error("EditConfiguration.addSystemValues() needs a session");
 
             /* ********** Get URI of a logged in user ************** */
-            IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(request);
-            List<String> userUris = 
-              UserToIndIdentifierFactory.getIndividualsForUser(ids);
-                        
-            if( userUris == null || userUris.size() == 0 ){
-            	log.debug("Cound not find user ur for edit request");
-                log.error("Could not find a userUri for edit request, make " +
-                        "sure that there is an IdentifierBundleFactory that " +
-                "produces userUri identifiers in the context.");
-            } else if( userUris.size() > 1  ){
-                log.error("Found multiple userUris, using the first in list.");
-                log.debug("Found multiple user uris");
-            }else {
-            	log.debug("EditConfiguration.java - checking system value for User URI " + userUris.get(0));
-                getUrisInScope().put("editingUser",userUris.get(0));
-            }
+            String userUri = EditN3Utils.getEditorUri(request);
+           	log.debug("EditConfiguration.java - checking system value for User URI " + userUri);
+            getUrisInScope().put("editingUser", userUri);
         }   
     }
     
