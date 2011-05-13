@@ -14,8 +14,8 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.HasAssociatedIndividual;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndividual;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;

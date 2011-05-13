@@ -15,8 +15,8 @@ import stubs.edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestricti
 import stubs.javax.servlet.ServletContextStub;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.HasAssociatedIndividual;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndividual;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;

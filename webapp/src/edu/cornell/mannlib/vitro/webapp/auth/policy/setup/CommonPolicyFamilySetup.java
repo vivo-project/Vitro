@@ -10,7 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.CommonIdentifierBundleFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.CommonIdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.DisplayRestrictedDataByRoleLevelPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.DisplayRestrictedDataToSelfPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;

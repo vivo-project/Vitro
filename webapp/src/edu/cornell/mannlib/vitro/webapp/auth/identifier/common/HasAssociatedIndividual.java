@@ -1,10 +1,13 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.auth.identifier;
+package edu.cornell.mannlib.vitro.webapp.auth.identifier.common;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 
 /**
  * The current user is associated with this Individual.

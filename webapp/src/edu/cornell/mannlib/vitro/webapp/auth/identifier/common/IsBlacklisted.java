@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.auth.identifier;
+package edu.cornell.mannlib.vitro.webapp.auth.identifier.common;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -25,6 +25,8 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 
 /**

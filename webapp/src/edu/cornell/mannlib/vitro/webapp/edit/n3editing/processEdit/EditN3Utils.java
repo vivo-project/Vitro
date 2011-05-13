@@ -9,11 +9,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.xerces.util.XMLChar;
 
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.HasAssociatedIndividual;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.HasRoleLevel;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IsUser;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndividual;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasRoleLevel;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.IsUser;
 
 public class EditN3Utils {
     /** Several places could give an editor URI. Return the first one. */

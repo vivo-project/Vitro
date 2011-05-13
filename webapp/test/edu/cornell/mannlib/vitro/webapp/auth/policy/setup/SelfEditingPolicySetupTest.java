@@ -20,9 +20,9 @@ import com.hp.hpl.jena.rdf.model.impl.RDFDefaultErrorHandler;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.HasAssociatedIndividual;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndividual;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.SelfEditingPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
