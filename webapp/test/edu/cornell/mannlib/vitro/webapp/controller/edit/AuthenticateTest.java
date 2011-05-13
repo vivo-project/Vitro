@@ -29,6 +29,7 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.AuthenticatorStub;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
@@ -133,7 +134,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		user.setUsername(userInfo.username);
 		user.setURI(userInfo.uri);
 		user.setRoleURI(String.valueOf(userInfo.securityLevel));
-		user.setMd5password(Authenticate.applyMd5Encoding(userInfo.password));
+		user.setMd5password(Authenticator.applyMd5Encoding(userInfo.password));
 		user.setLoginCount(userInfo.loginCount);
 		if (userInfo.loginCount > 0) {
 			user.setFirstTime(new Date(0));

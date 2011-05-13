@@ -16,7 +16,6 @@ import javax.servlet.ServletException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.Level;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +28,6 @@ import stubs.javax.servlet.http.HttpSessionStub;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
-import edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate;
 
 /**
  * Test the basic features of ProgramTest.
@@ -93,7 +91,7 @@ public class ProgramLoginTest extends AbstractTestClass {
 		user.setUsername(name);
 		user.setURI(uri);
 		user.setRoleURI(String.valueOf(50));
-		user.setMd5password(Authenticate.applyMd5Encoding(password));
+		user.setMd5password(Authenticator.applyMd5Encoding(password));
 		user.setLoginCount(loginCount);
 		if (loginCount > 0) {
 			user.setFirstTime(new Date(0));

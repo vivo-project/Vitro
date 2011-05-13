@@ -33,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUser
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 
 public class UserRetryController extends BaseEditController {
@@ -355,7 +356,7 @@ public class UserRetryController extends BaseEditController {
 				log.error("Can't encode a null password");
 			}
 
-			String encodedPassword = Authenticate.applyMd5Encoding(rawPassword);
+			String encodedPassword = Authenticator.applyMd5Encoding(rawPassword);
 			log.trace(action + ": Raw password '" + rawPassword
 					+ "', encoded '" + encodedPassword + "'");
 

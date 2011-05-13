@@ -494,22 +494,6 @@ public class Authenticate extends VitroHttpServlet {
 	// ----------------------------------------------------------------------
 
 	/**
-	 * Encode this password for storage in the database. Apply an MD5 encoding,
-	 * and store the result as a string of hex digits.
-	 */
-	public static String applyMd5Encoding(String password) {
-		try {
-			MessageDigest md = MessageDigest.getInstance("MD5");
-			byte[] digest = md.digest(password.getBytes());
-			char[] hexChars = Hex.encodeHex(digest);
-			return new String(hexChars).toUpperCase();
-		} catch (NoSuchAlgorithmException e) {
-			// This can't happen with a normal Java runtime.
-			throw new RuntimeException(e);
-		}
-	}
-
-	/**
 	 * The servlet context should contain a map from User URIs to
 	 * {@link HttpSession}s. Get a reference to it, creating it if necessary.
 	 */
