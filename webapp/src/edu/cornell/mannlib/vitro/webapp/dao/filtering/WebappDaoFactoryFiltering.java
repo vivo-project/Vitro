@@ -179,10 +179,6 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
         return innerWebappDaoFactory.getUserURI();
     }
 
-    public FlagDao getFlagDao() {
-        return innerWebappDaoFactory.getFlagDao();
-    }
-
     public KeywordIndividualRelationDao getKeys2EntsDao() {
         return innerWebappDaoFactory.getKeys2EntsDao();
     }

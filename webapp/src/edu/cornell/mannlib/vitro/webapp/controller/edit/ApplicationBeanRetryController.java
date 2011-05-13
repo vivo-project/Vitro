@@ -43,7 +43,7 @@ public class ApplicationBeanRetryController extends BaseEditController {
         try {
             super.doGet(request,response);
         } catch (Exception e) {
-            log.error("PortalRetryController encountered exception calling super.doGet()");
+            log.error(e,e);
         }
 
         //create an EditProcessObject for this and put it in the session
@@ -88,7 +88,7 @@ public class ApplicationBeanRetryController extends BaseEditController {
    
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
-        request.setAttribute("formJsp","/templates/edit/specific/portal_retry.jsp");
+        request.setAttribute("formJsp","/templates/edit/specific/applicationBean_retry.jsp");
         request.setAttribute("scripts","/templates/edit/formBasic.js");
         request.setAttribute("title","Site Information Editing Form");
         request.setAttribute("_action",action);
