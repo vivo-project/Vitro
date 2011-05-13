@@ -29,6 +29,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
+import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 
@@ -74,13 +75,13 @@ public void doGet (HttpServletRequest req, HttpServletResponse res) throws IOExc
 	String classUri = (String) getServletContext().getAttribute("classuri");
 	BooleanQuery query = new BooleanQuery();
 	 query.add(
-             new TermQuery( new Term(Entity2LuceneDoc.term.RDFTYPE, classUri)),
+             new TermQuery( new Term(VitroLuceneTermNames.RDFTYPE, classUri)),
              BooleanClause.Occur.MUST );     
 	 
 	 IndexSearcher index = LuceneIndexFactory.getIndexSearcher(getServletContext());
      TopDocs docs = index.search(query, null, 
              ENTITY_LIST_CONTROLLER_MAX_RESULTS, 
-             new Sort(Entity2LuceneDoc.term.NAMELOWERCASE));   
+             new Sort(VitroLuceneTermNames.NAME_LOWERCASE));   
      
      if( docs == null ){
          log.error("Search of lucene index returned null");
@@ -97,7 +98,7 @@ public void doGet (HttpServletRequest req, HttpServletResponse res) throws IOExc
          if (hit != null) {
              Document doc = index.doc(hit.doc);
              if (doc != null) {                                                                                        
-                 String uri = doc.getField(Entity2LuceneDoc.term.URI).stringValue();
+                 String uri = doc.getField(VitroLuceneTermNames.URI).stringValue();
                  resource = ResourceFactory.createResource(uri);
                  node = (RDFNode) ResourceFactory.createResource(classUri);
                  model.add(resource, RDF.type, node);

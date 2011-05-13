@@ -45,14 +45,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         public static String CLASSGROUP_URI    = "classgroup";
         /** Modtime from db */
         public static String MODTIME    = "modTime";
-        /** Name of entity, tab or vclass */
-        public static String NAME       = "name";
-        /** rdfs:label unanalyzed */
-        public static String NAMELOWERCASE = "nameunanalyzed" ;
-        /** Name of entity, unstemmed */
-        public static String NAMEUNSTEMMED       = "nameunstemmed";
-        /** Unaltered name of individual, un-lowercased, un-stemmed, un-tokenized" */
-        public static String NAMERAW      = "nameraw";
+
         /** time of index in msec since epoc */
         public static String INDEXEDTIME= "indexedTime";
         /** timekey of entity in yyyymmddhhmm  */
@@ -77,7 +70,21 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         /** class names in human readable form of an individual*/
         public static final String CLASSLOCALNAMELOWERCASE = "classLocalNameLowerCase";
         /** class names in human readable form of an individual*/
-        public static final String CLASSLOCALNAME = "classLocalName";        
+        public static final String CLASSLOCALNAME = "classLocalName";      
+
+        // Fields derived from rdfs:label
+        /** Raw rdfs:label: no lowercasing, no tokenizing, no stop words, no stemming **/
+        public static String NAME_RAW = "nameRaw"; // was NAMERAW
+        
+        /** rdfs:label lowercased, no tokenizing, no stop words, no stemming **/
+        public static String NAME_LOWERCASE = "nameLowercase"; // was NAMELOWERCASE
+        
+        /** rdfs:label lowercased, tokenized, stop words, no stemming **/
+        public static String NAME_UNSTEMMED = "nameUnstemmed"; // was NAMEUNSTEMMED
+        
+        /** rdfs:label lowercased, tokenized, stop words, stemmed **/
+        public static String NAME_STEMMED = "nameStemmed"; // was NAME
+     
     }
 
     private static final Log log = LogFactory.getLog(Entity2LuceneDoc.class.getName());
@@ -189,7 +196,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         //java class
         doc.add( new  Field(term.JCLASS, entClassName, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
 
-        //Entity Name        
+        // Individual label      
         if( ent.getRdfsLabel() != null )
             value=ent.getRdfsLabel();
         else{
@@ -198,21 +205,22 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
             log.debug("Using local name for individual with rdfs:label " + ent.getURI());
             value = ent.getLocalName();
         }
-        Field name = new Field(term.NAME, value, Field.Store.YES, Field.Index.ANALYZED);
-        doc.add( name );
+
+        Field labelRaw = new Field(term.NAME_RAW, value, Field.Store.YES, Field.Index.NOT_ANALYZED);
+        labelRaw.setBoost(NAME_BOOST);
+        doc.add(labelRaw);
         
-        Field nameUn = new Field(term.NAMEUNSTEMMED, value, Field.Store.NO, Field.Index.ANALYZED);  
-        nameUn.setBoost(NAME_BOOST);
-        doc.add( nameUn );
+        Field labelLowerCase = new Field(term.NAME_LOWERCASE, value, Field.Store.YES, Field.Index.NOT_ANALYZED);
+        labelLowerCase.setBoost(NAME_BOOST);
+        doc.add(labelLowerCase);
         
-        // BK nameunanalyzed is used by IndividualListController
-        Field nameUnanalyzed = new Field(term.NAMELOWERCASE, value.toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED);        
-        nameUnanalyzed.setBoost(NAME_BOOST);
-        doc.add( nameUnanalyzed );
+        Field labelUnstemmed = new Field(term.NAME_UNSTEMMED, value, Field.Store.NO, Field.Index.ANALYZED);
+        labelUnstemmed.setBoost(NAME_BOOST);
+        doc.add(labelUnstemmed);
         
-        Field nameRaw = new Field(term.NAMERAW, value, Field.Store.YES, Field.Index.NOT_ANALYZED);
-        nameRaw.setBoost(NAME_BOOST);
-        doc.add(nameRaw);
+        Field labelStemmed = new Field(term.NAME_STEMMED, value, Field.Store.NO, Field.Index.ANALYZED);
+        labelStemmed.setBoost(NAME_BOOST);
+        doc.add(labelStemmed);        
         
         
         //Moniker

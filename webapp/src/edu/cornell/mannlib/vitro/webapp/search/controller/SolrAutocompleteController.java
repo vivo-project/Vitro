@@ -9,43 +9,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.WildcardQuery;
-import org.apache.lucene.util.Version;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.json.JSONArray;
-
-import com.hp.hpl.jena.sparql.lib.org.json.JSONObject;
+import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
-import edu.cornell.mannlib.vitro.webapp.search.SearchException;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
+import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 
 /**
  * AutocompleteController generates autocomplete content
- * through a Lucene search. 
+ * through a Solr search. 
  */
+
+// RY Rename to AutocompleteController once the transition to Solr is complete.
 public class SolrAutocompleteController extends VitroAjaxController {
 
     private static final long serialVersionUID = 1L;
@@ -53,11 +44,14 @@ public class SolrAutocompleteController extends VitroAjaxController {
     
     //private static final String TEMPLATE_DEFAULT = "autocompleteResults.ftl";
     
-    private static String QUERY_PARAMETER_NAME = "term";
+    private static final String PARAM_QUERY = "term";
+    private static final String PARAM_RDFTYPE = "type";
     
     String NORESULT_MSG = "";    
-    private int defaultMaxSearchSize= 1000;
+    private static final int DEFAULT_MAX_HIT_COUNT = 1000; 
 
+    public static final int MAX_QUERY_LENGTH = 500;
+    
     @Override
     protected Actions requiredActions(VitroRequest vreq) {
     	return new Actions(new UseBasicAjaxControllers());
@@ -68,13 +62,10 @@ public class SolrAutocompleteController extends VitroAjaxController {
         throws IOException, ServletException {
         
         try {
-
-            int maxHitSize = defaultMaxSearchSize;
             
-            String qtxt = vreq.getParameter(QUERY_PARAMETER_NAME);
-            Analyzer analyzer = getAnalyzer(getServletContext());
+            String qtxt = vreq.getParameter(PARAM_QUERY);
             
-            Query query = getQuery(vreq, analyzer, qtxt);             
+            SolrQuery query = getQuery(qtxt, vreq);             
             if (query == null ) {
                 log.debug("query for '" + qtxt +"' is null.");
                 doNoQuery(response);
@@ -82,43 +73,35 @@ public class SolrAutocompleteController extends VitroAjaxController {
             }
             log.debug("query for '" + qtxt +"' is " + query.toString());
                         
-            IndexSearcher searcherForRequest = LuceneIndexFactory.getIndexSearcher(getServletContext());
-            
-            TopDocs topDocs = null;
-            try{
-                topDocs = searcherForRequest.search(query,null,maxHitSize);
-            }catch(Throwable t){
-                log.error("in first pass at search: " + t);
-                // this is a hack to deal with odd cases where search and index threads interact
-                try{
-                    wait(150);
-                    topDocs = searcherForRequest.search(query,null,maxHitSize);
-                }catch (Exception e){
-                    log.error(e, e);
-                    doNoSearchResults(response);
-                    return;
-                }
-            }
+            SolrServer solr = SolrSetup.getSolrServer(getServletContext());
+            QueryResponse queryResponse = solr.query(query);
 
-            if( topDocs == null || topDocs.scoreDocs == null){
-                log.error("topDocs for a search was null");                
+            if ( queryResponse == null) {
+                log.error("Query response for a search was null");                
                 doNoSearchResults(response);
                 return;
             }
             
-            int hitsLength = topDocs.scoreDocs.length;
-            if ( hitsLength < 1 ){                
+            SolrDocumentList docs = queryResponse.getResults();
+
+            if ( docs == null) {
+                log.error("Docs for a search was null");                
+                doNoSearchResults(response);
+                return;
+            }
+            
+            long hitCount = docs.getNumFound();
+            log.debug("Number of hits = " + hitCount);
+            if ( hitCount < 1 ) {                
                 doNoSearchResults(response);
                 return;
             }            
-            log.debug("found "+hitsLength+" hits"); 
 
             List<SearchResult> results = new ArrayList<SearchResult>();
-            for(int i=0; i<topDocs.scoreDocs.length ;i++){
-                try{                     
-                    Document doc = searcherForRequest.doc(topDocs.scoreDocs[i].doc);                    
-                    String uri = doc.get(VitroLuceneTermNames.URI);
-                    String name = doc.get(VitroLuceneTermNames.NAMERAW);
+            for (SolrDocument doc : docs) {
+                try{                                      
+                    String uri = doc.get(VitroLuceneTermNames.URI).toString();
+                    String name = doc.get(VitroLuceneTermNames.NAME_RAW).toString();
                     SearchResult result = new SearchResult(name, uri);
                     results.add(result);
                 } catch(Exception e){
@@ -137,7 +120,6 @@ public class SolrAutocompleteController extends VitroAjaxController {
                 jsonArray.put(result.toMap());
             }
             response.getWriter().write(jsonArray.toString());
-
         
         } catch (Throwable e) {
             log.error(e, e);            
@@ -145,136 +127,109 @@ public class SolrAutocompleteController extends VitroAjaxController {
         }
     }
 
-    private Analyzer getAnalyzer(ServletContext servletContext) throws SearchException {
-        Object obj = servletContext.getAttribute(LuceneSetup.ANALYZER);
-        if( obj == null || !(obj instanceof Analyzer) )
-            throw new SearchException("Could not get analyzer");
-        else
-            return (Analyzer)obj;        
-    }
-
-    private Query getQuery(VitroRequest vreq, Analyzer analyzer, 
-    			String querystr) throws SearchException{
-        
-        Query query = null;
-        try {
-            if( querystr == null){
-                log.error("There was no Parameter '"+ QUERY_PARAMETER_NAME            
-                    +"' in the request.");                
-                return null;
-            }else if( querystr.length() > MAX_QUERY_LENGTH ){
-                log.debug("The search was too long. The maximum " +
-                        "query length is " + MAX_QUERY_LENGTH );
-                return null;
-            } 
-
-            query = makeNameQuery(querystr, analyzer, vreq);
-            
-            // Filter by type
-            {
-                BooleanQuery boolQuery = new BooleanQuery(); 
-                String typeParam = (String) vreq.getParameter("type");
-                boolQuery.add(  new TermQuery(
-                        new Term(VitroLuceneTermNames.RDFTYPE, 
-                                typeParam)),
-                    BooleanClause.Occur.MUST);
-                boolQuery.add(query, BooleanClause.Occur.MUST);
-                query = boolQuery;
-            }
-            
-        } catch (Exception ex){
-            throw new SearchException(ex.getMessage());
+    private SolrQuery getQuery(String querystr, VitroRequest vreq) {
+       
+        if ( querystr == null) {
+            log.error("There was no parameter '"+ PARAM_QUERY            
+                +"' in the request.");                
+            return null;
+        } else if( querystr.length() > MAX_QUERY_LENGTH ) {
+            log.debug("The search was too long. The maximum " +
+                    "query length is " + MAX_QUERY_LENGTH );
+            return null;
         }
+                   
+        SolrQuery query = new SolrQuery();
+        query = query.setStart(0);
+        query = query.setRows(DEFAULT_MAX_HIT_COUNT);  
+        
+        query = setNameQuery(query, querystr, vreq);
+        
+        // Filter by type
+        String typeParam = (String) vreq.getParameter(PARAM_RDFTYPE);
+        if (typeParam != null) {
+            query = query.addFilterQuery(VitroLuceneTermNames.RDFTYPE + ":\"" + typeParam + "\"");
+        }   
+        
+        // Set the fields to retrieve **** RY
+        // query = query.setFields( ... );
 
         return query;
     }
     
-    private Query makeNameQuery(String querystr, Analyzer analyzer, HttpServletRequest request) {
+    private SolrQuery setNameQuery(SolrQuery query, String querystr, HttpServletRequest request) {
 
         String tokenizeParam = (String) request.getParameter("tokenize"); 
         boolean tokenize = "true".equals(tokenizeParam);
         
         // Note: Stemming is only relevant if we are tokenizing: an untokenized name
         // query will not be stemmed. So we don't look at the stem parameter until we get to
-        // makeTokenizedNameQuery().
+        // setTokenizedNameQuery().
         if (tokenize) {
-            return makeTokenizedNameQuery(querystr, analyzer, request);
+            return setTokenizedNameQuery(query, querystr, request);
         } else {
-            return makeUntokenizedNameQuery(querystr);
+            return setUntokenizedNameQuery(query, querystr);
         }
     }
     
-    private Query makeTokenizedNameQuery(String querystr, Analyzer analyzer, HttpServletRequest request) {
+    private SolrQuery setTokenizedNameQuery(SolrQuery query, String querystr, HttpServletRequest request) {
  
         String stemParam = (String) request.getParameter("stem"); 
         boolean stem = "true".equals(stemParam);
-        String termName = stem ? VitroLuceneTermNames.NAME : VitroLuceneTermNames.NAMEUNSTEMMED;
+        String termName = stem ? VitroLuceneTermNames.NAME_STEMMED : VitroLuceneTermNames.NAME_UNSTEMMED;
 
         BooleanQuery boolQuery = new BooleanQuery();
         
-        // Use the query parser to analyze the search term the same way the indexed text was analyzed.
-        // For example, text is lowercased, and function words are stripped out.
-        QueryParser parser = getQueryParser(termName, analyzer);
-        
-        // The wildcard query doesn't play well with stemming. Query term name:tales* doesn't match
-        // "tales", which is indexed as "tale", while query term name:tales does. Obviously we need 
-        // the wildcard for name:tal*, so the only way to get them all to match is use a disjunction 
-        // of wildcard and non-wildcard queries. The query will look have only an implicit disjunction
-        // operator: e.g., +(name:tales name:tales*)
-        try {
-            log.debug("Adding non-wildcard query for " + querystr);
-            Query query = parser.parse(querystr);
-            boolQuery.add(query, BooleanClause.Occur.SHOULD);
-
-            // Prevent ParseException here when adding * after a space.
-            // If there's a space at the end, we don't need the wildcard query.
-            if (! querystr.endsWith(" ")) {
-                log.debug("Adding wildcard query for " + querystr);
-                Query wildcardQuery = parser.parse(querystr + "*");            
-                boolQuery.add(wildcardQuery, BooleanClause.Occur.SHOULD);
-            }
-            
-            log.debug("Name query is: " + boolQuery.toString());
-        } catch (ParseException e) {
-            log.warn(e, e);
-        }
+//        // Use the query parser to analyze the search term the same way the indexed text was analyzed.
+//        // For example, text is lowercased, and function words are stripped out.
+//        QueryParser parser = getQueryParser(termName);
+//        
+//        // The wildcard query doesn't play well with stemming. Query term name:tales* doesn't match
+//        // "tales", which is indexed as "tale", while query term name:tales does. Obviously we need 
+//        // the wildcard for name:tal*, so the only way to get them all to match is use a disjunction 
+//        // of wildcard and non-wildcard queries. The query will look have only an implicit disjunction
+//        // operator: e.g., +(name:tales name:tales*)
+//        try {
+//            log.debug("Adding non-wildcard query for " + querystr);
+//            Query query = parser.parse(querystr);
+//            boolQuery.add(query, BooleanClause.Occur.SHOULD);
+//
+//            // Prevent ParseException here when adding * after a space.
+//            // If there's a space at the end, we don't need the wildcard query.
+//            if (! querystr.endsWith(" ")) {
+//                log.debug("Adding wildcard query for " + querystr);
+//                Query wildcardQuery = parser.parse(querystr + "*");            
+//                boolQuery.add(wildcardQuery, BooleanClause.Occur.SHOULD);
+//            }
+//            
+//            log.debug("Name query is: " + boolQuery.toString());
+//        } catch (ParseException e) {
+//            log.warn(e, e);
+//        }
        
-        return boolQuery;  
+        return query;
     }
 
-    private Query makeUntokenizedNameQuery(String querystr) {
+    private SolrQuery setUntokenizedNameQuery(SolrQuery query, String querystr) {
         
-        querystr = querystr.toLowerCase();
-        String termName = VitroLuceneTermNames.NAMELOWERCASE;
-        BooleanQuery query = new BooleanQuery();
-        log.debug("Adding wildcard query on unanalyzed name");
-        query.add( 
-                new WildcardQuery(new Term(termName, querystr + "*")),
-                BooleanClause.Occur.MUST);   
+        //querystr = querystr.toLowerCase();
+        querystr += "*";
+        query = query.setQuery(querystr);
+        // *** It's the df parameter that sets the field to search
+        //String field = VitroLuceneTermNames.LABEL_LOWERCASE; 
         
         return query;
     }
             
-    private QueryParser getQueryParser(String searchField, Analyzer analyzer){
-        // searchField indicates which field to search against when there is no term
-        // indicated in the query string.
-        // The analyzer is needed so that we use the same analyzer on the search queries as
-        // was used on the text that was indexed.
-        QueryParser qp = new QueryParser(Version.LUCENE_29, searchField,analyzer);
-        //this sets the query parser to AND all of the query terms it finds.
-        qp.setDefaultOperator(QueryParser.AND_OPERATOR);
-        return qp;
-    }
-
     private void doNoQuery(HttpServletResponse response) throws IOException  {
-        // For now, we are not sending an error message back to the client because with the default autocomplete configuration it
-        // chokes.
+        // For now, we are not sending an error message back to the client because 
+        // with the default autocomplete configuration it chokes.
         doNoSearchResults(response);
     }
 
     private void doSearchError(HttpServletResponse response) throws IOException {
-        // For now, we are not sending an error message back to the client because with the default autocomplete configuration it
-        // chokes.
+        // For now, we are not sending an error message back to the client because 
+        // with the default autocomplete configuration it chokes.
         doNoSearchResults(response);
     }
 
@@ -282,8 +237,6 @@ public class SolrAutocompleteController extends VitroAjaxController {
         response.getWriter().write("[]");
     }
     
-    public static final int MAX_QUERY_LENGTH = 500;
-
     public class SearchResult implements Comparable<Object> {
         private String label;
         private String uri;

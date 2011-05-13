@@ -22,10 +22,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.queryParser.MultiFieldQueryParser;
-import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.util.Version;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -73,9 +69,8 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(SolrPagedSearchController.class);
     
-
     private static final int DEFAULT_HITS_PER_PAGE = 25;
-    private static final int DEFAULT_MAX_SEARCH_SIZE = 1000;   
+    private static final int DEFAULT_MAX_HIT_COUNT = 1000;   
 
     private static final String PARAM_XML_REQUEST = "xml";
     private static final String PARAM_START_INDEX = "startIndex";
@@ -169,15 +164,15 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             }                        
             log.debug("hitsPerPage is " + hitsPerPage);
             
-            int maxHitCount = DEFAULT_MAX_SEARCH_SIZE ;
-            if( startIndex >= DEFAULT_MAX_SEARCH_SIZE  - hitsPerPage )
-                maxHitCount = startIndex + DEFAULT_MAX_SEARCH_SIZE ;
+            int maxHitCount = DEFAULT_MAX_HIT_COUNT ;
+            if( startIndex >= DEFAULT_MAX_HIT_COUNT  - hitsPerPage )
+                maxHitCount = startIndex + DEFAULT_MAX_HIT_COUNT ;
 
             log.debug("maxHitSize is " + maxHitCount);
 
             String qtxt = vreq.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
             
-            log.debug("Query text is "+ qtxt); // + " Analyzer is "+ analyzer.toString());
+            log.debug("Query text is \""+ qtxt + "\""); 
 
             SolrQuery query = getQuery(qtxt, maxHitCount, vreq);
 
@@ -440,51 +435,32 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
 
     private SolrQuery getQuery(String queryText, int maxHitCount, VitroRequest vreq) {
         SolrQuery query = new SolrQuery(queryText);
-        //SolrQuery query = new SolrQuery();
-        //query.setQuery(queryText);
         
         // Solr requires these values, but we don't want them to be the real values for this page
         // of results, else the refinement links won't work correctly: each page of results needs to
         // show refinement links generated for all results, not just for the results on the current page.
-        query.setStart(0);
-        query.setRows(maxHitCount);
+        query.setStart(0)
+             .setRows(maxHitCount);
 
         // Classgroup filtering
-        Object param = vreq.getParameter(PARAM_CLASSGROUP);
-        if( param != null && !"".equals(param)){           
+        String classgroupParam = (String) vreq.getParameter(PARAM_CLASSGROUP);
+        if ( ! StringUtils.isBlank(classgroupParam) ) {           
             log.debug("Firing classgroup query ");
-            log.debug("request.getParameter(classgroup) is "+ param.toString());
-            query = query.addFilterQuery(VitroLuceneTermNames.CLASSGROUP_URI + ":\"" + param + "\"");
+            log.debug("request.getParameter(classgroup) is "+ classgroupParam);
+            query.addFilterQuery(VitroLuceneTermNames.CLASSGROUP_URI + ":\"" + classgroupParam + "\"");
         }
 
         // rdf:type filtering
-        param = vreq.getParameter(PARAM_RDFTYPE);
-        if(  param != null && !"".equals(param)){                         
+        String typeParam = (String) vreq.getParameter(PARAM_RDFTYPE);
+        if (  ! StringUtils.isBlank(typeParam) ) {                         
             log.debug("Firing type query ");
-            log.debug("request.getParameter(type) is "+ param.toString());   
-            query = query.addFilterQuery(VitroLuceneTermNames.RDFTYPE + ":\"" + param + "\"");
+            log.debug("request.getParameter(type) is "+ typeParam);   
+            query.addFilterQuery(VitroLuceneTermNames.RDFTYPE + ":\"" + typeParam + "\"");
         }
                 
         //query.setQuery(queryText);
         log.debug("Query = " + query.toString());
         return query;
-    }
-    
-    @SuppressWarnings("unused")
-    private QueryParser getQueryParser(Analyzer analyzer){
-
-    	MultiFieldQueryParser qp = new MultiFieldQueryParser(Version.LUCENE_29, new String[] { 
-    	        VitroLuceneTermNames.NAME,
-    	        VitroLuceneTermNames.NAMEUNSTEMMED,
-    	        VitroLuceneTermNames.RDFTYPE,
-    	        VitroLuceneTermNames.ALLTEXT, 
-    	        VitroLuceneTermNames.ALLTEXTUNSTEMMED,
-    	        VitroLuceneTermNames.NAMERAW,
-    	        VitroLuceneTermNames.CLASSLOCALNAME,
-    	        VitroLuceneTermNames.CLASSLOCALNAMELOWERCASE }, analyzer);
-    				//"name", "nameunstemmed", "type", "ALLTEXT", "ALLTEXTUNSTEMMED", "nameraw" , "classLocalName", "classLocalNameLowerCase" }, analyzer); 
-    	
-    	return qp;
     }
 
     private class VClassGroupSearchLink extends LinkTemplateModel {
