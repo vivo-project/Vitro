@@ -23,7 +23,6 @@ import com.hp.hpl.jena.query.Dataset;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
-import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
@@ -122,9 +121,6 @@ public class VitroRequestPrep implements Filter {
     		wdf = (WebappDaoFactory) o;
     		log.debug("Found a WebappDaoFactory in the session and using it for this request");
     	}
-        
-        RoleLevel role = RoleLevel.getRoleFromLoginStatus(req);
-        log.debug("setting role to "+role.getShorthand());   
         
         VitroFilters filters = null;
 		        
