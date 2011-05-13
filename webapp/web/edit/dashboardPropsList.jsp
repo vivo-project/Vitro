@@ -1,11 +1,6 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousEditorPages" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataProperty" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.KeywordProperty" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
@@ -18,29 +13,8 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
 <%! 
 public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.dashboardPropsList.jsp");
-%>
-<%
-boolean showSelfEdits=false;
-boolean showCuratorEdits=false;
-
-IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(request);
-String editorUri = SelfEditingIdentifierFactory.getSelfEditingUri(ids);
-if (editorUri != null) {
-    showSelfEdits=true;
-    log.debug("self editing active");
-} else {
-    log.debug("self editing inactive");
-}
-
-if (PolicyHelper.isAuthorizedForActions(request, new UseMiscellaneousEditorPages())) {
-	showCuratorEdits=true;
-	log.debug("curator editing active");
-} else {
-	log.debug("curator editing inactive");
-}
 %>
 
 <c:set var='entity' value='${requestScope.entity}'/><%-- just moving this into page scope for easy use --%>
