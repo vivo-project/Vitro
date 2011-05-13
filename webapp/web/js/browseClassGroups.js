@@ -149,9 +149,9 @@ var graphClassGroups = {
         var height = values.length * 37;
         
         // Create the canvas
-        var r = Raphael("visual-graph", 300, height + 10);
+        var r = Raphael("visual-graph", 225, height + 10);
         
-        var chart = r.g.hbarchart(0, 16, 300, height, [values], {type:"soft", singleColor:"#999"});
+        var chart = r.g.hbarchart(0, 16, 225, height, [values], {type:"soft", singleColor:"#999"});
         
         // Was unable to append <a> within <svg> -- was always hidden and couldn't get it to display
         // so using jQuery click to add links
