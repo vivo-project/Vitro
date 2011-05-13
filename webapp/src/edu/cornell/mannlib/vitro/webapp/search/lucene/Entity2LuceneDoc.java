@@ -206,21 +206,22 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
             value = ent.getLocalName();
         }
 
-        Field labelRaw = new Field(term.NAME_RAW, value, Field.Store.YES, Field.Index.NOT_ANALYZED);
-        labelRaw.setBoost(NAME_BOOST);
-        doc.add(labelRaw);
+        Field nameRaw = new Field(term.NAME_RAW, value, Field.Store.YES, Field.Index.NOT_ANALYZED);
+        nameRaw.setBoost(NAME_BOOST);
+        doc.add(nameRaw);
         
-        Field labelLowerCase = new Field(term.NAME_LOWERCASE, value, Field.Store.YES, Field.Index.NOT_ANALYZED);
-        labelLowerCase.setBoost(NAME_BOOST);
-        doc.add(labelLowerCase);
+        // RY Not sure if we need to store this. For Solr, see schema.xml field definition.
+        Field nameLowerCase = new Field(term.NAME_LOWERCASE, value.toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED);
+        nameLowerCase.setBoost(NAME_BOOST);
+        doc.add(nameLowerCase);
         
-        Field labelUnstemmed = new Field(term.NAME_UNSTEMMED, value, Field.Store.NO, Field.Index.ANALYZED);
-        labelUnstemmed.setBoost(NAME_BOOST);
-        doc.add(labelUnstemmed);
+        Field nameUnstemmed = new Field(term.NAME_UNSTEMMED, value, Field.Store.NO, Field.Index.ANALYZED);
+        nameUnstemmed.setBoost(NAME_BOOST);
+        doc.add(nameUnstemmed);
         
-        Field labelStemmed = new Field(term.NAME_STEMMED, value, Field.Store.NO, Field.Index.ANALYZED);
-        labelStemmed.setBoost(NAME_BOOST);
-        doc.add(labelStemmed);        
+        Field nameStemmed = new Field(term.NAME_STEMMED, value, Field.Store.NO, Field.Index.ANALYZED);
+        nameStemmed.setBoost(NAME_BOOST);
+        doc.add(nameStemmed);        
         
         
         //Moniker

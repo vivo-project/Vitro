@@ -434,7 +434,8 @@
 <field name="PROHIBITED_FROM_TEXT_RESULTS" type="string" indexed="true" stored="false" multiValued="false"/>
 <field name="URI" type="string" indexed="true" stored="true" multiValued="false" omitNorms="true"/>
 <field name="nameRaw" type="string" indexed="true" stored="true" multiValued="true"/>
-<field name="nameLowercase" type="string" indexed="true" stored="false" multiValued="true"/>
+<!-- RY Not sure if we need to store nameLowercase -->
+<field name="nameLowercase" type="string" indexed="true" stored="true" multiValued="true"/>
 <field name="nameUnstemmed" type="text" indexed="true" stored="false" multiValued="true"/>
 <field name="nameStemmed" type="text" indexed="true" stored="false" multiValued="true"/>
 <field name="indexedTime" type="string" indexed="true" stored="true" multiValued="true"/>
