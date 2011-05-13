@@ -102,9 +102,12 @@ public class SimpleReasoner extends StatementListener {
 			if (stmt.getPredicate().equals(RDF.type)) {
 			    addedABoxTypeAssertion(stmt, inferenceModel);
 			    setMostSpecificTypes(stmt.getSubject(), inferenceModel);
-			} else {
+			} 
+	       /* uncomment this to enable subproperty/equivalent property inferencing. sjm222 5/13/2011	
+			else {
 			    addedABoxAssertion(stmt,inferenceModel);
 			}
+	       */
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
 			log.error("Exception while adding inferences: ", e);
@@ -123,9 +126,12 @@ public class SimpleReasoner extends StatementListener {
 			if (stmt.getPredicate().equals(RDF.type)) {
 			    removedABoxTypeAssertion(stmt, inferenceModel);
 			    setMostSpecificTypes(stmt.getSubject(), inferenceModel);
-			} else {
+			}
+			/* uncomment this to enable subproperty/equivalent property inferencing. sjm222 5/13/2011
+			else {
 				removedABoxAssertion(stmt, inferenceModel);
 			}
+			*/
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
 			log.error("Exception while retracting inferences: ", e);
@@ -164,7 +170,9 @@ public class SimpleReasoner extends StatementListener {
 				   addedSubClass(subject,object,inferenceModel);
 				   addedSubClass(object,subject,inferenceModel);
 				}
-			} else if (stmt.getPredicate().equals(RDFS.subPropertyOf) || stmt.getPredicate().equals(OWL.equivalentProperty)) {
+			} 
+			  /* uncomment this to enable sub property/equivalent property inferencing. sjm222 5/13/2011
+			  else if (stmt.getPredicate().equals(RDFS.subPropertyOf) || stmt.getPredicate().equals(OWL.equivalentProperty)) {
 				OntProperty subject = tboxModel.getOntProperty((stmt.getSubject()).getURI());
 				OntProperty object = tboxModel.getOntProperty(((Resource)stmt.getObject()).getURI()); 
 				
@@ -174,8 +182,10 @@ public class SimpleReasoner extends StatementListener {
 					// equivalent property is the same as subProperty in both directions
 				   addedSubProperty(subject,object,inferenceModel);
 				   addedSubProperty(object,subject,inferenceModel);
-				}				
-			}
+				}
+			   }
+			*/				
+			
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
 			log.error("Exception while adding inference(s): ", e);
@@ -210,7 +220,9 @@ public class SimpleReasoner extends StatementListener {
 				   removedSubClass(subject,object,inferenceModel);
 				   removedSubClass(object,subject,inferenceModel);
 				}
-			} else if (stmt.getPredicate().equals(RDFS.subPropertyOf) || stmt.getPredicate().equals(OWL.equivalentProperty)) {
+			} 
+			/* uncomment this to enable sub property / equivalent property inferencing. sjm222 5/13/2011.
+			else if (stmt.getPredicate().equals(RDFS.subPropertyOf) || stmt.getPredicate().equals(OWL.equivalentProperty)) {
 				OntProperty subject = tboxModel.getOntProperty((stmt.getSubject()).getURI());
 				OntProperty object = tboxModel.getOntProperty(((Resource)stmt.getObject()).getURI()); 
 				
@@ -222,6 +234,7 @@ public class SimpleReasoner extends StatementListener {
 				   removedSubProperty(object,subject);
 				}				
 			}
+			*/
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
 			log.error("Exception while removing inference(s): ", e);
