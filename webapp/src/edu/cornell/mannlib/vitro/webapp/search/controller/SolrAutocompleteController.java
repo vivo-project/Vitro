@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,8 +22,10 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.core.SolrConfig;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.xml.sax.SAXException;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
@@ -176,7 +179,7 @@ public class SolrAutocompleteController extends VitroAjaxController {
  
         String stemParam = (String) request.getParameter("stem"); 
         boolean stem = "true".equals(stemParam);
-        String termName = stem ? VitroLuceneTermNames.NAME_STEMMED : VitroLuceneTermNames.NAME_UNSTEMMED;
+        String termName = stem ? VitroLuceneTermNames.AC_NAME_STEMMED : VitroLuceneTermNames.AC_NAME_UNSTEMMED  ;
 
         BooleanQuery boolQuery = new BooleanQuery();
         
@@ -214,9 +217,18 @@ public class SolrAutocompleteController extends VitroAjaxController {
         
         //querystr = querystr.toLowerCase();
         querystr += "*";
-        query = query.setQuery(querystr);
-        // *** It's the df parameter that sets the field to search
-        //String field = VitroLuceneTermNames.LABEL_LOWERCASE; 
+        //query = query.setQuery(VitroLuceneTermNames.NAME_LOWERCASE + ":" + querystr);
+        //query.addFilterQuery(VitroLuceneTermNames.NAME_LOWERCASE);
+        //query.setQuery(querystr);
+        
+        try {
+            SolrConfig config = new SolrConfig();
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            log.error(e, e);
+            return null;
+        }
         
         return query;
     }
