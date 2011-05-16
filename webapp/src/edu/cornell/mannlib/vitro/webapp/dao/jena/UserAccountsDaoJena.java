@@ -61,6 +61,8 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 					USERACCOUNT_PASSWORD_CHANGE_REQUIRED));
 			u.setLoginCount(getPropertyIntValue(r, USERACCOUNT_LOGIN_COUNT));
 			u.setStatusFromString(getPropertyStringValue(r, USERACCOUNT_STATUS));
+			u.setExternalAuthId(getPropertyStringValue(r,
+					USERACCOUNT_EXTERNAL_AUTH_ID));
 			u.setPermissionSetUris(getPropertyResourceURIValues(r,
 					USERACCOUNT_HAS_PERMISSION_SET));
 			return u;
@@ -105,6 +107,8 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 				addPropertyStringValue(res, USERACCOUNT_STATUS, userAccount
 						.getStatus().toString(), model);
 			}
+			addPropertyStringValue(res, USERACCOUNT_EXTERNAL_AUTH_ID,
+					userAccount.getExternalAuthId(), model);
 			updatePropertyResourceURIValues(res,
 					USERACCOUNT_HAS_PERMISSION_SET,
 					userAccount.getPermissionSetUris(), model);
@@ -158,6 +162,8 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 				updatePropertyStringValue(res, USERACCOUNT_STATUS, userAccount
 						.getStatus().toString(), model);
 			}
+			updatePropertyStringValue(res, USERACCOUNT_EXTERNAL_AUTH_ID,
+					userAccount.getExternalAuthId(), model);
 			updatePropertyResourceURIValues(res,
 					USERACCOUNT_HAS_PERMISSION_SET,
 					userAccount.getPermissionSetUris(), model);
