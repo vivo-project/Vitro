@@ -36,7 +36,7 @@
         </section>
     </#if>
     
-    <#if ( !newPasswordRequired?? )>
+    <#if !newPasswordRequired??>
         <p>Enter the email address and password for your internal Vitro account.</p>
     <#else>
         <p>You must change your password to log in.</p>
@@ -45,12 +45,12 @@
 	<form method="post" action="${controllerUrl}">
         <#if newPasswordRequired??>
             <label for="newPassword">New Password</label>
-            <input name="newPassword" id="newPassword" class="text-field" type="password" value="${newPassword!}" required autofocus />
+            <input name="newPassword" id="newPassword" class="text-field" type="password" required autofocus />
             
             <p class="password-note">Minimum of 6 characters in length.</p>
             
             <label for="confirmPassword">Confirm Password</label>
-            <input id="confirmPassword" name="confirmPassword" class="text-field" type="password" value="${confirmPassword!}" required />
+            <input id="confirmPassword" name="confirmPassword" class="text-field" type="password" required />
             
             <input id="username" name="username" type="hidden" value="${username!}" />
             <input id="password" name="password" type="hidden" value="${password!}" />
