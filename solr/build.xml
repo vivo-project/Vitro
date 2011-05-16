@@ -12,7 +12,7 @@
 	<property name="solr.build.dir" location="."/>
 	<property name="solr.example.dir" location="${solr.build.dir}/exampleSolr" />
 	<property name="solr.context.config.example" location="${solr.build.dir}/exampleSolrContext.xml"/>
-    <property name="solr.war" location="${solr.build.dir}/apache-solr-1.4.1.war"/>
+    <property name="solr.war" location="${solr.build.dir}/apache-solr-3.1.0.war"/>
 
 	<!-- ================================= 
       target: describe              

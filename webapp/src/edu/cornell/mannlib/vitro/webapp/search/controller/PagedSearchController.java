@@ -141,7 +141,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
         //There may be other non-html formats in the future
         Format format = getFormat(vreq);            
         boolean wasXmlRequested = Format.XML == format;
-        log.debug("xml was the requested format");                         
+        log.debug("Requested format was " + (wasXmlRequested ? "xml" : "html"));                      
         boolean wasHtmlRequested = ! wasXmlRequested; 
         
         try {
