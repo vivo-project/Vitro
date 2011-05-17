@@ -480,7 +480,7 @@
 <field name="classgroup" type="string" indexed="true" stored="true" multiValued="true"/>
 <field name="PROHIBITED_FROM_TEXT_RESULTS" type="string" indexed="true" stored="false" multiValued="false"/>
 <field name="URI" type="string" indexed="true" stored="true" multiValued="false" omitNorms="true"/>
-<field name="nameRaw" type="string" indexed="true" stored="true" multiValued="true"/>
+<field name="nameRaw" type="string" indexed="false" stored="true" multiValued="true"/>
 <!-- RY Not sure if we need to store nameLowercase. Is it ever displayed? -->
 <field name="nameLowercase" type="lowercase" indexed="true" stored="true" multiValued="true"/>
 <field name="acNameUnstemmed" type="textUnstemmed" indexed="true" stored="false" multiValued="true"/>

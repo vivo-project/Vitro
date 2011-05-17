@@ -689,7 +689,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
     	        VitroLuceneTermNames.MONIKER,
     	        VitroLuceneTermNames.ALLTEXT,
     	        VitroLuceneTermNames.ALLTEXTUNSTEMMED,
-    	        VitroLuceneTermNames.NAME_RAW,
+    	        VitroLuceneTermNames.NAME_LOWERCASE,
     	        VitroLuceneTermNames.CLASSLOCALNAME,
     	        VitroLuceneTermNames.CLASSLOCALNAMELOWERCASE }, analyzer);
     	

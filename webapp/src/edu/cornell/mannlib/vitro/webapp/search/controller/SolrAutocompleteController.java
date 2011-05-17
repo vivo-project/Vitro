@@ -12,7 +12,6 @@ import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,10 +21,9 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.core.SolrConfig;
+import org.apache.solr.common.params.FacetParams;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.xml.sax.SAXException;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
@@ -104,7 +102,9 @@ public class SolrAutocompleteController extends VitroAjaxController {
             for (SolrDocument doc : docs) {
                 try{                                      
                     String uri = doc.get(VitroLuceneTermNames.URI).toString();
-                    String name = doc.get(VitroLuceneTermNames.NAME_RAW).toString();
+                    // VitroLuceneTermNames.NAME_RAW is a multivalued field, so doc.get() returns a list
+                    @SuppressWarnings("unchecked")
+                    String name = ((List<String>) doc.get(VitroLuceneTermNames.NAME_RAW)).get(0);
                     SearchResult result = new SearchResult(name, uri);
                     results.add(result);
                 } catch(Exception e){
@@ -215,22 +215,16 @@ public class SolrAutocompleteController extends VitroAjaxController {
 
     private SolrQuery setUntokenizedNameQuery(SolrQuery query, String querystr) {
         
-        //querystr = querystr.toLowerCase();
-        querystr += "*";
-        //query = query.setQuery(VitroLuceneTermNames.NAME_LOWERCASE + ":" + querystr);
-        //query.addFilterQuery(VitroLuceneTermNames.NAME_LOWERCASE);
-        //query.setQuery(querystr);
-        
-        try {
-            SolrConfig config = new SolrConfig();
+        // Using facet method described in http://solr.pl/en/2010/10/18/solr-and-autocomplete-part-1/
+        // Consider using Solr Suggester in a future version.
+        return query.setFacet(true)
+                    .addFacetField(VitroLuceneTermNames.NAME_LOWERCASE)
+                    .setFacetMinCount(1)
+                    .setFacetLimit(MAX_QUERY_LENGTH)
+                    .setFacetPrefix(querystr)//.toLowerCase())
+                    //.setFacetSort(FacetParams.FACET_SORT_INDEX) // sort by alpha (but doesn't work)
+                    .setQuery("*:*");
 
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            log.error(e, e);
-            return null;
-        }
-        
-        return query;
     }
             
     private void doNoQuery(HttpServletResponse response) throws IOException  {
