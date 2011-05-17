@@ -46,7 +46,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 
 public class EntityListController extends VitroHttpServlet {
 
-    public static final int ENTITY_LIST_CONTROLLER_MAX_RESULTS = 30000;
+    public static final int ENTITY_LIST_CONTROLLER_MAX_RESULTS = BooleanQuery.getMaxClauseCount();
     public static final int INDIVIDUALS_PER_PAGE = 30;
     
     long startTime = -1;
