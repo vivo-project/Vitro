@@ -470,32 +470,33 @@
        when adding a document.
    -->
 
-<!-- ****************************  Vitro Fields *************************** -->
+    <!-- ****************************  Vitro Fields *************************** -->
+    
+    <field name="DocId" type="string" indexed="true" stored="true" required="true" /> 
+    
+    <field name="type" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
+    <field name="classLocalName" type="text" indexed="true" stored="true" multiValued="true"/>
+    <field name="classLocalNameLowerCase" type="text" indexed="true" stored="false" multiValued="true"/>
+    <field name="classgroup" type="string" indexed="true" stored="true" multiValued="true"/>
+    <field name="PROHIBITED_FROM_TEXT_RESULTS" type="string" indexed="true" stored="false" multiValued="false"/>
+    <field name="URI" type="string" indexed="true" stored="true" multiValued="false" omitNorms="true"/>
+    <field name="nameRaw" type="string" indexed="false" stored="true" multiValued="true"/>
+    <!-- RY Not sure if we need to store nameLowercase. Is it ever displayed? -->
+    <field name="nameLowercase" type="lowercase" indexed="true" stored="true" multiValued="true"/>
+    <field name="acNameUnstemmed" type="textUnstemmed" indexed="true" stored="false" multiValued="true"/>
+    <field name="acNameStemmed" type="text" indexed="true" stored="false" multiValued="true"/>
+    <field name="indexedTime" type="string" indexed="true" stored="true" multiValued="true"/>
+    <field name="ALLTEXT" type="text" indexed="true" stored="false" multiValued="true"/>
+    <field name="ALLTEXTUNSTEMMED" type="textgen" indexed="true" stored="false" multiValued="true"/>
+    <field name="THUMBNAIL" type="string" indexed="true" stored="true"/>
+    
+    
+    <field name="moniker" type="ignored" />
+    <field name="modType" type="ignored"/>
+    <field name="JCLASS" type="ignored"/>
 
-<field name="DocId" type="string" indexed="true" stored="true" required="true" /> 
-
-<field name="type" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
-<field name="classLocalName" type="text" indexed="true" stored="true" multiValued="true"/>
-<field name="classLocalNameLowerCase" type="text" indexed="true" stored="false" multiValued="true"/>
-<field name="classgroup" type="string" indexed="true" stored="true" multiValued="true"/>
-<field name="PROHIBITED_FROM_TEXT_RESULTS" type="string" indexed="true" stored="false" multiValued="false"/>
-<field name="URI" type="string" indexed="true" stored="true" multiValued="false" omitNorms="true"/>
-<field name="nameRaw" type="string" indexed="false" stored="true" multiValued="true"/>
-<!-- RY Not sure if we need to store nameLowercase. Is it ever displayed? -->
-<field name="nameLowercase" type="lowercase" indexed="true" stored="true" multiValued="true"/>
-<field name="acNameUnstemmed" type="textUnstemmed" indexed="true" stored="false" multiValued="true"/>
-<field name="acNameStemmed" type="text" indexed="true" stored="false" multiValued="true"/>
-<field name="indexedTime" type="string" indexed="true" stored="true" multiValued="true"/>
-<field name="ALLTEXT" type="text" indexed="true" stored="false" multiValued="true"/>
-<field name="ALLTEXTUNSTEMMED" type="textgen" indexed="true" stored="false" multiValued="true"/>
-<field name="THUMBNAIL" type="string" indexed="true" stored="true"/>
-
-
-<field name="moniker" type="ignored" />
-<field name="modType" type="ignored"/>
-<field name="JCLASS" type="ignored"/>
-
-<!-- ****************************  End Vitro Fields *************************** -->
+   
+    <!-- ****************************  End Vitro Fields *************************** -->
 
 
    <!-- catchall field, containing all other searchable text fields (implemented
