@@ -121,7 +121,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
      */
     @SuppressWarnings("unused")
 	protected Actions requiredActions(VitroRequest vreq) {
-        return Actions.EMPTY;
+        return Actions.AUTHORIZED;
     }
     
     // Subclasses will override

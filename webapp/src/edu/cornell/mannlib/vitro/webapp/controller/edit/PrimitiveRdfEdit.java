@@ -26,7 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;
 
 public class PrimitiveRdfEdit extends VitroAjaxController {
 

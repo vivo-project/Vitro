@@ -16,7 +16,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -31,7 +30,6 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
@@ -44,6 +42,7 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
 	
 	private static final int MAXIMUM_USERNAME_LENGTH = 100;
 	
+	@Override
 	public IdentifierBundle getIdentifierBundle(ServletRequest request,
 			HttpSession session, ServletContext context) {
 		if (!(request instanceof HttpServletRequest)) {
@@ -202,7 +201,8 @@ public class SelfEditingIdentifierFactory implements IdentifierBundleFactory {
 
         log.debug("checking directlry " + realPath + " for blacklisting sparql query files");
         File[] files = blacklistDir.listFiles(new FileFilter(){
-            public boolean accept(File pathname) {
+            @Override
+			public boolean accept(File pathname) {
                 return pathname.getName().endsWith(".sparql");
             }}
         );

@@ -2,9 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.codec.binary.Hex;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
@@ -114,5 +118,26 @@ public abstract class Authenticator {
 	 * </pre>
 	 */
 	public abstract void recordUserIsLoggedOut();
+
+	// ----------------------------------------------------------------------
+	// Public utility methods.
+	// ----------------------------------------------------------------------
+
+	/**
+	 * Apply MD5 to this string, and encode as a string of hex digits. Just
+	 * right for storing passwords in the database, or hashing the password
+	 * link.
+	 */
+	public static String applyMd5Encoding(String raw) {
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			byte[] digest = md.digest(raw.getBytes());
+			char[] hexChars = Hex.encodeHex(digest);
+			return new String(hexChars).toUpperCase();
+		} catch (NoSuchAlgorithmException e) {
+			// This can't happen with a normal Java runtime.
+			throw new RuntimeException(e);
+		}
+	}
 
 }

@@ -7,8 +7,8 @@ import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.Vi
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.CLASSLOCALNAME;
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.CLASSLOCALNAMELOWERCASE;
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.MONIKER;
-import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.NAME;
-import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.NAMEUNSTEMMED;
+import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.AC_NAME_STEMMED;
+import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.AC_NAME_UNSTEMMED;
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.RDFTYPE;
 
 import java.io.File;
@@ -245,10 +245,9 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
     	PerFieldAnalyzerWrapper analyzer = new PerFieldAnalyzerWrapper( new StandardAnalyzer(Version.LUCENE_29));
     	
     	analyzer.addAnalyzer(ALLTEXT, new HtmlLowerStopStemAnalyzer());
-//    	analyzer.addAnalyzer(NAME, new HtmlLowerStopStemAnalyzer());
         analyzer.addAnalyzer(ALLTEXTUNSTEMMED, new HtmlLowerStopAnalyzer());
-        analyzer.addAnalyzer(NAMEUNSTEMMED, new HtmlLowerStopAnalyzer());      
-        analyzer.addAnalyzer(NAME, new StandardAnalyzer(Version.LUCENE_29));
+        analyzer.addAnalyzer(AC_NAME_UNSTEMMED, new HtmlLowerStopAnalyzer());      
+        analyzer.addAnalyzer(AC_NAME_STEMMED, new HtmlLowerStopStemAnalyzer());
         analyzer.addAnalyzer(MONIKER, new StandardAnalyzer(Version.LUCENE_29));
         analyzer.addAnalyzer(RDFTYPE, new StandardAnalyzer(Version.LUCENE_29));
         analyzer.addAnalyzer(CLASSLOCALNAME, new HtmlLowerStopAnalyzer());

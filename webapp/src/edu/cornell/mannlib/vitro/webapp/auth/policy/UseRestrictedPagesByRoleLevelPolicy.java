@@ -5,9 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.HasRoleLevel;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasRoleLevel;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
@@ -27,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvance
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousCuratorPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousEditorPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousPages;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 
@@ -48,7 +48,7 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 			return defaultDecision("whatToAuth was null");
 		}
 
-		RoleLevel userRole = getUsersRoleLevel(whoToAuth);
+		RoleLevel userRole = HasRoleLevel.getUsersRoleLevel(whoToAuth);
 
 		PolicyDecision result;
 		if (whatToAuth instanceof UseAdvancedDataToolsPages) {
@@ -91,6 +91,9 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
 
 		} else if (whatToAuth instanceof SeeIndividualEditingPanel) {
+			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
+			
+		} else if (whatToAuth instanceof UseMiscellaneousEditorPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
 			
 		} else if (whatToAuth instanceof UseBasicAjaxControllers) {
@@ -137,16 +140,4 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		return new BasicPolicyDecision(Authorization.INCONCLUSIVE, message);
 	}
 
-	/**
-	 * The user is nobody unless they have a HasRoleLevel identifier.
-	 */
-	private RoleLevel getUsersRoleLevel(IdentifierBundle whoToAuth) {
-		RoleLevel userRole = RoleLevel.PUBLIC;
-		for (Identifier id : whoToAuth) {
-			if (id instanceof HasRoleLevel) {
-				userRole = ((HasRoleLevel) id).getRoleLevel();
-			}
-		}
-		return userRole;
-	}
 }

@@ -14,7 +14,6 @@ import net.sf.jga.fn.UnaryFunctor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.solr.analysis.HTMLStripReader;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -141,23 +140,27 @@ public abstract class VitroHighlighter extends UnaryFunctor<String,String> {
 
     private final String stripHtml(String in){
         /* make a string with html stripped out */
-        Reader stripIn =new HTMLStripReader( new StringReader( in ) );
-        StringWriter stripOut = new StringWriter(in.length());
-
-        char bytes[] = new char[5000];
-        int bytesRead = 0;
-        try {
-            //this is a mess, there must be a better way to do this.
-            while ( true  ){
-                bytesRead = stripIn.read( bytes );
-                if( bytesRead == -1 ) break;
-                stripOut.write(bytes, 0, bytesRead  );
-            }
-        } catch (IOException e1) {
-            log.error("LuceneHighlighter.getHighlightFragments()" +
-                 " - unable to strip html" + e1);
-        }
-        return stripOut.toString();
+        // ryounes 5/16/2011 Broken with upgrade to Solr 3.1: HTMLStripReader has been removed.
+        // According to change list, should use HTMLStripCharFilter, but it's not immediately clear how
+        // to migrate this code. Will enter Jira issue.
+//        Reader stripIn = new HTMLStripReader( new StringReader( in ) );
+//        StringWriter stripOut = new StringWriter(in.length());
+//
+//        char bytes[] = new char[5000];
+//        int bytesRead = 0;
+//        try {
+//            //this is a mess, there must be a better way to do this.
+//            while ( true  ){
+//                bytesRead = stripIn.read( bytes );
+//                if( bytesRead == -1 ) break;
+//                stripOut.write(bytes, 0, bytesRead  );
+//            }
+//        } catch (IOException e1) {
+//            log.error("LuceneHighlighter.getHighlightFragments()" +
+//                 " - unable to strip html" + e1);
+//        }
+//        return stripOut.toString();
+        return in;
     }
 }
 

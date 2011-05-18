@@ -188,7 +188,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
          try{
              docs = index.search(query, null, 
                  ENTITY_LIST_CONTROLLER_MAX_RESULTS, 
-                 new Sort(Entity2LuceneDoc.term.NAMELOWERCASE));
+                 new Sort(Entity2LuceneDoc.term.NAME_LOWERCASE));
          }catch(Throwable th){
              log.error("Could not run search. " + th.getMessage());
              docs = null;
@@ -258,7 +258,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
             Query alphaQuery = null;
             if( alpha != null && !"".equals(alpha) && alpha.length() == 1){      
                 alphaQuery =    
-                    new PrefixQuery(new Term(Entity2LuceneDoc.term.NAMELOWERCASE, alpha.toLowerCase()));
+                    new PrefixQuery(new Term(Entity2LuceneDoc.term.NAME_LOWERCASE, alpha.toLowerCase()));
                 query.add(alphaQuery,BooleanClause.Occur.MUST);
             }                      
                             

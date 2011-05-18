@@ -2,11 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao;
 
-import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
+import java.util.List;
+
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-
-import java.util.List;
 
 public interface VClassDao {
 

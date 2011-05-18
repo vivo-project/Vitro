@@ -6,8 +6,8 @@ import java.util.Map;
 
 import com.hp.hpl.jena.rdf.model.Literal;
 
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditSubmission;
 import freemarker.template.Configuration;
 /**
  * All classes that implement this interface must have a public constructor that 

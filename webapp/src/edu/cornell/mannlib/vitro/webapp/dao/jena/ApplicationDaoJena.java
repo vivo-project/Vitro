@@ -29,12 +29,12 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
     
 	Integer portalCount = null;
 	List<String> externallyLinkedNamespaces = null;
-    ModelChangedListener modelChangedListener = null;
+    ModelChangedListener externalNamespaceChangeListener = null;
 	
     public ApplicationDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
-        modelChangedListener = new ExternalNamespacesChangeListener();
-        getOntModelSelector().getDisplayModel().register(modelChangedListener);
+        externalNamespaceChangeListener = new ExternalNamespacesChangeListener();
+        getOntModelSelector().getDisplayModel().register(externalNamespaceChangeListener);
     }
     
     private String getApplicationResourceURI() {
@@ -117,18 +117,19 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
     }
     
     public void close() {
-        if (modelChangedListener != null) {
-            getOntModelSelector().getDisplayModel().unregister(modelChangedListener);
+        if (externalNamespaceChangeListener != null) {
+            getOntModelSelector().getDisplayModel().unregister(externalNamespaceChangeListener);
         }
     }
 
 	private static final boolean CLEAR_CACHE = true;
 	
+	@Override
 	public synchronized List<String> getExternallyLinkedNamespaces() {
 	    return getExternallyLinkedNamespaces(!CLEAR_CACHE);
 	}
 
-    public synchronized List<String> getExternallyLinkedNamespaces(boolean clearCache) {
+    private synchronized List<String> getExternallyLinkedNamespaces(boolean clearCache) {
         if (clearCache || externallyLinkedNamespaces == null) {            
             externallyLinkedNamespaces = new ArrayList<String>();
             OntModel ontModel = getOntModelSelector().getDisplayModel();

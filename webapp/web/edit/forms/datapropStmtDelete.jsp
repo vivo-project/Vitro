@@ -7,14 +7,14 @@
 
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataProperty" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory"%>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.RdfLiteralHash" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.StandardModelSelector"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.StandardModelSelector"%>
 <%@ page import="com.hp.hpl.jena.shared.Lock"%>
 <%@ page import="com.hp.hpl.jena.ontology.OntModel"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent"%>

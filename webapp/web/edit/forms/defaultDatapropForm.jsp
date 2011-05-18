@@ -7,7 +7,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest"%>
 <%@ page import="java.util.HashMap"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration" %>
 <%@ taglib prefix="v" uri="http://vitro.mannlib.cornell.edu/vitro/tags" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%>
 <%! private static HashMap<String,String> defaultsForXSDtypes ;

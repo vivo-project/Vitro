@@ -143,18 +143,20 @@
     <listener-class> edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup </listener-class>
   </listener>
   
-	<!--<listener>
-		<listener-class>
-	        edu.cornell.mannlib.vitro.webapp.auth.policy.setup.SelfEditingPolicySetup
-		</listener-class>
-	</listener>  -->
-
-    <listener>
-        <listener-class>
-            edu.cornell.mannlib.vitro.webapp.auth.identifier.UserToIndIdentifierFactorySetup
-        </listener-class>
-    </listener>
-
+  <!--
+  <listener>
+    <listener-class>
+      edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup
+    </listener-class>
+  </listener>
+  -->
+  
+  <!--<listener>
+  	<listener-class>
+          edu.cornell.mannlib.vitro.webapp.auth.policy.setup.SelfEditingPolicySetup
+  	</listener-class>
+  </listener>  -->
+  
   <listener>
     <listener-class> edu.cornell.mannlib.vitro.webapp.auth.policy.setup.EditorEditingPolicySetup
     </listener-class>
@@ -890,7 +892,13 @@
   <servlet>
     <servlet-name>SearchController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.PagedSearchController</servlet-class>
+  </servlet> 
+  <!--   
+  <servlet>
+    <servlet-name>SearchController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.SolrPagedSearchController</servlet-class>
   </servlet>
+  -->
   <servlet-mapping>
     <servlet-name>SearchController</servlet-name>
     <url-pattern>/search</url-pattern>
@@ -913,6 +921,12 @@
     <servlet-name>AutocompleteController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.AutocompleteController</servlet-class>
   </servlet>
+  <!--
+    <servlet>
+    <servlet-name>AutocompleteController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.SolrAutocompleteController</servlet-class>
+    </servlet>
+  -->
   <servlet-mapping>
     <servlet-name>AutocompleteController</servlet-name>
     <url-pattern>/autocomplete</url-pattern>
@@ -962,6 +976,12 @@
     <servlet-name>JSON Service</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.JSONServlet</servlet-class>
   </servlet>
+  <!--
+  <servlet>
+    <servlet-name>JSON Service</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.SolrJsonServlet</servlet-class>
+  </servlet>
+  -->
   <servlet-mapping>
     <servlet-name>JSON Service</servlet-name>
     <url-pattern>/dataservice</url-pattern>

@@ -2,8 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.jsptags;
 
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditSubmission;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;

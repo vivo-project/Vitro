@@ -30,8 +30,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.util.Version;
 import org.json.JSONArray;
-
-import com.hp.hpl.jena.sparql.lib.org.json.JSONObject;
+import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
@@ -118,7 +117,7 @@ public class AutocompleteController extends VitroAjaxController {
                 try{                     
                     Document doc = searcherForRequest.doc(topDocs.scoreDocs[i].doc);                    
                     String uri = doc.get(VitroLuceneTermNames.URI);
-                    String name = doc.get(VitroLuceneTermNames.NAMERAW);
+                    String name = doc.get(VitroLuceneTermNames.NAME_RAW);
                     SearchResult result = new SearchResult(name, uri);
                     results.add(result);
                 } catch(Exception e){
@@ -208,7 +207,7 @@ public class AutocompleteController extends VitroAjaxController {
  
         String stemParam = (String) request.getParameter("stem"); 
         boolean stem = "true".equals(stemParam);
-        String termName = stem ? VitroLuceneTermNames.NAME : VitroLuceneTermNames.NAMEUNSTEMMED;
+        String termName = stem ? VitroLuceneTermNames.AC_NAME_STEMMED : VitroLuceneTermNames.AC_NAME_UNSTEMMED;
 
         BooleanQuery boolQuery = new BooleanQuery();
         
@@ -245,7 +244,7 @@ public class AutocompleteController extends VitroAjaxController {
     private Query makeUntokenizedNameQuery(String querystr) {
         
         querystr = querystr.toLowerCase();
-        String termName = VitroLuceneTermNames.NAMELOWERCASE;
+        String termName = VitroLuceneTermNames.NAME_LOWERCASE;
         BooleanQuery query = new BooleanQuery();
         log.debug("Adding wildcard query on unanalyzed name");
         query.add( 

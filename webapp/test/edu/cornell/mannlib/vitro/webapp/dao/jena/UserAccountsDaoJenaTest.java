@@ -83,6 +83,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		assertEquals("changeRequired", false, u.isPasswordChangeRequired());
 		assertEquals("loginCount", 5, u.getLoginCount());
 		assertEquals("status", Status.ACTIVE, u.getStatus());
+		assertEquals("externalAuthId", "user1", u.getExternalAuthId());
 		assertEquals("permissionSetUris", Collections.singleton(URI_ROLE1),
 				u.getPermissionSetUris());
 	}
@@ -112,6 +113,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		in.setPasswordChangeRequired(true);
 		in.setLoginCount(42);
 		in.setStatus(Status.INACTIVE);
+		in.setExternalAuthId("newUser");
 		in.setPermissionSetUris(buildSet(URI_ROLE1, URI_ROLE2));
 
 		String newUri = dao.insertUserAccount(in);
@@ -127,6 +129,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		assertEquals("changeRequired", true, u.isPasswordChangeRequired());
 		assertEquals("loginCount", 42, u.getLoginCount());
 		assertEquals("status", Status.INACTIVE, u.getStatus());
+		assertEquals("externalAuthId", "newUser", u.getExternalAuthId());
 		assertEquals("permissionSetUris", buildSet(URI_ROLE1, URI_ROLE2),
 				u.getPermissionSetUris());
 	}
@@ -157,6 +160,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		up.setPasswordChangeRequired(false);
 		up.setLoginCount(43);
 		up.setStatus(Status.ACTIVE);
+		up.setExternalAuthId("updatedUser1");
 		up.setPermissionSetUris(buildSet(URI_ROLE1, URI_ROLE3));
 
 		dao.updateUserAccount(up);
@@ -172,6 +176,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		assertEquals("changeRequired", false, u.isPasswordChangeRequired());
 		assertEquals("loginCount", 43, u.getLoginCount());
 		assertEquals("status", Status.ACTIVE, u.getStatus());
+		assertEquals("externalAuthId", "updatedUser1", u.getExternalAuthId());
 		assertEquals("permissionSetUris", buildSet(URI_ROLE1, URI_ROLE3),
 				u.getPermissionSetUris());
 	}
@@ -256,6 +261,10 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 
 		assertCorrectPermissionSets(expected, dao.getAllPermissionSets());
 	}
+
+	// ----------------------------------------------------------------------
+	// helper methods
+	// ----------------------------------------------------------------------
 
 	private void assertCorrectPermissionSets(Set<PermissionSet> expected,
 			Collection<PermissionSet> actual) {

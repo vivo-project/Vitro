@@ -6,7 +6,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.VClass" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration" %>
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
@@ -23,7 +23,7 @@
     WebappDaoFactory wdf = vreq.getWebappDaoFactory();  
 %>
 
-<%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.SelectListGenerator"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.SelectListGenerator"%>
 <%@page import="java.util.Map"%>
 <%@page import="com.hp.hpl.jena.ontology.OntModel"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch"%>

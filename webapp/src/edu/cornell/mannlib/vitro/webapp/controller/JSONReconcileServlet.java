@@ -377,7 +377,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
     	 
         String stemParam = (String) request.getParameter("stem"); 
         boolean stem = "true".equals(stemParam);
-        String termName = stem ? VitroLuceneTermNames.NAME : VitroLuceneTermNames.NAMEUNSTEMMED;
+        String termName = stem ? VitroLuceneTermNames.AC_NAME_STEMMED : VitroLuceneTermNames.AC_NAME_UNSTEMMED;
 
         BooleanQuery boolQuery = new BooleanQuery();
         
@@ -415,7 +415,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
     private Query makeUntokenizedNameQuery(String querystr) {
         
         querystr = querystr.toLowerCase();
-        String termName = VitroLuceneTermNames.NAMELOWERCASE;
+        String termName = VitroLuceneTermNames.NAME_LOWERCASE;
         BooleanQuery query = new BooleanQuery();
         log.debug("Adding wildcard query on unanalyzed name");
         query.add( 

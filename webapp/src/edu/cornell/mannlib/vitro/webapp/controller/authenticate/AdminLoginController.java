@@ -7,7 +7,11 @@ import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSour
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -23,9 +27,13 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
  * URL can come here, but they need to pass Internal Authentication to proceed.
  */
 public class AdminLoginController extends FreemarkerHttpServlet {
+	private static final Log log = LogFactory
+			.getLog(AdminLoginController.class);
+
 	public static final String PARAMETER_USERNAME = "username";
 	public static final String PARAMETER_PASSWORD = "password";
 	public static final String PARAMETER_NEW_PASSWORD = "newPassword";
+	public static final String PARAMETER_CONFIRM_PASSWORD = "confirmPassword";
 
 	public static final String URL_THIS = "/admin/login";
 	public static final String URL_HOME_PAGE = "/";
@@ -36,10 +44,13 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 	private static final String MESSAGE_NO_PASSWORD = "errorNoPassword";
 	private static final String MESSAGE_LOGIN_FAILED = "errorLoginFailed";
 	private static final String MESSAGE_NEW_PASSWORD_REQUIRED = "newPasswordRequired";
+	private static final String MESSAGE_NEW_PASSWORD_WRONG_LENGTH = "errorNewPasswordWrongLength";
+	private static final String MESSAGE_NEW_PASSWORDS_DONT_MATCH = "errorNewPasswordsDontMatch";
+	private static final String MESSAGE_NEW_PASSWORD_MATCHES_OLD = "errorNewPasswordMatchesOld";
 
 	@Override
 	protected Actions requiredActions(VitroRequest vreq) {
-		return Actions.EMPTY; // No requirements to use this page.
+		return Actions.AUTHORIZED; // No requirements to use this page.
 	}
 
 	@Override
@@ -56,6 +67,7 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 		private final String username;
 		private final String password;
 		private final String newPassword;
+		private final String confirmPassword;
 
 		public Core(VitroRequest vreq) {
 			this.auth = Authenticator.getInstance(vreq);
@@ -64,20 +76,40 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 			this.password = nonNull(vreq.getParameter(PARAMETER_PASSWORD));
 			this.newPassword = nonNull(vreq
 					.getParameter(PARAMETER_NEW_PASSWORD));
+			this.confirmPassword = nonNull(vreq
+					.getParameter(PARAMETER_CONFIRM_PASSWORD));
+
+			log.debug("Parameters: username='" + username + "', password='"
+					+ password + "', newPassword='" + newPassword
+					+ "', confirmPassword='" + confirmPassword + "'");
 		}
 
 		public ResponseValues process() {
 			if (username.isEmpty() && password.isEmpty()) {
-				return showInitialForm();
+				return showForm();
 			}
 			if (username.isEmpty()) {
-				return showFormWithMessage(MESSAGE_NO_USERNAME);
+				return showForm(MESSAGE_NO_USERNAME);
 			}
 			if (password.isEmpty()) {
-				return showFormWithMessage(MESSAGE_NO_PASSWORD);
+				return showForm(MESSAGE_NO_PASSWORD);
 			}
-			if (newPasswordRequired() && newPassword.isEmpty()) {
-				return showFormWithMessage(MESSAGE_NEW_PASSWORD_REQUIRED);
+			if (newPasswordRequired()) {
+				if (newPassword.isEmpty()) {
+					return showForm(MESSAGE_NEW_PASSWORD_REQUIRED);
+				}
+				if (!isPasswordValidLength(newPassword)) {
+					return showForm(MESSAGE_NEW_PASSWORD_REQUIRED,
+							MESSAGE_NEW_PASSWORD_WRONG_LENGTH);
+				}
+				if (newPassword.equals(password)) {
+					return showForm(MESSAGE_NEW_PASSWORD_REQUIRED,
+							MESSAGE_NEW_PASSWORD_MATCHES_OLD);
+				}
+				if (!newPassword.equals(confirmPassword)) {
+					return showForm(MESSAGE_NEW_PASSWORD_REQUIRED,
+							MESSAGE_NEW_PASSWORDS_DONT_MATCH);
+				}
 			}
 
 			boolean loggedIn = tryToLogin();
@@ -85,7 +117,7 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 				return goToHomePage();
 			}
 
-			return showFormWithMessage(MESSAGE_LOGIN_FAILED);
+			return showForm(MESSAGE_LOGIN_FAILED);
 		}
 
 		private boolean newPasswordRequired() {
@@ -93,11 +125,16 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 					&& auth.isPasswordChangeRequired(username);
 		}
 
+		private boolean isPasswordValidLength(String pw) {
+			return (pw.length() >= User.MIN_PASSWORD_LENGTH)
+					&& (pw.length() <= User.MAX_PASSWORD_LENGTH);
+		}
+
 		private boolean tryToLogin() {
 			if (auth.isCurrentPassword(username, password)) {
 				auth.recordLoginAgainstUserAccount(username, INTERNAL);
 
-				if (auth.isPasswordChangeRequired(username)) {
+				if (!newPassword.isEmpty()) {
 					auth.recordNewPassword(username, newPassword);
 				}
 
@@ -107,18 +144,20 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 			}
 		}
 
-		private ResponseValues showInitialForm() {
-			Map<String, Object> body = new HashMap<String, Object>();
-			body.put("controllerUrl", UrlBuilder.getUrl(URL_THIS));
-			body.put("username", "");
-			return new TemplateResponseValues(TEMPLATE_NAME, body);
-		}
-
-		private ResponseValues showFormWithMessage(String messageCode) {
+		private ResponseValues showForm(String... codes) {
 			Map<String, Object> body = new HashMap<String, Object>();
 			body.put("controllerUrl", UrlBuilder.getUrl(URL_THIS));
 			body.put("username", username);
-			body.put(messageCode, Boolean.TRUE);
+			body.put("password", password);
+			body.put("newPassword", newPassword);
+			body.put("confirmPassword", confirmPassword);
+
+			for (String code : codes) {
+				body.put(code, Boolean.TRUE);
+			}
+
+			log.debug("showing form with values: " + body);
+			
 			return new TemplateResponseValues(TEMPLATE_NAME, body);
 		}
 

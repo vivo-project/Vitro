@@ -7,9 +7,9 @@
 <%@ page import="com.hp.hpl.jena.rdf.model.Literal" %>
 <%@ page import="com.hp.hpl.jena.rdf.model.Model" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.ModelChangePreprocessor"%>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.DefaultAddMissingIndividualFormModelPreprocessor"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.ModelChangePreprocessor"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.DefaultAddMissingIndividualFormModelPreprocessor"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena"%>
 

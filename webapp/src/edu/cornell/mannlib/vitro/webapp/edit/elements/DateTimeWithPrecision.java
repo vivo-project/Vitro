@@ -25,9 +25,9 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditSubmission;
 import freemarker.template.Configuration;
 
 /**

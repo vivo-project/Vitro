@@ -444,13 +444,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
             return entityWebappDao = new IndividualDaoJena(this);
     }
 
-    public FlagDao getFlagDao() {
-        if (flagDao != null)
-            return flagDao;
-        else
-            return flagDao = new FlagDaoJena(this);
-    }
-
     public KeywordIndividualRelationDao getKeys2EntsDao() {
         if (keys2EntsDao != null)
             return keys2EntsDao;

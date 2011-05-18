@@ -16,7 +16,7 @@ import stubs.javax.servlet.ServletContextStub;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndividual;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
@@ -69,14 +69,11 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 
 		policy = new SelfEditingPolicy(ctx);
 
-		ids = new ArrayIdentifierBundle();
-		ids.add(new SelfEditingIdentifierFactory.NetId("test223"));
-
 		IndividualImpl ind = new IndividualImpl();
 		ind.setURI(SELFEDITOR_URI);
-		ids.add(new SelfEditingIdentifierFactory.SelfEditing(ind,
-				SelfEditingIdentifierFactory.NOT_BLACKLISTED));
-
+		
+		ids = new ArrayIdentifierBundle();
+		ids.add(new HasAssociatedIndividual(SELFEDITOR_URI));
 	}
 
 	@Test
@@ -323,19 +320,13 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 	private void setUpTwoSEIs() {
 		ids = new ArrayIdentifierBundle();
 
-		ids.add(new SelfEditingIdentifierFactory.NetId("bozoUser"));
-
 		IndividualImpl ind1 = new IndividualImpl();
 		ind1.setURI(SAFE_NS + "bozoUri");
-		ids.add(new SelfEditingIdentifierFactory.SelfEditing(ind1,
-				SelfEditingIdentifierFactory.NOT_BLACKLISTED));
-
-		ids.add(new SelfEditingIdentifierFactory.NetId("test223"));
+		ids.add(new HasAssociatedIndividual(ind1.getURI()));
 
 		IndividualImpl ind2 = new IndividualImpl();
 		ind2.setURI(SELFEDITOR_URI);
-		ids.add(new SelfEditingIdentifierFactory.SelfEditing(ind2,
-				SelfEditingIdentifierFactory.NOT_BLACKLISTED));
+		ids.add(new HasAssociatedIndividual(ind2.getURI()));
 	}
 
 	// ----------------------------------------------------------------------

@@ -66,8 +66,7 @@ public class BasicAuthenticator extends Authenticator {
 			return false;
 		}
 
-		String md5NewPassword = Authenticate
-				.applyMd5Encoding(clearTextPassword);
+		String md5NewPassword = applyMd5Encoding(clearTextPassword);
 		return md5NewPassword.equals(user.getMd5password());
 	}
 
@@ -90,7 +89,7 @@ public class BasicAuthenticator extends Authenticator {
 			return;
 		}
 		user.setOldPassword(user.getMd5password());
-		user.setMd5password(Authenticate.applyMd5Encoding(newClearTextPassword));
+		user.setMd5password(applyMd5Encoding(newClearTextPassword));
 		getUserDao().updateUser(user);
 	}
 
@@ -226,7 +225,7 @@ public class BasicAuthenticator extends Authenticator {
 		if (iDao == null) {
 			return Collections.emptyList();
 		}
-		
+
 		String selfEditorUri = SelfEditingConfiguration.getBean(request)
 				.getIndividualUriFromUsername(iDao, username);
 		if (selfEditorUri == null) {
@@ -313,15 +312,15 @@ public class BasicAuthenticator extends Authenticator {
 		if (wadf == null) {
 			return null;
 		}
-		
+
 		IndividualDao individualDao = wadf.getIndividualDao();
 		if (individualDao == null) {
 			log.error("getIndividualDao: no IndividualDao");
 		}
-		
+
 		return individualDao;
 	}
-	
+
 	/**
 	 * Get a reference to the WebappDaoFactory, or null.
 	 */

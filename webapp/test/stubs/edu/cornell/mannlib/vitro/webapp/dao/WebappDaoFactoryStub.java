@@ -214,12 +214,6 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 				"WebappDaoFactory.getLinktypeDao() not implemented.");
 	}
 
-	@Override
-	public FlagDao getFlagDao() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getFlagDao() not implemented.");
-	}
-
     // TODO This goes away when the UserAccounts stuff is fully implemented -- jb
 	@Override
 	public UserDao getUserDao() {

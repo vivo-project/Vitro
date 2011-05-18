@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
-import edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate;
 
 /**
  * A simple stub for unit tests that require an Authenticator. Call setup() to
@@ -137,7 +136,7 @@ public class AuthenticatorStub extends Authenticator {
 		if (!isExistingUser(username)) {
 			return false;
 		}
-		String md5Password = Authenticate.applyMd5Encoding(clearTextPassword);
+		String md5Password = applyMd5Encoding(clearTextPassword);
 		User user = getUserByUsername(username);
 		return md5Password.equals(user.getMd5password());
 	}

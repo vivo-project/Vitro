@@ -14,6 +14,8 @@ import org.junit.Test;
 import com.hp.hpl.jena.rdf.model.Literal;
 
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Generator;
 
 public class EditN3GeneratorTest {
 

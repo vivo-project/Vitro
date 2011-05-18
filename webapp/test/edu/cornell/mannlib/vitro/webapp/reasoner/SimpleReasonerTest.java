@@ -554,7 +554,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	/*
 	 * tests rdfs:subPropertyOf materialization for object properties.
 	 */
-	@Test
+	// @Test  uncomment when sub/equiv property inferencing is enabled. sjm222 5/13/2011
 	public void addABoxAssertion1(){
 				
 		// Create TBox, ABox and Inference models and register
@@ -597,7 +597,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	* Test that when a statement is asserted, that it not
 	* added to the inference graph.
 	*/
-	@Test
+	// @Test  uncomment when sub/equiv property inferencing is enabled. sjm222 5/13/2011
 	public void addABoxAssertion2(){
 			
 		// Create TBox, ABox and Inference models and register
@@ -639,7 +639,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	/*
 	* Test inference based on property equivalence
 	*/ 
-	@Test
+	// @Test  uncomment when sub/equiv property inferencing is enabled. sjm222 5/13/2011
 	public void addABoxAssertion4(){
 				
 		// Create TBox, ABox and Inference models and register
@@ -694,7 +694,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	 * property so no inference should be materialized.
 	 */
 
-	@Test
+	// @Test  uncomment when sub/equiv property inferencing is enabled. sjm222 5/13/2011
 	public void addABoxAssertion5(){
 				
 		// Create TBox, ABox and Inference models and register
@@ -737,7 +737,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	/*
 	 * Test inference based on property equivalence
 	 */
-	@Test
+	// @Test  uncomment when sub/equiv property inferencing is enabled. sjm222 5/13/2011
 	public void addABoxAssertion6() {
 				
 		// Create TBox, ABox and Inference models and register
@@ -794,7 +794,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	 * rdfs:subPropetyOf statement, this test serves
 	 * as a test of equivalentProperty assertions also.
 	 */
-	@Test
+	// @Test  uncomment when sub/equiv property inferencing is enabled. sjm222 5/13/2011
 	public void addTBoxSubPropertyAssertion1(){
 				
 		// Create TBox, ABox and Inference models and register
@@ -850,7 +850,6 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		
 	}
 	
-	@Test
 	/*
 	 * Test the removal of a subPropertyOf statement from 
 	 * the TBox. The instance data that is the basis
@@ -864,6 +863,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	 * as a test of equivalentProperty assertions also.
 	 * 
 	 */
+	// @Test  uncomment when sub/equiv property inferencing is enabled. sjm222 5/13/2011
 	public void removeTBoxSubPropertyAssertion1(){
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
@@ -955,11 +955,12 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	}
 	
 	
-	@Test
+
 	/*
      * Test computation of mostSpecificType annotations in response
      * to an added/removed ABox type assertion.
 	 */
+	@Test
 	public void mstTest1(){
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
@@ -1025,11 +1026,12 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		Assert.assertFalse(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classD.getURI(), XSDDatatype.XSDanyURI)));	
 	}
 	
-	@Test
+
 	/*
      * Test computation of mostSpecificType annotations in response
      * to an added ABox type assertion.
 	 */
+	@Test
 	public void mstTest2(){
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
@@ -1074,11 +1076,11 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		Assert.assertTrue(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classC.getURI(), XSDDatatype.XSDanyURI)));	
 	}
 		
-	@Test
 	/*
      * Test computation of mostSpecificType annotations in response
      * to an added/removed TBox assertions.
 	 */
+	@Test
 	public void mstTest3(){
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox

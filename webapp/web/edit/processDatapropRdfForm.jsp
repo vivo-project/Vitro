@@ -9,10 +9,10 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.EditLiteral" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Generator" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Generator" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditSubmission" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 <%@ page import="org.apache.commons.logging.Log" %>
@@ -21,13 +21,13 @@
 <%@ page import="java.util.*" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.RdfLiteralHash"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.beans.DataProperty"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.RoleIdentifier"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 
 <%-- 2nd prototype of processing, adapted for data property editing

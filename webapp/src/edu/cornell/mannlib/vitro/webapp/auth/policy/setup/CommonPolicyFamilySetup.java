@@ -10,7 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.CommonIdentifierBundleFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.CommonIdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.DisplayRestrictedDataByRoleLevelPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.DisplayRestrictedDataToSelfPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
@@ -41,7 +41,7 @@ public class CommonPolicyFamilySetup implements ServletContextListener {
 					new UseRestrictedPagesByRoleLevelPolicy());
 
 			// This factory creates Identifiers for all of the above policies.
-			CommonIdentifierBundleFactory factory = new CommonIdentifierBundleFactory();
+			CommonIdentifierBundleFactory factory = new CommonIdentifierBundleFactory(ctx);
 
 			ActiveIdentifierBundleFactories.addFactory(sce, factory);
 		} catch (Exception e) {

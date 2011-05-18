@@ -2,19 +2,16 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.HasAssociatedIndividual;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.HasRoleLevel;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndividual;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasRoleLevel;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
@@ -24,9 +21,9 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayData
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
+import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 
 /**
  * Permit display of various data if it relates to the user's associated
@@ -60,12 +57,13 @@ public class DisplayRestrictedDataToSelfPolicy implements PolicyIface {
 			return defaultDecision("whatToAuth was null");
 		}
 
-		RoleLevel userRole = getUsersRoleLevel(whoToAuth);
+		RoleLevel userRole = HasRoleLevel.getUsersRoleLevel(whoToAuth);
 		if (userRole != RoleLevel.SELF) {
 			return defaultDecision("not a self-editor");
 		}
 
-		Collection<String> associated = getAssociatedIndividualUris(whoToAuth);
+		Collection<String> associated = HasAssociatedIndividual
+				.getIndividualUris(whoToAuth);
 		if (associated.isEmpty()) {
 			return defaultDecision("not self-editing for anyone");
 		}
@@ -175,37 +173,6 @@ public class DisplayRestrictedDataToSelfPolicy implements PolicyIface {
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * The user is nobody unless they have a HasRoleLevel identifier.
-	 */
-	private RoleLevel getUsersRoleLevel(IdentifierBundle whoToAuth) {
-		RoleLevel userRole = RoleLevel.PUBLIC;
-		for (Identifier id : whoToAuth) {
-			if (id instanceof HasRoleLevel) {
-				userRole = ((HasRoleLevel) id).getRoleLevel();
-			}
-		}
-		return userRole;
-	}
-
-	/**
-	 * Find out who the user has self-editing rights for. We only include the
-	 * ones that are not blacklisted.
-	 */
-	private Collection<String> getAssociatedIndividualUris(
-			IdentifierBundle whoToAuth) {
-		List<String> list = new ArrayList<String>();
-		for (Identifier id : whoToAuth) {
-			if (id instanceof HasAssociatedIndividual) {
-				HasAssociatedIndividual haiId = (HasAssociatedIndividual) id;
-				if (!haiId.isBlacklisted()) {
-					list.add(haiId.getAssociatedIndividualUri());
-				}
-			}
-		}
-		return list;
 	}
 
 }
