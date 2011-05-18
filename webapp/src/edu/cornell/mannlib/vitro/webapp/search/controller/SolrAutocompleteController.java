@@ -114,8 +114,8 @@ public class SolrAutocompleteController extends VitroAjaxController {
                 }
             }   
 
-            // See if we can do without this, since we set sort field on the query
-            //Collections.sort(results);
+            // Since SolrQuery.setSortField() is buggy, sort the results here
+            Collections.sort(results);
             
             // map.put("results", results);
             // writeTemplate(TEMPLATE_DEFAULT, map, config, vreq, response);
@@ -156,8 +156,9 @@ public class SolrAutocompleteController extends VitroAjaxController {
             query.addFilterQuery(VitroLuceneTermNames.RDFTYPE + ":\"" + typeParam + "\"");
         }   
         
-//        query.setFields(VitroLuceneTermNames.NAME_RAW, VitroLuceneTermNames.URI) // fields to retrieve
-//             .setSortField(VitroLuceneTermNames.NAME_RAW, SolrQuery.ORDER.asc);
+        query.setFields(VitroLuceneTermNames.NAME_RAW, VitroLuceneTermNames.URI); // fields to retrieve
+             // Solr bug: generates sort=nameLowercase asc instead of sort=nameLowercase+asc
+             //.setSortField(VitroLuceneTermNames.NAME_LOWERCASE, SolrQuery.ORDER.asc);
         
         return query;
     }
@@ -182,12 +183,14 @@ public class SolrAutocompleteController extends VitroAjaxController {
     }
     
     private void setTokenizedQuery(SolrQuery query, String queryStr, HttpServletRequest request) {
+        
+        // RY 5/18/2011 For now, just doing untokenized query, due to the interactions of wildcard
+        // query and stemming described below. Need to find a way to do this in Solr.
+        // Should take the same approach if we can figure out how to do a disjunction.
  
-        String stemParam = (String) request.getParameter("stem"); 
-        boolean stem = "true".equals(stemParam);
-        String termName = stem ? VitroLuceneTermNames.AC_NAME_STEMMED : VitroLuceneTermNames.AC_NAME_UNSTEMMED  ;
-
-        BooleanQuery boolQuery = new BooleanQuery();
+//        String stemParam = (String) request.getParameter("stem"); 
+//        boolean stem = "true".equals(stemParam);
+//        String termName = stem ? VitroLuceneTermNames.AC_NAME_STEMMED : VitroLuceneTermNames.AC_NAME_UNSTEMMED  ;
         
 //        // Use the query parser to analyze the search term the same way the indexed text was analyzed.
 //        // For example, text is lowercased, and function words are stripped out.
@@ -196,18 +199,18 @@ public class SolrAutocompleteController extends VitroAjaxController {
 //        // The wildcard query doesn't play well with stemming. Query term name:tales* doesn't match
 //        // "tales", which is indexed as "tale", while query term name:tales does. Obviously we need 
 //        // the wildcard for name:tal*, so the only way to get them all to match is use a disjunction 
-//        // of wildcard and non-wildcard queries. The query will look have only an implicit disjunction
+//        // of wildcard and non-wildcard queries. The query will have only an implicit disjunction
 //        // operator: e.g., +(name:tales name:tales*)
 //        try {
-//            log.debug("Adding non-wildcard query for " + queryStr);
-//            Query query = parser.parse(queryStr);
+//            log.debug("Adding non-wildcard query for " + querystr);
+//            Query query = parser.parse(querystr);
 //            boolQuery.add(query, BooleanClause.Occur.SHOULD);
 //
 //            // Prevent ParseException here when adding * after a space.
 //            // If there's a space at the end, we don't need the wildcard query.
-//            if (! queryStr.endsWith(" ")) {
-//                log.debug("Adding wildcard query for " + queryStr);
-//                Query wildcardQuery = parser.parse(queryStr + "*");            
+//            if (! querystr.endsWith(" ")) {
+//                log.debug("Adding wildcard query for " + querystr);
+//                Query wildcardQuery = parser.parse(querystr + "*");            
 //                boolQuery.add(wildcardQuery, BooleanClause.Occur.SHOULD);
 //            }
 //            
@@ -215,12 +218,13 @@ public class SolrAutocompleteController extends VitroAjaxController {
 //        } catch (ParseException e) {
 //            log.warn(e, e);
 //        }
-
+       
+        setUntokenizedQuery(query, queryStr);
     }
 
     private void setUntokenizedQuery(SolrQuery query, String queryStr) {
         
-        // Don't know why we should have to do this; the analyzer should take care of it, but doesn't
+        // We have to lowercase manually, because Solr doesn't do text analysis on wildcard queries
         queryStr = queryStr.toLowerCase();
         // Solr wants whitespace to be escaped with a backslash
         // Better: replace \s+
