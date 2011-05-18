@@ -197,18 +197,20 @@ public class VitroHttpServlet extends HttpServlet {
 	}
 
 	/**
-	 * If logging is set to the TRACE level, dump the HTTP headers on the
-	 * request.
+	 * If logging on the subclass is set to the TRACE level, dump the HTTP
+	 * headers on the request.
 	 */
 	private void dumpRequestHeaders(HttpServletRequest req) {
 		@SuppressWarnings("unchecked")
 		Enumeration<String> names = req.getHeaderNames();
 
-		log.trace("----------------------request:" + req.getRequestURL());
+		Log subclassLog = LogFactory.getLog(this.getClass());
+		subclassLog.trace("----------------------request:"
+				+ req.getRequestURL());
 		while (names.hasMoreElements()) {
 			String name = names.nextElement();
 			if (!BORING_HEADERS.contains(name)) {
-				log.trace(name + "=" + req.getHeader(name));
+				subclassLog.trace(name + "=" + req.getHeader(name));
 			}
 		}
 	}

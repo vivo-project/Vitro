@@ -5,41 +5,32 @@ package edu.cornell.mannlib.vitro.webapp.controller.accounts;
 import static edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsSelectionCriteria.DEFAULT_ACCOUNTS_PER_PAGE;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.OntModel;
-
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
 import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.Direction;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.Field;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 
 /**
- * Display the paginated list of User Accounts.
+ * Handle the List page.
  */
-public class UserAccountsListController extends FreemarkerHttpServlet {
+public class UserAccountsListPage extends UserAccountsPage {
 	private static final Log log = LogFactory
-			.getLog(UserAccountsListController.class);
+			.getLog(UserAccountsListPage.class);
 
 	public static final String PARAMETER_ACCOUNTS_PER_PAGE = "accountsPerPage";
 	public static final String PARAMETER_PAGE_INDEX = "pageIndex";
@@ -54,67 +45,19 @@ public class UserAccountsListController extends FreemarkerHttpServlet {
 
 	private static final String TEMPLATE_NAME = "userAccounts-list.ftl";
 
-	private OntModel userAccountsModel;
-	private UserAccountsDao userAccountsDao;
+	private UserAccountsSelectionCriteria criteria = UserAccountsSelectionCriteria.DEFAULT_CRITERIA;
 
-	@Override
-	public void init() throws ServletException {
-		super.init();
-
-		OntModelSelector oms = (OntModelSelector) getServletContext()
-				.getAttribute("baseOntModelSelector");
-		userAccountsModel = oms.getUserAccountsModel();
-
-		WebappDaoFactory wdf = (WebappDaoFactory) getServletContext()
-				.getAttribute("webappDaoFactory");
-		userAccountsDao = wdf.getUserAccountsDao();
-	}
-
-	@Override
-	protected Actions requiredActions(VitroRequest vreq) {
-		return new Actions(new ManageUserAccounts());
+	public UserAccountsListPage(VitroRequest vreq) {
+		super(vreq);
 	}
 
 	/**
-	 * Assume the default criteria for display. Modify the criteria based on
-	 * parameters in the request. Get the selected accounts and display them.
+	 * Build the criteria from the request parameters.
 	 */
-	@Override
-	protected ResponseValues processRequest(VitroRequest vreq) {
-		if (log.isDebugEnabled()) {
-			dumpRequestParameters(vreq);
-		}
-
-		Map<String, Object> body = new HashMap<String, Object>();
-
-		UserAccountsSelectionCriteria criteria = buildCriteria(vreq);
-
-		body.put("accountsPerPage", criteria.getAccountsPerPage());
-		body.put("pageIndex", criteria.getPageIndex());
-		body.put("orderDirection", criteria.getOrderBy().getDirection().keyword);
-		body.put("orderField", criteria.getOrderBy().getField().name);
-		body.put("roleFilterUri", criteria.getRoleFilterUri());
-		body.put("searchTerm", criteria.getSearchTerm());
-
-		UserAccountsSelection selection = UserAccountsSelector.select(
-				userAccountsModel, criteria);
-
-		body.put("accounts", wrapUserAccounts(selection));
-		body.put("total", selection.getResultCount());
-		body.put("page", buildPageMap(selection));
-
-		body.put("formUrl", buildFormUrl(vreq));
-		body.put("roles", buildRolesList());
-
-		body.put("messages", buildMessagesMap(vreq));
-
-		return new TemplateResponseValues(TEMPLATE_NAME, body);
-	}
-
-	private UserAccountsSelectionCriteria buildCriteria(VitroRequest vreq) {
-		int accountsPerPage = getIntegerParameter(vreq,
-				PARAMETER_ACCOUNTS_PER_PAGE, DEFAULT_ACCOUNTS_PER_PAGE);
-		int pageIndex = getIntegerParameter(vreq, PARAMETER_PAGE_INDEX, 1);
+	public void parseParameters() {
+		int accountsPerPage = getIntegerParameter(PARAMETER_ACCOUNTS_PER_PAGE,
+				DEFAULT_ACCOUNTS_PER_PAGE);
+		int pageIndex = getIntegerParameter(PARAMETER_PAGE_INDEX, 1);
 
 		Direction orderingDirection = Direction.fromKeyword(vreq
 				.getParameter(PARAMETER_ORDERING_DIRECTION));
@@ -123,33 +66,72 @@ public class UserAccountsListController extends FreemarkerHttpServlet {
 		UserAccountsOrdering ordering = new UserAccountsOrdering(orderingField,
 				orderingDirection);
 
-		String roleFilterUri = getStringParameter(vreq,
-				PARAMETER_ROLE_FILTER_URI, "");
-		String searchTerm = getStringParameter(vreq, PARAMETER_SEARCH_TERM, "");
+		String roleFilterUri = getStringParameter(PARAMETER_ROLE_FILTER_URI, "");
+		String searchTerm = getStringParameter(PARAMETER_SEARCH_TERM, "");
 
-		return new UserAccountsSelectionCriteria(accountsPerPage, pageIndex,
-				ordering, roleFilterUri, searchTerm);
+		criteria = new UserAccountsSelectionCriteria(accountsPerPage,
+				pageIndex, ordering, roleFilterUri, searchTerm);
 	}
 
-	private String getStringParameter(VitroRequest vreq, String key,
-			String defaultValue) {
-		String value = vreq.getParameter(key);
-		return (value == null) ? defaultValue : value;
+	/**
+	 * Build the selection criteria from the request, select the accounts, and
+	 * create the ResponseValues to display the page.
+	 */
+	public ResponseValues showPage() {
+		UserAccountsSelection selection = UserAccountsSelector.select(
+				userAccountsModel, criteria);
+		Map<String, Object> body = buildTemplateBodyMap(selection);
+		return new TemplateResponseValues(TEMPLATE_NAME, body);
 	}
 
-	private int getIntegerParameter(VitroRequest vreq, String key,
-			int defaultValue) {
-		String value = vreq.getParameter(key);
-		if (value == null) {
-			return defaultValue;
-		}
+	/**
+	 * We just came from adding a new account. Show the list with a message.
+	 */
+	public ResponseValues showPageWithNewAccount(UserAccount userAccount) {
+		UserAccountsSelection selection = UserAccountsSelector.select(
+				userAccountsModel, criteria);
+		Map<String, Object> body = buildTemplateBodyMap(selection);
 
-		try {
-			return Integer.parseInt(value);
-		} catch (NumberFormatException e) {
-			log.warn("Invalid integer for parameter '" + key + "': " + value);
-			return defaultValue;
-		}
+		body.put("newUserAccount", new UserAccountWrapper(vreq, userAccount,
+				Collections.<String> emptyList()));
+
+		return new TemplateResponseValues(TEMPLATE_NAME, body);
+	}
+
+	/**
+	 * We just came from deleting accounts. Show the list with a message.
+	 */
+	public ResponseValues showPageWithDeletions(Collection<String> deletedUris) {
+		UserAccountsSelection selection = UserAccountsSelector.select(
+				userAccountsModel, criteria);
+		Map<String, Object> body = buildTemplateBodyMap(selection);
+
+		body.put("deletedAccountCount", deletedUris.size());
+
+		return new TemplateResponseValues(TEMPLATE_NAME, body);
+	}
+
+	private Map<String, Object> buildTemplateBodyMap(
+			UserAccountsSelection selection) {
+		Map<String, Object> body = new HashMap<String, Object>();
+
+		body.put("accountsPerPage", criteria.getAccountsPerPage());
+		body.put("pageIndex", criteria.getPageIndex());
+		body.put("orderDirection", criteria.getOrderBy().getDirection().keyword);
+		body.put("orderField", criteria.getOrderBy().getField().name);
+		body.put("roleFilterUri", criteria.getRoleFilterUri());
+		body.put("searchTerm", criteria.getSearchTerm());
+
+		body.put("accounts", wrapUserAccounts(selection));
+		body.put("total", selection.getResultCount());
+		body.put("page", buildPageMap(selection));
+
+		body.put("formUrls", buildUrlsMap());
+		body.put("roles", buildRolesList());
+
+		body.put("messages", buildMessagesMap());
+
+		return body;
 	}
 
 	private Map<String, Integer> buildPageMap(UserAccountsSelection selection) {
@@ -175,61 +157,37 @@ public class UserAccountsListController extends FreemarkerHttpServlet {
 		return map;
 	}
 
-	private String buildFormUrl(VitroRequest vreq) {
-		UrlBuilder urlBuilder = new UrlBuilder(vreq.getAppBean());
-		return urlBuilder.getPortalUrl("/listUserAccounts");
-	}
-
-	private List<PermissionSet> buildRolesList() {
-		List<PermissionSet> list = new ArrayList<PermissionSet>();
-		list.addAll(userAccountsDao.getAllPermissionSets());
-		Collections.sort(list, new Comparator<PermissionSet>() {
-			@Override
-			public int compare(PermissionSet ps1, PermissionSet ps2) {
-				return ps1.getUri().compareTo(ps2.getUri());
-			}
-		});
-		return list;
-	}
-
-	private Map<String, Object> buildMessagesMap(VitroRequest vreq) {
+	private Map<String, Object> buildMessagesMap() {
 		Map<String, Object> map = new HashMap<String, Object>();
 
-		UserAccount newUser = getUserFromUriParameter(vreq,
-				PARAMETER_NEW_USER_URI);
+		UserAccount newUser = getUserFromUriParameter(PARAMETER_NEW_USER_URI);
 		if (newUser != null) {
 			map.put("newUser", newUser);
 		}
 
-		UserAccount updatedUser = getUserFromUriParameter(vreq,
-				PARAMETER_UPDATED_USER_URI);
+		UserAccount updatedUser = getUserFromUriParameter(PARAMETER_UPDATED_USER_URI);
 		if (updatedUser != null) {
 			map.put("updatedUser", updatedUser);
 		}
 
-		if (isFlagOnRequest(vreq, FLAG_UPDATED_USER_PW)) {
+		if (isFlagOnRequest(FLAG_UPDATED_USER_PW)) {
 			map.put("updatedUserPw", true);
 		}
 
-		if (isFlagOnRequest(vreq, FLAG_USERS_DELETED)) {
+		if (isFlagOnRequest(FLAG_USERS_DELETED)) {
 			map.put("usersDeleted", true);
 		}
 
 		return map;
 	}
 
-	private UserAccount getUserFromUriParameter(VitroRequest vreq, String key) {
+	private UserAccount getUserFromUriParameter(String key) {
 		String uri = vreq.getParameter(key);
 		if ((uri == null) || uri.isEmpty()) {
 			return null;
 		}
 
 		return userAccountsDao.getUserAccountByUri(uri);
-	}
-
-	private boolean isFlagOnRequest(VitroRequest vreq, String key) {
-		String value = vreq.getParameter(key);
-		return (value != null);
 	}
 
 	/**
@@ -240,7 +198,7 @@ public class UserAccountsListController extends FreemarkerHttpServlet {
 			UserAccountsSelection selection) {
 		List<UserAccountWrapper> list = new ArrayList<UserAccountWrapper>();
 		for (UserAccount account : selection.getUserAccounts()) {
-			list.add(new UserAccountWrapper(account,
+			list.add(new UserAccountWrapper(vreq, account,
 					findPermissionSetLabels(account)));
 		}
 		return list;
@@ -263,11 +221,16 @@ public class UserAccountsListController extends FreemarkerHttpServlet {
 	public static class UserAccountWrapper {
 		private final UserAccount account;
 		private final List<String> permissionSets;
+		private final String editUrl;
 
-		public UserAccountWrapper(UserAccount account,
+		public UserAccountWrapper(VitroRequest vreq, UserAccount account,
 				List<String> permissionSets) {
 			this.account = account;
 			this.permissionSets = permissionSets;
+
+			UrlBuilder urlBuilder = new UrlBuilder(vreq.getAppBean());
+			this.editUrl = urlBuilder.getPortalUrl("/userAccounts/edit",
+					new ParamMap("editAccount", account.getUri()));
 		}
 
 		public String getUri() {
@@ -301,6 +264,10 @@ public class UserAccountsListController extends FreemarkerHttpServlet {
 
 		public List<String> getPermissionSets() {
 			return permissionSets;
+		}
+
+		public String getEditUrl() {
+			return editUrl;
 		}
 
 	}

@@ -11,6 +11,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
@@ -69,6 +70,28 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 		} finally {
 			getOntModel().leaveCriticalSection();
 		}
+	}
+
+	@Override
+	public UserAccount getUserAccountByEmail(String emailAddress) {
+		if (emailAddress == null) {
+			return null;
+		}
+
+		String userUri = null;
+		
+		getOntModel().enterCriticalSection(Lock.READ);
+		try {
+			StmtIterator stmts = getOntModel().listStatements(null, USERACCOUNT_EMAIL_ADDRESS,
+					getOntModel().createLiteral(emailAddress));
+			if (stmts.hasNext()) {
+				userUri = stmts.next().getSubject().getURI();
+			}
+		} finally {
+			getOntModel().leaveCriticalSection();
+		}
+		
+		return getUserAccountByUri(userUri);
 	}
 
 	@Override
