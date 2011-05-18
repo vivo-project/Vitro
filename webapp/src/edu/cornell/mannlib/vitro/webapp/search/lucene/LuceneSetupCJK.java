@@ -27,6 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
+import edu.cornell.mannlib.vitro.webapp.search.beans.ContextNodesInclusionFactory;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
@@ -92,7 +93,8 @@ public class LuceneSetupCJK implements javax.servlet.ServletContextListener {
             OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
             Entity2LuceneDoc translator = new Entity2LuceneDoc( 
                     new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel),
-                    new IndividualProhibitedFromSearch(context) );                                  
+                    new IndividualProhibitedFromSearch(context),
+                    new ContextNodesInclusionFactory(DisplayVocabulary.CONTEXT_NODES_URI, displayOntModel, context));                                  
             indexer.addObj2Doc(translator);     
                                               
             indexer.setLuceneIndexFactory(lif);

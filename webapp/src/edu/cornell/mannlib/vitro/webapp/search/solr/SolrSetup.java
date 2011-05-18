@@ -23,6 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
+import edu.cornell.mannlib.vitro.webapp.search.beans.ContextNodesInclusionFactory;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
@@ -67,10 +68,15 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             /* setup the individual to solr doc translation */            
             //first we need a ent2luceneDoc translator
             OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
-            Entity2LuceneDoc ent2LuceneDoc = new Entity2LuceneDoc( 
-                    new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel),
-                    new IndividualProhibitedFromSearch(context) );                                              
-            IndividualToSolrDocument indToSolrDoc = new IndividualToSolrDocument( ent2LuceneDoc );
+//            Entity2LuceneDoc ent2LuceneDoc = new Entity2LuceneDoc( 
+//                    new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel),
+//                    new IndividualProhibitedFromSearch(context),
+//                    new ContextNodesInclusionFactory(DisplayVocabulary.CONTEXT_NODES_URI, displayOntModel, context));                                              
+//            IndividualToSolrDocument indToSolrDoc = new IndividualToSolrDocument( ent2LuceneDoc );
+            IndividualToSolrDocument indToSolrDoc = new IndividualToSolrDocument(
+            		new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel),
+            		new IndividualProhibitedFromSearch(context), 
+            		new ContextNodesInclusionFactory(DisplayVocabulary.CONTEXT_NODES_URI, displayOntModel, context));
             List<Obj2DocIface> o2d = new ArrayList<Obj2DocIface>();
             o2d.add(indToSolrDoc);
             

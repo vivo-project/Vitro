@@ -10,6 +10,7 @@ import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.Vi
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.AC_NAME_STEMMED;
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.AC_NAME_UNSTEMMED;
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.RDFTYPE;
+import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.CONTEXTNODE;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,6 +42,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
+import edu.cornell.mannlib.vitro.webapp.search.beans.ContextNodesInclusionFactory;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
 
@@ -111,10 +113,16 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 					getAnalyzer());
 			context.setAttribute(ANALYZER, getAnalyzer());
 			
+			//bk392 adding another argument to Entity2LuceneDoc
+			// that takes care of sparql queries for context nodes.
+			
 			OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
 			Entity2LuceneDoc translator = new Entity2LuceneDoc( 
 			        new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel),
-			        new IndividualProhibitedFromSearch(context) );									
+			        new IndividualProhibitedFromSearch(context),
+			        new ContextNodesInclusionFactory(DisplayVocabulary.CONTEXT_NODES_URI, displayOntModel, context)
+			        
+			);									
 			indexer.addObj2Doc(translator);			
 			
 			context.setAttribute(LuceneIndexer.class.getName(), indexer);
@@ -250,8 +258,10 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
         analyzer.addAnalyzer(AC_NAME_STEMMED, new HtmlLowerStopStemAnalyzer());
         analyzer.addAnalyzer(MONIKER, new StandardAnalyzer(Version.LUCENE_29));
         analyzer.addAnalyzer(RDFTYPE, new StandardAnalyzer(Version.LUCENE_29));
+        analyzer.addAnalyzer(CONTEXTNODE, new StandardAnalyzer(Version.LUCENE_29));
         analyzer.addAnalyzer(CLASSLOCALNAME, new HtmlLowerStopAnalyzer());
         analyzer.addAnalyzer(CLASSLOCALNAMELOWERCASE, new HtmlLowerStopAnalyzer());
+        
         
         return analyzer;
     }

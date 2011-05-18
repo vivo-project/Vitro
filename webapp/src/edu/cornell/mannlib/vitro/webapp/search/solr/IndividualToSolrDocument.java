@@ -2,22 +2,260 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.solr;
 
-import org.apache.solr.common.SolrDocument;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.document.Document;
+import org.apache.solr.client.solrj.beans.Field;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.SolrInputField;
+import org.joda.time.DateTime;
+
+import com.hp.hpl.jena.vocabulary.OWL;
+
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
+import edu.cornell.mannlib.vitro.webapp.search.VitroTermNames;
+import edu.cornell.mannlib.vitro.webapp.search.beans.ContextNodesInclusionFactory;
+import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearch;
+import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
 
 public class IndividualToSolrDocument implements Obj2DocIface {
     
     protected LuceneDocToSolrDoc luceneToSolr;
-    protected Entity2LuceneDoc entityToLucene;
     
-    public IndividualToSolrDocument(Entity2LuceneDoc e2d){
-        entityToLucene = e2d;  
-        luceneToSolr = new LuceneDocToSolrDoc();
+    public static final Log log = LogFactory.getLog(IndividualToSolrDocument.class.getName());
+    
+    public static VitroTermNames term = new VitroTermNames();
+    
+    private static String entClassName = Individual.class.getName();
+    
+    private ProhibitedFromSearch classesProhibitedFromSearch;
+    
+    private IndividualProhibitedFromSearch individualProhibitedFromSearch;
+    
+    private ContextNodesInclusionFactory contextNodesInclusionFactory;
+    
+    private static HashSet<String> objectProperties = new HashSet<String>();
+    
+        
+    public IndividualToSolrDocument(ProhibitedFromSearch classesProhibitedFromSearch, 
+    		IndividualProhibitedFromSearch individualProhibitedFromSearch,
+    			ContextNodesInclusionFactory contextNodesInclusionFactory){
+    	this.classesProhibitedFromSearch = classesProhibitedFromSearch;
+    	this.individualProhibitedFromSearch = individualProhibitedFromSearch;
+    	this.contextNodesInclusionFactory = contextNodesInclusionFactory;
     }
+    
+    @Override
+    public Object translate(Object obj) throws IndexingException{
+    	long tProhibited = System.currentTimeMillis();
+    	
+    	if(!(obj instanceof Individual))
+    		return null;
+    	
+    	Individual ent = (Individual)obj;
+    	String value;
+    	String classPublicNames = "";
+    	SolrInputDocument doc = new SolrInputDocument();
+    	
+    	//DocId
+    	String id = ent.getURI();
+    	log.debug("translating " + id);
+    	
+    	if(id == null){
+    		log.debug("cannot add individuals without URIs to lucene Index");
+    		return null;
+    	}else if( id.startsWith(VitroVocabulary.vitroURI) ||
+    			id.startsWith(VitroVocabulary.VITRO_PUBLIC) ||
+    			id.startsWith(VitroVocabulary.PSEUDO_BNODE_NS) ||
+    			id.startsWith(OWL.NS)){
+    		log.debug("not indexing because of namespace:" + id);
+    		return null;
+    	}
+    	
+    	//filter out class groups, owl:ObjectProperties etc..
+    	if(individualProhibitedFromSearch.isIndividualProhibited(id)){
+    		return null;
+    	}
+    	
+    	log.debug("time to check if individual is prohibited:" + Long.toString(System.currentTimeMillis() - tProhibited));
+    	
+    	// Types and classgroups
+    	boolean prohibited = false;
+    	List<VClass> vclasses = ent.getVClasses(false);
+    	long tClassgroup = System.currentTimeMillis();
+    	for(VClass clz : vclasses){
+    		if(clz.getURI() == null){
+    			continue;
+    		}else if(OWL.Thing.getURI().equals(clz.getURI())){
+    			//index individuals of type owl:Thing, just don't add owl:Thing as the type field in the index
+    			continue;
+    		} else if(clz.getURI().startsWith(OWL.NS)){
+    			log.debug("not indexing " + id + " because of type " + clz.getURI());
+    			return null;
+    		} else {
+    			if( !prohibited && classesProhibitedFromSearch.isClassProhibited(clz.getURI()))
+    				prohibited = true;
+    			if( clz.getSearchBoost() != null)
+    				doc.setDocumentBoost(doc.getDocumentBoost() + clz.getSearchBoost());
+    			
+    			doc.addField(term.RDFTYPE, clz.getURI());
+    			
+    			if(clz.getLocalName() != null){
+    				doc.addField(term.CLASSLOCALNAME, clz.getLocalName());
+    				doc.addField(term.CLASSLOCALNAMELOWERCASE, clz.getLocalName().toLowerCase());
+    			}
+    			
+    			if(clz.getName() != null)
+    				classPublicNames += clz.getName();
+    			
+    			//Classgroup URI
+    			if(clz.getGroupURI() != null){
+    				doc.addField(term.CLASSGROUP_URI,clz.getGroupURI());
+    			}
+    			
+    		}
+    	}
+    	
+    	log.debug("time to check if class is prohibited and adding classes, classgroups and type to the index: " + Long.toString(System.currentTimeMillis() - tClassgroup));
+
+    	
+    	doc.addField(term.PROHIBITED_FROM_TEXT_RESULTS, prohibited?"1":"0");
+    	
+    	//lucene DocID
+    	doc.addField(term.DOCID, entClassName + id);
+    	
+    	//vitro id
+    	doc.addField(term.URI, id);
+    	
+    	//java class
+    	doc.addField(term.JCLASS, entClassName);
+    	
+    	//Individual Label
+    	if(ent.getRdfsLabel() != null)
+    		value = ent.getRdfsLabel();
+    	else{
+    		log.debug("Using local name for individual with rdfs:label " + ent.getURI());
+    		value = ent.getLocalName();
+    	}
+    	
+    	doc.addField(term.NAME_RAW, value, NAME_BOOST);
+    	doc.addField(term.NAME_LOWERCASE, value.toLowerCase(),NAME_BOOST);
+    	doc.addField(term.NAME_UNSTEMMED, value,NAME_BOOST);
+    	doc.addField(term.NAME_STEMMED, value, NAME_BOOST);
+    	
+    	long tContextNodes = System.currentTimeMillis();
+    	
+    	String contextNodePropertyValues = "";
+    	contextNodePropertyValues += contextNodesInclusionFactory.getPropertiesAssociatedWithEducationalTraining(ent.getURI());
+        contextNodePropertyValues += contextNodesInclusionFactory.getPropertiesAssociatedWithRole(ent.getURI());
+        contextNodePropertyValues += contextNodesInclusionFactory.getPropertiesAssociatedWithPosition(ent.getURI());
+        contextNodePropertyValues += contextNodesInclusionFactory.getPropertiesAssociatedWithRelationship(ent.getURI());
+        contextNodePropertyValues += contextNodesInclusionFactory.getPropertiesAssociatedWithAwardReceipt(ent.getURI());
+        contextNodePropertyValues += contextNodesInclusionFactory.getPropertiesAssociatedWithInformationResource(ent.getURI());   
+        
+        
+        doc.addField(term.CONTEXTNODE, contextNodePropertyValues);
+
+    	log.debug("time to fire contextnode queries and include them in the index: " + Long.toString(System.currentTimeMillis() - tContextNodes));
+
+        
+        long tMoniker = System.currentTimeMillis();
+    	
+        //Moniker 
+        if(ent.getMoniker() != null){
+        	doc.addField(term.MONIKER, ent.getMoniker());
+        }
+        
+        //boost for entity
+        if(ent.getSearchBoost() != null && ent.getSearchBoost() != 0)
+        	doc.setDocumentBoost(ent.getSearchBoost());
+        
+        //thumbnail
+        try{
+        	value = null;
+        	if(ent.hasThumb())
+        		doc.addField(term.THUMBNAIL, "1");
+        	else
+        		doc.addField(term.THUMBNAIL, "0");
+        }catch(Exception ex){
+        	log.debug("could not index thumbnail: " + ex);
+        }
+        
+        
+        //time of index in millis past epoc
+        Object anon[] =  { new Long((new DateTime() ).getMillis())  };
+        doc.addField(term.INDEXEDTIME, String.format("%019d", anon));
+        
+    	log.debug("time to include moniker , thumbnail and indexedtime in the index: " + Long.toString(System.currentTimeMillis() - tMoniker));
+
+        long tPropertyStatements = System.currentTimeMillis();
+        if(!prohibited){
+            //ALLTEXT, all of the 'full text'
+            String t=null;
+            value =""; 
+            value+= " "+( ((t=ent.getName()) == null)?"":t );  
+            value+= " "+( ((t=ent.getAnchor()) == null)?"":t); 
+            value+= " "+ ( ((t=ent.getMoniker()) == null)?"":t ); 
+            value+= " "+ ( ((t=ent.getDescription()) == null)?"":t ); 
+            value+= " "+ ( ((t=ent.getBlurb()) == null)?"":t ); 
+    
+            value+= " " + classPublicNames; 
+    
+            List<DataPropertyStatement> dataPropertyStatements = ent.getDataPropertyStatements();
+            if (dataPropertyStatements != null) {
+                Iterator<DataPropertyStatement> dataPropertyStmtIter = dataPropertyStatements.iterator();
+                while (dataPropertyStmtIter.hasNext()) {
+                    DataPropertyStatement dataPropertyStmt =  dataPropertyStmtIter.next();
+                    value+= " "+ ( ((t=dataPropertyStmt.getData()) == null)?"":t );
+                }
+            }
+    
+            List<ObjectPropertyStatement> objectPropertyStatements = ent.getObjectPropertyStatements();
+            if (objectPropertyStatements != null) {
+                Iterator<ObjectPropertyStatement> objectPropertyStmtIter = objectPropertyStatements.iterator();
+                while (objectPropertyStmtIter.hasNext()) {
+                    ObjectPropertyStatement objectPropertyStmt = objectPropertyStmtIter.next();
+                    if( "http://www.w3.org/2002/07/owl#differentFrom".equals(objectPropertyStmt.getPropertyURI()) )
+                        continue;
+                    try {
+                        value+= " "+ ( ((t=objectPropertyStmt.getObject().getName()) == null)?"":t );                        
+                        if(ent.isVClass("http://xmlns.com/foaf/0.1/Person")){
+                        	//IndividualURIToObjectProperties.put(ent.getURI(), ( ((t=objectPropertyStmt.getProperty().getURI()) == null)?"":t ) );
+                        	objectProperties.add(( ((t=objectPropertyStmt.getProperty().getURI()) == null)?"":t ));
+                        }
+                        
+                    } catch (Exception e) { 
+                        log.debug("could not index name of related object: " + e.getMessage());
+                    }
+                }
+            }
+            
+        	log.debug("time to include data property statements, object property statements in the index: " + Long.toString(System.currentTimeMillis() - tPropertyStatements));
+            
+            doc.addField(term.ALLTEXT, value);
+            doc.addField(term.ALLTEXTUNSTEMMED, value);
+        }
+        
+        return doc;
+    }
+    
+//    public IndividualToSolrDocument(Entity2LuceneDoc e2d){
+////        entityToLucene = e2d;  
+//        luceneToSolr = new LuceneDocToSolrDoc();
+//    }
     
     @Override
     public boolean canTranslate(Object obj) {
@@ -34,14 +272,23 @@ public class IndividualToSolrDocument implements Obj2DocIface {
         throw new Error("IndiviudalToSolrDocument.getIndexId() is unimplemented");        
     }
 
-    @Override
-    public Object translate(Object obj) throws IndexingException {
-        return luceneToSolr.translate( entityToLucene.translate( obj ) );
-    }
+//    @Override
+//    public Object translate(Object obj) throws IndexingException {
+//        return luceneToSolr.translate( entityToLucene.translate( obj ) );
+//    }
 
     @Override
     public Object unTranslate(Object result) {
-        return luceneToSolr.unTranslate( result ); 
+        Individual ent = null;
+        if( result != null && result instanceof Document){
+            Document hit = (Document) result;
+            String id = hit.get(term.URI);
+            ent = new IndividualImpl();
+            ent.setURI(id);
+        }
+        return ent;
     }
 
+    public static float NAME_BOOST = 3.0F;
+    
 }
