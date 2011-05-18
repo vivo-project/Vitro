@@ -18,6 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.datatypes.TypeMapper;
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -25,6 +26,9 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
@@ -73,7 +77,10 @@ public class IndividualController extends FreemarkerHttpServlet {
         put("vitro", VitroVocabulary.vitroURI);
         put("vitroPublic", VitroVocabulary.VITRO_PUBLIC);
     }};
-    
+        
+	private static final Property extendedLinkedDataProperty = ResourceFactory.createProperty(namespaces.get("vitro") + "extendedLinkedData");
+	private static final Literal xsdTrue = ResourceFactory.createTypedLiteral("true", XSDDatatype.XSDboolean);
+	
     private static final String TEMPLATE_INDIVIDUAL_DEFAULT = "individual.ftl";
     private static final String TEMPLATE_HELP = "individual-help.ftl";
     private static Map<String,Float>qsMap;
@@ -329,8 +336,8 @@ public class IndividualController extends FreemarkerHttpServlet {
 			ontModel = (OntModel)session.getAttribute("jenaOntModel");		
 		if( ontModel == null)
 			ontModel = (OntModel)getServletContext().getAttribute("jenaOntModel");
-			
-		Model newModel = getRDF(individual, ontModel, ModelFactory.createDefaultModel(), 0);		
+					
+		Model newModel = getRDF(individual, ontModel, ModelFactory.createDefaultModel(),0);		
 		
 		return new RdfResponseValues(rdfFormat, newModel);
 	}
@@ -548,7 +555,6 @@ public class IndividualController extends FreemarkerHttpServlet {
 		return null;
 	}  
 	
-
 	@SuppressWarnings("unused")
 	private boolean checkForSunset(VitroRequest vreq, Individual entity) {
         // TODO Auto-generated method stub
@@ -591,11 +597,11 @@ public class IndividualController extends FreemarkerHttpServlet {
 		return "enabled".equals(property);
 	}
 
-    private Model getRDF(Individual entity, OntModel contextModel, Model newModel, int recurseDepth ) {
+    private Model getRDF(Individual entity, OntModel contextModel, Model newModel, int recurseDepth) {
+    	
     	Resource subj = newModel.getResource(entity.getURI());
     	
     	List<DataPropertyStatement> dstates = entity.getDataPropertyStatements();
-    	//System.out.println("data: "+dstates.size());
     	TypeMapper typeMapper = TypeMapper.getInstance();
     	for (DataPropertyStatement ds: dstates) {
     		Property dp = newModel.getProperty(ds.getDatapropURI());
@@ -610,22 +616,31 @@ public class IndividualController extends FreemarkerHttpServlet {
     		newModel.add(newModel.createStatement(subj, dp, lit));
     	}
     	
-    	if( recurseDepth < 5 ){
+    	if (recurseDepth < 5) {
 	    	List<ObjectPropertyStatement> ostates = entity.getObjectPropertyStatements();
+	    	
 	    	for (ObjectPropertyStatement os: ostates) {
 	    		ObjectProperty objProp = os.getProperty();
-	    		Property op = newModel.getProperty(os.getPropertyURI());
+	    		Property prop = newModel.getProperty(os.getPropertyURI());
 	    		Resource obj = newModel.getResource(os.getObjectURI());
-	    		newModel.add(newModel.createStatement(subj, op, obj));
-	    		if( objProp.getStubObjectRelation() )
+	    		newModel.add(newModel.createStatement(subj, prop, obj));
+	    		if ( includeInLinkedData(obj, contextModel)) {
 	    			newModel.add(getRDF(os.getObject(), contextModel, newModel, recurseDepth + 1));
+	    	    } else {
+	    	    	contextModel.enterCriticalSection(Lock.READ);
+	    			try {
+	    				newModel.add(contextModel.listStatements(obj, RDFS.label, (RDFNode)null));
+	    			} finally {
+	    				contextModel.leaveCriticalSection();
+	    			} 
+	    	    }
 	    	}
     	}
     	
     	newModel = getLabelAndTypes(entity, contextModel, newModel );
     	return newModel;
     }
-
+    
     /* Get the properties that are difficult to get via a filtered WebappDaoFactory. */
     private Model getLabelAndTypes(Individual entity, Model ontModel, Model newModel){
     	for( VClass vclass : entity.getVClasses()){
@@ -692,7 +707,27 @@ public class IndividualController extends FreemarkerHttpServlet {
         return qsMap;
     }
     
-//    static String getAcceptedContentType(String acceptHeader,Map<String,Float>qs){
-//        
-//    }
+    public static boolean includeInLinkedData(Resource object, Model contextModel) {
+ 
+       	boolean retval = false;
+       	
+       	contextModel.enterCriticalSection(Lock.READ);
+       	
+       	try {
+	    	StmtIterator iter = contextModel.listStatements(object, RDF.type, (RDFNode)null);
+	    	    	
+	    	while (iter.hasNext()) {
+	    		Statement stmt = iter.next();
+	    		
+	    		if (stmt.getObject().isResource() && contextModel.contains(stmt.getObject().asResource(), extendedLinkedDataProperty, xsdTrue)) {
+	    			retval = true;
+	    		    break;
+	    		}	
+	    	}
+       	} finally {
+       		contextModel.leaveCriticalSection();
+       	}
+    	   	
+    	return retval;
+    }    
 }
