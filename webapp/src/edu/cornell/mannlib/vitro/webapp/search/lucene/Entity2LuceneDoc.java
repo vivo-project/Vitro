@@ -27,7 +27,6 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.ContextNodesInclusionFactor
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.test.LuceneDocument;
 
 /**
  * This class expect that Entities passed to it will have
@@ -137,7 +136,6 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         String value;
         Document doc = new Document();
         String classPublicNames = "";
-        LuceneDocument document = new LuceneDocument();
         
         //DocId
         String id = ent.getURI();
@@ -180,14 +178,12 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
                 
                 Field typeField = new Field (term.RDFTYPE, clz.getURI(), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS);
                 doc.add( typeField);
-                document.setRDFTYPE(clz.getURI());
                 
                 if(clz.getLocalName() != null){
                 	Field classLocalName = new Field(term.CLASSLOCALNAME, clz.getLocalName(), Field.Store.YES, Field.Index.ANALYZED);
                 	Field classLocalNameLowerCase = new Field(term.CLASSLOCALNAMELOWERCASE, clz.getLocalName().toLowerCase(), Field.Store.YES, Field.Index.ANALYZED);
                 	doc.add(classLocalName);
                 	doc.add(classLocalNameLowerCase);
-                	document.setCLASSLOCALNAME(clz.getLocalName());
                 }
                 
                 if( clz.getName() != null )
@@ -199,28 +195,23 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
                             Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS);
                 //	classGroupField.setBoost(FIELD_BOOST);
                     doc.add(classGroupField);
-                    document.setCLASSGROUP_URI(clz.getGroupURI());
                 }
             }
         }        
         doc.add( new Field(term.PROHIBITED_FROM_TEXT_RESULTS, prohibited?"1":"0", 
                 Field.Store.NO,Field.Index.NOT_ANALYZED_NO_NORMS) );
-        document.setPROHIBITED_FROM_TEXT_RESULTS(prohibited?"1":"0");
         
         /* lucene DOCID */
         doc.add( new Field(term.DOCID, entClassName + id,
                             Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
-        document.setDOCID(entClassName + id);
         
         
         //vitro Id        
         doc.add(  new Field(term.URI, id, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));        
-        document.setURI(id);
         
         
         //java class
         doc.add( new  Field(term.JCLASS, entClassName, Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));
-        document.setJCLASS(entClassName);
         
         // Individual label      
         if( ent.getRdfsLabel() != null )
@@ -234,7 +225,6 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         Field nameRaw = new Field(term.NAME_RAW, value, Field.Store.YES, Field.Index.NOT_ANALYZED);
         nameRaw.setBoost(NAME_BOOST);
         doc.add(nameRaw);
-        document.setNAME(value);
         
         // RY Not sure if we need to store this. For Solr, see schema.xml field definition.
         Field nameLowerCase = new Field(term.NAME_LOWERCASE, value.toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED);
@@ -263,14 +253,12 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         
         Field contextNodeInformation = new Field(term.CONTEXTNODE, contextNodePropertyValues, Field.Store.YES, Field.Index.ANALYZED );
         doc.add(contextNodeInformation);
-        document.setCONTEXTNODE(contextNodePropertyValues);
         
         //Moniker
         
         if(ent.getMoniker() != null){
         	Field moniker = new Field(term.MONIKER, ent.getMoniker(), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS);
         	doc.add(moniker);
-        	document.setMONIKER(ent.getMoniker());
         }
         
         //boost for entity
@@ -313,45 +301,32 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         Object anon[] =  { new Long((new DateTime() ).getMillis())  };
         doc.add(  new Field(term.INDEXEDTIME, String.format( "%019d", anon ),
                             Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS));                 
-        document.setINDEXEDTIME(String.format("%019d", anon));
         
         
         if( ! prohibited ){
             //ALLTEXT, all of the 'full text'
-        	StringBuffer alltext = new StringBuffer();
-        	
             String t=null;
             value =""; 
             value+= " "+( ((t=ent.getName()) == null)?"":t );  
-            alltext.append("\t NAME: " + ( ((t=ent.getName()) == null)?"":t ));
             value+= " "+( ((t=ent.getAnchor()) == null)?"":t); 
-            alltext.append("\t ANCHOR: " + ( ((t=ent.getAnchor()) == null)?"":t));
             value+= " "+ ( ((t=ent.getMoniker()) == null)?"":t ); 
-            alltext.append("\t MONIKER: " + ( ((t=ent.getMoniker()) == null)?"":t ));
             value+= " "+ ( ((t=ent.getDescription()) == null)?"":t ); 
-            alltext.append("\t DESCRIPTION: " + ( ((t=ent.getDescription()) == null)?"":t ));
             value+= " "+ ( ((t=ent.getBlurb()) == null)?"":t ); 
-            alltext.append("\t BLURB: " + ( ((t=ent.getBlurb()) == null)?"":t ));
             value+= " "+ getKeyterms(ent); 
-            alltext.append("\t KEYTERMS: " + getKeyterms(ent));
     
             value+= " " + classPublicNames; 
-            alltext.append(" CLASSPUBLICNAMES: " + classPublicNames);
     
             List<DataPropertyStatement> dataPropertyStatements = ent.getDataPropertyStatements();
             if (dataPropertyStatements != null) {
-                alltext.append("\n DATA_PROPERTY_STATEMENTS \n -------------------------------- \n");
                 Iterator<DataPropertyStatement> dataPropertyStmtIter = dataPropertyStatements.iterator();
                 while (dataPropertyStmtIter.hasNext()) {
                     DataPropertyStatement dataPropertyStmt =  dataPropertyStmtIter.next();
                     value+= " "+ ( ((t=dataPropertyStmt.getData()) == null)?"":t );
-                    alltext.append("\n " + ( ((t=dataPropertyStmt.getData()) == null)?"":t ));
                 }
             }
     
             List<ObjectPropertyStatement> objectPropertyStatements = ent.getObjectPropertyStatements();
             if (objectPropertyStatements != null) {
-                alltext.append("\n OBJECT_PROPERTY_STATEMENTS \n -------------------------------- \n");
                 Iterator<ObjectPropertyStatement> objectPropertyStmtIter = objectPropertyStatements.iterator();
                 while (objectPropertyStmtIter.hasNext()) {
                     ObjectPropertyStatement objectPropertyStmt = objectPropertyStmtIter.next();
@@ -359,8 +334,6 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
                         continue;
                     try {
                         value+= " "+ ( ((t=objectPropertyStmt.getObject().getName()) == null)?"":t );
-                        alltext.append("\n " +( ((t=objectPropertyStmt.getProperty().getURI()) == null)?"":t )
-                        		+  " : " +  ( ((t=objectPropertyStmt.getObject().getName()) == null)?"":t ));
                         
                         if(ent.isVClass("http://xmlns.com/foaf/0.1/Person")){
                         	//IndividualURIToObjectProperties.put(ent.getURI(), ( ((t=objectPropertyStmt.getProperty().getURI()) == null)?"":t ) );
@@ -376,10 +349,8 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
             doc.add( new  Field(term.ALLTEXT, value , Field.Store.NO, Field.Index.ANALYZED));            
             //unstemmed terms
             doc.add( new Field(term.ALLTEXTUNSTEMMED, value, Field.Store.NO, Field.Index.ANALYZED));
-            document.setALLTEXT(alltext.toString());
         }
         
-        document.writeToLog();
         
        // log.info("\n IndividualURItoObjectProperties " + IndividualURIToObjectProperties.toString() + " \n\n");
         log.info(" \n Object Properties " + objectProperties.toString() + "\n\n");
