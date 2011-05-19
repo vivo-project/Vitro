@@ -638,6 +638,23 @@ public class IndividualController extends FreemarkerHttpServlet {
     	}
     	
     	newModel = getLabelAndTypes(entity, contextModel, newModel );
+    		
+    	// get all the statements not covered by the object property / datatype property code above
+    	// note implication that extendedLinkedData individuals will only be evaulated for the
+    	// recognized object properties.
+    	contextModel.enterCriticalSection(Lock.READ);
+		try {
+			StmtIterator iter = contextModel.listStatements(subj, (Property) null, (RDFNode) null);
+			while (iter.hasNext()) {
+				Statement stmt = iter.next();
+				if (!newModel.contains(stmt)) {
+				   newModel.add(stmt);
+				}
+			}  
+		} finally {
+			contextModel.leaveCriticalSection();
+		} 
+    	
     	return newModel;
     }
     
