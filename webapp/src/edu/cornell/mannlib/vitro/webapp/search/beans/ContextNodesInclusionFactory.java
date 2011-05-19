@@ -26,55 +26,66 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 public class ContextNodesInclusionFactory {
 
 	private OntModel fullModel;
-	private String contextNodeURI;
-	private String query = "";
+//	private String contextNodeURI;
+	//private String query = "";
 	
-	private static final String queryForEducationalTraining = "SELECT ?query WHERE {" +
-		"?searchConfig <"+ DisplayVocabulary.QUERY_FOR_EDUCATIONAL_TRAINING + "> ?query . }";				
+//	private static final String queryForEducationalTraining = "SELECT ?query WHERE {" +
+//		"?searchConfig <"+ DisplayVocabulary.QUERY_FOR_EDUCATIONAL_TRAINING + "> ?query . }";				
 				
 	private static Log log = LogFactory.getLog(ContextNodesInclusionFactory.class);
 	
 	public ContextNodesInclusionFactory(String contextNodeURI,
 			OntModel displayOntModel, ServletContext context) {
 		this.fullModel = ModelContext.getJenaOntModel(context);
-		this.contextNodeURI = contextNodeURI;
-		query = getQueryFromModel(contextNodeURI, displayOntModel);
+//		this.contextNodeURI = contextNodeURI;
+		//query = getQueryFromModel(contextNodeURI, displayOntModel);
 	}
-
-	private String getQueryFromModel(String uri, OntModel displayOntModel) {
-		
-		String resultQuery = "";
-		QuerySolutionMap initialBinding = new QuerySolutionMap();
-		Resource searchConfig = ResourceFactory.createResource(uri);
-		
-		initialBinding.add("searchConfig", searchConfig);
-		
-		Query query = QueryFactory.create(queryForEducationalTraining);
-		displayOntModel.enterCriticalSection(Lock.READ);
-		try{
-			QueryExecution qExec = QueryExecutionFactory.create(query, displayOntModel, initialBinding);
-			try{
-				ResultSet results = qExec.execSelect();
-				while(results.hasNext()){
-					QuerySolution soln = results.nextSolution();
-					Literal node = soln.getLiteral("query");
-					if(node.isLiteral()){
-						resultQuery = node.toString();
-					}else{
-						log.warn("unexpected literal in the object position for context node queries " + node.toString());
-					}
-				} 
-			}catch(Throwable t){
-				log.error(t,t);
-			} finally{
-				qExec.close();
-			} 
-		}finally{
-				displayOntModel.leaveCriticalSection();
-		}
-		
-		return resultQuery.substring(0, resultQuery.length() - 3);
-	}
+	
+	/*
+	 * bk392 : The original idea behind writing up this method was to check
+	 * if I can read the queries from search.n3, write them to the displayOntModel(during startup) and 
+	 * read them in this class.
+	 * 
+	 * Eventually, its going to be like that. All these hardcoded queries
+	 * will go into search.n3 and will be written into the display model.
+	 * ContextNodesInclusionFactors gets the queries out from the display Model
+	 * and fires them, gets the values, concatenates them and passes them back to
+	 * IndividualToSolrDoc.
+	 */
+//	private String getQueryFromModel(String uri, OntModel displayOntModel) {
+//		
+//		String resultQuery = "";
+//		QuerySolutionMap initialBinding = new QuerySolutionMap();
+//		Resource searchConfig = ResourceFactory.createResource(uri);
+//		
+//		initialBinding.add("searchConfig", searchConfig);
+//		
+//		Query query = QueryFactory.create(queryForEducationalTraining);
+//		displayOntModel.enterCriticalSection(Lock.READ);
+//		try{
+//			QueryExecution qExec = QueryExecutionFactory.create(query, displayOntModel, initialBinding);
+//			try{
+//				ResultSet results = qExec.execSelect();
+//				while(results.hasNext()){
+//					QuerySolution soln = results.nextSolution();
+//					Literal node = soln.getLiteral("query");
+//					if(node.isLiteral()){
+//						resultQuery = node.toString();
+//					}else{
+//						log.warn("unexpected literal in the object position for context node queries " + node.toString());
+//					}
+//				} 
+//			}catch(Throwable t){
+//				log.error(t,t);
+//			} finally{
+//				qExec.close();
+//			} 
+//		}finally{
+//				displayOntModel.leaveCriticalSection();
+//		}
+//		
+//		return resultQuery.substring(0, resultQuery.length() - 3);
+//	}
 	
 	
 //	public List<Field> getFieldValues(String uri, Model modelToQuery, List<String> queries){
