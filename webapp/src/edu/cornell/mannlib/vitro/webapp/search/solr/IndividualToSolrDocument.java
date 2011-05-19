@@ -9,10 +9,8 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
-import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.SolrInputField;
 import org.joda.time.DateTime;
 
 import com.hp.hpl.jena.vocabulary.OWL;
@@ -29,7 +27,6 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.ContextNodesInclusionFactor
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
 
 public class IndividualToSolrDocument implements Obj2DocIface {
     
@@ -47,7 +44,6 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     
     private ContextNodesInclusionFactory contextNodesInclusionFactory;
     
-    private static HashSet<String> objectProperties = new HashSet<String>();
     
         
     public IndividualToSolrDocument(ProhibitedFromSearch classesProhibitedFromSearch, 
@@ -58,7 +54,8 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     	this.contextNodesInclusionFactory = contextNodesInclusionFactory;
     }
     
-    @Override
+    @SuppressWarnings("static-access")
+	@Override
     public Object translate(Object obj) throws IndexingException{
     	long tProhibited = System.currentTimeMillis();
     	
@@ -232,11 +229,6 @@ public class IndividualToSolrDocument implements Obj2DocIface {
                         continue;
                     try {
                         value+= " "+ ( ((t=objectPropertyStmt.getObject().getName()) == null)?"":t );                        
-                        if(ent.isVClass("http://xmlns.com/foaf/0.1/Person")){
-                        	//IndividualURIToObjectProperties.put(ent.getURI(), ( ((t=objectPropertyStmt.getProperty().getURI()) == null)?"":t ) );
-                        	objectProperties.add(( ((t=objectPropertyStmt.getProperty().getURI()) == null)?"":t ));
-                        }
-                        
                     } catch (Exception e) { 
                         log.debug("could not index name of related object: " + e.getMessage());
                     }

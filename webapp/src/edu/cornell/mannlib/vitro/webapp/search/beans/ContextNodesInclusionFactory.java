@@ -26,7 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 public class ContextNodesInclusionFactory {
 
 	private OntModel fullModel;
-//	private String contextNodeURI;
+	private String contextNodeURI;
 	//private String query = "";
 	
 //	private static final String queryForEducationalTraining = "SELECT ?query WHERE {" +
@@ -37,7 +37,7 @@ public class ContextNodesInclusionFactory {
 	public ContextNodesInclusionFactory(String contextNodeURI,
 			OntModel displayOntModel, ServletContext context) {
 		this.fullModel = ModelContext.getJenaOntModel(context);
-//		this.contextNodeURI = contextNodeURI;
+		this.contextNodeURI = contextNodeURI;
 		//query = getQueryFromModel(contextNodeURI, displayOntModel);
 	}
 	
