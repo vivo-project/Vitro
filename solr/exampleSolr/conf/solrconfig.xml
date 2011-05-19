@@ -385,7 +385,10 @@
          be based on the last SolrCore to be initialized.
          
       -->
-    <maxBooleanClauses>1024</maxBooleanClauses>
+       -->
+    <!-- Increasing to handle large wildcard queries used in IndividualListController. 
+         See VIVO-384. -->
+    <maxBooleanClauses>50000</maxBooleanClauses>
 
 
     <!-- Solr Internal Query Caches
@@ -1393,7 +1396,45 @@
       </fragmentsBuilder>
     </highlighting>
   </searchComponent>
-
+<!-- Autocomplete -->
+  <!--
+  <searchComponent class="solr.SpellCheckComponent" name="suggest">
+    <lst name="spellchecker">
+      <str name="name">suggest</str>
+      <str name="classname">org.apache.solr.spelling.suggest.Suggester</str>
+      <str name="lookupImpl">org.apache.solr.spelling.suggest.tst.TSTLookup</str>
+      -->
+      <!-- Alternatives to lookupImpl: 
+        org.apache.solr.spelling.suggest.fst.FSTLookup   [finite state automaton]
+        org.apache.solr.spelling.suggest.jaspell.JaspellLookup [default, jaspell-based]
+        org.apache.solr.spelling.suggest.tst.TSTLookup   [ternary trees]
+      -->
+      <!-- the indexed field to derive suggestions from -->
+      <!--
+      <str name="field">nameLowercase</str> 
+      <float name="threshold">0.005</float>
+      <str name="buildOnCommit">false</str>
+      <str name="storeDir">suggest</str>
+      -->
+      <!--
+        <str name="sourceLocation">american-english</str>
+      -->
+  <!--
+    </lst>
+  </searchComponent>
+  <requestHandler class="org.apache.solr.handler.component.SearchHandler" name="/suggest">
+    <lst name="defaults">
+      <str name="spellcheck">true</str>
+      <str name="spellcheck.dictionary">suggest</str>
+      <str name="spellcheck.onlyMorePopular">false</str>
+      <str name="spellcheck.count">100</str>
+      <str name="spellcheck.collate">false</str>
+    </lst>
+    <arr name="components">
+      <str>suggest</str>
+    </arr>
+  </requestHandler>
+  -->
   <!-- Update Processors
 
        Chains of Update Processor Factories for dealing with Update

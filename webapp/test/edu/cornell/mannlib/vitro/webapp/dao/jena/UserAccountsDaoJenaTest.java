@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
@@ -46,6 +47,9 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 	private static final String URI_USER1 = NS_MINE + "user01";
 	private static final String URI_NO_SUCH_USER = NS_MINE + "bogusUser";
 
+	private static final String EMAIL_USER1 = "email@able.edu";
+	private static final String EMAIL_NO_SUCH_USER = NS_MINE + "bogus@email.com";
+	
 	private static final String URI_ROLE1 = NS_MINE + "role1";
 	private static final String URI_ROLE2 = NS_MINE + "role2";
 	private static final String URI_ROLE3 = NS_MINE + "role3";
@@ -98,6 +102,24 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 	public void getUserAccountByUriNotFound() {
 		UserAccount u = dao.getUserAccountByUri("bogusUri");
 		assertNull("null result", u);
+	}
+
+	@Test
+	public void getUserAccountByEmailSuccess() {
+		UserAccount u = dao.getUserAccountByEmail(EMAIL_USER1);
+		assertEquals("uri", URI_USER1, u.getUri());
+	}
+
+	@Test
+	public void getUserAccountByEmailNull() {
+		UserAccount u = dao.getUserAccountByEmail(null);
+		assertEquals("uri", null, u);
+	}
+
+	@Test
+	public void getUserAccountByEmailNotFound() {
+		UserAccount u = dao.getUserAccountByEmail(EMAIL_NO_SUCH_USER);
+		assertEquals("uri", null, u);
 	}
 
 	@Test

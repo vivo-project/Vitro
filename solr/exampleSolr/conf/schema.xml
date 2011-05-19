@@ -488,7 +488,8 @@
 <field name="nameLowercase" type="string" indexed="true" stored="true" multiValued="true"/>
 <field name="nameUnstemmed" type="text" indexed="true" stored="false" multiValued="true"/>
 <field name="nameStemmed" type="text" indexed="true" stored="false" multiValued="true"/>
-
+<field name="acNameUnstemmed" type="textUnstemmed" indexed="true" stored="false" multiValued="true"/>
+<field name="acNameStemmed" type="text" indexed="true" stored="false" multiValued="true"/>
 <field name="indexedTime" type="string" indexed="true" stored="true" multiValued="true"/>
 
 <field name="ALLTEXT" type="text" indexed="true" stored="false" multiValued="true"/>

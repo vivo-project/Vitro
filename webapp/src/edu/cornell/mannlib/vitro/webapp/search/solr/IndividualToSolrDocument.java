@@ -161,7 +161,7 @@ public class IndividualToSolrDocument implements Obj2DocIface {
         contextNodePropertyValues += contextNodesInclusionFactory.getPropertiesAssociatedWithPosition(ent.getURI());
         contextNodePropertyValues += contextNodesInclusionFactory.getPropertiesAssociatedWithRelationship(ent.getURI());
         contextNodePropertyValues += contextNodesInclusionFactory.getPropertiesAssociatedWithAwardReceipt(ent.getURI());
-        contextNodePropertyValues += contextNodesInclusionFactory.getPropertiesAssociatedWithInformationResource(ent.getURI());   
+        contextNodePropertyValues += contextNodesInclusionFactory.getPropertiesAssociatedWithInformationResource(ent.getURI()); 
         
         
         doc.addField(term.CONTEXTNODE, contextNodePropertyValues);

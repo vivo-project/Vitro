@@ -21,6 +21,14 @@ public interface UserAccountsDao {
 	UserAccount getUserAccountByUri(String uri);
 
 	/**
+	 * Get the UserAccount for this Email address.
+	 * 
+	 * @return null if the Email address is null, or if there is no such
+	 *         UserAccount
+	 */
+	UserAccount getUserAccountByEmail(String emailAddress);
+
+	/**
 	 * Create a new UserAccount in the model.
 	 * 
 	 * On entry, the URI of the UserAccount should be empty. On exit, the URI

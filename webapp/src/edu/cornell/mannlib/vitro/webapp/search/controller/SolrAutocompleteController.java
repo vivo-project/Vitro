@@ -13,15 +13,16 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.TermsResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.params.FacetParams;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -113,6 +114,7 @@ public class SolrAutocompleteController extends VitroAjaxController {
                 }
             }   
 
+            // Since SolrQuery.setSortField() is buggy, sort the results here
             Collections.sort(results);
             
             // map.put("results", results);
@@ -130,38 +132,43 @@ public class SolrAutocompleteController extends VitroAjaxController {
         }
     }
 
-    private SolrQuery getQuery(String querystr, VitroRequest vreq) {
+    private SolrQuery getQuery(String queryStr, VitroRequest vreq) {
        
-        if ( querystr == null) {
+        if ( queryStr == null) {
             log.error("There was no parameter '"+ PARAM_QUERY            
                 +"' in the request.");                
             return null;
-        } else if( querystr.length() > MAX_QUERY_LENGTH ) {
+        } else if( queryStr.length() > MAX_QUERY_LENGTH ) {
             log.debug("The search was too long. The maximum " +
                     "query length is " + MAX_QUERY_LENGTH );
             return null;
         }
                    
         SolrQuery query = new SolrQuery();
-        query = query.setStart(0);
-        query = query.setRows(DEFAULT_MAX_HIT_COUNT);  
+        query.setStart(0)
+             .setRows(DEFAULT_MAX_HIT_COUNT);  
         
-        query = setNameQuery(query, querystr, vreq);
+        setQuery(query, queryStr, vreq);
         
         // Filter by type
         String typeParam = (String) vreq.getParameter(PARAM_RDFTYPE);
         if (typeParam != null) {
-            query = query.addFilterQuery(VitroLuceneTermNames.RDFTYPE + ":\"" + typeParam + "\"");
+            query.addFilterQuery(VitroLuceneTermNames.RDFTYPE + ":\"" + typeParam + "\"");
         }   
         
-        // Set the fields to retrieve **** RY
-        // query = query.setFields( ... );
-
+        query.setFields(VitroLuceneTermNames.NAME_RAW, VitroLuceneTermNames.URI); // fields to retrieve
+             // Solr bug: generates sort=nameLowercase asc instead of sort=nameLowercase+asc
+             //.setSortField(VitroLuceneTermNames.NAME_LOWERCASE, SolrQuery.ORDER.asc);
+        
         return query;
     }
     
-    private SolrQuery setNameQuery(SolrQuery query, String querystr, HttpServletRequest request) {
+    private void setQuery(SolrQuery query, String queryStr, HttpServletRequest request) {
 
+        if (StringUtils.isBlank(queryStr)) {
+            log.error("No query string");
+        }
+        
         String tokenizeParam = (String) request.getParameter("tokenize"); 
         boolean tokenize = "true".equals(tokenizeParam);
         
@@ -169,19 +176,21 @@ public class SolrAutocompleteController extends VitroAjaxController {
         // query will not be stemmed. So we don't look at the stem parameter until we get to
         // setTokenizedNameQuery().
         if (tokenize) {
-            return setTokenizedNameQuery(query, querystr, request);
+            setTokenizedQuery(query, queryStr, request);
         } else {
-            return setUntokenizedNameQuery(query, querystr);
+            setUntokenizedQuery(query, queryStr);
         }
     }
     
-    private SolrQuery setTokenizedNameQuery(SolrQuery query, String querystr, HttpServletRequest request) {
+    private void setTokenizedQuery(SolrQuery query, String queryStr, HttpServletRequest request) {
+        
+        // RY 5/18/2011 For now, just doing untokenized query, due to the interactions of wildcard
+        // query and stemming described below. Need to find a way to do this in Solr.
+        // Should take the same approach if we can figure out how to do a disjunction.
  
-        String stemParam = (String) request.getParameter("stem"); 
-        boolean stem = "true".equals(stemParam);
-        String termName = stem ? VitroLuceneTermNames.AC_NAME_STEMMED : VitroLuceneTermNames.AC_NAME_UNSTEMMED  ;
-
-        BooleanQuery boolQuery = new BooleanQuery();
+//        String stemParam = (String) request.getParameter("stem"); 
+//        boolean stem = "true".equals(stemParam);
+//        String termName = stem ? VitroLuceneTermNames.AC_NAME_STEMMED : VitroLuceneTermNames.AC_NAME_UNSTEMMED  ;
         
 //        // Use the query parser to analyze the search term the same way the indexed text was analyzed.
 //        // For example, text is lowercased, and function words are stripped out.
@@ -190,7 +199,7 @@ public class SolrAutocompleteController extends VitroAjaxController {
 //        // The wildcard query doesn't play well with stemming. Query term name:tales* doesn't match
 //        // "tales", which is indexed as "tale", while query term name:tales does. Obviously we need 
 //        // the wildcard for name:tal*, so the only way to get them all to match is use a disjunction 
-//        // of wildcard and non-wildcard queries. The query will look have only an implicit disjunction
+//        // of wildcard and non-wildcard queries. The query will have only an implicit disjunction
 //        // operator: e.g., +(name:tales name:tales*)
 //        try {
 //            log.debug("Adding non-wildcard query for " + querystr);
@@ -210,20 +219,18 @@ public class SolrAutocompleteController extends VitroAjaxController {
 //            log.warn(e, e);
 //        }
        
-        return query;
+        setUntokenizedQuery(query, queryStr);
     }
 
-    private SolrQuery setUntokenizedNameQuery(SolrQuery query, String querystr) {
+    private void setUntokenizedQuery(SolrQuery query, String queryStr) {
         
-        // Using facet method described in http://solr.pl/en/2010/10/18/solr-and-autocomplete-part-1/
-        // Consider using Solr Suggester in a future version.
-        return query.setFacet(true)
-                    .addFacetField(VitroLuceneTermNames.NAME_LOWERCASE)
-                    .setFacetMinCount(1)
-                    .setFacetLimit(MAX_QUERY_LENGTH)
-                    .setFacetPrefix(querystr)//.toLowerCase())
-                    //.setFacetSort(FacetParams.FACET_SORT_INDEX) // sort by alpha (but doesn't work)
-                    .setQuery("*:*");
+        // We have to lowercase manually, because Solr doesn't do text analysis on wildcard queries
+        queryStr = queryStr.toLowerCase();
+        // Solr wants whitespace to be escaped with a backslash
+        // Better: replace \s+
+        queryStr = queryStr.replaceAll(" ", "\\\\ ");
+        queryStr = VitroLuceneTermNames.NAME_LOWERCASE + ":" + queryStr + "*";
+        query.setQuery(queryStr);
 
     }
             
