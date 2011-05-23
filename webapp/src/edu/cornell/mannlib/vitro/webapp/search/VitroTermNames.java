@@ -54,4 +54,7 @@ public class VitroTermNames {
     
     /** rdfs:label lowercased, tokenized, stop words, stemmed **/
     public static String NAME_STEMMED = "nameStemmed"; // was NAME
+    
+    /** field for beta values of all documents **/
+    public static final String BETA = "BETA";
 }

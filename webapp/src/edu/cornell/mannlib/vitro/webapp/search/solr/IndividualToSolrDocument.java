@@ -13,6 +13,10 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.joda.time.DateTime;
 
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
@@ -23,7 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.VitroTermNames;
-import edu.cornell.mannlib.vitro.webapp.search.beans.ContextNodesInclusionFactory;
+import edu.cornell.mannlib.vitro.webapp.search.beans.SearchQueryHandler;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
@@ -42,16 +46,16 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     
     private IndividualProhibitedFromSearch individualProhibitedFromSearch;
     
-    private ContextNodesInclusionFactory contextNodesInclusionFactory;
+    private SearchQueryHandler searchQueryHandler;
     
     
         
     public IndividualToSolrDocument(ProhibitedFromSearch classesProhibitedFromSearch, 
     		IndividualProhibitedFromSearch individualProhibitedFromSearch,
-    			ContextNodesInclusionFactory contextNodesInclusionFactory){
+    			SearchQueryHandler searchQueryHandler){
     	this.classesProhibitedFromSearch = classesProhibitedFromSearch;
     	this.individualProhibitedFromSearch = individualProhibitedFromSearch;
-    	this.contextNodesInclusionFactory = contextNodesInclusionFactory;
+    	this.searchQueryHandler = searchQueryHandler;
     }
     
     @SuppressWarnings("static-access")
@@ -156,12 +160,12 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     	long tContextNodes = System.currentTimeMillis();
     	
     	String contextNodePropertyValues = "";
-    	contextNodePropertyValues += contextNodesInclusionFactory.getPropertiesAssociatedWithEducationalTraining(ent.getURI());
-        contextNodePropertyValues += contextNodesInclusionFactory.getPropertiesAssociatedWithRole(ent.getURI());
-        contextNodePropertyValues += contextNodesInclusionFactory.getPropertiesAssociatedWithPosition(ent.getURI());
-        contextNodePropertyValues += contextNodesInclusionFactory.getPropertiesAssociatedWithRelationship(ent.getURI());
-        contextNodePropertyValues += contextNodesInclusionFactory.getPropertiesAssociatedWithAwardReceipt(ent.getURI());
-        contextNodePropertyValues += contextNodesInclusionFactory.getPropertiesAssociatedWithInformationResource(ent.getURI()); 
+    	contextNodePropertyValues += searchQueryHandler.getPropertiesAssociatedWithEducationalTraining(ent.getURI());
+        contextNodePropertyValues += searchQueryHandler.getPropertiesAssociatedWithRole(ent.getURI());
+        contextNodePropertyValues += searchQueryHandler.getPropertiesAssociatedWithPosition(ent.getURI());
+        contextNodePropertyValues += searchQueryHandler.getPropertiesAssociatedWithRelationship(ent.getURI());
+        contextNodePropertyValues += searchQueryHandler.getPropertiesAssociatedWithAwardReceipt(ent.getURI());
+        contextNodePropertyValues += searchQueryHandler.getPropertiesAssociatedWithInformationResource(ent.getURI()); 
         
         
         doc.addField(term.CONTEXTNODE, contextNodePropertyValues);
@@ -237,8 +241,8 @@ public class IndividualToSolrDocument implements Obj2DocIface {
             
         	log.debug("time to include data property statements, object property statements in the index: " + Long.toString(System.currentTimeMillis() - tPropertyStatements));
             
-            doc.addField(term.ALLTEXT, value);
-            doc.addField(term.ALLTEXTUNSTEMMED, value);
+            doc.addField(term.ALLTEXT, value,ALL_TEXT_BOOST);
+            doc.addField(term.ALLTEXTUNSTEMMED, value,ALL_TEXT_BOOST);
         }
         
         return doc;
@@ -282,5 +286,6 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     }
 
     public static float NAME_BOOST = 3.0F;
+    public static float ALL_TEXT_BOOST = 2.0F;
     
 }

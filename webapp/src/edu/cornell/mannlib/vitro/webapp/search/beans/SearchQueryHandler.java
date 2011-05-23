@@ -15,15 +15,17 @@ import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 
-public class ContextNodesInclusionFactory {
+public class SearchQueryHandler {
 
 	private OntModel fullModel;
 	private String contextNodeURI;
@@ -32,9 +34,9 @@ public class ContextNodesInclusionFactory {
 //	private static final String queryForEducationalTraining = "SELECT ?query WHERE {" +
 //		"?searchConfig <"+ DisplayVocabulary.QUERY_FOR_EDUCATIONAL_TRAINING + "> ?query . }";				
 				
-	private static Log log = LogFactory.getLog(ContextNodesInclusionFactory.class);
+	private static Log log = LogFactory.getLog(SearchQueryHandler.class);
 	
-	public ContextNodesInclusionFactory(String contextNodeURI,
+	public SearchQueryHandler(String contextNodeURI,
 			OntModel displayOntModel, ServletContext context) {
 		this.fullModel = ModelContext.getJenaOntModel(context);
 		this.contextNodeURI = contextNodeURI;
@@ -643,6 +645,22 @@ public class ContextNodesInclusionFactory {
 		
 	}
 	 
-	 
-
+	private int getTotalIndividuals(){
+		return fullModel.listIndividuals().toList().size();
+	}
+	
+	public float calculateBeta(String uri){
+		float beta=0;
+		RDFNode node = (Resource) fullModel.getResource(uri); 
+		StmtIterator stmtItr = fullModel.listStatements((Resource)null, (Property)null,node);
+		 int Conn = 0;
+	        while(stmtItr.hasNext()){
+	        	stmtItr.next();
+	        	Conn++;
+	        }
+	        
+	        beta = (float)Conn/getTotalIndividuals();
+	        beta += 1;
+		return beta; 
+	}
 }

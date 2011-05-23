@@ -23,7 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
-import edu.cornell.mannlib.vitro.webapp.search.beans.ContextNodesInclusionFactory;
+import edu.cornell.mannlib.vitro.webapp.search.beans.SearchQueryHandler;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
@@ -110,7 +110,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
     
     private IndividualProhibitedFromSearch individualProhibited;
 
-	private ContextNodesInclusionFactory contextNodesInclusionFactory;
+	private SearchQueryHandler searchQueryHandler;
     
     private static HashMap<String, String> IndividualURIToObjectProperties = new HashMap<String, String>();
     
@@ -118,10 +118,10 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
     
     public Entity2LuceneDoc(
             ProhibitedFromSearch classesProhibitedFromSearch, 
-            IndividualProhibitedFromSearch individualProhibited, ContextNodesInclusionFactory contextNodesInclusionFactory){
+            IndividualProhibitedFromSearch individualProhibited, SearchQueryHandler searchQueryHandler){
         this.classesProhibitedFromSearch = classesProhibitedFromSearch;
         this.individualProhibited = individualProhibited;
-        this.contextNodesInclusionFactory = contextNodesInclusionFactory;
+        this.searchQueryHandler = searchQueryHandler;
     }
     
     public boolean canTranslate(Object obj) {    	
@@ -242,12 +242,12 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         String contextNodePropertyValues;
         
 //        if(ent.isVClass("http://xmlns.com/foaf/0.1/Person")){
-        contextNodePropertyValues = contextNodesInclusionFactory.getPropertiesAssociatedWithEducationalTraining(ent.getURI());
-        contextNodePropertyValues += contextNodesInclusionFactory.getPropertiesAssociatedWithRole(ent.getURI());
-        contextNodePropertyValues += contextNodesInclusionFactory.getPropertiesAssociatedWithPosition(ent.getURI());
-        contextNodePropertyValues += contextNodesInclusionFactory.getPropertiesAssociatedWithRelationship(ent.getURI());
-        contextNodePropertyValues += contextNodesInclusionFactory.getPropertiesAssociatedWithAwardReceipt(ent.getURI());
-        contextNodePropertyValues += contextNodesInclusionFactory.getPropertiesAssociatedWithInformationResource(ent.getURI());        
+        contextNodePropertyValues = searchQueryHandler.getPropertiesAssociatedWithEducationalTraining(ent.getURI());
+        contextNodePropertyValues += searchQueryHandler.getPropertiesAssociatedWithRole(ent.getURI());
+        contextNodePropertyValues += searchQueryHandler.getPropertiesAssociatedWithPosition(ent.getURI());
+        contextNodePropertyValues += searchQueryHandler.getPropertiesAssociatedWithRelationship(ent.getURI());
+        contextNodePropertyValues += searchQueryHandler.getPropertiesAssociatedWithAwardReceipt(ent.getURI());
+        contextNodePropertyValues += searchQueryHandler.getPropertiesAssociatedWithInformationResource(ent.getURI());        
 
 //        }
         
