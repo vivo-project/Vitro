@@ -7,7 +7,9 @@ import java.util.Collection;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
 /**
- * TODO
+ * TODO delete and kick to Accounts list with message, telling how many were
+ * deleted. If there was a problem, the user will need to infer it from the
+ * count??
  */
 public class UserAccountsDeleter extends UserAccountsPage {
 
@@ -16,12 +18,13 @@ public class UserAccountsDeleter extends UserAccountsPage {
 	}
 
 	/**
-	 * @return 
+	 * @return
 	 * 
 	 */
 	public Collection<String> delete() {
 		// TODO Auto-generated method stub
-		throw new RuntimeException("UserAccountsDeleter.delete() not implemented.");
+		throw new RuntimeException(
+				"UserAccountsDeleter.delete() not implemented.");
 	}
 
 }
