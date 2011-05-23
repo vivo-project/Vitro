@@ -15,9 +15,7 @@ import javax.servlet.ServletException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.search.ScoreDoc;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -180,7 +178,7 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
         SolrServer solr = SolrSetup.getSolrServer(context);
         QueryResponse response = null;
         
-        // Execute lucene query for individuals of the specified type
+        // Execute query for individuals of the specified type
         try {
             response = solr.query(query);            
         } catch (Throwable t) {
@@ -197,19 +195,19 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
             throw new ServletException("Could not run search in IndividualListController");    
         }
 
-         // get list of individuals for the search results
-         long size = docs.getNumFound();
-         log.debug("Number of search results: " + size);
+        // get list of individuals for the search results
+        long size = docs.getNumFound();
+        log.debug("Number of search results: " + size);
 
-         List<Individual> individuals = new ArrayList<Individual>((int)size); 
-         for (SolrDocument doc : docs) {
-             String uri = doc.get(VitroLuceneTermNames.URI).toString();
-             Individual individual = indDao.getIndividualByURI( uri ); 
-             if (individual != null) {
-                 individuals.add(individual);
-             }
-         }
-         
+        List<Individual> individuals = new ArrayList<Individual>(); 
+        for (SolrDocument doc : docs) {
+            String uri = doc.get(VitroLuceneTermNames.URI).toString();
+            Individual individual = indDao.getIndividualByURI( uri ); 
+            if (individual != null) {
+                individuals.add(individual);
+            }
+        }
+        
         rvMap.put("count", size);
          
         if( size > INDIVIDUALS_PER_PAGE ){
@@ -245,7 +243,8 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
 
         int start = (page-1)*INDIVIDUALS_PER_PAGE;
         query.setStart(start)
-             .setRows(INDIVIDUALS_PER_PAGE);
+             .setRows(INDIVIDUALS_PER_PAGE)
+             .setSortField("nameLowercaseSingleValued", SolrQuery.ORDER.asc);
         
         log.debug("Query: " + query);
         return query;  
@@ -314,5 +313,4 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
             return selected;
         }
     }
-     
 }

@@ -114,7 +114,6 @@ public class SolrAutocompleteController extends VitroAjaxController {
                 }
             }   
 
-            // Since SolrQuery.setSortField() is buggy, sort the results here
             Collections.sort(results);
             
             // map.put("results", results);
@@ -157,8 +156,9 @@ public class SolrAutocompleteController extends VitroAjaxController {
         }   
         
         query.setFields(VitroLuceneTermNames.NAME_RAW, VitroLuceneTermNames.URI); // fields to retrieve
-             // Solr bug: generates sort=nameLowercase asc instead of sort=nameLowercase+asc
-             //.setSortField(VitroLuceneTermNames.NAME_LOWERCASE, SolrQuery.ORDER.asc);
+       
+        // Can't sort on multivalued field, so sort results in Java when we get them
+        // query.setSortField(VitroLuceneTermNames.NAME_LOWERCASE, SolrQuery.ORDER.asc);
         
         return query;
     }

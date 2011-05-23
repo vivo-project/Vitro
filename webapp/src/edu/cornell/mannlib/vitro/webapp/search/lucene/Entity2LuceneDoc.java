@@ -80,6 +80,10 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         /** rdfs:label lowercased, no tokenizing, no stop words, no stemming **/
         public static String NAME_LOWERCASE = "nameLowercase"; // was NAMELOWERCASE
         
+        /** Same as NAME_LOWERCASE, but single-valued so it's sortable. **/
+        // RY Need to control how indexing selects which of multiple values to copy. 
+        public static String NAME_LOWERCASE_SINGLE_VALUED = "nameLowercaseSingleValued";
+        
         /** rdfs:label lowercased, tokenized, stop words, no stemming.
          *  Used for autocomplete matching on proper names. **/
         public static String AC_NAME_UNSTEMMED = "acNameUnstemmed"; // was NAMEUNSTEMMED        

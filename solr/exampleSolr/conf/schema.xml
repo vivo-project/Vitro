@@ -483,6 +483,8 @@
     <field name="nameRaw" type="string" indexed="false" stored="true" multiValued="true"/>
     <!-- RY Not sure if we need to store nameLowercase. Is it ever displayed? -->
     <field name="nameLowercase" type="lowercase" indexed="true" stored="true" multiValued="true"/>
+    <!-- A sortable version of nameLowercase -->
+    <field name="nameLowercaseSingleValued" type="lowercase" indexed="true" stored="false" multiValued="false" /> 
     <field name="acNameUnstemmed" type="textUnstemmed" indexed="true" stored="false" multiValued="true"/>
     <field name="acNameStemmed" type="text" indexed="true" stored="false" multiValued="true"/>
     <field name="indexedTime" type="string" indexed="true" stored="true" multiValued="true"/>
@@ -495,6 +497,8 @@
     <field name="modType" type="ignored"/>
     <field name="JCLASS" type="ignored"/>
 
+    <!-- Copy nameLowercase to sortable field. -->
+    <copyField source="nameLowercase" dest="nameLowercaseSingleValued" />
    
     <!-- ****************************  End Vitro Fields *************************** -->
 
