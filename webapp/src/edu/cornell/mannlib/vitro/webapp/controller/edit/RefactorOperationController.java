@@ -21,6 +21,11 @@ import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.ontology.OntResource;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -45,7 +50,10 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.FileGraphSetup;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 public class RefactorOperationController extends BaseEditController {
 	
@@ -68,17 +76,7 @@ public class RefactorOperationController extends BaseEditController {
 		OntModel ontModel = (OntModel) getServletContext().getAttribute("baseOntModel");
 		ontModel.enterCriticalSection(Lock.WRITE);
 		ArrayList<String> results = new ArrayList<String>();
-		
-		/* Debugging code thats inserts invalid triples into model
-		Property hasTitle = ontModel.getProperty("http://www.owl-ontologies.com/Ontology1209425965.owl#hasTitleee");
-		Resource product = ontModel.createResource("http://www.owl-ontologies.com/Ontology1209425965.owl#someBook14");
-		Resource product2 = ontModel.createResource("http://www.owl-ontologies.com/Ontology1209425965.owl#someBook15");
-		Literal illegalLiteral = ontModel.createTypedLiteral(134);
-		Literal illegalLiteral2 = ontModel.createTypedLiteral(234);
-		ontModel.add(product, hasTitle, illegalLiteral);
-		ontModel.add(product2, hasTitle, illegalLiteral2);
-		*/
-		
+				
 		try
 		{
 			ExtendedIterator dataProperties = ontModel.listDatatypeProperties();
@@ -180,12 +178,10 @@ public class RefactorOperationController extends BaseEditController {
 
 		return "";
 	}
-
+	
 	private String doRenameResource(VitroRequest request, HttpServletResponse response, EditProcessObject epo) {
+		
 		String userURI = LoginStatusBean.getBean(request).getUserURI();
-		
-		OntModel ontModel = (OntModel) getServletContext().getAttribute("baseOntModel");
-		
 		String oldURIStr = (String) epo.getAttribute("oldURI");
 		String newURIStr = request.getParameter("newURI");
 			
@@ -213,40 +209,44 @@ public class RefactorOperationController extends BaseEditController {
             }
             return "STOP";
 		}
-			
-		ontModel.enterCriticalSection(Lock.WRITE);
-		ontModel.getBaseModel().notifyEvent(new EditEvent(userURI,true));
-		try {
-			Property prop = ontModel.getProperty(oldURIStr);
-			if(prop != null)
-			{
-				try {
-					Property newProp = ontModel.createProperty(newURIStr);
-					StmtIterator statements = ontModel.listStatements(null, prop, (RDFNode)null);
-					try {
-						while(statements.hasNext()) {
-							Statement statement = (Statement)statements.next();
-							Resource subj = statement.getSubject();
-							RDFNode obj = statement.getObject();
-							Statement newStatement = ontModel.createStatement(subj, newProp, obj);
-							ontModel.add(newStatement);
-						}
-					} finally {
-						if (statements != null) {
-							statements.close();
-						}
-					}
-					ontModel.remove(ontModel.listStatements(null, prop, (RDFNode)null));
-				} catch (InvalidPropertyURIException ipue) {
-					/* if it can't be a property, don't bother with predicates */ 
-				}			
-				Resource res = ontModel.getResource(oldURIStr);
-				ResourceUtils.renameResource(res,newURIStr);
-			}
-		} finally {
-			ontModel.getBaseModel().notifyEvent(new EditEvent(userURI,false));
-			ontModel.leaveCriticalSection();
-		}
+		
+		// find the models that the resource is referred to in and change
+		// the name in each of those models.		
+		String queryStr = "SELECT distinct ?graph WHERE {{ GRAPH ?graph { ?subj <" +  oldURIStr  + "> ?obj }} ";
+		queryStr += " union { GRAPH ?graph { <" + oldURIStr + "> ?prop ?obj }} ";
+		queryStr += " union { GRAPH ?graph { ?subj ?prop <" +  oldURIStr  + ">}}}";
+		Dataset dataset = request.getDataset();
+		
+    	dataset.getLock().enterCriticalSection(Lock.READ);
+    	try {
+    		ResultSet resultSet = QueryExecutionFactory.create(QueryFactory.create(queryStr), dataset).execSelect();
+    		
+    		while (resultSet.hasNext()) {
+    			QuerySolution qs = resultSet.next();
+    			String graphURI = qs.get("graph").asNode().toString();
+    			
+    			if (graphURI.startsWith(FileGraphSetup.FILEGRAPH_URI_ROOT)) {
+    			   continue;	
+    			}
+    			
+    			boolean doNotify = false;
+    			Model model = null;
+    			
+    			if (JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL.equals(graphURI)) {
+    				model = ModelContext.getBaseOntModelSelector(getServletContext()).getTBoxModel();
+    				doNotify = true;
+    			} else if (JenaDataSourceSetupBase.JENA_DB_MODEL.equals(graphURI)) {
+					model = ModelContext.getBaseOntModelSelector(getServletContext()).getABoxModel();
+					doNotify = true;
+    			} else {
+    			    model = dataset.getNamedModel(graphURI);
+    		    }
+    			
+    			renameResourceInModel(model, userURI, oldURIStr, newURIStr, doNotify);
+    		}	
+    	} finally {
+    		dataset.getLock().leaveCriticalSection();
+    	}
 		
 		// there are no statements to delete, but we want indexes updated appropriately
 		request.getFullWebappDaoFactory().getIndividualDao().deleteIndividual(oldURIStr);
@@ -273,6 +273,50 @@ public class RefactorOperationController extends BaseEditController {
 		
 		return redirectStr;
 		
+	}
+	
+	private void renameResourceInModel(Model model, String userURI, String oldURIStr, String newURIStr, boolean doNotify) {
+				
+		model.enterCriticalSection(Lock.WRITE);
+		
+		if (doNotify) {
+		   model.notifyEvent(new EditEvent(userURI,true));
+		}
+		
+		try {
+			Property prop = model.getProperty(oldURIStr); // this will create a resource if there isn't
+			                                              // one by this URI (we don't expect this to happen
+			                                              // and will also return a resource if the given
+			                                              // URI is the URI of a class.
+			try {
+				Property newProp = model.createProperty(newURIStr);
+				StmtIterator statements = model.listStatements(null, prop, (RDFNode)null);
+				try {
+					while(statements.hasNext()) {
+						Statement statement = (Statement)statements.next();
+						Resource subj = statement.getSubject();
+						RDFNode obj = statement.getObject();
+						Statement newStatement = model.createStatement(subj, newProp, obj);
+						model.add(newStatement);
+					}
+				} finally {
+					if (statements != null) {
+						statements.close();
+					}
+				}
+				model.remove(model.listStatements(null, prop, (RDFNode)null));
+			} catch (InvalidPropertyURIException ipue) {
+				/* if it can't be a property, don't bother with predicates */ 
+			}			
+			Resource res = model.getResource(oldURIStr);
+			ResourceUtils.renameResource(res,newURIStr);
+			
+		} finally {
+			if (doNotify) {
+			   model.notifyEvent(new EditEvent(userURI,false));
+			}
+			model.leaveCriticalSection();
+		}		
 	}
 	
 	private void doMovePropertyStatements(VitroRequest request, HttpServletResponse response, EditProcessObject epo) {
