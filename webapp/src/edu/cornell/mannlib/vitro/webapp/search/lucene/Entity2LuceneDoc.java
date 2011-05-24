@@ -86,11 +86,11 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         
         /** rdfs:label lowercased, tokenized, stop words, no stemming.
          *  Used for autocomplete matching on proper names. **/
-        public static String AC_NAME_UNSTEMMED = "acNameUnstemmed"; // was NAMEUNSTEMMED        
+        public static String NAME_UNSTEMMED = "nameUnstemmed"; // was NAMEUNSTEMMED        
         
         /** rdfs:label lowercased, tokenized, stop words, stemmed.
          *  Used for autocomplete matching where stemming is desired (e.g., book titles)  **/
-        public static String AC_NAME_STEMMED = "acNameStemmed"; // was NAME
+        public static String NAME_STEMMED = "nameStemmed"; // was NAME
      
     }
 
@@ -222,11 +222,11 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         nameLowerCase.setBoost(NAME_BOOST);
         doc.add(nameLowerCase);
         
-        Field nameUnstemmed = new Field(term.AC_NAME_UNSTEMMED, value, Field.Store.NO, Field.Index.ANALYZED);
+        Field nameUnstemmed = new Field(term.NAME_UNSTEMMED, value, Field.Store.NO, Field.Index.ANALYZED);
         nameUnstemmed.setBoost(NAME_BOOST);
         doc.add(nameUnstemmed);
         
-        Field nameStemmed = new Field(term.AC_NAME_STEMMED, value, Field.Store.NO, Field.Index.ANALYZED);
+        Field nameStemmed = new Field(term.NAME_STEMMED, value, Field.Store.NO, Field.Index.ANALYZED);
         nameStemmed.setBoost(NAME_BOOST);
         doc.add(nameStemmed);        
         
