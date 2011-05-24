@@ -13,7 +13,14 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 
 /**
- * TODO
+ * Handle the "Add new account" form display and submission.
+ * 
+ * TODO Associate a profile from this account
+ * 
+ * TODO Handle sending of email.
+ * 
+ * TODO Handle initial password set if email isn't available. Set password
+ * fields, change-required flag, account is active.
  */
 public class UserAccountsAddPage extends UserAccountsPage {
 	private static final String PARAMETER_SUBMIT = "submitAdd";
@@ -143,6 +150,22 @@ public class UserAccountsAddPage extends UserAccountsPage {
 		}
 
 		return new TemplateResponseValues(TEMPLATE_NAME, body);
+	}
+
+	/**
+	 * @return
+	 */
+	public UserAccount getAddedAccount() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("UserAccountsAddPage.getAddedAccount() not implemented.");
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean wasPasswordEmailSent() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("UserAccountsAddPage.wasPasswordEmailSent() not implemented.");
 	}
 
 }

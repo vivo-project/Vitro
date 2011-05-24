@@ -27,6 +27,11 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 
 /**
  * Handle the List page.
+ * 
+ * TODO: agree with Manolo how to do the column heads as links that change the
+ * sort order
+ * 
+ * TODO: auto-complete
  */
 public class UserAccountsListPage extends UserAccountsPage {
 	private static final Log log = LogFactory
@@ -87,7 +92,8 @@ public class UserAccountsListPage extends UserAccountsPage {
 	/**
 	 * We just came from adding a new account. Show the list with a message.
 	 */
-	public ResponseValues showPageWithNewAccount(UserAccount userAccount) {
+	public ResponseValues showPageWithNewAccount(UserAccount userAccount,
+			boolean emailWasSent) {
 		UserAccountsSelection selection = UserAccountsSelector.select(
 				userAccountsModel, criteria);
 		Map<String, Object> body = buildTemplateBodyMap(selection);
@@ -96,6 +102,15 @@ public class UserAccountsListPage extends UserAccountsPage {
 				Collections.<String> emptyList()));
 
 		return new TemplateResponseValues(TEMPLATE_NAME, body);
+	}
+
+	/**
+	 * We just came from editing an account. Show the list with a message.
+	 */
+	public ResponseValues showPageWithUpdatedAccount(UserAccount userAccount,
+			boolean emailWasSent) {
+		throw new RuntimeException(
+				"UserAccountsListPage.showPageWithUpdatedAccount not implemented.");
 	}
 
 	/**

@@ -233,7 +233,7 @@ public class JSONServlet extends VitroHttpServlet {
             rObj.put("alpha", map.get("alpha"));
                             
             List<Individual> inds = (List<Individual>)map.get("entities");
-            List<IndividualTemplateModel> indsTm = new ArrayList<IndividualTemplateModel>();
+
             JSONArray jInds = new JSONArray();
             for(Individual ind : inds ){
                 JSONObject jo = new JSONObject();

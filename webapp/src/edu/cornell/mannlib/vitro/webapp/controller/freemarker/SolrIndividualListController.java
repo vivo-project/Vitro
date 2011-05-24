@@ -15,18 +15,12 @@ import javax.servlet.ServletException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.PrefixQuery;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TopDocs;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -36,8 +30,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Exc
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
+import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames;
+import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividualTemplateModel;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.TemplateModel;
@@ -62,7 +56,6 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
         String templateName = TEMPLATE_DEFAULT;
         Map<String, Object> body = new HashMap<String, Object>();
         String errorMessage = null;
-        String message = null;
         
         try {
             Object obj = vreq.getAttribute("vclass");
@@ -78,7 +71,7 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
                             errorMessage = "Class " + vitroClassIdStr + " not found";
                         }
                     } catch (Exception ex) {
-                        throw new HelpException("IndividualListController: request parameter 'vclassId' must be a URI string.");
+                        throw new HelpException("IndividualListController: url parameter 'vclassId' must be a URI string.");
                     }
                 }
             } else if (obj instanceof VClass) {
@@ -101,14 +94,16 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
                         getServletContext());                                
                 body.putAll(map);
 
+                @SuppressWarnings("unchecked")
                 List<Individual> inds = (List<Individual>)map.get("entities");
                 List<ListedIndividualTemplateModel> indsTm = new ArrayList<ListedIndividualTemplateModel>();
-                for(Individual ind : inds ){
+                for ( Individual ind : inds ) {
                     indsTm.add(new ListedIndividualTemplateModel(ind,vreq));
                 }
                 body.put("individuals", indsTm);
                 
                 List<TemplateModel> wpages = new ArrayList<TemplateModel>();
+                @SuppressWarnings("unchecked")
                 List<PageRecord> pages = (List<PageRecord>)body.get("pages");
                 BeansWrapper wrapper = new BeansWrapper();
                 for( PageRecord pr: pages ){
@@ -125,10 +120,10 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
                     body.put("subtitle", vclass.getName());
                 }
                 body.put("title", title);  
-                body.put("redirecturl", vreq.getContextPath()+"/entityurl/");
+                body.put("rdfUrl", vreq.getContextPath() + "/listrdf/" + vclass.getLocalName() + ".rdf");
                 getServletContext().setAttribute("classuri", vclass.getURI());
             }   
-            
+
         } catch (HelpException help){
             errorMessage = "Request attribute 'vclass' or request parameter 'vclassId' must be set before calling. Its value must be a class uri."; 
         } catch (Throwable e) {
@@ -138,10 +133,8 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
         if (errorMessage != null) {
             templateName = Template.ERROR_MESSAGE.toString();
             body.put("errorMessage", errorMessage);
-        } else if (message != null) {
-            body.put("message", message);
         }
-    
+        
         return new TemplateResponseValues(templateName, body);
     }
       
@@ -175,163 +168,148 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
      * This method is now called in a couple of places.  It should be refactored
      * into a DAO or similar object.
      */
-     public static Map<String,Object> getResultsForVClass(String vclassURI, int page, String alpha, IndividualDao indDao, ServletContext context) 
-     throws CorruptIndexException, IOException, ServletException{
-         Map<String,Object> rvMap = new HashMap<String,Object>();      
-                                  
-         //make lucene query for this rdf:type
-         Query query = getQuery(vclassURI, alpha);        
-         
-         //execute lucene query for individuals of the specified type
-         IndexSearcher index = LuceneIndexFactory.getIndexSearcher(context);
-         TopDocs docs = null;
-         try{
-             docs = index.search(query, null, 
-                 ENTITY_LIST_CONTROLLER_MAX_RESULTS, 
-                 new Sort(Entity2LuceneDoc.term.NAME_LOWERCASE));
-         }catch(Throwable th){
-             log.error("Could not run search. " + th.getMessage());
-             docs = null;
-         }
-         
-         if( docs == null )            
-             throw new ServletException("Could not run search in IndividualListController");        
-         
-         //get list of individuals for the search results
-         int size = docs.totalHits;
-         log.debug("Number of search results: " + size);
-         
-         // don't get all the results, only get results for the requestedSize
-         List<Individual> individuals = new ArrayList<Individual>(INDIVIDUALS_PER_PAGE);
-         int individualsAdded = 0;
-         int ii = (page-1)*INDIVIDUALS_PER_PAGE;               
-         while( individualsAdded < INDIVIDUALS_PER_PAGE && ii < size ){
-             ScoreDoc hit = docs.scoreDocs[ii];
-             if (hit != null) {
-                 Document doc = index.doc(hit.doc);
-                 if (doc != null) {                                                                                        
-                     String uri = doc.getField(Entity2LuceneDoc.term.URI).stringValue();
-                     Individual ind = indDao.getIndividualByURI( uri );  
-                     if( ind != null ){
-                         individuals.add( ind );                         
-                         individualsAdded++;
-                     }
-                 } else {
-                     log.warn("no document found for lucene doc id " + hit.doc);
-                 }
-             } else {
-                 log.debug("hit was null");
-             }                         
-             ii++;            
-         }   
-         
-         rvMap.put("count", size);
-         
-         if( size > INDIVIDUALS_PER_PAGE ){
-             rvMap.put("showPages", Boolean.TRUE);
-             List<PageRecord> pageRecords = makePagesList(size, INDIVIDUALS_PER_PAGE, page);
-             rvMap.put("pages", pageRecords);                    
-         }else{
-             rvMap.put("showPages", Boolean.FALSE);
-             rvMap.put("pages", Collections.emptyList());
-         }
-                         
-         rvMap.put("alpha",alpha);
-         
-         rvMap.put("totalCount", size);
-         rvMap.put("entities",individuals);
-         if (individuals == null) 
-             log.debug("entities list is null for vclass " + vclassURI );                        
-         
-         return rvMap;
-     }
-     
-     private static BooleanQuery getQuery(String vclassUri,  String alpha){
-         BooleanQuery query = new BooleanQuery();
-         try{      
-            //query term for rdf:type
-            query.add(
-                    new TermQuery( new Term(Entity2LuceneDoc.term.RDFTYPE, vclassUri)),
-                    BooleanClause.Occur.MUST );                          
-                                       
-            //Add alpha filter if it is needed
-            Query alphaQuery = null;
-            if( alpha != null && !"".equals(alpha) && alpha.length() == 1){      
-                alphaQuery =    
-                    new PrefixQuery(new Term(Entity2LuceneDoc.term.NAME_LOWERCASE, alpha.toLowerCase()));
-                query.add(alphaQuery,BooleanClause.Occur.MUST);
-            }                      
-                            
-            log.debug("Query: " + query);
-            return query;
-        } catch (Exception ex){
-            log.error(ex,ex);
-            return new BooleanQuery();        
-        }        
-     }    
+    public static Map<String,Object> getResultsForVClass(String vclassURI, int page, String alpha, IndividualDao indDao, ServletContext context) 
+    throws CorruptIndexException, IOException, ServletException {
+        Map<String,Object> rvMap = new HashMap<String,Object>();      
 
-     public static List<PageRecord> makePagesList( int count, int pageSize,  int selectedPage){        
+        // Make solr query for this rdf:type
+        SolrQuery query = getQuery(vclassURI, alpha, page);         
+        SolrServer solr = SolrSetup.getSolrServer(context);
+        QueryResponse response = null;
+        
+        // Execute query for individuals of the specified type
+        try {
+            response = solr.query(query);            
+        } catch (Throwable t) {
+            log.error(t, t);            
+        }
+
+        if ( response == null ) {         
+            throw new ServletException("Could not run search in IndividualListController");        
+        }
+
+        SolrDocumentList docs = response.getResults();
+        
+        if (docs == null) {
+            throw new ServletException("Could not run search in IndividualListController");    
+        }
+
+        // get list of individuals for the search results
+        long size = docs.getNumFound();
+        log.debug("Number of search results: " + size);
+
+        List<Individual> individuals = new ArrayList<Individual>(); 
+        for (SolrDocument doc : docs) {
+            String uri = doc.get(VitroLuceneTermNames.URI).toString();
+            Individual individual = indDao.getIndividualByURI( uri ); 
+            if (individual != null) {
+                individuals.add(individual);
+            }
+        }
+        
+        rvMap.put("count", size);
          
-         List<PageRecord> records = new ArrayList<PageRecord>( MAX_PAGES + 1 );
-         int requiredPages = count/pageSize ;
-         int remainder = count % pageSize ; 
-         if( remainder > 0 )
-             requiredPages++;
+        if( size > INDIVIDUALS_PER_PAGE ){
+            rvMap.put("showPages", Boolean.TRUE);
+            List<PageRecord> pageRecords = makePagesList(size, INDIVIDUALS_PER_PAGE, page);
+            rvMap.put("pages", pageRecords);                    
+        }else{
+            rvMap.put("showPages", Boolean.FALSE);
+            rvMap.put("pages", Collections.emptyList());
+        }
+                         
+        rvMap.put("alpha",alpha);
+
+        rvMap.put("totalCount", size);
+        rvMap.put("entities",individuals);
+        
+        if (individuals.isEmpty()) 
+            log.debug("entities list is empty for vclass " + vclassURI );                        
          
-         if( selectedPage < MAX_PAGES && requiredPages > MAX_PAGES ){
-             //the selected pages is within the first maxPages, just show the normal pages up to maxPages.
-             for(int page = 1; page < requiredPages && page <= MAX_PAGES ; page++ ){
-                 records.add( new PageRecord( "page=" + page, Integer.toString(page), Integer.toString(page), selectedPage == page ) );            
-             }
-             records.add( new PageRecord( "page="+ (MAX_PAGES+1), Integer.toString(MAX_PAGES+1), "more...", false));
-         }else if( requiredPages > MAX_PAGES && selectedPage+1 > MAX_PAGES && selectedPage < requiredPages - MAX_PAGES){
-             //the selected pages is in the middle of the list of page
-             int startPage = selectedPage - MAX_PAGES / 2;
-             int endPage = selectedPage + MAX_PAGES / 2;            
-             for(int page = startPage; page <= endPage ; page++ ){
-                 records.add( new PageRecord( "page=" + page, Integer.toString(page), Integer.toString(page), selectedPage == page ) );            
-             }
-             records.add( new PageRecord( "page="+ endPage+1, Integer.toString(endPage+1), "more...", false));
-         }else if ( requiredPages > MAX_PAGES && selectedPage > requiredPages - MAX_PAGES ){
-             //the selected page is in the end of the list 
-             int startPage = requiredPages - MAX_PAGES;      
-             double max = Math.ceil(count/pageSize);
-             for(int page = startPage; page <= max; page++ ){
-                 records.add( new PageRecord( "page=" + page, Integer.toString(page), Integer.toString(page), selectedPage == page ) );            
-             }          
-         }else{
-             //there are fewer than maxPages pages.            
-             for(int i = 1; i <= requiredPages; i++ ){
-                 records.add( new PageRecord( "page=" + i, Integer.toString(i), Integer.toString(i), selectedPage == i ) );            
+        return rvMap;
+    }
+     
+    private static SolrQuery getQuery(String vclassUri, String alpha, int page){
+
+        String queryStr = VitroLuceneTermNames.RDFTYPE + ":\"" + vclassUri + "\"";
+            
+        // Add alpha filter if it is needed
+        if ( alpha != null && !"".equals(alpha) && alpha.length() == 1) {      
+            queryStr += VitroLuceneTermNames.NAME_LOWERCASE + ":" + alpha.toLowerCase() + "*";
+        }     
+        
+        SolrQuery query = new SolrQuery(queryStr);
+
+        int start = (page-1)*INDIVIDUALS_PER_PAGE;
+        query.setStart(start)
+             .setRows(INDIVIDUALS_PER_PAGE)
+             .setSortField(VitroLuceneTermNames.NAME_LOWERCASE_SINGLE_VALUED, SolrQuery.ORDER.asc);
+        
+        log.debug("Query: " + query);
+        return query;  
+    }    
+
+    public static List<PageRecord> makePagesList( long size, int pageSize,  int selectedPage ) {        
+
+        List<PageRecord> records = new ArrayList<PageRecord>( MAX_PAGES + 1 );
+        int requiredPages = (int) (size/pageSize) ;
+        int remainder = (int) (size % pageSize) ; 
+        if( remainder > 0 )
+            requiredPages++;
+         
+        if( selectedPage < MAX_PAGES && requiredPages > MAX_PAGES ){
+            //the selected pages is within the first maxPages, just show the normal pages up to maxPages.
+            for(int page = 1; page < requiredPages && page <= MAX_PAGES ; page++ ){
+                records.add( new PageRecord( "page=" + page, Integer.toString(page), Integer.toString(page), selectedPage == page ) );            
+            }
+            records.add( new PageRecord( "page="+ (MAX_PAGES+1), Integer.toString(MAX_PAGES+1), "more...", false));
+        }else if( requiredPages > MAX_PAGES && selectedPage+1 > MAX_PAGES && selectedPage < requiredPages - MAX_PAGES){
+            //the selected pages is in the middle of the list of page
+            int startPage = selectedPage - MAX_PAGES / 2;
+            int endPage = selectedPage + MAX_PAGES / 2;            
+            for(int page = startPage; page <= endPage ; page++ ){
+                records.add( new PageRecord( "page=" + page, Integer.toString(page), Integer.toString(page), selectedPage == page ) );            
+            }
+            records.add( new PageRecord( "page="+ endPage+1, Integer.toString(endPage+1), "more...", false));
+        }else if ( requiredPages > MAX_PAGES && selectedPage > requiredPages - MAX_PAGES ){
+            //the selected page is in the end of the list 
+            int startPage = requiredPages - MAX_PAGES;      
+            double max = Math.ceil(size/pageSize);
+            for(int page = startPage; page <= max; page++ ){
+                records.add( new PageRecord( "page=" + page, Integer.toString(page), Integer.toString(page), selectedPage == page ) );            
+            }          
+        }else{
+            //there are fewer than maxPages pages.            
+            for(int i = 1; i <= requiredPages; i++ ){
+                records.add( new PageRecord( "page=" + i, Integer.toString(i), Integer.toString(i), selectedPage == i ) );            
              }    
-         }                
-         return records;
-     }
-     
-     public static class PageRecord  {
-         public PageRecord(String param, String index, String text, boolean selected) {            
-             this.param = param;
-             this.index = index;
-             this.text = text;
-             this.selected = selected;
-         }
-         public String param;
-         public String index;
-         public String text;        
-         public boolean selected=false;
-         
-         public String getParam() {
-             return param;
-         }
-         public String getIndex() {
-             return index;
-         }
-         public String getText() {
-             return text;
-         }
-         public boolean getSelected(){
-             return selected;
-         }
-     }
-     
+        }                
+        return records;
+    }
+
+    public static class PageRecord  {
+        public PageRecord(String param, String index, String text, boolean selected) {            
+            this.param = param;
+            this.index = index;
+            this.text = text;
+            this.selected = selected;
+        }
+        public String param;
+        public String index;
+        public String text;        
+        public boolean selected=false;
+
+        public String getParam() {
+            return param;
+        }
+        public String getIndex() {
+            return index;
+        }
+        public String getText() {
+            return text;
+        }
+        public boolean getSelected(){
+            return selected;
+        }
+    }
 }

@@ -174,11 +174,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             
             log.debug("Query text is \""+ qtxt + "\""); 
 
-            SolrQuery query = getQuery(qtxt, maxHitCount, vreq);
-
-            // ** For xml requested, add version=2.2 for xml version 
-            // is that enough, or do we also have to add wt param?
-            
+            SolrQuery query = getQuery(qtxt, maxHitCount, vreq);            
             SolrServer solr = SolrSetup.getSolrServer(getServletContext());
             QueryResponse response = null;
             

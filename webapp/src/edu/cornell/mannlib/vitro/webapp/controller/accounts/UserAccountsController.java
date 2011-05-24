@@ -9,7 +9,6 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
-import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -49,7 +48,13 @@ public class UserAccountsController extends FreemarkerHttpServlet {
 			}
 
 		} else if (ACTION_EDIT.equals(action)) {
-			return new UserAccountsEditPage(vreq).showPage();
+			UserAccountsEditPage page = new UserAccountsEditPage(vreq);
+			page.parseParametersAndValidate();
+			if (page.isSubmit() && page.isValid()) {
+				return editAccountAndShowList(vreq, page);
+			} else {
+				return page.showPage();
+			}
 
 		} else if (ACTION_DELETE.equals(action)) {
 			UserAccountsDeleter deleter = new UserAccountsDeleter(vreq);
@@ -66,10 +71,18 @@ public class UserAccountsController extends FreemarkerHttpServlet {
 
 	private ResponseValues addAccountAndShowList(VitroRequest vreq,
 			UserAccountsAddPage addPage) {
-		UserAccount userAccount = addPage.createNewAccount();
+		addPage.createNewAccount();
 
 		UserAccountsListPage listPage = new UserAccountsListPage(vreq);
-		return listPage.showPageWithNewAccount(userAccount);
+		return listPage.showPageWithNewAccount(addPage.getAddedAccount(),
+				addPage.wasPasswordEmailSent());
 	}
 
+	private ResponseValues editAccountAndShowList(VitroRequest vreq,
+			UserAccountsEditPage editPage) {
+		editPage.updateAccount();
+		UserAccountsListPage listPage = new UserAccountsListPage(vreq);
+		return listPage.showPageWithUpdatedAccount(
+				editPage.getUpdatedAccount(), editPage.wasPasswordEmailSent());
+	}
 }

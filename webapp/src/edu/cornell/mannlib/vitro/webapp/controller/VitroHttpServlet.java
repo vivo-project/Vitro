@@ -225,11 +225,14 @@ public class VitroHttpServlet extends HttpServlet {
 	 * A child class may call this if logging is set to debug level.
 	 */
 	protected void dumpRequestParameters(HttpServletRequest req) {
+		Log subclassLog = LogFactory.getLog(this.getClass());
+		
 		@SuppressWarnings("unchecked")
 		Map<String, String[]> map = req.getParameterMap();
+		
 		for (String key : map.keySet()) {
 			String[] values = map.get(key);
-			log.debug("Parameter '" + key + "' = "
+			subclassLog.debug("Parameter '" + key + "' = "
 					+ Arrays.deepToString(values));
 		}
 	}

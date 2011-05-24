@@ -7,7 +7,7 @@
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseIndex.css" />')}
 
 <section class="individualList">
-   <h2>${title} <span class="rdfLink"><a class="icon-rdf" href="${redirecturl}" title="View the ${title} list in RDF format">RDF</a></span></h2>
+   <h2>${title} <span class="rdfLink"><a class="icon-rdf" href="${rdfUrl}" title="View the ${title} list in RDF format">RDF</a></span></h2>
     <#if subtitle??>
         <h4>${subtitle}</h4>
     </#if>

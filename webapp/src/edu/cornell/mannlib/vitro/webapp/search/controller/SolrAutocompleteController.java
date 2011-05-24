@@ -114,7 +114,6 @@ public class SolrAutocompleteController extends VitroAjaxController {
                 }
             }   
 
-            // Since SolrQuery.setSortField() is buggy, sort the results here
             Collections.sort(results);
             
             // map.put("results", results);
@@ -157,8 +156,9 @@ public class SolrAutocompleteController extends VitroAjaxController {
         }   
         
         query.setFields(VitroLuceneTermNames.NAME_RAW, VitroLuceneTermNames.URI); // fields to retrieve
-             // Solr bug: generates sort=nameLowercase asc instead of sort=nameLowercase+asc
-             //.setSortField(VitroLuceneTermNames.NAME_LOWERCASE, SolrQuery.ORDER.asc);
+       
+        // Can't sort on multivalued field, so sort results in Java when we get them
+        // query.setSortField(VitroLuceneTermNames.NAME_LOWERCASE, SolrQuery.ORDER.asc);
         
         return query;
     }
@@ -187,6 +187,7 @@ public class SolrAutocompleteController extends VitroAjaxController {
         // RY 5/18/2011 For now, just doing untokenized query, due to the interactions of wildcard
         // query and stemming described below. Need to find a way to do this in Solr.
         // Should take the same approach if we can figure out how to do a disjunction.
+        // Probably just add an explicit "OR" between the terms.
  
 //        String stemParam = (String) request.getParameter("stem"); 
 //        boolean stem = "true".equals(stemParam);
