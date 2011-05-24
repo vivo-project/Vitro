@@ -71,8 +71,9 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     	String classPublicNames = "";
     	SolrInputDocument doc = new SolrInputDocument();
     	
-    	float beta = searchQueryHandler.calculateBeta(ent.getURI());
-    	doc.addField(term.BETA,beta);
+    	//float beta = searchQueryHandler.calculateBeta(ent.getURI());
+    	//doc.addField(term.BETA,beta);
+    	float beta =1;
     	
     	//DocId
     	String id = ent.getURI();
