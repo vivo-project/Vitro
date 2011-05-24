@@ -242,17 +242,17 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
         String contextNodePropertyValues;
         
 //        if(ent.isVClass("http://xmlns.com/foaf/0.1/Person")){
-        contextNodePropertyValues = searchQueryHandler.getPropertiesAssociatedWithEducationalTraining(ent.getURI());
+        /*contextNodePropertyValues = searchQueryHandler.getPropertiesAssociatedWithEducationalTraining(ent.getURI());
         contextNodePropertyValues += searchQueryHandler.getPropertiesAssociatedWithRole(ent.getURI());
         contextNodePropertyValues += searchQueryHandler.getPropertiesAssociatedWithPosition(ent.getURI());
         contextNodePropertyValues += searchQueryHandler.getPropertiesAssociatedWithRelationship(ent.getURI());
         contextNodePropertyValues += searchQueryHandler.getPropertiesAssociatedWithAwardReceipt(ent.getURI());
-        contextNodePropertyValues += searchQueryHandler.getPropertiesAssociatedWithInformationResource(ent.getURI());        
+        contextNodePropertyValues += searchQueryHandler.getPropertiesAssociatedWithInformationResource(ent.getURI());      */  
 
 //        }
         
-        Field contextNodeInformation = new Field(term.CONTEXTNODE, contextNodePropertyValues, Field.Store.YES, Field.Index.ANALYZED );
-        doc.add(contextNodeInformation);
+       /* Field contextNodeInformation = new Field(term.CONTEXTNODE, contextNodePropertyValues, Field.Store.YES, Field.Index.ANALYZED );
+        doc.add(contextNodeInformation);*/
         
         //Moniker
         

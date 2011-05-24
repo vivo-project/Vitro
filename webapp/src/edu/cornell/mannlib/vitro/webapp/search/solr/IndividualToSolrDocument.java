@@ -71,6 +71,9 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     	String classPublicNames = "";
     	SolrInputDocument doc = new SolrInputDocument();
     	
+    	float beta = searchQueryHandler.calculateBeta(ent.getURI());
+    	doc.addField(term.BETA,beta);
+    	
     	//DocId
     	String id = ent.getURI();
     	log.debug("translating " + id);
@@ -152,10 +155,10 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     		value = ent.getLocalName();
     	}
     	
-    	doc.addField(term.NAME_RAW, value, NAME_BOOST);
-    	doc.addField(term.NAME_LOWERCASE, value.toLowerCase(),NAME_BOOST);
-    	doc.addField(term.NAME_UNSTEMMED, value,NAME_BOOST);
-    	doc.addField(term.NAME_STEMMED, value, NAME_BOOST);
+    	doc.addField(term.NAME_RAW, value, (NAME_BOOST*beta));
+    	doc.addField(term.NAME_LOWERCASE, value.toLowerCase(),(NAME_BOOST*beta));
+    	doc.addField(term.NAME_UNSTEMMED, value,(NAME_BOOST*beta));
+    	doc.addField(term.NAME_STEMMED, value, (NAME_BOOST*beta));
     	
     	long tContextNodes = System.currentTimeMillis();
     	
@@ -241,8 +244,8 @@ public class IndividualToSolrDocument implements Obj2DocIface {
             
         	log.debug("time to include data property statements, object property statements in the index: " + Long.toString(System.currentTimeMillis() - tPropertyStatements));
             
-            doc.addField(term.ALLTEXT, value,ALL_TEXT_BOOST);
-            doc.addField(term.ALLTEXTUNSTEMMED, value,ALL_TEXT_BOOST);
+            doc.addField(term.ALLTEXT, value,(ALL_TEXT_BOOST*beta));
+            doc.addField(term.ALLTEXTUNSTEMMED, value,(ALL_TEXT_BOOST*beta));
         }
         
         return doc;

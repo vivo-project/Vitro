@@ -29,6 +29,7 @@ public class SearchQueryHandler {
 
 	private OntModel fullModel;
 	private String contextNodeURI;
+	private int totalInd;
 	//private String query = "";
 	
 //	private static final String queryForEducationalTraining = "SELECT ?query WHERE {" +
@@ -40,6 +41,7 @@ public class SearchQueryHandler {
 			OntModel displayOntModel, ServletContext context) {
 		this.fullModel = ModelContext.getJenaOntModel(context);
 		this.contextNodeURI = contextNodeURI;
+		this.totalInd = fullModel.listIndividuals().toList().size();
 		//query = getQueryFromModel(contextNodeURI, displayOntModel);
 	}
 	
@@ -644,11 +646,7 @@ public class SearchQueryHandler {
 		return propertyValues.toString();
 		
 	}
-	 
-	private int getTotalIndividuals(){
-		return fullModel.listIndividuals().toList().size();
-	}
-	
+		
 	public float calculateBeta(String uri){
 		float beta=0;
 		RDFNode node = (Resource) fullModel.getResource(uri); 
@@ -659,7 +657,7 @@ public class SearchQueryHandler {
 	        	Conn++;
 	        }
 	        
-	        beta = (float)Conn/getTotalIndividuals();
+	        beta = (float)Conn/totalInd;
 	        beta += 1;
 		return beta; 
 	}
