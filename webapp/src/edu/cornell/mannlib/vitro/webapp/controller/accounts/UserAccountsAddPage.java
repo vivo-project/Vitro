@@ -16,11 +16,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
  * Handle the "Add new account" form display and submission.
  * 
  * TODO Associate a profile from this account
- * 
- * TODO Handle sending of email.
- * 
- * TODO Handle initial password set if email isn't available. Set password
- * fields, change-required flag, account is active.
  */
 public class UserAccountsAddPage extends UserAccountsPage {
 	private static final String PARAMETER_SUBMIT = "submitAdd";
@@ -38,6 +33,8 @@ public class UserAccountsAddPage extends UserAccountsPage {
 
 	private static final String TEMPLATE_NAME = "userAccounts-add.ftl";
 
+	private final UserAccountsAddPageStrategy strategy;
+
 	/* The request parameters */
 	private boolean submit;
 	private String emailAddress = "";
@@ -46,14 +43,18 @@ public class UserAccountsAddPage extends UserAccountsPage {
 	private String selectedRoleUri = "";
 	private boolean associateWithProfile;
 
-	/* The result of validating a "submit" request. */
+	/** The result of validating a "submit" request. */
 	private String errorCode = "";
+
+	/** The new user account, if one was created. */
+	private UserAccount addedAccount;
 
 	public UserAccountsAddPage(VitroRequest vreq) {
 		super(vreq);
-	}
 
-	public void parseParametersAndValidate() {
+		this.strategy = UserAccountsAddPageStrategy.getInstance(this,
+				isEmailEnabled(vreq));
+
 		parseRequestParameters();
 
 		if (submit) {
@@ -68,6 +69,8 @@ public class UserAccountsAddPage extends UserAccountsPage {
 		lastName = getStringParameter(PARAMETER_LAST_NAME, "");
 		selectedRoleUri = getRoleChoices();
 		associateWithProfile = getAssociateFlag();
+
+		strategy.parseAdditionalParameters();
 	}
 
 	public boolean isSubmit() {
@@ -85,6 +88,8 @@ public class UserAccountsAddPage extends UserAccountsPage {
 			errorCode = ERROR_NO_LAST_NAME;
 		} else if (selectedRoleUri.isEmpty()) {
 			errorCode = ERROR_NO_ROLE;
+		} else {
+			errorCode = strategy.additionalValidations();
 		}
 	}
 
@@ -96,24 +101,28 @@ public class UserAccountsAddPage extends UserAccountsPage {
 		return errorCode.isEmpty();
 	}
 
-	public UserAccount createNewAccount() {
+	public void createNewAccount() {
 		UserAccount u = new UserAccount();
 		u.setEmailAddress(emailAddress);
 		u.setFirstName(firstName);
 		u.setLastName(lastName);
 		u.setExternalAuthId("");
-
+		
 		u.setMd5Password("");
 		u.setOldPassword("");
 		u.setPasswordChangeRequired(false);
 		u.setPasswordLinkExpires(0);
 		u.setLoginCount(0);
 		u.setStatus(Status.INACTIVE);
-
+		
 		u.setPermissionSetUris(Collections.singleton(selectedRoleUri));
-
+		
+		strategy.setAdditionalProperties(u);
+		
 		String uri = userAccountsDao.insertUserAccount(u);
-		return userAccountsDao.getUserAccountByUri(uri);
+		this.addedAccount = userAccountsDao.getUserAccountByUri(uri);
+
+		strategy.notifyUser();
 	}
 
 	/** What role are they asking for? */
@@ -132,40 +141,34 @@ public class UserAccountsAddPage extends UserAccountsPage {
 				PARAMETER_ASSOCIATE_WITH_PROFILE, "no"));
 	}
 
-	public ResponseValues showPage() {
+	public final ResponseValues showPage() {
 		Map<String, Object> body = new HashMap<String, Object>();
-
+		
 		body.put("emailAddress", emailAddress);
 		body.put("firstName", firstName);
 		body.put("lastName", lastName);
 		body.put("selectedRole", selectedRoleUri);
-		body.put("associate", associateWithProfile);
-
+		if (associateWithProfile) {
+			body.put("associate", Boolean.TRUE);
+		}
 		body.put("roles", buildRolesList());
-
 		body.put("formUrls", buildUrlsMap());
-
+		
 		if (!errorCode.isEmpty()) {
 			body.put(errorCode, Boolean.TRUE);
 		}
-
+		
+		strategy.addMoreBodyValues(body);
+		
 		return new TemplateResponseValues(TEMPLATE_NAME, body);
 	}
 
-	/**
-	 * @return
-	 */
 	public UserAccount getAddedAccount() {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("UserAccountsAddPage.getAddedAccount() not implemented.");
+		return addedAccount;
 	}
 
-	/**
-	 * @return
-	 */
 	public boolean wasPasswordEmailSent() {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("UserAccountsAddPage.wasPasswordEmailSent() not implemented.");
+		return this.strategy.wasPasswordEmailSent();
 	}
 
 }

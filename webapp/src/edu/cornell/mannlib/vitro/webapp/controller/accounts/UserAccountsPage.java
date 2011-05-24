@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,6 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
+import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 
 /**
  * Common routines for the page controllers.
@@ -45,6 +47,10 @@ public abstract class UserAccountsPage {
 		WebappDaoFactory wdf = (WebappDaoFactory) this.ctx
 				.getAttribute("webappDaoFactory");
 		userAccountsDao = wdf.getUserAccountsDao();
+	}
+
+	protected static boolean isEmailEnabled(HttpServletRequest req) {
+		return FreemarkerEmailFactory.isConfigured(req);
 	}
 
 	protected String getStringParameter(String key, String defaultValue) {
@@ -74,7 +80,7 @@ public abstract class UserAccountsPage {
 		String value = vreq.getParameter(key);
 		return (value != null);
 	}
-	
+
 	/**
 	 * Create a list of all known PermissionSets.
 	 */
@@ -94,13 +100,11 @@ public abstract class UserAccountsPage {
 	 * Make these URLs available to all of the pages.
 	 */
 	protected Map<String, String> buildUrlsMap() {
-		UrlBuilder urlBuilder = new UrlBuilder(vreq.getAppBean());
-
 		Map<String, String> map = new HashMap<String, String>();
 
-		map.put("list", urlBuilder.getPortalUrl("/userAccounts/list"));
-		map.put("add", urlBuilder.getPortalUrl("/userAccounts/add"));
-		map.put("delete", urlBuilder.getPortalUrl("/userAccounts/delete"));
+		map.put("list", UrlBuilder.getUrl("/userAccounts/list"));
+		map.put("add", UrlBuilder.getUrl("/userAccounts/add"));
+		map.put("delete", UrlBuilder.getUrl("/userAccounts/delete"));
 
 		return map;
 	}

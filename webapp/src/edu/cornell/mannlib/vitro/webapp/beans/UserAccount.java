@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
+
 /**
  * Information about the account of a user. URI, email, password, etc.
  */
@@ -105,6 +107,11 @@ public class UserAccount {
 
 	public long getPasswordLinkExpires() {
 		return passwordLinkExpires;
+	}
+
+	public String getPasswordLinkExpiresHash() {
+		return Authenticator.applyMd5Encoding(String
+				.valueOf(passwordLinkExpires));
 	}
 
 	public void setPasswordLinkExpires(long passwordLinkExpires) {

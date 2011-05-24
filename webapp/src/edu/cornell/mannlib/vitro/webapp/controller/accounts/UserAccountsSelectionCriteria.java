@@ -75,4 +75,11 @@ public class UserAccountsSelectionCriteria {
 		return (t == null) ? nullValue : t;
 	}
 
+	@Override
+	public String toString() {
+		return "UserAccountsSelectionCriteria[accountsPerPage="
+				+ accountsPerPage + ", pageIndex=" + pageIndex + ", orderBy="
+				+ orderBy + ", roleFilterUri='" + roleFilterUri
+				+ "', searchTerm='" + searchTerm + "']";
+	}
 }

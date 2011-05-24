@@ -39,50 +39,52 @@ public class UserAccountsController extends FreemarkerHttpServlet {
 		log.debug("action = '" + action + "'");
 
 		if (ACTION_ADD.equals(action)) {
-			UserAccountsAddPage page = new UserAccountsAddPage(vreq);
-			page.parseParametersAndValidate();
-			if (page.isSubmit() && page.isValid()) {
-				return addAccountAndShowList(vreq, page);
-			} else {
-				return page.showPage();
-			}
-
+			return handleAddRequest(vreq);
 		} else if (ACTION_EDIT.equals(action)) {
-			UserAccountsEditPage page = new UserAccountsEditPage(vreq);
-			page.parseParametersAndValidate();
-			if (page.isSubmit() && page.isValid()) {
-				return editAccountAndShowList(vreq, page);
-			} else {
-				return page.showPage();
-			}
-
+			return handleEditRequest(vreq);
 		} else if (ACTION_DELETE.equals(action)) {
-			UserAccountsDeleter deleter = new UserAccountsDeleter(vreq);
-			Collection<String> deletedUris = deleter.delete();
-
-			return new UserAccountsListPage(vreq)
-					.showPageWithDeletions(deletedUris);
-
+			return handleDeleteRequest(vreq);
 		} else {
-			UserAccountsListPage page = new UserAccountsListPage(vreq);
+			return handleListRequest(vreq);
+		}
+	}
+
+	private ResponseValues handleAddRequest(VitroRequest vreq) {
+		UserAccountsAddPage page = new UserAccountsAddPage(vreq);
+		if (page.isSubmit() && page.isValid()) {
+			page.createNewAccount();
+
+			UserAccountsListPage listPage = new UserAccountsListPage(vreq);
+			return listPage.showPageWithNewAccount(page.getAddedAccount(),
+					page.wasPasswordEmailSent());
+		} else {
 			return page.showPage();
 		}
 	}
 
-	private ResponseValues addAccountAndShowList(VitroRequest vreq,
-			UserAccountsAddPage addPage) {
-		addPage.createNewAccount();
-
-		UserAccountsListPage listPage = new UserAccountsListPage(vreq);
-		return listPage.showPageWithNewAccount(addPage.getAddedAccount(),
-				addPage.wasPasswordEmailSent());
+	private ResponseValues handleEditRequest(VitroRequest vreq) {
+		UserAccountsEditPage page = new UserAccountsEditPage(vreq);
+		page.parseParametersAndValidate();
+		if (page.isSubmit() && page.isValid()) {
+			page.updateAccount();
+			UserAccountsListPage listPage = new UserAccountsListPage(vreq);
+			return listPage.showPageWithUpdatedAccount(
+					page.getUpdatedAccount(), page.wasPasswordEmailSent());
+		} else {
+			return page.showPage();
+		}
 	}
 
-	private ResponseValues editAccountAndShowList(VitroRequest vreq,
-			UserAccountsEditPage editPage) {
-		editPage.updateAccount();
-		UserAccountsListPage listPage = new UserAccountsListPage(vreq);
-		return listPage.showPageWithUpdatedAccount(
-				editPage.getUpdatedAccount(), editPage.wasPasswordEmailSent());
+	private ResponseValues handleDeleteRequest(VitroRequest vreq) {
+		UserAccountsDeleter deleter = new UserAccountsDeleter(vreq);
+		Collection<String> deletedUris = deleter.delete();
+
+		return new UserAccountsListPage(vreq)
+				.showPageWithDeletions(deletedUris);
+	}
+
+	private ResponseValues handleListRequest(VitroRequest vreq) {
+		UserAccountsListPage page = new UserAccountsListPage(vreq);
+		return page.showPage();
 	}
 }

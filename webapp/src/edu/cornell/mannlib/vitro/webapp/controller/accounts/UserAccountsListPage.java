@@ -54,12 +54,13 @@ public class UserAccountsListPage extends UserAccountsPage {
 
 	public UserAccountsListPage(VitroRequest vreq) {
 		super(vreq);
+		parseParameters();
 	}
 
 	/**
 	 * Build the criteria from the request parameters.
 	 */
-	public void parseParameters() {
+	private void parseParameters() {
 		int accountsPerPage = getIntegerParameter(PARAMETER_ACCOUNTS_PER_PAGE,
 				DEFAULT_ACCOUNTS_PER_PAGE);
 		int pageIndex = getIntegerParameter(PARAMETER_PAGE_INDEX, 1);
@@ -76,6 +77,7 @@ public class UserAccountsListPage extends UserAccountsPage {
 
 		criteria = new UserAccountsSelectionCriteria(accountsPerPage,
 				pageIndex, ordering, roleFilterUri, searchTerm);
+		log.debug("selection criteria is: " + criteria);
 	}
 
 	/**

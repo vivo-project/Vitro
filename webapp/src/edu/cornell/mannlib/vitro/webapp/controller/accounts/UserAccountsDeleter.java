@@ -2,29 +2,51 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 /**
- * TODO delete and kick to Accounts list with message, telling how many were
- * deleted. If there was a problem, the user will need to infer it from the
- * count??
+ * Process a request to delete User Accounts.
  */
 public class UserAccountsDeleter extends UserAccountsPage {
+	
+	private static final String PARAMETER_DELETE_ACCOUNT = "deleteAccount";
+
+	/** Might be empty, but never null. */
+	private final String[] uris;
 
 	protected UserAccountsDeleter(VitroRequest vreq) {
 		super(vreq);
+		
+		String[] values = vreq.getParameterValues(PARAMETER_DELETE_ACCOUNT);
+		if (values == null) {
+			this.uris = new String[0];
+		} else {
+			this.uris = values;
+		}
 	}
 
-	/**
-	 * @return
-	 * 
-	 */
 	public Collection<String> delete() {
-		// TODO Auto-generated method stub
-		throw new RuntimeException(
-				"UserAccountsDeleter.delete() not implemented.");
+		List<String> deletedUris = new ArrayList<String>(); 
+		
+		WebappDaoFactory wadf = vreq.getWebappDaoFactory();
+		UserAccountsDao dao = wadf.getUserAccountsDao();
+		
+		for (String uri: uris) {
+			UserAccount u = dao.getUserAccountByUri(uri);
+			if (u != null) {
+				dao.deleteUserAccount(uri);
+				deletedUris.add(uri);
+			}
+		}
+		
+		return deletedUris;
 	}
 
 }

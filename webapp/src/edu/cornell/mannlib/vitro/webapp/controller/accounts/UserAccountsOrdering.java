@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts;
 
-
 /**
  * How are the accounts to be sorted?
  */
@@ -77,5 +76,11 @@ public class UserAccountsOrdering {
 
 	public Direction getDirection() {
 		return direction;
+	}
+
+	@Override
+	public String toString() {
+		return "UserAccountsOrdering[field=" + field + ", direction="
+				+ direction + "]";
 	}
 }
