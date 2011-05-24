@@ -34,6 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.SolrIndividualListController;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController.PageRecord;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
@@ -51,10 +52,11 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.Individual
  * @author bdc34
  *
  */
-
-// RY Rename to JsonServlet once the transition to Solr is complete.
 public class SolrJsonServlet extends VitroHttpServlet {
-
+    
+    private static final Log log = LogFactory.getLog(SolrJsonServlet.class.getName());
+    private static final int REPLY_SIZE = 256;
+    
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         super.doPost(req, resp);
@@ -235,7 +237,7 @@ public class SolrJsonServlet extends VitroHttpServlet {
             rObj.put("alpha", map.get("alpha"));
                             
             List<Individual> inds = (List<Individual>)map.get("entities");
-            List<IndividualTemplateModel> indsTm = new ArrayList<IndividualTemplateModel>();
+
             JSONArray jInds = new JSONArray();
             for(Individual ind : inds ){
                 JSONObject jo = new JSONObject();
@@ -560,7 +562,6 @@ public class SolrJsonServlet extends VitroHttpServlet {
         return ja;
     }
 
-    private static final int REPLY_SIZE = 256;
 
-    private static final Log log = LogFactory.getLog(JSONServlet.class.getName());
+
 }
