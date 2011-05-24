@@ -67,7 +67,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseClassGrou
         <script type="text/javascript">
             var browseData = {
                 baseUrl: '${urls.base}',
-                dataServiceUrl: '${urls.base}/dataservice?getVClassesForVClassGroup=1&classgroupUri=',
+                dataServiceUrl: '${dataServiceUrlVClassesForVClassGroup}',
                 defaultBrowseClassGroupUri: '${firstPopulatedClassGroup.uri!}',
                 defaultBrowseClassGroupCount: '${firstPopulatedClassGroup.individualCount!}'
             };

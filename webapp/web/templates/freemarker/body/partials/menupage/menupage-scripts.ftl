@@ -15,11 +15,10 @@
     </#if>
 </#list>
 
-<#-- For v1.3: The controller should pass in the dataservice url. -->
 <script type="text/javascript">
     var menupageData = {
         baseUrl: '${urls.base}',
-        dataServiceUrl: '${urls.base}/dataservice?getLuceneIndividualsByVClass=1&vclassId=',
+        dataServiceUrl: '${dataServiceUrlIndividualsByVClass}',
         defaultBrowseVClassUri: '${firstNonEmptyVClass}'
     };
 </script>
