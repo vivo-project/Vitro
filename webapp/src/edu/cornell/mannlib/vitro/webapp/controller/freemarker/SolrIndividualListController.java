@@ -25,6 +25,7 @@ import org.apache.solr.common.SolrDocumentList;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
+import edu.cornell.mannlib.vitro.webapp.controller.IndividualListRdfController;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -56,7 +57,6 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
         String templateName = TEMPLATE_DEFAULT;
         Map<String, Object> body = new HashMap<String, Object>();
         String errorMessage = null;
-        String message = null;
         
         try {
             Object obj = vreq.getAttribute("vclass");
@@ -72,7 +72,7 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
                             errorMessage = "Class " + vitroClassIdStr + " not found";
                         }
                     } catch (Exception ex) {
-                        throw new HelpException("IndividualListController: request parameter 'vclassId' must be a URI string.");
+                        throw new HelpException("IndividualListController: url parameter 'vclassId' must be a URI string.");
                     }
                 }
             } else if (obj instanceof VClass) {
@@ -95,14 +95,16 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
                         getServletContext());                                
                 body.putAll(map);
 
+                @SuppressWarnings("unchecked")
                 List<Individual> inds = (List<Individual>)map.get("entities");
                 List<ListedIndividualTemplateModel> indsTm = new ArrayList<ListedIndividualTemplateModel>();
-                for(Individual ind : inds ){
+                for ( Individual ind : inds ) {
                     indsTm.add(new ListedIndividualTemplateModel(ind,vreq));
                 }
                 body.put("individuals", indsTm);
                 
                 List<TemplateModel> wpages = new ArrayList<TemplateModel>();
+                @SuppressWarnings("unchecked")
                 List<PageRecord> pages = (List<PageRecord>)body.get("pages");
                 BeansWrapper wrapper = new BeansWrapper();
                 for( PageRecord pr: pages ){
@@ -119,10 +121,10 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
                     body.put("subtitle", vclass.getName());
                 }
                 body.put("title", title);  
-                body.put("redirecturl", vreq.getContextPath()+"/entityurl/");
+                body.put("rdfUrl", vreq.getContextPath() + IndividualListRdfController.URL);
                 getServletContext().setAttribute("classuri", vclass.getURI());
             }   
-            
+
         } catch (HelpException help){
             errorMessage = "Request attribute 'vclass' or request parameter 'vclassId' must be set before calling. Its value must be a class uri."; 
         } catch (Throwable e) {
@@ -132,10 +134,8 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
         if (errorMessage != null) {
             templateName = Template.ERROR_MESSAGE.toString();
             body.put("errorMessage", errorMessage);
-        } else if (message != null) {
-            body.put("message", message);
         }
-    
+        
         return new TemplateResponseValues(templateName, body);
     }
       
@@ -244,7 +244,7 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
         int start = (page-1)*INDIVIDUALS_PER_PAGE;
         query.setStart(start)
              .setRows(INDIVIDUALS_PER_PAGE)
-             .setSortField("nameLowercaseSingleValued", SolrQuery.ORDER.asc);
+             .setSortField(VitroLuceneTermNames.NAME_LOWERCASE_SINGLE_VALUED, SolrQuery.ORDER.asc);
         
         log.debug("Query: " + query);
         return query;  

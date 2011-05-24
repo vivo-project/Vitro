@@ -44,18 +44,18 @@ public void doGet (HttpServletRequest req, HttpServletResponse res) throws IOExc
 	String url = req.getRequestURI().substring(req.getContextPath().length());
 	ContentType contentType = checkForRequestType(req.getHeader("accept"));
 	
-	if(Pattern.compile("^/entityurl/$").matcher(url).matches()){
+	if(Pattern.compile("^/listrdf/$").matcher(url).matches()){
 		String redirectURL = null;
 		if(contentType!=null){
 			if ( RDFXML_MIMETYPE.equals(contentType.getMediaType()))
-				redirectURL = "/entityurl/entityurl.rdf";
+				redirectURL = "/listrdf/listrdf.rdf";
 			else if( N3_MIMETYPE.equals(contentType.getMediaType()))
-				redirectURL = "/entityurl/entityurl.n3";
+				redirectURL = "/listrdf/listrdf.n3";
 			else if ( TTL_MIMETYPE.equals(contentType.getMediaType()))
-				redirectURL = "/entityurl/entityurl.ttl";
+				redirectURL = "/listrdf/listrdf.ttl";
 		}
 		else{
-			redirectURL = "/entityurl/entityrurl.rdf";
+			redirectURL = "/listrdf/listrdf.rdf";
 		}
 		
 		 String hn = req.getHeader("Host");
