@@ -80,6 +80,7 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             
             //memModel.writeAll(System.out,"N3",null);
             
+            /* commenting out during development of 1.3 - this will be redone.
             if ( updateRequired(ctx, memModel)) {
             	log.error(getMigrationErrString());
             	System.out.println(getMigrationErrString());
@@ -88,6 +89,7 @@ public class JenaDataSourceSetupSDB extends JenaDataSourceSetupBase implements j
             	AbortStartup.abortStartup(ctx);
             	throw new MigrationRequiredError(getMigrationErrString());
             }
+            */
             
             if (memModel == null) {
                 memModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
