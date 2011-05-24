@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 
 /**
  *  Controller for comments ("contact us") page
@@ -30,11 +31,12 @@ public class UserMailController extends VitroHttpServlet{
         VitroRequest vreq = new VitroRequest(request);
         try {
         //this try block passes any errors to error.jsp
-            if (!ContactMailServlet.isSmtpHostConfigured(request)) {
+            if (!FreemarkerEmailFactory.isConfigured(request)) {
                 request.setAttribute("title", "Mail All Users Form");
                 request.setAttribute("bodyJsp", "/contact_err.jsp");// <<< this is where the body gets set
-                request.setAttribute("ERR","This application has not yet been configured to send mail -- " +
-                		"smtp host has not been specified in the configuration properties file.");
+				request.setAttribute("ERR",
+						"This application has not yet been configured to send mail. "
+								+ "Email properties must be specified in the configuration properties file.");
                 RequestDispatcher errd = request.getRequestDispatcher(Controllers.BASIC_JSP);
                 errd.forward(request, response);
             }

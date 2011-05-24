@@ -10,7 +10,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -26,12 +25,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 import freemarker.template.Configuration;
 
 public class ContactMailController extends FreemarkerHttpServlet {
@@ -51,19 +49,6 @@ public class ContactMailController extends FreemarkerHttpServlet {
     private final static String TEMPLATE_BACKUP = "contactForm-backup.ftl";
     private final static String TEMPLATE_ERROR = "contactForm-error.ftl";
     
-    private static String smtpHost = "";
-
-    @Override
-    public void init() {
-		smtpHost = ConfigurationProperties.getBean(getServletContext())
-				.getProperty(ContactMailServlet.SMTPHOST_PROPERTY, "");
-		if (smtpHost.isEmpty()) {
-			log.debug("No Vitro.smtpHost specified");
-		} else {
-			log.debug("Found Vitro.smtpHost value of " + smtpHost);
-		}
-    }
-    
 	@Override
     protected String getTitle(String siteName, VitroRequest vreq) {
         return siteName + " Feedback Form";
@@ -80,10 +65,10 @@ public class ContactMailController extends FreemarkerHttpServlet {
         
         String statusMsg = null; // holds the error status
         
-        if (smtpHost.isEmpty()) {
+        if (!FreemarkerEmailFactory.isConfigured(vreq)) {
             body.put("errorMessage", 
                     "This application has not yet been configured to send mail. " +
-                    "An smtp host has not been specified in the configuration properties file.");
+                    "Email properties must be specified in the configuration properties file.");
             templateName = TEMPLATE_ERROR; 
         }
         
@@ -172,11 +157,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
                     PrintWriter outFile = new PrintWriter(fw); 
                     writeBackupCopy(outFile, msgText, spamReason, config, vreq);
        
-                    // Set the smtp host
-                    Properties props = System.getProperties();
-                    props.put("mail.smtp.host", smtpHost);
-                    Session s = Session.getDefaultInstance(props,null); // was Session.getInstance(props,null);
-                    //s.setDebug(true);
+                    Session s = FreemarkerEmailFactory.getEmailSession(vreq);
                     try {
                     	
                     	if (spamReason == null) {

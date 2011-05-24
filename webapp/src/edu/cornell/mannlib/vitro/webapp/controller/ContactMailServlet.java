@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Properties;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -25,10 +24,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 
 public class ContactMailServlet extends VitroHttpServlet {
-	public static final String SMTPHOST_PROPERTY = "Vitro.smtpHost";
 		
 	private static final Log log = LogFactory.getLog(ContactMailServlet.class);
 	
@@ -41,24 +39,6 @@ public class ContactMailServlet extends VitroHttpServlet {
     private final static String WEB_USEREMAIL_PARAM = "webuseremail";
     private final static String COMMENTS_PARAM      = "s34gfd88p9x1";
 	
-    private static String smtpHost = null;
-
-    public static boolean isSmtpHostConfigured(HttpServletRequest req) {
-		return ConfigurationProperties.getBean(req)
-				.getProperty(SMTPHOST_PROPERTY, "").length() > 0;
-    }
-    
-    @Override
-    public void init() {
-		smtpHost = ConfigurationProperties.getBean(getServletContext())
-				.getProperty(SMTPHOST_PROPERTY, "");
-		if (smtpHost.isEmpty()) {
-			log.debug("No Vitro.smtpHost specified");
-		} else {
-			log.debug("Found Vitro.smtpHost value of " + smtpHost);
-		}
-    }
-
     @Override
     public void doGet( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException {
@@ -69,9 +49,9 @@ public class ContactMailServlet extends VitroHttpServlet {
         
         String statusMsg = null; // holds the error status
         
-        if (smtpHost==null || smtpHost.equals("")){
-            statusMsg = "This application has not yet been configured to send mail " +
-            		"-- smtp host has not been identified in the Configuration Properties file.";
+        if (!FreemarkerEmailFactory.isConfigured(vreq)) {
+			statusMsg = "This application has not yet been configured to send mail. "
+					+ "Email properties must be specified in the configuration properties file.";
             redirectToError(response, statusMsg);
             return;
         }
@@ -166,10 +146,7 @@ public class ContactMailServlet extends VitroHttpServlet {
         				.getRealPath(EMAIL_BACKUP_FILE_PATH),true)); //autoflush
         writeBackupCopy(outFile, msgText, spamReason);
 
-        // Set the smtp host
-        Properties props = System.getProperties();
-        props.put("mail.smtp.host", smtpHost);
-        Session s = Session.getDefaultInstance(props,null); // was Session.getInstance(props,null);
+        Session s = FreemarkerEmailFactory.getEmailSession(vreq);
         //s.setDebug(true);
         try {
         	
