@@ -25,7 +25,6 @@ import org.apache.solr.common.SolrDocumentList;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.controller.IndividualListRdfController;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -121,7 +120,7 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
                     body.put("subtitle", vclass.getName());
                 }
                 body.put("title", title);  
-                body.put("rdfUrl", vreq.getContextPath() + IndividualListRdfController.URL);
+                body.put("rdfUrl", vreq.getContextPath() + "/listrdf/" + vclass.getLocalName() + ".rdf");
                 getServletContext().setAttribute("classuri", vclass.getURI());
             }   
 
