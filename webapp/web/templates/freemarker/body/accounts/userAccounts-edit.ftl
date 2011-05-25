@@ -2,5 +2,5 @@
 
 <#-- Template for editing a user account -->
 
-<h1>Edit user account</h1>
+<h3>Edit user account</h3>
 

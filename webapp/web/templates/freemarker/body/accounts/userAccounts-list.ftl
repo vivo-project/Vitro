@@ -2,7 +2,7 @@
 
 <#-- Template for displaying list of user accounts -->
 
-<form method="POST" action="${formUrls.list}">
+<form method="POST" action="${formUrls.list}" class="customForm" role="">
 
     <#--current page: <input type="text" name="pageIndex" value="${page.current}" />
     <br />-->
@@ -38,7 +38,7 @@
     <input type="submit" name="list" value="Refresh page" />--> 
 </form>
 
-<form method="POST" action="${formUrls.add}">
+<form method="POST" action="${formUrls.add}" class="customForm" role="">
     <h3>Account  | <input type="submit" class="submit" value="Add new account" /></h3>
 </form>
 
@@ -75,7 +75,7 @@
     </select>
 </section>
 
-<form method="POST" action="${formUrls.list}">
+<form method="POST" action="${formUrls.list}" class="customForm" role="">
     <section id="search-accounts">
         <input type="text" name="" />
         <input class="submit" type="submit" value="Search accounts"/>
@@ -96,7 +96,7 @@
    }
 </SCRIPT>
 
-<form method="POST" action="${formUrls.list}">
+<form method="POST" action="${formUrls.list}" id="account-display" class="customForm" role="">
     <section class="accounts">
         <input type="submit" class="submit delete-account" value="Delete" onClick="changeAction(this.form, '${formUrls.delete}')" />
         <!-- 
