@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.controller.accounts;
+package edu.cornell.mannlib.vitro.webapp.controller.accounts.admin;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,6 +9,7 @@ import java.util.Map;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsPage;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 
@@ -52,7 +53,7 @@ public class UserAccountsAddPage extends UserAccountsPage {
 	public UserAccountsAddPage(VitroRequest vreq) {
 		super(vreq);
 
-		this.strategy = UserAccountsAddPageStrategy.getInstance(this,
+		this.strategy = UserAccountsAddPageStrategy.getInstance(vreq, this,
 				isEmailEnabled(vreq));
 
 		parseRequestParameters();
@@ -107,18 +108,18 @@ public class UserAccountsAddPage extends UserAccountsPage {
 		u.setFirstName(firstName);
 		u.setLastName(lastName);
 		u.setExternalAuthId("");
-		
+
 		u.setMd5Password("");
 		u.setOldPassword("");
 		u.setPasswordChangeRequired(false);
 		u.setPasswordLinkExpires(0);
 		u.setLoginCount(0);
 		u.setStatus(Status.INACTIVE);
-		
+
 		u.setPermissionSetUris(Collections.singleton(selectedRoleUri));
-		
+
 		strategy.setAdditionalProperties(u);
-		
+
 		String uri = userAccountsDao.insertUserAccount(u);
 		this.addedAccount = userAccountsDao.getUserAccountByUri(uri);
 
@@ -143,7 +144,7 @@ public class UserAccountsAddPage extends UserAccountsPage {
 
 	public final ResponseValues showPage() {
 		Map<String, Object> body = new HashMap<String, Object>();
-		
+
 		body.put("emailAddress", emailAddress);
 		body.put("firstName", firstName);
 		body.put("lastName", lastName);
@@ -153,13 +154,13 @@ public class UserAccountsAddPage extends UserAccountsPage {
 		}
 		body.put("roles", buildRolesList());
 		body.put("formUrls", buildUrlsMap());
-		
+
 		if (!errorCode.isEmpty()) {
 			body.put(errorCode, Boolean.TRUE);
 		}
-		
+
 		strategy.addMoreBodyValues(body);
-		
+
 		return new TemplateResponseValues(TEMPLATE_NAME, body);
 	}
 

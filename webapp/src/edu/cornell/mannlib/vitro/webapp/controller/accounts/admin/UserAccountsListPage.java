@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.controller.accounts;
+package edu.cornell.mannlib.vitro.webapp.controller.accounts.admin;
 
 import static edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsSelectionCriteria.DEFAULT_ACCOUNTS_PER_PAGE;
 
@@ -18,6 +18,11 @@ import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering;
+import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsPage;
+import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsSelection;
+import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsSelectionCriteria;
+import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsSelector;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.Direction;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.Field;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;

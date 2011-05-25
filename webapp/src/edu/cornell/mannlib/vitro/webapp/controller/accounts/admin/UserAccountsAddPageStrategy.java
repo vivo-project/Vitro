@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.controller.accounts;
+package edu.cornell.mannlib.vitro.webapp.controller.accounts.admin;
 
 import static javax.mail.Message.RecipientType.TO;
 
@@ -13,7 +13,8 @@ import java.util.Map;
 
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsPage;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailMessage;
@@ -21,19 +22,20 @@ import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailMessage;
 /**
  * Handle the variant details of the UserAccountsAddPage.
  */
-public abstract class UserAccountsAddPageStrategy {
+public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 	protected final UserAccountsAddPage page;
 
-	public static UserAccountsAddPageStrategy getInstance(
+	public static UserAccountsAddPageStrategy getInstance(VitroRequest vreq, 
 			UserAccountsAddPage page, boolean emailEnabled) {
 		if (emailEnabled) {
-			return new EmailStrategy(page);
+			return new EmailStrategy(vreq, page);
 		} else {
-			return new NoEmailStrategy(page);
+			return new NoEmailStrategy(vreq, page);
 		}
 	}
 
-	public UserAccountsAddPageStrategy(UserAccountsAddPage page) {
+	public UserAccountsAddPageStrategy(VitroRequest vreq, UserAccountsAddPage page) {
+		super(vreq);
 		this.page = page;
 	}
 
@@ -59,8 +61,8 @@ public abstract class UserAccountsAddPageStrategy {
 
 		private boolean sentEmail;
 
-		public EmailStrategy(UserAccountsAddPage page) {
-			super(page);
+		public EmailStrategy(VitroRequest vreq, UserAccountsAddPage page) {
+			super(vreq, page);
 		}
 
 		@Override
@@ -99,7 +101,7 @@ public abstract class UserAccountsAddPageStrategy {
 			body.put("subjectLine", "Your VIVO account has been created.");
 
 			FreemarkerEmailMessage email = FreemarkerEmailFactory
-					.createNewMessage(page.vreq);
+					.createNewMessage(vreq);
 			email.addRecipient(TO, page.getAddedAccount().getEmailAddress());
 			email.setSubject("Your VIVO account has been created.");
 			email.setHtmlTemplate("userAccounts-acctCreatedEmail-html.ftl");
@@ -118,7 +120,7 @@ public abstract class UserAccountsAddPageStrategy {
 				String relativeUrl = UrlBuilder.getUrl(CREATE_PASSWORD_URL, "user",
 						email, "key", hash);
 				
-				URL context = new URL(page.vreq.getRequestURL().toString());
+				URL context = new URL(vreq.getRequestURL().toString());
 				URL url = new URL(context, relativeUrl);
 				return url.toExternalForm();
 			} catch (MalformedURLException e) {
@@ -148,15 +150,15 @@ public abstract class UserAccountsAddPageStrategy {
 		private String initialPassword;
 		private String confirmPassword;
 
-		public NoEmailStrategy(UserAccountsAddPage page) {
-			super(page);
+		public NoEmailStrategy(VitroRequest vreq, UserAccountsAddPage page) {
+			super(vreq, page);
 		}
 
 		@Override
 		protected void parseAdditionalParameters() {
-			initialPassword = page.getStringParameter(
+			initialPassword = getStringParameter(
 					PARAMETER_INITIAL_PASSWORD, "");
-			confirmPassword = page.getStringParameter(
+			confirmPassword = getStringParameter(
 					PARAMETER_CONFIRM_PASSWORD, "");
 		}
 
