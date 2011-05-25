@@ -2,9 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.jena;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Set;
 
 import javax.servlet.ServletContext;
 
@@ -15,7 +17,11 @@ import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.rdf.model.AnonId;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -99,6 +105,69 @@ public class InitialJenaModelUtils {
 				m.getProperty(VitroVocabulary.IN_CLASSGROUP), thingsClassGroup);
 		return m;
 	}
+
+	public static Model createModelFromQueries(ServletContext sc, String rootDir, OntModel sourceModel, String subject) {
+		
+		Model model = ModelFactory.createDefaultModel(); 
+		
+		Set<String> pathSet = sc.getResourcePaths(rootDir);
+		
+		if (pathSet == null) {
+		  log.warn(rootDir + " not found.");
+		  return model;
+		}
+		
+		for ( String path : pathSet ) {
+            File file = new File(sc.getRealPath(path));	
+            if (file.isDirectory()) {           	
+            	model.add(createModelFromQueries(sc, path, sourceModel, subject));
+            } else if (file.isFile()) { 
+    			if (!path.endsWith(".sparql")) {
+    				log.warn("Ignoring file " + path + " because the file extension is not sparql.");
+    				continue;
+    			}
+            	model.add(createModelFromQuery(file, sourceModel, subject));
+            } else {
+            	log.warn("path is neither a directory nor a file " + path);
+            }
+		} // end - for
+				
+		return model;
+	}	
 	
-	
+	public static Model createModelFromQuery(File sparqlFile, OntModel sourceModel, String subject) {
+		
+		Model model = ModelFactory.createDefaultModel(); 
+						
+		BufferedReader reader = null;
+		
+		try {
+			try {
+				reader = new BufferedReader(new FileReader(sparqlFile));
+				StringBuffer fileContents = new StringBuffer();
+				String ln;
+			
+				while ( (ln = reader.readLine()) != null) {
+					fileContents.append(ln).append('\n');
+				}		
+						
+				String query = fileContents.toString();
+				String subjectString = "<" + subject + ">";
+				query = query.replaceAll("PERSON_URI", subjectString);
+				
+				Query q = QueryFactory.create(query, Syntax.syntaxARQ);
+				QueryExecution qe = QueryExecutionFactory.create(q, sourceModel);
+				qe.execConstruct(model);
+		   	} catch (Exception e) {
+				log.error("Unable to process file " + sparqlFile.getAbsolutePath(), e);
+			} finally {
+				reader.close();
+			}
+		} catch (IOException ioe) {
+			// this is for the reader.close above
+			log.warn("Exception while trying to close file: " + sparqlFile.getAbsolutePath(), ioe);
+		}			
+				
+		return model;
+	}	
 }
