@@ -177,6 +177,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             SolrQuery query = getQuery(qtxt, maxHitCount, vreq);            
             SolrServer solr = SolrSetup.getSolrServer(getServletContext());
             QueryResponse response = null;
+           
             
             try {
                 response = solr.query(query);

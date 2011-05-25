@@ -658,6 +658,7 @@ public class SearchQueryHandler {
 	        }
 	        
 	        beta = (float)Conn/totalInd;
+	        beta *= 100;
 	        beta += 1;
 		return beta; 
 	}

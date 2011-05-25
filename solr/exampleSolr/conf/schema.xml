@@ -381,7 +381,7 @@
     <fieldtype name="phonetic" stored="false" indexed="true" class="solr.TextField" >
       <analyzer>
         <tokenizer class="solr.StandardTokenizerFactory"/>
-        <filter class="solr.DoubleMetaphoneFilterFactory" inject="false"/>
+        <filter class="solr.PhoneticFilterFactory" encoder="Metaphone" inject="false"/>
       </analyzer>
     </fieldtype>
 
@@ -493,9 +493,11 @@
 <field name="acNameUnstemmed" type="textUnstemmed" indexed="true" stored="false" multiValued="true"/>
 <field name="acNameStemmed" type="text" indexed="true" stored="false" multiValued="true"/>
 <field name="indexedTime" type="string" indexed="true" stored="true" multiValued="true"/>
+<field name="NAME_PHONETIC" type ="phonetic" indexed="true" stored="false" multiValued="true"/>
 
 <field name="ALLTEXT" type="text" indexed="true" stored="false" multiValued="true"/>
 <field name="ALLTEXTUNSTEMMED" type="textgen" indexed="true" stored="false" multiValued="true"/>
+<field name="ALLTEXT_PHONETIC" type="phonetic" indexed="true" stored="false" multiValued="true"/>
 
 <field name="THUMBNAIL" type="string" indexed="true" stored="true"/>
 
@@ -577,7 +579,7 @@
  <uniqueKey>DocId</uniqueKey>
 
  <!-- field for the QueryParser to use when an explicit fieldname is absent -->
- <!-- <defaultSearchField>ALLTEXT</defaultSearchField> -->
+ <defaultSearchField>ALLTEXT</defaultSearchField>
 
  <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
  <solrQueryParser defaultOperator="AND"/>
@@ -600,7 +602,8 @@
  <!-- Similarity is the scoring routine for each document vs. a query.
       A custom similarity may be specified here, but the default is fine
       for most applications.  -->
- <!-- <similarity class="org.apache.lucene.search.DefaultSimilarity"/> -->
+<similarity class="org.apache.lucene.search.DefaultSimilarity"/>
+<!-- <similarity class="edu.cornell.mannlib.vitro.webapp.search.lucene.CustomSimilarity"/> -->
  <!-- ... OR ...
       Specify a SimilarityFactory class name implementation
       allowing parameters to be used.

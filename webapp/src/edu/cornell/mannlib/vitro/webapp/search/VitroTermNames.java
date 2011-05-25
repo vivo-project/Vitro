@@ -57,4 +57,8 @@ public class VitroTermNames {
     
     /** field for beta values of all documents **/
     public static final String BETA = "BETA";
+    
+    /** adding phonetic field **/
+    public static final String ALLTEXT_PHONETIC = "ALLTEXT_PHONETIC";
+    public static final String NAME_PHONETIC = "NAME_PHONETIC";
 }

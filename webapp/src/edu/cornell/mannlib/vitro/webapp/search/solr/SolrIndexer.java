@@ -36,7 +36,6 @@ public class SolrIndexer implements IndexerIface {
     
     @Override
     public synchronized void index(Individual ind, boolean newDoc) throws IndexingException {
-
         if( ! indexing )
             throw new IndexingException("SolrIndexer: must call " +
                     "startIndexing() before index().");
@@ -61,6 +60,7 @@ public class SolrIndexer implements IndexerIface {
                             Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
                             docs.add( solrDoc );
                             server.add( docs );
+                   
 //                            if( !newDoc ){  
 //                                server.add( docs );
 //                                log.debug("updated " + ind.getName() + " " + ind.getURI());

@@ -71,9 +71,9 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     	String classPublicNames = "";
     	SolrInputDocument doc = new SolrInputDocument();
     	
-    	//float beta = searchQueryHandler.calculateBeta(ent.getURI());
-    	//doc.addField(term.BETA,beta);
-    	float beta =1;
+    	float beta = searchQueryHandler.calculateBeta(ent.getURI());
+    	doc.addField(term.BETA,beta);
+    	//float beta =1;
     	
     	//DocId
     	String id = ent.getURI();
@@ -156,10 +156,11 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     		value = ent.getLocalName();
     	}
     	
-    	doc.addField(term.NAME_RAW, value, (NAME_BOOST*beta));
-    	doc.addField(term.NAME_LOWERCASE, value.toLowerCase(),(NAME_BOOST*beta));
-    	doc.addField(term.NAME_UNSTEMMED, value,(NAME_BOOST*beta));
-    	doc.addField(term.NAME_STEMMED, value, (NAME_BOOST*beta));
+    	doc.addField(term.NAME_RAW, value, NAME_BOOST+beta);
+    	doc.addField(term.NAME_LOWERCASE, value.toLowerCase(),NAME_BOOST+beta);
+    	doc.addField(term.NAME_UNSTEMMED, value,NAME_BOOST+beta);
+    	doc.addField(term.NAME_STEMMED, value, NAME_BOOST+beta);
+    	doc.addField(term.NAME_PHONETIC, value, PHONETIC_BOOST);
     	
     	long tContextNodes = System.currentTimeMillis();
     	
@@ -245,8 +246,10 @@ public class IndividualToSolrDocument implements Obj2DocIface {
             
         	log.debug("time to include data property statements, object property statements in the index: " + Long.toString(System.currentTimeMillis() - tPropertyStatements));
             
-            doc.addField(term.ALLTEXT, value,(ALL_TEXT_BOOST*beta));
-            doc.addField(term.ALLTEXTUNSTEMMED, value,(ALL_TEXT_BOOST*beta));
+            doc.addField(term.ALLTEXT, value, 4*beta);
+            doc.addField(term.ALLTEXTUNSTEMMED, value, 4*beta);
+            doc.addField(term.ALLTEXT_PHONETIC, value, PHONETIC_BOOST);
+            doc.setDocumentBoost(2*beta);
         }
         
         return doc;
@@ -289,7 +292,8 @@ public class IndividualToSolrDocument implements Obj2DocIface {
         return ent;
     }
 
-    public static float NAME_BOOST = 3.0F;
-    public static float ALL_TEXT_BOOST = 2.0F;
+    public static float NAME_BOOST = 2.0F;
+    public static float PHONETIC_BOOST = 0.1F;
+    
     
 }
