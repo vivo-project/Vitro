@@ -20,8 +20,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.Direction;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.Field;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 
@@ -100,7 +98,7 @@ public class UserAccountsListPage extends UserAccountsPage {
 				userAccountsModel, criteria);
 		Map<String, Object> body = buildTemplateBodyMap(selection);
 
-		body.put("newUserAccount", new UserAccountWrapper(vreq, userAccount,
+		body.put("newUserAccount", new UserAccountWrapper(userAccount,
 				Collections.<String> emptyList()));
 
 		return new TemplateResponseValues(TEMPLATE_NAME, body);
@@ -215,7 +213,7 @@ public class UserAccountsListPage extends UserAccountsPage {
 			UserAccountsSelection selection) {
 		List<UserAccountWrapper> list = new ArrayList<UserAccountWrapper>();
 		for (UserAccount account : selection.getUserAccounts()) {
-			list.add(new UserAccountWrapper(vreq, account,
+			list.add(new UserAccountWrapper(account,
 					findPermissionSetLabels(account)));
 		}
 		return list;
@@ -240,14 +238,11 @@ public class UserAccountsListPage extends UserAccountsPage {
 		private final List<String> permissionSets;
 		private final String editUrl;
 
-		public UserAccountWrapper(VitroRequest vreq, UserAccount account,
+		public UserAccountWrapper(UserAccount account,
 				List<String> permissionSets) {
 			this.account = account;
 			this.permissionSets = permissionSets;
-
-			UrlBuilder urlBuilder = new UrlBuilder(vreq.getAppBean());
-			this.editUrl = urlBuilder.getPortalUrl("/userAccounts/edit",
-					new ParamMap("editAccount", account.getUri()));
+			this.editUrl = UserAccountsPage.editAccountUrl(account.getUri());
 		}
 
 		public String getUri() {

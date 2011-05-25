@@ -24,6 +24,18 @@
         <#assign errorMessage = "You must select a role." />
     </#if>
     
+    <#if errorPasswordIsEmpty??>
+        <#assign errorMessage = "No password supplied." />
+    </#if>
+    
+    <#if errorPasswordIsWrongLength??>
+        <#assign errorMessage = "Password must be between ${minimumLength} and ${maximumLength} characters." />
+    </#if>
+    
+    <#if errorPasswordsDontMatch??>
+        <#assign errorMessage = "Passwords do not match." />
+    </#if>
+    
     <#if errorMessage?has_content>
         <section id="error-alert" role="alert">
             <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon"/>
@@ -52,6 +64,14 @@
                 <br />
             </#list>
 
+            <#if !emailIsEnabled??>
+                <label for="initial-password">Initial password<span class="requiredHint"> *</span></label>
+                <input type="password" name="initialPassword" value="${initialPassword}" id="initial-password" role="input "/>
+
+                <label for="confirm-password">Confirm initial password<span class="requiredHint"> *</span></label> 
+                <input type="text" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input "/>
+            </#if>
+
             <p>Associate a profile with this account</p>
             <input type="radio" name="associate" value="yes" role="radio" <#if associate??>checked</#if> id="associate" />
             <label class="inline" for="associate"> Yes</label>
@@ -63,12 +83,14 @@
             <input type="checkbox" name="resetPassword" value="" id="reset-password" role="checkbox" />
             <label  class="inline" for="reset-password"> Reset password</label>
 
-            <p class="note">
-                Note: An email will be sent to the address entered above 
-                notifying that an account has been created. 
-                It will include instructions for activating the account and creating a password.
-            </p>
-
+            <#if emailIsEnabled??>
+                <p class="note">
+                    Note: An email will be sent to the address entered above 
+                    notifying that an account has been created. 
+                    It will include instructions for activating the account and creating a password.
+                </p>
+            </#if>
+    
             <input type="submit" name="submitAdd" value="Add new account" class="submit"/> or <a href="${formUrls.list}">Cancel</a>
 
             <p class="requiredHint">* required fields</p>

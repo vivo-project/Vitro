@@ -20,6 +20,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
@@ -102,11 +103,16 @@ public abstract class UserAccountsPage {
 	protected Map<String, String> buildUrlsMap() {
 		Map<String, String> map = new HashMap<String, String>();
 
-		map.put("list", UrlBuilder.getUrl("/userAccounts/list"));
-		map.put("add", UrlBuilder.getUrl("/userAccounts/add"));
-		map.put("delete", UrlBuilder.getUrl("/userAccounts/delete"));
+		map.put("list", UrlBuilder.getUrl("/accountsAdmin/list"));
+		map.put("add", UrlBuilder.getUrl("/accountsAdmin/add"));
+		map.put("delete", UrlBuilder.getUrl("/accountsAdmin/delete"));
+		map.put("createPassword", UrlBuilder.getUrl("/accounts/createPassword"));
 
 		return map;
 	}
 
+	protected static String editAccountUrl(String uri) {
+		return UrlBuilder.getUrl("/accountsAdmin/edit",
+				new ParamMap("editAccount", uri));
+	}
 }

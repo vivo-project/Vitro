@@ -6,12 +6,14 @@ import static javax.mail.Message.RecipientType.TO;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailMessage;
@@ -52,7 +54,8 @@ public abstract class UserAccountsAddPageStrategy {
 	// ----------------------------------------------------------------------
 
 	private static class EmailStrategy extends UserAccountsAddPageStrategy {
-		public static final String CREATE_PASSWORD_URL = "/userAccounts/createPassword";
+		public static final String CREATE_PASSWORD_URL = "/accounts/createPassword";
+		private static final int DAYS_TO_ACTIVATE_ACCOUNT = 90;
 
 		private boolean sentEmail;
 
@@ -73,8 +76,14 @@ public abstract class UserAccountsAddPageStrategy {
 
 		@Override
 		protected void setAdditionalProperties(UserAccount u) {
-			u.setPasswordLinkExpires(new Date().getTime());
+			u.setPasswordLinkExpires(figureExpirationDate().getTime());
 			u.setStatus(Status.INACTIVE);
+		}
+		
+		private Date figureExpirationDate() {
+			Calendar c = Calendar.getInstance();
+			c.add(Calendar.DATE, DAYS_TO_ACTIVATE_ACCOUNT);
+			return c.getTime();
 		}
 
 		@Override
@@ -93,8 +102,8 @@ public abstract class UserAccountsAddPageStrategy {
 					.createNewMessage(page.vreq);
 			email.addRecipient(TO, page.getAddedAccount().getEmailAddress());
 			email.setSubject("Your VIVO account has been created.");
-			email.setHtmlTemplate("userAccounts-createdEmail-html.ftl");
-			email.setTextTemplate("userAccounts-createdEmail-text.ftl");
+			email.setHtmlTemplate("userAccounts-acctCreatedEmail-html.ftl");
+			email.setTextTemplate("userAccounts-acctCreatedEmail-text.ftl");
 			email.setBodyMap(body);
 			email.send();
 
@@ -103,11 +112,11 @@ public abstract class UserAccountsAddPageStrategy {
 
 		private String buildCreatePasswordLink() {
 			try {
-				String uri = page.getAddedAccount().getUri();
+				String email = page.getAddedAccount().getEmailAddress();
 				String hash = page.getAddedAccount()
 						.getPasswordLinkExpiresHash();
 				String relativeUrl = UrlBuilder.getUrl(CREATE_PASSWORD_URL, "user",
-						uri, "key", hash);
+						email, "key", hash);
 				
 				URL context = new URL(page.vreq.getRequestURL().toString());
 				URL url = new URL(context, relativeUrl);
@@ -116,7 +125,7 @@ public abstract class UserAccountsAddPageStrategy {
 				return "error_creating_password_link";
 			}
 		}
-
+		
 		@Override
 		protected boolean wasPasswordEmailSent() {
 			return sentEmail;

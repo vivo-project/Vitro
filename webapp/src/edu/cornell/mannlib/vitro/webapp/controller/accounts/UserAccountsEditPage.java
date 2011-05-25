@@ -56,14 +56,6 @@ public class UserAccountsEditPage extends UserAccountsPage {
 	}
 
 	/**
-	 * 
-	 */
-	public void parseParametersAndValidate() {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("UserAccountsEditPage.parseParametersAndValidate() not implemented.");
-	}
-
-	/**
 	 * @return
 	 */
 	public boolean isValid() {

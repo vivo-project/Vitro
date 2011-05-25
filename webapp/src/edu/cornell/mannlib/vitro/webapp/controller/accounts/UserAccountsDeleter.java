@@ -21,7 +21,7 @@ public class UserAccountsDeleter extends UserAccountsPage {
 	/** Might be empty, but never null. */
 	private final String[] uris;
 
-	protected UserAccountsDeleter(VitroRequest vreq) {
+	public UserAccountsDeleter(VitroRequest vreq) {
 		super(vreq);
 		
 		String[] values = vreq.getParameterValues(PARAMETER_DELETE_ACCOUNT);

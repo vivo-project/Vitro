@@ -11,11 +11,17 @@ import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 
 /**
  * Information about the account of a user. URI, email, password, etc.
+ * 
+ * The "password link expires hash" is just a string that is derived from the
+ * value in the passwordLinkExpires field. It doesn't have to be a hash, and
+ * there is no need for it to be cryptographic, but it seems embarrassing to
+ * just send the value as a clear string. There is no real need for security
+ * here, except that a brute force attack would allow someone to change the
+ * password on an account that they know has a password change pending.
  */
 public class UserAccount {
-
-	public final static int MIN_PASSWORD_LENGTH = 6;
-	public final static int MAX_PASSWORD_LENGTH = 12;
+	public static final int MIN_PASSWORD_LENGTH = 6;
+	public static final int MAX_PASSWORD_LENGTH = 12;
 
 	public enum Status {
 		ACTIVE, INACTIVE;
@@ -110,8 +116,8 @@ public class UserAccount {
 	}
 
 	public String getPasswordLinkExpiresHash() {
-		return Authenticator.applyMd5Encoding(String
-				.valueOf(passwordLinkExpires));
+		return limitStringLength(8, Authenticator.applyMd5Encoding(String
+				.valueOf(passwordLinkExpires)));
 	}
 
 	public void setPasswordLinkExpires(long passwordLinkExpires) {
@@ -168,6 +174,16 @@ public class UserAccount {
 
 	private <T> T nonNull(T value, T defaultValue) {
 		return (value == null) ? defaultValue : value;
+	}
+	
+	private String limitStringLength(int limit, String s) {
+		if (s == null) {
+			return "";
+		} else if (s.length() <= limit) {
+			return s;
+		} else {
+			return s.substring(0, limit);
+		}
 	}
 
 	@Override
