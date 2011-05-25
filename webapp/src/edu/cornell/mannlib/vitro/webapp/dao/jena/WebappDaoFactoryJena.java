@@ -33,6 +33,7 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.Classes2ClassesDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
@@ -61,6 +62,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.PropertyGroupDaoJena;
 
 public class WebappDaoFactoryJena implements WebappDaoFactory {
 
@@ -629,6 +631,33 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         if (applicationDao != null) {
             applicationDao.close();
         }   
+    }
+    
+    //Method for using special model for webapp dao factory, such as display model
+    //This is still in flux, am checking in to allow others to experiment
+    public void setSpecialDataModel(OntModel specialModel, OntModel specialTboxModel) {
+    	WebappDaoFactoryJena specialWadfj = new WebappDaoFactoryJena(specialModel);
+    	entityWebappDao = specialWadfj.getIndividualDao();
+    	keys2EntsDao = specialWadfj.getKeys2EntsDao();
+    	keywordDao = specialWadfj.getKeywordDao();
+    	linksDao = specialWadfj.getLinksDao();
+    	linktypeDao = specialWadfj.getLinktypeDao();
+    	vClassGroupDao = specialWadfj.getVClassGroupDao();
+    	//To allow for testing, add a property group, this will allow
+    	//the unassigned group method section to be executed and main Image to be assigned to that group
+    	//otherwise the dummy group does not allow for the unassigned group to be executed
+    	
+    	propertyGroupDao = specialWadfj.getPropertyGroupDao();
+    	PropertyGroup pgtest = new edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup();
+    	pgtest.setName("testname");
+    	pgtest.setDisplayRank(1);
+    	propertyGroupDao.insertNewPropertyGroup(pgtest);
+    	//?Simple ont model selector uses submodels - unsure if relevant here
+    	//|| ontModelSelector instanceof SimpleOntModelSelector
+    	if(ontModelSelector instanceof OntModelSelectorImpl ) {
+    		OntModelSelectorImpl omsImpl = (OntModelSelectorImpl) ontModelSelector;
+    		omsImpl.setTBoxModel(specialTboxModel);
+    	}
     }
    
 }

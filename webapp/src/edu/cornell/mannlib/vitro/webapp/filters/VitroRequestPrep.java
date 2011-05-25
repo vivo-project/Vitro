@@ -18,11 +18,15 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
@@ -30,7 +34,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.FilterFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.HideFromDisplayByPolicyFilter;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
-
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
+import org.apache.commons.dbcp.BasicDataSource;
 /**
  * This sets up several objects in the Request scope for each
  * incoming HTTP request.  This is done in a Filter so
@@ -121,7 +126,9 @@ public class VitroRequestPrep implements Filter {
     		wdf = (WebappDaoFactory) o;
     		log.debug("Found a WebappDaoFactory in the session and using it for this request");
     	}
-        
+    	
+    	checkForSpecialWDF(vreq, wdf);
+    	
         VitroFilters filters = null;
 		        
         filters = getFiltersFromContextFilterFactory(req, wdf);
@@ -191,5 +198,26 @@ public class VitroRequestPrep implements Filter {
     	// Nothing to do.
     }
 
-
+    //check if special model - this is for enabling the use of a different model for menu management 
+    private void checkForSpecialWDF(VitroRequest vreq, WebappDaoFactory wadf) {
+    	if(vreq.getParameter("test") != null) {    		
+    		if(wadf instanceof WebappDaoFactoryJena) {
+    			WebappDaoFactoryJena wadfj = (WebappDaoFactoryJena) wadf;
+    			OntModel testDisplayModel = (OntModel) _context.getAttribute("displayOntModel");
+        	
+    			//Hardcoding tbox model uri for now
+        		String tboxModelUri =  "http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadataTBOX";
+        		BasicDataSource bds = JenaDataSourceSetupBase.getApplicationDataSource(_context);
+        		//Model dbPlainModel = JenaDataSourceSetupBase.makeDBModelFromConfigurationProperties(tboxModelUri, OntModelSpec.OWL_MEM, _context);
+        		String dbType = ConfigurationProperties.getBean(_context).getProperty( // database type
+        				"VitroConnection.DataSource.dbtype", "MySQL");
+        		com.hp.hpl.jena.rdf.model.Model displayTboxModel = JenaDataSourceSetupBase.makeDBModel(bds, tboxModelUri, OntModelSpec.OWL_MEM, JenaDataSourceSetupBase.TripleStoreType.RDB, dbType, _context);
+    			System.out.println("Checking what the display tbox model is returning");
+        		displayTboxModel.write(System.out, "N3");
+        		OntModel displayTboxOntModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, displayTboxModel);
+    			
+        		wadfj.setSpecialDataModel(testDisplayModel, displayTboxOntModel);
+    		}
+    	}
+    }
 }
