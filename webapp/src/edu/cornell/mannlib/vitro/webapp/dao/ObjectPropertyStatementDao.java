@@ -31,7 +31,7 @@ public interface ObjectPropertyStatementDao {
 
     int insertNewObjectPropertyStatement(ObjectPropertyStatement objPropertyStmt );
     
-    public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(String subjectUri, String propertyUri, String query);
+    public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(String subjectUri, String propertyUri, String objectKey, String query);
     
-    public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(String subjectUri, String propertyUri, String query, Set<String> constructQueries);
+    public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(String subjectUri, String propertyUri, String objectKey, String query, Set<String> constructQueries);
 }

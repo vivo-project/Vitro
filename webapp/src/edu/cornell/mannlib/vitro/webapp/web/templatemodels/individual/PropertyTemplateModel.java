@@ -42,6 +42,7 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         this.name = name;
     }
     
+    protected abstract boolean isEmpty();
     
     /* Access methods for templates */
     

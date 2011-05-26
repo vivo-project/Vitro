@@ -61,7 +61,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
             String subjectUri = subject.getURI();
             String propertyUri = op.getURI();
             List<Map<String, String>> statementData = 
-                opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, getSelectQuery(), getConstructQueries());
+                opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, getObjectKey(), getSelectQuery(), getConstructQueries());
     
             /* Apply post-processing */
             postprocess(statementData, wdf);
@@ -75,6 +75,11 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         } else {
             log.debug("Object property " + getUri() + " is unpopulated.");
         }
+    }
+
+    @Override
+    protected boolean isEmpty() {
+        return subclasses.isEmpty();
     }
     
     protected ConfigError checkQuery(String queryString) {
