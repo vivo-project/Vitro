@@ -18,20 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 
 /**
- * TODO present the form. Get the submission.
- * 
- * TODO If email is available, present the reset flag with message templage, and
- * send email
- * 
- * TODO if email is not available, allow password change with checks for
- * validity
- * 
- * TODO If successful, go to AccountsList with message and optional password
- * message.
- * 
- * TODO if unsuccessful, go back to the page, with errors.
- * 
- * TODO How much of this can be shared with AddPage? Email templates?
+ * Handle the "Edit Account" form display and submission.
  */
 public class UserAccountsEditPage extends UserAccountsPage {
 	private static final Log log = LogFactory
@@ -186,7 +173,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 			return uris.iterator().next();
 		}
 	}
-	
+
 	private Map<String, String> buildUrlsMapWithEditUrl() {
 		Map<String, String> map = buildUrlsMap();
 		map.put("edit", editAccountUrl(userAccount.getUri()));
@@ -198,7 +185,8 @@ public class UserAccountsEditPage extends UserAccountsPage {
 		userAccount.setFirstName(firstName);
 		userAccount.setLastName(lastName);
 
-		userAccount.setPermissionSetUris(Collections.singleton(selectedRoleUri));
+		userAccount
+				.setPermissionSetUris(Collections.singleton(selectedRoleUri));
 
 		strategy.setAdditionalProperties(userAccount);
 
