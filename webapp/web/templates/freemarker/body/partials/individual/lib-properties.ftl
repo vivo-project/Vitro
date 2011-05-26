@@ -81,17 +81,15 @@ Assumes property is non-null. -->
 we need to also show the property label. If no label is specified, the property
 name will be used as the label. -->
 <#macro addLinkWithLabel property editable label="${property.name?capitalize}" extraParams="">
-    <#if property?has_content>
-        <#local addLink><@addLink property editable label extraParams /></#local>
-        <#local verboseDisplay><@verboseDisplay property /></#local>
-        <#if addLink?has_content || verboseDisplay?has_content>
-            <h2 id="${property.localName}">${label} ${addLink!} ${verboseDisplay!}</h2>         
-        </#if>
+    <#local addLink><@addLink property editable label extraParams /></#local>
+    <#local verboseDisplay><@verboseDisplay property /></#local>
+    <#if addLink?has_content || verboseDisplay?has_content>
+        <h2 id="${property.localName}">${label} ${addLink!} ${verboseDisplay!}</h2>         
     </#if>
 </#macro>
 
 <#macro addLink property editable label="${property.name}" extraParams="">
-    <#if property?has_content && editable>
+    <#if editable>
         <#local url = property.addUrl>
         <#if url?has_content>
             <@showAddLink property.localName label addParamsToEditUrl(url, extraParams) />
@@ -210,7 +208,7 @@ name will be used as the label. -->
      Note that this macro has a side-effect in the call to propertyGroups.pullProperty().
 -->
 <#macro image individual propertyGroups namespaces editable showPlaceholder="never" placeholder="">
-    <#local mainImage = propertyGroups.pullProperty("${namespaces.vitroPublic}fake")!>
+    <#local mainImage = propertyGroups.pullProperty("${namespaces.vitroPublic}mainImage")!>
     <#local extraParams = "">
     <#if placeholder?has_content>
         <#local extraParams = { "placeholder" : placeholder } >
