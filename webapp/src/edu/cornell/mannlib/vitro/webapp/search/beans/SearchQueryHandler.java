@@ -168,42 +168,42 @@ public class SearchQueryHandler {
 					if(hrJobTitle != null){
 						propertyValues.append(" " + hrJobTitle.toString());
 					}else{
-						log.warn("hrJobTitle is null ");
+						log.debug("hrJobTitle is null ");
 					}
 					
 					RDFNode involvedOrganizationName = soln.get("involvedOrganizationName");
 					if(involvedOrganizationName != null){
 						propertyValues.append(" " + involvedOrganizationName.toString());
 					}else{
-						log.warn("involvedOrganizationName is null ");
+						log.debug("involvedOrganizationName is null ");
 					}
 					
 					RDFNode positionForPerson = soln.get("positionForPerson");
 					if(positionForPerson != null){
 						propertyValues.append(" " + positionForPerson.toString());
 					}else{
-						log.warn("positionForPerson is null ");
+						log.debug("positionForPerson is null ");
 					}
 					
 					RDFNode positionInOrganization = soln.get("positionInOrganization");
 					if(positionInOrganization != null){
 						propertyValues.append(" " + positionInOrganization.toString());
 					}else{
-						log.warn("positionInOrganization is null ");
+						log.debug("positionInOrganization is null ");
 					}
 					
 					RDFNode titleOrRole = soln.get("titleOrRole");
 					if(titleOrRole != null){
 						propertyValues.append(" " + titleOrRole.toString());
 					}else{
-						log.warn("titleOrRole is null ");
+						log.debug("titleOrRole is null ");
 					}
 					
 					RDFNode positionLabel = soln.get("positionLabel");
 					if(positionLabel != null){
 						propertyValues.append(" " + positionLabel.toString());
 					}else{
-						log.warn("positionLabel is null ");
+						log.debug("positionLabel is null ");
 					}
 										
 				} 
@@ -268,28 +268,28 @@ public class SearchQueryHandler {
 					if(advisee != null){
 						propertyValues.append(" " + advisee.toString());
 					}else{
-						log.warn("advisee is null ");
+						log.debug("advisee is null ");
 					}
 					
 					RDFNode degreeCandidacy = soln.get("degreeCandidacy");
 					if(degreeCandidacy != null){
 						propertyValues.append(" " + degreeCandidacy.toString());
 					}else{
-						log.warn("degreeCandidacy is null ");
+						log.debug("degreeCandidacy is null ");
 					}
 					
 					RDFNode linkedAuthor = soln.get("linkedAuthor");
 					if(linkedAuthor != null){
 						propertyValues.append(" " + linkedAuthor.toString());
 					}else{
-						log.warn("linkedAuthor is null ");
+						log.debug("linkedAuthor is null ");
 					}
 					
 					RDFNode linkedInformationResource = soln.get("linkedInformationResource");
 					if(linkedInformationResource != null){
 						propertyValues.append(" " + linkedInformationResource.toString());
 					}else{
-						log.warn("linkedInformationResource is null ");
+						log.debug("linkedInformationResource is null ");
 					}					
 										
 				} 
@@ -355,28 +355,28 @@ public class SearchQueryHandler {
 					if(awardConferredBy != null){
 						propertyValues.append(" " + awardConferredBy.toString());
 					}else{
-						log.warn("awardConferredBy is null ");
+						log.debug("awardConferredBy is null ");
 					}
 					
 					RDFNode awardOrHonorFor = soln.get("awardOrHonorFor");
 					if(awardOrHonorFor != null){
 						propertyValues.append(" " + awardOrHonorFor.toString());
 					}else{
-						log.warn("awardOrHonorFor is null ");
+						log.debug("awardOrHonorFor is null ");
 					}
 					
 					RDFNode description = soln.get("description");
 					if(description != null){
 						propertyValues.append(" " + description.toString());
 					}else{
-						log.warn("description is null ");
+						log.debug("description is null ");
 					}
 					
 					RDFNode awardReceiptLabel = soln.get("awardReceiptLabel");
 					if(awardReceiptLabel != null){
 						propertyValues.append(" " + awardReceiptLabel.toString());
 					}else{
-						log.warn("awardReceiptLabel is null ");
+						log.debug("awardReceiptLabel is null ");
 					}					
 										
 				} 
@@ -502,35 +502,35 @@ public class SearchQueryHandler {
 					if(academicDegreeLabel != null){
 						propertyValues.append(" " + academicDegreeLabel.toString());
 					}else{
-						log.warn("academicDegreeLabel is null ");
+						log.debug("academicDegreeLabel is null ");
 					}
 					
 					RDFNode academicDegreeAbbreviation = soln.get("academicDegreeAbbreviation");
 					if(academicDegreeAbbreviation != null){
 						propertyValues.append(" " + academicDegreeAbbreviation.toString());
 					}else{
-						log.warn("academicDegreeAbbreviation is null ");
+						log.debug("academicDegreeAbbreviation is null ");
 					}
 					
 					RDFNode majorField = soln.get("majorField");
 					if(majorField != null){
 						propertyValues.append("  " + majorField.toString());
 					}else{
-						log.warn("majorField is null ");
+						log.debug("majorField is null ");
 					}
 					
 					RDFNode trainingAtDepartmentOrSchool = soln.get("departmentOrSchool");
 					if(trainingAtDepartmentOrSchool != null){
 						propertyValues.append(" " + trainingAtDepartmentOrSchool.toString());
 					}else{
-						log.warn("trainingAtDepartmentOrSchool is null ");
+						log.debug("trainingAtDepartmentOrSchool is null ");
 					}
 					
 					RDFNode trainingAtOrganizationLabel = soln.get("trainingAtOrganizationLabel");
 					if(trainingAtOrganizationLabel != null){
 						propertyValues.append(" " + trainingAtOrganizationLabel.toString());
 					}else{
-						log.warn("trainingAtOrganizationLabel is null ");
+						log.debug("trainingAtOrganizationLabel is null ");
 					}
 										
 				} 
@@ -596,42 +596,42 @@ public class SearchQueryHandler {
 					if(linkedAuthor != null){
 						propertyValues.append(" " + linkedAuthor.toString());
 					}else{
-						log.warn("linkedAuthor is null ");
+						log.debug("linkedAuthor is null ");
 					}
 					
 					RDFNode linkedInformationResource = soln.get("linkedInformationResource");
 					if(linkedInformationResource != null){
 						propertyValues.append(" " + linkedInformationResource.toString());
 					}else{
-						log.warn("linkedInformationResource is null ");
+						log.debug("linkedInformationResource is null ");
 					}
 					
 					RDFNode editor = soln.get("editor");
 					if(editor != null){
 						propertyValues.append("  " + editor.toString());
 					}else{
-						log.warn("editor is null ");
+						log.debug("editor is null ");
 					}
 					
 					RDFNode subjectArea = soln.get("subjectArea");
 					if(subjectArea != null){
 						propertyValues.append(" " + subjectArea.toString());
 					}else{
-						log.warn("subjectArea is null ");
+						log.debug("subjectArea is null ");
 					}
 					
 					RDFNode researchAreaOf = soln.get("researchAreaOf");
 					if(researchAreaOf != null){
 						propertyValues.append(" " + researchAreaOf.toString());
 					}else{
-						log.warn("researchAreaOf is null ");
+						log.debug("researchAreaOf is null ");
 					}
 					
 					RDFNode features = soln.get("features");
 					if(features != null){
 						propertyValues.append(" " + features.toString());
 					}else{
-						log.warn("features is null ");
+						log.debug("features is null ");
 					}
 										
 				} 

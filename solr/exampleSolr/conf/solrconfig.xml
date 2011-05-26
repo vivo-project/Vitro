@@ -708,7 +708,7 @@
       -->
      <lst name="defaults">
        <str name="defType">dismax</str>
-       <str name="qf">nameRaw nameLowercase nameUnstemmed nameStemmed ALLTEXT ALLTEXTUNSTEMMED ALLTEXT_PHONETIC NAME_PHONETIC</str>
+       <str name="qf">nameRaw nameLowercase nameUnstemmed nameStemmed ALLTEXT ALLTEXTUNSTEMMED ALLTEXT_PHONETIC NAME_PHONETIC contextNode</str>
        <str name="echoParams">explicit</str>
        <str name="bf">BETA</str>
        <int name="rows">10</int>
