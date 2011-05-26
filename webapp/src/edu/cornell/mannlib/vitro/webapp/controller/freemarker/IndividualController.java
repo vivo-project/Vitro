@@ -4,10 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,7 +56,7 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
-import edu.cornell.mannlib.vitro.webapp.utils.jena.InitialJenaModelUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.jena.ExtendedLinkedDataUtils;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividualTemplateModel;
@@ -674,7 +672,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        		rootDir = RICH_EXPORT_ROOT +  include + "/";
 	        	}
 	        	
-				Model extendedModel = InitialJenaModelUtils.createModelFromQueries(getServletContext(), rootDir, contextModel, entity.getURI());
+				Model extendedModel = ExtendedLinkedDataUtils.createModelFromQueries(getServletContext(), rootDir, contextModel, entity.getURI());
 				newModel.add(extendedModel);
 	        }
 		}
