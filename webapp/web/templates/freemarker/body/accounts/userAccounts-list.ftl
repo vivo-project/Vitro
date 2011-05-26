@@ -47,8 +47,26 @@
         <p>
             A new account for 
             <a href="${newUserAccount.editUrl}">${newUserAccount.firstName} ${newUserAccount.lastName}</a>
-            was successfully created. A notification email has been sent to ${newUserAccount.emailAddress}
-            with instructions for activating the account and creating a password.
+            was successfully created. 
+            <#if emailWasSent?? > 
+                A notification email has been sent to ${newUserAccount.emailAddress}
+                with instructions for activating the account and creating a password.
+            </#if>
+        </p>
+    </section>
+</#if>
+
+<#if updatedUserAccount?? >
+    <section class="account-feedback">
+        <p>
+            The account for 
+            <a href="${updatedUserAccount.editUrl}">${updatedUserAccount.firstName} ${updatedUserAccount.lastName}</a>
+            has been updated.
+            <#if emailWasSent?? > 
+                A confirmation email has been sent to ${updatedUserAccount.emailAddress}
+                with instructions for resetting a password. 
+                The password will not be reset until the user follows the link provided in this email.
+            </#if>
         </p>
     </section>
 </#if>

@@ -68,8 +68,9 @@ public class UserAccountsAddPage extends UserAccountsPage {
 		emailAddress = getStringParameter(PARAMETER_EMAIL_ADDRESS, "");
 		firstName = getStringParameter(PARAMETER_FIRST_NAME, "");
 		lastName = getStringParameter(PARAMETER_LAST_NAME, "");
-		selectedRoleUri = getRoleChoices();
-		associateWithProfile = getAssociateFlag();
+		selectedRoleUri = getStringParameter(PARAMETER_ROLE, "");
+		associateWithProfile = isParameterAsExpected(
+				PARAMETER_ASSOCIATE_WITH_PROFILE, "yes");
 
 		strategy.parseAdditionalParameters();
 	}
@@ -124,22 +125,6 @@ public class UserAccountsAddPage extends UserAccountsPage {
 		this.addedAccount = userAccountsDao.getUserAccountByUri(uri);
 
 		strategy.notifyUser();
-	}
-
-	/** What role are they asking for? */
-	private String getRoleChoices() {
-		String[] roles = vreq.getParameterValues(PARAMETER_ROLE);
-		if ((roles == null) || (roles.length == 0)) {
-			return "";
-		} else {
-			return roles[0];
-		}
-	}
-
-	/** Are they associating with an Individual profile? */
-	private boolean getAssociateFlag() {
-		return "yes".equals(getStringParameter(
-				PARAMETER_ASSOCIATE_WITH_PROFILE, "no"));
 	}
 
 	public final ResponseValues showPage() {

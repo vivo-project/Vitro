@@ -22,6 +22,7 @@ public class UserAccountsUserController extends FreemarkerHttpServlet {
 	public static final String BOGUS_STANDARD_MESSAGE = "Request failed. Please contact your system administrator.";
 
 	private static final String ACTION_CREATE_PASSWORD = "/createPassword";
+	private static final String ACTION_RESET_PASSWORD = "/resetPassword";
 
 	@Override
 	protected Actions requiredActions(VitroRequest vreq) {
@@ -39,6 +40,8 @@ public class UserAccountsUserController extends FreemarkerHttpServlet {
 
 		if (ACTION_CREATE_PASSWORD.equals(action)) {
 			return handleCreatePasswordRequest(vreq);
+		} else if (ACTION_RESET_PASSWORD.equals(action)) {
+			return handleResetPasswordRequest(vreq);
 		} else {
 			return handleInvalidRequest(vreq);
 		}
@@ -51,6 +54,21 @@ public class UserAccountsUserController extends FreemarkerHttpServlet {
 			return showHomePage(vreq, page.getBogusMessage());
 		} else if (page.isSubmit() && page.isValid()) {
 			page.createPassword();
+			return showHomePage(vreq,
+					"Your password has been saved. Please log in.");
+		} else {
+			return page.showPage();
+		}
+
+	}
+
+	private ResponseValues handleResetPasswordRequest(VitroRequest vreq) {
+		UserAccountsResetPasswordPage page = new UserAccountsResetPasswordPage(
+				vreq);
+		if (page.isBogus()) {
+			return showHomePage(vreq, page.getBogusMessage());
+		} else if (page.isSubmit() && page.isValid()) {
+			page.resetPassword();
 			return showHomePage(vreq,
 					"Your password has been saved. Please log in.");
 		} else {

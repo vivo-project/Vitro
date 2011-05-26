@@ -68,6 +68,8 @@
                 <label for="initial-password">Initial password<span class="requiredHint"> *</span></label>
                 <input type="password" name="initialPassword" value="${initialPassword}" id="initial-password" role="input "/>
 
+                <p>Minimum of ${minimumLength} characters in length.</p>
+
                 <label for="confirm-password">Confirm initial password<span class="requiredHint"> *</span></label> 
                 <input type="text" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input "/>
             </#if>
@@ -78,10 +80,6 @@
 
             <input type="radio" name="associate" value="no"  role="radio" <#if !associate??>checked</#if> id="no-associate" />
             <label class="inline" for="no-associate"> No</label>
-
-            <br />
-            <input type="checkbox" name="resetPassword" value="" id="reset-password" role="checkbox" />
-            <label  class="inline" for="reset-password"> Reset password</label>
 
             <#if emailIsEnabled??>
                 <p class="note">

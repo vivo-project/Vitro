@@ -105,6 +105,9 @@ public class UserAccountsListPage extends UserAccountsPage {
 
 		body.put("newUserAccount", new UserAccountWrapper(userAccount,
 				Collections.<String> emptyList()));
+		if (emailWasSent) {
+			body.put("emailWasSent", Boolean.TRUE);
+		}
 
 		return new TemplateResponseValues(TEMPLATE_NAME, body);
 	}
@@ -114,8 +117,17 @@ public class UserAccountsListPage extends UserAccountsPage {
 	 */
 	public ResponseValues showPageWithUpdatedAccount(UserAccount userAccount,
 			boolean emailWasSent) {
-		throw new RuntimeException(
-				"UserAccountsListPage.showPageWithUpdatedAccount not implemented.");
+		UserAccountsSelection selection = UserAccountsSelector.select(
+				userAccountsModel, criteria);
+		Map<String, Object> body = buildTemplateBodyMap(selection);
+
+		body.put("updatedUserAccount", new UserAccountWrapper(userAccount,
+				Collections.<String> emptyList()));
+		if (emailWasSent) {
+			body.put("emailWasSent", Boolean.TRUE);
+		}
+
+		return new TemplateResponseValues(TEMPLATE_NAME, body);
 	}
 
 	/**

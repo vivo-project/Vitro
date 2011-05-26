@@ -2,7 +2,7 @@
 
 <#-- Template for adding a user account -->
 
-<h3>Create your Password</h3>
+<h3>Reset your Password</h3>
 
     <#if errorPasswordIsEmpty??>
         <#assign errorMessage = "No password supplied." />
@@ -23,11 +23,11 @@
         </section>
     </#if>
 
-<section id="create-password" role="region">
+<section id="reset-password" role="region">
     <fieldset>
         <legend>Please enter your new password for ${userAccount.emailAddress}</legend>
 
-        <form method="POST" action="${formUrls.createPassword}" class="customForm" role="create password">
+        <form method="POST" action="${formUrls.resetPassword}" class="customForm" role="create password">
             <input type="hidden" name="user" value="${userAccount.emailAddress}" />
             <input type="hidden" name="key"  value="${userAccount.passwordLinkExpiresHash}" />
         

@@ -1,6 +1,6 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#-- Confirmation that an password has been created. -->
+<#-- Confirmation that an password has been reset. -->
 
 <html>
     <head>
@@ -12,11 +12,11 @@
         </p>
         
         <p>
-            <strong>Password successfully created.</strong>
+            <strong>Password successfully changed.</strong>
         </p>
         
         <p>
-            Your new password associated with ${userAccount.emailAddress} has been created.
+            Your new password associated with ${userAccount.emailAddress} has been changed.
         </p>
         
         <p>

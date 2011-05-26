@@ -18,20 +18,19 @@ import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailMessage;
 
 /**
  * When the user clicks on the link in their notification email, handle their
- * request to create a password.
+ * request to reset their password.
  */
-public class UserAccountsCreatePasswordPage extends
-		UserAccountsPasswordBasePage {
+public class UserAccountsResetPasswordPage extends UserAccountsPasswordBasePage {
 	private static final Log log = LogFactory
-			.getLog(UserAccountsCreatePasswordPage.class);
+			.getLog(UserAccountsResetPasswordPage.class);
 
-	private static final String TEMPLATE_NAME = "userAccounts-createPassword.ftl";
+	private static final String TEMPLATE_NAME = "userAccounts-resetPassword.ftl";
 
-	public UserAccountsCreatePasswordPage(VitroRequest vreq) {
+	protected UserAccountsResetPasswordPage(VitroRequest vreq) {
 		super(vreq);
 	}
 
-	public void createPassword() {
+	public void resetPassword() {
 		userAccount.setMd5Password(Authenticator.applyMd5Encoding(newPassword));
 		userAccount.setPasswordLinkExpires(0L);
 		userAccount.setStatus(Status.ACTIVE);
@@ -44,7 +43,7 @@ public class UserAccountsCreatePasswordPage extends
 
 	@Override
 	protected String passwordChangeNotPendingMessage() {
-		return "The account for " + userEmail + " has already been activated.";
+		return "The password for " + userEmail + " has already been reset.";
 	}
 
 	@Override
@@ -55,15 +54,16 @@ public class UserAccountsCreatePasswordPage extends
 	private void notifyUser() {
 		Map<String, Object> body = new HashMap<String, Object>();
 		body.put("userAccount", userAccount);
-		body.put("subjectLine", "Password successfully created.");
+		body.put("subjectLine", "Password changed.");
 
 		FreemarkerEmailMessage email = FreemarkerEmailFactory
 				.createNewMessage(vreq);
 		email.addRecipient(TO, userAccount.getEmailAddress());
-		email.setSubject("Password successfully created.");
-		email.setHtmlTemplate("userAccounts-passwordCreatedEmail-html.ftl");
-		email.setTextTemplate("userAccounts-passwordCreatedEmail-text.ftl");
+		email.setSubject("Password changed.");
+		email.setHtmlTemplate("userAccounts-passwordResetEmail-html.ftl");
+		email.setTextTemplate("userAccounts-passwordResetEmail-text.ftl");
 		email.setBodyMap(body);
 		email.send();
 	}
+
 }

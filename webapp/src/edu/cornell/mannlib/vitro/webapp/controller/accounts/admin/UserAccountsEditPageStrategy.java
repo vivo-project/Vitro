@@ -20,11 +20,11 @@ import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailMessage;
 /**
  * Handle the variant details of the UserAccountsAddPage.
  */
-public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
-	protected final UserAccountsAddPage page;
+public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
+	protected final UserAccountsEditPage page;
 
-	public static UserAccountsAddPageStrategy getInstance(VitroRequest vreq,
-			UserAccountsAddPage page, boolean emailEnabled) {
+	public static UserAccountsEditPageStrategy getInstance(VitroRequest vreq,
+			UserAccountsEditPage page, boolean emailEnabled) {
 		if (emailEnabled) {
 			return new EmailStrategy(vreq, page);
 		} else {
@@ -32,8 +32,8 @@ public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 		}
 	}
 
-	public UserAccountsAddPageStrategy(VitroRequest vreq,
-			UserAccountsAddPage page) {
+	public UserAccountsEditPageStrategy(VitroRequest vreq,
+			UserAccountsEditPage page) {
 		super(vreq);
 		this.page = page;
 	}
@@ -54,18 +54,21 @@ public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 	// Strategy to use if email is enabled.
 	// ----------------------------------------------------------------------
 
-	private static class EmailStrategy extends UserAccountsAddPageStrategy {
-		public static final String CREATE_PASSWORD_URL = "/accounts/createPassword";
+	private static class EmailStrategy extends UserAccountsEditPageStrategy {
+		private static final String PARAMETER_RESET_PASSWORD = "resetPassword";
 
+		public static final String RESET_PASSWORD_URL = "/accounts/resetPassword";
+
+		private boolean resetPassword;
 		private boolean sentEmail;
 
-		public EmailStrategy(VitroRequest vreq, UserAccountsAddPage page) {
+		public EmailStrategy(VitroRequest vreq, UserAccountsEditPage page) {
 			super(vreq, page);
 		}
 
 		@Override
 		protected void parseAdditionalParameters() {
-			// No additional parameters
+			resetPassword = isFlagOnRequest(PARAMETER_RESET_PASSWORD);
 		}
 
 		@Override
@@ -76,40 +79,48 @@ public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 
 		@Override
 		protected void setAdditionalProperties(UserAccount u) {
-			u.setPasswordLinkExpires(figureExpirationDate().getTime());
-			u.setStatus(Status.INACTIVE);
+			if (resetPassword) {
+				u.setPasswordLinkExpires(figureExpirationDate().getTime());
+			}
 		}
 
 		@Override
 		protected void addMoreBodyValues(Map<String, Object> body) {
 			body.put("emailIsEnabled", Boolean.TRUE);
+			if (resetPassword) {
+				body.put("resetPassword", Boolean.TRUE);
+			}
 		}
 
 		@Override
 		protected void notifyUser() {
+			if (!resetPassword) {
+				return;
+			}
+
 			Map<String, Object> body = new HashMap<String, Object>();
-			body.put("userAccount", page.getAddedAccount());
-			body.put("passwordLink", buildCreatePasswordLink());
-			body.put("subjectLine", "Your VIVO account has been created.");
+			body.put("userAccount", page.getUpdatedAccount());
+			body.put("passwordLink", buildResetPasswordLink());
+			body.put("subjectLine", "Reset password request");
 
 			FreemarkerEmailMessage email = FreemarkerEmailFactory
 					.createNewMessage(vreq);
-			email.addRecipient(TO, page.getAddedAccount().getEmailAddress());
-			email.setSubject("Your VIVO account has been created.");
-			email.setHtmlTemplate("userAccounts-acctCreatedEmail-html.ftl");
-			email.setTextTemplate("userAccounts-acctCreatedEmail-text.ftl");
+			email.addRecipient(TO, page.getUpdatedAccount().getEmailAddress());
+			email.setSubject("Reset password request");
+			email.setHtmlTemplate("userAccounts-resetPasswordEmail-html.ftl");
+			email.setTextTemplate("userAccounts-resetPasswordEmail-text.ftl");
 			email.setBodyMap(body);
 			email.send();
 
 			sentEmail = true;
 		}
 
-		private String buildCreatePasswordLink() {
+		private String buildResetPasswordLink() {
 			try {
-				String email = page.getAddedAccount().getEmailAddress();
-				String hash = page.getAddedAccount()
+				String email = page.getUpdatedAccount().getEmailAddress();
+				String hash = page.getUpdatedAccount()
 						.getPasswordLinkExpiresHash();
-				String relativeUrl = UrlBuilder.getUrl(CREATE_PASSWORD_URL,
+				String relativeUrl = UrlBuilder.getUrl(RESET_PASSWORD_URL,
 						"user", email, "key", hash);
 
 				URL context = new URL(vreq.getRequestURL().toString());
@@ -131,34 +142,33 @@ public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 	// Strategy to use if email is not enabled.
 	// ----------------------------------------------------------------------
 
-	private static class NoEmailStrategy extends UserAccountsAddPageStrategy {
-		private static final String PARAMETER_INITIAL_PASSWORD = "initialPassword";
+	private static class NoEmailStrategy extends UserAccountsEditPageStrategy {
+		private static final String PARAMETER_NEW_PASSWORD = "newPassword";
 		private static final String PARAMETER_CONFIRM_PASSWORD = "confirmPassword";
 
-		private static final String ERROR_NO_PASSWORD = "errorPasswordIsEmpty";
 		private static final String ERROR_WRONG_PASSWORD_LENGTH = "errorPasswordIsWrongLength";
 		private static final String ERROR_PASSWORDS_DONT_MATCH = "errorPasswordsDontMatch";
 
-		private String initialPassword;
+		private String newPassword;
 		private String confirmPassword;
 
-		public NoEmailStrategy(VitroRequest vreq, UserAccountsAddPage page) {
+		public NoEmailStrategy(VitroRequest vreq, UserAccountsEditPage page) {
 			super(vreq, page);
 		}
 
 		@Override
 		protected void parseAdditionalParameters() {
-			initialPassword = getStringParameter(PARAMETER_INITIAL_PASSWORD, "");
+			newPassword = getStringParameter(PARAMETER_NEW_PASSWORD, "");
 			confirmPassword = getStringParameter(PARAMETER_CONFIRM_PASSWORD, "");
 		}
 
 		@Override
 		protected String additionalValidations() {
-			if (initialPassword.isEmpty()) {
-				return ERROR_NO_PASSWORD;
+			if (newPassword.isEmpty() && confirmPassword.isEmpty()) {
+				return "";
 			} else if (!checkPasswordLength()) {
 				return ERROR_WRONG_PASSWORD_LENGTH;
-			} else if (!initialPassword.equals(confirmPassword)) {
+			} else if (!newPassword.equals(confirmPassword)) {
 				return ERROR_PASSWORDS_DONT_MATCH;
 			} else {
 				return "";
@@ -166,13 +176,13 @@ public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 		}
 
 		private boolean checkPasswordLength() {
-			return initialPassword.length() >= UserAccount.MIN_PASSWORD_LENGTH
-					&& initialPassword.length() <= UserAccount.MAX_PASSWORD_LENGTH;
+			return newPassword.length() >= UserAccount.MIN_PASSWORD_LENGTH
+					&& newPassword.length() <= UserAccount.MAX_PASSWORD_LENGTH;
 		}
 
 		@Override
 		protected void addMoreBodyValues(Map<String, Object> body) {
-			body.put("initialPassword", initialPassword);
+			body.put("newPassword", newPassword);
 			body.put("confirmPassword", confirmPassword);
 			body.put("minimumLength", UserAccount.MIN_PASSWORD_LENGTH);
 			body.put("maximumLength", UserAccount.MAX_PASSWORD_LENGTH);
@@ -180,9 +190,8 @@ public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 
 		@Override
 		protected void setAdditionalProperties(UserAccount u) {
-			u.setMd5Password(initialPassword);
+			u.setMd5Password(newPassword);
 			u.setPasswordChangeRequired(true);
-			u.setStatus(Status.ACTIVE);
 		}
 
 		@Override

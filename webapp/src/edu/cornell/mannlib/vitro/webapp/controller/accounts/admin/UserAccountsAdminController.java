@@ -9,12 +9,15 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
+import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 
 /**
- * Parcel out the different actions required of the Administrators portion of the UserAccounts GUI.
+ * Parcel out the different actions required of the Administrators portion of
+ * the UserAccounts GUI.
  */
 public class UserAccountsAdminController extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory
@@ -64,7 +67,9 @@ public class UserAccountsAdminController extends FreemarkerHttpServlet {
 
 	private ResponseValues handleEditRequest(VitroRequest vreq) {
 		UserAccountsEditPage page = new UserAccountsEditPage(vreq);
-		if (page.isSubmit() && page.isValid()) {
+		if (page.isBogus()) {
+			return showHomePage(vreq, page.getBogusMessage());
+		} else if (page.isSubmit() && page.isValid()) {
 			page.updateAccount();
 			UserAccountsListPage listPage = new UserAccountsListPage(vreq);
 			return listPage.showPageWithUpdatedAccount(
@@ -85,6 +90,11 @@ public class UserAccountsAdminController extends FreemarkerHttpServlet {
 	private ResponseValues handleListRequest(VitroRequest vreq) {
 		UserAccountsListPage page = new UserAccountsListPage(vreq);
 		return page.showPage();
+	}
+
+	private ResponseValues showHomePage(VitroRequest vreq, String message) {
+		DisplayMessage.setMessage(vreq, message);
+		return new RedirectResponseValues("/");
 	}
 
 }
