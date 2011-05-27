@@ -126,7 +126,7 @@ public class JenaIngestController extends BaseEditController {
 			String modelT = (String)getServletContext().getAttribute("modelT");
 			String info = (String)getServletContext().getAttribute("info");
 			if(modelT == null){
-				boolean initialSwitch = JenaDataSourceSetupBase.isSDBActive(vreq);
+				boolean initialSwitch = true; // SDB mode initially
 				if(initialSwitch){
 					VitroJenaSDBModelMaker vsmm = (VitroJenaSDBModelMaker) getServletContext().getAttribute("vitroJenaSDBModelMaker");
 					vreq.getSession().setAttribute("vitroJenaModelMaker", vsmm);

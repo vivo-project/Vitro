@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
@@ -51,10 +50,14 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
 
     protected static String BASE = "/WEB-INF/ontologies/";
     protected static String USERPATH = BASE+"user/";
+    protected static String USER_ABOX_PATH = BASE+"user/abox";
+    protected static String USER_TBOX_PATH = BASE+"user/tbox";
+    protected static String USER_APPMETA_PATH = BASE+"user/applicationMetadata";
     protected static String SYSTEMPATH = BASE+"system/";
     protected static String AUTHPATH = BASE+"auth/";
     public static String APPPATH = BASE+"app/";
     protected static String SUBMODELS = "/WEB-INF/submodels/";
+    protected static boolean firstStartup = false;
 
     String DB_USER =   "jenatest";                          // database user id
     String DB_PASSWD = "jenatest";                          // database password
@@ -250,6 +253,10 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
 	   RDB, SDB
    }
    
+   protected boolean isFirstStartup() {
+	   return firstStartup;
+   }
+   
    protected Model makeDBModel(BasicDataSource ds, 
                                String jenaDbModelname, 
                                OntModelSpec jenaDbOntModelSpec, 
@@ -410,28 +417,13 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     }
     
     public static void setVitroJenaModelMaker(VitroJenaModelMaker vjmm, 
-                                              ServletContextEvent sce){
-    	sce.getServletContext().setAttribute(rdbModelMaker, vjmm);
+                                              ServletContext ctx){
+    	ctx.setAttribute(rdbModelMaker, vjmm);
     }
     
     public static void setVitroJenaSDBModelMaker(VitroJenaSDBModelMaker vsmm, 
-                                                 ServletContextEvent sce){
-    	sce.getServletContext().setAttribute(sdbModelMaker, vsmm);
-    }
-    
-	public static boolean isSDBActive(ServletRequest req) {
-		if (!(req instanceof HttpServletRequest)) {
-			return false;
-		}
-		HttpServletRequest hreq = (HttpServletRequest) req;
-		return isSDBActive(hreq.getSession().getServletContext());
-	}
-    
-    public static boolean isSDBActive(ServletContext ctx) {
-    	String tripleStoreTypeStr = 
-    		ConfigurationProperties.getBean(ctx).getProperty(
-    				"VitroConnection.DataSource.tripleStoreType", "RDB");
-    	return ("SDB".equals(tripleStoreTypeStr)); 
+                                                 ServletContext ctx){
+    	ctx.setAttribute(sdbModelMaker, vsmm);
     }
     
     protected VitroJenaModelMaker getVitroJenaModelMaker(){

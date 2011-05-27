@@ -61,10 +61,8 @@ public class WebappDaoFactorySDBPrep implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain filterChain) throws IOException, ServletException {
 		
-		if ( (!(JenaDataSourceSetupBase.isSDBActive(request))) || 
-		        (request.getAttribute(
-		                "WebappDaoFactorySDBPrep.setup") != null) ) {
-			// don't run multiple times or if SDB is not active
+		if ( request.getAttribute("WebappDaoFactorySDBPrep.setup") != null ) {
+			// don't run multiple times
 		    filterChain.doFilter(request, response);
 			return;
 		}
