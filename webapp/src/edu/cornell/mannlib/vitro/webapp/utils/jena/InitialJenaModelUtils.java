@@ -88,7 +88,7 @@ public class InitialJenaModelUtils {
         	throw new RuntimeException("No default theme has been set; unable to create default portal.");      	
         }
         portal1.setPropertyValue(themeDirProperty,ResourceFactory.createPlainLiteral(defaultThemeStr));
-		portal1.setLabel("New Vitro Portal", null);	
+		portal1.setLabel("Vitro", null);	
 		return essentialInterfaceData;		
 	}
 	
