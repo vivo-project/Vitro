@@ -4,6 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -79,10 +81,11 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 		}
 
 		String userUri = null;
-		
+
 		getOntModel().enterCriticalSection(Lock.READ);
 		try {
-			StmtIterator stmts = getOntModel().listStatements(null, USERACCOUNT_EMAIL_ADDRESS,
+			StmtIterator stmts = getOntModel().listStatements(null,
+					USERACCOUNT_EMAIL_ADDRESS,
 					getOntModel().createLiteral(emailAddress));
 			if (stmts.hasNext()) {
 				userUri = stmts.next().getSubject().getURI();
@@ -90,7 +93,7 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 		} finally {
 			getOntModel().leaveCriticalSection();
 		}
-		
+
 		return getUserAccountByUri(userUri);
 	}
 
@@ -263,6 +266,8 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 			getOntModel().leaveCriticalSection();
 		}
 
+		Collections.sort(list, new PermissionSetsByUri());
+
 		return list;
 	}
 
@@ -286,4 +291,11 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 				+ errMsg);
 	}
 
+	private static class PermissionSetsByUri implements
+			Comparator<PermissionSet> {
+		@Override
+		public int compare(PermissionSet ps1, PermissionSet ps2) {
+			return ps1.getUri().compareTo(ps2.getUri());
+		}
+	}
 }

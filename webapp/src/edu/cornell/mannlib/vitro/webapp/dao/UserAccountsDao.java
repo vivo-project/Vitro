@@ -75,7 +75,7 @@ public interface UserAccountsDao {
 	PermissionSet getPermissionSetByUri(String uri);
 
 	/**
-	 * Get all of the PermissionSets in the model.
+	 * Get all of the PermissionSets in the model, sorted by URI.
 	 * 
 	 * @return a collection which might be empty, but is never null.
 	 */
