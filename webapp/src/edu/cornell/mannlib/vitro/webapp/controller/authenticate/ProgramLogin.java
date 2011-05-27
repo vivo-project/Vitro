@@ -3,8 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
 import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource.INTERNAL;
-import static edu.cornell.mannlib.vitro.webapp.beans.User.MAX_PASSWORD_LENGTH;
-import static edu.cornell.mannlib.vitro.webapp.beans.User.MIN_PASSWORD_LENGTH;
+import static edu.cornell.mannlib.vitro.webapp.beans.UserAccount.MAX_PASSWORD_LENGTH;
+import static edu.cornell.mannlib.vitro.webapp.beans.UserAccount.MIN_PASSWORD_LENGTH;
 
 import java.io.IOException;
 import java.io.PrintWriter;

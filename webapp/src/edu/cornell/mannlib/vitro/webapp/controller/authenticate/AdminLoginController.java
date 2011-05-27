@@ -3,6 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
 import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource.INTERNAL;
+import static edu.cornell.mannlib.vitro.webapp.beans.UserAccount.MAX_PASSWORD_LENGTH;
+import static edu.cornell.mannlib.vitro.webapp.beans.UserAccount.MIN_PASSWORD_LENGTH;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +13,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -126,8 +127,8 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 		}
 
 		private boolean isPasswordValidLength(String pw) {
-			return (pw.length() >= User.MIN_PASSWORD_LENGTH)
-					&& (pw.length() <= User.MAX_PASSWORD_LENGTH);
+			return (pw.length() >= MIN_PASSWORD_LENGTH)
+					&& (pw.length() <= MAX_PASSWORD_LENGTH);
 		}
 
 		private boolean tryToLogin() {

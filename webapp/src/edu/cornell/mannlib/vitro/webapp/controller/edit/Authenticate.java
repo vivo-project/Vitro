@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
+import static edu.cornell.mannlib.vitro.webapp.beans.UserAccount.MAX_PASSWORD_LENGTH;
+import static edu.cornell.mannlib.vitro.webapp.beans.UserAccount.MIN_PASSWORD_LENGTH;
 import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.FORCED_PASSWORD_CHANGE;
 import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.LOGGED_IN;
 import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.LOGGING_IN;
@@ -10,8 +12,6 @@ import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -85,6 +84,7 @@ public class Authenticate extends VitroHttpServlet {
 	 * Find out where they are in the login process, process any input, record
 	 * the new state, and show the next page.
 	 */
+	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) {
 
 		VitroRequest vreq = new VitroRequest(request);
@@ -374,10 +374,10 @@ public class Authenticate extends VitroHttpServlet {
 			return;
 		}
 
-		if ((newPassword.length() < User.MIN_PASSWORD_LENGTH)
-				|| (newPassword.length() > User.MAX_PASSWORD_LENGTH)) {
-			bean.setMessage(Message.PASSWORD_LENGTH, User.MIN_PASSWORD_LENGTH,
-					User.MAX_PASSWORD_LENGTH);
+		if ((newPassword.length() < MIN_PASSWORD_LENGTH)
+				|| (newPassword.length() > MAX_PASSWORD_LENGTH)) {
+			bean.setMessage(Message.PASSWORD_LENGTH, MIN_PASSWORD_LENGTH,
+					MAX_PASSWORD_LENGTH);
 			return;
 		}
 
@@ -393,10 +393,11 @@ public class Authenticate extends VitroHttpServlet {
 	}
 
 	/**
-	 * They are already logged in. There's nothing to do; no transition.
+	 * They are already logged in.
 	 */
 	@SuppressWarnings("unused")
 	private void processInputLoggedIn(HttpServletRequest request) {
+		// Nothing to do. No transition.
 	}
 
 	/**
