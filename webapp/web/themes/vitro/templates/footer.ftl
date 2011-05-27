@@ -13,7 +13,7 @@
             </#if>
              | <a class="terms" href="${urls.termsOfUse}">Terms of Use</a></small> | 
         </#if>
-        Powered by <a class="powered-by-vivo" href="http://vivoweb.org" target="_blank"><strong>VIVO</strong></a>
+        Powered by <a class="powered-by-vitro" href="http://vitro.sourceforge.net"><strong>Vitro</strong></a>
         <#if user.hasRevisionInfoAccess>
              | Version <a href="${version.moreInfoUrl}">${version.label}</a>
         </#if>
@@ -25,7 +25,6 @@
             <#if urls.contact??>
                 <li role="listitem"><a href="${urls.contact}">Contact Us</a></li>
             </#if> 
-            <li role="listitem"><a href="http://www.vivoweb.org/support" target="blank">Support</a></li>
         </ul>
     </nav>
 </footer>
