@@ -33,7 +33,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	
 	
 	private Resource objectProperty = ResourceFactory.createResource("http://www.w3.org/2002/07/owl#ObjectProperty");
-	private static final String mostSpecificTypePropertyURI = "http://vivoweb.org/ontology/core#mostSpecificType";
+	private static final String mostSpecificTypePropertyURI = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType";
   
 	@Before
 	public void suppressErrorOutput() {
@@ -1011,19 +1011,19 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		aBox.add(ind_x, RDF.type, classD);		
 		
 		// Verify ind_x mostSpecificType annotation for D
-		Assert.assertTrue(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classD.getURI(), XSDDatatype.XSDanyURI)));	
+		Assert.assertTrue(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createResource(classD.getURI())));	
 	
 		// Verify ind_x doesn't have a mostSpecificType annotation for 
 		// A, Y, C, E or B.
-		Assert.assertFalse(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classA.getURI(), XSDDatatype.XSDanyURI)));	
-		Assert.assertFalse(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classY.getURI(), XSDDatatype.XSDanyURI)));
-		Assert.assertFalse(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classC.getURI(), XSDDatatype.XSDanyURI)));	
-		Assert.assertFalse(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classE.getURI(), XSDDatatype.XSDanyURI)));
-		Assert.assertFalse(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classB.getURI(), XSDDatatype.XSDanyURI)));	
+		Assert.assertFalse(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createResource(classA.getURI())));	
+		Assert.assertFalse(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createResource(classY.getURI())));
+		Assert.assertFalse(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createResource(classC.getURI())));	
+		Assert.assertFalse(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createResource(classE.getURI())));
+		Assert.assertFalse(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createResource(classB.getURI())));	
 		
 		aBox.remove(ind_x, RDF.type, classD); // retract assertion that x is of type D.
 		// Verify that D is not longer the most specific type
-		Assert.assertFalse(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classD.getURI(), XSDDatatype.XSDanyURI)));	
+		Assert.assertFalse(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createResource(classD.getURI())));	
 	}
 	
 
@@ -1071,9 +1071,9 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		StmtIterator stmtIterator = aBox.listStatements(ind_x, mostSpecificType, (RDFNode)null);
 				
 		// Verify ind_x mostSpecificType annotation for A, B and C
-		Assert.assertTrue(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classA.getURI(), XSDDatatype.XSDanyURI)));	
-		Assert.assertTrue(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classB.getURI(), XSDDatatype.XSDanyURI)));	
-		Assert.assertTrue(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classC.getURI(), XSDDatatype.XSDanyURI)));	
+		Assert.assertTrue(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createResource(classA.getURI())));	
+		Assert.assertTrue(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createResource(classB.getURI())));	
+		Assert.assertTrue(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createResource(classC.getURI())));	
 	}
 		
 	/*
@@ -1128,16 +1128,16 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		aBox.add(ind_x, RDF.type, OWL_THING);	
 		aBox.add(ind_y, RDF.type, classD);	
 	
-		Assert.assertTrue(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(OWL.Thing.getURI(), XSDDatatype.XSDanyURI)));	
-		Assert.assertTrue(aBox.contains(ind_y, mostSpecificType, ResourceFactory.createTypedLiteral(classD.getURI(), XSDDatatype.XSDanyURI)));
+		Assert.assertTrue(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createResource(OWL.Thing.getURI())));	
+		Assert.assertTrue(aBox.contains(ind_y, mostSpecificType, ResourceFactory.createResource(classD.getURI())));
 		
 		aBox.add(ind_x, RDF.type, classC);
 		aBox.add(ind_y, RDF.type, classF);
 		
-		Assert.assertFalse(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(OWL.Thing.getURI(), XSDDatatype.XSDanyURI)));	
-		Assert.assertTrue(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createTypedLiteral(classC.getURI(), XSDDatatype.XSDanyURI)));	
-		Assert.assertTrue(aBox.contains(ind_y, mostSpecificType, ResourceFactory.createTypedLiteral(classD.getURI(), XSDDatatype.XSDanyURI)));
-		Assert.assertTrue(aBox.contains(ind_y, mostSpecificType, ResourceFactory.createTypedLiteral(classF.getURI(), XSDDatatype.XSDanyURI)));
+		Assert.assertFalse(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createResource(OWL.Thing.getURI())));	
+		Assert.assertTrue(aBox.contains(ind_x, mostSpecificType, ResourceFactory.createResource(classC.getURI())));	
+		Assert.assertTrue(aBox.contains(ind_y, mostSpecificType, ResourceFactory.createResource(classD.getURI())));
+		Assert.assertTrue(aBox.contains(ind_y, mostSpecificType, ResourceFactory.createResource(classF.getURI())));
 		
 		// Set up a class hierarchy. 
 		// Pellet will compute TBox inferences.
@@ -1151,17 +1151,17 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	    classD.addSubClass(classF);
 	    classD.addSubClass(classG);
 	    
-		Assert.assertFalse(aBox.contains(ind_y, mostSpecificType, ResourceFactory.createTypedLiteral(classD.getURI(), XSDDatatype.XSDanyURI)));
-		Assert.assertTrue(aBox.contains(ind_y, mostSpecificType, ResourceFactory.createTypedLiteral(classF.getURI(), XSDDatatype.XSDanyURI)));
+		Assert.assertFalse(aBox.contains(ind_y, mostSpecificType, ResourceFactory.createResource(classD.getURI())));
+		Assert.assertTrue(aBox.contains(ind_y, mostSpecificType, ResourceFactory.createResource(classF.getURI())));
 	    
 		// If F is removed as a subclass of D, then D should once again be a most specific type
 		// for y.
 		classD.removeSubClass(classF);
-		Assert.assertTrue(aBox.contains(ind_y, mostSpecificType, ResourceFactory.createTypedLiteral(classD.getURI(), XSDDatatype.XSDanyURI)));
+		Assert.assertTrue(aBox.contains(ind_y, mostSpecificType, ResourceFactory.createResource(classD.getURI())));
 		
 	}
 	// To help in debugging the unit test
-	void printModels(OntModel ontModel) {
+	void printModel(OntModel ontModel) {
 	    
 		System.out.println("\nThe model has " + ontModel.size() + " statements:");
 		System.out.println("---------------------------------------------------");
