@@ -8883,6 +8883,8 @@ coordinate, align, ordinate, organise, organize
 coordinated, interconnected, matching, unified
 coordinating, coordinative
 coordinative, coordinating
+co-author, co-authors, coauthor, coauthors
+coauthor, co-author, co-authors, coauthors
 cop, apprehend, arrest, bull, collar, copper, fuzz, glom, hook, nab, nail, pig, snitch, thieve
 copacetic, copasetic, copesetic, copesettic
 copaline, copalite
@@ -31512,7 +31514,7 @@ pubescence, puberty
 pubescent, downy, puberulent, sericeous
 public, populace, world
 publically, publicly
-publication, issue, publishing
+publication, issue, publishing, publications
 publicise, advertise, advertize, air, bare, publicize
 publicised, publicized
 publiciser, publicist, publicizer

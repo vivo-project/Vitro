@@ -1,5 +1,9 @@
 package edu.cornell.mannlib.vitro.webapp.search.beans;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
@@ -21,6 +25,9 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.vocabulary.RDF;
+import java.util.HashSet;
+import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
@@ -30,6 +37,14 @@ public class SearchQueryHandler {
 	private OntModel fullModel;
 	private String contextNodeURI;
 	private int totalInd;
+	private static final String prefix = "prefix owl: <http://www.w3.org/2002/07/owl#> "
+		+ " prefix vitroDisplay: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>  "
+		+ " prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  "
+		+ " prefix core: <http://vivoweb.org/ontology/core#>  "
+		+ " prefix foaf: <http://xmlns.com/foaf/0.1/> "
+		+ " prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> "
+		+ " prefix localNav: <http://vitro.mannlib.cornell.edu/ns/localnav#>  "
+		+ " prefix bibo: <http://purl.org/ontology/bibo/>  ";
 	//private String query = "";
 	
 //	private static final String queryForEducationalTraining = "SELECT ?query WHERE {" +
@@ -124,20 +139,11 @@ public class SearchQueryHandler {
 		
 		initialBinding.add("uri", uriResource);
 		
-		String prefix = "prefix owl: <http://www.w3.org/2002/07/owl#> "
-			+ " prefix vitroDisplay: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>  "
-			+ " prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  "
-			+ " prefix core: <http://vivoweb.org/ontology/core#>  "
-			+ " prefix foaf: <http://xmlns.com/foaf/0.1/> "
-			+ " prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> "
-			+ " prefix localNav: <http://vitro.mannlib.cornell.edu/ns/localnav#>  "
-			+ " prefix bibo: <http://purl.org/ontology/bibo/>  ";		
-		
 		String thisQuery = prefix +
 		"SELECT " +
 		"(str(?HRJobTitle) as ?hrJobTitle)  (str(?InvolvedOrganizationName) as ?involvedOrganizationName) " +
 		" (str(?PositionForPerson) as ?positionForPerson) (str(?PositionInOrganization) as ?positionInOrganization) " +
-		" (str(?TitleOrRole) as ?titleOrRole) (str(?PositionLabel) as ?positionLabel) WHERE {" 
+		" (str(?TitleOrRole) as ?titleOrRole) WHERE {" //(str(?PositionLabel) as ?positionLabel) 
 		
 		+ "?uri rdf:type foaf:Agent  ; ?b ?c . "
 		+ " ?c rdf:type core:Position . "
@@ -147,7 +153,7 @@ public class SearchQueryHandler {
 		+ " OPTIONAL   { ?c core:positionForPerson ?f . ?f rdfs:label ?PositionForPerson . } . "
 		+ " OPTIONAL { ?c core:positionInOrganization ?i . ?i rdfs:label ?PositionInOrganization . } . "
 		+ " OPTIONAL { ?c core:titleOrRole ?TitleOrRole . } . "
-		+ " OPTIONAL { ?c rdfs:label ?PositionLabel . } "
+		//+ " OPTIONAL { ?c rdfs:label ?PositionLabel . } "
 		
 		+ " } ORDER BY ?PositionLabel ";
 		
@@ -199,12 +205,12 @@ public class SearchQueryHandler {
 						log.debug("titleOrRole is null ");
 					}
 					
-					RDFNode positionLabel = soln.get("positionLabel");
+					/*RDFNode positionLabel = soln.get("positionLabel");
 					if(positionLabel != null){
 						propertyValues.append(" " + positionLabel.toString());
 					}else{
 						log.debug("positionLabel is null ");
-					}
+					}*/
 										
 				} 
 			}catch(Throwable t){
@@ -227,15 +233,6 @@ public class SearchQueryHandler {
 		Resource uriResource = ResourceFactory.createResource(uri);
 		
 		initialBinding.add("uri", uriResource);
-		
-		String prefix = "prefix owl: <http://www.w3.org/2002/07/owl#> "
-			+ " prefix vitroDisplay: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>  "
-			+ " prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  "
-			+ " prefix core: <http://vivoweb.org/ontology/core#>  "
-			+ " prefix foaf: <http://xmlns.com/foaf/0.1/> "
-			+ " prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> "
-			+ " prefix localNav: <http://vitro.mannlib.cornell.edu/ns/localnav#>  "
-			+ " prefix bibo: <http://purl.org/ontology/bibo/>  ";		
 		
 		String thisQuery = prefix +
 		"SELECT (str(?Advisee) as ?advisee)  (str(?DegreeCandidacy) as ?degreeCandidacy) " +
@@ -304,7 +301,6 @@ public class SearchQueryHandler {
 		
 		return propertyValues.toString();
 	}	
-
 	
 	public String getPropertiesAssociatedWithAwardReceipt(String uri){
 		
@@ -315,18 +311,9 @@ public class SearchQueryHandler {
 		
 		initialBinding.add("uri", uriResource);
 		
-		String prefix = "prefix owl: <http://www.w3.org/2002/07/owl#> "
-			+ " prefix vitroDisplay: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>  "
-			+ " prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  "
-			+ " prefix core: <http://vivoweb.org/ontology/core#>  "
-			+ " prefix foaf: <http://xmlns.com/foaf/0.1/> "
-			+ " prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> "
-			+ " prefix localNav: <http://vitro.mannlib.cornell.edu/ns/localnav#>  "
-			+ " prefix bibo: <http://purl.org/ontology/bibo/>  ";		
-		
 		String thisQuery = prefix +
 		"SELECT (str(?AwardConferredBy) as ?awardConferredBy)  (str(?AwardOrHonorFor) as ?awardOrHonorFor) " +
-		" (str(?Description) as ?description) (str(?AwardReceiptLabel) as ?awardReceiptLabel)  WHERE {" 
+		" (str(?Description) as ?description)   WHERE {" //(str(?AwardReceiptLabel) as ?awardReceiptLabel)
 		
 		+ "?uri rdf:type foaf:Agent  ; ?b ?c . "
 		+ " ?c rdf:type core:AwardReceipt . "
@@ -334,7 +321,7 @@ public class SearchQueryHandler {
 		+ " OPTIONAL { ?c core:awardConferredBy ?d . ?d rdfs:label ?AwardConferredBy } . "
 		+ " OPTIONAL { ?c core:awardOrHonorFor ?e . ?e rdfs:label ?AwardOrHonorFor } ."
 		+ " OPTIONAL   { ?c core:description ?Description . } . "
-		+ " OPTIONAL { ?c rdfs:label ?AwardReceiptLabel . } . "
+		//+ " OPTIONAL { ?c rdfs:label ?AwardReceiptLabel . } . "
 		
 		+ " } ORDER BY ?AwardReceiptLabel";
 		
@@ -372,12 +359,12 @@ public class SearchQueryHandler {
 						log.debug("description is null ");
 					}
 					
-					RDFNode awardReceiptLabel = soln.get("awardReceiptLabel");
+					/*RDFNode awardReceiptLabel = soln.get("awardReceiptLabel");
 					if(awardReceiptLabel != null){
 						propertyValues.append(" " + awardReceiptLabel.toString());
 					}else{
 						log.debug("awardReceiptLabel is null ");
-					}					
+					}*/					
 										
 				} 
 			}catch(Throwable t){
@@ -400,15 +387,6 @@ public class SearchQueryHandler {
 		Resource uriResource = ResourceFactory.createResource(uri);
 		
 		initialBinding.add("uri", uriResource);
-		
-		String prefix = "prefix owl: <http://www.w3.org/2002/07/owl#> "
-			+ " prefix vitroDisplay: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>  "
-			+ " prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  "
-			+ " prefix core: <http://vivoweb.org/ontology/core#>  "
-			+ " prefix foaf: <http://xmlns.com/foaf/0.1/> "
-			+ " prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> "
-			+ " prefix localNav: <http://vitro.mannlib.cornell.edu/ns/localnav#>  "
-			+ " prefix bibo: <http://purl.org/ontology/bibo/>  ";		
 		
 		String thisQuery = prefix +
 		"SELECT DISTINCT (str(?OrganizationLabel) as ?organizationLabel)  WHERE {" 
@@ -449,9 +427,7 @@ public class SearchQueryHandler {
 		
 		return propertyValues.toString();
 	}
-	
-	
-	
+		
 	public String getPropertiesAssociatedWithEducationalTraining(String uri){
 		
 		StringBuffer propertyValues = new StringBuffer();
@@ -460,15 +436,6 @@ public class SearchQueryHandler {
 		Resource uriResource = ResourceFactory.createResource(uri);
 		
 		initialBinding.add("uri", uriResource);
-		
-		String prefix = "prefix owl: <http://www.w3.org/2002/07/owl#> "
-					+ " prefix vitroDisplay: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>  "
-					+ " prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  "
-					+ " prefix foaf: <http://xmlns.com/foaf/0.1/> "
-					+ " prefix core: <http://vivoweb.org/ontology/core#>  "
-					+ " prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> "
-					+ " prefix localNav: <http://vitro.mannlib.cornell.edu/ns/localnav#>  "
-					+ " prefix bibo: <http://purl.org/ontology/bibo/>  ";
 		
 		String thisQuery = prefix + 
 		"SELECT  (str(?AcademicDegreeLabel) as ?academicDegreeLabel) (str(?AcademicDegreeAbbreviation) as ?academicDegreeAbbreviation) "
@@ -555,15 +522,6 @@ public class SearchQueryHandler {
 		
 		initialBinding.add("uri", uriResource);
 		
-		String prefix = "prefix owl: <http://www.w3.org/2002/07/owl#> "
-					+ " prefix vitroDisplay: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>  "
-					+ " prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  "
-					+ " prefix foaf: <http://xmlns.com/foaf/0.1/> "
-					+ " prefix core: <http://vivoweb.org/ontology/core#>  "
-					+ " prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> "
-					+ " prefix localNav: <http://vitro.mannlib.cornell.edu/ns/localnav#>  "
-					+ " prefix bibo: <http://purl.org/ontology/bibo/>  ";
-		
 		String thisQuery = prefix + 
 		"SELECT  (str(?LinkedAuthor) as ?linkedAuthor) (str(?LinkedInformationResource) as ?linkedInformationResource) "
          + "(str(?Editor) as ?editor) (str(?SubjectArea) as ?subjectArea) (str(?ResearchAreaOf) as ?researchAreaOf) " +
@@ -594,7 +552,7 @@ public class SearchQueryHandler {
 					
 					RDFNode linkedAuthor = soln.get("linkedAuthor");
 					if(linkedAuthor != null){
-						propertyValues.append(" " + linkedAuthor.toString());
+						propertyValues.append(" publications " + linkedAuthor.toString());
 					}else{
 						log.debug("linkedAuthor is null ");
 					}
@@ -608,7 +566,7 @@ public class SearchQueryHandler {
 					
 					RDFNode editor = soln.get("editor");
 					if(editor != null){
-						propertyValues.append("  " + editor.toString());
+						propertyValues.append(" " + editor.toString());
 					}else{
 						log.debug("editor is null ");
 					}
@@ -629,7 +587,7 @@ public class SearchQueryHandler {
 					
 					RDFNode features = soln.get("features");
 					if(features != null){
-						propertyValues.append(" " + features.toString());
+						propertyValues.append(" publications " + features.toString());
 					}else{
 						log.debug("features is null ");
 					}
@@ -651,15 +609,135 @@ public class SearchQueryHandler {
 		float beta=0;
 		RDFNode node = (Resource) fullModel.getResource(uri); 
 		StmtIterator stmtItr = fullModel.listStatements((Resource)null, (Property)null,node);
-		 int Conn = 0;
-	        while(stmtItr.hasNext()){
-	        	stmtItr.next();
-	        	Conn++;
-	        }
-	        
-	        beta = (float)Conn/totalInd;
-	        beta *= 100;
-	        beta += 1;
+		int Conn = stmtItr.toList().size();
+		beta = (float)Conn/totalInd;
+		beta *= 100;
+		beta += 1;
 		return beta; 
+	}
+	
+	public String[] getAdjacentNodes(String uri,boolean isPerson){
+		
+    	List<String> queryList = new ArrayList<String>();
+    	Set<String> adjacentNodes = new HashSet<String>();
+    	Set<String> coauthorNames = new HashSet<String>();
+    	String[] info = new String[]{"",""};
+    	StringBuffer adjacentNodesConcat = new StringBuffer();
+    	StringBuffer coauthorBuff = new StringBuffer();
+    	adjacentNodesConcat.append("");
+    	coauthorBuff.append("");
+    	
+    	queryList.add(prefix + 
+    			" SELECT ?adjobj (str(?adjobjLabel) as ?coauthor) " +
+    			" WHERE { " +
+    			" ?uri rdf:type <http://xmlns.com/foaf/0.1/Person> . " +
+    			" ?uri ?prop ?obj . " +
+    			" ?obj rdf:type <http://vivoweb.org/ontology/core#Relationship> . " +
+    			" ?obj ?prop2 ?obj2 . " +
+    			" ?obj2 rdf:type <http://vivoweb.org/ontology/core#InformationResource> . " +
+    			" ?obj2 ?prop3 ?obj3 . " +
+    			" ?obj3 rdf:type <http://vivoweb.org/ontology/core#Relationship> . " +
+    			" ?obj3 ?prop4 ?adjobj . " +
+    			" ?adjobj rdfs:label ?adjobjLabel . " +
+    			" ?adjobj rdf:type <http://xmlns.com/foaf/0.1/Person> . " +
+
+    			" FILTER (?prop !=rdf:type) . " +
+    			" FILTER (?prop2!=rdf:type) . " +
+    			" FILTER (?prop3!=rdf:type) . " +
+    			" FILTER (?prop4!=rdf:type) . " +
+    			" FILTER (?adjobj != ?uri) . " +
+    	"}");
+
+    	queryList.add(prefix +
+    			" SELECT ?adjobj " +
+    			" WHERE{ " +
+
+    			" ?uri rdf:type foaf:Agent . " +
+    			" ?uri ?prop ?obj . " +
+    			" ?obj ?prop2 ?adjobj . " +
+
+
+    			" FILTER (?prop !=rdf:type) . " +
+    			" FILTER isURI(?obj) . " +
+
+    			" FILTER (?prop2!=rdf:type) . " +
+    			" FILTER (?adjobj != ?uri) . " +
+    			" FILTER isURI(?adjobj) . " +
+
+    			" { ?adjobj rdf:type <http://xmlns.com/foaf/0.1/Organization> . } " +
+    			" UNION " +
+    			" { ?adjobj rdf:type <http://xmlns.com/foaf/0.1/Person> . } " +
+    			" UNION " +
+    			" { ?adjobj rdf:type <http://vivoweb.org/ontology/core#InformationResource> . } " +
+    			" UNION " +
+    			" { ?adjobj rdf:type <http://vivoweb.org/ontology/core#Location> . } ." +
+    	"}");
+	
+    	Query query;
+    	
+    	QuerySolution soln;
+    	QuerySolutionMap initialBinding = new QuerySolutionMap();
+		Resource uriResource = ResourceFactory.createResource(uri);
+		
+		initialBinding.add("uri", uriResource);
+    	
+    	Iterator<String> queryItr = queryList.iterator();
+    	
+    	fullModel.enterCriticalSection(Lock.READ);
+    	Resource adjacentIndividual = null;
+    	RDFNode coauthor = null;
+    	try{
+    		while(queryItr.hasNext()){
+    			if(!isPerson){
+    				queryItr.next(); // we don't want first query to execute if the ind is not a person. 
+    			}
+    			query = QueryFactory.create(queryItr.next(),Syntax.syntaxARQ);
+    			QueryExecution qexec = QueryExecutionFactory.create(query,fullModel,initialBinding);
+    			try{
+    					ResultSet results = qexec.execSelect();
+    					while(results.hasNext()){
+    						soln = results.nextSolution();
+
+    						adjacentIndividual = (Resource)soln.get("adjobj");
+    						if(adjacentIndividual!=null){
+    							adjacentNodes.add(adjacentIndividual.getURI());
+    						}	
+
+    						coauthor = soln.get("coauthor");
+    						if(coauthor!=null){
+    							coauthorNames.add(" co-authors " + coauthor.toString());
+    						}	
+    					}
+    			}catch(Exception e){
+    				log.error("Error found in getAdjacentNodes method of SearchQueryHandler");
+    			}finally{
+    				qexec.close();
+    			}	
+    		}
+    		queryList = null;	
+    		Iterator<String> itr = adjacentNodes.iterator();
+    		while(itr.hasNext()){
+    			adjacentNodesConcat.append(itr.next() + " ");
+    		}
+    		
+    		info[0] = adjacentNodesConcat.toString();
+    		
+    		itr = coauthorNames.iterator();
+    		while(itr.hasNext()){
+    			coauthorBuff.append(itr.next());
+    		}
+    		
+    		info[1] = coauthorBuff.toString();
+    		
+    	}
+    	catch(Throwable t){
+    		log.error(t,t);
+    	}finally{
+    		fullModel.leaveCriticalSection();
+    		adjacentNodes = null;
+    		adjacentNodesConcat = null;
+    		coauthorBuff = null;
+    	}
+    	return info;
 	}
 }

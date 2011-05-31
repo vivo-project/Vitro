@@ -708,9 +708,10 @@
       -->
      <lst name="defaults">
        <str name="defType">dismax</str>
-       <str name="qf">nameRaw nameLowercase nameUnstemmed nameStemmed ALLTEXT ALLTEXTUNSTEMMED ALLTEXT_PHONETIC NAME_PHONETIC contextNode</str>
+       <str name="qf">nameRaw nameLowercase ALLTEXT ALLTEXTUNSTEMMED ALLTEXT_PHONETIC NAME_PHONETIC nameUnstemmed nameStemmed targetInfo</str>
+       <str name="pf">targetInfo</str>
        <str name="echoParams">explicit</str>
-       <str name="bf">BETA</str>
+       <str name="ps">1</str>
        <int name="rows">10</int>
      </lst>
     <!-- In addition to defaults, "appends" params can be specified

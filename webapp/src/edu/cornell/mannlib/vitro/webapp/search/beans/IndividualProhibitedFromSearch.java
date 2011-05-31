@@ -24,9 +24,8 @@ public class IndividualProhibitedFromSearch {
     
     protected static Log log = LogFactory.getLog(IndividualProhibitedFromSearch.class);
     
-    
     public IndividualProhibitedFromSearch( ServletContext context ){
-        this.fullModel = ModelContext.getUnionOntModelSelector(context).getFullModel(); 
+       this.fullModel = ModelContext.getUnionOntModelSelector(context).getFullModel(); 
     }    
     
     public boolean isIndividualProhibited(String uri){
@@ -49,7 +48,7 @@ public class IndividualProhibitedFromSearch {
     
     private Query makeAskQueryForUri( String uri ){
         String queryString =
-            "PREFIX fn: <http://www.w3.org/2005/xpath-functions#> \n" +            
+            "PREFIX fn: <http://www.w3.org/2005/xpath-functions#> \n" +
             "ASK { \n" +
             "    <"+uri+"> <" + RDF.type.getURI() + "> ?type . \n" +             
             "  FILTER ( \n" + 

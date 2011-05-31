@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.solr;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -12,12 +13,16 @@ import org.apache.lucene.document.Document;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.joda.time.DateTime;
+import org.openrdf.model.vocabulary.RDF;
 
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -48,16 +53,20 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     
     private SearchQueryHandler searchQueryHandler;
     
+    public static Map<String,Float> betas = new Hashtable<String,Float>();
     
-        
+    private static List<String> contextNodeClassNames = new ArrayList<String>();
+    
     public IndividualToSolrDocument(ProhibitedFromSearch classesProhibitedFromSearch, 
     		IndividualProhibitedFromSearch individualProhibitedFromSearch,
     			SearchQueryHandler searchQueryHandler){
     	this.classesProhibitedFromSearch = classesProhibitedFromSearch;
     	this.individualProhibitedFromSearch = individualProhibitedFromSearch;
     	this.searchQueryHandler = searchQueryHandler;
+    	fillContextNodes(); 
     }
     
+   
     @SuppressWarnings("static-access")
 	@Override
     public Object translate(Object obj) throws IndexingException{
@@ -68,12 +77,9 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     	
     	Individual ent = (Individual)obj;
     	String value;
-    	String classPublicNames = "";
+    	StringBuffer classPublicNames = new StringBuffer();
+    	classPublicNames.append("");
     	SolrInputDocument doc = new SolrInputDocument();
-    	
-    	float beta = searchQueryHandler.calculateBeta(ent.getURI());
-    	doc.addField(term.BETA,beta);
-    	//float beta =1;
     	
     	//DocId
     	String id = ent.getURI();
@@ -100,8 +106,12 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     	// Types and classgroups
     	boolean prohibited = false;
     	List<VClass> vclasses = ent.getVClasses(false);
+    	ArrayList<String> superClassNames = new ArrayList<String>();
+    	String superLclName = null;
     	long tClassgroup = System.currentTimeMillis();
     	for(VClass clz : vclasses){
+    		superLclName = clz.getLocalName();
+    		superClassNames.add(superLclName);
     		if(clz.getURI() == null){
     			continue;
     		}else if(OWL.Thing.getURI().equals(clz.getURI())){
@@ -110,7 +120,10 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     		} else if(clz.getURI().startsWith(OWL.NS)){
     			log.debug("not indexing " + id + " because of type " + clz.getURI());
     			return null;
-    		} else {
+    		} else if(contextNodeClassNames.contains(superLclName)) { // check to see if context node is being indexed.
+    			return null;
+    		}
+    		else {
     			if( !prohibited && classesProhibitedFromSearch.isClassProhibited(clz.getURI()))
     				prohibited = true;
     			if( clz.getSearchBoost() != null)
@@ -123,8 +136,10 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     				doc.addField(term.CLASSLOCALNAMELOWERCASE, clz.getLocalName().toLowerCase());
     			}
     			
-    			if(clz.getName() != null)
-    				classPublicNames += clz.getName();
+    			if(clz.getName() != null){
+    				classPublicNames.append(" ");
+    			    classPublicNames.append(clz.getName());
+    			}
     			
     			//Classgroup URI
     			if(clz.getGroupURI() != null){
@@ -132,6 +147,10 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     			}
     			
     		}
+    	}
+    	
+    	if(superClassNames.isEmpty()){
+    		return null;
     	}
     	
     	log.debug("time to check if class is prohibited and adding classes, classgroups and type to the index: " + Long.toString(System.currentTimeMillis() - tClassgroup));
@@ -156,38 +175,95 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     		value = ent.getLocalName();
     	}
     	
-    	doc.addField(term.NAME_RAW, value, NAME_BOOST+beta);
-    	doc.addField(term.NAME_LOWERCASE, value.toLowerCase(),NAME_BOOST+beta);
-    	doc.addField(term.NAME_UNSTEMMED, value,NAME_BOOST+beta);
-    	doc.addField(term.NAME_STEMMED, value, NAME_BOOST+beta);
+    	// collecting object property statements 
+    	
+    	String uri = ent.getURI();
+    	StringBuffer objectNames = new StringBuffer();
+    	objectNames.append("");
+    	String t=null;
+    	StringBuffer addUri = new StringBuffer();
+    	addUri.append("");
+    	 List<ObjectPropertyStatement> objectPropertyStatements = ent.getObjectPropertyStatements();
+         if (objectPropertyStatements != null) {
+             Iterator<ObjectPropertyStatement> objectPropertyStmtIter = objectPropertyStatements.iterator();
+             while (objectPropertyStmtIter.hasNext()) {
+                 ObjectPropertyStatement objectPropertyStmt = objectPropertyStmtIter.next();
+                 if( "http://www.w3.org/2002/07/owl#differentFrom".equals(objectPropertyStmt.getPropertyURI()) )
+                     continue;
+                 try {
+                	 objectNames.append(" ");
+                     objectNames.append(((t=objectPropertyStmt.getObject().getName()) == null)?"":t);   
+                     addUri.append(" ");
+                     addUri.append(((t=objectPropertyStmt.getObject().getURI()) == null)?"":t);
+                 } catch (Exception e) { 
+                     log.debug("could not index name of related object: " + e.getMessage());
+                 }
+             }
+         }
+         
+      // adding beta value
+     	
+     	float beta = 0;
+     	if(betas.containsKey(uri)){
+     		beta = betas.get(uri);
+     	}else{
+     		beta = searchQueryHandler.calculateBeta(uri); // or calculate & put in map
+     		betas.put(uri, beta);
+     	}
+     	//doc.addField(term.BETA,beta);
+    	
+    	 // adding PHI value
+        boolean isPerson = (superClassNames.contains("Person")) ? true : false ;
+        String adjInfo[] = searchQueryHandler.getAdjacentNodes(uri,isPerson);
+        StringBuffer info = new StringBuffer();
+        info.append(adjInfo[0]);
+        info.append(addUri.toString());
+        
+        //doc.addField(term.ADJACENT_NODES,info.toString()); // adding adjacent nodes
+        float phi = calculatePHI(info);
+        
+        //doc.addField(term.PHI, phi); // adding phi value
+        
+    	doc.addField(term.NAME_RAW, value, NAME_BOOST+beta+phi);
+    	doc.addField(term.NAME_LOWERCASE, value.toLowerCase(),NAME_BOOST+beta+phi);
+    	doc.addField(term.NAME_UNSTEMMED, value,NAME_BOOST+beta+phi);
+    	doc.addField(term.NAME_STEMMED, value, NAME_BOOST+beta+phi);
     	doc.addField(term.NAME_PHONETIC, value, PHONETIC_BOOST);
     	
     	long tContextNodes = System.currentTimeMillis();
     	
-    	String contextNodePropertyValues = "";
-    	contextNodePropertyValues += searchQueryHandler.getPropertiesAssociatedWithEducationalTraining(ent.getURI());
-        contextNodePropertyValues += searchQueryHandler.getPropertiesAssociatedWithRole(ent.getURI());
-        contextNodePropertyValues += searchQueryHandler.getPropertiesAssociatedWithPosition(ent.getURI());
-        contextNodePropertyValues += searchQueryHandler.getPropertiesAssociatedWithRelationship(ent.getURI());
-        contextNodePropertyValues += searchQueryHandler.getPropertiesAssociatedWithAwardReceipt(ent.getURI());
-        contextNodePropertyValues += searchQueryHandler.getPropertiesAssociatedWithInformationResource(ent.getURI()); 
+    	// collecting context node information
+    	
+    	StringBuffer targetInfo = new StringBuffer();
+    	targetInfo.append("");
+    	if(superClassNames.contains("Agent")){
+    	objectNames.append(" ");
+    	objectNames.append(searchQueryHandler.getPropertiesAssociatedWithEducationalTraining(ent.getURI()));
+    	objectNames.append(" ");
+    	objectNames.append(searchQueryHandler.getPropertiesAssociatedWithRole(ent.getURI()));
+    	objectNames.append(" ");
+    	objectNames.append(searchQueryHandler.getPropertiesAssociatedWithPosition(ent.getURI()));
+    	objectNames.append(" ");
+    	objectNames.append(searchQueryHandler.getPropertiesAssociatedWithRelationship(ent.getURI()));
+    	objectNames.append(" ");
+    	objectNames.append(searchQueryHandler.getPropertiesAssociatedWithAwardReceipt(ent.getURI()));
+    	}
+    	if(superClassNames.contains("InformationResource")){
+    	targetInfo.append(" ");
+    	targetInfo.append(searchQueryHandler.getPropertiesAssociatedWithInformationResource(ent.getURI()));
+    	}
         
         
-        doc.addField(term.CONTEXTNODE, contextNodePropertyValues);
+        doc.addField(term.targetInfo, targetInfo.toString() + adjInfo[1]);
 
     	log.debug("time to fire contextnode queries and include them in the index: " + Long.toString(System.currentTimeMillis() - tContextNodes));
 
         
         long tMoniker = System.currentTimeMillis();
     	
-        //Moniker 
-        if(ent.getMoniker() != null){
-        	doc.addField(term.MONIKER, ent.getMoniker());
-        }
-        
         //boost for entity
-        if(ent.getSearchBoost() != null && ent.getSearchBoost() != 0)
-        	doc.setDocumentBoost(ent.getSearchBoost());
+       // if(ent.getSearchBoost() != null && ent.getSearchBoost() != 0)
+        //	doc.setDocumentBoost(ent.getSearchBoost());
         
         //thumbnail
         try{
@@ -205,54 +281,74 @@ public class IndividualToSolrDocument implements Obj2DocIface {
         Object anon[] =  { new Long((new DateTime() ).getMillis())  };
         doc.addField(term.INDEXEDTIME, String.format("%019d", anon));
         
-    	log.debug("time to include moniker , thumbnail and indexedtime in the index: " + Long.toString(System.currentTimeMillis() - tMoniker));
+    	log.debug("time to include thumbnail and indexedtime in the index: " + Long.toString(System.currentTimeMillis() - tMoniker));
 
         long tPropertyStatements = System.currentTimeMillis();
+        
+        //collecting data property statements 
+        
         if(!prohibited){
             //ALLTEXT, all of the 'full text'
-            String t=null;
-            value =""; 
-            value+= " "+( ((t=ent.getName()) == null)?"":t );  
-            value+= " "+( ((t=ent.getAnchor()) == null)?"":t); 
-            value+= " "+ ( ((t=ent.getMoniker()) == null)?"":t ); 
-            value+= " "+ ( ((t=ent.getDescription()) == null)?"":t ); 
-            value+= " "+ ( ((t=ent.getBlurb()) == null)?"":t ); 
-    
-            value+= " " + classPublicNames; 
+            StringBuffer allTextValue = new StringBuffer();
+            allTextValue.append("");
+            allTextValue.append(" ");
+            allTextValue.append(((t=ent.getName()) == null)?"":t);  
+            allTextValue.append(" ");
+            allTextValue.append(((t=ent.getAnchor()) == null)?"":t); 
+            allTextValue.append(" ");
+            allTextValue.append(classPublicNames.toString()); 
     
             List<DataPropertyStatement> dataPropertyStatements = ent.getDataPropertyStatements();
             if (dataPropertyStatements != null) {
                 Iterator<DataPropertyStatement> dataPropertyStmtIter = dataPropertyStatements.iterator();
                 while (dataPropertyStmtIter.hasNext()) {
                     DataPropertyStatement dataPropertyStmt =  dataPropertyStmtIter.next();
-                    value+= " "+ ( ((t=dataPropertyStmt.getData()) == null)?"":t );
+                    allTextValue.append(" ");
+                    allTextValue.append(((t=dataPropertyStmt.getData()) == null)?"":t);
                 }
             }
-    
-            List<ObjectPropertyStatement> objectPropertyStatements = ent.getObjectPropertyStatements();
-            if (objectPropertyStatements != null) {
-                Iterator<ObjectPropertyStatement> objectPropertyStmtIter = objectPropertyStatements.iterator();
-                while (objectPropertyStmtIter.hasNext()) {
-                    ObjectPropertyStatement objectPropertyStmt = objectPropertyStmtIter.next();
-                    if( "http://www.w3.org/2002/07/owl#differentFrom".equals(objectPropertyStmt.getPropertyURI()) )
-                        continue;
-                    try {
-                        value+= " "+ ( ((t=objectPropertyStmt.getObject().getName()) == null)?"":t );                        
-                    } catch (Exception e) { 
-                        log.debug("could not index name of related object: " + e.getMessage());
-                    }
-                }
-            }
+             
+            allTextValue.append(objectNames.toString());
             
         	log.debug("time to include data property statements, object property statements in the index: " + Long.toString(System.currentTimeMillis() - tPropertyStatements));
             
-            doc.addField(term.ALLTEXT, value, 4*beta);
-            doc.addField(term.ALLTEXTUNSTEMMED, value, 4*beta);
-            doc.addField(term.ALLTEXT_PHONETIC, value, PHONETIC_BOOST);
-            doc.setDocumentBoost(2*beta);
+        	String alltext = allTextValue.toString();
+            doc.addField(term.ALLTEXT, alltext, 2.5F*beta*phi);
+            doc.addField(term.ALLTEXTUNSTEMMED, alltext, 2.5F*beta*phi);
+            doc.addField(term.ALLTEXT_PHONETIC, alltext, PHONETIC_BOOST);
+            doc.setDocumentBoost(2.5F*beta*phi);
         }
         
         return doc;
+    }
+    
+    /*
+     * Method for calculation of PHI for a doc. 
+     */
+    
+    public float calculatePHI(StringBuffer adjNodes){
+    	
+    	StringTokenizer nodes = new StringTokenizer(adjNodes.toString()," ");
+    	String uri=null;
+    	float phi=0.1F;
+    	float beta=0;
+    	int size=0;
+    	while(nodes.hasMoreTokens()){
+    		size++;
+    		uri = nodes.nextToken();
+    		if(betas.containsKey(uri)){ // get if already calculated
+    			phi += betas.get(uri);
+    		}else{						// query if not calculated and put in map
+    			beta = searchQueryHandler.calculateBeta(uri);
+    			betas.put(uri, beta);
+    			phi+=beta;
+    		}
+    	}
+    	if(size>0)
+    		phi = (float)phi/size;
+    	else
+    		phi = 1;
+    	return phi;
     }
     
 //    public IndividualToSolrDocument(Entity2LuceneDoc e2d){
@@ -291,6 +387,32 @@ public class IndividualToSolrDocument implements Obj2DocIface {
         }
         return ent;
     }
+    
+    private void fillContextNodes(){
+    	this.contextNodeClassNames.add("Role");
+        this.contextNodeClassNames.add("AttendeeRole");
+        this.contextNodeClassNames.add("ClinicalRole");
+        this.contextNodeClassNames.add("LeaderRole");
+        this.contextNodeClassNames.add("MemberRole");
+        this.contextNodeClassNames.add("OutreachProviderRole");
+        this.contextNodeClassNames.add("PresenterRole");
+        this.contextNodeClassNames.add("ResearcherRole");
+        this.contextNodeClassNames.add("InvestigatorRole");
+        this.contextNodeClassNames.add("CoPrincipalInvestigatorRole");
+        this.contextNodeClassNames.add("PrincipalInvestigatorRole");
+        this.contextNodeClassNames.add("ServiceProviderRole");
+        this.contextNodeClassNames.add("TeacherRole");
+        this.contextNodeClassNames.add("Position");
+        this.contextNodeClassNames.add("FacultyAdministrativePosition");
+        this.contextNodeClassNames.add("FacultyPosition");
+        this.contextNodeClassNames.add("LibrarianPosition");
+        this.contextNodeClassNames.add("Non-AcademicPosition");
+        this.contextNodeClassNames.add("Non-FacultyAcademicPosition");
+        this.contextNodeClassNames.add("PostdoctoralPosition");
+        this.contextNodeClassNames.add("AdvisingRelationship");
+        this.contextNodeClassNames.add("Authorship");
+    }
+    
 
     public static float NAME_BOOST = 2.0F;
     public static float PHONETIC_BOOST = 0.1F;

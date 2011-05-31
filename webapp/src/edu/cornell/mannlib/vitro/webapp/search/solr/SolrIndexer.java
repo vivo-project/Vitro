@@ -19,6 +19,7 @@ import org.apache.solr.common.SolrInputDocument;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
+import edu.cornell.mannlib.vitro.webapp.search.solr.IndividualToSolrDocument;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexerIface;
 
 public class SolrIndexer implements IndexerIface {
@@ -134,6 +135,9 @@ public class SolrIndexer implements IndexerIface {
             server.commit();            
         } catch (Exception e) {
             log.error("Could not commit to solr server", e);
+        }finally{
+        	IndividualToSolrDocument.betas.clear();
+        	IndividualToSolrDocument.betas = null;
         }
         
         try {

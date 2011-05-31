@@ -29,8 +29,8 @@ public class VitroTermNames {
     /** text for 'full text' search, this is unstemmed for
      * use with wildcards and prefix queries */
     public static String ALLTEXTUNSTEMMED = "ALLTEXTUNSTEMMED";
-    /** class name for storing context nodes **/
-    public static final String CONTEXTNODE = "contextNode";
+    /** class name for storing targeted information **/
+    public static final String targetInfo = "targetInfo";
     /** keywords */
     public static final String KEYWORDS = "KEYWORDS";
     /** Does the individual have a thumbnail image? 1=yes 0=no */
@@ -57,6 +57,8 @@ public class VitroTermNames {
     
     /** field for beta values of all documents **/
     public static final String BETA = "BETA";
+    public static final String PHI = "PHI";
+    public static final String ADJACENT_NODES = "ADJACENT_NODES";
     
     /** adding phonetic field **/
     public static final String ALLTEXT_PHONETIC = "ALLTEXT_PHONETIC";
