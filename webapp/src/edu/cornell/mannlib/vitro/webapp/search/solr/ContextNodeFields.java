@@ -62,7 +62,11 @@ public class ContextNodeFields implements DocumentModifier{
     	objectProperties.append(getPropertiesAssociatedWithRelationship(individual.getURI()));
     	objectProperties.append(" ");
     	objectProperties.append(getPropertiesAssociatedWithAwardReceipt(individual.getURI()));
-
+    	objectProperties.append(" ");
+    	objectProperties.append(getPropertiesAssociatedWithInformationResource(individual.getURI()));
+    	
+    	
+    	field.addValue(objectProperties, field.getBoost());
     	
     }
     
