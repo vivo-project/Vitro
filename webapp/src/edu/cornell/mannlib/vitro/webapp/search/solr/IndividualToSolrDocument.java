@@ -70,10 +70,12 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     
     public IndividualToSolrDocument(ProhibitedFromSearch classesProhibitedFromSearch, 
             IndividualProhibitedFromSearch individualProhibitedFromSearch,
+                SearchQueryHandler searchQueryHandler,
                 List<DocumentModifier> docModifiers){
         this.classesProhibitedFromSearch = classesProhibitedFromSearch;
         this.individualProhibitedFromSearch = individualProhibitedFromSearch;
         this.documentModifiers = docModifiers;
+        this.searchQueryHandler = searchQueryHandler;
         fillContextNodes(); 
     }
     

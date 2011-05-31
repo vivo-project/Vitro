@@ -68,15 +68,18 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             /* setup the individual to solr doc translation */            
             //first we need a ent2luceneDoc translator
             OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
-//            Entity2LuceneDoc ent2LuceneDoc = new Entity2LuceneDoc( 
-//                    new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel),
-//                    new IndividualProhibitedFromSearch(context),
-//                    new ContextNodesInclusionFactory(DisplayVocabulary.CONTEXT_NODES_URI, displayOntModel, context));                                              
-//            IndividualToSolrDocument indToSolrDoc = new IndividualToSolrDocument( ent2LuceneDoc );
+            
+            List<DocumentModifier> modifiers = new ArrayList<DocumentModifier>();
+            CalculateBeta betas = new CalculateBeta(ModelContext.getJenaOntModel(context));
+            modifiers.add( new CalculateBeta(ModelContext.getJenaOntModel(context)));
+            modifiers.add( new CalculatePhi(betas));
+            modifiers.add( new ContextNodeFields() );
+            
             IndividualToSolrDocument indToSolrDoc = new IndividualToSolrDocument(
             		new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel),
             		new IndividualProhibitedFromSearch(context), 
-            		new SearchQueryHandler(DisplayVocabulary.CONTEXT_NODES_URI, displayOntModel, context));
+            		new SearchQueryHandler(DisplayVocabulary.CONTEXT_NODES_URI, displayOntModel, context),
+            		modifiers);
             List<Obj2DocIface> o2d = new ArrayList<Obj2DocIface>();
             o2d.add(indToSolrDoc);
             
