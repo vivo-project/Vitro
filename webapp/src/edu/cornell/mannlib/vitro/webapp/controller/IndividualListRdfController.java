@@ -34,8 +34,8 @@ public class IndividualListRdfController extends VitroHttpServlet {
     public void doGet (HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
     	    
     	// Make the query
-    	String classUri = (String) getServletContext().getAttribute("classuri");
-    	String queryStr = VitroLuceneTermNames.RDFTYPE + ":\"" + classUri + "\"";
+    	String vclassUri = req.getParameter("vclass");
+    	String queryStr = VitroLuceneTermNames.RDFTYPE + ":\"" + vclassUri + "\"";
     	SolrQuery query = new SolrQuery(queryStr);
     	query.setStart(0)
     	     .setRows(ENTITY_LIST_CONTROLLER_MAX_RESULTS)
@@ -67,7 +67,7 @@ public class IndividualListRdfController extends VitroHttpServlet {
         for (SolrDocument doc : docs) {
             String uri = doc.get(VitroLuceneTermNames.URI).toString();
             Resource resource = ResourceFactory.createResource(uri);
-            RDFNode node = (RDFNode) ResourceFactory.createResource(classUri);
+            RDFNode node = (RDFNode) ResourceFactory.createResource(vclassUri);
             model.add(resource, RDF.type, node);
         }
 
