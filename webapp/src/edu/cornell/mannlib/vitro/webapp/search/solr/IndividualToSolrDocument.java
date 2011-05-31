@@ -206,30 +206,13 @@ public class IndividualToSolrDocument implements Obj2DocIface {
              }
          }         
     	
-    	 // adding PHI value
-       
-        
-        //doc.addField(term.ADJACENT_NODES,info.toString()); // adding adjacent nodes
-       
-        
-        //doc.addField(term.PHI, phi); // adding phi value
-        
+    	
     	doc.addField(term.NAME_RAW, value, NAME_BOOST);
     	doc.addField(term.NAME_LOWERCASE, value.toLowerCase(),NAME_BOOST);
     	doc.addField(term.NAME_UNSTEMMED, value,NAME_BOOST);
     	doc.addField(term.NAME_STEMMED, value, NAME_BOOST);
     	doc.addField(term.NAME_PHONETIC, value, PHONETIC_BOOST);
     	
-    	long tContextNodes = System.currentTimeMillis();
-    	
-    	// collecting context node information
-    	
-    	
-    	
-       
-
-    	log.debug("time to fire contextnode queries and include them in the index: " + Long.toString(System.currentTimeMillis() - tContextNodes));
-
         
         long tMoniker = System.currentTimeMillis();
     	
