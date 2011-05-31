@@ -52,6 +52,8 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     private IndividualProhibitedFromSearch individualProhibitedFromSearch;
     
     private SearchQueryHandler searchQueryHandler;
+
+    private List<DocumentModifier> documentModifiers = new ArrayList<DocumentModifier>();
     
     public static Map<String,Float> betas = new Hashtable<String,Float>();
     
@@ -66,7 +68,15 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     	fillContextNodes(); 
     }
     
-   
+    public IndividualToSolrDocument(ProhibitedFromSearch classesProhibitedFromSearch, 
+            IndividualProhibitedFromSearch individualProhibitedFromSearch,
+                List<DocumentModifier> docModifiers){
+        this.classesProhibitedFromSearch = classesProhibitedFromSearch;
+        this.individualProhibitedFromSearch = individualProhibitedFromSearch;
+        this.documentModifiers = docModifiers;
+        fillContextNodes(); 
+    }
+    
     @SuppressWarnings("static-access")
 	@Override
     public Object translate(Object obj) throws IndexingException{
@@ -317,6 +327,13 @@ public class IndividualToSolrDocument implements Obj2DocIface {
             doc.addField(term.ALLTEXTUNSTEMMED, alltext, 2.5F*beta*phi);
             doc.addField(term.ALLTEXT_PHONETIC, alltext, PHONETIC_BOOST);
             doc.setDocumentBoost(2.5F*beta*phi);
+            
+            //run the document modifiers
+            if( documentModifiers != null ){
+                for(DocumentModifier modifier: documentModifiers){
+                    modifier.modifyDocument(ent, doc);
+                }
+            }
         }
         
         return doc;
