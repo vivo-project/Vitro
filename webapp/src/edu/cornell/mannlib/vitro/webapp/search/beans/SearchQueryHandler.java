@@ -552,7 +552,7 @@ public class SearchQueryHandler {
 					
 					RDFNode linkedAuthor = soln.get("linkedAuthor");
 					if(linkedAuthor != null){
-						propertyValues.append(" publications " + linkedAuthor.toString());
+						propertyValues.append(" publications " + linkedAuthor.toString() + " publications ");
 					}else{
 						log.debug("linkedAuthor is null ");
 					}
@@ -587,7 +587,7 @@ public class SearchQueryHandler {
 					
 					RDFNode features = soln.get("features");
 					if(features != null){
-						propertyValues.append(" publications " + features.toString());
+						propertyValues.append(" publications " + features.toString() + " publications ");
 					}else{
 						log.debug("features is null ");
 					}
@@ -604,18 +604,7 @@ public class SearchQueryHandler {
 		return propertyValues.toString();
 		
 	}
-		
-	public float calculateBeta(String uri){
-		float beta=0;
-		RDFNode node = (Resource) fullModel.getResource(uri); 
-		StmtIterator stmtItr = fullModel.listStatements((Resource)null, (Property)null,node);
-		int Conn = stmtItr.toList().size();
-		beta = (float)Conn/totalInd;
-		beta *= 100;
-		beta += 1;
-		return beta; 
-	}
-	
+			
 	public String[] getAdjacentNodes(String uri,boolean isPerson){
 		
     	List<String> queryList = new ArrayList<String>();
@@ -705,7 +694,7 @@ public class SearchQueryHandler {
 
     						coauthor = soln.get("coauthor");
     						if(coauthor!=null){
-    							coauthorNames.add(" co-authors " + coauthor.toString());
+    							coauthorNames.add(" co-authors " + coauthor.toString() + " co-authors ");
     						}	
     					}
     			}catch(Exception e){

@@ -52,20 +52,19 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     private IndividualProhibitedFromSearch individualProhibitedFromSearch;
     
     private SearchQueryHandler searchQueryHandler;
+    
+    public static ArrayList<String> superClassNames = null;
+    
+    public static StringBuffer addUri = null;
 
     private List<DocumentModifier> documentModifiers = new ArrayList<DocumentModifier>();
-    
-    
     
     private static List<String> contextNodeClassNames = new ArrayList<String>();
     
     public IndividualToSolrDocument(ProhibitedFromSearch classesProhibitedFromSearch, 
     		IndividualProhibitedFromSearch individualProhibitedFromSearch,
     			SearchQueryHandler searchQueryHandler){
-    	this.classesProhibitedFromSearch = classesProhibitedFromSearch;
-    	this.individualProhibitedFromSearch = individualProhibitedFromSearch;
-    	this.searchQueryHandler = searchQueryHandler;
-    	fillContextNodes(); 
+    	this(classesProhibitedFromSearch,individualProhibitedFromSearch,searchQueryHandler,null);
     }
     
     public IndividualToSolrDocument(ProhibitedFromSearch classesProhibitedFromSearch, 
@@ -118,7 +117,7 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     	// Types and classgroups
     	boolean prohibited = false;
     	List<VClass> vclasses = ent.getVClasses(false);
-    	ArrayList<String> superClassNames = new ArrayList<String>();
+    	superClassNames = new ArrayList<String>();
     	String superLclName = null;
     	long tClassgroup = System.currentTimeMillis();
     	for(VClass clz : vclasses){
@@ -193,7 +192,7 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     	StringBuffer objectNames = new StringBuffer();
     	objectNames.append("");
     	String t=null;
-    	StringBuffer addUri = new StringBuffer();
+    	addUri = new StringBuffer();
     	addUri.append("");
     	 List<ObjectPropertyStatement> objectPropertyStatements = ent.getObjectPropertyStatements();
          if (objectPropertyStatements != null) {
@@ -214,21 +213,17 @@ public class IndividualToSolrDocument implements Obj2DocIface {
          }         
     	
     	 // adding PHI value
-        boolean isPerson = (superClassNames.contains("Person")) ? true : false ;
-        String adjInfo[] = searchQueryHandler.getAdjacentNodes(uri,isPerson);
-        StringBuffer info = new StringBuffer();
-        info.append(adjInfo[0]);
-        info.append(addUri.toString());
+       
         
         //doc.addField(term.ADJACENT_NODES,info.toString()); // adding adjacent nodes
-        float phi = calculatePHI(info);
+       
         
         //doc.addField(term.PHI, phi); // adding phi value
         
-    	doc.addField(term.NAME_RAW, value, NAME_BOOST+phi);
-    	doc.addField(term.NAME_LOWERCASE, value.toLowerCase(),NAME_BOOST+phi);
-    	doc.addField(term.NAME_UNSTEMMED, value,NAME_BOOST+phi);
-    	doc.addField(term.NAME_STEMMED, value, NAME_BOOST+phi);
+    	doc.addField(term.NAME_RAW, value, NAME_BOOST);
+    	doc.addField(term.NAME_LOWERCASE, value.toLowerCase(),NAME_BOOST);
+    	doc.addField(term.NAME_UNSTEMMED, value,NAME_BOOST);
+    	doc.addField(term.NAME_STEMMED, value, NAME_BOOST);
     	doc.addField(term.NAME_PHONETIC, value, PHONETIC_BOOST);
     	
     	long tContextNodes = System.currentTimeMillis();
@@ -237,24 +232,7 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     	
     	StringBuffer targetInfo = new StringBuffer();
     	targetInfo.append("");
-    	if(superClassNames.contains("Agent")){
-    	objectNames.append(" ");
-    	objectNames.append(searchQueryHandler.getPropertiesAssociatedWithEducationalTraining(ent.getURI()));
-    	objectNames.append(" ");
-    	objectNames.append(searchQueryHandler.getPropertiesAssociatedWithRole(ent.getURI()));
-    	objectNames.append(" ");
-    	objectNames.append(searchQueryHandler.getPropertiesAssociatedWithPosition(ent.getURI()));
-    	objectNames.append(" ");
-    	objectNames.append(searchQueryHandler.getPropertiesAssociatedWithRelationship(ent.getURI()));
-    	objectNames.append(" ");
-    	objectNames.append(searchQueryHandler.getPropertiesAssociatedWithAwardReceipt(ent.getURI()));
-    	}
-    	if(superClassNames.contains("InformationResource")){
-    	targetInfo.append(" ");
-    	targetInfo.append(searchQueryHandler.getPropertiesAssociatedWithInformationResource(ent.getURI()));
-    	}
-        
-        
+    	
         doc.addField(term.targetInfo, targetInfo.toString() + adjInfo[1]);
 
     	log.debug("time to fire contextnode queries and include them in the index: " + Long.toString(System.currentTimeMillis() - tContextNodes));
@@ -263,8 +241,8 @@ public class IndividualToSolrDocument implements Obj2DocIface {
         long tMoniker = System.currentTimeMillis();
     	
         //boost for entity
-       // if(ent.getSearchBoost() != null && ent.getSearchBoost() != 0)
-        //	doc.setDocumentBoost(ent.getSearchBoost());
+        if(ent.getSearchBoost() != null && ent.getSearchBoost() != 0)
+        doc.setDocumentBoost(ent.getSearchBoost());
         
         //thumbnail
         try{
@@ -314,10 +292,9 @@ public class IndividualToSolrDocument implements Obj2DocIface {
         	log.debug("time to include data property statements, object property statements in the index: " + Long.toString(System.currentTimeMillis() - tPropertyStatements));
             
         	String alltext = allTextValue.toString();
-            doc.addField(term.ALLTEXT, alltext, 2.5F*phi);
-            doc.addField(term.ALLTEXTUNSTEMMED, alltext, 2.5F*phi);
+            doc.addField(term.ALLTEXT, alltext, ALL_TEXT_BOOST);
+            doc.addField(term.ALLTEXTUNSTEMMED, alltext, ALL_TEXT_BOOST);
             doc.addField(term.ALLTEXT_PHONETIC, alltext, PHONETIC_BOOST);
-            doc.setDocumentBoost(2.5F*phi);
             
             //run the document modifiers
             if( documentModifiers != null ){
@@ -334,30 +311,7 @@ public class IndividualToSolrDocument implements Obj2DocIface {
      * Method for calculation of PHI for a doc. 
      */
     
-    public float calculatePHI(StringBuffer adjNodes){
-    	
-    	StringTokenizer nodes = new StringTokenizer(adjNodes.toString()," ");
-    	String uri=null;
-    	float phi=0.1F;
-    	float beta=0;
-    	int size=0;
-    	while(nodes.hasMoreTokens()){
-    		size++;
-    		uri = nodes.nextToken();
-    		if(betas.containsKey(uri)){ // get if already calculated
-    			phi += betas.get(uri);
-    		}else{						// query if not calculated and put in map
-    			beta = searchQueryHandler.calculateBeta(uri);
-    			betas.put(uri, beta);
-    			phi+=beta;
-    		}
-    	}
-    	if(size>0)
-    		phi = (float)phi/size;
-    	else
-    		phi = 1;
-    	return phi;
-    }
+    
     
 //    public IndividualToSolrDocument(Entity2LuceneDoc e2d){
 ////        entityToLucene = e2d;  
@@ -423,6 +377,7 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     
 
     public static float NAME_BOOST = 2.0F;
+    public static float ALL_TEXT_BOOST = 2.5F;
     public static float PHONETIC_BOOST = 0.1F;
     
     
