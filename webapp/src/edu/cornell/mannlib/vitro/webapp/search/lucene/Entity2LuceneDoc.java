@@ -23,7 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
-import edu.cornell.mannlib.vitro.webapp.search.beans.SearchQueryHandler;
+
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
@@ -113,8 +113,6 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
     private ProhibitedFromSearch classesProhibitedFromSearch;
     
     private IndividualProhibitedFromSearch individualProhibited;
-
-	private SearchQueryHandler searchQueryHandler;
     
     private static HashMap<String, String> IndividualURIToObjectProperties = new HashMap<String, String>();
     
@@ -122,10 +120,9 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
     
     public Entity2LuceneDoc(
             ProhibitedFromSearch classesProhibitedFromSearch, 
-            IndividualProhibitedFromSearch individualProhibited, SearchQueryHandler searchQueryHandler){
+            IndividualProhibitedFromSearch individualProhibited){
         this.classesProhibitedFromSearch = classesProhibitedFromSearch;
         this.individualProhibited = individualProhibited;
-        this.searchQueryHandler = searchQueryHandler;
     }
     
     public boolean canTranslate(Object obj) {    	

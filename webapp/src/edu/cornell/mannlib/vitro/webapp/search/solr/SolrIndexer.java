@@ -136,8 +136,8 @@ public class SolrIndexer implements IndexerIface {
         } catch (Exception e) {
             log.error("Could not commit to solr server", e);
         }finally{
-        	IndividualToSolrDocument.betas.clear();
-        	IndividualToSolrDocument.betas = null;
+        	CalculateParameters.betaMap.clear();
+        	CalculateParameters.betaMap = null;
         }
         
         try {

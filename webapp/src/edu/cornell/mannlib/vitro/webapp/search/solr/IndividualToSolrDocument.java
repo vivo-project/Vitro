@@ -32,7 +32,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.VitroTermNames;
-import edu.cornell.mannlib.vitro.webapp.search.beans.SearchQueryHandler;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
@@ -51,8 +50,6 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     
     private IndividualProhibitedFromSearch individualProhibitedFromSearch;
     
-    private SearchQueryHandler searchQueryHandler;
-    
     public static ArrayList<String> superClassNames = null;
     
     public static StringBuffer addUri = null;
@@ -62,19 +59,16 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     private static List<String> contextNodeClassNames = new ArrayList<String>();
     
     public IndividualToSolrDocument(ProhibitedFromSearch classesProhibitedFromSearch, 
-    		IndividualProhibitedFromSearch individualProhibitedFromSearch,
-    			SearchQueryHandler searchQueryHandler){
-    	this(classesProhibitedFromSearch,individualProhibitedFromSearch,searchQueryHandler,null);
+    		IndividualProhibitedFromSearch individualProhibitedFromSearch){
+    	this(classesProhibitedFromSearch,individualProhibitedFromSearch,null);
     }
     
     public IndividualToSolrDocument(ProhibitedFromSearch classesProhibitedFromSearch, 
             IndividualProhibitedFromSearch individualProhibitedFromSearch,
-                SearchQueryHandler searchQueryHandler,
                 List<DocumentModifier> docModifiers){
         this.classesProhibitedFromSearch = classesProhibitedFromSearch;
         this.individualProhibitedFromSearch = individualProhibitedFromSearch;
         this.documentModifiers = docModifiers;
-        this.searchQueryHandler = searchQueryHandler;
         fillContextNodes(); 
     }
     
@@ -230,10 +224,9 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     	
     	// collecting context node information
     	
-    	StringBuffer targetInfo = new StringBuffer();
-    	targetInfo.append("");
     	
-        doc.addField(term.targetInfo, targetInfo.toString() + adjInfo[1]);
+    	
+       
 
     	log.debug("time to fire contextnode queries and include them in the index: " + Long.toString(System.currentTimeMillis() - tContextNodes));
 
@@ -298,6 +291,7 @@ public class IndividualToSolrDocument implements Obj2DocIface {
             
             //run the document modifiers
             if( documentModifiers != null ){
+            	doc.addField(term.targetInfo,"");
                 for(DocumentModifier modifier: documentModifiers){
                     modifier.modifyDocument(ent, doc);
                 }

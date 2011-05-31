@@ -24,6 +24,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.search.VitroTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames;
 
 public class ContextNodeFields implements DocumentModifier{
@@ -49,22 +50,25 @@ public class ContextNodeFields implements DocumentModifier{
     @Override
     public void modifyDocument(Individual individual, SolrInputDocument doc) {
     	
-    	SolrInputField field = doc.getField(VitroLuceneTermNames.ALLTEXT);
+    	SolrInputField field = doc.getField(VitroTermNames.ALLTEXT);
+    	SolrInputField targetField = doc.getField(VitroTermNames.targetInfo);
     	StringBuffer objectProperties = new StringBuffer();
-    	
-    	objectProperties.append(" ");
-    	objectProperties.append(getPropertiesAssociatedWithEducationalTraining(individual.getURI()));
-    	objectProperties.append(" ");
-    	objectProperties.append(getPropertiesAssociatedWithRole(individual.getURI()));
-    	objectProperties.append(" ");
-    	objectProperties.append(getPropertiesAssociatedWithPosition(individual.getURI()));
-    	objectProperties.append(" ");
-    	objectProperties.append(getPropertiesAssociatedWithRelationship(individual.getURI()));
-    	objectProperties.append(" ");
-    	objectProperties.append(getPropertiesAssociatedWithAwardReceipt(individual.getURI()));
-    	objectProperties.append(" ");
-    	objectProperties.append(getPropertiesAssociatedWithInformationResource(individual.getURI()));
-    	
+  
+    	if(IndividualToSolrDocument.superClassNames.contains("Agent")){
+    		objectProperties.append(" ");
+    		objectProperties.append(getPropertiesAssociatedWithEducationalTraining(individual.getURI()));
+    		objectProperties.append(" ");
+    		objectProperties.append(getPropertiesAssociatedWithRole(individual.getURI()));
+    		objectProperties.append(" ");
+    		objectProperties.append(getPropertiesAssociatedWithPosition(individual.getURI()));
+    		objectProperties.append(" ");
+    		objectProperties.append(getPropertiesAssociatedWithRelationship(individual.getURI()));
+    		objectProperties.append(" ");
+    		objectProperties.append(getPropertiesAssociatedWithAwardReceipt(individual.getURI()));
+    	}
+    	if(IndividualToSolrDocument.superClassNames.contains("InformationResource")){
+    		targetField.addValue(" " + getPropertiesAssociatedWithInformationResource(individual.getURI()), targetField.getBoost());
+    	}
     	
     	field.addValue(objectProperties, field.getBoost());
     	

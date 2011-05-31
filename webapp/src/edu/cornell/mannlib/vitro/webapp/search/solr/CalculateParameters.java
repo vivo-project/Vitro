@@ -33,7 +33,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.search.VitroTermNames;
-import edu.cornell.mannlib.vitro.webapp.search.beans.SearchQueryHandler;
+
 
 public class CalculateParameters implements DocumentModifier {
 
@@ -270,8 +270,11 @@ public class CalculateParameters implements DocumentModifier {
         
         for(String term: fieldsToMultiplyBetaBy){
             SolrInputField f = doc.getField( term );
-            f.setBoost( getBeta(uri)*phi*IndividualToSolrDocument.ALL_TEXT_BOOST);
+            f.addValue(info.toString(),getBeta(uri)*phi*IndividualToSolrDocument.ALL_TEXT_BOOST);
         }
+        
+        SolrInputField f = doc.getField(VitroTermNames.targetInfo);
+        f.addValue(adjInfo[1],f.getBoost());
         doc.setDocumentBoost(getBeta(uri)*phi*IndividualToSolrDocument.ALL_TEXT_BOOST);   
 	}
 	
