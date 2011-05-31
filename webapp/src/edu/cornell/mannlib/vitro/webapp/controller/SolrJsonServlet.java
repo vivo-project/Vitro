@@ -53,7 +53,7 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 public class SolrJsonServlet extends VitroHttpServlet {
     
     private static final long serialVersionUID = 1L;
-    private static final Log log = LogFactory.getLog(SolrJsonServlet.class.getName());
+    private static final Log log = LogFactory.getLog(SolrJsonServlet.class);
     private static final int REPLY_SIZE = 256;
     
     @Override

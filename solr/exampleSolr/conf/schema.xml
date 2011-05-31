@@ -486,6 +486,10 @@
     <field name="nameLowercaseSingleValued" type="lowercase" indexed="true" stored="false" multiValued="false" /> 
     <field name="nameUnstemmed" type="textUnstemmed" indexed="true" stored="false" multiValued="true"/>
     <field name="nameStemmed" type="text" indexed="true" stored="false" multiValued="true"/>
+   <!--
+    <field name="prefixNameUnstemmed" type="prefixTextUnstemmed" indexed="true" stored="false" multiValued="true"/>
+    <field name="prefixNameStemmed" type="prefixText" indexed="true" stored="false" multiValued="true"/>
+   -->
     <field name="indexedTime" type="string" indexed="true" stored="true" multiValued="true"/>
     <field name="ALLTEXT" type="text" indexed="true" stored="false" multiValued="true"/>
     <field name="ALLTEXTUNSTEMMED" type="textgen" indexed="true" stored="false" multiValued="true"/>
