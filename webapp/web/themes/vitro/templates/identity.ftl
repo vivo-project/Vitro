@@ -34,7 +34,7 @@
             
             <form id="search-form" action="${urls.search}" name="search" role="search"> 
                 <div id="search-field">
-                    <input type="text" name="querytext" class="search-vivo" value="${querytext!}" />
+                    <input type="text" name="querytext" class="search-vitro" value="${querytext!}" />
                     <input type="submit" value="Search" class="search">
                 </div>
             </form>

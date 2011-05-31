@@ -33,7 +33,7 @@ a:hover {
     text-decoration: none;
 }
 a {
-    color: #006279;
+    color: #47B6D0;
 }
 em {
     font-style: italic;
@@ -47,7 +47,7 @@ h2 {
     line-height: 1.5em;
 }
 h2 a {
-    color: #006279; 
+    color: #006279;
 }
 h2 a:link, 
 h2 a:visited {
@@ -61,19 +61,19 @@ h3 {
     padding: 10px 0 12px 0;
     margin: 0;
     font-size: 1.125em;
-    color: #006279; 
+    color: #006279;
 }
 h4 {
     padding: 10px 0 12px 0;
     margin: 0;
     font-size: 1em;
-    color: #006279; 
+    color: #006279;
 }
 h5 {
     padding: 10px 0 12px 0;
     margin: 0;
     font-size: .875em;
-    color: #006279; 
+    color: #006279;
 }
 /* ------------------------------------------------->  */
 /* EDITING STYLES ---------------------------------->  */
@@ -108,6 +108,7 @@ removed once we refactor the editing forms to Freemarker */
 input#submit, 
 input#submit:visited {
     background: #222 url(../images/alert-overlay.png) repeat-x;
+    /*background-image: -moz-linear-gradient(center top , #00a8c3, #058da3);*/
     display: inline-block;
     padding: 5px 18px 7px;
     color: #fff;
@@ -126,6 +127,7 @@ input#submit:visited {
     margin-right: .6em;
     margin-top: .5em;
     margin-bottom: .5em;
+    
 }
 #verbose-mode .small {
     font-size: 12px;
@@ -252,7 +254,7 @@ p.submit {
 }
 .database_header {
     background-color: #f1f2ee;
-    color: #006279;
+    color: #47B6D0;
     font-size: 1em;
 }
 .database_upperleftcorner {
@@ -371,7 +373,7 @@ a.ingestMenu:visited {
 a.ingestMenu:hover, 
 a.ingestMenu:active {
     text-decoration: none;
-    color: #006279;
+    color: #47B6D0;
 }
 
 /* ------------------------------------------------->  */
@@ -459,7 +461,7 @@ ul#header-nav  a:active {
     padding-top: 8px;
     cursor: pointer;
 }
-input.search-vivo {
+input.search-vitro {
     float: left;
     width: 228px;
     height: 25px;
@@ -486,7 +488,7 @@ ul#main-nav {
 #main-nav li {
     float: left;
     line-height: 46px;
-    /*background: url(../images/separator-main-nav.jpg) right -2px no-repeat;*/
+    background: url(../images/separator-main-nav.jpg) right 12px no-repeat;
 }
 #main-nav li a {
     padding-left: 16px;
@@ -497,10 +499,11 @@ ul#main-nav {
 }
 #main-nav li a:hover {
     color: #002b44;
+    background: url(../images/rollover-nav.gif) left bottom repeat-x;
 }
 #main-nav li a.selected {
     color: #002b44;
-    /*background: url(../images/selected-main-nav.jpg) left -1px no-repeat;*/
+    background: url(../images/rollover-nav.gif) left bottom repeat-x;
     margin-left: 18px;
 }
 /* WRAPPER CONTENT------>  */
@@ -519,6 +522,11 @@ ul#main-nav {
     width: 570px;
     padding-bottom: 40px;
 }
+#intro li{
+    background: url(../images/intro.gif) left 10px no-repeat;
+    padding-left: 13px;
+    margin-left: 40px;
+}
 body.loggedIn #intro {
     width: 98%;
 }
@@ -534,7 +542,7 @@ body.loggedIn #intro {
     padding: 0 24px 0 24px;
 }
 #intro a {
-    color: #006279
+    color: #47B6D0
 }
 /* LOG IN------>  */          
 #login {
@@ -552,7 +560,7 @@ body.login #login {
 }
 #login h2 {
     font-size: 22px;
-    color: #006279;
+    color: #47B6D0;
     padding-left: 15px;
     padding-top: 18px;
     border-bottom: none;
@@ -599,7 +607,7 @@ body.login #login {
 }
 #login-form input.text-field:focus {
     border: 1px solid rgba(57, 138, 172, .5);  
-    background-color: rgba(57, 138, 172, .1);   
+    background-color: rgba(0, 168, 196, .1);   
 }
 #login-form p.submit {
     width: 100px;
@@ -640,7 +648,7 @@ p.forgot-password {
     padding-bottom: 1.2em;
 }
 p.forgot-password a {
-    color: #006279;
+    color: #47B6D0;
 }
 p.request-account {
     width: 219px;
@@ -677,44 +685,6 @@ p.password-note {
     margin-right:-10px;
     height:34px;
 }
-/* HOME SEARCH ------>  */
-#search-home {
-    float: left;
-    width: 533px;
-    margin: 30px 0 0 24px;
-}
-#search-home h3 {
-    padding: 0;
-    font-size: 22px;
-    margin-bottom: 15px;
-    color: #006279;
-}
-#search-home-field {
-    width: 483px;
-    height: 44px;
-    background: url(../images/search-field-and-button.gif) 0 0 no-repeat;
-}
-#search-home-field input.search {
-    text-decoration: none;
-    background-color: transparent;
-    color: #fff;
-    font-size: 18px;
-    border: none;
-    padding-left: 23px;
-    padding-top: 8px;
-    cursor: pointer;
-}
-input.search-home-vivo {
-    float: left;
-    margin: 10px 0 0 8px;
-    width: 350px;
-    height: 20px;
-    border: 0;
-    font-size: 18px;
-    color: #5e6363;
-    margin-left: 4px;
-    margin-top: 2px;
-}
 /* BROWSE ------>  */
 ul#browse-classgroups a:hover {
     background: url(../images/arrow.gif) 0 10px no-repeat;
@@ -733,7 +703,7 @@ ul#classes-in-classgroup a.selected {
     background: url(../images/arrow.gif) 0 10px no-repeat;
 }
 #visual-graph h5 {
-    color: #006279;
+    color: #47B6D0;
 }
 svg text:hover {
     color: #2EA0CF;
@@ -802,7 +772,7 @@ a.powered-by-vitro {
     color: #09C;
     text-decoration: none;
 }
-a.powered-by-vivo:hover {
+a.powered-by-vitro:hover {
     color: #4e5051;
     text-decoration: none;
 }
@@ -833,7 +803,7 @@ p{
     top: 1px;
 }
 .blue {
-    color: #006279; 
+    color: #47B6D0; 
 }
 .green {
     color: #47b6d0;
@@ -886,7 +856,7 @@ p{
  }
 .individualList li a { 
     font-weight: normal; 
-    color: #006279;
+    color: #47B6D0;
 }
 
 /* ------------------------------------------------->  */
@@ -900,7 +870,7 @@ p{
 }
 #menupage-intro h2 {
     font-size: 1.375em;
-    color: #006279;
+    color: #47B6D0;
     font-weight: normal;
 }
 #menupage-intro.people h2 {
@@ -920,7 +890,7 @@ p{
 }
 #menupage-content h4 {
     font-size: 1.25em;
-    color: #006279;
+    color: #47B6D0;
     font-weight: normal;
 }
 ul#vgraph-classes li {
@@ -948,7 +918,7 @@ ul#vgraph-classes .count-classes {
 }
 #find-by h3 {
     font-size: 1.125em;
-    color: #006279;
+    color: #47B6D0;
     font-weight: normal;
 }
 ul#find-filters a {
@@ -971,7 +941,7 @@ ul#find-filters a.selected {
 }
 #researchers h3 {
     font-size: 1.25em;
-    color: #006279;
+    color: #47B6D0;
     font-weight: normal;
     background: url(../images/arrow.gif) 140px 27px no-repeat;
 }
@@ -987,7 +957,7 @@ ul#find-filters a.selected {
     font-size: 4.375em;
     text-align: center;
     float: left;
-    color: #006279;
+    color: #47B6D0;
     border-right: 1px dotted #dde4e3;
     font-weight: bold;
 }
@@ -999,7 +969,7 @@ ul#find-filters a.selected {
 }
 #nav-display p {
     font-size: 26px;
-    color: #006279;
+    color: #47B6D0;
 }
 #nav-display img {
     border-left: 1px solid #e8e8e8;
@@ -1135,7 +1105,7 @@ ul#alpha-browse-individuals .count-classes {
     background-color: #f2f9fb;
 }
 #admin h3 {
-    background: #006279;
+    background: #47B6D0;
     color: #fff;
 }
 #admin .uri-link {
@@ -1150,7 +1120,7 @@ ul#alpha-browse-individuals .count-classes {
 }
 #individual-intro h1 {
     font-size: 1.375em; 
-    color: #006279; 
+    color: #47B6D0; 
 }
 #individual-intro span.preferred-title {
     font-size: .825em;
@@ -1161,7 +1131,7 @@ ul#individual-tools {
     color: #8AA149;
 }
 #individual-intro ul.individual-urls li a {
-    color: #006279;
+    color: #47B6D0;
 }
 h2#mainImage, #share-contact h2 {
     color: #5E6363;
@@ -1208,13 +1178,13 @@ ul.individual-urls li {
     line-height: 1.6em;
 }
 ul.individual-urls li a {
-    color: #006279;
+    color: #47B6D0;
 }
 ul.individual-urls-people {
     list-style: url(../../../images/individual/arrow-grey.gif);
 }
 ul.individual-urls-people li a {
-    color: #006279;
+    color: #47B6D0;
 }
 /* INDIVIDUAL RIGHT CONTENT ------>  */
 #individual-info {
@@ -1222,7 +1192,7 @@ ul.individual-urls-people li a {
 }
 #individual-info h1.fn {
     font-size: 1.375em;
-    color: #006279;
+    color: #47B6D0;
     line-height: 1.3em;
 }
 h1.fn .preferred-title {
@@ -1247,7 +1217,7 @@ ul#individual-personInPosition li {
     line-height: 1.8em;
 }
 ul#individual-personInPosition li a {
-    color: #006279;
+    color: #47B6D0;
 }
 .individual-overview {
     font-size: 1em;
@@ -1265,12 +1235,12 @@ ul#individual-hasResearchArea li:last-child {
     border-right: none;
 }
 ul#individual-hasResearchArea li a {
-    color: #006279;
+    color: #47B6D0;
 }
 /* INDIVIDUAL VISUALIZATION ------>  */
 #visualization h3 {
     font-size: 1.25em;
-    color: #006279;
+    color: #47B6D0;
 }
 .publication-year-range {
     font-size: .875em;
@@ -1281,7 +1251,7 @@ a.all-vivo-publications {
 }
 /* <------ TEMPORAL GRAPH  */
 #temporal-graph h3 a {
-    color: #006279;
+    color: #47B6D0;
     font-size: .8em !important;
     text-decoration: underline;
 }
@@ -1291,7 +1261,7 @@ img.co-author {
 }
 #co-authors h3 {
     font-size: 1.25em;
-    color: #006279;
+    color: #47B6D0;
 }
 p.view-all-coauthors {
     font-size: .875em;
@@ -1324,7 +1294,7 @@ p.view-all-coauthors {
 }
 section.property-group h2 {
     font-size: 1.25em;
-    color: #006279;
+    color: #47B6D0;
     font-weight: normal;
 }
 article.property {
@@ -1349,7 +1319,7 @@ article.property ul.property-list {
     color: #5e6363;
 }
 article.property ul.property-list li a {
-    color: #006279;
+    color: #47B6D0;
     line-height: 1.6em;
 }
 /* MISCELLANEOUS ------>  */
@@ -1375,15 +1345,15 @@ a {
 /* SITE ADMIN DASHBOARD ---------------------------->  */
 /* ------------------------------------------------->  */
 #adminDashboard .pageBodyGroup {
-  padding: 0 1em .5em 1em;
+    padding: 0 1em .5em 1em;
 }
 #adminDashboard .pageBodyGroup h3 {
-  background-color: #fff;
-  border-bottom: 1px dotted #AFB2B2;
-  font-weight: bold;
-  padding: .625em;
-  color: #006279;
-  margin-bottom: .625em;
+    background-color: #fff;
+    border-bottom: 1px dotted #AFB2B2;
+    font-weight: bold;
+    padding: .625em;
+    color: #006279;
+    margin-bottom: .625em;
 }
 #adminDashboard .pageBodyGroup ul {
   margin: 0 0 1em .6em;
@@ -1403,11 +1373,11 @@ a {
     border-left: 1px solid #DFE6E6;
 }
 #revision-build-date h3{
-color: #006279;
+color: #47B6D0;
 }
 #revision-levels caption {
     font-size: 18px;
-    color: #006279;
+    color: #47B6D0;
 }
 #revision-levels th {
     font-weight: bold;
@@ -1421,7 +1391,7 @@ color: #006279;
 /* STATIC PAGES  ----------------------------------->  */
 /* ------------------------------------------------->  */
 #terms h3 {
-    color: #006279;
+    color: #47B6D0;
 }
 
 /* ------------------------------------------------->  */
