@@ -504,7 +504,6 @@ ul#main-nav {
 #main-nav li a.selected {
     color: #002b44;
     background: url(../images/rollover-nav.gif) left bottom repeat-x;
-    margin-left: 18px;
 }
 /* WRAPPER CONTENT------>  */
 #wrapper-content {
@@ -560,7 +559,7 @@ body.login #login {
 }
 #login h2 {
     font-size: 22px;
-    color: #47B6D0;
+    color: #006279;
     padding-left: 15px;
     padding-top: 18px;
     border-bottom: none;
@@ -686,21 +685,43 @@ p.password-note {
     height:34px;
 }
 /* BROWSE ------>  */
+#browse {
+    background-color: #f7f5f0;
+    border-color: #dde5e4;
+}
+#browse h4 {
+    background-color: transparent;
+    color: #006279;
+    margin-bottom: 0;
+    margin-top: 20px;
+    padding-left: 37px;
+    width: 13%;
+}
+ul#browse-classgroups {
+    background-color: #e0ded9;
+    padding: 0;
+}
+ul#browse-classgroups li {
+    border-bottom: 1px solid #bbbbb9;
+}
 ul#browse-classgroups a:hover {
-    background: url(../images/arrow.gif) 0 10px no-repeat;
-    color: #2ea0cf;
+    background-image: none;
+    color: #fff;
+    background-color: #7c7a77;
 }
 ul#browse-classgroups a.selected {
-    color: #2ea0cf;
-    background: url(../images/arrow.gif) 0 10px no-repeat;
+    color: #fff;
+    background-image: none;
+    background-color: #7c7a77;
 }
 ul#classes-in-classgroup a:hover {
-    background: url(../images/arrow.gif) 0 10px no-repeat;
-    color: #2ea0cf;
+    background-image: none;
+    color: #fff;
+    background-color: #7c7a77;
 }
 ul#classes-in-classgroup a.selected {
-    color: #2ea0cf;
-    background: url(../images/arrow.gif) 0 10px no-repeat;
+    color: #fff;
+    background-image: none;
 }
 #visual-graph h5 {
     color: #47B6D0;
@@ -717,6 +738,10 @@ p.view-all {
 }
 a.view-all-style {
     color: #303e4e
+}
+ul#browse-classgroups a.selected span.count-classes,
+ul#browse-classgroups a:hover span.count-classes {
+    color: #fff;
 }
 /* FOOTER------>  */
 footer {
@@ -1160,7 +1185,7 @@ ul#individual-tools li a {
     color: #5f6464;
 }
 ul.individual-urls {
-    list-style: url(../../../images/individual/arrow-grey.gif);
+    list-style: url(../images/bullet.gif);
 }
 ul#individual-email, 
 ul#individual-phone {
@@ -1192,7 +1217,7 @@ ul.individual-urls-people li a {
 }
 #individual-info h1.fn {
     font-size: 1.375em;
-    color: #47B6D0;
+    color: #006279;
     line-height: 1.3em;
 }
 h1.fn .preferred-title {
