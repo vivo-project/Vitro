@@ -58,31 +58,6 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     
     protected static final Log log = LogFactory.getLog(DataPropertyDaoJena.class.getName());
     
-    /* This may be the intent behind JenaBaseDao.NONUSER_NAMESPACES, but that
-     * value does not contain all of these namespaces.
-     */
-    protected static final List<String> EXCLUDED_NAMESPACES = Arrays.asList(
-            // Don't need to exclude these, because they are not owl:DatatypeProperty
-            //"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-            //"http://www.w3.org/2000/01/rdf-schema#",
-            "http://www.w3.org/2002/07/owl#",
-            "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#",
-            "http://vitro.mannlib.cornell.edu/ns/vitro/public#"
-        ); 
-
-    /*
-     * This is a hack to throw out properties in the vitro, rdf, rdfs, and owl namespaces.
-     * It will be implemented in a better way in v1.3 (Editing and Display Configuration).
-     */
-    protected static final String PROPERTY_FILTERS;
-    static {
-        List<String> namespaceFilters = new ArrayList<String>();
-        for (String namespace : EXCLUDED_NAMESPACES) {
-            namespaceFilters.add("( afn:namespace(?property) != \"" + namespace + "\" )");
-        }
-        PROPERTY_FILTERS = StringUtils.join(namespaceFilters, " && ");
-    } 
-    
     private class DataPropertyRanker implements Comparator {
         public int compare (Object o1, Object o2) {
             DataProperty dp1 = (DataProperty) o1;
@@ -735,34 +710,63 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             return rootProperties;
     }
 
+    /*
+     * SPARQL-based methods for getting the individual's data properties.
+     * Ideally this implementation should replace the existing way of getting
+     * the data property list, but the consequences of this may be far-reaching,
+     * so we are implementing a new method now and will merge the old approach
+     * into the new one in a future release.
+     */
+    
+    /* This may be the intent behind JenaBaseDao.NONUSER_NAMESPACES, but that
+     * value does not contain all of these namespaces.
+     */
+    protected static final List<String> EXCLUDED_NAMESPACES = Arrays.asList(
+            // Don't need to exclude these, because they are not owl:DatatypeProperty
+            //"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+            //"http://www.w3.org/2000/01/rdf-schema#",
+            "http://www.w3.org/2002/07/owl#",
+            "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#",
+            "http://vitro.mannlib.cornell.edu/ns/vitro/public#"
+        ); 
+
+    /*
+     * This is a hack to throw out properties in the vitro, rdf, rdfs, and owl namespaces.
+     * It will be implemented in a better way in v1.3 (Editing and Display Configuration).
+     */
+    protected static final String PROPERTY_FILTERS;
+    static {
+        List<String> namespaceFilters = new ArrayList<String>();
+        for (String namespace : EXCLUDED_NAMESPACES) {
+            namespaceFilters.add("( afn:namespace(?property) != \"" + namespace + "\" )");
+        }
+        PROPERTY_FILTERS = StringUtils.join(namespaceFilters, " && ");
+    } 
+    
+    protected static final String DATA_PROPERTY_QUERY_STRING = 
+        PREFIXES + "\n" +
+        "SELECT DISTINCT ?property WHERE { \n" +
+        "   ?subject ?property ?object . \n" + 
+        "   ?property a owl:DatatypeProperty . \n" +
+        "   FILTER ( \n" +
+        "       isLiteral(?object) && \n" +
+                PROPERTY_FILTERS + "\n" +
+        "   ) \n" +
+        "}";
+    
     @Override
     public List<DataProperty> getDataPropertyList(Individual subject) {
         return getDataPropertyList(subject.getURI());
     }
     
     @Override
-    /*
-     * SPARQL-based method for getting the individual's data properties.
-     * Ideally this implementation should replace the existing way of getting
-     * the data property list, but the consequences of this may be far-reaching,
-     * so we are implementing a new method now and will merge the old approach
-     * into the new one in a future release.
-     */
     public List<DataProperty> getDataPropertyList(String subjectUri) {
 
         // Due to a Jena bug, prebinding on ?subject combined with the isLiteral()
-        // filter causes the query to fail. Using string concatenation to insert the
-        // subject uri instead.
-        String queryString = 
-            prefixes + "\n" +
-            "SELECT DISTINCT ?property WHERE { \n" +
-            "   <" + subjectUri + "> ?property ?object . \n" + 
-            "   ?property a owl:DatatypeProperty . \n" +
-            "   FILTER ( \n" +
-            "       isLiteral(?object) && \n" +
-                    PROPERTY_FILTERS + "\n" +
-            "   ) \n" +
-            "}";
+        // filter causes the query to fail. Insert the subjectUri manually instead.
+        // QuerySolutionMap initialBindings = new QuerySolutionMap();
+        // initialBindings.add("subject", ResourceFactory.createResource(subjectUri));
+        String queryString = subUriForQueryVar(DATA_PROPERTY_QUERY_STRING, "subject", subjectUri);
         
         Query query = null;
         try {

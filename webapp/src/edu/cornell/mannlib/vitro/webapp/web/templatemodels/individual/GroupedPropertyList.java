@@ -109,7 +109,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
     
     }
     
-    // It's possible that a collated object property retrieved in the call to getPopulatedObjectPropertyList()
+    // It's possible that an object property retrieved in the call to getPopulatedObjectPropertyList()
     // is now empty of statements, because if not editing, some statements without a linked individual
     // are not retrieved by the query. (See <linked-individual-required> elements in queries.)
     // Remove these properties, and also remove any groups with no remaining properties. 
