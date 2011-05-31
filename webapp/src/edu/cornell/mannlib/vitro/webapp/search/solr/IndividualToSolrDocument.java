@@ -55,7 +55,7 @@ public class IndividualToSolrDocument implements Obj2DocIface {
 
     private List<DocumentModifier> documentModifiers = new ArrayList<DocumentModifier>();
     
-    public static Map<String,Float> betas = new Hashtable<String,Float>();
+    
     
     private static List<String> contextNodeClassNames = new ArrayList<String>();
     
@@ -209,18 +209,7 @@ public class IndividualToSolrDocument implements Obj2DocIface {
                      log.debug("could not index name of related object: " + e.getMessage());
                  }
              }
-         }
-         
-      // adding beta value
-     	
-     	float beta = 0;
-     	if(betas.containsKey(uri)){
-     		beta = betas.get(uri);
-     	}else{
-     		beta = searchQueryHandler.calculateBeta(uri); // or calculate & put in map
-     		betas.put(uri, beta);
-     	}
-     	//doc.addField(term.BETA,beta);
+         }         
     	
     	 // adding PHI value
         boolean isPerson = (superClassNames.contains("Person")) ? true : false ;
@@ -234,10 +223,10 @@ public class IndividualToSolrDocument implements Obj2DocIface {
         
         //doc.addField(term.PHI, phi); // adding phi value
         
-    	doc.addField(term.NAME_RAW, value, NAME_BOOST+beta+phi);
-    	doc.addField(term.NAME_LOWERCASE, value.toLowerCase(),NAME_BOOST+beta+phi);
-    	doc.addField(term.NAME_UNSTEMMED, value,NAME_BOOST+beta+phi);
-    	doc.addField(term.NAME_STEMMED, value, NAME_BOOST+beta+phi);
+    	doc.addField(term.NAME_RAW, value, NAME_BOOST+phi);
+    	doc.addField(term.NAME_LOWERCASE, value.toLowerCase(),NAME_BOOST+phi);
+    	doc.addField(term.NAME_UNSTEMMED, value,NAME_BOOST+phi);
+    	doc.addField(term.NAME_STEMMED, value, NAME_BOOST+phi);
     	doc.addField(term.NAME_PHONETIC, value, PHONETIC_BOOST);
     	
     	long tContextNodes = System.currentTimeMillis();
@@ -323,10 +312,10 @@ public class IndividualToSolrDocument implements Obj2DocIface {
         	log.debug("time to include data property statements, object property statements in the index: " + Long.toString(System.currentTimeMillis() - tPropertyStatements));
             
         	String alltext = allTextValue.toString();
-            doc.addField(term.ALLTEXT, alltext, 2.5F*beta*phi);
-            doc.addField(term.ALLTEXTUNSTEMMED, alltext, 2.5F*beta*phi);
+            doc.addField(term.ALLTEXT, alltext, 2.5F*phi);
+            doc.addField(term.ALLTEXTUNSTEMMED, alltext, 2.5F*phi);
             doc.addField(term.ALLTEXT_PHONETIC, alltext, PHONETIC_BOOST);
-            doc.setDocumentBoost(2.5F*beta*phi);
+            doc.setDocumentBoost(2.5F*phi);
             
             //run the document modifiers
             if( documentModifiers != null ){
