@@ -496,7 +496,7 @@ public class ContextNodeFields implements DocumentModifier{
 					
 					RDFNode linkedAuthor = soln.get("linkedAuthor");
 					if(linkedAuthor != null){
-						propertyValues.append(" publications " + linkedAuthor.toString());
+						propertyValues.append(" publications " + linkedAuthor.toString() + " publications ");
 					}else{
 						log.debug("linkedAuthor is null ");
 					}
@@ -531,7 +531,7 @@ public class ContextNodeFields implements DocumentModifier{
 					
 					RDFNode features = soln.get("features");
 					if(features != null){
-						propertyValues.append(" publications " + features.toString());
+						propertyValues.append(" publications " + features.toString() + " publications ");
 					}else{
 						log.debug("features is null ");
 					}

@@ -206,19 +206,28 @@ public class IndividualToSolrDocument implements Obj2DocIface {
              }
          }         
     	
-    	
-    	doc.addField(term.NAME_RAW, value, NAME_BOOST);
-    	doc.addField(term.NAME_LOWERCASE, value.toLowerCase(),NAME_BOOST);
-    	doc.addField(term.NAME_UNSTEMMED, value,NAME_BOOST);
-    	doc.addField(term.NAME_STEMMED, value, NAME_BOOST);
-    	doc.addField(term.NAME_PHONETIC, value, PHONETIC_BOOST);
+         if(documentModifiers == null){
+        	 doc.addField(term.NAME_RAW, value, NAME_BOOST);
+        	 doc.addField(term.NAME_LOWERCASE, value.toLowerCase(),NAME_BOOST);
+        	 doc.addField(term.NAME_UNSTEMMED, value,NAME_BOOST);
+        	 doc.addField(term.NAME_STEMMED, value, NAME_BOOST);
+        	 doc.addField(term.NAME_PHONETIC, value, PHONETIC_BOOST);
+         }else{
+        	 doc.addField(term.NAME_RAW, value);
+        	 doc.addField(term.NAME_LOWERCASE, value.toLowerCase());
+        	 doc.addField(term.NAME_UNSTEMMED, value);
+        	 doc.addField(term.NAME_STEMMED, value);
+        	 doc.addField(term.NAME_PHONETIC, value, PHONETIC_BOOST);
+         }
     	
         
         long tMoniker = System.currentTimeMillis();
     	
+        if(documentModifiers == null){
         //boost for entity
         if(ent.getSearchBoost() != null && ent.getSearchBoost() != 0)
         doc.setDocumentBoost(ent.getSearchBoost());
+        }
         
         //thumbnail
         try{
@@ -268,9 +277,9 @@ public class IndividualToSolrDocument implements Obj2DocIface {
         	log.debug("time to include data property statements, object property statements in the index: " + Long.toString(System.currentTimeMillis() - tPropertyStatements));
             
         	String alltext = allTextValue.toString();
-            doc.addField(term.ALLTEXT, alltext, ALL_TEXT_BOOST);
-            doc.addField(term.ALLTEXTUNSTEMMED, alltext, ALL_TEXT_BOOST);
-            doc.addField(term.ALLTEXT_PHONETIC, alltext, PHONETIC_BOOST);
+            doc.addField(term.ALLTEXT, alltext);
+            doc.addField(term.ALLTEXTUNSTEMMED, alltext);
+            doc.addField(term.ALLTEXT_PHONETIC, alltext);
             
             //run the document modifiers
             if( documentModifiers != null ){
@@ -284,9 +293,7 @@ public class IndividualToSolrDocument implements Obj2DocIface {
         return doc;
     }
     
-    /*
-     * Method for calculation of PHI for a doc. 
-     */
+   
     
     
     
