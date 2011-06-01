@@ -279,7 +279,7 @@ public class IndividualToSolrDocument implements Obj2DocIface {
         	String alltext = allTextValue.toString();
             doc.addField(term.ALLTEXT, alltext);
             doc.addField(term.ALLTEXTUNSTEMMED, alltext);
-            doc.addField(term.ALLTEXT_PHONETIC, alltext);
+            doc.addField(term.ALLTEXT_PHONETIC, alltext,PHONETIC_BOOST);
             
             //run the document modifiers
             if( documentModifiers != null ){
@@ -357,6 +357,7 @@ public class IndividualToSolrDocument implements Obj2DocIface {
         this.contextNodeClassNames.add("PostdoctoralPosition");
         this.contextNodeClassNames.add("AdvisingRelationship");
         this.contextNodeClassNames.add("Authorship");
+        this.contextNodeClassNames.add("AcademicDegree");
     }
     
 
