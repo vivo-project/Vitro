@@ -13,13 +13,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.common.SolrDocument;
+import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.SolrException;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
-import edu.cornell.mannlib.vitro.webapp.search.solr.IndividualToSolrDocument;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexerIface;
 
 public class SolrIndexer implements IndexerIface {
@@ -60,8 +60,10 @@ public class SolrIndexer implements IndexerIface {
                             //sending each doc individually is inefficient
                             Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
                             docs.add( solrDoc );
-                            server.add( docs );
-                   
+                            UpdateResponse res = server.add( docs );
+                            log.debug("response after adding docs to server: "+ res);
+                        
+                            
 //                            if( !newDoc ){  
 //                                server.add( docs );
 //                                log.debug("updated " + ind.getName() + " " + ind.getURI());
@@ -132,9 +134,12 @@ public class SolrIndexer implements IndexerIface {
     @Override
     public synchronized void endIndexing() {
         try {
-            server.commit();            
-        } catch (Exception e) {
+           UpdateResponse res = server.commit();
+           log.debug("Response after committing to server: "+ res );
+        } catch (SolrServerException e) {
             log.error("Could not commit to solr server", e);
+        } catch(IOException e){
+        	log.error("Could not commit to solr server", e);
         }finally{
         	CalculateParameters.betaMap.clear();
         	CalculateParameters.betaMap = null;

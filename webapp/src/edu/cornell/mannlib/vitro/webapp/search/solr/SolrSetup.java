@@ -57,8 +57,8 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             }            
             CommonsHttpSolrServer server;
             server = new CommonsHttpSolrServer( solrServerUrl );
-            server.setSoTimeout(1000);  // socket read timeout
-            server.setConnectionTimeout(100);
+            server.setSoTimeout(10000);  // socket read timeout
+            server.setConnectionTimeout(10000);
             server.setDefaultMaxConnectionsPerHost(100);
             server.setMaxTotalConnections(100);         
             server.setMaxRetries(1);            
