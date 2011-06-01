@@ -104,6 +104,13 @@
     </listener-class>
   </listener> 
   
+  <!--  Update to the new UserAccounts model (1.3). Needs to run after JenaDataSourceSetup. -->
+  <!-- <listener>
+    <listener-class>
+        edu.cornell.mannlib.vitro.webapp.servlet.setup.UpdateUserAccounts
+    </listener-class>
+  </listener> -->
+
   <!-- Attaching submodels permits extra RDF files to be made visible without storing the data in the DB. -->
   <listener>
      <listener-class>edu.cornell.mannlib.vitro.webapp.servlet.setup.AttachSubmodels</listener-class>
