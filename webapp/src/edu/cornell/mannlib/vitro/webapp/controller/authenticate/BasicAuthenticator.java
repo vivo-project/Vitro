@@ -15,7 +15,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy.AuthRole;
@@ -126,7 +125,6 @@ public class BasicAuthenticator extends Authenticator {
 			String userUri, String roleUri, int securityLevel,
 			AuthenticationSource authSource) {
 		HttpSession session = request.getSession();
-		createLoginFormBean(username, userUri, roleUri, session);
 		createLoginStatusBean(username, userUri, securityLevel, authSource,
 				session);
 		setSessionTimeoutLimit(session);
@@ -147,25 +145,6 @@ public class BasicAuthenticator extends Authenticator {
 
 	/**
 	 * Put the login bean into the session.
-	 * 
-	 * TODO The LoginFormBean is being phased out.
-	 */
-	private void createLoginFormBean(String username, String userUri,
-			String roleUri, HttpSession session) {
-		LoginFormBean lfb = new LoginFormBean();
-		lfb.setUserURI(userUri);
-		lfb.setLoginStatus("authenticated");
-		lfb.setSessionId(session.getId());
-		lfb.setLoginRole(roleUri);
-		lfb.setLoginRemoteAddr(request.getRemoteAddr());
-		lfb.setLoginName(username);
-		session.setAttribute("loginHandler", lfb);
-	}
-
-	/**
-	 * Put the login bean into the session.
-	 * 
-	 * TODO this should eventually replace the LoginFormBean.
 	 */
 	private void createLoginStatusBean(String username, String userUri,
 			int securityLevel, AuthenticationSource authSource,
