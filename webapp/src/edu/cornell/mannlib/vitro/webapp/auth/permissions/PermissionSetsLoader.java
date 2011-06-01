@@ -45,7 +45,7 @@ public class PermissionSetsLoader implements ServletContextListener {
 			OntModel model = ModelContext.getBaseOntModelSelector(ctx)
 					.getUserAccountsModel();
 
-			ModelWrapper wrapper = new ModelWrapper(model, ns);
+			ModelWrapper wrapper = new ModelWrapper(model);
 			wrapper.createPermissionSet("1", "Self Editor");
 			wrapper.createPermissionSet("2", "Editor");
 			wrapper.createPermissionSet("3", "Curator");
@@ -64,15 +64,13 @@ public class PermissionSetsLoader implements ServletContextListener {
 
 	private static class ModelWrapper {
 		private final OntModel model;
-		private final String defaultNamespace;
 
 		private final Property typeProperty;
 		private final Property labelProperty;
 		private final Resource permissionSet;
 
-		public ModelWrapper(OntModel model, String defaultNamespace) {
+		public ModelWrapper(OntModel model) {
 			this.model = model;
-			this.defaultNamespace = defaultNamespace;
 
 			typeProperty = model.createProperty(VitroVocabulary.RDF_TYPE);
 			labelProperty = model.createProperty(VitroVocabulary.LABEL);
@@ -80,7 +78,7 @@ public class PermissionSetsLoader implements ServletContextListener {
 		}
 
 		public void createPermissionSet(String uriSuffix, String label) {
-			String uri = defaultNamespace + "permissionSet-" + uriSuffix;
+			String uri = "http://permissionSet-" + uriSuffix;
 
 			model.enterCriticalSection(Lock.WRITE);
 			try {
