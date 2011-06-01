@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
+import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -47,6 +48,10 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 		try {
 			OntResource r = getOntModel().getOntResource(uri);
 			if (r == null) {
+				return null;
+			}
+
+			if (!isResourceOfType(r, USERACCOUNT)) {
 				return null;
 			}
 
@@ -90,6 +95,7 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 			if (stmts.hasNext()) {
 				userUri = stmts.next().getSubject().getURI();
 			}
+			stmts.close();
 		} finally {
 			getOntModel().leaveCriticalSection();
 		}
@@ -227,6 +233,9 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 			if (r == null) {
 				return null;
 			}
+			if (!isResourceOfType(r, PERMISSIONSET)) {
+				return null;
+			}
 
 			PermissionSet ps = new PermissionSet();
 			ps.setUri(uri);
@@ -289,6 +298,23 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 
 		throw new InsertException("Could not create URI for individual: "
 				+ errMsg);
+	}
+
+	/**
+	 * Since there is no reasoner on the UserAccountModel, this will return a
+	 * false negative for a subtype of the specified type.
+	 * 
+	 * There should already be a lock on the model when this is called.
+	 */
+	private boolean isResourceOfType(OntResource r, OntClass type) {
+		StmtIterator stmts = getOntModel().listStatements(r, RDF.type, type);
+		if (stmts.hasNext()) {
+			stmts.close();
+			return true;
+		} else {
+			stmts.close();
+			return false;
+		}
 	}
 
 	private static class PermissionSetsByUri implements
