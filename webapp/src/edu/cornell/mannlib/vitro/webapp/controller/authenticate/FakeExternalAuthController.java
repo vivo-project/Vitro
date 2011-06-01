@@ -117,7 +117,7 @@ public class FakeExternalAuthController extends FreemarkerHttpServlet {
 		}
 
 		@Override
-		public String getExternalUsername(HttpServletRequest request) {
+		public String getExternalAuthId(HttpServletRequest request) {
 			log.debug("external username is '" + username + "'");
 			return username;
 		}
