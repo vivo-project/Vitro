@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOwnAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
@@ -23,10 +24,17 @@ public class UserAccountsUserController extends FreemarkerHttpServlet {
 
 	private static final String ACTION_CREATE_PASSWORD = "/createPassword";
 	private static final String ACTION_RESET_PASSWORD = "/resetPassword";
+	private static final String ACTION_MY_ACCOUNT = "/myAccount";
 
 	@Override
 	protected Actions requiredActions(VitroRequest vreq) {
-		return Actions.AUTHORIZED;
+		String action = vreq.getPathInfo();
+
+		if (ACTION_MY_ACCOUNT.equals(action)) {
+			return new Actions(new EditOwnAccount());
+		} else {
+			return Actions.AUTHORIZED;
+		}
 	}
 
 	@Override
@@ -38,13 +46,23 @@ public class UserAccountsUserController extends FreemarkerHttpServlet {
 		String action = vreq.getPathInfo();
 		log.debug("action = '" + action + "'");
 
-		if (ACTION_CREATE_PASSWORD.equals(action)) {
+		if (ACTION_MY_ACCOUNT.equals(action)) {
+			return handleMyAccountRequest(vreq);
+		} else if (ACTION_CREATE_PASSWORD.equals(action)) {
 			return handleCreatePasswordRequest(vreq);
 		} else if (ACTION_RESET_PASSWORD.equals(action)) {
 			return handleResetPasswordRequest(vreq);
 		} else {
 			return handleInvalidRequest(vreq);
 		}
+	}
+
+	private ResponseValues handleMyAccountRequest(VitroRequest vreq) {
+		UserAccountsMyAccountPage page = new UserAccountsMyAccountPage(vreq);
+		if (page.isSubmit() && page.isValid()) {
+			page.updateAccount();
+		}
+		return page.showPage();
 	}
 
 	private ResponseValues handleCreatePasswordRequest(VitroRequest vreq) {

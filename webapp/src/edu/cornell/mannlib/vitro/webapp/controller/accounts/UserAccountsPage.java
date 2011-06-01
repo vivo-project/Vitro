@@ -59,8 +59,8 @@ public abstract class UserAccountsPage {
 		userAccountsDao = wdf.getUserAccountsDao();
 	}
 
-	protected static boolean isEmailEnabled(HttpServletRequest req) {
-		return FreemarkerEmailFactory.isConfigured(req);
+	protected boolean isEmailEnabled() {
+		return FreemarkerEmailFactory.isConfigured(vreq);
 	}
 
 	protected String getStringParameter(String key, String defaultValue) {
@@ -126,6 +126,7 @@ public abstract class UserAccountsPage {
 		map.put("list", UrlBuilder.getUrl("/accountsAdmin/list"));
 		map.put("add", UrlBuilder.getUrl("/accountsAdmin/add"));
 		map.put("delete", UrlBuilder.getUrl("/accountsAdmin/delete"));
+		map.put("myAccount", UrlBuilder.getUrl("/accounts/myAccount"));
 		map.put("createPassword", UrlBuilder.getUrl("/accounts/createPassword"));
 		map.put("resetPassword", UrlBuilder.getUrl("/accounts/resetPassword"));
 

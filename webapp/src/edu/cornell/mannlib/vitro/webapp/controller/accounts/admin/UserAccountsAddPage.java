@@ -54,7 +54,7 @@ public class UserAccountsAddPage extends UserAccountsPage {
 		super(vreq);
 
 		this.strategy = UserAccountsAddPageStrategy.getInstance(vreq, this,
-				isEmailEnabled(vreq));
+				isEmailEnabled());
 
 		parseRequestParameters();
 

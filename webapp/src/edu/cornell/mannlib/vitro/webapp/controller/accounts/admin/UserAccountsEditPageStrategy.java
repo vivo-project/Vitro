@@ -13,6 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsPage;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailMessage;
@@ -166,18 +167,13 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 		protected String additionalValidations() {
 			if (newPassword.isEmpty() && confirmPassword.isEmpty()) {
 				return "";
-			} else if (!checkPasswordLength()) {
+			} else if (!checkPasswordLength(newPassword)) {
 				return ERROR_WRONG_PASSWORD_LENGTH;
 			} else if (!newPassword.equals(confirmPassword)) {
 				return ERROR_PASSWORDS_DONT_MATCH;
 			} else {
 				return "";
 			}
-		}
-
-		private boolean checkPasswordLength() {
-			return newPassword.length() >= UserAccount.MIN_PASSWORD_LENGTH
-					&& newPassword.length() <= UserAccount.MAX_PASSWORD_LENGTH;
 		}
 
 		@Override
@@ -190,8 +186,10 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 
 		@Override
 		protected void setAdditionalProperties(UserAccount u) {
-			u.setMd5Password(newPassword);
-			u.setPasswordChangeRequired(true);
+			if (!newPassword.isEmpty()) {
+				u.setMd5Password(Authenticator.applyMd5Encoding(newPassword));
+				u.setPasswordChangeRequired(true);
+			}
 		}
 
 		@Override
