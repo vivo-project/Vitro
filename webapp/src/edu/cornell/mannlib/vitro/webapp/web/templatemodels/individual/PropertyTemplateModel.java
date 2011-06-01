@@ -29,26 +29,23 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     private String localName;
     protected String propertyUri;
     protected Map<String, Object> verboseDisplay = null;
-    
-    // For editing
     protected String subjectUri = null;
+    protected VitroRequest vreq;
     protected boolean addAccess = false;
     
     PropertyTemplateModel(Property property, Individual subject, EditingPolicyHelper policyHelper, VitroRequest vreq) {
+        subjectUri = subject.getURI(); 
         propertyUri = property.getURI();
+        this.vreq = vreq;
         localName = property.getLocalName();        
         log.debug("Local name for property " + propertyUri + ": " + localName);
-        setVerboseDisplayValues(property, vreq);
+        setVerboseDisplayValues(property);
         // Do in subclass constructor. The label has not been set on the property, and the
         // means of getting the label differs between object and data properties.
         // this.name = property.getLabel();
-        
-        if (policyHelper != null) {
-            subjectUri = subject.getURI();            
-        }
     }
     
-    protected void setVerboseDisplayValues(Property property, VitroRequest vreq) {  
+    protected void setVerboseDisplayValues(Property property) {  
         // No verbose display for these properties
         if (GroupedPropertyList.VITRO_PROPS_TO_ADD_TO_LIST.contains(property)) {
             return;
