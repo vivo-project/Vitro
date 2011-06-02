@@ -119,8 +119,12 @@ public class LoginStatusBean {
 				.getAttribute("webappDaoFactory");
 		UserDao userDao = wadf.getUserDao();
 
-		String userUri = getBean(session).getUserURI();
-		return userDao.getUserByURI(userUri);
+		if (getBean(session).isLoggedIn()) {
+			String userUri = getBean(session).getUserURI();
+			return userDao.getUserByURI(userUri);
+		} else {
+			return null;
+		}
 	}
 
 	// ----------------------------------------------------------------------
