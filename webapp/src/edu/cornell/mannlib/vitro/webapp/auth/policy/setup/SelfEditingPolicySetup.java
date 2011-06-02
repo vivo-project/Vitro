@@ -43,7 +43,7 @@ public class SelfEditingPolicySetup implements ServletContextListener {
 			SelfEditingPolicy cep = new SelfEditingPolicy(ctx);
 			ServletPolicyList.addPolicy(ctx, cep);
 
-			// need to put an IdentifierFactory for CuratorEditingIds into the
+			// need to put an IdentifierFactory for SelfEditingIds into the
 			// ServletContext
 			ActiveIdentifierBundleFactories.addFactory(sce,
 					new SelfEditingIdentifierFactory());
