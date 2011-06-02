@@ -25,6 +25,7 @@ import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vedit.validator.impl.IntValidator;
 import edu.cornell.mannlib.vedit.validator.impl.XMLNameValidator;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionListener;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
@@ -121,7 +122,7 @@ public class DatapropRetryController extends BaseEditController {
 
         //set up any listeners
         List changeListenerList = new ArrayList();
-        //changeListenerList.add(new PropertyRestrictionListener(getServletContext()));
+        changeListenerList.add(new PropertyRestrictionListener(getServletContext()));
         epo.setChangeListenerList(changeListenerList);
 
 
