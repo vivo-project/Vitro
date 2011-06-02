@@ -179,7 +179,7 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 	 * This sets some static method in the lucene library to achieve this.
 	 */
 	public static void setBoolMax() {
-		BooleanQuery.setMaxClauseCount(16384);
+		BooleanQuery.setMaxClauseCount(50000);
 	}
        
 	/**

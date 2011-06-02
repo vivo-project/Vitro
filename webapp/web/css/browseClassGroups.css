@@ -78,7 +78,7 @@ ul#classes-in-classgroup {
     margin-bottom: 10px;
 }
 ul#classes-in-classgroup.vis {
-    width: 44%;
+    width: 55%;
     border-right: 1px solid #DDE5E4;
 }
 ul#classes-in-classgroup li {
@@ -87,18 +87,16 @@ ul#classes-in-classgroup li {
     width: 100%;
     border-bottom: 1px solid #dde4e3;
     font-size: 14px;
-    height: 35px;
-    line-height: 35px;
 }
 ul#classes-in-classgroup li:last-child {
     border-bottom: none
 }
 ul#classes-in-classgroup a {
     display: block;
-    padding-left: 15px;
-    height: 35px;
     color: #5e6363;
     text-decoration: none;
+    padding: .5em 0 .5em 0.938em;
+    line-height: 1.5em;
 }
 ul#classes-in-classgroup .count-individuals {
     font-size: 12px;
@@ -106,7 +104,7 @@ ul#classes-in-classgroup .count-individuals {
 /* VISUALIZATION  ------>  */
 #visual-graph {
     float: left;
-    width: 308px;
+    width: 235px;
 }
 #visual-graph h5 {
     padding: 20px 0 12px 12px;

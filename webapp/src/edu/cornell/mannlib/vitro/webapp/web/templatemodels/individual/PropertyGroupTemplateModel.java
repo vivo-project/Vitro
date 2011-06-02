@@ -40,6 +40,10 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
             }
         }
     }
+
+    protected boolean isEmpty() {
+        return properties.isEmpty();
+    }
     
     protected void remove(PropertyTemplateModel ptm) {
         properties.remove(ptm);

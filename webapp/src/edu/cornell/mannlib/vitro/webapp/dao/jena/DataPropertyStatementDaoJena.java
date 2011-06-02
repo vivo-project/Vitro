@@ -21,6 +21,7 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -338,8 +339,12 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
             ResultSet results = qexec.execSelect(); 
     
             while (results.hasNext()) {
-                QuerySolution sol = results.next();
-                Literal value = sol.getLiteral("value");
+                QuerySolution soln = results.next();
+                RDFNode node = soln.get("value");
+                if (! node.isLiteral()) {
+                    continue;
+                }                
+                Literal value = soln.getLiteral("value");
                 values.add(value);
             }
         } finally {

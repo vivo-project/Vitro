@@ -6,14 +6,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
@@ -27,18 +25,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
-/*
-public class GroupedPropertyList extends ArrayList<PropertyGroupTemplateModel> {
-If this class extends a List type, Freemarker does not let the templates call methods
-on it. Since the class must then contain a list rather than be a list, the template
-syntax is less idiomatic: e.g., groups.all rather than simply groups. An alternative
-is to make the get methods (getProperty and getPropertyAndRemoveFromList) methods
-of the IndividualTemplateModel. Then this class doesn't need methods, and can extend
-a List type.
-*/
 public class GroupedPropertyList extends BaseTemplateModel {
 
     private static final long serialVersionUID = 1L;
@@ -105,9 +93,34 @@ public class GroupedPropertyList extends BaseTemplateModel {
             groups.add(new PropertyGroupTemplateModel(vreq, propertyGroup, subject, 
                     policyHelper, populatedDataPropertyList, populatedObjectPropertyList));
         }   
+        
+        if (!editing) {
+            pruneEmptyProperties();
+        }        
     
     }
 
+    private void pruneEmptyProperties() {
+        Iterator<PropertyGroupTemplateModel> iGroups = groups.iterator();
+        while (iGroups.hasNext()) {
+            PropertyGroupTemplateModel pgtm = iGroups.next();
+            Iterator<PropertyTemplateModel> iProperties = pgtm.getProperties().iterator();
+            while (iProperties.hasNext()) {
+                PropertyTemplateModel property = iProperties.next();
+                if (property instanceof ObjectPropertyTemplateModel) {
+                    if ( ( (ObjectPropertyTemplateModel) property).isEmpty() ) {                        
+                        iProperties.remove();
+                    }
+                } else if ( ( (DataPropertyTemplateModel) property).isEmpty() ) {                                            
+                    iProperties.remove();
+                }
+            } 
+            if (pgtm.isEmpty()) {
+                iGroups.remove();
+            }
+        }        
+    }
+    
     @SuppressWarnings("unchecked")
     protected void sort(List<Property> propertyList) {            
         try {

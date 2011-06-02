@@ -6,11 +6,16 @@
     <h3>Disclaimers</h3>
     <p>This ${websiteName} website contains material&mdash;text information, publication
     citations, links, and images&mdash;provided by ${copyrightAnchor} and by various
-    third parties, both individuals and organizations, commercial and otherwise. The use of this material 
-    is protected by copyright and unless the terms of use are clearly stated with respect to individual items, 
-    users must seek permission from the copyright owner for all uses that are not allowed by fair use and 
-    other provisions of the United States Copyright Act. Redistribution or commercial use is prohibited 
-    without express written permission.</p>
+    third parties, both individuals and organizations, commercial and otherwise. To the extent copyrightable,
+    the information presented on the VIVO website and available as Resource Description Framework (RDF) data
+    from VIVO at ${copyrightAnchor} is intended for public use and is freely distributed under the terms of the
+    <a href="http://creativecommons.org/licenses/by/3.0/" target="_blank">Creative Commons CC-BY 3.0</a> license which allows you
+    to copy, distribute, display and make derivatives of this information provided you give credit to 
+    ${copyrightAnchor}. Any non-copyrightable information is available to you under a
+    <a href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank">CC0 waiver</a>.  However, source documents,
+    images or web pages attached to or linked from VIVO may contain copyrighted information and should only be
+    used or distributed under terms included with each source or in accordance with the principles of fair use.
+    </p>
     
     <h3>Disclaimer of Liability</h3>
     <p>${copyrightAnchor} makes no warranty, expressed or implied, including the warranties of merchantability 

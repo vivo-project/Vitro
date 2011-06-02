@@ -293,7 +293,7 @@ public class UrlBuilder {
             } else {
                 if (wadf.getApplicationDao().isExternallyLinkedNamespace(namespace)) {
                     log.debug("Found externally linked namespace " + namespace);
-                    profileUrl = namespace + "/" + localName;
+                    profileUrl = namespace + localName;
                 } else {
                     ParamMap params = new ParamMap("uri", individualUri);
                     profileUrl = getUrl("/individual", params);

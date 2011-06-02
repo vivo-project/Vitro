@@ -37,7 +37,7 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
             String subjectUri = subject.getURI();
             String propertyUri = op.getURI();
             List<Map<String, String>> statementData = 
-                opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, getSelectQuery(), getConstructQueries());
+                opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, getObjectKey(), getSelectQuery(), getConstructQueries());
             
             /* Apply postprocessing */
             postprocess(statementData, wdf);
@@ -53,6 +53,11 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
         } else {
             log.debug("Object property " + getUri() + " is unpopulated.");
         }
+    }
+
+    @Override
+    protected boolean isEmpty() {
+        return statements.isEmpty();
     }
     
     /* Access methods for templates */

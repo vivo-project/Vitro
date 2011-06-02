@@ -62,6 +62,11 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
         }
     }
     
+    @Override
+    protected boolean isEmpty() {
+        return statements.isEmpty();
+    }
+    
     /* Access methods for templates */
     
     public String getType() {

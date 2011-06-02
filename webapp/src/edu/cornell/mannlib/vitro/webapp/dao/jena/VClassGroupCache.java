@@ -196,16 +196,16 @@ public class VClassGroupCache{
         
         boolean singlePortalApplication = wdFactory.getPortalDao().getAllPortals().size() == 1;
         
-        if ( singlePortalApplication ) {
+        //        if ( singlePortalApplication ) {
             if ( vFilters == null ) 
                 vFilters = VitroFilterUtils.getDisplayFilterByRoleLevel(RoleLevel.PUBLIC, wdFactory);
-        } else if ( portal.isFlag1Filtering() ){
-            PortalFlag pflag = new PortalFlag(portal.getPortalId());
-            if( vFilters == null)
-                vFilters = VitroFilterUtils.getFilterFromPortalFlag(pflag);
-            else
-                vFilters = vFilters.and( VitroFilterUtils.getFilterFromPortalFlag(pflag));
-        }
+            //        } else if ( portal.isFlag1Filtering() ){
+            //            PortalFlag pflag = new PortalFlag(portal.getPortalId());
+            //            if( vFilters == null)
+            //                vFilters = VitroFilterUtils.getFilterFromPortalFlag(pflag);
+            //            else
+            //                vFilters = vFilters.and( VitroFilterUtils.getFilterFromPortalFlag(pflag));
+            //        }
         
         WebappDaoFactory filteringDaoFactory ;
         
@@ -215,10 +215,10 @@ public class VClassGroupCache{
             filteringDaoFactory = wdFactory;
         }
         _groupListMap.remove(portal.getPortalId());
-        if ( !singlePortalApplication ) {
-            _groupListMap.put(portal.getPortalId(), 
-                    getGroups(filteringDaoFactory.getVClassGroupDao(),portal.getPortalId()));
-        } else {
+        //        if ( !singlePortalApplication ) {
+        //  _groupListMap.put(portal.getPortalId(), 
+        //          getGroups(filteringDaoFactory.getVClassGroupDao(),portal.getPortalId()));
+        //        } else {
             List<VClassGroup> unfilteredGroups = getGroups(wdFactory.getVClassGroupDao(), portal.getPortalId(), INCLUDE_INDIVIDUAL_COUNT);
             List<VClassGroup> filteredGroups = getGroups(filteringDaoFactory.getVClassGroupDao(),portal.getPortalId(), !INCLUDE_INDIVIDUAL_COUNT);
             _groupListMap.put(portal.getPortalId(), removeFilteredOutGroupsAndClasses(unfilteredGroups, filteredGroups));
@@ -232,7 +232,7 @@ public class VClassGroupCache{
             // short-circuit it when we have a single portal by using
             // the filtering DAO only to filter groups and classes,
             // and the unfiltered DAO to get the counts.
-        }        
+            //        }        
     }
     
     private List<VClassGroup> removeFilteredOutGroupsAndClasses(List<VClassGroup> unfilteredGroups, List<VClassGroup> filteredGroups) {

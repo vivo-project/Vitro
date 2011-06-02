@@ -8,8 +8,8 @@
     <section class="siteMap" role="region">
         <#list classGroups as classGroup>
             <#-- Only render classgroups that have at least one class with individuals -->
-            <#if (classGroup.individualCount > 0)>
-                <h2>${classGroup.publicName}</h2>
+            <#if (classGroup.individualCount > 0)>              
+                <h2>${classGroup.displayName}</h2>
                 <ul role="list">
                     <#list classGroup.classes as class> 
                         <#-- Only render classes with individuals -->
