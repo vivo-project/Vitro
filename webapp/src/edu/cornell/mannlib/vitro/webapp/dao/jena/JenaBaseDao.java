@@ -6,6 +6,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -729,7 +731,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     	}
     }
     
-    private String getLabel(String lang, List<RDFNode>labelList) {
+    private Literal getLabel(String lang, List<RDFNode>labelList) {
     	Iterator<RDFNode> labelIt = labelList.iterator();
     	while (labelIt.hasNext()) {
     		RDFNode label = labelIt.next();
@@ -737,10 +739,10 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     			Literal labelLit = ((Literal)label);
     			String labelLanguage = labelLit.getLanguage();
     			if ( (labelLanguage==null) && (lang==null) ) {
-    				return labelLit.getLexicalForm();
+    				return labelLit;
     			}
     			if ( (lang != null) && (lang.equals(labelLanguage)) ) {
-    				return labelLit.getLexicalForm();
+    				return labelLit;
     			}
     		}
     	}
@@ -766,26 +768,34 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         return label;
     }
     
+    protected String getLabel(OntResource r){
+        String label = null;
+        Literal labelLiteral = getLabelLiteral(r);
+        if (labelLiteral != null) {
+            label = labelLiteral.getLexicalForm();
+        }
+        return label;
+    }
+
     /**
      * works through list of PREFERRED_LANGUAGES to find an appropriate 
      * label, or NULL if not found.  
      */
-    protected String getLabel(OntResource r){
-        String label = null;
+    public Literal getLabelLiteral(OntResource r) {
+        Literal labelLiteral = null;
         r.getOntModel().enterCriticalSection(Lock.READ);
         try {            
             // try rdfs:label with preferred languages
-            label = tryPropertyForPreferredLanguages( r, RDFS.label, ALSO_TRY_NO_LANG );
-            
+            labelLiteral = tryPropertyForPreferredLanguages( r, RDFS.label, ALSO_TRY_NO_LANG );
             // try vitro:label with preferred languages
             // Commenting out for NIHVIVO-1962
            /* if ( label == null ) {
-                label = tryPropertyForPreferredLanguages( r, r.getModel().getProperty(VitroVocabulary.label), ALSO_TRY_NO_LANG );
-            }   */                           
+                labelLiteral = tryPropertyForPreferredLanguages( r, r.getModel().getProperty(VitroVocabulary.label), ALSO_TRY_NO_LANG );
+            }   */          
         } finally {
             r.getOntModel().leaveCriticalSection();
         }
-        return label;
+        return labelLiteral;        
     }
     
     /**
@@ -809,9 +819,24 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         return label;
     }
     
-    private String tryPropertyForPreferredLanguages( OntResource r, Property p, boolean alsoTryNoLang ) {
-    	String label = null;
-	    List<RDFNode> labels = (List<RDFNode>) r.listPropertyValues(p).toList();
+    private Literal tryPropertyForPreferredLanguages( OntResource r, Property p, boolean alsoTryNoLang ) {
+    	Literal label = null;
+	    List<RDFNode> labels = r.listPropertyValues(p).toList();
+
+	    // Sort by lexical value to guarantee consistent results
+	    Collections.sort(labels, new Comparator<RDFNode>() {
+	        public int compare(RDFNode left, RDFNode right) {
+	            if (left == null) {
+	                return (right == null) ? 0 : -1;
+	            }
+	            if ( left.isLiteral() && right.isLiteral()) {
+	                return ((Literal) left).getLexicalForm().compareTo(((Literal) right).getLexicalForm());
+	            } 
+	            // Can't sort meaningfully if both are not literals
+	            return 0;	            
+	        }
+	    });
+	    
 	    for (int i=0; i<PREFERRED_LANGUAGES.length; i++) {
 	    	String lang = PREFERRED_LANGUAGES[i];
 	    	label = getLabel(lang,labels);
