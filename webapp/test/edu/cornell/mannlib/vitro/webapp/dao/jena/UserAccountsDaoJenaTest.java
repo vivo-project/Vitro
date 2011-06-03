@@ -107,7 +107,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 	@Test
 	public void getUserAccountByUriWrongType() {
 		UserAccount u = dao.getUserAccountByUri(URI_ROLE1);
-		System.out.println(u);
+		//System.out.println(u);
 		assertNull("null result", u);
 	}
 
@@ -329,7 +329,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		StmtIterator stmts = ontModel.listStatements();
 		while (stmts.hasNext()) {
 			Statement stmt = stmts.next();
-			System.out.println(formatStatement(stmt));
+			//System.out.println(formatStatement(stmt));
 		}
 	}
 

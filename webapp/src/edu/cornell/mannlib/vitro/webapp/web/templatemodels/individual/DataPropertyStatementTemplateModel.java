@@ -26,7 +26,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
     private static final Log log = LogFactory.getLog(DataPropertyStatementTemplateModel.class); 
     private static final String EDIT_PATH = "edit/editDatapropStmtRequestDispatch.jsp";  
     
-    private String value = null;
+    protected String value = null;
     
     // Used for editing
     private String dataPropHash = null;
@@ -44,7 +44,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
      * This method handles the special case where we are creating a DataPropertyStatementTemplateModel outside the GroupedPropertyList.
      * Specifically, it allows rdfs:label to be treated like a data property statement and thus have editing links. It is not possible
      * to handle rdfs:label like vitro links and vitroPublic image, because it is not possible to construct a DataProperty from
-     * rdfs:label. 
+     * rdfs:label.
      */
     DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, VitroRequest vreq, EditingPolicyHelper policyHelper) {
         super(subjectUri, propertyUri, policyHelper);
@@ -64,7 +64,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
         this.value = value;
     }
     
-    private void setEditAccess(Literal value, EditingPolicyHelper policyHelper) {
+    protected void setEditAccess(Literal value, EditingPolicyHelper policyHelper) {
         
         if (policyHelper != null) { // we're editing         
             DataPropertyStatement dps = new DataPropertyStatementImpl(subjectUri, propertyUri, value.getLexicalForm());
