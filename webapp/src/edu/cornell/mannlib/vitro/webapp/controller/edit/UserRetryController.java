@@ -27,7 +27,6 @@ import edu.cornell.mannlib.vedit.listener.ChangeListener;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vedit.validator.ValidationObject;
 import edu.cornell.mannlib.vedit.validator.Validator;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.setup.SelfEditingPolicySetup;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
