@@ -301,7 +301,7 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
         "    ?subject ?property ?value . \n" +
         // ignore statements with uri values
         " FILTER ( isLiteral(?value) ) " +
-        "} ";
+        "} ORDER BY ?value";
     
     protected static Query dataPropertyValueQuery;
     static {

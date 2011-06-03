@@ -62,7 +62,6 @@ public class IndividualListController extends FreemarkerHttpServlet {
         String templateName = TEMPLATE_DEFAULT;
         Map<String, Object> body = new HashMap<String, Object>();
         String errorMessage = null;
-        String message = null;
         
         try {
             Object obj = vreq.getAttribute("vclass");
@@ -138,9 +137,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
         if (errorMessage != null) {
             templateName = Template.ERROR_MESSAGE.toString();
             body.put("errorMessage", errorMessage);
-        } else if (message != null) {
-            body.put("message", message);
-        }
+        } 
     
         return new TemplateResponseValues(templateName, body);
     }
