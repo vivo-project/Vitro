@@ -17,7 +17,6 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy.AuthRole;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate;
@@ -105,25 +104,22 @@ public class BasicAuthenticator extends Authenticator {
 		recordLoginOnUserRecord(user);
 
 		String userUri = user.getURI();
-		String roleUri = user.getRoleURI();
 		int securityLevel = parseUserSecurityLevel(user);
-		recordLoginWithOrWithoutUserAccount(username, userUri, roleUri,
-				securityLevel, authSource);
+		recordLoginWithOrWithoutUserAccount(username, userUri, securityLevel,
+				authSource);
 	}
 
 	@Override
 	public void recordLoginWithoutUserAccount(String username,
 			String individualUri, AuthenticationSource authSource) {
-		String roleUri = AuthRole.USER.roleUri();
 		int securityLevel = LoginStatusBean.NON_EDITOR;
-		recordLoginWithOrWithoutUserAccount(username, individualUri, roleUri,
-				securityLevel, authSource);
+		recordLoginWithOrWithoutUserAccount(username, individualUri, securityLevel,
+				authSource);
 	}
 
 	/** This much is in common on login, whether or not you have a user account. */
 	private void recordLoginWithOrWithoutUserAccount(String username,
-			String userUri, String roleUri, int securityLevel,
-			AuthenticationSource authSource) {
+			String userUri, int securityLevel, AuthenticationSource authSource) {
 		HttpSession session = request.getSession();
 		createLoginStatusBean(username, userUri, securityLevel, authSource,
 				session);
