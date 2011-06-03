@@ -43,6 +43,8 @@ while(it.hasNext()){
 %>
 <%= found %>
 
+<%--
+
 <h3>Do you have a REMOTE_USER header from CUWebAuth?</h3>
 
 <% String user = request.getHeader("REMOTE_USER"); 
@@ -94,3 +96,4 @@ No
 %> The policy decision was <%= pdecison %> 
   
 <% } %>
+--%>
