@@ -163,4 +163,9 @@ public class DisplayRestrictedDataByRoleLevelPolicy implements PolicyIface {
 				.canDisplayPredicate(uri, userRole);
 	}
 
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + " - " + hashCode();
+	}
+
 }

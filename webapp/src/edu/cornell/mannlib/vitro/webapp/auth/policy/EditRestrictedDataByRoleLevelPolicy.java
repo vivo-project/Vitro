@@ -140,4 +140,8 @@ public class EditRestrictedDataByRoleLevelPolicy implements PolicyIface {
 				uri, userRole);
 	}
 
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + " - " + hashCode();
+	}
 }

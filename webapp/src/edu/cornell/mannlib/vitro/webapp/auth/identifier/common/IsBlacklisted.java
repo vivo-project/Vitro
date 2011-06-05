@@ -224,7 +224,8 @@ public class IsBlacklisted extends AbstractCommonIdentifier implements
 
 	@Override
 	public String toString() {
-		return "IsBlacklisted['" + reasonForBlacklisting + "']";
+		return "IsBlacklisted[" + associatedIndividualUri + ", "
+				+ reasonForBlacklisting + "]";
 	}
 
 }

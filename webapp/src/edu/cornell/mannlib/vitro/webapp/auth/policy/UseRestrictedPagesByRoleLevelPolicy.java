@@ -144,4 +144,8 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		return new BasicPolicyDecision(Authorization.INCONCLUSIVE, message);
 	}
 
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + " - " + hashCode();
+	}
 }

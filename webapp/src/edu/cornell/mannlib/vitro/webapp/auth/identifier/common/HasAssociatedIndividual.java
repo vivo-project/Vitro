@@ -43,6 +43,6 @@ public class HasAssociatedIndividual extends AbstractCommonIdentifier implements
 
 	@Override
 	public String toString() {
-		return "HasAssociatedIndividual['" + associatedIndividualUri + "']";
+		return "HasAssociatedIndividual[" + associatedIndividualUri + "]";
 	}
 }

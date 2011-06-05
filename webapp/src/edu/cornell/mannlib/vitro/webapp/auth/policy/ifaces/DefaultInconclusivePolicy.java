@@ -16,7 +16,8 @@ public class DefaultInconclusivePolicy implements PolicyIface {
 			Authorization.INCONCLUSIVE,
 			"This is the default decision defined in DefaultInconclusivePolicy");
 
-    public PolicyDecision isAuthorized(IdentifierBundle whoToAuth,
+    @Override
+	public PolicyDecision isAuthorized(IdentifierBundle whoToAuth,
             RequestedAction whatToAuth) {
         if (whoToAuth == null)
             return new BasicPolicyDecision(Authorization.INCONCLUSIVE,
@@ -29,7 +30,7 @@ public class DefaultInconclusivePolicy implements PolicyIface {
 
 	@Override
 	public String toString() {
-		return "DefaultInconclusivePolicy";
+		return this.getClass().getSimpleName() + " - " + hashCode();
 	}
 
 }

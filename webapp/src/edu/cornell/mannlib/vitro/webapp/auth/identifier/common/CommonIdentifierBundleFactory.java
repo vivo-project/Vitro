@@ -145,4 +145,10 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 		individuals.add(ind);
 		return individuals;
 	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + " - " + hashCode();
+	}
+	
 }
