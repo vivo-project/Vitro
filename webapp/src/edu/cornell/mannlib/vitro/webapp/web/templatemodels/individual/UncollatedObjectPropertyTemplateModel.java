@@ -30,17 +30,13 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
         statements = new ArrayList<ObjectPropertyStatementTemplateModel>();
         
         if (populatedObjectPropertyList.contains(op)) {
-            log.debug("Getting data for populated object property " + getUri());
+            log.debug("Getting data for populated object property " + op.getURI());
+            
             /* Get the data */
-            WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-            ObjectPropertyStatementDao opDao = wdf.getObjectPropertyStatementDao();
-            String subjectUri = subject.getURI();
-            String propertyUri = op.getURI();
-            List<Map<String, String>> statementData = 
-                opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, getObjectKey(), getSelectQuery(), getConstructQueries());
+            List<Map<String, String>> statementData = getStatementData();
             
             /* Apply postprocessing */
-            postprocess(statementData, wdf);
+            postprocess(statementData);
             
             /* Put into data structure to send to template */            
             String objectKey = getObjectKey();

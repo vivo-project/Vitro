@@ -11,6 +11,10 @@ package edu.cornell.mannlib.vitro.webapp.controller.accounts;
 public class UserAccountsSelectionCriteria {
 	public static final int DEFAULT_ACCOUNTS_PER_PAGE = 25;
 
+	public static final UserAccountsSelectionCriteria DEFAULT_CRITERIA = new UserAccountsSelectionCriteria(
+			DEFAULT_ACCOUNTS_PER_PAGE, 1,
+			UserAccountsOrdering.DEFAULT_ORDERING, "", "");
+
 	/** How many accounts should we bring back, at most? */
 	private final int accountsPerPage;
 
@@ -71,4 +75,11 @@ public class UserAccountsSelectionCriteria {
 		return (t == null) ? nullValue : t;
 	}
 
+	@Override
+	public String toString() {
+		return "UserAccountsSelectionCriteria[accountsPerPage="
+				+ accountsPerPage + ", pageIndex=" + pageIndex + ", orderBy="
+				+ orderBy + ", roleFilterUri='" + roleFilterUri
+				+ "', searchTerm='" + searchTerm + "']";
+	}
 }

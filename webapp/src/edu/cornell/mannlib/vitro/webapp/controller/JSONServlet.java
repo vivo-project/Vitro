@@ -40,8 +40,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.SelectListGenerator;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.SelectListGenerator;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
 
@@ -233,7 +233,7 @@ public class JSONServlet extends VitroHttpServlet {
             rObj.put("alpha", map.get("alpha"));
                             
             List<Individual> inds = (List<Individual>)map.get("entities");
-            List<IndividualTemplateModel> indsTm = new ArrayList<IndividualTemplateModel>();
+
             JSONArray jInds = new JSONArray();
             for(Individual ind : inds ){
                 JSONObject jo = new JSONObject();

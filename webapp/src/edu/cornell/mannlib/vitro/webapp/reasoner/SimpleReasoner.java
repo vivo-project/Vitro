@@ -12,7 +12,6 @@ import javax.servlet.ServletContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.AnnotationProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -54,7 +53,7 @@ public class SimpleReasoner extends StatementListener {
 	private static final String bottomObjectPropertyURI = "http://www.w3.org/2002/07/owl#bottomObjectProperty";
 	private static final String topDataPropertyURI = "http://www.w3.org/2002/07/owl#topDataProperty";
 	private static final String bottomDataPropertyURI = "http://www.w3.org/2002/07/owl#bottomDataProperty";
-	private static final String mostSpecificTypePropertyURI = "http://vivoweb.org/ontology/core#mostSpecificType";
+	private static final String mostSpecificTypePropertyURI = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType";
 	
 	private AnnotationProperty mostSpecificType = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createAnnotationProperty(mostSpecificTypePropertyURI);
 	
@@ -102,9 +101,12 @@ public class SimpleReasoner extends StatementListener {
 			if (stmt.getPredicate().equals(RDF.type)) {
 			    addedABoxTypeAssertion(stmt, inferenceModel);
 			    setMostSpecificTypes(stmt.getSubject(), inferenceModel);
-			} else {
+			} 
+	       /* uncomment this to enable subproperty/equivalent property inferencing. sjm222 5/13/2011	
+			else {
 			    addedABoxAssertion(stmt,inferenceModel);
 			}
+	       */
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
 			log.error("Exception while adding inferences: ", e);
@@ -123,9 +125,12 @@ public class SimpleReasoner extends StatementListener {
 			if (stmt.getPredicate().equals(RDF.type)) {
 			    removedABoxTypeAssertion(stmt, inferenceModel);
 			    setMostSpecificTypes(stmt.getSubject(), inferenceModel);
-			} else {
+			}
+			/* uncomment this to enable subproperty/equivalent property inferencing. sjm222 5/13/2011
+			else {
 				removedABoxAssertion(stmt, inferenceModel);
 			}
+			*/
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
 			log.error("Exception while retracting inferences: ", e);
@@ -164,7 +169,9 @@ public class SimpleReasoner extends StatementListener {
 				   addedSubClass(subject,object,inferenceModel);
 				   addedSubClass(object,subject,inferenceModel);
 				}
-			} else if (stmt.getPredicate().equals(RDFS.subPropertyOf) || stmt.getPredicate().equals(OWL.equivalentProperty)) {
+			} 
+			  /* uncomment this to enable sub property/equivalent property inferencing. sjm222 5/13/2011
+			  else if (stmt.getPredicate().equals(RDFS.subPropertyOf) || stmt.getPredicate().equals(OWL.equivalentProperty)) {
 				OntProperty subject = tboxModel.getOntProperty((stmt.getSubject()).getURI());
 				OntProperty object = tboxModel.getOntProperty(((Resource)stmt.getObject()).getURI()); 
 				
@@ -174,8 +181,10 @@ public class SimpleReasoner extends StatementListener {
 					// equivalent property is the same as subProperty in both directions
 				   addedSubProperty(subject,object,inferenceModel);
 				   addedSubProperty(object,subject,inferenceModel);
-				}				
-			}
+				}
+			   }
+			*/				
+			
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
 			log.error("Exception while adding inference(s): ", e);
@@ -210,7 +219,9 @@ public class SimpleReasoner extends StatementListener {
 				   removedSubClass(subject,object,inferenceModel);
 				   removedSubClass(object,subject,inferenceModel);
 				}
-			} else if (stmt.getPredicate().equals(RDFS.subPropertyOf) || stmt.getPredicate().equals(OWL.equivalentProperty)) {
+			} 
+			/* uncomment this to enable sub property / equivalent property inferencing. sjm222 5/13/2011.
+			else if (stmt.getPredicate().equals(RDFS.subPropertyOf) || stmt.getPredicate().equals(OWL.equivalentProperty)) {
 				OntProperty subject = tboxModel.getOntProperty((stmt.getSubject()).getURI());
 				OntProperty object = tboxModel.getOntProperty(((Resource)stmt.getObject()).getURI()); 
 				
@@ -222,6 +233,7 @@ public class SimpleReasoner extends StatementListener {
 				   removedSubProperty(object,subject);
 				}				
 			}
+			*/
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
 			log.error("Exception while removing inference(s): ", e);
@@ -760,13 +772,13 @@ public class SimpleReasoner extends StatementListener {
 			
 			while (iter.hasNext()) {
 				Statement stmt = iter.next();
-								
-				if ( !stmt.getObject().isLiteral() ) {
-					log.warn("The object of this assertion is expected to be a literal: " + stmtString(stmt));
+
+				if ( !stmt.getObject().isResource() ) {
+					log.warn("The object of this assertion is expected to be a resource: " + stmtString(stmt));
 					continue;
 				}
-								
-				if (!typeURIs.contains(stmt.getObject().asLiteral().getLexicalForm())) {
+				
+				if (!typeURIs.contains(stmt.getObject().asResource().getURI())) {
 					retractions.add(stmt);
 				}
 			}
@@ -778,11 +790,10 @@ public class SimpleReasoner extends StatementListener {
 			
 			while (typeIter.hasNext()) {
 				String typeURI = typeIter.next();
-				Literal uriLiteral = ResourceFactory.createTypedLiteral(typeURI, XSDDatatype.XSDanyURI);
+				Resource mstResource = ResourceFactory.createResource(typeURI);
 				
-				if (!aboxModel.contains(individual, mostSpecificType, uriLiteral)) {
-					Statement toAdd = ResourceFactory.createStatement(individual, mostSpecificType, uriLiteral);
-					aboxModel.add(individual, mostSpecificType, uriLiteral);
+				if (!aboxModel.contains(individual, mostSpecificType, mstResource)) {
+					aboxModel.add(individual, mostSpecificType, mstResource);
 				}
 			}			
 		} finally {

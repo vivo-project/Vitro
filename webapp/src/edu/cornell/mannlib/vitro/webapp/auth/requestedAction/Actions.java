@@ -31,12 +31,12 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
 public class Actions {
 	private static final Log log = LogFactory.getLog(Actions.class);
 
-	public static final Actions EMPTY = new Actions();
+	public static final Actions AUTHORIZED = new Actions();
 	public static final Actions UNAUTHORIZED = new Actions(
 			new UnauthorizedAction());
 
 	public static Actions notNull(Actions actions) {
-		return (actions == null) ? EMPTY : actions;
+		return (actions == null) ? AUTHORIZED : actions;
 	}
 
 	private final List<Set<RequestedAction>> clauseList;

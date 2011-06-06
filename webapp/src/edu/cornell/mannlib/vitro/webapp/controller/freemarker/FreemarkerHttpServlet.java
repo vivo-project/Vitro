@@ -33,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Rdf
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.Tags;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
@@ -121,7 +122,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
      */
     @SuppressWarnings("unused")
 	protected Actions requiredActions(VitroRequest vreq) {
-        return Actions.EMPTY;
+        return Actions.AUTHORIZED;
     }
     
     // Subclasses will override
@@ -247,7 +248,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         urls.put("base", UrlBuilder.contextPath);
 
         urls.put("about", urlBuilder.getPortalUrl(Route.ABOUT));
-        if (ContactMailServlet.isSmtpHostConfigured(vreq)) {
+        if (FreemarkerEmailFactory.isConfigured(vreq)) {
             urls.put("contact", urlBuilder.getPortalUrl(Route.CONTACT));
         }
         urls.put("search", urlBuilder.getPortalUrl(Route.SEARCH));  

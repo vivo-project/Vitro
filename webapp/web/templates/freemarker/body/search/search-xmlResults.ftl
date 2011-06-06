@@ -9,7 +9,7 @@
     </#if>   
   </lst>
   
-  <result name="response" numFound="${hitsLength}" start="${startIndex}" >
+  <result name="response" numFound="${hitCount}" start="${startIndex}" >
     <#list individuals as individual>                 
         <doc>
           <str name="uri">${individual.uri?xml}</str>                      

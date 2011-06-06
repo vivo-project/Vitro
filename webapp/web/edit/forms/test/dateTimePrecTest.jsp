@@ -13,7 +13,7 @@ This is a test file for the DateTimeWithPrecision EditElement.
 <%@ page import="java.util.HashMap"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory"%>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>

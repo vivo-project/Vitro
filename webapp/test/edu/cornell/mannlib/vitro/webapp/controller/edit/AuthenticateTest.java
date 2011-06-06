@@ -20,6 +20,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import stubs.edu.cornell.mannlib.vitro.webapp.dao.UserDaoStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryStub;
 import stubs.javax.servlet.ServletConfigStub;
 import stubs.javax.servlet.ServletContextStub;
 import stubs.javax.servlet.http.HttpServletRequestStub;
@@ -29,6 +31,7 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.AuthenticatorStub;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
@@ -39,6 +42,8 @@ public class AuthenticateTest extends AbstractTestClass {
 
 	private AuthenticatorStub authenticator;
 	private ServletContextStub servletContext;
+	private WebappDaoFactoryStub webappDaoFactory;
+	private UserDaoStub userDao;
 	private ServletConfigStub servletConfig;
 	private HttpSessionStub session;
 	private HttpServletRequestStub request;
@@ -109,7 +114,17 @@ public class AuthenticateTest extends AbstractTestClass {
 		authenticator.setAssociatedUri(OLD_SELF.username,
 				"old_self_associated_uri");
 
+		userDao = new UserDaoStub();
+		userDao.addUser(createUserFromUserInfo(NEW_DBA));
+		userDao.addUser(createUserFromUserInfo(OLD_DBA));
+		userDao.addUser(createUserFromUserInfo(OLD_SELF));
+		userDao.addUser(createUserFromUserInfo(OLD_STRANGER));
+		
+		webappDaoFactory = new WebappDaoFactoryStub();
+		webappDaoFactory.setUserDao(userDao);
+		
 		servletContext = new ServletContextStub();
+		servletContext.setAttribute("webappDaoFactory", webappDaoFactory);
 
 		servletConfig = new ServletConfigStub();
 		servletConfig.setServletContext(servletContext);
@@ -133,7 +148,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		user.setUsername(userInfo.username);
 		user.setURI(userInfo.uri);
 		user.setRoleURI(String.valueOf(userInfo.securityLevel));
-		user.setMd5password(Authenticate.applyMd5Encoding(userInfo.password));
+		user.setMd5password(Authenticator.applyMd5Encoding(userInfo.password));
 		user.setLoginCount(userInfo.loginCount);
 		if (userInfo.loginCount > 0) {
 			user.setFirstTime(new Date(0));

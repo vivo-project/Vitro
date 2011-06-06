@@ -11,9 +11,9 @@
 
 <h3>Dates</h3>
 <ul>
-    <li>Current date & time: ${now?datetime}</li>
-    <li>Current date: ${now?date}</li>
-    <li>Current time: ${now?time}</li>
+    <li>Current date & time: ${.now?datetime}</li>
+    <li>Current date: ${.now?date}</li>
+    <li>Current time: ${.now?time}</li>
 </ul>
 <h3>Dates</h3>
 

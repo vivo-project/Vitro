@@ -124,7 +124,7 @@ public class SiteAdminController extends FreemarkerHttpServlet {
             urls.put("users", urlBuilder.getPortalUrl("/listUsers"));
         }
         if (PolicyHelper.isAuthorizedForActions(vreq, new ManageUserAccounts())) {
-        	urls.put("userList", urlBuilder.getPortalUrl("/listUserAccounts"));
+        	urls.put("userList", urlBuilder.getPortalUrl("/accountsAdmin"));
         }
  
 		if (PolicyHelper.isAuthorizedForActions(vreq, new EditSiteInformation())) {

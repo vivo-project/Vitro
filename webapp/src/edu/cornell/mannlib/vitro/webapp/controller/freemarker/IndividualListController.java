@@ -62,7 +62,6 @@ public class IndividualListController extends FreemarkerHttpServlet {
         String templateName = TEMPLATE_DEFAULT;
         Map<String, Object> body = new HashMap<String, Object>();
         String errorMessage = null;
-        String message = null;
         
         try {
             Object obj = vreq.getAttribute("vclass");
@@ -125,8 +124,8 @@ public class IndividualListController extends FreemarkerHttpServlet {
                     body.put("subtitle", vclass.getName());
                 }
                 body.put("title", title);  
-                body.put("redirecturl", vreq.getContextPath()+"/entityurl/");
-                getServletContext().setAttribute("classuri", vclass.getURI());
+                body.put("rdfUrl", UrlBuilder.getUrl("/listrdf", "vclass", vclass.getURI()));
+
             }   
             
         } catch (HelpException help){
@@ -138,9 +137,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
         if (errorMessage != null) {
             templateName = Template.ERROR_MESSAGE.toString();
             body.put("errorMessage", errorMessage);
-        } else if (message != null) {
-            body.put("message", message);
-        }
+        } 
     
         return new TemplateResponseValues(templateName, body);
     }
@@ -188,7 +185,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
          try{
              docs = index.search(query, null, 
                  ENTITY_LIST_CONTROLLER_MAX_RESULTS, 
-                 new Sort(Entity2LuceneDoc.term.NAMELOWERCASE));
+                 new Sort(Entity2LuceneDoc.term.NAME_LOWERCASE));
          }catch(Throwable th){
              log.error("Could not run search. " + th.getMessage());
              docs = null;
@@ -258,7 +255,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
             Query alphaQuery = null;
             if( alpha != null && !"".equals(alpha) && alpha.length() == 1){      
                 alphaQuery =    
-                    new PrefixQuery(new Term(Entity2LuceneDoc.term.NAMELOWERCASE, alpha.toLowerCase()));
+                    new PrefixQuery(new Term(Entity2LuceneDoc.term.NAME_LOWERCASE, alpha.toLowerCase()));
                 query.add(alphaQuery,BooleanClause.Occur.MUST);
             }                      
                             

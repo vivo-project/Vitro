@@ -32,10 +32,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
 
 public class FileGraphSetup implements ServletContextListener {
 
-	private static String ABOX = "abox";
-	private static String TBOX = "tbox";
-	private static String PATH_ROOT = "/WEB-INF/filegraph/";
-	private static String URI_ROOT = "http://vitro.mannlib.cornell.edu/filegraph/";
+	private static final String ABOX = "abox";
+	private static final String TBOX = "tbox";
+	private static final String PATH_ROOT = "/WEB-INF/filegraph/";
+	public static final String FILEGRAPH_URI_ROOT = "http://vitro.mannlib.cornell.edu/filegraph/";
 	
 	private static final Log log = LogFactory.getLog(FileGraphSetup.class);
 		
@@ -189,7 +189,7 @@ public class FileGraphSetup implements ServletContextListener {
 	 */
 	public void cleanupDB(Store kbStore, Set<String> uriSet, String type) {
 		
-		Pattern graphURIPat = Pattern.compile("^" + URI_ROOT + type);   
+		Pattern graphURIPat = Pattern.compile("^" + FILEGRAPH_URI_ROOT + type);   
 		 
 	    Iterator<Node> iter = StoreUtils.storeGraphNames(kbStore);	
 	    
@@ -237,7 +237,7 @@ public class FileGraphSetup implements ServletContextListener {
 		
 	    if (path != null) {
 	    	File file = new File(path);
-			uri = URI_ROOT + type + "/" + file.getName(); 
+			uri = FILEGRAPH_URI_ROOT + type + "/" + file.getName(); 
 	    }
 		
 		return uri;

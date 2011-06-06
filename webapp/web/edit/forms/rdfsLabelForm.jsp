@@ -9,8 +9,8 @@
 
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary"%>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration"%>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.RdfLiteralHash"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement" %>
@@ -22,15 +22,8 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="v" uri="http://vitro.mannlib.cornell.edu/vitro/tags" %>
 
-<%! 
-    private String getInputType(String propertyName) {
-        String inputType = ( propertyName.equals("blurb") || propertyName.equals("desription") ) ? "textarea" : "text";
-        return  inputType;
-    }
-
-%>
 <%
-    org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger("edu.cornell.mannlib.vitro.jsp.edit.forms.defaultVitroNsPropForm.jsp");
+    org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger("edu.cornell.mannlib.vitro.jsp.edit.forms.rdfLabelForm.jsp");
 
     VitroRequest vreq = new VitroRequest(request);
     WebappDaoFactory wdf = vreq.getWebappDaoFactory();
@@ -38,10 +31,8 @@
     
     String subjectUri   = vreq.getParameter("subjectUri");
     String predicateUri = vreq.getParameter("predicateUri");
-    String propertyName = predicateUri.substring(predicateUri.lastIndexOf("#")+1);
-    vreq.setAttribute("propertyName", propertyName);
 
-    log.debug("Starting defaultVitroNsPropForm.jsp for property " + predicateUri);
+    log.debug("Starting rdfsLabelForm.jsp");
     
     DataPropertyStatement dps = (DataPropertyStatement)vreq.getAttribute("dataprop");
      
@@ -99,20 +90,11 @@
 
 <c:set var="predicate" value="<%=predicateUri%>" />
 
-<%--  Then enter a SPARQL query for the field, by convention concatenating the field id with "Existing"
-      to convey that the expression is used to retrieve any existing value for the field in an existing individual.
-      This must then be referenced in the sparqlForExistingLiterals section of the JSON block below
-      and in the literalsOnForm --%>
-<v:jsonset var="dataExisting">
-    SELECT ?dataExisting WHERE {
-        ?subject <${predicate}> ?dataExisting }
-</v:jsonset>
-
 <%--  Pair the "existing" query with the skeleton of what will be asserted for a new statement involving this field.
       The actual assertion inserted in the model will be created via string substitution into the ? variables.
       NOTE the pattern of punctuation (a period after the prefix URI and after the ?field) --%>
 <v:jsonset var="dataAssertion"  >
-    ?subject <${predicate}> ?${propertyName} .
+    ?subject <${predicate}> ?label .
 </v:jsonset>
 
 <c:set var="editjson" scope="request">
@@ -124,7 +106,7 @@
     
     "subject"   : ["subject",   "${subjectUriJson}" ],
     "predicate" : ["predicate", "${predicateUriJson}" ],
-    "object"    : ["${propertyName}", "", "DATAPROPHASH" ],
+    "object"    : ["label", "", "DATAPROPHASH" ],
     
     "n3required"    : [ "${dataAssertion}" ],
     "n3optional"    : [ ],
@@ -132,14 +114,14 @@
     "urisInScope"    : { },
     "literalsInScope": { },
     "urisOnForm"     : [ ],
-    "literalsOnForm" :  [ "${propertyName}" ],
+    "literalsOnForm" :  [ "label" ],
     "filesOnForm"    : [ ],
     "sparqlForLiterals" : { },
     "sparqlForUris" : {  },
-    "sparqlForExistingLiterals" : { "${propertyName}" : "${dataExisting}" },
+    "sparqlForExistingLiterals" : { },
     "sparqlForExistingUris" : { },
     "fields" : {
-      "${propertyName}" : {
+      "label" : {
          "newResource"      : "false",
          "validators"       : [ ${validators} ],
          "optionsType"      : "UNDEFINED",
@@ -171,25 +153,19 @@
     }    
 
     // Configure form
-    String propertyLabel = propertyName.equals("label") ? "name" : propertyName;
     String actionText = dps == null ? "Add new " : "Edit ";
-    String submitLabel = actionText + propertyLabel;
-    String title = actionText + "<em>" + propertyLabel + "</em> for " + subject.getName();
-    
-    String inputType = getInputType(propertyName);
-    log.debug(propertyName + " needs input type " + inputType + "in defaultVitroNsPropForm.jsp");
-    boolean useTinyMCE = inputType.equals("textarea");
-    log.debug( (useTinyMCE ? "" : "not ") + "using tinyMCE to edit " + propertyName + "in defaultVitroNsPropForm.jsp");
+    String submitLabel = actionText + "label";
+    String title = actionText + "<em>label</em> for " + subject.getName();
   
 %>
 
 <jsp:include page="${preForm}">
-    <jsp:param name="useTinyMCE" value="<%= useTinyMCE %>"/>
+    <jsp:param name="useTinyMCE" value="false"/>
 </jsp:include>
 
 <h2><%= title %></h2>
 <form action="<c:url value="/edit/processDatapropRdfForm.jsp"/>" >
-    <v:input type="<%= inputType %>" id="${propertyName}" size="30" />
+    <v:input type="text" id="label" size="30" />
     <input type="hidden" name="vitroNsProp" value="true" />
     <p class="submit"><v:input type="submit" id="submit" value="<%= submitLabel %>" cancel="true"/></p>
 </form>

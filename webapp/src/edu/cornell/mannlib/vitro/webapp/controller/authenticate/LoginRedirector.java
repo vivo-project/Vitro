@@ -15,6 +15,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -152,8 +153,8 @@ public class LoginRedirector {
 	}
 
 	private boolean isMerelySelfEditor() {
-		return LoginStatusBean.getBean(session).isLoggedInExactly(
-				LoginStatusBean.NON_EDITOR);
+		RoleLevel role = RoleLevel.getRoleFromLoginStatus(request);
+		return role == RoleLevel.PUBLIC || role == RoleLevel.SELF;
 	}
 
 	private boolean isLoginPage(String page) {

@@ -67,7 +67,7 @@ public abstract class VitroAjaxController extends HttpServlet {
      */
     @SuppressWarnings("unused")
 	protected Actions requiredActions(VitroRequest vreq) {
-        return Actions.EMPTY;
+        return Actions.AUTHORIZED;
     }
     
 	/** 

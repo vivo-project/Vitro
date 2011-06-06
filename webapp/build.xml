@@ -108,8 +108,6 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		      message="${deploy.properties.file} must contain a value for vitro.home.directory" />
 		<fail unless="Vitro.defaultNamespace"
 		      message="${deploy.properties.file} must contain a value for Vitro.defaultNamespace" />
-		<fail unless="Vitro.smtpHost"
-		      message="${deploy.properties.file} must contain a value for Vitro.smtpHost (may be empty)" />
 		<fail unless="VitroConnection.DataSource.url"
 		      message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.url" />
 		<fail unless="VitroConnection.DataSource.username"

@@ -7,10 +7,22 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
+
 /**
  * Information about the account of a user. URI, email, password, etc.
+ * 
+ * The "password link expires hash" is just a string that is derived from the
+ * value in the passwordLinkExpires field. It doesn't have to be a hash, and
+ * there is no need for it to be cryptographic, but it seems embarrassing to
+ * just send the value as a clear string. There is no real need for security
+ * here, except that a brute force attack would allow someone to change the
+ * password on an account that they know has a password change pending.
  */
 public class UserAccount {
+	public static final int MIN_PASSWORD_LENGTH = 6;
+	public static final int MAX_PASSWORD_LENGTH = 12;
+
 	public enum Status {
 		ACTIVE, INACTIVE;
 
@@ -30,36 +42,20 @@ public class UserAccount {
 
 	}
 
-	/** Should never be null. */
-	private String uri = "";
+	private String uri = ""; // Never null.
 
+	private String emailAddress = ""; // Never null.
+	private String firstName = ""; // Never null.
+	private String lastName = ""; // Never null.
 
-	/** Should never be null. */
-	private String emailAddress = "";
-
-	/** Should never be null. */
-	private String firstName = "";
-
-	/** Should never be null. */
-	private String lastName = "";
-
-
-	/** Should never be null. */
-	private String md5Password = "";
-
-	/** Should never be null. */
-	private String oldPassword = "";
-
-	/** Should never be negative. */
-	private long passwordLinkExpires = 0L;
-
+	private String md5Password = ""; // Never null.
+	private String oldPassword = ""; // Never null.
+	private long passwordLinkExpires = 0L; // Never negative.
 	private boolean passwordChangeRequired = false;
 
-	/** Should never be negative. */
-	private int loginCount = 0;
-	
-	/** Might be null. */
-	private Status status = Status.INACTIVE;
+	private int loginCount = 0; // Never negative.
+	private Status status = Status.INACTIVE; // Might be null.
+	private String externalAuthId = ""; // Never null.
 
 	/** This may be empty, but should never be null. */
 	private Set<String> permissionSetUris = Collections.emptySet();
@@ -119,6 +115,11 @@ public class UserAccount {
 		return passwordLinkExpires;
 	}
 
+	public String getPasswordLinkExpiresHash() {
+		return limitStringLength(8, Authenticator.applyMd5Encoding(String
+				.valueOf(passwordLinkExpires)));
+	}
+
 	public void setPasswordLinkExpires(long passwordLinkExpires) {
 		this.passwordLinkExpires = Math.max(0, passwordLinkExpires);
 	}
@@ -128,7 +129,8 @@ public class UserAccount {
 	}
 
 	public void setPasswordChangeRequired(Boolean passwordChangeRequired) {
-		this.passwordChangeRequired = nonNull(passwordChangeRequired, Boolean.FALSE);
+		this.passwordChangeRequired = nonNull(passwordChangeRequired,
+				Boolean.FALSE);
 	}
 
 	public int getLoginCount() {
@@ -151,6 +153,14 @@ public class UserAccount {
 		this.status = Status.fromString(statusString);
 	}
 
+	public String getExternalAuthId() {
+		return externalAuthId;
+	}
+
+	public void setExternalAuthId(String externalAuthId) {
+		this.externalAuthId = nonNull(externalAuthId, "");
+	}
+
 	public Set<String> getPermissionSetUris() {
 		return new HashSet<String>(permissionSetUris);
 	}
@@ -161,19 +171,31 @@ public class UserAccount {
 		}
 		this.permissionSetUris = new HashSet<String>(permissionSetUris);
 	}
-	
+
 	private <T> T nonNull(T value, T defaultValue) {
 		return (value == null) ? defaultValue : value;
+	}
+	
+	private String limitStringLength(int limit, String s) {
+		if (s == null) {
+			return "";
+		} else if (s.length() <= limit) {
+			return s;
+		} else {
+			return s.substring(0, limit);
+		}
 	}
 
 	@Override
 	public String toString() {
-		return "UserAccount[uri=" + uri + ", emailAddress=" + emailAddress
-				+ ", firstName=" + firstName + ", lastName=" + lastName
-				+ ", md5password=" + md5Password + ", passwordChangeExpires="
-				+ passwordLinkExpires + ", loginCount=" + loginCount
-				+ ", status=" + status + ", permissionSetUris="
-				+ permissionSetUris + "]";
+		return "UserAccount[uri=" + uri + (", emailAddress=" + emailAddress)
+				+ (", firstName=" + firstName) + (", lastName=" + lastName)
+				+ (", md5password=" + md5Password)
+				+ (", oldPassword=" + oldPassword)
+				+ (", passwordLinkExpires=" + passwordLinkExpires)
+				+ (", passwordChangeRequired=" + passwordChangeRequired)
+				+ (", loginCount=" + loginCount) + (", status=" + status)
+				+ (", externalAuthId=" + externalAuthId)
+				+ (", permissionSetUris=" + permissionSetUris) + "]";
 	}
-
 }

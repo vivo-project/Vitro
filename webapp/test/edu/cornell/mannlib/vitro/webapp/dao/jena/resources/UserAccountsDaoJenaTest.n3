@@ -17,6 +17,7 @@ mydomain:user01
 	auth:passwordChangeExpires 0 ;
 	auth:loginCount 5 ;
 	auth:status "ACTIVE" ;
+	auth:externalAuthId "user1";
 	auth:hasPermissionSet mydomain:role1 ;
 	.
 	

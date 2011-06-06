@@ -35,6 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
+import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import freemarker.cache.TemplateLoader;
@@ -100,7 +101,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         
         // Get the config for this object property
         try {
-            config = new PropertyListConfig(op, vreq, policyHelper);
+            config = new PropertyListConfig(op, policyHelper);
         } catch (InvalidConfigurationException e) {
             throw e;
         } catch (Exception e) {
@@ -116,6 +117,11 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                 addAccess = true;
             }
         }
+    }
+    
+    protected List<Map<String, String>> getStatementData() {
+        ObjectPropertyStatementDao opDao = vreq.getWebappDaoFactory().getObjectPropertyStatementDao();
+        return opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, objectKey, getSelectQuery(), getConstructQueries());
     }
     
     protected abstract boolean isEmpty();
@@ -139,11 +145,11 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         return null;
     }
       
-    protected String getSelectQuery() {
+    private String getSelectQuery() {
         return config.selectQuery;
     }
     
-    protected Set<String> getConstructQueries() {
+    private Set<String> getConstructQueries() {
         return config.constructQueries;
     }
     
@@ -206,7 +212,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     }
     
     /** Apply post-processing to query results to prepare for template */
-    protected void postprocess(List<Map<String, String>> data, WebappDaoFactory wdf) {
+    protected void postprocess(List<Map<String, String>> data) {
         
         if (log.isDebugEnabled()) {
             log.debug("Data for property " + getUri() + " before postprocessing");
@@ -342,7 +348,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private String templateName;
         private ObjectPropertyDataPostProcessor postprocessor = null;
 
-        PropertyListConfig(ObjectProperty op, VitroRequest vreq, EditingPolicyHelper policyHelper) 
+        PropertyListConfig(ObjectProperty op, EditingPolicyHelper policyHelper) 
             throws InvalidConfigurationException {
 
             // Get the custom config filename
@@ -370,7 +376,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             }
             
             if ( ! isDefaultConfig(configFileName) ) {
-                ConfigError configError = checkConfiguration(vreq);
+                ConfigError configError = checkConfiguration();
                 if ( configError != null ) { // the configuration contains an error
                     // If this is a collated property, throw an error: this results in creating an 
                     // UncollatedPropertyTemplateModel instead.
@@ -393,7 +399,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             return configFileName.equals(DEFAULT_CONFIG_FILE_NAME);
         }
         
-        private ConfigError checkConfiguration(VitroRequest vreq) {
+        private ConfigError checkConfiguration() {
 
             ConfigError error = ObjectPropertyTemplateModel.this.checkQuery(selectQuery);
             if (error != null) {

@@ -8,10 +8,11 @@
           version="2.0"> */ %> 
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 <%@ taglib prefix="form" uri="http://vitro.mannlib.cornell.edu/edit/tags" %>
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousEditorPages" %>
 
 <%
-	if (LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.EDITOR)) {
+	if (PolicyHelper.isAuthorizedForActions(request, new UseMiscellaneousEditorPages())) {
 		request.setAttribute("isEditor", Boolean.TRUE);
 	}
 %>

@@ -251,6 +251,14 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         return 0;
     }
 
+    /*
+     * SPARQL-based method for getting values related to a single object property.
+     * We cannot return a List<ObjectPropertyStatement> here, the way the corresponding method of
+     * DataPropertyStatementDaoJena returns a List<DataPropertyStatement>. We need to accomodate
+     * custom queries that could request any data in addition to just the object of the statement.
+     * However, we do need to get the object of the statement so that we have it to create editing links.
+     */
+    
     @Override 
     public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
             String subjectUri, 
@@ -263,13 +271,6 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
     }
     
     @Override
-    /*
-     * SPARQL-based method for getting values related to a single object property.
-     * We cannot return a List<ObjectPropertyStatement> here, the way the corresponding method of
-     * DataPropertyStatementDaoJena returns a List<DataPropertyStatement>. We need to accomodate
-     * custom queries that could request any data in addition to just the object of the statement.
-     * However, we do need to get the object of the statement so that we have it to create editing links.
-     */
     public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
             String subjectUri, 
             String propertyUri, 
@@ -315,7 +316,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             while (results.hasNext()) {
                 QuerySolution soln = results.nextSolution();
                 RDFNode node = soln.get(objectKey);
-                if (node.isResource()) {
+                if (node.isURIResource()) {
                     list.add(QueryUtils.querySolutionToStringValueMap(soln));
                 }
             }

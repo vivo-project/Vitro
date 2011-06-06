@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.utils;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
 import javax.mail.Message;
 import javax.mail.Session;
@@ -16,28 +15,19 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
+import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 
 public class MailUtil {
 	private static final Log log = LogFactory.getLog(MailUtil.class);
-	
-	 	private String smtpHost = "";
+	private final HttpServletRequest req;
 	
 		public MailUtil(HttpServletRequest req) {
-			smtpHost = ConfigurationProperties.getBean(req)
-					.getProperty(ContactMailServlet.SMTPHOST_PROPERTY, "");
-			if (smtpHost.isEmpty()) {
-				log.debug("No Vitro.smtpHost specified");
-			} else {
-				log.debug("Found Vitro.smtpHost value of " + smtpHost);
-			}
+			this.req = req;
 		}
         
         public void sendMessage(String messageText, String subject, String from, String to, List<String> deliverToArray) throws IOException{
-        	Properties props = System.getProperties();
-            props.put("mail.smtp.host", smtpHost);
-            Session s = Session.getDefaultInstance(props,null);
+        	
+            Session s = FreemarkerEmailFactory.getEmailSession(req);
             
             try{
             	

@@ -231,7 +231,7 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
         	}
         	
             //check if fedora is on line
-            OntModel sessionOntModel = (OntModel)req.getSession().getAttribute("jenaOntModel");
+            OntModel sessionOntModel = (OntModel)rawRequest.getSession().getAttribute("jenaOntModel");
             synchronized (FedoraDatastreamController.class) {
                 if( fedoraUrl == null ){
                     setup( sessionOntModel, getServletContext() );
@@ -280,7 +280,7 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
                 "enough information to complete your request.(Missing fileRes)");
             
             //check if file individual has a fedora:PID for a data stream
-            VitroRequest vreq = new VitroRequest(req);
+            VitroRequest vreq = new VitroRequest(rawRequest);
             IndividualDao iwDao = vreq.getWebappDaoFactory().getIndividualDao();
             Individual fileEntity = iwDao.getIndividualByURI(fileUri);
             

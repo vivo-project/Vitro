@@ -7,9 +7,8 @@ import javax.servlet.ServletContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.HasRoleLevel;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasRoleLevel;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
@@ -51,7 +50,7 @@ public class DisplayRestrictedDataByRoleLevelPolicy implements PolicyIface {
 			return defaultDecision("whatToAuth was null");
 		}
 
-		RoleLevel userRole = getUsersRoleLevel(whoToAuth);
+		RoleLevel userRole = HasRoleLevel.getUsersRoleLevel(whoToAuth);
 
 		PolicyDecision result;
 		if (whatToAuth instanceof DisplayDataProperty) {
@@ -164,17 +163,9 @@ public class DisplayRestrictedDataByRoleLevelPolicy implements PolicyIface {
 				.canDisplayPredicate(uri, userRole);
 	}
 
-	/**
-	 * The user is nobody unless they have a HasRoleLevel identifier.
-	 */
-	private RoleLevel getUsersRoleLevel(IdentifierBundle whoToAuth) {
-		RoleLevel userRole = RoleLevel.PUBLIC;
-		for (Identifier id : whoToAuth) {
-			if (id instanceof HasRoleLevel) {
-				userRole = ((HasRoleLevel) id).getRoleLevel();
-			}
-		}
-		return userRole;
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + " - " + hashCode();
 	}
 
 }

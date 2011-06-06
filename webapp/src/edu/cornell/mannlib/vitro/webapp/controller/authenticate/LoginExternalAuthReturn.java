@@ -40,8 +40,8 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		String username = ExternalAuthHelper.getHelper(req)
-				.getExternalUsername(req);
+		String username = ExternalAuthHelper.getHelper(req).getExternalAuthId(
+				req);
 		List<String> associatedUris = getAuthenticator(req)
 				.getAssociatedIndividualUris(username);
 

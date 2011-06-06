@@ -21,6 +21,14 @@ public interface UserAccountsDao {
 	UserAccount getUserAccountByUri(String uri);
 
 	/**
+	 * Get the UserAccount for this Email address.
+	 * 
+	 * @return null if the Email address is null, or if there is no such
+	 *         UserAccount
+	 */
+	UserAccount getUserAccountByEmail(String emailAddress);
+
+	/**
 	 * Create a new UserAccount in the model.
 	 * 
 	 * On entry, the URI of the UserAccount should be empty. On exit, the URI
@@ -67,7 +75,7 @@ public interface UserAccountsDao {
 	PermissionSet getPermissionSetByUri(String uri);
 
 	/**
-	 * Get all of the PermissionSets in the model.
+	 * Get all of the PermissionSets in the model, sorted by URI.
 	 * 
 	 * @return a collection which might be empty, but is never null.
 	 */

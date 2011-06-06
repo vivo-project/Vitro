@@ -118,8 +118,6 @@ public interface WebappDaoFactory {
     public LinksDao getLinksDao();
     public LinktypeDao getLinktypeDao();
 
-    public FlagDao getFlagDao();
-
     // TODO This goes away when the UserAccounts stuff is fully implemented - jblake.
     public UserDao getUserDao();
     

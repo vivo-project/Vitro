@@ -68,21 +68,22 @@ public class BaseResourceBean implements ResourceBean {
             return RoleLevel.values()[0];            
         }
         
-        public static RoleLevel getRoleFromLoginStatus(HttpServletRequest req) {
-            int level = LoginStatusBean.getBean(req).getSecurityLevel();
-            if( level == LoginStatusBean.ANYBODY)    // 0
-                return PUBLIC;
-            if( level == LoginStatusBean.NON_EDITOR) // 1
-                return SELF;
-            if( level == LoginStatusBean.EDITOR )    // 4
-                return EDITOR;
-            if( level == LoginStatusBean.CURATOR )   // 5
-                return CURATOR;
-            if( level == LoginStatusBean.DBA )       // 50
-                return DB_ADMIN;
-            else
-                return PUBLIC;
-        }
+		public static RoleLevel getRoleFromLoginStatus(HttpServletRequest req) {
+			User u = LoginStatusBean.getCurrentUser(req);
+			if (u == null) {
+				return PUBLIC;
+			} else if ("1".equals(u.getRoleURI())) {
+				return SELF;
+			} else if ("4".equals(u.getRoleURI())) {
+				return EDITOR;
+			} else if ("5".equals(u.getRoleURI())) {
+				return CURATOR;
+			} else if ("50".equals(u.getRoleURI())) {
+				return DB_ADMIN;
+			} else {
+				return PUBLIC;
+			}
+		}
     }
 
     public boolean isAnonymous() {        

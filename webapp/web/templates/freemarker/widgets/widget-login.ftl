@@ -20,7 +20,7 @@
         <noscript>
             <section id="error-alert">
                 <img src="${urls.images}/iconAlertBig.png" alt="Alert Icon"/>
-                <p>In order to edit VIVO content, you'll need to enable JavaScript.</p>
+                <p>In order to edit content, you'll need to enable JavaScript.</p>
             </section>
         </noscript>
     </#if>
@@ -38,7 +38,7 @@
             </section>
         </#if>
        
-        <form  role="form" id="login-form" action="${formAction}" method="post" name="login-form" />
+        <form role="form" id="login-form" action="${formAction}" method="post" name="login-form" />
             <#if externalAuthUrl??>
                 <p class="external-auth"><a class="blue button" href="${externalAuthUrl}">${externalAuthName}</a></p>
                 <p class="or-auth">or</p>
@@ -46,13 +46,13 @@
                 <h3 class="internal-auth" >Log in using your ${siteName} account</h3>
             </#if>
 
-            <label for="email">Email</label>
-            <input class="text-field focus" name="loginName" id="loginName" type="text" value="${loginName!}" required />
+            <label for="loginName">Email</label>
+            <input id="loginName" name="loginName" class="text-field focus" type="text" value="${loginName!}" required autofocus />
 
-            <label for="password">Password</label>
-            <input class="text-field" name="loginPassword" id="password" type="password" required />
+            <label for="loginPassword">Password</label>
+            <input id="loginPassword" name="loginPassword" class="text-field" type="password" required />
             
-            <p class="submit"><input name="loginForm" type="submit" class="green button" value="Log in"/></p>
+            <p class="submit"><input name="loginForm" class="green button" type="submit" value="Log in"/></p>
             <#-- NC: remember me won't be ready for r1.2
             <input class="checkbox-remember-me" name="remember-me" type="checkbox" value="" />  
             <label class="label-remember-me" for="remember-me">Remember me</label> -->
@@ -74,16 +74,16 @@
                 </div>
             </#if>
            
-            <form role="form" id="login-form" action="${formAction}" method="post" name="login-form" required />
-                <label for="new-password">New Password</label>
-                <input id="new-password" class="text-field focus" type="password" name="newPassword"  required />
+            <form role="form" id="login-form" action="${formAction}" method="post" name="login-form" />
+                <label for="newPassword">New Password</label>
+                <input id="newPassword" name="newPassword" class="text-field focus" type="password" required autofocus/>
                 
                 <p class="password-note">Minimum of 6 characters in length.</p>
                 
-                <label for="confirm-password">Confirm Password</label>
-                <input id="confirm-password" class="text-field" type="password" name="confirmPassword"  />
+                <label for="confirmPassword">Confirm Password</label>
+                <input id="confirmPassword" name="confirmPassword" class="text-field" type="password" required />
                 
-                 <p class="submit-password"><input name="passwordChangeForm" type="submit" class="green button" value="Log in"/> <span class="or">or <a class="cancel" href="${cancelUrl}">Cancel</a></span></p>
+                 <p class="submit-password"><input name="passwordChangeForm" class="green button" type="submit" value="Log in"/> <span class="or">or <a class="cancel" href="${cancelUrl}">Cancel</a></span></p>
             </form>
     </section>
 </#macro>

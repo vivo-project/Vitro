@@ -2,11 +2,16 @@
 
 package edu.cornell.mannlib.vedit.beans;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import edu.cornell.mannlib.vitro.webapp.beans.User;
+import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 /**
  * An immutable object that records the user's login info as a session
@@ -91,6 +96,37 @@ public class LoginStatusBean {
 		return (LoginStatusBean) o;
 	}
 
+	/**
+	 * Get the current user, or null if not logged in.
+	 */
+	public static User getCurrentUser(HttpServletRequest request) {
+		if (request == null) {
+			return null;
+		}
+		return getCurrentUser(request.getSession(false));
+	}
+
+	/**
+	 * Get the current user, or null if not logged in.
+	 */
+	public static User getCurrentUser(HttpSession session) {
+		if (session == null) {
+			return null;
+		}
+
+		ServletContext ctx = session.getServletContext();
+		WebappDaoFactory wadf = (WebappDaoFactory) ctx
+				.getAttribute("webappDaoFactory");
+		UserDao userDao = wadf.getUserDao();
+
+		if (getBean(session).isLoggedIn()) {
+			String userUri = getBean(session).getUserURI();
+			return userDao.getUserByURI(userUri);
+		} else {
+			return null;
+		}
+	}
+
 	// ----------------------------------------------------------------------
 	// the bean
 	// ----------------------------------------------------------------------
@@ -129,15 +165,7 @@ public class LoginStatusBean {
 	}
 
 	public boolean isLoggedIn() {
-		return securityLevel > ANYBODY;
-	}
-
-	public boolean isLoggedInExactly(int level) {
-		return securityLevel == level;
-	}
-
-	public boolean isLoggedInAtLeast(int minimumLevel) {
-		return securityLevel >= minimumLevel;
+		return authenticationSource != AuthenticationSource.UNKNOWN;
 	}
 
 	public boolean hasExternalAuthentication() {

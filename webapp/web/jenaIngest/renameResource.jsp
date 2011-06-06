@@ -26,7 +26,7 @@ to follow the established "n" + random integer naming convention.</p>
 
 <form id="takeuri" action="ingest" method="get">
 <input type="hidden" name="action" value="renameResource"/>
-<p>Old Namespace� <input id="uri1" type="text" size="52" name="uri1"/></p>
-<p>New Namespace� <input id="uri2" type="text" size="52" name="uri2"/></p>
+<p>Old namespace: <input id="uri1" type="text" size="52" name="uri1"/></p>
+<p>New namespace: <input id="uri2" type="text" size="52" name="uri2"/></p>
 <p><input id="submit" type="submit" name="submit" value="Change namespace" /></p>
 </form>

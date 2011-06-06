@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
@@ -46,6 +47,9 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 	private static final String URI_USER1 = NS_MINE + "user01";
 	private static final String URI_NO_SUCH_USER = NS_MINE + "bogusUser";
 
+	private static final String EMAIL_USER1 = "email@able.edu";
+	private static final String EMAIL_NO_SUCH_USER = NS_MINE + "bogus@email.com";
+	
 	private static final String URI_ROLE1 = NS_MINE + "role1";
 	private static final String URI_ROLE2 = NS_MINE + "role2";
 	private static final String URI_ROLE3 = NS_MINE + "role3";
@@ -83,6 +87,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		assertEquals("changeRequired", false, u.isPasswordChangeRequired());
 		assertEquals("loginCount", 5, u.getLoginCount());
 		assertEquals("status", Status.ACTIVE, u.getStatus());
+		assertEquals("externalAuthId", "user1", u.getExternalAuthId());
 		assertEquals("permissionSetUris", Collections.singleton(URI_ROLE1),
 				u.getPermissionSetUris());
 	}
@@ -98,6 +103,31 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		UserAccount u = dao.getUserAccountByUri("bogusUri");
 		assertNull("null result", u);
 	}
+	
+	@Test
+	public void getUserAccountByUriWrongType() {
+		UserAccount u = dao.getUserAccountByUri(URI_ROLE1);
+		//System.out.println(u);
+		assertNull("null result", u);
+	}
+
+	@Test
+	public void getUserAccountByEmailSuccess() {
+		UserAccount u = dao.getUserAccountByEmail(EMAIL_USER1);
+		assertEquals("uri", URI_USER1, u.getUri());
+	}
+
+	@Test
+	public void getUserAccountByEmailNull() {
+		UserAccount u = dao.getUserAccountByEmail(null);
+		assertEquals("uri", null, u);
+	}
+
+	@Test
+	public void getUserAccountByEmailNotFound() {
+		UserAccount u = dao.getUserAccountByEmail(EMAIL_NO_SUCH_USER);
+		assertEquals("uri", null, u);
+	}
 
 	@Test
 	public void insertUserAccountSuccess() {
@@ -112,6 +142,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		in.setPasswordChangeRequired(true);
 		in.setLoginCount(42);
 		in.setStatus(Status.INACTIVE);
+		in.setExternalAuthId("newUser");
 		in.setPermissionSetUris(buildSet(URI_ROLE1, URI_ROLE2));
 
 		String newUri = dao.insertUserAccount(in);
@@ -127,6 +158,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		assertEquals("changeRequired", true, u.isPasswordChangeRequired());
 		assertEquals("loginCount", 42, u.getLoginCount());
 		assertEquals("status", Status.INACTIVE, u.getStatus());
+		assertEquals("externalAuthId", "newUser", u.getExternalAuthId());
 		assertEquals("permissionSetUris", buildSet(URI_ROLE1, URI_ROLE2),
 				u.getPermissionSetUris());
 	}
@@ -157,6 +189,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		up.setPasswordChangeRequired(false);
 		up.setLoginCount(43);
 		up.setStatus(Status.ACTIVE);
+		up.setExternalAuthId("updatedUser1");
 		up.setPermissionSetUris(buildSet(URI_ROLE1, URI_ROLE3));
 
 		dao.updateUserAccount(up);
@@ -172,6 +205,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		assertEquals("changeRequired", false, u.isPasswordChangeRequired());
 		assertEquals("loginCount", 43, u.getLoginCount());
 		assertEquals("status", Status.ACTIVE, u.getStatus());
+		assertEquals("externalAuthId", "updatedUser1", u.getExternalAuthId());
 		assertEquals("permissionSetUris", buildSet(URI_ROLE1, URI_ROLE3),
 				u.getPermissionSetUris());
 	}
@@ -238,6 +272,12 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 	}
 
 	@Test
+	public void getPermissionSetByUriWrongType() {
+		PermissionSet ps = dao.getPermissionSetByUri(URI_USER1);
+		assertNull("null result", ps);
+	}
+	
+	@Test
 	public void getAllPermissionSets() {
 		setLoggerLevel(JenaBaseDao.class, Level.DEBUG);
 
@@ -256,6 +296,10 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 
 		assertCorrectPermissionSets(expected, dao.getAllPermissionSets());
 	}
+
+	// ----------------------------------------------------------------------
+	// helper methods
+	// ----------------------------------------------------------------------
 
 	private void assertCorrectPermissionSets(Set<PermissionSet> expected,
 			Collection<PermissionSet> actual) {
@@ -285,7 +329,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		StmtIterator stmts = ontModel.listStatements();
 		while (stmts.hasNext()) {
 			Statement stmt = stmts.next();
-			System.out.println(formatStatement(stmt));
+			//System.out.println(formatStatement(stmt));
 		}
 	}
 

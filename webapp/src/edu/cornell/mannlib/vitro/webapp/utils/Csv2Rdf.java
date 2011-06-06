@@ -56,6 +56,10 @@ public class Csv2Rdf {
 		this.propertyNameBase = individualNameBase+"_";
 	}
 	
+	public Model[] convertToRdf(InputStream fis) throws IOException {
+		return convertToRdf(fis, null, null);
+	}
+	
 	public Model[] convertToRdf(InputStream fis,VitroRequest vreq, Model destination) throws IOException {
 		OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		OntModel tboxOntModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
@@ -65,13 +69,11 @@ public class Csv2Rdf {
 		CSVReader cReader = new SimpleReader();
 		cReader.setSeperator(separatorChar);
 		cReader.setQuoteCharacters(quoteChars);	
-		WebappDaoFactory wdf = vreq.getFullWebappDaoFactory();
-		Random random = new Random();
-		boolean uriIsGood = false;
-		boolean inDestination = false;
-        int attempts = 0;
-        String uri = null;
-		String errMsg = null;
+
+		URIGenerator uriGen = (vreq != null && destination != null) 
+				? new RandomURIGenerator(vreq, destination)
+		        : new SequentialURIGenerator();
+		
 		List<String[]> fileRows = cReader.parse(fis);
 		
         String[] columnHeaders = fileRows.get(0);
@@ -82,24 +84,8 @@ public class Csv2Rdf {
             dpArray[i] = tboxOntModel.createDatatypeProperty(tboxNamespace+propertyNameBase+columnHeaders[i].replaceAll("\\W",""));
         }
         Individual ind = null;
-        for (int row=1; row<fileRows.size(); row++) {
-        	if(namespace!=null && !namespace.isEmpty()){
-        		while( uriIsGood == false && attempts < 30 ){	
-        			uri = namespace+individualNameBase+random.nextInt( Math.min(Integer.MAX_VALUE,(int)Math.pow(2,attempts + 13)) );
-        			errMsg = wdf.checkURI(uri);
-        			Resource res = ResourceFactory.createResource(uri);
-        			inDestination = destination.contains(res, null);
-        			if(  errMsg != null && !inDestination)
-        				uri = null;
-        			else
-        				uriIsGood = true;				
-        			attempts++;
-        		}
-        	}
-        	uriIsGood = false;
-        	attempts =0;
-        	inDestination = false;
-        	
+        for (int row=1; row<fileRows.size(); row++) {    	
+        	String uri = uriGen.getNextURI();
         	if(uri!=null)
         		ind = ontModel.createIndividual(uri,theClass);
         	else
@@ -121,6 +107,53 @@ public class Csv2Rdf {
 		resultModels[1] = tboxOntModel;
 		return resultModels;
 		
+	}
+	
+	private interface URIGenerator {
+		public String getNextURI();
+	}
+	
+	private class RandomURIGenerator implements URIGenerator {
+		
+		private VitroRequest vreq;
+		private Model destination;
+		private Random random = new Random(System.currentTimeMillis());
+		
+		public RandomURIGenerator(VitroRequest vreq, Model destination) {
+			this.vreq = vreq;
+			this.destination = destination;
+		}
+		
+		public String getNextURI() {
+			boolean uriIsGood = false;
+			boolean inDestination = false;
+			String uri = null;
+	        int attempts = 0;
+			if(namespace!=null && !namespace.isEmpty()){
+        		while( uriIsGood == false && attempts < 30 ){	
+        			uri = namespace+individualNameBase+random.nextInt( Math.min(Integer.MAX_VALUE,(int)Math.pow(2,attempts + 13)) );
+        			String errMsg = vreq.getWebappDaoFactory().checkURI(uri);
+        			Resource res = ResourceFactory.createResource(uri);
+        			inDestination = destination.contains(res, null);
+        			if( errMsg != null && !inDestination)
+        				uri = null;
+        			else
+        				uriIsGood = true;				
+        			attempts++;
+        		}
+        	}
+        	return uri;
+		}
+		
+	}
+	
+	private class SequentialURIGenerator implements URIGenerator {
+		private int index = 0;
+		
+		public String getNextURI() {
+			index++;
+			return namespace + individualNameBase + Integer.toString(index); 
+		}
 	}
 	
 }

@@ -93,7 +93,9 @@ public class JenaExportController extends BaseEditController {
 		Model model = null;
 		OntModel ontModel = ModelFactory.createOntologyModel();
 		
-		if(!subgraphParam.equalsIgnoreCase("tbox") && !subgraphParam.equalsIgnoreCase("abox") && !subgraphParam.equalsIgnoreCase("full")){
+		if(!subgraphParam.equalsIgnoreCase("tbox") 
+				&& !subgraphParam.equalsIgnoreCase("abox") 
+				&& !subgraphParam.equalsIgnoreCase("full")){
 			ontologyURI = subgraphParam;
 			subgraphParam = "tbox";
 			char[] uri =  ontologyURI.toCharArray();
@@ -101,38 +103,20 @@ public class JenaExportController extends BaseEditController {
 			for(int i =0; i < uri.length-1;i++)
 				ontologyURI = ontologyURI + uri[i];
 		}
-		
-		
-		String mode = (JenaDataSourceSetupBase.isSDBActive(vreq)) ? "SDB" : "RDB"; 
+	
 		if( "abox".equals(subgraphParam)){
 			model = ModelFactory.createDefaultModel();
 			if("inferred".equals(assertedOrInferredParam)){
-				if(mode.equals("RDB")){
-					Dataset jenaDataset = DatasetFactory.create((OntModel)getServletContext().getAttribute("jenaOntModel"));
-					Dataset inferenceDataset = DatasetFactory.create((OntModel)getServletContext().getAttribute("inferenceOntModel"));
-					model = xutil.extractABox(jenaDataset,inferenceDataset,null);
-				}
-				else{
-					model = ModelContext.getInferenceOntModelSelector(getServletContext()).getABoxModel();
-				}
+				model = ModelContext.getInferenceOntModelSelector(
+						getServletContext()).getABoxModel();
 			}
 			else if("full".equals(assertedOrInferredParam)){
-				if(mode.equals("RDB")){
-					model = xutil.extractABox((OntModel)getServletContext().getAttribute("jenaOntModel"));
-				}
-				else{
-					model = ModelContext.getUnionOntModelSelector(getServletContext()).getABoxModel();
-				}
+				model = ModelContext.getUnionOntModelSelector(
+						getServletContext()).getABoxModel();
 			}
 			else if("asserted".equals(assertedOrInferredParam)){
-				if(mode.equals("RDB")){
-					Dataset jenaDataset = DatasetFactory.create((OntModel)getServletContext().getAttribute("jenaOntModel"));
-					Dataset baseDataset = DatasetFactory.create((OntModel)getServletContext().getAttribute("baseOntModel"));
-					model = xutil.extractABox(jenaDataset,baseDataset,null);
-				}
-				else{
-					model = ModelContext.getBaseOntModelSelector(getServletContext()).getABoxModel();
-				}
+				model = ModelContext.getBaseOntModelSelector(
+						getServletContext()).getABoxModel();
 			}
 		}
 		else if("tbox".equals(subgraphParam)){
@@ -160,53 +144,35 @@ public class JenaExportController extends BaseEditController {
                         ModelContext.getBaseOntModelSelector(
                                 getServletContext()).getTBoxModel(), ontologyURI);              		        
 		    }
-//			if("inferred".equals(assertedOrInferredParam)){
-//				model = xutil.extractTBox(dataset, ontologyURI,INFERENCE_GRAPH);
-//			}
-//			else if("full".equals(assertedOrInferredParam)){
-//				model = xutil.extractTBox(dataset, ontologyURI, FULL_GRAPH);
-//			}
-//			else{
-//				model = xutil.extractTBox(dataset, ontologyURI, ASSERTIONS_GRAPH);
-//			}
 			
 		}
 		else if("full".equals(subgraphParam)){
 			if("inferred".equals(assertedOrInferredParam)){
-				ontModel = xutil.extractTBox(dataset, ontologyURI,INFERENCE_GRAPH);
-				if(mode.equals("RDB")){
-					Dataset jenaDataset = DatasetFactory.create((OntModel)getServletContext().getAttribute("jenaOntModel"));
-					Dataset inferenceDataset = DatasetFactory.create((OntModel)getServletContext().getAttribute("inferenceOntModel"));
-					ontModel.addSubModel(xutil.extractABox(jenaDataset, inferenceDataset, null));
-				}
-				else{
-					ontModel.addSubModel(ModelContext.getInferenceOntModelSelector(getServletContext()).getABoxModel());
-					ontModel.addSubModel(ModelContext.getInferenceOntModelSelector(getServletContext()).getTBoxModel());
-				}
+				ontModel = xutil.extractTBox(
+						dataset, ontologyURI, INFERENCE_GRAPH);
+				ontModel.addSubModel(ModelContext.getInferenceOntModelSelector(
+						getServletContext()).getABoxModel());
+				ontModel.addSubModel(ModelContext.getInferenceOntModelSelector(
+						getServletContext()).getTBoxModel());
 			}
 			else if("full".equals(assertedOrInferredParam)){
 				ontModel = xutil.extractTBox(dataset, ontologyURI, FULL_GRAPH);
-				if(mode.equals("RDB")){
-					ontModel.addSubModel(xutil.extractABox((OntModel)getServletContext().getAttribute("jenaOntModel")));
-				}
-				else{
-					ontModel.addSubModel(ModelContext.getUnionOntModelSelector(getServletContext()).getABoxModel());
-					ontModel.addSubModel(ModelContext.getUnionOntModelSelector(getServletContext()).getTBoxModel());
-					ontModel.addSubModel(ModelContext.getUnionOntModelSelector(getServletContext()).getApplicationMetadataModel());
-				}
+				ontModel.addSubModel(ModelContext.getUnionOntModelSelector(
+						getServletContext()).getABoxModel());
+				ontModel.addSubModel(ModelContext.getUnionOntModelSelector(
+						getServletContext()).getTBoxModel());
+				ontModel.addSubModel(ModelContext.getUnionOntModelSelector(
+						getServletContext()).getApplicationMetadataModel());
 			}
 			else{
-				ontModel = xutil.extractTBox(dataset, ontologyURI, ASSERTIONS_GRAPH);
-				if(mode.equals("RDB")){
-					Dataset jenaDataset = DatasetFactory.create((OntModel)getServletContext().getAttribute("jenaOntModel"));
-					Dataset baseDataset = DatasetFactory.create((OntModel)getServletContext().getAttribute("baseOntModel"));
-					ontModel.addSubModel(xutil.extractABox(jenaDataset,baseDataset,null));
-				}
-				else{
-					ontModel.addSubModel(ModelContext.getBaseOntModelSelector(getServletContext()).getABoxModel());
-					ontModel.addSubModel(ModelContext.getBaseOntModelSelector(getServletContext()).getTBoxModel());
-					ontModel.addSubModel(ModelContext.getBaseOntModelSelector(getServletContext()).getApplicationMetadataModel());
-				}
+				ontModel = xutil.extractTBox(
+						dataset, ontologyURI, ASSERTIONS_GRAPH);
+				ontModel.addSubModel(ModelContext.getBaseOntModelSelector(
+						getServletContext()).getABoxModel());
+				ontModel.addSubModel(ModelContext.getBaseOntModelSelector(
+						getServletContext()).getTBoxModel());
+				ontModel.addSubModel(ModelContext.getBaseOntModelSelector(
+						getServletContext()).getApplicationMetadataModel());
 			}
 			
 		}

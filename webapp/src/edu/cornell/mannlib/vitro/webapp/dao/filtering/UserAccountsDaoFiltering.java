@@ -17,7 +17,7 @@ public class UserAccountsDaoFiltering extends BaseFiltering implements
 		UserAccountsDao {
 
 	private final UserAccountsDao innerDao;
-	
+
 	@SuppressWarnings("unused")
 	private final VitroFilters filters;
 
@@ -30,6 +30,11 @@ public class UserAccountsDaoFiltering extends BaseFiltering implements
 	@Override
 	public UserAccount getUserAccountByUri(String uri) {
 		return innerDao.getUserAccountByUri(uri);
+	}
+
+	@Override
+	public UserAccount getUserAccountByEmail(String emailAddress) {
+		return innerDao.getUserAccountByEmail(emailAddress);
 	}
 
 	@Override

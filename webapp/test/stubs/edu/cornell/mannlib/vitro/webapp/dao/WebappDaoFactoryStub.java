@@ -12,7 +12,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayModelDao;
-import edu.cornell.mannlib.vitro.webapp.dao.FlagDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.KeywordDao;
 import edu.cornell.mannlib.vitro.webapp.dao.KeywordIndividualRelationDao;
@@ -59,6 +58,12 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 		this.objectPropertyDao = objectPropertyDao;
 	}
 
+	// TODO This goes away when the UserAccounts stuff is fully implemented -- jb
+	private UserDao userDao;
+	public void setUserDao(UserDao userDao) {
+		this.userDao = userDao;
+	}
+
 	// ----------------------------------------------------------------------
 	// Stub methods
 	// ----------------------------------------------------------------------
@@ -76,6 +81,12 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	@Override
 	public ObjectPropertyDao getObjectPropertyDao() {
 		return this.objectPropertyDao;
+	}
+
+    // TODO This goes away when the UserAccounts stuff is fully implemented -- jb
+	@Override
+	public UserDao getUserDao() {
+		return this.userDao;
 	}
 
 	// ----------------------------------------------------------------------
@@ -212,19 +223,6 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	public LinktypeDao getLinktypeDao() {
 		throw new RuntimeException(
 				"WebappDaoFactory.getLinktypeDao() not implemented.");
-	}
-
-	@Override
-	public FlagDao getFlagDao() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getFlagDao() not implemented.");
-	}
-
-    // TODO This goes away when the UserAccounts stuff is fully implemented -- jb
-	@Override
-	public UserDao getUserDao() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getUserDao() not implemented.");
 	}
 
 	@Override

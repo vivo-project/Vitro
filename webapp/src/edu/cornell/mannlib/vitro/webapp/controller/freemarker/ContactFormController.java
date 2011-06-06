@@ -10,10 +10,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
-import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 
 /**
  *  Controller for comments ("contact us") page
@@ -40,10 +40,10 @@ public class ContactFormController extends FreemarkerHttpServlet {
         String templateName;
         Map<String, Object> body = new HashMap<String, Object>();
         
-        if (!ContactMailServlet.isSmtpHostConfigured(vreq)) {
+        if (!FreemarkerEmailFactory.isConfigured(vreq)) {
             body.put("errorMessage", 
                      "This application has not yet been configured to send mail. " +
-                     "An smtp host has not been specified in the configuration properties file.");
+                     "Email properties must be specified in the configuration properties file.");
             templateName = TEMPLATE_ERROR;
         }
         

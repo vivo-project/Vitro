@@ -81,8 +81,7 @@ public class HtmlLowerStopAnalyzer extends Analyzer {
 
     /**
      * Processes the input by first converting it to
-     * lower case, then by eliminating stop words, and
-     * finally by performing Porter stemming on it.
+     * lower case, then by eliminating stop words.
      *
      * @param reader the Reader that
      *               provides access to the input text

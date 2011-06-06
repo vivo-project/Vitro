@@ -15,10 +15,9 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy.AuthRole;
+import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate;
@@ -66,8 +65,7 @@ public class BasicAuthenticator extends Authenticator {
 			return false;
 		}
 
-		String md5NewPassword = Authenticate
-				.applyMd5Encoding(clearTextPassword);
+		String md5NewPassword = applyMd5Encoding(clearTextPassword);
 		return md5NewPassword.equals(user.getMd5password());
 	}
 
@@ -90,7 +88,7 @@ public class BasicAuthenticator extends Authenticator {
 			return;
 		}
 		user.setOldPassword(user.getMd5password());
-		user.setMd5password(Authenticate.applyMd5Encoding(newClearTextPassword));
+		user.setMd5password(applyMd5Encoding(newClearTextPassword));
 		getUserDao().updateUser(user);
 	}
 
@@ -107,27 +105,23 @@ public class BasicAuthenticator extends Authenticator {
 		recordLoginOnUserRecord(user);
 
 		String userUri = user.getURI();
-		String roleUri = user.getRoleURI();
 		int securityLevel = parseUserSecurityLevel(user);
-		recordLoginWithOrWithoutUserAccount(username, userUri, roleUri,
-				securityLevel, authSource);
+		recordLoginWithOrWithoutUserAccount(username, userUri, securityLevel,
+				authSource);
 	}
 
 	@Override
 	public void recordLoginWithoutUserAccount(String username,
 			String individualUri, AuthenticationSource authSource) {
-		String roleUri = AuthRole.USER.roleUri();
 		int securityLevel = LoginStatusBean.NON_EDITOR;
-		recordLoginWithOrWithoutUserAccount(username, individualUri, roleUri,
-				securityLevel, authSource);
+		recordLoginWithOrWithoutUserAccount(username, individualUri, securityLevel,
+				authSource);
 	}
 
 	/** This much is in common on login, whether or not you have a user account. */
 	private void recordLoginWithOrWithoutUserAccount(String username,
-			String userUri, String roleUri, int securityLevel,
-			AuthenticationSource authSource) {
+			String userUri, int securityLevel, AuthenticationSource authSource) {
 		HttpSession session = request.getSession();
-		createLoginFormBean(username, userUri, roleUri, session);
 		createLoginStatusBean(username, userUri, securityLevel, authSource,
 				session);
 		setSessionTimeoutLimit(session);
@@ -148,25 +142,6 @@ public class BasicAuthenticator extends Authenticator {
 
 	/**
 	 * Put the login bean into the session.
-	 * 
-	 * TODO The LoginFormBean is being phased out.
-	 */
-	private void createLoginFormBean(String username, String userUri,
-			String roleUri, HttpSession session) {
-		LoginFormBean lfb = new LoginFormBean();
-		lfb.setUserURI(userUri);
-		lfb.setLoginStatus("authenticated");
-		lfb.setSessionId(session.getId());
-		lfb.setLoginRole(roleUri);
-		lfb.setLoginRemoteAddr(request.getRemoteAddr());
-		lfb.setLoginName(username);
-		session.setAttribute("loginHandler", lfb);
-	}
-
-	/**
-	 * Put the login bean into the session.
-	 * 
-	 * TODO this should eventually replace the LoginFormBean.
 	 */
 	private void createLoginStatusBean(String username, String userUri,
 			int securityLevel, AuthenticationSource authSource,
@@ -181,8 +156,9 @@ public class BasicAuthenticator extends Authenticator {
 	 * Editors and other privileged users get a longer timeout interval.
 	 */
 	private void setSessionTimeoutLimit(HttpSession session) {
-		if (LoginStatusBean.getBean(session).isLoggedInAtLeast(
-				LoginStatusBean.EDITOR)) {
+		RoleLevel role = RoleLevel.getRoleFromLoginStatus(request);
+		if (role == RoleLevel.EDITOR || role == RoleLevel.CURATOR
+				|| role == RoleLevel.DB_ADMIN) {
 			session.setMaxInactiveInterval(PRIVILEGED_TIMEOUT_INTERVAL);
 		} else {
 			session.setMaxInactiveInterval(LOGGED_IN_TIMEOUT_INTERVAL);
@@ -226,7 +202,7 @@ public class BasicAuthenticator extends Authenticator {
 		if (iDao == null) {
 			return Collections.emptyList();
 		}
-		
+
 		String selfEditorUri = SelfEditingConfiguration.getBean(request)
 				.getIndividualUriFromUsername(iDao, username);
 		if (selfEditorUri == null) {
@@ -313,15 +289,15 @@ public class BasicAuthenticator extends Authenticator {
 		if (wadf == null) {
 			return null;
 		}
-		
+
 		IndividualDao individualDao = wadf.getIndividualDao();
 		if (individualDao == null) {
 			log.error("getIndividualDao: no IndividualDao");
 		}
-		
+
 		return individualDao;
 	}
-	
+
 	/**
 	 * Get a reference to the WebappDaoFactory, or null.
 	 */

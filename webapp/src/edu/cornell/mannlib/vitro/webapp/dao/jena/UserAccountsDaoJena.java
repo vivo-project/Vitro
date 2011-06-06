@@ -4,13 +4,17 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
+import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
@@ -47,6 +51,10 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 				return null;
 			}
 
+			if (!isResourceOfType(r, USERACCOUNT)) {
+				return null;
+			}
+
 			UserAccount u = new UserAccount();
 			u.setUri(r.getURI());
 			u.setEmailAddress(getPropertyStringValue(r,
@@ -61,12 +69,38 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 					USERACCOUNT_PASSWORD_CHANGE_REQUIRED));
 			u.setLoginCount(getPropertyIntValue(r, USERACCOUNT_LOGIN_COUNT));
 			u.setStatusFromString(getPropertyStringValue(r, USERACCOUNT_STATUS));
+			u.setExternalAuthId(getPropertyStringValue(r,
+					USERACCOUNT_EXTERNAL_AUTH_ID));
 			u.setPermissionSetUris(getPropertyResourceURIValues(r,
 					USERACCOUNT_HAS_PERMISSION_SET));
 			return u;
 		} finally {
 			getOntModel().leaveCriticalSection();
 		}
+	}
+
+	@Override
+	public UserAccount getUserAccountByEmail(String emailAddress) {
+		if (emailAddress == null) {
+			return null;
+		}
+
+		String userUri = null;
+
+		getOntModel().enterCriticalSection(Lock.READ);
+		try {
+			StmtIterator stmts = getOntModel().listStatements(null,
+					USERACCOUNT_EMAIL_ADDRESS,
+					getOntModel().createLiteral(emailAddress));
+			if (stmts.hasNext()) {
+				userUri = stmts.next().getSubject().getURI();
+			}
+			stmts.close();
+		} finally {
+			getOntModel().leaveCriticalSection();
+		}
+
+		return getUserAccountByUri(userUri);
 	}
 
 	@Override
@@ -105,6 +139,8 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 				addPropertyStringValue(res, USERACCOUNT_STATUS, userAccount
 						.getStatus().toString(), model);
 			}
+			addPropertyStringValue(res, USERACCOUNT_EXTERNAL_AUTH_ID,
+					userAccount.getExternalAuthId(), model);
 			updatePropertyResourceURIValues(res,
 					USERACCOUNT_HAS_PERMISSION_SET,
 					userAccount.getPermissionSetUris(), model);
@@ -158,6 +194,8 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 				updatePropertyStringValue(res, USERACCOUNT_STATUS, userAccount
 						.getStatus().toString(), model);
 			}
+			updatePropertyStringValue(res, USERACCOUNT_EXTERNAL_AUTH_ID,
+					userAccount.getExternalAuthId(), model);
 			updatePropertyResourceURIValues(res,
 					USERACCOUNT_HAS_PERMISSION_SET,
 					userAccount.getPermissionSetUris(), model);
@@ -193,6 +231,9 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 		try {
 			OntResource r = getOntModel().getOntResource(uri);
 			if (r == null) {
+				return null;
+			}
+			if (!isResourceOfType(r, PERMISSIONSET)) {
 				return null;
 			}
 
@@ -234,6 +275,8 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 			getOntModel().leaveCriticalSection();
 		}
 
+		Collections.sort(list, new PermissionSetsByUri());
+
 		return list;
 	}
 
@@ -257,4 +300,28 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 				+ errMsg);
 	}
 
+	/**
+	 * Since there is no reasoner on the UserAccountModel, this will return a
+	 * false negative for a subtype of the specified type.
+	 * 
+	 * There should already be a lock on the model when this is called.
+	 */
+	private boolean isResourceOfType(OntResource r, OntClass type) {
+		StmtIterator stmts = getOntModel().listStatements(r, RDF.type, type);
+		if (stmts.hasNext()) {
+			stmts.close();
+			return true;
+		} else {
+			stmts.close();
+			return false;
+		}
+	}
+
+	private static class PermissionSetsByUri implements
+			Comparator<PermissionSet> {
+		@Override
+		public int compare(PermissionSet ps1, PermissionSet ps2) {
+			return ps1.getUri().compareTo(ps2.getUri());
+		}
+	}
 }

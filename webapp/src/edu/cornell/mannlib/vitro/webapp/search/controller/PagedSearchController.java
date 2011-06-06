@@ -65,6 +65,7 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.CustomSimilarity;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
+import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.LinkTemplateModel;
@@ -140,7 +141,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
         //There may be other non-html formats in the future
         Format format = getFormat(vreq);            
         boolean wasXmlRequested = Format.XML == format;
-        log.debug("xml was the requested format");                         
+        log.debug("Requested format was " + (wasXmlRequested ? "xml" : "html"));                      
         boolean wasHtmlRequested = ! wasXmlRequested; 
         
         try {
@@ -228,7 +229,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
             		Document document = searcherForRequest.doc(scoreDoc.doc);
             		Explanation explanation = searcherForRequest.explain(query, scoreDoc.doc);
             		
-            		log.debug("Document title: "+ document.get(Entity2LuceneDoc.VitroLuceneTermNames.NAME) + " score: " +scoreDoc.score);
+            		log.debug("Document title: "+ document.get(Entity2LuceneDoc.VitroLuceneTermNames.NAME_STEMMED) + " score: " +scoreDoc.score);
             		log.debug("Scoring of the doc explained " + explanation.toString());
             		log.debug("Explanation's description "+ explanation.getDescription());
             		log.debug("ALLTEXT: " + document.get(Entity2LuceneDoc.VitroLuceneTermNames.ALLTEXT));
@@ -364,7 +365,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
             body.put("title", qtxt + " - " + appBean.getApplicationName()
                     + " Search Results");
             
-            body.put("hitsLength",hitsLength);
+            body.put("hitCount",hitsLength);
             body.put("startIndex", startIndex);
             
             body.put("pagingLinks", getPagingLinks(startIndex, hitsPerPage,
@@ -404,7 +405,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
             Document doc;
             try {
                 doc = searcher.doc(topDocs.scoreDocs[i].doc);
-                String name =doc.get(Entity2LuceneDoc.term.NAME);
+                String name =doc.get(Entity2LuceneDoc.term.NAME_STEMMED);
                 if( name != null && name.length() > 0)
                     alphas.add( name.substring(0, 1));                
             } catch (CorruptIndexException e) {
@@ -621,7 +622,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
                 BooleanQuery boolQuery = new BooleanQuery();
                 boolQuery.add( query, BooleanClause.Occur.MUST );
                 boolQuery.add( 
-                    new WildcardQuery(new Term(Entity2LuceneDoc.term.NAME, alpha+'*')),
+                    new WildcardQuery(new Term(Entity2LuceneDoc.term.NAME_STEMMED, alpha+'*')),
                     BooleanClause.Occur.MUST);
                 query = boolQuery;
             }
@@ -682,7 +683,15 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
 //        qp.setStemmedToUnstemmed(map);
     	
     	MultiFieldQueryParser qp = new MultiFieldQueryParser(Version.LUCENE_29, new String[]{ 
-    				"name", "nameunstemmed", "type", "moniker", "ALLTEXT", "ALLTEXTUNSTEMMED", "nameraw" , "classLocalName", "classLocalNameLowerCase" }, analyzer); 
+    	        VitroLuceneTermNames.NAME_STEMMED,
+    	        VitroLuceneTermNames.NAME_UNSTEMMED,
+    	        VitroLuceneTermNames.RDFTYPE,
+    	        VitroLuceneTermNames.MONIKER,
+    	        VitroLuceneTermNames.ALLTEXT,
+    	        VitroLuceneTermNames.ALLTEXTUNSTEMMED,
+    	        VitroLuceneTermNames.NAME_LOWERCASE,
+    	        VitroLuceneTermNames.CLASSLOCALNAME,
+    	        VitroLuceneTermNames.CLASSLOCALNAMELOWERCASE }, analyzer);
     	
     //	QueryParser qp = new QueryParser(Version.LUCENE_29, "name", analyzer); 
     	

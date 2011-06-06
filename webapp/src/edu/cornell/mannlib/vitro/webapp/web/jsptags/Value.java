@@ -2,12 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.jsptags;
 
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
-import org.apache.commons.lang.StringEscapeUtils;
-
-import javax.servlet.http.HttpSession;
-import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
 /**

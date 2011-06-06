@@ -27,12 +27,12 @@ import edu.cornell.mannlib.vedit.listener.ChangeListener;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vedit.validator.ValidationObject;
 import edu.cornell.mannlib.vedit.validator.Validator;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.setup.SelfEditingPolicySetup;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 
 public class UserRetryController extends BaseEditController {
@@ -118,30 +118,21 @@ public class UserRetryController extends BaseEditController {
         
         /* bdc34: Datastar needs non-backend-editing users for logging in non-Cornell people*/
         /* SelfEditingPolicySetup.SELF_EDITING_POLICY_WAS_SETUP is set by the SelfEditingPolicySetup context listener */
-        boolean selfEditing = (Boolean)getServletContext().getAttribute(SelfEditingPolicySetup.SELF_EDITING_POLICY_WAS_SETUP) == Boolean.TRUE;
-        Option nonEditor = new Option(ROLE_PROTOCOL+LoginStatusBean.NON_EDITOR, "self editor");
+        Option nonEditor = new Option(ROLE_PROTOCOL+1, "self editor");
         /* self editing should be displayed if we are editing a user account that is already  
          *  self-editing even if self editing is off. */
-        if( selfEditing || 
-        	( !"insert".equals(action) && userForEditing.getRoleURI().equals(nonEditor.getValue()) )){        	        	
-            nonEditor.setSelected(userForEditing.getRoleURI().equals(nonEditor.getValue()));
-            if (nonEditor.getSelected() || loginBean.isLoggedInAtLeast(LoginStatusBean.NON_EDITOR))
-                roleOptionList.add(nonEditor); 
-        }
+        roleOptionList.add(nonEditor); 
         
-        Option editor = new Option(ROLE_PROTOCOL+LoginStatusBean.EDITOR, "editor");
+        Option editor = new Option(ROLE_PROTOCOL+4, "editor");
         editor.setSelected(userForEditing.getRoleURI().equals(editor.getValue()));
-        Option curator = new Option(ROLE_PROTOCOL+LoginStatusBean.CURATOR, "curator");
+        Option curator = new Option(ROLE_PROTOCOL+5, "curator");
         curator.setSelected(userForEditing.getRoleURI().equals(curator.getValue()));
-        Option administrator = new Option (ROLE_PROTOCOL+LoginStatusBean.DBA, "system administrator");
+        Option administrator = new Option (ROLE_PROTOCOL+50, "system administrator");
         administrator.setSelected(userForEditing.getRoleURI().equals(administrator.getValue()));        
         
-        if (editor.getSelected() || loginBean.isLoggedInAtLeast(LoginStatusBean.EDITOR))
-            roleOptionList.add(editor);
-        if (curator.getSelected() || loginBean.isLoggedInAtLeast(LoginStatusBean.CURATOR))
-            roleOptionList.add(curator);
-        if (administrator.getSelected() || loginBean.isLoggedInAtLeast(LoginStatusBean.DBA))
-            roleOptionList.add(administrator);
+        roleOptionList.add(editor);
+        roleOptionList.add(curator);
+        roleOptionList.add(administrator);
 
         optionMap.put("Role", roleOptionList);
 
@@ -355,7 +346,7 @@ public class UserRetryController extends BaseEditController {
 				log.error("Can't encode a null password");
 			}
 
-			String encodedPassword = Authenticate.applyMd5Encoding(rawPassword);
+			String encodedPassword = Authenticator.applyMd5Encoding(rawPassword);
 			log.trace(action + ": Raw password '" + rawPassword
 					+ "', encoded '" + encodedPassword + "'");
 
