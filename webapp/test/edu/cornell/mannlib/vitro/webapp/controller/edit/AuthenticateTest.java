@@ -416,7 +416,7 @@ public class AuthenticateTest extends AbstractTestClass {
 	@Test
 	public void alreadyLoggedIn() {
 		LoginStatusBean statusBean = new LoginStatusBean(OLD_DBA_URI,
-				OLD_DBA_NAME, AuthenticationSource.INTERNAL);
+				AuthenticationSource.INTERNAL);
 		LoginStatusBean.setBean(session, statusBean);
 		setRequestFromLoginLink(URL_WITH_LINK);
 

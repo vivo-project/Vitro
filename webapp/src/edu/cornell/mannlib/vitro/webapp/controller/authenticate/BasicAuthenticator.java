@@ -102,20 +102,20 @@ public class BasicAuthenticator extends Authenticator {
 		recordLoginOnUserRecord(user);
 
 		String userUri = user.getURI();
-		recordLoginWithOrWithoutUserAccount(username, userUri, authSource);
+		recordLoginWithOrWithoutUserAccount(userUri, authSource);
 	}
 
 	@Override
 	public void recordLoginWithoutUserAccount(String username,
 			String individualUri, AuthenticationSource authSource) {
-		recordLoginWithOrWithoutUserAccount(username, individualUri, authSource);
+		recordLoginWithOrWithoutUserAccount(individualUri, authSource);
 	}
 
 	/** This much is in common on login, whether or not you have a user account. */
-	private void recordLoginWithOrWithoutUserAccount(String username,
-			String userUri, AuthenticationSource authSource) {
+	private void recordLoginWithOrWithoutUserAccount(String userUri,
+			AuthenticationSource authSource) {
 		HttpSession session = request.getSession();
-		createLoginStatusBean(username, userUri, authSource, session);
+		createLoginStatusBean(userUri, authSource, session);
 		setSessionTimeoutLimit(session);
 		recordInUserSessionMap(userUri, session);
 		notifyOtherUsers(userUri, session);
@@ -135,9 +135,9 @@ public class BasicAuthenticator extends Authenticator {
 	/**
 	 * Put the login bean into the session.
 	 */
-	private void createLoginStatusBean(String username, String userUri,
+	private void createLoginStatusBean(String userUri,
 			AuthenticationSource authSource, HttpSession session) {
-		LoginStatusBean lsb = new LoginStatusBean(userUri, username, authSource);
+		LoginStatusBean lsb = new LoginStatusBean(userUri, authSource);
 		LoginStatusBean.setBean(session, lsb);
 		log.debug("Adding status bean: " + lsb);
 	}
@@ -243,10 +243,10 @@ public class BasicAuthenticator extends Authenticator {
 			return;
 		}
 
-		String username = loginBean.getUsername();
-		User user = userDao.getUserByUsername(username);
+		String userUri = loginBean.getUserURI();
+		User user = userDao.getUserByURI(userUri);
 		if (user == null) {
-			log.error("Unable to retrieve user " + username + " from model");
+			log.error("Unable to retrieve user " + userUri + " from model");
 			return;
 		}
 

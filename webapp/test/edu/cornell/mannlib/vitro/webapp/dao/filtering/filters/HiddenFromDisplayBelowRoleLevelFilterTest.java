@@ -71,11 +71,11 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 
 		boolean expectedResult;
 
-		public String getUsername() {
+		public String getUserUri() {
 			if (loginStatus == null) {
 				return "nobody";
 			} else {
-				return loginStatus.getUsername();
+				return loginStatus.getUserURI();
 			}
 		}
 
@@ -170,7 +170,7 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 
 	private static LoginStatusBean loginStatusBean(User user,
 			AuthenticationSource auth) {
-		return new LoginStatusBean(user.getURI(), user.getUsername(), auth);
+		return new LoginStatusBean(user.getURI(), auth);
 	}
 
 	private static final VClass PUBLIC_VCLASS = vClass("PUBLIC_vclass",
@@ -568,7 +568,7 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 		@Override
 		public String describeTest() {
 			String message = "IndividualTest, login=" + getRoleLevel() + "("
-					+ getUsername() + ")";
+					+ getUserUri() + ")";
 			if (individual == null) {
 				message += ", individual=null";
 			} else {
@@ -596,7 +596,7 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 		@Override
 		public String describeTest() {
 			String message = "VClassTest, login=" + getRoleLevel() + "("
-					+ getUsername() + ")";
+					+ getUserUri() + ")";
 			if (vClass == null) {
 				message += ", vClass=null";
 			} else {
@@ -624,7 +624,7 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 		@Override
 		public String describeTest() {
 			String message = "DataPropertyTest, login=" + getRoleLevel() + "("
-					+ getUsername() + ")";
+					+ getUserUri() + ")";
 			if (dataProperty == null) {
 				message += ", dataProperty=null";
 			} else {
@@ -652,7 +652,7 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 		@Override
 		public String describeTest() {
 			String message = "ObjectPropertyTest, login=" + getRoleLevel()
-					+ "(" + getUsername() + ")";
+					+ "(" + getUserUri() + ")";
 			if (objectProperty == null) {
 				message += ", objectProperty=null";
 			} else {
@@ -695,7 +695,7 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 		@Override
 		public String describeTest() {
 			String message = "DataPropertyStatementTest, login="
-					+ getRoleLevel() + "(" + getUsername() + ")";
+					+ getRoleLevel() + "(" + getUserUri() + ")";
 
 			if (subject == null) {
 				message += ", subject=null";
@@ -752,7 +752,7 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 		@Override
 		public String describeTest() {
 			String message = "ObjectPropertyStatementTest, login="
-					+ getRoleLevel() + "(" + getUsername() + ")";
+					+ getRoleLevel() + "(" + getUserUri() + ")";
 
 			if (subject == null) {
 				message += ", subject=null";

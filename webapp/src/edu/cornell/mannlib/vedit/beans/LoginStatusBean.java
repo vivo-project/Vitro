@@ -22,7 +22,7 @@ public class LoginStatusBean {
 
 	/** A bean to return when the user has not logged in. */
 	private static final LoginStatusBean DUMMY_BEAN = new LoginStatusBean("",
-			"", AuthenticationSource.UNKNOWN);
+			AuthenticationSource.UNKNOWN);
 
 	/** The bean is attached to the session by this name. */
 	private static final String ATTRIBUTE_NAME = "loginStatus";
@@ -96,17 +96,26 @@ public class LoginStatusBean {
 			return null;
 		}
 
+		if (!getBean(session).isLoggedIn()) {
+			return null;
+		}
+
 		ServletContext ctx = session.getServletContext();
 		WebappDaoFactory wadf = (WebappDaoFactory) ctx
 				.getAttribute("webappDaoFactory");
-		UserDao userDao = wadf.getUserDao();
-
-		if (getBean(session).isLoggedIn()) {
-			String userUri = getBean(session).getUserURI();
-			return userDao.getUserByURI(userUri);
-		} else {
+		if (wadf == null) {
+			log.error("No WebappDaoFactory");
 			return null;
 		}
+
+		UserDao userDao = wadf.getUserDao();
+		if (userDao == null) {
+			log.error("No UserDao");
+			return null;
+		}
+
+		String userUri = getBean(session).getUserURI();
+		return userDao.getUserByURI(userUri);
 	}
 
 	// ----------------------------------------------------------------------
@@ -118,22 +127,16 @@ public class LoginStatusBean {
 	}
 
 	private final String userURI;
-	private final String username;
 	private final AuthenticationSource authenticationSource;
 
-	public LoginStatusBean(String userURI, String username,
+	public LoginStatusBean(String userURI,
 			AuthenticationSource authenticationSource) {
 		this.userURI = userURI;
-		this.username = username;
 		this.authenticationSource = authenticationSource;
 	}
 
 	public String getUserURI() {
 		return userURI;
-	}
-
-	public String getUsername() {
-		return username;
 	}
 
 	public AuthenticationSource getAuthenticationSource() {
@@ -150,8 +153,8 @@ public class LoginStatusBean {
 
 	@Override
 	public String toString() {
-		return "LoginStatusBean[userURI=" + userURI + ", username=" + username
-				+ ", authenticationSource=" + authenticationSource + "]";
+		return "LoginStatusBean[userURI=" + userURI + ", authenticationSource="
+				+ authenticationSource + "]";
 	}
 
 }

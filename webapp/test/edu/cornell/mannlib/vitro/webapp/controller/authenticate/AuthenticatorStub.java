@@ -152,8 +152,7 @@ public class AuthenticatorStub extends Authenticator {
 		recordedLogins.add(username);
 
 		User user = getUserByUsername(username);
-		LoginStatusBean lsb = new LoginStatusBean(user.getURI(), username,
-				authSource);
+		LoginStatusBean lsb = new LoginStatusBean(user.getURI(), authSource);
 		LoginStatusBean.setBean(request.getSession(), lsb);
 	}
 
