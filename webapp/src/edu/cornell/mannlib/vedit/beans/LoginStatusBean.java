@@ -168,14 +168,6 @@ public class LoginStatusBean {
 		return authenticationSource != AuthenticationSource.UNKNOWN;
 	}
 
-	public boolean isLoggedInExactly(int level) {
-		return securityLevel == level;
-	}
-
-	public boolean isLoggedInAtLeast(int minimumLevel) {
-		return securityLevel >= minimumLevel;
-	}
-
 	public boolean hasExternalAuthentication() {
 		return authenticationSource == AuthenticationSource.EXTERNAL;
 	}

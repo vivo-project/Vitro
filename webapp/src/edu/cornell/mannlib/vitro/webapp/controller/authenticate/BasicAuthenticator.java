@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
+import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate;
@@ -155,8 +156,9 @@ public class BasicAuthenticator extends Authenticator {
 	 * Editors and other privileged users get a longer timeout interval.
 	 */
 	private void setSessionTimeoutLimit(HttpSession session) {
-		if (LoginStatusBean.getBean(session).isLoggedInAtLeast(
-				LoginStatusBean.EDITOR)) {
+		RoleLevel role = RoleLevel.getRoleFromLoginStatus(request);
+		if (role == RoleLevel.EDITOR || role == RoleLevel.CURATOR
+				|| role == RoleLevel.DB_ADMIN) {
 			session.setMaxInactiveInterval(PRIVILEGED_TIMEOUT_INTERVAL);
 		} else {
 			session.setMaxInactiveInterval(LOGGED_IN_TIMEOUT_INTERVAL);
