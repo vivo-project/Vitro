@@ -152,27 +152,8 @@ public class AuthenticatorStub extends Authenticator {
 		recordedLogins.add(username);
 
 		User user = getUserByUsername(username);
-		LoginStatusBean lsb = new LoginStatusBean(user.getURI(), username,
-				parseUserSecurityLevel(user.getRoleURI()), authSource);
+		LoginStatusBean lsb = new LoginStatusBean(user.getURI(), authSource);
 		LoginStatusBean.setBean(request.getSession(), lsb);
-	}
-
-	private static final String ROLE_NAMESPACE = "role:/";
-
-	/**
-	 * Parse the role URI from User. Don't crash if it is not valid.
-	 */
-	private int parseUserSecurityLevel(String roleURI) {
-		try {
-			if (roleURI.startsWith(ROLE_NAMESPACE)) {
-				String roleLevel = roleURI.substring(ROLE_NAMESPACE.length());
-				return Integer.parseInt(roleLevel);
-			} else {
-				return Integer.parseInt(roleURI);
-			}
-		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException(e);
-		}
 	}
 
 	// ----------------------------------------------------------------------
