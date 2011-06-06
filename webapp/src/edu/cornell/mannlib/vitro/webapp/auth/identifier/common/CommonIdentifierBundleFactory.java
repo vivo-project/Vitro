@@ -11,7 +11,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -23,6 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
+import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
@@ -104,18 +104,12 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 			HttpServletRequest req) {
 		Collection<Individual> individuals = new ArrayList<Individual>();
 
-		LoginStatusBean bean = LoginStatusBean.getBean(req);
-		String username = bean.getUsername();
-
-		if (!bean.isLoggedIn()) {
+		User user = LoginStatusBean.getCurrentUser(req);
+		if (user == null) {
 			log.debug("No Associated Individuals: not logged in.");
 			return individuals;
 		}
-
-		if (StringUtils.isEmpty(username)) {
-			log.debug("No Associated Individuals: username is empty.");
-			return individuals;
-		}
+		String username = user.getUsername();
 
 		WebappDaoFactory wdf = (WebappDaoFactory) context
 				.getAttribute("webappDaoFactory");
@@ -150,5 +144,5 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 	public String toString() {
 		return this.getClass().getSimpleName() + " - " + hashCode();
 	}
-	
+
 }

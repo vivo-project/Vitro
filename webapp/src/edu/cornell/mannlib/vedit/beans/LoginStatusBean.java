@@ -20,27 +20,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 public class LoginStatusBean {
 	private static final Log log = LogFactory.getLog(LoginStatusBean.class);
 
-	/**
-	 * Security level when the user has not logged in. Also used as a minimum
-	 * level when we want to include every user, logged in or not.
-	 */
-	public static final int ANYBODY = 0;
-
-	/** Security level when a user with no privileges is logged in. */
-	public static final int NON_EDITOR = 1;
-
-	/** Security level when an authorized editor is logged in. */
-	public static final int EDITOR = 4;
-
-	/** Security level when an authorized curator is logged in. */
-	public static final int CURATOR = 5;
-
-	/** Security level when a system administrator is logged in. */
-	public static final int DBA = 50;
-
 	/** A bean to return when the user has not logged in. */
 	private static final LoginStatusBean DUMMY_BEAN = new LoginStatusBean("",
-			"", ANYBODY, AuthenticationSource.UNKNOWN);
+			AuthenticationSource.UNKNOWN);
 
 	/** The bean is attached to the session by this name. */
 	private static final String ATTRIBUTE_NAME = "loginStatus";
@@ -114,17 +96,26 @@ public class LoginStatusBean {
 			return null;
 		}
 
+		if (!getBean(session).isLoggedIn()) {
+			return null;
+		}
+
 		ServletContext ctx = session.getServletContext();
 		WebappDaoFactory wadf = (WebappDaoFactory) ctx
 				.getAttribute("webappDaoFactory");
-		UserDao userDao = wadf.getUserDao();
-
-		if (getBean(session).isLoggedIn()) {
-			String userUri = getBean(session).getUserURI();
-			return userDao.getUserByURI(userUri);
-		} else {
+		if (wadf == null) {
+			log.error("No WebappDaoFactory");
 			return null;
 		}
+
+		UserDao userDao = wadf.getUserDao();
+		if (userDao == null) {
+			log.error("No UserDao");
+			return null;
+		}
+
+		String userUri = getBean(session).getUserURI();
+		return userDao.getUserByURI(userUri);
 	}
 
 	// ----------------------------------------------------------------------
@@ -136,28 +127,16 @@ public class LoginStatusBean {
 	}
 
 	private final String userURI;
-	private final String username;
-	private final int securityLevel;
 	private final AuthenticationSource authenticationSource;
 
-	public LoginStatusBean(String userURI, String username, int securityLevel,
+	public LoginStatusBean(String userURI,
 			AuthenticationSource authenticationSource) {
 		this.userURI = userURI;
-		this.username = username;
-		this.securityLevel = securityLevel;
 		this.authenticationSource = authenticationSource;
 	}
 
 	public String getUserURI() {
 		return userURI;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public int getSecurityLevel() {
-		return securityLevel;
 	}
 
 	public AuthenticationSource getAuthenticationSource() {
@@ -174,9 +153,8 @@ public class LoginStatusBean {
 
 	@Override
 	public String toString() {
-		return "LoginStatusBean[userURI=" + userURI + ", username=" + username
-				+ ", securityLevel=" + securityLevel
-				+ ", authenticationSource=" + authenticationSource + "]";
+		return "LoginStatusBean[userURI=" + userURI + ", authenticationSource="
+				+ authenticationSource + "]";
 	}
 
 }

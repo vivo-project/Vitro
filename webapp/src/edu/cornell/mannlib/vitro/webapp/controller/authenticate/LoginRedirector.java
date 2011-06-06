@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -20,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
+import freemarker.template.utility.StringUtil;
 
 /**
  * A user has just completed the login process. What page do we direct them to?
@@ -49,11 +51,12 @@ public class LoginRedirector {
 
 	/** Is there an Individual associated with this user? */
 	private String getAssociatedIndividualUri() {
-		String username = LoginStatusBean.getBean(request).getUsername();
-		if (username == null) {
+		User user = LoginStatusBean.getCurrentUser(request);
+		if (user == null) {
 			log.warn("Not logged in? How did we get here?");
 			return null;
 		}
+		String username = user.getUsername();
 
 		List<String> uris = Authenticator.getInstance(request)
 				.getAssociatedIndividualUris(username);
@@ -105,19 +108,17 @@ public class LoginRedirector {
 					+ "but the system contains no profile for you.";
 		}
 
-		LoginStatusBean bean = LoginStatusBean.getBean(request);
-		Authenticator auth = Authenticator.getInstance(request);
-		User user = auth.getUserByUsername(bean.getUsername());
-
 		String backString = "";
-		String greeting = bean.getUsername();
+		String greeting = "";
 
+		User user = LoginStatusBean.getCurrentUser(request);
 		if (user != null) {
+			greeting = user.getUsername();
 			if (user.getLoginCount() > 1) {
 				backString = " back";
 			}
 			String name = user.getFirstName();
-			if ((name != null) && (name.length() > 0)) {
+			if (!StringUtils.isEmpty(name)) {
 				greeting = name;
 			}
 		}
