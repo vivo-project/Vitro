@@ -31,9 +31,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.LogoutEvent;
  * The "standard" implementation of Authenticator.
  */
 public class BasicAuthenticator extends Authenticator {
-	/** User roles are recorded in the model like "role:/50", etc. */
-	private static final String ROLE_NAMESPACE = "role:/";
-
 	private static final Log log = LogFactory.getLog(BasicAuthenticator.class);
 
 	private final HttpServletRequest request;
@@ -105,25 +102,20 @@ public class BasicAuthenticator extends Authenticator {
 		recordLoginOnUserRecord(user);
 
 		String userUri = user.getURI();
-		int securityLevel = parseUserSecurityLevel(user);
-		recordLoginWithOrWithoutUserAccount(username, userUri, securityLevel,
-				authSource);
+		recordLoginWithOrWithoutUserAccount(username, userUri, authSource);
 	}
 
 	@Override
 	public void recordLoginWithoutUserAccount(String username,
 			String individualUri, AuthenticationSource authSource) {
-		int securityLevel = LoginStatusBean.NON_EDITOR;
-		recordLoginWithOrWithoutUserAccount(username, individualUri, securityLevel,
-				authSource);
+		recordLoginWithOrWithoutUserAccount(username, individualUri, authSource);
 	}
 
 	/** This much is in common on login, whether or not you have a user account. */
 	private void recordLoginWithOrWithoutUserAccount(String username,
-			String userUri, int securityLevel, AuthenticationSource authSource) {
+			String userUri, AuthenticationSource authSource) {
 		HttpSession session = request.getSession();
-		createLoginStatusBean(username, userUri, securityLevel, authSource,
-				session);
+		createLoginStatusBean(username, userUri, authSource, session);
 		setSessionTimeoutLimit(session);
 		recordInUserSessionMap(userUri, session);
 		notifyOtherUsers(userUri, session);
@@ -144,10 +136,8 @@ public class BasicAuthenticator extends Authenticator {
 	 * Put the login bean into the session.
 	 */
 	private void createLoginStatusBean(String username, String userUri,
-			int securityLevel, AuthenticationSource authSource,
-			HttpSession session) {
-		LoginStatusBean lsb = new LoginStatusBean(userUri, username,
-				securityLevel, authSource);
+			AuthenticationSource authSource, HttpSession session) {
+		LoginStatusBean lsb = new LoginStatusBean(userUri, username, authSource);
 		LoginStatusBean.setBean(session, lsb);
 		log.debug("Adding status bean: " + lsb);
 	}
@@ -316,25 +306,6 @@ public class BasicAuthenticator extends Authenticator {
 		}
 
 		return wadf;
-	}
-
-	/**
-	 * Parse the role URI from User. Don't crash if it is not valid.
-	 */
-	private int parseUserSecurityLevel(User user) {
-		String roleURI = user.getRoleURI();
-		try {
-			if (roleURI.startsWith(ROLE_NAMESPACE)) {
-				String roleLevel = roleURI.substring(ROLE_NAMESPACE.length());
-				return Integer.parseInt(roleLevel);
-			} else {
-				return Integer.parseInt(roleURI);
-			}
-		} catch (NumberFormatException e) {
-			log.warn("Invalid RoleURI '" + roleURI + "' for user '"
-					+ user.getURI() + "'");
-			return 1;
-		}
 	}
 
 }

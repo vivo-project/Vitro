@@ -119,10 +119,10 @@ public class AuthenticateTest extends AbstractTestClass {
 		userDao.addUser(createUserFromUserInfo(OLD_DBA));
 		userDao.addUser(createUserFromUserInfo(OLD_SELF));
 		userDao.addUser(createUserFromUserInfo(OLD_STRANGER));
-		
+
 		webappDaoFactory = new WebappDaoFactoryStub();
 		webappDaoFactory.setUserDao(userDao);
-		
+
 		servletContext = new ServletContextStub();
 		servletContext.setAttribute("webappDaoFactory", webappDaoFactory);
 
@@ -394,7 +394,8 @@ public class AuthenticateTest extends AbstractTestClass {
 		doTheRequest();
 
 		assertProcessBean(FORCED_PASSWORD_CHANGE, NEW_DBA_NAME, NO_MSG,
-				"Your new password cannot match the current one.", URL_LOGIN, URL_WITH_LINK);
+				"Your new password cannot match the current one.", URL_LOGIN,
+				URL_WITH_LINK);
 		assertRedirectToLoginProcessPage();
 	}
 
@@ -415,8 +416,7 @@ public class AuthenticateTest extends AbstractTestClass {
 	@Test
 	public void alreadyLoggedIn() {
 		LoginStatusBean statusBean = new LoginStatusBean(OLD_DBA_URI,
-				OLD_DBA_NAME, OLD_DBA_SECURITY_LEVEL,
-				AuthenticationSource.INTERNAL);
+				OLD_DBA_NAME, AuthenticationSource.INTERNAL);
 		LoginStatusBean.setBean(session, statusBean);
 		setRequestFromLoginLink(URL_WITH_LINK);
 
@@ -471,14 +471,14 @@ public class AuthenticateTest extends AbstractTestClass {
 	public void exitDbaFromLoginPage() {
 		setProcessBean(LOGGING_IN, NO_USER, URL_LOGIN, URL_LOGIN);
 		setLoginNameAndPassword(OLD_DBA_NAME, OLD_DBA_PW);
-		
+
 		doTheRequest();
-		
+
 		assertNoProcessBean();
 		assertNewLoginSessions(OLD_DBA_NAME);
 		assertRedirect(URL_SITE_ADMIN);
 	}
-	
+
 	// ----------------------------------------------------------------------
 	// Helper methods
 	// ----------------------------------------------------------------------

@@ -2,10 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.filtering.filters;
 
-import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.CURATOR;
-import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.DBA;
-import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.EDITOR;
-import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.NON_EDITOR;
 import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource.INTERNAL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -25,8 +21,10 @@ import org.junit.runners.Parameterized.Parameters;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDaoStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.IndividualDaoStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDaoStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.dao.UserDaoStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryStub;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
@@ -37,6 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
+import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 
 /**
@@ -95,15 +94,49 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 
 	private static final String NS = "http://someDomain/individual/";
 
+	private static final String ROLE_NON_EDITOR = "1";
+	private static final String ROLE_EDITOR = "4";
+	private static final String ROLE_CURATOR = "5";
+	private static final String ROLE_DBA = "50";
+
+	private static final User USER_SELF = user("userSelf", "self_editor",
+			ROLE_NON_EDITOR);
+	private static final User USER_EDITOR = user("userEditor", "editor",
+			ROLE_EDITOR);
+	private static final User USER_CURATOR = user("userCurator", "curator",
+			ROLE_CURATOR);
+	private static final User USER_DBA = user(NS + "userDba", "dba", ROLE_DBA);
+
+	/** Create a User */
+	private static User user(String uri, String username, String roleUri) {
+		User user = new User();
+		user.setURI(NS + uri);
+		user.setUsername(username);
+		user.setRoleURI(roleUri);
+		return user;
+	}
+
+	private static final UserDaoStub DAO_USER = userDao(USER_SELF, USER_EDITOR,
+			USER_CURATOR, USER_DBA);
+
+	/** Create the UserDao */
+	private static UserDaoStub userDao(User... users) {
+		UserDaoStub dao = new UserDaoStub();
+		for (User user : users) {
+			dao.addUser(user);
+		}
+		return dao;
+	}
+
 	private static final LoginStatusBean LOGIN_NONE = null;
-	private static final LoginStatusBean LOGIN_SELF = new LoginStatusBean(NS
-			+ "userSelf", "self_editor", NON_EDITOR, INTERNAL);
-	private static final LoginStatusBean LOGIN_EDITOR = new LoginStatusBean(NS
-			+ "userEditor", "editor", EDITOR, INTERNAL);
-	private static final LoginStatusBean LOGIN_CURATOR = new LoginStatusBean(NS
-			+ "userCurator", "curator", CURATOR, INTERNAL);
-	private static final LoginStatusBean LOGIN_DBA = new LoginStatusBean(NS
-			+ "userDba", "dba", DBA, INTERNAL);
+	private static final LoginStatusBean LOGIN_SELF = loginStatusBean(
+			USER_SELF, INTERNAL);
+	private static final LoginStatusBean LOGIN_EDITOR = loginStatusBean(
+			USER_EDITOR, INTERNAL);
+	private static final LoginStatusBean LOGIN_CURATOR = loginStatusBean(
+			USER_CURATOR, INTERNAL);
+	private static final LoginStatusBean LOGIN_DBA = loginStatusBean(USER_DBA,
+			INTERNAL);
 
 	private static final LoginStatusBean[] LOGINS = new LoginStatusBean[] {
 			LOGIN_NONE, LOGIN_SELF, LOGIN_EDITOR, LOGIN_CURATOR, LOGIN_DBA };
@@ -133,6 +166,11 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 		i.setURI("uri:" + moniker);
 		i.setHiddenFromDisplayBelowRoleLevel(displayThreshhold);
 		return i;
+	}
+
+	private static LoginStatusBean loginStatusBean(User user,
+			AuthenticationSource auth) {
+		return new LoginStatusBean(user.getURI(), user.getUsername(), auth);
 	}
 
 	private static final VClass PUBLIC_VCLASS = vClass("PUBLIC_vclass",
@@ -739,21 +777,32 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 	}
 
 	public static RoleLevel getRoleLevel(LoginStatusBean loginStatus) {
-		if (loginStatus != null) {
-			switch (loginStatus.getSecurityLevel()) {
-			case LoginStatusBean.NON_EDITOR:
-				return RoleLevel.SELF;
-			case LoginStatusBean.EDITOR:
-				return RoleLevel.EDITOR;
-			case LoginStatusBean.CURATOR:
-				return RoleLevel.CURATOR;
-			case LoginStatusBean.DBA:
-				return RoleLevel.DB_ADMIN;
-			default:
-				break;
-			}
+		if (loginStatus == null) {
+			return RoleLevel.PUBLIC;
 		}
-		return RoleLevel.PUBLIC;
+
+		String userUri = loginStatus.getUserURI();
+		if (userUri == null) {
+			return RoleLevel.PUBLIC;
+		}
+
+		User user = DAO_USER.getUserByURI(userUri);
+		if (user == null) {
+			return RoleLevel.PUBLIC;
+		}
+
+		String roleURI = user.getRoleURI();
+		if ("1".equals(roleURI)) {
+			return RoleLevel.SELF;
+		} else if ("4".equals(roleURI)) {
+			return RoleLevel.EDITOR;
+		} else if ("5".equals(roleURI)) {
+			return RoleLevel.CURATOR;
+		} else if ("50".equals(roleURI)) {
+			return RoleLevel.DB_ADMIN;
+		} else {
+			return RoleLevel.PUBLIC;
+		}
 	}
 
 	// ----------------------------------------------------------------------
