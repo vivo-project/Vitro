@@ -116,7 +116,7 @@
 
 <form method="POST" action="${formUrls.list}" id="account-display" class="customForm" role="">
     <section class="accounts">
-        <input type="submit" class="submit delete-account" value="Delete" onClick="changeAction(this.form, '${formUrls.delete}')" />
+        <input type="submit" class="delete-account submit" value="Delete" onClick="changeAction(this.form, '${formUrls.delete}')" />
         <!-- 
             When this is clicked, the checkboxes are noticed and all other fields are ignored. 
             submit the form (submit action is formUrls.delete)
@@ -158,14 +158,14 @@
             <tr>
                 <th scope="col">
                     <div>
-                        <input class="hide" type="checkbox" name="delete-all" id="">Email Address<span></span>
+                        <input class="hide" type="checkbox" name="delete-all" id="">Email Address <a href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=ASC"><img class="middle" src="${urls.themeImages}/sort-asc.gif" /></a> <a href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=DESC"><img src="${urls.themeImages}/sort-desc.gif" /></a>
                     </div>
                 </th>
-                <th scope="col"><div>First name <a href="?accountsPerPage=${accountsPerPage}&orderField=firstName&orderDirection=ASC"><img class="middle" src="${urls.themeImages}/sort-asc.gif" /></a> <a href="?accountsPerPage=${accountsPerPage}&orderField=firstNameorderDirection=DEC"><img src="${urls.themeImages}/sort-desc.gif" /></a></div></th>
-                <th scope="col"><div>Last Name<span></span></div></th>
-                <th scope="col"><div>Status<span></span></div></th>
+                <th scope="col"><div>First name <a href="?accountsPerPage=${accountsPerPage}&orderField=firstName&orderDirection=ASC"><img class="middle" src="${urls.themeImages}/sort-asc.gif" /></a> <a href="?accountsPerPage=${accountsPerPage}&orderField=firstName&orderDirection=DESC"><img src="${urls.themeImages}/sort-desc.gif" /></a></div></th>
+                <th scope="col"><div>Last Name <a href="?accountsPerPage=${accountsPerPage}&orderField=lastName&orderDirection=ASC"><img class="middle" src="${urls.themeImages}/sort-asc.gif" /></a> <a href="?accountsPerPage=${accountsPerPage}&orderField=lastName&orderDirection=DESC"><img src="${urls.themeImages}/sort-desc.gif" /></a></div></th>
+                <th scope="col"><div>Status <a href="?accountsPerPage=${accountsPerPage}&orderField=status&orderDirection=ASC"><img class="middle" src="${urls.themeImages}/sort-asc.gif" /></a> <a href="?accountsPerPage=${accountsPerPage}&orderField=status&orderDirection=DESC"><img src="${urls.themeImages}/sort-desc.gif" /></a></div></th>
                 <th scope="col"><div>Roles</div></th>
-                <th scope="col"><div>Login Count<span></span></div></th>
+                <th scope="col"><div>Login Count <a href="?accountsPerPage=${accountsPerPage}&orderField=count&orderDirection=ASC"><img class="middle" src="${urls.themeImages}/sort-asc.gif" /></a> <a href="?accountsPerPage=${accountsPerPage}&orderField=count&orderDirection=DESC"><img src="${urls.themeImages}/sort-desc.gif" /></a></div></th>
             </tr>
         </thead>
     
