@@ -13,6 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsPage;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailMessage;
@@ -180,7 +181,7 @@ public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 
 		@Override
 		protected void setAdditionalProperties(UserAccount u) {
-			u.setMd5Password(initialPassword);
+			u.setMd5Password(Authenticator.applyMd5Encoding(initialPassword));
 			u.setPasswordChangeRequired(true);
 			u.setStatus(Status.ACTIVE);
 		}
