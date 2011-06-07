@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate;
@@ -46,7 +47,7 @@ public class BasicAuthenticator extends Authenticator {
 		}
 		return userAccountsDao.getUserAccountByEmail(emailAddress);
 	}
-	
+
 	@Override
 	public UserAccount getAccountForExternalAuth(String externalAuthId) {
 		UserAccountsDao userAccountsDao = getUserAccountsDao();
@@ -102,7 +103,6 @@ public class BasicAuthenticator extends Authenticator {
 		}
 		return false;
 	}
-
 
 	@Override
 	public List<String> getAssociatedIndividualUris(UserAccount userAccount) {
@@ -195,22 +195,22 @@ public class BasicAuthenticator extends Authenticator {
 	}
 
 	private List<String> getUrisAssociatedBySelfEditorConfig(UserAccount user) {
+		List<String> uris = new ArrayList<String>();
 		if (user == null) {
-			return Collections.emptyList();
+			return uris;
 		}
 
 		IndividualDao iDao = getIndividualDao();
 		if (iDao == null) {
-			return Collections.emptyList();
+			return uris;
 		}
 
-		String selfEditorUri = SelfEditingConfiguration.getBean(request)
-				.getIndividualUriFromUsername(iDao, user.getExternalAuthId());
-		if (selfEditorUri == null) {
-			return Collections.emptyList();
-		} else {
-			return Collections.singletonList(selfEditorUri);
+		List<Individual> associatedIndividuals = SelfEditingConfiguration
+				.getBean(request).getAssociatedIndividuals(iDao, user);
+		for (Individual ind : associatedIndividuals) {
+			uris.add(ind.getURI());
 		}
+		return uris;
 	}
 
 	@Override
@@ -238,15 +238,15 @@ public class BasicAuthenticator extends Authenticator {
 		if (wadf == null) {
 			return null;
 		}
-		
+
 		UserAccountsDao userAccountsDao = wadf.getUserAccountsDao();
 		if (userAccountsDao == null) {
 			log.error("getUserAccountsDao: no UserAccountsDao");
 		}
-		
+
 		return userAccountsDao;
 	}
-	
+
 	/**
 	 * Get a reference to the IndividualDao, or null.
 	 */

@@ -14,6 +14,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showAuth.css" /
             <tr><th>First name:</th><td>${currentUser.firstName}</td></tr>
             <tr><th>Last name:</th><td>${currentUser.lastName}</td></tr>
             <tr><th>Email:</th><td>${currentUser.emailAddress}</td></tr>
+            <tr><th>External Auth ID:</th><td>${currentUser.externalAuthId}</td></tr>
             <tr><th>Login count:</th><td>${currentUser.loginCount}</td></tr>
             <#list currentUser.permissionSetUris as role>
                 <tr><th>Role:</th><td>${role}</td></tr>

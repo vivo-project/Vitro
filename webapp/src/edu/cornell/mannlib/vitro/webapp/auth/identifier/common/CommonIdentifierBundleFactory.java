@@ -100,6 +100,12 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 		return ids;
 	}
 
+	/**
+	 * Get all Individuals associated with the current user.
+	 * 
+	 * TODO Currently only uses the matching property. Should also use
+	 * "mayEditAs" type of association.
+	 */
 	private Collection<Individual> getAssociatedIndividuals(
 			HttpServletRequest req) {
 		Collection<Individual> individuals = new ArrayList<Individual>();
@@ -109,7 +115,6 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 			log.debug("No Associated Individuals: not logged in.");
 			return individuals;
 		}
-		String emailAddress = user.getEmailAddress();
 
 		WebappDaoFactory wdf = (WebappDaoFactory) context
 				.getAttribute("webappDaoFactory");
@@ -121,22 +126,8 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 		IndividualDao indDao = wdf.getIndividualDao();
 
 		SelfEditingConfiguration sec = SelfEditingConfiguration.getBean(req);
-		String uri = sec.getIndividualUriFromUsername(indDao, emailAddress);
-		if (uri == null) {
-			log.debug("Could not find an Individual with a netId of "
-					+ emailAddress);
-			return individuals;
-		}
+		individuals.addAll(sec.getAssociatedIndividuals(indDao, user));
 
-		Individual ind = indDao.getIndividualByURI(uri);
-		if (ind == null) {
-			log.warn("Found a URI for the netId " + emailAddress
-					+ " but could not build Individual");
-			return individuals;
-		}
-		log.debug("Found an Individual for netId " + emailAddress + " URI: " + uri);
-
-		individuals.add(ind);
 		return individuals;
 	}
 

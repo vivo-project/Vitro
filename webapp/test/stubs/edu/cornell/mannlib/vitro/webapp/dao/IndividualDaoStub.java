@@ -206,13 +206,6 @@ public class IndividualDaoStub implements IndividualDao {
 	}
 
 	@Override
-	public String getIndividualURIFromNetId(String netIdStr,
-			String netidMatchingPropertyUri) {
-		throw new RuntimeException(
-				"IndividualDaoStub.getIndividualURIFromNetId() not implemented.");
-	}
-
-	@Override
 	public String getNetId(String entityURI) {
 		throw new RuntimeException(
 				"IndividualDaoStub.getNetId() not implemented.");
