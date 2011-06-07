@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.RevisionInfoController;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.SiteAdminController;
@@ -11,8 +12,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.SiteAdminControlle
 public class User extends BaseTemplateModel {
     private final VitroRequest vreq;
 
-    // TODO JB Modify this to use UserAccount instead of User.
-    private final edu.cornell.mannlib.vitro.webapp.beans.User currentUser;
+    private final UserAccount currentUser;
     
     public User(VitroRequest vreq) {
         this.vreq = vreq;
@@ -24,7 +24,7 @@ public class User extends BaseTemplateModel {
     }
     
     public String getEmailAddress() {
-		return (currentUser == null) ? "" : currentUser.getUsername();
+		return (currentUser == null) ? "" : currentUser.getEmailAddress();
     }
     
     public String getLoginName() {

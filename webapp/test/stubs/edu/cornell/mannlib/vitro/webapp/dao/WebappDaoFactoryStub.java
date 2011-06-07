@@ -45,6 +45,7 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	private IndividualDao individualDao;
 	private DataPropertyDao dataPropertyDao;
 	private ObjectPropertyDao objectPropertyDao;
+	private UserAccountsDao userAccountsDao;
 
 	public void setIndividualDao(IndividualDao individualDao) {
 		this.individualDao = individualDao;
@@ -58,10 +59,8 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 		this.objectPropertyDao = objectPropertyDao;
 	}
 
-	// TODO This goes away when the UserAccounts stuff is fully implemented -- jb
-	private UserDao userDao;
-	public void setUserDao(UserDao userDao) {
-		this.userDao = userDao;
+	public void setUserAccountsDao(UserAccountsDao userAccountsDao) {
+		this.userAccountsDao = userAccountsDao;
 	}
 
 	// ----------------------------------------------------------------------
@@ -83,10 +82,9 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 		return this.objectPropertyDao;
 	}
 
-    // TODO This goes away when the UserAccounts stuff is fully implemented -- jb
 	@Override
-	public UserDao getUserDao() {
-		return this.userDao;
+	public UserAccountsDao getUserAccountsDao() {
+		return this.userAccountsDao;
 	}
 
 	// ----------------------------------------------------------------------
@@ -226,12 +224,6 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	}
 
 	@Override
-	public UserAccountsDao getUserAccountsDao() {
-		throw new RuntimeException(
-		"WebappDaoFactory.getUserAccountsDao() not implemented.");
-	}
-	
-	@Override
 	public VClassGroupDao getVClassGroupDao() {
 		throw new RuntimeException(
 				"WebappDaoFactory.getVClassGroupDao() not implemented.");
@@ -270,6 +262,11 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	@Override
 	public void close() {
 		throw new RuntimeException("WebappDaoFactory.close() not implemented.");
+	}
+
+	@Override
+	public UserDao getUserDao() {
+		throw new RuntimeException("WebappDaoFactory.getUserDao() not implemented.");
 	}
 
 }

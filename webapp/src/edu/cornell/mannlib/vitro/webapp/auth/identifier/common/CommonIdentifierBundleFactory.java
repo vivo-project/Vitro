@@ -22,7 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
-import edu.cornell.mannlib.vitro.webapp.beans.User;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
@@ -104,12 +104,12 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 			HttpServletRequest req) {
 		Collection<Individual> individuals = new ArrayList<Individual>();
 
-		User user = LoginStatusBean.getCurrentUser(req);
+		UserAccount user = LoginStatusBean.getCurrentUser(req);
 		if (user == null) {
 			log.debug("No Associated Individuals: not logged in.");
 			return individuals;
 		}
-		String username = user.getUsername();
+		String emailAddress = user.getEmailAddress();
 
 		WebappDaoFactory wdf = (WebappDaoFactory) context
 				.getAttribute("webappDaoFactory");
@@ -121,20 +121,20 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 		IndividualDao indDao = wdf.getIndividualDao();
 
 		SelfEditingConfiguration sec = SelfEditingConfiguration.getBean(req);
-		String uri = sec.getIndividualUriFromUsername(indDao, username);
+		String uri = sec.getIndividualUriFromUsername(indDao, emailAddress);
 		if (uri == null) {
 			log.debug("Could not find an Individual with a netId of "
-					+ username);
+					+ emailAddress);
 			return individuals;
 		}
 
 		Individual ind = indDao.getIndividualByURI(uri);
 		if (ind == null) {
-			log.warn("Found a URI for the netId " + username
+			log.warn("Found a URI for the netId " + emailAddress
 					+ " but could not build Individual");
 			return individuals;
 		}
-		log.debug("Found an Individual for netId " + username + " URI: " + uri);
+		log.debug("Found an Individual for netId " + emailAddress + " URI: " + uri);
 
 		individuals.add(ind);
 		return individuals;

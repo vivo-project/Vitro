@@ -104,6 +104,30 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 	}
 
 	@Override
+	public UserAccount getUserAccountByExternalAuthId(String externalAuthId) {
+		if (externalAuthId == null) {
+			return null;
+		}
+		
+		String userUri = null;
+		
+		getOntModel().enterCriticalSection(Lock.READ);
+		try {
+			StmtIterator stmts = getOntModel().listStatements(null,
+					USERACCOUNT_EXTERNAL_AUTH_ID,
+					getOntModel().createLiteral(externalAuthId));
+			if (stmts.hasNext()) {
+				userUri = stmts.next().getSubject().getURI();
+			}
+			stmts.close();
+		} finally {
+			getOntModel().leaveCriticalSection();
+		}
+
+		return getUserAccountByUri(userUri);
+	}
+
+	@Override
 	public String insertUserAccount(UserAccount userAccount) {
 		if (userAccount == null) {
 			throw new NullPointerException("userAccount may not be null.");
@@ -324,4 +348,5 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 			return ps1.getUri().compareTo(ps2.getUri());
 		}
 	}
+
 }

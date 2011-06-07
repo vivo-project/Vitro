@@ -17,6 +17,7 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader;
 import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
@@ -31,11 +32,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  */
 public class UpdateUserAccounts implements ServletContextListener {
 	private static final Log log = LogFactory.getLog(UpdateUserAccounts.class);
-
-	private static final String URI_PERMISSION_SET_SELF_EDITOR = "http://permissionSet-1";
-	private static final String URI_PERMISSION_SET_EDITOR = "http://permissionSet-2";
-	private static final String URI_PERMISSION_SET_CURATOR = "http://permissionSet-3";
-	private static final String URI_PERMISSION_SET_DBA = "http://permissionSet-4";
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
@@ -149,13 +145,13 @@ public class UpdateUserAccounts implements ServletContextListener {
 		}
 
 		private Set<String> translateFromRoleUri(String roleUri) {
-			String permissionSetUri = URI_PERMISSION_SET_SELF_EDITOR;
+			String permissionSetUri = PermissionSetsLoader.URI_SELF_EDITOR;
 			if ("4".equals(roleUri)) {
-				permissionSetUri = URI_PERMISSION_SET_EDITOR;
+				permissionSetUri = PermissionSetsLoader.URI_EDITOR;
 			} else if ("5".equals(roleUri)) {
-				permissionSetUri = URI_PERMISSION_SET_CURATOR;
+				permissionSetUri = PermissionSetsLoader.URI_CURATOR;
 			} else if ("50".equals(roleUri)) {
-				permissionSetUri = URI_PERMISSION_SET_DBA;
+				permissionSetUri = PermissionSetsLoader.URI_DBA;
 			}
 			return Collections.singleton(permissionSetUri);
 		}

@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -19,10 +18,10 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
-import edu.cornell.mannlib.vitro.webapp.beans.User;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
+import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LogoutEvent;
@@ -40,75 +39,98 @@ public class BasicAuthenticator extends Authenticator {
 	}
 
 	@Override
-	public boolean isExistingUser(String username) {
-		return getUserByUsername(username) != null;
-	}
-
-	@Override
-	public User getUserByUsername(String username) {
-		UserDao userDao = getUserDao();
-		if (userDao == null) {
+	public UserAccount getAccountForInternalAuth(String emailAddress) {
+		UserAccountsDao userAccountsDao = getUserAccountsDao();
+		if (userAccountsDao == null) {
 			return null;
 		}
-		return userDao.getUserByUsername(username);
+		return userAccountsDao.getUserAccountByEmail(emailAddress);
+	}
+	
+	@Override
+	public UserAccount getAccountForExternalAuth(String externalAuthId) {
+		UserAccountsDao userAccountsDao = getUserAccountsDao();
+		if (userAccountsDao == null) {
+			return null;
+		}
+		return userAccountsDao.getUserAccountByExternalAuthId(externalAuthId);
 	}
 
 	@Override
-	public boolean isCurrentPassword(String username, String clearTextPassword) {
-		User user = getUserDao().getUserByUsername(username);
-		if (user == null) {
-			log.trace("Checking password '" + clearTextPassword
-					+ "' for user '" + username + "', but user doesn't exist.");
+	public boolean isCurrentPassword(UserAccount userAccount,
+			String clearTextPassword) {
+		if (userAccount == null) {
 			return false;
 		}
-
-		String md5NewPassword = applyMd5Encoding(clearTextPassword);
-		return md5NewPassword.equals(user.getMd5password());
+		if (clearTextPassword == null) {
+			return false;
+		}
+		String encodedPassword = applyMd5Encoding(clearTextPassword);
+		return encodedPassword.equals(userAccount.getMd5Password());
 	}
 
 	@Override
-	public boolean isPasswordChangeRequired(String username) {
-		User user = getUserDao().getUserByUsername(username);
-		if ((user != null) && (user.getLoginCount() == 0)) {
+	public void recordNewPassword(UserAccount userAccount,
+			String newClearTextPassword) {
+		if (userAccount == null) {
+			log.error("Trying to change password on null user.");
+			return;
+		}
+		userAccount.setMd5Password(applyMd5Encoding(newClearTextPassword));
+		userAccount.setPasswordChangeRequired(false);
+		userAccount.setPasswordLinkExpires(0L);
+		getUserAccountsDao().updateUserAccount(userAccount);
+	}
+
+	@Override
+	public boolean accountRequiresEditing(UserAccount userAccount) {
+		if (userAccount == null) {
+			log.error("Trying to check for valid fields on a null user.");
+			return false;
+		}
+		if (userAccount.getFirstName().isEmpty()) {
 			return true;
-		} else {
-			return false;
 		}
+		if (userAccount.getLastName().isEmpty()) {
+			return true;
+		}
+		if (userAccount.getEmailAddress().isEmpty()) {
+			return true;
+		}
+		if (!isValidEmailAddress(userAccount.getEmailAddress())) {
+			return true;
+		}
+		return false;
+	}
+
+
+	@Override
+	public List<String> getAssociatedIndividualUris(UserAccount userAccount) {
+		List<String> uris = new ArrayList<String>();
+		if (userAccount == null) {
+			return uris;
+		}
+		uris.addAll(getUrisAssociatedBySelfEditorConfig(userAccount));
+		return uris;
 	}
 
 	@Override
-	public void recordNewPassword(String username, String newClearTextPassword) {
-		User user = getUserByUsername(username);
-		if (user == null) {
-			log.error("Trying to change password on non-existent user: "
-					+ username);
-			return;
-		}
-		user.setOldPassword(user.getMd5password());
-		user.setMd5password(applyMd5Encoding(newClearTextPassword));
-		getUserDao().updateUser(user);
-	}
-
-	@Override
-	public void recordLoginAgainstUserAccount(String username,
+	public void recordLoginAgainstUserAccount(UserAccount userAccount,
 			AuthenticationSource authSource) {
-		User user = getUserByUsername(username);
-		if (user == null) {
-			log.error("Trying to record the login of a non-existent user: "
-					+ username);
+		if (userAccount == null) {
+			log.error("Trying to record the login of a null user. ");
 			return;
 		}
 
-		recordLoginOnUserRecord(user);
-
-		String userUri = user.getURI();
-		recordLoginWithOrWithoutUserAccount(userUri, authSource);
+		recordLoginOnUserRecord(userAccount);
+		recordLoginWithOrWithoutUserAccount(userAccount.getUri(), authSource);
 	}
 
+	// TODO JB This goes away.
 	@Override
-	public void recordLoginWithoutUserAccount(String username,
-			String individualUri, AuthenticationSource authSource) {
-		recordLoginWithOrWithoutUserAccount(individualUri, authSource);
+	public void recordLoginWithoutUserAccount(String individualUri) {
+		recordLoginWithOrWithoutUserAccount(individualUri,
+				AuthenticationSource.EXTERNAL);
 	}
 
 	/** This much is in common on login, whether or not you have a user account. */
@@ -124,12 +146,9 @@ public class BasicAuthenticator extends Authenticator {
 	/**
 	 * Update the user record to record the login.
 	 */
-	private void recordLoginOnUserRecord(User user) {
-		user.setLoginCount(user.getLoginCount() + 1);
-		if (user.getFirstTime() == null) { // first login
-			user.setFirstTime(new Date());
-		}
-		getUserDao().updateUser(user);
+	private void recordLoginOnUserRecord(UserAccount userAccount) {
+		userAccount.setLoginCount(userAccount.getLoginCount() + 1);
+		getUserAccountsDao().updateUserAccount(userAccount);
 	}
 
 	/**
@@ -175,16 +194,8 @@ public class BasicAuthenticator extends Authenticator {
 				session.getServletContext(), session);
 	}
 
-	@Override
-	public List<String> getAssociatedIndividualUris(String username) {
-		List<String> uris = new ArrayList<String>();
-		uris.addAll(getUrisAssociatedBySelfEditorConfig(username));
-		uris.addAll(getUrisAssociatedByMayEditAs(username));
-		return uris;
-	}
-
-	private List<String> getUrisAssociatedBySelfEditorConfig(String username) {
-		if (username == null) {
+	private List<String> getUrisAssociatedBySelfEditorConfig(UserAccount user) {
+		if (user == null) {
 			return Collections.emptyList();
 		}
 
@@ -194,35 +205,12 @@ public class BasicAuthenticator extends Authenticator {
 		}
 
 		String selfEditorUri = SelfEditingConfiguration.getBean(request)
-				.getIndividualUriFromUsername(iDao, username);
+				.getIndividualUriFromUsername(iDao, user.getExternalAuthId());
 		if (selfEditorUri == null) {
 			return Collections.emptyList();
 		} else {
 			return Collections.singletonList(selfEditorUri);
 		}
-	}
-
-	private List<String> getUrisAssociatedByMayEditAs(String username) {
-		if (username == null) {
-			return Collections.emptyList();
-		}
-
-		UserDao userDao = getUserDao();
-		if (userDao == null) {
-			return Collections.emptyList();
-		}
-
-		User user = userDao.getUserByUsername(username);
-		if (user == null) {
-			return Collections.emptyList();
-		}
-
-		String userUri = user.getURI();
-		if (userUri == null) {
-			return Collections.emptyList();
-		}
-
-		return userDao.getIndividualsUserMayEditAs(userUri);
 	}
 
 	@Override
@@ -233,44 +221,32 @@ public class BasicAuthenticator extends Authenticator {
 	}
 
 	private void notifyOtherUsersOfLogout(HttpSession session) {
-		LoginStatusBean loginBean = LoginStatusBean.getBean(session);
-		if (!loginBean.isLoggedIn()) {
+		String userUri = LoginStatusBean.getBean(session).getUserURI();
+		if ((userUri == null) || userUri.isEmpty()) {
 			return;
 		}
 
-		UserDao userDao = getUserDao();
-		if (userDao == null) {
-			return;
-		}
-
-		String userUri = loginBean.getUserURI();
-		User user = userDao.getUserByURI(userUri);
-		if (user == null) {
-			log.error("Unable to retrieve user " + userUri + " from model");
-			return;
-		}
-
-		Authenticate.sendLoginNotifyEvent(new LogoutEvent(user.getURI()),
+		Authenticate.sendLoginNotifyEvent(new LogoutEvent(userUri),
 				session.getServletContext(), session);
 	}
 
 	/**
-	 * Get a reference to the UserDao, or null.
+	 * Get a reference to the UserAccountsDao, or null.
 	 */
-	private UserDao getUserDao() {
+	private UserAccountsDao getUserAccountsDao() {
 		WebappDaoFactory wadf = getWebappDaoFactory();
 		if (wadf == null) {
 			return null;
 		}
-
-		UserDao userDao = wadf.getUserDao();
-		if (userDao == null) {
-			log.error("getUserDao: no UserDao");
+		
+		UserAccountsDao userAccountsDao = wadf.getUserAccountsDao();
+		if (userAccountsDao == null) {
+			log.error("getUserAccountsDao: no UserAccountsDao");
 		}
-
-		return userDao;
+		
+		return userAccountsDao;
 	}
-
+	
 	/**
 	 * Get a reference to the IndividualDao, or null.
 	 */

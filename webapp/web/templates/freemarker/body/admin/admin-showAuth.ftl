@@ -10,12 +10,14 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showAuth.css" /
     <#if currentUser?has_content>
         <table summary="Information about the current user" style="border: 1">
             <caption>Current user</caption>
-            <tr><th>URI:</th><td>${currentUser.URI}</td></tr>
+            <tr><th>URI:</th><td>${currentUser.uri}</td></tr>
             <tr><th>First name:</th><td>${currentUser.firstName}</td></tr>
             <tr><th>Last name:</th><td>${currentUser.lastName}</td></tr>
-            <tr><th>Username:</th><td>${currentUser.username}</td></tr>
+            <tr><th>Email:</th><td>${currentUser.emailAddress}</td></tr>
             <tr><th>Login count:</th><td>${currentUser.loginCount}</td></tr>
-            <tr><th>Role:</th><td>${currentUser.roleURI}</td></tr>
+            <#list currentUser.permissionSetUris as role>
+                <tr><th>Role:</th><td>${role}</td></tr>
+            </#list>
         </table>
     <#else>
         <h3>Not logged in</h3>

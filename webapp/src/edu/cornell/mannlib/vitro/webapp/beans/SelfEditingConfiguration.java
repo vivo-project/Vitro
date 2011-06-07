@@ -87,6 +87,7 @@ public class SelfEditingConfiguration {
 		}
 	}
 
+	// TODO JB This should move to UserAccountsDao.
 	public String getIndividualUriFromUsername(IndividualDao indDao,
 			String username) {
 		if (indDao == null) {

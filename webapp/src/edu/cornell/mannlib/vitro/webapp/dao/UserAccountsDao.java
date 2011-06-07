@@ -29,6 +29,13 @@ public interface UserAccountsDao {
 	UserAccount getUserAccountByEmail(String emailAddress);
 
 	/**
+	 * Get the UserAccount for this External Authentication ID
+	 * 
+	 * @return null if the ID is null, or if there is no such UserAccount
+	 */
+	UserAccount getUserAccountByExternalAuthId(String externalAuthId);
+
+	/**
 	 * Create a new UserAccount in the model.
 	 * 
 	 * On entry, the URI of the UserAccount should be empty. On exit, the URI

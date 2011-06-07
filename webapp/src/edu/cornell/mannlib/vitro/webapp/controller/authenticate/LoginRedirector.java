@@ -18,10 +18,9 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
-import edu.cornell.mannlib.vitro.webapp.beans.User;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
-import freemarker.template.utility.StringUtil;
 
 /**
  * A user has just completed the login process. What page do we direct them to?
@@ -51,23 +50,22 @@ public class LoginRedirector {
 
 	/** Is there an Individual associated with this user? */
 	private String getAssociatedIndividualUri() {
-		User user = LoginStatusBean.getCurrentUser(request);
-		if (user == null) {
-			log.warn("Not logged in? How did we get here?");
+		UserAccount userAccount = LoginStatusBean.getCurrentUser(request);
+		if (userAccount == null) {
+			log.debug("Not logged in? Must be cancelling the password change");
 			return null;
 		}
-		String username = user.getUsername();
 
 		List<String> uris = Authenticator.getInstance(request)
-				.getAssociatedIndividualUris(username);
+				.getAssociatedIndividualUris(userAccount);
 		if (uris.isEmpty()) {
-			log.debug("'" + username
+			log.debug("'" + userAccount.getEmailAddress()
 					+ "' is not associated with an individual.");
 			return null;
 		} else {
 			String uri = uris.get(0);
-			log.debug("'" + username + "' is associated with an individual: "
-					+ uri);
+			log.debug("'" + userAccount.getEmailAddress()
+					+ "' is associated with an individual: " + uri);
 			return uri;
 		}
 	}
@@ -111,13 +109,13 @@ public class LoginRedirector {
 		String backString = "";
 		String greeting = "";
 
-		User user = LoginStatusBean.getCurrentUser(request);
-		if (user != null) {
-			greeting = user.getUsername();
-			if (user.getLoginCount() > 1) {
+		UserAccount userAccount = LoginStatusBean.getCurrentUser(request);
+		if (userAccount != null) {
+			greeting = userAccount.getEmailAddress();
+			if (userAccount.getLoginCount() > 1) {
 				backString = " back";
 			}
-			String name = user.getFirstName();
+			String name = userAccount.getFirstName();
 			if (!StringUtils.isEmpty(name)) {
 				greeting = name;
 			}
