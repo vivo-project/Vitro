@@ -84,4 +84,10 @@ public class UserAccountsDaoStub implements UserAccountsDao {
 				"UserAccountsDao.getUserAccountByExternalAuthId() not implemented.");
 	}
 
+	@Override
+	public Collection<UserAccount> getAllUserAccounts() {
+		throw new RuntimeException(
+				"UserAccountsDao.getAllUserAccounts() not implemented.");
+	}
+
 }

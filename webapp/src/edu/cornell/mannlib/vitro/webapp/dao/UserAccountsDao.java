@@ -14,6 +14,11 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 public interface UserAccountsDao {
 
 	/**
+	 * Get all of the UserAccounts in the model.
+	 */
+	Collection<UserAccount> getAllUserAccounts();
+
+	/**
 	 * Get the UserAccount for this URI.
 	 * 
 	 * @return null if the URI is null, or if there is no such UserAccount

@@ -28,6 +28,11 @@ public class UserAccountsDaoFiltering extends BaseFiltering implements
 	}
 
 	@Override
+	public Collection<UserAccount> getAllUserAccounts() {
+		return innerDao.getAllUserAccounts();
+	}
+
+	@Override
 	public UserAccount getUserAccountByUri(String uri) {
 		return innerDao.getUserAccountByUri(uri);
 	}

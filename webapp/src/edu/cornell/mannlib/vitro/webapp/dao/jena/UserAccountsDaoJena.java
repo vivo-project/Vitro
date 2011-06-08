@@ -39,6 +39,36 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 	}
 
 	@Override
+	public Collection<UserAccount> getAllUserAccounts() {
+		List<String> userUris = new ArrayList<String>();
+
+		getOntModel().enterCriticalSection(Lock.READ);
+		try {
+			StmtIterator stmts = getOntModel().listStatements((Resource) null,
+					RDF.type, USERACCOUNT);
+			while (stmts.hasNext()) {
+				Resource subject = stmts.next().getSubject();
+				if (subject != null) {
+					userUris.add(subject.getURI());
+				}
+			}
+			stmts.close();
+		} finally {
+			getOntModel().leaveCriticalSection();
+		}
+
+		List<UserAccount> userAccounts = new ArrayList<UserAccount>();
+		for (String userUri : userUris) {
+			UserAccount ua = getUserAccountByUri(userUri);
+			if (ua != null) {
+				userAccounts.add(ua);
+			}
+		}
+
+		return userAccounts;
+	}
+
+	@Override
 	public UserAccount getUserAccountByUri(String uri) {
 		if (uri == null) {
 			return null;
@@ -108,9 +138,9 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 		if (externalAuthId == null) {
 			return null;
 		}
-		
+
 		String userUri = null;
-		
+
 		getOntModel().enterCriticalSection(Lock.READ);
 		try {
 			StmtIterator stmts = getOntModel().listStatements(null,
