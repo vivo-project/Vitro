@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -29,15 +30,16 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     // Used for editing
     private String objectUri = null;
     private String templateName = null;
-
+    private VitroRequest vitroRequest = null;
+    //Updating to include Vitro Request
     ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, String objectKey, 
-            Map<String, String> data, EditingPolicyHelper policyHelper, String templateName) {
+            Map<String, String> data, EditingPolicyHelper policyHelper, String templateName, VitroRequest vreq) {
         super(subjectUri, propertyUri, policyHelper);
         
         this.data = data;
         this.objectUri = data.get(objectKey);
         this.templateName = templateName;
-        
+        this.vitroRequest = vreq;
         setEditAccess(policyHelper);
     }
 
@@ -50,7 +52,8 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
      */
     ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, 
             VitroRequest vreq, EditingPolicyHelper policyHelper) {
-        super(subjectUri, propertyUri, policyHelper);       
+        super(subjectUri, propertyUri, policyHelper); 
+        vitroRequest = vreq;
     }
 
     private void setEditAccess(EditingPolicyHelper policyHelper) {
@@ -93,6 +96,11 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
             if (! isDeletable()) {
                 params.put("deleteProhibited", "prohibited");
             }
+            //Check if special parameters being sent
+            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vitroRequest);
+            if(specialParams.size() > 0) {
+            	params.putAll(specialParams);
+            }
             editUrl = UrlBuilder.getUrl(EDIT_PATH, params);
         }
         
@@ -122,7 +130,11 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
                 }
             }
             params.put("templateName", templateName);
-            
+            //Check if special parameters being sent
+            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vitroRequest);
+            if(specialParams.size() > 0) {
+            	params.putAll(specialParams);
+            }
             deleteUrl = UrlBuilder.getUrl(EDIT_PATH, params);
 
         }

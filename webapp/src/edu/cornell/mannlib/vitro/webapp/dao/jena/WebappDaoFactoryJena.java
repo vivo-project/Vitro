@@ -635,8 +635,24 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     
     //Method for using special model for webapp dao factory, such as display model
     //This is still in flux, am checking in to allow others to experiment
-    public void setSpecialDataModel(OntModel specialModel, OntModel specialTboxModel) {
-    	WebappDaoFactoryJena specialWadfj = new WebappDaoFactoryJena(specialModel);
+    public boolean isUsingSpecialModel = false;
+    public void setSpecialDataModel(OntModel specialModel, OntModel specialTboxModel, OntModel specialDisplayModel) {
+    	//Set up model selector for the new webapp dao factory object with the input model
+    	//The selector is used by the object property dao, therefore should be set up even though we 
+    	//use the new webapp dao factory object to generate portions to overwrite the regular webapp dao factory
+    	OntModelSelectorImpl specialSelector = new OntModelSelectorImpl();
+    	specialSelector.setFullModel(specialModel);
+    	specialSelector.setApplicationMetadataModel(specialModel);
+    	specialSelector.setDisplayModel(specialDisplayModel);
+    	specialSelector.setTBoxModel(specialTboxModel);
+    	specialSelector.setABoxModel(specialModel);
+    	specialSelector.setUserAccountsModel(specialModel);
+    	//although we're only use part of the new wadf and copy over below, the object property dao
+    	//utilizes methods that will employ the display model returned from the simple ontmodel selector
+    	//so if the object property dao is to be copied over we need to ensure we have the correct display model
+    	//and tbox model
+    	WebappDaoFactoryJena specialWadfj = new WebappDaoFactoryJena(specialSelector);
+    
     	entityWebappDao = specialWadfj.getIndividualDao();
     	keys2EntsDao = specialWadfj.getKeys2EntsDao();
     	keywordDao = specialWadfj.getKeywordDao();
@@ -646,18 +662,28 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     	//To allow for testing, add a property group, this will allow
     	//the unassigned group method section to be executed and main Image to be assigned to that group
     	//otherwise the dummy group does not allow for the unassigned group to be executed
-    	
     	propertyGroupDao = specialWadfj.getPropertyGroupDao();
+    	objectPropertyDao = specialWadfj.getObjectPropertyDao();
+    	objectPropertyStatementDao = specialWadfj.getObjectPropertyStatementDao();
+    	dataPropertyDao = specialWadfj.getDataPropertyDao();
+    	dataPropertyStatementDao = specialWadfj.getDataPropertyStatementDao();
     	PropertyGroup pgtest = new edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup();
     	pgtest.setName("testname");
     	pgtest.setDisplayRank(1);
     	propertyGroupDao.insertNewPropertyGroup(pgtest);
     	//?Simple ont model selector uses submodels - unsure if relevant here
     	//|| ontModelSelector instanceof SimpleOntModelSelector
-    	if(ontModelSelector instanceof OntModelSelectorImpl ) {
+    	if(ontModelSelector instanceof OntModelSelectorImpl) {
     		OntModelSelectorImpl omsImpl = (OntModelSelectorImpl) ontModelSelector;
     		omsImpl.setTBoxModel(specialTboxModel);
+    		omsImpl.setDisplayModel(specialDisplayModel);
     	}
+    	else if(ontModelSelector instanceof SimpleOntModelSelector) {
+    		SimpleOntModelSelector omsImpl = (SimpleOntModelSelector) ontModelSelector;
+    		omsImpl.setTBoxModel(specialTboxModel);
+    		omsImpl.setDisplayModel(specialDisplayModel);
+    	}
+    	isUsingSpecialModel = true;
     }
    
 }

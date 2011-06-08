@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -91,12 +92,14 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     
     // Used for editing
     private boolean addAccess = false;
-
+    //To allow for checking of special parameters
+    private VitroRequest vitroRequest = null;
     ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, 
             EditingPolicyHelper policyHelper)
         throws InvalidConfigurationException {
         
-        super(op, subject, policyHelper, vreq);        
+        super(op, subject, policyHelper, vreq); 
+        this.vitroRequest = vreq;
         setName(op.getDomainPublic());
         
         // Get the config for this object property
@@ -575,7 +578,13 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             } 
             ParamMap params = new ParamMap(
                     "subjectUri", subjectUri,
-                    "predicateUri", propertyUri);                              
+                    "predicateUri", propertyUri);  
+            //Check if special parameters being sent
+            
+            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vitroRequest);
+            if(specialParams.size() > 0) {
+            	params.putAll(specialParams);
+            }
             addUrl = UrlBuilder.getUrl(EDIT_PATH, params);  
 
         }

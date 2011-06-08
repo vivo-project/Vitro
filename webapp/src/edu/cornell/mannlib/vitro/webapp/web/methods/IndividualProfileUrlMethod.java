@@ -27,7 +27,7 @@ public class IndividualProfileUrlMethod extends BaseTemplateMethodModel {
         Environment env = Environment.getCurrentEnvironment();
         HttpServletRequest request = (HttpServletRequest) env.getCustomAttribute("request");
         VitroRequest vreq = new VitroRequest(request);
-        String url = UrlBuilder.getIndividualProfileUrl(uri, vreq.getWebappDaoFactory());
+        String url = UrlBuilder.getIndividualProfileUrl(uri, vreq);
         return (url == null) ? "" : url; // don't return a null to the template
     }
 

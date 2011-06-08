@@ -270,6 +270,12 @@ public class UrlBuilder {
     public static String getPath(Route route, ParamMap params) {
         return getPath(route.path(), params);
     }
+    //Adding method to allow for checking for special parameters
+    public static String getIndividualProfileUrl(String individualUri, VitroRequest vreq) {
+        Individual individual = new IndividualImpl(individualUri);
+        return getIndividualProfileUrl(individual, individualUri, vreq);
+    }
+    
     
     public static String getIndividualProfileUrl(String individualUri, WebappDaoFactory wadf) {
         Individual individual = new IndividualImpl(individualUri);
@@ -279,6 +285,19 @@ public class UrlBuilder {
     public static String getIndividualProfileUrl(Individual individual, WebappDaoFactory wadf) {
         String individualUri = individual.getURI();
         return getIndividualProfileUrl(individual, individualUri, wadf);        
+    }
+    
+    //Trying first with using a form of the method that includes the vitro request
+    private static String getIndividualProfileUrl(Individual individual, String individualUri, VitroRequest vreq) {
+    	WebappDaoFactory wadf = vreq.getWebappDaoFactory();
+    	String profileUrl = getIndividualProfileUrl(individual, individualUri, wadf);
+    	if(profileUrl != null) {
+    		HashMap<String, String> specialParams = getSpecialParams(vreq);
+    		if(specialParams.size() != 0) {
+    			profileUrl = addParams(profileUrl, new ParamMap(specialParams));
+    		}
+    	}
+    	return profileUrl;
     }
     
     private static String getIndividualProfileUrl(Individual individual, String individualUri, WebappDaoFactory wadf) {
@@ -344,6 +363,34 @@ public class UrlBuilder {
             log.error("Error decoding url " + str + " with encoding " + encoding + ": Unsupported encoding.");
         }
         return decodedUrl;
+    }
+    
+    //To be used in different property templates so placing method for reuse here
+    //Check if special params included, specifically for menu management and other models
+    public static HashMap<String,String> getSpecialParams(VitroRequest vreq) {
+    	
+    	HashMap<String,String> specialParams = new HashMap<String, String>();
+    	if(vreq != null) {
+    		//this parameter is sufficient to switch to menu model
+    		String useMenuModelParam = vreq.getParameter("usemenumodel");
+    		//the parameters below allow for using a different model
+	    	String useMainModelUri = vreq.getParameter("usemodel");
+	    	String useTboxModelUri = vreq.getParameter("usetboxmodel");
+	    	String useDisplayModelUri = vreq.getParameter("usedisplaymodel");
+	    	if(useMenuModelParam != null && !useMenuModelParam.isEmpty()) {
+	    		specialParams.put("usemenumodel", useMenuModelParam);
+	    	}
+	    	else if(useMainModelUri != null && !useMainModelUri.isEmpty()) {
+	    		specialParams.put("usemodel", useMainModelUri);
+	    		if(useTboxModelUri != null && !useTboxModelUri.isEmpty()){ 
+	    			specialParams.put("usetboxmodel", useTboxModelUri);
+	    		}
+	    		if(useDisplayModelUri != null && !useDisplayModelUri.isEmpty()) {
+	    			specialParams.put("usedisplaymodel", useDisplayModelUri);
+	    		}
+	    	}
+    	}
+    	return specialParams;
     }
 
 }

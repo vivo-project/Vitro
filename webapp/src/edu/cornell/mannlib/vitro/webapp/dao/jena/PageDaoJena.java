@@ -38,7 +38,8 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
     static protected Query pageMappingsQuery;
     static protected Query homePageUriQuery;
     static protected Query classGroupPageQuery;
-    
+    static protected Query classIntersectionPageQuery;
+
     static final String prefixes = 
         "PREFIX rdf:   <" + VitroVocabulary.RDF +"> \n" +
         "PREFIX rdfs:  <" + VitroVocabulary.RDFS +"> \n" + 
@@ -78,6 +79,10 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         prefixes + "\n" +
         "SELECT ?classGroup WHERE { ?pageUri <" + DisplayVocabulary.FOR_CLASSGROUP + "> ?classGroup . }";
     
+    static final protected String classIntersectionPageQueryString = 
+    	prefixes + "\n" + 
+        "SELECT ?classIntersection WHERE { ?pageUri <" + DisplayVocabulary.CLASS_INTERSECTION + "> ?classIntersection . }";
+
     static{
         try{    
             pageQuery=QueryFactory.create(pageQueryString);
@@ -108,6 +113,12 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         }catch(Throwable th){
             log.error("could not create SPARQL query for classGroupPageQuery " + th.getMessage());
             log.error(classGroupPageQueryString);
+        }
+        try{    
+            classIntersectionPageQuery=QueryFactory.create(classIntersectionPageQueryString);
+        }catch(Throwable th){
+            log.error("could not create SPARQL query for classIntersectionPageQuery " + th.getMessage());
+            log.error(classIntersectionPageQueryString);
         }  
     }        
     
@@ -240,6 +251,30 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         return classGroupsForPage.get(0);
     }
     
+    /**
+     * Get the names of the classes for class intersection.  Multiple classes possible.
+     */
+    public List<String> getClassIntersections(String pageUri) {
+    	List<String> classIntersections = new ArrayList<String>();
+    	 QuerySolutionMap initialBindings = new QuerySolutionMap();
+         initialBindings.add("pageUri", ResourceFactory.createResource(pageUri));
+         
+         Model displayModel = getOntModelSelector().getDisplayModel();
+         QueryExecution qexec = QueryExecutionFactory.create( classIntersectionPageQuery, displayModel , initialBindings);
+         
+        
+         ResultSet resultSet = qexec.execSelect();        
+         while(resultSet.hasNext()){
+             QuerySolution soln = resultSet.next();
+             classIntersections.add( nodeToString(soln.get("classIntersection")) );        
+         }
+         if( classIntersections.size() == 0 ){
+             log.debug("No class intersections info defined in display model for "+ pageUri);
+             return null;
+         }
+            
+    	return classIntersections;
+    }
     
     /* ****************************************************************************** */
     
