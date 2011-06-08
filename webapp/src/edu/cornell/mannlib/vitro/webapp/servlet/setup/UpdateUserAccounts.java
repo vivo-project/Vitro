@@ -6,8 +6,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -17,14 +20,23 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntResource;
+import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.util.iterator.ClosableIterator;
+import com.hp.hpl.jena.vocabulary.RDF;
+
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader;
-import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
-import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 
 /**
  * Convert any existing User resources (up to rel 1.2) in the UserAccounts Model
@@ -32,6 +44,18 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  */
 public class UpdateUserAccounts implements ServletContextListener {
 	private static final Log log = LogFactory.getLog(UpdateUserAccounts.class);
+
+	public static final String NS = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#";
+	public static final String USER = NS + "User";
+	public static final String USER_USERNAME = NS + "username";
+	public static final String USER_MD5PASSWORD = NS + "md5password";
+	public static final String USER_OLDPASSWORD = NS + "oldpassword";
+	public static final String USER_FIRSTTIME = NS + "firstTime";
+	public static final String USER_LOGINCOUNT = NS + "loginCount";
+	public static final String USER_ROLE = NS + "roleURI";
+	public static final String USER_LASTNAME = NS + "lastName";
+	public static final String USER_FIRSTNAME = NS + "firstName";
+	public static final String MAY_EDIT_AS = NS + "mayEditAs";
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
@@ -62,7 +86,7 @@ public class UpdateUserAccounts implements ServletContextListener {
 
 	private static class Updater {
 		private final ServletContext ctx;
-		private final UserDao userDao;
+		private final MockUserDao userDao;
 		private final UserAccountsDao userAccountsDao;
 
 		public Updater(ServletContext ctx) {
@@ -70,8 +94,9 @@ public class UpdateUserAccounts implements ServletContextListener {
 
 			WebappDaoFactory wadf = (WebappDaoFactory) ctx
 					.getAttribute("webappDaoFactory");
-			userDao = wadf.getUserDao();
 			userAccountsDao = wadf.getUserAccountsDao();
+
+			userDao = new MockUserDao(ctx);
 		}
 
 		/**
@@ -90,7 +115,7 @@ public class UpdateUserAccounts implements ServletContextListener {
 					+ journal.getPath() + "'");
 
 			try {
-				for (User user : userDao.getAllUsers()) {
+				for (MockUser user : userDao.getAllUsers()) {
 					try {
 						UserAccount ua = getConvertedUser(user);
 						if (ua != null) {
@@ -117,11 +142,11 @@ public class UpdateUserAccounts implements ServletContextListener {
 			}
 		}
 
-		private UserAccount getConvertedUser(User user) {
+		private UserAccount getConvertedUser(MockUser user) {
 			return userAccountsDao.getUserAccountByEmail(user.getUsername());
 		}
 
-		private UserAccount convertToUserAccount(User u) {
+		private UserAccount convertToUserAccount(MockUser u) {
 			UserAccount ua = new UserAccount();
 			ua.setEmailAddress(nonNull(u.getUsername()));
 			ua.setFirstName(nonNull(u.getFirstName()));
@@ -146,11 +171,11 @@ public class UpdateUserAccounts implements ServletContextListener {
 
 		private Set<String> translateFromRoleUri(String roleUri) {
 			String permissionSetUri = PermissionSetsLoader.URI_SELF_EDITOR;
-			if ("4".equals(roleUri)) {
+			if ("role:/4".equals(roleUri)) {
 				permissionSetUri = PermissionSetsLoader.URI_EDITOR;
-			} else if ("5".equals(roleUri)) {
+			} else if ("role:/5".equals(roleUri)) {
 				permissionSetUri = PermissionSetsLoader.URI_CURATOR;
-			} else if ("50".equals(roleUri)) {
+			} else if ("role:/50".equals(roleUri)) {
 				permissionSetUri = PermissionSetsLoader.URI_DBA;
 			}
 			return Collections.singleton(permissionSetUri);
@@ -200,13 +225,13 @@ public class UpdateUserAccounts implements ServletContextListener {
 			}
 		}
 
-		public void noteAlreadyConverted(User user, UserAccount ua) {
+		public void noteAlreadyConverted(MockUser user, UserAccount ua) {
 			note("UserAccount '" + ua.getUri() + "' already exists for User '"
 					+ user.getURI() + "', " + user.getFirstName() + " "
 					+ user.getLastName());
 		}
 
-		public void writeUser(User u) {
+		public void writeUser(MockUser u) {
 			w.println();
 			w.println("# converting User: ");
 			w.println(u.getURI());
@@ -225,7 +250,7 @@ public class UpdateUserAccounts implements ServletContextListener {
 					+ ua.getFirstName() + " " + ua.getLastName());
 		}
 
-		public void noteDeletedUser(User user) {
+		public void noteDeletedUser(MockUser user) {
 			note("Delete User: '" + user.getURI() + "'");
 		}
 
@@ -284,6 +309,176 @@ public class UpdateUserAccounts implements ServletContextListener {
 					"yyyy-MM-dd'T'HH-mm-sss");
 			return prefix + "." + sdf.format(new Date()) + suffix;
 		}
+	}
+
+	// ----------------------------------------------------------------------
+	// Classes to replace the User and UserDao, just for the upgrade.
+	// ----------------------------------------------------------------------
+
+	private static class MockUser {
+		private String username;
+		private String roleURI;
+		private int loginCount;
+		private String md5password;
+		private String lastName;
+		private String firstName;
+		private String URI;
+
+		public String getUsername() {
+			return username;
+		}
+
+		public void setUsername(String username) {
+			this.username = username;
+		}
+
+		public String getRoleURI() {
+			return roleURI;
+		}
+
+		public void setRoleURI(String roleURI) {
+			this.roleURI = roleURI;
+		}
+
+		public int getLoginCount() {
+			return loginCount;
+		}
+
+		public void setLoginCount(int loginCount) {
+			this.loginCount = loginCount;
+		}
+
+		public String getMd5password() {
+			return md5password;
+		}
+
+		public void setMd5password(String md5password) {
+			this.md5password = md5password;
+		}
+
+		public String getLastName() {
+			return lastName;
+		}
+
+		public void setLastName(String lastName) {
+			this.lastName = lastName;
+		}
+
+		public String getFirstName() {
+			return firstName;
+		}
+
+		public void setFirstName(String firstName) {
+			this.firstName = firstName;
+		}
+
+		public String getURI() {
+			return URI;
+		}
+
+		public void setURI(String uRI) {
+			URI = uRI;
+		}
+
+	}
+
+	private static class MockUserDao {
+		private final OntModel model;
+
+		public MockUserDao(ServletContext ctx) {
+			this.model = ModelContext.getBaseOntModelSelector(ctx)
+					.getUserAccountsModel();
+		}
+
+		public Collection<MockUser> getAllUsers() {
+			List<MockUser> allUsersList = new ArrayList<MockUser>();
+			model.enterCriticalSection(Lock.READ);
+			try {
+				ClosableIterator<Statement> userStmtIt = model.listStatements(
+						null, RDF.type, resource(USER));
+				try {
+					while (userStmtIt.hasNext()) {
+						Statement stmt = userStmtIt.next();
+						OntResource subjRes = stmt.getSubject().as(
+								OntResource.class);
+						allUsersList.add(userFromUserInd(subjRes));
+					}
+				} finally {
+					userStmtIt.close();
+				}
+			} finally {
+				model.leaveCriticalSection();
+			}
+			return allUsersList;
+		}
+
+		private MockUser userFromUserInd(OntResource userInd) {
+			MockUser user = new MockUser();
+			user.setURI(userInd.getURI());
+
+			try {
+				user.setUsername(getStringPropertyValue(userInd, USER_USERNAME));
+			} catch (Exception e) {
+				// ignore it.
+			}
+
+			try {
+				user.setMd5password(getStringPropertyValue(userInd,
+						USER_MD5PASSWORD));
+			} catch (Exception e) {
+				// ignore it.
+			}
+
+			try {
+				user.setLoginCount(getIntegerPropertyValue(userInd,
+						USER_LOGINCOUNT));
+			} catch (Exception e) {
+				user.setLoginCount(0);
+			}
+
+			try {
+				user.setRoleURI(getStringPropertyValue(userInd, USER_ROLE));
+			} catch (Exception e) {
+				log.error("Unable to set user role\n", e);
+				e.printStackTrace();
+				user.setRoleURI("1");
+			}
+			try {
+				user.setLastName(getStringPropertyValue(userInd, USER_LASTNAME));
+			} catch (Exception e) {
+				// ignore it.
+			}
+
+			try {
+				user.setFirstName(getStringPropertyValue(userInd,
+						USER_FIRSTNAME));
+			} catch (Exception e) {
+				// ignore it.
+			}
+
+			return user;
+		}
+
+		private String getStringPropertyValue(OntResource userInd,
+				String propertyUri) {
+			Property property = model.getProperty(propertyUri);
+			Literal object = (Literal) userInd.getProperty(property)
+					.getObject();
+			return object.getString();
+		}
+
+		private int getIntegerPropertyValue(OntResource userInd,
+				String propertyUri) {
+			Property property = model.getProperty(propertyUri);
+			Literal object = (Literal) userInd.getProperty(property)
+					.getObject();
+			return object.getInt();
+		}
+
+		private Resource resource(String uri) {
+			return model.getResource(uri);
+		}
+
 	}
 
 }
