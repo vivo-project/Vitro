@@ -114,8 +114,8 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		      message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.username" />
 		<fail unless="VitroConnection.DataSource.password"
 		      message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.password" />
-		<fail unless="initialAdminUser"
-		      message="${deploy.properties.file} must contain a value for initialAdminUser" />
+		<fail unless="rootUser.emailAddress"
+		      message="${deploy.properties.file} must contain a value for rootUser.emailAddress" />
 
 	</target>
 

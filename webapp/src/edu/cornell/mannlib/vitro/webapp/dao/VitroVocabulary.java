@@ -174,6 +174,7 @@ public class VitroVocabulary {
     // =============== Vitro UserAccount and PermissionSet vocabulary ===========
     
     public static final String USERACCOUNT = VITRO_AUTH + "UserAccount";
+    public static final String USERACCOUNT_ROOT_USER = VITRO_AUTH + "RootUserAccount";
     public static final String USERACCOUNT_EMAIL_ADDRESS = VITRO_AUTH + "emailAddress";
     public static final String USERACCOUNT_FIRST_NAME = VITRO_AUTH + "firstName";
     public static final String USERACCOUNT_LAST_NAME = VITRO_AUTH + "lastName";

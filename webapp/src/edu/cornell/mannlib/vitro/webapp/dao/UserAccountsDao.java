@@ -41,6 +41,11 @@ public interface UserAccountsDao {
 	UserAccount getUserAccountByExternalAuthId(String externalAuthId);
 
 	/**
+	 * Is this UserAccount a root user?
+	 */
+	boolean isRootUser(UserAccount userAccount);
+	
+	/**
 	 * Create a new UserAccount in the model.
 	 * 
 	 * On entry, the URI of the UserAccount should be empty. On exit, the URI

@@ -24,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
+import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 /**
@@ -49,6 +50,7 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 		ArrayIdentifierBundle bundle = new ArrayIdentifierBundle();
 
 		bundle.addAll(createUserIdentifiers(req));
+		bundle.addAll(createRootUserIdentifiers(req));
 		bundle.addAll(createRoleLevelIdentifiers(req));
 		bundle.addAll(createBlacklistOrAssociatedIndividualIdentifiers(req));
 
@@ -63,6 +65,16 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 		LoginStatusBean bean = LoginStatusBean.getBean(req);
 		if (bean.isLoggedIn()) {
 			return Collections.singleton(new IsUser(bean.getUserURI()));
+		} else {
+			return Collections.emptySet();
+		}
+	}
+
+	private Collection<? extends Identifier> createRootUserIdentifiers(
+			HttpServletRequest req) {
+		UserAccount user = LoginStatusBean.getCurrentUser(req);
+		if (isRootUser(user)) {
+			return Collections.singleton(new IsRootUser());
 		} else {
 			return Collections.emptySet();
 		}
@@ -129,6 +141,25 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 		individuals.addAll(sec.getAssociatedIndividuals(indDao, user));
 
 		return individuals;
+	}
+
+	/**
+	 * Is this user a root user?
+	 */
+	private boolean isRootUser(UserAccount user) {
+		if (user == null) {
+			return false;
+		}
+
+		WebappDaoFactory wdf = (WebappDaoFactory) context
+				.getAttribute("webappDaoFactory");
+		if (wdf == null) {
+			log.error("Could not get a WebappDaoFactory from the ServletContext");
+			return false;
+		}
+
+		UserAccountsDao uaDao = wdf.getUserAccountsDao();
+		return uaDao.isRootUser(user);
 	}
 
 	@Override

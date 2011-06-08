@@ -158,6 +158,21 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 	}
 
 	@Override
+	public boolean isRootUser(UserAccount userAccount) {
+		if (userAccount == null) {
+			return false;
+		}
+
+		getOntModel().enterCriticalSection(Lock.READ);
+		try {
+			OntResource r = getOntModel().getOntResource(userAccount.getUri());
+			return isResourceOfType(r, USERACCOUNT_ROOT_USER);
+		} finally {
+			getOntModel().leaveCriticalSection();
+		}
+	}
+
+	@Override
 	public String insertUserAccount(UserAccount userAccount) {
 		if (userAccount == null) {
 			throw new NullPointerException("userAccount may not be null.");
@@ -361,6 +376,13 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 	 * There should already be a lock on the model when this is called.
 	 */
 	private boolean isResourceOfType(OntResource r, OntClass type) {
+		if (r == null) {
+			return false;
+		}
+		if (type == null) {
+			return false;
+		}
+		
 		StmtIterator stmts = getOntModel().listStatements(r, RDF.type, type);
 		if (stmts.hasNext()) {
 			stmts.close();

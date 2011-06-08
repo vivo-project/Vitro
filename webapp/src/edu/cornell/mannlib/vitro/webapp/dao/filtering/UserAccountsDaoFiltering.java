@@ -48,6 +48,11 @@ public class UserAccountsDaoFiltering extends BaseFiltering implements
 	}
 	
 	@Override
+	public boolean isRootUser(UserAccount userAccount) {
+		return innerDao.isRootUser(userAccount);
+	}
+
+	@Override
 	public String insertUserAccount(UserAccount userAccount) {
 		return innerDao.insertUserAccount(userAccount);
 	}

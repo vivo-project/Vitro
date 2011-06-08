@@ -155,6 +155,7 @@ public class JenaBaseDaoCon {
     /* ***************** User Account Model constants ***************** */
 
     protected  OntClass           USERACCOUNT = _constModel.createClass(VitroVocabulary.USERACCOUNT);
+    protected  OntClass           USERACCOUNT_ROOT_USER = _constModel.createClass(VitroVocabulary.USERACCOUNT_ROOT_USER);
     protected  DatatypeProperty   USERACCOUNT_EMAIL_ADDRESS = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_EMAIL_ADDRESS);
     protected  DatatypeProperty   USERACCOUNT_FIRST_NAME = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_FIRST_NAME);
     protected  DatatypeProperty   USERACCOUNT_LAST_NAME = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_LAST_NAME);
