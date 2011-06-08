@@ -127,8 +127,6 @@ public class UpdateUserAccounts implements ServletContextListener {
 							userAccountsDao.insertUserAccount(ua);
 							journal.noteUserAccount(ua);
 
-							// TODO: for now, keep the User also.
-							journal.note("Not deleting User " + user.getURI());
 							// userDao.deleteUser(user);
 							journal.noteDeletedUser(user);
 						}
