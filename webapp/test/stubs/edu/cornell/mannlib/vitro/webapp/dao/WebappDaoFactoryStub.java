@@ -26,7 +26,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
-import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -262,11 +261,6 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	@Override
 	public void close() {
 		throw new RuntimeException("WebappDaoFactory.close() not implemented.");
-	}
-
-	@Override
-	public UserDao getUserDao() {
-		throw new RuntimeException("WebappDaoFactory.getUserDao() not implemented.");
 	}
 
 }

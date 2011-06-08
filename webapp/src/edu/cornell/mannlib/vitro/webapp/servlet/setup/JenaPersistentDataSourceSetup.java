@@ -12,11 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.util.iterator.ClosableIterator;
-import com.hp.hpl.jena.vocabulary.RDF;
 
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
 
 public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase 
@@ -41,9 +37,6 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
 				firstStartup = true;
 				readOntologyFilesInPathSet(AUTHPATH, sce.getServletContext(),
 						userAccountsDbModel);
-				if (userAccountsDbModel.size() == 0) {
-					createInitialAdminUser(userAccountsDbModel, ctx);
-				}
 			}
         	OntModel userAccountsModel = ModelFactory.createOntologyModel(
         	        MEM_ONT_MODEL_SPEC);
@@ -85,9 +78,6 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
 	private void initializeUserAccounts(ServletContext ctx, 
 										Model userAccountsModel) {
 		readOntologyFilesInPathSet(AUTHPATH, ctx, userAccountsModel);
-		if (userAccountsModel.size() == 0) {
-			createInitialAdminUser(userAccountsModel, ctx);
-		}
 	}
 	
 }

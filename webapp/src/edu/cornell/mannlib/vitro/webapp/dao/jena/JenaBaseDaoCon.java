@@ -104,9 +104,6 @@ public class JenaBaseDaoCon {
     protected DatatypeProperty   LINK_TYPE = _constModel.createDatatypeProperty(VitroVocabulary.LINK_TYPE);
     protected DatatypeProperty   LINK_DISPLAYRANK = _constModel.createDatatypeProperty(VitroVocabulary.LINK_DISPLAYRANK_URL);
 
-    // TODO This goes away when the UserAccount stuff is fully implemented - jblake
-    protected OntClass           USER = _constModel.createClass(VitroVocabulary.USER);
-
 //    protected  OntClass           APPLICATION = null;
 //    protected  DatatypeProperty   APPLICATION_FLAG1NAME = null;
 //    protected  DatatypeProperty   APPLICATION_FLAG2NAME = null;
