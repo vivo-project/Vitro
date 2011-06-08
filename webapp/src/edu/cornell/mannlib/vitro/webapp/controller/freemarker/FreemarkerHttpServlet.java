@@ -22,7 +22,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
-import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
@@ -255,6 +254,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         urls.put("termsOfUse", urlBuilder.getPortalUrl(Route.TERMS_OF_USE));  
         urls.put("login", urlBuilder.getLoginUrl());          
         urls.put("logout", urlBuilder.getLogoutUrl());       
+        urls.put("myAccount", UrlBuilder.getUrl("/accounts/myAccount"));       
         urls.put("siteAdmin", urlBuilder.getPortalUrl(Route.SITE_ADMIN));  
         urls.put("themeImages", urlBuilder.getPortalUrl(themeDir + "/images"));
         urls.put("images", UrlBuilder.getUrl("/images"));
