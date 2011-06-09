@@ -169,7 +169,8 @@ public class VitroVocabulary {
 
     // =============== Vitro User vocabulary =================================
 
-//    public static final String MAY_EDIT_AS = vitroURI+"mayEditAs";
+    // TODO JB This should go away when the new method of associating UserAccounts with Individuals is in place.
+    public static final String MAY_EDIT_AS = vitroURI+"mayEditAs";
 
     // =============== Vitro UserAccount and PermissionSet vocabulary ===========
     
