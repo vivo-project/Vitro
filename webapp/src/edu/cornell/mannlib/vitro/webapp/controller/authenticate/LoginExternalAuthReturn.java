@@ -15,6 +15,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 
 /**
  * Handle the return from the external authorization login server. If we are
@@ -40,36 +41,44 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		String username = ExternalAuthHelper.getHelper(req).getExternalAuthId(
-				req);
-		List<String> associatedUris = getAuthenticator(req)
-				.getAssociatedIndividualUris(username);
-
-		if (username == null) {
-			log.debug("No username.");
+		String externalAuthId = ExternalAuthHelper.getHelper(req)
+				.getExternalAuthId(req);
+		if (externalAuthId == null) {
+			log.debug("No externalAuthId.");
 			complainAndReturnToReferrer(req, resp, ATTRIBUTE_REFERRER,
 					MESSAGE_LOGIN_FAILED);
-		} else if (getAuthenticator(req).isExistingUser(username)) {
-			log.debug("Logging in as " + username);
-			getAuthenticator(req).recordLoginAgainstUserAccount(username,
+			return;
+		}
+
+		UserAccount userAccount = getAuthenticator(req)
+				.getAccountForExternalAuth(externalAuthId);
+		if (userAccount != null) {
+			log.debug("Logging in as " + userAccount.getUri());
+			getAuthenticator(req).recordLoginAgainstUserAccount(userAccount,
 					AuthenticationSource.EXTERNAL);
 			removeLoginProcessArtifacts(req);
 			new LoginRedirector(req, resp).redirectLoggedInUser();
-		} else if (!associatedUris.isEmpty()) {
-			log.debug("Recognize '" + username + "' as self-editor for "
+			return;
+		}
+
+		List<String> associatedUris = getAuthenticator(req)
+				.getAssociatedIndividualUris(userAccount);
+		// TODO JB - this case should lead to creating a new account.
+		if (!associatedUris.isEmpty()) {
+			log.debug("Recognize '" + externalAuthId + "' as self-editor for "
 					+ associatedUris);
 			String uri = associatedUris.get(0);
 
-			getAuthenticator(req).recordLoginWithoutUserAccount(username, uri,
-					AuthenticationSource.EXTERNAL);
+			getAuthenticator(req).recordLoginWithoutUserAccount(uri);
 			removeLoginProcessArtifacts(req);
 			new LoginRedirector(req, resp).redirectLoggedInUser();
-		} else {
-			log.debug("User is not recognized: " + username);
-			removeLoginProcessArtifacts(req);
-			new LoginRedirector(req, resp)
-					.redirectUnrecognizedExternalUser(username);
+			return;
 		}
+
+		log.debug("User is not recognized: " + externalAuthId);
+		removeLoginProcessArtifacts(req);
+		new LoginRedirector(req, resp)
+				.redirectUnrecognizedExternalUser(externalAuthId);
 	}
 
 	private void removeLoginProcessArtifacts(HttpServletRequest req) {

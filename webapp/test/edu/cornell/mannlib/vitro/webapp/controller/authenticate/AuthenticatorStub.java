@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
-import edu.cornell.mannlib.vitro.webapp.beans.User;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 
 /**
  * A simple stub for unit tests that require an Authenticator. Call setup() to
@@ -67,7 +67,9 @@ public class AuthenticatorStub extends Authenticator {
 	// Stub infrastructure
 	// ----------------------------------------------------------------------
 
-	private final Map<String, User> usersByName = new HashMap<String, User>();
+	private final Map<String, UserAccount> usersByEmail = new HashMap<String, UserAccount>();
+	private final Map<String, UserAccount> usersByExternalAuthId = new HashMap<String, UserAccount>();
+
 	private final Map<String, List<String>> editingPermissions = new HashMap<String, List<String>>();
 	private final Map<String, String> associatedUris = new HashMap<String, String>();
 	private final List<String> recordedLogins = new ArrayList<String>();
@@ -79,8 +81,13 @@ public class AuthenticatorStub extends Authenticator {
 		this.request = request;
 	}
 
-	public void addUser(User user) {
-		usersByName.put(user.getUsername(), user);
+	public void addUser(UserAccount user) {
+		usersByEmail.put(user.getEmailAddress(), user);
+
+		String externalAuthId = user.getExternalAuthId();
+		if (!externalAuthId.isEmpty()) {
+			usersByExternalAuthId.put(user.getExternalAuthId(), user);
+		}
 	}
 
 	public void addEditingPermission(String username, String personUri) {
@@ -107,52 +114,55 @@ public class AuthenticatorStub extends Authenticator {
 	// ----------------------------------------------------------------------
 
 	@Override
-	public boolean isExistingUser(String username) {
-		return usersByName.containsKey(username);
+	public UserAccount getAccountForInternalAuth(String emailAddress) {
+		return usersByEmail.get(emailAddress);
 	}
 
 	@Override
-	public User getUserByUsername(String username) {
-		return usersByName.get(username);
+	public UserAccount getAccountForExternalAuth(String externalAuthId) {
+		return usersByExternalAuthId.get(externalAuthId);
 	}
 
 	@Override
-	public List<String> getAssociatedIndividualUris(String username) {
+	public boolean isCurrentPassword(UserAccount userAccount,
+			String clearTextPassword) {
+		if (userAccount == null) {
+			return false;
+		} else {
+			return userAccount.getMd5Password().equals(
+					Authenticator.applyMd5Encoding(clearTextPassword));
+		}
+	}
+
+	@Override
+	public List<String> getAssociatedIndividualUris(UserAccount userAccount) {
 		List<String> uris = new ArrayList<String>();
 
-		if (associatedUris.containsKey(username)) {
-			uris.add(associatedUris.get(username));
+		String emailAddress = userAccount.getEmailAddress();
+		if (associatedUris.containsKey(emailAddress)) {
+			uris.add(associatedUris.get(emailAddress));
 		}
 
-		if (editingPermissions.containsKey(username)) {
-			uris.addAll(editingPermissions.get(username));
+		if (editingPermissions.containsKey(emailAddress)) {
+			uris.addAll(editingPermissions.get(emailAddress));
 		}
 
 		return uris;
 	}
 
 	@Override
-	public boolean isCurrentPassword(String username, String clearTextPassword) {
-		if (!isExistingUser(username)) {
-			return false;
-		}
-		String md5Password = applyMd5Encoding(clearTextPassword);
-		User user = getUserByUsername(username);
-		return md5Password.equals(user.getMd5password());
+	public void recordNewPassword(UserAccount userAccount,
+			String newClearTextPassword) {
+		newPasswords.put(userAccount.getEmailAddress(), newClearTextPassword);
 	}
 
 	@Override
-	public void recordNewPassword(String username, String newClearTextPassword) {
-		newPasswords.put(username, newClearTextPassword);
-	}
-
-	@Override
-	public void recordLoginAgainstUserAccount(String username,
+	public void recordLoginAgainstUserAccount(UserAccount userAccount,
 			AuthenticationSource authSource) {
-		recordedLogins.add(username);
+		recordedLogins.add(userAccount.getEmailAddress());
 
-		User user = getUserByUsername(username);
-		LoginStatusBean lsb = new LoginStatusBean(user.getURI(), authSource);
+		LoginStatusBean lsb = new LoginStatusBean(userAccount.getUri(),
+				authSource);
 		LoginStatusBean.setBean(request.getSession(), lsb);
 	}
 
@@ -167,16 +177,15 @@ public class AuthenticatorStub extends Authenticator {
 	}
 
 	@Override
-	public void recordLoginWithoutUserAccount(String username,
-			String individualUri, AuthenticationSource authSource) {
+	public boolean accountRequiresEditing(UserAccount userAccount) {
 		throw new RuntimeException(
-				"AuthenticatorStub.recordLoginWithoutUserAccount() not implemented.");
+				"AuthenticatorStub.accountRequiresEditing() not implemented.");
 	}
 
 	@Override
-	public boolean isPasswordChangeRequired(String username) {
+	public void recordLoginWithoutUserAccount(String individualUri) {
 		throw new RuntimeException(
-				"AuthenticatorStub.isPasswordChangeRequired() not implemented.");
+				"AuthenticatorStub.recordLoginWithoutUserAccount() not implemented.");
 	}
 
 }

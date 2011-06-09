@@ -30,6 +30,11 @@ public class PermissionSetsLoader implements ServletContextListener {
 	private static final Log log = LogFactory
 			.getLog(PermissionSetsLoader.class);
 
+	public static final String URI_SELF_EDITOR = "http://permissionSet-1";
+	public static final String URI_EDITOR = "http://permissionSet-4";
+	public static final String URI_CURATOR = "http://permissionSet-5";
+	public static final String URI_DBA = "http://permissionSet-50";
+	
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		ServletContext ctx = sce.getServletContext();
@@ -46,10 +51,10 @@ public class PermissionSetsLoader implements ServletContextListener {
 					.getUserAccountsModel();
 
 			ModelWrapper wrapper = new ModelWrapper(model);
-			wrapper.createPermissionSet("1", "Self Editor");
-			wrapper.createPermissionSet("2", "Editor");
-			wrapper.createPermissionSet("3", "Curator");
-			wrapper.createPermissionSet("4", "Site Admin");
+			wrapper.createPermissionSet(URI_SELF_EDITOR, "Self Editor");
+			wrapper.createPermissionSet(URI_EDITOR, "Editor");
+			wrapper.createPermissionSet(URI_CURATOR, "Curator");
+			wrapper.createPermissionSet(URI_DBA, "Site Admin");
 		} catch (Exception e) {
 			log.error("could not run PermissionSetsLoader" + e);
 			AbortStartup.abortStartup(ctx);
@@ -77,9 +82,7 @@ public class PermissionSetsLoader implements ServletContextListener {
 			permissionSet = model.createResource(VitroVocabulary.PERMISSIONSET);
 		}
 
-		public void createPermissionSet(String uriSuffix, String label) {
-			String uri = "http://permissionSet-" + uriSuffix;
-
+		public void createPermissionSet(String uri, String label) {
 			model.enterCriticalSection(Lock.WRITE);
 			try {
 				Resource r = model.createResource(uri);

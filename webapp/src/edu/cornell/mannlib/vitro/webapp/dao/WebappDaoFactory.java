@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -118,9 +117,6 @@ public interface WebappDaoFactory {
     public LinksDao getLinksDao();
     public LinktypeDao getLinktypeDao();
 
-    // TODO This goes away when the UserAccounts stuff is fully implemented - jblake.
-    public UserDao getUserDao();
-    
     public UserAccountsDao getUserAccountsDao();
 
     public VClassGroupDao getVClassGroupDao();

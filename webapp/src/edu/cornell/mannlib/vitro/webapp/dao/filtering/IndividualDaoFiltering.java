@@ -85,16 +85,6 @@ class IndividualDaoFiltering extends BaseFiltering implements IndividualDao{
         innerIndividualDao.fillVClassForIndividual(individual);
     }
 
-
-    public String getIndividualURIFromNetId(String netIdStr, String netidMatchingPropertyUri) {
-        String uri = innerIndividualDao.getIndividualURIFromNetId(netIdStr, netidMatchingPropertyUri);
-        if( uri == null ) return null;
-        Individual ent = getIndividualByURI(uri);
-        if( ent != null && filters.getIndividualFilter().fn(ent) )
-            return uri;
-        else
-            return null;
-    }
     public List<Individual> getIndividualsByDataProperty(String dataPropertyUri, String value) {
         return filterAndWrap(innerIndividualDao.getIndividualsByDataProperty(dataPropertyUri,value),
                      filters);

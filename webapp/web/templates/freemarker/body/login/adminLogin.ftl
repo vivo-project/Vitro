@@ -5,7 +5,7 @@
 <section id="internalLogin" role="region">
     <h2>Internal Login</h2>
 
-    <#if errorNoUser??>
+    <#if errorNoEmail??>
         <#assign errorMessage = "No email supplied." />
     </#if>
     
@@ -52,11 +52,11 @@
             <label for="confirmPassword">Confirm Password</label>
             <input id="confirmPassword" name="confirmPassword" class="text-field" type="password" required />
             
-            <input id="username" name="username" type="hidden" value="${username!}" />
+            <input id="email" name="email" type="hidden" value="${email!}" />
             <input id="password" name="password" type="hidden" value="${password!}" />
         <#else>
-            <label for="username">Email</label>
-            <input id="username" name="username" class="text-field focus" type="text" value="${username!}" required autofocus />
+            <label for="email">Email</label>
+            <input id="email" name="email" class="text-field focus" type="text" value="${email!}" required autofocus />
 
         	<label for="password">Password</label>
             <input id="password" name="password" class="text-field" type="password" required />

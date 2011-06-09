@@ -33,10 +33,9 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
@@ -507,12 +506,14 @@ public class N3MultiPartUpload extends VitroHttpServlet {
     }
     
     public void sendUserEmail(HttpServletRequest request, HttpSession session, String uploadFileName) {
-        LoginStatusBean loginBean = LoginStatusBean.getBean(request);
-        String userURI = loginBean.getUserURI();
+    	UserAccount userAccount = LoginStatusBean.getCurrentUser(request);
+    	if (userAccount == null) {
+    		return;
+    	}
+    	
         try{
-	        System.out.println("User URI is " + userURI);
-	        UserDao uDao = (new VitroRequest(request)).getFullWebappDaoFactory().getUserDao();
-	        String email = uDao.getUserEmailAddress(userURI);
+	        System.out.println("User URI is " + userAccount.getUri());
+	        String email = userAccount.getEmailAddress();
 	        String deliveryFrom = "hjk54@cornell.edu";//TO DO: replace with email address to be used
 	        //Now send message
 	        MailUtil mu = new MailUtil(request);

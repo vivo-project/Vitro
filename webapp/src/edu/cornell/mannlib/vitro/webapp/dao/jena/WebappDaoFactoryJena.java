@@ -55,7 +55,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
-import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -73,7 +72,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     protected LinksDao linksDao;
     protected LinktypeDao linktypeDao;
     protected ApplicationDaoJena applicationDao;
-    protected UserDao userDao; // TODO This goes away when the UserAccounts stuff is fully implemented -- jb
     protected UserAccountsDao userAccountsDao;
     protected VClassGroupDao vClassGroupDao;
     protected PropertyGroupDao propertyGroupDao;
@@ -494,14 +492,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
             return propertyGroupDao;
         else
             return propertyGroupDao = new PropertyGroupDaoJena(this);
-    }
-
-    // TODO This goes away when the UserAccounts stuff is fully implemented -- jb
-    public UserDao getUserDao() {
-        if (userDao != null)
-            return userDao;
-        else
-            return userDao = new UserDaoJena(this);
     }
 
     public UserAccountsDao getUserAccountsDao() {

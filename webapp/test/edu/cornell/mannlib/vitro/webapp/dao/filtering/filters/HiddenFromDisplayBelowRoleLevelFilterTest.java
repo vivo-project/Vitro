@@ -3,12 +3,18 @@
 package edu.cornell.mannlib.vitro.webapp.dao.filtering.filters;
 
 import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource.INTERNAL;
+import static edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader.URI_CURATOR;
+import static edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader.URI_DBA;
+import static edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader.URI_EDITOR;
+import static edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader.URI_SELF_EDITOR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,7 +27,7 @@ import org.junit.runners.Parameterized.Parameters;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDaoStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.IndividualDaoStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDaoStub;
-import stubs.edu.cornell.mannlib.vitro.webapp.dao.UserDaoStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDaoStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryStub;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
@@ -35,7 +41,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
-import edu.cornell.mannlib.vitro.webapp.beans.User;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 
 /**
@@ -94,35 +100,32 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 
 	private static final String NS = "http://someDomain/individual/";
 
-	private static final String ROLE_NON_EDITOR = "1";
-	private static final String ROLE_EDITOR = "4";
-	private static final String ROLE_CURATOR = "5";
-	private static final String ROLE_DBA = "50";
-
-	private static final User USER_SELF = user("userSelf", "self_editor",
-			ROLE_NON_EDITOR);
-	private static final User USER_EDITOR = user("userEditor", "editor",
-			ROLE_EDITOR);
-	private static final User USER_CURATOR = user("userCurator", "curator",
-			ROLE_CURATOR);
-	private static final User USER_DBA = user(NS + "userDba", "dba", ROLE_DBA);
+	private static final UserAccount USER_SELF = userAccount("userSelf",
+			"self_editor", URI_SELF_EDITOR);
+	private static final UserAccount USER_EDITOR = userAccount("userEditor",
+			"editor", URI_EDITOR);
+	private static final UserAccount USER_CURATOR = userAccount("userCurator",
+			"curator", URI_CURATOR);
+	private static final UserAccount USER_DBA = userAccount(NS + "userDba",
+			"dba", URI_DBA);
 
 	/** Create a User */
-	private static User user(String uri, String username, String roleUri) {
-		User user = new User();
-		user.setURI(NS + uri);
-		user.setUsername(username);
-		user.setRoleURI(roleUri);
+	private static UserAccount userAccount(String uri, String emailAddress,
+			String roleUri) {
+		UserAccount user = new UserAccount();
+		user.setUri(NS + uri);
+		user.setEmailAddress(emailAddress);
+		user.setPermissionSetUris(Collections.singleton(roleUri));
 		return user;
 	}
 
-	private static final UserDaoStub DAO_USER = userDao(USER_SELF, USER_EDITOR,
+	private static final UserAccountsDaoStub DAO_USER_ACCOUNT = userAccountsDao(USER_SELF, USER_EDITOR,
 			USER_CURATOR, USER_DBA);
 
-	/** Create the UserDao */
-	private static UserDaoStub userDao(User... users) {
-		UserDaoStub dao = new UserDaoStub();
-		for (User user : users) {
+	/** Create the UserAccountsDao */
+	private static UserAccountsDaoStub userAccountsDao(UserAccount... users) {
+		UserAccountsDaoStub dao = new UserAccountsDaoStub();
+		for (UserAccount user : users) {
 			dao.addUser(user);
 		}
 		return dao;
@@ -137,6 +140,11 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 			USER_CURATOR, INTERNAL);
 	private static final LoginStatusBean LOGIN_DBA = loginStatusBean(USER_DBA,
 			INTERNAL);
+
+	private static LoginStatusBean loginStatusBean(UserAccount user,
+			AuthenticationSource auth) {
+		return new LoginStatusBean(user.getUri(), auth);
+	}
 
 	private static final LoginStatusBean[] LOGINS = new LoginStatusBean[] {
 			LOGIN_NONE, LOGIN_SELF, LOGIN_EDITOR, LOGIN_CURATOR, LOGIN_DBA };
@@ -166,11 +174,6 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 		i.setURI("uri:" + moniker);
 		i.setHiddenFromDisplayBelowRoleLevel(displayThreshhold);
 		return i;
-	}
-
-	private static LoginStatusBean loginStatusBean(User user,
-			AuthenticationSource auth) {
-		return new LoginStatusBean(user.getURI(), auth);
 	}
 
 	private static final VClass PUBLIC_VCLASS = vClass("PUBLIC_vclass",
@@ -786,21 +789,21 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 			return RoleLevel.PUBLIC;
 		}
 
-		User user = DAO_USER.getUserByURI(userUri);
+		UserAccount user = DAO_USER_ACCOUNT.getUserAccountByUri(userUri);
 		if (user == null) {
 			return RoleLevel.PUBLIC;
 		}
 
-		String roleURI = user.getRoleURI();
-		if ("1".equals(roleURI)) {
-			return RoleLevel.SELF;
-		} else if ("4".equals(roleURI)) {
-			return RoleLevel.EDITOR;
-		} else if ("5".equals(roleURI)) {
-			return RoleLevel.CURATOR;
-		} else if ("50".equals(roleURI)) {
-			return RoleLevel.DB_ADMIN;
-		} else {
+		Set<String> roleUris = user.getPermissionSetUris();
+		if (roleUris.contains(URI_DBA)) {
+			return RoleLevel.DB_ADMIN; 
+		} else 		if (roleUris.contains(URI_CURATOR)) {
+			return RoleLevel.CURATOR; 
+		} else 		if (roleUris.contains(URI_EDITOR)) {
+			return RoleLevel.EDITOR; 
+		} else 		if (roleUris.contains(URI_SELF_EDITOR)) {
+			return RoleLevel.SELF; 
+ 		} else {
 			return RoleLevel.PUBLIC;
 		}
 	}

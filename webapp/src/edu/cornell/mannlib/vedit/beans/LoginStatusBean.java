@@ -9,8 +9,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.beans.User;
-import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 /**
@@ -81,7 +81,7 @@ public class LoginStatusBean {
 	/**
 	 * Get the current user, or null if not logged in.
 	 */
-	public static User getCurrentUser(HttpServletRequest request) {
+	public static UserAccount getCurrentUser(HttpServletRequest request) {
 		if (request == null) {
 			return null;
 		}
@@ -91,7 +91,7 @@ public class LoginStatusBean {
 	/**
 	 * Get the current user, or null if not logged in.
 	 */
-	public static User getCurrentUser(HttpSession session) {
+	public static UserAccount getCurrentUser(HttpSession session) {
 		if (session == null) {
 			return null;
 		}
@@ -108,14 +108,14 @@ public class LoginStatusBean {
 			return null;
 		}
 
-		UserDao userDao = wadf.getUserDao();
-		if (userDao == null) {
-			log.error("No UserDao");
+		UserAccountsDao userAccountsDao = wadf.getUserAccountsDao();
+		if (userAccountsDao == null) {
+			log.error("No UserAccountsDao");
 			return null;
 		}
 
 		String userUri = getBean(session).getUserURI();
-		return userDao.getUserByURI(userUri);
+		return userAccountsDao.getUserAccountByUri(userUri);
 	}
 
 	// ----------------------------------------------------------------------

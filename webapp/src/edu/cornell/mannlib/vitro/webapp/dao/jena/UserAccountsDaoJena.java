@@ -39,6 +39,36 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 	}
 
 	@Override
+	public Collection<UserAccount> getAllUserAccounts() {
+		List<String> userUris = new ArrayList<String>();
+
+		getOntModel().enterCriticalSection(Lock.READ);
+		try {
+			StmtIterator stmts = getOntModel().listStatements((Resource) null,
+					RDF.type, USERACCOUNT);
+			while (stmts.hasNext()) {
+				Resource subject = stmts.next().getSubject();
+				if (subject != null) {
+					userUris.add(subject.getURI());
+				}
+			}
+			stmts.close();
+		} finally {
+			getOntModel().leaveCriticalSection();
+		}
+
+		List<UserAccount> userAccounts = new ArrayList<UserAccount>();
+		for (String userUri : userUris) {
+			UserAccount ua = getUserAccountByUri(userUri);
+			if (ua != null) {
+				userAccounts.add(ua);
+			}
+		}
+
+		return userAccounts;
+	}
+
+	@Override
 	public UserAccount getUserAccountByUri(String uri) {
 		if (uri == null) {
 			return null;
@@ -101,6 +131,45 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 		}
 
 		return getUserAccountByUri(userUri);
+	}
+
+	@Override
+	public UserAccount getUserAccountByExternalAuthId(String externalAuthId) {
+		if (externalAuthId == null) {
+			return null;
+		}
+
+		String userUri = null;
+
+		getOntModel().enterCriticalSection(Lock.READ);
+		try {
+			StmtIterator stmts = getOntModel().listStatements(null,
+					USERACCOUNT_EXTERNAL_AUTH_ID,
+					getOntModel().createLiteral(externalAuthId));
+			if (stmts.hasNext()) {
+				userUri = stmts.next().getSubject().getURI();
+			}
+			stmts.close();
+		} finally {
+			getOntModel().leaveCriticalSection();
+		}
+
+		return getUserAccountByUri(userUri);
+	}
+
+	@Override
+	public boolean isRootUser(UserAccount userAccount) {
+		if (userAccount == null) {
+			return false;
+		}
+
+		getOntModel().enterCriticalSection(Lock.READ);
+		try {
+			OntResource r = getOntModel().getOntResource(userAccount.getUri());
+			return isResourceOfType(r, USERACCOUNT_ROOT_USER);
+		} finally {
+			getOntModel().leaveCriticalSection();
+		}
 	}
 
 	@Override
@@ -307,6 +376,13 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 	 * There should already be a lock on the model when this is called.
 	 */
 	private boolean isResourceOfType(OntResource r, OntClass type) {
+		if (r == null) {
+			return false;
+		}
+		if (type == null) {
+			return false;
+		}
+		
 		StmtIterator stmts = getOntModel().listStatements(r, RDF.type, type);
 		if (stmts.hasNext()) {
 			stmts.close();
@@ -324,4 +400,5 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 			return ps1.getUri().compareTo(ps2.getUri());
 		}
 	}
+
 }

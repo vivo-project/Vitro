@@ -22,8 +22,9 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
-import edu.cornell.mannlib.vitro.webapp.beans.User;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
+import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 /**
@@ -49,6 +50,7 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 		ArrayIdentifierBundle bundle = new ArrayIdentifierBundle();
 
 		bundle.addAll(createUserIdentifiers(req));
+		bundle.addAll(createRootUserIdentifiers(req));
 		bundle.addAll(createRoleLevelIdentifiers(req));
 		bundle.addAll(createBlacklistOrAssociatedIndividualIdentifiers(req));
 
@@ -63,6 +65,16 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 		LoginStatusBean bean = LoginStatusBean.getBean(req);
 		if (bean.isLoggedIn()) {
 			return Collections.singleton(new IsUser(bean.getUserURI()));
+		} else {
+			return Collections.emptySet();
+		}
+	}
+
+	private Collection<? extends Identifier> createRootUserIdentifiers(
+			HttpServletRequest req) {
+		UserAccount user = LoginStatusBean.getCurrentUser(req);
+		if (isRootUser(user)) {
+			return Collections.singleton(new IsRootUser());
 		} else {
 			return Collections.emptySet();
 		}
@@ -100,16 +112,21 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 		return ids;
 	}
 
+	/**
+	 * Get all Individuals associated with the current user.
+	 * 
+	 * TODO Currently only uses the matching property. Should also use
+	 * "mayEditAs" type of association.
+	 */
 	private Collection<Individual> getAssociatedIndividuals(
 			HttpServletRequest req) {
 		Collection<Individual> individuals = new ArrayList<Individual>();
 
-		User user = LoginStatusBean.getCurrentUser(req);
+		UserAccount user = LoginStatusBean.getCurrentUser(req);
 		if (user == null) {
 			log.debug("No Associated Individuals: not logged in.");
 			return individuals;
 		}
-		String username = user.getUsername();
 
 		WebappDaoFactory wdf = (WebappDaoFactory) context
 				.getAttribute("webappDaoFactory");
@@ -121,23 +138,28 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 		IndividualDao indDao = wdf.getIndividualDao();
 
 		SelfEditingConfiguration sec = SelfEditingConfiguration.getBean(req);
-		String uri = sec.getIndividualUriFromUsername(indDao, username);
-		if (uri == null) {
-			log.debug("Could not find an Individual with a netId of "
-					+ username);
-			return individuals;
-		}
+		individuals.addAll(sec.getAssociatedIndividuals(indDao, user));
 
-		Individual ind = indDao.getIndividualByURI(uri);
-		if (ind == null) {
-			log.warn("Found a URI for the netId " + username
-					+ " but could not build Individual");
-			return individuals;
-		}
-		log.debug("Found an Individual for netId " + username + " URI: " + uri);
-
-		individuals.add(ind);
 		return individuals;
+	}
+
+	/**
+	 * Is this user a root user?
+	 */
+	private boolean isRootUser(UserAccount user) {
+		if (user == null) {
+			return false;
+		}
+
+		WebappDaoFactory wdf = (WebappDaoFactory) context
+				.getAttribute("webappDaoFactory");
+		if (wdf == null) {
+			log.error("Could not get a WebappDaoFactory from the ServletContext");
+			return false;
+		}
+
+		UserAccountsDao uaDao = wdf.getUserAccountsDao();
+		return uaDao.isRootUser(user);
 	}
 
 	@Override

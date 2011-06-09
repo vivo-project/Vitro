@@ -12,7 +12,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayModelDao;
-import edu.cornell.mannlib.vitro.webapp.dao.FlagDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.KeywordDao;
 import edu.cornell.mannlib.vitro.webapp.dao.KeywordIndividualRelationDao;
@@ -27,7 +26,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
-import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -69,7 +67,6 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
     transient private ObjectPropertyStatementDao filteringObjectPropertyStatementDao=null;
     transient private VClassDao                filteringVClassDao=null;
 
-    transient private UserDao filteringUserDao=null;     // TODO This goes away when the UserAccounts stuff is fully implemented - jblake.
     transient private UserAccountsDao filteringUserAccountsDao=null;
     transient private VClassGroupDao filteringVClassGroupDao=null;
     transient private PropertyGroupDao filteringPropertyGroupDao=null;
@@ -126,14 +123,6 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
             filteringIndividualDao =
                 new IndividualDaoFiltering(innerWebappDaoFactory.getIndividualDao(),filters);
         return filteringIndividualDao;
-    }
-
-    // TODO This goes away when the UserAccounts stuff is fully implemented - jblake.
-    public UserDao getUserDao() {
-        if( filteringUserDao == null)
-            filteringUserDao =
-                new UserDaoFiltering(innerWebappDaoFactory.getUserDao(),filters);                                     
-        return filteringUserDao;
     }
 
     public UserAccountsDao getUserAccountsDao() {

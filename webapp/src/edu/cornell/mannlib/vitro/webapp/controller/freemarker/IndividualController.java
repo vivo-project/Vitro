@@ -455,8 +455,10 @@ public class IndividualController extends FreemarkerHttpServlet {
             netIdStr = vreq.getParameter("netid");
         if ( netIdStr != null ){
     		SelfEditingConfiguration sec = SelfEditingConfiguration.getBean(vreq);
-    		uri = sec.getIndividualUriFromUsername(iwDao, netIdStr);
-            return iwDao.getIndividualByURI(uri);
+    		List<Individual> assocInds = sec.getAssociatedIndividuals(iwDao, netIdStr);
+    		if (!assocInds.isEmpty()) {
+    			return assocInds.get(0);
+    		}
         }
 
 		return null;		
