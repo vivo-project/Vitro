@@ -28,8 +28,17 @@ public class User extends BaseTemplateModel {
     }
     
     public String getLoginName() {
-		return (currentUser == null) ? ""
-				: (currentUser.getFirstName() + " " + currentUser.getLastName());
+    	if (currentUser == null) {
+    		return "";
+    	} 
+
+    	String firstName = currentUser.getFirstName();
+		String lastName = currentUser.getLastName();
+		if (firstName.isEmpty() && lastName.isEmpty()) {
+			return currentUser.getEmailAddress();
+		}
+		
+		return firstName + " " + lastName;
     }
     
     public boolean getHasSiteAdminAccess() {
