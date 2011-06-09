@@ -10,7 +10,6 @@ $(document).ready(function(){
         $('#account-display').submit();
     });
     
-    
     //Delete accounts
     //Show is javascript is enable
     $('input:checkbox[name=delete-all]').show();
@@ -24,17 +23,20 @@ $(document).ready(function(){
          // if not checked, deselect all the checkboxes
            $('input:checkbox[name=deleteAccount]').removeAttr('checked');
          }
-       
     });
     
-      $('input:checkbox[name=deleteAccount]').click(function(){
-           $('input:checkbox[name=delete-all]').removeAttr('checked');
-      });
+    $('input:checkbox[name=deleteAccount]').click(function(){
+        $('input:checkbox[name=delete-all]').removeAttr('checked');
+    });
       
-      // Confirmation alert for account deletion in userAccounts-list.ftl template
-       $('input[name="delete-account"]').click(function(){
-           var countAccount = $('input:checkbox[name=deleteAccount]:checked').length;
-           var answer = confirm( 'Are you sure you want to delete ' + ((countAccount > 1) ? 'these accounts' : 'this account') +'?');
-           return answer;
-       });
+    // Confirmation alert for account deletion in userAccounts-list.ftl template
+    $('input[name="delete-account"]').click(function(){
+        var countAccount = $('input:checkbox[name=deleteAccount]:checked').length;
+        if (countAccount == 0){
+            return false;
+        }else{
+            var answer = confirm( 'Are you sure you want to delete ' + ((countAccount > 1) ? 'these accounts' : 'this account') +'?');
+            return answer;
+        }
+    });
 });
