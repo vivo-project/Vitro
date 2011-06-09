@@ -358,15 +358,18 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 		Random random = new Random(System.currentTimeMillis());
 		for (int attempts = 0; attempts < 30; attempts++) {
 			int upperBound = (int) Math.pow(2, attempts + 13);
-			uri = namespace + ("n" + random.nextInt(upperBound));
-			errMsg = getWebappDaoFactory().checkURI(uri);
-			if (errMsg == null) {
+			uri = namespace + ("u" + random.nextInt(upperBound));
+			if (!isUriUsed(uri)) {
 				return uri;
 			}
 		}
 
 		throw new InsertException("Could not create URI for individual: "
 				+ errMsg);
+	}
+	
+	private boolean isUriUsed(String uri) {
+		return (getOntModel().getOntResource(uri) != null);
 	}
 
 	/**
