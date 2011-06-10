@@ -58,6 +58,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualCreationEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualDeletionEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualUpdateEvent;
+import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 
 public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
 
@@ -1047,5 +1048,20 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
 								
 		return uri;
 	}
+
+    @Override
+    // This method returns an EditLiteral rather than a Jena Literal, since IndividualDao
+    // should not reference Jena objects. (However, the problem isn't really solved 
+    // because EditLiteral currently references the Jena API.)
+    public EditLiteral getLabelEditLiteral(String individualUri) {
+        Literal literal = getLabelLiteral(individualUri);
+        if (literal == null) {
+            return null;
+        }
+        String value = literal.getLexicalForm();
+        String datatype = literal.getDatatypeURI();
+        String lang = literal.getLanguage();
+        return new EditLiteral(value, datatype, lang);       
+    }
 	
 }
