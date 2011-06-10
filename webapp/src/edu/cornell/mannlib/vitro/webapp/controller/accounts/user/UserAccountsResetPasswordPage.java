@@ -33,6 +33,7 @@ public class UserAccountsResetPasswordPage extends UserAccountsPasswordBasePage 
 	public void resetPassword() {
 		userAccount.setMd5Password(Authenticator.applyMd5Encoding(newPassword));
 		userAccount.setPasswordLinkExpires(0L);
+		userAccount.setPasswordChangeRequired(false);
 		userAccount.setStatus(Status.ACTIVE);
 		userAccountsDao.updateUserAccount(userAccount);
 		log.debug("Set password on '" + userAccount.getEmailAddress()
