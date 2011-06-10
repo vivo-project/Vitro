@@ -12,6 +12,10 @@
         <#assign errorMessage = "An account with that email address already exists." />
     </#if>
     
+    <#if errorEmailInvalidFormat??>
+        <#assign errorMessage = "'${emailAddress}' is not a valid email address." />
+    </#if>
+    
     <#if errorFirstNameIsEmpty??>
         <#assign errorMessage = "You must supply a first name." />
     </#if>

@@ -126,6 +126,13 @@ public class RootUserPolicy implements PolicyIface {
 								+ PROPERTY_ROOT_USER_EMAIL + "'");
 			}
 
+			if (!Authenticator.isValidEmailAddress(emailAddress)) {
+				throw new IllegalStateException("Value for '"
+						+ PROPERTY_ROOT_USER_EMAIL
+						+ "' is not a valid email address: '" + emailAddress
+						+ "'");
+			}
+
 			if (null != uaDao.getUserAccountByEmail(emailAddress)) {
 				throw new IllegalStateException("Can't create root user - "
 						+ "an account already exists with email address '"

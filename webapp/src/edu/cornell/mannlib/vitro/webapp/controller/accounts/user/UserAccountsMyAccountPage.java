@@ -13,6 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsPage;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.admin.UserAccountsEditPage;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 
@@ -30,6 +31,7 @@ public class UserAccountsMyAccountPage extends UserAccountsPage {
 
 	private static final String ERROR_NO_EMAIL = "errorEmailIsEmpty";
 	private static final String ERROR_EMAIL_IN_USE = "errorEmailInUse";
+	private static final String ERROR_EMAIL_INVALID_FORMAT = "errorEmailInvalidFormat";
 	private static final String ERROR_NO_FIRST_NAME = "errorFirstNameIsEmpty";
 	private static final String ERROR_NO_LAST_NAME = "errorLastNameIsEmpty";
 
@@ -87,6 +89,8 @@ public class UserAccountsMyAccountPage extends UserAccountsPage {
 			errorCode = ERROR_NO_EMAIL;
 		} else if (emailIsChanged() && isEmailInUse()) {
 			errorCode = ERROR_EMAIL_IN_USE;
+		} else if (!isEmailValidFormat()) {
+			errorCode = ERROR_EMAIL_INVALID_FORMAT;
 		} else if (firstName.isEmpty()) {
 			errorCode = ERROR_NO_FIRST_NAME;
 		} else if (lastName.isEmpty()) {
@@ -102,6 +106,10 @@ public class UserAccountsMyAccountPage extends UserAccountsPage {
 
 	private boolean isEmailInUse() {
 		return userAccountsDao.getUserAccountByEmail(emailAddress) != null;
+	}
+
+	private boolean isEmailValidFormat() {
+		return Authenticator.isValidEmailAddress(emailAddress);
 	}
 
 	public boolean isValid() {

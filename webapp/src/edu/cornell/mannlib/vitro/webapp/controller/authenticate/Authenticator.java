@@ -6,6 +6,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Hex;
@@ -144,8 +146,30 @@ public abstract class Authenticator {
 		}
 	}
 
+	/**
+	 * Check whether the form of the emailAddress is syntactically correct. Does
+	 * not allow multiple addresses. Does not allow local addresses (without a
+	 * hostname).
+	 * 
+	 * Does not confirm that the host actually exists, or has a mailbox by that
+	 * name.
+	 */
 	public static boolean isValidEmailAddress(String emailAddress) {
-		// TODO check for valid syntax.
-		return (emailAddress != null) && (!emailAddress.isEmpty());
+		try {
+			// InternetAddress constructor will throw an exception if the
+			// address does not have valid format (if "strict" is true).
+			@SuppressWarnings("unused")
+			InternetAddress a = new InternetAddress(emailAddress, true);
+
+			// InternetAddress permits a localname without hostname.
+			// Guard against that.
+			if (emailAddress.indexOf('@') == -1) {
+				return false;
+			}
+
+			return true;
+		} catch (AddressException e) {
+			return false;
+		}
 	}
 }
