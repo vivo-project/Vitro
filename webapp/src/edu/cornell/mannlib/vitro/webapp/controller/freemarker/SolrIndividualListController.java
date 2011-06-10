@@ -120,8 +120,7 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
                     body.put("subtitle", vclass.getName());
                 }
                 body.put("title", title);  
-                body.put("rdfUrl", vreq.getContextPath() + "/listrdf/" + vclass.getLocalName() + ".rdf");
-                getServletContext().setAttribute("classuri", vclass.getURI());
+                body.put("rdfUrl", UrlBuilder.getUrl("/listrdf", "vclass", vclass.getURI()));                         
             }   
 
         } catch (HelpException help){

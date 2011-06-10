@@ -2,11 +2,16 @@
 
 package edu.cornell.mannlib.vedit.beans;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 /**
  * An immutable object that records the user's login info as a session
@@ -15,27 +20,9 @@ import org.apache.commons.logging.LogFactory;
 public class LoginStatusBean {
 	private static final Log log = LogFactory.getLog(LoginStatusBean.class);
 
-	/**
-	 * Security level when the user has not logged in. Also used as a minimum
-	 * level when we want to include every user, logged in or not.
-	 */
-	public static final int ANYBODY = 0;
-
-	/** Security level when a user with no privileges is logged in. */
-	public static final int NON_EDITOR = 1;
-
-	/** Security level when an authorized editor is logged in. */
-	public static final int EDITOR = 4;
-
-	/** Security level when an authorized curator is logged in. */
-	public static final int CURATOR = 5;
-
-	/** Security level when a system administrator is logged in. */
-	public static final int DBA = 50;
-
 	/** A bean to return when the user has not logged in. */
 	private static final LoginStatusBean DUMMY_BEAN = new LoginStatusBean("",
-			"", ANYBODY, AuthenticationSource.UNKNOWN);
+			AuthenticationSource.UNKNOWN);
 
 	/** The bean is attached to the session by this name. */
 	private static final String ATTRIBUTE_NAME = "loginStatus";
@@ -91,6 +78,46 @@ public class LoginStatusBean {
 		return (LoginStatusBean) o;
 	}
 
+	/**
+	 * Get the current user, or null if not logged in.
+	 */
+	public static UserAccount getCurrentUser(HttpServletRequest request) {
+		if (request == null) {
+			return null;
+		}
+		return getCurrentUser(request.getSession(false));
+	}
+
+	/**
+	 * Get the current user, or null if not logged in.
+	 */
+	public static UserAccount getCurrentUser(HttpSession session) {
+		if (session == null) {
+			return null;
+		}
+
+		if (!getBean(session).isLoggedIn()) {
+			return null;
+		}
+
+		ServletContext ctx = session.getServletContext();
+		WebappDaoFactory wadf = (WebappDaoFactory) ctx
+				.getAttribute("webappDaoFactory");
+		if (wadf == null) {
+			log.error("No WebappDaoFactory");
+			return null;
+		}
+
+		UserAccountsDao userAccountsDao = wadf.getUserAccountsDao();
+		if (userAccountsDao == null) {
+			log.error("No UserAccountsDao");
+			return null;
+		}
+
+		String userUri = getBean(session).getUserURI();
+		return userAccountsDao.getUserAccountByUri(userUri);
+	}
+
 	// ----------------------------------------------------------------------
 	// the bean
 	// ----------------------------------------------------------------------
@@ -100,15 +127,11 @@ public class LoginStatusBean {
 	}
 
 	private final String userURI;
-	private final String username;
-	private final int securityLevel;
 	private final AuthenticationSource authenticationSource;
 
-	public LoginStatusBean(String userURI, String username, int securityLevel,
+	public LoginStatusBean(String userURI,
 			AuthenticationSource authenticationSource) {
 		this.userURI = userURI;
-		this.username = username;
-		this.securityLevel = securityLevel;
 		this.authenticationSource = authenticationSource;
 	}
 
@@ -116,28 +139,12 @@ public class LoginStatusBean {
 		return userURI;
 	}
 
-	public String getUsername() {
-		return username;
-	}
-
-	public int getSecurityLevel() {
-		return securityLevel;
-	}
-
 	public AuthenticationSource getAuthenticationSource() {
 		return authenticationSource;
 	}
 
 	public boolean isLoggedIn() {
-		return securityLevel > ANYBODY;
-	}
-
-	public boolean isLoggedInExactly(int level) {
-		return securityLevel == level;
-	}
-
-	public boolean isLoggedInAtLeast(int minimumLevel) {
-		return securityLevel >= minimumLevel;
+		return authenticationSource != AuthenticationSource.UNKNOWN;
 	}
 
 	public boolean hasExternalAuthentication() {
@@ -146,9 +153,8 @@ public class LoginStatusBean {
 
 	@Override
 	public String toString() {
-		return "LoginStatusBean[userURI=" + userURI + ", username=" + username
-				+ ", securityLevel=" + securityLevel
-				+ ", authenticationSource=" + authenticationSource + "]";
+		return "LoginStatusBean[userURI=" + userURI + ", authenticationSource="
+				+ authenticationSource + "]";
 	}
 
 }

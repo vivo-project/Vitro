@@ -33,8 +33,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController.PageRecord;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.SolrIndividualListController.PageRecord;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.SolrIndividualListController;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -43,7 +43,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.SelectListGenerator;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
 
 /**
  * This servlet is for servicing requests for JSON objects/data.
@@ -51,10 +50,12 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.Individual
  * @author bdc34
  *
  */
-
-// RY Rename to JsonServlet once the transition to Solr is complete.
 public class SolrJsonServlet extends VitroHttpServlet {
-
+    
+    private static final long serialVersionUID = 1L;
+    private static final Log log = LogFactory.getLog(SolrJsonServlet.class);
+    private static final int REPLY_SIZE = 256;
+    
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         super.doPost(req, resp);
@@ -77,8 +78,8 @@ public class SolrJsonServlet extends VitroHttpServlet {
             }else if( vreq.getParameter("getN3EditOptionList") != null ){
                 doN3EditOptionList(req,resp);
                 return;
-            }else if( vreq.getParameter("getLuceneIndividualsByVClass") != null ){
-                getLuceneIndividualsByVClass(req,resp);
+            }else if( vreq.getParameter("getSolrIndividualsByVClass") != null ){
+                getSolrIndividualsByVClass(req,resp);
                 return;
             }else if( vreq.getParameter("getVClassesForVClassGroup") != null ){
                 getVClassesForVClassGroup(req,resp);
@@ -125,7 +126,7 @@ public class SolrJsonServlet extends VitroHttpServlet {
         writer.write(map.toString());                        
     }
 
-    private void getLuceneIndividualsByVClass( HttpServletRequest req, HttpServletResponse resp ){
+    private void getSolrIndividualsByVClass( HttpServletRequest req, HttpServletResponse resp ){
         String errorMessage = null;
         JSONObject rObj = null;
         try{            
@@ -144,7 +145,7 @@ public class SolrJsonServlet extends VitroHttpServlet {
                 log.debug("parameter vclassId URI parameter expected ");
                 throw new Exception("parameter vclassId URI parameter expected ");
             }
-            rObj = getLuceneIndividualsByVClass(vclass.getURI(),req, getServletContext());
+            rObj = getSolrIndividualsByVClass(vclass.getURI(),req, getServletContext());
         }catch(Exception ex){
             errorMessage = ex.toString();
             log.error(ex,ex);
@@ -173,7 +174,7 @@ public class SolrJsonServlet extends VitroHttpServlet {
         
     }
     
-    public static JSONObject getLuceneIndividualsByVClass(String vclassURI, HttpServletRequest req, ServletContext context) throws Exception {
+    public static JSONObject getSolrIndividualsByVClass(String vclassURI, HttpServletRequest req, ServletContext context) throws Exception {
         
         VitroRequest vreq = new VitroRequest(req);        
         VClass vclass=null;
@@ -191,6 +192,7 @@ public class SolrJsonServlet extends VitroHttpServlet {
         
         
         if( log.isDebugEnabled() ){
+            @SuppressWarnings("unchecked")
             Enumeration<String> e = vreq.getParameterNames();
             while(e.hasMoreElements()){
                 String name = (String)e.nextElement();
@@ -222,9 +224,9 @@ public class SolrJsonServlet extends VitroHttpServlet {
                                 .put("name",vclass.getName()));
         
         if (vclass != null) {
-            String alpha = IndividualListController.getAlphaParameter(vreq);
-            int page = IndividualListController.getPageParameter(vreq);
-            Map<String,Object> map = IndividualListController.getResultsForVClass(
+            String alpha = SolrIndividualListController.getAlphaParameter(vreq);
+            int page = SolrIndividualListController.getPageParameter(vreq);
+            Map<String,Object> map = SolrIndividualListController.getResultsForVClass(
                     vclass.getURI(), 
                     page, 
                     alpha, 
@@ -234,8 +236,9 @@ public class SolrJsonServlet extends VitroHttpServlet {
             rObj.put("totalCount", map.get("totalCount"));
             rObj.put("alpha", map.get("alpha"));
                             
+            @SuppressWarnings("unchecked")
             List<Individual> inds = (List<Individual>)map.get("entities");
-            List<IndividualTemplateModel> indsTm = new ArrayList<IndividualTemplateModel>();
+
             JSONArray jInds = new JSONArray();
             for(Individual ind : inds ){
                 JSONObject jo = new JSONObject();
@@ -259,6 +262,7 @@ public class SolrJsonServlet extends VitroHttpServlet {
             rObj.put("individuals", jInds);
             
             JSONArray wpages = new JSONArray();
+            @SuppressWarnings("unchecked")
             List<PageRecord> pages = (List<PageRecord>)map.get("pages");                
             for( PageRecord pr: pages ){                    
                 JSONObject p = new JSONObject();
@@ -382,6 +386,7 @@ public class SolrJsonServlet extends VitroHttpServlet {
         HttpSession session = vreq.getSession();
         if( session == null )
             throw new ServletException("there is no session to get the pervious results from");
+        @SuppressWarnings("unchecked")
         List<Individual> entsInVClass = (List<Individual>) session.getAttribute(resKey);
         if( entsInVClass == null )
             throw new ServletException("Could not find List<Individual> for resultKey " + resKey);
@@ -389,7 +394,6 @@ public class SolrJsonServlet extends VitroHttpServlet {
         List<Individual> entsToReturn = new ArrayList<Individual>(REPLY_SIZE);
         boolean more = false;
         int count = 0;
-        int size = REPLY_SIZE;
         /* we have a large number of items to send back so we need to stash the list in the session scope */
         if( entsInVClass.size() > REPLY_SIZE){
             more = true;
@@ -544,7 +548,7 @@ public class SolrJsonServlet extends VitroHttpServlet {
 
     private JSONArray individualsToJson(List<Individual> individuals) throws ServletException {
         JSONArray ja = new JSONArray();
-        Iterator it = individuals.iterator();
+        Iterator<Individual> it = individuals.iterator();
         try{
             while(it.hasNext()){
                 Individual ent = (Individual) it.next();
@@ -560,7 +564,4 @@ public class SolrJsonServlet extends VitroHttpServlet {
         return ja;
     }
 
-    private static final int REPLY_SIZE = 256;
-
-    private static final Log log = LogFactory.getLog(JSONServlet.class.getName());
 }

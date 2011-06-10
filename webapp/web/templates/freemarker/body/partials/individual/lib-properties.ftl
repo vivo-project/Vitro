@@ -29,9 +29,10 @@
 
 <#macro dataPropertyList property editable>
     <#list property.statements as statement>
-        <@propertyListItem property statement editable>${statement.value}</@propertyListItem>
+        <@propertyListItem property statement editable >${statement.value}</@propertyListItem>
     </#list> 
 </#macro>
+
 
 <#macro objectProperty property editable template=property.template>
     <#if property.collatedBySubclass> <#-- collated -->
@@ -44,14 +45,15 @@
     </#if>
 </#macro>
 
-<#macro collatedObjectPropertyList property editable template=property.template>
+
+<#macro collatedObjectPropertyList property editable template=property.template >
     <#assign subclasses = property.subclasses>
     <#list subclasses?keys as subclass>
         <#if subclass?has_content>
             <li class="subclass" role="listitem">
                 <h3>${subclass?lower_case}</h3>
                 <ul class="subclass-property-list">
-                    <@objectPropertyList property editable subclasses[subclass] template/>
+                    <@objectPropertyList property editable subclasses[subclass] template />
                 </ul>
             </li>
         <#else>
@@ -73,7 +75,7 @@ Assumes property is non-null. -->
 
 <#macro objectPropertyList property editable statements=property.statements template=property.template>
     <#list statements as statement>
-        <@propertyListItem property statement editable><#include "${template}"></@propertyListItem>
+     <@propertyListItem property statement editable><#include "${template}"></@propertyListItem>
     </#list>
 </#macro>
 
@@ -90,6 +92,7 @@ name will be used as the label. -->
 
 <#macro addLink property editable label="${property.name}" extraParams="">
     <#if editable>
+    	<#--@dump var="property"/-->
         <#local url = property.addUrl>
         <#if url?has_content>
             <@showAddLink property.localName label addParamsToEditUrl(url, extraParams) />
@@ -114,10 +117,11 @@ name will be used as the label. -->
     <h2 id="${property.localName}">${label} <@verboseDisplay property /></h2>     
 </#macro>
 
-<#macro propertyListItem property statement editable>
+
+<#macro propertyListItem property statement editable >
     <li role="listitem">    
         <#nested>        
-        <@editingLinks "${property.localName}" statement editable />
+        <@editingLinks "${property.localName}" statement editable/>
     </li>
 </#macro>
 
@@ -236,3 +240,5 @@ name will be used as the label. -->
     ${label.value}
     <@editingLinks "label" label editable />
 </#macro>
+
+

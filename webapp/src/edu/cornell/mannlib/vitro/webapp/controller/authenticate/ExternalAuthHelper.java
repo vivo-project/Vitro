@@ -34,8 +34,8 @@ public class ExternalAuthHelper {
 	/** This configuration property points to the external authorization server. */
 	private static final String PROPERTY_EXTERNAL_AUTH_SERVER_URL = "externalAuth.serverUrl";
 
-	/** This configuration property says which HTTP header holds the username. */
-	public static final String PROPERTY_EXTERNAL_AUTH_USERNAME_HEADER = "externalAuth.netIdHeaderName";
+	/** This configuration property says which HTTP header holds the auth ID. */
+	public static final String PROPERTY_EXTERNAL_AUTH_ID_HEADER = "externalAuth.netIdHeaderName";
 
 	// ----------------------------------------------------------------------
 	// static methods
@@ -82,7 +82,7 @@ public class ExternalAuthHelper {
 		String externalAuthServerUrl = ConfigurationProperties.getBean(ctx)
 				.getProperty(PROPERTY_EXTERNAL_AUTH_SERVER_URL);
 		String externalAuthHeaderName = ConfigurationProperties.getBean(ctx)
-				.getProperty(PROPERTY_EXTERNAL_AUTH_USERNAME_HEADER);
+				.getProperty(PROPERTY_EXTERNAL_AUTH_ID_HEADER);
 
 		return new ExternalAuthHelper(externalAuthServerUrl,
 				externalAuthHeaderName);
@@ -134,7 +134,7 @@ public class ExternalAuthHelper {
 		}
 	}
 
-	public String getExternalUsername(HttpServletRequest request) {
+	public String getExternalAuthId(HttpServletRequest request) {
 		if (request == null) {
 			log.error("request is null.");
 			return null;
@@ -143,13 +143,13 @@ public class ExternalAuthHelper {
 		if (externalAuthHeaderName == null) {
 			log.error("User asked for external authentication, "
 					+ "but deploy.properties doesn't contain a value for '"
-					+ PROPERTY_EXTERNAL_AUTH_USERNAME_HEADER + "'");
+					+ PROPERTY_EXTERNAL_AUTH_ID_HEADER + "'");
 			return null;
 		}
 
-		String username = request.getHeader(externalAuthHeaderName);
-		log.debug("username=" + username);
-		return username;
+		String externalAuthId = request.getHeader(externalAuthHeaderName);
+		log.debug("externalAuthId=" + externalAuthId);
+		return externalAuthId;
 	}
 
 	@Override

@@ -1,7 +1,7 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
 <#-- Default individual profile page template -->
-
+<#--@dumpAll /-->
 <section id="individual-intro" class="vcard" role="region">
     <#-- Image -->
     <#assign individualImage>

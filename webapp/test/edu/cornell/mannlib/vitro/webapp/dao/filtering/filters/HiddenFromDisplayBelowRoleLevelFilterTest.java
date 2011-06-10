@@ -2,17 +2,19 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.filtering.filters;
 
-import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.CURATOR;
-import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.DBA;
-import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.EDITOR;
-import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.NON_EDITOR;
 import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource.INTERNAL;
+import static edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader.URI_CURATOR;
+import static edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader.URI_DBA;
+import static edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader.URI_EDITOR;
+import static edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader.URI_SELF_EDITOR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,8 +27,10 @@ import org.junit.runners.Parameterized.Parameters;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDaoStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.IndividualDaoStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDaoStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDaoStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryStub;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
@@ -37,6 +41,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 
 /**
@@ -72,11 +77,11 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 
 		boolean expectedResult;
 
-		public String getUsername() {
+		public String getUserUri() {
 			if (loginStatus == null) {
 				return "nobody";
 			} else {
-				return loginStatus.getUsername();
+				return loginStatus.getUserURI();
 			}
 		}
 
@@ -95,15 +100,51 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 
 	private static final String NS = "http://someDomain/individual/";
 
+	private static final UserAccount USER_SELF = userAccount("userSelf",
+			"self_editor", URI_SELF_EDITOR);
+	private static final UserAccount USER_EDITOR = userAccount("userEditor",
+			"editor", URI_EDITOR);
+	private static final UserAccount USER_CURATOR = userAccount("userCurator",
+			"curator", URI_CURATOR);
+	private static final UserAccount USER_DBA = userAccount(NS + "userDba",
+			"dba", URI_DBA);
+
+	/** Create a User */
+	private static UserAccount userAccount(String uri, String emailAddress,
+			String roleUri) {
+		UserAccount user = new UserAccount();
+		user.setUri(NS + uri);
+		user.setEmailAddress(emailAddress);
+		user.setPermissionSetUris(Collections.singleton(roleUri));
+		return user;
+	}
+
+	private static final UserAccountsDaoStub DAO_USER_ACCOUNT = userAccountsDao(USER_SELF, USER_EDITOR,
+			USER_CURATOR, USER_DBA);
+
+	/** Create the UserAccountsDao */
+	private static UserAccountsDaoStub userAccountsDao(UserAccount... users) {
+		UserAccountsDaoStub dao = new UserAccountsDaoStub();
+		for (UserAccount user : users) {
+			dao.addUser(user);
+		}
+		return dao;
+	}
+
 	private static final LoginStatusBean LOGIN_NONE = null;
-	private static final LoginStatusBean LOGIN_SELF = new LoginStatusBean(NS
-			+ "userSelf", "self_editor", NON_EDITOR, INTERNAL);
-	private static final LoginStatusBean LOGIN_EDITOR = new LoginStatusBean(NS
-			+ "userEditor", "editor", EDITOR, INTERNAL);
-	private static final LoginStatusBean LOGIN_CURATOR = new LoginStatusBean(NS
-			+ "userCurator", "curator", CURATOR, INTERNAL);
-	private static final LoginStatusBean LOGIN_DBA = new LoginStatusBean(NS
-			+ "userDba", "dba", DBA, INTERNAL);
+	private static final LoginStatusBean LOGIN_SELF = loginStatusBean(
+			USER_SELF, INTERNAL);
+	private static final LoginStatusBean LOGIN_EDITOR = loginStatusBean(
+			USER_EDITOR, INTERNAL);
+	private static final LoginStatusBean LOGIN_CURATOR = loginStatusBean(
+			USER_CURATOR, INTERNAL);
+	private static final LoginStatusBean LOGIN_DBA = loginStatusBean(USER_DBA,
+			INTERNAL);
+
+	private static LoginStatusBean loginStatusBean(UserAccount user,
+			AuthenticationSource auth) {
+		return new LoginStatusBean(user.getUri(), auth);
+	}
 
 	private static final LoginStatusBean[] LOGINS = new LoginStatusBean[] {
 			LOGIN_NONE, LOGIN_SELF, LOGIN_EDITOR, LOGIN_CURATOR, LOGIN_DBA };
@@ -530,7 +571,7 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 		@Override
 		public String describeTest() {
 			String message = "IndividualTest, login=" + getRoleLevel() + "("
-					+ getUsername() + ")";
+					+ getUserUri() + ")";
 			if (individual == null) {
 				message += ", individual=null";
 			} else {
@@ -558,7 +599,7 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 		@Override
 		public String describeTest() {
 			String message = "VClassTest, login=" + getRoleLevel() + "("
-					+ getUsername() + ")";
+					+ getUserUri() + ")";
 			if (vClass == null) {
 				message += ", vClass=null";
 			} else {
@@ -586,7 +627,7 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 		@Override
 		public String describeTest() {
 			String message = "DataPropertyTest, login=" + getRoleLevel() + "("
-					+ getUsername() + ")";
+					+ getUserUri() + ")";
 			if (dataProperty == null) {
 				message += ", dataProperty=null";
 			} else {
@@ -614,7 +655,7 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 		@Override
 		public String describeTest() {
 			String message = "ObjectPropertyTest, login=" + getRoleLevel()
-					+ "(" + getUsername() + ")";
+					+ "(" + getUserUri() + ")";
 			if (objectProperty == null) {
 				message += ", objectProperty=null";
 			} else {
@@ -657,7 +698,7 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 		@Override
 		public String describeTest() {
 			String message = "DataPropertyStatementTest, login="
-					+ getRoleLevel() + "(" + getUsername() + ")";
+					+ getRoleLevel() + "(" + getUserUri() + ")";
 
 			if (subject == null) {
 				message += ", subject=null";
@@ -714,7 +755,7 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 		@Override
 		public String describeTest() {
 			String message = "ObjectPropertyStatementTest, login="
-					+ getRoleLevel() + "(" + getUsername() + ")";
+					+ getRoleLevel() + "(" + getUserUri() + ")";
 
 			if (subject == null) {
 				message += ", subject=null";
@@ -739,21 +780,32 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 	}
 
 	public static RoleLevel getRoleLevel(LoginStatusBean loginStatus) {
-		if (loginStatus != null) {
-			switch (loginStatus.getSecurityLevel()) {
-			case LoginStatusBean.NON_EDITOR:
-				return RoleLevel.SELF;
-			case LoginStatusBean.EDITOR:
-				return RoleLevel.EDITOR;
-			case LoginStatusBean.CURATOR:
-				return RoleLevel.CURATOR;
-			case LoginStatusBean.DBA:
-				return RoleLevel.DB_ADMIN;
-			default:
-				break;
-			}
+		if (loginStatus == null) {
+			return RoleLevel.PUBLIC;
 		}
-		return RoleLevel.PUBLIC;
+
+		String userUri = loginStatus.getUserURI();
+		if (userUri == null) {
+			return RoleLevel.PUBLIC;
+		}
+
+		UserAccount user = DAO_USER_ACCOUNT.getUserAccountByUri(userUri);
+		if (user == null) {
+			return RoleLevel.PUBLIC;
+		}
+
+		Set<String> roleUris = user.getPermissionSetUris();
+		if (roleUris.contains(URI_DBA)) {
+			return RoleLevel.DB_ADMIN; 
+		} else 		if (roleUris.contains(URI_CURATOR)) {
+			return RoleLevel.CURATOR; 
+		} else 		if (roleUris.contains(URI_EDITOR)) {
+			return RoleLevel.EDITOR; 
+		} else 		if (roleUris.contains(URI_SELF_EDITOR)) {
+			return RoleLevel.SELF; 
+ 		} else {
+			return RoleLevel.PUBLIC;
+		}
 	}
 
 	// ----------------------------------------------------------------------

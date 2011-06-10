@@ -53,12 +53,14 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         put("vitroPublic", VitroVocabulary.VITRO_PUBLIC);
     }};
     
-    protected static String prefixes = "";
+    protected static final String PREFIXES;
     static {
+        String prefixes = "";
         for (String key : NAMESPACES.keySet()) {
             prefixes += "PREFIX " + key + ": <" + NAMESPACES.get(key) + ">\n";
         }
-        log.debug("Query prefixes: " + prefixes);
+        PREFIXES = prefixes;
+        log.debug("Query prefixes: " + PREFIXES);
     }
     
     protected DatasetWrapperFactory dwf;

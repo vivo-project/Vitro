@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+
+<!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+
+<rdf:RDF
+  xmlns:owl  ="http://www.w3.org/2002/07/owl#"
+  xmlns:rdf  ="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs ="http://www.w3.org/2000/01/rdf-schema#"
+  xmlns:xsd  ="http://www.w3.org/2001/XMLSchema#"
+  xmlns:vitro="http://vitro.mannlib.cornell.edu/ns/vitro/0.7#"
+  xmlns      =""
+ >
+
+<owl:Ontology rdf:about="">
+ <rdfs:comment>
+    An ontology with a property with a prohibited annotation for unit testing.  
+ </rdfs:comment>
+</owl:Ontology>
+
+<owl:AnnotationProperty rdf:about="vitro:selfEditProhibitedAnnot"/>
+
+<owl:ObjectProperty rdf:about="vitro:hasSuperPowers">
+  <vitro:selfEditProhibitedAnnot rdf:datatype="xsd:boolean">true</vitro:selfEditProhibitedAnnot>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="vitro:mayPrintMoney">
+  <vitro:selfEditProhibitedAnnot rdf:datatype="xsd:boolean">true</vitro:selfEditProhibitedAnnot>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="vitro:getsOutOfJailFree">
+  <vitro:selfEditProhibitedAnnot rdf:datatype="xsd:boolean">true</vitro:selfEditProhibitedAnnot>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="vitro:canDeleteModel">
+  <vitro:selfEditProhibitedAnnot rdf:datatype="xsd:boolean">true</vitro:selfEditProhibitedAnnot>
+</owl:ObjectProperty>
+
+
+<owl:DatatypeProperty rdf:about="vitro:felonies">
+  <vitro:selfEditProhibitedAnnot rdf:datatype="xsd:boolean">true</vitro:selfEditProhibitedAnnot>
+</owl:DatatypeProperty>
+
+
+</rdf:RDF>
+

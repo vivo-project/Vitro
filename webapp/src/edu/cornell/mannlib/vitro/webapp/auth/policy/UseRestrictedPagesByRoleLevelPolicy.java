@@ -13,6 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndividuals;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOwnAccount;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditSiteInformation;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManagePortals;
@@ -102,6 +103,9 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		} else if (whatToAuth instanceof UseMiscellaneousPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
 			
+		} else if (whatToAuth instanceof EditOwnAccount) {
+			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
+			
 		} else {
 			result = defaultDecision("Unrecognized action");
 		}
@@ -140,4 +144,8 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		return new BasicPolicyDecision(Authorization.INCONCLUSIVE, message);
 	}
 
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + " - " + hashCode();
+	}
 }

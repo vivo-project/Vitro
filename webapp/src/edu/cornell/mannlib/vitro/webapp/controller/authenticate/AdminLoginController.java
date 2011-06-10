@@ -3,6 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
 import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource.INTERNAL;
+import static edu.cornell.mannlib.vitro.webapp.beans.UserAccount.MAX_PASSWORD_LENGTH;
+import static edu.cornell.mannlib.vitro.webapp.beans.UserAccount.MIN_PASSWORD_LENGTH;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.beans.User;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -30,7 +32,7 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory
 			.getLog(AdminLoginController.class);
 
-	public static final String PARAMETER_USERNAME = "username";
+	public static final String PARAMETER_EMAIL_ADDRESS = "email";
 	public static final String PARAMETER_PASSWORD = "password";
 	public static final String PARAMETER_NEW_PASSWORD = "newPassword";
 	public static final String PARAMETER_CONFIRM_PASSWORD = "confirmPassword";
@@ -40,7 +42,7 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 
 	public static final String TEMPLATE_NAME = "adminLogin.ftl";
 
-	private static final String MESSAGE_NO_USERNAME = "errorNoUser";
+	private static final String MESSAGE_NO_EMAIL_ADDRESS = "errorNoEmail";
 	private static final String MESSAGE_NO_PASSWORD = "errorNoPassword";
 	private static final String MESSAGE_LOGIN_FAILED = "errorLoginFailed";
 	private static final String MESSAGE_NEW_PASSWORD_REQUIRED = "newPasswordRequired";
@@ -64,32 +66,37 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 	private static class Core {
 		private final Authenticator auth;
 
-		private final String username;
+		private final String emailAddress;
 		private final String password;
 		private final String newPassword;
 		private final String confirmPassword;
+		private final UserAccount userAccount;
 
 		public Core(VitroRequest vreq) {
 			this.auth = Authenticator.getInstance(vreq);
 
-			this.username = nonNull(vreq.getParameter(PARAMETER_USERNAME));
+			this.emailAddress = nonNull(vreq
+					.getParameter(PARAMETER_EMAIL_ADDRESS));
 			this.password = nonNull(vreq.getParameter(PARAMETER_PASSWORD));
 			this.newPassword = nonNull(vreq
 					.getParameter(PARAMETER_NEW_PASSWORD));
 			this.confirmPassword = nonNull(vreq
 					.getParameter(PARAMETER_CONFIRM_PASSWORD));
 
-			log.debug("Parameters: username='" + username + "', password='"
+			log.debug("Parameters: email='" + emailAddress + "', password='"
 					+ password + "', newPassword='" + newPassword
 					+ "', confirmPassword='" + confirmPassword + "'");
+
+			this.userAccount = this.auth
+					.getAccountForInternalAuth(emailAddress);
 		}
 
 		public ResponseValues process() {
-			if (username.isEmpty() && password.isEmpty()) {
+			if (emailAddress.isEmpty() && password.isEmpty()) {
 				return showForm();
 			}
-			if (username.isEmpty()) {
-				return showForm(MESSAGE_NO_USERNAME);
+			if (emailAddress.isEmpty()) {
+				return showForm(MESSAGE_NO_EMAIL_ADDRESS);
 			}
 			if (password.isEmpty()) {
 				return showForm(MESSAGE_NO_PASSWORD);
@@ -121,21 +128,21 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 		}
 
 		private boolean newPasswordRequired() {
-			return auth.isCurrentPassword(username, password)
-					&& auth.isPasswordChangeRequired(username);
+			return auth.isCurrentPassword(userAccount, password)
+					&& (userAccount.isPasswordChangeRequired());
 		}
 
 		private boolean isPasswordValidLength(String pw) {
-			return (pw.length() >= User.MIN_PASSWORD_LENGTH)
-					&& (pw.length() <= User.MAX_PASSWORD_LENGTH);
+			return (pw.length() >= MIN_PASSWORD_LENGTH)
+					&& (pw.length() <= MAX_PASSWORD_LENGTH);
 		}
 
 		private boolean tryToLogin() {
-			if (auth.isCurrentPassword(username, password)) {
-				auth.recordLoginAgainstUserAccount(username, INTERNAL);
+			if (auth.isCurrentPassword(userAccount, password)) {
+				auth.recordLoginAgainstUserAccount(userAccount, INTERNAL);
 
 				if (!newPassword.isEmpty()) {
-					auth.recordNewPassword(username, newPassword);
+					auth.recordNewPassword(userAccount, newPassword);
 				}
 
 				return true;
@@ -147,7 +154,7 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 		private ResponseValues showForm(String... codes) {
 			Map<String, Object> body = new HashMap<String, Object>();
 			body.put("controllerUrl", UrlBuilder.getUrl(URL_THIS));
-			body.put("username", username);
+			body.put("email", emailAddress);
 			body.put("password", password);
 			body.put("newPassword", newPassword);
 			body.put("confirmPassword", confirmPassword);
@@ -157,7 +164,7 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 			}
 
 			log.debug("showing form with values: " + body);
-			
+
 			return new TemplateResponseValues(TEMPLATE_NAME, body);
 		}
 

@@ -28,6 +28,11 @@ public class UserAccountsDaoFiltering extends BaseFiltering implements
 	}
 
 	@Override
+	public Collection<UserAccount> getAllUserAccounts() {
+		return innerDao.getAllUserAccounts();
+	}
+
+	@Override
 	public UserAccount getUserAccountByUri(String uri) {
 		return innerDao.getUserAccountByUri(uri);
 	}
@@ -35,6 +40,16 @@ public class UserAccountsDaoFiltering extends BaseFiltering implements
 	@Override
 	public UserAccount getUserAccountByEmail(String emailAddress) {
 		return innerDao.getUserAccountByEmail(emailAddress);
+	}
+
+	@Override
+	public UserAccount getUserAccountByExternalAuthId(String externalAuthId) {
+		return innerDao.getUserAccountByExternalAuthId(externalAuthId);
+	}
+	
+	@Override
+	public boolean isRootUser(UserAccount userAccount) {
+		return innerDao.isRootUser(userAccount);
 	}
 
 	@Override
@@ -61,4 +76,5 @@ public class UserAccountsDaoFiltering extends BaseFiltering implements
 	public Collection<PermissionSet> getAllPermissionSets() {
 		return innerDao.getAllPermissionSets();
 	}
+
 }

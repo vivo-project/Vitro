@@ -337,7 +337,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
 
 
     /**
-     * Get the class groups represented for the individuals in the topDocs.
+     * Get the class groups represented for the individuals in the documents.
      */
     private List<VClassGroup> getClassGroups(VClassGroupDao grpDao, SolrDocumentList docs) {        
         LinkedHashMap<String,VClassGroup> grpMap = grpDao.getClassGroupMap();

@@ -14,6 +14,11 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 public interface UserAccountsDao {
 
 	/**
+	 * Get all of the UserAccounts in the model.
+	 */
+	Collection<UserAccount> getAllUserAccounts();
+
+	/**
 	 * Get the UserAccount for this URI.
 	 * 
 	 * @return null if the URI is null, or if there is no such UserAccount
@@ -28,6 +33,18 @@ public interface UserAccountsDao {
 	 */
 	UserAccount getUserAccountByEmail(String emailAddress);
 
+	/**
+	 * Get the UserAccount for this External Authentication ID
+	 * 
+	 * @return null if the ID is null, or if there is no such UserAccount
+	 */
+	UserAccount getUserAccountByExternalAuthId(String externalAuthId);
+
+	/**
+	 * Is this UserAccount a root user?
+	 */
+	boolean isRootUser(UserAccount userAccount);
+	
 	/**
 	 * Create a new UserAccount in the model.
 	 * 
@@ -75,7 +92,7 @@ public interface UserAccountsDao {
 	PermissionSet getPermissionSetByUri(String uri);
 
 	/**
-	 * Get all of the PermissionSets in the model.
+	 * Get all of the PermissionSets in the model, sorted by URI.
 	 * 
 	 * @return a collection which might be empty, but is never null.
 	 */

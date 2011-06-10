@@ -66,7 +66,7 @@
     -->
 
     <!-- The StrField type is not analyzed, but indexed/stored verbatim. -->
-    <fieldType name="string" class="solr.StrField" sortMissingLast="true"/>
+    <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
 
     <!-- boolean type: "true" or "false" -->
     <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true" omitNorms="true"/>
@@ -480,19 +480,23 @@
 <field name="classLocalName" type="text" indexed="true" stored="true" multiValued="true"/>
 <field name="classLocalNameLowerCase" type="text" indexed="true" stored="false" multiValued="true"/>
 
-<field name="classgroup" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
-<field name="PROHIBITED_FROM_TEXT_RESULTS" type="string" indexed="true" stored="false" omitNorms="true" multiValued="false"/>
+<field name="classgroup" type="string" indexed="true" stored="true" required="true" multiValued="true"/>
+<field name="PROHIBITED_FROM_TEXT_RESULTS" type="string" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
 <field name="URI" type="string" indexed="true" stored="true" multiValued="false" omitNorms="true"/>
 
-<field name="nameRaw" type="string" indexed="true" stored="true" multiValued="true"/>
+<field name="nameRaw" type="string" indexed="false" stored="true" multiValued="true"/>
 <!-- RY Not sure if we need to store nameLowercase -->
 <field name="nameLowercase" type="string" indexed="true" stored="true" multiValued="true"/>
 <!-- A sortable version of nameLowercase -->
 <field name="nameLowercaseSingleValued" type="lowercase" indexed="true" stored="false" multiValued="false" /> 
-<field name="nameUnstemmed" type="text" indexed="true" stored="false" multiValued="true"/>
+<field name="nameUnstemmed" type="lowercase" indexed="true" stored="false" multiValued="true"/>
 <field name="nameStemmed" type="text" indexed="true" stored="false" multiValued="true"/>
-<field name="acNameUnstemmed" type="textUnstemmed" indexed="true" stored="false" multiValued="true"/>
-<field name="acNameStemmed" type="text" indexed="true" stored="false" multiValued="true"/>
+
+   <!--
+    <field name="prefixNameUnstemmed" type="prefixTextUnstemmed" indexed="true" stored="false" multiValued="true"/>
+    <field name="prefixNameStemmed" type="prefixText" indexed="true" stored="false" multiValued="true"/>
+   -->
+
 <field name="indexedTime" type="string" indexed="true" stored="true" multiValued="true"/>
 <field name="NAME_PHONETIC" type ="phonetic" indexed="true" stored="false" multiValued="true"/>
 

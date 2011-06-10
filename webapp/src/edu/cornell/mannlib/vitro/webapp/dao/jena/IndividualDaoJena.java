@@ -650,38 +650,20 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         return keywords;
     }
 
-	public String getIndividualURIFromNetId(String netIdStr, String netidMatchingPropertyUri) {
-		if (netidMatchingPropertyUri == null) {
-			return null;
-		}
-
-        Property prop = getOntModel().getProperty(netidMatchingPropertyUri);
-        Literal netid = getOntModel().createLiteral(netIdStr);
-        
-        ResIterator stmts = null;
-        try{
-            stmts = getOntModel().listResourcesWithProperty(prop, netid);
-            if (stmts.hasNext()) {
-                return stmts.nextResource().getURI();
-            } else {
-            	return null;
-            }
-        }   finally{
-            if( stmts != null ) stmts.close();
-        }
-    }
-
     /**
      * In Jena it can be difficult to get an object with a given dataproperty if
      * you do not care about the datatype or lang of the literal.  Use this
      * method if you would like to ignore the lang and datatype.  
+     * 
+     * Note: this method doesn't require that a property be declared in the 
+     * ontology as a data property -- only that it behaves as one.
      */
     public List<Individual> getIndividualsByDataProperty(String dataPropertyUri, String value){        
         Property prop = null;
         if( RDFS.label.getURI().equals( dataPropertyUri )){
             prop = RDFS.label;
         }else{
-            prop = getOntModel().getDatatypeProperty(dataPropertyUri);
+            prop = getOntModel().getProperty(dataPropertyUri);
         }
 
         if( prop == null ) {            

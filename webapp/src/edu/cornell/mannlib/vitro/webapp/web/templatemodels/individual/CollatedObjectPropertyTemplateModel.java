@@ -41,7 +41,6 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         Pattern.compile("ORDER\\s+BY\\s+(DESC\\s*\\(\\s*)?\\?" + SUBCLASS_VARIABLE_NAME, Pattern.CASE_INSENSITIVE);
     
     private SortedMap<String, List<ObjectPropertyStatementTemplateModel>> subclasses;
-    private WebappDaoFactory wdf;
     
     CollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, 
             VitroRequest vreq, EditingPolicyHelper policyHelper,
@@ -53,20 +52,16 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         subclasses = new TreeMap<String, List<ObjectPropertyStatementTemplateModel>>();
         
         if (populatedObjectPropertyList.contains(op)) {
-            log.debug("Getting data for populated object property " + getUri());
+            log.debug("Getting data for populated object property " + op.getURI());
+            
             /* Get the data */
-            wdf = vreq.getWebappDaoFactory();
-            ObjectPropertyStatementDao opDao = wdf.getObjectPropertyStatementDao();
-            String subjectUri = subject.getURI();
-            String propertyUri = op.getURI();
-            List<Map<String, String>> statementData = 
-                opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, getObjectKey(), getSelectQuery(), getConstructQueries());
-    
+            List<Map<String, String>> statementData = getStatementData();
+                    
             /* Apply post-processing */
-            postprocess(statementData, wdf);
+            postprocess(statementData);
             
             /* Collate the data */
-           subclasses = collate(subjectUri, propertyUri, statementData, vreq, policyHelper);
+           subclasses = collate(subjectUri, propertyUri, statementData, policyHelper);
             
             for (List<ObjectPropertyStatementTemplateModel> list : subclasses.values()) {
                 postprocessStatementList(list);
@@ -139,7 +134,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
                 }                
             }
             // Sort the data for this object from most to least specific subclass, with nulls at end
-            Collections.sort(dataForThisObject, new SubclassComparator(wdf)); 
+            Collections.sort(dataForThisObject, new SubclassComparator()); 
             filteredList.add(dataForThisObject.get(0));
         }
 
@@ -155,8 +150,8 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         
         private VClassDao vclassDao;
         
-        SubclassComparator(WebappDaoFactory wdf) {
-            this.vclassDao = wdf.getVClassDao();
+        SubclassComparator() {
+            this.vclassDao = vreq.getWebappDaoFactory().getVClassDao();
         }
 
         @Override
@@ -197,7 +192,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
     
     // Collate the statements by subclass. 
     private SortedMap<String, List<ObjectPropertyStatementTemplateModel>> collate(String subjectUri, String propertyUri,
-            List<Map<String, String>> statementData, VitroRequest vreq, EditingPolicyHelper policyHelper) {
+            List<Map<String, String>> statementData, EditingPolicyHelper policyHelper) {
     
         SortedMap<String, List<ObjectPropertyStatementTemplateModel>> subclassMap = 
             new TreeMap<String, List<ObjectPropertyStatementTemplateModel>>();
@@ -236,7 +231,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
             }
             
             listForThisSubclass.add(new ObjectPropertyStatementTemplateModel(subjectUri, 
-                    propertyUri, objectKey, map, policyHelper, getTemplateName()));
+                    propertyUri, objectKey, map, policyHelper, getTemplateName(), vreq));
         } 
  
         return subclassMap; 

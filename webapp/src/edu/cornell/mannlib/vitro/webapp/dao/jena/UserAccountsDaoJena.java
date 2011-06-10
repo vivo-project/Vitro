@@ -4,9 +4,12 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
+import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -36,6 +39,36 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 	}
 
 	@Override
+	public Collection<UserAccount> getAllUserAccounts() {
+		List<String> userUris = new ArrayList<String>();
+
+		getOntModel().enterCriticalSection(Lock.READ);
+		try {
+			StmtIterator stmts = getOntModel().listStatements((Resource) null,
+					RDF.type, USERACCOUNT);
+			while (stmts.hasNext()) {
+				Resource subject = stmts.next().getSubject();
+				if (subject != null) {
+					userUris.add(subject.getURI());
+				}
+			}
+			stmts.close();
+		} finally {
+			getOntModel().leaveCriticalSection();
+		}
+
+		List<UserAccount> userAccounts = new ArrayList<UserAccount>();
+		for (String userUri : userUris) {
+			UserAccount ua = getUserAccountByUri(userUri);
+			if (ua != null) {
+				userAccounts.add(ua);
+			}
+		}
+
+		return userAccounts;
+	}
+
+	@Override
 	public UserAccount getUserAccountByUri(String uri) {
 		if (uri == null) {
 			return null;
@@ -45,6 +78,10 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 		try {
 			OntResource r = getOntModel().getOntResource(uri);
 			if (r == null) {
+				return null;
+			}
+
+			if (!isResourceOfType(r, USERACCOUNT)) {
 				return null;
 			}
 
@@ -79,19 +116,60 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 		}
 
 		String userUri = null;
-		
+
 		getOntModel().enterCriticalSection(Lock.READ);
 		try {
-			StmtIterator stmts = getOntModel().listStatements(null, USERACCOUNT_EMAIL_ADDRESS,
+			StmtIterator stmts = getOntModel().listStatements(null,
+					USERACCOUNT_EMAIL_ADDRESS,
 					getOntModel().createLiteral(emailAddress));
 			if (stmts.hasNext()) {
 				userUri = stmts.next().getSubject().getURI();
 			}
+			stmts.close();
 		} finally {
 			getOntModel().leaveCriticalSection();
 		}
-		
+
 		return getUserAccountByUri(userUri);
+	}
+
+	@Override
+	public UserAccount getUserAccountByExternalAuthId(String externalAuthId) {
+		if (externalAuthId == null) {
+			return null;
+		}
+
+		String userUri = null;
+
+		getOntModel().enterCriticalSection(Lock.READ);
+		try {
+			StmtIterator stmts = getOntModel().listStatements(null,
+					USERACCOUNT_EXTERNAL_AUTH_ID,
+					getOntModel().createLiteral(externalAuthId));
+			if (stmts.hasNext()) {
+				userUri = stmts.next().getSubject().getURI();
+			}
+			stmts.close();
+		} finally {
+			getOntModel().leaveCriticalSection();
+		}
+
+		return getUserAccountByUri(userUri);
+	}
+
+	@Override
+	public boolean isRootUser(UserAccount userAccount) {
+		if (userAccount == null) {
+			return false;
+		}
+
+		getOntModel().enterCriticalSection(Lock.READ);
+		try {
+			OntResource r = getOntModel().getOntResource(userAccount.getUri());
+			return isResourceOfType(r, USERACCOUNT_ROOT_USER);
+		} finally {
+			getOntModel().leaveCriticalSection();
+		}
 	}
 
 	@Override
@@ -224,6 +302,9 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 			if (r == null) {
 				return null;
 			}
+			if (!isResourceOfType(r, PERMISSIONSET)) {
+				return null;
+			}
 
 			PermissionSet ps = new PermissionSet();
 			ps.setUri(uri);
@@ -263,6 +344,8 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 			getOntModel().leaveCriticalSection();
 		}
 
+		Collections.sort(list, new PermissionSetsByUri());
+
 		return list;
 	}
 
@@ -275,15 +358,50 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 		Random random = new Random(System.currentTimeMillis());
 		for (int attempts = 0; attempts < 30; attempts++) {
 			int upperBound = (int) Math.pow(2, attempts + 13);
-			uri = namespace + ("n" + random.nextInt(upperBound));
-			errMsg = getWebappDaoFactory().checkURI(uri);
-			if (errMsg == null) {
+			uri = namespace + ("u" + random.nextInt(upperBound));
+			if (!isUriUsed(uri)) {
 				return uri;
 			}
 		}
 
 		throw new InsertException("Could not create URI for individual: "
 				+ errMsg);
+	}
+	
+	private boolean isUriUsed(String uri) {
+		return (getOntModel().getOntResource(uri) != null);
+	}
+
+	/**
+	 * Since there is no reasoner on the UserAccountModel, this will return a
+	 * false negative for a subtype of the specified type.
+	 * 
+	 * There should already be a lock on the model when this is called.
+	 */
+	private boolean isResourceOfType(OntResource r, OntClass type) {
+		if (r == null) {
+			return false;
+		}
+		if (type == null) {
+			return false;
+		}
+		
+		StmtIterator stmts = getOntModel().listStatements(r, RDF.type, type);
+		if (stmts.hasNext()) {
+			stmts.close();
+			return true;
+		} else {
+			stmts.close();
+			return false;
+		}
+	}
+
+	private static class PermissionSetsByUri implements
+			Comparator<PermissionSet> {
+		@Override
+		public int compare(PermissionSet ps1, PermissionSet ps2) {
+			return ps1.getUri().compareTo(ps2.getUri());
+		}
 	}
 
 }

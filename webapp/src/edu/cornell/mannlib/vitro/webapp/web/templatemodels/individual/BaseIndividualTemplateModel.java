@@ -2,12 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
@@ -72,7 +71,7 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
     /* These methods perform some manipulation of the data returned by the Individual methods */
     
     public String getProfileUrl() {
-        return UrlBuilder.getIndividualProfileUrl(individual, vreq.getWebappDaoFactory());
+        return UrlBuilder.getIndividualProfileUrl(individual, vreq.getWebappDaoFactory());        
     }
 
     // For image, we use the default list view and Individual methods to reconstruct the image
@@ -132,18 +131,8 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
      * DataProperty from it. It cannot be handled the way the vitro links and vitro public image
      * are handled like ordinary ObjectProperty instances.
      */
-    public DataPropertyStatementTemplateModel getNameStatement() {
-        String propertyUri = VitroVocabulary.LABEL; // rdfs:label
-        DataPropertyStatementTemplateModel dpstm = new DataPropertyStatementTemplateModel(getUri(), propertyUri, vreq, policyHelper);
-        
-        // If the individual has no rdfs:label, return the local name. It will not be editable (this replicates previous behavior;
-        // perhaps we would want to allow a label to be added. But such individuals do not usually have their profiles viewed or
-        // edited directly.
-        if (dpstm.getValue() == null) {
-            dpstm.setValue(getLocalName());
-        }
-        
-        return dpstm;
+    public NameStatementTemplateModel getNameStatement() {
+        return new NameStatementTemplateModel(getUri(), vreq, policyHelper);
     }
     
     /* These methods simply forward to the methods of the wrapped individual. It would be desirable to 

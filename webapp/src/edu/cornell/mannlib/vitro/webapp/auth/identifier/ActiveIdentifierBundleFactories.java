@@ -50,6 +50,18 @@ public class ActiveIdentifierBundleFactories {
 
 		getActiveFactories(ctx).addFactory(factory);
 	}
+	
+	/**
+	 * Just for diagnostics. Don't expose the factories themselves, only their names.
+	 */
+	public static List<String> getFactoryNames(ServletContext ctx) {
+		List<String> names = new ArrayList<String>();
+		ActiveIdentifierBundleFactories actFact = getActiveFactories(ctx);
+		for (IdentifierBundleFactory factory: actFact.factories) {
+			names.add(factory.toString());
+		}
+		return names;
+	}
 
 	/**
 	 * Get the Identifiers from the list of factories. This might return an
@@ -118,5 +130,4 @@ public class ActiveIdentifierBundleFactories {
 		}
 		return ib;
 	}
-
 }

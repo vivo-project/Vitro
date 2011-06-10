@@ -108,10 +108,6 @@ public interface IndividualDao extends ObjectSourceIface {
     /**
      * Returns a list of individuals with the given value for the given dataProperty.  If
      * there are no Indiviuals that fit the criteria then an empty list is returned.
-     * 
-     * @param dataPropertyUri
-     * @param value
-     * @return
      */
     public List<Individual> getIndividualsByDataProperty(String dataPropertyUri, String value);
 
@@ -127,9 +123,6 @@ public interface IndividualDao extends ObjectSourceIface {
 			String modeStr);
 
 	List<Keyword> getKeywordObjectsForIndividual(String individualURI);
-
-	/** In most cases, it's best to let ExternalAuthHelper call this for you. */
-	String getIndividualURIFromNetId(String netIdStr, String netidMatchingPropertyUri);
 
 	String getNetId(String entityURI);
 

@@ -56,6 +56,7 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.jena.ExtendedLinkedDataUtils;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividualTemplateModel;
@@ -72,6 +73,9 @@ public class IndividualController extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(IndividualController.class);
+    private static final String RICH_EXPORT_ROOT = "/WEB-INF/rich-export/";
+    private static final String PERSON_CLASS_URI = "http://xmlns.com/foaf/0.1/Person";
+    private static final String INCLUDE_ALL = "all";
     
     private static final Map<String, String> namespaces = new HashMap<String, String>() {{
         put("vitro", VitroVocabulary.vitroURI);
@@ -336,8 +340,10 @@ public class IndividualController extends FreemarkerHttpServlet {
 			ontModel = (OntModel)session.getAttribute("jenaOntModel");		
 		if( ontModel == null)
 			ontModel = (OntModel)getServletContext().getAttribute("jenaOntModel");
-					
-		Model newModel = getRDF(individual, ontModel, ModelFactory.createDefaultModel(),0);		
+		
+                
+        String[] includes = vreq.getParameterValues("include");
+		Model newModel = getRDF(individual,ontModel,ModelFactory.createDefaultModel(),0,includes);		
 		
 		return new RdfResponseValues(rdfFormat, newModel);
 	}
@@ -449,8 +455,10 @@ public class IndividualController extends FreemarkerHttpServlet {
             netIdStr = vreq.getParameter("netid");
         if ( netIdStr != null ){
     		SelfEditingConfiguration sec = SelfEditingConfiguration.getBean(vreq);
-    		uri = sec.getIndividualUriFromUsername(iwDao, netIdStr);
-            return iwDao.getIndividualByURI(uri);
+    		List<Individual> assocInds = sec.getAssociatedIndividuals(iwDao, netIdStr);
+    		if (!assocInds.isEmpty()) {
+    			return assocInds.get(0);
+    		}
         }
 
 		return null;		
@@ -597,7 +605,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 		return "enabled".equals(property);
 	}
 
-    private Model getRDF(Individual entity, OntModel contextModel, Model newModel, int recurseDepth) {
+    private Model getRDF(Individual entity, OntModel contextModel, Model newModel, int recurseDepth, String[] includes) {
     	
     	Resource subj = newModel.getResource(entity.getURI());
     	
@@ -625,7 +633,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	    		Resource obj = newModel.getResource(os.getObjectURI());
 	    		newModel.add(newModel.createStatement(subj, prop, obj));
 	    		if ( includeInLinkedData(obj, contextModel)) {
-	    			newModel.add(getRDF(os.getObject(), contextModel, newModel, recurseDepth + 1));
+	    			newModel.add(getRDF(os.getObject(), contextModel, newModel, recurseDepth + 1, includes));
 	    	    } else {
 	    	    	contextModel.enterCriticalSection(Lock.READ);
 	    			try {
@@ -640,7 +648,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     	newModel = getLabelAndTypes(entity, contextModel, newModel );
     		
     	// get all the statements not covered by the object property / datatype property code above
-    	// note implication that extendedLinkedData individuals will only be evaulated for the
+    	// note implication that extendedLinkedData individuals will only be evaluated for the
     	// recognized object properties.
     	contextModel.enterCriticalSection(Lock.READ);
 		try {
@@ -654,7 +662,27 @@ public class IndividualController extends FreemarkerHttpServlet {
 		} finally {
 			contextModel.leaveCriticalSection();
 		} 
-    	
+			
+		if (recurseDepth == 0 && includes != null && entity.isVClass(PERSON_CLASS_URI)) {
+			
+	        for (String include : includes) {
+	       
+	        	String rootDir = null;
+	        	if (INCLUDE_ALL.equals(include)) {
+	        		rootDir = RICH_EXPORT_ROOT;
+	        	} else {
+	        		rootDir = RICH_EXPORT_ROOT +  include + "/";
+	        	}
+	        	
+	        	long start = System.currentTimeMillis();
+				Model extendedModel = ExtendedLinkedDataUtils.createModelFromQueries(getServletContext(), rootDir, contextModel, entity.getURI());
+	        	long elapsedTimeMillis = System.currentTimeMillis()-start;
+	        	log.info("Time to create rich export model: msecs = " + elapsedTimeMillis);
+	        	
+				newModel.add(extendedModel);
+	        }
+		}
+		
     	return newModel;
     }
     

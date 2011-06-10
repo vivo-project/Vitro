@@ -34,19 +34,18 @@ public class AttachSubmodels implements ServletContextListener {
 		if (AbortStartup.isStartupAborted(ctx)) {
             return;
         }
+		
 	    
+        if (true) {
+            (new FileGraphSetup()).contextInitialized(sce);
+            return;
+            // use filegraphs instead of submodels if we're running SDB
+        }	    
+	    
+        // The future of AttachSubmodels is uncertain.
+        // Presently unreachable code follows.
+        
 		try {
-		    
-		    //FIXME refactor this
-			String tripleStoreTypeStr = ConfigurationProperties.getBean(sce)
-					.getProperty("VitroConnection.DataSource.tripleStoreType",
-							"RDB");
-            if ("SDB".equals(tripleStoreTypeStr)) {
-                (new FileGraphSetup()).contextInitialized(sce);
-                return;
-                // use filegraphs instead of submodels if we're running SDB
-            }
-		    
 			int attachmentCount = 0;
 			OntModel baseModel = (OntModel) ctx.getAttribute( JenaBaseDao.ASSERTIONS_ONT_MODEL_ATTRIBUTE_NAME );
 			Set<String> pathSet = ctx.getResourcePaths( PATH );

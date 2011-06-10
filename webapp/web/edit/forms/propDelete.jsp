@@ -2,8 +2,6 @@
 
 
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.SelfEditing"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.RoleIdentifier"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>

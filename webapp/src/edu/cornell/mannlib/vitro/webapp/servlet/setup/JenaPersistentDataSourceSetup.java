@@ -12,11 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.util.iterator.ClosableIterator;
-import com.hp.hpl.jena.vocabulary.RDF;
 
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
 
 public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase 
@@ -32,101 +28,15 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
 	    if (AbortStartup.isStartupAborted(ctx)) {
             return;
         }
-	    
-		Model dbModel;
-		OntModel memModel = ModelFactory.createOntologyModel(
-                this.DB_ONT_MODEL_SPEC);	
-		
-        try {
-        	
-            dbModel = makeDBModelFromConfigurationProperties(
-                    JENA_DB_MODEL, DB_ONT_MODEL_SPEC, ctx);
-            
-            boolean firstStartup = isFirstStartup(dbModel);
-
-            if (firstStartup) {
-                long startTime = System.currentTimeMillis();
-                System.out.println("Reading ontology files into database");
-                readOntologyFilesInPathSet(USERPATH, ctx, dbModel);
-                readOntologyFilesInPathSet(SYSTEMPATH, ctx, dbModel);
-                System.out.println(
-                        (System.currentTimeMillis() - startTime) / 1000 + 
-                            " seconds to populate DB");
-            }
-            
-            
-            if (isSDBActive(ctx)) {
-                memModel = ModelFactory.createOntologyModel(
-                        this.DB_ONT_MODEL_SPEC, dbModel); 
-                // no in-memory copying
-            } else {
-                System.out.println(
-                        "Populating in-memory Jena model from " + 
-                        "persistent DB model"); 
-                long startTime = System.currentTimeMillis();
-                memModel.add(dbModel);
-                System.out.println( 
-                        (System.currentTimeMillis() - startTime) / 1000 +
-                        " seconds to synchronize models");               
-            	memModel.getBaseModel().register(
-            	        new ModelSynchronizer(dbModel));
-            }
-            
-        } catch (OutOfMemoryError ome) {
-            System.out.println("**** ERROR *****");
-            System.out.println("Insufficient memory to load ");
-            System.out.println("database contents for vitro.");
-            System.out.println("Refer to servlet container documentation ");
-            System.out.println("about increasing heap space.");
-            System.out.println("****************");
-        } catch (Throwable t) {
-        	System.out.println("Logging error details");
-        	log.error("Unable to open db model", t);
-			System.out.println("**** ERROR *****");
-            System.out.println("Vitro unable to open Jena database model.");
-			System.out.println("Check that the configuration properties file ");
-			System.out.println("has been created in WEB-INF/classes, ");
-			System.out.println("and that the database connection parameters ");
-			System.out.println("are accurate. ");
-			System.out.println("****************");
-        }        
-        
-        // default inference graph
-        try {
-        	Model infDbModel = makeDBModelFromConfigurationProperties(
-        	        JENA_INF_MODEL, DB_ONT_MODEL_SPEC, ctx);
-        	OntModel infModel = null; 
-        	if (infDbModel != null) {
-        	    if (isSDBActive(ctx)) {
-        	        infModel = ModelFactory.createOntologyModel(
-                            MEM_ONT_MODEL_SPEC, infDbModel);
-        	    } else {
-        	        infModel = ModelFactory.createOntologyModel(
-                            MEM_ONT_MODEL_SPEC);
-            		long startTime = System.currentTimeMillis();
-            		System.out.println("Copying cached inferences into memory");
-            		infModel.add(infDbModel);
-            		System.out.println(
-            		        (System.currentTimeMillis() - startTime) / 1000 + 
-            		            " seconds to load inferences");
-        	    }
-        	}
-        	infModel.getBaseModel().register(new ModelSynchronizer(infDbModel));
-        	ctx.setAttribute("inferenceOntModel",infModel);
-        } catch (Throwable e) {
-        	log.error("Unable to load inference cache from DB", e);
-        }
         
         // user accounts Model
         try {
         	Model userAccountsDbModel = makeDBModelFromConfigurationProperties(
         	        JENA_USER_ACCOUNTS_MODEL, DB_ONT_MODEL_SPEC, ctx);
 			if (userAccountsDbModel.size() == 0) {
+				firstStartup = true;
 				readOntologyFilesInPathSet(AUTHPATH, sce.getServletContext(),
 						userAccountsDbModel);
-				if (userAccountsDbModel.size() == 0) {
-					createInitialAdminUser(userAccountsDbModel, ctx);
-				}
 			}
         	OntModel userAccountsModel = ModelFactory.createOntologyModel(
         	        MEM_ONT_MODEL_SPEC);
@@ -135,6 +45,9 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
         	        new ModelSynchronizer(userAccountsDbModel));
         	sce.getServletContext().setAttribute(
         	        "userAccountsOntModel", userAccountsModel);
+        	if (userAccountsModel.isEmpty()) {
+        		initializeUserAccounts(ctx, userAccountsModel);
+        	}
         } catch (Throwable t) {
         	log.error("Unable to load user accounts model from DB", t);
         }
@@ -154,26 +67,17 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
 	    } catch (Throwable t) {
 	    	log.error("Unable to load user application configuration model from DB", t);
 	    }
-	    
-        ctx.setAttribute("jenaOntModel", memModel);
        
-	}
-	
-	private boolean isFirstStartup(Model dbModel) {
-	    ClosableIterator stmtIt = dbModel.listStatements(
-	            null, 
-	            RDF.type, 
-	            ResourceFactory.createResource(VitroVocabulary.PORTAL));
-        try {
-            return (!stmtIt.hasNext());
-        } finally {
-            stmtIt.close();
-        }
 	}
 	
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		// Nothing to do.
+	}
+	
+	private void initializeUserAccounts(ServletContext ctx, 
+										Model userAccountsModel) {
+		readOntologyFilesInPathSet(AUTHPATH, ctx, userAccountsModel);
 	}
 	
 }

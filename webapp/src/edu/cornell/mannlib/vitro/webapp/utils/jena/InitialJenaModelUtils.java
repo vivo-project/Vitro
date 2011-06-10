@@ -2,9 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.jena;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Set;
 
 import javax.servlet.ServletContext;
 
@@ -15,7 +17,11 @@ import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.rdf.model.AnonId;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -82,7 +88,7 @@ public class InitialJenaModelUtils {
         	throw new RuntimeException("No default theme has been set; unable to create default portal.");      	
         }
         portal1.setPropertyValue(themeDirProperty,ResourceFactory.createPlainLiteral(defaultThemeStr));
-		portal1.setLabel("New Vitro Portal", null);	
+		portal1.setLabel("Vitro", null);	
 		return essentialInterfaceData;		
 	}
 	
@@ -99,6 +105,5 @@ public class InitialJenaModelUtils {
 				m.getProperty(VitroVocabulary.IN_CLASSGROUP), thingsClassGroup);
 		return m;
 	}
-	
-	
+				
 }

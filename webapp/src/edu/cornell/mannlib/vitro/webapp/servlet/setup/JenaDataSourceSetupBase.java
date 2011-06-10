@@ -7,9 +7,6 @@ import java.sql.SQLException;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
@@ -20,13 +17,11 @@ import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.sdb.StoreDesc;
 import com.hp.hpl.jena.sdb.store.DatabaseType;
 import com.hp.hpl.jena.sdb.store.LayoutType;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDBGraphGenerator;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RegeneratingGraph;
@@ -51,10 +46,14 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
 
     protected static String BASE = "/WEB-INF/ontologies/";
     protected static String USERPATH = BASE+"user/";
+    protected static String USER_ABOX_PATH = BASE+"user/abox";
+    protected static String USER_TBOX_PATH = BASE+"user/tbox";
+    protected static String USER_APPMETA_PATH = BASE+"user/applicationMetadata";
     protected static String SYSTEMPATH = BASE+"system/";
     protected static String AUTHPATH = BASE+"auth/";
     public static String APPPATH = BASE+"app/";
     protected static String SUBMODELS = "/WEB-INF/submodels/";
+    protected static boolean firstStartup = false;
 
     String DB_USER =   "jenatest";                          // database user id
     String DB_PASSWD = "jenatest";                          // database password
@@ -250,6 +249,10 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
 	   RDB, SDB
    }
    
+   protected boolean isFirstStartup() {
+	   return firstStartup;
+   }
+   
    protected Model makeDBModel(BasicDataSource ds, 
                                String jenaDbModelname, 
                                OntModelSpec jenaDbOntModelSpec, 
@@ -343,37 +346,6 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         else 
             return defaultformat;
     }
-    /**
-     * If the {@link ConfigurationProperties} has a name for the initial admin
-     * user, create the user and add it to the model.
-     */
-    protected void createInitialAdminUser(Model model, ServletContext ctx) {
-        String initialAdminUsername = ConfigurationProperties
-                .getBean(ctx).getProperty("initialAdminUser");
-        if (initialAdminUsername == null) {
-            return;
-        }
-
-        // A hard-coded MD5 encryption of "defaultAdmin"
-        String initialAdminPassword = "22BA075EC8951A70960A0A95C0BC2294";
-
-        String vitroDefaultNs = DEFAULT_DEFAULT_NAMESPACE;
-
-        Resource user = model.createResource(vitroDefaultNs
-                + "defaultAdminUser");
-        model.add(model.createStatement(user, model
-                .createProperty(VitroVocabulary.RDF_TYPE), model
-                .getResource(VitroVocabulary.USER)));
-        model.add(model.createStatement(user, model
-                .createProperty(VitroVocabulary.USER_USERNAME), model
-                .createTypedLiteral(initialAdminUsername)));
-        model.add(model.createStatement(user, model
-                .createProperty(VitroVocabulary.USER_MD5PASSWORD), model
-                .createTypedLiteral(initialAdminPassword)));
-        model.add(model.createStatement(user, model
-                .createProperty(VitroVocabulary.USER_ROLE), model
-                .createTypedLiteral("role:/50")));
-    }
     
     protected final static String DB_TYPE = "MySQL";
     private static VitroJenaModelMaker vjmm = null;
@@ -410,28 +382,13 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     }
     
     public static void setVitroJenaModelMaker(VitroJenaModelMaker vjmm, 
-                                              ServletContextEvent sce){
-    	sce.getServletContext().setAttribute(rdbModelMaker, vjmm);
+                                              ServletContext ctx){
+    	ctx.setAttribute(rdbModelMaker, vjmm);
     }
     
     public static void setVitroJenaSDBModelMaker(VitroJenaSDBModelMaker vsmm, 
-                                                 ServletContextEvent sce){
-    	sce.getServletContext().setAttribute(sdbModelMaker, vsmm);
-    }
-    
-	public static boolean isSDBActive(ServletRequest req) {
-		if (!(req instanceof HttpServletRequest)) {
-			return false;
-		}
-		HttpServletRequest hreq = (HttpServletRequest) req;
-		return isSDBActive(hreq.getSession().getServletContext());
-	}
-    
-    public static boolean isSDBActive(ServletContext ctx) {
-    	String tripleStoreTypeStr = 
-    		ConfigurationProperties.getBean(ctx).getProperty(
-    				"VitroConnection.DataSource.tripleStoreType", "RDB");
-    	return ("SDB".equals(tripleStoreTypeStr)); 
+                                                 ServletContext ctx){
+    	ctx.setAttribute(sdbModelMaker, vsmm);
     }
     
     protected VitroJenaModelMaker getVitroJenaModelMaker(){

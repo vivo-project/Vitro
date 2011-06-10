@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader.URI_DBA;
+import static edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader.URI_SELF_EDITOR;
 import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.FORCED_PASSWORD_CHANGE;
 import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.LOGGING_IN;
 import static org.junit.Assert.assertEquals;
@@ -10,7 +12,7 @@ import static org.junit.Assert.fail;
 
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -20,6 +22,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import stubs.edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDaoStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryStub;
 import stubs.javax.servlet.ServletConfigStub;
 import stubs.javax.servlet.ServletContextStub;
 import stubs.javax.servlet.http.HttpServletRequestStub;
@@ -28,7 +32,7 @@ import stubs.javax.servlet.http.HttpSessionStub;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
-import edu.cornell.mannlib.vitro.webapp.beans.User;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.AuthenticatorStub;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
@@ -40,6 +44,8 @@ public class AuthenticateTest extends AbstractTestClass {
 
 	private AuthenticatorStub authenticator;
 	private ServletContextStub servletContext;
+	private WebappDaoFactoryStub webappDaoFactory;
+	private UserAccountsDaoStub userAccountsDao;
 	private ServletConfigStub servletConfig;
 	private HttpSessionStub session;
 	private HttpServletRequestStub request;
@@ -55,27 +61,27 @@ public class AuthenticateTest extends AbstractTestClass {
 	private static final String NEW_DBA_NAME = "new_dba_name";
 	private static final String NEW_DBA_PW = "new_dba_pw";
 	private static final UserInfo NEW_DBA = new UserInfo(NEW_DBA_NAME,
-			"new_dba_uri", NEW_DBA_PW, 50, 0);
+			"new_dba_uri", NEW_DBA_PW, URI_DBA, 0);
 
 	/** A DBA who has logged in before. */
 	private static final String OLD_DBA_NAME = "old_dba_name";
 	private static final String OLD_DBA_PW = "old_dba_pw";
 	private static final String OLD_DBA_URI = "old_dba_uri";
-	private static final int OLD_DBA_SECURITY_LEVEL = 50;
 	private static final UserInfo OLD_DBA = new UserInfo(OLD_DBA_NAME,
-			OLD_DBA_URI, OLD_DBA_PW, OLD_DBA_SECURITY_LEVEL, 5);
+			OLD_DBA_URI, OLD_DBA_PW, URI_DBA, 5);
 
 	/** A self-editor who has logged in before and has a profile. */
 	private static final String OLD_SELF_NAME = "old_self_name";
 	private static final String OLD_SELF_PW = "old_self_pw";
 	private static final UserInfo OLD_SELF = new UserInfo(OLD_SELF_NAME,
-			"old_self_uri", OLD_SELF_PW, 1, 100);
+			"old_self_uri", OLD_SELF_PW, URI_SELF_EDITOR, 100);
 
 	/** A self-editor who has logged in before but has no profile. */
 	private static final String OLD_STRANGER_NAME = "old_stranger_name";
 	private static final String OLD_STRANGER_PW = "stranger_pw";
 	private static final UserInfo OLD_STRANGER = new UserInfo(
-			OLD_STRANGER_NAME, "old_stranger_uri", OLD_STRANGER_PW, 1, 20);
+			OLD_STRANGER_NAME, "old_stranger_uri", OLD_STRANGER_PW,
+			URI_SELF_EDITOR, 20);
 
 	/** the login page */
 	private static final String URL_LOGIN = "/vivo/login";
@@ -110,7 +116,17 @@ public class AuthenticateTest extends AbstractTestClass {
 		authenticator.setAssociatedUri(OLD_SELF.username,
 				"old_self_associated_uri");
 
+		userAccountsDao = new UserAccountsDaoStub();
+		userAccountsDao.addUser(createUserFromUserInfo(NEW_DBA));
+		userAccountsDao.addUser(createUserFromUserInfo(OLD_DBA));
+		userAccountsDao.addUser(createUserFromUserInfo(OLD_SELF));
+		userAccountsDao.addUser(createUserFromUserInfo(OLD_STRANGER));
+
+		webappDaoFactory = new WebappDaoFactoryStub();
+		webappDaoFactory.setUserAccountsDao(userAccountsDao);
+
 		servletContext = new ServletContextStub();
+		servletContext.setAttribute("webappDaoFactory", webappDaoFactory);
 
 		servletConfig = new ServletConfigStub();
 		servletConfig.setServletContext(servletContext);
@@ -129,16 +145,14 @@ public class AuthenticateTest extends AbstractTestClass {
 		auth.init(servletConfig);
 	}
 
-	private User createUserFromUserInfo(UserInfo userInfo) {
-		User user = new User();
-		user.setUsername(userInfo.username);
-		user.setURI(userInfo.uri);
-		user.setRoleURI(String.valueOf(userInfo.securityLevel));
-		user.setMd5password(Authenticator.applyMd5Encoding(userInfo.password));
+	private UserAccount createUserFromUserInfo(UserInfo userInfo) {
+		UserAccount user = new UserAccount();
+		user.setEmailAddress(userInfo.username);
+		user.setUri(userInfo.uri);
+		user.setPermissionSetUris(userInfo.permissionSetUris);
+		user.setMd5Password(Authenticator.applyMd5Encoding(userInfo.password));
 		user.setLoginCount(userInfo.loginCount);
-		if (userInfo.loginCount > 0) {
-			user.setFirstTime(new Date(0));
-		}
+		user.setPasswordChangeRequired(userInfo.loginCount == 0);
 		return user;
 	}
 
@@ -380,7 +394,8 @@ public class AuthenticateTest extends AbstractTestClass {
 		doTheRequest();
 
 		assertProcessBean(FORCED_PASSWORD_CHANGE, NEW_DBA_NAME, NO_MSG,
-				"Your new password cannot match the current one.", URL_LOGIN, URL_WITH_LINK);
+				"Your new password cannot match the current one.", URL_LOGIN,
+				URL_WITH_LINK);
 		assertRedirectToLoginProcessPage();
 	}
 
@@ -401,7 +416,6 @@ public class AuthenticateTest extends AbstractTestClass {
 	@Test
 	public void alreadyLoggedIn() {
 		LoginStatusBean statusBean = new LoginStatusBean(OLD_DBA_URI,
-				OLD_DBA_NAME, OLD_DBA_SECURITY_LEVEL,
 				AuthenticationSource.INTERNAL);
 		LoginStatusBean.setBean(session, statusBean);
 		setRequestFromLoginLink(URL_WITH_LINK);
@@ -457,14 +471,14 @@ public class AuthenticateTest extends AbstractTestClass {
 	public void exitDbaFromLoginPage() {
 		setProcessBean(LOGGING_IN, NO_USER, URL_LOGIN, URL_LOGIN);
 		setLoginNameAndPassword(OLD_DBA_NAME, OLD_DBA_PW);
-		
+
 		doTheRequest();
-		
+
 		assertNoProcessBean();
 		assertNewLoginSessions(OLD_DBA_NAME);
 		assertRedirect(URL_SITE_ADMIN);
 	}
-	
+
 	// ----------------------------------------------------------------------
 	// Helper methods
 	// ----------------------------------------------------------------------
@@ -603,23 +617,23 @@ public class AuthenticateTest extends AbstractTestClass {
 		final String username;
 		final String uri;
 		final String password;
-		final int securityLevel;
+		final Set<String> permissionSetUris;
 		final int loginCount;
 
 		public UserInfo(String username, String uri, String password,
-				int securityLevel, int loginCount) {
+				String roleUri, int loginCount) {
 			this.username = username;
 			this.uri = uri;
 			this.password = password;
-			this.securityLevel = securityLevel;
+			this.permissionSetUris = Collections.singleton(roleUri);
 			this.loginCount = loginCount;
 		}
 
 		@Override
 		public String toString() {
 			return "UserInfo[username=" + username + ", uri=" + uri
-					+ ", password=" + password + ", securityLevel="
-					+ securityLevel + ", loginCount=" + loginCount + "]";
+					+ ", password=" + password + ", roleUri="
+					+ permissionSetUris + ", loginCount=" + loginCount + "]";
 		}
 	}
 

@@ -11,12 +11,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
-import edu.cornell.mannlib.vitro.webapp.beans.User;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 
@@ -48,22 +50,22 @@ public class LoginRedirector {
 
 	/** Is there an Individual associated with this user? */
 	private String getAssociatedIndividualUri() {
-		String username = LoginStatusBean.getBean(request).getUsername();
-		if (username == null) {
-			log.warn("Not logged in? How did we get here?");
+		UserAccount userAccount = LoginStatusBean.getCurrentUser(request);
+		if (userAccount == null) {
+			log.debug("Not logged in? Must be cancelling the password change");
 			return null;
 		}
 
 		List<String> uris = Authenticator.getInstance(request)
-				.getAssociatedIndividualUris(username);
+				.getAssociatedIndividualUris(userAccount);
 		if (uris.isEmpty()) {
-			log.debug("'" + username
+			log.debug("'" + userAccount.getEmailAddress()
 					+ "' is not associated with an individual.");
 			return null;
 		} else {
 			String uri = uris.get(0);
-			log.debug("'" + username + "' is associated with an individual: "
-					+ uri);
+			log.debug("'" + userAccount.getEmailAddress()
+					+ "' is associated with an individual: " + uri);
 			return uri;
 		}
 	}
@@ -104,19 +106,17 @@ public class LoginRedirector {
 					+ "but the system contains no profile for you.";
 		}
 
-		LoginStatusBean bean = LoginStatusBean.getBean(request);
-		Authenticator auth = Authenticator.getInstance(request);
-		User user = auth.getUserByUsername(bean.getUsername());
-
 		String backString = "";
-		String greeting = bean.getUsername();
+		String greeting = "";
 
-		if (user != null) {
-			if (user.getLoginCount() > 1) {
+		UserAccount userAccount = LoginStatusBean.getCurrentUser(request);
+		if (userAccount != null) {
+			greeting = userAccount.getEmailAddress();
+			if (userAccount.getLoginCount() > 1) {
 				backString = " back";
 			}
-			String name = user.getFirstName();
-			if ((name != null) && (name.length() > 0)) {
+			String name = userAccount.getFirstName();
+			if (!StringUtils.isEmpty(name)) {
 				greeting = name;
 			}
 		}
@@ -152,8 +152,8 @@ public class LoginRedirector {
 	}
 
 	private boolean isMerelySelfEditor() {
-		return LoginStatusBean.getBean(session).isLoggedInExactly(
-				LoginStatusBean.NON_EDITOR);
+		RoleLevel role = RoleLevel.getRoleFromLoginStatus(request);
+		return role == RoleLevel.PUBLIC || role == RoleLevel.SELF;
 	}
 
 	private boolean isLoginPage(String page) {

@@ -22,7 +22,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
-import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
@@ -33,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Rdf
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.Tags;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
@@ -247,13 +247,14 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         urls.put("base", UrlBuilder.contextPath);
 
         urls.put("about", urlBuilder.getPortalUrl(Route.ABOUT));
-        if (ContactMailServlet.isSmtpHostConfigured(vreq)) {
+        if (FreemarkerEmailFactory.isConfigured(vreq)) {
             urls.put("contact", urlBuilder.getPortalUrl(Route.CONTACT));
         }
         urls.put("search", urlBuilder.getPortalUrl(Route.SEARCH));  
         urls.put("termsOfUse", urlBuilder.getPortalUrl(Route.TERMS_OF_USE));  
         urls.put("login", urlBuilder.getLoginUrl());          
         urls.put("logout", urlBuilder.getLogoutUrl());       
+        urls.put("myAccount", UrlBuilder.getUrl("/accounts/myAccount"));       
         urls.put("siteAdmin", urlBuilder.getPortalUrl(Route.SITE_ADMIN));  
         urls.put("themeImages", urlBuilder.getPortalUrl(themeDir + "/images"));
         urls.put("images", UrlBuilder.getUrl("/images"));

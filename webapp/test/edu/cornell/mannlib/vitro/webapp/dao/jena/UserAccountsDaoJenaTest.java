@@ -103,6 +103,13 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		UserAccount u = dao.getUserAccountByUri("bogusUri");
 		assertNull("null result", u);
 	}
+	
+	@Test
+	public void getUserAccountByUriWrongType() {
+		UserAccount u = dao.getUserAccountByUri(URI_ROLE1);
+		//System.out.println(u);
+		assertNull("null result", u);
+	}
 
 	@Test
 	public void getUserAccountByEmailSuccess() {
@@ -265,6 +272,12 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 	}
 
 	@Test
+	public void getPermissionSetByUriWrongType() {
+		PermissionSet ps = dao.getPermissionSetByUri(URI_USER1);
+		assertNull("null result", ps);
+	}
+	
+	@Test
 	public void getAllPermissionSets() {
 		setLoggerLevel(JenaBaseDao.class, Level.DEBUG);
 
@@ -316,7 +329,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		StmtIterator stmts = ontModel.listStatements();
 		while (stmts.hasNext()) {
 			Statement stmt = stmts.next();
-			System.out.println(formatStatement(stmt));
+			//System.out.println(formatStatement(stmt));
 		}
 	}
 

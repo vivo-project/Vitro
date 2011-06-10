@@ -8,7 +8,6 @@ import java.util.List;
 import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vitro.webapp.beans.ResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
-import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,7 +43,6 @@ public class RoleLevelOptionsSetup {
     }
     
     public static List<Option> getUpdateOptionsList(ResourceBean b) {
-        // if make changes here, make sure to change SelfEditingPolicySetup and CuratorEditingPolicySetup
         List<Option> prohibitedFromUpdateList = new LinkedList<Option>();
         try {
             BaseResourceBean.RoleLevel currentLevel = b.getProhibitedFromUpdateBelowRoleLevel();

@@ -17,8 +17,8 @@
                 <li><a href="${siteConfig.urls.menuN3Editor}">Menu management</a></li>  
             </#if>
             
-            <#if siteConfig.urls.users??>
-                <li><a href="${siteConfig.urls.users}">User accounts</a></li>  
+            <#if siteConfig.urls.userList??>
+                <li><a href="${siteConfig.urls.userList}">User accounts</a></li>  
             </#if>
             
         </ul>

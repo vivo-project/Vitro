@@ -31,10 +31,12 @@ public class DisplayVocabulary {
     public static final String PAGE_TYPE = NS + "Page";
     public static final String HOME_PAGE_TYPE = NS + "HomePage";
     public static final String CLASSGROUP_PAGE_TYPE = NS + "ClassGroupPage";
+    //Including for now, can take out later
+    public static final String 	CLASSINTERSECTION_PAGE_TYPE = NS + "ClassIntersectionPage";
 
     /* Object Properties */
     public static final String FOR_CLASSGROUP = NS + "forClassGroup";
-    
+    public static final String CLASS_INTERSECTION = NS + "intersectsWithClass";
     /* Data Properties */
     public static final DatatypeProperty URL_MAPPING = m_model.createDatatypeProperty(NS + "urlMapping");
     public static final String TITLE = NS + "title";

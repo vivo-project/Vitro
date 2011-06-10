@@ -50,6 +50,10 @@
     <listener-class>edu.cornell.mannlib.vitro.webapp.config.RevisionInfoSetup</listener-class>
   </listener>
 
+  <listener>
+    <listener-class>edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory$Setup</listener-class>
+  </listener>
+
   <!-- DefaultThemeSetup needs to run before the JenaDataSourceSetup
        to allow creation of default portal and tab -->
   <listener>
@@ -100,6 +104,13 @@
     </listener-class>
   </listener> 
   
+  <!--  Update to the new UserAccounts model (1.3). Needs to run after JenaDataSourceSetup. -->
+  <listener>
+    <listener-class>
+        edu.cornell.mannlib.vitro.webapp.servlet.setup.UpdateUserAccounts
+    </listener-class>
+  </listener>
+
   <!-- Attaching submodels permits extra RDF files to be made visible without storing the data in the DB. -->
   <listener>
      <listener-class>edu.cornell.mannlib.vitro.webapp.servlet.setup.AttachSubmodels</listener-class>
@@ -110,11 +121,9 @@
   <!-- See documentation for details. -->
   <!-- If used, must be run after JenaDataSourceSetup -->
 
-<!--
   <listener>
     <listener-class>edu.cornell.mannlib.vitro.webapp.servlet.setup.PelletReasonerSetup</listener-class>
   </listener>
--->
 
   <!-- The followng listener records all edit changes, in reified form, to another database model -->
   <!-- still at an experimental stage -->
@@ -129,6 +138,10 @@
 -->
 
   <listener>
+    <listener-class>edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader</listener-class>
+  </listener>
+ 
+  <listener>
     <listener-class> edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper$Setup
     </listener-class>
   </listener>
@@ -138,40 +151,22 @@
     </listener-class>
   </listener>
 
+  <listener>
+    <listener-class> edu.cornell.mannlib.vitro.webapp.auth.policy.RootUserPolicy$Setup</listener-class>
+  </listener>
+
   <!-- The Lucene index uses a "public" filter, so the PropertyRestrictionPolicyHelper must already be set up. -->
+  <!--
   <listener>
     <listener-class> edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup </listener-class>
   </listener>
-  
-  <!--
+  -->  
   <listener>
     <listener-class>
       edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup
     </listener-class>
   </listener>
-  -->
   
-  <!--<listener>
-  	<listener-class>
-          edu.cornell.mannlib.vitro.webapp.auth.policy.setup.SelfEditingPolicySetup
-  	</listener-class>
-  </listener>  -->
-  
-  <listener>
-    <listener-class> edu.cornell.mannlib.vitro.webapp.auth.policy.setup.EditorEditingPolicySetup
-    </listener-class>
-  </listener>
-
-  <listener>
-    <listener-class> edu.cornell.mannlib.vitro.webapp.auth.policy.setup.CuratorEditingPolicySetup
-    </listener-class>
-  </listener>
-
-  <listener>
-    <listener-class> edu.cornell.mannlib.vitro.webapp.auth.policy.setup.DbAdminEditingPolicySetup
-    </listener-class>
-  </listener>
- 
   <listener>
     <listener-class>
         edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerSetup
@@ -645,15 +640,6 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>UserEditController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.UserEditController</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>UserEditController</servlet-name>
-    <url-pattern>/userEdit</url-pattern>
-  </servlet-mapping>
-
-  <servlet>
     <servlet-name>OntologyEditController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.OntologyEditController</servlet-class>
   </servlet>
@@ -752,23 +738,31 @@
     <url-pattern>/addRestriction</url-pattern>
   </servlet-mapping>
 
-<!-- TODO This should go away as soon as the new UserAccounts are fully implemented. jblake -->
   <servlet>
-    <servlet-name>UsersListingController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.listing.UsersListingController</servlet-class>
+    <servlet-name>AccountsAdmin</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.accounts.admin.UserAccountsAdminController</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>UsersListingController</servlet-name>
-    <url-pattern>/listUsers</url-pattern>
+    <servlet-name>AccountsAdmin</servlet-name>
+    <url-pattern>/accountsAdmin/*</url-pattern>
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>UserAccounts</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsController</servlet-class>
+    <servlet-name>AccountsUser</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.accounts.user.UserAccountsUserController</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>UserAccounts</servlet-name>
-    <url-pattern>/userAccounts/*</url-pattern>
+    <servlet-name>AccountsUser</servlet-name>
+    <url-pattern>/accounts/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ShowAuth</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.admin.ShowAuthController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ShowAuth</servlet-name>
+    <url-pattern>/admin/showAuth</url-pattern>
   </servlet-mapping>
 
   <servlet>
@@ -870,43 +864,43 @@
     <servlet-name>ObjectPropertyStatementListingController</servlet-name>
     <url-pattern>/listObjectPropertyStatements</url-pattern>
   </servlet-mapping>
-  
+
+  <!-- 
   <servlet>
     <servlet-name>IndividualListController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController</servlet-class>
   </servlet>
-  <!-- 
+  -->
   <servlet>
     <servlet-name>IndividualListController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.SolrIndividualListController</servlet-class>
   </servlet>
-  -->
   <servlet-mapping>
     <servlet-name>IndividualListController</servlet-name>
     <url-pattern>/individuallist</url-pattern>
   </servlet-mapping>
-  
-    <servlet>
+
+  <!--
+  <servlet>
     <servlet-name>IndividualListRdf</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.EntityURLController</servlet-class>
-    </servlet>
-  <!--
+  </servlet>
+  -->
   <servlet>
     <servlet-name>IndividualListRdf</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.IndividualListRdfController</servlet-class>
   </servlet>
-  -->
   <servlet-mapping>
     <servlet-name>IndividualListRdf</servlet-name>
     <url-pattern>/listrdf/*</url-pattern>
   </servlet-mapping>
-  <!--
+
+  <!--   
   <servlet>
     <servlet-name>SearchController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.PagedSearchController</servlet-class>
   </servlet> 
   -->
-     
   <servlet>
     <servlet-name>SearchController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.SolrPagedSearchController</servlet-class>
@@ -930,16 +924,16 @@
     <url-pattern>/searchcontroller</url-pattern>
   </servlet-mapping>
 
+  <!--
   <servlet>
     <servlet-name>AutocompleteController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.AutocompleteController</servlet-class>
   </servlet>
-  <!--
-    <servlet>
+  -->
+  <servlet>
     <servlet-name>AutocompleteController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.SolrAutocompleteController</servlet-class>
-    </servlet>
-  -->
+  </servlet>
   <servlet-mapping>
     <servlet-name>AutocompleteController</servlet-name>
     <url-pattern>/autocomplete</url-pattern>
@@ -984,10 +978,16 @@
     <servlet-name>ContactFormController</servlet-name>
     <url-pattern>/contact</url-pattern>
   </servlet-mapping>
-  
+
+  <!--
   <servlet>
     <servlet-name>JSON Service</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.JSONServlet</servlet-class>
+  </servlet>
+  -->
+  <servlet>
+    <servlet-name>JSON Service</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.SolrJsonServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>JSON Service</servlet-name>

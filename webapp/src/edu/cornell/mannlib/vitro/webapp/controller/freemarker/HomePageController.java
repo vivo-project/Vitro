@@ -41,6 +41,7 @@ public class HomePageController extends FreemarkerHttpServlet {
             if(pageData != null)
                 body.putAll(pageData);            
         }
+        body.put("dataServiceUrlVClassesForVClassGroup", UrlBuilder.getUrl("/dataservice?getVClassesForVClassGroup=1&classgroupUri="));
         
         return new TemplateResponseValues(BODY_TEMPLATE, body);
     }

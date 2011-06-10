@@ -12,7 +12,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayModelDao;
-import edu.cornell.mannlib.vitro.webapp.dao.FlagDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.KeywordDao;
 import edu.cornell.mannlib.vitro.webapp.dao.KeywordIndividualRelationDao;
@@ -27,7 +26,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
-import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -46,6 +44,7 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	private IndividualDao individualDao;
 	private DataPropertyDao dataPropertyDao;
 	private ObjectPropertyDao objectPropertyDao;
+	private UserAccountsDao userAccountsDao;
 
 	public void setIndividualDao(IndividualDao individualDao) {
 		this.individualDao = individualDao;
@@ -57,6 +56,10 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 
 	public void setObjectPropertyDao(ObjectPropertyDao objectPropertyDao) {
 		this.objectPropertyDao = objectPropertyDao;
+	}
+
+	public void setUserAccountsDao(UserAccountsDao userAccountsDao) {
+		this.userAccountsDao = userAccountsDao;
 	}
 
 	// ----------------------------------------------------------------------
@@ -76,6 +79,11 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	@Override
 	public ObjectPropertyDao getObjectPropertyDao() {
 		return this.objectPropertyDao;
+	}
+
+	@Override
+	public UserAccountsDao getUserAccountsDao() {
+		return this.userAccountsDao;
 	}
 
 	// ----------------------------------------------------------------------
@@ -214,19 +222,6 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 				"WebappDaoFactory.getLinktypeDao() not implemented.");
 	}
 
-    // TODO This goes away when the UserAccounts stuff is fully implemented -- jb
-	@Override
-	public UserDao getUserDao() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getUserDao() not implemented.");
-	}
-
-	@Override
-	public UserAccountsDao getUserAccountsDao() {
-		throw new RuntimeException(
-		"WebappDaoFactory.getUserAccountsDao() not implemented.");
-	}
-	
 	@Override
 	public VClassGroupDao getVClassGroupDao() {
 		throw new RuntimeException(

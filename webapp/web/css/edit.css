@@ -356,3 +356,7 @@ div.sparqlform .parenthetical {
     background: #FFF6BF; 
     color: #7F7034;
 }
+.note {
+    font-size: .8em;
+    line-height: 1.3em;
+}

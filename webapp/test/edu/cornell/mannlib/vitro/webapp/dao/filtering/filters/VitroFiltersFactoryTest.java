@@ -200,8 +200,6 @@ public class VitroFiltersFactoryTest {
         Assert.assertNotNull("getObjectPropertyFilter was null", vf.getObjectPropertyFilter());
         Assert.assertNotNull("getObjectPropertyStatementFilter was null", vf.getObjectPropertyStatementFilter());
         Assert.assertNotNull("getIndividualFilter was null", vf.getIndividualFilter());
-        //Assert.assertNotNull("getTabFilter was null", vf.getTabFilter());
-        Assert.assertNotNull("getUserFilter was null", vf.getUserFilter());
         Assert.assertNotNull("getVClassGroupFilter was null", vf.getVClassGroupFilter());
     }
     

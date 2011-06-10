@@ -2,48 +2,43 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.RevisionInfoController;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.SiteAdminController;
 
 public class User extends BaseTemplateModel {
-   
-    private static final Log log = LogFactory.getLog(User.class);
-    
-    private enum Access {
-        FILTER_SECURITY(LoginStatusBean.EDITOR);
-        
-        private final int requiredLoginLevel;
-        
-        Access(int requiredLoginLevel) {
-            this.requiredLoginLevel = requiredLoginLevel;
-        }
-        
-        int requiredLoginLevel() {
-            return this.requiredLoginLevel;
-        }
-    }
-    
-    private LoginStatusBean loginBean = null;
-    private VitroRequest vreq = null;
+    private final VitroRequest vreq;
+
+    private final UserAccount currentUser;
     
     public User(VitroRequest vreq) {
         this.vreq = vreq;
-        loginBean = LoginStatusBean.getBean(vreq);
+        this.currentUser = LoginStatusBean.getCurrentUser(vreq);
     }
     
     public boolean isLoggedIn() {
-        return loginBean.isLoggedIn();
+        return currentUser != null;
+    }
+    
+    public String getEmailAddress() {
+		return (currentUser == null) ? "" : currentUser.getEmailAddress();
     }
     
     public String getLoginName() {
-        return loginBean.getUsername();
+    	if (currentUser == null) {
+    		return "";
+    	} 
+
+    	String firstName = currentUser.getFirstName();
+		String lastName = currentUser.getLastName();
+		if (firstName.isEmpty() && lastName.isEmpty()) {
+			return currentUser.getEmailAddress();
+		}
+		
+		return firstName + " " + lastName;
     }
     
     public boolean getHasSiteAdminAccess() {

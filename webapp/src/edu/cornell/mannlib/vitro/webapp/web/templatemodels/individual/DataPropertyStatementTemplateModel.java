@@ -3,7 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.util.List;
-
+import java.util.HashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -26,29 +26,33 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
     private static final Log log = LogFactory.getLog(DataPropertyStatementTemplateModel.class); 
     private static final String EDIT_PATH = "edit/editDatapropStmtRequestDispatch.jsp";  
     
-    private String value = null;
+    protected String value = null;
     
     // Used for editing
     private String dataPropHash = null;
-
+    //Useful in case additional params to be retrieved for URL
+    private VitroRequest vitroRequest= null;
+   
+    //Extended to include vitro request to check for special parameters
     DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, 
-            Literal literal, EditingPolicyHelper policyHelper) {
+            Literal literal, EditingPolicyHelper policyHelper, VitroRequest vreq) {
         super(subjectUri, propertyUri, policyHelper);
         
         this.value = literal.getLexicalForm();
+        this.vitroRequest = vreq;
         setEditAccess(literal, policyHelper);
-
+       
     }
     
     /*
      * This method handles the special case where we are creating a DataPropertyStatementTemplateModel outside the GroupedPropertyList.
      * Specifically, it allows rdfs:label to be treated like a data property statement and thus have editing links. It is not possible
      * to handle rdfs:label like vitro links and vitroPublic image, because it is not possible to construct a DataProperty from
-     * rdfs:label. 
+     * rdfs:label.
      */
     DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, VitroRequest vreq, EditingPolicyHelper policyHelper) {
         super(subjectUri, propertyUri, policyHelper);
-        
+        vitroRequest = vreq;
         DataPropertyStatementDao dpsDao = vreq.getWebappDaoFactory().getDataPropertyStatementDao();
         List<Literal> literals = dpsDao.getDataPropertyValuesForIndividualByProperty(subjectUri, propertyUri);
         
@@ -64,7 +68,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
         this.value = value;
     }
     
-    private void setEditAccess(Literal value, EditingPolicyHelper policyHelper) {
+    protected void setEditAccess(Literal value, EditingPolicyHelper policyHelper) {
         
         if (policyHelper != null) { // we're editing         
             DataPropertyStatement dps = new DataPropertyStatementImpl(subjectUri, propertyUri, value.getLexicalForm());
@@ -107,6 +111,12 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
             if (! isDeletable()) {
                 params.put("deleteProhibited", "prohibited");
             }
+            //Check if special parameters being sent
+            
+            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vitroRequest);
+            if(specialParams.size() > 0) {
+            	params.putAll(specialParams);
+            }
             editUrl = UrlBuilder.getUrl(EDIT_PATH, params);    
         }
         return editUrl;
@@ -120,6 +130,11 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
                     "predicateUri", propertyUri,
                     "datapropKey", dataPropHash,
                     "cmd", "delete");
+            //Check if special parameters being sent
+            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vitroRequest);
+            if(specialParams.size() > 0) {
+            	params.putAll(specialParams);
+            }
             deleteUrl = UrlBuilder.getUrl(EDIT_PATH, params);
         }
         return deleteUrl;

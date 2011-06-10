@@ -195,6 +195,13 @@ public class SelfEditorRelationshipPolicy extends AbstractRelationshipPolicy
 		return userNotAuthorizedToStatement();
 	}
 
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName()
+				+ ": information resources, grants, projects, etc. - "
+				+ hashCode();
+	}
+
 	// ----------------------------------------------------------------------
 	// methods for InformationResource
 	// ----------------------------------------------------------------------

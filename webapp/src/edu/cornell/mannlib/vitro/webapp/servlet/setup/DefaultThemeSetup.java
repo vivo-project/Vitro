@@ -26,11 +26,8 @@ public class DefaultThemeSetup implements ServletContextListener {
     	ArrayList<String> themeNames = ThemeUtils.getThemes(sc, doSort);
         
         String defaultTheme;
-        if (themeNames.contains("enhanced")) {
-        	defaultTheme = "enhanced";
-        }
-        else if (themeNames.contains("default")) {
-        	defaultTheme = "default";
+        if (themeNames.contains("vitro")) {
+        	defaultTheme = "vitro";
         }
         else {
         	defaultTheme = themeNames.get(0);
