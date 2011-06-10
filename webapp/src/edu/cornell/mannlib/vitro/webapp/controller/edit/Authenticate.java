@@ -124,7 +124,7 @@ public class Authenticate extends VitroHttpServlet {
 			// Send them on their way.
 			switch (exitState) {
 			case NOWHERE:
-				new LoginRedirector(vreq, response).redirectCancellingUser();
+				new LoginRedirector(vreq).redirectCancellingUser(response);
 				break;
 			case LOGGING_IN:
 				showLoginScreen(vreq, response);
@@ -133,7 +133,7 @@ public class Authenticate extends VitroHttpServlet {
 				showLoginScreen(vreq, response);
 				break;
 			default: // LOGGED_IN:
-				new LoginRedirector(vreq, response).redirectLoggedInUser();
+				new LoginRedirector(vreq).redirectLoggedInUser(response);
 				break;
 			}
 		} catch (Exception e) {

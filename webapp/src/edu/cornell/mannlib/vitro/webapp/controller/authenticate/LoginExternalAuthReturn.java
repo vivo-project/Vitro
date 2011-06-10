@@ -57,7 +57,7 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 			getAuthenticator(req).recordLoginAgainstUserAccount(userAccount,
 					AuthenticationSource.EXTERNAL);
 			removeLoginProcessArtifacts(req);
-			new LoginRedirector(req, resp).redirectLoggedInUser();
+			new LoginRedirector(req).redirectLoggedInUser(resp);
 			return;
 		}
 
@@ -71,14 +71,14 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 
 			getAuthenticator(req).recordLoginWithoutUserAccount(uri);
 			removeLoginProcessArtifacts(req);
-			new LoginRedirector(req, resp).redirectLoggedInUser();
+			new LoginRedirector(req).redirectLoggedInUser(resp);
 			return;
 		}
 
 		log.debug("User is not recognized: " + externalAuthId);
 		removeLoginProcessArtifacts(req);
-		new LoginRedirector(req, resp)
-				.redirectUnrecognizedExternalUser(externalAuthId);
+		new LoginRedirector(req).redirectUnrecognizedExternalUser(resp,
+				externalAuthId);
 	}
 
 	private void removeLoginProcessArtifacts(HttpServletRequest req) {

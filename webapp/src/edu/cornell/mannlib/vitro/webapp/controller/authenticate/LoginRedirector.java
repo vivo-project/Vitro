@@ -29,17 +29,14 @@ public class LoginRedirector {
 	private static final Log log = LogFactory.getLog(LoginRedirector.class);
 
 	private final HttpServletRequest request;
-	private final HttpServletResponse response;
 	private final HttpSession session;
 
 	private final String uriOfAssociatedIndividual;
 	private final String afterLoginPage;
 
-	public LoginRedirector(HttpServletRequest request,
-			HttpServletResponse response) {
+	public LoginRedirector(HttpServletRequest request) {
 		this.request = request;
 		this.session = request.getSession();
-		this.response = response;
 
 		uriOfAssociatedIndividual = getAssociatedIndividualUri();
 
@@ -70,28 +67,45 @@ public class LoginRedirector {
 		}
 	}
 
-	public void redirectLoggedInUser() throws IOException {
-		DisplayMessage.setMessage(request, assembleWelcomeMessage());
-
-		try {
-			if (isSelfEditorWithIndividual()) {
-				log.debug("Going to Individual home page.");
-				response.sendRedirect(getAssociatedIndividualHomePage());
-			} else if (isMerelySelfEditor()) {
-				log.debug("User not recognized. Going to application home.");
-				response.sendRedirect(getApplicationHomePageUrl());
+	public String getRedirectionUriForLoggedInUser() {
+		if (isSelfEditorWithIndividual()) {
+			log.debug("Going to Individual home page.");
+			return getAssociatedIndividualHomePage();
+		} else if (isMerelySelfEditor()) {
+			log.debug("User not recognized. Going to application home.");
+			return getApplicationHomePageUrl();
+		} else {
+			if (isLoginPage(afterLoginPage)) {
+				log.debug("Coming from /login. Going to site admin page.");
+				return getSiteAdminPageUrl();
+			} else if (null != afterLoginPage) {
+				log.debug("Returning to requested page: " + afterLoginPage);
+				return afterLoginPage;
 			} else {
-				if (isLoginPage(afterLoginPage)) {
-					log.debug("Coming from /login. Going to site admin page.");
-					response.sendRedirect(getSiteAdminPageUrl());
-				} else if (null != afterLoginPage) {
-					log.debug("Returning to requested page: " + afterLoginPage);
-					response.sendRedirect(afterLoginPage);
-				} else {
-					log.debug("Don't know what to do. Go home.");
-					response.sendRedirect(getApplicationHomePageUrl());
-				}
+				log.debug("Don't know what to do. Go home.");
+				return getApplicationHomePageUrl();
 			}
+		}
+	}
+
+	public String getRedirectionUriForCancellingUser() {
+		if (isLoginPage(afterLoginPage)) {
+			log.debug("Coming from /login. Going to home.");
+			return getApplicationHomePageUrl();
+		} else if (null != afterLoginPage) {
+			log.debug("Returning to requested page: " + afterLoginPage);
+			return afterLoginPage;
+		} else {
+			log.debug("Don't know what to do. Go home.");
+			return getApplicationHomePageUrl();
+		}
+	}
+
+	public void redirectLoggedInUser(HttpServletResponse response)
+			throws IOException {
+		try {
+			DisplayMessage.setMessage(request, assembleWelcomeMessage());
+			response.sendRedirect(getRedirectionUriForLoggedInUser());
 			LoginProcessBean.removeBean(request);
 		} catch (IOException e) {
 			log.debug("Problem with re-direction", e);
@@ -124,18 +138,10 @@ public class LoginRedirector {
 		return "Welcome" + backString + ", " + greeting;
 	}
 
-	public void redirectCancellingUser() throws IOException {
+	public void redirectCancellingUser(HttpServletResponse response)
+			throws IOException {
 		try {
-			if (isLoginPage(afterLoginPage)) {
-				log.debug("Coming from /login. Going to home.");
-				response.sendRedirect(getApplicationHomePageUrl());
-			} else if (null != afterLoginPage) {
-				log.debug("Returning to requested page: " + afterLoginPage);
-				response.sendRedirect(afterLoginPage);
-			} else {
-				log.debug("Don't know what to do. Go home.");
-				response.sendRedirect(getApplicationHomePageUrl());
-			}
+			response.sendRedirect(getRedirectionUriForCancellingUser());
 			LoginProcessBean.removeBean(request);
 		} catch (IOException e) {
 			log.debug("Problem with re-direction", e);
@@ -143,8 +149,8 @@ public class LoginRedirector {
 		}
 	}
 
-	public void redirectUnrecognizedExternalUser(String username)
-			throws IOException {
+	public void redirectUnrecognizedExternalUser(HttpServletResponse response,
+			String username) throws IOException {
 		log.debug("Redirecting unrecognized external user: " + username);
 		DisplayMessage.setMessage(request,
 				"VIVO cannot find a profile for your account.");
