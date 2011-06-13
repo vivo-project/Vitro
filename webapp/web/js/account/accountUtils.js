@@ -6,7 +6,6 @@ function changeAction(form, url) {
     return true;
 }
 
-
 $(document).ready(function(){
 
     //Accounts per page
