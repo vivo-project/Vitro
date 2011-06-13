@@ -113,7 +113,7 @@ public class LoginRedirector {
 		}
 	}
 
-	private String assembleWelcomeMessage() {
+	public String assembleWelcomeMessage() {
 		if (isMerelySelfEditor() && !isSelfEditorWithIndividual()) {
 			// A special message for unrecognized self-editors:
 			return "You have logged in, "
