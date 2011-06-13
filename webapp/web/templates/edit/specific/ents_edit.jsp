@@ -34,13 +34,13 @@
         	<c:set var="query" 
                  value="PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-                        SELECT   ?pred  ?predLabel ?obj ?objLabel
+                        SELECT   ?pred  ?predLabel ?obj ?objLabel ?graph
                         WHERE 
                         {
-                         { GRAPH ?g { <${entity.URI}> ?pred ?obj} } 
+                         { GRAPH ?graph { <${entity.URI}> ?pred ?obj} } 
                          OPTIONAL { GRAPH ?h { ?obj rdfs:label ?objLabel } }
                          OPTIONAL { GRAPH ?i { ?pred rdfs:label ?predLabel } }
-                        }
+                        } ORDER BY ?graph ?pred
                         limit 10000"/>
           <form action="admin/sparqlquery" method="get">
             <input type="hidden" name="query" value="${query}"/>
@@ -51,13 +51,13 @@
           <c:set var="query" 
                  value="PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-                        SELECT ?sub ?subL  ?pred  ?predLabel
+                        SELECT ?sub ?subL  ?pred  ?predLabel ?graph
                         WHERE 
                         {
-                         { GRAPH ?g { ?sub ?pred <${entity.URI}> } }
+                         { GRAPH ?graph { ?sub ?pred <${entity.URI}> } }
                          OPTIONAL { GRAPH ?h { ?sub rdfs:label ?subL } }
                          OPTIONAL { GRAPH ?i { ?pred rdfs:label ?predLabel } }
-                        }
+                        } ORDER BY ?graph ?pred
                         limit 10000"/>
           <form action="admin/sparqlquery" method="get">
             <input type="hidden" name="query" value="${query}"/>
