@@ -10,6 +10,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Keyword;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
 
 public interface IndividualDao extends ObjectSourceIface {
@@ -135,6 +136,8 @@ public interface IndividualDao extends ObjectSourceIface {
 	 * @throws InsertException Could not create a URI
 	 */
 	String getUnusedURI(Individual individual) throws InsertException;
+	
+	EditLiteral getLabelEditLiteral(String individualUri);
 	
     @Deprecated
     public abstract Individual getIndividualByExternalId(int externalIdType,

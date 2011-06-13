@@ -19,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
+import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 
 
 class IndividualDaoFiltering extends BaseFiltering implements IndividualDao{
@@ -241,5 +242,11 @@ class IndividualDaoFiltering extends BaseFiltering implements IndividualDao{
 	public String getUnusedURI(Individual individual) throws InsertException {
 		return innerIndividualDao.getUnusedURI(individual);
 	}
+
+
+    @Override
+    public EditLiteral getLabelEditLiteral(String individualUri) {
+        return innerIndividualDao.getLabelEditLiteral(individualUri);
+    }
 
 }

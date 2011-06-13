@@ -29,7 +29,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
     protected String value = null;
     
     // Used for editing
-    private String dataPropHash = null;
+    protected String dataPropHash = null;
     //Useful in case additional params to be retrieved for URL
     private VitroRequest vitroRequest= null;
    
@@ -84,7 +84,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
             }      
             
             // Determine whether the statement can be deleted
-            // Hack for rdfs:label - the policy doesn't prevent deletion
+            // Hack for rdfs:label - the policy doesn't prevent deletion.
             if ( ! propertyUri.equals(VitroVocabulary.LABEL) ) {
                 action = new DropDataPropStmt(dps);
                 if (policyHelper.isAuthorizedAction(action)) {

@@ -776,12 +776,17 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         }
         return label;
     }
+    
+    protected Literal getLabelLiteral(String individualUri) {
+        OntResource resource = webappDaoFactory.getOntModel().createOntResource(individualUri);
+        return getLabelLiteral(resource);
+    }
 
     /**
      * works through list of PREFERRED_LANGUAGES to find an appropriate 
      * label, or NULL if not found.  
      */
-    public Literal getLabelLiteral(OntResource r) {
+    protected Literal getLabelLiteral(OntResource r) {
         Literal labelLiteral = null;
         r.getOntModel().enterCriticalSection(Lock.READ);
         try {            
