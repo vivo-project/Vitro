@@ -28,7 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.ClassProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
 
-public class IndividualToSolrDocument implements Obj2DocIface {
+public class IndividualToSolrDocument {
     
     protected LuceneDocToSolrDoc luceneToSolr;
     
@@ -70,21 +70,15 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     }
     
     @SuppressWarnings("static-access")
-	@Override
-    public Object translate(Object obj) throws IndexingException{
-    	long tProhibited = System.currentTimeMillis();
-    	
-    	if(!(obj instanceof Individual))
-    		return null;
-    	
-    	Individual ent = (Individual)obj;
+    public SolrInputDocument translate(Individual ind) throws IndexingException{
+    	long tProhibited = System.currentTimeMillis();    	    	
     	String value;
     	StringBuffer classPublicNames = new StringBuffer();
     	classPublicNames.append("");
     	SolrInputDocument doc = new SolrInputDocument();
     	
     	//DocId
-    	String id = ent.getURI();
+    	String id = ind.getURI();
     	log.debug("translating " + id);
     	
     	if(id == null){
@@ -107,7 +101,7 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     	
     	// Types and classgroups
     	boolean prohibited = false;
-    	List<VClass> vclasses = ent.getVClasses(false);
+    	List<VClass> vclasses = ind.getVClasses(false);
     	superClassNames = new ArrayList<String>();
     	String superLclName = null;
     	long tClassgroup = System.currentTimeMillis();
@@ -170,22 +164,22 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     	doc.addField(term.JCLASS, entClassName);
     	
     	//Individual Label
-    	if(ent.getRdfsLabel() != null)
-    		value = ent.getRdfsLabel();
+    	if(ind.getRdfsLabel() != null)
+    		value = ind.getRdfsLabel();
     	else{
-    		log.debug("Using local name for individual with rdfs:label " + ent.getURI());
-    		value = ent.getLocalName();
+    		log.debug("Using local name for individual with rdfs:label " + ind.getURI());
+    		value = ind.getLocalName();
     	}
     	
     	// collecting object property statements 
     	
-    	String uri = ent.getURI();
+    	String uri = ind.getURI();
     	StringBuffer objectNames = new StringBuffer();
     	objectNames.append("");
     	String t=null;
     	addUri = new StringBuffer();
     	addUri.append("");
-    	 List<ObjectPropertyStatement> objectPropertyStatements = ent.getObjectPropertyStatements();
+    	 List<ObjectPropertyStatement> objectPropertyStatements = ind.getObjectPropertyStatements();
          if (objectPropertyStatements != null) {
              Iterator<ObjectPropertyStatement> objectPropertyStmtIter = objectPropertyStatements.iterator();
              while (objectPropertyStmtIter.hasNext()) {
@@ -222,14 +216,14 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     	
         if(documentModifiers == null){
         //boost for entity
-        if(ent.getSearchBoost() != null && ent.getSearchBoost() != 0)
-        doc.setDocumentBoost(ent.getSearchBoost());
+        if(ind.getSearchBoost() != null && ind.getSearchBoost() != 0)
+        doc.setDocumentBoost(ind.getSearchBoost());
         }
         
         //thumbnail
         try{
         	value = null;
-        	if(ent.hasThumb())
+        	if(ind.hasThumb())
         		doc.addField(term.THUMBNAIL, "1");
         	else
         		doc.addField(term.THUMBNAIL, "0");
@@ -253,13 +247,13 @@ public class IndividualToSolrDocument implements Obj2DocIface {
             StringBuffer allTextValue = new StringBuffer();
             allTextValue.append("");
             allTextValue.append(" ");
-            allTextValue.append(((t=ent.getName()) == null)?"":t);  
+            allTextValue.append(((t=ind.getName()) == null)?"":t);  
             allTextValue.append(" ");
-            allTextValue.append(((t=ent.getAnchor()) == null)?"":t); 
+            allTextValue.append(((t=ind.getAnchor()) == null)?"":t); 
             allTextValue.append(" ");
             allTextValue.append(classPublicNames.toString()); 
     
-            List<DataPropertyStatement> dataPropertyStatements = ent.getDataPropertyStatements();
+            List<DataPropertyStatement> dataPropertyStatements = ind.getDataPropertyStatements();
             if (dataPropertyStatements != null) {
                 Iterator<DataPropertyStatement> dataPropertyStmtIter = dataPropertyStatements.iterator();
                 while (dataPropertyStmtIter.hasNext()) {
@@ -282,7 +276,7 @@ public class IndividualToSolrDocument implements Obj2DocIface {
             if( documentModifiers != null ){
             	doc.addField(term.targetInfo,"");
                 for(DocumentModifier modifier: documentModifiers){
-                    modifier.modifyDocument(ent, doc);
+                    modifier.modifyDocument(ind, doc);
                 }
             }
         }
@@ -290,37 +284,12 @@ public class IndividualToSolrDocument implements Obj2DocIface {
         return doc;
     }
     
-   
-    
-    
-    
-//    public IndividualToSolrDocument(Entity2LuceneDoc e2d){
-////        entityToLucene = e2d;  
-//        luceneToSolr = new LuceneDocToSolrDoc();
-//    }
-    
-    @Override
-    public boolean canTranslate(Object obj) {
-        return obj != null && obj instanceof Individual;
-    }
-
-    @Override
-    public boolean canUnTranslate(Object result) {
-        return result != null && result instanceof SolrDocument;
-    }
-
-    @Override
+           
     public Object getIndexId(Object obj) {
         throw new Error("IndiviudalToSolrDocument.getIndexId() is unimplemented");        
     }
 
-//    @Override
-//    public Object translate(Object obj) throws IndexingException {
-//        return luceneToSolr.translate( entityToLucene.translate( obj ) );
-//    }
-
-    @Override
-    public Object unTranslate(Object result) {
+    public Individual unTranslate(Object result) {
         Individual ent = null;
         if( result != null && result instanceof Document){
             Document hit = (Document) result;

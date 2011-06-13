@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -15,7 +14,6 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.SolrException;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
@@ -26,20 +24,20 @@ public class SolrIndexer implements IndexerIface {
     private final static Log log = LogFactory.getLog(SolrIndexer.class);
     
     protected SolrServer server;
-    protected boolean indexing;    
-    protected List<Obj2DocIface> obj2DocList;
-    protected HashSet<String> urisIndexed;
+    protected boolean indexing;        
+    protected HashSet<String> urisIndexed;    
+    protected IndividualToSolrDocument individualToSolrDoc;
     
-    public SolrIndexer( SolrServer server, List<Obj2DocIface> o2d){
+    public SolrIndexer( SolrServer server, IndividualToSolrDocument indToDoc){
         this.server = server; 
-        this.obj2DocList = o2d;        
+        this.individualToSolrDoc = indToDoc;        
     }
     
     @Override
     public synchronized void index(Individual ind, boolean newDoc) throws IndexingException {
         if( ! indexing )
             throw new IndexingException("SolrIndexer: must call " +
-                    "startIndexing() before index().");
+                    "startIndexing() before index().");        
         
         if( ind == null )
             log.debug("Individual to index was null, ignoring.");
@@ -50,40 +48,26 @@ public class SolrIndexer implements IndexerIface {
                 return;
             }else{
                 urisIndexed.add(ind.getURI());
-                log.debug("indexing " + ind.getURI());
-                Iterator<Obj2DocIface> it = getObj2DocList().iterator();
-                while (it.hasNext()) {
-                    Obj2DocIface obj2doc = (Obj2DocIface) it.next();
-                    if (obj2doc.canTranslate(ind)) {
-                        SolrInputDocument solrDoc = (SolrInputDocument) obj2doc.translate(ind);
-                        if( solrDoc != null){
-                            //sending each doc individually is inefficient
-                            Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
-                            docs.add( solrDoc );
-                            UpdateResponse res = server.add( docs );
-                            log.debug("response after adding docs to server: "+ res);
-                        
-                            
-//                            if( !newDoc ){  
-//                                server.add( docs );
-//                                log.debug("updated " + ind.getName() + " " + ind.getURI());
-//                            }else{                 
-//                                server.add( docs );
-//                                log.debug("added " + ind.getName() + " " + ind.getURI());
-//                            }
-                        }else{
-                            log.debug("removing from index " + ind.getURI());
-                            //writer.deleteDocuments((Term)obj2doc.getIndexId(ind));
-                        }
-                    }
-                }
+                log.debug("indexing " + ind.getURI());                
+                
+                SolrInputDocument solrDoc = individualToSolrDoc.translate(ind);
+                if( solrDoc != null){
+                    //sending each doc individually is inefficient
+                    Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
+                    docs.add( solrDoc );
+                    UpdateResponse res = server.add( docs );
+                    log.debug("response after adding docs to server: "+ res);                
+                }else{
+                    log.debug("removing from index " + ind.getURI());
+                    //TODO: how do we delete document?                    
+                    //writer.deleteDocuments((Term)obj2doc.getIndexId(ind));
+                }                            
             }
         } catch (IOException ex) {
             throw new IndexingException(ex.getMessage());
         } catch (SolrServerException ex) {
             throw new IndexingException(ex.getMessage());
-        }
-        
+        }        
     }
 
     @Override
@@ -118,12 +102,12 @@ public class SolrIndexer implements IndexerIface {
     
     
     public synchronized void addObj2Doc(Obj2DocIface o2d) {
-        if (o2d != null)
-            obj2DocList.add(o2d);
+        //no longer used
     }
 
     public synchronized List<Obj2DocIface> getObj2DocList() {
-        return obj2DocList;
+        //no longer used
+        return null;
     }
     
     @Override

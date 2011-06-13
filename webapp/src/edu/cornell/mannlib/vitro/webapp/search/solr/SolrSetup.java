@@ -26,7 +26,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearchImpl;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
-import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
@@ -74,12 +73,10 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             IndividualToSolrDocument indToSolrDoc = new IndividualToSolrDocument(
             		new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel),
             		new IndividualProhibitedFromSearchImpl(context), 
-            		modifiers);
-            List<Obj2DocIface> o2d = new ArrayList<Obj2DocIface>();
-            o2d.add(indToSolrDoc);
+            		modifiers);                        
             
             /* setup solr indexer */
-            SolrIndexer solrIndexer = new SolrIndexer(server, o2d);            
+            SolrIndexer solrIndexer = new SolrIndexer(server, indToSolrDoc);            
             if( solrIndexer.isIndexEmpty() ){
                 log.info("solr index is empty, requesting rebuild");
                 sce.getServletContext().setAttribute(LuceneSetup.INDEX_REBUILD_REQUESTED_AT_STARTUP, Boolean.TRUE);         

@@ -28,6 +28,10 @@ public class IndividualProhibitedFromSearchImpl implements IndividualProhibitedF
        this.fullModel = ModelContext.getUnionOntModelSelector(context).getFullModel(); 
     }    
     
+    public IndividualProhibitedFromSearchImpl( OntModel fullModel ){
+        this.fullModel = fullModel; 
+     }
+    
     public boolean isIndividualProhibited(String uri){
         if( uri == null || uri.isEmpty() )
             return true;
