@@ -46,4 +46,11 @@ public class RequestIdentifiers {
 		return (IdentifierBundle) obj;
 	}
 
+	/**
+	 * The login status has changed, so discard the cached Identifiers.
+	 */
+	public static void resetIdentifiers(ServletRequest request) {
+		request.removeAttribute(ATTRIBUTE_ID_BUNDLE);
+	}
+
 }
