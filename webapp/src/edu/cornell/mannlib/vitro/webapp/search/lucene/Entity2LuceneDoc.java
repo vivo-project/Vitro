@@ -171,7 +171,7 @@ public class Entity2LuceneDoc  implements Obj2DocIface{
                 log.debug("not indexing " + id + " because of type " + clz.getURI());
                 return null;
              }else{                
-                if( !prohibited && classesProhibitedFromSearch.isClassProhibited(clz.getURI()) )
+                if( !prohibited && classesProhibitedFromSearch.isClassProhibitedFromSearch(clz.getURI()) )
                     prohibited = true;                                                   
                 
                 if( clz.getSearchBoost() != null )

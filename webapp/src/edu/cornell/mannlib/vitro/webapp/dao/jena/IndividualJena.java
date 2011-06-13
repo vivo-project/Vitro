@@ -780,7 +780,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
 					Statement stmt = stmtIt.nextStatement();
 					if (stmt.getObject().isURIResource()) {
 						String typeURI = ((Resource)stmt.getObject()).getURI();
-						if (pfs.isClassProhibited(typeURI)) {
+						if (pfs.isClassProhibitedFromSearch(typeURI)) {
 							return false;
 						}
 					}

@@ -6,11 +6,11 @@ import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.Vi
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.ALLTEXTUNSTEMMED;
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.CLASSLOCALNAME;
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.CLASSLOCALNAMELOWERCASE;
+import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.CONTEXTNODE;
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.MONIKER;
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.NAME_STEMMED;
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.NAME_UNSTEMMED;
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.RDFTYPE;
-import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.CONTEXTNODE;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,10 +39,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
-import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearch;
+import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearchImpl;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
-
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
 
@@ -119,7 +118,7 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 			OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
 			Entity2LuceneDoc translator = new Entity2LuceneDoc( 
 			        new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel),
-			        new IndividualProhibitedFromSearch(context)
+			        new IndividualProhibitedFromSearchImpl(context)
 			        
 			);									
 			indexer.addObj2Doc(translator);			

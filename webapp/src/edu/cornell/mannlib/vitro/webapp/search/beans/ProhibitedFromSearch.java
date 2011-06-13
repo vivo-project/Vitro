@@ -25,7 +25,7 @@ import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 
-public class ProhibitedFromSearch {
+public class ProhibitedFromSearch implements ClassProhibitedFromSearch{
 	List<String> prohibitedClasses;
 	String ProhibitedFromSearchURI;
 	
@@ -41,7 +41,7 @@ public class ProhibitedFromSearch {
 		model.register(new ProhibitedFromSearchChangeListener( this ));
 	}
 	 
-	public synchronized boolean isClassProhibited(String classURI){
+	public synchronized boolean isClassProhibitedFromSearch(String classURI){
 		if( classURI != null ){
 			boolean p = prohibitedClasses.contains(classURI);
 			log.debug( classURI + " is " + (p?"prohibited":"not prohibited"));

@@ -3,7 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.search.solr;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -13,16 +13,8 @@ import org.apache.lucene.document.Document;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.joda.time.DateTime;
-import org.openrdf.model.vocabulary.RDF;
 
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.StringTokenizer;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -32,8 +24,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.VitroTermNames;
+import edu.cornell.mannlib.vitro.webapp.search.beans.ClassProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearch;
-import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
 
 public class IndividualToSolrDocument implements Obj2DocIface {
@@ -46,7 +38,7 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     
     private static String entClassName = Individual.class.getName();
     
-    private ProhibitedFromSearch classesProhibitedFromSearch;
+    private ClassProhibitedFromSearch classesProhibitedFromSearch;
     
     private IndividualProhibitedFromSearch individualProhibitedFromSearch;
     
@@ -58,14 +50,19 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     
     private static List<String> contextNodeClassNames = new ArrayList<String>();
     
-    public IndividualToSolrDocument(ProhibitedFromSearch classesProhibitedFromSearch, 
+    public IndividualToSolrDocument(
+            ClassProhibitedFromSearch classesProhibitedFromSearch, 
     		IndividualProhibitedFromSearch individualProhibitedFromSearch){
-    	this(classesProhibitedFromSearch,individualProhibitedFromSearch,null);
+    	
+        this(   classesProhibitedFromSearch,
+    	        individualProhibitedFromSearch,
+    	        Collections.EMPTY_LIST);
     }
     
-    public IndividualToSolrDocument(ProhibitedFromSearch classesProhibitedFromSearch, 
+    public IndividualToSolrDocument(
+            ClassProhibitedFromSearch classesProhibitedFromSearch, 
             IndividualProhibitedFromSearch individualProhibitedFromSearch,
-                List<DocumentModifier> docModifiers){
+            List<DocumentModifier> docModifiers){
         this.classesProhibitedFromSearch = classesProhibitedFromSearch;
         this.individualProhibitedFromSearch = individualProhibitedFromSearch;
         this.documentModifiers = docModifiers;
@@ -129,7 +126,7 @@ public class IndividualToSolrDocument implements Obj2DocIface {
     			return null;
     		}
     		else {
-    			if( !prohibited && classesProhibitedFromSearch.isClassProhibited(clz.getURI()))
+    			if( !prohibited && classesProhibitedFromSearch.isClassProhibitedFromSearch(clz.getURI()))
     				prohibited = true;
     			if( clz.getSearchBoost() != null)
     				doc.setDocumentBoost(doc.getDocumentBoost() + clz.getSearchBoost());

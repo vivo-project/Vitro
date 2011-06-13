@@ -23,12 +23,11 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
-import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearch;
+import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearchImpl;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
 
@@ -74,7 +73,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             
             IndividualToSolrDocument indToSolrDoc = new IndividualToSolrDocument(
             		new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel),
-            		new IndividualProhibitedFromSearch(context), 
+            		new IndividualProhibitedFromSearchImpl(context), 
             		modifiers);
             List<Obj2DocIface> o2d = new ArrayList<Obj2DocIface>();
             o2d.add(indToSolrDoc);
