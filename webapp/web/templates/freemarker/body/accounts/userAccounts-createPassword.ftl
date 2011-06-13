@@ -3,7 +3,6 @@
 <#-- Template for adding a user account -->
 
 <h3>Create your Password</h3>
-
     <#if errorPasswordIsEmpty??>
         <#assign errorMessage = "No password supplied." />
     </#if>
@@ -24,26 +23,24 @@
     </#if>
 
 <section id="create-password" role="region">
-    <fieldset>
-        <legend>Please enter your new password for ${userAccount.emailAddress}</legend>
+    <p>Please enter your new password for ${userAccount.emailAddress}</p>
 
-        <form method="POST" action="${formUrls.createPassword}" class="customForm" role="create password">
-            <input type="hidden" name="user" value="${userAccount.emailAddress}" />
-            <input type="hidden" name="key"  value="${userAccount.passwordLinkExpiresHash}" />
+    <form method="POST" action="${formUrls.createPassword}" class="customForm" role="create password">
+        <input type="hidden" name="user" value="${userAccount.emailAddress}" role="input" />
+        <input type="hidden" name="key"  value="${userAccount.passwordLinkExpiresHash}" role="input" />
+    
+        <label for="new-password">Password<span class="requiredHint"> *</span></label>
+        <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
         
-            <label for="new-password">Password<span class="requiredHint"> *</span></label>
-            <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input "/>
-            
-            <p>Minimum of ${minimumLength} characters in length.</p>
+        <p class="note">Minimum of ${minimumLength} characters in length.</p>
 
-            <label for="confirm-password">Confirm Password<span class="requiredHint"> *</span></label>
-            <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input "/>
+        <label for="confirm-password">Confirm Password<span class="requiredHint"> *</span></label>
+        <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
 
-            <input type="submit" name="submit" value="Save changes" class="submit"/>
+        <p><input type="submit" name="submit" value="Save changes" class="submit"/></p>
 
-            <p class="requiredHint">* required fields</p>
-        </form>
-    </fieldset>
+        <p class="requiredHint">* required fields</p>
+    </form>
 </section>
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/customForm.css" />')}
