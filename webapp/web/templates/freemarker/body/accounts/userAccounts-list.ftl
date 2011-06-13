@@ -196,7 +196,8 @@
             <span>| <a href="#">n</a> accounts | </span>  
     
             <#assign counts = [25, 50, 100]>
-            <select name="accountsPerPage" class="accounts-per-page-bottom">
+            
+            <select name="accountsPerPage" class="accounts-per-page">
                 <#list counts as count>
                 <option value="${count}" <#if accountsPerPage= count>selected</#if> >${count}</option>
                 </#list>

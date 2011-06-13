@@ -1,13 +1,14 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
+    
+// Change form actions in account main page
+function changeAction(form, url) {
+    form.action = url;
+    return true;
+}
+
 
 $(document).ready(function(){
-    
-    // Change form actions in account main page
-    function changeAction(form, url) {
-       form.action = url;
-       return true;
-    }
-    
+
     //Accounts per page
     //Hide is javascrip is enable
     $('input[name="accounts-per-page"]').addClass('hide');
