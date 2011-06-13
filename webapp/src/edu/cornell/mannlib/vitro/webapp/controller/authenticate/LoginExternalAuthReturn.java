@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 
 /**
  * Handle the return from the external authorization login server. If we are
@@ -36,6 +37,13 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 	 * - User corresponds to a User acocunt. Record the login. 
 	 * - User corresponds to an Individual (self-editor). 
 	 * - User is not recognized.
+	 * 
+	 * On entry, we expect to find:
+	 * - A LoginProcessBean, which will give us the afterLoginUrl if the login
+	 *      succeeds.
+	 * - A referrer URL, to which we will redirect if the login fails.
+	 *      TODO: is this equal to LoginProcessBean.getLoginPageUrl()?
+	 * These are removed on exit.
 	 * </pre>
 	 */
 	@Override
@@ -49,6 +57,9 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 					MESSAGE_LOGIN_FAILED);
 			return;
 		}
+		
+		String afterLoginUrl = LoginProcessBean.getBean(req).getAfterLoginUrl();
+		removeLoginProcessArtifacts(req);
 
 		UserAccount userAccount = getAuthenticator(req)
 				.getAccountForExternalAuth(externalAuthId);
@@ -56,8 +67,7 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 			log.debug("Logging in as " + userAccount.getUri());
 			getAuthenticator(req).recordLoginAgainstUserAccount(userAccount,
 					AuthenticationSource.EXTERNAL);
-			removeLoginProcessArtifacts(req);
-			new LoginRedirector(req).redirectLoggedInUser(resp);
+			new LoginRedirector(req, afterLoginUrl).redirectLoggedInUser(resp);
 			return;
 		}
 
@@ -70,19 +80,19 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 			String uri = associatedUris.get(0);
 
 			getAuthenticator(req).recordLoginWithoutUserAccount(uri);
-			removeLoginProcessArtifacts(req);
-			new LoginRedirector(req).redirectLoggedInUser(resp);
+			new LoginRedirector(req, afterLoginUrl).redirectLoggedInUser(resp);
 			return;
 		}
 
 		log.debug("User is not recognized: " + externalAuthId);
 		removeLoginProcessArtifacts(req);
-		new LoginRedirector(req).redirectUnrecognizedExternalUser(resp,
+		new LoginRedirector(req, afterLoginUrl).redirectUnrecognizedExternalUser(resp,
 				externalAuthId);
 	}
 
 	private void removeLoginProcessArtifacts(HttpServletRequest req) {
 		req.getSession().removeAttribute(ATTRIBUTE_REFERRER);
+		LoginProcessBean.removeBean(req);
 	}
 
 	@Override

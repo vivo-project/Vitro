@@ -133,7 +133,7 @@ public class UserAccountsUserController extends FreemarkerHttpServlet {
 	}
 
 	private ResponseValues showLoginRedirection(VitroRequest vreq) {
-		LoginRedirector lr = new LoginRedirector(vreq);
+		LoginRedirector lr = new LoginRedirector(vreq, null);
 		DisplayMessage.setMessage(vreq, lr.assembleWelcomeMessage());
 		String uri = lr.getRedirectionUriForLoggedInUser();
 		return new RedirectResponseValues(uri);

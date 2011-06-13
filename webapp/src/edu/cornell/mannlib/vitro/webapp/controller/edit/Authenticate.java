@@ -124,7 +124,7 @@ public class Authenticate extends VitroHttpServlet {
 			// Send them on their way.
 			switch (exitState) {
 			case NOWHERE:
-				new LoginRedirector(vreq).redirectCancellingUser(response);
+				showLoginCanceled(response, vreq);
 				break;
 			case LOGGING_IN:
 				showLoginScreen(vreq, response);
@@ -133,7 +133,7 @@ public class Authenticate extends VitroHttpServlet {
 				showLoginScreen(vreq, response);
 				break;
 			default: // LOGGED_IN:
-				new LoginRedirector(vreq).redirectLoggedInUser(response);
+				showLoginComplete(response, vreq);
 				break;
 			}
 		} catch (Exception e) {
@@ -477,6 +477,31 @@ public class Authenticate extends VitroHttpServlet {
 		response.sendRedirect(loginProcessPage);
 		return;
 	}
+	
+	/**
+	 * Exit: user has completed the login. Redirect appropriately and clear the bean.
+	 */
+	private void showLoginComplete(HttpServletResponse response,
+			VitroRequest vreq) throws IOException {
+		getLoginRedirector(vreq).redirectLoggedInUser(response);
+		LoginProcessBean.removeBean(vreq);
+	}
+
+	/**
+	 * Exit: user has canceled. Redirect and clear the bean.
+	 */
+	private void showLoginCanceled(HttpServletResponse response,
+			VitroRequest vreq) throws IOException {
+		getLoginRedirector(vreq).redirectCancellingUser(response);
+		LoginProcessBean.removeBean(vreq);
+	}
+
+	private LoginRedirector getLoginRedirector(VitroRequest vreq) {
+		String afterLoginUrl = LoginProcessBean.getBean(vreq).getAfterLoginUrl();
+		return new LoginRedirector(vreq, afterLoginUrl);
+	}
+
+
 
 	/** Get a reference to the Authenticator. */
 	private Authenticator getAuthenticator(HttpServletRequest request) {
