@@ -29,9 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSea
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
 
 public class IndividualToSolrDocument {
-    
-    protected LuceneDocToSolrDoc luceneToSolr;
-    
+        
     public static final Log log = LogFactory.getLog(IndividualToSolrDocument.class.getName());
     
     public static VitroTermNames term = new VitroTermNames();
