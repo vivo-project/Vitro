@@ -2,16 +2,23 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts.user;
 
+import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource.EXTERNAL;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOwnAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginRedirector;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 
 /**
  * Parcel out the different actions required of the UserAccounts GUI.
@@ -25,6 +32,7 @@ public class UserAccountsUserController extends FreemarkerHttpServlet {
 	private static final String ACTION_CREATE_PASSWORD = "/createPassword";
 	private static final String ACTION_RESET_PASSWORD = "/resetPassword";
 	private static final String ACTION_MY_ACCOUNT = "/myAccount";
+	private static final String ACTION_FIRST_TIME_EXTERNAL = "/firstTimeExternal";
 
 	@Override
 	protected Actions requiredActions(VitroRequest vreq) {
@@ -52,6 +60,8 @@ public class UserAccountsUserController extends FreemarkerHttpServlet {
 			return handleCreatePasswordRequest(vreq);
 		} else if (ACTION_RESET_PASSWORD.equals(action)) {
 			return handleResetPasswordRequest(vreq);
+		} else if (ACTION_FIRST_TIME_EXTERNAL.equals(action)) {
+			return handleFirstTimeLoginFromExternalAccount(vreq);
 		} else {
 			return handleInvalidRequest(vreq);
 		}
@@ -95,6 +105,24 @@ public class UserAccountsUserController extends FreemarkerHttpServlet {
 
 	}
 
+	private ResponseValues handleFirstTimeLoginFromExternalAccount(
+			VitroRequest vreq) {
+		UserAccountsFirstTimeExternalPage page = new UserAccountsFirstTimeExternalPage(
+				vreq);
+		if (page.isBogus()) {
+			return showHomePage(vreq, page.getBogusMessage());
+		} else if (page.isSubmit() && page.isValid()) {
+			UserAccount userAccount = page.createAccount();
+			Authenticator auth = Authenticator.getInstance(vreq);
+			auth.recordLoginAgainstUserAccount(userAccount, EXTERNAL);
+			LoginProcessBean.removeBean(vreq);
+
+			return showLoginRedirection(vreq);
+		} else {
+			return page.showPage();
+		}
+	}
+
 	private ResponseValues handleInvalidRequest(VitroRequest vreq) {
 		return showHomePage(vreq, BOGUS_STANDARD_MESSAGE);
 	}
@@ -104,4 +132,10 @@ public class UserAccountsUserController extends FreemarkerHttpServlet {
 		return new RedirectResponseValues("/");
 	}
 
+	private ResponseValues showLoginRedirection(VitroRequest vreq) {
+		LoginRedirector lr = new LoginRedirector(vreq);
+		DisplayMessage.setMessage(vreq, lr.assembleWelcomeMessage());
+		String uri = lr.getRedirectionUriForLoggedInUser();
+		return new RedirectResponseValues(uri);
+	}
 }
