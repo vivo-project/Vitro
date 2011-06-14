@@ -182,10 +182,4 @@ public class AuthenticatorStub extends Authenticator {
 				"AuthenticatorStub.accountRequiresEditing() not implemented.");
 	}
 
-	@Override
-	public void recordLoginWithoutUserAccount(String individualUri) {
-		throw new RuntimeException(
-				"AuthenticatorStub.recordLoginWithoutUserAccount() not implemented.");
-	}
-
 }

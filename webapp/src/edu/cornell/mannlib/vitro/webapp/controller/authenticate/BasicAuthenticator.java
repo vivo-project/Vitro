@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -123,24 +122,12 @@ public class BasicAuthenticator extends Authenticator {
 		}
 
 		recordLoginOnUserRecord(userAccount);
-		recordLoginWithOrWithoutUserAccount(userAccount.getUri(), authSource);
-	}
 
-	// TODO JB This goes away.
-	@Override
-	public void recordLoginWithoutUserAccount(String individualUri) {
-		recordLoginWithOrWithoutUserAccount(individualUri,
-				AuthenticationSource.EXTERNAL);
-	}
-
-	/** This much is in common on login, whether or not you have a user account. */
-	private void recordLoginWithOrWithoutUserAccount(String userUri,
-			AuthenticationSource authSource) {
 		HttpSession session = request.getSession();
-		createLoginStatusBean(userUri, authSource, session);
+		createLoginStatusBean(userAccount.getUri(), authSource, session);
 		setSessionTimeoutLimit(session);
-		recordInUserSessionMap(userUri, session);
-		notifyOtherUsers(userUri, session);
+		recordInUserSessionMap(userAccount.getUri(), session);
+		notifyOtherUsers(userAccount.getUri(), session);
 	}
 
 	/**

@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 import static edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginExternalAuthSetup.ATTRIBUTE_REFERRER;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +15,8 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.controller.accounts.user.UserAccountsFirstTimeExternalPage;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 
 /**
@@ -57,37 +58,26 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 					MESSAGE_LOGIN_FAILED);
 			return;
 		}
-		
+
 		String afterLoginUrl = LoginProcessBean.getBean(req).getAfterLoginUrl();
 		removeLoginProcessArtifacts(req);
 
 		UserAccount userAccount = getAuthenticator(req)
 				.getAccountForExternalAuth(externalAuthId);
-		if (userAccount != null) {
+		if (userAccount == null) {
+			log.debug("Creating new account for " + externalAuthId
+					+ ", return to '" + afterLoginUrl + "'");
+			UserAccountsFirstTimeExternalPage.setExternalLoginInfo(req,
+					externalAuthId, afterLoginUrl);
+			resp.sendRedirect(UrlBuilder.getUrl("/accounts/firstTimeExternal"));
+			return;
+		} else {
 			log.debug("Logging in as " + userAccount.getUri());
 			getAuthenticator(req).recordLoginAgainstUserAccount(userAccount,
 					AuthenticationSource.EXTERNAL);
 			new LoginRedirector(req, afterLoginUrl).redirectLoggedInUser(resp);
 			return;
 		}
-
-		List<String> associatedUris = getAuthenticator(req)
-				.getAssociatedIndividualUris(userAccount);
-		// TODO JB - this case should lead to creating a new account.
-		if (!associatedUris.isEmpty()) {
-			log.debug("Recognize '" + externalAuthId + "' as self-editor for "
-					+ associatedUris);
-			String uri = associatedUris.get(0);
-
-			getAuthenticator(req).recordLoginWithoutUserAccount(uri);
-			new LoginRedirector(req, afterLoginUrl).redirectLoggedInUser(resp);
-			return;
-		}
-
-		log.debug("User is not recognized: " + externalAuthId);
-		removeLoginProcessArtifacts(req);
-		new LoginRedirector(req, afterLoginUrl).redirectUnrecognizedExternalUser(resp,
-				externalAuthId);
 	}
 
 	private void removeLoginProcessArtifacts(HttpServletRequest req) {

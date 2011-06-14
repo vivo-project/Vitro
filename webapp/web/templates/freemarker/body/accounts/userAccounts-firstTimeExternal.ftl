@@ -39,6 +39,7 @@
 
         <form method="POST" action="${formUrls.firstTimeExternal}" class="customForm" role="my account">
         	<input type="hidden" name="externalAuthId" value="${externalAuthId}" />
+        	<input type="hidden" name="afterLoginUrl" value="${afterLoginUrl}" />
         
             <label for="first-name">First name<span class="requiredHint"> *</span></label> 
             <input type="text" name="firstName" value="${firstName}" id="first-name" role="input "/>

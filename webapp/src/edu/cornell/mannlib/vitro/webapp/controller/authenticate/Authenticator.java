@@ -107,17 +107,6 @@ public abstract class Authenticator {
 
 	/**
 	 * <pre>
-	 * Record that the user has logged in but with only external authentication 
-	 * info, so no internal user account.
-	 * - this involves everything except updating the user record.
-	 * </pre>
-	 * 
-	 * TODO JB This goes away.
-	 */
-	public abstract void recordLoginWithoutUserAccount(String individualUri);
-
-	/**
-	 * <pre>
 	 * Record that the current user has logged out: - notify other users of the
 	 * model. 
 	 * - invalidate the session.

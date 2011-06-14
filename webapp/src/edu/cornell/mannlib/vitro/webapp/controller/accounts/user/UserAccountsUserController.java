@@ -4,10 +4,10 @@ package edu.cornell.mannlib.vitro.webapp.controller.accounts.user;
 
 import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource.EXTERNAL;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOwnAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
@@ -115,9 +115,7 @@ public class UserAccountsUserController extends FreemarkerHttpServlet {
 			UserAccount userAccount = page.createAccount();
 			Authenticator auth = Authenticator.getInstance(vreq);
 			auth.recordLoginAgainstUserAccount(userAccount, EXTERNAL);
-			LoginProcessBean.removeBean(vreq);
-
-			return showLoginRedirection(vreq);
+			return showLoginRedirection(vreq, page.getAfterLoginUrl());
 		} else {
 			return page.showPage();
 		}
@@ -132,10 +130,31 @@ public class UserAccountsUserController extends FreemarkerHttpServlet {
 		return new RedirectResponseValues("/");
 	}
 
-	private ResponseValues showLoginRedirection(VitroRequest vreq) {
-		LoginRedirector lr = new LoginRedirector(vreq, null);
+	private ResponseValues showLoginRedirection(VitroRequest vreq,
+			String afterLoginUrl) {
+		LoginRedirector lr = new LoginRedirector(vreq, afterLoginUrl);
 		DisplayMessage.setMessage(vreq, lr.assembleWelcomeMessage());
 		String uri = lr.getRedirectionUriForLoggedInUser();
-		return new RedirectResponseValues(uri);
+		return new RedirectResponseValues(stripContextPath(vreq, uri));
+	}
+
+	/**
+	 * TODO The LoginRedirector gives a URI that includes the context path. But
+	 * the RedirectResponseValues wants a URI that does not include the context
+	 * path.
+	 * 
+	 * Bridge the gap.
+	 */
+	private String stripContextPath(VitroRequest vreq, String uri) {
+		if ((uri == null) || uri.isEmpty() || uri.equals(vreq.getContextPath())) {
+			return "/";
+		}
+		if (uri.contains("://")) {
+			return uri;
+		}
+		if (uri.startsWith(vreq.getContextPath() + '/')) {
+			return uri.substring(vreq.getContextPath().length());
+		}
+		return uri;
 	}
 }
