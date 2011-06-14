@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 
@@ -36,7 +37,8 @@ public class VClassTemplateModel extends BaseTemplateModel {
         return vclass.getEntityCount();
     }
 
-    public VClassGroupTemplateModel getGroup(){
-        return new VClassGroupTemplateModel(vclass.getGroup());
+    public VClassGroupTemplateModel getGroup() {
+        VClassGroup group = vclass.getGroup();
+        return (group == null) ? null : new VClassGroupTemplateModel(vclass.getGroup());
     }
 }
