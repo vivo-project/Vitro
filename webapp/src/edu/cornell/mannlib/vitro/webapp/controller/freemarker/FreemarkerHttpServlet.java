@@ -337,9 +337,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         Map<String, Object> map = new HashMap<String, Object>();
 
         ApplicationBean appBean = vreq.getAppBean();
-        // Ideally, templates wouldn't need portal id. Currently used as a hidden input value
-        // in the site search box, so needed for now.
-        
         String siteName = appBean.getApplicationName();
         map.put("siteName", siteName);
         

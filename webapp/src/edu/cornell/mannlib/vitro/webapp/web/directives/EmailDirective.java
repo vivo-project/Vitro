@@ -65,10 +65,10 @@ public class EmailDirective extends BaseTemplateDirectiveModel {
 
         HttpServletRequest request = (HttpServletRequest) env.getCustomAttribute("request");
         
-        o = (FreemarkerEmailMessage) request.getAttribute("email");        
+        o = (FreemarkerEmailMessage) request.getAttribute("emailMessage");        
         if ( o == null) {
             throw new TemplateModelException(
-                "No email object found in the request.");
+                "No email message object found in the request.");
         }
         if ( ! (o instanceof FreemarkerEmailMessage)) {
             throw new TemplateModelException(

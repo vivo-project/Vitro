@@ -61,6 +61,7 @@ public class FreemarkerEmailMessage {
 
 	private InternetAddress fromAddress = null;
 	private String subject = "";
+	private String templateName;
 	private String htmlTemplateName;
 	private String textTemplateName;
 	private Map<String, Object> bodyMap = Collections.emptyMap();
@@ -144,27 +145,30 @@ public class FreemarkerEmailMessage {
 	public void setTextTemplate(String templateName) {
 		this.textTemplateName = nonNull(templateName, "");
 	}
+	
+	public void setTemplate(String templateName) {
+	    this.templateName = nonNull(templateName, "");
+	}
 
 	public void setBodyMap(Map<String, Object> body) {
 		if (body == null) {
 			this.bodyMap = Collections.emptyMap();
 		} else {
-			this.bodyMap = Collections
-					.unmodifiableMap(new HashMap<String, Object>(body));
+			this.bodyMap = new HashMap<String, Object>(body);
 		}
 	}
 	
-	public void processTemplate(VitroRequest vreq, String templateName, Map<String, Object> map) {
+	public void processTemplate(VitroRequest vreq) {
 	    
-	    vreq.setAttribute("email", this);
+	    vreq.setAttribute("emailMessage", this);
 
-	    map.putAll(FreemarkerHttpServlet.getDirectivesForAllEnvironments());
-        map.put("email", new edu.cornell.mannlib.vitro.webapp.web.directives.EmailDirective());
+	    bodyMap.putAll(FreemarkerHttpServlet.getDirectivesForAllEnvironments());
+        bodyMap.put("email", new edu.cornell.mannlib.vitro.webapp.web.directives.EmailDirective());
 	    
 	    try {
 	        Template template = config.getTemplate(templateName);     
 	        StringWriter writer = new StringWriter();  
-	        Environment env = template.createProcessingEnvironment(map, writer);
+	        Environment env = template.createProcessingEnvironment(bodyMap, writer);
 	        env.setCustomAttribute("request", vreq);
             env.process();
         } catch (TemplateException e) {

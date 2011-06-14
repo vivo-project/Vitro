@@ -9,8 +9,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
-import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsPage;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
@@ -47,7 +47,7 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 
 	protected abstract void setAdditionalProperties(UserAccount u);
 
-	protected abstract void notifyUser(VitroRequest vreq);
+	protected abstract void notifyUser();
 
 	protected abstract boolean wasPasswordEmailSent();
 
@@ -95,7 +95,7 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 		}
 
 		@Override
-		protected void notifyUser(VitroRequest vreq) {
+		protected void notifyUser() {
 			if (!resetPassword) {
 				return;
 			}
@@ -103,23 +103,24 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 			Map<String, Object> body = new HashMap<String, Object>();
 			body.put("userAccount", page.getUpdatedAccount());
 			body.put("passwordLink", buildResetPasswordLink());
-			//body.put("subjectLine", "Reset password request");
+			body.put("siteName", getSiteName());
 
 			FreemarkerEmailMessage email = FreemarkerEmailFactory
 					.createNewMessage(vreq);
 			email.addRecipient(TO, page.getUpdatedAccount().getEmailAddress());
+			email.setTemplate(EMAIL_TEMPLATE);
+			email.setBodyMap(body);
 			
 			vreq.setAttribute("email", email);
 	
-			email.processTemplate(vreq, EMAIL_TEMPLATE, body);
-			
-			//email.setSubject("Reset password request");
-			//email.setHtmlTemplate("userAccounts-resetPasswordEmail-html.ftl");
-			//email.setTextTemplate("userAccounts-resetPasswordEmail-text.ftl");
-			//email.setBodyMap(body);
-			//email.send();
+			email.processTemplate(vreq);
 
 			sentEmail = true;
+		}
+		
+		private String getSiteName() {
+	        ApplicationBean appBean = vreq.getAppBean();
+	        return appBean.getApplicationName();		    
 		}
 
 		private String buildResetPasswordLink() {
@@ -199,7 +200,7 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 		}
 
 		@Override
-		protected void notifyUser(VitroRequest vreq) {
+		protected void notifyUser() {
 			// Do nothing.
 		}
 
