@@ -92,9 +92,9 @@
 
             <#if emailIsEnabled??>
                 <p class="note">
-                    Note: A confirmation email with instructions for resetting a password 
-                    will be sent to the address entered above. 
-                    The password will not be reset until the user follows the link provided in this email. 
+                    Note: Instructions for resetting the password will 
+                    be emailed to the address entered above. The password will not 
+                    be reset until the user follows the link provided in this email.
                 </p>
             </#if>
     
