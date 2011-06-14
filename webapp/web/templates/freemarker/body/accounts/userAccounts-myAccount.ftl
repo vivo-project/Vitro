@@ -75,12 +75,12 @@
             <input type="text" name="lastName" value="${lastName}" id="last-name" role="input" />
 
             <#if !externalAuth??>
-                <label for="new-password">New password<span class="requiredHint"> *</span></label>
+                <label for="new-password">New password</label>
                 <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
 
                 <p class="note">Minimum of ${minimumLength} characters in length. Leaving this blank means that the password will not be changed.</p>
 
-                <label for="confirm-password">Confirm initial password<span class="requiredHint"> *</span></label> 
+                <label for="confirm-password">Confirm new password</label> 
                 <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
             </#if>
 
