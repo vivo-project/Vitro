@@ -247,6 +247,8 @@ public class CalculateParameters implements DocumentModifier {
 	public void modifyDocument(Individual individual, SolrInputDocument doc) {
 		// TODO Auto-generated method stub
 		 // calculate beta value.  
+        log.debug("Parameter calculation starts..");
+        
         float beta = 0;
         String uri = individual.getURI();
         if(hasBeta(uri)){
@@ -276,6 +278,8 @@ public class CalculateParameters implements DocumentModifier {
         SolrInputField f = doc.getField(VitroTermNames.targetInfo);
         f.addValue(adjInfo[1],f.getBoost());
         doc.setDocumentBoost(getBeta(uri)*phi*IndividualToSolrDocument.ALL_TEXT_BOOST);   
+        
+        log.debug("Parameter calculation is done");
 	}
 	
 }

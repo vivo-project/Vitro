@@ -10,7 +10,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
-import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.joda.time.DateTime;
 
@@ -26,7 +25,6 @@ import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.VitroTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ClassProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearch;
-import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
 
 public class IndividualToSolrDocument {
         
