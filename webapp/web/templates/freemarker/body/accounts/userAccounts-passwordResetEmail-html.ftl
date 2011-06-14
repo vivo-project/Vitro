@@ -1,6 +1,6 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#-- Confirmation that an password has been reset. -->
+<#-- Confirmation that a password has been reset. -->
 
 <html>
     <head>

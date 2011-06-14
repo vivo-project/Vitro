@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.email;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,9 +29,14 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
+import freemarker.core.Environment;
 import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 
 /**
  * A framework that makes it simpler to send email messages with a body built
@@ -145,6 +152,69 @@ public class FreemarkerEmailMessage {
 			this.bodyMap = Collections
 					.unmodifiableMap(new HashMap<String, Object>(body));
 		}
+	}
+	
+	public void processTemplate(VitroRequest vreq, String templateName, Map<String, Object> map) {
+	    
+	    vreq.setAttribute("email", this);
+
+	    map.putAll(FreemarkerHttpServlet.getDirectivesForAllEnvironments());
+        map.put("email", new edu.cornell.mannlib.vitro.webapp.web.directives.EmailDirective());
+	    
+	    try {
+	        Template template = config.getTemplate(templateName);     
+	        StringWriter writer = new StringWriter();  
+	        Environment env = template.createProcessingEnvironment(map, writer);
+	        env.setCustomAttribute("request", vreq);
+            env.process();
+        } catch (TemplateException e) {
+            log.error(e, e);
+        } catch (IOException e) {
+            log.error(e, e);
+        }	    	    
+	}
+	
+	public void send(String subject, String html, String text) {
+        try {
+            MimeMessage msg = new MimeMessage(session);
+            msg.setReplyTo(new Address[] { replyToAddress });
+
+            if (fromAddress == null) {
+                msg.addFrom(new Address[] { replyToAddress });
+            } else {
+                msg.addFrom(new Address[] { fromAddress });
+            }
+
+            for (Recipient recipient : recipients) {
+                msg.addRecipient(recipient.type, recipient.address);
+            }
+
+            msg.setSubject(subject);
+
+            if (html.isEmpty()) {
+                if (html.isEmpty()) {
+                    log.error("Message has neither text body nor HTML body");
+                } else {
+                    msg.setContent(html, "text/html");
+                }
+            } else {
+                if (html.isEmpty()) {
+                    msg.setContent(text, "text/plain");
+                } else {
+                    MimeMultipart content = new MimeMultipart("alternative");
+                    addBodyPart(content, text, "text/plain");
+                    addBodyPart(content, html, "text/html");
+                    msg.setContent(content);
+                }
+            }
+
+            msg.setSentDate(new Date());
+
+            Transport.send(msg);
+
+        } catch (MessagingException e) {
+            log.error("Failed to send message.", e);
+        }	    
 	}
 
 	public void send() {

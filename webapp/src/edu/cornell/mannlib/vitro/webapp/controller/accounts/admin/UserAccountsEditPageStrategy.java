@@ -47,7 +47,7 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 
 	protected abstract void setAdditionalProperties(UserAccount u);
 
-	protected abstract void notifyUser();
+	protected abstract void notifyUser(VitroRequest vreq);
 
 	protected abstract boolean wasPasswordEmailSent();
 
@@ -57,7 +57,8 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 
 	private static class EmailStrategy extends UserAccountsEditPageStrategy {
 		private static final String PARAMETER_RESET_PASSWORD = "resetPassword";
-
+		private static final String EMAIL_TEMPLATE = "userAccounts-resetPasswordEmail.ftl";
+		
 		public static final String RESET_PASSWORD_URL = "/accounts/resetPassword";
 
 		private boolean resetPassword;
@@ -94,7 +95,7 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 		}
 
 		@Override
-		protected void notifyUser() {
+		protected void notifyUser(VitroRequest vreq) {
 			if (!resetPassword) {
 				return;
 			}
@@ -102,16 +103,21 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 			Map<String, Object> body = new HashMap<String, Object>();
 			body.put("userAccount", page.getUpdatedAccount());
 			body.put("passwordLink", buildResetPasswordLink());
-			body.put("subjectLine", "Reset password request");
+			//body.put("subjectLine", "Reset password request");
 
 			FreemarkerEmailMessage email = FreemarkerEmailFactory
 					.createNewMessage(vreq);
 			email.addRecipient(TO, page.getUpdatedAccount().getEmailAddress());
-			email.setSubject("Reset password request");
-			email.setHtmlTemplate("userAccounts-resetPasswordEmail-html.ftl");
-			email.setTextTemplate("userAccounts-resetPasswordEmail-text.ftl");
-			email.setBodyMap(body);
-			email.send();
+			
+			vreq.setAttribute("email", email);
+	
+			email.processTemplate(vreq, EMAIL_TEMPLATE, body);
+			
+			//email.setSubject("Reset password request");
+			//email.setHtmlTemplate("userAccounts-resetPasswordEmail-html.ftl");
+			//email.setTextTemplate("userAccounts-resetPasswordEmail-text.ftl");
+			//email.setBodyMap(body);
+			//email.send();
 
 			sentEmail = true;
 		}
@@ -193,7 +199,7 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 		}
 
 		@Override
-		protected void notifyUser() {
+		protected void notifyUser(VitroRequest vreq) {
 			// Do nothing.
 		}
 

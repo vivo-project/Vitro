@@ -306,11 +306,18 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
      */    
     public static Map<String, Object> getDirectives() {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("dump", new freemarker.ext.dump.DumpDirective());
-        map.put("dumpAll", new freemarker.ext.dump.DumpAllDirective());  
-        map.put("help", new freemarker.ext.dump.HelpDirective()); 
+        map.putAll(getDirectivesForAllEnvironments());
         map.put("url", new edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective()); 
         map.put("widget", new edu.cornell.mannlib.vitro.webapp.web.directives.WidgetDirective());
+        
+        return map;
+    }
+    
+    public static Map<String, Object> getDirectivesForAllEnvironments() {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("dump", new freemarker.ext.dump.DumpDirective());
+        map.put("dumpAll", new freemarker.ext.dump.DumpAllDirective());  
+        map.put("help", new freemarker.ext.dump.HelpDirective());    
         return map;
     }
     

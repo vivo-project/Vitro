@@ -200,7 +200,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 
 		userAccountsDao.updateUserAccount(userAccount);
 
-		strategy.notifyUser();
+		strategy.notifyUser(vreq);
 	}
 
 	public boolean wasPasswordEmailSent() {
