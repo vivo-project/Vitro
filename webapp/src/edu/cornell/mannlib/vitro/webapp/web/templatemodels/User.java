@@ -41,6 +41,14 @@ public class User extends BaseTemplateModel {
 		return firstName + " " + lastName;
     }
     
+    public String getFirstName() {
+    	if (currentUser == null) {
+    		return "";
+    	} else {
+    		return currentUser.getFirstName();
+    	}
+    }
+    
     public boolean getHasSiteAdminAccess() {
     	return PolicyHelper.isAuthorizedForActions(vreq, SiteAdminController.REQUIRED_ACTIONS);
     }
