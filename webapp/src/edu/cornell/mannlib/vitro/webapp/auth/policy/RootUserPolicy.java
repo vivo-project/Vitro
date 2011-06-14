@@ -75,6 +75,8 @@ public class RootUserPolicy implements PolicyIface {
 				UserAccountsDao uaDao = getUserAccountsDao(ctx);
 				OntModel userAccountsModel = getUserAccountsModel(ctx);
 
+				checkForWrongRootUser(ctx, uaDao);
+
 				if (!rootUserExists(uaDao)) {
 					createRootUser(ctx, uaDao, userAccountsModel);
 				}
@@ -103,13 +105,34 @@ public class RootUserPolicy implements PolicyIface {
 					.getUserAccountsModel();
 		}
 
+		private void checkForWrongRootUser(ServletContext ctx,
+				UserAccountsDao uaDao) {
+			UserAccount root = getRootUser(uaDao);
+			if (root == null) {
+				return;
+			}
+			String actualRootEmail = root.getEmailAddress();
+
+			String configRootEmail = ConfigurationProperties.getBean(ctx)
+					.getProperty(PROPERTY_ROOT_USER_EMAIL);
+			if (actualRootEmail.equals(configRootEmail)) {
+				return;
+			}
+
+			log.warn("Root user '" + actualRootEmail + "' already exists.");
+		}
+
 		private boolean rootUserExists(UserAccountsDao uaDao) {
+			return (getRootUser(uaDao) != null);
+		}
+
+		private UserAccount getRootUser(UserAccountsDao uaDao) {
 			for (UserAccount ua : uaDao.getAllUserAccounts()) {
 				if (uaDao.isRootUser(ua)) {
-					return true;
+					return ua;
 				}
 			}
-			return false;
+			return null;
 		}
 
 		/**
