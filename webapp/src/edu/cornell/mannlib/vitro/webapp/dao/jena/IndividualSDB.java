@@ -456,13 +456,13 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 		if (this.mainImageUri != NOT_INITIALIZED) {
 			return mainImageUri;
 		} else {
-			for (ObjectPropertyStatement stmt : getObjectPropertyStatements()) {
-				if (stmt.getPropertyURI()
-						.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
-					mainImageUri = stmt.getObjectURI();
-					return mainImageUri;
-				}
-			}
+			List<ObjectPropertyStatement> mainImgStmts = 
+					getObjectPropertyStatements(VitroVocabulary.IND_MAIN_IMAGE);
+			if (mainImgStmts != null && mainImgStmts.size() > 0) {
+				// arbitrarily return the first value in the list
+				mainImageUri = mainImgStmts.get(0).getObjectURI();
+				return mainImageUri;				
+			} 
 			return null;
 		}
 	}
