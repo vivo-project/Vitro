@@ -74,3 +74,41 @@
     height:620px;
     overflow:visible;
 }
+/* <------ SEARCH RESULTS PAGE*/
+.searchTOC {    
+    margin-bottom: 1.5em; 
+    float:right;
+    margin-right:35px;
+    margin-left:45px;
+    width:182px;
+    text-align:center;
+/*    border: 1px solid #dde4e3;*/
+    padding-top:4px;
+    color: #fff;
+    background: #5e6363; 
+}
+.searchTOC span {    
+    color: #fff;
+}
+.searchTOC ul {
+    width: 160px;
+    border: 1px solid #dde4e3;
+    background: #f1f2ee;
+    padding: 0 10px 0px 10px;
+    margin-top: 4px;
+    text-align: left;
+}
+.searchTOC ul li {
+    display: block;
+    border-bottom: 1px solid #dde4e3;
+    font-size: 14px;
+    height: 35px;
+    line-height: 35px;
+}
+.searchTOC ul li:last-child {
+    border-bottom: none
+}
+.searchTOC ul a {
+    display: block;
+    padding-left: 15px;
+}
