@@ -253,6 +253,7 @@ public class FreemarkerEmailMessage {
         }	    
 	}
 
+	// TO BE REMOVED
 	public void send() {
 		String textBody = figureMessageBody(textTemplateName);
 		String htmlBody = figureMessageBody(htmlTemplateName);
@@ -303,6 +304,7 @@ public class FreemarkerEmailMessage {
 	 * Process the template. If there is no template name or if there is a
 	 * problem with the process, return an empty string.
 	 */
+	// TO BE REMOVED
 	private String figureMessageBody(String templateName) {
 		if (templateName.isEmpty()) {
 			return "";
