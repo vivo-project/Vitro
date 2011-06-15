@@ -94,7 +94,7 @@
             <label class="inline" for="no-associate"> No</label>
 
             <br />
-            <input type="checkbox" name="resetPassword" value="" id="reset-password" role="checkbox" />
+            <input type="checkbox" name="resetPassword" value="" id="reset-password" role="checkbox" <#if resetPassword??>checked</#if> />
             <label  class="inline" for="reset-password"> Reset password</label>
 
             <#if emailIsEnabled??>
