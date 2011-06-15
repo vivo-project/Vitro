@@ -85,7 +85,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 		externalAuthId = getStringParameter(PARAMETER_EXTERNAL_AUTH_ID, "");
 		firstName = getStringParameter(PARAMETER_FIRST_NAME, "");
 		lastName = getStringParameter(PARAMETER_LAST_NAME, "");
-		selectedRoleUri = getStringParameter(PARAMETER_ROLE, "");
+		selectedRoleUri = isRootUser() ? "" :getStringParameter(PARAMETER_ROLE, "");
 		associateWithProfile = isParameterAsExpected(
 				PARAMETER_ASSOCIATE_WITH_PROFILE, "yes");
 
@@ -127,7 +127,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 			errorCode = ERROR_NO_FIRST_NAME;
 		} else if (lastName.isEmpty()) {
 			errorCode = ERROR_NO_LAST_NAME;
-		} else if (selectedRoleUri.isEmpty()) {
+		} else if (!isRootUser() && selectedRoleUri.isEmpty()) {
 			errorCode = ERROR_NO_ROLE;
 		} else {
 			errorCode = strategy.additionalValidations();
@@ -145,7 +145,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 	private boolean isEmailValidFormat() {
 		return Authenticator.isValidEmailAddress(emailAddress);
 	}
-	
+
 	private boolean externalAuthIdIsChanged() {
 		return !externalAuthId.equals(userAccount.getExternalAuthId());
 	}
@@ -155,6 +155,10 @@ public class UserAccountsEditPage extends UserAccountsPage {
 			return false;
 		}
 		return userAccountsDao.getUserAccountByExternalAuthId(externalAuthId) != null;
+	}
+
+	private boolean isRootUser() {
+		return userAccountsDao.isRootUser(userAccount);
 	}
 
 	public boolean isValid() {
@@ -177,6 +181,11 @@ public class UserAccountsEditPage extends UserAccountsPage {
 			body.put("lastName", userAccount.getLastName());
 			body.put("selectedRole", getExistingRoleUri());
 		}
+
+		if (isRootUser()) {
+			body.put("selectedRole", "");
+		}
+
 		body.put("roles", buildRolesList());
 		if (associateWithProfile) {
 			body.put("associate", Boolean.TRUE);
@@ -213,8 +222,12 @@ public class UserAccountsEditPage extends UserAccountsPage {
 		userAccount.setLastName(lastName);
 		userAccount.setExternalAuthId(externalAuthId);
 
-		userAccount
-				.setPermissionSetUris(Collections.singleton(selectedRoleUri));
+		if (isRootUser()) {
+			userAccount.setPermissionSetUris(Collections.<String> emptySet());
+		} else {
+			userAccount.setPermissionSetUris(Collections
+					.singleton(selectedRoleUri));
+		}
 
 		strategy.setAdditionalProperties(userAccount);
 
