@@ -103,13 +103,18 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 			Map<String, Object> body = new HashMap<String, Object>();
 			body.put("userAccount", page.getUpdatedAccount());
 			body.put("passwordLink", buildResetPasswordLink());
-			body.put("siteName", getSiteName());
+			
+			String siteName = getSiteName();
+			body.put("siteName", siteName);
 
 			FreemarkerEmailMessage email = FreemarkerEmailFactory
 					.createNewMessage(vreq);
 			email.addRecipient(TO, page.getUpdatedAccount().getEmailAddress());
 			email.setTemplate(EMAIL_TEMPLATE);
-			email.setBodyMap(body);
+			email.setBodyMap(body);			
+			email.setDefaultSubject(getDefaultSubject(siteName));
+			email.setDefaultHtml(getDefaultHtml());
+			email.setDefaultText(getDefaultText());
 			
 			vreq.setAttribute("email", email);
 	
@@ -117,10 +122,22 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 
 			sentEmail = true;
 		}
-		
+
 		private String getSiteName() {
-	        ApplicationBean appBean = vreq.getAppBean();
-	        return appBean.getApplicationName();		    
+            ApplicationBean appBean = vreq.getAppBean();
+            return appBean.getApplicationName();            
+        }
+		
+		private String getDefaultSubject(String siteName) {
+		    return siteName + " reset password request";
+		}
+		
+		private String getDefaultHtml() {
+		    return "";
+		}
+		
+		private String getDefaultText() {
+		    return "Default text for user accounts edit page";
 		}
 
 		private String buildResetPasswordLink() {

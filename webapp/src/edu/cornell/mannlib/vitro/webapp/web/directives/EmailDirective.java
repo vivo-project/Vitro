@@ -29,54 +29,43 @@ public class EmailDirective extends BaseTemplateDirectiveModel {
     @Override
     public void execute(Environment env, Map params, TemplateModel[] loopVars,
             TemplateDirectiveBody body) throws TemplateException, IOException {
-      
-        Object o = params.get("subject");
-        if (o == null) {
-            throw new TemplateModelException(
-                "The email directive requires a value for parameter 'subject'.");
-        }        
-        if (! ( o instanceof SimpleScalar)) {
-            throw new TemplateModelException(
-                "The email directive requires a string value for parameter 'subject'.");
-        }        
-        String subject = o.toString();         
-
-        o = params.get("html");
-        if (o == null) {
-            throw new TemplateModelException(
-                "The email directive requires a value for parameter 'html'.");
-        }        
-        if (! ( o instanceof SimpleScalar)) {
-            throw new TemplateModelException(
-                "The email directive requires a string value for parameter 'html'.");
-        }        
-        String html = o.toString();
-        
-        o = params.get("text");
-        if (o == null) {
-            throw new TemplateModelException(
-                "The email directive requires a value for parameter 'text'.");
-        }        
-        if (! ( o instanceof SimpleScalar)) {
-            throw new TemplateModelException(
-                "The email directive requires a string value for parameter 'text'.");
-        }        
-        String text = o.toString(); 
 
         HttpServletRequest request = (HttpServletRequest) env.getCustomAttribute("request");
-        
-        o = (FreemarkerEmailMessage) request.getAttribute("emailMessage");        
-        if ( o == null) {
+        FreemarkerEmailMessage email = null;
+
+        Object paramValue = (FreemarkerEmailMessage) request.getAttribute("emailMessage");        
+        if ( paramValue == null) {
             throw new TemplateModelException(
                 "No email message object found in the request.");
         }
-        if ( ! (o instanceof FreemarkerEmailMessage)) {
+        if ( ! (paramValue instanceof FreemarkerEmailMessage)) {
             throw new TemplateModelException(
                 "Invalid value for request email attribute");
         }
-        FreemarkerEmailMessage email = (FreemarkerEmailMessage) o;
-        email.send(subject, html, text);
+        email = (FreemarkerEmailMessage) paramValue;       
+
         
+        // Read in parameter values. If a value is undefined by the template, the
+        // default values defined by the email object will be used.
+        String subject = null;
+        paramValue = params.get("subject");    
+        if (paramValue != null && paramValue instanceof SimpleScalar) {
+            subject = paramValue.toString();  
+        }  
+
+        String html = null;
+        paramValue = params.get("html");
+        if (paramValue != null && paramValue instanceof SimpleScalar) {
+            html = paramValue.toString();  
+        }            
+        
+        String text = null;
+        paramValue = params.get("text");
+        if (paramValue != null && paramValue instanceof SimpleScalar) {
+            text = paramValue.toString();  
+        } 
+
+        email.send(subject, html, text);       
     }
     
     @Override
@@ -84,15 +73,17 @@ public class EmailDirective extends BaseTemplateDirectiveModel {
         Map<String, Object> map = new LinkedHashMap<String, Object>();
 
         map.put("effect", "Create an email message from the parameters set in the invoking template.");
+        map.put("comment", "Parameter values undefined by the template will be provided by controller default values.");
         
         Map<String, String> params = new HashMap<String, String>();
-        params.put("subject", "email subject");
-        params.put("html", "HTML version of email message");
-        params.put("text", "Plain text version of email message");
+        params.put("subject", "email subject (optional)");
+        params.put("html", "HTML version of email message (optional)");
+        params.put("text", "Plain text version of email message (optional)");
         map.put("parameters", params);
-        
+
         List<String> examples = new ArrayList<String>();
         examples.add("&lt;email subject=\"Password reset confirmation\" html=html text=text&gt;");
+        examples.add("&lt;email html=html text=text&gt;");
         map.put("examples", examples);
         
         return map;

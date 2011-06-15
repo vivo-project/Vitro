@@ -26,6 +26,7 @@ import javax.mail.internet.MimeMultipart;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -61,10 +62,15 @@ public class FreemarkerEmailMessage {
 
 	private InternetAddress fromAddress = null;
 	private String subject = "";
+	private String defaultSubject = "";
+	private String defaultHtml = "";
+	private String defaultText = "";
 	private String templateName;
-	private String htmlTemplateName;
-	private String textTemplateName;
 	private Map<String, Object> bodyMap = Collections.emptyMap();
+	
+	// TO BE REMOVED
+    private String htmlTemplateName;
+    private String textTemplateName;
 
 	/**
 	 * Package access - should only be created by the factory.
@@ -133,22 +139,36 @@ public class FreemarkerEmailMessage {
 			return;
 		}
 	}
-
-	public void setSubject(String subject) {
-		this.subject = nonNull(subject, "");
-	}
-
+	
+	// TO BE REMOVED
 	public void setHtmlTemplate(String templateName) {
 		this.htmlTemplateName = nonNull(templateName, "");
 	}
 
+	// TO BE REMOVED
 	public void setTextTemplate(String templateName) {
 		this.textTemplateName = nonNull(templateName, "");
+	}
+
+	public void setSubject(String subject) {
+		this.subject = nonNull(subject, "");
 	}
 	
 	public void setTemplate(String templateName) {
 	    this.templateName = nonNull(templateName, "");
 	}
+	
+	public void setDefaultSubject(String defaultSubject) {
+	    this.defaultSubject = nonNull(defaultSubject, "");
+	}
+	
+    public void setDefaultHtml(String defaultHtml) {
+        this.defaultHtml = nonNull(defaultHtml, "");
+    }	
+    
+    public void setDefaultText(String defaultText) {
+        this.defaultText = nonNull(defaultText, "");
+    }
 
 	public void setBodyMap(Map<String, Object> body) {
 		if (body == null) {
@@ -192,24 +212,36 @@ public class FreemarkerEmailMessage {
             for (Recipient recipient : recipients) {
                 msg.addRecipient(recipient.type, recipient.address);
             }
-
+            
+            if (subject == null) {
+                log.debug("No email subject specified in template. Using default subject.");
+                subject = defaultSubject;
+            }
             msg.setSubject(subject);
 
-            if (html.isEmpty()) {
-                if (html.isEmpty()) {
+            if (html == null) {
+                log.debug("No html email specified in template. Using default html.");
+                html = defaultHtml;
+            }
+            
+            if (text == null) {
+                log.debug("No plain text email specified in template. Using default html.");
+                text = defaultText;
+            }
+            
+            if (StringUtils.isEmpty(text)) {
+                if (StringUtils.isEmpty(html)) {
                     log.error("Message has neither text body nor HTML body");
                 } else {
                     msg.setContent(html, "text/html");
                 }
+            } else if (StringUtils.isEmpty(html)) {
+                msg.setContent(text, "text/plain");
             } else {
-                if (html.isEmpty()) {
-                    msg.setContent(text, "text/plain");
-                } else {
-                    MimeMultipart content = new MimeMultipart("alternative");
-                    addBodyPart(content, text, "text/plain");
-                    addBodyPart(content, html, "text/html");
-                    msg.setContent(content);
-                }
+                MimeMultipart content = new MimeMultipart("alternative");
+                addBodyPart(content, text, "text/plain");
+                addBodyPart(content, html, "text/html");
+                msg.setContent(content);
             }
 
             msg.setSentDate(new Date());
