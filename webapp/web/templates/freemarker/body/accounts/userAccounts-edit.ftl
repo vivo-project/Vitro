@@ -16,6 +16,10 @@
         <#assign errorMessage = "'${emailAddress}' is not a valid email address." />
     </#if>
     
+    <#if errorExternalAuthIdInUse??>
+        <#assign errorMessage = "An account with that external authorization ID already exists." />
+    </#if>
+    
     <#if errorFirstNameIsEmpty??>
         <#assign errorMessage = "You must supply a first name." />
     </#if>
@@ -60,6 +64,9 @@
 
             <label for="last-name">Last name<span class="requiredHint"> *</span></label> 
             <input type="text" name="lastName" value="${lastName}" id="last-name" role="input" />
+
+            <label for="external-auth-id">External authorization ID (optional)</label> 
+            <input type="text" name="externalAuthId" value="${externalAuthId}" id="external-auth-id" role="input "/>
 
             <p>Roles<span class="requiredHint"> *</span> </p>
             <#list roles as role>
