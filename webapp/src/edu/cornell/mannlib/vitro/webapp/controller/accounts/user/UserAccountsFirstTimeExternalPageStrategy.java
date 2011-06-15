@@ -52,6 +52,8 @@ public abstract class UserAccountsFirstTimeExternalPageStrategy extends
 	public static class EmailStrategy extends
 			UserAccountsFirstTimeExternalPageStrategy {
 
+		private static final String EMAIL_TEMPLATE = "userAccounts-firstTimeExternalEmail.ftl";
+
 		public EmailStrategy(VitroRequest vreq,
 				UserAccountsFirstTimeExternalPage page) {
 			super(vreq, page);
@@ -66,15 +68,14 @@ public abstract class UserAccountsFirstTimeExternalPageStrategy extends
 		public void notifyUser(UserAccount ua) {
 			Map<String, Object> body = new HashMap<String, Object>();
 			body.put("userAccount", ua);
-			body.put("subjectLine", "Your VIVO account has been created.");
 
 			FreemarkerEmailMessage email = FreemarkerEmailFactory
 					.createNewMessage(vreq);
 			email.addRecipient(TO, ua.getEmailAddress());
 			email.setSubject("Your VIVO account has been created.");
-			email.setHtmlTemplate("userAccounts-firstTimeExternalEmail-html.ftl");
-			email.setTextTemplate("userAccounts-firstTimeExternalEmail-text.ftl");
+			email.setTemplate(EMAIL_TEMPLATE);
 			email.setBodyMap(body);
+			email.processTemplate();
 			email.send();
 		}
 

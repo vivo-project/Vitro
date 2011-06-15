@@ -2,9 +2,12 @@
 
 <#-- Confirmation that an account has been created. -->
 
+<#assign subject = "Your VIVO account has been created." />
+
+<#assign html>
 <html>
     <head>
-        <title>${subjectLine}</title>
+        <title>${subject}</title>
     </head>
     <body>
         <p>
@@ -41,3 +44,25 @@
         </p>
     </body>
 </html>
+</#assign>
+
+<#assign text>
+${userAccount.firstName} ${userAccount.lastName}
+
+Congratulations!
+
+We have created your new VIVO account associated with 
+${userAccount.emailAddress}.
+
+If you did not request this new account you can safely ignore this email. 
+This request will expire if not acted upon for 30 days.
+        
+Paste the link below into your browser's address bar to create your password 
+for your new account using our secure server.
+        
+${passwordLink}
+        
+Thanks!
+</#assign>
+
+<@email subject=subject html=html text=text />

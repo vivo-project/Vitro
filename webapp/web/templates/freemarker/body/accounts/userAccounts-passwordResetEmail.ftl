@@ -2,9 +2,12 @@
 
 <#-- Confirmation that a password has been reset. -->
 
+<#assign subject = "Password changed." />
+
+<#assign html>
 <html>
     <head>
-        <title>${subjectLine}</title>
+        <title>${subject}</title>
     </head>
     <body>
         <p>
@@ -24,3 +27,17 @@
         </p>
     </body>
 </html>
+</#assign>
+
+<#assign text>
+${userAccount.firstName} ${userAccount.lastName}
+
+Password successfully changed.
+
+Your new password associated with ${userAccount.emailAddress} 
+has been changed.
+
+Thank you.
+</#assign>
+
+<@email subject=subject html=html text=text />
