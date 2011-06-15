@@ -14,6 +14,7 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.query.Dataset;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
@@ -21,8 +22,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearchImpl;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
@@ -66,9 +69,14 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             //first we need a ent2luceneDoc translator
             OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
             
+            OntModel abox = ModelContext.getBaseOntModelSelector(context).getABoxModel();
+            
+            OntModel inferences = (OntModel)context.getAttribute( JenaBaseDao.INFERENCE_ONT_MODEL_ATTRIBUTE_NAME);
+            Dataset dataset = WebappDaoFactoryJena.makeInMemoryDataset(abox, inferences);
+            
             List<DocumentModifier> modifiers = new ArrayList<DocumentModifier>();
-            modifiers.add(new CalculateParameters(ModelContext.getJenaOntModel(context)));
-            modifiers.add(new ContextNodeFields(ModelContext.getJenaOntModel(context)));
+          // modifiers.add(new CalculateParameters(ModelContext.getJenaOntModel(context)));
+            modifiers.add(new ContextNodeFields( dataset ));
             
             IndividualToSolrDocument indToSolrDoc = new IndividualToSolrDocument(
             		new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel),
