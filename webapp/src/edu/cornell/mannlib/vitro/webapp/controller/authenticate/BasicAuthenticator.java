@@ -125,7 +125,7 @@ public class BasicAuthenticator extends Authenticator {
 
 		HttpSession session = request.getSession();
 		createLoginStatusBean(userAccount.getUri(), authSource, session);
-		setSessionTimeoutLimit(session);
+		setSessionTimeoutLimit(userAccount, session);
 		recordInUserSessionMap(userAccount.getUri(), session);
 		notifyOtherUsers(userAccount.getUri(), session);
 	}
@@ -151,10 +151,13 @@ public class BasicAuthenticator extends Authenticator {
 	/**
 	 * Editors and other privileged users get a longer timeout interval.
 	 */
-	private void setSessionTimeoutLimit(HttpSession session) {
+	private void setSessionTimeoutLimit(UserAccount userAccount,
+			HttpSession session) {
 		RoleLevel role = RoleLevel.getRoleFromLoginStatus(request);
 		if (role == RoleLevel.EDITOR || role == RoleLevel.CURATOR
 				|| role == RoleLevel.DB_ADMIN) {
+			session.setMaxInactiveInterval(PRIVILEGED_TIMEOUT_INTERVAL);
+		} else if (getUserAccountsDao().isRootUser(userAccount)) {
 			session.setMaxInactiveInterval(PRIVILEGED_TIMEOUT_INTERVAL);
 		} else {
 			session.setMaxInactiveInterval(LOGGED_IN_TIMEOUT_INTERVAL);
