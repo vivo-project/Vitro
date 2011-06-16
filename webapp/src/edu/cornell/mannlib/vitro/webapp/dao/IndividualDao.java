@@ -10,6 +10,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Keyword;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
 
 public interface IndividualDao extends ObjectSourceIface {
@@ -108,10 +109,6 @@ public interface IndividualDao extends ObjectSourceIface {
     /**
      * Returns a list of individuals with the given value for the given dataProperty.  If
      * there are no Indiviuals that fit the criteria then an empty list is returned.
-     * 
-     * @param dataPropertyUri
-     * @param value
-     * @return
      */
     public List<Individual> getIndividualsByDataProperty(String dataPropertyUri, String value);
 
@@ -128,9 +125,6 @@ public interface IndividualDao extends ObjectSourceIface {
 
 	List<Keyword> getKeywordObjectsForIndividual(String individualURI);
 
-	/** In most cases, it's best to let ExternalAuthHelper call this for you. */
-	String getIndividualURIFromNetId(String netIdStr, String netidMatchingPropertyUri);
-
 	String getNetId(String entityURI);
 
 	String getStatus(String entityURI);
@@ -142,6 +136,8 @@ public interface IndividualDao extends ObjectSourceIface {
 	 * @throws InsertException Could not create a URI
 	 */
 	String getUnusedURI(Individual individual) throws InsertException;
+	
+	EditLiteral getLabelEditLiteral(String individualUri);
 	
     @Deprecated
     public abstract Individual getIndividualByExternalId(int externalIdType,

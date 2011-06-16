@@ -129,6 +129,7 @@ public abstract class UserAccountsPage {
 		map.put("myAccount", UrlBuilder.getUrl("/accounts/myAccount"));
 		map.put("createPassword", UrlBuilder.getUrl("/accounts/createPassword"));
 		map.put("resetPassword", UrlBuilder.getUrl("/accounts/resetPassword"));
+		map.put("firstTimeExternal", UrlBuilder.getUrl("/accounts/firstTimeExternal"));
 
 		return map;
 	}

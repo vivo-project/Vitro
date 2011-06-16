@@ -94,6 +94,7 @@ public class WidgetDirective extends BaseTemplateDirectiveModel {
         
     }
 
+    @Override
     public Map<String, Object> help(String name) {
         Map<String, Object> map = new LinkedHashMap<String, Object>();
 

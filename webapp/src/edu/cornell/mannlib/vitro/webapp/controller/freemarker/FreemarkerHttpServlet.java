@@ -22,7 +22,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
-import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
@@ -255,6 +254,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         urls.put("termsOfUse", urlBuilder.getPortalUrl(Route.TERMS_OF_USE));  
         urls.put("login", urlBuilder.getLoginUrl());          
         urls.put("logout", urlBuilder.getLogoutUrl());       
+        urls.put("myAccount", UrlBuilder.getUrl("/accounts/myAccount"));       
         urls.put("siteAdmin", urlBuilder.getPortalUrl(Route.SITE_ADMIN));  
         urls.put("themeImages", urlBuilder.getPortalUrl(themeDir + "/images"));
         urls.put("images", UrlBuilder.getUrl("/images"));
@@ -306,11 +306,18 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
      */    
     public static Map<String, Object> getDirectives() {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("dump", new freemarker.ext.dump.DumpDirective());
-        map.put("dumpAll", new freemarker.ext.dump.DumpAllDirective());  
-        map.put("help", new freemarker.ext.dump.HelpDirective()); 
+        map.putAll(getDirectivesForAllEnvironments());
         map.put("url", new edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective()); 
         map.put("widget", new edu.cornell.mannlib.vitro.webapp.web.directives.WidgetDirective());
+        
+        return map;
+    }
+    
+    public static Map<String, Object> getDirectivesForAllEnvironments() {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("dump", new freemarker.ext.dump.DumpDirective());
+        map.put("dumpAll", new freemarker.ext.dump.DumpAllDirective());  
+        map.put("help", new freemarker.ext.dump.HelpDirective());    
         return map;
     }
     
@@ -330,9 +337,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         Map<String, Object> map = new HashMap<String, Object>();
 
         ApplicationBean appBean = vreq.getAppBean();
-        // Ideally, templates wouldn't need portal id. Currently used as a hidden input value
-        // in the site search box, so needed for now.
-        
         String siteName = appBean.getApplicationName();
         map.put("siteName", siteName);
         

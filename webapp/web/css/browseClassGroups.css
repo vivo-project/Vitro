@@ -64,11 +64,13 @@ ul#browse-classgroups .count-classes {
     border: 1px solid #dde6e5;
     background: #fff;
     min-height: 230px;
+    padding-top: 10px;
 }
 a.browse-superclass {
     position: absolute;
     right: 0.5em;
     font-size: 0.9em;
+    top: 3px;
 }
 ul#classes-in-classgroup {
     float: left;

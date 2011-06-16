@@ -356,24 +356,6 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
     	// Nothing to do.
     }
     
-    private void checkMainModelForUserAccounts(OntModel mainModel, OntModel userAccountsModel) {
-        Model extractedUserData = ((new JenaModelUtils()).extractUserAccountsData(mainModel));
-        if (extractedUserData.size() > 0) {
-            userAccountsModel.enterCriticalSection(Lock.WRITE);
-            try {
-                userAccountsModel.add(extractedUserData);
-            } finally {
-                userAccountsModel.leaveCriticalSection();
-            }
-            mainModel.enterCriticalSection(Lock.WRITE);
-            try {
-                mainModel.remove(extractedUserData);
-            } finally {
-                mainModel.leaveCriticalSection();
-            }
-        }
-    }
-    
     private OntModel ontModelFromContextAttribute(ServletContext ctx, String attribute) {
         OntModel ontModel;
         Object attributeValue = ctx.getAttribute(attribute);

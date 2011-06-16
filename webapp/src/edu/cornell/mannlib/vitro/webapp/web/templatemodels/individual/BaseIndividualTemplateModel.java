@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -70,7 +71,7 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
     /* These methods perform some manipulation of the data returned by the Individual methods */
     
     public String getProfileUrl() {
-        return UrlBuilder.getIndividualProfileUrl(individual, vreq.getWebappDaoFactory());
+        return UrlBuilder.getIndividualProfileUrl(individual, vreq.getWebappDaoFactory());        
     }
 
     // For image, we use the default list view and Individual methods to reconstruct the image

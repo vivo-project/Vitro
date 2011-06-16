@@ -19,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
+import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 
 
 class IndividualDaoFiltering extends BaseFiltering implements IndividualDao{
@@ -85,16 +86,6 @@ class IndividualDaoFiltering extends BaseFiltering implements IndividualDao{
         innerIndividualDao.fillVClassForIndividual(individual);
     }
 
-
-    public String getIndividualURIFromNetId(String netIdStr, String netidMatchingPropertyUri) {
-        String uri = innerIndividualDao.getIndividualURIFromNetId(netIdStr, netidMatchingPropertyUri);
-        if( uri == null ) return null;
-        Individual ent = getIndividualByURI(uri);
-        if( ent != null && filters.getIndividualFilter().fn(ent) )
-            return uri;
-        else
-            return null;
-    }
     public List<Individual> getIndividualsByDataProperty(String dataPropertyUri, String value) {
         return filterAndWrap(innerIndividualDao.getIndividualsByDataProperty(dataPropertyUri,value),
                      filters);
@@ -251,5 +242,11 @@ class IndividualDaoFiltering extends BaseFiltering implements IndividualDao{
 	public String getUnusedURI(Individual individual) throws InsertException {
 		return innerIndividualDao.getUnusedURI(individual);
 	}
+
+
+    @Override
+    public EditLiteral getLabelEditLiteral(String individualUri) {
+        return innerIndividualDao.getLabelEditLiteral(individualUri);
+    }
 
 }

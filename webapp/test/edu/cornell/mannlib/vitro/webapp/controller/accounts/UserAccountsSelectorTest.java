@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -91,6 +90,27 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 				Collections
 						.singleton("http://vivo.mydomain.edu/individual/role2"),
 				acct.getPermissionSetUris());
+		assertEquals("rootUser", false, acct.isRootUser());
+	}
+
+	@Test
+	public void checkFieldsForRootUser() {
+		selectOnCriteria(1, 8, DEFAULT_ORDERING, "", "");
+		assertSelectedUris(10, "user08");
+
+		UserAccount acct = selection.getUserAccounts().get(0);
+		assertEquals("uri", "http://vivo.mydomain.edu/individual/user08",
+				acct.getUri());
+		assertEquals("email", "email@henry.edu", acct.getEmailAddress());
+		assertEquals("firstName", "Mary", acct.getFirstName());
+		assertEquals("lastName", "McInerney", acct.getLastName());
+		assertEquals("password", "garbage", acct.getMd5Password());
+		assertEquals("expires", 0L, acct.getPasswordLinkExpires());
+		assertEquals("loginCount", 7, acct.getLoginCount());
+		assertEquals("status", UserAccount.Status.ACTIVE, acct.getStatus());
+		assertEqualSets("permissions", Collections.<String> emptySet(),
+				acct.getPermissionSetUris());
+		assertEquals("rootUser", true, acct.isRootUser());
 	}
 
 	// ----------------------------------------------------------------------

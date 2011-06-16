@@ -9,15 +9,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
-import edu.cornell.mannlib.vitro.webapp.beans.User;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsPage;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.admin.UserAccountsEditPage;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 /**
  * Handle the "My Account" form display and submission.
@@ -33,6 +31,7 @@ public class UserAccountsMyAccountPage extends UserAccountsPage {
 
 	private static final String ERROR_NO_EMAIL = "errorEmailIsEmpty";
 	private static final String ERROR_EMAIL_IN_USE = "errorEmailInUse";
+	private static final String ERROR_EMAIL_INVALID_FORMAT = "errorEmailInvalidFormat";
 	private static final String ERROR_NO_FIRST_NAME = "errorFirstNameIsEmpty";
 	private static final String ERROR_NO_LAST_NAME = "errorLastNameIsEmpty";
 
@@ -57,7 +56,7 @@ public class UserAccountsMyAccountPage extends UserAccountsPage {
 	public UserAccountsMyAccountPage(VitroRequest vreq) {
 		super(vreq);
 
-		this.userAccount = getLoggedInUser();
+		this.userAccount = LoginStatusBean.getCurrentUser(vreq);
 		this.strategy = UserAccountsMyAccountPageStrategy.getInstance(vreq,
 				this, isExternalAccount());
 
@@ -90,6 +89,8 @@ public class UserAccountsMyAccountPage extends UserAccountsPage {
 			errorCode = ERROR_NO_EMAIL;
 		} else if (emailIsChanged() && isEmailInUse()) {
 			errorCode = ERROR_EMAIL_IN_USE;
+		} else if (!isEmailValidFormat()) {
+			errorCode = ERROR_EMAIL_INVALID_FORMAT;
 		} else if (firstName.isEmpty()) {
 			errorCode = ERROR_NO_FIRST_NAME;
 		} else if (lastName.isEmpty()) {
@@ -107,27 +108,12 @@ public class UserAccountsMyAccountPage extends UserAccountsPage {
 		return userAccountsDao.getUserAccountByEmail(emailAddress) != null;
 	}
 
-	public boolean isValid() {
-		return errorCode.isEmpty();
+	private boolean isEmailValidFormat() {
+		return Authenticator.isValidEmailAddress(emailAddress);
 	}
 
-	private UserAccount getLoggedInUser() {
-		// TODO This is a bogus measure.
-		// TODO It only works because for now we are not deleting old User
-		// structures, and there is a new UserAccount with email set to the old
-		// User username.
-		String uri = LoginStatusBean.getBean(vreq).getUserURI();
-		WebappDaoFactory wdf = (WebappDaoFactory) this.ctx
-				.getAttribute("webappDaoFactory");
-		User u = wdf.getUserDao().getUserByURI(uri);
-
-		UserAccount ua = userAccountsDao.getUserAccountByEmail(u.getUsername());
-		if (ua == null) {
-			throw new IllegalStateException("Couldn't find a UserAccount "
-					+ "for uri: '" + uri + "'");
-		}
-		log.debug("Logged-in user is " + ua);
-		return ua;
+	public boolean isValid() {
+		return errorCode.isEmpty();
 	}
 
 	private boolean isExternalAccount() {

@@ -26,7 +26,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
-import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -45,6 +44,7 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	private IndividualDao individualDao;
 	private DataPropertyDao dataPropertyDao;
 	private ObjectPropertyDao objectPropertyDao;
+	private UserAccountsDao userAccountsDao;
 
 	public void setIndividualDao(IndividualDao individualDao) {
 		this.individualDao = individualDao;
@@ -58,10 +58,8 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 		this.objectPropertyDao = objectPropertyDao;
 	}
 
-	// TODO This goes away when the UserAccounts stuff is fully implemented -- jb
-	private UserDao userDao;
-	public void setUserDao(UserDao userDao) {
-		this.userDao = userDao;
+	public void setUserAccountsDao(UserAccountsDao userAccountsDao) {
+		this.userAccountsDao = userAccountsDao;
 	}
 
 	// ----------------------------------------------------------------------
@@ -83,10 +81,9 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 		return this.objectPropertyDao;
 	}
 
-    // TODO This goes away when the UserAccounts stuff is fully implemented -- jb
 	@Override
-	public UserDao getUserDao() {
-		return this.userDao;
+	public UserAccountsDao getUserAccountsDao() {
+		return this.userAccountsDao;
 	}
 
 	// ----------------------------------------------------------------------
@@ -225,12 +222,6 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 				"WebappDaoFactory.getLinktypeDao() not implemented.");
 	}
 
-	@Override
-	public UserAccountsDao getUserAccountsDao() {
-		throw new RuntimeException(
-		"WebappDaoFactory.getUserAccountsDao() not implemented.");
-	}
-	
 	@Override
 	public VClassGroupDao getVClassGroupDao() {
 		throw new RuntimeException(

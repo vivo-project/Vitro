@@ -14,6 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Keyword;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
+import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 
 /**
  * A minimal implementation of the IndividualDao.
@@ -206,13 +207,6 @@ public class IndividualDaoStub implements IndividualDao {
 	}
 
 	@Override
-	public String getIndividualURIFromNetId(String netIdStr,
-			String netidMatchingPropertyUri) {
-		throw new RuntimeException(
-				"IndividualDaoStub.getIndividualURIFromNetId() not implemented.");
-	}
-
-	@Override
 	public String getNetId(String entityURI) {
 		throw new RuntimeException(
 				"IndividualDaoStub.getNetId() not implemented.");
@@ -243,5 +237,11 @@ public class IndividualDaoStub implements IndividualDao {
 		throw new RuntimeException(
 				"IndividualDaoStub.getIndividualByExternalId() not implemented.");
 	}
+
+    @Override
+    public EditLiteral getLabelEditLiteral(String individualUri) {
+        throw new RuntimeException(
+        "IndividualDaoStub.getLabelLiteral() not implemented.");
+    }
 
 }

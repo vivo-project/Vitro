@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 import static edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginExternalAuthSetup.ATTRIBUTE_REFERRER;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +14,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.controller.accounts.user.UserAccountsFirstTimeExternalPage;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 
 /**
  * Handle the return from the external authorization login server. If we are
@@ -35,45 +38,51 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 	 * - User corresponds to a User acocunt. Record the login. 
 	 * - User corresponds to an Individual (self-editor). 
 	 * - User is not recognized.
+	 * 
+	 * On entry, we expect to find:
+	 * - A LoginProcessBean, which will give us the afterLoginUrl if the login
+	 *      succeeds.
+	 * - A referrer URL, to which we will redirect if the login fails.
+	 *      TODO: is this equal to LoginProcessBean.getLoginPageUrl()?
+	 * These are removed on exit.
 	 * </pre>
 	 */
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		String username = ExternalAuthHelper.getHelper(req).getExternalAuthId(
-				req);
-		List<String> associatedUris = getAuthenticator(req)
-				.getAssociatedIndividualUris(username);
-
-		if (username == null) {
-			log.debug("No username.");
+		String externalAuthId = ExternalAuthHelper.getHelper(req)
+				.getExternalAuthId(req);
+		if (externalAuthId == null) {
+			log.debug("No externalAuthId.");
 			complainAndReturnToReferrer(req, resp, ATTRIBUTE_REFERRER,
 					MESSAGE_LOGIN_FAILED);
-		} else if (getAuthenticator(req).isExistingUser(username)) {
-			log.debug("Logging in as " + username);
-			getAuthenticator(req).recordLoginAgainstUserAccount(username,
-					AuthenticationSource.EXTERNAL);
-			removeLoginProcessArtifacts(req);
-			new LoginRedirector(req, resp).redirectLoggedInUser();
-		} else if (!associatedUris.isEmpty()) {
-			log.debug("Recognize '" + username + "' as self-editor for "
-					+ associatedUris);
-			String uri = associatedUris.get(0);
+			return;
+		}
 
-			getAuthenticator(req).recordLoginWithoutUserAccount(username, uri,
-					AuthenticationSource.EXTERNAL);
-			removeLoginProcessArtifacts(req);
-			new LoginRedirector(req, resp).redirectLoggedInUser();
+		String afterLoginUrl = LoginProcessBean.getBean(req).getAfterLoginUrl();
+		removeLoginProcessArtifacts(req);
+
+		UserAccount userAccount = getAuthenticator(req)
+				.getAccountForExternalAuth(externalAuthId);
+		if (userAccount == null) {
+			log.debug("Creating new account for " + externalAuthId
+					+ ", return to '" + afterLoginUrl + "'");
+			UserAccountsFirstTimeExternalPage.setExternalLoginInfo(req,
+					externalAuthId, afterLoginUrl);
+			resp.sendRedirect(UrlBuilder.getUrl("/accounts/firstTimeExternal"));
+			return;
 		} else {
-			log.debug("User is not recognized: " + username);
-			removeLoginProcessArtifacts(req);
-			new LoginRedirector(req, resp)
-					.redirectUnrecognizedExternalUser(username);
+			log.debug("Logging in as " + userAccount.getUri());
+			getAuthenticator(req).recordLoginAgainstUserAccount(userAccount,
+					AuthenticationSource.EXTERNAL);
+			new LoginRedirector(req, afterLoginUrl).redirectLoggedInUser(resp);
+			return;
 		}
 	}
 
 	private void removeLoginProcessArtifacts(HttpServletRequest req) {
 		req.getSession().removeAttribute(ATTRIBUTE_REFERRER);
+		LoginProcessBean.removeBean(req);
 	}
 
 	@Override

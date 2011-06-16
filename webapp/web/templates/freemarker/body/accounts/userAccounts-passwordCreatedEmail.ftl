@@ -2,9 +2,12 @@
 
 <#-- Confirmation that an password has been created. -->
 
+<#assign subject = "Password successfully created." />
+
+<#assign html>
 <html>
     <head>
-        <title>${subjectLine}</title>
+        <title>${subject}</title>
     </head>
     <body>
         <p>
@@ -24,3 +27,17 @@
         </p>
     </body>
 </html>
+</#assign>
+
+<#assign text>
+${userAccount.firstName} ${userAccount.lastName}
+
+Password successfully created.
+
+Your new password associated with ${userAccount.emailAddress} 
+has been created.
+
+Thank you.
+</#assign>
+
+<@email subject=subject html=html text=text />

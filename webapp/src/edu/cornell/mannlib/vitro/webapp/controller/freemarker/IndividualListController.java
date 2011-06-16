@@ -174,10 +174,29 @@ public class IndividualListController extends FreemarkerHttpServlet {
      */
      public static Map<String,Object> getResultsForVClass(String vclassURI, int page, String alpha, IndividualDao indDao, ServletContext context) 
      throws CorruptIndexException, IOException, ServletException{
-         Map<String,Object> rvMap = new HashMap<String,Object>();      
-                                  
-         //make lucene query for this rdf:type
-         Query query = getQuery(vclassURI, alpha);        
+    	 Map<String,Object> rvMap = new HashMap<String,Object>();    
+    	 try{
+	         //make lucene query for this rdf:type
+    		 List<String> classUris = new ArrayList<String>();
+    		 classUris.add(vclassURI);
+	        Query query = getQuery(classUris, alpha);        
+	        rvMap = getResultsForVClassQuery(query, page, alpha, indDao, context);
+	        List<Individual> individuals = (List<Individual>) rvMap.get("entities");
+	        if (individuals == null) 
+	             log.debug("entities list is null for vclass " + vclassURI );                        
+    	 } catch(Throwable th) {
+    		 log.error("An error occurred retrieving results for vclass query", th);
+    	 }
+         return rvMap;
+     }
+     
+     /*
+      * This method includes what was formerly a part of the method above, allowing for refactoring of code
+      * to use for a different number fo classes
+      */
+     public static Map<String,Object> getResultsForVClassQuery(Query query, int page, String alpha, IndividualDao indDao, ServletContext context) 
+     throws CorruptIndexException, IOException, ServletException{
+         Map<String,Object> rvMap = new HashMap<String,Object>();        
          
          //execute lucene query for individuals of the specified type
          IndexSearcher index = LuceneIndexFactory.getIndexSearcher(context);
@@ -236,21 +255,44 @@ public class IndividualListController extends FreemarkerHttpServlet {
          rvMap.put("alpha",alpha);
          
          rvMap.put("totalCount", size);
-         rvMap.put("entities",individuals);
-         if (individuals == null) 
-             log.debug("entities list is null for vclass " + vclassURI );                        
+         rvMap.put("entities",individuals);                     
          
          return rvMap;
      }
      
-     private static BooleanQuery getQuery(String vclassUri,  String alpha){
+    
+    
+     public static Map<String,Object> getResultsForVClassIntersections(List<String> vclassURIs, int page, String alpha, IndividualDao indDao, ServletContext context) 
+     throws CorruptIndexException, IOException, ServletException{
+         Map<String,Object> rvMap = new HashMap<String,Object>();  
+         try{
+             //make lucene query for multiple rdf types 
+	         Query query = getQuery(vclassURIs, alpha);     
+	         //get results corresponding to this query
+	         rvMap = getResultsForVClassQuery(query, page, alpha, indDao, context);
+	         List<Individual> individuals = (List<Individual>) rvMap.get("entities");
+		     if (individuals == null) 
+		       log.debug("entities list is null for vclass " + vclassURIs.toString() );     
+         } catch(Throwable th) {
+        	 log.error("Error retrieving individuals corresponding to intersection multiple classes." + vclassURIs.toString());
+         }
+         return rvMap;
+     }
+     /*
+      * This method creates a query to search for terms with rdf type corresponding to vclass Uri.
+      * The original version allowed only for one class URI but needed to be extended to enable multiple
+      *  vclass Uris to be passed
+      */
+     
+     private static BooleanQuery getQuery(List<String>vclassUris,  String alpha){
          BooleanQuery query = new BooleanQuery();
          try{      
-            //query term for rdf:type
-            query.add(
-                    new TermQuery( new Term(Entity2LuceneDoc.term.RDFTYPE, vclassUri)),
-                    BooleanClause.Occur.MUST );                          
-                                       
+            //query term for rdf:type - multiple types possible
+        	for(String vclassUri: vclassUris) {
+	            query.add(
+	                    new TermQuery( new Term(Entity2LuceneDoc.term.RDFTYPE, vclassUri)),
+	                    BooleanClause.Occur.MUST );                          
+        	}                           
             //Add alpha filter if it is needed
             Query alphaQuery = null;
             if( alpha != null && !"".equals(alpha) && alpha.length() == 1){      
@@ -265,8 +307,8 @@ public class IndividualListController extends FreemarkerHttpServlet {
             log.error(ex,ex);
             return new BooleanQuery();        
         }        
-     }    
-
+     }  
+     
      public static List<PageRecord> makePagesList( int count, int pageSize,  int selectedPage){        
          
          List<PageRecord> records = new ArrayList<PageRecord>( MAX_PAGES + 1 );

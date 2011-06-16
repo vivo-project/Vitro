@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -70,5 +71,6 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
     public List<PropertyTemplateModel> getProperties() {
         return properties;
     }
+    
 
 }

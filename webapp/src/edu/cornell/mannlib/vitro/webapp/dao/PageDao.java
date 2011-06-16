@@ -3,7 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.dao;
 
 import java.util.Map;
-
+import java.util.List;
 public interface PageDao {
 
     Map<String, Object> getPage(String pageUri);
@@ -22,4 +22,6 @@ public interface PageDao {
     String getHomePageUri();
    
     String getClassGroupPage(String pageUri);
+    
+    List<String> getClassIntersections(String pageUri);
 }

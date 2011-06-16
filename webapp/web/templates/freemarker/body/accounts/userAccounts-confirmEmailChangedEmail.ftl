@@ -2,9 +2,12 @@
 
 <#-- Confirmation that the user has changed his email account. -->
 
+<#assign subject = "Your VIVO email account has been changed." />
+
+<#assign html>
 <html>
     <head>
-        <title>${subjectLine}</title>
+        <title>${subject}</title>
     </head>
     <body>
         <p>
@@ -21,3 +24,15 @@
         </p>
     </body>
 </html>
+</#assign>
+
+<#assign text>
+Hi, ${userAccount.firstName} ${userAccount.lastName}
+
+You recently changed the email address associated with 
+${userAccount.firstName} ${userAccount.lastName}
+
+Thank you.
+</#assign>
+
+<@email subject=subject html=html text=text />

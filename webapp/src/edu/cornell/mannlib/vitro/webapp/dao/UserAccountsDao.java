@@ -14,6 +14,11 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 public interface UserAccountsDao {
 
 	/**
+	 * Get all of the UserAccounts in the model.
+	 */
+	Collection<UserAccount> getAllUserAccounts();
+
+	/**
 	 * Get the UserAccount for this URI.
 	 * 
 	 * @return null if the URI is null, or if there is no such UserAccount
@@ -27,6 +32,13 @@ public interface UserAccountsDao {
 	 *         UserAccount
 	 */
 	UserAccount getUserAccountByEmail(String emailAddress);
+
+	/**
+	 * Get the UserAccount for this External Authentication ID
+	 * 
+	 * @return null if the ID is null, or if there is no such UserAccount
+	 */
+	UserAccount getUserAccountByExternalAuthId(String externalAuthId);
 
 	/**
 	 * Create a new UserAccount in the model.

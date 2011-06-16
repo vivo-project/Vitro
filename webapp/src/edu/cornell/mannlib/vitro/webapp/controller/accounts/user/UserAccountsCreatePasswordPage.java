@@ -26,6 +26,7 @@ public class UserAccountsCreatePasswordPage extends
 			.getLog(UserAccountsCreatePasswordPage.class);
 
 	private static final String TEMPLATE_NAME = "userAccounts-createPassword.ftl";
+	private static final String EMAIL_TEMPLATE = "userAccounts-passwordCreatedEmail.ftl";
 
 	public UserAccountsCreatePasswordPage(VitroRequest vreq) {
 		super(vreq);
@@ -34,11 +35,12 @@ public class UserAccountsCreatePasswordPage extends
 	public void createPassword() {
 		userAccount.setMd5Password(Authenticator.applyMd5Encoding(newPassword));
 		userAccount.setPasswordLinkExpires(0L);
+		userAccount.setPasswordChangeRequired(false);
 		userAccount.setStatus(Status.ACTIVE);
 		userAccountsDao.updateUserAccount(userAccount);
 		log.debug("Set password on '" + userAccount.getEmailAddress()
 				+ "' to '" + newPassword + "'");
-		
+
 		notifyUser();
 	}
 
@@ -55,15 +57,14 @@ public class UserAccountsCreatePasswordPage extends
 	private void notifyUser() {
 		Map<String, Object> body = new HashMap<String, Object>();
 		body.put("userAccount", userAccount);
-		body.put("subjectLine", "Password successfully created.");
 
 		FreemarkerEmailMessage email = FreemarkerEmailFactory
 				.createNewMessage(vreq);
 		email.addRecipient(TO, userAccount.getEmailAddress());
 		email.setSubject("Password successfully created.");
-		email.setHtmlTemplate("userAccounts-passwordCreatedEmail-html.ftl");
-		email.setTextTemplate("userAccounts-passwordCreatedEmail-text.ftl");
+		email.setTemplate(EMAIL_TEMPLATE);
 		email.setBodyMap(body);
+		email.processTemplate();
 		email.send();
 	}
 }

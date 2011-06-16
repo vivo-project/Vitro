@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.beans;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -64,7 +67,9 @@ public class SelfEditingConfiguration {
 	}
 
 	private static SelfEditingConfiguration buildBean(HttpSession session) {
-		String selfEditingIdMatchingProperty = ConfigurationProperties.getBean(session)
+		ConfigurationProperties config = ConfigurationProperties
+				.getBean(session);
+		String selfEditingIdMatchingProperty = config
 				.getProperty(PROPERTY_SELF_EDITING_ID_MATCHING_PROPERTY);
 		return new SelfEditingConfiguration(selfEditingIdMatchingProperty);
 	}
@@ -87,25 +92,39 @@ public class SelfEditingConfiguration {
 		}
 	}
 
-	public String getIndividualUriFromUsername(IndividualDao indDao,
-			String username) {
+	/**
+	 * Get all Individuals associated with this user through the matching
+	 * property. Never returns null.
+	 */
+	public List<Individual> getAssociatedIndividuals(IndividualDao indDao,
+			UserAccount user) {
+		if (user == null) {
+			log.debug("user is null");
+			return Collections.emptyList();
+		}
+		return getAssociatedIndividuals(indDao, user.getExternalAuthId());
+	}
+
+	/**
+	 * Get all Individuals associated with this externalAuthId through the
+	 * matching property. Never returns null.
+	 */
+	public List<Individual> getAssociatedIndividuals(IndividualDao indDao,
+			String externalAuthId) {
 		if (indDao == null) {
 			log.warn("No IndividualDao");
-			return null;
+			return Collections.emptyList();
 		}
-		if (username == null) {
-			log.debug("username is null");
-			return null;
+		if (externalAuthId == null) {
+			log.debug("externalAuthId is null");
+			return Collections.emptyList();
 		}
 		if (selfEditingIdMatchingProperty == null) {
 			log.debug("selfEditingMatchingProperty is null");
-			return null;
+			return Collections.emptyList();
 		}
-
-		String uri = indDao.getIndividualURIFromNetId(username,
-				selfEditingIdMatchingProperty);
-		log.debug("Username=" + username + ", individual URI=" + uri);
-		return uri;
+		return indDao.getIndividualsByDataProperty(
+				selfEditingIdMatchingProperty, externalAuthId);
 	}
 
 	@Override

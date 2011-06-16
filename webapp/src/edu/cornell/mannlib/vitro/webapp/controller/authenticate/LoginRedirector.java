@@ -16,12 +16,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasRoleLevel;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.IsRootUser;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
-import edu.cornell.mannlib.vitro.webapp.beans.User;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
-import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
-import freemarker.template.utility.StringUtil;
 
 /**
  * A user has just completed the login process. What page do we direct them to?
@@ -30,78 +32,87 @@ public class LoginRedirector {
 	private static final Log log = LogFactory.getLog(LoginRedirector.class);
 
 	private final HttpServletRequest request;
-	private final HttpServletResponse response;
 	private final HttpSession session;
 
 	private final String uriOfAssociatedIndividual;
 	private final String afterLoginPage;
 
-	public LoginRedirector(HttpServletRequest request,
-			HttpServletResponse response) {
+	public LoginRedirector(HttpServletRequest request, String afterLoginPage) {
 		this.request = request;
 		this.session = request.getSession();
-		this.response = response;
+		this.afterLoginPage = afterLoginPage;
 
 		uriOfAssociatedIndividual = getAssociatedIndividualUri();
-
-		LoginProcessBean processBean = LoginProcessBean.getBean(request);
-		log.debug("process bean is: " + processBean);
-		afterLoginPage = processBean.getAfterLoginUrl();
 	}
 
 	/** Is there an Individual associated with this user? */
 	private String getAssociatedIndividualUri() {
-		User user = LoginStatusBean.getCurrentUser(request);
-		if (user == null) {
-			log.warn("Not logged in? How did we get here?");
+		UserAccount userAccount = LoginStatusBean.getCurrentUser(request);
+		if (userAccount == null) {
+			log.debug("Not logged in? Must be cancelling the password change");
 			return null;
 		}
-		String username = user.getUsername();
 
 		List<String> uris = Authenticator.getInstance(request)
-				.getAssociatedIndividualUris(username);
+				.getAssociatedIndividualUris(userAccount);
 		if (uris.isEmpty()) {
-			log.debug("'" + username
+			log.debug("'" + userAccount.getEmailAddress()
 					+ "' is not associated with an individual.");
 			return null;
 		} else {
 			String uri = uris.get(0);
-			log.debug("'" + username + "' is associated with an individual: "
-					+ uri);
+			log.debug("'" + userAccount.getEmailAddress()
+					+ "' is associated with an individual: " + uri);
 			return uri;
 		}
 	}
 
-	public void redirectLoggedInUser() throws IOException {
-		DisplayMessage.setMessage(request, assembleWelcomeMessage());
-
-		try {
-			if (isSelfEditorWithIndividual()) {
-				log.debug("Going to Individual home page.");
-				response.sendRedirect(getAssociatedIndividualHomePage());
-			} else if (isMerelySelfEditor()) {
-				log.debug("User not recognized. Going to application home.");
-				response.sendRedirect(getApplicationHomePageUrl());
+	public String getRedirectionUriForLoggedInUser() {
+		if (isSelfEditorWithIndividual()) {
+			log.debug("Going to Individual home page.");
+			return getAssociatedIndividualHomePage();
+		} else if (isMerelySelfEditor()) {
+			log.debug("User not recognized. Going to application home.");
+			return getApplicationHomePageUrl();
+		} else {
+			if (isLoginPage(afterLoginPage)) {
+				log.debug("Coming from /login. Going to site admin page.");
+				return getSiteAdminPageUrl();
+			} else if (null != afterLoginPage) {
+				log.debug("Returning to requested page: " + afterLoginPage);
+				return afterLoginPage;
 			} else {
-				if (isLoginPage(afterLoginPage)) {
-					log.debug("Coming from /login. Going to site admin page.");
-					response.sendRedirect(getSiteAdminPageUrl());
-				} else if (null != afterLoginPage) {
-					log.debug("Returning to requested page: " + afterLoginPage);
-					response.sendRedirect(afterLoginPage);
-				} else {
-					log.debug("Don't know what to do. Go home.");
-					response.sendRedirect(getApplicationHomePageUrl());
-				}
+				log.debug("Don't know what to do. Go home.");
+				return getApplicationHomePageUrl();
 			}
-			LoginProcessBean.removeBean(request);
+		}
+	}
+
+	public String getRedirectionUriForCancellingUser() {
+		if (isLoginPage(afterLoginPage)) {
+			log.debug("Coming from /login. Going to home.");
+			return getApplicationHomePageUrl();
+		} else if (null != afterLoginPage) {
+			log.debug("Returning to requested page: " + afterLoginPage);
+			return afterLoginPage;
+		} else {
+			log.debug("Don't know what to do. Go home.");
+			return getApplicationHomePageUrl();
+		}
+	}
+
+	public void redirectLoggedInUser(HttpServletResponse response)
+			throws IOException {
+		try {
+			DisplayMessage.setMessage(request, assembleWelcomeMessage());
+			response.sendRedirect(getRedirectionUriForLoggedInUser());
 		} catch (IOException e) {
 			log.debug("Problem with re-direction", e);
 			response.sendRedirect(getApplicationHomePageUrl());
 		}
 	}
 
-	private String assembleWelcomeMessage() {
+	public String assembleWelcomeMessage() {
 		if (isMerelySelfEditor() && !isSelfEditorWithIndividual()) {
 			// A special message for unrecognized self-editors:
 			return "You have logged in, "
@@ -111,13 +122,13 @@ public class LoginRedirector {
 		String backString = "";
 		String greeting = "";
 
-		User user = LoginStatusBean.getCurrentUser(request);
-		if (user != null) {
-			greeting = user.getUsername();
-			if (user.getLoginCount() > 1) {
+		UserAccount userAccount = LoginStatusBean.getCurrentUser(request);
+		if (userAccount != null) {
+			greeting = userAccount.getEmailAddress();
+			if (userAccount.getLoginCount() > 1) {
 				backString = " back";
 			}
-			String name = user.getFirstName();
+			String name = userAccount.getFirstName();
 			if (!StringUtils.isEmpty(name)) {
 				greeting = name;
 			}
@@ -126,27 +137,18 @@ public class LoginRedirector {
 		return "Welcome" + backString + ", " + greeting;
 	}
 
-	public void redirectCancellingUser() throws IOException {
+	public void redirectCancellingUser(HttpServletResponse response)
+			throws IOException {
 		try {
-			if (isLoginPage(afterLoginPage)) {
-				log.debug("Coming from /login. Going to home.");
-				response.sendRedirect(getApplicationHomePageUrl());
-			} else if (null != afterLoginPage) {
-				log.debug("Returning to requested page: " + afterLoginPage);
-				response.sendRedirect(afterLoginPage);
-			} else {
-				log.debug("Don't know what to do. Go home.");
-				response.sendRedirect(getApplicationHomePageUrl());
-			}
-			LoginProcessBean.removeBean(request);
+			response.sendRedirect(getRedirectionUriForCancellingUser());
 		} catch (IOException e) {
 			log.debug("Problem with re-direction", e);
 			response.sendRedirect(getApplicationHomePageUrl());
 		}
 	}
 
-	public void redirectUnrecognizedExternalUser(String username)
-			throws IOException {
+	public void redirectUnrecognizedExternalUser(HttpServletResponse response,
+			String username) throws IOException {
 		log.debug("Redirecting unrecognized external user: " + username);
 		DisplayMessage.setMessage(request,
 				"VIVO cannot find a profile for your account.");
@@ -154,7 +156,12 @@ public class LoginRedirector {
 	}
 
 	private boolean isMerelySelfEditor() {
-		RoleLevel role = RoleLevel.getRoleFromLoginStatus(request);
+		IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(request);
+		if (IsRootUser.isRootUser(ids)) {
+			return false;
+		}
+		
+		RoleLevel role = HasRoleLevel.getUsersRoleLevel(ids);
 		return role == RoleLevel.PUBLIC || role == RoleLevel.SELF;
 	}
 

@@ -169,21 +169,13 @@ public class VitroVocabulary {
 
     // =============== Vitro User vocabulary =================================
 
-    // TODO - these go away when the UserAccount stuff is fully implemented - jblake
-    public static final String USER = vitroURI+"User";
-    public static final String USER_USERNAME = vitroURI+"username";
-    public static final String USER_MD5PASSWORD = vitroURI+"md5password";
-    public static final String USER_OLDPASSWORD = vitroURI+"oldpassword";
-    public static final String USER_FIRSTTIME = vitroURI+"firstTime";
-    public static final String USER_LOGINCOUNT = vitroURI+"loginCount";
-    public static final String USER_ROLE = vitroURI+"roleURI";
-    public static final String USER_LASTNAME = vitroURI+"lastName";
-    public static final String USER_FIRSTNAME = vitroURI+"firstName";
+    // TODO JB This should go away when the new method of associating UserAccounts with Individuals is in place.
     public static final String MAY_EDIT_AS = vitroURI+"mayEditAs";
 
     // =============== Vitro UserAccount and PermissionSet vocabulary ===========
     
     public static final String USERACCOUNT = VITRO_AUTH + "UserAccount";
+    public static final String USERACCOUNT_ROOT_USER = VITRO_AUTH + "RootUserAccount";
     public static final String USERACCOUNT_EMAIL_ADDRESS = VITRO_AUTH + "emailAddress";
     public static final String USERACCOUNT_FIRST_NAME = VITRO_AUTH + "firstName";
     public static final String USERACCOUNT_LAST_NAME = VITRO_AUTH + "lastName";

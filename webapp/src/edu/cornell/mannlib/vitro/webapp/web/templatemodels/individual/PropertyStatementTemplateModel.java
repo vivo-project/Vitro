@@ -3,11 +3,13 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 public abstract class PropertyStatementTemplateModel extends BaseTemplateModel {
@@ -49,4 +51,5 @@ public abstract class PropertyStatementTemplateModel extends BaseTemplateModel {
     protected boolean isDeletable() {
         return editAccessList.contains(EditAccess.DELETE);
     }
+    
 }

@@ -7,8 +7,6 @@ import java.sql.SQLException;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
@@ -19,13 +17,11 @@ import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.sdb.StoreDesc;
 import com.hp.hpl.jena.sdb.store.DatabaseType;
 import com.hp.hpl.jena.sdb.store.LayoutType;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDBGraphGenerator;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RegeneratingGraph;
@@ -349,37 +345,6 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
             return "TURTLE";
         else 
             return defaultformat;
-    }
-    /**
-     * If the {@link ConfigurationProperties} has a name for the initial admin
-     * user, create the user and add it to the model.
-     */
-    protected void createInitialAdminUser(Model model, ServletContext ctx) {
-        String initialAdminUsername = ConfigurationProperties
-                .getBean(ctx).getProperty("initialAdminUser");
-        if (initialAdminUsername == null) {
-            return;
-        }
-
-        // A hard-coded MD5 encryption of "defaultAdmin"
-        String initialAdminPassword = "22BA075EC8951A70960A0A95C0BC2294";
-
-        String vitroDefaultNs = DEFAULT_DEFAULT_NAMESPACE;
-
-        Resource user = model.createResource(vitroDefaultNs
-                + "defaultAdminUser");
-        model.add(model.createStatement(user, model
-                .createProperty(VitroVocabulary.RDF_TYPE), model
-                .getResource(VitroVocabulary.USER)));
-        model.add(model.createStatement(user, model
-                .createProperty(VitroVocabulary.USER_USERNAME), model
-                .createTypedLiteral(initialAdminUsername)));
-        model.add(model.createStatement(user, model
-                .createProperty(VitroVocabulary.USER_MD5PASSWORD), model
-                .createTypedLiteral(initialAdminPassword)));
-        model.add(model.createStatement(user, model
-                .createProperty(VitroVocabulary.USER_ROLE), model
-                .createTypedLiteral("role:/50")));
     }
     
     protected final static String DB_TYPE = "MySQL";

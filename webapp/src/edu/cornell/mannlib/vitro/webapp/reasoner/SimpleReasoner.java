@@ -57,7 +57,6 @@ public class SimpleReasoner extends StatementListener {
 	
 	private AnnotationProperty mostSpecificType = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createAnnotationProperty(mostSpecificTypePropertyURI);
 	
-	
 	/**
 	 * @param tboxModel - input.  This model contains both asserted and inferred TBox axioms
 	 * @param aboxModel - input.  This model contains asserted ABox statements
@@ -679,8 +678,8 @@ public class SimpleReasoner extends StatementListener {
 	 */
 	public void setMostSpecificTypes(Resource individual, Model inferenceModel) {
 	
-		aboxModel.enterCriticalSection(Lock.WRITE);
-		inferenceModel.enterCriticalSection(Lock.READ);
+		inferenceModel.enterCriticalSection(Lock.WRITE);
+		aboxModel.enterCriticalSection(Lock.READ);
 		tboxModel.enterCriticalSection(Lock.READ);
 		
 		try {
@@ -763,12 +762,12 @@ public class SimpleReasoner extends StatementListener {
 	
 	public void setMostSpecificTypes(Resource individual, HashSet<String> typeURIs, Model inferenceModel) {
 		
-		aboxModel.enterCriticalSection(Lock.WRITE);
+		inferenceModel.enterCriticalSection(Lock.WRITE);
 		
 		try {
 		    Model retractions = ModelFactory.createDefaultModel();
 			// remove obsolete most-specific-type assertions
-			StmtIterator iter = aboxModel.listStatements(individual, mostSpecificType, (RDFNode) null);
+			StmtIterator iter = inferenceModel.listStatements(individual, mostSpecificType, (RDFNode) null);
 			
 			while (iter.hasNext()) {
 				Statement stmt = iter.next();
@@ -783,7 +782,7 @@ public class SimpleReasoner extends StatementListener {
 				}
 			}
 			
-			aboxModel.remove(retractions);
+			inferenceModel.remove(retractions);
 			
 			// add new most-specific-type assertions 
 			Iterator<String> typeIter = typeURIs.iterator();
@@ -792,12 +791,12 @@ public class SimpleReasoner extends StatementListener {
 				String typeURI = typeIter.next();
 				Resource mstResource = ResourceFactory.createResource(typeURI);
 				
-				if (!aboxModel.contains(individual, mostSpecificType, mstResource)) {
-					aboxModel.add(individual, mostSpecificType, mstResource);
+				if (!inferenceModel.contains(individual, mostSpecificType, mstResource)) {
+					inferenceModel.add(individual, mostSpecificType, mstResource);
 				}
 			}			
 		} finally {
-			aboxModel.leaveCriticalSection();
+			inferenceModel.leaveCriticalSection();
 		}
 	
 	    return;	

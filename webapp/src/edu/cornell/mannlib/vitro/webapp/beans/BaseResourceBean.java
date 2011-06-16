@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.beans;
 
+import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
@@ -9,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openrdf.model.impl.URIImpl;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class BaseResourceBean implements ResourceBean {
@@ -69,17 +72,20 @@ public class BaseResourceBean implements ResourceBean {
         }
         
 		public static RoleLevel getRoleFromLoginStatus(HttpServletRequest req) {
-			User u = LoginStatusBean.getCurrentUser(req);
+			UserAccount u = LoginStatusBean.getCurrentUser(req);
 			if (u == null) {
 				return PUBLIC;
-			} else if ("1".equals(u.getRoleURI())) {
-				return SELF;
-			} else if ("4".equals(u.getRoleURI())) {
-				return EDITOR;
-			} else if ("5".equals(u.getRoleURI())) {
+			}
+			
+			Set<String> roles = u.getPermissionSetUris();
+			if (roles.contains(PermissionSetsLoader.URI_DBA)) {
+				return  DB_ADMIN;
+			} else if (roles.contains(PermissionSetsLoader.URI_CURATOR)) {
 				return CURATOR;
-			} else if ("50".equals(u.getRoleURI())) {
-				return DB_ADMIN;
+			} else if (roles.contains(PermissionSetsLoader.URI_EDITOR)) {
+				return EDITOR;
+			} else if (roles.contains(PermissionSetsLoader.URI_SELF_EDITOR)) {
+				return SELF;
 			} else {
 				return PUBLIC;
 			}

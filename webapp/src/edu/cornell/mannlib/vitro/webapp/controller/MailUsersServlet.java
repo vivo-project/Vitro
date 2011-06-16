@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -22,7 +23,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 
 public class MailUsersServlet extends VitroHttpServlet {
@@ -74,10 +76,8 @@ public class MailUsersServlet extends VitroHttpServlet {
         int recipientCount = 0;
         String deliveryfrom = null;
         
-        UserDao uDao = vreq.getFullWebappDaoFactory().getUserDao();
-        
         // get Individuals that the User mayEditAs
-        deliverToArray = uDao.getUserAccountEmails();
+        deliverToArray = getEmailsForAllUserAccounts(vreq);
         
         //Removed all form type stuff b/c recipients pre-configured
         recipientCount=(deliverToArray == null) ? 0 : deliverToArray.size();
@@ -208,6 +208,18 @@ public class MailUsersServlet extends VitroHttpServlet {
         }
 
     }
+    
+	private List<String> getEmailsForAllUserAccounts(VitroRequest vreq) {
+		UserAccountsDao uaDao = vreq.getFullWebappDaoFactory()
+				.getUserAccountsDao();
+		
+		List<String> emails = new ArrayList<String>();
+		for (UserAccount user : uaDao.getAllUserAccounts()) {
+			emails.add(user.getEmailAddress());
+		}
+
+		return emails;
+	}
 
     @Override
 	public void doPost( HttpServletRequest request, HttpServletResponse response )

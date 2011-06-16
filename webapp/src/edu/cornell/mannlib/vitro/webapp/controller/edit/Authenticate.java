@@ -28,7 +28,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
-import edu.cornell.mannlib.vitro.webapp.beans.User;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -124,7 +124,7 @@ public class Authenticate extends VitroHttpServlet {
 			// Send them on their way.
 			switch (exitState) {
 			case NOWHERE:
-				new LoginRedirector(vreq, response).redirectCancellingUser();
+				showLoginCanceled(response, vreq);
 				break;
 			case LOGGING_IN:
 				showLoginScreen(vreq, response);
@@ -133,7 +133,7 @@ public class Authenticate extends VitroHttpServlet {
 				showLoginScreen(vreq, response);
 				break;
 			default: // LOGGED_IN:
-				new LoginRedirector(vreq, response).redirectLoggedInUser();
+				showLoginComplete(response, vreq);
 				break;
 			}
 		} catch (Exception e) {
@@ -313,8 +313,9 @@ public class Authenticate extends VitroHttpServlet {
 
 		bean.setUsername(username);
 
-		User user = getAuthenticator(request).getUserByUsername(username);
-		log.trace("User is " + (user == null ? "null" : user.getURI()));
+		UserAccount user = getAuthenticator(request).getAccountForInternalAuth(
+				username);
+		log.trace("User is " + (user == null ? "null" : user.getUri()));
 
 		if (user == null) {
 			bean.setMessage(Message.UNKNOWN_USERNAME, username);
@@ -326,16 +327,16 @@ public class Authenticate extends VitroHttpServlet {
 			return;
 		}
 
-		if (!getAuthenticator(request).isCurrentPassword(username, password)) {
+		if (!getAuthenticator(request).isCurrentPassword(user, password)) {
 			bean.setMessage(Message.INCORRECT_PASSWORD);
 			return;
 		}
 
 		// Username and password are correct. What next?
-		if (isFirstTimeLogin(user)) {
+		if (user.isPasswordChangeRequired()) {
 			transitionToForcedPasswordChange(request);
 		} else {
-			transitionToLoggedIn(request, username);
+			transitionToLoggedIn(request, user);
 		}
 	}
 
@@ -383,13 +384,15 @@ public class Authenticate extends VitroHttpServlet {
 
 		String username = bean.getUsername();
 
-		if (getAuthenticator(request).isCurrentPassword(username, newPassword)) {
+		UserAccount user = getAuthenticator(request).getAccountForInternalAuth(
+				username);
+		if (getAuthenticator(request).isCurrentPassword(user, newPassword)) {
 			bean.setMessage(Message.USING_OLD_PASSWORD);
 			return;
 		}
 
 		// New password is acceptable. Store it and go on.
-		transitionToLoggedIn(request, username, newPassword);
+		transitionToLoggedIn(request, user, newPassword);
 	}
 
 	/**
@@ -398,17 +401,6 @@ public class Authenticate extends VitroHttpServlet {
 	@SuppressWarnings("unused")
 	private void processInputLoggedIn(HttpServletRequest request) {
 		// Nothing to do. No transition.
-	}
-
-	/**
-	 * Has this user ever logged in before?
-	 */
-	private boolean isFirstTimeLogin(User user) {
-		if (user.getLoginCount() == 0) {
-			return true;
-		} else {
-			return false;
-		}
 	}
 
 	/**
@@ -432,9 +424,9 @@ public class Authenticate extends VitroHttpServlet {
 	 * State change: all requirements are satisfied. Log them in.
 	 */
 	private void transitionToLoggedIn(HttpServletRequest request,
-			String username) {
-		log.debug("Completed login: " + username);
-		getAuthenticator(request).recordLoginAgainstUserAccount(username,
+			UserAccount user) {
+		log.debug("Completed login: " + user.getEmailAddress());
+		getAuthenticator(request).recordLoginAgainstUserAccount(user,
 				AuthenticationSource.INTERNAL);
 	}
 
@@ -443,10 +435,11 @@ public class Authenticate extends VitroHttpServlet {
 	 * log them in.
 	 */
 	private void transitionToLoggedIn(HttpServletRequest request,
-			String username, String newPassword) {
-		log.debug("Completed login: " + username + ", password changed.");
-		getAuthenticator(request).recordNewPassword(username, newPassword);
-		getAuthenticator(request).recordLoginAgainstUserAccount(username,
+			UserAccount user, String newPassword) {
+		log.debug("Completed login: " + user.getEmailAddress()
+				+ ", password changed.");
+		getAuthenticator(request).recordNewPassword(user, newPassword);
+		getAuthenticator(request).recordLoginAgainstUserAccount(user,
 				AuthenticationSource.INTERNAL);
 	}
 
@@ -478,12 +471,37 @@ public class Authenticate extends VitroHttpServlet {
 		log.debug("logging in.");
 
 		LoginInProcessFlag.set(vreq);
-		
+
 		String loginProcessPage = LoginProcessBean.getBean(vreq)
 				.getLoginPageUrl();
 		response.sendRedirect(loginProcessPage);
 		return;
 	}
+	
+	/**
+	 * Exit: user has completed the login. Redirect appropriately and clear the bean.
+	 */
+	private void showLoginComplete(HttpServletResponse response,
+			VitroRequest vreq) throws IOException {
+		getLoginRedirector(vreq).redirectLoggedInUser(response);
+		LoginProcessBean.removeBean(vreq);
+	}
+
+	/**
+	 * Exit: user has canceled. Redirect and clear the bean.
+	 */
+	private void showLoginCanceled(HttpServletResponse response,
+			VitroRequest vreq) throws IOException {
+		getLoginRedirector(vreq).redirectCancellingUser(response);
+		LoginProcessBean.removeBean(vreq);
+	}
+
+	private LoginRedirector getLoginRedirector(VitroRequest vreq) {
+		String afterLoginUrl = LoginProcessBean.getBean(vreq).getAfterLoginUrl();
+		return new LoginRedirector(vreq, afterLoginUrl);
+	}
+
+
 
 	/** Get a reference to the Authenticator. */
 	private Authenticator getAuthenticator(HttpServletRequest request) {

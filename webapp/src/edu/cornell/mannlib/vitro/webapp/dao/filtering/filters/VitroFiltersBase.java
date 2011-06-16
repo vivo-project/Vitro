@@ -19,7 +19,6 @@ public abstract class VitroFiltersBase implements VitroFilters {
              AdaptorFunctors.and(this.getObjectPropertyStatementFilter(),other.getObjectPropertyStatementFilter()),
              AdaptorFunctors.and(this.getClassFilter(),other.getClassFilter()),
              AdaptorFunctors.and(this.getVClassGroupFilter(),other.getVClassGroupFilter()),
-             AdaptorFunctors.and(this.getUserFilter(), other.getUserFilter()),
              AdaptorFunctors.and(this.getPropertyGroupFilter(), other.getPropertyGroupFilter())
             );
     }

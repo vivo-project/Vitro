@@ -15,6 +15,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
@@ -53,7 +54,8 @@ import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
  */
 public class JSONReconcileServlet extends VitroHttpServlet {
 
-	private static String QUERY_PARAMETER_NAME = "term";
+    private static final long serialVersionUID = 1L;
+    private static String QUERY_PARAMETER_NAME = "term";
 	public static final int MAX_QUERY_LENGTH = 500;
 	private static final Log log = LogFactory.getLog(JSONReconcileServlet.class.getName());
 
@@ -70,14 +72,14 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 		super.doGet(req, resp);
 		resp.setContentType("application/json");
 		VitroRequest vreq = new VitroRequest(req);
-		System.out.println("vreq");
-		System.out.println(vreq.getWebappDaoFactory());
+		//log.debug("vreq");
+		//log.debug(vreq.getWebappDaoFactory());
 
 		try {
 			if (vreq.getParameter("query") != null
 					|| vreq.getParameter("queries") != null) {
 				JSONObject qJson = getResult(vreq, req, resp);
-				System.out.println("result: " + qJson.toString());
+				log.debug("result: " + qJson.toString());
 				String responseStr = (vreq.getParameter("callback") == null) ? qJson
 						.toString() : vreq.getParameter("callback") + "("
 						+ qJson.toString() + ")";
@@ -124,8 +126,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 			// "q2":{"query":"Dina","type":"http://xmlns.com/foaf/0.1/Person","type_strict":"should"}}
 			String qStr = (String) qObj;
 			queries.add(qStr);
-			System.out.println();
-			System.out.println("query: " + qStr + "\n");
+			log.debug("\nquery: " + qStr + "\n");
 		}
 
 		try {
@@ -158,7 +159,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 				}
 			}
 		} catch (JSONException ex) {
-			System.err.println("JSONReconcileServlet JSONException: " + ex);
+			log.error("JSONException: " + ex);
 			throw new ServletException("JSONReconcileServlet JSONException: "
 					+ ex);
 		}
@@ -327,15 +328,15 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 			}
 
 		} catch (JSONException ex) {
-			System.err.println("JSONReconcileServlet JSONException: " + ex);
+			log.error("JSONException: " + ex);
 			throw new ServletException("JSONReconcileServlet JSONException: "
 					+ ex);
 		} catch (SearchException ex) {
-			System.err.println("JSONReconcileServlet SearchException: " + ex);
+			log.error("SearchException: " + ex);
 			throw new ServletException("JSONReconcileServlet SearchException: "
 					+ ex);
 		} catch (IOException ex) {
-			System.err.println("JSONReconcileServlet IOException: " + ex);
+			log.error("IOException: " + ex);
 			throw new ServletException("JSONReconcileServlet IOException: "
 					+ ex);
 		}
@@ -354,30 +355,12 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 
     private Query makeReconcileNameQuery(String querystr, Analyzer analyzer, HttpServletRequest request) {
 
-    	/* Original code
-        String tokenizeParam = (String) request.getParameter("tokenize"); 
-        boolean tokenize = "true".equals(tokenizeParam);
-        
-        // Note: Stemming is only relevant if we are tokenizing: an untokenized name
-        // query will not be stemmed. So we don't look at the stem parameter until we get to
-        // makeTokenizedNameQuery().
-        if (tokenize) {
-            return makeTokenizedNameQuery(querystr, analyzer, request);
-        } else {
-            return makeUntokenizedNameQuery(querystr);
-        }
-        */
-    	
-    	// modified code for reconciliation service
-    	request.setAttribute("stem", true);
     	return makeTokenizedNameQuery(querystr, analyzer, request);
     }
 	
     private Query makeTokenizedNameQuery(String querystr, Analyzer analyzer, HttpServletRequest request) {
-    	 
-        String stemParam = (String) request.getParameter("stem"); 
-        boolean stem = "true".equals(stemParam);
-        String termName = stem ? VitroLuceneTermNames.NAME_STEMMED : VitroLuceneTermNames.NAME_UNSTEMMED;
+    	   
+        String termName = VitroLuceneTermNames.NAME_STEMMED;
 
         BooleanQuery boolQuery = new BooleanQuery();
         
@@ -407,22 +390,8 @@ public class JSONReconcileServlet extends VitroHttpServlet {
         } catch (ParseException e) {
             log.warn(e, e);
         }
-        
-        
+                
         return boolQuery;
-    }
-	
-    private Query makeUntokenizedNameQuery(String querystr) {
-        
-        querystr = querystr.toLowerCase();
-        String termName = VitroLuceneTermNames.NAME_LOWERCASE;
-        BooleanQuery query = new BooleanQuery();
-        log.debug("Adding wildcard query on unanalyzed name");
-        query.add( 
-                new WildcardQuery(new Term(termName, querystr + "*")),
-                BooleanClause.Occur.MUST);   
-        
-        return query;
     }
 
     private QueryParser getQueryParser(String searchField, Analyzer analyzer){
@@ -450,10 +419,8 @@ public class JSONReconcileServlet extends VitroHttpServlet {
     					"query length is " + MAX_QUERY_LENGTH );
     			return null;
     		} 
-
-    		
+	
     		query = makeReconcileNameQuery(querystr, analyzer, request);
-    		
 
     		// filter by type
     		if (typeParam != null) {
@@ -471,7 +438,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 			while (it.hasNext()) {
 				String[] pvPair = it.next();
 				Query extraQuery = makeReconcileNameQuery(pvPair[1], analyzer, request);
-				if (!"".equals(pvPair[0]) && pvPair[0] != null) {
+				if ( ! StringUtils.isEmpty(pvPair[0]) ) {
 					BooleanQuery boolQuery = new BooleanQuery();
 					boolQuery.add(new TermQuery(new Term(
 							VitroLuceneTermNames.RDFTYPE, pvPair[0])),
@@ -489,3 +456,4 @@ public class JSONReconcileServlet extends VitroHttpServlet {
     }
 
 }
+

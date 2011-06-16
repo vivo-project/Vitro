@@ -2,7 +2,7 @@
 
 <#-- Template for adding a user account -->
 
-<h3>Add new account</h3>
+<h3><a class="account-menu" href="accountsAdmin">User accounts</a> > Add new account</h3>
 
     <#if errorEmailIsEmpty??>
         <#assign errorMessage = "You must supply an email address." />
@@ -10,6 +10,14 @@
     
     <#if errorEmailInUse??>
         <#assign errorMessage = "An account with that email address already exists." />
+    </#if>
+    
+    <#if errorEmailInvalidFormat??>
+        <#assign errorMessage = "'${emailAddress}' is not a valid email address." />
+    </#if>
+    
+    <#if errorExternalAuthIdInUse??>
+        <#assign errorMessage = "An account with that external authorization ID already exists." />
     </#if>
     
     <#if errorFirstNameIsEmpty??>
@@ -57,9 +65,12 @@
             <label for="last-name">Last name<span class="requiredHint"> *</span></label> 
             <input type="text" name="lastName" value="${lastName}" id="last-name" role="input "/>
 
+            <label for="external-auth-id">External authorization ID (optional)</label> 
+            <input type="text" name="externalAuthId" value="${externalAuthId}" id="external-auth-id" role="input "/>
+
             <p>Roles<span class="requiredHint"> *</span> </p>
             <#list roles as role>
-                <input type="radio" name="role" value="${role.uri}" role="radio" <#if selectedRole = role.uri>selected</#if> />
+                <input type="radio" name="role" value="${role.uri}" role="radio" <#if selectedRole = role.uri>checked</#if> />
                 <label class="inline" for="${role.label}"> ${role.label}</label>
                 <br />
             </#list>
@@ -89,7 +100,7 @@
                 </p>
             </#if>
     
-            <input type="submit" name="submitAdd" value="Add new account" class="submit"/> or <a href="${formUrls.list}">Cancel</a>
+            <input type="submit" name="submitAdd" value="Add new account" class="submit"/> or <a class="cancel" href="${formUrls.list}">Cancel</a>
 
             <p class="requiredHint">* required fields</p>
         </form>

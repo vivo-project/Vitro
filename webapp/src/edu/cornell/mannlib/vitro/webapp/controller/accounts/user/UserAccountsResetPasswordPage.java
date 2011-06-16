@@ -26,6 +26,8 @@ public class UserAccountsResetPasswordPage extends UserAccountsPasswordBasePage 
 
 	private static final String TEMPLATE_NAME = "userAccounts-resetPassword.ftl";
 
+	private static final String EMAIL_TEMPLATE = "userAccounts-passwordResetEmail.ftl";
+
 	protected UserAccountsResetPasswordPage(VitroRequest vreq) {
 		super(vreq);
 	}
@@ -33,11 +35,12 @@ public class UserAccountsResetPasswordPage extends UserAccountsPasswordBasePage 
 	public void resetPassword() {
 		userAccount.setMd5Password(Authenticator.applyMd5Encoding(newPassword));
 		userAccount.setPasswordLinkExpires(0L);
+		userAccount.setPasswordChangeRequired(false);
 		userAccount.setStatus(Status.ACTIVE);
 		userAccountsDao.updateUserAccount(userAccount);
 		log.debug("Set password on '" + userAccount.getEmailAddress()
 				+ "' to '" + newPassword + "'");
-		
+
 		notifyUser();
 	}
 
@@ -54,15 +57,14 @@ public class UserAccountsResetPasswordPage extends UserAccountsPasswordBasePage 
 	private void notifyUser() {
 		Map<String, Object> body = new HashMap<String, Object>();
 		body.put("userAccount", userAccount);
-		body.put("subjectLine", "Password changed.");
 
 		FreemarkerEmailMessage email = FreemarkerEmailFactory
 				.createNewMessage(vreq);
 		email.addRecipient(TO, userAccount.getEmailAddress());
 		email.setSubject("Password changed.");
-		email.setHtmlTemplate("userAccounts-passwordResetEmail-html.ftl");
-		email.setTextTemplate("userAccounts-passwordResetEmail-text.ftl");
+		email.setTemplate(EMAIL_TEMPLATE);
 		email.setBodyMap(body);
+		email.processTemplate();
 		email.send();
 	}
 

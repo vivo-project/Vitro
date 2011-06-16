@@ -11,6 +11,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -19,12 +22,12 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering;
+import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.Direction;
+import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.Field;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsPage;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsSelection;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsSelectionCriteria;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsSelector;
-import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.Direction;
-import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.Field;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 
@@ -91,55 +94,7 @@ public class UserAccountsListPage extends UserAccountsPage {
 		UserAccountsSelection selection = UserAccountsSelector.select(
 				userAccountsModel, criteria);
 		Map<String, Object> body = buildTemplateBodyMap(selection);
-		return new TemplateResponseValues(TEMPLATE_NAME, body);
-	}
-
-	/**
-	 * We just came from adding a new account. Show the list with a message.
-	 */
-	public ResponseValues showPageWithNewAccount(UserAccount userAccount,
-			boolean emailWasSent) {
-		UserAccountsSelection selection = UserAccountsSelector.select(
-				userAccountsModel, criteria);
-		Map<String, Object> body = buildTemplateBodyMap(selection);
-
-		body.put("newUserAccount", new UserAccountWrapper(userAccount,
-				Collections.<String> emptyList()));
-		if (emailWasSent) {
-			body.put("emailWasSent", Boolean.TRUE);
-		}
-
-		return new TemplateResponseValues(TEMPLATE_NAME, body);
-	}
-
-	/**
-	 * We just came from editing an account. Show the list with a message.
-	 */
-	public ResponseValues showPageWithUpdatedAccount(UserAccount userAccount,
-			boolean emailWasSent) {
-		UserAccountsSelection selection = UserAccountsSelector.select(
-				userAccountsModel, criteria);
-		Map<String, Object> body = buildTemplateBodyMap(selection);
-
-		body.put("updatedUserAccount", new UserAccountWrapper(userAccount,
-				Collections.<String> emptyList()));
-		if (emailWasSent) {
-			body.put("emailWasSent", Boolean.TRUE);
-		}
-
-		return new TemplateResponseValues(TEMPLATE_NAME, body);
-	}
-
-	/**
-	 * We just came from deleting accounts. Show the list with a message.
-	 */
-	public ResponseValues showPageWithDeletions(Collection<String> deletedUris) {
-		UserAccountsSelection selection = UserAccountsSelector.select(
-				userAccountsModel, criteria);
-		Map<String, Object> body = buildTemplateBodyMap(selection);
-
-		body.put("deletedAccountCount", deletedUris.size());
-
+		Message.applyToBodyMap(vreq, body);
 		return new TemplateResponseValues(TEMPLATE_NAME, body);
 	}
 
@@ -238,10 +193,15 @@ public class UserAccountsListPage extends UserAccountsPage {
 
 	private List<String> findPermissionSetLabels(UserAccount account) {
 		List<String> labels = new ArrayList<String>();
-		for (String uri : account.getPermissionSetUris()) {
-			PermissionSet pSet = userAccountsDao.getPermissionSetByUri(uri);
-			if (pSet != null) {
-				labels.add(pSet.getLabel());
+
+		if (account.isRootUser()) {
+			labels.add("ROOT");
+		} else {
+			for (String uri : account.getPermissionSetUris()) {
+				PermissionSet pSet = userAccountsDao.getPermissionSetByUri(uri);
+				if (pSet != null) {
+					labels.add(pSet.getLabel());
+				}
 			}
 		}
 		return labels;
@@ -299,6 +259,86 @@ public class UserAccountsListPage extends UserAccountsPage {
 			return editUrl;
 		}
 
+	}
+
+	/**
+	 * Message info that lives in the session. Another request can store this,
+	 * and it will be displayed (once) by the list page.
+	 */
+	public static class Message {
+		private static final String ATTRIBUTE = Message.class.getName();
+		private static final Collection<String> EMPTY = Collections.emptySet();
+
+		public static void showNewAccount(HttpServletRequest req,
+				UserAccount userAccount, boolean emailWasSent) {
+			Message message = new Message(Type.NEW_ACCOUNT, userAccount,
+					emailWasSent, EMPTY);
+			setMessage(req, message);
+		}
+
+		public static void showUpdatedAccount(HttpServletRequest req,
+				UserAccount userAccount, boolean emailWasSent) {
+			Message message = new Message(Type.UPDATED_ACCOUNT, userAccount,
+					emailWasSent, EMPTY);
+			setMessage(req, message);
+		}
+
+		public static void showDeletions(HttpServletRequest req,
+				Collection<String> deletedUris) {
+			Message message = new Message(Type.DELETIONS, null, false,
+					deletedUris);
+			setMessage(req, message);
+		}
+
+		private static void setMessage(HttpServletRequest req, Message message) {
+			req.getSession().setAttribute(ATTRIBUTE, message);
+		}
+
+		public static void applyToBodyMap(HttpServletRequest req,
+				Map<String, Object> body) {
+			HttpSession session = req.getSession();
+			Object o = session.getAttribute(ATTRIBUTE);
+			session.removeAttribute(ATTRIBUTE);
+			
+			if (o instanceof Message) {
+				((Message) o).applyToBodyMap(body);
+			}
+		}
+
+		enum Type {
+			NEW_ACCOUNT, UPDATED_ACCOUNT, DELETIONS
+		}
+
+		private final Type type;
+		private final UserAccount userAccount;
+		private final boolean emailWasSent;
+		private final Collection<String> deletedUris;
+
+		public Message(Type type, UserAccount userAccount,
+				boolean emailWasSent, Collection<String> deletedUris) {
+			this.type = type;
+			this.userAccount = userAccount;
+			this.emailWasSent = emailWasSent;
+			this.deletedUris = deletedUris;
+		}
+
+		private void applyToBodyMap(Map<String, Object> body) {
+			if (type == Type.NEW_ACCOUNT) {
+				body.put("newUserAccount", new UserAccountWrapper(userAccount,
+						Collections.<String> emptyList()));
+				if (emailWasSent) {
+					body.put("emailWasSent", Boolean.TRUE);
+				}
+			} else if (type == Type.UPDATED_ACCOUNT) {
+				body.put("updatedUserAccount", new UserAccountWrapper(
+						userAccount, Collections.<String> emptyList()));
+				if (emailWasSent) {
+					body.put("emailWasSent", Boolean.TRUE);
+				}
+			} else {
+				body.put("deletedAccountCount", deletedUris.size());
+			}
+		}
 	}
 
 }

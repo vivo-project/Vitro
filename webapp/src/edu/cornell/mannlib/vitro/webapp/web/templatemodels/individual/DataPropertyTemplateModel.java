@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -30,11 +31,12 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     private static final String EDIT_PATH = "edit/editDatapropStmtRequestDispatch.jsp";  
     
     private List<DataPropertyStatementTemplateModel> statements;
-
+    private VitroRequest vitroRequest = null;
     DataPropertyTemplateModel(DataProperty dp, Individual subject, VitroRequest vreq, 
             EditingPolicyHelper policyHelper, List<DataProperty> populatedDataPropertyList) {
         
         super(dp, subject, policyHelper, vreq);
+        vitroRequest = vreq;
         setName(dp.getPublicName());
 
         statements = new ArrayList<DataPropertyStatementTemplateModel>();
@@ -45,7 +47,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
             DataPropertyStatementDao dpDao = vreq.getWebappDaoFactory().getDataPropertyStatementDao();
             List<Literal> values = dpDao.getDataPropertyValuesForIndividualByProperty(subject, dp);            
             for (Literal value : values) {
-                statements.add(new DataPropertyStatementTemplateModel(subjectUri, propertyUri, value, policyHelper));
+                statements.add(new DataPropertyStatementTemplateModel(subjectUri, propertyUri, value, policyHelper, vreq));
             }
         } else {
             log.debug("Data property " + getUri() + " is unpopulated.");
@@ -88,6 +90,12 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
             ParamMap params = new ParamMap(
                     "subjectUri", subjectUri,
                     "predicateUri", propertyUri);
+            //Check if special parameters being sent
+            
+            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vitroRequest);
+            if(specialParams.size() > 0) {
+            	params.putAll(specialParams);
+            }
             addUrl = UrlBuilder.getUrl(EDIT_PATH, params);       
         }
         return addUrl;

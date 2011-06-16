@@ -39,6 +39,36 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 	}
 
 	@Override
+	public Collection<UserAccount> getAllUserAccounts() {
+		List<String> userUris = new ArrayList<String>();
+
+		getOntModel().enterCriticalSection(Lock.READ);
+		try {
+			StmtIterator stmts = getOntModel().listStatements((Resource) null,
+					RDF.type, USERACCOUNT);
+			while (stmts.hasNext()) {
+				Resource subject = stmts.next().getSubject();
+				if (subject != null) {
+					userUris.add(subject.getURI());
+				}
+			}
+			stmts.close();
+		} finally {
+			getOntModel().leaveCriticalSection();
+		}
+
+		List<UserAccount> userAccounts = new ArrayList<UserAccount>();
+		for (String userUri : userUris) {
+			UserAccount ua = getUserAccountByUri(userUri);
+			if (ua != null) {
+				userAccounts.add(ua);
+			}
+		}
+
+		return userAccounts;
+	}
+
+	@Override
 	public UserAccount getUserAccountByUri(String uri) {
 		if (uri == null) {
 			return null;
@@ -73,6 +103,7 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 					USERACCOUNT_EXTERNAL_AUTH_ID));
 			u.setPermissionSetUris(getPropertyResourceURIValues(r,
 					USERACCOUNT_HAS_PERMISSION_SET));
+			u.setRootUser(isResourceOfType(r, USERACCOUNT_ROOT_USER));
 			return u;
 		} finally {
 			getOntModel().leaveCriticalSection();
@@ -92,6 +123,30 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 			StmtIterator stmts = getOntModel().listStatements(null,
 					USERACCOUNT_EMAIL_ADDRESS,
 					getOntModel().createLiteral(emailAddress));
+			if (stmts.hasNext()) {
+				userUri = stmts.next().getSubject().getURI();
+			}
+			stmts.close();
+		} finally {
+			getOntModel().leaveCriticalSection();
+		}
+
+		return getUserAccountByUri(userUri);
+	}
+
+	@Override
+	public UserAccount getUserAccountByExternalAuthId(String externalAuthId) {
+		if (externalAuthId == null) {
+			return null;
+		}
+
+		String userUri = null;
+
+		getOntModel().enterCriticalSection(Lock.READ);
+		try {
+			StmtIterator stmts = getOntModel().listStatements(null,
+					USERACCOUNT_EXTERNAL_AUTH_ID,
+					getOntModel().createLiteral(externalAuthId));
 			if (stmts.hasNext()) {
 				userUri = stmts.next().getSubject().getURI();
 			}
@@ -144,6 +199,10 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 			updatePropertyResourceURIValues(res,
 					USERACCOUNT_HAS_PERMISSION_SET,
 					userAccount.getPermissionSetUris(), model);
+
+			if (userAccount.isRootUser()) {
+				model.add(res, RDF.type, USERACCOUNT_ROOT_USER);
+			}
 
 			userAccount.setUri(userUri);
 			return userUri;
@@ -199,6 +258,13 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 			updatePropertyResourceURIValues(res,
 					USERACCOUNT_HAS_PERMISSION_SET,
 					userAccount.getPermissionSetUris(), model);
+
+			if (userAccount.isRootUser()) {
+				model.add(res, RDF.type, USERACCOUNT_ROOT_USER);
+			} else {
+				model.remove(res, RDF.type, USERACCOUNT_ROOT_USER);
+			}
+
 		} finally {
 			model.leaveCriticalSection();
 		}
@@ -289,15 +355,18 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 		Random random = new Random(System.currentTimeMillis());
 		for (int attempts = 0; attempts < 30; attempts++) {
 			int upperBound = (int) Math.pow(2, attempts + 13);
-			uri = namespace + ("n" + random.nextInt(upperBound));
-			errMsg = getWebappDaoFactory().checkURI(uri);
-			if (errMsg == null) {
+			uri = namespace + ("u" + random.nextInt(upperBound));
+			if (!isUriUsed(uri)) {
 				return uri;
 			}
 		}
 
 		throw new InsertException("Could not create URI for individual: "
 				+ errMsg);
+	}
+
+	private boolean isUriUsed(String uri) {
+		return (getOntModel().getOntResource(uri) != null);
 	}
 
 	/**
@@ -307,6 +376,13 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 	 * There should already be a lock on the model when this is called.
 	 */
 	private boolean isResourceOfType(OntResource r, OntClass type) {
+		if (r == null) {
+			return false;
+		}
+		if (type == null) {
+			return false;
+		}
+
 		StmtIterator stmts = getOntModel().listStatements(r, RDF.type, type);
 		if (stmts.hasNext()) {
 			stmts.close();
@@ -324,4 +400,5 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 			return ps1.getUri().compareTo(ps2.getUri());
 		}
 	}
+
 }

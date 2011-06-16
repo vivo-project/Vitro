@@ -119,10 +119,10 @@
         Model model =  (Model)application.getAttribute("jenaOntModel");
         editConfig.prepareForDataPropUpdate(model,dps);
         formTitle   = "Change text for: <em>"+prop.getPublicName()+"</em>";
-        submitLabel = "save change";
+        submitLabel = "Save change";
     } else {
         formTitle   = "Add new entry for: <em>"+prop.getPublicName()+"</em>";
-        submitLabel = "save entry";
+        submitLabel = "Save entry";
     }
 %>
 

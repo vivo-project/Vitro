@@ -269,23 +269,4 @@ private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
 		
 	}
 	
-	public Model extractUserAccountsData(Model inputModel) {
-		
-		Model userAccountsModel = ModelFactory.createDefaultModel();
-		
-		String queryStr = makeDescribeQueryStr( VitroVocabulary.USER, null );
-		
-		Query usersSparqlQuery = QueryFactory.create(queryStr);
-		QueryExecution qe = QueryExecutionFactory.create(usersSparqlQuery,inputModel);
-		try {
-			inputModel.enterCriticalSection(Lock.READ);
-			qe.execDescribe(userAccountsModel);
-		} finally {
-			inputModel.leaveCriticalSection();
-		}
-		
-		return userAccountsModel;
-		
-	}
-	
 }

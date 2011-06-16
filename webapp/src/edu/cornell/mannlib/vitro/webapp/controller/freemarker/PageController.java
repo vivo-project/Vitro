@@ -23,7 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.BrowseDataGetter;
 import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetter;
 import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.ClassGroupPageData;
-
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.ClassIntersectionDataGetter;
 /**
  * Controller for getting data for pages defined in the display model. 
  * 
@@ -112,7 +112,10 @@ public class PageController extends FreemarkerHttpServlet{
             return Collections.emptyMap();
             
         PageDataGetter getter = getPageDataGetterMap(getServletContext()).get(type);
-        
+        //For now hardcoding, check to see if data getter included within 
+        if((String)page.get("datagetter") != null) {
+        	getter = new ClassIntersectionDataGetter();
+        }
         if( getter != null ){
             try{
                 return getter.getData(getServletContext(), vreq, pageUri, page, type);
@@ -177,6 +180,12 @@ public class PageController extends FreemarkerHttpServlet{
             getPageDataGetterMap(context).put(cgpd.getType(), cgpd);      
             BrowseDataGetter bdg = new BrowseDataGetter();
             getPageDataGetterMap(context).put(bdg.getType(), bdg);
+            //TODO: Check if can include by type here
+            ClassIntersectionDataGetter cidg =  new ClassIntersectionDataGetter();
+            getPageDataGetterMap(context).put(cidg.getType(), cidg);
+            
         }
     }
+    
+    
 }
