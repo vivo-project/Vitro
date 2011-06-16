@@ -238,10 +238,15 @@ public class UserAccountsListPage extends UserAccountsPage {
 
 	private List<String> findPermissionSetLabels(UserAccount account) {
 		List<String> labels = new ArrayList<String>();
-		for (String uri : account.getPermissionSetUris()) {
-			PermissionSet pSet = userAccountsDao.getPermissionSetByUri(uri);
-			if (pSet != null) {
-				labels.add(pSet.getLabel());
+
+		if (account.isRootUser()) {
+			labels.add("ROOT");
+		} else {
+			for (String uri : account.getPermissionSetUris()) {
+				PermissionSet pSet = userAccountsDao.getPermissionSetByUri(uri);
+				if (pSet != null) {
+					labels.add(pSet.getLabel());
+				}
 			}
 		}
 		return labels;

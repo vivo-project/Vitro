@@ -101,6 +101,7 @@ mydomain:user07
 	
 mydomain:user08
 	a auth:UserAccount ;
+	a auth:RootUserAccount ;
 	auth:emailAddress "email@henry.edu" ;
 	auth:firstName "Mary" ;
 	auth:lastName "McInerney" ;

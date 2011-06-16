@@ -206,6 +206,7 @@ public class UserAccount {
 				+ (", passwordChangeRequired=" + passwordChangeRequired)
 				+ (", loginCount=" + loginCount) + (", status=" + status)
 				+ (", externalAuthId=" + externalAuthId)
+				+ (", rootUser=" + rootUser)
 				+ (", permissionSetUris=" + permissionSetUris) + "]";
 	}
 }
