@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.search.solr;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -10,7 +11,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 
-import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -152,15 +152,64 @@ public class ContextNodeFields implements DocumentModifier{
 				+ " ?c core:trainingAtOrganization ?e . ?e rdfs:label ?ContextNodeProperty . "
 				+ " }");
 	}
-	
-	private Log log = LogFactory.getLog(ContextNodeFields.class);
 
-	private Dataset dataset;
-		
+   private Log log = LogFactory.getLog(ContextNodeFields.class);
+
+    private Dataset dataset;
+        
+    
+    public ContextNodeFields(Dataset dataset){
+        this.dataset = dataset;
+    }
+    
+	/* TODO: consider a constructor like this:
+	 * public ContextNodeFields(OntModel fullModel, List<String> queries )
+	 */
 	
-	public ContextNodeFields(Dataset dataset){
-		this.dataset = dataset;
-	}
+	/*
+	 *TODO:
+	 * consider reducing the code in this class using a method like the following:
+	 */	 
+	public String runQuery( Individual individual, String query ){
+	    StringBuffer propertyValues = new StringBuffer();
+            
+        QuerySolutionMap initialBinding = new QuerySolutionMap();
+        Resource uriResource = ResourceFactory.createResource(individual.getURI());        
+        initialBinding.add("uri", uriResource);
+        
+        Query sparqlQuery = QueryFactory.create( query, Syntax.syntaxARQ);
+        fullModel.enterCriticalSection(Lock.READ);
+        
+        try{
+            QueryExecution qExec = QueryExecutionFactory.create(sparqlQuery, fullModel, initialBinding);
+            try{                
+                ResultSet results = qExec.execSelect();                
+                while(results.hasNext()){                    
+                    QuerySolution soln = results.nextSolution();                                   
+                    Iterator<String> iter =  soln.varNames() ;
+                    while( iter.hasNext()){
+                        String name = iter.next();
+                        RDFNode node = soln.get( name );
+                        if( node != null ){
+                            propertyValues.append(" " + node.toString());
+                        }else{
+                            log.debug(name + " is null");
+                        }                        
+                    }
+                }
+            }catch(Throwable t){
+                log.error(t,t);
+            } finally{
+                qExec.close();
+            } 
+        }finally{
+            fullModel.leaveCriticalSection();
+        }
+        
+        return propertyValues.toString();
+	}	 		
+
+
 	
 	
     @Override
@@ -1691,6 +1740,12 @@ public class ContextNodeFields implements DocumentModifier{
 		
 		initialBinding.add("uri", uriResource);
 		
+		/* bdc34: 
+		 * I don't understand 
+		 * " OPTIONAL { ?uri core:hasSubjectArea ?f . ?f rdfs:label ?SubjectArea ; core:researchAreaOf ?h . ?h rdfs:label ?ResearchAreaOf . } "
+		 * Won't this assoiciate every person who is associated with the subject area of the paper
+		 * to the paper?  That seems a bit extream. 
+		 */
 		String thisQuery = prefix + 
 		"SELECT  (str(?LinkedAuthor) as ?linkedAuthor) (str(?LinkedInformationResource) as ?linkedInformationResource) "
          + "(str(?Editor) as ?editor) (str(?SubjectArea) as ?subjectArea) (str(?ResearchAreaOf) as ?researchAreaOf) " +
