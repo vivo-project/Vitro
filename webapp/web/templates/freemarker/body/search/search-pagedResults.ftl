@@ -13,7 +13,7 @@
     <#-- Refinement links -->
     <#if classGroupLinks?has_content>
         <div class="searchTOC">
-            <span>Display only</span>           
+            <h4>Display only</h4>           
             <ul>           
             <#list classGroupLinks as link>
                 <li><a href="${link.url}">${link.text}</a></li>
@@ -24,7 +24,7 @@
 
     <#if classLinks?has_content>
         <div class="searchTOC">
-            <span>Limit ${classGroupName} to</span>
+            <h4>Limit ${classGroupName} to</h4>
             <ul>           
             <#list classLinks as link>
                 <li><a href="${link.url}">${link.text}</a></li>
