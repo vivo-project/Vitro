@@ -87,8 +87,9 @@
     color: #fff;
     background: #5e6363; 
 }
-.searchTOC span {    
+.searchTOC h4 {    
     color: #fff;
+    padding: 0 0 0 0;
 }
 .searchTOC ul {
     width: 160px;
