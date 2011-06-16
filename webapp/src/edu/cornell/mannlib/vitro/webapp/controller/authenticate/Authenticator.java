@@ -45,10 +45,10 @@ public abstract class Authenticator {
 	// ----------------------------------------------------------------------
 
 	/** Maximum inactive interval for a ordinary logged-in session, in seconds. */
-	public static final int LOGGED_IN_TIMEOUT_INTERVAL = 300;
+	public static final int LOGGED_IN_TIMEOUT_INTERVAL = 60 * 60;
 
 	/** Maximum inactive interval for a editor (or better) session, in seconds. */
-	public static final int PRIVILEGED_TIMEOUT_INTERVAL = 32000;
+	public static final int PRIVILEGED_TIMEOUT_INTERVAL = 60 * 60 * 8;
 
 	/**
 	 * Does a user by this name exist?
