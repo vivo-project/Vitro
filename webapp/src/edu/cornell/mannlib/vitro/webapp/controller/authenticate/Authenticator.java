@@ -96,8 +96,9 @@ public abstract class Authenticator {
 	 * <pre>
 	 * Record that the user has logged in, with all of the housekeeping that 
 	 * goes with it:
-	 * - updating the user record
-	 * - setting login status and timeout limit in the session
+	 * - update the user record
+	 * - set login status and timeout limit in the session
+	 * - refresh the Identifiers on the request
 	 * - record the user in the session map
 	 * - notify other users of the model
 	 * </pre>

@@ -38,6 +38,12 @@ public class UserAccountsDaoStub implements UserAccountsDao {
 		return userAccountsByUri.get(uri);
 	}
 
+	@Override
+	public boolean isRootUser(UserAccount userAccount) {
+		// TODO for now, no user is Root
+		return false;
+	}
+
 	// ----------------------------------------------------------------------
 	// Un-implemented methods
 	// ----------------------------------------------------------------------
@@ -46,11 +52,6 @@ public class UserAccountsDaoStub implements UserAccountsDao {
 	public UserAccount getUserAccountByEmail(String emailAddress) {
 		throw new RuntimeException(
 				"UserAccountsDaoStub.getUserAccountByEmail() not implemented.");
-	}
-
-	@Override
-	public boolean isRootUser(UserAccount userAccount) {
-		throw new RuntimeException("UserAccountsDao.isRootUser() not implemented.");
 	}
 
 	@Override

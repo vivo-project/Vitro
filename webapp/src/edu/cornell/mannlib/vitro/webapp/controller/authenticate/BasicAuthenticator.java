@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
@@ -125,6 +126,7 @@ public class BasicAuthenticator extends Authenticator {
 
 		HttpSession session = request.getSession();
 		createLoginStatusBean(userAccount.getUri(), authSource, session);
+		RequestIdentifiers.resetIdentifiers(request);
 		setSessionTimeoutLimit(userAccount, session);
 		recordInUserSessionMap(userAccount.getUri(), session);
 		notifyOtherUsers(userAccount.getUri(), session);

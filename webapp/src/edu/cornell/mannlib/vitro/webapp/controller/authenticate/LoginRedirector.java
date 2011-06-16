@@ -16,6 +16,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasRoleLevel;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.IsRootUser;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
@@ -152,7 +156,12 @@ public class LoginRedirector {
 	}
 
 	private boolean isMerelySelfEditor() {
-		RoleLevel role = RoleLevel.getRoleFromLoginStatus(request);
+		IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(request);
+		if (IsRootUser.isRootUser(ids)) {
+			return false;
+		}
+		
+		RoleLevel role = HasRoleLevel.getUsersRoleLevel(ids);
 		return role == RoleLevel.PUBLIC || role == RoleLevel.SELF;
 	}
 

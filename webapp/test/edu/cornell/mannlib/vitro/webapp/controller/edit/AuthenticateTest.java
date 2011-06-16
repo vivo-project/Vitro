@@ -32,6 +32,8 @@ import stubs.javax.servlet.http.HttpSessionStub;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.CommonIdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.AuthenticatorStub;
@@ -143,6 +145,9 @@ public class AuthenticateTest extends AbstractTestClass {
 
 		auth = new Authenticate();
 		auth.init(servletConfig);
+
+		ActiveIdentifierBundleFactories.addFactory(servletContext,
+				new CommonIdentifierBundleFactory(servletContext));
 	}
 
 	private UserAccount createUserFromUserInfo(UserInfo userInfo) {
