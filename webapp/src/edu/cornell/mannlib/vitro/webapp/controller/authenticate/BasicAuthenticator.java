@@ -159,7 +159,7 @@ public class BasicAuthenticator extends Authenticator {
 		if (role == RoleLevel.EDITOR || role == RoleLevel.CURATOR
 				|| role == RoleLevel.DB_ADMIN) {
 			session.setMaxInactiveInterval(PRIVILEGED_TIMEOUT_INTERVAL);
-		} else if (getUserAccountsDao().isRootUser(userAccount)) {
+		} else if (userAccount.isRootUser()) {
 			session.setMaxInactiveInterval(PRIVILEGED_TIMEOUT_INTERVAL);
 		} else {
 			session.setMaxInactiveInterval(LOGGED_IN_TIMEOUT_INTERVAL);

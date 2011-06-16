@@ -60,6 +60,8 @@ public class UserAccount {
 	/** This may be empty, but should never be null. */
 	private Set<String> permissionSetUris = Collections.emptySet();
 
+	private boolean rootUser = false;
+
 	public String getUri() {
 		return uri;
 	}
@@ -172,10 +174,18 @@ public class UserAccount {
 		this.permissionSetUris = new HashSet<String>(permissionSetUris);
 	}
 
+	public boolean isRootUser() {
+		return rootUser;
+	}
+
+	public void setRootUser(boolean rootUser) {
+		this.rootUser = rootUser;
+	}
+
 	private <T> T nonNull(T value, T defaultValue) {
 		return (value == null) ? defaultValue : value;
 	}
-	
+
 	private String limitStringLength(int limit, String s) {
 		if (s == null) {
 			return "";

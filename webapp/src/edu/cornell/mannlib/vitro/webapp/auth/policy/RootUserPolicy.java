@@ -9,11 +9,6 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.vocabulary.RDF;
-
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.IsRootUser;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
@@ -25,9 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
 
 /**
@@ -73,12 +66,11 @@ public class RootUserPolicy implements PolicyIface {
 
 			try {
 				UserAccountsDao uaDao = getUserAccountsDao(ctx);
-				OntModel userAccountsModel = getUserAccountsModel(ctx);
 
 				checkForWrongRootUser(ctx, uaDao);
 
 				if (!rootUserExists(uaDao)) {
-					createRootUser(ctx, uaDao, userAccountsModel);
+					createRootUser(ctx, uaDao);
 				}
 
 				ServletPolicyList.addPolicy(ctx, new RootUserPolicy());
@@ -98,11 +90,6 @@ public class RootUserPolicy implements PolicyIface {
 						"No webappDaoFactory on the servlet context");
 			}
 			return wadf.getUserAccountsDao();
-		}
-
-		private OntModel getUserAccountsModel(ServletContext ctx) {
-			return ModelContext.getBaseOntModelSelector(ctx)
-					.getUserAccountsModel();
 		}
 
 		private void checkForWrongRootUser(ServletContext ctx,
@@ -128,7 +115,7 @@ public class RootUserPolicy implements PolicyIface {
 
 		private UserAccount getRootUser(UserAccountsDao uaDao) {
 			for (UserAccount ua : uaDao.getAllUserAccounts()) {
-				if (uaDao.isRootUser(ua)) {
+				if (ua.isRootUser()) {
 					return ua;
 				}
 			}
@@ -139,8 +126,7 @@ public class RootUserPolicy implements PolicyIface {
 		 * TODO The first and last name should be left blank, so the user will
 		 * be forced to edit them. However, that's not in place yet.
 		 */
-		private void createRootUser(ServletContext ctx, UserAccountsDao uaDao,
-				OntModel userAccountsModel) {
+		private void createRootUser(ServletContext ctx, UserAccountsDao uaDao) {
 			String emailAddress = ConfigurationProperties.getBean(ctx)
 					.getProperty(PROPERTY_ROOT_USER_EMAIL);
 			if (emailAddress == null) {
@@ -170,18 +156,9 @@ public class RootUserPolicy implements PolicyIface {
 					.applyMd5Encoding(ROOT_USER_INITIAL_PASSWORD));
 			ua.setPasswordChangeRequired(true);
 			ua.setStatus(Status.ACTIVE);
+			ua.setRootUser(true);
 
 			uaDao.insertUserAccount(ua);
-
-			userAccountsModel.enterCriticalSection(Lock.WRITE);
-			try {
-				Resource r = userAccountsModel.getResource(ua.getUri());
-				Resource t = userAccountsModel
-						.getResource(VitroVocabulary.USERACCOUNT_ROOT_USER);
-				userAccountsModel.add(r, RDF.type, t);
-			} finally {
-				userAccountsModel.leaveCriticalSection();
-			}
 
 			log.info("Created root user as '" + emailAddress + "'");
 		}

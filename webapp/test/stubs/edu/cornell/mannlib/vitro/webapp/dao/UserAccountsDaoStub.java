@@ -38,12 +38,6 @@ public class UserAccountsDaoStub implements UserAccountsDao {
 		return userAccountsByUri.get(uri);
 	}
 
-	@Override
-	public boolean isRootUser(UserAccount userAccount) {
-		// TODO for now, no user is Root
-		return false;
-	}
-
 	// ----------------------------------------------------------------------
 	// Un-implemented methods
 	// ----------------------------------------------------------------------

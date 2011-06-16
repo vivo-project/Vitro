@@ -85,7 +85,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 		externalAuthId = getStringParameter(PARAMETER_EXTERNAL_AUTH_ID, "");
 		firstName = getStringParameter(PARAMETER_FIRST_NAME, "");
 		lastName = getStringParameter(PARAMETER_LAST_NAME, "");
-		selectedRoleUri = isRootUser() ? "" :getStringParameter(PARAMETER_ROLE, "");
+		selectedRoleUri = getStringParameter(PARAMETER_ROLE, "");
 		associateWithProfile = isParameterAsExpected(
 				PARAMETER_ASSOCIATE_WITH_PROFILE, "yes");
 
@@ -158,7 +158,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 	}
 
 	private boolean isRootUser() {
-		return userAccountsDao.isRootUser(userAccount);
+		return ((userAccount != null) && userAccount.isRootUser());
 	}
 
 	public boolean isValid() {
@@ -182,11 +182,10 @@ public class UserAccountsEditPage extends UserAccountsPage {
 			body.put("selectedRole", getExistingRoleUri());
 		}
 
-		if (isRootUser()) {
-			body.put("selectedRole", "");
+		if (!isRootUser()) {
+			body.put("roles", buildRolesList());
 		}
 
-		body.put("roles", buildRolesList());
 		if (associateWithProfile) {
 			body.put("associate", Boolean.TRUE);
 		}

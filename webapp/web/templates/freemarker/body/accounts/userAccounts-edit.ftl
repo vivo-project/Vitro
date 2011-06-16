@@ -68,12 +68,14 @@
             <label for="external-auth-id">External authorization ID (optional)</label> 
             <input type="text" name="externalAuthId" value="${externalAuthId}" id="external-auth-id" role="input "/>
 
-            <p>Roles<span class="requiredHint"> *</span> </p>
-            <#list roles as role>
-                <input type="radio" name="role" value="${role.uri}" role="radio" <#if selectedRole = role.uri>checked</#if> />
-                <label class="inline" for="${role.label}"> ${role.label}</label>
-                <br />
-            </#list>
+            <#if roles?has_content>
+                <p>Roles<span class="requiredHint"> *</span> </p>
+                <#list roles as role>
+                    <input type="radio" name="role" value="${role.uri}" role="radio" <#if selectedRole = role.uri>checked</#if> />
+                    <label class="inline" for="${role.label}"> ${role.label}</label>
+                    <br />
+                </#list>
+            </#if>
 
             <#if !emailIsEnabled??>
                 <label for="new-password">New password<span class="requiredHint"> *</span></label>
