@@ -75,7 +75,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             Dataset dataset = WebappDaoFactoryJena.makeInMemoryDataset(abox, inferences);
             
             List<DocumentModifier> modifiers = new ArrayList<DocumentModifier>();
-          // modifiers.add(new CalculateParameters(ModelContext.getJenaOntModel(context)));
+           // modifiers.add(new CalculateParameters(ModelContext.getJenaOntModel(context)));
             modifiers.add(new ContextNodeFields( dataset ));
             
             IndividualToSolrDocument indToSolrDoc = new IndividualToSolrDocument(

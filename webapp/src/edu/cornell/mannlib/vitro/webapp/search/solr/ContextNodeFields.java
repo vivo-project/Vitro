@@ -177,10 +177,10 @@ public class ContextNodeFields implements DocumentModifier{
     		objectProperties.append(" ");
     		
     		
-    		objectProperties.append(getPropertiesAssociatedWithContextNodes(individual.getURI()));
+//    		objectProperties.append(getPropertiesAssociatedWithContextNodes(individual.getURI()));
     		
-//    		objectProperties.append(getPropertiesAssociatedWithEducationalTraining(individual.getURI()));
-//    		objectProperties.append(" ");
+    		objectProperties.append(getPropertiesAssociatedWithEducationalTraining(individual.getURI()));
+    		objectProperties.append(" ");
     		
     		// properties related to core:EducationalTraining
     		
@@ -197,11 +197,11 @@ public class ContextNodeFields implements DocumentModifier{
 //    		objectProperties.append(" ");
 //
 //    		
-//    		objectProperties.append(getPropertiesAssociatedWithRole(individual.getURI()));
-//    		objectProperties.append(" ");
+    		objectProperties.append(getPropertiesAssociatedWithRole(individual.getURI()));
+    		objectProperties.append(" ");
     		
-//    		objectProperties.append(getPropertiesAssociatedWithPosition(individual.getURI()));
-//    		objectProperties.append(" ");
+    		objectProperties.append(getPropertiesAssociatedWithPosition(individual.getURI()));
+    		objectProperties.append(" ");
     		
     		//properties related to core:Position
 //    		objectProperties.append(getHRJobTitle(individual.getURI()));
@@ -219,8 +219,8 @@ public class ContextNodeFields implements DocumentModifier{
 //    		objectProperties.append(getInvolvedOrganizationName(individual.getURI()));
 //    		objectProperties.append(" ");
 
-//    		objectProperties.append(getPropertiesAssociatedWithRelationship(individual.getURI()));
-//    		objectProperties.append(" ");
+    		objectProperties.append(getPropertiesAssociatedWithRelationship(individual.getURI()));
+    		objectProperties.append(" ");
     		
     		//properties related to core:Relationship
 //    		objectProperties.append(getLinkedAuthor(individual.getURI()));
@@ -235,8 +235,8 @@ public class ContextNodeFields implements DocumentModifier{
 //    		objectProperties.append(getDegreeCandidacy(individual.getURI()));
 //    		objectProperties.append(" ");
 
-//    		objectProperties.append(getPropertiesAssociatedWithAwardReceipt(individual.getURI()));
-//    		objectProperties.append(" ");
+    		objectProperties.append(getPropertiesAssociatedWithAwardReceipt(individual.getURI()));
+    		objectProperties.append(" ");
     		
     		//properties related to core:AwardReceipt
 //    		objectProperties.append(getAwardConferredBy(individual.getURI()));
@@ -251,12 +251,12 @@ public class ContextNodeFields implements DocumentModifier{
 
     	}
     	if(IndividualToSolrDocument.superClassNames.contains("InformationResource")){
-    		//targetField.addValue(" " + getPropertiesAssociatedWithInformationResource(individual.getURI()), targetField.getBoost());
+    		targetField.addValue(" " + getPropertiesAssociatedWithInformationResource(individual.getURI()), targetField.getBoost());
     		//properties related to core:InformationResource
-    		targetField.addValue(" " + getLinkedAuthorandLinkedInformationResource(individual.getURI()), targetField.getBoost());
-    		targetField.addValue(" " + getFeatures(individual.getURI()), targetField.getBoost());
-    		targetField.addValue(" " + getEditor(individual.getURI()), targetField.getBoost());
-    		targetField.addValue(" " + getSubjectAreaAndResearchAreaOf(individual.getURI()), targetField.getBoost());
+//    		targetField.addValue(" " + getLinkedAuthorandLinkedInformationResource(individual.getURI()), targetField.getBoost());
+//    		targetField.addValue(" " + getFeatures(individual.getURI()), targetField.getBoost());
+//    		targetField.addValue(" " + getEditor(individual.getURI()), targetField.getBoost());
+//    		targetField.addValue(" " + getSubjectAreaAndResearchAreaOf(individual.getURI()), targetField.getBoost());
     	}
     	
     	field.addValue(objectProperties, field.getBoost());
@@ -571,10 +571,9 @@ public class ContextNodeFields implements DocumentModifier{
 		+ " } ORDER BY ?PositionLabel ";
 		
 		Query sparqlQuery = QueryFactory.create(thisQuery, Syntax.syntaxARQ);
-		fullModel.enterCriticalSection(Lock.READ);
-		
+		dataset.getLock().enterCriticalSection(Lock.READ);		
 		try{
-			QueryExecution qExec = QueryExecutionFactory.create(sparqlQuery, fullModel, initialBinding);
+			QueryExecution qExec = QueryExecutionFactory.create(sparqlQuery, dataset, initialBinding);
 			try{
 				
 				ResultSet results = qExec.execSelect();
@@ -632,7 +631,7 @@ public class ContextNodeFields implements DocumentModifier{
 				qExec.close();
 			} 
 		}finally{
-				fullModel.leaveCriticalSection();
+			dataset.getLock().leaveCriticalSection();
 		}
 		
 		return propertyValues.toString();
@@ -851,10 +850,10 @@ public class ContextNodeFields implements DocumentModifier{
 		+ " } ";
 		
 		Query sparqlQuery = QueryFactory.create(thisQuery, Syntax.syntaxARQ);
-		fullModel.enterCriticalSection(Lock.READ);
+		dataset.getLock().enterCriticalSection(Lock.READ);
 		
 		try{
-			QueryExecution qExec = QueryExecutionFactory.create(sparqlQuery, fullModel, initialBinding);
+			QueryExecution qExec = QueryExecutionFactory.create(sparqlQuery, dataset, initialBinding);
 			try{
 				
 				ResultSet results = qExec.execSelect();
@@ -898,7 +897,7 @@ public class ContextNodeFields implements DocumentModifier{
 				qExec.close();
 			} 
 		}finally{
-				fullModel.leaveCriticalSection();
+				dataset.getLock().leaveCriticalSection();
 		}
 		
 		return propertyValues.toString();
@@ -1069,10 +1068,10 @@ public class ContextNodeFields implements DocumentModifier{
 		+ " } ORDER BY ?AwardReceiptLabel";
 		
 		Query sparqlQuery = QueryFactory.create(thisQuery, Syntax.syntaxARQ);
-		fullModel.enterCriticalSection(Lock.READ);
+		dataset.getLock().enterCriticalSection(Lock.READ);
 		
 		try{
-			QueryExecution qExec = QueryExecutionFactory.create(sparqlQuery, fullModel, initialBinding);
+			QueryExecution qExec = QueryExecutionFactory.create(sparqlQuery, dataset, initialBinding);
 			try{
 				
 				ResultSet results = qExec.execSelect();
@@ -1116,7 +1115,7 @@ public class ContextNodeFields implements DocumentModifier{
 				qExec.close();
 			} 
 		}finally{
-				fullModel.leaveCriticalSection();
+				dataset.getLock().leaveCriticalSection();
 		}
 		
 		return propertyValues.toString();
@@ -1140,10 +1139,10 @@ public class ContextNodeFields implements DocumentModifier{
 		+ " } ORDER BY ?OrganizationLabel ";
 		
 		Query sparqlQuery = QueryFactory.create(thisQuery, Syntax.syntaxARQ);
-		fullModel.enterCriticalSection(Lock.READ);
+		dataset.getLock().enterCriticalSection(Lock.READ);
 		
 		try{
-			QueryExecution qExec = QueryExecutionFactory.create(sparqlQuery, fullModel, initialBinding);
+			QueryExecution qExec = QueryExecutionFactory.create(sparqlQuery, dataset, initialBinding);
 			try{
 				
 				ResultSet results = qExec.execSelect();
@@ -1166,7 +1165,7 @@ public class ContextNodeFields implements DocumentModifier{
 				qExec.close();
 			} 
 		}finally{
-				fullModel.leaveCriticalSection();
+				dataset.getLock().leaveCriticalSection();
 		}
 		
 		return propertyValues.toString();
@@ -1404,10 +1403,10 @@ public class ContextNodeFields implements DocumentModifier{
 			+"}";
 		
 		Query sparqlQuery = QueryFactory.create(thisQuery, Syntax.syntaxARQ);
-		fullModel.enterCriticalSection(Lock.READ);
+		dataset.getLock().enterCriticalSection(Lock.READ);
 		
 		try{
-			QueryExecution qExec = QueryExecutionFactory.create(sparqlQuery, fullModel, initialBinding);
+			QueryExecution qExec = QueryExecutionFactory.create(sparqlQuery, dataset, initialBinding);
 			try{
 				
 				ResultSet results = qExec.execSelect();
@@ -1458,7 +1457,7 @@ public class ContextNodeFields implements DocumentModifier{
 				qExec.close();
 			} 
 		}finally{
-				fullModel.leaveCriticalSection();
+				dataset.getLock().leaveCriticalSection();
 		}		
 		return propertyValues.toString();
 		
@@ -1708,10 +1707,9 @@ public class ContextNodeFields implements DocumentModifier{
 			+"}";
 		
 		Query sparqlQuery = QueryFactory.create(thisQuery, Syntax.syntaxARQ);
-		fullModel.enterCriticalSection(Lock.READ);
-		
+		dataset.getLock().enterCriticalSection(Lock.READ);
 		try{
-			QueryExecution qExec = QueryExecutionFactory.create(sparqlQuery, fullModel, initialBinding);
+			QueryExecution qExec = QueryExecutionFactory.create(sparqlQuery, dataset, initialBinding);
 			try{
 				
 				ResultSet results = qExec.execSelect();
@@ -1769,7 +1767,7 @@ public class ContextNodeFields implements DocumentModifier{
 				qExec.close();
 			} 
 		}finally{
-				fullModel.leaveCriticalSection();
+			dataset.getLock().leaveCriticalSection();
 		}		
 		return propertyValues.toString();
 		
