@@ -26,7 +26,7 @@ public class UserAccountsResetPasswordPage extends UserAccountsPasswordBasePage 
 
 	private static final String TEMPLATE_NAME = "userAccounts-resetPassword.ftl";
 
-	private static final String EMAIL_TEMPLATE = "userAccounts-passwordResetEmail.ftl";
+	private static final String EMAIL_TEMPLATE = "userAccounts-passwordResetCompleteEmail.ftl";
 
 	protected UserAccountsResetPasswordPage(VitroRequest vreq) {
 		super(vreq);
