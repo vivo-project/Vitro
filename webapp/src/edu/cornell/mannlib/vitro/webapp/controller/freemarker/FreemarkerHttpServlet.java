@@ -184,14 +184,22 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         templateDataModel.put("body", bodyString);
         
         // Tell the template and any directives it uses that we're processing a page template.
-        templateDataModel.put("templateType", PAGE_TEMPLATE_TYPE);        
-        writePage(templateDataModel, config, vreq, response);       
+        templateDataModel.put("templateType", PAGE_TEMPLATE_TYPE);  
+        
+        writePage(templateDataModel, config, vreq, response, values.getStatusCode());       
     }
     
     protected void doRedirect(HttpServletRequest request, HttpServletResponse response, ResponseValues values) 
         throws ServletException, IOException { 
         String redirectUrl = values.getRedirectUrl();
+        setResponseStatus(response, values.getStatusCode());
         response.sendRedirect(redirectUrl);        
+    }
+    
+    private void setResponseStatus(HttpServletResponse response, int statusCode) {
+        if (statusCode > 0) {
+            response.setStatus(statusCode);
+        }
     }
     
     protected void doForward(HttpServletRequest request, HttpServletResponse response, ResponseValues values) 
@@ -369,11 +377,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         // This value is used only in stylesheets.ftl and already contains the context path.
         map.put("stylesheetPath", UrlBuilder.getUrl(themeDir + "/css"));  
 
-//        String bannerImage = portal.getBannerImage();  
-//        if ( ! StringUtils.isEmpty(bannerImage)) {
-//            map.put("bannerImage", UrlBuilder.getUrl(themeDir + "site_icons/" + bannerImage));
-//        }
-
         String flashMessage = DisplayMessage.getMessageAndClear(vreq);
         if (! flashMessage.isEmpty()) {
             map.put("flash", flashMessage);
@@ -452,18 +455,24 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     }
     
     protected void writePage(Map<String, Object> root, Configuration config, 
-            HttpServletRequest request, HttpServletResponse response) throws TemplateProcessingException {   
-        writeTemplate(getPageTemplateName(), root, config, request, response);                   
+            HttpServletRequest request, HttpServletResponse response, int statusCode) throws TemplateProcessingException {   
+        writeTemplate(getPageTemplateName(), root, config, request, response, statusCode);                   
     }
     
     protected void writeTemplate(String templateName, Map<String, Object> map, Configuration config, 
-            HttpServletRequest request, HttpServletResponse response) throws TemplateProcessingException {       
-        StringWriter sw = processTemplate(templateName, map, config, request);          
-        write(sw, response);
+            HttpServletRequest request, HttpServletResponse response) throws TemplateProcessingException { 
+        writeTemplate(templateName, map, config, request, response, 0);
+    }
+
+    protected void writeTemplate(String templateName, Map<String, Object> map, Configuration config, 
+            HttpServletRequest request, HttpServletResponse response, int statusCode) throws TemplateProcessingException {       
+        StringWriter sw = processTemplate(templateName, map, config, request);     
+        write(sw, response, statusCode);
     }
     
-    protected void write(StringWriter sw, HttpServletResponse response) {        
+    protected void write(StringWriter sw, HttpServletResponse response, int statusCode) {        
         try {
+            setResponseStatus(response, statusCode);
             PrintWriter out = response.getWriter();
             out.print(sw);     
         } catch (IOException e) {

@@ -22,6 +22,11 @@ public abstract class BaseResponseValues implements ResponseValues {
     BaseResponseValues(ContentType contentType) {
         this.contentType = contentType;
     }
+
+    BaseResponseValues(ContentType contentType, int statusCode) {
+        this.contentType = contentType;
+        this.statusCode = statusCode;
+    }
     
     @Override
     public int getStatusCode() {
@@ -38,6 +43,7 @@ public abstract class BaseResponseValues implements ResponseValues {
         return contentType;
     }
 
+    @Override
     public void setContentType(ContentType contentType) {
         this.contentType = contentType;
     }
