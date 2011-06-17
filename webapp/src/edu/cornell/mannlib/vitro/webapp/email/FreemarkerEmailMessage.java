@@ -160,10 +160,7 @@ public class FreemarkerEmailMessage {
 
 		try {
 			Template template = config.getTemplate(templateName);
-			Environment env = template.createProcessingEnvironment(bodyMap,
-					new StringWriter());
-			env.setCustomAttribute("request", req);
-			env.process();
+			template.process(bodyMap, new StringWriter());
 		} catch (TemplateException e) {
 			log.error(e, e);
 		} catch (IOException e) {
