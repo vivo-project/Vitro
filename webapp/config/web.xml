@@ -1020,18 +1020,6 @@
     <url-pattern>/dwr/*</url-pattern>
   </servlet-mapping>
 
-  <!-- Deprecated servlet (still used in Datastar) - retain temporarily for testing and comparison. -->
-  <servlet>
-    <servlet-name>sendmail</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet</servlet-class>
-    <load-on-startup>5</load-on-startup>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>sendmail</servlet-name>
-    <url-pattern>/sendmail</url-pattern>
-  </servlet-mapping>
-  <!-- end deprecated servlet -->
-  
   <servlet>
    <servlet-name>sendMail</servlet-name>
    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.ContactMailController</servlet-class>

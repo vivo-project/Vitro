@@ -57,6 +57,7 @@ public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 
 	private static class EmailStrategy extends UserAccountsAddPageStrategy {
 		public static final String CREATE_PASSWORD_URL = "/accounts/createPassword";
+		private static final String EMAIL_TEMPLATE = "userAccounts-acctCreatedEmail.ftl";
 
 		private boolean sentEmail;
 
@@ -91,15 +92,14 @@ public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 			Map<String, Object> body = new HashMap<String, Object>();
 			body.put("userAccount", page.getAddedAccount());
 			body.put("passwordLink", buildCreatePasswordLink());
-			body.put("subjectLine", "Your VIVO account has been created.");
 
 			FreemarkerEmailMessage email = FreemarkerEmailFactory
 					.createNewMessage(vreq);
 			email.addRecipient(TO, page.getAddedAccount().getEmailAddress());
 			email.setSubject("Your VIVO account has been created.");
-			email.setHtmlTemplate("userAccounts-acctCreatedEmail-html.ftl");
-			email.setTextTemplate("userAccounts-acctCreatedEmail-text.ftl");
+			email.setTemplate(EMAIL_TEMPLATE);
 			email.setBodyMap(body);
+			email.processTemplate();
 			email.send();
 
 			sentEmail = true;

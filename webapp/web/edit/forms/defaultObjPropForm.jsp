@@ -128,10 +128,10 @@
         	
             log.debug("property set to offer \"create new\" option; custom form: ["+prop.getCustomEntryForm()+"]");
             formTitle   = "Select an existing "+classOfObjectFillers.getName()+" for "+subject.getName();
-            submitLabel = "select existing";
+            submitLabel = "Select existing";
         } else {
             formTitle   = "Add an entry to: <em>"+prop.getDomainPublic()+"</em>";
-            submitLabel = "save entry";
+            submitLabel = "Save entry";
         }
     }
     
@@ -193,7 +193,7 @@
         <input type="hidden" value="${param.objectUri}" name="objectUri"/>        
 		<input type="hidden" value="create" name="cmd"/>        
 		<v:input type="typesForCreateNew" id="typeOfNew" />
-        <v:input type="submit" id="submit" value="add a new item of this type" cancel="${offerCancel}"/>
+        <v:input type="submit" id="submit" value="Add a new item of this type" cancel="${offerCancel}"/>
 	</form>                            
 </c:if>
 

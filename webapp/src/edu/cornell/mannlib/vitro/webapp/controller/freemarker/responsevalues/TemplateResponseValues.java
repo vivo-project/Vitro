@@ -49,7 +49,9 @@ public class TemplateResponseValues extends BaseResponseValues {
     }   
     
     public static TemplateResponseValues getTemplateResponseValuesFromException(ExceptionResponseValues responseValues) {
-        return new TemplateResponseValues(responseValues.getTemplateName(), responseValues.getMap());
+        return new TemplateResponseValues(responseValues.getTemplateName(), 
+                                          responseValues.getMap(),
+                                          responseValues.getStatusCode());
     }
 }
 

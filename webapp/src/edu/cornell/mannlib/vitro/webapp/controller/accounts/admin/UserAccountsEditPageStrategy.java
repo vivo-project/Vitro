@@ -9,8 +9,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
-import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsPage;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
@@ -57,7 +57,8 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 
 	private static class EmailStrategy extends UserAccountsEditPageStrategy {
 		private static final String PARAMETER_RESET_PASSWORD = "resetPassword";
-
+		private static final String EMAIL_TEMPLATE = "userAccounts-resetPasswordEmail.ftl";
+		
 		public static final String RESET_PASSWORD_URL = "/accounts/resetPassword";
 
 		private boolean resetPassword;
@@ -102,18 +103,22 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 			Map<String, Object> body = new HashMap<String, Object>();
 			body.put("userAccount", page.getUpdatedAccount());
 			body.put("passwordLink", buildResetPasswordLink());
-			body.put("subjectLine", "Reset password request");
+			body.put("siteName", getSiteName());
 
 			FreemarkerEmailMessage email = FreemarkerEmailFactory
 					.createNewMessage(vreq);
 			email.addRecipient(TO, page.getUpdatedAccount().getEmailAddress());
-			email.setSubject("Reset password request");
-			email.setHtmlTemplate("userAccounts-resetPasswordEmail-html.ftl");
-			email.setTextTemplate("userAccounts-resetPasswordEmail-text.ftl");
+			email.setTemplate(EMAIL_TEMPLATE);
 			email.setBodyMap(body);
+			email.processTemplate();
 			email.send();
 
 			sentEmail = true;
+		}
+		
+		private String getSiteName() {
+	        ApplicationBean appBean = vreq.getAppBean();
+	        return appBean.getApplicationName();		    
 		}
 
 		private String buildResetPasswordLink() {

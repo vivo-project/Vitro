@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
@@ -123,24 +123,13 @@ public class BasicAuthenticator extends Authenticator {
 		}
 
 		recordLoginOnUserRecord(userAccount);
-		recordLoginWithOrWithoutUserAccount(userAccount.getUri(), authSource);
-	}
 
-	// TODO JB This goes away.
-	@Override
-	public void recordLoginWithoutUserAccount(String individualUri) {
-		recordLoginWithOrWithoutUserAccount(individualUri,
-				AuthenticationSource.EXTERNAL);
-	}
-
-	/** This much is in common on login, whether or not you have a user account. */
-	private void recordLoginWithOrWithoutUserAccount(String userUri,
-			AuthenticationSource authSource) {
 		HttpSession session = request.getSession();
-		createLoginStatusBean(userUri, authSource, session);
-		setSessionTimeoutLimit(session);
-		recordInUserSessionMap(userUri, session);
-		notifyOtherUsers(userUri, session);
+		createLoginStatusBean(userAccount.getUri(), authSource, session);
+		RequestIdentifiers.resetIdentifiers(request);
+		setSessionTimeoutLimit(userAccount, session);
+		recordInUserSessionMap(userAccount.getUri(), session);
+		notifyOtherUsers(userAccount.getUri(), session);
 	}
 
 	/**
@@ -164,10 +153,13 @@ public class BasicAuthenticator extends Authenticator {
 	/**
 	 * Editors and other privileged users get a longer timeout interval.
 	 */
-	private void setSessionTimeoutLimit(HttpSession session) {
+	private void setSessionTimeoutLimit(UserAccount userAccount,
+			HttpSession session) {
 		RoleLevel role = RoleLevel.getRoleFromLoginStatus(request);
 		if (role == RoleLevel.EDITOR || role == RoleLevel.CURATOR
 				|| role == RoleLevel.DB_ADMIN) {
+			session.setMaxInactiveInterval(PRIVILEGED_TIMEOUT_INTERVAL);
+		} else if (userAccount.isRootUser()) {
 			session.setMaxInactiveInterval(PRIVILEGED_TIMEOUT_INTERVAL);
 		} else {
 			session.setMaxInactiveInterval(LOGGED_IN_TIMEOUT_INTERVAL);

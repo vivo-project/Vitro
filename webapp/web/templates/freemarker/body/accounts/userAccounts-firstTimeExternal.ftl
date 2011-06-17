@@ -38,16 +38,17 @@
         </p>
 
         <form method="POST" action="${formUrls.firstTimeExternal}" class="customForm" role="my account">
-        	<input type="hidden" name="externalAuthId" value="${externalAuthId}" />
+            <input type="hidden" name="externalAuthId" value="${externalAuthId}" role="input" />
+            <input type="hidden" name="afterLoginUrl" value="${afterLoginUrl}" role="input" />
         
             <label for="first-name">First name<span class="requiredHint"> *</span></label> 
-            <input type="text" name="firstName" value="${firstName}" id="first-name" role="input "/>
+            <input type="text" name="firstName" value="${firstName}" id="first-name" role="input" />
 
             <label for="last-name">Last name<span class="requiredHint"> *</span></label> 
-            <input type="text" name="lastName" value="${lastName}" id="last-name" role="input "/>
+            <input type="text" name="lastName" value="${lastName}" id="last-name" role="input" />
 
             <label for="email-address">Email address<span class="requiredHint"> *</span></label>
-            <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input "/>
+            <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
 
             <#if emailIsEnabled??>
                 <p class="note">
@@ -56,7 +57,7 @@
                 </p>
             </#if>
 
-            <input type="submit" name="submit" value="Create account" class="submit"/> or <a href="${urls.home}">Cancel</a>
+            <input type="submit" name="submit" value="Create account" class="submit"/> or <a class="cancel" href="${urls.home}">Cancel</a>
         </form>
     </fieldset>
 </section>

@@ -781,7 +781,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
 					if (stmt.getObject().isURIResource()) {
 						String typeURI = ((Resource)stmt.getObject()).getURI();
 						if (pfs.isClassProhibitedFromSearch(typeURI)) {
-							return false;
+							return true;
 						}
 					}
 				}

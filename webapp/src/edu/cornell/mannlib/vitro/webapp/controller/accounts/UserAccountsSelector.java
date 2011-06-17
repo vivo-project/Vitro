@@ -39,7 +39,7 @@ public class UserAccountsSelector {
 			+ "PREFIX fn: <http://www.w3.org/2005/xpath-functions#> \n"
 			+ "PREFIX auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> \n";
 
-	private static final String ALL_VARIABLES = "?uri ?email ?firstName ?lastName ?pwd ?expire ?count ?status";
+	private static final String ALL_VARIABLES = "?uri ?email ?firstName ?lastName ?pwd ?expire ?count ?status ?isRoot";
 
 	private static final String COUNT_VARIABLE = "?uri";
 
@@ -169,7 +169,8 @@ public class UserAccountsSelector {
 				+ "    OPTIONAL { ?uri auth:md5password ?pwd } \n"
 				+ "    OPTIONAL { ?uri auth:passwordChangeExpires ?expire } \n"
 				+ "    OPTIONAL { ?uri auth:loginCount ?count } \n"
-				+ "    OPTIONAL { ?uri auth:status ?status }";
+				+ "    OPTIONAL { ?uri auth:status ?status } \n"
+				+ "    OPTIONAL { ?uri ?isRoot auth:RootUserAccount }";
 	}
 
 	private String filterClauses() {
@@ -201,11 +202,10 @@ public class UserAccountsSelector {
 	}
 
 	/**
-	 * Escape any regex special characters in the string. 
+	 * Escape any regex special characters in the string.
 	 * 
-	 * Note that the SPARQL
-	 * parser requires two backslashes, in order to pass a single backslash to
-	 * the REGEX function.
+	 * Note that the SPARQL parser requires two backslashes, in order to pass a
+	 * single backslash to the REGEX function.
 	 */
 	private String escapeForRegex(String raw) {
 		StringBuilder clean = new StringBuilder();
@@ -327,6 +327,7 @@ public class UserAccountsSelector {
 			user.setPasswordLinkExpires(ifLongPresent(solution, "expire", 0L));
 			user.setLoginCount(ifIntPresent(solution, "count", 0));
 			user.setStatus(parseStatus(solution, "status", null));
+			user.setRootUser(solution.contains("isRoot"));
 			return user;
 		}
 

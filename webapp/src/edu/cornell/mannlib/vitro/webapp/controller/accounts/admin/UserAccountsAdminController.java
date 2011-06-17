@@ -57,9 +57,9 @@ public class UserAccountsAdminController extends FreemarkerHttpServlet {
 		if (page.isSubmit() && page.isValid()) {
 			page.createNewAccount();
 
-			UserAccountsListPage listPage = new UserAccountsListPage(vreq);
-			return listPage.showPageWithNewAccount(page.getAddedAccount(),
-					page.wasPasswordEmailSent());
+			UserAccountsListPage.Message.showNewAccount(vreq,
+					page.getAddedAccount(), page.wasPasswordEmailSent());
+			return redirectToList();
 		} else {
 			return page.showPage();
 		}
@@ -71,9 +71,10 @@ public class UserAccountsAdminController extends FreemarkerHttpServlet {
 			return showHomePage(vreq, page.getBogusMessage());
 		} else if (page.isSubmit() && page.isValid()) {
 			page.updateAccount();
-			UserAccountsListPage listPage = new UserAccountsListPage(vreq);
-			return listPage.showPageWithUpdatedAccount(
+
+			UserAccountsListPage.Message.showUpdatedAccount(vreq,
 					page.getUpdatedAccount(), page.wasPasswordEmailSent());
+			return redirectToList();
 		} else {
 			return page.showPage();
 		}
@@ -83,13 +84,21 @@ public class UserAccountsAdminController extends FreemarkerHttpServlet {
 		UserAccountsDeleter deleter = new UserAccountsDeleter(vreq);
 		Collection<String> deletedUris = deleter.delete();
 
-		return new UserAccountsListPage(vreq)
-				.showPageWithDeletions(deletedUris);
+		UserAccountsListPage.Message.showDeletions(vreq, deletedUris);
+		return redirectToList();
 	}
 
 	private ResponseValues handleListRequest(VitroRequest vreq) {
 		UserAccountsListPage page = new UserAccountsListPage(vreq);
 		return page.showPage();
+	}
+
+	/**
+	 * After an successful change, redirect to the list instead of forwarding.
+	 * That way, a browser "refresh" won't try to repeat the operation.
+	 */
+	private ResponseValues redirectToList() {
+		return new RedirectResponseValues("/accountsAdmin/list");
 	}
 
 	private ResponseValues showHomePage(VitroRequest vreq, String message) {

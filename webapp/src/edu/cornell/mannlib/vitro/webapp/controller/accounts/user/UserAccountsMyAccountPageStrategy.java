@@ -107,6 +107,8 @@ public abstract class UserAccountsMyAccountPageStrategy extends
 
 		private static final String ERROR_WRONG_PASSWORD_LENGTH = "errorPasswordIsWrongLength";
 		private static final String ERROR_PASSWORDS_DONT_MATCH = "errorPasswordsDontMatch";
+		
+		private static final String EMAIL_TEMPLATE = "userAccounts-confirmEmailChangedEmail.ftl";
 
 		private final String originalEmail;
 
@@ -167,15 +169,14 @@ public abstract class UserAccountsMyAccountPageStrategy extends
 
 			Map<String, Object> body = new HashMap<String, Object>();
 			body.put("userAccount", page.getUserAccount());
-			body.put("subjectLine", "Your VIVO email account has been changed.");
 
 			FreemarkerEmailMessage email = FreemarkerEmailFactory
 					.createNewMessage(vreq);
 			email.addRecipient(TO, page.getUserAccount().getEmailAddress());
 			email.setSubject("Your VIVO email account has been changed.");
-			email.setHtmlTemplate("userAccounts-confirmEmailChangedEmail-html.ftl");
-			email.setTextTemplate("userAccounts-confirmEmailChangedEmail-text.ftl");
+			email.setTemplate(EMAIL_TEMPLATE);
 			email.setBodyMap(body);
+			email.processTemplate();
 			email.send();
 
 			emailSent = true;

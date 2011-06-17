@@ -14,6 +14,14 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Where are we in the process of logging on? What message should we show to the
  * user?
+ * 
+ * TODO: the contents loginPageUrl is not explicitly defined, but it is assumed
+ * to be either null, absolute, or relative to the host. It would be better if
+ * it were explicitly defined, and either null, absolute or relative to the
+ * context path. Then, the context path could be applied when the URL is used.
+ * Later for that.
+ * 
+ * TODO: similar for afterLoginUrl, I presume.
  */
 public class LoginProcessBean {
 	private static final Log log = LogFactory.getLog(LoginProcessBean.class);

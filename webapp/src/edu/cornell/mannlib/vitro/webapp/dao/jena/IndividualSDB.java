@@ -395,8 +395,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             String[] graphVars = { "?g" };
             String queryStr = 
                 "CONSTRUCT { <"+ind.getURI()+"> <" + propertyURI + "> ?value } \n" +
-                    "WHERE { GRAPH ?g {  \n" +
-                    "<" + ind.getURI() +"> <" + propertyURI + "> ?value } \n" + 
+                    "WHERE {  \n" +
+                    "<" + ind.getURI() +"> <" + propertyURI + "> ?value \n" + 
                     WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
                     "\n} ";
             Query query = QueryFactory.create(queryStr);
@@ -456,13 +456,13 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 		if (this.mainImageUri != NOT_INITIALIZED) {
 			return mainImageUri;
 		} else {
-			for (ObjectPropertyStatement stmt : getObjectPropertyStatements()) {
-				if (stmt.getPropertyURI()
-						.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
-					mainImageUri = stmt.getObjectURI();
-					return mainImageUri;
-				}
-			}
+			List<ObjectPropertyStatement> mainImgStmts = 
+					getObjectPropertyStatements(VitroVocabulary.IND_MAIN_IMAGE);
+			if (mainImgStmts != null && mainImgStmts.size() > 0) {
+				// arbitrarily return the first value in the list
+				mainImageUri = mainImgStmts.get(0).getObjectURI();
+				return mainImageUri;				
+			} 
 			return null;
 		}
 	}
@@ -502,14 +502,11 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 	    if( _hasThumb != null ){
 	        return _hasThumb;	    
         }else{            
-            String[] graphVars = { "?g" };
             String ask = 
-                "ASK { GRAPH ?g  " +
-                "  { <" + individualURI + "> <http://vitro.mannlib.cornell.edu/ns/vitro/public#mainImage> ?mainImage . \n" +
-                "    ?mainImage <http://vitro.mannlib.cornell.edu/ns/vitro/public#thumbnailImage> ?thumbImage . }\n"  +                      
-                        WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
-                "}";
-            DatasetWrapper w = getDatasetWrapper();
+                "ASK { " +
+                "    <" + individualURI + "> <http://vitro.mannlib.cornell.edu/ns/vitro/public#mainImage> ?mainImage . \n" +
+                "    ?mainImage <http://vitro.mannlib.cornell.edu/ns/vitro/public#thumbnailImage> ?thumbImage . }\n"  ;                     
+          DatasetWrapper w = getDatasetWrapper();
             Dataset dataset = w.getDataset();
             dataset.getLock().enterCriticalSection(Lock.READ);
             try{                
@@ -552,10 +549,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         Dataset dataset = w.getDataset();
     	dataset.getLock().enterCriticalSection(Lock.READ);
         try {
-            String graphVars[] = { "?g" };
         	StringBuffer selectPrimaryLinkQueryBuff = new StringBuffer().append(
-        		"SELECT ?url ?anchor \n" ).append(
-        		"WHERE{ GRAPH ?g { \n " ).append(
+        		"SELECT ?url ?anchor \n" ).append(" WHERE { \n").append(
         		"    <" + this.individualURI + "> ").append(
         		             "<" + VitroVocabulary.PRIMARY_LINK + "> " ).append(
         		                     "?link . \n").append(
@@ -563,9 +558,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         		        ).append(
         		"    ?link <" + VitroVocabulary.LINK_ANCHOR + "> ?anchor . \n" 
         		        ).append(
-        		"} \n")
-        		.append(WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode))
-        		.append("}");
+        		"} \n");
         	QueryExecution qexec = QueryExecutionFactory.create(
                     QueryFactory.create(selectPrimaryLinkQueryBuff.toString())
                             , dataset);
@@ -678,12 +671,9 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         Dataset dataset = w.getDataset();
     	dataset.getLock().enterCriticalSection(Lock.READ);
     	try {
-    	    String[] graphVars = { "?g" };
     		String valuesOfProperty = 
-    			"CONSTRUCT{<" + this.individualURI + "> <" + propertyURI + "> ?object}" +
-    			"WHERE{ GRAPH ?g { <" + this.individualURI + "> <" + propertyURI + "> ?object} \n" +
-    			WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
-    			"}";
+    			"CONSTRUCT{ <" + this.individualURI + "> <" + propertyURI + "> ?object }" +
+    			"WHERE{ <" + this.individualURI + "> <" + propertyURI + "> ?object } \n";
     	    tempModel = QueryExecutionFactory.create(QueryFactory.create(valuesOfProperty), dataset).execConstruct();
     	    ontModel.add(tempModel.listStatements());
     	    Resource ontRes = ontModel.getResource(this.individualURI);
@@ -727,13 +717,10 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	Dataset dataset = w.getDataset();
     	dataset.getLock().enterCriticalSection(Lock.READ);
     	try {
-    	    String[] graphVars = { "?g" };
     		String valuesOfProperty = 
     			"SELECT ?object" +
-    			"WHERE{ GRAPH ?g { <" + this.individualURI + "> <" + 
-    			        propertyURI + "> ?object} \n" +
-    			        WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +       
-    			 "}";
+    			"WHERE{ <" + this.individualURI + "> <" + 
+    			        propertyURI + "> ?object } \n";
     		ResultSet values = QueryExecutionFactory.create(
     		        QueryFactory.create(valuesOfProperty), dataset)
     		                .execSelect();
@@ -767,13 +754,10 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	Dataset dataset = w.getDataset();
     	dataset.getLock().enterCriticalSection(Lock.READ);
     	try {
-    	    String[] graphVars = { "?g" };
     		String valueOfProperty = 
     			"SELECT ?object " +
-    			"WHERE{ GRAPH ?g { <" + this.individualURI + "> <" + 
-    			        propertyURI + "> ?object} \n" +
-    			        WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
-    			"}";
+    			"WHERE{ <" + this.individualURI + "> <" + 
+    			        propertyURI + "> ?object } \n";
     		QueryExecution qe = QueryExecutionFactory.create(
                     QueryFactory.create(valueOfProperty), dataset);
     		try {

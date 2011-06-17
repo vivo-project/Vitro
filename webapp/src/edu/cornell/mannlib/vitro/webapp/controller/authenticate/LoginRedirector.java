@@ -16,11 +16,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasRoleLevel;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.IsRootUser;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
-import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 
 /**
  * A user has just completed the login process. What page do we direct them to?
@@ -34,15 +37,12 @@ public class LoginRedirector {
 	private final String uriOfAssociatedIndividual;
 	private final String afterLoginPage;
 
-	public LoginRedirector(HttpServletRequest request) {
+	public LoginRedirector(HttpServletRequest request, String afterLoginPage) {
 		this.request = request;
 		this.session = request.getSession();
+		this.afterLoginPage = afterLoginPage;
 
 		uriOfAssociatedIndividual = getAssociatedIndividualUri();
-
-		LoginProcessBean processBean = LoginProcessBean.getBean(request);
-		log.debug("process bean is: " + processBean);
-		afterLoginPage = processBean.getAfterLoginUrl();
 	}
 
 	/** Is there an Individual associated with this user? */
@@ -106,7 +106,6 @@ public class LoginRedirector {
 		try {
 			DisplayMessage.setMessage(request, assembleWelcomeMessage());
 			response.sendRedirect(getRedirectionUriForLoggedInUser());
-			LoginProcessBean.removeBean(request);
 		} catch (IOException e) {
 			log.debug("Problem with re-direction", e);
 			response.sendRedirect(getApplicationHomePageUrl());
@@ -142,7 +141,6 @@ public class LoginRedirector {
 			throws IOException {
 		try {
 			response.sendRedirect(getRedirectionUriForCancellingUser());
-			LoginProcessBean.removeBean(request);
 		} catch (IOException e) {
 			log.debug("Problem with re-direction", e);
 			response.sendRedirect(getApplicationHomePageUrl());
@@ -158,7 +156,12 @@ public class LoginRedirector {
 	}
 
 	private boolean isMerelySelfEditor() {
-		RoleLevel role = RoleLevel.getRoleFromLoginStatus(request);
+		IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(request);
+		if (IsRootUser.isRootUser(ids)) {
+			return false;
+		}
+		
+		RoleLevel role = HasRoleLevel.getUsersRoleLevel(ids);
 		return role == RoleLevel.PUBLIC || role == RoleLevel.SELF;
 	}
 

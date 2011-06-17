@@ -32,13 +32,27 @@ public class User extends BaseTemplateModel {
     		return "";
     	} 
 
-    	String firstName = currentUser.getFirstName();
-		String lastName = currentUser.getLastName();
-		if (firstName.isEmpty() && lastName.isEmpty()) {
-			return currentUser.getEmailAddress();
-		}
-		
-		return firstName + " " + lastName;
+    	if (currentUser.getFirstName().isEmpty()) {
+    		return currentUser.getEmailAddress();
+    	}
+    	
+    	return currentUser.getFirstName();
+    }
+    
+    public String getFirstName() {
+    	if (currentUser == null) {
+    		return "";
+    	} else {
+    		return currentUser.getFirstName();
+    	}
+    }
+    
+    public String getLastName() {
+    	if (currentUser == null) {
+    		return "";
+    	} else {
+    		return currentUser.getLastName();
+    	}
     }
     
     public boolean getHasSiteAdminAccess() {

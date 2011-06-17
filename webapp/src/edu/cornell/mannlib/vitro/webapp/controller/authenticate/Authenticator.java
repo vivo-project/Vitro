@@ -51,10 +51,10 @@ public abstract class Authenticator {
 	// ----------------------------------------------------------------------
 
 	/** Maximum inactive interval for a ordinary logged-in session, in seconds. */
-	public static final int LOGGED_IN_TIMEOUT_INTERVAL = 300;
+	public static final int LOGGED_IN_TIMEOUT_INTERVAL = 60 * 60;
 
 	/** Maximum inactive interval for a editor (or better) session, in seconds. */
-	public static final int PRIVILEGED_TIMEOUT_INTERVAL = 32000;
+	public static final int PRIVILEGED_TIMEOUT_INTERVAL = 60 * 60 * 8;
 
 	/**
 	 * Get the UserAccount for this external ID, or null if there is none.
@@ -96,25 +96,15 @@ public abstract class Authenticator {
 	 * <pre>
 	 * Record that the user has logged in, with all of the housekeeping that 
 	 * goes with it:
-	 * - updating the user record
-	 * - setting login status and timeout limit in the session
+	 * - update the user record
+	 * - set login status and timeout limit in the session
+	 * - refresh the Identifiers on the request
 	 * - record the user in the session map
 	 * - notify other users of the model
 	 * </pre>
 	 */
 	public abstract void recordLoginAgainstUserAccount(UserAccount userAccount,
 			AuthenticationSource authSource);
-
-	/**
-	 * <pre>
-	 * Record that the user has logged in but with only external authentication 
-	 * info, so no internal user account.
-	 * - this involves everything except updating the user record.
-	 * </pre>
-	 * 
-	 * TODO JB This goes away.
-	 */
-	public abstract void recordLoginWithoutUserAccount(String individualUri);
 
 	/**
 	 * <pre>

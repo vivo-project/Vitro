@@ -49,11 +49,6 @@ public class UserAccountsDaoStub implements UserAccountsDao {
 	}
 
 	@Override
-	public boolean isRootUser(UserAccount userAccount) {
-		throw new RuntimeException("UserAccountsDao.isRootUser() not implemented.");
-	}
-
-	@Override
 	public String insertUserAccount(UserAccount userAccount) {
 		throw new RuntimeException(
 				"UserAccountsDaoStub.insertUserAccount() not implemented.");

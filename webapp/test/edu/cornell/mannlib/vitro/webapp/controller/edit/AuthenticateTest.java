@@ -18,10 +18,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Level;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import stubs.edu.cornell.mannlib.vitro.webapp.config.ConfigurationPropertiesStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.dao.IndividualDaoStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDaoStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryStub;
 import stubs.javax.servlet.ServletConfigStub;
@@ -32,7 +35,10 @@ import stubs.javax.servlet.http.HttpSessionStub;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.CommonIdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.AuthenticatorStub;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
@@ -46,6 +52,7 @@ public class AuthenticateTest extends AbstractTestClass {
 	private ServletContextStub servletContext;
 	private WebappDaoFactoryStub webappDaoFactory;
 	private UserAccountsDaoStub userAccountsDao;
+	private IndividualDaoStub individualDao;
 	private ServletConfigStub servletConfig;
 	private HttpSessionStub session;
 	private HttpServletRequestStub request;
@@ -122,8 +129,11 @@ public class AuthenticateTest extends AbstractTestClass {
 		userAccountsDao.addUser(createUserFromUserInfo(OLD_SELF));
 		userAccountsDao.addUser(createUserFromUserInfo(OLD_STRANGER));
 
+		individualDao = new IndividualDaoStub();
+		
 		webappDaoFactory = new WebappDaoFactoryStub();
 		webappDaoFactory.setUserAccountsDao(userAccountsDao);
+		webappDaoFactory.setIndividualDao(individualDao);
 
 		servletContext = new ServletContextStub();
 		servletContext.setAttribute("webappDaoFactory", webappDaoFactory);
@@ -143,6 +153,12 @@ public class AuthenticateTest extends AbstractTestClass {
 
 		auth = new Authenticate();
 		auth.init(servletConfig);
+
+		setLoggerLevel(ConfigurationProperties.class, Level.WARN);
+		new ConfigurationPropertiesStub().setBean(servletContext);
+		
+		ActiveIdentifierBundleFactories.addFactory(servletContext,
+				new CommonIdentifierBundleFactory(servletContext));
 	}
 
 	private UserAccount createUserFromUserInfo(UserInfo userInfo) {

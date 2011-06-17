@@ -100,7 +100,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        // Check to see if the request is for a non-information resource, redirect if it is.
 	        String redirectURL = checkForRedirect ( url, vreq );
 	        if( redirectURL != null ){
-	            return new RedirectResponseValues(redirectURL);
+	            return new RedirectResponseValues(redirectURL, HttpServletResponse.SC_SEE_OTHER);
 	        }            	                                         
 	
 	        Individual individual = null;
@@ -463,12 +463,19 @@ public class IndividualController extends FreemarkerHttpServlet {
 
 		return null;		
     }
- 
 	
-	private static Pattern URI_PATTERN = Pattern.compile("^/individual/([^/]*)$");
-    //Redirect if the request is for http://hostname/individual/localname
-    // if accept is nothing or text/html redirect to ???
-    // if accept is some RDF thing redirect to the URL for RDF
+	/* 
+	 * Following recipe 3 from "Best Practice Recipes for Publishing RDF Vocabularies."
+	 * See http://www.w3.org/TR/swbp-vocab-pub/#recipe3.
+	 * The basic idea is that a URI like http://vivo.cornell.edu/individual/n1234
+	 * identifies a real world individual. HTTP cannot send that as the response
+	 * to a GET request because it can only send bytes and not things. The server 
+	 * sends a 303, to mean "you asked for something I cannot send you, but I can 
+	 * send you this other stream of bytes about that thing." 
+	 * In the case of a request like http://vivo.cornell.edu/individual/n1234/n1234.rdf,
+	 * the request is for a set of bytes rather than an individual, so no 303 is needed.
+     */
+    private static Pattern URI_PATTERN = Pattern.compile("^/individual/([^/]*)$");
 	private String checkForRedirect(String url, VitroRequest vreq) {
 		Matcher m = URI_PATTERN.matcher(url);
 		if( m.matches() && m.groupCount() == 1 ){			
@@ -506,7 +513,11 @@ public class IndividualController extends FreemarkerHttpServlet {
 	protected ContentType checkForLinkedDataRequest(String url, VitroRequest vreq ) {		
 		try {
 		    Matcher m;
-		    // Check for url param specifying format
+		    /*
+		     * Check for url param specifying format.
+		     * Example: http://vivo.cornell.edu/individual/n23?format=rdfxml
+		     * This request will trigger a redirect with a 303.
+		     */
 		    String formatParam = (String) vreq.getParameter("format");
 		    if (formatParam != null) {
 		        m = RDFXML_FORMAT.matcher(formatParam);
@@ -523,7 +534,11 @@ public class IndividualController extends FreemarkerHttpServlet {
 	            } 		        
 		    }
 		    
-			//check the accept header
+			/*
+			 * Check the accept header. This request will trigger a 
+			 * redirect with a 303, because the request is for an individual
+			 * but the server can only provide a set of bytes.
+			 */
 		    String acceptHeader = vreq.getHeader("accept");
 			if (acceptHeader != null) {			    
 				String ctStr = ContentType.getBestContentType(
@@ -538,10 +553,12 @@ public class IndividualController extends FreemarkerHttpServlet {
 			}
 			
 			/*
-			 * check for parts of URL that indicate request for RDF
-			   http://vivo.cornell.edu/individual/n23/n23.rdf
-			   http://vivo.cornell.edu/individual/n23/n23.n3
-			   http://vivo.cornell.edu/individual/n23/n23.ttl
+			 * Check for parts of URL that indicate request for RDF
+			 * http://vivo.cornell.edu/individual/n23/n23.rdf
+			 * http://vivo.cornell.edu/individual/n23/n23.n3
+			 * http://vivo.cornell.edu/individual/n23/n23.ttl
+			 * This request will not trigger a redirect and 303, because
+			 * the request is for a set of bytes rather than an individual.   
 			 */
 	        m = RDF_REQUEST.matcher(url);
 	        if( m.matches() ) {
@@ -555,8 +572,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        if( m.matches() ) {
 	            return ContentType.TURTLE;
 	        }    
-			
-			
+						
 		} catch (Throwable th) {
 			log.error("problem while checking accept header " , th);
 		}

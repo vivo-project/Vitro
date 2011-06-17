@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.email;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,22 +23,30 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.web.directives.EmailDirective;
+import freemarker.core.Environment;
 import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 
 /**
  * A framework that makes it simpler to send email messages with a body built
  * from a Freemarker template.
  * 
- * In fact, the body can be plain text from a template, HTML from a template, or
- * both.
+ * The template must contain the @email directive, which may provide the subject
+ * line, the HTML content, and the plain text content. If these values are not
+ * provided by the directive, they default to empty strings, or to values that
+ * were set by the controller.
+ * 
+ * The directive also calls the send() method here.
+ * 
+ * @see EmailDirective
  */
 public class FreemarkerEmailMessage {
 	private static final Log log = LogFactory
@@ -47,15 +57,15 @@ public class FreemarkerEmailMessage {
 	private final HttpServletRequest req;
 	private final Session session;
 	private final Configuration config;
-	private final ServletContext ctx;
 
 	private final List<Recipient> recipients = new ArrayList<Recipient>();
 	private final InternetAddress replyToAddress;
 
 	private InternetAddress fromAddress = null;
 	private String subject = "";
-	private String htmlTemplateName;
-	private String textTemplateName;
+	private String templateName = "";
+	private String htmlContent = "";
+	private String textContent = "";
 	private Map<String, Object> bodyMap = Collections.emptyMap();
 
 	/**
@@ -66,8 +76,6 @@ public class FreemarkerEmailMessage {
 		this.req = req;
 		this.session = session;
 		this.replyToAddress = replyToAddress;
-
-		this.ctx = req.getSession().getServletContext();
 
 		Object o = req.getAttribute(ATTRIBUTE_NAME);
 		if (!(o instanceof Configuration)) {
@@ -115,10 +123,6 @@ public class FreemarkerEmailMessage {
 
 		try {
 			recipients.add(new Recipient(type, emailAddress, personalName));
-		} catch (AddressException e) {
-			log.warn("invalid recipient address: " + type + ", '"
-					+ emailAddress + "', personal name '" + personalName + "'");
-			return;
 		} catch (UnsupportedEncodingException e) {
 			log.warn("invalid recipient address: " + type + ", '"
 					+ emailAddress + "', personal name '" + personalName + "'");
@@ -130,27 +134,41 @@ public class FreemarkerEmailMessage {
 		this.subject = nonNull(subject, "");
 	}
 
-	public void setHtmlTemplate(String templateName) {
-		this.htmlTemplateName = nonNull(templateName, "");
+	public void setHtmlContent(String htmlContent) {
+		this.htmlContent = nonNull(htmlContent, "");
 	}
 
-	public void setTextTemplate(String templateName) {
-		this.textTemplateName = nonNull(templateName, "");
+	public void setTextContent(String textContent) {
+		this.textContent = nonNull(textContent, "");
+	}
+
+	public void setTemplate(String templateName) {
+		this.templateName = nonNull(templateName, "");
 	}
 
 	public void setBodyMap(Map<String, Object> body) {
 		if (body == null) {
 			this.bodyMap = Collections.emptyMap();
 		} else {
-			this.bodyMap = Collections
-					.unmodifiableMap(new HashMap<String, Object>(body));
+			this.bodyMap = new HashMap<String, Object>(body);
+		}
+	}
+
+	public void processTemplate() {
+		bodyMap.putAll(FreemarkerHttpServlet.getDirectivesForAllEnvironments());
+		bodyMap.put("email", new EmailDirective(this));
+
+		try {
+			Template template = config.getTemplate(templateName);
+			template.process(bodyMap, new StringWriter());
+		} catch (TemplateException e) {
+			log.error(e, e);
+		} catch (IOException e) {
+			log.error(e, e);
 		}
 	}
 
 	public void send() {
-		String textBody = figureMessageBody(textTemplateName);
-		String htmlBody = figureMessageBody(htmlTemplateName);
-
 		try {
 			MimeMessage msg = new MimeMessage(session);
 			msg.setReplyTo(new Address[] { replyToAddress });
@@ -167,19 +185,19 @@ public class FreemarkerEmailMessage {
 
 			msg.setSubject(subject);
 
-			if (textBody.isEmpty()) {
-				if (htmlBody.isEmpty()) {
+			if (textContent.isEmpty()) {
+				if (htmlContent.isEmpty()) {
 					log.error("Message has neither text body nor HTML body");
 				} else {
-					msg.setContent(htmlBody, "text/html");
+					msg.setContent(htmlContent, "text/html");
 				}
 			} else {
-				if (htmlBody.isEmpty()) {
-					msg.setContent(textBody, "text/plain");
+				if (htmlContent.isEmpty()) {
+					msg.setContent(textContent, "text/plain");
 				} else {
 					MimeMultipart content = new MimeMultipart("alternative");
-					addBodyPart(content, textBody, "text/plain");
-					addBodyPart(content, htmlBody, "text/html");
+					addBodyPart(content, textContent, "text/plain");
+					addBodyPart(content, htmlContent, "text/html");
 					msg.setContent(content);
 				}
 			}
@@ -190,26 +208,6 @@ public class FreemarkerEmailMessage {
 
 		} catch (MessagingException e) {
 			log.error("Failed to send message.", e);
-		}
-	}
-
-	/**
-	 * Process the template. If there is no template name or if there is a
-	 * problem with the process, return an empty string.
-	 */
-	private String figureMessageBody(String templateName) {
-		if (templateName.isEmpty()) {
-			return "";
-		}
-
-		try {
-			TemplateProcessingHelper helper = new TemplateProcessingHelper(
-					config, req, ctx);
-			return helper.processTemplate(templateName, bodyMap).toString();
-		} catch (TemplateProcessingException e) {
-			log.warn("Exception while processing email template '"
-					+ templateName + "'", e);
-			return "";
 		}
 	}
 
@@ -235,7 +233,7 @@ public class FreemarkerEmailMessage {
 		}
 
 		public Recipient(RecipientType type, String address, String personalName)
-				throws AddressException, UnsupportedEncodingException {
+				throws UnsupportedEncodingException {
 			this.type = type;
 			this.address = new InternetAddress(address, personalName);
 		}

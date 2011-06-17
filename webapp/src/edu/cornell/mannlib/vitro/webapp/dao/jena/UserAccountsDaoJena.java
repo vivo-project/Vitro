@@ -103,6 +103,7 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 					USERACCOUNT_EXTERNAL_AUTH_ID));
 			u.setPermissionSetUris(getPropertyResourceURIValues(r,
 					USERACCOUNT_HAS_PERMISSION_SET));
+			u.setRootUser(isResourceOfType(r, USERACCOUNT_ROOT_USER));
 			return u;
 		} finally {
 			getOntModel().leaveCriticalSection();
@@ -158,21 +159,6 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 	}
 
 	@Override
-	public boolean isRootUser(UserAccount userAccount) {
-		if (userAccount == null) {
-			return false;
-		}
-
-		getOntModel().enterCriticalSection(Lock.READ);
-		try {
-			OntResource r = getOntModel().getOntResource(userAccount.getUri());
-			return isResourceOfType(r, USERACCOUNT_ROOT_USER);
-		} finally {
-			getOntModel().leaveCriticalSection();
-		}
-	}
-
-	@Override
 	public String insertUserAccount(UserAccount userAccount) {
 		if (userAccount == null) {
 			throw new NullPointerException("userAccount may not be null.");
@@ -213,6 +199,10 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 			updatePropertyResourceURIValues(res,
 					USERACCOUNT_HAS_PERMISSION_SET,
 					userAccount.getPermissionSetUris(), model);
+
+			if (userAccount.isRootUser()) {
+				model.add(res, RDF.type, USERACCOUNT_ROOT_USER);
+			}
 
 			userAccount.setUri(userUri);
 			return userUri;
@@ -268,6 +258,13 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 			updatePropertyResourceURIValues(res,
 					USERACCOUNT_HAS_PERMISSION_SET,
 					userAccount.getPermissionSetUris(), model);
+
+			if (userAccount.isRootUser()) {
+				model.add(res, RDF.type, USERACCOUNT_ROOT_USER);
+			} else {
+				model.remove(res, RDF.type, USERACCOUNT_ROOT_USER);
+			}
+
 		} finally {
 			model.leaveCriticalSection();
 		}
@@ -367,7 +364,7 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 		throw new InsertException("Could not create URI for individual: "
 				+ errMsg);
 	}
-	
+
 	private boolean isUriUsed(String uri) {
 		return (getOntModel().getOntResource(uri) != null);
 	}
@@ -385,7 +382,7 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 		if (type == null) {
 			return false;
 		}
-		
+
 		StmtIterator stmts = getOntModel().listStatements(r, RDF.type, type);
 		if (stmts.hasNext()) {
 			stmts.close();

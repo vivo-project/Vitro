@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import freemarker.core.Environment;
+import freemarker.template.SimpleScalar;
 import freemarker.template.TemplateDirectiveBody;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
@@ -44,11 +45,18 @@ public class UrlDirective extends BaseTemplateDirectiveModel {
                 "The url directive doesn't allow nested content.");
         } 
         
-        String path = params.get("path").toString();
-        if (path == null) {
+        Object o = params.get("path");
+        if (o == null) {
             throw new TemplateModelException(
                 "The url directive requires a value for parameter 'path'.");
         }
+        
+        if (! ( o instanceof SimpleScalar)) {
+            throw new TemplateModelException(
+                "The url directive requires a string value for parameter 'path'.");
+        }
+        
+        String path = o.toString();
         
         if (!path.startsWith("/")) {
             throw new TemplateModelException(
@@ -60,6 +68,7 @@ public class UrlDirective extends BaseTemplateDirectiveModel {
         out.write(url);
     }
 
+    @Override
     public Map<String, Object> help(String name) {
         Map<String, Object> map = new LinkedHashMap<String, Object>();
 
@@ -77,6 +86,5 @@ public class UrlDirective extends BaseTemplateDirectiveModel {
         
         return map;
     }
-
     
 }

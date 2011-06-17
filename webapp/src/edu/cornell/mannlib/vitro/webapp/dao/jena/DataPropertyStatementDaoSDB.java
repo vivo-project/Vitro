@@ -57,15 +57,13 @@ public class DataPropertyStatementDaoSDB extends DataPropertyStatementDaoJena
         }
         else
         {
-            String[] graphVars = { "?g" };
         	String query = 
 	        	"CONSTRUCT { \n" +
 			       "   <" + entity.getURI() + "> ?p ?o . \n" +
-			       "} WHERE { GRAPH ?g { \n" +
+			       "} WHERE { \n" +
 			       "   <" + entity.getURI() + "> ?p ?o . \n" +
 			       "   FILTER(isLiteral(?o)) \n" +
-			       WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
-	            "} }" ;
+	            "}" ;
         	Model results = null;
         	DatasetWrapper w = dwf.getDatasetWrapper();
             Dataset dataset = w.getDataset();
