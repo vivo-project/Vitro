@@ -114,7 +114,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        	return doNotFound(vreq);
 	        }
 
-            ContentType rdfFormat = checkForLinkedDataRequest(url, vreq);
+            ContentType rdfFormat = checkUrlForLinkedDataRequest(url, vreq);
             if( rdfFormat != null ){
                 return doRdf(vreq, individual, rdfFormat);
             }   
@@ -472,110 +472,119 @@ public class IndividualController extends FreemarkerHttpServlet {
 	 * to a GET request because it can only send bytes and not things. The server 
 	 * sends a 303, to mean "you asked for something I cannot send you, but I can 
 	 * send you this other stream of bytes about that thing." 
-	 * In the case of a request like http://vivo.cornell.edu/individual/n1234/n1234.rdf,
+	 * In the case of a request like http://vivo.cornell.edu/individual/n1234/n1234.rdf
+	 * or http://vivo.cornell.edu/individual/n1234?format=rdfxml,
 	 * the request is for a set of bytes rather than an individual, so no 303 is needed.
      */
     private static Pattern URI_PATTERN = Pattern.compile("^/individual/([^/]*)$");
 	private String checkForRedirect(String url, VitroRequest vreq) {
-		Matcher m = URI_PATTERN.matcher(url);
-		if( m.matches() && m.groupCount() == 1 ){			
-			ContentType c = checkForLinkedDataRequest(url, vreq);			
-			if( c != null ){
-				String redirectUrl = "/individual/" + m.group(1) + "/" + m.group(1) ; 
-				if( RDFXML_MIMETYPE.equals( c.getMediaType())  ){
-					return redirectUrl + ".rdf";
-				}else if( N3_MIMETYPE.equals( c.getMediaType() )){
-					return redirectUrl + ".n3";
-				}else if( TTL_MIMETYPE.equals( c.getMediaType() )){
-					return redirectUrl + ".ttl";
-				}//else send them to html													
-			}
-			//else redirect to HTML representation
-			return "display/" + m.group(1);
-		}else{			
-			return null;
-		}
+	   
+	    String formatParam = (String) vreq.getParameter("format");
+	    if ( formatParam == null ) {
+	        Matcher m = URI_PATTERN.matcher(url);
+    		if ( m.matches() && m.groupCount() == 1 ) {			
+    			ContentType c = checkAcceptHeaderForLinkedDataRequest(url, vreq);			
+    			if ( c != null ) {
+    				String redirectUrl = "/individual/" + m.group(1) + "/" + m.group(1) ; 
+    				if ( RDFXML_MIMETYPE.equals( c.getMediaType() ) ) {
+    					return redirectUrl + ".rdf";
+    				} else if ( N3_MIMETYPE.equals( c.getMediaType() ) ) {
+    					return redirectUrl + ".n3";
+    				} else if ( TTL_MIMETYPE.equals( c.getMediaType() ) ) {
+    					return redirectUrl + ".ttl";
+    				}//else send them to html													
+    			}
+    			//else redirect to HTML representation
+    			return "display/" + m.group(1);
+    		} 
+	    }
+	    return null;
 	}
 
-	private static Pattern RDF_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.rdf$");
-    private static Pattern N3_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.n3$");
-    private static Pattern TTL_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.ttl$");
-    private static Pattern HTML_REQUEST = Pattern.compile("^/display/([^/]*)$");
-    
+    protected ContentType checkAcceptHeaderForLinkedDataRequest(String url, VitroRequest vreq) {
+        try {
+            /*
+             * Check the accept header. This request will trigger a 
+             * redirect with a 303 ("see also"), because the request is for 
+             * an individual but the server can only provide a set of bytes.
+             */
+            String acceptHeader = vreq.getHeader("accept");
+            if (acceptHeader != null) {             
+                String ctStr = ContentType.getBestContentType(
+                        ContentType.getTypesAndQ(acceptHeader), 
+                        getAcceptedContentTypes());
+                                
+                if (ctStr!=null && (
+                        RDFXML_MIMETYPE.equals(ctStr) || 
+                        N3_MIMETYPE.equals(ctStr) ||
+                        TTL_MIMETYPE.equals(ctStr) ))
+                    return new ContentType(ctStr);              
+            }            
+        } catch (Throwable th) {
+            log.error("Problem while checking accept header " , th);
+        }
+        return null;
+    }
+
     public static final Pattern RDFXML_FORMAT = Pattern.compile("rdfxml");
     public static final Pattern N3_FORMAT = Pattern.compile("n3");
     public static final Pattern TTL_FORMAT = Pattern.compile("ttl");
     
+    private static Pattern RDF_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.rdf$");
+    private static Pattern N3_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.n3$");
+    private static Pattern TTL_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.ttl$");
+    private static Pattern HTML_REQUEST = Pattern.compile("^/display/([^/]*)$");
+    
     /**  
      * @return null if this is not a linked data request, returns content type if it is a 
-     * linked data request.
+     * linked data request. 
+     * These are Vitro-specific ways of requesting rdf, unrelated to semantic web standards.
+     * They do not trigger a redirect with a 303, because the request is for a set of bytes
+     * rather than an individual.
      */
-	protected ContentType checkForLinkedDataRequest(String url, VitroRequest vreq ) {		
-		try {
-		    Matcher m;
-		    /*
-		     * Check for url param specifying format.
-		     * Example: http://vivo.cornell.edu/individual/n23?format=rdfxml
-		     * This request will trigger a redirect with a 303.
-		     */
-		    String formatParam = (String) vreq.getParameter("format");
-		    if (formatParam != null) {
-		        m = RDFXML_FORMAT.matcher(formatParam);
-		        if ( m.matches() ) {
-		            return  ContentType.RDFXML;
-		        }
-	            m = N3_FORMAT.matcher(formatParam);
-	            if( m.matches() ) {
-	                return  ContentType.N3;
-	            }
-	            m = TTL_FORMAT.matcher(formatParam);
-	            if( m.matches() ) {
-	                return  ContentType.TURTLE;
-	            } 		        
-		    }
-		    
-			/*
-			 * Check the accept header. This request will trigger a 
-			 * redirect with a 303, because the request is for an individual
-			 * but the server can only provide a set of bytes.
-			 */
-		    String acceptHeader = vreq.getHeader("accept");
-			if (acceptHeader != null) {			    
-				String ctStr = ContentType.getBestContentType(
-				        ContentType.getTypesAndQ(acceptHeader), 
-				        getAcceptedContentTypes());
-								
-				if (ctStr!=null && (
-						RDFXML_MIMETYPE.equals(ctStr) || 
-						N3_MIMETYPE.equals(ctStr) ||
-						TTL_MIMETYPE.equals(ctStr) ))
-					return new ContentType(ctStr);				
-			}
-			
-			/*
-			 * Check for parts of URL that indicate request for RDF
-			 * http://vivo.cornell.edu/individual/n23/n23.rdf
-			 * http://vivo.cornell.edu/individual/n23/n23.n3
-			 * http://vivo.cornell.edu/individual/n23/n23.ttl
-			 * This request will not trigger a redirect and 303, because
-			 * the request is for a set of bytes rather than an individual.   
-			 */
-	        m = RDF_REQUEST.matcher(url);
-	        if( m.matches() ) {
-	            return ContentType.RDFXML;
+	protected ContentType checkUrlForLinkedDataRequest(String url, VitroRequest vreq ) {		
+
+	    Matcher m;
+	    
+	    /*
+	     * Check for url param specifying format.
+	     * Example: http://vivo.cornell.edu/individual/n23?format=rdfxml
+	     */
+	    String formatParam = (String) vreq.getParameter("format");
+	    if (formatParam != null) {
+	        m = RDFXML_FORMAT.matcher(formatParam);
+	        if ( m.matches() ) {
+	            return  ContentType.RDFXML;
 	        }
-	        m = N3_REQUEST.matcher(url);
-	        if( m.matches() ) {
-	            return ContentType.N3;
-	        }
-	        m = TTL_REQUEST.matcher(url);
-	        if( m.matches() ) {
-	            return ContentType.TURTLE;
-	        }    
+            m = N3_FORMAT.matcher(formatParam);
+            if( m.matches() ) {
+                return  ContentType.N3;
+            }
+            m = TTL_FORMAT.matcher(formatParam);
+            if( m.matches() ) {
+                return  ContentType.TURTLE;
+            } 		        
+	    }
+
+		/*
+		 * Check for parts of URL that indicate request for RDF. Examples:
+		 * http://vivo.cornell.edu/individual/n23/n23.rdf
+		 * http://vivo.cornell.edu/individual/n23/n23.n3
+		 * http://vivo.cornell.edu/individual/n23/n23.ttl
+		 */
+        m = RDF_REQUEST.matcher(url);
+        if( m.matches() ) {
+            return ContentType.RDFXML;
+        }
+        m = N3_REQUEST.matcher(url);
+        if( m.matches() ) {
+            return ContentType.N3;
+        }
+        m = TTL_REQUEST.matcher(url);
+        if( m.matches() ) {
+            return ContentType.TURTLE;
+        }    
 						
-		} catch (Throwable th) {
-			log.error("problem while checking accept header " , th);
-		}
 		return null;
 	}  
 	
