@@ -22,6 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
 
+
 /**
  * The IndexBuilder is used to rebuild or update a search index.
  * There should only be one IndexBuilder in a vitro web application.
@@ -282,6 +283,8 @@ public class IndexBuilder extends Thread {
      * @throws AbortIndexing 
      */
     private void indexForSource(Iterator<Individual> individuals , boolean newDocs) throws AbortIndexing{     
+        
+       
         long starttime = System.currentTimeMillis();         
         long count = 0;
         while(individuals.hasNext()){
@@ -290,7 +293,8 @@ public class IndexBuilder extends Thread {
             
             Individual ind = null;
             try{
-                ind = individuals.next();                                
+                ind = individuals.next();     
+                         
                 indexer.index(ind, newDocs);                         
             }catch(Throwable ex){
                 if( stopRequested || log == null){//log might be null if system is shutting down.
@@ -387,5 +391,7 @@ public class IndexBuilder extends Thread {
     
     private class AbortIndexing extends Exception {
     	// Just a vanilla exception
-    }    
+    }  
+    
 }
+

@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -37,8 +38,8 @@ import edu.cornell.mannlib.vitro.webapp.search.VitroTermNames;
 
 public class CalculateParameters implements DocumentModifier {
 
-	Model fullModel;
-    int totalInd;
+	private Dataset dataset;
+    public static int totalInd=1;
     public static Map<String,Float> betaMap = new Hashtable<String,Float>();
     private float phi;
     private static final String prefix = "prefix owl: <http://www.w3.org/2002/07/owl#> "
@@ -50,6 +51,17 @@ public class CalculateParameters implements DocumentModifier {
 		+ " prefix localNav: <http://vitro.mannlib.cornell.edu/ns/localnav#>  "
 		+ " prefix bibo: <http://purl.org/ontology/bibo/>  ";
     
+    private static final String betaQuery = prefix + " SELECT count(distinct ?inLinks) " +
+    		" WHERE { " +
+    		" ?uri rdf:type owl:Thing . " +
+    		" ?inLinks ?prop ?uri . " +
+    		" } ";
+    
+    private static final String totalCountQuery = prefix + " SELECT count(distinct ?ind) " +
+	" WHERE { " +
+	" ?ind rdf:type owl:Thing . " +
+	" } ";
+     
     private static Log log = LogFactory.getLog(CalculateParameters.class);
     
     private static final String[] fieldsToAddBetaTo = {
@@ -64,20 +76,40 @@ public class CalculateParameters implements DocumentModifier {
         VitroTermNames.ALLTEXTUNSTEMMED,                
     };
 	
-	public CalculateParameters(OntModel fullModel){
-		 this.fullModel=fullModel;
-	     this.totalInd = fullModel.listIndividuals().toList().size();
+	public CalculateParameters(Dataset dataset){
+		 this.dataset =dataset;
+		 new Thread(new TotalInd(this.dataset,totalCountQuery)).start();
 	}
 	
 	public float calculateBeta(String uri){
-        float beta=0;
-        RDFNode node = (Resource) fullModel.getResource(uri); 
-        StmtIterator stmtItr = fullModel.listStatements((Resource)null, (Property)null,node);
-        int Conn = stmtItr.toList().size();
-        beta = (float)Conn/totalInd;
-        beta *= 100;
-        beta += 1;
-        return beta; 
+		float beta=0;
+		int Conn=0; 
+		Query query;
+		QuerySolutionMap initialBinding = new QuerySolutionMap();
+		QuerySolution soln = null;
+		Resource uriResource = ResourceFactory.createResource(uri);
+		initialBinding.add("uri", uriResource);
+		dataset.getLock().enterCriticalSection(Lock.READ);
+
+		try{
+			query = QueryFactory.create(betaQuery,Syntax.syntaxARQ);
+			QueryExecution qexec = QueryExecutionFactory.create(query,dataset,initialBinding);
+			ResultSet results = qexec.execSelect();
+			List<String> resultVars = results.getResultVars();
+			if(resultVars!=null && resultVars.size()!=0){
+				soln = results.next();
+				Conn = Integer.parseInt(soln.getLiteral(resultVars.get(0)).getLexicalForm());
+			}
+		}catch(Throwable t){
+			log.error(t,t);
+		}finally{
+			dataset.getLock().leaveCriticalSection();
+		}
+
+		beta = (float)Conn/totalInd;
+		beta *= 100;
+		beta += 1;
+		return beta; 
     }
 	
 	public float calculatePhi(StringBuffer adjNodes){
@@ -185,7 +217,7 @@ public class CalculateParameters implements DocumentModifier {
     	
     	Iterator<String> queryItr = queryList.iterator();
     	
-    	fullModel.enterCriticalSection(Lock.READ);
+    	dataset.getLock().enterCriticalSection(Lock.READ);
     	Resource adjacentIndividual = null;
     	RDFNode coauthor = null;
     	try{
@@ -194,7 +226,7 @@ public class CalculateParameters implements DocumentModifier {
     				queryItr.next(); // we don't want first query to execute if the ind is not a person. 
     			}
     			query = QueryFactory.create(queryItr.next(),Syntax.syntaxARQ);
-    			QueryExecution qexec = QueryExecutionFactory.create(query,fullModel,initialBinding);
+    			QueryExecution qexec = QueryExecutionFactory.create(query,dataset,initialBinding);
     			try{
     					ResultSet results = qexec.execSelect();
     					while(results.hasNext()){
@@ -235,7 +267,7 @@ public class CalculateParameters implements DocumentModifier {
     	catch(Throwable t){
     		log.error(t,t);
     	}finally{
-    		fullModel.leaveCriticalSection();
+    		dataset.getLock().leaveCriticalSection();
     		adjacentNodes = null;
     		adjacentNodesConcat = null;
     		coauthorBuff = null;
@@ -282,4 +314,41 @@ public class CalculateParameters implements DocumentModifier {
         log.debug("Parameter calculation is done");
 	}
 	
+}
+
+class TotalInd implements Runnable{
+	private Dataset dataset;
+	private String totalCountQuery;
+	private static Log log = LogFactory.getLog(TotalInd.class);
+	
+	public TotalInd(Dataset dataset,String totalCountQuery){
+		this.dataset = dataset;
+		this.totalCountQuery = totalCountQuery;
+		
+	}
+	public void run(){
+		    int totalInd=0;
+	        Query query;
+	    	QuerySolution soln = null;
+			dataset.getLock().enterCriticalSection(Lock.READ);
+			
+			try{
+				query = QueryFactory.create(totalCountQuery,Syntax.syntaxARQ);
+				QueryExecution qexec = QueryExecutionFactory.create(query,dataset);
+				ResultSet results = qexec.execSelect();
+				List<String> resultVars = results.getResultVars();
+				
+				if(resultVars!=null && resultVars.size()!=0){
+					soln = results.next();
+					totalInd = Integer.parseInt(soln.getLiteral(resultVars.get(0)).getLexicalForm());
+				}
+				CalculateParameters.totalInd = totalInd;
+				log.info("Total number of individuals in the system are : " + CalculateParameters.totalInd);
+			}catch(Throwable t){
+				log.error(t,t);
+			}finally{
+				dataset.getLock().leaveCriticalSection();
+			}
+		
+	}
 }

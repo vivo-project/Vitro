@@ -76,7 +76,8 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             
             List<DocumentModifier> modifiers = new ArrayList<DocumentModifier>();
            // modifiers.add(new CalculateParameters(ModelContext.getJenaOntModel(context)));
-            modifiers.add(new ContextNodeFields( dataset ));
+            modifiers.add(new CalculateParameters(dataset));
+            modifiers.add(new ContextNodeFields(dataset));
             
             IndividualToSolrDocument indToSolrDoc = new IndividualToSolrDocument(
             		new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel),

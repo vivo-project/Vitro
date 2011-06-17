@@ -125,8 +125,10 @@ public class SolrIndexer implements IndexerIface {
         } catch(IOException e){
         	log.error("Could not commit to solr server", e);
         }finally{
-        	CalculateParameters.betaMap.clear();
-        	CalculateParameters.betaMap = null;
+        	if(CalculateParameters.betaMap!=null){
+        		CalculateParameters.betaMap.clear();
+        		CalculateParameters.betaMap = null;
+        	}
         }
         
         try {
