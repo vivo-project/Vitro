@@ -20,7 +20,6 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.Syntax;
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -44,6 +43,7 @@ public class ContextNodeFields implements DocumentModifier{
 	private static final List<String> singleValuedQueriesForInformationResource = new ArrayList<String>();
 	private static final List<String> multiValuedQueriesForAgent = new ArrayList<String>();
 	private static final String multiValuedQueryForInformationResource;
+//	private static StringBuffer objectProperties = new StringBuffer();
 	
    private Log log = LogFactory.getLog(ContextNodeFields.class);
    private Dataset dataset;
@@ -61,7 +61,7 @@ public class ContextNodeFields implements DocumentModifier{
 	 *TODO:
 	 * consider reducing the code in this class using a method like the following:
 	 */	 
-	public String runQuery( Individual individual, String query ){
+	public StringBuffer runQuery( Individual individual, String query ){
 	    StringBuffer propertyValues = new StringBuffer();
             
         QuerySolutionMap initialBinding = new QuerySolutionMap();
@@ -96,7 +96,7 @@ public class ContextNodeFields implements DocumentModifier{
             dataset.getLock().leaveCriticalSection();
         }
         
-        return propertyValues.toString();
+        return propertyValues;
 	}	 		
 
 
@@ -113,8 +113,27 @@ public class ContextNodeFields implements DocumentModifier{
   
     	if(IndividualToSolrDocument.superClassNames.contains("Agent")){
     		objectProperties.append(" ");
-    		for(String query : multiValuedQueriesForAgent){
-    			objectProperties.append(runQuery(individual, query));
+    		
+    		int threadCount = multiValuedQueriesForAgent.size();
+    		QueryRunner[] threads = new QueryRunner[threadCount];
+    		
+    		
+    		//Make a thread for each query and start it.
+    		for(int i= 0; i < threadCount; i++){
+    			QueryRunner t = new QueryRunner(individual, multiValuedQueriesForAgent.get(i));
+    			t.start();
+    			threads[i] = t;
+    		}
+    		
+    		//Wait for each thread to finish and collect results
+    		for(int i = 0 ; i < threadCount ; i++){
+    			try {
+					threads[i].join();
+					objectProperties.append(  threads[i].getPropertyValues() ) ;
+					threads[i] = null;
+				} catch (InterruptedException e) {
+					log.error("Thread " + threads[i].getName() + " interrupted!");
+				}
     		}
     	}
 
@@ -366,6 +385,65 @@ public class ContextNodeFields implements DocumentModifier{
 					
 					+"}" ;
 	
+	}
+	
+	
+	private class QueryRunner extends Thread{
+		
+		private Individual ind;
+		private String query;
+		private StringBuffer propertyValues = new StringBuffer();
+		
+		public String getPropertyValues(){
+			return propertyValues.toString();
+		}
+		
+		public QueryRunner(Individual ind, String query){
+			this.ind = ind;
+			this.query = query;
+		}
+		
+		
+		public void run(){
+		  //  StringBuffer propertyValues = new StringBuffer();
+			
+			propertyValues.append(runQuery(ind, query));
+			
+            
+//	        QuerySolutionMap initialBinding = new QuerySolutionMap();
+//	        Resource uriResource = ResourceFactory.createResource(ind.getURI());        
+//	        initialBinding.add("uri", uriResource);
+//	        
+//	        Query sparqlQuery = QueryFactory.create( query, Syntax.syntaxARQ);
+//			dataset.getLock().enterCriticalSection(Lock.READ);
+//	        try{
+//	            QueryExecution qExec = QueryExecutionFactory.create(sparqlQuery, dataset, initialBinding);
+//	            try{                
+//	                ResultSet results = qExec.execSelect();                
+//	                while(results.hasNext()){                    
+//	                    QuerySolution soln = results.nextSolution();                                   
+//	                    Iterator<String> iter =  soln.varNames() ;
+//	                    while( iter.hasNext()){
+//	                        String name = iter.next();
+//	                        RDFNode node = soln.get( name );
+//	                        if( node != null ){
+//	                            propertyValues.append(" " + node.toString());
+//	                        }else{
+//	                            log.debug(name + " is null");
+//	                        }                        
+//	                    }
+//	                }
+//	            }catch(Throwable t){
+//	                log.error(t,t);
+//	            } finally{
+//	                qExec.close();
+//	            } 
+//	        }finally{
+//	            dataset.getLock().leaveCriticalSection();
+//	        }
+//	        
+	       //objectProperties.append(propertyValues.toString());
+		}
 	}
 
     
