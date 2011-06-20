@@ -334,13 +334,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	private ResponseValues doRdf(VitroRequest vreq, Individual individual,
 			ContentType rdfFormat) throws IOException, ServletException {    	
 				
-		OntModel ontModel = null;
-		HttpSession session = vreq.getSession(false);
-		if( session != null )
-			ontModel = (OntModel)session.getAttribute("jenaOntModel");		
-		if( ontModel == null)
-			ontModel = (OntModel)getServletContext().getAttribute("jenaOntModel");
-		
+		OntModel ontModel = vreq.getJenaOntModel();		
                 
         String[] includes = vreq.getParameterValues("include");
 		Model newModel = getRDF(individual,ontModel,ModelFactory.createDefaultModel(),0,includes);		

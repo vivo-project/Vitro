@@ -933,21 +933,18 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 		if (ind.getModel().contains((Resource) null, RDF.type, (RDFNode) null)){
 		    tempModel = ind.getModel();
 		} else {
+			String[] graphVars = { "?g" };
     		String getTypes = 
         		"CONSTRUCT{ <" + this.individualURI + "> <" + RDF.type +
         		        "> ?types }\n" +
-        		"WHERE{ GRAPH " + 
-        		((direct) 
-        		    ? "<http://vitro.mannlib.cornell.edu/default/vitro-kb-2>" 
-        		    : "?g") 
-        		+ " { <" + this.individualURI +"> <" +RDF.type+ "> ?types } \n" ;
-    		
-    		    if (!direct) {
-    		        String[] graphVars = { "?g" };
-    		        getTypes += WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode);
-    		    }
-    		
-        		getTypes += "} \n";        	
+        		"WHERE{ GRAPH ?g"   
+        		+ " { <" + this.individualURI +"> <" +RDF.type+ "> ?types } \n" 
+   		        + WebappDaoFactorySDB.getFilterBlock(
+   		        		graphVars, (direct 
+   		        				? WebappDaoFactorySDB.SDBDatasetMode
+   		        						.ASSERTIONS_ONLY 
+   		        			    : datasetMode)) 
+        		+ "} \n";        	
         	DatasetWrapper w = getDatasetWrapper();
         	Dataset dataset = w.getDataset();
         	dataset.getLock().enterCriticalSection(Lock.READ);

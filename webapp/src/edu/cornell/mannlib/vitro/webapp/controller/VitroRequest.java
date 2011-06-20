@@ -70,6 +70,10 @@ public class VitroRequest extends HttpServletRequestWrapper {
     	setAttribute("dataset", dataset);
     }
     
+    public void setJenaOntModel(OntModel ontModel) {
+    	setAttribute("jenaOntModel", ontModel);
+    }
+    
     /** gets assertions + inferences WebappDaoFactory with no filtering **/
     public WebappDaoFactory getFullWebappDaoFactory() {
     	Object webappDaoFactoryAttr = _req.getAttribute("fullWebappDaoFactory");
@@ -106,6 +110,10 @@ public class VitroRequest extends HttpServletRequestWrapper {
     }
     
     public OntModel getJenaOntModel() {
+    	Object ontModel = getAttribute("jenaOntModel");
+    	if (ontModel instanceof OntModel) {
+    		return (OntModel) ontModel;
+    	}
     	OntModel jenaOntModel = (OntModel)_req.getSession().getAttribute( JenaBaseDao.JENA_ONT_MODEL_ATTRIBUTE_NAME );
     	if ( jenaOntModel == null ) {
     		jenaOntModel = (OntModel)_req.getSession().getServletContext().getAttribute( JenaBaseDao.JENA_ONT_MODEL_ATTRIBUTE_NAME );
