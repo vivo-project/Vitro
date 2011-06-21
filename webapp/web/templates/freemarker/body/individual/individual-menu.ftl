@@ -1,25 +1,32 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#-- Default VIVO individual profile page template (extends individual.ftl in vitro) -->
+<#-- Menu management page (uses individual display mechanism) -->
+
+<#import "lib-properties.ftl" as p>
 
 <#include "individual-setup.ftl">
 
-<#assign individualProductExtension>
-    <#-- Include for any class specific template additions -->
-    ${classSpecificExtension!}
-    
-    <#include "individual-overview.ftl">
-        </section> <!-- #individual-info -->
-    </section> <!-- #individual-intro -->
-</#assign>
-
-<#assign nameForOtherGroup = "other"> <#-- used by both individual-propertyGroupMenu.ftl and individual-properties.ftl -->
-
 <h3>Menu management</h3>
 
-<#-- Menu Ontology properties -->
-<#include "individual-menu-properties.ftl">
+<#assign hasElement = propertyGroups.pullProperty("${namespaces.display}hasElement")>
 
+<#-- List the menu items -->
+<#list hasElement.statements as statement>
+    <#-- can we just provide the name of the template? -->
+    Position | <#include "${hasElement.template}"> | <@p.editingLinks "hasElement" statement editable /> <br />
+</#list>
+
+<br /> <#-- remove this once styles are applied -->
+
+<#-- Link to add a new menu item -->
+<#if editable>
+    <#assign addUrl = hasElement.addUrl>
+    <#if addUrl?has_content>
+        <a class="add-hasElement green button" href="${addUrl}" title="Add new menu item">Add menu item</a>
+    </#if>
+</#if>
+
+<#-- Remove unneeded scripts and stylesheets -->
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/individual/individual.css" />',
                   '<link rel="stylesheet" href="${urls.base}/css/individual/individual-vivo.css" />')}
 

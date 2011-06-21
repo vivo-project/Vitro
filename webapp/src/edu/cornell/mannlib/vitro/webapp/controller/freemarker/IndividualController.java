@@ -78,6 +78,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     private static final String INCLUDE_ALL = "all";
     
     private static final Map<String, String> namespaces = new HashMap<String, String>() {{
+        put("display", VitroVocabulary.DISPLAY);
         put("vitro", VitroVocabulary.vitroURI);
         put("vitroPublic", VitroVocabulary.VITRO_PUBLIC);
     }};
