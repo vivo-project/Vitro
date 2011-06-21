@@ -17,8 +17,12 @@ presents some admirably clear rules for capitalizing titles:
   (1) a, an, and the,
   (2) two and three letter conjunctions (and, or, nor, for, but, so, yet),
   (3) prepositions.
-  Exceptions:  The first and last words are always capitalized even
-  if they are among the above three groups.
+  Exceptions:  The first word is always capitalized even
+  if it is among the above three groups. For the last word, we can specify the
+  option to always capitalize it or to treat it like a medial word. The original
+  method always capitalized the final word, so to support the old method calls
+  we have defined another method to provide this as default behavior.
+  
 
 But consider the case:
   "It Waits Underneath the Sea"
@@ -34,14 +38,19 @@ The default entries on the exception list are:
      to of by at for but in with has
      de von
 The observant may note that the last row is not composed of English words. The honorary
-"de" has been included in honor of "Honoré de Balzac". And "von" was added for the sake
+"de" has been included in honor of "Honore' de Balzac". And "von" was added for the sake
 of equal time.
  */
 public class TitleCase {
     static String ignore[] = {"a","an","the","and","or","nor","for","but","so","yet",
             "to","of","by","at","for","but","in","with","has","de","von"};
+        
+    public static String toTitleCase(String in) {
+        // Support old behavior without modifying method calls
+        return toTitleCase(in, true);
+    }
 
-    public static String toTitleCase(String in){
+    public static String toTitleCase(String in, boolean alwaysCapitalizeLast){
         if( in == null || in.length() ==0 )
             return in;
 
@@ -55,9 +64,12 @@ public class TitleCase {
         while(st.hasMoreTokens()){
             String token = st.nextToken();
 
-            //always capatize first and last
-            if( count == 1 || count == last ){
+            // always capitalize first 
+            if ( count == 1 || 
+                    // always capitalize last, unless we've asked not to
+                    ( alwaysCapitalizeLast && count == last ) ) {
                 out.append(capitalizeWord(token));
+
             } else {
 
                 //check if on ignored list
