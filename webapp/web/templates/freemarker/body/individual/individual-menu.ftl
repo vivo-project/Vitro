@@ -2,8 +2,6 @@
 
 <#-- Menu management page (uses individual display mechanism) -->
 
-<#import "lib-properties.ftl" as p>
-
 <#include "individual-setup.ftl">
 
 <h3>Menu management</h3>
@@ -12,7 +10,6 @@
 
 <#-- List the menu items -->
 <#list hasElement.statements as statement>
-    <#-- can we just provide the name of the template? -->
     Position | <#include "${hasElement.template}"> | <@p.editingLinks "hasElement" statement editable /> <br />
 </#list>
 
