@@ -75,11 +75,7 @@ Assumes property is non-null. -->
 
 <#macro objectPropertyList property editable statements=property.statements template=property.template>
     <#list statements as statement>
-     <#if property.localName == "hasElement">
-        <@menuItem property statement editable><#include "${template}"></@menuItem>
-     <#else>
         <@propertyListItem property statement editable><#include "${template}"></@propertyListItem>
-     </#if>
     </#list>
 </#macro>
 
@@ -96,14 +92,9 @@ name will be used as the label. -->
 
 <#macro addLink property editable label="${property.name}" extraParams="">
     <#if editable>
-    	<#--@dump var="property"/-->
         <#local url = property.addUrl>
         <#if url?has_content>
-            <#if property.localName == "hasElement">
-                <@showAddMenuItemLink property.localName label addParamsToEditUrl(url, extraParams) />
-            <#else>
-                <@showAddLink property.localName label addParamsToEditUrl(url, extraParams) />
-            </#if>
+            <@showAddLink property.localName label addParamsToEditUrl(url, extraParams) />
         </#if>
     </#if>
 </#macro>
@@ -249,12 +240,3 @@ name will be used as the label. -->
     <@editingLinks "label" label editable />
 </#macro>
 
-<#-- Add menu item button  -->
-<#macro showAddMenuItemLink propertyLocalName label url>
-    <a class="add-${propertyLocalName} green button" href="${url}" title="Add new ${label?lower_case} entry">Add menu item</a>
-</#macro>
-
-<#-- List menu items -->
-<#macro menuItem property statement editable >
-        Position | <#nested> | <@editingLinks "${property.localName}" statement editable/> <br />
-</#macro>

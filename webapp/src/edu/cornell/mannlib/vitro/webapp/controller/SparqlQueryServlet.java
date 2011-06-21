@@ -151,18 +151,13 @@ public class SparqlQueryServlet extends BaseEditController {
 		
 		String queryParam = vreq.getParameter("query");
 		boolean graphPresent = false;
-		StringTokenizer tokenizer = new StringTokenizer(queryParam, " ");
-	    while(tokenizer.hasMoreTokens()){
-	    	if("graph".equalsIgnoreCase(tokenizer.nextToken())){
-	    		graphPresent = true;
-	    		break;
+		String[] tokens = queryParam.split("\\s");
+	    for(int i = 0; i < tokens.length; i++){
+	    	if("graph".equalsIgnoreCase(tokens[i])){
+	    		return vreq.getDataset();
 	    	}
 	    }
-		Dataset dataset = vreq.getDataset();
-		if (dataset != null && graphPresent) {
-			return dataset;
-		}
-
+		
 		DataSource dataSource = DatasetFactory.create();
 		dataSource.setDefaultModel(vreq.getJenaOntModel());
 		return dataSource;

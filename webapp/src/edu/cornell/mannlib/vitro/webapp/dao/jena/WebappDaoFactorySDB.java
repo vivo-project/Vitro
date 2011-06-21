@@ -23,6 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 	
+	public static final String UNION_GRAPH = "urn:x-arq:UnionGraph"; 
     private SDBDatasetMode datasetMode = SDBDatasetMode.ASSERTIONS_AND_INFERENCES;
     
 	/**

@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
@@ -26,18 +27,14 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
-import com.hp.hpl.jena.vocabulary.OWL;
-import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -105,67 +102,42 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         		ents.addAll(getIndividualsByVClass(vc));
         	}
         } else {
-    	    DatasetWrapper w = getDatasetWrapper();
-    	    Dataset dataset = w.getDataset();
-        	dataset.getLock().enterCriticalSection(Lock.READ);
-        	try {
-        	    String[] graphVars = {"?g", "?h", "?i"};
-        		String query = 
-    	    		"SELECT DISTINCT ?ind ?label ?moniker " +
-    	    		"WHERE " +
-    	    		 "{ \n" +
-                        "{   ?ind a <" + theClass.getURI() + "> } \n" +
-    	    		 	"UNION { \n" +
-                        "    ?ind a <" + theClass.getURI() + "> . \n" +
-    	    		 	"    ?ind  <" + RDFS.label.getURI() + "> ?label \n" +
-    	    		 	"} \n" +
-    	    		 	"UNION { \n" +
-                        "    ?ind a <" + theClass.getURI() + "> . \n" +
-    	    		 	"    ?ind  <" + VitroVocabulary.MONIKER + "> ?moniker \n" +
-    	    		 	"} \n" +
-    	    		 "} ORDER BY ?ind ?label";
-        		ResultSet rs =QueryExecutionFactory.create(
-        		        QueryFactory.create(query), dataset)
-        		        .execSelect();
-        		String uri = null;
-        		String label = null;
-        		String moniker = null;
-        		while (rs.hasNext()) {
-        		    QuerySolution sol = rs.nextSolution();
-        		    Resource currRes = sol.getResource("ind");
-        		    if (currRes.isAnon()) {
-        		        continue;
-        		    }
-        		    if (uri != null && !uri.equals(currRes.getURI())) {
-        		        Individual ent = makeIndividual(uri, label, moniker);
-        		        if (ent != null) {
-        		            ents.add(ent);
-        		        }
-        	            uri = currRes.getURI();
-        	            label = null;
-        	            moniker = null;
-        		    } else if (uri == null) {
-        		        uri = currRes.getURI();
-        		    }
-                    Literal labelLit = sol.getLiteral("label");
-                    if (labelLit != null) {
-                        label = labelLit.getLexicalForm();
-                    }
-                    Literal monikerLit = sol.getLiteral("moniker");
-                    if (monikerLit != null) {
-                        moniker = monikerLit.getLexicalForm();
-                    }
-                    if (!rs.hasNext()) {
-                        Individual ent = makeIndividual(uri, label, moniker);
-                        if (ent != null) {
-                            ents.add(ent);
-                        }
-                    }
-        		}
-        	} finally {
-        		dataset.getLock().leaveCriticalSection();
-        		w.close();
-        	} 
+        	
+        	List<Individual> individualList;
+        	
+        	// Check if there is a graph filter.
+        	// If so, we will use it in a slightly strange way.  Unfortunately,
+        	// performance is quite bad if we add several graph variables in 
+        	// order to account for the fact that an individual's type 
+        	// declaration may be in a different graph from its label or 
+        	// moniker.  Thus, we will run two queries: one with a single
+        	// graph variable to get the list of URIs, and a second against
+        	// the union graph to get individuals with their labels and 
+        	// monikers.  We will then toss out any individual in the second
+        	// list that is not also in the first list.
+        	// Annoying, yes, but better than the alternative.
+        	// Note that both queries need to sort identically or 
+        	// the results may be very strange.
+        	String[] graphVars = {"?g"};
+        	String filterStr = WebappDaoFactorySDB.getFilterBlock(
+        			graphVars, datasetMode);
+        	if (!StringUtils.isEmpty(filterStr)) {
+        		List<Individual> graphFilteredIndividualList = 
+        			    getGraphFilteredIndividualList(theClass, filterStr);
+        		List<Individual> unfilteredIndividualList = getIndividualList(
+        				theClass);
+        		Iterator<Individual> unfilteredIt  = unfilteredIndividualList
+        													.iterator(); 
+        		for (Individual filt : graphFilteredIndividualList) {
+        			Individual unfilt = unfilteredIt.next();
+        			while (!unfilt.getURI().equals(filt.getURI())) {
+        				unfilt = unfilteredIt.next();
+        			}
+        			ents.add(unfilt);
+        		}	
+        	} else {
+        		ents = getIndividualList(theClass);
+        	}
         }
         
         java.util.Collections.sort(ents);
@@ -180,6 +152,105 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         
         return ents;
 
+    }
+        
+    private List<Individual> getIndividualList(Resource theClass) {
+    	List<Individual> ents = new ArrayList<Individual>();
+   	    DatasetWrapper w = getDatasetWrapper();
+	    Dataset dataset = w.getDataset();
+    	dataset.getLock().enterCriticalSection(Lock.READ);
+    	try {
+    	    
+    		String query = 
+	    		"SELECT DISTINCT ?ind ?label ?moniker " +
+	    		"WHERE " +
+	    		 "{ \n" +
+                    "{   ?ind a <" + theClass.getURI() + "> } \n" +
+	    		 	"UNION { \n" +
+                    "    ?ind a <" + theClass.getURI() + "> . \n" +
+	    		 	"    ?ind  <" + RDFS.label.getURI() + "> ?label \n" +
+	    		 	"} \n" +
+	    		 	"UNION { \n" +
+                    "    ?ind a <" + theClass.getURI() + "> . \n" +
+	    		 	"    ?ind  <" + VitroVocabulary.MONIKER + "> ?moniker \n" +
+	    		 	"} \n" +
+	    		 "} ORDER BY ?ind ?label";
+    		ResultSet rs =QueryExecutionFactory.create(
+    		        QueryFactory.create(query), dataset)
+    		        .execSelect();
+    		String uri = null;
+    		String label = null;
+    		String moniker = null;
+    		while (rs.hasNext()) {
+    		    QuerySolution sol = rs.nextSolution();
+    		    Resource currRes = sol.getResource("ind");
+    		    if (currRes.isAnon()) {
+    		        continue;
+    		    }
+    		    if (uri != null && !uri.equals(currRes.getURI())) {
+    		        Individual ent = makeIndividual(uri, label, moniker);
+    		        if (ent != null) {
+    		            ents.add(ent);
+    		        }
+    	            uri = currRes.getURI();
+    	            label = null;
+    	            moniker = null;
+    		    } else if (uri == null) {
+    		        uri = currRes.getURI();
+    		    }
+                Literal labelLit = sol.getLiteral("label");
+                if (labelLit != null) {
+                    label = labelLit.getLexicalForm();
+                }
+                Literal monikerLit = sol.getLiteral("moniker");
+                if (monikerLit != null) {
+                    moniker = monikerLit.getLexicalForm();
+                }
+                if (!rs.hasNext()) {
+                    Individual ent = makeIndividual(uri, label, moniker);
+                    if (ent != null) {
+                        ents.add(ent);
+                    }
+                }
+    		}
+    	} finally {
+    		dataset.getLock().leaveCriticalSection();
+    		w.close();
+    	} 
+        return ents;
+    }
+    
+    private List<Individual> getGraphFilteredIndividualList(Resource theClass, 
+    		                                                String filterStr) {
+		List<Individual> filteredIndividualList = new ArrayList<Individual>();
+		DatasetWrapper w = getDatasetWrapper();
+   	    Dataset dataset = w.getDataset();
+       	dataset.getLock().enterCriticalSection(Lock.READ);
+       	try {
+    		String query = 
+    			"SELECT DISTINCT ?ind ?label ?moniker " +
+    			"WHERE " +
+    			"{ GRAPH ?g { \n" +
+                	"{   ?ind a <" + theClass.getURI() + "> } \n" +
+                "  } \n" + filterStr +
+                "} ORDER BY ?ind";
+    		ResultSet rs =QueryExecutionFactory.create(
+    		        QueryFactory.create(query), dataset)
+    		        .execSelect();
+    		while (rs.hasNext()) {
+    		    QuerySolution sol = rs.nextSolution();
+    		    Resource currRes = sol.getResource("ind");
+    		    if (currRes.isAnon()) {
+    		        continue;
+    		    }
+    		    filteredIndividualList.add(
+    		    		makeIndividual(currRes.getURI(), null, null));
+    		}
+       	} finally {
+    		dataset.getLock().leaveCriticalSection();
+    		w.close();
+		}
+       	return filteredIndividualList;
     }
     
     private Individual makeIndividual(String uri, String label, String moniker) {

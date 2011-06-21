@@ -422,6 +422,7 @@ ul#header-nav li.last {
     border-right: none;
 }
 ul#header-nav li:last-child {
+    padding-left: 1px;
     padding-right: 0;
     border-right: none;
 }
@@ -436,6 +437,9 @@ ul#header-nav a:hover,
 ul#header-nav  a:active {
     text-decoration: none;
     color: #999;
+}
+ul#header-nav a.log-out {
+    padding-left: 10px;
 }
 /* SEARCH ------>  */
 #search {
@@ -1319,7 +1323,7 @@ p.view-all-coauthors {
 }
 section.property-group h2 {
     font-size: 1.25em;
-    color: #47B6D0;
+    color: #006279;
     font-weight: normal;
 }
 article.property {
@@ -1328,7 +1332,7 @@ article.property {
 article.property h3 {
     background: #fafaf9;
     font-size: 1.063em;
-    color: #8aa149;
+    color: #a8833e;
 }
 article.property ul.property-list li.subclass h3 {
     font-size: 1.063em;

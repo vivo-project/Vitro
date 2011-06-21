@@ -25,6 +25,7 @@
             <#if urls.contact??>
                 <li role="listitem"><a href="${urls.contact}">Contact Us</a></li>
             </#if> 
+            <li role="listitem"><a href="http://www.vivoweb.org/support" target="blank">Support</a></li>
         </ul>
     </nav>
 </footer>
