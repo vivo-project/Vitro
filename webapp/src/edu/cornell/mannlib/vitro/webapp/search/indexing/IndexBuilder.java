@@ -9,8 +9,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
+import java.util.Queue;
 
 import javax.servlet.ServletContext;
+import org.apache.solr.client.solrj.SolrServer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
+import edu.cornell.mannlib.vitro.webapp.search.solr.CalculateParameters;
 
 
 /**
@@ -285,8 +289,27 @@ public class IndexBuilder extends Thread {
     private void indexForSource(Iterator<Individual> individuals , boolean newDocs) throws AbortIndexing{     
         
        
-        long starttime = System.currentTimeMillis();         
-        long count = 0;
+      //  long starttime = System.currentTimeMillis();         
+        int count = 0;
+        int numOfThreads = 10;
+       
+      
+        List<IndexWorkerThread> workers = new ArrayList<IndexWorkerThread>();
+        boolean distributing = true;
+       
+        for(int i = 0; i< numOfThreads ;i++){
+        	workers.add(new IndexWorkerThread(indexer,i,distributing)); // made a pool of workers
+        }
+        
+        log.info("Indexing worker pool ready for indexing.");
+       
+        // starting worker threads
+        
+        for(int i =0; i < numOfThreads; i++){
+        	workers.get(i).start();
+        }
+        
+        
         while(individuals.hasNext()){
             if( stopRequested )
                 throw new AbortIndexing();
@@ -295,7 +318,10 @@ public class IndexBuilder extends Thread {
             try{
                 ind = individuals.next();     
                          
-                indexer.index(ind, newDocs);                         
+                //indexer.index(ind);    
+                
+                workers.get(count%numOfThreads).addToQueue(ind); // adding individual to worker queue.
+                
             }catch(Throwable ex){
                 if( stopRequested || log == null){//log might be null if system is shutting down.
                     throw new AbortIndexing();
@@ -304,20 +330,33 @@ public class IndexBuilder extends Thread {
                 log.warn("Error indexing individual " + uri + " " + ex.getMessage());
             }
             count++;
-            if( log.isDebugEnabled() ){            
+           /* if( log.isDebugEnabled() ){            
                 if( (count % 100 ) == 0 && count > 0 ){
                     long dt = (System.currentTimeMillis() - starttime);
                     log.debug("individuals indexed: " + count + " in " + dt + " msec " +
                              " time pre individual = " + (dt / count) + " msec" );                          
                 }                
-            }                
+            }    */            
         }
         
-        log.info( 
+        for(int i =0 ; i < numOfThreads; i ++){
+        	workers.get(i).setDistributing(false);
+        }
+        for(int i =0; i < numOfThreads; i++){
+        	try{
+        		workers.get(i).join();
+        	}catch(InterruptedException e){
+        		log.error(e,e);
+        	}
+        }
+        
+       /* log.info( 
              "individuals indexed: " + count + " in " + (System.currentTimeMillis() - starttime) + " msec" +
               (count!=0?(" time per individual = " + (System.currentTimeMillis() - starttime)/ count + " msec"):"")
-        );
+        );*/
     }        
+
+    
     
     /**
      * For a list of individuals, this builds a list of dependent resources and returns it.  

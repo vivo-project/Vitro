@@ -38,13 +38,11 @@ public class IndividualToSolrDocument {
     
     private IndividualProhibitedFromSearch individualProhibitedFromSearch;
     
-    public static ArrayList<String> superClassNames = null;
-    
-    public static StringBuffer addUri = null;
-
-    private List<DocumentModifier> documentModifiers = new ArrayList<DocumentModifier>();
+    public List<DocumentModifier> documentModifiers = new ArrayList<DocumentModifier>();
     
     private static List<String> contextNodeClassNames = new ArrayList<String>();
+    
+    
     
     public IndividualToSolrDocument(
             ClassProhibitedFromSearch classesProhibitedFromSearch, 
@@ -68,6 +66,8 @@ public class IndividualToSolrDocument {
     @SuppressWarnings("static-access")
     public SolrInputDocument translate(Individual ind) throws IndexingException{
     	long tProhibited = System.currentTimeMillis();    	    	
+    	ArrayList<String> superClassNames = null;
+    	StringBuffer addUri = null;
     	String value;
     	StringBuffer classPublicNames = new StringBuffer();
     	classPublicNames.append("");
@@ -193,7 +193,7 @@ public class IndividualToSolrDocument {
              }
          }         
     	
-         if(documentModifiers == null){
+         if(documentModifiers == null || documentModifiers.isEmpty()){
         	 doc.addField(term.NAME_RAW, value, NAME_BOOST);
         	 doc.addField(term.NAME_LOWERCASE, value.toLowerCase(),NAME_BOOST);
         	 doc.addField(term.NAME_UNSTEMMED, value,NAME_BOOST);
@@ -210,7 +210,7 @@ public class IndividualToSolrDocument {
         
         long tMoniker = System.currentTimeMillis();
     	
-        if(documentModifiers == null){
+        if(documentModifiers == null || documentModifiers.isEmpty()){
         //boost for entity
         if(ind.getSearchBoost() != null && ind.getSearchBoost() != 0)
         doc.setDocumentBoost(ind.getSearchBoost());
@@ -269,10 +269,10 @@ public class IndividualToSolrDocument {
             doc.addField(term.ALLTEXT_PHONETIC, alltext,PHONETIC_BOOST);
             
             //run the document modifiers
-            if( documentModifiers != null ){
+            if( documentModifiers != null && !documentModifiers.isEmpty()){
             	doc.addField(term.targetInfo,"");
                 for(DocumentModifier modifier: documentModifiers){
-                    modifier.modifyDocument(ind, doc);
+                    modifier.modifyDocument(ind, doc, addUri);
                 }
             }
         }

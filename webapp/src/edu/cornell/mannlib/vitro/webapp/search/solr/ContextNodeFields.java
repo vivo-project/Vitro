@@ -103,7 +103,7 @@ public class ContextNodeFields implements DocumentModifier{
 	
 	
     @Override
-    public void modifyDocument(Individual individual, SolrInputDocument doc) {
+    public void modifyDocument(Individual individual, SolrInputDocument doc, StringBuffer addUri) {
     	
         log.debug("retrieving context node values..");
 
@@ -111,7 +111,7 @@ public class ContextNodeFields implements DocumentModifier{
     	SolrInputField targetField = doc.getField(VitroTermNames.targetInfo);
     	StringBuffer objectProperties = new StringBuffer();
   
-    	if(IndividualToSolrDocument.superClassNames.contains("Agent")){
+    	
     		objectProperties.append(" ");
     		
     		int threadCount = multiValuedQueriesForAgent.size();
@@ -135,14 +135,15 @@ public class ContextNodeFields implements DocumentModifier{
 					log.error("Thread " + threads[i].getName() + " interrupted!");
 				}
     		}
-    	}
+    		
 
-    	if(IndividualToSolrDocument.superClassNames.contains("InformationResource")){
+    	
     		targetField.addValue(" " + runQuery(individual, multiValuedQueryForInformationResource), targetField.getBoost());
-    	}
+    	
     	
     	field.addValue(objectProperties, field.getBoost());
         log.debug("context node values are retrieved");
+    		
     
     }
     
@@ -386,6 +387,7 @@ public class ContextNodeFields implements DocumentModifier{
 					+"}" ;
 	
 	}
+	
 	
 	
 	private class QueryRunner extends Thread{

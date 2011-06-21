@@ -38,7 +38,7 @@ public interface IndexerIface {
      * @param newDoc - if true, just insert doc, if false attempt to update.
      * @throws IndexingException
      */
-    public void index(Individual ind, boolean newDoc)throws IndexingException;
+    public void index(Individual ind)throws IndexingException;
 
 
     /**

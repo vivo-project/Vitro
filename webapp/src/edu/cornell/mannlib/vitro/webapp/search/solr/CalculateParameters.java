@@ -1,6 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.search.solr;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -40,8 +41,7 @@ public class CalculateParameters implements DocumentModifier {
 
 	private Dataset dataset;
     public static int totalInd=1;
-    public static Map<String,Float> betaMap = new Hashtable<String,Float>();
-    private float phi;
+    protected Map<String,Float> betaMap = new Hashtable<String,Float>();
     private static final String prefix = "prefix owl: <http://www.w3.org/2002/07/owl#> "
 		+ " prefix vitroDisplay: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>  "
 		+ " prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  "
@@ -81,6 +81,10 @@ public class CalculateParameters implements DocumentModifier {
 		 new Thread(new TotalInd(this.dataset,totalCountQuery)).start();
 	}
 	
+	public CalculateParameters(){
+		super();
+	}
+	
 	public float calculateBeta(String uri){
 		float beta=0;
 		int Conn=0; 
@@ -116,19 +120,12 @@ public class CalculateParameters implements DocumentModifier {
 
 		StringTokenizer nodes = new StringTokenizer(adjNodes.toString()," ");
 		String uri=null;
-		float beta=0;
 		int size=0;
-		phi = 0.1F;
+		float phi = 0.1F;
 		while(nodes.hasMoreTokens()){
 			size++;
 			uri = nodes.nextToken();
-			if(hasBeta(uri)){ // get if already calculated
-				phi += getBeta(uri);
-			}else{						// query if not calculated and put in map
-				beta = calculateBeta(uri);
-				setBeta(uri, beta);
-				phi+=beta;
-			}
+		    phi += getBeta(uri);
 		}
 		if(size>0)
 			phi = (float)phi/size;
@@ -137,20 +134,21 @@ public class CalculateParameters implements DocumentModifier {
 		return phi;
 	}
 	
-	public Float getBeta(String uri){
-        return betaMap.get(uri);
-    }
-    public float getPhi(){
-		return phi;
-	}
-    public boolean hasBeta(String uri){
-    	return betaMap.containsKey(uri);
-    }
-    public void setBeta(String uri, float beta){
-    	betaMap.put(uri, beta);
+	public synchronized Float getBeta(String uri){
+		
+		float beta;
+		 if(betaMap.containsKey(uri)){
+	            beta = betaMap.get(uri);
+	        }else{
+	            beta = calculateBeta(uri); // or calculate & put in map
+	            betaMap.put(uri, beta);
+	        } 
+        return beta;
+		
     }
     
-    public String[] getAdjacentNodes(String uri,boolean isPerson){
+    
+    public String[] getAdjacentNodes(String uri){
 		
     	List<String> queryList = new ArrayList<String>();
     	Set<String> adjacentNodes = new HashSet<String>();
@@ -222,9 +220,9 @@ public class CalculateParameters implements DocumentModifier {
     	RDFNode coauthor = null;
     	try{
     		while(queryItr.hasNext()){
-    			if(!isPerson){
+    			/*if(!isPerson){
     				queryItr.next(); // we don't want first query to execute if the ind is not a person. 
-    			}
+    			}*/
     			query = QueryFactory.create(queryItr.next(),Syntax.syntaxARQ);
     			QueryExecution qexec = QueryExecutionFactory.create(query,dataset,initialBinding);
     			try{
@@ -276,26 +274,17 @@ public class CalculateParameters implements DocumentModifier {
 	}
    
 	@Override
-	public void modifyDocument(Individual individual, SolrInputDocument doc) {
+	public void modifyDocument(Individual individual, SolrInputDocument doc, StringBuffer addUri) {
 		// TODO Auto-generated method stub
 		 // calculate beta value.  
         log.debug("Parameter calculation starts..");
         
-        float beta = 0;
         String uri = individual.getURI();
-        if(hasBeta(uri)){
-            beta = getBeta(uri);
-        }else{
-            beta = calculateBeta(uri); // or calculate & put in map
-            setBeta(uri,beta);
-        } 
-        
-        boolean isPerson = (IndividualToSolrDocument.superClassNames.contains("Person")) ? true : false ;
-        String adjInfo[] = getAdjacentNodes(uri,isPerson);
+        String adjInfo[] = getAdjacentNodes(uri);
         StringBuffer info = new StringBuffer();
         info.append(adjInfo[0]);
-        info.append(IndividualToSolrDocument.addUri.toString());
-        phi = calculatePhi(info);
+        info.append(addUri.toString());
+        float phi = calculatePhi(info);
         
         for(String term: fieldsToAddBetaTo){
             SolrInputField f = doc.getField( term );
@@ -312,6 +301,10 @@ public class CalculateParameters implements DocumentModifier {
         doc.setDocumentBoost(getBeta(uri)*phi*IndividualToSolrDocument.ALL_TEXT_BOOST);   
         
         log.debug("Parameter calculation is done");
+	}
+	
+	public void clearMap(){
+		betaMap.clear();
 	}
 	
 }

@@ -19,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexerIface;
+import edu.cornell.mannlib.vitro.webapp.search.solr.CalculateParameters;
 
 public class SolrIndexer implements IndexerIface {
     private final static Log log = LogFactory.getLog(SolrIndexer.class);
@@ -34,7 +35,7 @@ public class SolrIndexer implements IndexerIface {
     }
     
     @Override
-    public synchronized void index(Individual ind, boolean newDoc) throws IndexingException {
+    public void index(Individual ind) throws IndexingException {
         if( ! indexing )
             throw new IndexingException("SolrIndexer: must call " +
                     "startIndexing() before index().");        
@@ -47,15 +48,19 @@ public class SolrIndexer implements IndexerIface {
                 log.debug("already indexed " + ind.getURI() );
                 return;
             }else{
-                urisIndexed.add(ind.getURI());
-                log.debug("indexing " + ind.getURI());                
-                
-                SolrInputDocument solrDoc = individualToSolrDoc.translate(ind);
+            	SolrInputDocument solrDoc = null;
+            	synchronized(this){
+            		urisIndexed.add(ind.getURI());
+            	}
+                log.debug("indexing " + ind.getURI());      
+              //  synchronized(individualToSolrDoc){
+                	solrDoc = individualToSolrDoc.translate(ind);
+              //  }
                 if( solrDoc != null){
                     //sending each doc individually is inefficient
-                    Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
-                    docs.add( solrDoc );
-                    UpdateResponse res = server.add( docs );
+                   // Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
+                   // docs.add( solrDoc );
+                    UpdateResponse res = server.add( solrDoc );
                     log.debug("response after adding docs to server: "+ res);                
                 }else{
                     log.debug("removing from index " + ind.getURI());
@@ -125,12 +130,14 @@ public class SolrIndexer implements IndexerIface {
         } catch(IOException e){
         	log.error("Could not commit to solr server", e);
         }finally{
-        	if(CalculateParameters.betaMap!=null){
-        		CalculateParameters.betaMap.clear();
-        		CalculateParameters.betaMap = null;
+        	if(!individualToSolrDoc.documentModifiers.isEmpty()){
+        		if(individualToSolrDoc.documentModifiers.get(0) instanceof CalculateParameters){
+        			CalculateParameters c = (CalculateParameters) individualToSolrDoc.documentModifiers.get(0);
+        			c.clearMap();
+        			log.info("BetaMap cleared");
+        		}
         	}
         }
-        
         try {
             server.optimize();
         } catch (Exception e) {
