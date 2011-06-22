@@ -52,9 +52,8 @@
     </#if>
     
     <#if confirmMessage?has_content>
-        <section id="error-alert" role="alert">
-            <img src="${urls.images}/iconConfirmation.png" width="24" height="24" alert="Confirmation icon"/>
-            <p>${confirmMessage}</p>
+        <section  class="account-feedback" role="alert">
+            <p><img class="middle" src="${urls.images}/iconConfirmation.png" alert="Confirmation icon"/> ${confirmMessage}</p>
         </section>
     </#if>
 
