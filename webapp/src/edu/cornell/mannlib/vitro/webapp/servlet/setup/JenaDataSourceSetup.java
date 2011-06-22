@@ -23,7 +23,6 @@ import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.Syntax;
-import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -41,7 +40,6 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -55,9 +53,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
-import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.InitialJenaModelUtils;
-import edu.cornell.mannlib.vitro.webapp.utils.jena.NamespaceMapperJena;
 
 public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements javax.servlet.ServletContextListener {
     
@@ -285,8 +281,12 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
                 WebappDaoFactorySDB.SDBDatasetMode.INFERENCES_ONLY);
         ctx.setAttribute("deductionsWebappDaoFactory", infWadf);
         
-        OntModel masterUnion = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,
-                ModelFactory.createUnion(unionABoxModel, unionTBoxModel));
+        OntModel masterUnion = ModelFactory.createOntologyModel(
+        		DB_ONT_MODEL_SPEC, makeDBModel(
+        				bds, WebappDaoFactorySDB.UNION_GRAPH,
+        						DB_ONT_MODEL_SPEC, TripleStoreType.SDB, ctx));
+        //OntModel masterUnion = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,
+        //        ModelFactory.createUnion(unionABoxModel, unionTBoxModel));
         unionOms.setFullModel(masterUnion);
         ctx.setAttribute("jenaOntModel", masterUnion);  
         WebappDaoFactory wadf = new WebappDaoFactorySDB(unionOms, bds, storeDesc, defaultNamespace, null, null);

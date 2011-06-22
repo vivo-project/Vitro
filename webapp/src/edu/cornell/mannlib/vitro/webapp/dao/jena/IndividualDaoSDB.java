@@ -66,14 +66,18 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     
     protected Individual makeIndividual(String individualURI) {
         try {
-            return new IndividualSDB(individualURI, this.dwf, datasetMode, getWebappDaoFactory());
+            return new IndividualSDB(individualURI, 
+            	                     this.dwf,
+            	                     datasetMode, 
+            	                     getWebappDaoFactory());
         } catch (IndividualNotFoundException e) {
             // If the individual does not exist, return null.
             return null;
         }
     }
 
-    private static final Log log = LogFactory.getLog(IndividualDaoSDB.class.getName());
+    private static final Log log = LogFactory.getLog(
+    		IndividualDaoSDB.class.getName());
 
     @Override
     protected OntModel getOntModel() {
@@ -83,7 +87,9 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     private static final boolean SKIP_INITIALIZATION = true;
     
     @Override
-    public List getIndividualsByVClassURI(String vclassURI, int offset, int quantity ) {
+    public List getIndividualsByVClassURI(String vclassURI, 
+    		                              int offset, 
+    		                              int quantity ) {
 
     	if (vclassURI==null) {
             return null;
@@ -253,7 +259,9 @@ public class IndividualDaoSDB extends IndividualDaoJena {
        	return filteredIndividualList;
     }
     
-    private Individual makeIndividual(String uri, String label, String moniker) {
+    private Individual makeIndividual(String uri, 
+    		                          String label, 
+    		                          String moniker) {
         Individual ent = new IndividualSDB(uri, 
                 this.dwf, datasetMode, getWebappDaoFactory(), 
                 SKIP_INITIALIZATION);
@@ -272,7 +280,8 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     }  
     
     /**
-     * fills in the Individual objects needed for any ObjectPropertyStatements attached to the specified individual.
+     * fills in the Individual objects needed for any ObjectPropertyStatements 
+     * attached to the specified individual.
      * @param entity
      */
     private void fillIndividualsForObjectPropertyStatements(Individual entity){
@@ -280,7 +289,8 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         try {
             Iterator e2eIt = entity.getObjectPropertyStatements().iterator();
             while (e2eIt.hasNext()) {
-                ObjectPropertyStatement e2e = (ObjectPropertyStatement) e2eIt.next();
+                ObjectPropertyStatement e2e = 
+                		(ObjectPropertyStatement) e2eIt.next();
                 e2e.setSubject(makeIndividual(e2e.getSubjectURI()));
                 e2e.setObject(makeIndividual(e2e.getObjectURI()));       
             }
@@ -298,7 +308,8 @@ public class IndividualDaoSDB extends IndividualDaoJena {
      * ontology as a data property -- only that it behaves as one.
      */
     @Override
-    public List<Individual> getIndividualsByDataProperty(String dataPropertyUri, String value){        
+    public List<Individual> getIndividualsByDataProperty(String dataPropertyUri, 
+    	                                                 String value){        
         Property prop = null;
         if( RDFS.label.getURI().equals( dataPropertyUri )){
             prop = RDFS.label;
@@ -324,7 +335,8 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         //warning: this assumes that any language tags will be EN
         Literal litv3 = getOntModel().createLiteral(value,"EN");        
         
-        HashMap<String,Individual> individualsMap = new HashMap<String, Individual>();
+        HashMap<String,Individual> individualsMap = 
+        		new HashMap<String, Individual>();
                 
         getOntModel().enterCriticalSection(Lock.READ);
         int count = 0;
@@ -411,14 +423,16 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     }
     
     @Override
-    public Iterator getAllOfThisTypeIterator() {
+    public Iterator<Individual> getAllOfThisTypeIterator() {
         final List<String> list = 
             new LinkedList<String>();
         
         // get all labeled resources from any non-tbox and non-metadata graphs.
         String query = "SELECT DISTINCT ?ind WHERE { \n" +
-                       "  GRAPH ?g { ?ind <" + RDFS.label.getURI() + "> ?label } \n" +
-                       "  FILTER (?g != <" + JenaDataSourceSetupBase.JENA_APPLICATION_METADATA_MODEL + "> " +
+                       "  GRAPH ?g { ?ind <" + RDFS.label.getURI() +
+                                          "> ?label } \n" +
+                       "  FILTER (?g != <" + JenaDataSourceSetupBase
+                               .JENA_APPLICATION_METADATA_MODEL + "> " +
                        "          && !regex(str(?g),\"tbox\")) \n " +
                        "}";
               
@@ -440,15 +454,22 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         	dataset.getLock().leaveCriticalSection();
         	w.close();
         }
-        
-        if (list.size() >0){
-            log.info("Number of individuals from source: " + list.size());
-            return new Iterator(){
-                Iterator<String> innerIt = list.iterator();
+
+        return getIndividualIterator(list);
+
+    }  
+
+    private Iterator<Individual> getIndividualIterator(
+    									final List<String> individualURIs) {
+        if (individualURIs.size() >0){
+            log.info("Number of individuals from source: " 
+            		+ individualURIs.size());
+            return new Iterator<Individual>(){
+                Iterator<String> innerIt = individualURIs.iterator();
                 public boolean hasNext() { 
                     return innerIt.hasNext();                    
                 }
-                public Object next() {
+                public Individual next() {
                     String indURI = innerIt.next();
                     Individual ind = makeIndividual(indURI);
                     if (ind != null) {
@@ -464,81 +485,62 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         }
         else
             return null;
-    }  
-
+    }
+    
     @Override
-    public Iterator getAllOfThisVClassIterator(String vClassURI) {
+    public Iterator<Individual> getAllOfThisVClassIterator(String vClassURI) {
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            List ents = new LinkedList();
+            List<String> individualURIs = new ArrayList<String>();
             OntClass cls = getOntModel().getOntClass(vClassURI);
             Iterator indIt = cls.listInstances();
             while (indIt.hasNext()) {
-                com.hp.hpl.jena.ontology.Individual ind = (com.hp.hpl.jena.ontology.Individual) indIt.next();
-                Individual ent = makeIndividual(ind.getURI());
-                if (ent != null) {
-                    ents.add(ent);
+                com.hp.hpl.jena.ontology.Individual ind = 
+                		(com.hp.hpl.jena.ontology.Individual) indIt.next();
+                if (ind.getURI() != null) {
+                    individualURIs.add(ind.getURI());
                 }
             }
-            return ents.iterator();
+            return getIndividualIterator(individualURIs);
         } finally {
             getOntModel().leaveCriticalSection();
         }
     }
 
     @Override
-    public Iterator getUpdatedSinceIterator(long updatedSince){
-        List ents = new ArrayList();
+    public Iterator<Individual> getUpdatedSinceIterator(long updatedSince){
+        List<String> individualURIs = new ArrayList<String>();
         Date since = new DateTime(updatedSince).toDate();
         String sinceStr = xsdDateTimeFormat.format(since);
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            Property modTimeProp = MODTIME;
-            if (modTimeProp == null)
-                modTimeProp = getOntModel().getProperty(VitroVocabulary.MODTIME);
-            if (modTimeProp == null)
-                return null; // throw an exception?
             String queryStr = "PREFIX vitro: <"+ VitroVocabulary.vitroURI+"> " +
-                              "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>" +
+                              "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>"+
                               "SELECT ?ent " +
                               "WHERE { " +
                               "     ?ent vitro:modTime ?modTime ." +
-                              "     FILTER (xsd:dateTime(?modTime) >= \""+sinceStr+"\"^^xsd:dateTime) " +
+                              "     FILTER (xsd:dateTime(?modTime) >= \""
+                              		+ sinceStr + "\"^^xsd:dateTime) " +
                               "}";
             Query query = QueryFactory.create(queryStr);
-            QueryExecution qe = QueryExecutionFactory.create(query,getOntModel());
-            ResultSet results = qe.execSelect();
-            while (results.hasNext()) {
-                QuerySolution qs = (QuerySolution) results.next();
-                Resource res = (Resource) qs.get("?ent");
-                com.hp.hpl.jena.ontology.Individual ent = getOntModel().getIndividual(res.getURI());
-                if (ent != null) {
-                    boolean userVisible = false;
-                    ClosableIterator typeIt = ent.listRDFTypes(true);
-                    try {
-                        while (typeIt.hasNext()) {
-                            Resource typeRes = (Resource) typeIt.next();
-                            if (typeRes.getNameSpace() == null || (!NONUSER_NAMESPACES.contains(typeRes.getNameSpace()))) {
-                                userVisible = true;
-                                break;
-                            }
-                        }
-                    } finally {
-                        typeIt.close();
-                    }
-                    if (userVisible) {
-                        Individual ind = makeIndividual(ent.getURI());
-                        if (ind != null) {
-                            ents.add(ind);
-                        }
-                    }
-                }
+            QueryExecution qe = QueryExecutionFactory.create(
+            		query,getOntModel());
+            try {
+	            ResultSet results = qe.execSelect();
+	            while (results.hasNext()) {
+	                QuerySolution qs = (QuerySolution) results.next();
+	                Resource res = (Resource) qs.get("?ent");
+	                if (res.getURI() != null) {
+	                	individualURIs.add(res.getURI());
+	                }
+	            }
+            } finally {
+            	qe.close();
             }
         } finally {
             getOntModel().leaveCriticalSection();
         }
-        return ents.iterator();
+        return getIndividualIterator(individualURIs);
     }
-
     
 }
