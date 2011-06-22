@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
@@ -55,6 +56,8 @@ public class VClassGroupCache{
     private final RebuildGroupCacheThread _cacheRebuildThread;    
     private final ServletContext context;
     
+    //Also keep track of the classes here, makes it easier to get the counts and other information
+    private HashMap<String, VClass> VclassMap = new HashMap<String, VClass>();
     
     private VClassGroupCache(ServletContext context) {
         this.context = context;
@@ -115,6 +118,14 @@ public class VClassGroupCache{
         else
             return _groupList;
     }     
+    
+    //Get specific VClass corresponding to Map
+    public VClass getCachedVClass(String classUri) {
+    	if(VclassMap.containsKey(classUri)) {
+    		return VclassMap.get(classUri);
+    	}
+    	return null;
+    }
         
     private synchronized void requestCacheUpdate(){
         log.debug("requesting update");
@@ -153,6 +164,17 @@ public class VClassGroupCache{
             
             _groupList = groups;
             _rebuildRequested = false;
+            
+            //Also save the classes and their corresponding VClass objects for use later
+            for(VClassGroup vcg: groups) {
+            	List<VClass> vclasses = vcg.getVitroClassList();
+            	for(VClass vclass: vclasses) {
+            		String classUri = vclass.getURI();
+            		if(!VclassMap.containsKey(classUri)) {
+            			VclassMap.put(classUri, vclass);
+            		}
+            	}
+            }
             
             log.info("rebuilt ClassGroup cache in " + (System.currentTimeMillis() - start) + " msec");
             return _groupList;            
