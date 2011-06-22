@@ -76,6 +76,8 @@ public class SimpleReasoner extends StatementListener {
 	}
 	
 	/**
+	 * This constructor is used for the unit tests only
+	 * 
 	 * @param tboxModel - input.  This model contains both asserted and inferred TBox axioms
 	 * @param aboxModel - input.  This model contains asserted ABox statements
 	 * @param inferenceModel - output. This is the model in which inferred (materialized) ABox statements are maintained (added or retracted).
@@ -157,9 +159,28 @@ public class SimpleReasoner extends StatementListener {
 				if (stmt.getSubject().isAnon() || stmt.getObject().isAnon()) {
 				    return;
 				}
-					
+			
+				if ( stmt.getObject().isResource() && (stmt.getObject().asResource()).getURI() == null ) {
+					log.warn("The object of this assertion has a null URI: " + stmtString(stmt));
+					return;
+				}
+
+				if ( stmt.getSubject().getURI() == null ) {
+					log.warn("The subject of this assertion has a null URI: " + stmtString(stmt));
+					return;
+				}
+				
 				OntClass subject = tboxModel.getOntClass((stmt.getSubject()).getURI());
+				if (subject == null) {
+					log.debug("didn't find subject class in the tbox: " + (stmt.getSubject()).getURI());
+					return;
+				}
+				
 				OntClass object = tboxModel.getOntClass(((Resource)stmt.getObject()).getURI()); 
+				if (object == null) {
+					log.debug("didn't find object class in the tbox: " + ((Resource)stmt.getObject()).getURI());
+					return;
+				}
 				
 				if (stmt.getPredicate().equals(RDFS.subClassOf)) {
 				   addedSubClass(subject,object,inferenceModel);
@@ -207,9 +228,28 @@ public class SimpleReasoner extends StatementListener {
 				if (stmt.getSubject().isAnon() || stmt.getObject().isAnon()) {
 				    return;
 				}
-					
+				
+				if ( stmt.getObject().isResource() && (stmt.getObject().asResource()).getURI() == null ) {
+					log.warn("The object of this assertion has a null URI: " + stmtString(stmt));
+					return;
+				}
+
+				if ( stmt.getSubject().getURI() == null ) {
+					log.warn("The subject of this assertion has a null URI: " + stmtString(stmt));
+					return;
+				}
+												
 				OntClass subject = tboxModel.getOntClass((stmt.getSubject()).getURI());
+				if (subject == null) {
+					log.debug("didn't find subject class in the tbox: " + (stmt.getSubject()).getURI());
+					return;
+				}
+				
 				OntClass object = tboxModel.getOntClass(((Resource)stmt.getObject()).getURI()); 
+				if (object == null) {
+					log.debug("didn't find object class in the tbox: " + ((Resource)stmt.getObject()).getURI());
+					return;
+				}
 				
 				if (stmt.getPredicate().equals(RDFS.subClassOf)) {
 				   removedSubClass(subject,object,inferenceModel);
@@ -253,36 +293,44 @@ public class SimpleReasoner extends StatementListener {
 		tboxModel.enterCriticalSection(Lock.READ);
 		
 		try {
-			OntClass cls = tboxModel.getOntClass(((Resource)stmt.getObject()).getURI()); 
+
+			OntClass cls = null;
 			
-			if (cls != null) {
-				
-				List<OntClass> parents = (cls.listSuperClasses(false)).toList();		
-				parents.addAll((cls.listEquivalentClasses()).toList());	
-				Iterator<OntClass> parentIt = parents.iterator();
-				
-				while (parentIt.hasNext()) {
-					OntClass parentClass = parentIt.next();
+			if ( (stmt.getObject().asResource()).getURI() != null ) {
+			    cls = tboxModel.getOntClass(stmt.getObject().asResource().getURI()); 
+			    
+				if (cls != null) {
 					
-					// VIVO doesn't materialize statements that assert anonymous types
-					// for individuals. Also, sharing an identical anonymous node is
-					// not allowed in owl-dl. picklist population code looks at qualities
-					// of classes not individuals.
-					if (parentClass.isAnon()) continue;
+					List<OntClass> parents = (cls.listSuperClasses(false)).toList();		
+					parents.addAll((cls.listEquivalentClasses()).toList());	
+					Iterator<OntClass> parentIt = parents.iterator();
 					
-					Statement infStmt = ResourceFactory.createStatement(stmt.getSubject(), RDF.type, parentClass);
-					inferenceModel.enterCriticalSection(Lock.WRITE);
-					try {
-						if (!inferenceModel.contains(infStmt) && !infStmt.equals(stmt) ) {
-						    //log.debug("Adding this inferred statement:  " + infStmt.toString() );
-							inferenceModel.add(infStmt);
-						}
-					} finally {
-						inferenceModel.leaveCriticalSection();
-					}	
+					while (parentIt.hasNext()) {
+						OntClass parentClass = parentIt.next();
+						
+						// VIVO doesn't materialize statements that assert anonymous types
+						// for individuals. Also, sharing an identical anonymous node is
+						// not allowed in owl-dl. picklist population code looks at qualities
+						// of classes not individuals.
+						if (parentClass.isAnon()) continue;
+						
+						Statement infStmt = ResourceFactory.createStatement(stmt.getSubject(), RDF.type, parentClass);
+						inferenceModel.enterCriticalSection(Lock.WRITE);
+						try {
+							if (!inferenceModel.contains(infStmt) && !infStmt.equals(stmt) ) {
+							    //log.debug("Adding this inferred statement:  " + infStmt.toString() );
+								inferenceModel.add(infStmt);
+							}
+						} finally {
+							inferenceModel.leaveCriticalSection();
+						}	
+					}
+				} else {
+					log.debug("Didn't find target class (the object of the added rdf:type statement) in the TBox: " + ((Resource)stmt.getObject()).getURI());
 				}
 			} else {
-				log.debug("Didn't find target class (the object of the added rdf:type statement) in the TBox: " + ((Resource)stmt.getObject()).getURI());
+				log.warn("The object of this rdf:type assertion has a null URI: " + stmtString(stmt));
+				return;
 			}
 		} finally {
 			tboxModel.leaveCriticalSection();
@@ -340,7 +388,7 @@ public class SimpleReasoner extends StatementListener {
 					}	
 				}
 			} else {
-				log.warn("Didn't find target property (the predicate of the added statement) in the TBox: " + stmt.getPredicate().getURI());
+				log.debug("Didn't find target property (the predicate of the added statement) in the TBox: " + stmt.getPredicate().getURI());
 			}
 		} finally {
 			tboxModel.leaveCriticalSection();
@@ -359,43 +407,53 @@ public class SimpleReasoner extends StatementListener {
 		
 		tboxModel.enterCriticalSection(Lock.READ);
 		
+		// convert this method to use generic resources - not get ontclass, not cls.listSuperClasses...
+		// use model contains if want to log warning about type owl class
+		
 		try {
-			OntClass cls = tboxModel.getOntClass(((Resource)stmt.getObject()).getURI()); 
 			
-			if (cls != null) {
-				
-				List<OntClass> parents = (cls.listSuperClasses(false)).toList();		
-				parents.addAll((cls.listEquivalentClasses()).toList());
-				Iterator<OntClass> parentIt = parents.iterator();
-				
-				while (parentIt.hasNext()) {
-					OntClass parentClass = parentIt.next();
+			OntClass cls = null;
+			
+			if ( (stmt.getObject().asResource()).getURI() != null ) {
+			    cls = tboxModel.getOntClass(stmt.getObject().asResource().getURI()); 
+			    
+				if (cls != null) {
 					
-					// VIVO doesn't materialize statements that assert anonymous types
-					// for individuals. Also, sharing an identical anonymous node is
-					// not allowed in owl-dl. picklist population code looks at qualities
-					// of classes not individuals.
-					if (parentClass.isAnon()) continue;  
+					List<OntClass> parents = (cls.listSuperClasses(false)).toList();		
+					parents.addAll((cls.listEquivalentClasses()).toList());
+					Iterator<OntClass> parentIt = parents.iterator();
 					
-					if (entailedType(stmt.getSubject(),parentClass)) continue;    // if a type is still entailed without the
-					                                                              // removed statement, then don't remove it
-					                                                              // from the inferences
-					
-					Statement infStmt = ResourceFactory.createStatement(stmt.getSubject(), RDF.type, parentClass);
+					while (parentIt.hasNext()) {
+						OntClass parentClass = parentIt.next();
 						
-					inferenceModel.enterCriticalSection(Lock.WRITE);
-					try {
-						if (inferenceModel.contains(infStmt)) {
-							//log.debug("Removing this inferred statement:  " + infStmt.toString() + " - " + infStmt.getSubject().toString() + " - " + infStmt.getPredicate().toString() + " - " + infStmt.getObject().toString());
-							inferenceModel.remove(infStmt);
-						}
-					} finally {
-						inferenceModel.leaveCriticalSection();
-					}	
+						// VIVO doesn't materialize statements that assert anonymous types
+						// for individuals. Also, sharing an identical anonymous node is
+						// not allowed in owl-dl. picklist population code looks at qualities
+						// of classes not individuals.
+						if (parentClass.isAnon()) continue;  
+						
+						if (entailedType(stmt.getSubject(),parentClass)) continue;    // if a type is still entailed without the
+						                                                              // removed statement, then don't remove it
+						                                                              // from the inferences
+						
+						Statement infStmt = ResourceFactory.createStatement(stmt.getSubject(), RDF.type, parentClass);
+							
+						inferenceModel.enterCriticalSection(Lock.WRITE);
+						try {
+							if (inferenceModel.contains(infStmt)) {
+								//log.debug("Removing this inferred statement:  " + infStmt.toString() + " - " + infStmt.getSubject().toString() + " - " + infStmt.getPredicate().toString() + " - " + infStmt.getObject().toString());
+								inferenceModel.remove(infStmt);
+							}
+						} finally {
+							inferenceModel.leaveCriticalSection();
+						}	
+					}
+				} else {
+					log.debug("Didn't find target class (the object of the removed rdf:type statement) in the TBox: " + ((Resource)stmt.getObject()).getURI());
 				}
 			} else {
-				log.debug("Didn't find target class (the object of the removed rdf:type statement) in the TBox: " + ((Resource)stmt.getObject()).getURI());
-			}
+				log.warn("The object of this rdf:type assertion has a null URI: " + stmtString(stmt));
+			}			
 		} finally {
 			tboxModel.leaveCriticalSection();
 		}
@@ -700,16 +758,23 @@ public class SimpleReasoner extends StatementListener {
 					continue;
 				}
 				
-				OntClass ontClass = tboxModel.getOntClass(stmt.getObject().asResource().getURI()); 
+				OntClass ontClass = null;
 				
+				if ( (stmt.getObject().asResource()).getURI() != null ) {
+				    ontClass = tboxModel.getOntClass(stmt.getObject().asResource().getURI()); 
+				} else {
+					log.warn("The object of this rdf:type assertion has a null URI: " + stmtString(stmt));
+					continue;
+				}
+				 
 				if (ontClass == null) {
-					log.warn("Didn't find target class (the object of the added rdf:type statement) in the TBox: " + (stmt.getObject().asResource()).getURI());
+					log.debug("Didn't find target class (the object of the added rdf:type statement) in the TBox: " + (stmt.getObject().asResource()).getURI());
 					continue;
 				}
 					
 				if (ontClass.isAnon()) continue;
 				
-				types.add(ontClass);
+				types.add(ontClass); 
 			}
 	
 			HashSet<String> typeURIs = new HashSet<String>();
