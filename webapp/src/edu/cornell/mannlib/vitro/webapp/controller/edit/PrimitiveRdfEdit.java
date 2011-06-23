@@ -20,8 +20,8 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.shared.Lock;
 
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena;
@@ -32,10 +32,14 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
 
     private static final long serialVersionUID = 1L;
 
-    @Override
-    protected Actions requiredActions(VitroRequest vreq) {
-    	return new Actions(new UseBasicAjaxControllers());
-    }
+	/**
+	 * No need to restrict authorization here. doRequest() will return an error
+	 * if the user is not authorized.
+	 */
+	@Override
+	protected Actions requiredActions(VitroRequest vreq) {
+		return Actions.AUTHORIZED;
+	}
     
     @Override
     protected void doRequest(VitroRequest vreq,
@@ -79,63 +83,60 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
 
         String editorUri = EditN3Utils.getEditorUri(vreq);           
         try {
-            processChanges( additions, retractions, getWriteModel(vreq),getQueryModel(vreq), editorUri);
+			Model a = mergeModels(additions);
+			Model r = mergeModels(retractions);
+
+			Model toBeAdded = a.difference(r);
+			Model toBeRetracted = r.difference(a);
+
+			Model depResRetractions = DependentResourceDeleteJena
+					.getDependentResourceDeleteForChange(toBeAdded,
+							toBeRetracted, getWriteModel(vreq));
+			toBeRetracted.add(depResRetractions);
+        	
+        	if (!isAuthorized(vreq, toBeAdded, toBeRetracted)) {
+        		doError(response, "Not authorized for these RDF edits", HttpStatus.SC_UNAUTHORIZED);
+        		return;
+        	}
+        	
+        	processChanges(editorUri, getWriteModel(vreq), toBeAdded, toBeRetracted);
         } catch (Exception e) {
             doError(response,e.getMessage(),HttpStatus.SC_INTERNAL_SERVER_ERROR);
         }           
         
     }
-    
-    protected void processChanges(Set<Model> additions, Set<Model> retractions, OntModel writeModel, OntModel queryModel, String editorURI ) throws Exception{
-        Model a = com.hp.hpl.jena.rdf.model.ModelFactory.createDefaultModel();
-        for(Model m : additions)
-            a.add(m);
-        
-        Model r = com.hp.hpl.jena.rdf.model.ModelFactory.createDefaultModel();
-        for(Model m : retractions)
-            r.add(m);
-        
-        processChanges(a,r,writeModel,queryModel,editorURI);
-               
-    }
-    
-    protected void processChanges(Model additions, Model retractions, OntModel writeModel, OntModel queryModel, String editorURI ) throws Exception{        
-        /*
-         * Do a diff on the additions and retractions and then only add the delta to the jenaOntModel.
-         */            
-        Model assertionsAdded = additions.difference( retractions );    
-        Model assertionsRetracted = retractions.difference( additions );
-            
-        Model depResRetractions = 
-            DependentResourceDeleteJena
-              .getDependentResourceDeleteForChange(assertionsAdded, assertionsRetracted, queryModel);
-        assertionsRetracted.add( depResRetractions );                     
-         
-        Lock lock = null;
-        try{
-            lock =  writeModel.getLock();
-            lock.enterCriticalSection(Lock.WRITE);
-            writeModel.getBaseModel().notifyEvent(new EditEvent(editorURI,true));   
-            writeModel.add( assertionsAdded );
-            writeModel.remove( assertionsRetracted );
-        }catch(Throwable t){
-            throw new Exception("Error while modifying model \n" + t.getMessage());     
-        }finally{
-            writeModel.getBaseModel().notifyEvent(new EditEvent(editorURI,false));
-            lock.leaveCriticalSection();
-        }        
-    }
-    
 
+	private boolean isAuthorized(VitroRequest vreq, Model toBeAdded, Model toBeRetracted) {
+		return PolicyHelper.isAuthorizedToAdd(vreq, toBeAdded)
+				&& PolicyHelper.isAuthorizedToDrop(vreq, toBeRetracted);
+	}
+
+	/** Package access to allow for unit testing. */
+	void processChanges(String editorUri, OntModel writeModel,
+			Model toBeAdded, Model toBeRetracted) throws Exception {
+		Lock lock = writeModel.getLock();
+		try {
+			lock.enterCriticalSection(Lock.WRITE);
+			writeModel.getBaseModel().notifyEvent(new EditEvent(editorUri, true));
+			writeModel.add(toBeAdded);
+			writeModel.remove(toBeRetracted);
+		} catch (Throwable t) {
+			throw new Exception("Error while modifying model \n" + t.getMessage());
+		} finally {
+			writeModel.getBaseModel().notifyEvent(new EditEvent(editorUri, false));
+			lock.leaveCriticalSection();
+		}
+	}
 
     /**
      * Convert the values from a parameters into RDF models.
+     * 
+     * Package access to allow for unit testing.
+     * 
      * @param parameters - the result of request.getParameters(String)
      * @param format - a valid format string for Jena's Model.read()
-     * @return 
-     * @throws Exception
      */
-    protected Set<Model> parseRdfParam(String[] parameters, String format) throws Exception{
+    Set<Model> parseRdfParam(String[] parameters, String format) throws Exception{
         Set<Model> models = new HashSet<Model>();               
         for( String param : parameters){
             try{
@@ -150,19 +151,23 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
         }
         return models;
     }
-    
-    protected OntModel getWriteModel(HttpServletRequest request){
+
+    private OntModel getWriteModel(HttpServletRequest request){
         HttpSession session = request.getSession(false);
         if( session == null || session.getAttribute("jenaOntModel") == null )
             return (OntModel)getServletContext().getAttribute("jenaOntModel");
         else
             return (OntModel)session.getAttribute("jenaOntModel");
     }
-    
-    protected OntModel getQueryModel(HttpServletRequest request){
-        return getWriteModel(request);
-    }
-    
-    Log log = LogFactory.getLog(PrimitiveRdfEdit.class.getName());
 
+	/** Package access to allow for unit testing. */
+	Model mergeModels(Set<Model> additions) {
+		Model a = com.hp.hpl.jena.rdf.model.ModelFactory.createDefaultModel();
+		for (Model m : additions) {
+			a.add(m);
+		}
+		return a;
+	}
+
+    Log log = LogFactory.getLog(PrimitiveRdfEdit.class.getName());
 }

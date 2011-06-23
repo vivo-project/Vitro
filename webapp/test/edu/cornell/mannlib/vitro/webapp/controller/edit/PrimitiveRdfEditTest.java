@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
-import java.util.Collections;
 import java.util.Set;
 
 import junit.framework.Assert;
@@ -11,12 +10,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 
 public class PrimitiveRdfEditTest {
     
@@ -48,15 +45,16 @@ public class PrimitiveRdfEditTest {
 				
 		Assert.assertNotNull( writeModel );
 		long size = writeModel.size();
-		pre.processChanges( models, Collections.EMPTY_SET, writeModel, writeModel, "uri:fakeEditorUri");		
+		pre.processChanges("uri:fakeEditorUri", writeModel,
+				pre.mergeModels(models), ModelFactory.createDefaultModel());
 		Assert.assertEquals(size+totalStmts, writeModel.size());
 				
 		String params3[] = { testN3b };
 		Set<Model> retracts = pre.parseRdfParam( params3, "N3");		
-		pre.processChanges(Collections.EMPTY_SET, retracts, writeModel, writeModel, "uri:fakeEditorUri");
+		pre.processChanges("uri:fakeEditorUri", writeModel, 
+				ModelFactory.createDefaultModel(), pre.mergeModels(retracts));
 		Assert.assertEquals(size+totalStmts-1, writeModel.size());		
 	}
-
 
 	@Test
 	public void testParseRdfParam() throws Exception {
@@ -65,7 +63,5 @@ public class PrimitiveRdfEditTest {
 		Set<Model> models = pre.parseRdfParam(params, "N3");
 		Assert.assertNotNull(models);
 		Assert.assertTrue( models.size() == 2);
-				
 	}
-
 }
