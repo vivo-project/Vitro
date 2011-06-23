@@ -2,6 +2,8 @@
 
 <#-- Template for displaying list of user accounts -->
 
+<#import "userAccounts-accountsNav.ftl" as p>
+
 <form method="POST" action="${formUrls.list}" class="customForm" role="">
 
     <#--current page: <input type="text" name="pageIndex" value="${page.current}" />
@@ -108,41 +110,8 @@
 </form>
 
 <form method="POST" action="${formUrls.list}" id="account-display" class="customForm" role="">
-    <section class="accounts">
-        <input type="submit" name="delete-account" class="delete-account submit" value="Delete" onClick="changeAction(this.form, '${formUrls.delete}')" />
-        <!-- 
-            When this is clicked, the checkboxes are noticed and all other fields are ignored. 
-            submit the form (submit action is formUrls.delete)
-        -->
+    <@p.accountsNav />
     
-        <nav class="display-tools">
-            <span>| <a href="#">n</a> accounts | </span>  
-    
-            <#assign counts = [25, 50, 100]>
-            
-            <select name="accountsPerPage" class="accounts-per-page">
-                <#list counts as count>
-                <option value="${count}" <#if accountsPerPage= count>selected</#if> >${count}</option>
-                </#list>
-                <!--     
-                    When accountsPerPage changes, 
-                    set pageIndex to 1 
-                    submit the form (submit action is formUrls.list) 
-                -->     
-            </select>
-    
-            accounts per page <input type="submit" name="accounts-per-page" value="Update" /> | 
-    
-            <#if page.previous?has_content>
-                <a href="${formUrls.list}?accountsPerPage=${accountsPerPage}&pageIndex=${page.previous}">Previous</a> <!-- only present if current page is not 1.-->
-            </#if>
-                ${page.current} of ${page.last} 
-            <#if page.next?has_content>
-                <a href="${formUrls.list}?accountsPerPage=${accountsPerPage}&pageIndex=${page.next}">Next</a><!-- only present if current page is not last page.-->
-            </#if>
-        </nav>
-    </section>
-
     <table id="account">
         <caption>Account Management</caption>
 
@@ -216,40 +185,7 @@
         </tbody>
     </table>
     
-    <section class="accounts">
-        <input type="submit" name="delete-account" class="delete-account submit" value="Delete" onClick="changeAction(this.form, '${formUrls.delete}')" />
-        <!-- 
-            When this is clicked, the checkboxes are noticed and all other fields are ignored. 
-            submit the form (submit action is formUrls.delete)
-        -->
-    
-        <nav class="display-tools">
-            <span>| <a href="#">n</a> accounts | </span>  
-    
-            <#assign counts = [25, 50, 100]>
-            
-            <select name="accountsPerPage" class="accounts-per-page">
-                <#list counts as count>
-                <option value="${count}" <#if accountsPerPage= count>selected</#if> >${count}</option>
-                </#list>
-                <!--     
-                    When accountsPerPage changes, 
-                    set pageIndex to 1 
-                    submit the form (submit action is formUrls.list) 
-                -->     
-            </select>
-    
-            accounts per page <input type="submit" name="accounts-per-page" value="Update" /> | 
-    
-            <#if page.previous?has_content>
-                <a href="${formUrls.list}?accountsPerPage=${accountsPerPage}&pageIndex=${page.previous}">Previous</a> <!-- only present if current page is not 1.-->
-            </#if>
-                ${page.current} of ${page.last} 
-            <#if page.next?has_content>
-                <a href="${formUrls.list}?accountsPerPage=${accountsPerPage}&pageIndex=${page.next}">Next</a><!-- only present if current page is not last page.-->
-            </#if>
-        </nav>
-    </section>
+    <@p.accountsNav />
 </form>
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/account/accountUtils.js"></script>')}
