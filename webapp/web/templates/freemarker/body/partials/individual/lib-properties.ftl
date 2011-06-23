@@ -240,3 +240,11 @@ name will be used as the label. -->
     <@editingLinks "label" label editable />
 </#macro>
 
+<#-- Most specific types -->
+<#macro mostSpecificTypes individual>
+    <#local types = individual.mostSpecificTypes />
+    <#list types as type>
+        <span class="most-specific-type">${type}</span>
+    </#list>
+</#macro>
+

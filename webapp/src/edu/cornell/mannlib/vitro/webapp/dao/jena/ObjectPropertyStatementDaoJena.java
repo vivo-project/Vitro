@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -38,6 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualUpdateEvent;
 
 public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements ObjectPropertyStatementDao {
@@ -359,7 +361,6 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             initialBindings.add(
                     "property", ResourceFactory.createResource(propertyUri));
         
-            List<Map<String, String>> list = new ArrayList<Map<String, String>>();
             DatasetWrapper w = dwf.getDatasetWrapper();
             Dataset dataset = w.getDataset();
             dataset.getLock().enterCriticalSection(Lock.READ);
@@ -383,4 +384,58 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         
     }
     
+    protected static final String MOST_SPECIFIC_TYPE_QUERY = 
+        "PREFIX rdfs: <" + VitroVocabulary.RDFS + "> \n" +
+        "PREFIX vitro: <" + VitroVocabulary.vitroURI + "> \n" +
+        "SELECT ?label WHERE { \n" +
+        "    ?subject vitro:mostSpecificType ?type . \n" +
+        "    ?type rdfs:label ?label \n" +
+        "} ORDER BY ?label ";
+    
+    @Override
+    /** 
+     * Finds all mostSpecificTypes of an individual.
+     * Returns a list of type labels.
+     * **/
+    public List<String> getMostSpecificTypesForIndividual(String subjectUri) {
+        
+        String queryString = subUriForQueryVar(MOST_SPECIFIC_TYPE_QUERY, "subject", subjectUri);
+        
+        log.debug("Query string for vitro:mostSpecificType : " + queryString);
+        
+        Query query = null;
+        try {
+            query = QueryFactory.create(queryString, Syntax.syntaxARQ);
+        } catch(Throwable th){
+            log.error("Could not create SPARQL query for query string. " + th.getMessage());
+            log.error(queryString);
+            return Collections.emptyList();
+        }        
+        
+        List<String> types = new ArrayList<String>();
+        DatasetWrapper w = dwf.getDatasetWrapper();
+        Dataset dataset = w.getDataset();
+        dataset.getLock().enterCriticalSection(Lock.READ);
+        try {
+            
+            QueryExecution qexec = QueryExecutionFactory.create(query, dataset);
+            ResultSet results = qexec.execSelect();
+            while (results.hasNext()) {
+                QuerySolution soln = results.nextSolution();
+                RDFNode node = soln.get("label");
+                if (node.isLiteral()) {
+                    String label = node.asLiteral().getLexicalForm();
+                    if (! StringUtils.isBlank(label)) {
+                        types.add(label);
+                    }
+                }
+            }
+            
+        } finally {
+            dataset.getLock().leaveCriticalSection();
+            w.close();
+        }
+        
+        return types;        
+    }
 }

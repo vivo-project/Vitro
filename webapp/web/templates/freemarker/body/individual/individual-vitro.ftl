@@ -31,10 +31,8 @@
                     <#-- Label -->
                     <@p.label individual editable />
                         
-                    <#-- Moniker -->
-                    <#if individual.moniker?has_content>
-                        <span class="preferred-title">${individual.moniker}</span>                  
-                    </#if>
+                    <#--  Most-specific types -->
+                    <@p.mostSpecificTypes individual />
                 </h1>
             </#if>
         </header>

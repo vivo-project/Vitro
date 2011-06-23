@@ -39,7 +39,7 @@
 #individual-intro h1 {
     padding-bottom: 8px;  
 }
-#individual-intro span.preferred-title {
+#individual-intro span.most-specific-type {
     padding-left: 10px;
     margin-left: 10px;
 }
@@ -188,7 +188,7 @@ ul#additional-emails li {
 #individual-info.withThumb {
     width: 78%;
 }
-h1.fn .preferred-title {
+h1.fn .most-specific-type {
     padding-left: 10px;
     margin-left: 10px;
 }

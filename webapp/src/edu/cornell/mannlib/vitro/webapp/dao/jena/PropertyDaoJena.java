@@ -404,7 +404,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         return classSet;
     }
      
-    protected Iterator<QuerySolution> getPropertyQueryResults(String subjectUri, Query query) {        
+    protected Iterator<QuerySolution> getPropertyQueryResults(Query query) {        
         log.debug("SPARQL query:\n" + query.toString());
         
         // RY Removing prebinding due to Jena bug: when isLiteral(?object) or 

@@ -41,7 +41,7 @@ public class VitroVocabulary {
     public static final String DISPLAY = DisplayVocabulary.DISPLAY_NS;
 
     // properties found on the beans
-
+    
     public static final String DESCRIPTION = vitroURI+"description";
     public static final String DESCRIPTION_ANNOT = vitroURI + "descriptionAnnot";
     public static final String PUBLIC_DESCRIPTION_ANNOT = vitroURI + "publicDescriptionAnnot";
@@ -56,6 +56,8 @@ public class VitroVocabulary {
     //public static final String PROHIBITED_FROM_CREATE_BELOW_ROLE_LEVEL_ANNOT = vitroURI+"prohibitedFromCreateBelowRoleLevelAnnot";
     public static final String PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT = vitroURI+"prohibitedFromUpdateBelowRoleLevelAnnot";
     //public static final String PROHIBITED_FROM_DELETE_BELOW_ROLE_LEVEL_ANNOT = vitroURI+"prohibitedFromDeleteBelowRoleLevelAnnot";
+    
+    public static final String MOST_SPECIFIC_TYPE = vitroURI + "mostSpecificType";
 
     // roles
     public static final String PUBLIC = "http://vitro.mannlib.cornell.edu/ns/vitro/role#public";

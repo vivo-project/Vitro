@@ -168,7 +168,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             if( startIndex >= DEFAULT_MAX_HIT_COUNT  - hitsPerPage )
                 maxHitCount = startIndex + DEFAULT_MAX_HIT_COUNT ;
 
-            log.debug("maxHitSize is " + maxHitCount);
+            log.debug("maxHitCount is " + maxHitCount);
 
             String qtxt = vreq.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
             
@@ -363,7 +363,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
                 }
             } catch(Exception e) {
                 log.error("problem getting VClassGroups from search hits " 
-                        + e.getMessage());
+                        + e.getMessage() );
             }
         }            
         

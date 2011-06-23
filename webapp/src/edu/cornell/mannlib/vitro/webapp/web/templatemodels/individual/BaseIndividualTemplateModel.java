@@ -2,8 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,8 +23,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
+import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
@@ -146,9 +149,11 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         return individual.getName();
     }
 
-    public String getMoniker() {
-        return individual.getMoniker();
+    public List<String> getMostSpecificTypes() {
+        ObjectPropertyStatementDao opsDao = vreq.getWebappDaoFactory().getObjectPropertyStatementDao();
+        return opsDao.getMostSpecificTypesForIndividual(getUri());  
     }
+
 
     public String getUri() {
         return individual.getURI();

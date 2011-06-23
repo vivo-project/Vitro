@@ -116,9 +116,6 @@ public class SolrAutocompleteController extends VitroAjaxController {
 
             Collections.sort(results);
             
-            // map.put("results", results);
-            // writeTemplate(TEMPLATE_DEFAULT, map, config, vreq, response);
-            
             JSONArray jsonArray = new JSONArray();
             for (SearchResult result : results) {
                 jsonArray.put(result.toMap());
@@ -157,7 +154,7 @@ public class SolrAutocompleteController extends VitroAjaxController {
         
         query.setFields(VitroLuceneTermNames.NAME_RAW, VitroLuceneTermNames.URI); // fields to retrieve
        
-        // Can't sort on multivalued field, so sort results in Java when we get them
+        // Can't sort on multivalued field, so we sort the results in Java when we get them.
         // query.setSortField(VitroLuceneTermNames.NAME_LOWERCASE, SolrQuery.ORDER.asc);
         
         return query;
