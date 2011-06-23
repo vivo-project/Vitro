@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 
+import com.hp.hpl.jena.rdf.model.Literal;
+
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 
@@ -23,7 +25,15 @@ public class DropDataPropStmt extends AbstractDataPropertyAction {
         dataPropStmt.setData(data);        
     }
     
-    public String data(){ return dataPropStmt.getData(); }
+	public DropDataPropStmt(String subjectUri, String predicateUri, Literal data) {
+    	super(subjectUri, predicateUri);
+        dataPropStmt = new DataPropertyStatementImpl();
+        dataPropStmt.setIndividualURI(subjectUri);
+        dataPropStmt.setDatapropURI(predicateUri);
+        dataPropStmt.setData(data.getValue().toString());        
+	}
+
+	public String data(){ return dataPropStmt.getData(); }
     public String lang(){ return dataPropStmt.getLanguage(); }
     public String datatype(){return dataPropStmt.getDatatypeURI(); }
     
