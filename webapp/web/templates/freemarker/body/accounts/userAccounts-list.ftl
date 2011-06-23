@@ -187,5 +187,4 @@
     
     <@p.accountsNav />
 </form>
-
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/account/accountUtils.js"></script>')}

@@ -10,7 +10,7 @@
 <#macro accountsNav accountsCount=counts>
 
   <section class="accounts">
-      <input type="submit" name="delete-account" class="delete-account submit" value="Delete" onClick="changeAction(this.form, '${formUrls.delete}')" />
+      <input type="submit" name="delete-account" class="delete-account delete" value="Delete" onClick="changeAction(this.form, '${formUrls.delete}')" />
       <!-- 
           When this is clicked, the checkboxes are noticed and all other fields are ignored. 
           submit the form (submit action is formUrls.delete)
