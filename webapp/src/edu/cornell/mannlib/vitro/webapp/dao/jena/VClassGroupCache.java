@@ -3,9 +3,10 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -30,172 +31,149 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
 
-public class VClassGroupCache{
+public class VClassGroupCache {
     private static final Log log = LogFactory.getLog(VClassGroupCache.class);
-    
-	private static final String ATTRIBUTE_NAME = "VClassGroupCache";
+
+    private static final String ATTRIBUTE_NAME = "VClassGroupCache";
 
     private static final boolean ORDER_BY_DISPLAYRANK = true;
     private static final boolean INCLUDE_UNINSTANTIATED = true;
     private static final boolean INCLUDE_INDIVIDUAL_COUNT = true;
 
-    /** 
-     * Use getVClassGroupCache(ServletContext) to get a VClassGroupCache.
+    /**
+     * This is the cache of VClassGroups. It is a list of VClassGroups. If this
+     * is null then the cache is not built.
      */
-    public static VClassGroupCache getVClassGroupCache(ServletContext sc){
-        return (VClassGroupCache) sc.getAttribute(ATTRIBUTE_NAME);
-    }
-    
-    /** Indicates that a rebuild of the VCLassGroupCache is needed. */
-    private Boolean _rebuildRequested;
-    
-	/** This is the cache of VClassGroups.  It is a list of VClassGroups.  
-	 * If this is null then the cache is not built. */
     private List<VClassGroup> _groupList;
-                   
-    private final RebuildGroupCacheThread _cacheRebuildThread;    
+
+    /**
+     * Also keep track of the classes here, makes it easier to get the counts
+     * and other information */
+    private Map<String, VClass> VclassMap = new HashMap<String, VClass>();
+
+    
+    private final RebuildGroupCacheThread _cacheRebuildThread;
+    
+    /**
+     * Need a pointer to the context to get DAOs and models.
+     */
     private final ServletContext context;
-    
-    //Also keep track of the classes here, makes it easier to get the counts and other information
-    private HashMap<String, VClass> VclassMap = new HashMap<String, VClass>();
-    
+
+
     private VClassGroupCache(ServletContext context) {
         this.context = context;
         this._groupList = null;
-       
-        if( AbortStartup.isStartupAborted(context)){
+
+        if (AbortStartup.isStartupAborted(context)) {
             _cacheRebuildThread = null;
             return;
         }
-        
+
+        /* Need to register for changes of rdf:type for individuals in abox 
+         * and for changes of classgroups for classes. */         
         VClassGroupCacheChangeListener bccl = new VClassGroupCacheChangeListener();
         ModelContext.registerListenerForChanges(context, bccl);
-//        
-//        ModelContext.getJenaOntModel(context).register(bccl);
-//        ModelContext.getBaseOntModel(context).register(bccl);
-//        ModelContext.getInferenceOntModel(context).register(bccl);
-//        ModelContext.getUnionOntModelSelector(context).getABoxModel().register(bccl);
-//        ModelContext.getBaseOntModelSelector(context).getABoxModel().register(bccl);
-//        ModelContext.getInferenceOntModelSelector(context).getABoxModel().register(bccl);
-       
-        _rebuildRequested = true;
+
         _cacheRebuildThread = new RebuildGroupCacheThread(this);
         _cacheRebuildThread.setDaemon(true);
         _cacheRebuildThread.start();
-        _cacheRebuildThread.informOfQueueChange();       
+        _cacheRebuildThread.informOfQueueChange();
     }
-     
-    public void clearGroupCache(){        
-        _groupList.clear();
-    }   
-    
-    public VClassGroup getGroup(  String vClassGroupURI ){
-        if( vClassGroupURI == null || vClassGroupURI.isEmpty() )
+
+    public synchronized VClassGroup getGroup(String vClassGroupURI) {
+        if (vClassGroupURI == null || vClassGroupURI.isEmpty())
             return null;
         List<VClassGroup> cgList = getGroups();
-        for( VClassGroup cg : cgList ){
-            if( vClassGroupURI.equals( cg.getURI()))
+        for (VClassGroup cg : cgList) {
+            if (vClassGroupURI.equals(cg.getURI()))
                 return cg;
         }
         return null;
     }
-    
-    /**
-     * @deprecated use getGroups() instead.
-     */
-    public List<VClassGroup> getGroups( int portalId ){
-        //bdc34: this has been de-portaled.
-        if( _groupList == null )
-            return rebuildCache();
-        else
-            return _groupList;
-    }  
-    
-    
-    public List<VClassGroup> getGroups( ){     
-        if( _groupList == null )
-            return rebuildCache();
-        else
-            return _groupList;
-    }     
-    
-    //Get specific VClass corresponding to Map
-    public VClass getCachedVClass(String classUri) {
-    	if(VclassMap.containsKey(classUri)) {
-    		return VclassMap.get(classUri);
-    	}
-    	return null;
-    }
-        
-    private synchronized void requestCacheUpdate(){
-        log.debug("requesting update");
-        _rebuildRequested = true;                
-        _cacheRebuildThread.informOfQueueChange();
-    }    
 
-    protected synchronized List<VClassGroup> rebuildCache(){
-        long start = System.currentTimeMillis();
-        try{
-            WebappDaoFactory wdFactory = (WebappDaoFactory)context.getAttribute("webappDaoFactory");
-            if( wdFactory == null ){
-                log.error("Unable to rebuild cache: could not get 'webappDaoFactory' from Servletcontext");
-                return Collections.emptyList();
-            }
-            
-            VitroFilters vFilters = VitroFilterUtils.getPublicFilter(context);
-            WebappDaoFactory filteringDaoFactory = new WebappDaoFactoryFiltering(wdFactory,vFilters);
-        
-            // BJL23:  You may be wondering, why this extra method?  
-            // Can't we just use the filtering DAO?
-            // Yes, but using the filtered DAO involves an expensive method
-            // called correctVClassCounts() that requires each individual
-            // in a VClass to be retrieved and filtered.  This is fine in memory,
-            // but awful when using a database.  We can't (yet) avoid all
-            // this work when portal filtering is involved, but we can
-            // short-circuit it when we have a single portal by using
-            // the filtering DAO only to filter groups and classes,
-            // and the unfiltered DAO to get the counts.        
-            List<VClassGroup> unfilteredGroups = getGroups(wdFactory.getVClassGroupDao(), INCLUDE_INDIVIDUAL_COUNT);
-            List<VClassGroup> filteredGroups = getGroups(filteringDaoFactory.getVClassGroupDao(), !INCLUDE_INDIVIDUAL_COUNT);                                    
-            List<VClassGroup> groups = removeFilteredOutGroupsAndClasses(unfilteredGroups, filteredGroups);
-            
-            // Remove classes that have been configured to be hidden from search results.
-            filteringDaoFactory.getVClassGroupDao().removeClassesHiddenFromSearch(groups);
-            
-            _groupList = groups;
-            _rebuildRequested = false;
-            
-            //Also save the classes and their corresponding VClass objects for use later
-            for(VClassGroup vcg: groups) {
-            	List<VClass> vclasses = vcg.getVitroClassList();
-            	for(VClass vclass: vclasses) {
-            		String classUri = vclass.getURI();
-            		if(!VclassMap.containsKey(classUri)) {
-            			VclassMap.put(classUri, vclass);
-            		}
-            	}
-            }
-            
-            log.info("rebuilt ClassGroup cache in " + (System.currentTimeMillis() - start) + " msec");
-            return _groupList;            
-        }catch (Exception ex){
-            log.error("could not rebuild cache", ex);
+    public synchronized List<VClassGroup> getGroups() {
+        if (_groupList == null){
+            log.error("VClassGroup cache has not been created");
             return Collections.emptyList();
+        }else{
+            return _groupList;
         }
-    }    
+    }
+
+    // Get specific VClass corresponding to Map
+    public synchronized VClass getCachedVClass(String classUri) {
+        if( VclassMap != null){
+            if (VclassMap.containsKey(classUri)) {
+                return VclassMap.get(classUri);
+            }
+            return null;
+        }else{
+            log.error("VClassGroup cache has not been created");
+            return null;
+        }
+    }
+
+    protected synchronized void setCache(List<VClassGroup> newGroups, Map<String,VClass> classMap){
+        _groupList = newGroups;
+        VclassMap = classMap;
+    }
     
-    private List<VClassGroup> getGroups( VClassGroupDao vcgDao ,  boolean includeIndividualCount ){                    
-        // Get all classgroups, each populated with a list of their member vclasses            
-        List<VClassGroup> groups = 
-            vcgDao.getPublicGroupsWithVClasses(ORDER_BY_DISPLAYRANK, INCLUDE_UNINSTANTIATED, includeIndividualCount); 
+    public void requestCacheUpdate() {
+        log.debug("requesting update");        
+        _cacheRebuildThread.informOfQueueChange();
+    }
+    protected void requestStop() {
+        if (_cacheRebuildThread != null) {
+            _cacheRebuildThread.kill();
+            try {
+                _cacheRebuildThread.join();
+            } catch (InterruptedException e) {
+                log.warn("Waiting for the thread to die, but interrupted.", e);
+            }
+        }
+    }
+
+    protected VClassGroupDao getVCGDao() {
+        WebappDaoFactory wdf = (WebappDaoFactory) context.getAttribute("webappDaoFactory");
+        if (wdf == null) {
+            log.error("Cannot get webappDaoFactory from context");
+            return null;
+        } else
+            return wdf.getVClassGroupDao();
+    }
+    
+    
+    /* **************** static utility methods ***************** */
+    
+    protected static List<VClassGroup> getGroups(VClassGroupDao vcgDao,
+            boolean includeIndividualCount) {
+        // Get all classgroups, each populated with a list of their member vclasses
+        List<VClassGroup> groups = vcgDao.getPublicGroupsWithVClasses(
+                ORDER_BY_DISPLAYRANK, INCLUDE_UNINSTANTIATED,
+                includeIndividualCount);
 
         // remove classes that have been configured to be hidden from search results
         vcgDao.removeClassesHiddenFromSearch(groups);
-        
+
         return groups;
     }
+
+    protected static Map<String,VClass> classMapForGroups( List<VClassGroup> groups){
+        Map<String,VClass> newClassMap = new HashMap<String,VClass>();
+        for (VClassGroup vcg : groups) {
+            List<VClass> vclasses = vcg.getVitroClassList();
+            for (VClass vclass : vclasses) {
+                String classUri = vclass.getURI();
+                if (!newClassMap.containsKey(classUri)) {
+                    newClassMap.put(classUri, vclass);
+                }
+            }
+        }
+        return newClassMap;
+    }
     
-    private List<VClassGroup> removeFilteredOutGroupsAndClasses(List<VClassGroup> unfilteredGroups, List<VClassGroup> filteredGroups) {
+    protected static List<VClassGroup> removeFilteredOutGroupsAndClasses(
+            List<VClassGroup> unfilteredGroups, List<VClassGroup> filteredGroups) {
         List<VClassGroup> groups = new ArrayList<VClassGroup>();
         Set<String> allowedGroups = new HashSet<String>();
         Set<String> allowedVClasses = new HashSet<String>();
@@ -223,116 +201,158 @@ public class VClassGroupCache{
         }
         return groups;
     }
-    
-	private void requestStop() {
-		if( _cacheRebuildThread != null ){
-		    _cacheRebuildThread.kill();		
-        	try {
-        		_cacheRebuildThread.join();
-        	} catch (InterruptedException e) {
-        		log.warn("Waiting for the thread to die, but interrupted.", e);
-        	}
-		}
-	}
 
-    protected VClassGroupDao getVCGDao(){
-        WebappDaoFactory wdf =(WebappDaoFactory)context.getAttribute("webappDaoFactory");
-        if( wdf == null ){
-            log.error("Cannot get webappDaoFactory from context");
-            return null;
-        }else
-            return wdf.getVClassGroupDao();
-    }
     
-    /* ******************  Jena Model Change Listener***************************** */
-    private class VClassGroupCacheChangeListener extends StatementListener {        
-        public void addedStatement(Statement stmt) {
-            checkAndDoUpdate(stmt); 
-        }
-        
-        public void removedStatement(Statement stmt) {
-            checkAndDoUpdate(stmt);     
-        }
-
-        private void checkAndDoUpdate(Statement stmt){
-            if( stmt==null ) return;
-            if( log.isDebugEnabled()){
-                log.debug("subject: " + stmt.getSubject().getURI());
-                log.debug("predicate: " + stmt.getPredicate().getURI());
-            }
-            if( RDF.type.getURI().equals( stmt.getPredicate().getURI())  ){
-                requestCacheUpdate();
-            } else if( VitroVocabulary.IN_CLASSGROUP.equals( stmt.getPredicate().getURI() )){
-                requestCacheUpdate();
-            }
-        }
-    }
     /* ******************** RebuildGroupCacheThread **************** */
+    
     protected class RebuildGroupCacheThread extends Thread {
         private final VClassGroupCache cache;
-        private final AtomicLong queueChangeMillis = new AtomicLong();
+        private long queueChangeMillis = 0L;
+        private long timeToBuildLastCache = 100L; //in msec 
+        private boolean rebuildRequested = false;
         private volatile boolean die = false;
 
         RebuildGroupCacheThread(VClassGroupCache cache) {
-        	super("VClassGroupCache.RebuildGroupCacheThread");
+            super("VClassGroupCache.RebuildGroupCacheThread");
             this.cache = cache;
         }
-        
+
         public void run() {
-			while (!die) {
-				int delay;
-				
-				if (_rebuildRequested == Boolean.FALSE) {
-					log.debug("rebuildGroupCacheThread.run() -- queue empty, sleep");
-					delay = 1000 * 60;
-				} else if ((System.currentTimeMillis() - queueChangeMillis.get()) < 200) {
-					log.debug("rebuildGroupCacheThread.run() -- delay start of rebuild");
-					delay = 200;
-				} else {
-					log.debug("rebuildGroupCacheThread.run() -- refreshGroupCache()");
-					cache.rebuildCache();
-					delay = 0;
-				}
-				
-				if (delay > 0) {
-					synchronized (this) {
-						try {
-							wait(delay);
-						} catch (InterruptedException e) {
-							log.warn("Waiting " + delay
-									+ " milliseconds, but interrupted.", e);
-						}
-					}
-				}
+            while (!die) {
+                int delay;
+
+                if ( !rebuildRequested ) {
+                    log.debug("rebuildGroupCacheThread.run() -- queue empty, sleep");
+                    delay = 1000 * 60;
+                } else if ((System.currentTimeMillis() - queueChangeMillis ) < 500) {
+                    log.debug("rebuildGroupCacheThread.run() -- delay start of rebuild");
+                    delay = 500;
+                } else {
+                    log.debug("rebuildGroupCacheThread.run() -- starting rebuildCache()");                    
+                    long start = System.currentTimeMillis();
+                    
+                    rebuildRequested = false;
+                    rebuildCache( cache );
+                    
+                    timeToBuildLastCache = System.currentTimeMillis() - start;
+                    log.debug("rebuildGroupCacheThread.run() -- rebuilt cache in " 
+                            + timeToBuildLastCache + " msec");                    
+                    delay = 0;
+                }
+
+                if (delay > 0) {
+                    synchronized (this) {
+                        try {
+                            wait(delay);
+                        } catch (InterruptedException e) {
+                            log.warn("Waiting " + delay
+                                    + " milliseconds, but interrupted.", e);
+                        }
+                    }
+                }
             }
             log.debug("rebuildGroupCacheThread.run() -- die()");
         }
 
-        synchronized void informOfQueueChange(){
-            queueChangeMillis.set(System.currentTimeMillis());
+        protected void rebuildCache(VClassGroupCache cache) {            
+            try {
+                WebappDaoFactory wdFactory = (WebappDaoFactory) cache.context.getAttribute("webappDaoFactory");
+                if (wdFactory == null) 
+                    log.error("Unable to rebuild cache: could not get 'webappDaoFactory' from Servletcontext");                
+
+                VitroFilters vFilters = VitroFilterUtils.getPublicFilter(context);
+                WebappDaoFactory filteringDaoFactory = new WebappDaoFactoryFiltering(wdFactory, vFilters);
+
+                // BJL23: You may be wondering, why this extra method?
+                // Can't we just use the filtering DAO?
+                // Yes, but using the filtered DAO involves an expensive method
+                // called correctVClassCounts() that requires each individual
+                // in a VClass to be retrieved and filtered. This is fine in memory,
+                // but awful when using a database. We can't (yet) avoid all
+                // this work when portal filtering is involved, but we can
+                // short-circuit it when we have a single portal by using
+                // the filtering DAO only to filter groups and classes,
+                // and the unfiltered DAO to get the counts.
+                List<VClassGroup> unfilteredGroups = getGroups(
+                        wdFactory.getVClassGroupDao(), INCLUDE_INDIVIDUAL_COUNT);
+                List<VClassGroup> filteredGroups = getGroups(
+                        filteringDaoFactory.getVClassGroupDao(),
+                        !INCLUDE_INDIVIDUAL_COUNT);
+                List<VClassGroup> groups = removeFilteredOutGroupsAndClasses(
+                        unfilteredGroups, filteredGroups);
+
+                // Remove classes that have been configured to be hidden from search results.
+                filteringDaoFactory.getVClassGroupDao()
+                        .removeClassesHiddenFromSearch(groups);
+
+                cache.setCache(groups, classMapForGroups(groups));                
+            } catch (Exception ex) {
+                log.error("could not rebuild cache", ex);
+            }
+        }
+        
+        synchronized void informOfQueueChange() {
+            queueChangeMillis = System.currentTimeMillis();
+            rebuildRequested = true;
             this.notifyAll();
         }
 
-        synchronized void kill(){
+        synchronized void kill() {
             die = true;
             this.notifyAll();
         }
-    }
+    }        
 
-    /* ******************** ServletContextListener **************** */	
+    /* ****************** Jena Model Change Listener***************************** */
+    private class VClassGroupCacheChangeListener extends StatementListener {
+        public void addedStatement(Statement stmt) {
+            checkAndDoUpdate(stmt);
+        }
+
+        public void removedStatement(Statement stmt) {
+            checkAndDoUpdate(stmt);
+        }
+
+        private void checkAndDoUpdate(Statement stmt) {
+            if (stmt == null)
+                return;
+            if (log.isDebugEnabled()) {
+                log.debug("subject: " + stmt.getSubject().getURI());
+                log.debug("predicate: " + stmt.getPredicate().getURI());
+            }
+            if (RDF.type.getURI().equals(stmt.getPredicate().getURI())) {
+                requestCacheUpdate();
+            } else if (VitroVocabulary.IN_CLASSGROUP.equals(stmt.getPredicate()
+                    .getURI())) {
+                requestCacheUpdate();
+            }
+        }
+    }
+    
+    /* ******************** ServletContextListener **************** */
     public static class Setup implements ServletContextListener {
         @Override
-        public void contextInitialized(ServletContextEvent sce) {        
+        public void contextInitialized(ServletContextEvent sce) {
             ServletContext servletContext = sce.getServletContext();
-			servletContext.setAttribute(ATTRIBUTE_NAME,  new VClassGroupCache(servletContext) );
+            servletContext.setAttribute(ATTRIBUTE_NAME, new VClassGroupCache(
+                    servletContext));
         }
 
         @Override
         public void contextDestroyed(ServletContextEvent sce) {
             Object o = sce.getServletContext().getAttribute(ATTRIBUTE_NAME);
-        	if (o instanceof VClassGroupCache ) {
-        		((VClassGroupCache) o).requestStop();
-        	}
+            if (o instanceof VClassGroupCache) {
+                ((VClassGroupCache) o).requestStop();
+            }
         }
     }
+
+    
+    /**
+     * Use getVClassGroupCache(ServletContext) to get a VClassGroupCache.
+     */
+    public static VClassGroupCache getVClassGroupCache(ServletContext sc) {
+        return (VClassGroupCache) sc.getAttribute(ATTRIBUTE_NAME);
+    }
+
 }
