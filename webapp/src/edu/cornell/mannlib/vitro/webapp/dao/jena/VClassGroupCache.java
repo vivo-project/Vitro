@@ -75,9 +75,8 @@ public class VClassGroupCache {
         ModelContext.registerListenerForChanges(context, bccl);
 
         _cacheRebuildThread = new RebuildGroupCacheThread(this);
-        _cacheRebuildThread.setDaemon(true);
-        _cacheRebuildThread.start();
-        _cacheRebuildThread.informOfQueueChange();
+        _cacheRebuildThread.setDaemon(true);        
+        _cacheRebuildThread.start();        
     }
 
     public synchronized VClassGroup getGroup(String vClassGroupURI) {
@@ -122,6 +121,7 @@ public class VClassGroupCache {
         log.debug("requesting update");        
         _cacheRebuildThread.informOfQueueChange();
     }
+    
     protected void requestStop() {
         if (_cacheRebuildThread != null) {
             _cacheRebuildThread.kill();
@@ -142,6 +142,9 @@ public class VClassGroupCache {
             return wdf.getVClassGroupDao();
     }
     
+    protected void doSynchronousRebuild(){
+        _cacheRebuildThread.rebuildCache(this);        
+    }
     
     /* **************** static utility methods ***************** */
     
@@ -332,10 +335,12 @@ public class VClassGroupCache {
     /* ******************** ServletContextListener **************** */
     public static class Setup implements ServletContextListener {
         @Override
-        public void contextInitialized(ServletContextEvent sce) {
+        public void contextInitialized(ServletContextEvent sce) {            
             ServletContext servletContext = sce.getServletContext();
-            servletContext.setAttribute(ATTRIBUTE_NAME, new VClassGroupCache(
-                    servletContext));
+            VClassGroupCache vcgc = new VClassGroupCache(servletContext);
+            servletContext.setAttribute(ATTRIBUTE_NAME,vcgc);
+            vcgc.doSynchronousRebuild();            
+            log.info("VClassGroupCache added to context");            
         }
 
         @Override
