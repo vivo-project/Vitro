@@ -49,6 +49,7 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.VitroHighlighter;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames;
+import edu.cornell.mannlib.vitro.webapp.search.VitroTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.LinkTemplateModel;
@@ -177,6 +178,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             SolrQuery query = getQuery(qtxt, maxHitCount, vreq);            
             SolrServer solr = SolrSetup.getSolrServer(getServletContext());
             QueryResponse response = null;
+           
             
             try {
                 response = solr.query(query);
@@ -349,11 +351,11 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
         for(int i=0; i<hitCount && n > grpsFound ;i++){
             try{
                 SolrDocument doc = docs.get(i);        
-                Collection<Object> grps = doc.getFieldValues(VitroLuceneTermNames.CLASSGROUP_URI);     
+                Collection<Object> grps = doc.getFieldValues(VitroTermNames.CLASSGROUP_URI);     
                 if (grps != null) {
                     for (Object o : grps) {                            
                         String groupUri = o.toString();
-                        if( groupUri != null && ! classGroupsInHits.contains(groupUri)){
+                        if( groupUri != null && !classGroupsInHits.contains(groupUri)){
                             classGroupsInHits.add(groupUri);
                             grpsFound++;
                             if( grpsFound >= n )
@@ -364,6 +366,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             } catch(Exception e) {
                 log.error("problem getting VClassGroups from search hits " 
                         + e.getMessage() );
+                e.printStackTrace();
             }
         }            
         

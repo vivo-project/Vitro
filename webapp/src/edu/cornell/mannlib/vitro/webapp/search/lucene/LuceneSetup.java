@@ -6,6 +6,7 @@ import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.Vi
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.ALLTEXTUNSTEMMED;
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.CLASSLOCALNAME;
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.CLASSLOCALNAMELOWERCASE;
+import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.CONTEXTNODE;
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.MONIKER;
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.NAME_STEMMED;
 import static edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames.NAME_UNSTEMMED;
@@ -38,7 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
-import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearch;
+import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearchImpl;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
@@ -111,10 +112,15 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 					getAnalyzer());
 			context.setAttribute(ANALYZER, getAnalyzer());
 			
+			//bk392 adding another argument to Entity2LuceneDoc
+			// that takes care of sparql queries for context nodes.
+			
 			OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
 			Entity2LuceneDoc translator = new Entity2LuceneDoc( 
 			        new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel),
-			        new IndividualProhibitedFromSearch(context) );									
+			        new IndividualProhibitedFromSearchImpl(context)
+			        
+			);									
 			indexer.addObj2Doc(translator);			
 			
 			context.setAttribute(LuceneIndexer.class.getName(), indexer);
@@ -250,8 +256,10 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
         analyzer.addAnalyzer(NAME_STEMMED, new HtmlLowerStopStemAnalyzer());
         analyzer.addAnalyzer(MONIKER, new StandardAnalyzer(Version.LUCENE_29));
         analyzer.addAnalyzer(RDFTYPE, new StandardAnalyzer(Version.LUCENE_29));
+        analyzer.addAnalyzer(CONTEXTNODE, new StandardAnalyzer(Version.LUCENE_29));
         analyzer.addAnalyzer(CLASSLOCALNAME, new HtmlLowerStopAnalyzer());
         analyzer.addAnalyzer(CLASSLOCALNAMELOWERCASE, new HtmlLowerStopAnalyzer());
+        
         
         return analyzer;
     }

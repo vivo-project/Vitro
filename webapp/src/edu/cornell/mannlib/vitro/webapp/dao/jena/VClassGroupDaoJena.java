@@ -324,7 +324,7 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
         for (VClassGroup group : groups) {
             List<VClass> classList = new ArrayList<VClass>();
             for (VClass vclass : group.getVitroClassList()) {
-                if (!pfs.isClassProhibited(vclass.getURI())) {
+                if (!pfs.isClassProhibitedFromSearch(vclass.getURI())) {
                     classList.add(vclass);
                 }
             }

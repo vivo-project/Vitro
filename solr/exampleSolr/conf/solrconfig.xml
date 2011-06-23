@@ -384,7 +384,8 @@
          disagree on this property, the value at any given moment will
          be based on the last SolrCore to be initialized.
          
-    -->
+      -->
+       -->
     <!-- Increasing to handle large wildcard queries used in IndividualListController. 
          See VIVO-384. -->
     <maxBooleanClauses>50000</maxBooleanClauses>
@@ -706,8 +707,15 @@
          will be overridden by parameters in the request
       -->
      <lst name="defaults">
+       <str name="defType">edismax</str>
+       <str name="qf">nameRaw nameLowercase ALLTEXT ALLTEXTUNSTEMMED ALLTEXT_PHONETIC NAME_PHONETIC nameUnstemmed nameStemmed targetInfo</str>
+       <str name="pf">targetInfo</str>
        <str name="echoParams">explicit</str>
+       <str name="ps">2</str>
+       <str name="qs">2</str>
        <int name="rows">10</int>
+       <str name="q.alt">*:*</str>
+       <str name="fl">*,score</str>
      </lst>
     <!-- In addition to defaults, "appends" params can be specified
          to identify values which should be appended to the list of
@@ -783,20 +791,22 @@
        <str name="v.layout">layout</str>
        <str name="title">Solritas</str>
 
-       <str name="defType">edismax</str>
+      <!-- <str name="defType">edismax</str> -->
+     
        <str name="q.alt">*:*</str>
        <str name="rows">10</str>
        <str name="fl">*,score</str>
+
        <str name="mlt.qf">
          text^0.5 features^1.0 name^1.2 sku^1.5 id^10.0 manu^1.1 cat^1.4
        </str>
        <str name="mlt.fl">text,features,name,sku,id,manu,cat</str>
        <int name="mlt.count">3</int>
-
+ 
        <str name="qf">
           text^0.5 features^1.0 name^1.2 sku^1.5 id^10.0 manu^1.1 cat^1.4
        </str>
-
+      
        <str name="facet">on</str>
        <str name="facet.field">cat</str>
        <str name="facet.field">manu_exact</str>
@@ -1395,8 +1405,7 @@
       </fragmentsBuilder>
     </highlighting>
   </searchComponent>
-
-  <!-- Autocomplete -->
+<!-- Autocomplete -->
   <!--
   <searchComponent class="solr.SpellCheckComponent" name="suggest">
     <lst name="spellchecker">
@@ -1435,7 +1444,6 @@
     </arr>
   </requestHandler>
   -->
-  
   <!-- Update Processors
 
        Chains of Update Processor Factories for dealing with Update

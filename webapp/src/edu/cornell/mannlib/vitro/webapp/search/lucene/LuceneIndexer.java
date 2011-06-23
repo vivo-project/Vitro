@@ -473,5 +473,11 @@ public class LuceneIndexer implements IndexerIface {
                 System.out.println("Could not clean up temp indexing dir " + currentOffLineDir);
             }
         }                
-    }    
+    }
+
+	@Override
+	public void index(Individual ind) throws IndexingException {
+		// TODO Auto-generated method stub
+		
+	}    
 }

@@ -222,9 +222,9 @@
     <fieldType name="text" class="solr.TextField" positionIncrementGap="100" autoGeneratePhraseQueries="true">
       <analyzer type="index">
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>
-        <!-- in this example, we will only use synonyms at query time
-        <filter class="solr.SynonymFilterFactory" synonyms="index_synonyms.txt" ignoreCase="true" expand="false"/>
-        -->
+        <!-- in this example, we will only use synonyms at query time -->
+        <filter class="solr.SynonymFilterFactory" synonyms="syn.txt" ignoreCase="true" expand="true"/>
+        
         <!-- Case insensitive stop word removal.
           add enablePositionIncrements=true in both the index and query
           analyzers to leave a 'gap' for more accurate phrase queries.
@@ -237,12 +237,12 @@
         <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="1" catenateNumbers="1" catenateAll="0" splitOnCaseChange="1"/>
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.KeywordMarkerFilterFactory" protected="protwords.txt"/>
-        <!-- <filter class="solr.PorterStemFilterFactory"/> -->
+        <filter class="solr.PorterStemFilterFactory"/>
         <filter class="solr.SnowballPorterFilterFactory" language="English" protected="protwords.txt"/>        
       </analyzer>
       <analyzer type="query">
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>
-        <filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>
+        <filter class="solr.SynonymFilterFactory" synonyms="syn.txt" ignoreCase="true" expand="true"/>
         <filter class="solr.StopFilterFactory"
                 ignoreCase="true"
                 words="stopwords.txt"
@@ -251,6 +251,7 @@
         <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="0" catenateNumbers="0" catenateAll="0" splitOnCaseChange="1"/>
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.KeywordMarkerFilterFactory" protected="protwords.txt"/>
+        <filter class="solr.PorterStemFilterFactory"/>
          <filter class="solr.SnowballPorterFilterFactory" language="English" protected="protwords.txt"/>
       </analyzer>
     </fieldType>
@@ -381,7 +382,7 @@
     <fieldtype name="phonetic" stored="false" indexed="true" class="solr.TextField" >
       <analyzer>
         <tokenizer class="solr.StandardTokenizerFactory"/>
-        <filter class="solr.DoubleMetaphoneFilterFactory" inject="false"/>
+        <filter class="solr.PhoneticFilterFactory" encoder="Metaphone" inject="false"/>
       </analyzer>
     </fieldtype>
 
@@ -470,39 +471,53 @@
        when adding a document.
    -->
 
-    <!-- ****************************  Vitro Fields *************************** -->
-    
-    <field name="DocId" type="string" indexed="true" stored="true" required="true" />    
-    <field name="type" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
-    <field name="classLocalName" type="text" indexed="true" stored="true" multiValued="true"/>
-    <field name="classLocalNameLowerCase" type="text" indexed="true" stored="false" multiValued="true"/>
-    <field name="classgroup" type="string" indexed="true" stored="true" multiValued="true"/>
-    <field name="PROHIBITED_FROM_TEXT_RESULTS" type="string" indexed="true" stored="false" multiValued="false"/>
-    <field name="URI" type="string" indexed="true" stored="true" multiValued="false" omitNorms="true"/>
-    <field name="nameRaw" type="string" indexed="false" stored="true" multiValued="true"/>
-    <!-- RY Not sure if we need to store nameLowercase. Is it ever displayed? -->
-    <field name="nameLowercase" type="lowercase" indexed="true" stored="true" multiValued="true"/>
-    <!-- A sortable version of nameLowercase -->
-    <field name="nameLowercaseSingleValued" type="lowercase" indexed="true" stored="false" multiValued="false" /> 
-    <field name="nameUnstemmed" type="textUnstemmed" indexed="true" stored="false" multiValued="true"/>
-    <field name="nameStemmed" type="text" indexed="true" stored="false" multiValued="true"/>
+<!-- ****************************  Vitro Fields *************************** -->
+
+<field name="DocId" type="string" indexed="true" stored="true" required="true" omitNorms="true"/> 
+
+<field name="type" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
+
+<field name="classLocalName" type="text" indexed="true" stored="true" multiValued="true"/>
+<field name="classLocalNameLowerCase" type="text" indexed="true" stored="false" multiValued="true"/>
+
+<field name="classgroup" type="string" indexed="true" stored="true" multiValued="true"/>
+<field name="PROHIBITED_FROM_TEXT_RESULTS" type="string" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
+<field name="URI" type="string" indexed="true" stored="true" multiValued="false" omitNorms="true"/>
+
+<field name="nameRaw" type="string" indexed="false" stored="true" multiValued="true"/>
+<!-- RY Not sure if we need to store nameLowercase -->
+<field name="nameLowercase" type="string" indexed="true" stored="true" multiValued="true"/>
+<!-- A sortable version of nameLowercase -->
+<field name="nameLowercaseSingleValued" type="lowercase" indexed="true" stored="false" multiValued="false" /> 
+<field name="nameUnstemmed" type="lowercase" indexed="true" stored="false" multiValued="true"/>
+<field name="nameStemmed" type="text" indexed="true" stored="false" multiValued="true"/>
+
    <!--
     <field name="prefixNameUnstemmed" type="prefixTextUnstemmed" indexed="true" stored="false" multiValued="true"/>
     <field name="prefixNameStemmed" type="prefixText" indexed="true" stored="false" multiValued="true"/>
    -->
-    <field name="indexedTime" type="string" indexed="true" stored="true" multiValued="true"/>
-    <field name="ALLTEXT" type="text" indexed="true" stored="false" multiValued="true"/>
-    <field name="ALLTEXTUNSTEMMED" type="textgen" indexed="true" stored="false" multiValued="true"/>
-    <field name="THUMBNAIL" type="string" indexed="true" stored="true"/>
-      
-    <field name="moniker" type="ignored" />
-    <field name="modType" type="ignored"/>
-    <field name="JCLASS" type="ignored"/>
 
-    <!-- Copy nameLowercase to sortable field. -->
+<field name="indexedTime" type="string" indexed="true" stored="true" multiValued="true"/>
+<field name="NAME_PHONETIC" type ="phonetic" indexed="true" stored="false" multiValued="true"/>
+
+<field name="ALLTEXT" type="text" indexed="true" stored="false" multiValued="true"/>
+<field name="ALLTEXTUNSTEMMED" type="textgen" indexed="true" stored="false" multiValued="true"/>
+<field name="ALLTEXT_PHONETIC" type="phonetic" indexed="true" stored="false" multiValued="true"/>
+
+<field name="THUMBNAIL" type="string" indexed="true" stored="true"/>
+
+<field name="targetInfo" type="text" indexed="true" stored="false" multiValued="true"/>
+<!-- <field name="BETA" type="float" indexed="true" stored="true" multiValued="false"/>
+<field name="PHI" type="float" indexed="true" stored="true" multiValued="false"/>
+<field name="ADJACENT_NODES" type="string" indexed="true" stored="true" multiValued="true"/> -->
+
+<field name="moniker" type="ignored" />
+<field name="modType" type="ignored"/>
+<field name="JCLASS" type="ignored"/>
+
+ <!-- Copy nameLowercase to sortable field. -->
     <copyField source="nameLowercase" dest="nameLowercaseSingleValued" />
-   
-    <!-- ****************************  End Vitro Fields *************************** -->
+<!-- ****************************  End Vitro Fields *************************** -->
 
 
    <!-- catchall field, containing all other searchable text fields (implemented
@@ -571,7 +586,7 @@
  <uniqueKey>DocId</uniqueKey>
 
  <!-- field for the QueryParser to use when an explicit fieldname is absent -->
- <defaultSearchField>ALLTEXT</defaultSearchField>
+<!-- <defaultSearchField>ALLTEXT</defaultSearchField> -->
 
  <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
  <solrQueryParser defaultOperator="AND"/>
@@ -594,7 +609,8 @@
  <!-- Similarity is the scoring routine for each document vs. a query.
       A custom similarity may be specified here, but the default is fine
       for most applications.  -->
- <!-- <similarity class="org.apache.lucene.search.DefaultSimilarity"/> -->
+<similarity class="org.apache.lucene.search.DefaultSimilarity"/>
+<!-- <similarity class="edu.cornell.mannlib.vitro.webapp.search.lucene.CustomSimilarity"/> -->
  <!-- ... OR ...
       Specify a SimilarityFactory class name implementation
       allowing parameters to be used.

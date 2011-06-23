@@ -14,6 +14,7 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.query.Dataset;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
@@ -21,14 +22,14 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
-import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearch;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
+import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearchImpl;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
-import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
 
@@ -57,8 +58,8 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             }            
             CommonsHttpSolrServer server;
             server = new CommonsHttpSolrServer( solrServerUrl );
-            server.setSoTimeout(1000);  // socket read timeout
-            server.setConnectionTimeout(100);
+            server.setSoTimeout(10000);  // socket read timeout
+            server.setConnectionTimeout(10000);
             server.setDefaultMaxConnectionsPerHost(100);
             server.setMaxTotalConnections(100);         
             server.setMaxRetries(1);            
@@ -67,15 +68,24 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             /* setup the individual to solr doc translation */            
             //first we need a ent2luceneDoc translator
             OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
-            Entity2LuceneDoc ent2LuceneDoc = new Entity2LuceneDoc( 
-                    new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel),
-                    new IndividualProhibitedFromSearch(context) );                                              
-            IndividualToSolrDocument indToSolrDoc = new IndividualToSolrDocument( ent2LuceneDoc );
-            List<Obj2DocIface> o2d = new ArrayList<Obj2DocIface>();
-            o2d.add(indToSolrDoc);
+            
+            OntModel abox = ModelContext.getBaseOntModelSelector(context).getABoxModel();
+            
+            OntModel inferences = (OntModel)context.getAttribute( JenaBaseDao.INFERENCE_ONT_MODEL_ATTRIBUTE_NAME);
+            Dataset dataset = WebappDaoFactoryJena.makeInMemoryDataset(abox, inferences);
+            
+            List<DocumentModifier> modifiers = new ArrayList<DocumentModifier>();
+           // modifiers.add(new CalculateParameters(ModelContext.getJenaOntModel(context)));
+            modifiers.add(new CalculateParameters(dataset));
+            modifiers.add(new ContextNodeFields(dataset));
+            
+            IndividualToSolrDocument indToSolrDoc = new IndividualToSolrDocument(
+            		new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel),
+            		new IndividualProhibitedFromSearchImpl(context), 
+            		modifiers);                        
             
             /* setup solr indexer */
-            SolrIndexer solrIndexer = new SolrIndexer(server, o2d);            
+            SolrIndexer solrIndexer = new SolrIndexer(server, indToSolrDoc);            
             if( solrIndexer.isIndexEmpty() ){
                 log.info("solr index is empty, requesting rebuild");
                 sce.getServletContext().setAttribute(LuceneSetup.INDEX_REBUILD_REQUESTED_AT_STARTUP, Boolean.TRUE);         

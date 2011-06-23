@@ -24,6 +24,9 @@ public class DisplayVocabulary {
     /* Individuals */
     public static final String PRIMARY_LUCENE_INDEX_URI = NS + "PrimaryLuceneIndex";
     
+    //bk392 for extracting properties beyond context nodes.
+    public static final String CONTEXT_NODES_URI = NS + "QueryForContextNodes";
+    
     /* Page types */
     public static final String PAGE_TYPE = NS + "Page";
     public static final String HOME_PAGE_TYPE = NS + "HomePage";
@@ -37,8 +40,10 @@ public class DisplayVocabulary {
     /* Data Properties */
     public static final DatatypeProperty URL_MAPPING = m_model.createDatatypeProperty(NS + "urlMapping");
     public static final String TITLE = NS + "title";
-    public static final DatatypeProperty REQUIRES_BODY_TEMPLATE = m_model.createDatatypeProperty(NS + "requiresBodyTemplate"); 
-    
+    public static final DatatypeProperty REQUIRES_BODY_TEMPLATE = m_model.createDatatypeProperty(NS + "requiresBodyTemplate");
+    //bk392 for extracting properties beyond context nodes.
+    public static final DatatypeProperty QUERY_FOR_EDUCATIONAL_TRAINING = m_model.createDatatypeProperty(NS + "queryForEducationalTraining");
+
     /* URIs for storing menu.n3 */
     public static final String MENU_TEXT_RES = NS + "MenuText";    
     public static final String HAS_TEXT_REPRESENTATION = NS + "hasMenuText";

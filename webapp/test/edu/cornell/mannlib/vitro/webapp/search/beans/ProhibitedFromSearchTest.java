@@ -41,8 +41,8 @@ public class ProhibitedFromSearchTest {
 		ProhibitedFromSearch pfs = new ProhibitedFromSearch( SEARCH_CONFIG_URI , m);
 		Assert.assertNotNull(pfs.prohibitedClasses);
 		Assert.assertTrue(pfs.prohibitedClasses.size() == 4);
-		Assert.assertTrue(pfs.isClassProhibited(TEST_CLASS));
-		Assert.assertTrue(!pfs.isClassProhibited("http://someOtherClass.com/test"));
+		Assert.assertTrue(pfs.isClassProhibitedFromSearch(TEST_CLASS));
+		Assert.assertTrue(!pfs.isClassProhibitedFromSearch("http://someOtherClass.com/test"));
 	}
 	
 	@Test
@@ -55,8 +55,8 @@ public class ProhibitedFromSearchTest {
 		ProhibitedFromSearch pfs = new ProhibitedFromSearch( "http://NotFound.com/inModel", m);
 		Assert.assertNotNull(pfs.prohibitedClasses);
 		Assert.assertTrue(pfs.prohibitedClasses.size() == 0);
-		Assert.assertTrue(!pfs.isClassProhibited(TEST_CLASS));
-		Assert.assertTrue(!pfs.isClassProhibited("http://someOtherClass.com/test"));
+		Assert.assertTrue(!pfs.isClassProhibitedFromSearch(TEST_CLASS));
+		Assert.assertTrue(!pfs.isClassProhibitedFromSearch("http://someOtherClass.com/test"));
 	}
 	
 	
@@ -122,7 +122,7 @@ public class ProhibitedFromSearchTest {
 		ProhibitedFromSearch pfs = new ProhibitedFromSearch( DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, m);
 		Assert.assertNotNull(pfs.prohibitedClasses);
 		Assert.assertEquals(1, pfs.prohibitedClasses.size() );
-		Assert.assertTrue(pfs.isClassProhibited("http://vivoweb.org/ontology/core#NonAcademic"));
-		Assert.assertTrue(!pfs.isClassProhibited("http://someOtherClass.com/test"));
+		Assert.assertTrue(pfs.isClassProhibitedFromSearch("http://vivoweb.org/ontology/core#NonAcademic"));
+		Assert.assertTrue(!pfs.isClassProhibitedFromSearch("http://someOtherClass.com/test"));
 	}
 }

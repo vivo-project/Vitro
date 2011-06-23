@@ -1069,7 +1069,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 
 		while(itr.hasNext()) {
 			String typeURI = itr.next().getURI();
-			if (pfs.isClassProhibited(typeURI)) {
+			if (pfs.isClassProhibitedFromSearch(typeURI)) {
 				return true;
 			}
 		}
