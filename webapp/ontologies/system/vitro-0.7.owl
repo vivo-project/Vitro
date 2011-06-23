@@ -94,30 +94,6 @@ xmlns:vitro="&vitro;"
 <owl:DatatypeProperty rdf:about="&vitro;sunset"/>
 <owl:DatatypeProperty rdf:about="&vitro;timekey"/>
 
-<!-- portal flag classes -->
-
-<owl:Class rdf:about="&vitro;Flag1Value0Thing"/>
-<owl:Class rdf:about="&vitro;Flag1Value1Thing"/>
-<owl:Class rdf:about="&vitro;Flag1Value2Thing"/>
-<owl:Class rdf:about="&vitro;Flag1Value3Thing"/>
-<owl:Class rdf:about="&vitro;Flag1Value4Thing"/>
-<owl:Class rdf:about="&vitro;Flag1Value5Thing"/>
-<owl:Class rdf:about="&vitro;Flag1Value6Thing"/>
-<owl:Class rdf:about="&vitro;Flag1Value7Thing"/>
-<owl:Class rdf:about="&vitro;Flag1Value8Thing"/>
-<owl:Class rdf:about="&vitro;Flag1Value9Thing"/>
-<owl:Class rdf:about="&vitro;Flag1Value10Thing"/>
-<owl:Class rdf:about="&vitro;Flag1Value11Thing"/>
-<owl:Class rdf:about="&vitro;Flag1Value12Thing"/>
-<owl:Class rdf:about="&vitro;Flag1Value13Thing"/>
-<owl:Class rdf:about="&vitro;Flag1Value14Thing"/>
-<owl:Class rdf:about="&vitro;Flag1Value15Thing"/>
-<owl:Class rdf:about="&vitro;Flag1Value16Thing"/>
-<owl:Class rdf:about="&vitro;Flag1Value17Thing"/>
-<owl:Class rdf:about="&vitro;Flag1Value18Thing"/>
-<owl:Class rdf:about="&vitro;Flag1Value19Thing"/>
-<owl:Class rdf:about="&vitro;Flag1Value20Thing"/>
-
 <!-- Portal-related constructs -->
 
 <owl:Class rdf:about="&vitro;Portal"/>
@@ -130,8 +106,6 @@ xmlns:vitro="&vitro;"
 <owl:DatatypeProperty rdf:about="&vitro;acknowledgeText"/>
 <owl:DatatypeProperty rdf:about="&vitro;bannerWidth"/>
 <owl:DatatypeProperty rdf:about="&vitro;bannerHeight"/>
-<owl:DatatypeProperty rdf:about="&vitro;flag2Numeric"/>
-<owl:DatatypeProperty rdf:about="&vitro;flag3Numeric"/>
 <owl:DatatypeProperty rdf:about="&vitro;copyrightURL"/>
 <owl:DatatypeProperty rdf:about="&vitro;copyrightAnchor"/>
 <owl:DatatypeProperty rdf:about="&vitro;rootBreadCrumbURL"/>
@@ -140,9 +114,6 @@ xmlns:vitro="&vitro;"
 <owl:DatatypeProperty rdf:about="&vitro;logotypeHeight"/>
 <owl:DatatypeProperty rdf:about="&vitro;logotypeWidth"/>
 <owl:DatatypeProperty rdf:about="&vitro;imageThumbWidth"/>
-<owl:DatatypeProperty rdf:about="&vitro;flag1SearchFiltering"/>
-<owl:DatatypeProperty rdf:about="&vitro;flag2SearchFiltering"/>
-<owl:DatatypeProperty rdf:about="&vitro;flag3SearchFiltering"/>
 <owl:DatatypeProperty rdf:about="&vitro;urlPrefix"/>
 
 <!-- Application-related constructs -->
@@ -171,9 +142,6 @@ xmlns:vitro="&vitro;"
 
   <rdf:Description rdf:about="http://vitro.mannlib.cornell.edu/ns/vitro/0.7#hiddenFromDisplayBelowRoleLevelAnnot">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
-  </rdf:Description>
-  <rdf:Description rdf:about="http://vitro.mannlib.cornell.edu/ns/vitro/0.7#flag1Filtering">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
   </rdf:Description>
   <rdf:Description rdf:about="http://vitro.mannlib.cornell.edu/ns/vitro/0.7#forceStubDeletionAnnot">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
@@ -211,5 +179,11 @@ xmlns:vitro="&vitro;"
   <rdf:Description rdf:about="http://vitro.mannlib.cornell.edu/ns/vitro/0.7#selectFromExistingAnnot">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
   </rdf:Description>
+  <rdf:Description rdf:about="http://vitro.mannlib.cornell.edu/ns/vitro/0.7#customDisplayViewAnnot">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AnnotationProperty"/>
+  </rdf:Description>
+  
+  <owl:AnnotationProperty rdf:about="&vitro;mostSpecificType"/>
+  <owl:AnnotationProperty rdf:about="&vitro;extendedLinkedData"/>
 
 </rdf:RDF>
