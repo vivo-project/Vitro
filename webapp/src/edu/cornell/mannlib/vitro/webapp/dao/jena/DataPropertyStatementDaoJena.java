@@ -331,7 +331,7 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
         Map<String, String> bindings = new HashMap<String, String>();
         bindings.put("subject", subjectUri);
         bindings.put("property", propertyUri);
-        String queryString = subUrisForQueryVars(DATA_PROPERTY_VALUE_QUERY_STRING, bindings);
+        String queryString = QueryUtils.subUrisForQueryVars(DATA_PROPERTY_VALUE_QUERY_STRING, bindings);
 
         // Run the SPARQL query to get the properties
         List<Literal> values = new ArrayList<Literal>();                

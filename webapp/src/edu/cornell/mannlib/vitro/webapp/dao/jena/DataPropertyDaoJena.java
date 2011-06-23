@@ -766,7 +766,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         // filter causes the query to fail. Insert the subjectUri manually instead.
         // QuerySolutionMap initialBindings = new QuerySolutionMap();
         // initialBindings.add("subject", ResourceFactory.createResource(subjectUri));
-        String queryString = subUriForQueryVar(DATA_PROPERTY_QUERY_STRING, "subject", subjectUri);
+        String queryString = QueryUtils.subUriForQueryVar(DATA_PROPERTY_QUERY_STRING, "subject", subjectUri);
         
         Query query = null;
         try {

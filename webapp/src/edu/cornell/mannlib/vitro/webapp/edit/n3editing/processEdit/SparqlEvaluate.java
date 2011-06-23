@@ -160,6 +160,7 @@ public class SparqlEvaluate {
 //    }
     
     public  String queryToUri(String querystr){
+        log.debug("Query string in queryToUri():" + querystr);
         String value = null;
         QueryExecution qe = null;
         try{

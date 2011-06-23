@@ -859,7 +859,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         // Due to a Jena bug, prebinding on ?subject combined with the isURI()
         // filter causes the query to fail. Using string concatenation to insert the
         // subject uri instead.
-        String queryString = subUriForQueryVar(OBJECT_PROPERTY_QUERY_STRING, "subject", subjectUri); 
+        String queryString = QueryUtils.subUriForQueryVar(OBJECT_PROPERTY_QUERY_STRING, "subject", subjectUri); 
 
         Query query = null;
         try {

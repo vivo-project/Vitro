@@ -399,7 +399,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
      * **/
     public List<String> getMostSpecificTypesForIndividual(String subjectUri) {
         
-        String queryString = subUriForQueryVar(MOST_SPECIFIC_TYPE_QUERY, "subject", subjectUri);
+        String queryString = QueryUtils.subUriForQueryVar(MOST_SPECIFIC_TYPE_QUERY, "subject", subjectUri);
         
         log.debug("Query string for vitro:mostSpecificType : " + queryString);
         
