@@ -128,17 +128,6 @@ ul#individual-tools li {
     padding-right: 9px;
     float: left;
 }
-ul#individual-email {
-    clear: both;
-    list-style-type: circle;
-}
-ul#individual-email li {
-    font-size: .875em;
-}
-ul#individual-email li:first-child {
-    font-size: .875em;
-    margin-top: 10px;
-}
 ul#individual-phone {
     clear: both;
     list-style-type: circle;
@@ -147,7 +136,7 @@ ul#individual-phone li {
     font-size: .875em;
 }
 ul#individual-phone li:last-child {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 ul#individual-phone li:first-child {
     margin-top: 10px;
@@ -168,12 +157,23 @@ ul.individual-urls-people {
     list-style-type: circle;
     padding-left: 24px;
 }
-ul.individual-urls-people li {
+ul.individual-emails {
+    clear: both;
+    padding-left: 0;
+}
+ul.individual-urls-people li,
+ul.individual-emails li {
     font-size: .875em;
     line-height: 1.3em;
 }
-ul#links-additional li, ul#links-primary li {
+ul#links-additional li, 
+ul#links-primary li,
+ul#primary-email li,
+ul#additional-emails li {
     word-wrap: break-word;
+}
+#phoneNumber {
+    margin-top: 10px;
 }
 #photo-wrapper {
     position: relative;
