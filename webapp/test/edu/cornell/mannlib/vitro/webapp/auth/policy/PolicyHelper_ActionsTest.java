@@ -24,9 +24,9 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 
 /**
- * Test the basic top-level function of PolicyHelper.
+ * Test the function of PolicyHelper in authorizing simple actions.
  */
-public class PolicyHelperTest extends AbstractTestClass {
+public class PolicyHelper_ActionsTest extends AbstractTestClass {
 	private ServletContextStub ctx;
 	private HttpSessionStub session;
 	private HttpServletRequestStub req;
@@ -46,6 +46,10 @@ public class PolicyHelperTest extends AbstractTestClass {
 		req = new HttpServletRequestStub();
 		req.setSession(session);
 	}
+
+	// ----------------------------------------------------------------------
+	// Action-level tests
+	// ----------------------------------------------------------------------
 
 	@Test
 	public void authorizedForActionsNull() {
