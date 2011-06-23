@@ -149,15 +149,46 @@
         <thead>
             <tr>
                 <th scope="col">
-                    <div>
-                        <input class="hide" type="checkbox" name="delete-all" id="">Email Address <a href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=ASC"><img class="middle" src="${urls.themeImages}/sort-asc.gif" /></a> <a href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=DESC"><img src="${urls.themeImages}/sort-desc.gif" /></a>
-                    </div>
+                    <input class="hide" type="checkbox" name="delete-all" id="">
+                    Email Address
+                    <nav class="account-alpha-browse">
+                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=ASC" title="ascending order"></a> 
+                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=DESC" title="descending order"></a>
+                    </nav>
                 </th>
-                <th scope="col"><div>First name <a href="?accountsPerPage=${accountsPerPage}&orderField=firstName&orderDirection=ASC"><img class="middle" src="${urls.themeImages}/sort-asc.gif" /></a> <a href="?accountsPerPage=${accountsPerPage}&orderField=firstName&orderDirection=DESC"><img src="${urls.themeImages}/sort-desc.gif" /></a></div></th>
-                <th scope="col"><div>Last Name <a href="?accountsPerPage=${accountsPerPage}&orderField=lastName&orderDirection=ASC"><img class="middle" src="${urls.themeImages}/sort-asc.gif" /></a> <a href="?accountsPerPage=${accountsPerPage}&orderField=lastName&orderDirection=DESC"><img src="${urls.themeImages}/sort-desc.gif" /></a></div></th>
-                <th scope="col"><div>Status <a href="?accountsPerPage=${accountsPerPage}&orderField=status&orderDirection=ASC"><img class="middle" src="${urls.themeImages}/sort-asc.gif" /></a> <a href="?accountsPerPage=${accountsPerPage}&orderField=status&orderDirection=DESC"><img src="${urls.themeImages}/sort-desc.gif" /></a></div></th>
-                <th scope="col"><div>Roles</div></th>
-                <th scope="col"><div>Login Count <a href="?accountsPerPage=${accountsPerPage}&orderField=count&orderDirection=ASC"><img class="middle" src="${urls.themeImages}/sort-asc.gif" /></a> <a href="?accountsPerPage=${accountsPerPage}&orderField=count&orderDirection=DESC"><img src="${urls.themeImages}/sort-desc.gif" /></a></div></th>
+                <th scope="col">
+                    First name
+                    <nav class="account-alpha-browse">
+                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=firstName&orderDirection=ASC" title="ascending order"></a> 
+                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=firstName&orderDirection=DESC" title="descending order"></a>
+                    </nav>
+                </th>
+                
+                <th scope="col">
+                    Last name
+                    <nav class="account-alpha-browse">
+                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=lastName&orderDirection=ASC" title="ascending order"></a> 
+                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=lastName&orderDirection=DESC" title="descending order"></a>
+                    </nav>
+                </th>
+                
+                <th scope="col">
+                    Status
+                    <nav class="account-alpha-browse">
+                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=status&orderDirection=ASC" title="ascending order"></a> 
+                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=status&orderDirection=DESC" title="descending order"></a>
+                    </nav>
+                </th>
+                
+                <th scope="col">Roles</th>
+                
+                <th scope="col">
+                    Login count
+                    <nav class="account-alpha-browse">
+                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=count&orderDirection=ASC" title="ascending order"></a> 
+                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=count&orderDirection=DESC"" title="descending order"></a>
+                    </nav>
+                </th>
             </tr>
         </thead>
     
