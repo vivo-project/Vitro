@@ -119,8 +119,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
      * the subclass method. For the same reason, it can't refer to a static or instance field
      * REQUIRED_ACTIONS which is overridden in the subclass.
      */
-    @SuppressWarnings("unused")
-	protected Actions requiredActions(VitroRequest vreq) {
+    protected Actions requiredActions(VitroRequest vreq) {
         return Actions.AUTHORIZED;
     }
     
