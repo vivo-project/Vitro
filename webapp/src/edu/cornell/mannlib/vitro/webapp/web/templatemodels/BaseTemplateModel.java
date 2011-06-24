@@ -18,7 +18,7 @@ public abstract class BaseTemplateModel {
     private static final Log log = LogFactory.getLog(BaseTemplateModel.class);
     
     protected static ServletContext servletContext = null;
-
+    public VitroRequest vitroRequest = null;
     // Convenience method so subclasses can call getUrl(path)
     protected String getUrl(String path) {
         return UrlBuilder.getUrl(path);

@@ -40,7 +40,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualDeletionEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualUpdateEvent;
-
 public class PropertyInstanceDaoJena extends JenaBaseDao implements
         PropertyInstanceDao {
 

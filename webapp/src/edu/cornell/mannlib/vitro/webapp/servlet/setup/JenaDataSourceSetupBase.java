@@ -22,6 +22,7 @@ import com.hp.hpl.jena.sdb.store.DatabaseType;
 import com.hp.hpl.jena.sdb.store.LayoutType;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDBGraphGenerator;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RegeneratingGraph;
@@ -52,6 +53,8 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     protected static String SYSTEMPATH = BASE+"system/";
     protected static String AUTHPATH = BASE+"auth/";
     public static String APPPATH = BASE+"app/";
+    //these files are loaded everytime the system starts up
+    public static String APPPATH_LOAD = APPPATH + "menuload";
     protected static String SUBMODELS = "/WEB-INF/submodels/";
     protected static boolean firstStartup = false;
 
@@ -107,6 +110,12 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     // with this for release 1.2.
     static final String JENA_DISPLAY_METADATA_MODEL = 
             "http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadata";
+    
+    //TBox and display model related
+    static final String JENA_DISPLAY_TBOX_MODEL = 
+        DisplayVocabulary.DISPLAY_TBOX_MODEL_URI;
+    static final String JENA_DISPLAY_DISPLAY_MODEL = 
+        DisplayVocabulary.DISPLAY_DISPLAY_MODEL_URI;
 
     static final String DEFAULT_DEFAULT_NAMESPACE = 
             "http://vitro.mannlib.cornell.edu/ns/default#";
@@ -320,21 +329,25 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         Set<String> paths = ctx.getResourcePaths(path);
         if (paths != null) {
             for (String p : paths) {
-                String format = getRdfFormat(p);
-                log.info("Loading ontology file at " + p + 
-                         " as format " + format);
-                InputStream ontologyInputStream = ctx.getResourceAsStream(p);
-                try {
-                    model.read(ontologyInputStream, null, format);
-                    log.debug("...successful");
-                } catch (Throwable t) {
-                    log.error("Failed to load ontology file at '" + p + 
-                              "' as format " + format, t);
-                }
+               readOntologyFileFromPath(p, model, ctx);
             }
         }
     }
    
+    public static void readOntologyFileFromPath(String p, Model model, ServletContext ctx) {
+    	 String format = getRdfFormat(p);
+         log.info("Loading ontology file at " + p + 
+                  " as format " + format);
+         InputStream ontologyInputStream = ctx.getResourceAsStream(p);
+         try {
+             model.read(ontologyInputStream, null, format);
+             log.debug("...successful");
+         } catch (Throwable t) {
+             log.error("Failed to load ontology file at '" + p + 
+                       "' as format " + format, t);
+         }
+    }
+    
     private static String getRdfFormat(String filename){
         String defaultformat = "RDF/XML";
         if( filename == null )

@@ -29,6 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.FilterFactory;
@@ -221,8 +222,8 @@ public class VitroRequestPrep implements Filter {
     				//if using special models for menu management, get main menu model from context and set tbox and display uris to be used
 	    			useMainOntModel = (OntModel) _context.getAttribute("displayOntModel");
 	    			//Hardcoding tbox model uri for now
-	        		useTboxModelUri =  "http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadataTBOX";
-	        		useDisplayModelUri = "http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadata-displayModel";
+	        		useTboxModelUri =  DisplayVocabulary.DISPLAY_TBOX_MODEL_URI;
+	        		useDisplayModelUri = DisplayVocabulary.DISPLAY_DISPLAY_MODEL_URI;
     			} else {
     				//If main model uri passed as parameter then retrieve model from parameter
     				Model mainModel = JenaDataSourceSetupBase.makeDBModel(bds, useMainModelUri, OntModelSpec.OWL_MEM, JenaDataSourceSetupBase.TripleStoreType.RDB, dbType, _context);
@@ -232,13 +233,18 @@ public class VitroRequestPrep implements Filter {
     				}
     			}
     			
-	        	tboxModel = JenaDataSourceSetupBase.makeDBModel(bds, useTboxModelUri, OntModelSpec.OWL_MEM, JenaDataSourceSetupBase.TripleStoreType.RDB, dbType, _context);
-	    		System.out.println("Checking what the display tbox model is returning");
-	        	tboxModel.write(System.out, "N3");
-	        	useTboxOntModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, tboxModel);
-	    		//Set "display model" for display model
-	        	displayModel = JenaDataSourceSetupBase.makeDBModel(bds, useDisplayModelUri, OntModelSpec.OWL_MEM, JenaDataSourceSetupBase.TripleStoreType.RDB, dbType, _context);
-	        	useDisplayOntModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, displayModel);
+    			//Get tbox and display display model from servlet context otherwise load in directly from database
+    			useTboxOntModel = (OntModel) _context.getAttribute("displayOntModelTBOX");
+    			useDisplayOntModel = (OntModel) _context.getAttribute("displayOntModelDisplayModel");
+    			if(useTboxOntModel == null){
+		        	tboxModel = JenaDataSourceSetupBase.makeDBModel(bds, useTboxModelUri, OntModelSpec.OWL_MEM, JenaDataSourceSetupBase.TripleStoreType.RDB, dbType, _context);
+		        	useTboxOntModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, tboxModel);
+    			} 
+    			if(useDisplayOntModel == null) {
+		    		//Set "display model" for display model
+		        	displayModel = JenaDataSourceSetupBase.makeDBModel(bds, useDisplayModelUri, OntModelSpec.OWL_MEM, JenaDataSourceSetupBase.TripleStoreType.RDB, dbType, _context);
+		        	useDisplayOntModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, displayModel);
+    			}
     			//Set special model for wadfj
 	        	if(useMainOntModel != null) {
     				wadfj.setSpecialDataModel(useMainOntModel, useTboxOntModel, useDisplayOntModel);

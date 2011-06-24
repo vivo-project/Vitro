@@ -17,6 +17,10 @@ public class DisplayVocabulary {
     /** <p>The ontology model that holds the vocabulary terms</p> */
     private static OntModel m_model = ModelFactory.createOntologyModel( OntModelSpec.OWL_MEM, null );
     
+    /*Uris for Models for Display*/
+    
+    public static final String DISPLAY_TBOX_MODEL_URI = "http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadataTBOX";
+    public static final String DISPLAY_DISPLAY_MODEL_URI = "http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadata-displayModel";
     /* Namespace for display vocabulary */
     public static final String DISPLAY_NS = "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#";
     private static final String NS = DISPLAY_NS;
@@ -28,15 +32,22 @@ public class DisplayVocabulary {
     public static final String CONTEXT_NODES_URI = NS + "QueryForContextNodes";
     
     /* Page types */
+    //Corresponding to statements in menu management that define class of data getter to be used
     public static final String PAGE_TYPE = NS + "Page";
     public static final String HOME_PAGE_TYPE = NS + "HomePage";
     public static final String CLASSGROUP_PAGE_TYPE = NS + "ClassGroupPage";
-    //Including for now, can take out later
-    public static final String 	CLASSINTERSECTION_PAGE_TYPE = NS + "ClassIntersectionPage";
+    public static final String CLASSINDIVIDUALS_PAGE_TYPE = NS + "IndividualsForClassesPage";
 
     /* Object Properties */
     public static final String FOR_CLASSGROUP = NS + "forClassGroup";
     public static final String CLASS_INTERSECTION = NS + "intersectsWithClass";
+    public static final String HAS_CLASS_INTERSECTION = NS + "hasClassIntersection";
+    
+    /**Data Getter object properties **/
+    public static final String GETINDIVIDUALS_FOR_CLASS = NS + "getIndividualsForClass";
+    public static final String 	RESTRICT_RESULTS_BY = NS + "restrictResultsByClass";
+
+
     /* Data Properties */
     public static final DatatypeProperty URL_MAPPING = m_model.createDatatypeProperty(NS + "urlMapping");
     public static final String TITLE = NS + "title";

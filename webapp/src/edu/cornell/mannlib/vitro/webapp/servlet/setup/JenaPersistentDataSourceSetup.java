@@ -67,7 +67,65 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
 	    } catch (Throwable t) {
 	    	log.error("Unable to load user application configuration model from DB", t);
 	    }
-       
+	    
+	    //display tbox - currently reading in every time
+	    try {
+	    	Model displayTboxModel = makeDBModelFromConfigurationProperties(
+	    	        JENA_DISPLAY_TBOX_MODEL, DB_ONT_MODEL_SPEC, ctx);
+	    	//Reading in single file every time
+	    	//TODO: Check if original needs to be cleared/removed every time?
+	    	readOntologyFileFromPath(APPPATH_LOAD + "displayTBOX.n3", displayTboxModel, sce.getServletContext());	
+	    	OntModel appTBOXModel = ModelFactory.createOntologyModel(
+	    	        MEM_ONT_MODEL_SPEC);
+	    	appTBOXModel.add(displayTboxModel);
+	    	appTBOXModel.getBaseModel().register(new ModelSynchronizer(displayTboxModel));
+	    	ctx.setAttribute("displayOntModelTBOX", appTBOXModel);
+	    } catch (Throwable t) {
+	    	log.error("Unable to load user application configuration model TBOX from DB", t);
+	    }
+	    //Display Display model, currently empty, create if doesn't exist but no files to load
+	    try {
+	    	Model displayDisplayModel = makeDBModelFromConfigurationProperties(
+	    	        JENA_DISPLAY_DISPLAY_MODEL, DB_ONT_MODEL_SPEC, ctx);
+	    	//Reading in single file every time
+	    	//TODO: Check if original needs to be cleared/removed every time?
+	    	readOntologyFileFromPath(APPPATH_LOAD + "displayDisplay.n3", displayDisplayModel, sce.getServletContext());	
+
+	    	OntModel appDisplayDisplayModel = ModelFactory.createOntologyModel(
+	    	        MEM_ONT_MODEL_SPEC);
+	    	appDisplayDisplayModel.add(displayDisplayModel);
+	    	appDisplayDisplayModel.getBaseModel().register(new ModelSynchronizer(displayDisplayModel));
+	    	ctx.setAttribute("displayOntModelDisplayModel", appDisplayDisplayModel);
+	    } catch (Throwable t) {
+	    	log.error("Unable to load user application configuration model Display Model from DB", t);
+	    }
+	    /*
+	    //For comparison purposes
+	    //Read in application.owl and menu.n3 and compare with what is currently in the display model
+	    //What are the differences
+	    try {
+	    	//This is the model as retrieved on system load
+	    	Model loadedModel = ModelFactory.createDefaultModel();
+	    	
+
+	    	//Now read in from the menu model
+	    	Model appDbModel = makeDBModelFromConfigurationProperties(
+	    	        JENA_DISPLAY_METADATA_MODEL, DB_ONT_MODEL_SPEC, ctx);
+	    	//Now compare - do differences in both directions
+	    	//What's in the upto date display that's not in the one that's loaded from files
+	    	Model notInLoadedModel = appDbModel.difference(loadedModel);
+	    	System.out.println("**These are the statements not in the loaded model that ARE in the current model");
+	    	notInLoadedModel.write(System.out, "N3");
+	    	//Could also do RDF.. if need to
+	    	//Do the opposite too to check
+	    	Model notInCurrentModel = loadedModel.difference(appDbModel);
+	    	System.out.println("**These are statements in loaded model NOT in the current model");
+	    	notInCurrentModel.write(System.out, "N3");
+	    } catch (Exception ex) {
+	    	System.out.println("An error occurred in reading this file");
+	    	ex.printStackTrace();
+	    }
+	    */
 	}
 	
 	@Override

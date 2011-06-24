@@ -30,8 +30,6 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
     
     // Used for editing
     protected String dataPropHash = null;
-    //Useful in case additional params to be retrieved for URL
-    private VitroRequest vitroRequest= null;
    
     //Extended to include vitro request to check for special parameters
     DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, 

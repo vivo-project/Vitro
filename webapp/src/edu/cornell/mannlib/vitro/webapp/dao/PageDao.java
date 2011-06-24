@@ -23,5 +23,8 @@ public interface PageDao {
    
     String getClassGroupPage(String pageUri);
     
-    List<String> getClassIntersections(String pageUri);
+    Map<String, List<String>> getClassIntersections(String pageUri);
+    
+    Map<String, List<String>> getClassesAndRestrictionsForPage(String pageUri);
+
 }

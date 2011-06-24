@@ -21,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.JSONServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.utils.JSONtoFmModel;
@@ -33,10 +34,10 @@ public class BrowseDataGetter implements PageDataGetter {
     
     @Override
     public Map<String, Object> getData(ServletContext context,
-            VitroRequest vreq, String pageUri, Map<String, Object> page,
-            String type) {
+            VitroRequest vreq, String pageUri, Map<String, Object> page) {
         try{            
             Map params = vreq.getParameterMap();
+            
             Mode mode = getMode( vreq, params );
             switch( mode ){          
                 case VCLASS_ALPHA:
@@ -61,7 +62,10 @@ public class BrowseDataGetter implements PageDataGetter {
         return DisplayVocabulary.HOME_PAGE_TYPE;
     }
     
-
+  //Get data servuice
+    public String getDataServiceUrl() {
+    	return UrlBuilder.getUrl("/dataservice?getSolrIndividualsByVClass=1&vclassId=");
+    }
     private Map<String, Object> doClassAlphaDisplay( Map params, VitroRequest request, ServletContext context) throws Exception {
         Map<String,Object> body = new HashMap<String,Object>();
         body.putAll(getCommonValues(context, request));
@@ -215,5 +219,14 @@ public class BrowseDataGetter implements PageDataGetter {
         else
             return null;
     }
+    
+    /**
+     * For processig of JSONObject
+     */
+    public JSONObject convertToJSON(Map<String, Object> dataMap, VitroRequest vreq) {
+    	JSONObject rObj = null;
+    	return rObj;
+    }
+
 
 }

@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -43,6 +44,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.SelectListGenerator;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.DataGetterUtils;
 
 /**
  * This servlet is for servicing requests for JSON objects/data.
@@ -84,6 +86,12 @@ public class SolrJsonServlet extends VitroHttpServlet {
             }else if( vreq.getParameter("getVClassesForVClassGroup") != null ){
                 getVClassesForVClassGroup(req,resp);
                 return;
+            } else if( vreq.getParameter("getSolrIndividualsByVClasses") != null ){
+            	getSolrIndividualsByVClasses(req,resp);
+                return;
+            } else if( vreq.getParameter("getDataForPage") != null ){
+            	getDataForPage(req,resp);
+            	return;
             }
         }catch(Exception ex){
             log.warn(ex,ex);            
@@ -175,118 +183,107 @@ public class SolrJsonServlet extends VitroHttpServlet {
     }
     
     public static JSONObject getSolrIndividualsByVClass(String vclassURI, HttpServletRequest req, ServletContext context) throws Exception {
-        
+        List<String> vclassURIs = new ArrayList<String>();
+        vclassURIs.add(vclassURI);
         VitroRequest vreq = new VitroRequest(req);        
         VClass vclass=null;
         JSONObject rObj = new JSONObject();
         
-        DataProperty fNameDp = (new DataProperty());
-        fNameDp.setURI("http://xmlns.com/foaf/0.1/firstName");
-        DataProperty lNameDp = (new DataProperty());
-        lNameDp.setURI("http://xmlns.com/foaf/0.1/lastName");
-        DataProperty monikerDp = (new DataProperty());
-        monikerDp.setURI( VitroVocabulary.MONIKER);
-        //this property is vivo specific
-        DataProperty preferredTitleDp = (new DataProperty());
-        preferredTitleDp.setURI("http://vivoweb.org/ontology/core#preferredTitle");
-        
-        
-        if( log.isDebugEnabled() ){
-            @SuppressWarnings("unchecked")
-            Enumeration<String> e = vreq.getParameterNames();
-            while(e.hasMoreElements()){
-                String name = (String)e.nextElement();
-                log.debug("parameter: " + name);
-                for( String value : vreq.getParameterValues(name) ){
-                    log.debug("value for " + name + ": '" + value + "'");
-                }            
-            }
-        }
-        
-        //need an unfiltered dao to get firstnames and lastnames
-        WebappDaoFactory fullWdf = vreq.getFullWebappDaoFactory();
-                
-                                   
-        String vitroClassIdStr = vreq.getParameter("vclassId");
-        if ( vitroClassIdStr != null && !vitroClassIdStr.isEmpty()){                             
-            vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(vitroClassIdStr);
-            if (vclass == null) {
-                log.debug("Couldn't retrieve vclass ");   
-                throw new Exception ("Class " + vitroClassIdStr + " not found");
-            }                           
-        }else{
-            log.debug("parameter vclassId URI parameter expected ");
-            throw new Exception("parameter vclassId URI parameter expected ");
-        }
-        
-        rObj.put("vclass", 
-                new JSONObject().put("URI",vclass.getURI())
-                                .put("name",vclass.getName()));
-        
-        if (vclass != null) {
-            String alpha = SolrIndividualListController.getAlphaParameter(vreq);
-            int page = SolrIndividualListController.getPageParameter(vreq);
-            Map<String,Object> map = SolrIndividualListController.getResultsForVClass(
-                    vclass.getURI(), 
-                    page, 
-                    alpha, 
-                    vreq.getWebappDaoFactory().getIndividualDao(), 
-                    context);                                                
-            
-            rObj.put("totalCount", map.get("totalCount"));
-            rObj.put("alpha", map.get("alpha"));
-                            
-            @SuppressWarnings("unchecked")
-            List<Individual> inds = (List<Individual>)map.get("entities");
-
-            JSONArray jInds = new JSONArray();
-            for(Individual ind : inds ){
-                JSONObject jo = new JSONObject();
-                jo.put("URI", ind.getURI());
-                jo.put("label",ind.getRdfsLabel());
-                jo.put("name",ind.getName());
-                jo.put("thumbUrl", ind.getThumbUrl());
-                jo.put("imageUrl", ind.getImageUrl());
-                jo.put("profileUrl", UrlBuilder.getIndividualProfileUrl(ind, vreq.getWebappDaoFactory()));
-                
-                String moniker = getDataPropertyValue(ind, monikerDp, fullWdf);
-                jo.put("moniker", moniker);
-                jo.put("vclassName", getVClassName(ind,moniker,fullWdf));
-                                    
-                jo.put("preferredTitle", getDataPropertyValue(ind, preferredTitleDp, fullWdf));
-                jo.put("firstName", getDataPropertyValue(ind, fNameDp, fullWdf));                     
-                jo.put("lastName", getDataPropertyValue(ind, lNameDp, fullWdf));
-                
-                jInds.put(jo);
-            }
-            rObj.put("individuals", jInds);
-            
-            JSONArray wpages = new JSONArray();
-            @SuppressWarnings("unchecked")
-            List<PageRecord> pages = (List<PageRecord>)map.get("pages");                
-            for( PageRecord pr: pages ){                    
-                JSONObject p = new JSONObject();
-                p.put("text", pr.text);
-                p.put("param", pr.param);
-                p.put("index", pr.index);
-                wpages.put( p );
-            }
-            rObj.put("pages",wpages);    
-            
-            JSONArray jletters = new JSONArray();
-            List<String> letters = Controllers.getLetters();
-            for( String s : letters){
-                JSONObject jo = new JSONObject();
-                jo.put("text", s);
-                jo.put("param", "alpha=" + URLEncoder.encode(s, "UTF-8"));
-                jletters.put( jo );
-            }
-            rObj.put("letters", jletters);
-        }            
-                                       
-        return rObj;        
+        Map<String, Object> map = getSolrVclassIntersectionResults(vclassURIs, vreq, context);
+        //last parameter indicates single vclass instead of multiple vclasses
+        rObj = processVclassResults(map, vreq, context, false);                    
+        return rObj;                                               
     }
 
+    
+  //Accepts multiple vclasses and returns individuals which correspond to the intersection of those classes (i.e. have all those types) 
+    private void getSolrIndividualsByVClasses( HttpServletRequest req, HttpServletResponse resp ){
+        String errorMessage = null;
+        JSONObject rObj = null;
+        try{            
+            VitroRequest vreq = new VitroRequest(req);
+            VClass vclass=null;
+            
+            //Could have multiple vclass Ids sent in
+            List<String> vclassIds = new ArrayList<String>();
+            String[] vitroClassIdStr = vreq.getParameterValues("vclassId");            
+            if ( vitroClassIdStr != null && vitroClassIdStr.length > 0){    
+            	for(String vclassId: vitroClassIdStr) {
+	                vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(vclassId);
+	                if (vclass == null) {
+	                    log.debug("Couldn't retrieve vclass ");   
+	                    throw new Exception (errorMessage = "Class " + vclassId + " not found");
+	                }   
+            	}
+            }else{
+                log.debug("parameter vclassId URI parameter expected ");
+                throw new Exception("parameter vclassId URI parameter expected ");
+            }
+            vclassIds = Arrays.asList(vitroClassIdStr);
+            //rObj = getLuceneIndividualsByVClass(vclass.getURI(),req, getServletContext());
+            rObj = getSolrIndividualsByVClasses(vclassIds,req, getServletContext());
+        }catch(Exception ex){
+            errorMessage = ex.toString();
+            log.error(ex,ex);
+        }
+
+        if( rObj == null )
+            rObj = new JSONObject();
+        
+        try{
+            resp.setCharacterEncoding("UTF-8");
+            resp.setContentType("application/json;charset=UTF-8");
+            
+            if( errorMessage != null ){
+                rObj.put("errorMessage", errorMessage);
+                resp.setStatus(500 /*HttpURLConnection.HTTP_SERVER_ERROR*/);
+            }else{
+                rObj.put("errorMessage", "");
+            }            
+            Writer writer = resp.getWriter();
+            writer.write(rObj.toString());
+        }catch(JSONException jse){
+            log.error(jse,jse);
+        } catch (IOException e) {
+            log.error(e,e);
+        }
+    }
+    
+    public static JSONObject getSolrIndividualsByVClasses(List<String> vclassURIs, HttpServletRequest req, ServletContext context) throws Exception {
+   	 	VitroRequest vreq = new VitroRequest(req);        
+        Map<String, Object> map = getSolrVclassIntersectionResults(vclassURIs, vreq, context);
+        JSONObject rObj = processVclassResults(map, vreq, context, true);                    
+        return rObj;     
+   }
+    
+    //Including version for Solr query for Vclass Intersections
+    private static Map<String,Object> getSolrVclassIntersectionResults(List<String> vclassURIs, VitroRequest vreq, ServletContext context){
+        String alpha = SolrIndividualListController.getAlphaParameter(vreq);
+        int page = SolrIndividualListController.getPageParameter(vreq);
+        Map<String,Object> map = null;
+        try {
+        	//TODO: This needs to be moved or copied to Solr Individual List Controller
+        	//Note the method below does use Solr search
+	         map = SolrIndividualListController.getResultsForVClassIntersections(
+	                 vclassURIs, 
+	                 page, 
+	                 alpha, 
+	                 vreq.getWebappDaoFactory().getIndividualDao(), 
+	                 context);  
+        } catch(Exception ex) {
+        	log.error("Error in retrieval of Lucene results for VClass " + vclassURIs.toString(), ex);
+        }
+            
+        return map;
+   }
+   
+    //Factoring out to allow for results to be processed from query for both lucene and solr
+    //Map given to process method includes the actual individuals returned from the search
+    public static JSONObject processVclassResults(Map<String, Object> map, VitroRequest vreq, ServletContext context, boolean multipleVclasses) throws Exception{
+         JSONObject rObj = DataGetterUtils.processVclassResultsJSON(map, vreq, multipleVclasses);
+         return rObj;
+    } 
+    
     
     private static String getVClassName(Individual ind, String moniker,
             WebappDaoFactory fullWdf) {
@@ -544,6 +541,49 @@ public class SolrJsonServlet extends VitroHttpServlet {
         
         log.debug("done with getEntitiesByVClass()");
         
+    }
+    
+    /**
+     * Gets data based on data getter for page uri and returns in the form of Json objects
+     * @param req
+     * @param resp
+     */
+   private void getDataForPage(HttpServletRequest req, HttpServletResponse resp) {
+	   VitroRequest vreq = new VitroRequest(req);
+       String errorMessage = null;
+       JSONObject rObj = null;
+	   String pageUri = vreq.getParameter("pageUri");
+	   if(pageUri != null && !pageUri.isEmpty()) {
+		   ServletContext context = getServletContext();
+		   Map<String,Object> data = DataGetterUtils.getDataForPage(pageUri, vreq, context);
+		   //Convert to json version based on type of page
+		   if(data != null) {
+			 //Convert to json version based on type of page
+			   rObj = DataGetterUtils.covertDataToJSONForPage(pageUri, data, vreq, context);
+	   		}
+	   }
+
+	   if( rObj == null )
+           rObj = new JSONObject();
+	 //Send object
+       try{
+           resp.setCharacterEncoding("UTF-8");
+           resp.setContentType("application/json;charset=UTF-8");
+           
+           if( errorMessage != null ){
+               rObj.put("errorMessage", errorMessage);
+               resp.setStatus(500 /*HttpURLConnection.HTTP_SERVER_ERROR*/);
+           }else{
+               rObj.put("errorMessage", "");
+           }            
+           Writer writer = resp.getWriter();
+           writer.write(rObj.toString());
+       }catch(JSONException jse){
+           log.error(jse,jse);
+       } catch (IOException e) {
+           log.error(e,e);
+       }
+	   
     }
 
     private JSONArray individualsToJson(List<Individual> individuals) throws ServletException {

@@ -36,8 +36,7 @@ public class HomePageController extends FreemarkerHttpServlet {
             String uriOfPageInDisplayModel = "not defined";            
             Map<String, Object> pageData = 
                 dataGetter.getData(getServletContext(), vreq, 
-                        uriOfPageInDisplayModel, body, 
-                        DisplayVocabulary.HOME_PAGE_TYPE);
+                        uriOfPageInDisplayModel, body);
             if(pageData != null)
                 body.putAll(pageData);            
         }

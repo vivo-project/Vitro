@@ -29,6 +29,7 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -38,9 +39,16 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
+import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames;
+import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividualTemplateModel;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.TemplateModel;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 
 /** 
  * Generates a list of individuals for display in a template 
@@ -194,6 +202,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
       * This method includes what was formerly a part of the method above, allowing for refactoring of code
       * to use for a different number fo classes
       */
+     
      public static Map<String,Object> getResultsForVClassQuery(Query query, int page, String alpha, IndividualDao indDao, ServletContext context) 
      throws CorruptIndexException, IOException, ServletException{
          Map<String,Object> rvMap = new HashMap<String,Object>();        
@@ -260,6 +269,82 @@ public class IndividualListController extends FreemarkerHttpServlet {
          return rvMap;
      }
      
+   
+     
+     //Solr based version
+     public static Map<String,Object> getResultsForVClassQuery(SolrQuery query, int page, String alpha, IndividualDao indDao, ServletContext context) 
+     throws CorruptIndexException, IOException, ServletException{
+         Map<String,Object> rvMap = new HashMap<String,Object>();        
+         //Execute solr query
+         SolrServer solr = SolrSetup.getSolrServer(context);
+         QueryResponse response = null;
+         
+         try {
+             response = solr.query(query);
+
+         } catch (Throwable t) {
+             log.error("in first pass at search: " + t);
+             // this is a hack to deal with odd cases where search and index threads interact
+             try{
+            	 //Can't use the method below in a static class?
+                 //wait(150);
+                 response = solr.query(query);
+             } catch (Exception ex) {
+                 log.error(ex);
+                 //doFailedSearch()
+                 //return doFailedSearch(msg, qtxt, format);
+             }
+         }
+         
+        
+         SolrDocumentList docs = response.getResults();
+         if( docs == null )            
+             throw new ServletException("Could not run search in IndividualListController");        
+         
+         //get list of individuals for the search results
+         
+         int size = new Long(docs.getNumFound()).intValue();
+         log.debug("Number of search results: " + size);
+         
+         // don't get all the results, only get results for the requestedSize
+         List<Individual> individuals = new ArrayList<Individual>(INDIVIDUALS_PER_PAGE);
+         int individualsAdded = 0;
+         int ii = (page-1)*INDIVIDUALS_PER_PAGE;               
+         while( individualsAdded < INDIVIDUALS_PER_PAGE && ii < size ){
+        	 SolrDocument doc = docs.get(ii);
+        	 if (doc != null) {   
+	        	 String uri = doc.get(VitroLuceneTermNames.URI).toString();
+	             log.debug("Retrieving individual with uri "+ uri);
+	             Individual ind = indDao.getIndividualByURI(uri);
+	             if( ind != null ){
+	                 individuals.add( ind );                         
+	                 individualsAdded++;
+	             } 
+	         } else {
+                 log.warn("no document found for lucene doc id " + doc);
+             }
+             ii++;            
+         }   
+         
+         rvMap.put("count", size);
+         
+         if( size > INDIVIDUALS_PER_PAGE ){
+             rvMap.put("showPages", Boolean.TRUE);
+             List<PageRecord> pageRecords = makePagesList(size, INDIVIDUALS_PER_PAGE, page);
+             rvMap.put("pages", pageRecords);                    
+         }else{
+             rvMap.put("showPages", Boolean.FALSE);
+             rvMap.put("pages", Collections.emptyList());
+         }
+                         
+         rvMap.put("alpha",alpha);
+         
+         rvMap.put("totalCount", size);
+         rvMap.put("entities",individuals);                     
+         
+         return rvMap;
+     }
+     
     
     
      public static Map<String,Object> getResultsForVClassIntersections(List<String> vclassURIs, int page, String alpha, IndividualDao indDao, ServletContext context) 
@@ -267,17 +352,20 @@ public class IndividualListController extends FreemarkerHttpServlet {
          Map<String,Object> rvMap = new HashMap<String,Object>();  
          try{
              //make lucene query for multiple rdf types 
-	         Query query = getQuery(vclassURIs, alpha);     
+        	 //change to solr
+	         SolrQuery query = getSolrQuery(vclassURIs, alpha);     
 	         //get results corresponding to this query
 	         rvMap = getResultsForVClassQuery(query, page, alpha, indDao, context);
 	         List<Individual> individuals = (List<Individual>) rvMap.get("entities");
 		     if (individuals == null) 
 		       log.debug("entities list is null for vclass " + vclassURIs.toString() );     
          } catch(Throwable th) {
-        	 log.error("Error retrieving individuals corresponding to intersection multiple classes." + vclassURIs.toString());
+        	 log.error("Error retrieving individuals corresponding to intersection multiple classes." + vclassURIs.toString(), th);
          }
          return rvMap;
      }
+     
+     
      /*
       * This method creates a query to search for terms with rdf type corresponding to vclass Uri.
       * The original version allowed only for one class URI but needed to be extended to enable multiple
@@ -307,6 +395,53 @@ public class IndividualListController extends FreemarkerHttpServlet {
             log.error(ex,ex);
             return new BooleanQuery();        
         }        
+     }  
+     
+     //how to extend for solr query
+     //Alpha handling taken from SolrIndividualListController
+     private static SolrQuery getSolrQuery(List<String>vclassUris,  String alpha){
+    	 //SolrQuery query = getQuery(qtxt, maxHitCount, vreq);            
+         //SolrServer solr = SolrSetup.getSolrServer(getServletContext());
+    	 SolrQuery query = new SolrQuery();
+         
+         // Solr requires these values, but we don't want them to be the real values for this page
+         // of results, else the refinement links won't work correctly: each page of results needs to
+         // show refinement links generated for all results, not just for the results on the current page.
+         query.setStart(0)
+              .setRows(1000);
+         String queryText = "";
+         //Query text should be of form: 
+         List<String> queryTypes = new ArrayList<String>();
+         try{      
+             //query term for rdf:type - multiple types possible
+         	for(String vclassUri: vclassUris) {
+         		queryTypes.add(VitroLuceneTermNames.RDFTYPE + ":\"" + vclassUri + "\" ");
+         		
+         	} 
+         	
+         	if(queryTypes.size() > 1) {
+         		queryText = StringUtils.join(queryTypes, " AND ");
+         	} else {
+         		if(queryTypes.size() > 0) {
+         			queryText = queryTypes.get(0);
+         		}
+         	}
+         	
+         	 // Add alpha filter if it is needed
+            if ( alpha != null && !"".equals(alpha) && alpha.length() == 1) {      
+                queryText += VitroLuceneTermNames.NAME_LOWERCASE + ":" + alpha.toLowerCase() + "*";
+            }     
+            
+         	log.debug("Query text is " + queryText);
+         	query.setQuery(queryText);
+            log.debug("Query: " + query);
+             return query;
+         } catch (Exception ex){
+             log.error(ex,ex);
+         
+             return new SolrQuery();        
+         }       
+     
      }  
      
      public static List<PageRecord> makePagesList( int count, int pageSize,  int selectedPage){        

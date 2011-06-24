@@ -10,10 +10,12 @@ import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
@@ -26,7 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateMo
 public class ClassGroupPageData implements PageDataGetter{
     private static final Log log = LogFactory.getLog(ClassGroupPageData.class);
     
-    public Map<String,Object> getData(ServletContext context, VitroRequest vreq, String pageUri, Map<String, Object> page, String type ){
+    public Map<String,Object> getData(ServletContext context, VitroRequest vreq, String pageUri, Map<String, Object> page ){
         HashMap<String, Object> data = new HashMap<String,Object>();
         String classGroupUri = vreq.getWebappDaoFactory().getPageDao().getClassGroupPage(pageUri);
         data.put("classGroupUri", classGroupUri);
@@ -64,7 +66,10 @@ public class ClassGroupPageData implements PageDataGetter{
             
         }
                     
-        data.put("vClassGroup", group);  //may put null            
+        data.put("vClassGroup", group);  //may put null     
+        //Also add data service url
+        //Hardcoding for now, need a more dynamic way of doing this
+        data.put("dataServiceUrlIndividualsByVClass", this.getDataServiceUrl());
         return data;
     }        
     
@@ -112,6 +117,19 @@ public class ClassGroupPageData implements PageDataGetter{
         return DisplayVocabulary.CLASSGROUP_PAGE_TYPE;
     } 
     
+  //Get data servuice
+    public String getDataServiceUrl() {
+    	return UrlBuilder.getUrl("/dataservice?getSolrIndividualsByVClass=1&vclassId=");
+    }
+    
+    
+    /**
+     * For processig of JSONObject
+     */
+    public JSONObject convertToJSON(Map<String, Object> dataMap, VitroRequest vreq) {
+    	JSONObject rObj = null;
+    	return rObj;
+    }
     protected static void setAllClassCountsToZero(VClassGroup vcg){
         for(VClass vc : vcg){
             vc.setEntityCount(0);
