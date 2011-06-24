@@ -161,6 +161,9 @@ ul.individual-emails {
     clear: both;
     padding-left: 0;
 }
+#additional-emails li:last-child {
+    margin-bottom: 20px;
+}
 ul.individual-urls-people li,
 ul.individual-emails li {
     font-size: .875em;
