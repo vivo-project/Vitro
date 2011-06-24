@@ -49,6 +49,11 @@ public class RootUserPolicy implements PolicyIface {
 					"not root user");
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return "RootUserPolicy - " + hashCode();
+	}
 
 	// ----------------------------------------------------------------------
 	// Setup class
