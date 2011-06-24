@@ -287,15 +287,15 @@ public class IndexBuilder extends Thread {
      * @throws AbortIndexing 
      */
     private void indexForSource(Iterator<Individual> individuals , boolean newDocs) throws AbortIndexing{     
-        
-       
-      //  long starttime = System.currentTimeMillis();         
+             
         int count = 0;
         int numOfThreads = 10;
        
       
         List<IndexWorkerThread> workers = new ArrayList<IndexWorkerThread>();
         boolean distributing = true;
+        
+        IndexWorkerThread.setStartTime(System.currentTimeMillis());
        
         for(int i = 0; i< numOfThreads ;i++){
         	workers.add(new IndexWorkerThread(indexer,i,distributing)); // made a pool of workers
@@ -317,9 +317,7 @@ public class IndexBuilder extends Thread {
             Individual ind = null;
             try{
                 ind = individuals.next();     
-                         
-                //indexer.index(ind);    
-                
+                          
                 workers.get(count%numOfThreads).addToQueue(ind); // adding individual to worker queue.
                 
             }catch(Throwable ex){
@@ -329,14 +327,7 @@ public class IndexBuilder extends Thread {
                 String uri = ind!=null?ind.getURI():"null";
                 log.warn("Error indexing individual " + uri + " " + ex.getMessage());
             }
-            count++;
-           /* if( log.isDebugEnabled() ){            
-                if( (count % 100 ) == 0 && count > 0 ){
-                    long dt = (System.currentTimeMillis() - starttime);
-                    log.debug("individuals indexed: " + count + " in " + dt + " msec " +
-                             " time pre individual = " + (dt / count) + " msec" );                          
-                }                
-            }    */            
+            count++;          
         }
         
         for(int i =0 ; i < numOfThreads; i ++){
@@ -350,10 +341,8 @@ public class IndexBuilder extends Thread {
         	}
         }
         
-       /* log.info( 
-             "individuals indexed: " + count + " in " + (System.currentTimeMillis() - starttime) + " msec" +
-              (count!=0?(" time per individual = " + (System.currentTimeMillis() - starttime)/ count + " msec"):"")
-        );*/
+        IndexWorkerThread.resetCount();
+        
     }        
 
     
