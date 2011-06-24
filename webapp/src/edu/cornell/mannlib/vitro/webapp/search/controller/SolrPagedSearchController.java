@@ -347,9 +347,9 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
         HashSet<String> classGroupsInHits = new HashSet<String>(n);
         int grpsFound = 0;
         
-        for(int i = 0; i < maxHitCount && n > grpsFound ;i++){
+        long maxHits = Math.min(docs.getNumFound(), maxHitCount);
+        for(int i = 0; i < maxHits && n > grpsFound ;i++){
             try{
-                //log.debug("Looking for classgroups from document number " + i);
                 SolrDocument doc = docs.get(i);        
                 Collection<Object> grps = doc.getFieldValues(VitroTermNames.CLASSGROUP_URI);     
                 if (grps != null) {
