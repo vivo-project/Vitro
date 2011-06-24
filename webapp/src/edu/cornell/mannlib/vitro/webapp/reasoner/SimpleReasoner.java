@@ -959,6 +959,9 @@ public class SimpleReasoner extends StatementListener {
 			}
 		} catch (Exception e) {
 			 log.error("Exception while recomputing ABox inference model", e);
+			 inferenceRebuildModel.removeAll(); // don't do this in the finally, it's needed in the case
+                                                // where there isn't an exception
+			 return;
 		} finally {
    			 aboxModel.leaveCriticalSection();
 			 tboxModel.leaveCriticalSection();
@@ -967,7 +970,7 @@ public class SimpleReasoner extends StatementListener {
 		
 		// reflect the recomputed inferences into the application inference
 		// model.
-		inferenceRebuildModel.enterCriticalSection(Lock.READ);
+		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);
 		scratchpadModel.enterCriticalSection(Lock.WRITE);
         log.info("Updating ABox inference model");
 		// Remove everything from the current inference model that is not
@@ -1029,6 +1032,8 @@ public class SimpleReasoner extends StatementListener {
 				inferenceModel.leaveCriticalSection();
 			}
 		} finally {
+			inferenceRebuildModel.removeAll();
+			scratchpadModel.removeAll();
 			inferenceRebuildModel.leaveCriticalSection();
 			scratchpadModel.leaveCriticalSection();			
 		}
