@@ -114,10 +114,3 @@
     </td>
 </tr>  
 <script  type="text/javascript" >
-$(function() {
-        $("#ThemeDir option").each(function(i){
-                if ($(this).text() == "vivo-basic")
-                        $(this).text("vivo-basic (deprecated)");
-        });
-});
-</script>
