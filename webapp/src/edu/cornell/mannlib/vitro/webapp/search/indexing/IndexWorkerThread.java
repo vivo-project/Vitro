@@ -30,10 +30,10 @@ class IndexWorkerThread extends Thread{
 		this.indexer = indexer;
 		this.threadNum = threadNum;
 		this.distributing = distributing;
-		synchronized(this){
+		/*synchronized(this){
 			if(starttime == 0)
 				starttime = System.currentTimeMillis();
-		}
+		}*/
 	}
 	
 	public void addToQueue(Individual ind){
@@ -95,6 +95,14 @@ class IndexWorkerThread extends Thread{
 				} 
 			}
 		}
+	}
+	
+	public static void resetCount(){
+		count = 0;
+	}
+	
+	public static void setStartTime(long startTime){
+		starttime = startTime;
 	}
 	
 }
