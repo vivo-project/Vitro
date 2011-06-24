@@ -277,7 +277,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             if( wasHtmlRequested ){                                
                 // Search request includes no classgroup and no type, so add classgroup search refinement links.
                 if ( !classGroupFilterRequested && !typeFilterRequested ) { 
-                    List<VClassGroup> classgroups = getClassGroups(grpDao, docs);
+                    List<VClassGroup> classgroups = getClassGroups(grpDao, docs, maxHitCount);
                     List<VClassGroupSearchLink> classGroupLinks = new ArrayList<VClassGroupSearchLink>(classgroups.size());
                     for (VClassGroup vcg : classgroups) {
                         if (vcg.getPublicName() != null) {
@@ -340,16 +340,16 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
     /**
      * Get the class groups represented for the individuals in the documents.
      */
-    private List<VClassGroup> getClassGroups(VClassGroupDao grpDao, SolrDocumentList docs) {        
+    private List<VClassGroup> getClassGroups(VClassGroupDao grpDao, SolrDocumentList docs, int maxHitCount) {        
         LinkedHashMap<String,VClassGroup> grpMap = grpDao.getClassGroupMap();
         int n = grpMap.size();
         
         HashSet<String> classGroupsInHits = new HashSet<String>(n);
         int grpsFound = 0;
         
-        long hitCount = docs.getNumFound();
-        for(int i=0; i<hitCount && n > grpsFound ;i++){
+        for(int i = 0; i < maxHitCount && n > grpsFound ;i++){
             try{
+                //log.debug("Looking for classgroups from document number " + i);
                 SolrDocument doc = docs.get(i);        
                 Collection<Object> grps = doc.getFieldValues(VitroTermNames.CLASSGROUP_URI);     
                 if (grps != null) {
