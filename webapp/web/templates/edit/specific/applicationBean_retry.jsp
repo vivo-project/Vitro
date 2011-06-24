@@ -113,4 +113,3 @@
         <font color="red"><form:error name="LogotypeHeight"/></font>
     </td>
 </tr>  
-<script  type="text/javascript" >
