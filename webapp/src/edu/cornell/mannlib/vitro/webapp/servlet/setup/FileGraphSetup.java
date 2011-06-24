@@ -47,9 +47,10 @@ public class FileGraphSetup implements ServletContextListener {
 	    
 		boolean aboxChanged = false; // indicates whether any ABox file graph model has changed
 		boolean tboxChanged = false; // indicates whether any TBox file graph model has changed
+		OntModelSelectorImpl baseOms = null;
 		
 		try {
-			OntModelSelectorImpl baseOms = (OntModelSelectorImpl) sce.getServletContext().getAttribute("baseOntModelSelector");
+			baseOms = (OntModelSelectorImpl) sce.getServletContext().getAttribute("baseOntModelSelector");
 			Store kbStore = (Store) sce.getServletContext().getAttribute("kbStore");
 						
 			// ABox files
@@ -81,8 +82,16 @@ public class FileGraphSetup implements ServletContextListener {
 			t.printStackTrace();
 		}
 		
-		if (aboxChanged | tboxChanged)  {
-            SimpleReasonerSetup.setRecomputeRequired(sce.getServletContext());
+		if (aboxChanged || tboxChanged)  {
+			
+	        if ( !JenaDataSourceSetup.updateRequired(sce.getServletContext(), baseOms.getTBoxModel())) {
+	        	log.info("a full recompute of the Abox will be performed because" +
+	        			" the filegraph abox(s) and/or tbox(s) have changed, or are being read for the first time." );
+	            SimpleReasonerSetup.setRecomputeRequired(sce.getServletContext());
+	        } else {
+	        	log.info("A knowledgebase update is required. A full recompute of the Abox will not be" +
+	        			" performed; instead inferences will be updated incrementally as the knowledge base is updated.");
+	        }
 		}
 	}
 	

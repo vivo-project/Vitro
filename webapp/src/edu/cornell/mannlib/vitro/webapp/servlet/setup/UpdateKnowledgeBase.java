@@ -61,9 +61,9 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private static final String SPARQL_CONSTRUCT_DELETIONS_DIR = DATA_DIR + "sparqlConstructs/deletions/";
 	private static final String MISC_REPLACEMENTS_FILE = DATA_DIR + "miscReplacements.rdf";
 	private static final String OLD_TBOX_MODEL_DIR = DATA_DIR + "oldVersion/";
-	private static final String NEW_TBOX_MODEL_DIR = "/WEB-INF/submodels/";
+	private static final String NEW_TBOX_MODEL_DIR = "/WEB-INF/filegraph/tbox/";
 	private static final String OLD_TBOX_ANNOTATIONS_DIR = DATA_DIR + "oldAnnotations/";
-	private static final String NEW_TBOX_ANNOTATIONS_DIR = "/WEB-INF/ontologies/user";
+	private static final String NEW_TBOX_ANNOTATIONS_DIR = "/WEB-INF/ontologies/user/tbox/";
 	
 	public void contextInitialized(ServletContextEvent sce) {
 				
@@ -122,7 +122,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 					  reloadDisplayModel(ctx);
 				  }
 			  } catch (Throwable t){
-				  log.warn("Unable to perform miscellaneous application metadata replacements", t);
+				  log.warn("warning", t);
 			  }
 			  
 			  ontologyUpdater.update();
@@ -236,7 +236,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 				}
 			} catch (FileNotFoundException fnfe) {
 				log.error(rdfFiles[i].getName() + " not found. Unable to load" +
-						" RDF from this location.");
+						" RDF from this location: " + directoryPath);
 			}
 		}
 		return om;

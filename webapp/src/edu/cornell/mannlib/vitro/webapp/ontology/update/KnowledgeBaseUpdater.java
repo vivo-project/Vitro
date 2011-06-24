@@ -93,9 +93,6 @@ public class KnowledgeBaseUpdater {
 		performSparqlConstructAdditions(settings.getSparqlConstructAdditionsDir(), settings.getOntModelSelector().getABoxModel());
 		performSparqlConstructRetractions(settings.getSparqlConstructDeletionsDir(), settings.getOntModelSelector().getABoxModel());
 		
-		DateTimeMigration dtMigration = new DateTimeMigration(settings.getOntModelSelector().getABoxModel(), logger, record);
-        dtMigration.updateABox();
-        
 		List<AtomicOntologyChange> rawChanges = getAtomicOntologyChanges();
 		
 		AtomicOntologyChangeLists changes = new AtomicOntologyChangeLists(rawChanges,settings.getNewTBoxModel(),settings.getOldTBoxModel());
