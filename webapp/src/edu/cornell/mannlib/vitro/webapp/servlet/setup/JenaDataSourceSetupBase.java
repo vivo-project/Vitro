@@ -54,7 +54,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     protected static String AUTHPATH = BASE+"auth/";
     public static String APPPATH = BASE+"app/";
     //these files are loaded everytime the system starts up
-    public static String APPPATH_LOAD = APPPATH + "menuload";
+    public static String APPPATH_LOAD = APPPATH + "menuload/";
     protected static String SUBMODELS = "/WEB-INF/submodels/";
     protected static boolean firstStartup = false;
 

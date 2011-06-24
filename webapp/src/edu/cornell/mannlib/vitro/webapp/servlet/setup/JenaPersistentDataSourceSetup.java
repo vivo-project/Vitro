@@ -99,33 +99,6 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
 	    } catch (Throwable t) {
 	    	log.error("Unable to load user application configuration model Display Model from DB", t);
 	    }
-	    /*
-	    //For comparison purposes
-	    //Read in application.owl and menu.n3 and compare with what is currently in the display model
-	    //What are the differences
-	    try {
-	    	//This is the model as retrieved on system load
-	    	Model loadedModel = ModelFactory.createDefaultModel();
-	    	
-
-	    	//Now read in from the menu model
-	    	Model appDbModel = makeDBModelFromConfigurationProperties(
-	    	        JENA_DISPLAY_METADATA_MODEL, DB_ONT_MODEL_SPEC, ctx);
-	    	//Now compare - do differences in both directions
-	    	//What's in the upto date display that's not in the one that's loaded from files
-	    	Model notInLoadedModel = appDbModel.difference(loadedModel);
-	    	System.out.println("**These are the statements not in the loaded model that ARE in the current model");
-	    	notInLoadedModel.write(System.out, "N3");
-	    	//Could also do RDF.. if need to
-	    	//Do the opposite too to check
-	    	Model notInCurrentModel = loadedModel.difference(appDbModel);
-	    	System.out.println("**These are statements in loaded model NOT in the current model");
-	    	notInCurrentModel.write(System.out, "N3");
-	    } catch (Exception ex) {
-	    	System.out.println("An error occurred in reading this file");
-	    	ex.printStackTrace();
-	    }
-	    */
 	}
 	
 	@Override
