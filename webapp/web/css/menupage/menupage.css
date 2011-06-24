@@ -193,9 +193,7 @@ ul#browse-classes a {
 ul#alpha-browse-individuals {
     float: left;
     width: 619px;
-    /*    padding-left: 10px; */
-        list-style: none;
-    /*    margin-left: 1px; */
+    list-style: none;
 }
 ul#alpha-browse-individuals li {
     float: left;
@@ -212,11 +210,6 @@ ul#alpha-browse-individuals a {
     padding-left: 8px;
     width: 10px;
 }
-h4#selectedClassHeading {
-    margin-left:4px;
-    margin-top:-5px;
-    margin-bottom:-10px;
-}
 /* BROWSE INDIVIDUALS------>  */
 #individuals-in-class {
     float: right;
@@ -227,7 +220,6 @@ h4#selectedClassHeading {
     min-height: 170px;
 }
 h3.selected-class {
-    margin: 0 0 0 1em;
     padding: .8em 0 0 0;
 }
 #individuals-in-class ul {

@@ -140,9 +140,7 @@ var browseByVClass = {
                     browseByVClass.pagination(pages, page);
                 }
                 
-                //  selectedClassHeading = '<h3 class="selected-class">'+ results.vclass.name +'</h3>';   NIHVIVO-2483 tlw72
-               //   browseByVClass.individualsContainer.prepend(selectedClassHeading);
-               $('h4#selectedClassHeading').text(results.vclass.name);                               //  NIHVIVO-2483 tlw72
+                $('h3.selected-class').text(results.vclass.name);
                 
                 // Set selected class, alpha and page
                 browseByVClass.selectedVClass(results.vclass.URI);
@@ -219,9 +217,8 @@ var browseByVClass = {
         $('#alpha-browse-individuals li a[data-alpha="'+ alpha +'"]').addClass('selected');
     },
     
-    // Wipe the currently displayed class heading, individuals, no-content message, and existing pagination
+    // Wipe the currently displayed individuals, no-content message, and existing pagination
     wipeSlate: function() {
-        $('h3.selected-class').remove();
         browseByVClass.individualsInVClass.empty();
         $('p.no-individuals').remove();
         $('.pagination').remove();
