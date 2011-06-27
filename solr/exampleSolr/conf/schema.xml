@@ -485,17 +485,12 @@
 <field name="URI" type="string" indexed="true" stored="true" multiValued="false" omitNorms="true"/>
 
 <field name="nameRaw" type="string" indexed="false" stored="true" multiValued="true"/>
-<!-- RY Not sure if we need to store nameLowercase -->
-<field name="nameLowercase" type="string" indexed="true" stored="true" multiValued="true"/>
+<!-- RY Not sure if we need to store nameLowercase. Is it ever displayed? -->
+<field name="nameLowercase" type="lowercase" indexed="true" stored="true" multiValued="true"/>
 <!-- A sortable version of nameLowercase -->
 <field name="nameLowercaseSingleValued" type="lowercase" indexed="true" stored="false" multiValued="false" /> 
-<field name="nameUnstemmed" type="lowercase" indexed="true" stored="false" multiValued="true"/>
+<field name="nameUnstemmed" type="textUnstemmed" indexed="true" stored="false" multiValued="true"/>
 <field name="nameStemmed" type="text" indexed="true" stored="false" multiValued="true"/>
-
-   <!--
-    <field name="prefixNameUnstemmed" type="prefixTextUnstemmed" indexed="true" stored="false" multiValued="true"/>
-    <field name="prefixNameStemmed" type="prefixText" indexed="true" stored="false" multiValued="true"/>
-   -->
 
 <field name="indexedTime" type="string" indexed="true" stored="true" multiValued="true"/>
 <field name="NAME_PHONETIC" type ="phonetic" indexed="true" stored="false" multiValued="true"/>
@@ -511,12 +506,12 @@
 <field name="PHI" type="float" indexed="true" stored="true" multiValued="false"/>
 <field name="ADJACENT_NODES" type="string" indexed="true" stored="true" multiValued="true"/> -->
 
-<field name="moniker" type="ignored" />
 <field name="modType" type="ignored"/>
 <field name="JCLASS" type="ignored"/>
 
- <!-- Copy nameLowercase to sortable field. -->
-    <copyField source="nameLowercase" dest="nameLowercaseSingleValued" />
+<!-- Copy nameLowercase to sortable field. -->
+<copyField source="nameLowercase" dest="nameLowercaseSingleValued" />
+   
 <!-- ****************************  End Vitro Fields *************************** -->
 
 
