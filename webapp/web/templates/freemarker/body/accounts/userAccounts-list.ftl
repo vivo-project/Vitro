@@ -4,44 +4,8 @@
 
 <#import "userAccounts-accountsNav.ftl" as p>
 
-<form method="POST" action="${formUrls.list}" class="customForm" role="">
-
-    <#--current page: <input type="text" name="pageIndex" value="${page.current}" />
-    <br />-->
-
-    <#--sort order:
-    <!-- Manolo: I don't know the right way to handle these links in the column headers. --> 
-    <#--<#assign directions = ["ASC", "DESC"]>
-    <select name="orderDirection" >
-      <#list directions as direction>
-        <option value="${direction}" <#if orderDirection = direction>selected</#if> >${direction}</option>
-      </#list>
-    </select> 
-    <!-- When orderDirection changes, 
-            set pageIndex to 1 
-            submit the form (submit action is "list") --> 
-    <#--<br />        -->
-    
-
-    <#--sort field:
-    <!-- Manolo: I don't know the right way to handle these links in the column headers. --> 
-    <#--<#assign fields = ["email", "firstName", "lastName", "status", "count"]>
-    <select name="orderField" >
-      <#list fields as field>
-        <option value="${field}" <#if orderField = field>selected</#if> >${field}</option>
-      </#list>
-    </select> -->
-    
-    <!-- When orderField changes, 
-            set pageIndex to 1
-            set orderDirection to "ASC" 
-            submit the form (submit action is "list") --> 
-   <!-- <br />
-    <input type="submit" name="list" value="Refresh page" />--> 
-</form>
-
 <form method="POST" action="${formUrls.add}" class="customForm" role="">
-    <h3>Account  | <input type="submit" class="submit" value="Add new account" /></h3>
+    <h3>Account  | <input type="submit" class="submit add-account" value="Add new account" /></h3>
 </form>
 
 <#if newUserAccount?? >
