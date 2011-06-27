@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.search;
 
-public class VitroTermNames {
+public class VitroSearchTermNames {
     /** Id of entity, vclass or tab */
     public static String URI         = "URI";
     /** lucene document id */
@@ -46,17 +46,24 @@ public class VitroTermNames {
 
     // Fields derived from rdfs:label
     /** Raw rdfs:label: no lowercasing, no tokenizing, no stop words, no stemming **/
-    public static String NAME_RAW = "nameRaw"; // was NAMERAW
+    public static String NAME_RAW = "nameRaw"; // 
     
     /** rdfs:label lowercased, no tokenizing, no stop words, no stemming **/
-    public static String NAME_LOWERCASE = "nameLowercase"; // was NAMELOWERCASE
+    public static String NAME_LOWERCASE = "nameLowercase"; // 
+
+    /** Same as NAME_LOWERCASE, but single-valued so it's sortable. **/
+    // RY Need to control how indexing selects which of multiple values to copy. 
+    public static String NAME_LOWERCASE_SINGLE_VALUED = "nameLowercaseSingleValued";
     
     /** rdfs:label lowercased, tokenized, stop words, no stemming **/
-    public static String NAME_UNSTEMMED = "nameUnstemmed"; // was NAMEUNSTEMMED
+    public static String NAME_UNSTEMMED = "nameUnstemmed"; 
     
     /** rdfs:label lowercased, tokenized, stop words, stemmed **/
-    public static String NAME_STEMMED = "nameStemmed"; // was NAME
+    public static String NAME_STEMMED = "nameStemmed"; 
     
+    /** rdfs:label lowercased, untokenized, edge-n-gram-filtered for autocomplete on people names **/
+    public static String AC_NAME_UNTOKENIZED = "acNameUntokenized";
+
     /** field for beta values of all documents **/
     public static final String BETA = "BETA";
     public static final String PHI = "PHI";

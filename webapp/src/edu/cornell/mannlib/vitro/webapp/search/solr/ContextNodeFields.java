@@ -26,7 +26,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.search.VitroTermNames;
+import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 
 public class ContextNodeFields implements DocumentModifier{
 	
@@ -107,8 +107,8 @@ public class ContextNodeFields implements DocumentModifier{
     	
         log.debug("retrieving context node values..");
 
-    	SolrInputField field = doc.getField(VitroTermNames.ALLTEXT);
-    	SolrInputField targetField = doc.getField(VitroTermNames.targetInfo);
+    	SolrInputField field = doc.getField(VitroSearchTermNames.ALLTEXT);
+    	SolrInputField targetField = doc.getField(VitroSearchTermNames.targetInfo);
     	StringBuffer objectProperties = new StringBuffer();
   
     	

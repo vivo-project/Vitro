@@ -45,11 +45,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
+import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroHighlighter;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryFactory;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames;
-import edu.cornell.mannlib.vitro.webapp.search.VitroTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.LinkTemplateModel;
@@ -230,7 +229,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
             for(int i = startIndex; i < lastHitToShow; i++){
                 try {                    
                     SolrDocument doc = docs.get(i);
-                    String uri = doc.get(VitroLuceneTermNames.URI).toString();
+                    String uri = doc.get(VitroSearchTermNames.URI).toString();
                     log.debug("Retrieving individual with uri "+ uri);
                     Individual ent = new IndividualImpl();
                     ent.setURI(uri);
@@ -351,7 +350,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
         for(int i = 0; i < maxHits && n > grpsFound ;i++){
             try{
                 SolrDocument doc = docs.get(i);        
-                Collection<Object> grps = doc.getFieldValues(VitroTermNames.CLASSGROUP_URI);     
+                Collection<Object> grps = doc.getFieldValues(VitroSearchTermNames.CLASSGROUP_URI);     
                 if (grps != null) {
                     for (Object o : grps) {                            
                         String groupUri = o.toString();
@@ -418,7 +417,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
         HashSet<String> typesInHits = new HashSet<String>();  
         for (SolrDocument doc : docs) {
             try {
-                Collection<Object> types = doc.getFieldValues(VitroLuceneTermNames.RDFTYPE);     
+                Collection<Object> types = doc.getFieldValues(VitroSearchTermNames.RDFTYPE);     
                 if (types != null) {
                     for (Object o : types) {
                         String typeUri = o.toString();
@@ -446,7 +445,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
         if ( ! StringUtils.isBlank(classgroupParam) ) {           
             log.debug("Firing classgroup query ");
             log.debug("request.getParameter(classgroup) is "+ classgroupParam);
-            query.addFilterQuery(VitroLuceneTermNames.CLASSGROUP_URI + ":\"" + classgroupParam + "\"");
+            query.addFilterQuery(VitroSearchTermNames.CLASSGROUP_URI + ":\"" + classgroupParam + "\"");
         }
 
         // rdf:type filtering
@@ -454,7 +453,7 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
         if (  ! StringUtils.isBlank(typeParam) ) {                         
             log.debug("Firing type query ");
             log.debug("request.getParameter(type) is "+ typeParam);   
-            query.addFilterQuery(VitroLuceneTermNames.RDFTYPE + ":\"" + typeParam + "\"");
+            query.addFilterQuery(VitroSearchTermNames.RDFTYPE + ":\"" + typeParam + "\"");
         }
                 
         //query.setQuery(queryText);

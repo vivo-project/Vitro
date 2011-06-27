@@ -39,8 +39,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
+import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 
@@ -359,7 +359,7 @@ public class SolrJsonReconcileServlet extends VitroHttpServlet {
 	
     private Query makeTokenizedNameQuery(String querystr, Analyzer analyzer, HttpServletRequest request) {
     	   
-        String termName = VitroLuceneTermNames.NAME_STEMMED;
+        String termName = VitroSearchTermNames.NAME_STEMMED;
 
         BooleanQuery boolQuery = new BooleanQuery();
         
@@ -425,7 +425,7 @@ public class SolrJsonReconcileServlet extends VitroHttpServlet {
     		if (typeParam != null) {
     			BooleanQuery boolQuery = new BooleanQuery(); 
     			boolQuery.add(  new TermQuery(
-    					new Term(VitroLuceneTermNames.RDFTYPE, 
+    					new Term(VitroSearchTermNames.RDFTYPE, 
     							typeParam)),
     							BooleanClause.Occur.MUST);
     			boolQuery.add(query, BooleanClause.Occur.MUST);
@@ -440,7 +440,7 @@ public class SolrJsonReconcileServlet extends VitroHttpServlet {
 				if ( ! StringUtils.isEmpty(pvPair[0]) ) {
 					BooleanQuery boolQuery = new BooleanQuery();
 					boolQuery.add(new TermQuery(new Term(
-							VitroLuceneTermNames.RDFTYPE, pvPair[0])),
+							VitroSearchTermNames.RDFTYPE, pvPair[0])),
 							BooleanClause.Occur.MUST);
 					boolQuery.add(extraQuery, BooleanClause.Occur.MUST);
 					extraQuery = boolQuery;

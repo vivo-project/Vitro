@@ -36,7 +36,7 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.search.VitroTermNames;
+import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 
 
 public class CalculateParameters implements DocumentModifier {
@@ -67,15 +67,15 @@ public class CalculateParameters implements DocumentModifier {
     private static Log log = LogFactory.getLog(CalculateParameters.class);
     
     private static final String[] fieldsToAddBetaTo = {
-        VitroTermNames.NAME_RAW,
-        VitroTermNames.NAME_LOWERCASE,
-        VitroTermNames.NAME_UNSTEMMED,
-        VitroTermNames.NAME_STEMMED
+        VitroSearchTermNames.NAME_RAW,
+        VitroSearchTermNames.NAME_LOWERCASE,
+        VitroSearchTermNames.NAME_UNSTEMMED,
+        VitroSearchTermNames.NAME_STEMMED
     };
     
     private static final String[] fieldsToMultiplyBetaBy = {
-        VitroTermNames.ALLTEXT,
-        VitroTermNames.ALLTEXTUNSTEMMED,                
+        VitroSearchTermNames.ALLTEXT,
+        VitroSearchTermNames.ALLTEXTUNSTEMMED,                
     };
 	
 	public CalculateParameters(Dataset dataset){
@@ -298,7 +298,7 @@ public class CalculateParameters implements DocumentModifier {
             f.addValue(info.toString(),getBeta(uri)*phi*IndividualToSolrDocument.ALL_TEXT_BOOST);
         }
         
-        SolrInputField f = doc.getField(VitroTermNames.targetInfo);
+        SolrInputField f = doc.getField(VitroSearchTermNames.targetInfo);
         f.addValue(adjInfo[1],f.getBoost());
         doc.setDocumentBoost(getBeta(uri)*phi*IndividualToSolrDocument.ALL_TEXT_BOOST);   
         

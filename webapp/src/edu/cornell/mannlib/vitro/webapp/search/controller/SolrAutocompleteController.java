@@ -16,11 +16,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.search.BooleanQuery;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.response.TermsResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.json.JSONArray;
@@ -30,7 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames;
+import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 
 /**
@@ -102,10 +100,10 @@ public class SolrAutocompleteController extends VitroAjaxController {
             List<SearchResult> results = new ArrayList<SearchResult>();
             for (SolrDocument doc : docs) {
                 try{                                      
-                    String uri = doc.get(VitroLuceneTermNames.URI).toString();
-                    // VitroLuceneTermNames.NAME_RAW is a multivalued field, so doc.get() returns a list
+                    String uri = doc.get(VitroSearchTermNames.URI).toString();
+                    // VitroSearchTermNames.NAME_RAW is a multivalued field, so doc.get() returns a list
                     @SuppressWarnings("unchecked")
-                    String name = ((List<String>) doc.get(VitroLuceneTermNames.NAME_RAW)).get(0);
+                    String name = ((List<String>) doc.get(VitroSearchTermNames.NAME_RAW)).get(0);
                     SearchResult result = new SearchResult(name, uri);
                     results.add(result);
                 } catch(Exception e){
@@ -149,13 +147,13 @@ public class SolrAutocompleteController extends VitroAjaxController {
         // Filter by type
         String typeParam = (String) vreq.getParameter(PARAM_RDFTYPE);
         if (typeParam != null) {
-            query.addFilterQuery(VitroLuceneTermNames.RDFTYPE + ":\"" + typeParam + "\"");
+            query.addFilterQuery(VitroSearchTermNames.RDFTYPE + ":\"" + typeParam + "\"");
         }   
         
-        query.setFields(VitroLuceneTermNames.NAME_RAW, VitroLuceneTermNames.URI); // fields to retrieve
+        query.setFields(VitroSearchTermNames.NAME_RAW, VitroSearchTermNames.URI); // fields to retrieve
        
         // Can't sort on multivalued field, so we sort the results in Java when we get them.
-        // query.setSortField(VitroLuceneTermNames.NAME_LOWERCASE, SolrQuery.ORDER.asc);
+        // query.setSortField(VitroSearchTermNames.NAME_LOWERCASE, SolrQuery.ORDER.asc);
         
         return query;
     }
@@ -188,7 +186,7 @@ public class SolrAutocompleteController extends VitroAjaxController {
  
 //        String stemParam = (String) request.getParameter("stem"); 
 //        boolean stem = "true".equals(stemParam);
-//        String termName = stem ? VitroLuceneTermNames.AC_NAME_STEMMED : VitroLuceneTermNames.AC_NAME_UNSTEMMED  ;
+//        String termName = stem ? VitroSearchTermNames.AC_NAME_STEMMED : VitroSearchTermNames.AC_NAME_UNSTEMMED  ;
         
 //        // Use the query parser to analyze the search term the same way the indexed text was analyzed.
 //        // For example, text is lowercased, and function words are stripped out.
@@ -217,7 +215,20 @@ public class SolrAutocompleteController extends VitroAjaxController {
 //            log.warn(e, e);
 //        }
        
-        setUntokenizedQuery(query, queryStr);
+        //setUntokenizedQuery(query, queryStr);
+        
+      String stemParam = (String) request.getParameter("stem"); 
+      boolean stem = "true".equals(stemParam);
+      String termName = stem ? VitroSearchTermNames.NAME_STEMMED : VitroSearchTermNames.NAME_UNSTEMMED; 
+      
+      // We have to lowercase manually, because Solr doesn't do text analysis on wildcard queries
+      queryStr = queryStr.toLowerCase();
+      // Solr wants whitespace to be escaped with a backslash
+      // Better: replace \s+
+      queryStr = queryStr.replaceAll(" ", "\\\\ ");
+      queryStr = termName + ":" + queryStr + "*";
+      query.setQuery(queryStr);
+        
     }
 
     private void setUntokenizedQuery(SolrQuery query, String queryStr) {
@@ -227,7 +238,7 @@ public class SolrAutocompleteController extends VitroAjaxController {
         // Solr wants whitespace to be escaped with a backslash
         // Better: replace \s+
         queryStr = queryStr.replaceAll(" ", "\\\\ ");
-        queryStr = VitroLuceneTermNames.NAME_LOWERCASE + ":" + queryStr + "*";
+        queryStr = VitroSearchTermNames.NAME_LOWERCASE + ":" + queryStr + "*";
         query.setQuery(queryStr);
 
     }

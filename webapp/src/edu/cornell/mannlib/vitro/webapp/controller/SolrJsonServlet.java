@@ -5,10 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.controller;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -34,11 +32,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.SolrIndividualListController.PageRecord;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.SolrIndividualListController;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
@@ -220,7 +215,6 @@ public class SolrJsonServlet extends VitroHttpServlet {
                 throw new Exception("parameter vclassId URI parameter expected ");
             }
             vclassIds = Arrays.asList(vitroClassIdStr);
-            //rObj = getLuceneIndividualsByVClass(vclass.getURI(),req, getServletContext());
             rObj = getSolrIndividualsByVClasses(vclassIds,req, getServletContext());
         }catch(Exception ex){
             errorMessage = ex.toString();
@@ -271,7 +265,7 @@ public class SolrJsonServlet extends VitroHttpServlet {
 	                 vreq.getWebappDaoFactory().getIndividualDao(), 
 	                 context);  
         } catch(Exception ex) {
-        	log.error("Error in retrieval of Lucene results for VClass " + vclassURIs.toString(), ex);
+        	log.error("Error in retrieval of search results for VClass " + vclassURIs.toString(), ex);
         }
             
         return map;

@@ -15,8 +15,6 @@ import javax.servlet.ServletException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.search.Query;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -31,7 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Exc
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames;
+import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividualTemplateModel;
 import freemarker.ext.beans.BeansWrapper;
@@ -166,7 +164,7 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
     
     //Pulling out common code that is used for both single (regular) vclass query and multiple (intersection) query
     public static Map<String,Object> getResultsForVClasses(List<String> vclassURIs, int page, String alpha, IndividualDao indDao, ServletContext context) 
-    throws CorruptIndexException, IOException, ServletException{
+    throws IOException, ServletException{
    	 	Map<String,Object> rvMap = new HashMap<String,Object>();    
    	 	try{
 	   		 SolrQuery query = getQuery(vclassURIs, alpha, page);        
@@ -181,10 +179,10 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
     }
     
     public static Map<String,Object> getResultsForVClass(String vclassURI, int page, String alpha, IndividualDao indDao, ServletContext context) 
-    throws CorruptIndexException, IOException, ServletException{
+    throws IOException, ServletException{
    	 	Map<String,Object> rvMap = new HashMap<String,Object>();    
    	 	try{
-		     //make lucene query for this rdf:type
+		     //make query for this rdf:type
 	   		 List<String> classUris = new ArrayList<String>();
 	   		 classUris.add(vclassURI);
 	   		 SolrQuery query = getQuery(classUris, alpha, page);        
@@ -199,11 +197,10 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
     }
     
     public static Map<String,Object> getResultsForVClassIntersections(List<String> vclassURIs, int page, String alpha, IndividualDao indDao, ServletContext context) 
-    throws CorruptIndexException, IOException, ServletException{
+    throws IOException, ServletException{
         Map<String,Object> rvMap = new HashMap<String,Object>();  
         try{
-            //make lucene query for multiple rdf types 
-       	 //change to solr
+             // make query for multiple rdf types 
 	         SolrQuery query = getQuery(vclassURIs, alpha, page);     
 	         //get results corresponding to this query
 	         rvMap = getResultsForVClassQuery(query, page, alpha, indDao, context);
@@ -221,7 +218,7 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
      * into a DAO or similar object.
      */
     public static Map<String,Object> getResultsForVClassQuery(SolrQuery query, int page, String alpha, IndividualDao indDao, ServletContext context) 
-    throws CorruptIndexException, IOException, ServletException {
+    throws IOException, ServletException {
         Map<String,Object> rvMap = new HashMap<String,Object>();           
         SolrServer solr = SolrSetup.getSolrServer(context);
         QueryResponse response = null;
@@ -249,7 +246,7 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
 
         List<Individual> individuals = new ArrayList<Individual>(); 
         for (SolrDocument doc : docs) {
-            String uri = doc.get(VitroLuceneTermNames.URI).toString();
+            String uri = doc.get(VitroSearchTermNames.URI).toString();
             Individual individual = indDao.getIndividualByURI( uri ); 
             if (individual != null) {
                 individuals.add(individual);
@@ -286,7 +283,7 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
         try{      
             //query term for rdf:type - multiple types possible
         	for(String vclassUri: vclassUris) {
-        		queryTypes.add(VitroLuceneTermNames.RDFTYPE + ":\"" + vclassUri + "\" ");
+        		queryTypes.add(VitroSearchTermNames.RDFTYPE + ":\"" + vclassUri + "\" ");
         	} 
         	
         	if(queryTypes.size() > 1) {
@@ -299,14 +296,14 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
         	
         	 // Add alpha filter if it is needed
            if ( alpha != null && !"".equals(alpha) && alpha.length() == 1) {      
-               queryText += VitroLuceneTermNames.NAME_LOWERCASE + ":" + alpha.toLowerCase() + "*";
+               queryText += VitroSearchTermNames.NAME_LOWERCASE + ":" + alpha.toLowerCase() + "*";
            }     
            SolrQuery query = new SolrQuery(queryText);
            log.debug("Query text is " + queryText);
            int start = (page-1)*INDIVIDUALS_PER_PAGE;
            query.setStart(start)
                 .setRows(INDIVIDUALS_PER_PAGE)
-                .setSortField(VitroLuceneTermNames.NAME_LOWERCASE_SINGLE_VALUED, SolrQuery.ORDER.asc);
+                .setSortField(VitroSearchTermNames.NAME_LOWERCASE_SINGLE_VALUED, SolrQuery.ORDER.asc);
             return query;
         } catch (Exception ex){
             log.error(ex,ex);

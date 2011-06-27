@@ -61,7 +61,7 @@ public class IndexController extends FreemarkerHttpServlet {
         	return new ExceptionResponseValues(Template.ERROR_MESSAGE.toString(), body, e);            
         }
         
-        body.put("message","Rebuilding of index started."); 
+        body.put("message","Rebuild of search index started. A message will be written to the vivo log when indexing is complete."); 
         return new TemplateResponseValues(Template.MESSAGE.toString(), body);
     }
 }

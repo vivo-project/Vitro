@@ -22,7 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
-import edu.cornell.mannlib.vitro.webapp.search.VitroTermNames;
+import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ClassProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearch;
 
@@ -30,7 +30,7 @@ public class IndividualToSolrDocument {
         
     public static final Log log = LogFactory.getLog(IndividualToSolrDocument.class.getName());
     
-    public static VitroTermNames term = new VitroTermNames();
+    public static VitroSearchTermNames term = new VitroSearchTermNames();
     
     private static String entClassName = Individual.class.getName();
     
@@ -195,16 +195,18 @@ public class IndividualToSolrDocument {
     	
          if(documentModifiers == null || documentModifiers.isEmpty()){
         	 doc.addField(term.NAME_RAW, value, NAME_BOOST);
-        	 doc.addField(term.NAME_LOWERCASE, value.toLowerCase(),NAME_BOOST);
+        	 doc.addField(term.NAME_LOWERCASE, value, NAME_BOOST);
         	 doc.addField(term.NAME_UNSTEMMED, value,NAME_BOOST);
         	 doc.addField(term.NAME_STEMMED, value, NAME_BOOST);
         	 doc.addField(term.NAME_PHONETIC, value, PHONETIC_BOOST);
+        	 doc.addField(term.AC_NAME_UNTOKENIZED, value);
          }else{
         	 doc.addField(term.NAME_RAW, value);
-        	 doc.addField(term.NAME_LOWERCASE, value.toLowerCase());
+        	 doc.addField(term.NAME_LOWERCASE, value);
         	 doc.addField(term.NAME_UNSTEMMED, value);
         	 doc.addField(term.NAME_STEMMED, value);
         	 doc.addField(term.NAME_PHONETIC, value, PHONETIC_BOOST);
+             doc.addField(term.AC_NAME_UNTOKENIZED, value);
          }
     	
         
@@ -289,7 +291,7 @@ public class IndividualToSolrDocument {
         Individual ent = null;
         if( result != null && result instanceof Document){
             Document hit = (Document) result;
-            String id = hit.get(term.URI);
+            String id = hit.get(VitroSearchTermNames.URI);
             ent = new IndividualImpl();
             ent.setURI(id);
         }
@@ -297,29 +299,29 @@ public class IndividualToSolrDocument {
     }
     
     private void fillContextNodes(){
-    	this.contextNodeClassNames.add("Role");
-        this.contextNodeClassNames.add("AttendeeRole");
-        this.contextNodeClassNames.add("ClinicalRole");
-        this.contextNodeClassNames.add("LeaderRole");
-        this.contextNodeClassNames.add("MemberRole");
-        this.contextNodeClassNames.add("OutreachProviderRole");
-        this.contextNodeClassNames.add("PresenterRole");
-        this.contextNodeClassNames.add("ResearcherRole");
-        this.contextNodeClassNames.add("InvestigatorRole");
-        this.contextNodeClassNames.add("CoPrincipalInvestigatorRole");
-        this.contextNodeClassNames.add("PrincipalInvestigatorRole");
-        this.contextNodeClassNames.add("ServiceProviderRole");
-        this.contextNodeClassNames.add("TeacherRole");
-        this.contextNodeClassNames.add("Position");
-        this.contextNodeClassNames.add("FacultyAdministrativePosition");
-        this.contextNodeClassNames.add("FacultyPosition");
-        this.contextNodeClassNames.add("LibrarianPosition");
-        this.contextNodeClassNames.add("Non-AcademicPosition");
-        this.contextNodeClassNames.add("Non-FacultyAcademicPosition");
-        this.contextNodeClassNames.add("PostdoctoralPosition");
-        this.contextNodeClassNames.add("AdvisingRelationship");
-        this.contextNodeClassNames.add("Authorship");
-        this.contextNodeClassNames.add("AcademicDegree");
+    	IndividualToSolrDocument.contextNodeClassNames.add("Role");
+        IndividualToSolrDocument.contextNodeClassNames.add("AttendeeRole");
+        IndividualToSolrDocument.contextNodeClassNames.add("ClinicalRole");
+        IndividualToSolrDocument.contextNodeClassNames.add("LeaderRole");
+        IndividualToSolrDocument.contextNodeClassNames.add("MemberRole");
+        IndividualToSolrDocument.contextNodeClassNames.add("OutreachProviderRole");
+        IndividualToSolrDocument.contextNodeClassNames.add("PresenterRole");
+        IndividualToSolrDocument.contextNodeClassNames.add("ResearcherRole");
+        IndividualToSolrDocument.contextNodeClassNames.add("InvestigatorRole");
+        IndividualToSolrDocument.contextNodeClassNames.add("CoPrincipalInvestigatorRole");
+        IndividualToSolrDocument.contextNodeClassNames.add("PrincipalInvestigatorRole");
+        IndividualToSolrDocument.contextNodeClassNames.add("ServiceProviderRole");
+        IndividualToSolrDocument.contextNodeClassNames.add("TeacherRole");
+        IndividualToSolrDocument.contextNodeClassNames.add("Position");
+        IndividualToSolrDocument.contextNodeClassNames.add("FacultyAdministrativePosition");
+        IndividualToSolrDocument.contextNodeClassNames.add("FacultyPosition");
+        IndividualToSolrDocument.contextNodeClassNames.add("LibrarianPosition");
+        IndividualToSolrDocument.contextNodeClassNames.add("Non-AcademicPosition");
+        IndividualToSolrDocument.contextNodeClassNames.add("Non-FacultyAcademicPosition");
+        IndividualToSolrDocument.contextNodeClassNames.add("PostdoctoralPosition");
+        IndividualToSolrDocument.contextNodeClassNames.add("AdvisingRelationship");
+        IndividualToSolrDocument.contextNodeClassNames.add("Authorship");
+        IndividualToSolrDocument.contextNodeClassNames.add("AcademicDegree");
     }
     
 

@@ -21,7 +21,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames;
+import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 
 public class IndividualListRdfController extends VitroHttpServlet {
@@ -35,13 +35,13 @@ public class IndividualListRdfController extends VitroHttpServlet {
     	    
     	// Make the query
     	String vclassUri = req.getParameter("vclass");
-    	String queryStr = VitroLuceneTermNames.RDFTYPE + ":\"" + vclassUri + "\"";
+    	String queryStr = VitroSearchTermNames.RDFTYPE + ":\"" + vclassUri + "\"";
     	SolrQuery query = new SolrQuery(queryStr);
     	query.setStart(0)
     	     .setRows(ENTITY_LIST_CONTROLLER_MAX_RESULTS)
-    	     .setFields(VitroLuceneTermNames.URI);
+    	     .setFields(VitroSearchTermNames.URI);
     	     // For now, we're only displaying the url, so no need to sort.
-    	     //.setSortField(VitroLuceneTermNames.NAME_LOWERCASE_SINGLE_VALUED);
+    	     //.setSortField(VitroSearchTermNames.NAME_LOWERCASE_SINGLE_VALUED);
 
     	// Execute the query
         SolrServer solr = SolrSetup.getSolrServer(getServletContext());
@@ -65,7 +65,7 @@ public class IndividualListRdfController extends VitroHttpServlet {
 
         Model model = ModelFactory.createDefaultModel();
         for (SolrDocument doc : docs) {
-            String uri = doc.get(VitroLuceneTermNames.URI).toString();
+            String uri = doc.get(VitroSearchTermNames.URI).toString();
             Resource resource = ResourceFactory.createResource(uri);
             RDFNode node = (RDFNode) ResourceFactory.createResource(vclassUri);
             model.add(resource, RDF.type, node);
