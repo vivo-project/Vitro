@@ -57,7 +57,6 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private static final String REMOVED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + 	"removedData.n3";
 	private static final String ADDED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + "addedData.n3";
 	private static final String SPARQL_CONSTRUCT_ADDITIONS_DIR = DATA_DIR + "sparqlConstructs/additions/";
-	private static final String SPARQL_CONSTRUCT_ADDITIONS_PASS2_DIR = DATA_DIR + "sparqlConstructs/additions-pass2/";
 	private static final String SPARQL_CONSTRUCT_DELETIONS_DIR = DATA_DIR + "sparqlConstructs/deletions/";
 	private static final String MISC_REPLACEMENTS_FILE = DATA_DIR + "miscReplacements.rdf";
 	private static final String OLD_TBOX_MODEL_DIR = DATA_DIR + "oldVersion/";
@@ -83,7 +82,6 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setAskEmptyQueryFile(getAskEmptyQueryPath(ctx));
 			settings.setDataDir(ctx.getRealPath(DATA_DIR));
 			settings.setSparqlConstructAdditionsDir(ctx.getRealPath(SPARQL_CONSTRUCT_ADDITIONS_DIR));
-			settings.setSparqlConstructAdditionsPass2Dir(ctx.getRealPath(SPARQL_CONSTRUCT_ADDITIONS_PASS2_DIR));
 			settings.setSparqlConstructDeletionsDir(ctx.getRealPath(SPARQL_CONSTRUCT_DELETIONS_DIR));
 			settings.setDiffFile(ctx.getRealPath(DIFF_FILE));
 			settings.setSuccessAssertionsFile(ctx.getRealPath(SUCCESS_ASSERTIONS_FILE));
@@ -118,7 +116,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			  try {
 				  if (ontologyUpdater.updateRequired()) {
 					  ctx.setAttribute(LuceneSetup.INDEX_REBUILD_REQUESTED_AT_STARTUP, Boolean.TRUE);
-					  doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
+					  //doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
 					  reloadDisplayModel(ctx);
 				  }
 			  } catch (Throwable t){
@@ -140,7 +138,6 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
-		
 	}	
 	
 	/**

@@ -321,9 +321,6 @@ public void updateAnnotationModel() throws IOException {
 	   // for each ClassGroup in the old vitro annotations model: if it is not in 
 	   // the new vitro annotations model and the site has no classes asserted to 
 	   // be in that class group then delete it.
-	   // TODO: the site will have classes asserted to be in it if we have switched
-	   // the default assignment in the new version but haven't migration yet. How
-	   // to handle this?
 	   
 	   removeObsoleteAnnotations();
 	   
