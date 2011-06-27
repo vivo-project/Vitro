@@ -708,7 +708,7 @@
       -->
      <lst name="defaults">
        <str name="defType">edismax</str>
-       <str name="qf">nameRaw nameLowercase ALLTEXT ALLTEXTUNSTEMMED ALLTEXT_PHONETIC NAME_PHONETIC nameUnstemmed nameStemmed targetInfo</str>
+       <str name="qf">nameRaw nameLowercase ALLTEXT ALLTEXTUNSTEMMED ALLTEXT_PHONETIC NAME_PHONETIC nameUnstemmed nameStemmed targetInfo </str>
        <str name="pf">targetInfo</str>
        <str name="echoParams">explicit</str>
        <str name="ps">2</str>
