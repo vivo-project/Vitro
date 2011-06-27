@@ -231,8 +231,9 @@ public class IndividualToSolrDocument {
         
         
         //time of index in millis past epoc
-        Object anon[] =  { new Long((new DateTime() ).getMillis())  };
-        doc.addField(term.INDEXEDTIME, String.format("%019d", anon));
+       // Object anon[] =  { new Long((new DateTime() ).getMillis())  };
+       // doc.addField(term.INDEXEDTIME, String.format("%019d", anon));
+        doc.addField(term.INDEXEDTIME,(new DateTime()).getMillis());
         
     	log.debug("time to include thumbnail and indexedtime in the index: " + Long.toString(System.currentTimeMillis() - tMoniker));
 
