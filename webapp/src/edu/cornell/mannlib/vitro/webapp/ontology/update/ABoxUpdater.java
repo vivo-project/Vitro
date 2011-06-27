@@ -24,7 +24,6 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.AtomicOntologyChange.AtomicChangeType;
 
 /**  
@@ -425,14 +424,18 @@ public class ABoxUpdater {
 		while(propItr.hasNext()){
 			AtomicOntologyChange propChangeObj = propItr.next();
 			switch (propChangeObj.getAtomicChangeType()){
-			case ADD: addProperty(propChangeObj);
-			break;
-			case DELETE: deleteProperty(propChangeObj);
-			break;
-			case RENAME: renameProperty(propChangeObj);
-			break;
-			default: logger.logError("unexpected change type indicator: " + propChangeObj.getAtomicChangeType());
-			break;
+			  case ADD: 
+			   addProperty(propChangeObj);
+			   break;
+			case DELETE: 
+			   deleteProperty(propChangeObj);
+			   break;
+			case RENAME: 
+			   renameProperty(propChangeObj);
+			   break;
+			default: 
+			   logger.logError("unexpected change type indicator: " + propChangeObj.getAtomicChangeType());
+			   break;
 		    }		
 		}
 	}

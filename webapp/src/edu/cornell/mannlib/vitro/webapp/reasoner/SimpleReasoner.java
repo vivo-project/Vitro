@@ -419,8 +419,10 @@ public class SimpleReasoner extends StatementListener {
 			    
 				if (cls != null) {
 					
-					List<OntClass> parents = (cls.listSuperClasses(false)).toList();		
+					List<OntClass> parents = null;
+					parents = (cls.listSuperClasses(false)).toList();		
 					parents.addAll((cls.listEquivalentClasses()).toList());
+					
 					Iterator<OntClass> parentIt = parents.iterator();
 					
 					while (parentIt.hasNext()) {
@@ -453,7 +455,9 @@ public class SimpleReasoner extends StatementListener {
 				}
 			} else {
 				log.warn("The object of this rdf:type assertion has a null URI: " + stmtString(stmt));
-			}			
+			}		
+		} catch (Exception e) {
+			log.warn("exception while removing abox type assertions: " + e.getMessage());
 		} finally {
 			tboxModel.leaveCriticalSection();
 		}
@@ -530,6 +534,9 @@ public class SimpleReasoner extends StatementListener {
 				if (aboxModel.contains(stmt)) return true;
 			}
 			
+			return false;
+		} catch (Exception e) {
+			log.debug("exception in method entailedType: " + e.getMessage());
 			return false;
 		} finally {
 			aboxModel.leaveCriticalSection();
