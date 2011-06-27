@@ -7,14 +7,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.response.*;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
 import org.apache.solr.common.SolrInputDocument;
-
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
@@ -36,43 +41,40 @@ public class SolrIndexer implements IndexerIface {
     
     @Override
     public void index(Individual ind) throws IndexingException {
-        if( ! indexing )
-            throw new IndexingException("SolrIndexer: must call " +
-                    "startIndexing() before index().");        
-        
-        if( ind == null )
-            log.debug("Individual to index was null, ignoring.");
-        
-        try{
-            if( urisIndexed.contains(ind.getURI()) ){
-                log.debug("already indexed " + ind.getURI() );
-                return;
-            }else{
-            	SolrInputDocument solrDoc = null;
-            	synchronized(this){
-            		urisIndexed.add(ind.getURI());
-            	}
-                log.debug("indexing " + ind.getURI());      
-              //  synchronized(individualToSolrDoc){
-                	solrDoc = individualToSolrDoc.translate(ind);
-              //  }
-                if( solrDoc != null){
-                    //sending each doc individually is inefficient
-                   // Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
-                   // docs.add( solrDoc );
-                    UpdateResponse res = server.add( solrDoc );
-                    log.debug("response after adding docs to server: "+ res);                
-                }else{
-                    log.debug("removing from index " + ind.getURI());
-                    //TODO: how do we delete document?                    
-                    //writer.deleteDocuments((Term)obj2doc.getIndexId(ind));
-                }                            
-            }
-        } catch (IOException ex) {
-            throw new IndexingException(ex.getMessage());
-        } catch (SolrServerException ex) {
-            throw new IndexingException(ex.getMessage());
-        }        
+    	if( ! indexing )
+    		throw new IndexingException("SolrIndexer: must call " +
+    		"startIndexing() before index().");        
+
+    	if( ind == null )
+    		log.debug("Individual to index was null, ignoring.");
+
+    	try{
+    		if( urisIndexed.contains(ind.getURI()) ){
+    			log.debug("already indexed " + ind.getURI() );
+    			return;
+    		}else{
+    			SolrInputDocument solrDoc = null;
+    			synchronized(this){
+    				urisIndexed.add(ind.getURI());
+    			}
+    			log.debug("indexing " + ind.getURI());      
+
+    			solrDoc = individualToSolrDoc.translate(ind);
+
+    			if( solrDoc != null){
+    				UpdateResponse res = server.add( solrDoc );
+    				log.debug("response after adding docs to server: "+ res);                
+    			}else{
+    				log.debug("removing from index " + ind.getURI());
+    				//TODO: how do we delete document?                    
+    				//writer.deleteDocuments((Term)obj2doc.getIndexId(ind));
+    			}                            
+    		}
+    	} catch (IOException ex) {
+    		throw new IndexingException(ex.getMessage());
+    	} catch (SolrServerException ex) {
+    		throw new IndexingException(ex.getMessage());
+    	}        
     }
 
     @Override
@@ -95,7 +97,7 @@ public class SolrIndexer implements IndexerIface {
     @Override
     public synchronized void startIndexing() throws IndexingException {        
         while( indexing ){ //wait for indexing to end.
-            log.debug("LuceneIndexer.startIndexing() waiting...");
+            log.debug("SolrIndexer.startIndexing() waiting...");
             try{ wait(); } catch(InterruptedException ex){}
         }
                
@@ -149,8 +151,24 @@ public class SolrIndexer implements IndexerIface {
 
     @Override
     public long getModified() {
-        // TODO Auto-generated method stub
-        return 0;
+    	long modified = 0;
+
+    	SolrQuery query = new SolrQuery();
+    	query.setQuery("*:*");
+    	query.addSortField("indexedTime", SolrQuery.ORDER.desc);
+
+    	try {
+    		QueryResponse rsp = server.query(query);
+    		SolrDocumentList docs = rsp.getResults();
+    		if(docs!=null){
+    			modified = (Long)docs.get(0).getFieldValue("indexedTime");	
+    		}
+    	} catch (SolrServerException e) {
+    		// TODO Auto-generated catch block
+    		log.error(e,e);
+    	}
+
+    	return modified;
     }
 
     public boolean isIndexEmpty() {
