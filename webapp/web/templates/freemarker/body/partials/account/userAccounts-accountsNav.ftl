@@ -17,7 +17,7 @@
       -->
 
       <nav class="display-tools">
-          <span>| <a href="#">n</a> accounts | </span>  
+          <span>| n accounts | </span>  
 
           <select name="accountsPerPage" class="accounts-per-page">
               <#list accountsCount as count>
