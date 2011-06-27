@@ -42,7 +42,7 @@ import edu.cornell.mannlib.vitro.webapp.search.solr.CalculateParameters;
  */
 public class IndexBuilder extends Thread {
     private List<ObjectSourceIface> sourceList = new LinkedList<ObjectSourceIface>();
-    private IndexerIface indexer = null;
+	private IndexerIface indexer = null;
     private ServletContext context = null;       
     
     /* changedUris should only be accessed from synchronized blocks */
