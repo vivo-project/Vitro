@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.ontology.update;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.hp.hpl.jena.ontology.OntModel;
@@ -134,10 +133,12 @@ public class TBoxUpdater {
 				 List<RDFNode> siteObjects = siteModel.listObjectsOfProperty(subject, predicate).toList();
 				
 				 if (siteObjects.size() > 1) {
+					 /*
 					 logger.log("WARNING: found " + siteObjects.size() +
-							 " statements with subject = " + subject.getURI() + 
+					 		 " statements with subject = " + subject.getURI() + 
 							 " and property = " + predicate.getURI() +
 							 " in the site database (maximum of one is expected)");
+					 */
 				 }
 				 
 				 if (siteObjects.size() > 0) {
