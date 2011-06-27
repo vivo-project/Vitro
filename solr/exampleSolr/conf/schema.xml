@@ -530,7 +530,7 @@
   <field name="acNameStemmed" type="edgengram_stemmed" indexed="true" stored="false" multiValued="true" />
 -->
 
-<field name="indexedTime" type="string" indexed="true" stored="true" multiValued="true"/>
+<field name="indexedTime" type="long" indexed="true" stored="true"/>
 <field name="NAME_PHONETIC" type ="phonetic" indexed="true" stored="false" multiValued="true"/>
 
 <field name="ALLTEXT" type="text" indexed="true" stored="false" multiValued="true"/>
