@@ -88,6 +88,11 @@ p.submit {
     padding: 2px 2px 2px 2px;
     font-size: 1em;
 }
+.editingForm table tr.row td:nth-child(2) a {
+    font-size: 1.2em;
+    font-weight: bold;
+    word-wrap: break-word;
+}
 td.verticalfieldlabel {
     font-size: 11px;
     line-height : 13px;
