@@ -5,7 +5,7 @@
 <#import "userAccounts-accountsNav.ftl" as p>
 
 <form method="POST" action="${formUrls.add}" class="customForm" role="">
-    <h3>Account  | <input type="submit" class="submit add-account" value="Add new account" /></h3>
+    <h3>User accounts | <input type="submit" class="submit add-account" value="Add new account" /></h3>
 </form>
 
 <#if newUserAccount?? >
