@@ -65,7 +65,7 @@
             <label for="last-name">Last name<span class="requiredHint"> *</span></label> 
             <input type="text" name="lastName" value="${lastName}" id="last-name" role="input "/>
 
-            <label for="external-auth-id">External authorization ID (optional)</label> 
+            <label for="external-auth-id">External authorization ID</label> 
             <input type="text" name="externalAuthId" value="${externalAuthId}" id="external-auth-id" role="input "/>
 
             <p>Roles<span class="requiredHint"> *</span> </p>
@@ -107,4 +107,5 @@
     </fieldset>
 </section>
 
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/account.css" />')}
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/customForm.css" />')}

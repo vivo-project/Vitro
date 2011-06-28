@@ -114,4 +114,5 @@
     </fieldset>
 </section>
 
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/account.css" />')}
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/customForm.css" />')}

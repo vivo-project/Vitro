@@ -82,7 +82,7 @@
         <thead>
             <tr>
                 <th scope="col">
-                    <input class="hide" type="checkbox" name="delete-all" id="">
+                    <input class="hide" type="checkbox" name="delete-all">
                     Email Address
                     <nav class="account-alpha-browse">
                         <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=ASC" title="ascending order"></a> 
@@ -151,4 +151,6 @@
     
     <@p.accountsNav />
 </form>
+
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/account.css" />')}
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/account/accountUtils.js"></script>')}

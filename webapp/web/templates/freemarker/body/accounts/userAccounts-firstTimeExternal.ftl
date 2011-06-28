@@ -33,9 +33,7 @@
 
 <section id="first-time-login" role="region">
     <fieldset>
-        <p class="note">
-            Please provide your contact information to finish creating your account.
-        </p>
+        <p>Please provide your contact information to finish creating your account.</p>
 
         <form method="POST" action="${formUrls.firstTimeExternal}" class="customForm" role="my account">
             <input type="hidden" name="externalAuthId" value="${externalAuthId}" role="input" />
@@ -62,4 +60,5 @@
     </fieldset>
 </section>
 
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/account.css" />')}
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/customForm.css" />')}
