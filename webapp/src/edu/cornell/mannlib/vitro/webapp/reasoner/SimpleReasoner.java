@@ -21,6 +21,7 @@ import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -401,6 +402,7 @@ public class SimpleReasoner extends StatementListener {
 	 * that B is of that type.
 	 * 
 	 */
+	
 	public void removedABoxTypeAssertion(Statement stmt, Model inferenceModel) {
 		
 		//log.debug("stmt = " + stmt.toString());

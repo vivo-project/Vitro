@@ -26,7 +26,8 @@ import com.hp.hpl.jena.sdb.SDBFactory;
 import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.util.StoreUtils;
 
-import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 
 // This ContextListener must run after the JenaDataSourceSetup ContextListener
 
@@ -47,10 +48,10 @@ public class FileGraphSetup implements ServletContextListener {
 	    
 		boolean aboxChanged = false; // indicates whether any ABox file graph model has changed
 		boolean tboxChanged = false; // indicates whether any TBox file graph model has changed
-		OntModelSelectorImpl baseOms = null;
+		OntModelSelector baseOms = null;
 		
 		try {
-			baseOms = (OntModelSelectorImpl) sce.getServletContext().getAttribute("baseOntModelSelector");
+			baseOms = ModelContext.getBaseOntModelSelector(sce.getServletContext());
 			Store kbStore = (Store) sce.getServletContext().getAttribute("kbStore");
 						
 			// ABox files
@@ -83,7 +84,6 @@ public class FileGraphSetup implements ServletContextListener {
 		}
 		
 		if (aboxChanged || tboxChanged)  {
-			
 	        if ( !JenaDataSourceSetup.updateRequired(sce.getServletContext(), baseOms.getTBoxModel())) {
 	        	log.info("a full recompute of the Abox will be performed because" +
 	        			" the filegraph abox(s) and/or tbox(s) have changed, or are being read for the first time." );

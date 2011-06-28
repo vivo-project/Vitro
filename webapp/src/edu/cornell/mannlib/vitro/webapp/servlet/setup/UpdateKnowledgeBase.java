@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -26,9 +28,8 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.SimpleOntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.UpdateSettings;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
@@ -52,8 +53,6 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private static final String SUCCESS_ASSERTIONS_FILE = DATA_DIR + "success.n3";
 	private static final String SUCCESS_RDF_FORMAT = "N3";
 	private static final String DIFF_FILE = DATA_DIR + "diff.tab.txt";
-	private static final String LOG_FILE = DATA_DIR + LOG_DIR + "knowledgeBaseUpdate.log";
-	private static final String ERROR_LOG_FILE = DATA_DIR + LOG_DIR + 	"knowledgeBaseUpdate.error.log";
 	private static final String REMOVED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + 	"removedData.n3";
 	private static final String ADDED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + "addedData.n3";
 	private static final String SPARQL_CONSTRUCT_ADDITIONS_DIR = DATA_DIR + "sparqlConstructs/additions/";
@@ -73,9 +72,11 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		try {
 
 			ServletContext ctx = sce.getServletContext();
+			OntModelSelector assertionsOms = ModelContext.getBaseOntModelSelector(ctx);
 
-			OntModelSelector oms = new SimpleOntModelSelector((OntModel) sce.getServletContext().getAttribute(JenaBaseDao.ASSERTIONS_ONT_MODEL_ATTRIBUTE_NAME));
-			
+			String logFileName =  DATA_DIR + LOG_DIR + timestampedFileName("knowledgeBaseUpdate", "log");
+			String errorLogFileName = DATA_DIR + LOG_DIR + 	timestampedFileName("knowledgeBaseUpdate.error", "log");
+						
 			UpdateSettings settings = new UpdateSettings();
 			settings.setAskQueryFile(getAskQueryPath(ctx));
 			settings.setAskEverQueryFile(getAskEverQueryPath(ctx));
@@ -86,14 +87,14 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setDiffFile(ctx.getRealPath(DIFF_FILE));
 			settings.setSuccessAssertionsFile(ctx.getRealPath(SUCCESS_ASSERTIONS_FILE));
 			settings.setSuccessRDFFormat(SUCCESS_RDF_FORMAT);
-			settings.setLogFile(ctx.getRealPath(LOG_FILE));
-			settings.setErrorLogFile(ctx.getRealPath(ERROR_LOG_FILE));
+			settings.setLogFile(ctx.getRealPath(logFileName));
+			settings.setErrorLogFile(ctx.getRealPath(errorLogFileName));
 			settings.setAddedDataFile(ctx.getRealPath(ADDED_DATA_FILE));
 			settings.setRemovedDataFile(ctx.getRealPath(REMOVED_DATA_FILE));
 			WebappDaoFactory wadf = (WebappDaoFactory) ctx.getAttribute("webappDaoFactory");
 			settings.setDefaultNamespace(wadf.getDefaultNamespace());
 				
-			settings.setOntModelSelector(oms);
+			settings.setOntModelSelector(assertionsOms);
 			try {
 				OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_MODEL_DIR));
 				settings.setOldTBoxModel(oldTBoxModel);
@@ -181,7 +182,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		    	}
 		    }
 		} catch (FileNotFoundException fnfe) {
-			log.info("No miscellaneous application metadata replacements were performed.");
+			log.warn("Couldn't find miscellaneous application metadata replacement file: " + filename);
 		
 		} catch (Exception e) {
 			log.error("Error performing miscellaneous application metadata " +
@@ -254,6 +255,11 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		return ctx.getRealPath(ASK_EMPTY_QUERY_FILE);
 	
     }
+	
+	private static String timestampedFileName(String prefix, String suffix) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-sss");
+		return prefix + "." + sdf.format(new Date()) + suffix;
+	}
 	
 	private class ModelDirectoryNotFoundException extends RuntimeException {
 		public ModelDirectoryNotFoundException(String msg) {

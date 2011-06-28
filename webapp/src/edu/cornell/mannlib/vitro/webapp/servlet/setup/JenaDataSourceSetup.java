@@ -73,8 +73,6 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         	setUpJenaDataSource(ctx);
         	log.info((System.currentTimeMillis() - startTime) / 1000 + 
         			" seconds to set up SDB store");
-        } catch (MigrationRequiredError mre) {
-        	throw new MigrationRequiredError(mre.getMessage());
         } catch (SQLException sqle) {   
             // SQL exceptions are fatal and should halt startup
             AbortStartup.abortStartup(ctx);
@@ -94,18 +92,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
     } 
 
     private void setUpJenaDataSource(ServletContext ctx) throws SQLException {
-        
-    	/*
-        if ( updateRequired(ctx, memModel)) {
-        	log.error(getMigrationErrString());
-        	System.out.println(getMigrationErrString());
-        	// The rest of the application should not 
-        	// start if this condition is encountered
-        	AbortStartup.abortStartup(ctx);
-        	throw new MigrationRequiredError(getMigrationErrString());
-        }
-        */  
-           	
+                   	
         OntModelSelectorImpl baseOms = new OntModelSelectorImpl();     
         OntModelSelectorImpl inferenceOms = new OntModelSelectorImpl();       
         OntModelSelectorImpl unionOms = new OntModelSelectorImpl();
@@ -646,12 +633,5 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
 		
 		return required; 
 	}
-
-	private class MigrationRequiredError extends Error {
-	       public MigrationRequiredError(String string) {
-	           super(string);
-	       }
-	}
-    
  }
 
