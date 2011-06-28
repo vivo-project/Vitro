@@ -64,6 +64,13 @@ public class VitroSearchTermNames {
     /** rdfs:label lowercased, untokenized, edge-n-gram-filtered for autocomplete on people names **/
     public static String AC_NAME_UNTOKENIZED = "acNameUntokenized";
 
+    /** rdfs:label lowercased, tokenized, stop words, stemmed, edge-n-gram-filtered for autocomplete 
+     * on non-person labels such as book titles and grant names **/
+    public static String AC_NAME_STEMMED = "acNameStemmed";
+    
+    /* There is currently no use case for an autocomplete search field that is tokenized but not stemmed. 
+    public static String AC_NAME_TOKENIZED = "acNameTokenized";  */
+    
     /** field for beta values of all documents **/
     public static final String BETA = "BETA";
     public static final String PHI = "PHI";

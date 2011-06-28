@@ -175,47 +175,50 @@ public class IndividualToSolrDocument {
     	String t=null;
     	addUri = new StringBuffer();
     	addUri.append("");
-    	 List<ObjectPropertyStatement> objectPropertyStatements = ind.getObjectPropertyStatements();
-         if (objectPropertyStatements != null) {
-             Iterator<ObjectPropertyStatement> objectPropertyStmtIter = objectPropertyStatements.iterator();
-             while (objectPropertyStmtIter.hasNext()) {
-                 ObjectPropertyStatement objectPropertyStmt = objectPropertyStmtIter.next();
-                 if( "http://www.w3.org/2002/07/owl#differentFrom".equals(objectPropertyStmt.getPropertyURI()) )
-                     continue;
-                 try {
-                	 objectNames.append(" ");
-                     objectNames.append(((t=objectPropertyStmt.getObject().getName()) == null)?"":t);   
-                     addUri.append(" ");
-                     addUri.append(((t=objectPropertyStmt.getObject().getURI()) == null)?"":t);
-                 } catch (Exception e) { 
+    	List<ObjectPropertyStatement> objectPropertyStatements = ind.getObjectPropertyStatements();
+        if (objectPropertyStatements != null) {
+            Iterator<ObjectPropertyStatement> objectPropertyStmtIter = objectPropertyStatements.iterator();
+            while (objectPropertyStmtIter.hasNext()) {
+                ObjectPropertyStatement objectPropertyStmt = objectPropertyStmtIter.next();
+                if( "http://www.w3.org/2002/07/owl#differentFrom".equals(objectPropertyStmt.getPropertyURI()) )
+                    continue;
+                try {
+                	objectNames.append(" ");
+                    objectNames.append(((t=objectPropertyStmt.getObject().getName()) == null)?"":t);   
+                    addUri.append(" ");
+                    addUri.append(((t=objectPropertyStmt.getObject().getURI()) == null)?"":t);
+                } catch (Exception e) { 
                      log.debug("could not index name of related object: " + e.getMessage());
-                 }
-             }
-         }         
+                }
+            }
+        }         
     	
-         if(documentModifiers == null || documentModifiers.isEmpty()){
+        if(documentModifiers == null || documentModifiers.isEmpty()){
         	 doc.addField(term.NAME_RAW, value, NAME_BOOST);
         	 doc.addField(term.NAME_LOWERCASE, value, NAME_BOOST);
-        	 doc.addField(term.NAME_UNSTEMMED, value,NAME_BOOST);
+        	 doc.addField(term.NAME_UNSTEMMED, value, NAME_BOOST);
         	 doc.addField(term.NAME_STEMMED, value, NAME_BOOST);
         	 doc.addField(term.NAME_PHONETIC, value, PHONETIC_BOOST);
         	 doc.addField(term.AC_NAME_UNTOKENIZED, value);
-         }else{
+             doc.addField(term.AC_NAME_STEMMED, value);
+        }else{
         	 doc.addField(term.NAME_RAW, value);
         	 doc.addField(term.NAME_LOWERCASE, value);
         	 doc.addField(term.NAME_UNSTEMMED, value);
         	 doc.addField(term.NAME_STEMMED, value);
         	 doc.addField(term.NAME_PHONETIC, value, PHONETIC_BOOST);
-             doc.addField(term.AC_NAME_UNTOKENIZED, value);
-         }
+             doc.addField(term.AC_NAME_UNTOKENIZED, value);             
+             doc.addField(term.AC_NAME_STEMMED, value);
+        }
     	
         
         long tMoniker = System.currentTimeMillis();
     	
         if(documentModifiers == null || documentModifiers.isEmpty()){
-        //boost for entity
-        if(ind.getSearchBoost() != null && ind.getSearchBoost() != 0)
-        doc.setDocumentBoost(ind.getSearchBoost());
+            //boost for entity
+            if(ind.getSearchBoost() != null && ind.getSearchBoost() != 0) {
+                doc.setDocumentBoost(ind.getSearchBoost());
+            }
         }
         
         //thumbnail

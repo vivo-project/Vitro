@@ -142,7 +142,7 @@ public class SolrAutocompleteController extends VitroAjaxController {
         query.setStart(0)
              .setRows(DEFAULT_MAX_HIT_COUNT);  
         
-        setQuery(query, queryStr, vreq);
+        setNameQuery(query, queryStr, vreq);
         
         // Filter by type
         String typeParam = (String) vreq.getParameter(PARAM_RDFTYPE);
@@ -158,7 +158,7 @@ public class SolrAutocompleteController extends VitroAjaxController {
         return query;
     }
     
-    private void setQuery(SolrQuery query, String queryStr, HttpServletRequest request) {
+    private void setNameQuery(SolrQuery query, String queryStr, HttpServletRequest request) {
 
         if (StringUtils.isBlank(queryStr)) {
             log.error("No query string");
@@ -171,13 +171,13 @@ public class SolrAutocompleteController extends VitroAjaxController {
         // query will not be stemmed. So we don't look at the stem parameter until we get to
         // setTokenizedNameQuery().
         if (tokenize) {
-            setTokenizedQuery(query, queryStr, request);
+            setTokenizedNameQuery(query, queryStr, request);
         } else {
-            setUntokenizedQuery(query, queryStr);
+            setUntokenizedNameQuery(query, queryStr);
         }
     }
     
-    private void setTokenizedQuery(SolrQuery query, String queryStr, HttpServletRequest request) {
+    private void setTokenizedNameQuery(SolrQuery query, String queryStr, HttpServletRequest request) {
         
         // RY 5/18/2011 For now, just doing untokenized query, due to the interactions of wildcard
         // query and stemming described below. Need to find a way to do this in Solr.
@@ -215,30 +215,15 @@ public class SolrAutocompleteController extends VitroAjaxController {
 //            log.warn(e, e);
 //        }
        
-        //setUntokenizedQuery(query, queryStr);
-        
-      String stemParam = (String) request.getParameter("stem"); 
-      boolean stem = "true".equals(stemParam);
-      String termName = stem ? VitroSearchTermNames.NAME_STEMMED : VitroSearchTermNames.NAME_UNSTEMMED; 
-      
-      // We have to lowercase manually, because Solr doesn't do text analysis on wildcard queries
-      queryStr = queryStr.toLowerCase();
-      // Solr wants whitespace to be escaped with a backslash
-      // Better: replace \s+
-      queryStr = queryStr.replaceAll(" ", "\\\\ ");
-      queryStr = termName + ":" + queryStr + "*";
-      query.setQuery(queryStr);
-        
+        setUntokenizedNameQuery(query, queryStr);
     }
 
-    private void setUntokenizedQuery(SolrQuery query, String queryStr) {
+    private void setUntokenizedNameQuery(SolrQuery query, String queryStr) {
         
-        // We have to lowercase manually, because Solr doesn't do text analysis on wildcard queries
-        queryStr = queryStr.toLowerCase();
         // Solr wants whitespace to be escaped with a backslash
         // Better: replace \s+
-        queryStr = queryStr.replaceAll(" ", "\\\\ ");
-        queryStr = VitroSearchTermNames.NAME_LOWERCASE + ":" + queryStr + "*";
+        queryStr = queryStr.replaceAll("\\s+", "\\\\ ");
+        queryStr = VitroSearchTermNames.AC_NAME_UNTOKENIZED + ":" + queryStr;
         query.setQuery(queryStr);
 
     }
