@@ -201,6 +201,7 @@ public class IndividualToSolrDocument {
         	 doc.addField(term.NAME_PHONETIC, value, PHONETIC_BOOST);
         	 doc.addField(term.AC_NAME_UNTOKENIZED, value);
              doc.addField(term.AC_NAME_STEMMED, value);
+             // doc.addField(term.AC_NAME_TOKENIZED, value);
         }else{
         	 doc.addField(term.NAME_RAW, value);
         	 doc.addField(term.NAME_LOWERCASE, value);
@@ -209,6 +210,7 @@ public class IndividualToSolrDocument {
         	 doc.addField(term.NAME_PHONETIC, value, PHONETIC_BOOST);
              doc.addField(term.AC_NAME_UNTOKENIZED, value);             
              doc.addField(term.AC_NAME_STEMMED, value);
+             // doc.addField(term.AC_NAME_TOKENIZED, value);
         }
     	
         

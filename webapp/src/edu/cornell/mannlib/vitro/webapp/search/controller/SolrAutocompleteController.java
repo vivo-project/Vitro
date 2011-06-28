@@ -178,50 +178,44 @@ public class SolrAutocompleteController extends VitroAjaxController {
     }
     
     private void setTokenizedNameQuery(SolrQuery query, String queryStr, HttpServletRequest request) {
-        
-        // RY 5/18/2011 For now, just doing untokenized query, due to the interactions of wildcard
-        // query and stemming described below. Need to find a way to do this in Solr.
-        // Should take the same approach if we can figure out how to do a disjunction.
-        // Probably just add an explicit "OR" between the terms.
  
-//        String stemParam = (String) request.getParameter("stem"); 
-//        boolean stem = "true".equals(stemParam);
-//        String termName = stem ? VitroSearchTermNames.AC_NAME_STEMMED : VitroSearchTermNames.AC_NAME_UNSTEMMED  ;
+        /* We currently have no use case for a tokenized, unstemmed autocomplete search field, so the option
+         * has been disabled. If needed in the future, will need to add a new field and field type which
+         * is like AC_NAME_STEMMED but doesn't include the stemmer.
+        String stemParam = (String) request.getParameter("stem"); 
+        boolean stem = "true".equals(stemParam);
+        if (stem) {
+            String acTermName = VitroSearchTermNames.AC_NAME_STEMMED;
+            String nonAcTermName = VitroSearchTermNames.NAME_STEMMED;
+        } else {
+            String acTermName = VitroSearchTermNames.AC_NAME_UNSTEMMED;
+            String nonAcTermName = VitroSearchTermNames.NAME_UNSTEMMED;        
+        }
+        */
         
-//        // Use the query parser to analyze the search term the same way the indexed text was analyzed.
-//        // For example, text is lowercased, and function words are stripped out.
-//        QueryParser parser = getQueryParser(termName);
-//        
-//        // The wildcard query doesn't play well with stemming. Query term name:tales* doesn't match
-//        // "tales", which is indexed as "tale", while query term name:tales does. Obviously we need 
-//        // the wildcard for name:tal*, so the only way to get them all to match is use a disjunction 
-//        // of wildcard and non-wildcard queries. The query will have only an implicit disjunction
-//        // operator: e.g., +(name:tales name:tales*)
-//        try {
-//            log.debug("Adding non-wildcard query for " + querystr);
-//            Query query = parser.parse(querystr);
-//            boolQuery.add(query, BooleanClause.Occur.SHOULD);
-//
-//            // Prevent ParseException here when adding * after a space.
-//            // If there's a space at the end, we don't need the wildcard query.
-//            if (! querystr.endsWith(" ")) {
-//                log.debug("Adding wildcard query for " + querystr);
-//                Query wildcardQuery = parser.parse(querystr + "*");            
-//                boolQuery.add(wildcardQuery, BooleanClause.Occur.SHOULD);
-//            }
-//            
-//            log.debug("Name query is: " + boolQuery.toString());
-//        } catch (ParseException e) {
-//            log.warn(e, e);
-//        }
-       
-        setUntokenizedNameQuery(query, queryStr);
+        String acTermName = VitroSearchTermNames.AC_NAME_STEMMED;
+        String nonAcTermName = VitroSearchTermNames.NAME_STEMMED;
+        
+        if (queryStr.endsWith(" ")) {
+            // Solr wants whitespace to be escaped with a backslash
+            queryStr = queryStr.replaceAll("\\s+", "\\\\ ");
+            queryStr = nonAcTermName + ":" + queryStr;            
+        } else {
+            int indexOfLastWord = queryStr.lastIndexOf(" ") + 1;
+            String queryStr1 = queryStr.substring(0, indexOfLastWord);
+            String queryStr2 = queryStr.substring(indexOfLastWord);
+            queryStr = nonAcTermName + ":\"" + queryStr1 + "\"+" + acTermName + ":" + queryStr2;
+        }
+        
+        log.debug("Tokenized name query string = " + queryStr);
+        query.setQuery(queryStr);
+
     }
 
     private void setUntokenizedNameQuery(SolrQuery query, String queryStr) {
         
+        queryStr = queryStr.trim();
         // Solr wants whitespace to be escaped with a backslash
-        // Better: replace \s+
         queryStr = queryStr.replaceAll("\\s+", "\\\\ ");
         queryStr = VitroSearchTermNames.AC_NAME_UNTOKENIZED + ":" + queryStr;
         query.setQuery(queryStr);

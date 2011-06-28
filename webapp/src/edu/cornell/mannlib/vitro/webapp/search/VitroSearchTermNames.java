@@ -69,7 +69,7 @@ public class VitroSearchTermNames {
     public static String AC_NAME_STEMMED = "acNameStemmed";
     
     /* There is currently no use case for an autocomplete search field that is tokenized but not stemmed. 
-    public static String AC_NAME_TOKENIZED = "acNameTokenized";  */
+    public static String AC_NAME_UNSTEMMED = "acNameUnstemmed";  */
     
     /** field for beta values of all documents **/
     public static final String BETA = "BETA";
