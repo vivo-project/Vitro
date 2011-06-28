@@ -89,9 +89,6 @@ section.accounts .delete-account{
     float: left;
     font-size: .875em;
 }
-.hide {
-    display: none;
-}
 .accounts-per-page-form {
     display: inline-block;
 }
