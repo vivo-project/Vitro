@@ -104,13 +104,12 @@ browseByVClass.getIndividuals = function(vclassUri, alpha, page, scroll) {
                 pages = results.pages;
                 browseByVClass.pagination(pages, page);
             }
-            //Check if single vclass sent back, otherwise check for vclasses
+            
             if(results.vclass) {
-            	selectedClassHeading = '<h3 class="selected-class">'+ results.vclass.name +'</h3>';
-            	browseByVClass.individualsContainer.prepend(selectedClassHeading);
+            	$('h3.selected-class').text(results.vclass.name);
+            	// set selected class, alpha and page
+            	browseByVClass.selectedVClass(results.vclass.URI);
             }
-            // set selected class, alpha and page
-            browseByVClass.selectedVClass(results.vclass.URI);
             browseByVClass.selectedAlpha(alpha);
         }
     });

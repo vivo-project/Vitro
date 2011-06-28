@@ -19,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class UrlBuilder {
@@ -372,21 +373,21 @@ public class UrlBuilder {
     	HashMap<String,String> specialParams = new HashMap<String, String>();
     	if(vreq != null) {
     		//this parameter is sufficient to switch to menu model
-    		String useMenuModelParam = vreq.getParameter("usemenumodel");
+    		String useMenuModelParam = vreq.getParameter(DisplayVocabulary.SWITCH_TO_DISPLAY_MODEL);
     		//the parameters below allow for using a different model
-	    	String useMainModelUri = vreq.getParameter("usemodel");
-	    	String useTboxModelUri = vreq.getParameter("usetboxmodel");
-	    	String useDisplayModelUri = vreq.getParameter("usedisplaymodel");
+	    	String useMainModelUri = vreq.getParameter(DisplayVocabulary.USE_MODEL_PARAM);
+	    	String useTboxModelUri = vreq.getParameter(DisplayVocabulary.USE_TBOX_MODEL_PARAM);
+	    	String useDisplayModelUri = vreq.getParameter(DisplayVocabulary.USE_DISPLAY_MODEL_PARAM);
 	    	if(useMenuModelParam != null && !useMenuModelParam.isEmpty()) {
-	    		specialParams.put("usemenumodel", useMenuModelParam);
+	    		specialParams.put(DisplayVocabulary.SWITCH_TO_DISPLAY_MODEL, useMenuModelParam);
 	    	}
 	    	else if(useMainModelUri != null && !useMainModelUri.isEmpty()) {
-	    		specialParams.put("usemodel", useMainModelUri);
+	    		specialParams.put(DisplayVocabulary.USE_MODEL_PARAM, useMainModelUri);
 	    		if(useTboxModelUri != null && !useTboxModelUri.isEmpty()){ 
-	    			specialParams.put("usetboxmodel", useTboxModelUri);
+	    			specialParams.put(DisplayVocabulary.USE_TBOX_MODEL_PARAM, useTboxModelUri);
 	    		}
 	    		if(useDisplayModelUri != null && !useDisplayModelUri.isEmpty()) {
-	    			specialParams.put("usedisplaymodel", useDisplayModelUri);
+	    			specialParams.put(DisplayVocabulary.USE_DISPLAY_MODEL_PARAM, useDisplayModelUri);
 	    		}
 	    	}
     	}

@@ -623,18 +623,72 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         }   
     }
     
+    //Method for creating a copy - does not pass the same object
+    public WebappDaoFactoryJena (WebappDaoFactoryJena base) {
+    	//Not sure if selector somehow has greater longevity so making a copy instead of reference
+    	
+    	if(base.ontModelSelector instanceof OntModelSelectorImpl) {
+    		OntModelSelectorImpl selector = new OntModelSelectorImpl();
+    		selector.setABoxModel(base.ontModelSelector.getABoxModel());
+    		selector.setApplicationMetadataModel(base.ontModelSelector.getApplicationMetadataModel());
+    		selector.setDisplayModel(base.ontModelSelector.getDisplayModel());
+    		selector.setFullModel(base.ontModelSelector.getFullModel());
+    		selector.setTBoxModel(base.ontModelSelector.getTBoxModel());
+    		selector.setUserAccountsModel(base.ontModelSelector.getUserAccountsModel());
+    		this.ontModelSelector = selector;
+    	} else if(base.ontModelSelector instanceof SimpleOntModelSelector) {
+    		SimpleOntModelSelector selector = new SimpleOntModelSelector();
+    		selector.setABoxModel(base.ontModelSelector.getABoxModel());
+    		selector.setApplicationMetadataModel(base.ontModelSelector.getApplicationMetadataModel());
+    		selector.setDisplayModel(base.ontModelSelector.getDisplayModel());
+    		selector.setFullModel(base.ontModelSelector.getFullModel());
+    		selector.setTBoxModel(base.ontModelSelector.getTBoxModel());
+    		selector.setUserAccountsModel(base.ontModelSelector.getUserAccountsModel());
+    		this.ontModelSelector = selector;
+    	} else {
+    		//Not sure what this is but will set to equivalence here
+    		this.ontModelSelector =base.ontModelSelector;
+    	}
+    	
+        this.defaultNamespace = base.defaultNamespace;
+        this.nonuserNamespaces = base.nonuserNamespaces;
+        this.preferredLanguages = base.preferredLanguages;
+        this.userURI = base.userURI;
+        this.flag2ValueMap = new HashMap<String,OntClass>();
+        this.flag2ValueMap.putAll(base.flag2ValueMap);
+        this.flag2ClassLabelMap = new HashMap<Resource, String>();
+        this.flag2ClassLabelMap.putAll(base.flag2ClassLabelMap);
+        this.dwf = base.dwf;
+    }
+    
     //Method for using special model for webapp dao factory, such as display model
-    //This is still in flux, am checking in to allow others to experiment
-    public boolean isUsingSpecialModel = false;
+    
     public void setSpecialDataModel(OntModel specialModel, OntModel specialTboxModel, OntModel specialDisplayModel) {
+    	//Can we get the "original" models here from somewhere?
+    	OntModelSelector originalSelector = this.getOntModelSelector();
     	//Set up model selector for the new webapp dao factory object with the input model
     	//The selector is used by the object property dao, therefore should be set up even though we 
     	//use the new webapp dao factory object to generate portions to overwrite the regular webapp dao factory
     	OntModelSelectorImpl specialSelector = new OntModelSelectorImpl();
     	specialSelector.setFullModel(specialModel);
     	specialSelector.setApplicationMetadataModel(specialModel);
-    	specialSelector.setDisplayModel(specialDisplayModel);
-    	specialSelector.setTBoxModel(specialTboxModel);
+    	if(specialDisplayModel != null) {
+    		specialSelector.setDisplayModel(specialDisplayModel);
+    	} else {
+    		OntModel selectorDisplayModel = originalSelector.getDisplayModel();
+    		if(selectorDisplayModel != null) {
+    			specialSelector.setDisplayModel(originalSelector.getDisplayModel());
+    		}
+    	}
+    	if(specialTboxModel != null) {
+    		specialSelector.setTBoxModel(specialTboxModel);
+    	} else {
+    		OntModel selectorTboxModel = originalSelector.getTBoxModel();
+    		if(selectorTboxModel != null) {
+    			specialSelector.setTBoxModel(originalSelector.getTBoxModel());
+    		}
+    	}
+    
     	specialSelector.setABoxModel(specialModel);
     	specialSelector.setUserAccountsModel(specialModel);
     	//although we're only use part of the new wadf and copy over below, the object property dao
@@ -642,7 +696,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     	//so if the object property dao is to be copied over we need to ensure we have the correct display model
     	//and tbox model
     	WebappDaoFactoryJena specialWadfj = new WebappDaoFactoryJena(specialSelector);
-    
     	entityWebappDao = specialWadfj.getIndividualDao();
     	keys2EntsDao = specialWadfj.getKeys2EntsDao();
     	keywordDao = specialWadfj.getKeywordDao();
@@ -657,23 +710,8 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     	objectPropertyStatementDao = specialWadfj.getObjectPropertyStatementDao();
     	dataPropertyDao = specialWadfj.getDataPropertyDao();
     	dataPropertyStatementDao = specialWadfj.getDataPropertyStatementDao();
-    	PropertyGroup pgtest = new edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup();
-    	pgtest.setName("testname");
-    	pgtest.setDisplayRank(1);
-    	propertyGroupDao.insertNewPropertyGroup(pgtest);
-    	//?Simple ont model selector uses submodels - unsure if relevant here
-    	//|| ontModelSelector instanceof SimpleOntModelSelector
-    	if(ontModelSelector instanceof OntModelSelectorImpl) {
-    		OntModelSelectorImpl omsImpl = (OntModelSelectorImpl) ontModelSelector;
-    		omsImpl.setTBoxModel(specialTboxModel);
-    		omsImpl.setDisplayModel(specialDisplayModel);
-    	}
-    	else if(ontModelSelector instanceof SimpleOntModelSelector) {
-    		SimpleOntModelSelector omsImpl = (SimpleOntModelSelector) ontModelSelector;
-    		omsImpl.setTBoxModel(specialTboxModel);
-    		omsImpl.setDisplayModel(specialDisplayModel);
-    	}
-    	isUsingSpecialModel = true;
+    	//Why can't we set the selector to be the same?
+    	ontModelSelector = specialSelector;
     }
    
 }

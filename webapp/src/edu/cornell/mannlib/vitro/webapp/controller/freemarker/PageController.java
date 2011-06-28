@@ -57,9 +57,6 @@ public class PageController extends FreemarkerHttpServlet{
                 if( page.containsKey("title") ){
                     mapForTemplate.put("title", page.get("title"));
                 }
-               
-                //For multiple classes, 
-                //mapForTemplate.put("dataServiceUrlIndividualsByVClasses", UrlBuilder.getUrl("/dataservice?getSolrIndividualsByVClasses=1&vclassId="));
 
             } catch (Throwable th) {
                 return doNotFound(vreq);                

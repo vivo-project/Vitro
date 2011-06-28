@@ -124,8 +124,9 @@ public class ClassGroupPageData implements PageDataGetter{
     
     
     /**
-     * For processig of JSONObject
+     * For processing of JSONObject
      */
+    //Currently empty, TODO: Review requirements
     public JSONObject convertToJSON(Map<String, Object> dataMap, VitroRequest vreq) {
     	JSONObject rObj = null;
     	return rObj;

@@ -97,6 +97,16 @@ public class DisplayVocabulary {
     /** <p>Class of pages.</p> */
     public static final OntClass PAGE = m_model.createClass( NS + "Page" );
     
+    
+    //Parameters to switch to menu editing - or to switch models
+    public static final String SWITCH_TO_DISPLAY_MODEL = "switchToDisplayModel";
+    public static final String USE_MODEL_PARAM = "useThisModel";
+    public static final String USE_TBOX_MODEL_PARAM = "useThisTboxModel";
+    public static final String USE_DISPLAY_MODEL_PARAM = "useThisDisplayModel";
+    
+    //Attribute values used to store display tbox/display display model in servlet context
+    public static final String CONTEXT_DISPLAY_TBOX = "displayOntModelTBOX";
+    public static final String CONTEXT_DISPLAY_DISPLAY = "displayOntModelDisplayModel";
     /* URIs for some individuals in the dispaly ontology */
         
     

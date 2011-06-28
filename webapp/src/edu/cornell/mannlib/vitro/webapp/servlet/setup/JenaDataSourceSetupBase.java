@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import java.io.InputStream;
+import java.io.File;
 import java.sql.SQLException;
 import java.util.Set;
 
@@ -335,18 +336,29 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     }
    
     public static void readOntologyFileFromPath(String p, Model model, ServletContext ctx) {
-    	 String format = getRdfFormat(p);
-         log.info("Loading ontology file at " + p + 
-                  " as format " + format);
-         InputStream ontologyInputStream = ctx.getResourceAsStream(p);
-         try {
-             model.read(ontologyInputStream, null, format);
-             log.debug("...successful");
-         } catch (Throwable t) {
-             log.error("Failed to load ontology file at '" + p + 
-                       "' as format " + format, t);
-         }
-    }
+    	//Check that this is a file and not a directory
+    	File f = new File(ctx.getRealPath(p));
+    	if(f.exists() && f.isFile()){
+	    	String format = getRdfFormat(p);
+	         log.info("Loading ontology file at " + p + 
+	                  " as format " + format);
+	         InputStream ontologyInputStream = ctx.getResourceAsStream(p);
+	         try {
+	             model.read(ontologyInputStream, null, format);
+	             log.debug("...successful");
+	         } catch (Throwable t) {
+	             log.error("Failed to load ontology file at '" + p + 
+	                       "' as format " + format, t);
+	         }
+    	} else {
+    		if(!f.exists()) {
+    			log.debug("File for path " + p + " does not exist");
+    		}
+    		else if(f.isDirectory()) {
+    			log.debug("Path " + p + " corresponds to directory and not file so was not read in");
+    		}
+    	}
+   }
     
     private static String getRdfFormat(String filename){
         String defaultformat = "RDF/XML";

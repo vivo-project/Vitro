@@ -5,7 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.filters;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import java.util.Map;
+import java.util.Set;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -129,8 +130,8 @@ public class VitroRequestPrep implements Filter {
     		wdf = (WebappDaoFactory) o;
     		log.debug("Found a WebappDaoFactory in the session and using it for this request");
     	}
-    	
-    	checkForSpecialWDF(vreq, wdf);
+    	//This will replace the WebappDaoFactory with a different version if menu management parameter is found
+    	wdf = checkForSpecialWDF(vreq, wdf);
     	
         VitroFilters filters = null;
 		        
@@ -203,53 +204,75 @@ public class VitroRequestPrep implements Filter {
 
     //check if special model - this is for enabling the use of a different model for menu management 
     //Also enables the use of a completely different model and tbox if uris are passed
-    private void checkForSpecialWDF(VitroRequest vreq, WebappDaoFactory wadf) {
-    	String useMenuModelParam = vreq.getParameter("usemenumodel");
+    private WebappDaoFactory checkForSpecialWDF(VitroRequest vreq, WebappDaoFactory inputWadf) {
+    	String useMenuModelParam = vreq.getParameter(DisplayVocabulary.SWITCH_TO_DISPLAY_MODEL);
     	boolean useMenu = (useMenuModelParam != null);
     	//other parameters to be passed in in case want to use specific models
-    	String useMainModelUri = vreq.getParameter("usemodel");
-    	String useTboxModelUri = vreq.getParameter("usetboxmodel");
-    	String useDisplayModelUri = vreq.getParameter("usedisplaymodel");
+    	String useMainModelUri = vreq.getParameter(DisplayVocabulary.USE_MODEL_PARAM);
+    	String useTboxModelUri = vreq.getParameter(DisplayVocabulary.USE_TBOX_MODEL_PARAM);
+    	String useDisplayModelUri = vreq.getParameter(DisplayVocabulary.USE_DISPLAY_MODEL_PARAM);
+    	
     	if(useMenu || (useMainModelUri != null && !useMainModelUri.isEmpty() && useTboxModelUri != null && !useTboxModelUri.isEmpty())) {    		
-    		if(wadf instanceof WebappDaoFactoryJena) {
-    			WebappDaoFactoryJena wadfj = (WebappDaoFactoryJena) wadf;
+    		log.debug("Menu switching parameters exist, Use Menu: " + useMenu + " - UseModelUri:" + useMainModelUri + " - UseTboxModelUri:" + useTboxModelUri + " - useDisplayModelUri:" + useDisplayModelUri);
+    		if(inputWadf instanceof WebappDaoFactoryJena) {
+    			//Create a copy of the input WADF to be sent over and then set
+        		WebappDaoFactoryJena wadfj = new WebappDaoFactoryJena((WebappDaoFactoryJena) inputWadf);
+        		log.debug("Created copy of input webapp dao factory to be overwritten");
+    			//WebappDaoFactoryJena wadfj = (WebappDaoFactoryJena) wadf;
     			OntModel useMainOntModel = null, useTboxOntModel = null, useDisplayOntModel = null;
     			Model tboxModel = null, displayModel = null;
     			BasicDataSource bds = JenaDataSourceSetupBase.getApplicationDataSource(_context);
 	        	String dbType = ConfigurationProperties.getBean(_context).getProperty( // database type
 	        				"VitroConnection.DataSource.dbtype", "MySQL");
     			if(useMenu) {
+    				log.debug("Display model editing mode");
     				//if using special models for menu management, get main menu model from context and set tbox and display uris to be used
 	    			useMainOntModel = (OntModel) _context.getAttribute("displayOntModel");
 	    			//Hardcoding tbox model uri for now
 	        		useTboxModelUri =  DisplayVocabulary.DISPLAY_TBOX_MODEL_URI;
 	        		useDisplayModelUri = DisplayVocabulary.DISPLAY_DISPLAY_MODEL_URI;
+	        		//Get tbox and display display model from servlet context otherwise load in directly from database
+	    			useTboxOntModel = (OntModel) _context.getAttribute(DisplayVocabulary.CONTEXT_DISPLAY_TBOX);
+	    			useDisplayOntModel = (OntModel) _context.getAttribute(DisplayVocabulary.CONTEXT_DISPLAY_DISPLAY);
     			} else {
+    				log.debug("Display model editing mode not triggered, using model uri " + useMainModelUri);
     				//If main model uri passed as parameter then retrieve model from parameter
     				Model mainModel = JenaDataSourceSetupBase.makeDBModel(bds, useMainModelUri, OntModelSpec.OWL_MEM, JenaDataSourceSetupBase.TripleStoreType.RDB, dbType, _context);
     				//if this uri exists and model exists, then set up ont model version
     				if(mainModel != null) {
+    					log.debug("main model uri exists");
     					useMainOntModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, mainModel);
+    				} else {
+    					log.error("Main Model Uri " + useMainModelUri + " did not retrieve model");
     				}
     			}
     			
-    			//Get tbox and display display model from servlet context otherwise load in directly from database
-    			useTboxOntModel = (OntModel) _context.getAttribute("displayOntModelTBOX");
-    			useDisplayOntModel = (OntModel) _context.getAttribute("displayOntModelDisplayModel");
-    			if(useTboxOntModel == null){
+    			
+    			if(!useMenu || useTboxOntModel == null){
 		        	tboxModel = JenaDataSourceSetupBase.makeDBModel(bds, useTboxModelUri, OntModelSpec.OWL_MEM, JenaDataSourceSetupBase.TripleStoreType.RDB, dbType, _context);
 		        	useTboxOntModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, tboxModel);
     			} 
-    			if(useDisplayOntModel == null) {
+    			if(!useMenu || useDisplayOntModel == null) {
 		    		//Set "display model" for display model
 		        	displayModel = JenaDataSourceSetupBase.makeDBModel(bds, useDisplayModelUri, OntModelSpec.OWL_MEM, JenaDataSourceSetupBase.TripleStoreType.RDB, dbType, _context);
 		        	useDisplayOntModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, displayModel);
     			}
     			//Set special model for wadfj
 	        	if(useMainOntModel != null) {
-    				wadfj.setSpecialDataModel(useMainOntModel, useTboxOntModel, useDisplayOntModel);
-    			}
+	        		log.debug("Switching to use of input model");
+	        		//If menu model, preserve existing display model so the navigation elements remain
+	        		if(useMenu) {
+	        			useDisplayOntModel = null;
+	        		}
+    				//Changes will be made to the copy, not the original from the servlet context
+	        		wadfj.setSpecialDataModel(useMainOntModel, useTboxOntModel, useDisplayOntModel);
+	        		return wadfj;
+	        	}
     		}
     	}
+    	//if no parameters exist for switching models, return the original webapp dao factory object
+    	return inputWadf;
     }
+    
+    
 }

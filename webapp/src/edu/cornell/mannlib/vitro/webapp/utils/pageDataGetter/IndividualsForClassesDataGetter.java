@@ -74,17 +74,17 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
         		VClass vclass = vcgc.getCachedVClass(classUri);
         		if(vclass != null) {
         			
-        			System.out.println("VClass does exist for " + classUri + " and entity count is " + vclass.getEntityCount());
+        			log.debug("VClass does exist for " + classUri + " and entity count is " + vclass.getEntityCount());
         			vClasses.add(vclass);
         		} else {
-        			System.out.println("Vclass " + classUri + " does not exist in the cache");
+        			log.debug("Vclass " + classUri + " does not exist in the cache");
         			log.error("Error occurred, vclass does not exist for this uri " + classUri);
         			//Throw exception here
         		}
         	}
         	classesGroup.setVitroClassList(vClasses);
         	//What is individual count? Total?
-        	classesGroup.setIndividualCount(vClasses.size());
+        	//classesGroup.setIndividualCount(vClasses.size());
         	data.put("vClassGroup", classesGroup);
         	List<String> urlEncodedRestrictClasses = new ArrayList<String>();
         	if(restrictClasses.size() > 0) {
@@ -99,18 +99,7 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
             		//Assuming utf-8?
             		urlEncodedRestrictClasses.add(URLEncoder.encode(restrictClassUri, "UTF-8"));
         		}
-        		
-        		/*
-        		//If we were actually getting the intersections
-        		for(String classUri: classes) {
-        			List<String> intersectionUris = new ArrayList<String>();
-        			intersectionUris.add(classUri);
-        			intersectionUris.addAll(restrictClasses);
-        			Map<String, Object> results = SolrIndividualListController.getResultsForVClassIntersections(intersectionUris, pageParam, alpha, vreq.getWebappDaoFactory().getIndividualDao(), context);
-                	data.putAll(results);
-                	List<Individual> entities = (List<Individual>)results.get("entities");
-                	inds.addAll(entities);
-        		}*/
+        	
         		restrictClassesGroup.setVitroClassList(restrictVClasses);
         		restrictClassesGroup.setIndividualCount(restrictVClasses.size());
         	} else {
@@ -124,31 +113,6 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
         	data.put("restrictVClasses", restrictVClasses);
         	//not sure if this is useful
         	data.put("restrictVClassGroup", restrictClassesGroup);
-        	//if we were returning actual results
-        	/*
-        	
-        	//Map<String, Object> results = IndividualListController.getResultsForVClassIntersections(classIntersections, pageParam, alpha, vreq.getWebappDaoFactory().getIndividualDao(), context);
-        	//data.putAll(results);
-        	//NOTE: Below is copied from Individual List Controller's processing as some of these are used in the template
-        	//below may not be necessary if using a different template
-           
-            List<ListedIndividualTemplateModel> indsTm = new ArrayList<ListedIndividualTemplateModel>();
-            for(Individual ind : inds ){
-                indsTm.add(new ListedIndividualTemplateModel(ind,vreq));
-            }
-            data.put("individuals", indsTm);
-            
-            List<TemplateModel> wpages = new ArrayList<TemplateModel>();
-            List<PageRecord> pages = (List<PageRecord>)data.get("pages");
-            BeansWrapper wrapper = new BeansWrapper();
-            for( PageRecord pr: pages ){
-                wpages.add( wrapper.wrap(pr) );
-            }
-
-           
-            data.put("rdfUrl", vreq.getContextPath()+"/listrdf/");
-            
-            */
         	 //Also add data service url
             //Hardcoding for now, need a more dynamic way of doing this
             data.put("dataServiceUrlIndividualsByVClass", this.getDataServiceUrl());

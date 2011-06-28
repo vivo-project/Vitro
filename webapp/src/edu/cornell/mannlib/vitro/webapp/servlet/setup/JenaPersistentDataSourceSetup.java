@@ -56,14 +56,18 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
 	    try {
 	    	Model appDbModel = makeDBModelFromConfigurationProperties(
 	    	        JENA_DISPLAY_METADATA_MODEL, DB_ONT_MODEL_SPEC, ctx);
-			if (appDbModel.size() == 0) 
+	    	log.debug("Display model size is " + appDbModel.size());
+			if (appDbModel.size() == 0) {
 				readOntologyFilesInPathSet(
-				        APPPATH, sce.getServletContext(),appDbModel);			
+				        APPPATH, sce.getServletContext(),appDbModel);
+				log.debug("Loaded ontology files from " + APPPATH + " into display model");
+			}
 	    	OntModel appModel = ModelFactory.createOntologyModel(
 	    	        MEM_ONT_MODEL_SPEC);
 	    	appModel.add(appDbModel);
 	    	appModel.getBaseModel().register(new ModelSynchronizer(appDbModel));
 	    	ctx.setAttribute("displayOntModel", appModel);
+	    	
 	    } catch (Throwable t) {
 	    	log.error("Unable to load user application configuration model from DB", t);
 	    }
@@ -80,6 +84,7 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
 	    	appTBOXModel.add(displayTboxModel);
 	    	appTBOXModel.getBaseModel().register(new ModelSynchronizer(displayTboxModel));
 	    	ctx.setAttribute("displayOntModelTBOX", appTBOXModel);
+	    	log.debug("Loaded file " + APPPATH_LOAD + "displayTBOX.n3 into display tbox model");
 	    } catch (Throwable t) {
 	    	log.error("Unable to load user application configuration model TBOX from DB", t);
 	    }
@@ -96,6 +101,7 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
 	    	appDisplayDisplayModel.add(displayDisplayModel);
 	    	appDisplayDisplayModel.getBaseModel().register(new ModelSynchronizer(displayDisplayModel));
 	    	ctx.setAttribute("displayOntModelDisplayModel", appDisplayDisplayModel);
+	    	log.debug("Loaded file " + APPPATH_LOAD + "displayDisplay.n3 into display display model");
 	    } catch (Throwable t) {
 	    	log.error("Unable to load user application configuration model Display Model from DB", t);
 	    }
