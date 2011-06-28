@@ -144,7 +144,8 @@ public class LuceneSetup implements javax.servlet.ServletContextListener {
 			List<ObjectSourceIface> sources = new ArrayList<ObjectSourceIface>();
 			sources.add(wadf.getIndividualDao());
 
-			IndexBuilder builder = new IndexBuilder(context, indexer, sources);
+			//IndexBuilder builder = new IndexBuilder(context, indexer, sources);
+			IndexBuilder builder = new IndexBuilder(context, indexer, wadf);
 
 			// here we add the IndexBuilder with the LuceneIndexer
 			// to the servlet context so we can access it later in the webapp.

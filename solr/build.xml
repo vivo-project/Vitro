@@ -8,7 +8,7 @@
      =========================================== -->
 
 <project name="vitroSolr" default="describe">
-
+    <property name="ant.task.dir" location="../utilities/buildutils"/>
 	<property name="solr.build.dir" location="."/>
 	<property name="solr.example.dir" location="${solr.build.dir}/exampleSolr" />
 	<property name="solr.context.config.example" location="${solr.build.dir}/exampleSolrContext.xml"/>
@@ -20,7 +20,8 @@
 
 	<target name="describe" description="--> Describe the targets (this is the default).">
 		<echo>
-deploy   - Deploy solr service for use by vitro.
+deploy             - Deploy solr service for use by vitro.
+makeSolrjClientJar - Isolate solrj libraries in single jar.
         </echo>
 	</target>
 
@@ -88,5 +89,26 @@ deploy   - Deploy solr service for use by vitro.
 		
 	</target>
 
+    <target name="makeSolrjClientJar" >
+      <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"
+               classpath="${ant.task.dir}/jarjar.jar"/>
+
+      <jarjar jarfile="./solrjClient.jar">
+        <zipfileset src="./solrjClientLibs/apache-solr-core-3.1.0.jar"/>
+        <zipfileset src="./solrjClientLibs/apache-solr-solrj-3.1.0.jar"/>
+        <zipfileset src="./solrjClientLibs/commons-codec-1.4.jar"/>
+        <zipfileset src="./solrjClientLibs/commons-httpclient-3.1.jar"/>
+        <zipfileset src="./solrjClientLibs/commons-io-1.4.jar"/>
+        <zipfileset src="./solrjClientLibs/geronimo-stax-api_1.0_spec-1.0.1.jar"/>
+        <zipfileset src="./solrjClientLibs/jcl-over-slf4j-1.5.5.jar"/>
+        <zipfileset src="./solrjClientLibs/wstx-asl-3.2.7.jar"/>
+
+        <!-- leave the slf4j stuff out because it is broken by design  -->
+        <rule pattern="org.apache.**" result="isoloated.org.apache.@1"/>
+        <rule pattern="org.codehaus.**" result="isoloated.org.codehaus.@1"/>
+        <rule pattern="com.ctc.**" result="isoloated.com.ctc.@1"/>
+        
+      </jarjar>
+    </target>
 
 </project>

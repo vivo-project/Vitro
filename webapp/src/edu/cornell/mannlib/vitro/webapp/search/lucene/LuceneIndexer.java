@@ -479,5 +479,11 @@ public class LuceneIndexer implements IndexerIface {
 	public void index(Individual ind) throws IndexingException {
 		// TODO Auto-generated method stub
 		
-	}    
+	}
+
+    @Override
+    public void removeFromIndex(String uri) throws IndexingException {
+        // TODO Auto-generated method stub
+        
+    }    
 }

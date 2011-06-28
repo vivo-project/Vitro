@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.document.Document;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.joda.time.DateTime;
 
@@ -41,9 +41,7 @@ public class IndividualToSolrDocument {
     public List<DocumentModifier> documentModifiers = new ArrayList<DocumentModifier>();
     
     private static List<String> contextNodeClassNames = new ArrayList<String>();
-    
-    
-    
+            
     public IndividualToSolrDocument(
             ClassProhibitedFromSearch classesProhibitedFromSearch, 
     		IndividualProhibitedFromSearch individualProhibitedFromSearch){
@@ -73,7 +71,6 @@ public class IndividualToSolrDocument {
     	classPublicNames.append("");
     	SolrInputDocument doc = new SolrInputDocument();
     	
-    	//DocId
     	String id = ind.getURI();
     	log.debug("translating " + id);
     	
@@ -150,8 +147,8 @@ public class IndividualToSolrDocument {
     	
     	doc.addField(term.PROHIBITED_FROM_TEXT_RESULTS, prohibited?"1":"0");
     	
-    	//lucene DocID
-    	doc.addField(term.DOCID, entClassName + id);
+    	//DocID
+    	doc.addField(term.DOCID, getIdForUri( ind.getURI() ) );
     	
     	//vitro id
     	doc.addField(term.URI, id);
@@ -292,14 +289,28 @@ public class IndividualToSolrDocument {
     public Object getIndexId(Object obj) {
         throw new Error("IndiviudalToSolrDocument.getIndexId() is unimplemented");        
     }
+    
+    public String getIdForUri(String uri){
+        if( uri != null ){
+            return  entClassName + uri;
+        }else{
+            return null;
+        }
+    }
+    
+    public String getQueryForId(String uri ){
+        return term.DOCID + ':' + getIdForUri(uri);
+    }
 
     public Individual unTranslate(Object result) {
         Individual ent = null;
-        if( result != null && result instanceof Document){
-            Document hit = (Document) result;
-            String id = hit.get(VitroSearchTermNames.URI);
+
+        if( result != null && result instanceof SolrDocument){
+            SolrDocument hit = (SolrDocument) result;
+            String uri= (String) hit.getFirstValue(term.URI);
+
             ent = new IndividualImpl();
-            ent.setURI(id);
+            ent.setURI(uri);
         }
         return ent;
     }

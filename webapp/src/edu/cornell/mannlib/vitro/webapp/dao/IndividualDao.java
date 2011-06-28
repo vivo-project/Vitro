@@ -88,21 +88,12 @@ public interface IndividualDao extends ObjectSourceIface {
     /**
      * Returns an Iterator over all Individuals in the model that are user-viewable.
      */
-    public abstract Iterator<Individual> getAllOfThisTypeIterator();
-
-    /**
-     * Returns an Iterator over all Individuals in the model that are user-viewable and of the specified VClass URI.
-     * @param vClassURI
-     * @return
-     */
-    public abstract Iterator<Individual> getAllOfThisVClassIterator(String vClassURI);
+    public abstract Iterator<String> getAllOfThisTypeIterator();
 
     /**
      * Returns an Iterator over all Individuals in the model that are user-viewable and have been updated since the specified time.
      */
-    public abstract Iterator<Individual> getUpdatedSinceIterator(long updatedSince);
-
-        int getCountOfIndividualsInVClass(String vclassURI );
+    public abstract Iterator<String> getUpdatedSinceIterator(long updatedSince);
 
     public boolean isIndividualOfClass(String vclassURI, String indURI);
     

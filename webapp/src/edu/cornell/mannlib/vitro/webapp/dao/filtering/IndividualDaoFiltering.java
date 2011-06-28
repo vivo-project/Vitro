@@ -125,22 +125,7 @@ class IndividualDaoFiltering extends BaseFiltering implements IndividualDao{
     /* All of the methods that return iterator don't wrap the Individual in
      * a IndividualFiltering so they might cause problems */
     
-    public Iterator getAllOfThisTypeIterator() {        
-        return filterAndWrap(innerIndividualDao.getAllOfThisTypeIterator(), 
-                filters);        
-    }
 
-    public Iterator getAllOfThisVClassIterator(String classURI) {        
-        return filterAndWrap(
-                innerIndividualDao.getAllOfThisVClassIterator(classURI), 
-                filters);        
-    }
-    
-    public Iterator getUpdatedSinceIterator(long updatedSince) {
-        return filterAndWrap(
-                innerIndividualDao.getUpdatedSinceIterator(updatedSince),
-                filters);        
-    }
     
     private class ToFilteredIndividual extends UnaryFunctor<Individual, Individual>{
         private final VitroFilters filters;
@@ -151,19 +136,21 @@ class IndividualDaoFiltering extends BaseFiltering implements IndividualDao{
         public Individual fn(Individual arg) {
             return new IndividualFiltering(arg,filters);
         }        
-    }
-    
-    
-    public int getCountOfIndividualsInVClass(String vclassURI) {
-        Iterator<Individual> it = innerIndividualDao.getAllOfThisVClassIterator(vclassURI);
-        if( it == null ) return 0;
-        
-        Iterator<Individual> itFiltered = Filter.filter(it,filters.getIndividualFilter());
-        return (int)(Summarize.count(itFiltered,filters.getIndividualFilter()));
-    }
-        
+    }              
 
+    
     /* ******************* unfiltered methods ****************** */
+    
+    public Iterator<String> getAllOfThisTypeIterator() {        
+        return innerIndividualDao.getAllOfThisTypeIterator(); 
+                       
+    }
+    
+    public Iterator<String> getUpdatedSinceIterator(long updatedSince) {
+        return  innerIndividualDao.getUpdatedSinceIterator(updatedSince);
+                       
+    }
+    
     public Collection<DataPropertyStatement> getExternalIds(String individualURI) {
         return innerIndividualDao.getExternalIds(individualURI);
     }

@@ -67,7 +67,6 @@ import edu.cornell.mannlib.vitro.webapp.search.lucene.CustomSimilarity;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.LinkTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividualTemplateModel;
 import freemarker.template.Configuration;
@@ -585,11 +584,11 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
     }       
 
     private Analyzer getAnalyzer(ServletContext servletContext) throws SearchException {
-        Object obj = servletContext.getAttribute(LuceneSetup.ANALYZER);
-        if( obj == null || !(obj instanceof Analyzer) )
+//        Object obj = servletContext.getAttribute(LuceneSetup.ANALYZER);
+//        if( obj == null || !(obj instanceof Analyzer) )
             throw new SearchException("Could not get analyzer");
-        else
-            return (Analyzer)obj;        
+//        else
+//            return (Analyzer)obj;        
     }
 
     private Query getQuery(VitroRequest request,
@@ -777,16 +776,18 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
     
     @SuppressWarnings("unchecked")
     private HashSet<String> getDataPropertyBlacklist(){
-        HashSet<String>dpBlacklist = (HashSet<String>)
-        getServletContext().getAttribute(LuceneSetup.SEARCH_DATAPROPERTY_BLACKLIST);
-        return dpBlacklist;        
+//        HashSet<String>dpBlacklist = (HashSet<String>)
+//        getServletContext().getAttribute(LuceneSetup.SEARCH_DATAPROPERTY_BLACKLIST);
+//        return dpBlacklist;        
+        return null;
     }
     
     @SuppressWarnings("unchecked")
     private HashSet<String> getObjectPropertyBlacklist(){
-        HashSet<String>opBlacklist = (HashSet<String>)
-        getServletContext().getAttribute(LuceneSetup.SEARCH_OBJECTPROPERTY_BLACKLIST);
-        return opBlacklist;        
+//        HashSet<String>opBlacklist = (HashSet<String>)
+//        getServletContext().getAttribute(LuceneSetup.SEARCH_OBJECTPROPERTY_BLACKLIST);
+//        return opBlacklist;
+        return null;
     }
     
     

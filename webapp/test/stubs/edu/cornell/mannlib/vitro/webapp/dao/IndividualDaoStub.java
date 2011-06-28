@@ -131,28 +131,16 @@ public class IndividualDaoStub implements IndividualDao {
 	}
 
 	@Override
-	public Iterator<Individual> getAllOfThisTypeIterator() {
+	public Iterator<String> getAllOfThisTypeIterator() {
 		throw new RuntimeException(
 				"IndividualDaoStub.getAllOfThisTypeIterator() not implemented.");
-	}
+	}	
 
 	@Override
-	public Iterator<Individual> getAllOfThisVClassIterator(String vClassURI) {
-		throw new RuntimeException(
-				"IndividualDaoStub.getAllOfThisVClassIterator() not implemented.");
-	}
-
-	@Override
-	public Iterator<Individual> getUpdatedSinceIterator(long updatedSince) {
+	public Iterator<String> getUpdatedSinceIterator(long updatedSince) {
 		throw new RuntimeException(
 				"IndividualDaoStub.getUpdatedSinceIterator() not implemented.");
-	}
-
-	@Override
-	public int getCountOfIndividualsInVClass(String vclassURI) {
-		throw new RuntimeException(
-				"IndividualDaoStub.getCountOfIndividualsInVClass() not implemented.");
-	}
+	}	
 
 	@Override
 	public boolean isIndividualOfClass(String vclassURI, String indURI) {

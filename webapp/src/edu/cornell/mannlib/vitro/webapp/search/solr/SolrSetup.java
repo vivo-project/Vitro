@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.solr;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.impl.XMLResponseParser;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Dataset;
@@ -26,11 +28,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
+import edu.cornell.mannlib.vitro.webapp.search.IndexConstants;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearchImpl;
-import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
 
 public class SolrSetup implements javax.servlet.ServletContextListener{   
@@ -56,28 +57,30 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
                         );
                 return;
             }            
-            CommonsHttpSolrServer server;
-            server = new CommonsHttpSolrServer( solrServerUrl );
+            CommonsHttpSolrServer server;                       
+            server = new CommonsHttpSolrServer(new URL( solrServerUrl ),null,new XMLResponseParser(),false); 
+            //server = new CommonsHttpSolrServer(new URL( solrServerUrl ));
             server.setSoTimeout(10000);  // socket read timeout
             server.setConnectionTimeout(10000);
             server.setDefaultMaxConnectionsPerHost(100);
             server.setMaxTotalConnections(100);         
             server.setMaxRetries(1);            
             context.setAttribute(LOCAL_SOLR_SERVER, server);
-                        
+            
             /* setup the individual to solr doc translation */            
             //first we need a ent2luceneDoc translator
             OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
             
-            OntModel abox = ModelContext.getBaseOntModelSelector(context).getABoxModel();
-            
+            OntModel abox = ModelContext.getBaseOntModelSelector(context).getABoxModel();            
             OntModel inferences = (OntModel)context.getAttribute( JenaBaseDao.INFERENCE_ONT_MODEL_ATTRIBUTE_NAME);
             Dataset dataset = WebappDaoFactoryJena.makeInMemoryDataset(abox, inferences);
+            
+            OntModel jenaOntModel = ModelContext.getJenaOntModel(context);
             
             List<DocumentModifier> modifiers = new ArrayList<DocumentModifier>();
            // modifiers.add(new CalculateParameters(ModelContext.getJenaOntModel(context)));
             modifiers.add(new CalculateParameters(dataset));
-            modifiers.add(new ContextNodeFields(dataset));
+            modifiers.add(new ContextNodeFields(jenaOntModel));
             
             IndividualToSolrDocument indToSolrDoc = new IndividualToSolrDocument(
             		new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel),
@@ -88,7 +91,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             SolrIndexer solrIndexer = new SolrIndexer(server, indToSolrDoc);            
             if( solrIndexer.isIndexEmpty() ){
                 log.info("solr index is empty, requesting rebuild");
-                sce.getServletContext().setAttribute(LuceneSetup.INDEX_REBUILD_REQUESTED_AT_STARTUP, Boolean.TRUE);         
+                sce.getServletContext().setAttribute(IndexConstants.INDEX_REBUILD_REQUESTED_AT_STARTUP, Boolean.TRUE);         
             }            
             
             // This is where the builder gets the list of places to try to
@@ -96,11 +99,9 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             // does not get into the search index.
             WebappDaoFactory wadf = (WebappDaoFactory) context.getAttribute("webappDaoFactory");
             VitroFilters vf = VitroFilterUtils.getPublicFilter(context);
-            wadf = new WebappDaoFactoryFiltering(wadf, vf);
-            List<ObjectSourceIface> sources = new ArrayList<ObjectSourceIface>();
-            sources.add(wadf.getIndividualDao());
+            wadf = new WebappDaoFactoryFiltering(wadf, vf);            
             
-            IndexBuilder builder = new IndexBuilder(context, solrIndexer, sources);
+            IndexBuilder builder = new IndexBuilder(context, solrIndexer, wadf);
             // to the servlet context so we can access it later in the webapp.
             context.setAttribute(IndexBuilder.class.getName(), builder);
             
@@ -109,8 +110,8 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             SearchReindexingListener srl = new SearchReindexingListener(builder);
             ModelContext.registerListenerForChanges(ctx, srl);
                                     
-            if( sce.getServletContext().getAttribute(LuceneSetup.INDEX_REBUILD_REQUESTED_AT_STARTUP) instanceof Boolean &&
-                (Boolean)sce.getServletContext().getAttribute(LuceneSetup.INDEX_REBUILD_REQUESTED_AT_STARTUP) ){
+            if( sce.getServletContext().getAttribute(IndexConstants.INDEX_REBUILD_REQUESTED_AT_STARTUP) instanceof Boolean &&
+                (Boolean)sce.getServletContext().getAttribute(IndexConstants.INDEX_REBUILD_REQUESTED_AT_STARTUP) ){
                 log.info("Rebuild of solr index required before startup.");
                 builder.doIndexRebuild();                                               
                 int n = 0;
@@ -132,6 +133,9 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
     
     @Override
     public void contextDestroyed(ServletContextEvent sce) {       
+        IndexBuilder builder = (IndexBuilder)sce.getServletContext().getAttribute(IndexBuilder.class.getName());
+        if( builder != null )
+            builder.stopIndexingThread();
         
     }
     

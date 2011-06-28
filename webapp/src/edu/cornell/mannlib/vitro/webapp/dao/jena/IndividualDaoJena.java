@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
@@ -839,138 +840,14 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         return null;
     }
 
-    public Iterator<Individual> getAllOfThisTypeIterator() {
-        final List<com.hp.hpl.jena.ontology.Individual> list = 
-            new LinkedList<com.hp.hpl.jena.ontology.Individual>();
-        getOntModel().enterCriticalSection(Lock.READ);
-        try {
-            ClosableIterator<com.hp.hpl.jena.ontology.Individual> allIndIt = getOntModel().listIndividuals();
-            try {
-                while (allIndIt.hasNext()) {
-                    com.hp.hpl.jena.ontology.Individual ind = allIndIt.next();
-                    
-                    boolean userVisible = true;
-                    //Check for non-user visible types, maybe this should be an annotation?
-                    ClosableIterator<Resource> typeIt = ind.listRDFTypes(false);
-                    try {
-                        while (typeIt.hasNext()) {
-                            Resource typeRes = typeIt.next();
-                            String type = typeRes.getURI();
-                            // brute forcing this until we implement a better strategy
-                            if (VitroVocabulary.PORTAL.equals(type) || 
-                            	VitroVocabulary.LINK.equals(type) ||
-                            	VitroVocabulary.KEYWORD.equals(type) ||
-                            	VitroVocabulary.KEYWORD_INDIVIDUALRELATION.equals(type) ||
-                            	VitroVocabulary.CLASSGROUP.equals(type) ||
-                            	VitroVocabulary.PROPERTYGROUP.equals(type) ||
-                            	VitroVocabulary.APPLICATION.equals(type)) {    	
-                                userVisible = false;
-                                break;
-                            }
-                            if( OWL.ObjectProperty.getURI().equals(type) ||
-                            	OWL.DatatypeProperty.getURI().equals(type) ||
-                            	OWL.AnnotationProperty.getURI().equals(type) ||
-                            	RDF.type.getURI().equals(type) ){
-                            	userVisible = false;
-                            	break;
-                        	} 
-                        }
-                    } finally {
-                        typeIt.close();
-                    }
-                    if (userVisible) {
-                        list.add(ind);
-                    }
-                    
-                }
-            } finally {
-                allIndIt.close();
-            }
-        } finally {
-            getOntModel().leaveCriticalSection();
-        }
-        if (list.size() >0){
-            return new Iterator<Individual>(){
-                Iterator<com.hp.hpl.jena.ontology.Individual> innerIt = list.iterator();
-                public boolean hasNext() { 
-                    return innerIt.hasNext();                    
-                }
-                public Individual next() {
-                    return new IndividualJena(innerIt.next(), (WebappDaoFactoryJena) getWebappDaoFactory());
-                }
-                public void remove() {
-                    //not used
-                }            
-            };
-        }
-        else
-            return null;
+    public Iterator<String> getAllOfThisTypeIterator() {
+        //this is implemented in IndivdiualSDB
+        throw new NotImplementedException();
     }  
 
-    public Iterator<Individual> getAllOfThisVClassIterator(String vClassURI) {
-        getOntModel().enterCriticalSection(Lock.READ);
-        try {
-            List<Individual> ents = new LinkedList<Individual>();
-            OntClass cls = getOntModel().getOntClass(vClassURI);
-            Iterator<? extends OntResource> indIt = cls.listInstances();
-            while (indIt.hasNext()) {
-            	OntResource ind = indIt.next();
-                ents.add(new IndividualJena(ind, (WebappDaoFactoryJena) getWebappDaoFactory()));
-            }
-            return ents.iterator();
-        } finally {
-            getOntModel().leaveCriticalSection();
-        }
-    }
-
-    public Iterator<Individual> getUpdatedSinceIterator(long updatedSince){
-        List<Individual> ents = new ArrayList<Individual>();
-        Date since = new DateTime(updatedSince).toDate();
-        String sinceStr = xsdDateTimeFormat.format(since);
-        getOntModel().enterCriticalSection(Lock.READ);
-        try {
-            Property modTimeProp = MODTIME;
-            if (modTimeProp == null)
-                modTimeProp = getOntModel().getProperty(VitroVocabulary.MODTIME);
-            if (modTimeProp == null)
-                return null; // throw an exception?
-            String queryStr = "PREFIX vitro: <"+ VitroVocabulary.vitroURI+"> " +
-                              "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>" +
-                              "SELECT ?ent " +
-                              "WHERE { " +
-                              "     ?ent vitro:modTime ?modTime ." +
-                              "     FILTER (xsd:dateTime(?modTime) >= \""+sinceStr+"\"^^xsd:dateTime) " +
-                              "}";
-            Query query = QueryFactory.create(queryStr);
-            QueryExecution qe = QueryExecutionFactory.create(query,getOntModel());
-            ResultSet results = qe.execSelect();
-            while (results.hasNext()) {
-                QuerySolution qs = (QuerySolution) results.next();
-                Resource res = (Resource) qs.get("?ent");
-                com.hp.hpl.jena.ontology.Individual ent = getOntModel().getIndividual(res.getURI());
-                if (ent != null) {
-                    boolean userVisible = false;
-                    ClosableIterator<Resource> typeIt = ent.listRDFTypes(true);
-                    try {
-                        while (typeIt.hasNext()) {
-                            Resource typeRes = typeIt.next();
-                            if (typeRes.getNameSpace() == null || (!NONUSER_NAMESPACES.contains(typeRes.getNameSpace()))) {
-                                userVisible = true;
-                                break;
-                            }
-                        }
-                    } finally {
-                        typeIt.close();
-                    }
-                    if (userVisible) {
-                        ents.add(new IndividualJena(ent, (WebappDaoFactoryJena) getWebappDaoFactory()));
-                    }
-                }
-            }
-        } finally {
-            getOntModel().leaveCriticalSection();
-        }
-        return ents.iterator();
+    public Iterator<String> getUpdatedSinceIterator(long updatedSince){
+        //this is implemented in IndivdiualSDB
+        throw new NotImplementedException();
     }
 
     public boolean isIndividualOfClass(String vclassURI, String indURI) {

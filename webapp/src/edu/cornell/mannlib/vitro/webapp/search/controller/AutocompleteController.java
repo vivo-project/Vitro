@@ -39,7 +39,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 
 /**
  * AutocompleteController generates autocomplete content
@@ -145,11 +144,11 @@ public class AutocompleteController extends VitroAjaxController {
     }
 
     private Analyzer getAnalyzer(ServletContext servletContext) throws SearchException {
-        Object obj = servletContext.getAttribute(LuceneSetup.ANALYZER);
-        if( obj == null || !(obj instanceof Analyzer) )
+//        //Object obj = servletContext.getAttribute(LuceneSetup.ANALYZER);
+//        if( obj == null || !(obj instanceof Analyzer) )
             throw new SearchException("Could not get analyzer");
-        else
-            return (Analyzer)obj;        
+//        else
+//            return (Analyzer)obj;        
     }
 
     private Query getQuery(VitroRequest vreq, Analyzer analyzer, 

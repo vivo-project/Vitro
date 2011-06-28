@@ -46,7 +46,7 @@ public interface IndexerIface {
      * @param obj
      * @throws IndexingException
      */
-    public void removeFromIndex(Individual ind) throws IndexingException;
+    public void removeFromIndex(String uri) throws IndexingException;
 
     public void prepareForRebuild() throws IndexingException;
     

@@ -7,24 +7,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
-import java.util.Queue;
 
 import javax.servlet.ServletContext;
-import org.apache.solr.client.solrj.SolrServer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
-import edu.cornell.mannlib.vitro.webapp.search.solr.CalculateParameters;
 
 
 /**
@@ -41,32 +32,35 @@ import edu.cornell.mannlib.vitro.webapp.search.solr.CalculateParameters;
  *
  */
 public class IndexBuilder extends Thread {
-    private List<ObjectSourceIface> sourceList = new LinkedList<ObjectSourceIface>();
-	private IndexerIface indexer = null;
-    private ServletContext context = null;       
+    private WebappDaoFactory wdf;    
+	private final IndexerIface indexer;
+    private final ServletContext context;       
     
     /* changedUris should only be accessed from synchronized blocks */
     private HashSet<String> changedUris = null;
     
-    private List<Individual> updatedInds = null;
-    private List<Individual> deletedInds = null;    
+    private List<String> updatedInds = null;
+    private List<String> deletedInds = null;    
     
     private boolean reindexRequested = false;    
     protected boolean stopRequested = false;
     protected long reindexInterval = 1000 * 60 /* msec */ ;        
     
+    protected int numberOfThreads = 10;
+    
     public static final boolean UPDATE_DOCS = false;
     public static final boolean NEW_DOCS = true;
-     
+      
     private static final Log log = LogFactory.getLog(IndexBuilder.class);
 
-    public IndexBuilder(ServletContext context,
+    public IndexBuilder(
+                ServletContext context,
                 IndexerIface indexer,
-                List<ObjectSourceIface> sources){
+                WebappDaoFactory wdf){
         super("IndexBuilder");
         this.indexer = indexer;
-        this.sourceList = sources;
-        this.context = context;    
+        this.wdf = wdf;
+        this.context = context;            
         
         this.changedUris = new HashSet<String>();    
         this.start();
@@ -74,20 +68,15 @@ public class IndexBuilder extends Thread {
     
     protected IndexBuilder(){
         //for testing only
-        this( null, null, Collections.<ObjectSourceIface>emptyList());        
+        this( null, null, null);        
     }
     
-    public void addObjectSource(ObjectSourceIface osi) {    	
-        if (osi != null)
-            sourceList.add(osi);
+    public void setWdf(WebappDaoFactory wdf){    	
+        this.wdf = wdf;
     }
 
     public boolean isIndexing(){
         return indexer.isIndexing();
-    }
-
-    public List<ObjectSourceIface> getObjectSourceList() {
-        return sourceList;
     }
 
     public synchronized void doIndexRebuild() {
@@ -106,10 +95,16 @@ public class IndexBuilder extends Thread {
         this.notifyAll();    	    	   
     }
    
+    /**
+     * Use this method to add URIs that need to be indexed. 
+     */
     public synchronized void addToChangedUris(String uri){
     	changedUris.add(uri);
     }
     
+    /**
+     * Use this method to add URIs that need to be indexed. 
+     */
     public synchronized void addToChangedUris(Collection<String> uris){
     	changedUris.addAll(uris);    	
     }
@@ -124,7 +119,8 @@ public class IndexBuilder extends Thread {
 	
 	public synchronized void stopIndexingThread() {
 	    stopRequested = true;
-	    this.notifyAll();		
+	    this.notifyAll();		    
+	    this.interrupt();
 	}
 	
     @Override
@@ -145,10 +141,14 @@ public class IndexBuilder extends Thread {
             } catch (InterruptedException e) {
                 log.debug("woken up",e);
             }catch(Throwable e){
-                log.error(e,e);
+                if( log != null )//may be null on shutdown
+                    log.error(e,e);
             }
         }
-        log.info("Stopping IndexBuilder thread");
+        
+        
+        if(log != null )//may be null on shutdown 
+            log.info("Stopping IndexBuilder thread");
     }
 
   
@@ -164,65 +164,48 @@ public class IndexBuilder extends Thread {
 	 */
 	private void makeAddAndDeleteLists( Collection<String> uris){	    
 		/* clear updateInds and deletedUris.  This is the only method that should set these. */
-		this.updatedInds = new ArrayList<Individual>();
-		this.deletedInds = new ArrayList<Individual>();
-		
-		WebappDaoFactory wdf = (WebappDaoFactory)context.getAttribute("webappDaoFactory");
+		this.updatedInds = new ArrayList<String>();
+		this.deletedInds = new ArrayList<String>();
+				
     	for( String uri: uris){
     		if( uri != null ){
     			Individual ind = wdf.getIndividualDao().getIndividualByURI(uri);
     			if( ind != null)
-    				this.updatedInds.add(ind);
+    				this.updatedInds.add(uri);
     			else{
     				log.debug("found delete in changed uris");
-    				this.deletedInds.add(ind);
+    				this.deletedInds.add(uri);
     			}
     		}
-    	}
-    	
-	    this.updatedInds = addDepResourceClasses(updatedInds);	            	
+    	}    		    	            	
 	}	
   
+	/**
+	 * This rebuilds the whole index.
+	 */
     protected void indexRebuild() {
         log.info("Rebuild of search index is starting.");
 
-        List<Iterator<Individual>> listOfIterators = new LinkedList<Iterator<Individual>>();
-        for (ObjectSourceIface objectSource: sourceList) {
-            if (objectSource != null) {
-                listOfIterators.add(((objectSource)
-                        .getAllOfThisTypeIterator()));
-            }
-        }
-
         // clear out changed uris since we are doing a full index rebuild
         getAndEmptyChangedUris();
-
-        if (listOfIterators.size() == 0) 
-            log.warn("Warning: no ObjectSources found.");        
-
-        doBuild(listOfIterators, Collections.<Individual>emptyList() );
+       
+        log.debug("Getting all URIs in the model");
+        Iterator<String> uris = wdf.getIndividualDao().getAllOfThisTypeIterator();
+        
+        doBuild(uris, Collections.<String>emptyList() );
+        
         if( log != null )  //log might be null if system is shutting down.
             log.info("Rebuild of search index is complete.");
     }
       
     protected void updatedIndex() {
         log.debug("Starting updateIndex()");
-        long since = indexer.getModified() - 60000;
-                        
-        List<Iterator<Individual>> listOfIterators = 
-            new LinkedList<Iterator<Individual>>();
-        
-        for (ObjectSourceIface objectSource: sourceList) {
-        	if (objectSource != null) {
-                listOfIterators.add(((objectSource)
-                        .getUpdatedSinceIterator(since)));
-        	}
-        }
+        //long since = indexer.getModified() - 60000;                               
+        //List updatedUris = wdf.getIndividualDao().getUpdatedSinceIterator(since);        
                      
-        makeAddAndDeleteLists( getAndEmptyChangedUris());                   
-        listOfIterators.add( (new IndexBuilder.BuilderObjectSource(updatedInds)).getUpdatedSinceIterator(0) );
+        makeAddAndDeleteLists( getAndEmptyChangedUris() );                           
         
-        doBuild( listOfIterators, deletedInds );
+        doBuild( updatedInds.iterator(), deletedInds );
         log.debug("Ending updateIndex()");
     }
     
@@ -240,7 +223,7 @@ public class IndexBuilder extends Thread {
      * to false, and a check is made before adding, it will work fine; but
      * checking if an object is on the index is slow.
      */
-    private void doBuild(List<Iterator<Individual>> sourceIterators, Collection<Individual> deletes ){
+    private void doBuild(Iterator<String> updates, Collection<String> deletes ){
         boolean aborted = false;
         boolean newDocs = reindexRequested;
         boolean forceNewIndex = reindexRequested;
@@ -253,19 +236,12 @@ public class IndexBuilder extends Thread {
             reindexRequested = false;
             
             if( ! forceNewIndex ){                
-                for(Individual deleteMe : deletes ){
+                for(String deleteMe : deletes ){
                     indexer.removeFromIndex(deleteMe);
                 }
             }            
 
-            //get an iterator for all of the sources of indexable objects
-            for (Iterator<Individual> sourceIterator: sourceIterators) {
-            	if (sourceIterator == null) {
-                	log.warn("skipping null iterator");
-            	} else {
-                    indexForSource(sourceIterator, newDocs);
-            	}
-            }
+            indexUriList(updates, newDocs);
         } catch (AbortIndexing abort){
             if( log != null)
                 log.debug("aborting the indexing because thread stop was requested");
@@ -286,140 +262,100 @@ public class IndexBuilder extends Thread {
      * Use the back end indexer to index each object that the Iterator returns.
      * @throws AbortIndexing 
      */
-    private void indexForSource(Iterator<Individual> individuals , boolean newDocs) throws AbortIndexing{     
-             
-        int count = 0;
-        int numOfThreads = 10;
-       
-      
-        List<IndexWorkerThread> workers = new ArrayList<IndexWorkerThread>();
-        boolean distributing = true;
-        
+    private void indexUriList(Iterator<String> updateUris , boolean newDocs) throws AbortIndexing{
+        //make a copy of numberOfThreads so the local copy is safe during this method.
+        int numberOfThreads = this.numberOfThreads;
         IndexWorkerThread.setStartTime(System.currentTimeMillis());
-       
-        for(int i = 0; i< numOfThreads ;i++){
-        	workers.add(new IndexWorkerThread(indexer,i,distributing)); // made a pool of workers
-        }
+                                                                                                                              
+        //make lists of work URIs for workers
+        List<List<String>> workLists = makeWorkerUriLists(updateUris, numberOfThreads);                                     
+
+        //setup workers with work
+        List<IndexWorkerThread> workers = new ArrayList<IndexWorkerThread>();
+        for(int i = 0; i< numberOfThreads ;i++){
+            Iterator<Individual> workToDo = new UriToIndividualIterator(workLists.get(i), wdf);
+            workers.add( new IndexWorkerThread(indexer, i, workToDo) ); 
+        }        
+
+        log.debug("Starting the building and indexing of documents in worker threads");
+        // starting worker threads        
+        for(int i =0; i < numberOfThreads; i++){
+            workers.get(i).start();
+        }          
         
-        log.info("Indexing worker pool ready for indexing.");
-       
-        // starting worker threads
-        
-        for(int i =0; i < numOfThreads; i++){
-        	workers.get(i).start();
-        }
-        
-        
-        while(individuals.hasNext()){
-            if( stopRequested )
-                throw new AbortIndexing();
-            
-            Individual ind = null;
-            try{
-                ind = individuals.next();     
-                          
-                workers.get(count%numOfThreads).addToQueue(ind); // adding individual to worker queue.
-                
-            }catch(Throwable ex){
-                if( stopRequested || log == null){//log might be null if system is shutting down.
-                    throw new AbortIndexing();
-                }
-                String uri = ind!=null?ind.getURI():"null";
-                log.warn("Error indexing individual " + uri + " " + ex.getMessage());
-            }
-            count++;          
-        }
-        
-        for(int i =0 ; i < numOfThreads; i ++){
-        	workers.get(i).setDistributing(false);
-        }
-        for(int i =0; i < numOfThreads; i++){
+        //waiting for all the work to finish
+        for(int i =0; i < numberOfThreads; i++){
         	try{
         		workers.get(i).join();
         	}catch(InterruptedException e){
-        		log.error(e,e);
+        	    //this thread will get interrupted if the system is trying to shut down.        	    
+        	    if( log != null )
+        	        log.debug(e,e);
+        	    for( IndexWorkerThread thread: workers){
+        	        thread.requestStop();
+        	    }
+        	    return;
         	}
         }
         
-        IndexWorkerThread.resetCount();
-        
+        IndexWorkerThread.resetCount();        
     }        
 
     
-    
-    /**
-     * For a list of individuals, this builds a list of dependent resources and returns it.  
-     */
-    private List<Individual> addDepResourceClasses(List<Individual> inds) {
-        WebappDaoFactory wdf = (WebappDaoFactory)context.getAttribute("webappDaoFactory");
-        VClassDao vClassDao = wdf.getVClassDao();
-        Iterator<Individual> it = inds.iterator();
-        VClass depResVClass = new VClass(VitroVocabulary.DEPENDENT_RESORUCE); 
-        while(it.hasNext()){
-            Individual ind = it.next();
-            List<VClass> classes = ind.getVClasses();
-            boolean isDepResource = false;
-            for( VClass clazz : classes){
-                if( !isDepResource && VitroVocabulary.DEPENDENT_RESORUCE.equals(  clazz.getURI() ) ){                   
-                    isDepResource = true;
-                    break;
-                }
-            }
-            if( ! isDepResource ){ 
-                for( VClass clazz : classes){                   
-                    List<String> superClassUris = vClassDao.getAllSuperClassURIs(clazz.getURI());
-                    for( String uri : superClassUris){
-                        if( VitroVocabulary.DEPENDENT_RESORUCE.equals( uri ) ){                         
-                            isDepResource = true;
-                            break;
-                        }
-                    }
-                    if( isDepResource )
-                        break;                  
-                }
-            }
-            if( isDepResource){
-                classes.add(depResVClass);
-                ind.setVClasses(classes, true);
-            }
-        }
-        return inds;
-    }    
+   
     
     /* maybe ObjectSourceIface should be replaced with just an iterator. */
-    private class BuilderObjectSource implements ObjectSourceIface {
-        private final List<Individual> individuals; 
-        public BuilderObjectSource( List<Individual>  individuals){
-            this.individuals=individuals;
-        }        
+    protected class UriToIndividualIterator implements Iterator<Individual>{        
+        private final Iterator<String> uris;
+        private final WebappDaoFactory wdf;
+        
+        public UriToIndividualIterator( Iterator<String>  uris, WebappDaoFactory wdf){
+            this.uris= uris;
+            this.wdf = wdf;
+        }
+        
+        public UriToIndividualIterator( List<String>  uris, WebappDaoFactory wdf){
+            this.uris= uris.iterator();
+            this.wdf = wdf;
+        }                        
+
         @Override
-		public Iterator<Individual> getAllOfThisTypeIterator() {
-            return new Iterator<Individual>(){
-                final Iterator<Individual> it = individuals.iterator();
-                
-                @Override
-				public boolean hasNext() {
-                    return it.hasNext();
-                }
-                
-                @Override
-				public Individual next() {
-                    return it.next();
-                }
-                
-                @Override
-				public void remove() { /* not implemented */}               
-            };
-        }        
+        public boolean hasNext() {
+            return uris.hasNext();
+        }
+
+        /** may return null */
         @Override
-		public Iterator<Individual> getUpdatedSinceIterator(long msSinceEpoc) {
-            return getAllOfThisTypeIterator();
+        public Individual next() {
+            String uri = uris.next();
+            return wdf.getIndividualDao().getIndividualByURI(uri);  
+        }
+
+        @Override
+        public void remove() {
+            throw new IllegalAccessError("");            
         }
     }
+    
+    private static List<List<String>> makeWorkerUriLists(Iterator<String> uris,int workers){
+        List<List<String>> work = new ArrayList<List<String>>(workers);
+        for(int i =0; i< workers; i++){
+            work.add( new ArrayList<String>() );
+        }
+        
+        int counter = 0;
+        while(uris.hasNext()){
+            work.get( counter % workers ).add( uris.next() );
+            counter ++;
+        }
+        return work;        
+    }
+    
     
     private class AbortIndexing extends Exception {
     	// Just a vanilla exception
     }  
+
     
 }
 

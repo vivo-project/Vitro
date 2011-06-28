@@ -423,7 +423,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     }
     
     @Override
-    public Iterator<Individual> getAllOfThisTypeIterator() {
+    public Iterator<String> getAllOfThisTypeIterator() {
         final List<String> list = 
             new LinkedList<String>();
         
@@ -455,7 +455,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         	w.close();
         }
 
-        return getIndividualIterator(list);
+        return list.iterator();
 
     }  
 
@@ -485,30 +485,10 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         }
         else
             return null;
-    }
-    
-    @Override
-    public Iterator<Individual> getAllOfThisVClassIterator(String vClassURI) {
-        getOntModel().enterCriticalSection(Lock.READ);
-        try {
-            List<String> individualURIs = new ArrayList<String>();
-            OntClass cls = getOntModel().getOntClass(vClassURI);
-            Iterator indIt = cls.listInstances();
-            while (indIt.hasNext()) {
-                com.hp.hpl.jena.ontology.Individual ind = 
-                		(com.hp.hpl.jena.ontology.Individual) indIt.next();
-                if (ind.getURI() != null) {
-                    individualURIs.add(ind.getURI());
-                }
-            }
-            return getIndividualIterator(individualURIs);
-        } finally {
-            getOntModel().leaveCriticalSection();
-        }
-    }
+    }       
 
     @Override
-    public Iterator<Individual> getUpdatedSinceIterator(long updatedSince){
+    public Iterator<String> getUpdatedSinceIterator(long updatedSince){
         List<String> individualURIs = new ArrayList<String>();
         Date since = new DateTime(updatedSince).toDate();
         String sinceStr = xsdDateTimeFormat.format(since);
@@ -540,7 +520,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         } finally {
             getOntModel().leaveCriticalSection();
         }
-        return getIndividualIterator(individualURIs);
+        return individualURIs.iterator();
     }
     
 }

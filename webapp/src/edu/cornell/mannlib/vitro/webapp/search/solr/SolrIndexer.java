@@ -3,28 +3,23 @@
 package edu.cornell.mannlib.vitro.webapp.search.solr;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.response.*;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.apache.solr.client.solrj.impl.StreamingUpdateSolrServer;
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.SolrInputDocument;
+
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexerIface;
-import edu.cornell.mannlib.vitro.webapp.search.solr.CalculateParameters;
 
 public class SolrIndexer implements IndexerIface {
     private final static Log log = LogFactory.getLog(SolrIndexer.class);
@@ -41,6 +36,43 @@ public class SolrIndexer implements IndexerIface {
     
     @Override
     public void index(Individual ind) throws IndexingException {
+        if( ! indexing )
+            throw new IndexingException("SolrIndexer: must call " +
+                    "startIndexing() before index().");        
+        
+        if( ind == null )
+            log.debug("Individual to index was null, ignoring.");
+        
+        try{
+            if( urisIndexed.contains(ind.getURI()) ){
+                log.debug("already indexed " + ind.getURI() );
+                return;
+            }else{
+            	SolrInputDocument solrDoc = null;
+            	synchronized(this){
+            		urisIndexed.add(ind.getURI());
+            	}
+                log.debug("indexing " + ind.getURI());      
+                solrDoc = individualToSolrDoc.translate(ind);
+
+                if( solrDoc != null){
+                    //sending each doc individually is inefficient
+                   // Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
+                   // docs.add( solrDoc );
+                    UpdateResponse res = server.add( solrDoc );
+                    log.debug("response after adding docs to server: "+ res);                
+                }else{
+                    log.debug("removing from index " + ind.getURI());
+                    //TODO: how do we delete document?                    
+                    //writer.deleteDocuments((Term)obj2doc.getIndexId(ind));
+                }                            
+            }
+        } catch (IOException ex) {
+            throw new IndexingException(ex.getMessage());
+        } catch (SolrServerException ex) {
+            throw new IndexingException(ex.getMessage());
+        }        
+        
     	if( ! indexing )
     		throw new IndexingException("SolrIndexer: must call " +
     		"startIndexing() before index().");        
@@ -73,7 +105,7 @@ public class SolrIndexer implements IndexerIface {
     	} catch (IOException ex) {
     		throw new IndexingException(ex.getMessage());
     	} catch (SolrServerException ex) {
-    		throw new IndexingException(ex.getMessage());
+    		throw new IndexingException(ex.getMessage());    		
     	}        
     }
 
@@ -84,14 +116,21 @@ public class SolrIndexer implements IndexerIface {
 
     @Override
     public void prepareForRebuild() throws IndexingException {
-        // TODO Auto-generated method stub
-        
+        // TODO Auto-generated method stub        
     }
 
     @Override
-    public void removeFromIndex(Individual ind) throws IndexingException {
-        // TODO Auto-generated method stub
-        
+    public void removeFromIndex(String uri) throws IndexingException {
+        if( uri != null ){            
+            try {                        
+                server.deleteByQuery( individualToSolrDoc.getQueryForId(uri));
+                log.debug("deleted " + " " + uri);                                       
+            } catch (SolrServerException e) {
+                log.error( "could not delete individual " + uri, e);
+            } catch (IOException e) {
+                log.error( "could not delete individual " + uri, e);
+            }
+        }        
     }
 
     @Override

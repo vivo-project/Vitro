@@ -32,7 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.UpdateSettings;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
+import edu.cornell.mannlib.vitro.webapp.search.IndexConstants;
 
 /**
  * Invokes process to test whether the knowledge base needs any updating
@@ -116,7 +116,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			  
 			  try {
 				  if (ontologyUpdater.updateRequired()) {
-					  ctx.setAttribute(LuceneSetup.INDEX_REBUILD_REQUESTED_AT_STARTUP, Boolean.TRUE);
+					  ctx.setAttribute(IndexConstants.INDEX_REBUILD_REQUESTED_AT_STARTUP, Boolean.TRUE);
 					  //doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
 					  reloadDisplayModel(ctx);
 				  }

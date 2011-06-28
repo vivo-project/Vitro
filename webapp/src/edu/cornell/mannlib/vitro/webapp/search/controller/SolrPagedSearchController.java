@@ -44,12 +44,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.search.IndexConstants;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroHighlighter;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryFactory;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.LinkTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividualTemplateModel;
@@ -603,14 +603,14 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
     @SuppressWarnings({ "unchecked", "unused" })
     private HashSet<String> getDataPropertyBlacklist(){
         HashSet<String>dpBlacklist = (HashSet<String>)
-        getServletContext().getAttribute(LuceneSetup.SEARCH_DATAPROPERTY_BLACKLIST);
+        getServletContext().getAttribute(IndexConstants.SEARCH_DATAPROPERTY_BLACKLIST);
         return dpBlacklist;        
     }
     
     @SuppressWarnings({ "unchecked", "unused" })
     private HashSet<String> getObjectPropertyBlacklist(){
         HashSet<String>opBlacklist = (HashSet<String>)
-        getServletContext().getAttribute(LuceneSetup.SEARCH_OBJECTPROPERTY_BLACKLIST);
+        getServletContext().getAttribute(IndexConstants.SEARCH_OBJECTPROPERTY_BLACKLIST);
         return opBlacklist;        
     }
     
