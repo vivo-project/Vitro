@@ -6,4 +6,4 @@
      is also used to generate the property statement during a deletion.  
  -->
 
-<a href="${profileUrl(statement.object)}">${statement.name!}</a> ${statement.moniker!} 
+<a href="${profileUrl(statement.object)}">${statement.label!statement.localName!}</a> 

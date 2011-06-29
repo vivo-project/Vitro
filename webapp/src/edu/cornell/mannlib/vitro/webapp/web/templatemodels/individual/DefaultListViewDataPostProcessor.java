@@ -16,7 +16,6 @@ public class DefaultListViewDataPostProcessor extends
     private static final Log log = LogFactory.getLog(DefaultListViewDataPostProcessor.class); 
     
     private static final String KEY_NAME = "name";
-    // private static final String KEY_MONIKER = "moniker";
     private static final String KEY_OBJECT = "object";
     
     public DefaultListViewDataPostProcessor(ObjectPropertyTemplateModel optm, WebappDaoFactory wdf) {
@@ -27,7 +26,6 @@ public class DefaultListViewDataPostProcessor extends
     /* Apply processing specific to this postprocessor */
     protected void process(Map<String, String> map) {
         addName(map, KEY_NAME, KEY_OBJECT);
-        // addMoniker(map, KEY_MONIKER, KEY_OBJECT);
     }
  
 }

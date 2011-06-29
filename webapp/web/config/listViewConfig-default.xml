@@ -12,15 +12,15 @@
         PREFIX afn:  &lt;http://jena.hpl.hp.com/ARQ/function#&gt;
           
         SELECT <collated> ?subclass </collated>
-               ?object ?name ?moniker WHERE {
+               ?object ?label ?localName WHERE {
                
             ?subject ?property ?object
+            LET (?localName := afn:localname(?object)) 
             <collated> OPTIONAL { ?object a ?subclass } 
             FILTER ( afn:namespace(?subclass) != "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" )   
             </collated>
-            OPTIONAL { ?object rdfs:label ?name }
-            OPTIONAL { ?object vitro:moniker ?moniker }      
-        } ORDER BY <collated> ?subclass </collated> ?name ?object  
+        OPTIONAL { ?object rdfs:label ?label } 
+        } ORDER BY <collated> ?subclass </collated> ?label ?label ?localName  
     </query-select>
 
     <query-construct>
@@ -30,8 +30,7 @@
         CONSTRUCT {
             ?subject ?property ?object .
             ?object a ?subclass .
-            ?object rdfs:label ?name .
-            ?object vitro:moniker ?moniker
+            ?object rdfs:label ?label .
         } WHERE {
             { 
                 ?subject ?property ?object 
@@ -42,16 +41,11 @@
             } 
             UNION {
                 ?subject ?property ?object .
-                ?object rdfs:label ?name .
+                ?object rdfs:label ?label .
             } 
-            UNION {
-                ?subject ?property ?object .
-                ?object vitro:moniker ?moniker .
-            }
+            
         }
     </query-construct>
-     
-    <postprocessor>edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DefaultListViewDataPostProcessor</postprocessor>
     
     <template>propStatement-default.ftl</template>
 </list-view-config>
