@@ -5,10 +5,12 @@
 <p>${datetime}</p>
 
 <#if spamReason??>
-    <div style="color:red;">
+    <section id="error-alert" role="alert">
+        <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon" />
+        
         <p>REJECTED - SPAM</p>
         <p>${spamReason}</p>
-    </div>
+    </section>
 </#if>
 
 ${msgText}

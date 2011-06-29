@@ -8,15 +8,21 @@
     <head>
         <title>${subject}</title>
     </head>
+    
     <body>
         <h3>${subject}</h3>
+        
+        <p><strong>From:</strong> ${name}</p>
+
+        <p><strong>Email address:</strong> ${emailAddress}</p>
+            
         <p>
-            <strong>From:</strong> ${name}<br />
-            <strong>Email address:</strong> ${emailAddress}<br />
             <strong>IP address:</strong> ${ip}<br />
             <#if referrer??>
-                <em>Likely viewing page: ${referrer}</em><br />
+                <em>Likely viewing page: ${referrer}</em>
             </#if>
-            <strong>Comments:</strong> ${comments}
+        </p>  
+        
+        <p><strong>Comments:</strong> ${comments}</p>
     </body>
 </html>
