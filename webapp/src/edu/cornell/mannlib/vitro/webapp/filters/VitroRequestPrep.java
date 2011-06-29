@@ -133,6 +133,11 @@ public class VitroRequestPrep implements Filter {
     	//This will replace the WebappDaoFactory with a different version if menu management parameter is found
     	wdf = checkForSpecialWDF(vreq, wdf);
     	
+    	// request.setAttribute("aboxModel", setspeicalABoxModel)
+    	// request.setAttribute("tboxModel", speicalTboxModel)
+    	// request.setAttribute("infModel", speicalInfModel) (maybe?)
+    	// request.setAttribute("displayModel", displayModel) 
+    	
         VitroFilters filters = null;
 		        
         filters = getFiltersFromContextFilterFactory(req, wdf);

@@ -36,6 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 
 public class CalculateParameters implements DocumentModifier {
 
+    private boolean shutdown = false;
 	private Dataset dataset;
     public static int totalInd=1;
     protected Map<String,Float> betaMap = new Hashtable<String,Float>();
@@ -90,11 +91,11 @@ public class CalculateParameters implements DocumentModifier {
 		QuerySolution soln = null;
 		Resource uriResource = ResourceFactory.createResource(uri);
 		initialBinding.add("uri", uriResource);
-		dataset.getLock().enterCriticalSection(Lock.READ);
-
+		dataset.getLock().enterCriticalSection(Lock.READ);		
+		QueryExecution qexec=null;
 		try{
 			query = QueryFactory.create(betaQuery,Syntax.syntaxARQ);
-			QueryExecution qexec = QueryExecutionFactory.create(query,dataset,initialBinding);
+			qexec = QueryExecutionFactory.create(query,dataset,initialBinding);
 			ResultSet results = qexec.execSelect();
 			List<String> resultVars = results.getResultVars();
 			if(resultVars!=null && resultVars.size()!=0){
@@ -102,8 +103,11 @@ public class CalculateParameters implements DocumentModifier {
 				Conn = Integer.parseInt(soln.getLiteral(resultVars.get(0)).getLexicalForm());
 			}
 		}catch(Throwable t){
-			log.error(t,t);
+		    if( ! shutdown )
+		        log.error(t,t);
 		}finally{
+		    if( qexec != null ) 
+		        qexec.close();		    
 			dataset.getLock().leaveCriticalSection();
 		}
 
@@ -238,7 +242,8 @@ public class CalculateParameters implements DocumentModifier {
     						}	
     					}
     			}catch(Exception e){
-    				log.error("Error found in getAdjacentNodes method of SearchQueryHandler");
+    			    if( ! shutdown )
+    			        log.error("Error found in getAdjacentNodes method of SearchQueryHandler");
     			}finally{
     				qexec.close();
     			}	
@@ -260,7 +265,8 @@ public class CalculateParameters implements DocumentModifier {
     		
     	}
     	catch(Throwable t){
-    		log.error(t,t);
+    	    if( ! shutdown )
+    	        log.error(t,t);
     	}finally{
     		dataset.getLock().leaveCriticalSection();
     		adjacentNodes = null;
@@ -285,18 +291,21 @@ public class CalculateParameters implements DocumentModifier {
         
         for(String term: fieldsToAddBetaTo){
             SolrInputField f = doc.getField( term );
-            f.setBoost( getBeta(uri) + phi + IndividualToSolrDocument.NAME_BOOST);
+            float orgBoost = f.getBoost();
+            f.setBoost( getBeta(uri) + phi + orgBoost );
         }
         
         for(String term: fieldsToMultiplyBetaBy){
             SolrInputField f = doc.getField( term );
-            f.addValue(info.toString(),getBeta(uri)*phi*IndividualToSolrDocument.ALL_TEXT_BOOST);
+            //f.addValue(info.toString(),getBeta(uri)*phi*IndividualToSolrDocument.ALL_TEXT_BOOST);
         }
         
-        SolrInputField f = doc.getField(VitroSearchTermNames.targetInfo);
-        f.addValue(adjInfo[1],f.getBoost());
-        doc.setDocumentBoost(getBeta(uri)*phi*IndividualToSolrDocument.ALL_TEXT_BOOST);   
-        
+
+        //SolrInputField f = doc.getField(VitroSearchTermNames.targetInfo);
+        //f.addValue(adjInfo[1],f.getBoost());
+
+        doc.setDocumentBoost(getBeta(uri)*phi*IndividualToSolrDocument.ALL_TEXT_BOOST);           
+
         log.debug("Parameter calculation is done");
 	}
 	
@@ -304,6 +313,9 @@ public class CalculateParameters implements DocumentModifier {
 		betaMap.clear();
 	}
 	
+	public void shutdown(){
+        shutdown=true;
+    }
 }
 
 class TotalInd implements Runnable{
@@ -321,10 +333,11 @@ class TotalInd implements Runnable{
 	        Query query;
 	    	QuerySolution soln = null;
 			dataset.getLock().enterCriticalSection(Lock.READ);
+			QueryExecution qexec = null;
 			
 			try{
 				query = QueryFactory.create(totalCountQuery,Syntax.syntaxARQ);
-				QueryExecution qexec = QueryExecutionFactory.create(query,dataset);
+				qexec = QueryExecutionFactory.create(query,dataset);
 				ResultSet results = qexec.execSelect();
 				List<String> resultVars = results.getResultVars();
 				
@@ -337,8 +350,12 @@ class TotalInd implements Runnable{
 			}catch(Throwable t){
 				log.error(t,t);
 			}finally{
+			    if( qexec != null ) 
+			        qexec.close();
 				dataset.getLock().leaveCriticalSection();
 			}
 		
 	}
+	
+	
 }

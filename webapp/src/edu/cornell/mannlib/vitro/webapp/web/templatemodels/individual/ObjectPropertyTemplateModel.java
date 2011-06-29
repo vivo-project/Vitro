@@ -563,7 +563,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         return TYPE;
     }
 
-    public String getTemplate() {
+    public String Template() {
         return config.templateName;
     }
     

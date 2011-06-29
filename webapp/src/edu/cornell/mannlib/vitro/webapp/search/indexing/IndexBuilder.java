@@ -146,6 +146,7 @@ public class IndexBuilder extends Thread {
             }
         }
         
+        indexer.abortIndexingAndCleanUp();
         
         if(log != null )//may be null on shutdown 
             log.info("Stopping IndexBuilder thread");

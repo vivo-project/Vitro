@@ -13,6 +13,7 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -74,9 +75,12 @@ public class ObjectPropertyStatementDaoSDB extends
         	DatasetWrapper w = dwf.getDatasetWrapper();
         	Dataset dataset = w.getDataset();
         	dataset.getLock().enterCriticalSection(Lock.READ);
+        	QueryExecution qexec = null;
         	try {
-        		m = QueryExecutionFactory.create(QueryFactory.create(query), dataset).execConstruct();
+        		qexec = QueryExecutionFactory.create(QueryFactory.create(query), dataset);
+        		m = qexec.execConstruct();
         	} finally {
+        	    if(qexec != null) qexec.close();
         		dataset.getLock().leaveCriticalSection();
         		w.close();
         	}

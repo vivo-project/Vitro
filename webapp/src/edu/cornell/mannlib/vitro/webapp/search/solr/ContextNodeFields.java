@@ -35,6 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 public class ContextNodeFields implements DocumentModifier{
     private Model model;
     
+    private boolean shutdown = false;
     private static ExecutorService threadPool = null;
     private static final int THREAD_POOL_SIZE = 10;	 
     
@@ -134,7 +135,8 @@ public class ContextNodeFields implements DocumentModifier{
                     }
                 }
             }catch(Throwable t){
-                log.error(t,t);
+                if( ! shutdown )
+                    log.error(t,t);
             } finally{
                 qExec.close();
             } 
@@ -436,5 +438,8 @@ public class ContextNodeFields implements DocumentModifier{
             return new Thread( getNewThreadName() );
         }	    
 	}
-    
+
+	public void shutdown(){
+	    shutdown=true;	
+	}
 }

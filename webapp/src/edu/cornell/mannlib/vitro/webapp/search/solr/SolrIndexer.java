@@ -158,32 +158,51 @@ public class SolrIndexer implements IndexerIface {
     
     @Override
     public void abortIndexingAndCleanUp() {
-        endIndexing();        
+        try{
+            server.commit();            
+        }catch(SolrServerException e){
+            if( log != null)
+                log.debug("could not commit to solr server, " +
+                		"this should not be a problem since solr will do autocommit");
+        } catch (IOException e) {
+            if( log != null)
+                log.debug("could not commit to solr server, " +
+                        "this should not be a problem since solr will do autocommit");
+        }
+        try{
+            individualToSolrDoc.shutdown();
+        }catch(Exception e){
+            if( log != null)
+                log.warn(e,e);
+        }
     }
    
+    
     @Override
     public synchronized void endIndexing() {
         try {
-           UpdateResponse res = server.commit();
-           log.debug("Response after committing to server: "+ res );
-        } catch (SolrServerException e) {
-            log.error("Could not commit to solr server", e);
-        } catch(IOException e){
-        	log.error("Could not commit to solr server", e);
-        }finally{
-        	if(!individualToSolrDoc.documentModifiers.isEmpty()){
-        		if(individualToSolrDoc.documentModifiers.get(0) instanceof CalculateParameters){
-        			CalculateParameters c = (CalculateParameters) individualToSolrDoc.documentModifiers.get(0);
-        			c.clearMap();
-        			log.info("BetaMap cleared");
-        		}
-        	}
-        }
+            UpdateResponse res = server.commit();
+            log.debug("Response after committing to server: "+ res );
+         } catch (SolrServerException e) {
+             log.error("Could not commit to solr server", e);
+         } catch(IOException e){
+             log.error("Could not commit to solr server", e);
+         }finally{
+             if(!individualToSolrDoc.documentModifiers.isEmpty()){
+                 if(individualToSolrDoc.documentModifiers.get(0) instanceof CalculateParameters){
+                     CalculateParameters c = (CalculateParameters) individualToSolrDoc.documentModifiers.get(0);
+                     c.clearMap();
+                     log.info("BetaMap cleared");
+                 }
+             }
+         }
+        
         try {
             server.optimize();
         } catch (Exception e) {
             log.error("Could not optimize solr server", e);
         }
+        
         indexing = false;
         notifyAll();
     }
@@ -214,9 +233,5 @@ public class SolrIndexer implements IndexerIface {
         // TODO Auto-generated method stub
         return false;
     }
-
-    
-   
-   
 
 }

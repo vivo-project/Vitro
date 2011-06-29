@@ -315,6 +315,17 @@ public class IndividualToSolrDocument {
         return ent;
     }
     
+    public void shutdown(){
+        for(DocumentModifier dm: documentModifiers){
+            try{
+                dm.shutdown();
+            }catch(Exception e){
+                if( log != null)
+                    log.debug(e,e);
+            }
+        }
+    }
+    
     private void fillContextNodes(){
     	IndividualToSolrDocument.contextNodeClassNames.add("Role");
         IndividualToSolrDocument.contextNodeClassNames.add("AttendeeRole");

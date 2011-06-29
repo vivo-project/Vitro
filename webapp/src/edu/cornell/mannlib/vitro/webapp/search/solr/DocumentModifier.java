@@ -11,5 +11,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
  */
 public interface DocumentModifier {
     public void modifyDocument(Individual individual, SolrInputDocument doc, StringBuffer addUri);
+    
+    //called to inform the DocumentModifier that the system is shutting down
+    public void shutdown();
    
 }
