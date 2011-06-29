@@ -1,3 +1,5 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 <h2>${formTitle}</h2>
 
 <#assign form ="/edit/processRdfForm2.jsp">
