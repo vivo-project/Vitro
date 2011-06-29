@@ -291,6 +291,7 @@ public class SimpleReasoner extends StatementListener {
 	 */
 	public void addedABoxTypeAssertion(Statement stmt, Model inferenceModel) {
 		
+		//System.out.println("sjm: addedABoxTypeAssertion: " + stmtString(stmt));
 		tboxModel.enterCriticalSection(Lock.READ);
 		
 		try {
@@ -327,7 +328,7 @@ public class SimpleReasoner extends StatementListener {
 						}	
 					}
 				} else {
-					log.debug("Didn't find target class (the object of the added rdf:type statement) in the TBox: " + ((Resource)stmt.getObject()).getURI());
+					log.warn("Didn't find target class (the object of the added rdf:type statement) in the TBox: " + ((Resource)stmt.getObject()).getURI());
 				}
 			} else {
 				log.warn("The object of this rdf:type assertion has a null URI: " + stmtString(stmt));
@@ -405,7 +406,7 @@ public class SimpleReasoner extends StatementListener {
 	
 	public void removedABoxTypeAssertion(Statement stmt, Model inferenceModel) {
 		
-		//log.debug("stmt = " + stmt.toString());
+		//System.out.println("sjm: removedABoxTypeAssertion: " + stmtString(stmt));
 		
 		tboxModel.enterCriticalSection(Lock.READ);
 		
@@ -453,7 +454,7 @@ public class SimpleReasoner extends StatementListener {
 						}	
 					}
 				} else {
-					log.debug("Didn't find target class (the object of the removed rdf:type statement) in the TBox: " + ((Resource)stmt.getObject()).getURI());
+					log.warn("Didn't find target class (the object of the removed rdf:type statement) in the TBox: " + ((Resource)stmt.getObject()).getURI());
 				}
 			} else {
 				log.warn("The object of this rdf:type assertion has a null URI: " + stmtString(stmt));
@@ -745,6 +746,7 @@ public class SimpleReasoner extends StatementListener {
 	 */
 	public void setMostSpecificTypes(Resource individual, Model inferenceModel) {
 	
+		//System.out.println("sjm: setMostSpecificTypes called for individual " + individual.getURI());
 		inferenceModel.enterCriticalSection(Lock.WRITE);
 		aboxModel.enterCriticalSection(Lock.READ);
 		tboxModel.enterCriticalSection(Lock.READ);
@@ -777,7 +779,7 @@ public class SimpleReasoner extends StatementListener {
 				}
 				 
 				if (ontClass == null) {
-					log.debug("Didn't find target class (the object of the added rdf:type statement) in the TBox: " + (stmt.getObject().asResource()).getURI());
+					log.warn("(setMostSpecificType) Didn't find target class (the object of the added rdf:type statement) in the TBox: " + (stmt.getObject().asResource()).getURI());
 					continue;
 				}
 					
