@@ -26,7 +26,7 @@ var browseByVClass = {
     },
     
     // Event listeners. Called on page load
-    bindEventListeners: function() {
+    bindEventListeners: function() {        
         // Listeners for vClass switching
         this.vgraphVClassLinks.click(function() {
             uri = $(this).attr('data-uri');
@@ -215,6 +215,8 @@ var browseByVClass = {
         
         // Add active class for requested alpha
         $('#alpha-browse-individuals li a[data-alpha="'+ alpha +'"]').addClass('selected');
+        
+        return alpha;
     },
     
     // Wipe the currently displayed individuals, no-content message, and existing pagination
@@ -226,16 +228,20 @@ var browseByVClass = {
     
     // When no individuals are returned for the AJAX request, print a reasonable message for the user
     emptyResultSet: function(vclass, alpha) {
+        var nothingToSeeHere;
+        
         this.wipeSlate();
-        this.selectedAlpha(alpha);
+        alpha = this.selectedAlpha(alpha);
         
         if ( alpha != "all" ) {
             nothingToSeeHere = '<p class="no-individuals">There are no '+ vclass.name +' individuals whose name starts with <em>'+ alpha.toUpperCase() +'</em>.</p> <p class="no-individuals">Please try another letter or browse all.</p>';
         } else {
             nothingToSeeHere = '<p class="no-individuals">There are no '+ vclass.name +' individuals in the system.</p> <p class="no-individuals">Please select another class from the list.</p>';
         }
-        browseByVClass.individualsContainer.prepend(nothingToSeeHere);
+
+        browseByVClass.individualsContainer.prepend(nothingToSeeHere);   
     }
+    
 };
 
 $(document).ready(function() {
