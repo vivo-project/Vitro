@@ -184,14 +184,14 @@ public class SolrJsonServlet extends VitroHttpServlet {
         VClass vclass=null;
         JSONObject rObj = new JSONObject();
         
-        Map<String, Object> map = getSolrVclassIntersectionResults(vclassURIs, vreq, context);
+        Map<String, Object> map = getSolrVClassIntersectionResults(vclassURIs, vreq, context);
         //last parameter indicates single vclass instead of multiple vclasses
-        rObj = processVclassResults(map, vreq, context, false);                    
+        rObj = processVClassResults(map, vreq, context, false);                    
         return rObj;                                               
     }
 
     
-  //Accepts multiple vclasses and returns individuals which correspond to the intersection of those classes (i.e. have all those types) 
+    // Accepts multiple vclasses and returns individuals which correspond to the intersection of those classes (i.e. have all those types) 
     private void getSolrIndividualsByVClasses( HttpServletRequest req, HttpServletResponse resp ){
         String errorMessage = null;
         JSONObject rObj = null;
@@ -199,8 +199,7 @@ public class SolrJsonServlet extends VitroHttpServlet {
             VitroRequest vreq = new VitroRequest(req);
             VClass vclass=null;
             
-            //Could have multiple vclass Ids sent in
-            List<String> vclassIds = new ArrayList<String>();
+            // Could have multiple vclass ids sent in
             String[] vitroClassIdStr = vreq.getParameterValues("vclassId");            
             if ( vitroClassIdStr != null && vitroClassIdStr.length > 0){    
             	for(String vclassId: vitroClassIdStr) {
@@ -214,7 +213,7 @@ public class SolrJsonServlet extends VitroHttpServlet {
                 log.debug("parameter vclassId URI parameter expected ");
                 throw new Exception("parameter vclassId URI parameter expected ");
             }
-            vclassIds = Arrays.asList(vitroClassIdStr);
+            List<String> vclassIds = Arrays.asList(vitroClassIdStr);
             rObj = getSolrIndividualsByVClasses(vclassIds,req, getServletContext());
         }catch(Exception ex){
             errorMessage = ex.toString();
@@ -245,19 +244,17 @@ public class SolrJsonServlet extends VitroHttpServlet {
     
     public static JSONObject getSolrIndividualsByVClasses(List<String> vclassURIs, HttpServletRequest req, ServletContext context) throws Exception {
    	 	VitroRequest vreq = new VitroRequest(req);        
-        Map<String, Object> map = getSolrVclassIntersectionResults(vclassURIs, vreq, context);
-        JSONObject rObj = processVclassResults(map, vreq, context, true);                    
+        Map<String, Object> map = getSolrVClassIntersectionResults(vclassURIs, vreq, context);
+        JSONObject rObj = processVClassResults(map, vreq, context, true);                    
         return rObj;     
    }
     
     //Including version for Solr query for Vclass Intersections
-    private static Map<String,Object> getSolrVclassIntersectionResults(List<String> vclassURIs, VitroRequest vreq, ServletContext context){
+    private static Map<String,Object> getSolrVClassIntersectionResults(List<String> vclassURIs, VitroRequest vreq, ServletContext context){
         String alpha = SolrIndividualListController.getAlphaParameter(vreq);
         int page = SolrIndividualListController.getPageParameter(vreq);
         Map<String,Object> map = null;
         try {
-        	//TODO: This needs to be moved or copied to Solr Individual List Controller
-        	//Note the method below does use Solr search
 	         map = SolrIndividualListController.getResultsForVClassIntersections(
 	                 vclassURIs, 
 	                 page, 
@@ -273,37 +270,10 @@ public class SolrJsonServlet extends VitroHttpServlet {
    
     //Factoring out to allow for results to be processed from query for both lucene and solr
     //Map given to process method includes the actual individuals returned from the search
-    public static JSONObject processVclassResults(Map<String, Object> map, VitroRequest vreq, ServletContext context, boolean multipleVclasses) throws Exception{
+    public static JSONObject processVClassResults(Map<String, Object> map, VitroRequest vreq, ServletContext context, boolean multipleVclasses) throws Exception{
          JSONObject rObj = DataGetterUtils.processVclassResultsJSON(map, vreq, multipleVclasses);
          return rObj;
     } 
-    
-    
-    private static String getVClassName(Individual ind, String moniker,
-            WebappDaoFactory fullWdf) {
-        /* so the moniker frequently has a vclass name in it.  Try to return
-         * the vclass name that is the same as the moniker so that the templates
-         * can detect this. */
-        if( (moniker == null || moniker.isEmpty()) ){
-            if( ind.getVClass() != null && ind.getVClass().getName() != null )
-                return ind.getVClass().getName();
-            else
-                return "";
-        }
-            
-         List<VClass> vcList = ind.getVClasses();
-         for( VClass vc : vcList){
-             if( vc != null && moniker.equals( vc.getName() ))
-                 return moniker;
-         }
-         
-         // if we get here, then we didn't find a moniker that matched a vclass, 
-         // so just return any vclass.name
-         if( ind.getVClass() != null && ind.getVClass().getName() != null )
-             return ind.getVClass().getName();
-         else
-             return "";        
-    }
 
     static String getDataPropertyValue(Individual ind, DataProperty dp, WebappDaoFactory wdf){
         List<Literal> values = wdf.getDataPropertyStatementDao()

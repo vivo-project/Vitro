@@ -91,7 +91,7 @@ public class SolrAutocompleteController extends VitroAjaxController {
             }
             
             long hitCount = docs.getNumFound();
-            log.debug("Number of hits = " + hitCount);
+            log.debug("Total number of hits = " + hitCount);
             if ( hitCount < 1 ) {                
                 doNoSearchResults(response);
                 return;
