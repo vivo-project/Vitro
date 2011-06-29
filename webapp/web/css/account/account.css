@@ -102,6 +102,9 @@ nav.alpha-browse-account a {
     margin: 0;
     padding: 0;
 }
+.delete-all {
+    margin-left: 6px;
+}
 /* ADD ACCOUNTS ------>  */
 form.customForm #reset-password {
     margin-top: 20px;
