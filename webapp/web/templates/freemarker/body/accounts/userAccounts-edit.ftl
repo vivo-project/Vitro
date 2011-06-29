@@ -55,7 +55,7 @@
     <fieldset>
         <legend>Edit new account</legend>
 
-        <form method="POST" action="${formUrls.edit}" class="customForm" role="edit account">
+        <form method="POST" action="${formUrls.edit}" id="userAccountForm" class="customForm" role="edit account">
             <label for="email-address">Email address<span class="requiredHint"> *</span></label>
             <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
 
@@ -65,8 +65,7 @@
             <label for="last-name">Last name<span class="requiredHint"> *</span></label> 
             <input type="text" name="lastName" value="${lastName}" id="last-name" role="input" />
 
-            <label for="external-auth-id">External authorization ID</label> 
-            <input type="text" name="externalAuthId" value="${externalAuthId}" id="external-auth-id" role="input "/>
+            <#include "userAccounts-associateProfilePanel.ftl">
 
             <#if roles?has_content>
                 <p>Roles<span class="requiredHint"> *</span> </p>
@@ -77,7 +76,16 @@
                 </#list>
             </#if>
 
-            <#if !emailIsEnabled??>
+            <#if emailIsEnabled??>
+                <input type="checkbox" name="resetPassword" value="" id="reset-password" role="checkbox" <#if resetPassword??>checked</#if> />
+                <label  class="inline" for="reset-password"> Reset password</label>
+
+                <p class="note">
+                    Note: Instructions for resetting the password will 
+                    be emailed to the address entered above. The password will not 
+                    be reset until the user follows the link provided in this email.
+                </p>
+            <#else>
                 <label for="new-password">New password<span class="requiredHint"> *</span></label>
                 <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
 
@@ -85,28 +93,9 @@
                 <p>Leaving this blank means that the password will not be changed.</p>
 
                 <label for="confirm-password">Confirm initial password<span class="requiredHint"> *</span></label> 
-                <input type="text" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
+                <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
             </#if>
 
-            <p>Associate a profile with this account</p>
-            <input type="radio" name="associate" value="yes" role="radio" <#if associate??>checked</#if> id="associate" />
-            <label class="inline" for="associate"> Yes</label>
-
-            <input type="radio" name="associate" value="no"  role="radio" <#if !associate??>checked</#if> id="no-associate" />
-            <label class="inline" for="no-associate"> No</label>
-
-            <br />
-            <input type="checkbox" name="resetPassword" value="" id="reset-password" role="checkbox" <#if resetPassword??>checked</#if> />
-            <label  class="inline" for="reset-password"> Reset password</label>
-
-            <#if emailIsEnabled??>
-                <p class="note">
-                    Note: Instructions for resetting the password will 
-                    be emailed to the address entered above. The password will not 
-                    be reset until the user follows the link provided in this email.
-                </p>
-            </#if>
-    
             <input type="submit" name="submitEdit" value="Save changes" class="submit" /> or <a class="cancel" href="${formUrls.list}">Cancel</a>
 
             <p class="requiredHint">* required fields</p>

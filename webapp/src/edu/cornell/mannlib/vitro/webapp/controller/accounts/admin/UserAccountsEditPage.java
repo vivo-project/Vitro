@@ -32,7 +32,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 	private static final String PARAMETER_FIRST_NAME = "firstName";
 	private static final String PARAMETER_LAST_NAME = "lastName";
 	private static final String PARAMETER_ROLE = "role";
-	private static final String PARAMETER_ASSOCIATE_WITH_PROFILE = "associate";
+	private static final String PARAMETER_ASSOCIATED_PROFILE_URI = "associatedProfileUri";
 
 	private static final String ERROR_NO_EMAIL = "errorEmailIsEmpty";
 	private static final String ERROR_EMAIL_IN_USE = "errorEmailInUse";
@@ -54,7 +54,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 	private String firstName = "";
 	private String lastName = "";
 	private String selectedRoleUri = "";
-	private boolean associateWithProfile;
+	private String associatedProfileUri = "";
 
 	private UserAccount userAccount;
 
@@ -86,8 +86,8 @@ public class UserAccountsEditPage extends UserAccountsPage {
 		firstName = getStringParameter(PARAMETER_FIRST_NAME, "");
 		lastName = getStringParameter(PARAMETER_LAST_NAME, "");
 		selectedRoleUri = getStringParameter(PARAMETER_ROLE, "");
-		associateWithProfile = isParameterAsExpected(
-				PARAMETER_ASSOCIATE_WITH_PROFILE, "yes");
+		associatedProfileUri = getStringParameter(
+				PARAMETER_ASSOCIATED_PROFILE_URI, "");
 
 		strategy.parseAdditionalParameters();
 	}
@@ -186,9 +186,6 @@ public class UserAccountsEditPage extends UserAccountsPage {
 			body.put("roles", buildRolesList());
 		}
 
-		if (associateWithProfile) {
-			body.put("associate", Boolean.TRUE);
-		}
 		body.put("formUrls", buildUrlsMapWithEditUrl());
 
 		if (!errorCode.isEmpty()) {
@@ -216,6 +213,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 	}
 
 	public void updateAccount() {
+		// Assemble the fields of the account.
 		userAccount.setEmailAddress(emailAddress);
 		userAccount.setFirstName(firstName);
 		userAccount.setLastName(lastName);
@@ -227,11 +225,15 @@ public class UserAccountsEditPage extends UserAccountsPage {
 			userAccount.setPermissionSetUris(Collections
 					.singleton(selectedRoleUri));
 		}
-
 		strategy.setAdditionalProperties(userAccount);
 
+		// Update the account.
 		userAccountsDao.updateUserAccount(userAccount);
+		
+		// Associate the profile, as appropriate.
+		UserAccountsAssociatedProfileHelper.reconcile(userAccount, associatedProfileUri);
 
+		// Tell the user.
 		strategy.notifyUser();
 	}
 
