@@ -90,8 +90,8 @@ public class KnowledgeBaseUpdater {
 	
 	private void performUpdate() throws IOException {
 		
-		performSparqlConstructAdditions(settings.getSparqlConstructAdditionsDir(), settings.getOntModelSelector().getABoxModel());
-		performSparqlConstructRetractions(settings.getSparqlConstructDeletionsDir(), settings.getOntModelSelector().getABoxModel());
+		performSparqlConstructAdditions(settings.getSparqlConstructAdditionsDir(), settings.getAssertionOntModelSelector().getABoxModel());
+		performSparqlConstructRetractions(settings.getSparqlConstructDeletionsDir(), settings.getInferenceOntModelSelector().getABoxModel());
 		
 		List<AtomicOntologyChange> rawChanges = getAtomicOntologyChanges();
 		
@@ -127,49 +127,27 @@ public class KnowledgeBaseUpdater {
 			
 			aboxModel.add(actualAdditions);
 			record.recordAdditions(actualAdditions);
-			/*
-			if (actualAdditions.size() > 0) {
-				logger.log("Constructed " + actualAdditions.size() + " new " +
-						   "statement" 
-						   + ((actualAdditions.size() > 1) ? "s" : "") + 
-						   " using SPARQL construct queries.");
-			}
-			*/
-
 		} finally {
 			aboxModel.leaveCriticalSection();
 		}
 		
 	}
 	
-	private void performSparqlConstructRetractions(String sparqlConstructDir, OntModel aboxModel) throws IOException {
+	private void performSparqlConstructRetractions(String sparqlConstructDir, OntModel model) throws IOException {
 		
-		Model retractions = performSparqlConstructs(sparqlConstructDir, aboxModel, false);
+		Model retractions = performSparqlConstructs(sparqlConstructDir, model, false);
 		
 		if (retractions == null) {
 			return;
 		}
 		
-		aboxModel.enterCriticalSection(Lock.WRITE);
+		model.enterCriticalSection(Lock.WRITE);
+		
 		try {
-			Model actualRetractions = ModelFactory.createDefaultModel();
-			StmtIterator stmtIt = retractions.listStatements();
-			while (stmtIt.hasNext()) {
-				Statement stmt = stmtIt.nextStatement();
-				if (aboxModel.contains(stmt)) {
-					actualRetractions.add(stmt);
-				}
-			}
-			aboxModel.remove(actualRetractions);
-			record.recordRetractions(actualRetractions);
-			/*
-			if (actualRetractions.size() > 0) {
-				logger.log("Removed " + actualRetractions.size() + " statement" + ((actualRetractions.size() > 1) ? "s" : "") +  " using SPARQL CONSTRUCT queries.");
-			}
-			*/
-
+			model.remove(retractions);
+			record.recordRetractions(retractions);
 		} finally {
-			aboxModel.leaveCriticalSection();
+			model.leaveCriticalSection();
 		}
 		
 	}
@@ -218,7 +196,7 @@ public class KnowledgeBaseUpdater {
                         long num = numAfter - numBefore;
                         
                         if (num > 0) {
-						   logger.log((add ? "Added " : "Removed ") + num + 
+						   logger.log((add ? "Added " : "Removed ") + num + (add ? "" : " inferred") +
 								   " statement"  + ((num > 1) ? "s" : "") + 
 								   " using the SPARQL construct query from file " + sparqlFiles[i].getName());
                         }
@@ -254,7 +232,7 @@ public class KnowledgeBaseUpdater {
 
 		OntModel oldTBoxModel = settings.getOldTBoxModel();
 		OntModel newTBoxModel = settings.getNewTBoxModel();
-		OntModel ABoxModel = settings.getOntModelSelector().getABoxModel();
+		OntModel ABoxModel = settings.getAssertionOntModelSelector().getABoxModel();
 		ABoxUpdater aboxUpdater = new ABoxUpdater(
 				oldTBoxModel, newTBoxModel, ABoxModel, 
 				settings.getNewTBoxAnnotationsModel(), logger, record);
@@ -267,10 +245,10 @@ public class KnowledgeBaseUpdater {
 		
 		TBoxUpdater tboxUpdater = new TBoxUpdater(settings.getOldTBoxAnnotationsModel(),
 		                                          settings.getNewTBoxAnnotationsModel(),
-                                                  settings.getOntModelSelector().getABoxModel(), logger, record);
+                                                  settings.getAssertionOntModelSelector().getTBoxModel(), logger, record);
                                                   
         tboxUpdater.updateDefaultAnnotationValues();
-        tboxUpdater.updateAnnotationModel();
+        //tboxUpdater.updateAnnotationModel();
 	}
 	
 	/**
@@ -286,9 +264,9 @@ public class KnowledgeBaseUpdater {
 			return required;
 		}
 				
-		Model m = settings.getOntModelSelector().getApplicationMetadataModel();
+		Model abox = settings.getAssertionOntModelSelector().getABoxModel();
 		Query query = QueryFactory.create(sparqlQueryStr);
-		QueryExecution isUpdated = QueryExecutionFactory.create(query, m);
+		QueryExecution isUpdated = QueryExecutionFactory.create(query, abox);
 		
 		// if the ASK query DOES have a solution (i.e. the assertions exist
 		// showing that the update has already been performed), then the update
@@ -298,10 +276,11 @@ public class KnowledgeBaseUpdater {
 			required = false;
 		} else {
 			required = true;
+			Model tbox = settings.getAssertionOntModelSelector().getTBoxModel();
 			String sparqlQueryStr2 = loadSparqlQuery(settings.getAskEmptyQueryFile());
 			if (sparqlQueryStr2 != null) {
 				Query query2 = QueryFactory.create(sparqlQueryStr2);
-				QueryExecution isNotEmpty = QueryExecutionFactory.create(query2, m);
+				QueryExecution isNotEmpty = QueryExecutionFactory.create(query2, tbox);
 				required = isNotEmpty.execAsk();
 			} 
 		}
@@ -332,7 +311,8 @@ public class KnowledgeBaseUpdater {
 	private void assertSuccess() throws FileNotFoundException, IOException {
 		try {
 			
-		    Model m = settings.getOntModelSelector().getApplicationMetadataModel();
+		    //Model m = settings.getAssertionOntModelSelector().getApplicationMetadataModel();
+		    Model m = settings.getAssertionOntModelSelector().getABoxModel();
 		    File successAssertionsFile = new File(settings.getSuccessAssertionsFile()); 
 		    InputStream inStream = new FileInputStream(successAssertionsFile);
 		    m.enterCriticalSection(Lock.WRITE);

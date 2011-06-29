@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -83,21 +84,15 @@ public class FileGraphSetup implements ServletContextListener {
 			t.printStackTrace();
 		}
 		
-		if (aboxChanged || tboxChanged)  {
-	        if ( !JenaDataSourceSetup.updateRequired(sce.getServletContext(), baseOms.getTBoxModel())) {
+		if ( (aboxChanged || tboxChanged) && !isUpdateRequired(sce.getServletContext()) ) {
 	        	log.info("a full recompute of the Abox will be performed because" +
-	        			" the filegraph abox(s) and/or tbox(s) have changed, or are being read for the first time." );
+	        			" the filegraph abox(s) and/or tbox(s) have changed." );
 	            SimpleReasonerSetup.setRecomputeRequired(sce.getServletContext());
-	        } else {
-	        	log.info("A knowledgebase update is required. A full recompute of the Abox will not be" +
-	        			" performed; instead inferences will be updated incrementally as the knowledge base is updated.");
-	        }
 		}
 	}
 	
 	/*
 	 * Reads the graphs stored as files in sub-directories of 
-	 * FileGraphSetup.PATH_ROOT and for each graph:
 	 *   1. updates the SDB store to reflect the current contents of the graph.
 	 *   2. adds the graph as an in-memory submodel of the base in-memory graph 
 	 *      
@@ -255,4 +250,9 @@ public class FileGraphSetup implements ServletContextListener {
 	public void contextDestroyed( ServletContextEvent sce ) {
 		// nothing to do
 	}
+	
+private static boolean isUpdateRequired(ServletContext ctx) {
+    return (ctx.getAttribute(UpdateKnowledgeBase.KBM_REQURIED_AT_STARTUP) != null);
+}
+
 }

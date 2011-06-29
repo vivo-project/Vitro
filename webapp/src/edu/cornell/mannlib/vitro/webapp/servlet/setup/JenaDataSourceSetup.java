@@ -593,45 +593,5 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
     public static Store getApplicationStore(ServletContext ctx) {
         return (Store) ctx.getAttribute(STORE_ATTR);
     }
-    
-	/**
-	 * Executes a SPARQL ASK query to determine whether the knowledge base
-	 * needs to be updated to conform to a new ontology version
-	 */
-	public static boolean updateRequired(ServletContext ctx, OntModel m)  {
-		
-		boolean required = false;
-		
-		try {
-			String sparqlQueryStr = KnowledgeBaseUpdater.loadSparqlQuery(UpdateKnowledgeBase.getAskQueryPath(ctx));
-			if (sparqlQueryStr == null) {
-				return required;
-			}
-					
-			Query query = QueryFactory.create(sparqlQueryStr);
-			QueryExecution isUpdated = QueryExecutionFactory.create(query, m);
-			
-			// if the ASK query DOES have a solution (i.e. the assertions exist
-			// showing that the update has already been performed), then the update
-			// is NOT required.
-			
-			if (isUpdated.execAsk()) {
-				required = false;
-			} else {
-				required = true;
-				String sparqlQueryStr2 = KnowledgeBaseUpdater.loadSparqlQuery(UpdateKnowledgeBase.getAskEmptyQueryPath(ctx));
-				if (sparqlQueryStr2 != null) {
-					Query query2 = QueryFactory.create(sparqlQueryStr2);
-					QueryExecution isNotEmpty = QueryExecutionFactory.create(query2, m);
-					required = isNotEmpty.execAsk();
-				} 
-			}
-		} catch (IOException e) {
-			log.error("error while trying to determine if a knowledgbase update is required", e);
-			return false;
-		}
-		
-		return required; 
-	}
  }
 

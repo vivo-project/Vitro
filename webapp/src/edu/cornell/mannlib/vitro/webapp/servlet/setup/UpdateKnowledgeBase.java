@@ -42,6 +42,7 @@ import edu.cornell.mannlib.vitro.webapp.search.IndexConstants;
  */
 public class UpdateKnowledgeBase implements ServletContextListener {
 	
+    public static final String KBM_REQURIED_AT_STARTUP = "KNOWLEDGE_BASE_MIGRATION_REQUIRED_AT_STARTUP";
 	private final static Log log = LogFactory.getLog(UpdateKnowledgeBase.class);
 	
 	private static final String DATA_DIR = "/WEB-INF/ontologies/update/";
@@ -49,7 +50,6 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private static final String CHANGED_DATA_DIR = "changedData/";
 	private static final String ASK_QUERY_FILE = DATA_DIR + "ask.sparql";
 	private static final String ASK_EMPTY_QUERY_FILE = DATA_DIR + "askEmpty.sparql";
-	private static final String ASK_EVER_QUERY_FILE = DATA_DIR + "askEver.sparql";
 	private static final String SUCCESS_ASSERTIONS_FILE = DATA_DIR + "success.n3";
 	private static final String SUCCESS_RDF_FORMAT = "N3";
 	private static final String DIFF_FILE = DATA_DIR + "diff.tab.txt";
@@ -72,14 +72,12 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		try {
 
 			ServletContext ctx = sce.getServletContext();
-			OntModelSelector assertionsOms = ModelContext.getBaseOntModelSelector(ctx);
-
+			
 			String logFileName =  DATA_DIR + LOG_DIR + timestampedFileName("knowledgeBaseUpdate", "log");
 			String errorLogFileName = DATA_DIR + LOG_DIR + 	timestampedFileName("knowledgeBaseUpdate.error", "log");
 						
 			UpdateSettings settings = new UpdateSettings();
 			settings.setAskQueryFile(getAskQueryPath(ctx));
-			settings.setAskEverQueryFile(getAskEverQueryPath(ctx));
 			settings.setAskEmptyQueryFile(getAskEmptyQueryPath(ctx));
 			settings.setDataDir(ctx.getRealPath(DATA_DIR));
 			settings.setSparqlConstructAdditionsDir(ctx.getRealPath(SPARQL_CONSTRUCT_ADDITIONS_DIR));
@@ -93,8 +91,9 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setRemovedDataFile(ctx.getRealPath(REMOVED_DATA_FILE));
 			WebappDaoFactory wadf = (WebappDaoFactory) ctx.getAttribute("webappDaoFactory");
 			settings.setDefaultNamespace(wadf.getDefaultNamespace());
-				
-			settings.setOntModelSelector(assertionsOms);
+			settings.setAssertionOntModelSelector(ModelContext.getBaseOntModelSelector(ctx));
+			settings.setInferenceOntModelSelector(ModelContext.getInferenceOntModelSelector(ctx));
+			
 			try {
 				OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_MODEL_DIR));
 				settings.setOldTBoxModel(oldTBoxModel);
@@ -117,6 +116,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			  try {
 				  if (ontologyUpdater.updateRequired()) {
 					  ctx.setAttribute(IndexConstants.INDEX_REBUILD_REQUESTED_AT_STARTUP, Boolean.TRUE);
+					  ctx.setAttribute(KBM_REQURIED_AT_STARTUP, Boolean.TRUE);
 					  //doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
 					  reloadDisplayModel(ctx);
 				  }
@@ -243,17 +243,14 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	public void contextDestroyed(ServletContextEvent arg0) {
 		// nothing to do	
 	}
+	
 	public static String getAskQueryPath(ServletContext ctx) {
 		return ctx.getRealPath(ASK_QUERY_FILE);
 	
-    }	
-	public static String getAskEverQueryPath(ServletContext ctx) {
-		return ctx.getRealPath(ASK_EVER_QUERY_FILE);
-	
     }
+	
 	public static String getAskEmptyQueryPath(ServletContext ctx) {
 		return ctx.getRealPath(ASK_EMPTY_QUERY_FILE);
-	
     }
 	
 	private static String timestampedFileName(String prefix, String suffix) {

@@ -206,10 +206,12 @@ public class TBoxUpdater {
 				 } 
 
 				 if (i > 1) {
+					 /*
 					 logger.log("WARNING: found " + i +
 							 " statements with subject = " + subject.getURI() + 
 							 " and property = " + predicate.getURI() +
 							 " in the site annotations model (maximum of one is expected) "); 
+					 */
 					 continue; 
 				 }
 				 	 
