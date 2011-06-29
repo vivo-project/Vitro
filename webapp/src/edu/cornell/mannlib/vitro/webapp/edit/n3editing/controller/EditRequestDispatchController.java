@@ -18,6 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.EditConfigurationGenerator;
 import edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils;
 
 /**
@@ -34,11 +35,12 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     private static final long serialVersionUID = 1L;
     public static Log log = LogFactory.getLog(EditRequestDispatchController.class);
     
-    final String DEFAULT_OBJ_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultPropertyFormGenerator";
+    final String DEFAULT_OBJ_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultObjectPropertyFormGenerator";
     final String DEFAULT_ERROR_FORM = "error.jsp";
     final String DEFAULT_ADD_INDIVIDUAL = "defaultAddMissingIndividualForm.jsp";
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {      
+    	try{
         WebappDaoFactory wdf = vreq.getWebappDaoFactory();
         
         //get edit key.  
@@ -127,7 +129,9 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          if ("delete".equals(command)) {
              //TODO: delete command is used with the defualt delete form
              //maybe it doesn't need to be in here?
-             return null;
+        	 HashMap<String,Object> map = new HashMap<String,Object>();
+        	 map.put("errorMessage", "delete command is not yet implemented");
+        	 return new TemplateResponseValues("error-message.ftl", map);
          }
 
          //Certain predicates may be annotated to change the behavior of the edit
@@ -146,7 +150,10 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 //                   <c:param name="relatingPredicateUri" value="${param.predicateUri}"/>
 //               </c:redirect>
 //             <%
-             return null;
+             
+             HashMap<String,Object> map = new HashMap<String,Object>();
+        	 map.put("errorMessage", "skip edit form for object properties is not yet implemented");
+        	 return new TemplateResponseValues("error-message.ftl", map);
          }
 
          //use default object property form if nothing else works
@@ -193,21 +200,49 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          
          //what template?
          String template = editConfig.getTemplate();
+         String formTitle = (String)vreq.getAttribute("formTitle");
          
          //what goes in the map for templates?
          Map<String,Object> templateData = new HashMap<String,Object>();
          templateData.put("editConfiguration", editConfig);
+         templateData.put("formTitle", formTitle);
          
-         return new TemplateResponseValues(editConfig.getTemplate(), templateData);
+         return new TemplateResponseValues(template, templateData);
+         }catch(Throwable th){
+        	
+        	 HashMap<String,Object> map = new HashMap<String,Object>();
+        	 map.put("errorMessage", th.toString());
+        	 log.error(th,th);
+        	 return new TemplateResponseValues("error-message.ftl", map);
+        
+         }
     }
     
     private EditConfiguration makeEditConfiguration(
             String editConfGeneratorName, VitroRequest vreq, HttpSession session) {
-
-        //TODO: instianciate generator obj
-        //TODO: call getEditConfiguration()
-               
-        return null;
+    	
+    	EditConfigurationGenerator editConfigurationGenerator = null;
+    	
+        Object object = null;
+        try {
+            Class classDefinition = Class.forName(editConfGeneratorName);
+            object = classDefinition.newInstance();
+            editConfigurationGenerator = (EditConfigurationGenerator) object;
+        } catch (InstantiationException e) {
+            System.out.println(e);
+        } catch (IllegalAccessException e) {
+            System.out.println(e);
+        } catch (ClassNotFoundException e) {
+            System.out.println(e);
+        }    	
+        
+        if(editConfigurationGenerator == null){
+        	log.error("could not find editConfigurationGenerator " + editConfGeneratorName);
+        	return null;
+        } else {
+            return editConfigurationGenerator.getEditConfiguration(vreq, session);
+        }
+        
     }
 
     /*
@@ -263,12 +298,15 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
         }
         
         //forward to form?
-        return null;
+        HashMap<String,Object> map = new HashMap<String,Object>();
+   	 map.put("errorMessage", "forweard to create new is not yet implemented");
+   	 return new TemplateResponseValues("error-message.ftl", map);
     }        
     
     private ResponseValues doHelp(VitroRequest vreq, String message){
         //output some sort of help message for the developers.
         
-        return null;
-    }
+    	HashMap<String,Object> map = new HashMap<String,Object>();
+   	 map.put("errorMessage", "help is not yet implemented");
+   	 return new TemplateResponseValues("error-message.ftl", map);    }
 }
