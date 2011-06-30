@@ -117,6 +117,10 @@ public class IndexBuilder extends Thread {
 		return isReindexRequested() || ! changedUris.isEmpty() ;
 	}
 	
+	
+	/**
+	 * This is called when the system shuts down.
+	 */
 	public synchronized void stopIndexingThread() {
 	    stopRequested = true;
 	    this.notifyAll();		    
@@ -238,7 +242,12 @@ public class IndexBuilder extends Thread {
             
             if( ! forceNewIndex ){                
                 for(String deleteMe : deletes ){
-                    indexer.removeFromIndex(deleteMe);
+                    try{
+                        indexer.removeFromIndex(deleteMe);                    
+                    }catch(Exception ex){ 
+                        log.debug("could not remove individual " + deleteMe 
+                                + " from index, usually this is harmless",ex);
+                    }
                 }
             }            
 
@@ -251,7 +260,7 @@ public class IndexBuilder extends Thread {
             log.error(e,e);
         }
         
-        if( aborted && forceNewIndex ){
+        if( aborted ){
             indexer.abortIndexingAndCleanUp();
         }else{
             indexer.endIndexing();

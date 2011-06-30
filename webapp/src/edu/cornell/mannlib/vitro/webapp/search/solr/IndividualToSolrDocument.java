@@ -63,116 +63,157 @@ public class IndividualToSolrDocument {
     
     @SuppressWarnings("static-access")
     public SolrInputDocument translate(Individual ind) throws IndexingException{
-    	long tProhibited = System.currentTimeMillis();    	    	
-    	ArrayList<String> superClassNames = null;
-    	StringBuffer addUri = null;
-    	String value;
-    	StringBuffer classPublicNames = new StringBuffer();
-    	classPublicNames.append("");
-    	SolrInputDocument doc = new SolrInputDocument();
-    	
-    	String id = ind.getURI();
-    	log.debug("translating " + id);
-    	
-    	if(id == null){
-    		log.debug("cannot add individuals without URIs to lucene Index");
-    		return null;
-    	}else if( id.startsWith(VitroVocabulary.vitroURI) ||
-    			id.startsWith(VitroVocabulary.VITRO_PUBLIC) ||
-    			id.startsWith(VitroVocabulary.PSEUDO_BNODE_NS) ||
-    			id.startsWith(OWL.NS)){
-    		log.debug("not indexing because of namespace:" + id);
-    		return null;
-    	}
-    	
-    	//filter out class groups, owl:ObjectProperties etc..
-    	if(individualProhibitedFromSearch.isIndividualProhibited(id)){
-    		return null;
-    	}
-    	
-    	log.debug("time to check if individual is prohibited:" + Long.toString(System.currentTimeMillis() - tProhibited));
-    	
-    	// Types and classgroups
-    	boolean prohibited = false;
-    	List<VClass> vclasses = ind.getVClasses(false);
-    	superClassNames = new ArrayList<String>();
-    	String superLclName = null;
-    	long tClassgroup = System.currentTimeMillis();
-    	for(VClass clz : vclasses){
-    		superLclName = clz.getLocalName();
-    		superClassNames.add(superLclName);
-    		if(clz.getURI() == null){
-    			continue;
-    		}else if(OWL.Thing.getURI().equals(clz.getURI())){
-    			//index individuals of type owl:Thing, just don't add owl:Thing as the type field in the index
-    			continue;
-    		} else if(clz.getURI().startsWith(OWL.NS)){
-    			log.debug("not indexing " + id + " because of type " + clz.getURI());
-    			return null;
-    		} else if(contextNodeClassNames.contains(superLclName)) { // check to see if context node is being indexed.
-    			return null;
-    		}
-    		else {
-    			if( !prohibited && classesProhibitedFromSearch.isClassProhibitedFromSearch(clz.getURI()))
-    				prohibited = true;
-    			if( clz.getSearchBoost() != null)
-    				doc.setDocumentBoost(doc.getDocumentBoost() + clz.getSearchBoost());
-    			
-    			doc.addField(term.RDFTYPE, clz.getURI());
-    			
-    			if(clz.getLocalName() != null){
-    				doc.addField(term.CLASSLOCALNAME, clz.getLocalName());
-    				doc.addField(term.CLASSLOCALNAMELOWERCASE, clz.getLocalName().toLowerCase());
-    			}
-    			
-    			if(clz.getName() != null){
-    				classPublicNames.append(" ");
-    			    classPublicNames.append(clz.getName());
-    			}
-    			
-    			//Classgroup URI
-    			if(clz.getGroupURI() != null){
-    				doc.addField(term.CLASSGROUP_URI,clz.getGroupURI());
-    			}
-    			
-    		}
-    	}
-    	
-    	if(superClassNames.isEmpty()){
-    		return null;
-    	}
-    	
-    	log.debug("time to check if class is prohibited and adding classes, classgroups and type to the index: " + Long.toString(System.currentTimeMillis() - tClassgroup));
+        try{    	            	      	        	
+        	log.debug("translating " + ind.getURI());
+        	checkForSkipBasedOnNS( ind );
+        	        	            
+        	SolrInputDocument doc = new SolrInputDocument();                    	
+        	
+            //DocID
+            doc.addField(term.DOCID, getIdForUri( ind.getURI() ) );
+            
+            //vitro id
+            doc.addField(term.URI, ind.getURI());
+            
+            //java class
+            doc.addField(term.JCLASS, entClassName);
 
-    	
-    	doc.addField(term.PROHIBITED_FROM_TEXT_RESULTS, prohibited?"1":"0");
-    	
-    	//DocID
-    	doc.addField(term.DOCID, getIdForUri( ind.getURI() ) );
-    	
-    	//vitro id
-    	doc.addField(term.URI, id);
-    	
-    	//java class
-    	doc.addField(term.JCLASS, entClassName);
-    	
-    	//Individual Label
-    	if(ind.getRdfsLabel() != null)
-    		value = ind.getRdfsLabel();
-    	else{
-    		log.debug("Using local name for individual with rdfs:label " + ind.getURI());
-    		value = ind.getLocalName();
-    	}
-    	
-    	// collecting object property statements 
-    	
-    	String uri = ind.getURI();
-    	StringBuffer objectNames = new StringBuffer();
-    	objectNames.append("");
-    	String t=null;
-    	addUri = new StringBuffer();
-    	addUri.append("");
-    	List<ObjectPropertyStatement> objectPropertyStatements = ind.getObjectPropertyStatements();
+            //Individual Label
+            addLabel( ind, doc );
+            
+        	//add classes, classgroups get if prohibied becasue of its class
+            StringBuffer classPublicNames = new StringBuffer("");
+        	boolean prohibited = addClasses(ind, doc, classPublicNames);
+        	
+        	//filter out class groups, owl:ObjectProperties etc..
+        	if(individualProhibitedFromSearch.isIndividualProhibited( ind.getURI() )){
+        		return null;
+        	}        	   
+        	        	        	
+        	// collecting URIs and rdfs:labels of objects of statements         	
+        	StringBuffer objectNames = new StringBuffer("");        	
+        	StringBuffer addUri = new StringBuffer("");           	
+        	addObjectPropertyText(ind, doc, objectNames, addUri);        	                 	                                   
+        	
+        	//add if the individual has a thumbnail or not.
+        	addThumbnailExistance(ind, doc);           
+                        
+            //time of index in millis past epoc
+            doc.addField(term.INDEXEDTIME,(new DateTime()).getMillis()); 
+            
+            if(!prohibited){
+               addAllText( ind, doc, classPublicNames, objectNames );
+               
+               runAdditionalDocModifers(ind,doc,addUri);                        
+
+               //boost for entity
+                if(documentModifiers == null || documentModifiers.isEmpty() &&
+                   (ind.getSearchBoost() != null && ind.getSearchBoost() != 0)) {
+                        doc.setDocumentBoost(ind.getSearchBoost());                    
+                }
+            }
+            
+            return doc;
+        }catch(SkipIndividualException ex){
+            //indicates that this individual should not be indexed
+            log.debug(ex);
+            return null;
+        }
+    }
+    
+           
+    private void runAdditionalDocModifers( Individual ind, SolrInputDocument doc, StringBuffer addUri ) 
+    throws SkipIndividualException{
+        //run the document modifiers
+        if( documentModifiers != null && !documentModifiers.isEmpty()){
+            for(DocumentModifier modifier: documentModifiers){
+                modifier.modifyDocument(ind, doc, addUri);
+            }
+        }
+    }
+    
+    private void checkForSkipBasedOnNS(Individual ind) throws SkipIndividualException {
+        String id = ind.getURI();                  
+        if(id == null){            
+            throw new SkipIndividualException("cannot add individuals without URIs to lucene Index");
+        }else if( id.startsWith(VitroVocabulary.vitroURI) ||
+                id.startsWith(VitroVocabulary.VITRO_PUBLIC) ||
+                id.startsWith(VitroVocabulary.PSEUDO_BNODE_NS) ||
+                id.startsWith(OWL.NS)){
+            throw new SkipIndividualException("not indexing because of namespace:" + id);            
+        }        
+    }
+
+    private void addAllText(Individual ind, SolrInputDocument doc, StringBuffer classPublicNames, StringBuffer objectNames) {
+        String t=null;
+        
+        //ALLTEXT, all of the 'full text'
+        StringBuffer allTextValue = new StringBuffer();
+        allTextValue.append("");
+        allTextValue.append(" ");
+        allTextValue.append(((t=ind.getName()) == null)?"":t);  
+        allTextValue.append(" ");
+        allTextValue.append(((t=ind.getAnchor()) == null)?"":t); 
+        allTextValue.append(" ");     
+        allTextValue.append(classPublicNames);
+
+        //collecting data property statements
+        List<DataPropertyStatement> dataPropertyStatements = ind.getDataPropertyStatements();
+        if (dataPropertyStatements != null) {
+            Iterator<DataPropertyStatement> dataPropertyStmtIter = dataPropertyStatements.iterator();
+            while (dataPropertyStmtIter.hasNext()) {
+                DataPropertyStatement dataPropertyStmt =  dataPropertyStmtIter.next();
+                allTextValue.append(" ");
+                allTextValue.append(((t=dataPropertyStmt.getData()) == null)?"":t);
+            }
+        }
+         
+        allTextValue.append(objectNames.toString());
+                
+        String alltext = allTextValue.toString();
+        doc.addField(term.ALLTEXT, alltext);
+        doc.addField(term.ALLTEXTUNSTEMMED, alltext);
+        doc.addField(term.ALLTEXT_PHONETIC, alltext);        
+    }
+
+    private void addLabel(Individual ind, SolrInputDocument doc) {
+        String value = "";
+        if(ind.getRdfsLabel() != null)
+            value = ind.getRdfsLabel();
+        else{
+            value = ind.getLocalName();
+        }            
+        doc.addField(term.NAME_RAW, value);
+        doc.addField(term.NAME_LOWERCASE, value);
+        doc.addField(term.NAME_UNSTEMMED, value);
+        doc.addField(term.NAME_STEMMED, value);
+        doc.addField(term.NAME_PHONETIC, value);
+        doc.addField(term.AC_NAME_UNTOKENIZED, value);
+        doc.addField(term.AC_NAME_STEMMED, value);
+        // doc.addField(term.AC_NAME_TOKENIZED, value);            
+    }
+
+    /**
+     * Adds if the individual has a thumbnail image or not.
+     */
+    private void addThumbnailExistance(Individual ind, SolrInputDocument doc) {
+        try{
+            if(ind.hasThumb())
+                doc.addField(term.THUMBNAIL, "1");
+            else
+                doc.addField(term.THUMBNAIL, "0");
+        }catch(Exception ex){
+            log.debug("could not index thumbnail: " + ex);
+        }        
+    }
+
+    /**
+     * Get the rdfs:labes for objects of statements and put in objectNames.
+     *  Get the URIs for objects of statements and put in addUri.
+     */
+    private void addObjectPropertyText(Individual ind, SolrInputDocument doc,
+            StringBuffer objectNames, StringBuffer addUri) {
+        List<ObjectPropertyStatement> objectPropertyStatements = ind.getObjectPropertyStatements();
         if (objectPropertyStatements != null) {
             Iterator<ObjectPropertyStatement> objectPropertyStmtIter = objectPropertyStatements.iterator();
             while (objectPropertyStmtIter.hasNext()) {
@@ -180,7 +221,8 @@ public class IndividualToSolrDocument {
                 if( "http://www.w3.org/2002/07/owl#differentFrom".equals(objectPropertyStmt.getPropertyURI()) )
                     continue;
                 try {
-                	objectNames.append(" ");
+                    objectNames.append(" ");
+                    String t=null;
                     objectNames.append(((t=objectPropertyStmt.getObject().getName()) == null)?"":t);   
                     addUri.append(" ");
                     addUri.append(((t=objectPropertyStmt.getObject().getURI()) == null)?"":t);
@@ -188,92 +230,68 @@ public class IndividualToSolrDocument {
                      log.debug("could not index name of related object: " + e.getMessage());
                 }
             }
-        }         
-    	
-        	 doc.addField(term.NAME_RAW, value, NAME_BOOST);
-        	 doc.addField(term.NAME_LOWERCASE, value, NAME_BOOST);
-        	 doc.addField(term.NAME_UNSTEMMED, value, NAME_BOOST);
-        	 doc.addField(term.NAME_STEMMED, value, NAME_BOOST);
-        	 doc.addField(term.NAME_PHONETIC, value);
-        	 doc.addField(term.AC_NAME_UNTOKENIZED, value);
-             doc.addField(term.AC_NAME_STEMMED, value);
-             // doc.addField(term.AC_NAME_TOKENIZED, value);
-        
-        
-        long tMoniker = System.currentTimeMillis();
-    	
-        if(documentModifiers == null || documentModifiers.isEmpty()){
-            //boost for entity
-            if(ind.getSearchBoost() != null && ind.getSearchBoost() != 0) {
-                doc.setDocumentBoost(ind.getSearchBoost());
-            }
-        }
-        
-        //thumbnail
-        try{
-        	value = null;
-        	if(ind.hasThumb())
-        		doc.addField(term.THUMBNAIL, "1");
-        	else
-        		doc.addField(term.THUMBNAIL, "0");
-        }catch(Exception ex){
-        	log.debug("could not index thumbnail: " + ex);
-        }
-        
-        
-        //time of index in millis past epoc
-       // Object anon[] =  { new Long((new DateTime() ).getMillis())  };
-       // doc.addField(term.INDEXEDTIME, String.format("%019d", anon));
-        doc.addField(term.INDEXEDTIME,(new DateTime()).getMillis());
-        
-    	log.debug("time to include thumbnail and indexedtime in the index: " + Long.toString(System.currentTimeMillis() - tMoniker));
+        }        
+    }
 
-        long tPropertyStatements = System.currentTimeMillis();
+    /**
+     * Adds the info about the classes that the individual is a member
+     * of, classgroups and checks if prohibited.
+     * @param classPublicNames 
+     * @returns true if prohibited from search
+     * @throws SkipIndividualException 
+     */
+    protected boolean addClasses(Individual ind, SolrInputDocument doc, StringBuffer classPublicNames) throws SkipIndividualException{
+        ArrayList<String> superClassNames = null;        
         
-        //collecting data property statements 
-        
-        if(!prohibited){
-            //ALLTEXT, all of the 'full text'
-            StringBuffer allTextValue = new StringBuffer();
-            allTextValue.append("");
-            allTextValue.append(" ");
-            allTextValue.append(((t=ind.getName()) == null)?"":t);  
-            allTextValue.append(" ");
-            allTextValue.append(((t=ind.getAnchor()) == null)?"":t); 
-            allTextValue.append(" ");
-            allTextValue.append(classPublicNames.toString()); 
-    
-            List<DataPropertyStatement> dataPropertyStatements = ind.getDataPropertyStatements();
-            if (dataPropertyStatements != null) {
-                Iterator<DataPropertyStatement> dataPropertyStmtIter = dataPropertyStatements.iterator();
-                while (dataPropertyStmtIter.hasNext()) {
-                    DataPropertyStatement dataPropertyStmt =  dataPropertyStmtIter.next();
-                    allTextValue.append(" ");
-                    allTextValue.append(((t=dataPropertyStmt.getData()) == null)?"":t);
+        // Types and classgroups
+        boolean prohibited = false;
+        List<VClass> vclasses = ind.getVClasses(false);
+        superClassNames = new ArrayList<String>();         
+        for(VClass clz : vclasses){
+            String superLclName = clz.getLocalName();
+            superClassNames.add(superLclName);
+            if(clz.getURI() == null){
+                continue;
+            }else if(OWL.Thing.getURI().equals(clz.getURI())){
+                //index individuals of type owl:Thing, just don't add owl:Thing as the type field in the index
+                continue;
+            } else if(clz.getURI().startsWith(OWL.NS)){
+                throw new SkipIndividualException("not indexing " + ind.getURI() + " because of type " + clz.getURI() );                
+            } else if(contextNodeClassNames.contains(superLclName)) { // check to see if context node is being indexed.
+                throw new SkipIndividualException("not indexing " + ind.getURI() + " because of context node type " + clz.getURI() );
+            } else {
+                if( !prohibited && classesProhibitedFromSearch.isClassProhibitedFromSearch(clz.getURI()))
+                    prohibited = true;
+                if( clz.getSearchBoost() != null)
+                    doc.setDocumentBoost(doc.getDocumentBoost() + clz.getSearchBoost());
+                
+                doc.addField(term.RDFTYPE, clz.getURI());
+                
+                if(clz.getLocalName() != null){
+                    doc.addField(term.CLASSLOCALNAME, clz.getLocalName());
+                    doc.addField(term.CLASSLOCALNAMELOWERCASE, clz.getLocalName().toLowerCase());
                 }
-            }
-             
-            allTextValue.append(objectNames.toString());
-            
-        	log.debug("time to include data property statements, object property statements in the index: " + Long.toString(System.currentTimeMillis() - tPropertyStatements));
-            
-        	String alltext = allTextValue.toString();
-            doc.addField(term.ALLTEXT, alltext);
-            doc.addField(term.ALLTEXTUNSTEMMED, alltext);
-            doc.addField(term.ALLTEXT_PHONETIC, alltext);
-            
-            //run the document modifiers
-            if( documentModifiers != null && !documentModifiers.isEmpty()){
-                for(DocumentModifier modifier: documentModifiers){
-                    modifier.modifyDocument(ind, doc, addUri);
+                
+                if(clz.getName() != null){
+                    classPublicNames.append(" ");
+                    classPublicNames.append(clz.getName());
                 }
+                
+                //Add the Classgroup URI to a field
+                if(clz.getGroupURI() != null){
+                    doc.addField(term.CLASSGROUP_URI,clz.getGroupURI());
+                }               
             }
-        }
+        }            
         
-        return doc;
+        if(superClassNames.isEmpty()){
+            throw new SkipIndividualException("Not indexing because individual has no super classes");
+        }               
+        
+        doc.addField(term.PROHIBITED_FROM_TEXT_RESULTS, prohibited?"1":"0");
+        return prohibited;
     }
     
-           
     public Object getIndexId(Object obj) {
         throw new Error("IndiviudalToSolrDocument.getIndexId() is unimplemented");        
     }
@@ -342,6 +360,5 @@ public class IndividualToSolrDocument {
     
 
     public static float NAME_BOOST = 1.2F;
-    
     
 }

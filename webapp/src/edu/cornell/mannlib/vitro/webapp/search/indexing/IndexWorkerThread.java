@@ -60,6 +60,9 @@ class IndexWorkerThread extends Thread{
 	            ind = individualsToIndex.next();	            
 	            indexer.index( ind );
             } catch (IndexingException e) {
+                if( stopRequested )
+                    return;
+                
                 if( ind != null )
                     log.error("Could not index individual " + ind.getURI() , e );
                 else

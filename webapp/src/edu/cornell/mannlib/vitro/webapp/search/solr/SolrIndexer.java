@@ -173,7 +173,7 @@ public class SolrIndexer implements IndexerIface {
             individualToSolrDoc.shutdown();
         }catch(Exception e){
             if( log != null)
-                log.warn(e,e);
+                log.debug(e,e);
         }
     }
    
@@ -187,11 +187,11 @@ public class SolrIndexer implements IndexerIface {
         } catch(IOException e){
         	log.error("Could not commit to solr server", e);
         }
-        try {
-            server.optimize();
-        } catch (Exception e) {
-            log.error("Could not optimize solr server", e);
-        }
+//        try {
+//            server.optimize();
+//        } catch (Exception e) {
+//            log.error("Could not optimize solr server", e);
+//        }
         indexing = false;
         notifyAll();
     }
