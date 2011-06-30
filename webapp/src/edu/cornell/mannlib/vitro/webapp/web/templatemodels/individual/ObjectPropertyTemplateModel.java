@@ -563,7 +563,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         return TYPE;
     }
 
-    public String Template() {
+    public String getTemplate() {
         return config.templateName;
     }
     
@@ -579,12 +579,13 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             ParamMap params = new ParamMap(
                     "subjectUri", subjectUri,
                     "predicateUri", propertyUri);  
-            //Check if special parameters being sent
             
+            //Check if special parameters being sent
             HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vitroRequest);
             if(specialParams.size() > 0) {
             	params.putAll(specialParams);
             }
+             
             addUrl = UrlBuilder.getUrl(EDIT_PATH, params);  
 
         }
