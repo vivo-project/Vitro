@@ -397,7 +397,8 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
                 if( VitroVocabulary.OWL_THING.equals(typeUri))
                     continue;
                 VClass type = vclassDao.getVClassByURI(typeUri);
-                if( ! type.isAnonymous() &&
+                if( type != null &&
+                    ! type.isAnonymous() &&
                       type.getName() != null && !"".equals(type.getName()) &&
                       type.getGroupURI() != null ) //don't display classes that aren't in classgroups                      
                     classes.add(type);
