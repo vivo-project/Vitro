@@ -708,10 +708,8 @@
       -->
      <lst name="defaults">
        <str name="defType">edismax</str>
-       <str name="qf">nameRaw nameLowercase ALLTEXT ALLTEXTUNSTEMMED ALLTEXT_PHONETIC NAME_PHONETIC nameUnstemmed nameStemmed targetInfo </str>
-       <str name="pf">targetInfo</str>
+       <str name="qf">nameRaw nameLowercase ALLTEXT ALLTEXTUNSTEMMED ALLTEXT_PHONETIC NAME_PHONETIC nameUnstemmed nameStemmed </str>
        <str name="echoParams">explicit</str>
-       <str name="ps">2</str>
        <str name="qs">2</str>
        <int name="rows">10</int>
        <str name="q.alt">*:*</str>
