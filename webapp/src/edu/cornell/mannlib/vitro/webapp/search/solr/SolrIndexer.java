@@ -177,32 +177,21 @@ public class SolrIndexer implements IndexerIface {
         }
     }
    
-    
     @Override
     public synchronized void endIndexing() {
         try {
-            UpdateResponse res = server.commit();
-            log.debug("Response after committing to server: "+ res );
-         } catch (SolrServerException e) {
-             log.error("Could not commit to solr server", e);
-         } catch(IOException e){
-             log.error("Could not commit to solr server", e);
-         }finally{
-             if(!individualToSolrDoc.documentModifiers.isEmpty()){
-                 if(individualToSolrDoc.documentModifiers.get(0) instanceof CalculateParameters){
-                     CalculateParameters c = (CalculateParameters) individualToSolrDoc.documentModifiers.get(0);
-                     c.clearMap();
-                     log.info("BetaMap cleared");
-                 }
-             }
-         }
-        
+           UpdateResponse res = server.commit();
+           log.debug("Response after committing to server: "+ res );
+        } catch (SolrServerException e) {
+            log.error("Could not commit to solr server", e);
+        } catch(IOException e){
+        	log.error("Could not commit to solr server", e);
+        }
         try {
             server.optimize();
         } catch (Exception e) {
             log.error("Could not optimize solr server", e);
         }
-        
         indexing = false;
         notifyAll();
     }
@@ -230,8 +219,23 @@ public class SolrIndexer implements IndexerIface {
     }
 
     public boolean isIndexEmpty() {
-        // TODO Auto-generated method stub
+    	SolrQuery query = new SolrQuery();
+    	query.setQuery("*:*");
+    	try {
+    		QueryResponse rsp = server.query(query);
+    		SolrDocumentList docs = rsp.getResults();
+    		if(docs==null || docs.size()==0){
+    			return true;
+    		}
+    	} catch (SolrServerException e) {
+    		// TODO Auto-generated catch block
+    		log.error(e,e);
+    	}
         return false;
     }
+
+    
+   
+   
 
 }
