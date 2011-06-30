@@ -349,6 +349,7 @@ public class IndexBuilder extends Thread {
             work.get( counter % workers ).add( uris.next() );
             counter ++;
         }
+        log.info("Number of individuals to be indexed : " + counter);
         return work;        
     }
     
