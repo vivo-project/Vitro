@@ -570,9 +570,9 @@
 
 <field name="THUMBNAIL" type="string" indexed="true" stored="true"/>
 
-<field name="targetInfo" type="text" indexed="true" stored="false" multiValued="true"/>
-<!-- <field name="BETA" type="float" indexed="true" stored="true" multiValued="false"/>
-<field name="PHI" type="float" indexed="true" stored="true" multiValued="false"/>
+<!-- <field name="targetInfo" type="text" indexed="true" stored="false" multiValued="true"/> -->
+<field name="BETA" type="float" indexed="true" stored="true" multiValued="false"/>
+<!-- <field name="PHI" type="float" indexed="true" stored="true" multiValued="false"/>
 <field name="ADJACENT_NODES" type="string" indexed="true" stored="true" multiValued="true"/> -->
 
 <field name="modType" type="ignored"/>
