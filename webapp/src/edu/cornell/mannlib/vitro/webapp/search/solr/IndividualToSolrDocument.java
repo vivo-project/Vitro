@@ -190,7 +190,6 @@ public class IndividualToSolrDocument {
             }
         }         
     	
-        if(documentModifiers == null || documentModifiers.isEmpty()){
         	 doc.addField(term.NAME_RAW, value, NAME_BOOST);
         	 doc.addField(term.NAME_LOWERCASE, value, NAME_BOOST);
         	 doc.addField(term.NAME_UNSTEMMED, value, NAME_BOOST);
@@ -199,17 +198,7 @@ public class IndividualToSolrDocument {
         	 doc.addField(term.AC_NAME_UNTOKENIZED, value);
              doc.addField(term.AC_NAME_STEMMED, value);
              // doc.addField(term.AC_NAME_TOKENIZED, value);
-        }else{
-        	 doc.addField(term.NAME_RAW, value);
-        	 doc.addField(term.NAME_LOWERCASE, value);
-        	 doc.addField(term.NAME_UNSTEMMED, value);
-        	 doc.addField(term.NAME_STEMMED, value);
-        	 doc.addField(term.NAME_PHONETIC, value, PHONETIC_BOOST);
-             doc.addField(term.AC_NAME_UNTOKENIZED, value);             
-             doc.addField(term.AC_NAME_STEMMED, value);
-             // doc.addField(term.AC_NAME_TOKENIZED, value);
-        }
-    	
+        
         
         long tMoniker = System.currentTimeMillis();
     	
@@ -275,7 +264,6 @@ public class IndividualToSolrDocument {
             
             //run the document modifiers
             if( documentModifiers != null && !documentModifiers.isEmpty()){
-            	doc.addField(term.targetInfo,"");
                 for(DocumentModifier modifier: documentModifiers){
                     modifier.modifyDocument(ind, doc, addUri);
                 }
@@ -353,8 +341,7 @@ public class IndividualToSolrDocument {
     }
     
 
-    public static float NAME_BOOST = 2.0F;
-    public static float ALL_TEXT_BOOST = 2.5F;
+    public static float NAME_BOOST = 1.2F;
     public static float PHONETIC_BOOST = 0.1F;
     
     
