@@ -31,8 +31,6 @@ public class VitroSearchTermNames {
     /** text for 'full text' search, this is unstemmed for
      * use with wildcards and prefix queries */
     public static String ALLTEXTUNSTEMMED = "ALLTEXTUNSTEMMED";
-    /** class name for storing targeted information **/
-    public static final String targetInfo = "targetInfo";
     /** keywords */
     public static final String KEYWORDS = "KEYWORDS";
     /** Does the individual have a thumbnail image? 1=yes 0=no */
