@@ -62,11 +62,12 @@ public class ContextNodeFields implements DocumentModifier{
 		StringBuffer objectProperties = singleThreadExecute( individual, multiValuedQueriesForAgent);
 	
 		//change fields of solr document
-		SolrInputField targetField = doc.getField(VitroSearchTermNames.targetInfo);
-		targetField.addValue(" " + runQuery(individual, multiValuedQueryForInformationResource), targetField.getBoost());
+		//SolrInputField targetField = doc.getField(VitroSearchTermNames.targetInfo);
+		//targetField.addValue(" " + runQuery(individual, multiValuedQueryForInformationResource), targetField.getBoost());
 	
 		SolrInputField field = doc.getField(VitroSearchTermNames.ALLTEXT);
-    	field.addValue(objectProperties, field.getBoost());
+		
+    	field.addValue(objectProperties + " " + runQuery(individual, multiValuedQueryForInformationResource), field.getBoost());
         log.debug("context node values are retrieved");    		    
     }
 
