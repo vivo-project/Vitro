@@ -9,6 +9,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.shared.Lock;
@@ -37,11 +38,14 @@ public class IndividualProhibitedFromSearchImpl implements IndividualProhibitedF
             return true;
         
         boolean prohibited = false;
+        QueryExecution qexec = null;
         try {
             fullModel.getLock().enterCriticalSection(Lock.READ);                               
             Query query = makeAskQueryForUri( uri );
-            prohibited = QueryExecutionFactory.create( query, fullModel).execAsk();            
+            qexec = QueryExecutionFactory.create( query, fullModel);
+            prohibited = qexec.execAsk();            
         } finally {
+            if( qexec != null ) qexec.close();
             fullModel.getLock().leaveCriticalSection();
         }
         if( prohibited )

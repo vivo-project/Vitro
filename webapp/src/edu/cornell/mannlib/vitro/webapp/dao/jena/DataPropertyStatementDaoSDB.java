@@ -68,9 +68,12 @@ public class DataPropertyStatementDaoSDB extends DataPropertyStatementDaoJena
         	DatasetWrapper w = dwf.getDatasetWrapper();
             Dataset dataset = w.getDataset();
             dataset.getLock().enterCriticalSection(Lock.READ);
+            QueryExecution qexec = null;
             try { 
-        	    results = QueryExecutionFactory.create(QueryFactory.create(query), dataset).execConstruct();
+                qexec = QueryExecutionFactory.create(QueryFactory.create(query), dataset);                
+        	    results = qexec.execConstruct();
             } finally {
+                if(qexec!=null) qexec.close();
                 dataset.getLock().leaveCriticalSection();
                 w.close();
             }

@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
+import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -130,38 +131,49 @@ public class OntologyController extends VitroHttpServlet{
 			ontModel =(OntModel)session.getAttribute("jenaOntModel");		
 		if( ontModel == null)
 			ontModel = (OntModel)getServletContext().getAttribute("jenaOntModel");
-			
+
+        boolean found = false;
+        Model newModel = ModelFactory.createDefaultModel();			
 		ontModel.enterCriticalSection(Lock.READ);
-		OntResource ontResource = ontModel.getOntResource(url);
-		if(ontResource == null)
-			ontResource = ontModel.getOntResource(url + "/");
-		Model newModel = ModelFactory.createDefaultModel();
-		if(ontResource != null){
-			Resource resource = (Resource)ontResource;
-			try{
-				String queryString = "Describe <" + resource.getURI() + ">"; 
-				newModel = QueryExecutionFactory.create(QueryFactory.create(queryString), ontModel).execDescribe();
-			}
-			finally{
-				ontModel.leaveCriticalSection();
-			}
-		}
-		else{
-			ontModel.leaveCriticalSection();
-			doNotFound(vreq,res);
-			return;
-		}
+        try{
+            OntResource ontResource = ontModel.getOntResource(url);
+            if(ontResource == null)
+                ontResource = ontModel.getOntResource(url + "/");
+            if(ontResource != null){
+                found = true;
+                Resource resource = (Resource)ontResource;
+                QueryExecution qexec = null;
+                try{
+                    String queryString = "Describe <" + resource.getURI() + ">"; 
+                    qexec = QueryExecutionFactory.create(QueryFactory.create(queryString), ontModel);
+                    newModel = qexec.execDescribe();
+                } finally{
+                    qexec.close();
+                }
+            } else {
+                found = false;
+            }
+        }finally{
+            ontModel.leaveCriticalSection();
+        }
+
+        if( ! found ){
+            //respond to HTTP outside of critical section
+            doNotFound(req,res);
+            return;
+        } else {		
+            res.setContentType(rdfFormat.getMediaType());
+            String format = ""; 
+            if ( RDFXML_MIMETYPE.equals(rdfFormat.getMediaType()))
+                format = "RDF/XML";
+            else if( N3_MIMETYPE.equals(rdfFormat.getMediaType()))
+                format = "N3";
+            else if ( TTL_MIMETYPE.equals(rdfFormat.getMediaType()))
+                format ="TTL";
 		
-		res.setContentType(rdfFormat.getMediaType());
-		String format = ""; 
-		if ( RDFXML_MIMETYPE.equals(rdfFormat.getMediaType()))
-			format = "RDF/XML";
-		else if( N3_MIMETYPE.equals(rdfFormat.getMediaType()))
-			format = "N3";
-		else if ( TTL_MIMETYPE.equals(rdfFormat.getMediaType()))
-			format ="TTL";
-		
-		newModel.write( res.getOutputStream(), format );		
+            newModel.write( res.getOutputStream(), format );		
+            return;
+        }
 	}
 	
 	private static Pattern URI_PATTERN = Pattern.compile("^/ontology/([^/]*)/([^/]*)$");

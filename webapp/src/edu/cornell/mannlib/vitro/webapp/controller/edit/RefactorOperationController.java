@@ -22,6 +22,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
@@ -217,9 +218,11 @@ public class RefactorOperationController extends BaseEditController {
 		queryStr += " union { GRAPH ?graph { ?subj ?prop <" +  oldURIStr  + ">}}}";
 		Dataset dataset = request.getDataset();
 		
-    	dataset.getLock().enterCriticalSection(Lock.READ);
+        QueryExecution qexec = null;
+    	dataset.getLock().enterCriticalSection(Lock.READ);        
     	try {
-    		ResultSet resultSet = QueryExecutionFactory.create(QueryFactory.create(queryStr), dataset).execSelect();
+            qexec = QueryExecutionFactory.create(QueryFactory.create(queryStr), dataset);
+    		ResultSet resultSet = qexec.execSelect();
     		
     		while (resultSet.hasNext()) {
     			QuerySolution qs = resultSet.next();
@@ -245,6 +248,7 @@ public class RefactorOperationController extends BaseEditController {
     			renameResourceInModel(model, userURI, oldURIStr, newURIStr, doNotify);
     		}	
     	} finally {
+            if(qexec != null) qexec.close();
     		dataset.getLock().leaveCriticalSection();
     	}
 		

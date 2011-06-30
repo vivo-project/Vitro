@@ -18,6 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 
+import com.clarkparsia.pellet.sparqldl.engine.QueryExec;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntResource;
@@ -509,12 +510,15 @@ public class IndividualSDB extends IndividualImpl implements Individual {
           DatasetWrapper w = getDatasetWrapper();
             Dataset dataset = w.getDataset();
             dataset.getLock().enterCriticalSection(Lock.READ);
-            try{                
-                _hasThumb = QueryExecutionFactory.create(QueryFactory.create(ask), dataset).execAsk();                      
+            QueryExecution qexec = null;
+            try{            
+                qexec = QueryExecutionFactory.create(QueryFactory.create(ask), dataset);
+                _hasThumb = qexec.execAsk();
             }catch(Exception ex){
                 _hasThumb = false;
                 log.error(ex,ex);
             }finally{
+                if(qexec!=null) qexec.close();
                 dataset.getLock().leaveCriticalSection();
                 w.close();
             }
@@ -670,11 +674,13 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         DatasetWrapper w = getDatasetWrapper();
         Dataset dataset = w.getDataset();
     	dataset.getLock().enterCriticalSection(Lock.READ);
+        QueryExecution qexec = null;
     	try {
     		String valuesOfProperty = 
     			"CONSTRUCT{ <" + this.individualURI + "> <" + propertyURI + "> ?object }" +
     			"WHERE{ <" + this.individualURI + "> <" + propertyURI + "> ?object } \n";
-    	    tempModel = QueryExecutionFactory.create(QueryFactory.create(valuesOfProperty), dataset).execConstruct();
+            qexec = QueryExecutionFactory.create(QueryFactory.create(valuesOfProperty), dataset);
+    	    tempModel = qexec.execConstruct();
     	    ontModel.add(tempModel.listStatements());
     	    Resource ontRes = ontModel.getResource(this.individualURI);
     	    StmtIterator sit = ontRes.listProperties(ontRes.getModel().getProperty(propertyURI));
@@ -698,6 +704,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     			}
     		}
      	} finally {
+            if(qexec!=null) qexec.close();
     		tempModel.close();
     		ontModel.close();
      		dataset.getLock().leaveCriticalSection();
