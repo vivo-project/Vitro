@@ -39,7 +39,7 @@ public class CalculateParameters implements DocumentModifier {
     private boolean shutdown = false;
 	private Dataset dataset;
     public static int totalInd=1;
-    protected Map<String,Float> betaMap = new Hashtable<String,Float>();
+    
     private static final String prefix = "prefix owl: <http://www.w3.org/2002/07/owl#> "
 		+ " prefix vitroDisplay: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>  "
 		+ " prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  "
@@ -62,18 +62,6 @@ public class CalculateParameters implements DocumentModifier {
      
     private static Log log = LogFactory.getLog(CalculateParameters.class);
     
-    private static final String[] fieldsToAddBetaTo = {
-        VitroSearchTermNames.NAME_RAW,
-        VitroSearchTermNames.NAME_LOWERCASE,
-        VitroSearchTermNames.NAME_UNSTEMMED,
-        VitroSearchTermNames.NAME_STEMMED
-    };
-    
-    private static final String[] fieldsToMultiplyBetaBy = {
-        VitroSearchTermNames.ALLTEXT,
-        VitroSearchTermNames.ALLTEXTUNSTEMMED,                
-    };
-	
 	public CalculateParameters(Dataset dataset){
 		 this.dataset =dataset;
 		 new Thread(new TotalInd(this.dataset,totalCountQuery)).start();
@@ -114,41 +102,19 @@ public class CalculateParameters implements DocumentModifier {
 		beta = (float)Conn/totalInd;
 		beta *= 100;
 		beta += 1;
+		
+		// sigmoid function to keep beta between 0 to 1;
+		
+		beta = (float) (1 / ( 1 + Math.pow(Math.E,(-beta))));
+		
+		if(beta > 1)
+			log.info("Beta higher than 1 : " + beta);
+		else if(beta <= 0)
+			log.info("Beta lower < = 0 : " + beta);
 		return beta; 
     }
 	
-	public float calculatePhi(StringBuffer adjNodes){
-
-		StringTokenizer nodes = new StringTokenizer(adjNodes.toString()," ");
-		String uri=null;
-		int size=0;
-		float phi = 0.1F;
-		while(nodes.hasMoreTokens()){
-			size++;
-			uri = nodes.nextToken();
-		    phi += getBeta(uri);
-		}
-		if(size>0)
-			phi = (float)phi/size;
-		else
-			phi = 1;
-		return phi;
-	}
 	
-	public synchronized Float getBeta(String uri){
-		
-		float beta;
-		 if(betaMap.containsKey(uri)){
-	            beta = betaMap.get(uri);
-	        }else{
-	            beta = calculateBeta(uri); // or calculate & put in map
-	            betaMap.put(uri, beta);
-	        } 
-        return beta;
-		
-    }
-    
-    
     public String[] getAdjacentNodes(String uri){
 		
     	List<String> queryList = new ArrayList<String>();
@@ -281,37 +247,12 @@ public class CalculateParameters implements DocumentModifier {
 		// TODO Auto-generated method stub
 		 // calculate beta value.  
         log.debug("Parameter calculation starts..");
-        
-        String uri = individual.getURI();
-        String adjInfo[] = getAdjacentNodes(uri);
-        StringBuffer info = new StringBuffer();
-        info.append(adjInfo[0]);
-        info.append(addUri.toString());
-        float phi = calculatePhi(info);
-        
-        for(String term: fieldsToAddBetaTo){
-            SolrInputField f = doc.getField( term );
-            float orgBoost = f.getBoost();
-            f.setBoost( getBeta(uri) + phi + orgBoost );
-        }
-        
-        for(String term: fieldsToMultiplyBetaBy){
-            SolrInputField f = doc.getField( term );
-            //f.addValue(info.toString(),getBeta(uri)*phi*IndividualToSolrDocument.ALL_TEXT_BOOST);
-        }
-        
-
-        //SolrInputField f = doc.getField(VitroSearchTermNames.targetInfo);
-        //f.addValue(adjInfo[1],f.getBoost());
-
-        doc.setDocumentBoost(getBeta(uri)*phi*IndividualToSolrDocument.ALL_TEXT_BOOST);           
-
+        float beta = calculateBeta(individual.getURI());
+        doc.addField(VitroSearchTermNames.BETA, beta);
+        doc.setDocumentBoost(beta);   
         log.debug("Parameter calculation is done");
 	}
 	
-	public void clearMap(){
-		betaMap.clear();
-	}
 	
 	public void shutdown(){
         shutdown=true;
@@ -356,6 +297,4 @@ class TotalInd implements Runnable{
 			}
 		
 	}
-	
-	
 }
