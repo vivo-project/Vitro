@@ -194,7 +194,7 @@ public class IndividualToSolrDocument {
         	 doc.addField(term.NAME_LOWERCASE, value, NAME_BOOST);
         	 doc.addField(term.NAME_UNSTEMMED, value, NAME_BOOST);
         	 doc.addField(term.NAME_STEMMED, value, NAME_BOOST);
-        	 doc.addField(term.NAME_PHONETIC, value, PHONETIC_BOOST);
+        	 doc.addField(term.NAME_PHONETIC, value);
         	 doc.addField(term.AC_NAME_UNTOKENIZED, value);
              doc.addField(term.AC_NAME_STEMMED, value);
              // doc.addField(term.AC_NAME_TOKENIZED, value);
@@ -260,7 +260,7 @@ public class IndividualToSolrDocument {
         	String alltext = allTextValue.toString();
             doc.addField(term.ALLTEXT, alltext);
             doc.addField(term.ALLTEXTUNSTEMMED, alltext);
-            doc.addField(term.ALLTEXT_PHONETIC, alltext,PHONETIC_BOOST);
+            doc.addField(term.ALLTEXT_PHONETIC, alltext);
             
             //run the document modifiers
             if( documentModifiers != null && !documentModifiers.isEmpty()){
@@ -342,7 +342,6 @@ public class IndividualToSolrDocument {
     
 
     public static float NAME_BOOST = 1.2F;
-    public static float PHONETIC_BOOST = 0.1F;
     
     
 }
