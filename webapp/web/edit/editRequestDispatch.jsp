@@ -29,8 +29,6 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 	if(request.getParameter("switchToDisplayModel") != null) {
 		//forward to Edit Request Dispatch Controller
 		String queryString = request.getQueryString();
-		System.out.println("Query string is " + queryString);
-		System.out.println("Servlet path is " + request.getServletPath() + " and context path si " + request.getContextPath());
 		response.sendRedirect("http://localhost:8080/vivo/editRequestDispatch?" + queryString);
 	}
     /*
