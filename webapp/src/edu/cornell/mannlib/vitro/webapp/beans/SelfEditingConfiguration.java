@@ -13,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 
 /**
@@ -93,6 +94,24 @@ public class SelfEditingConfiguration {
 	}
 
 	/**
+	 * Find out whether there is a matching property at all.
+	 */
+	public boolean isConfigured() {
+		return selfEditingIdMatchingProperty != null;
+	}
+
+	/**
+	 * What is the matching property? (might be null).
+	 * 
+	 * TODO This seems to expose the property unnecessarily, but how else can I
+	 * do a SPARQL query for the Individual profiles that don't have matching
+	 * property values?
+	 */
+	public String getMatchingPropertyUri() {
+		return selfEditingIdMatchingProperty;
+	}
+
+	/**
 	 * Get all Individuals associated with this user through the matching
 	 * property. Never returns null.
 	 */
@@ -125,6 +144,66 @@ public class SelfEditingConfiguration {
 		}
 		return indDao.getIndividualsByDataProperty(
 				selfEditingIdMatchingProperty, externalAuthId);
+	}
+
+	/**
+	 * This Individual, if it exists, should be associated with this
+	 * UserAccount.
+	 * 
+	 * No other Individual should be associated with this UserAccount.
+	 */
+	public void associateIndividualWithUserAccount(IndividualDao indDao,
+			DataPropertyStatementDao dpsDao, UserAccount user,
+			String associatedIndividualUri) {
+		if (indDao == null) {
+			log.warn("No IndividualDao");
+			return;
+		}
+		if (dpsDao == null) {
+			log.warn("No DataPropertyStatementDao");
+			return;
+		}
+		if (user == null) {
+			log.debug("user is null");
+			return;
+		}
+		if (selfEditingIdMatchingProperty == null) {
+			log.error("Can't associate Individual with UserAccount: "
+					+ "selfEditingMatchingProperty is null");
+			return;
+		}
+
+		String externalAuthId = user.getExternalAuthId();
+		if (externalAuthId.isEmpty()) {
+			log.debug("user has no externalAuthId");
+			return;
+		}
+
+		// If the Individual exists, clear any previous matching property value
+		// and set this one.
+		Individual associatedInd = indDao
+				.getIndividualByURI(associatedIndividualUri);
+		if (associatedInd != null) {
+			log.debug("setting the matching property on '"
+					+ associatedIndividualUri + "' to '" + externalAuthId + "'");
+			dpsDao.deleteDataPropertyStatementsForIndividualByDataProperty(
+					associatedIndividualUri, selfEditingIdMatchingProperty);
+			dpsDao.insertNewDataPropertyStatement(new DataPropertyStatementImpl(
+					associatedIndividualUri, selfEditingIdMatchingProperty,
+					externalAuthId));
+		}
+
+		// If any other Individuals have this matching property value, remove
+		// it.
+		for (Individual ind : indDao.getIndividualsByDataProperty(
+				selfEditingIdMatchingProperty, externalAuthId)) {
+			String indUri = ind.getURI();
+			if (!indUri.equals(associatedIndividualUri)) {
+				log.debug("clearing the matching property on '" + indUri + "'");
+				dpsDao.deleteDataPropertyStatementsForIndividualByDataProperty(
+						indUri, selfEditingIdMatchingProperty);
+			}
+		}
 	}
 
 	@Override
