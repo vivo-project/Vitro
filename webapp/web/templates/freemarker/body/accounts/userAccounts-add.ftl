@@ -68,6 +68,8 @@
             <label for="external-auth-id">External authorization ID</label> 
             <input type="text" name="externalAuthId" value="${externalAuthId}" id="external-auth-id" role="input "/>
 
+            <#include "userAccounts-associateProfilePanel.ftl">
+
             <p>Roles<span class="requiredHint"> *</span> </p>
             <#list roles as role>
                 <input type="radio" name="role" value="${role.uri}" role="radio" <#if selectedRole = role.uri>checked</#if> />
@@ -75,31 +77,28 @@
                 <br />
             </#list>
 
-            <#if !emailIsEnabled??>
-                <label for="initial-password">Initial password<span class="requiredHint"> *</span></label>
-                <input type="password" name="initialPassword" value="${initialPassword}" id="initial-password" role="input "/>
-
-                <p>Minimum of ${minimumLength} characters in length.</p>
-
-                <label for="confirm-password">Confirm initial password<span class="requiredHint"> *</span></label> 
-                <input type="text" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input "/>
-            </#if>
-
-            <p>Associate a profile with this account</p>
-            <input type="radio" name="associate" value="yes" role="radio" <#if associate??>checked</#if> id="associate" />
-            <label class="inline" for="associate"> Yes</label>
-
-            <input type="radio" name="associate" value="no"  role="radio" <#if !associate??>checked</#if> id="no-associate" />
-            <label class="inline" for="no-associate"> No</label>
-
             <#if emailIsEnabled??>
                 <p class="note">
                     Note: An email will be sent to the address entered above 
                     notifying that an account has been created. 
                     It will include instructions for activating the account and creating a password.
                 </p>
+            <#else>
+                <table>
+                    <tr>
+                        <td>
+                            <label for="initial-password">Initial password<span class="requiredHint"> *</span></label>
+                            <input type="password" name="initialPassword" value="${initialPassword}" id="initial-password" role="input "/>
+                        </td>
+                        <td>
+                            <label for="confirm-password">Confirm initial password<span class="requiredHint"> *</span></label> 
+                            <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
+                        </td>
+                    </tr>
+                </table>
+                <p>Minimum of ${minimumLength} characters in length.</p>
             </#if>
-    
+
             <input type="submit" name="submitAdd" value="Add new account" class="submit"/> or <a class="cancel" href="${formUrls.list}">Cancel</a>
 
             <p class="requiredHint">* required fields</p>

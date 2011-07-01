@@ -10,6 +10,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsPage;
@@ -45,6 +46,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 	private static final String TEMPLATE_NAME = "userAccounts-edit.ftl";
 
 	private final UserAccountsEditPageStrategy strategy;
+	private final boolean matchingIsEnabled;
 
 	/* The request parameters */
 	private boolean submit;
@@ -69,6 +71,9 @@ public class UserAccountsEditPage extends UserAccountsPage {
 
 		this.strategy = UserAccountsEditPageStrategy.getInstance(vreq, this,
 				isEmailEnabled());
+
+		this.matchingIsEnabled = SelfEditingConfiguration.getBean(vreq)
+				.isConfigured();
 
 		parseRequestParameters();
 		validateUserAccountInfo();
@@ -168,6 +173,8 @@ public class UserAccountsEditPage extends UserAccountsPage {
 	public final ResponseValues showPage() {
 		Map<String, Object> body = new HashMap<String, Object>();
 
+		body.put("userUri", userUri);
+		
 		if (isSubmit()) {
 			body.put("emailAddress", emailAddress);
 			body.put("externalAuthId", externalAuthId);
@@ -185,11 +192,16 @@ public class UserAccountsEditPage extends UserAccountsPage {
 		if (!isRootUser()) {
 			body.put("roles", buildRolesList());
 		}
-
+		
+		body.put("profileTypes", buildProfileTypesList());
 		body.put("formUrls", buildUrlsMapWithEditUrl());
 
 		if (!errorCode.isEmpty()) {
 			body.put(errorCode, Boolean.TRUE);
+		}
+
+		if (matchingIsEnabled) {
+			body.put("showAssociation", Boolean.TRUE);
 		}
 
 		strategy.addMoreBodyValues(body);
@@ -229,9 +241,13 @@ public class UserAccountsEditPage extends UserAccountsPage {
 
 		// Update the account.
 		userAccountsDao.updateUserAccount(userAccount);
-		
+
 		// Associate the profile, as appropriate.
-		UserAccountsAssociatedProfileHelper.reconcile(userAccount, associatedProfileUri);
+		if (matchingIsEnabled) {
+			SelfEditingConfiguration.getBean(vreq)
+					.associateIndividualWithUserAccount(indDao, dpsDao,
+							userAccount, associatedProfileUri);
+		}
 
 		// Tell the user.
 		strategy.notifyUser();

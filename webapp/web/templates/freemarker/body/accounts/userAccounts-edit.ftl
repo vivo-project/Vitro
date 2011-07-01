@@ -86,14 +86,20 @@
                     be reset until the user follows the link provided in this email.
                 </p>
             <#else>
-                <label for="new-password">New password<span class="requiredHint"> *</span></label>
-                <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
-
+                <table>
+                    <tr>
+                        <td>
+                            <label for="new-password">New password<span class="requiredHint"> *</span></label>
+                            <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
+                        </td>
+                        <td>
+                            <label for="confirm-password">Confirm initial password<span class="requiredHint"> *</span></label> 
+                            <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
+                        </td>
+                    </tr>
+                </table>
                 <p>Minimum of ${minimumLength} characters in length.</p>
                 <p>Leaving this blank means that the password will not be changed.</p>
-
-                <label for="confirm-password">Confirm initial password<span class="requiredHint"> *</span></label> 
-                <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
             </#if>
 
             <input type="submit" name="submitEdit" value="Save changes" class="submit" /> or <a class="cancel" href="${formUrls.list}">Cancel</a>

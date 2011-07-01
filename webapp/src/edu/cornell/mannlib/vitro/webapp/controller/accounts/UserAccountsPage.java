@@ -10,9 +10,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,10 +22,14 @@ import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
+import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
+import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
@@ -34,6 +39,8 @@ import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
  */
 public abstract class UserAccountsPage {
 	private static final Log log = LogFactory.getLog(UserAccountsPage.class);
+
+	private static final String PERSON_CLASS_URI = "http://xmlns.com/foaf/0.1/Person";
 
 	/**
 	 * After the account is created, or the password is reset, the user has this
@@ -45,6 +52,9 @@ public abstract class UserAccountsPage {
 	protected final ServletContext ctx;
 	protected final OntModel userAccountsModel;
 	protected final UserAccountsDao userAccountsDao;
+	protected final VClassDao vclassDao;
+	protected final IndividualDao indDao;
+	protected final DataPropertyStatementDao dpsDao;
 
 	protected UserAccountsPage(VitroRequest vreq) {
 		this.vreq = vreq;
@@ -57,6 +67,9 @@ public abstract class UserAccountsPage {
 		WebappDaoFactory wdf = (WebappDaoFactory) this.ctx
 				.getAttribute("webappDaoFactory");
 		userAccountsDao = wdf.getUserAccountsDao();
+		vclassDao = wdf.getVClassDao();
+		indDao = wdf.getIndividualDao();
+		dpsDao = wdf.getDataPropertyStatementDao();
 	}
 
 	protected boolean isEmailEnabled() {
@@ -93,10 +106,10 @@ public abstract class UserAccountsPage {
 
 	/**
 	 * Treat the presence of a certain parameter, with a desired value, as a
-	 * boolean flag. 
+	 * boolean flag.
 	 * 
-	 * An example would be radio buttons with values of "yes" and
-	 * "no". The expected value would be "yes".
+	 * An example would be radio buttons with values of "yes" and "no". The
+	 * expected value would be "yes".
 	 */
 	protected boolean isParameterAsExpected(String key, String expected) {
 		return expected.equals(getStringParameter(key, ""));
@@ -118,6 +131,27 @@ public abstract class UserAccountsPage {
 	}
 
 	/**
+	 * Create a list of possible profile types.
+	 * 
+	 * TODO Right now, these are foaf:Person and it's sub-classes. What will it
+	 * be for Vitro?
+	 */
+	protected SortedMap<String, String> buildProfileTypesList() {
+		String seedClassUri = PERSON_CLASS_URI;
+		List<String> classUris = vclassDao.getAllSubClassURIs(seedClassUri);
+		classUris.add(seedClassUri);
+		
+		SortedMap<String, String> types = new TreeMap<String, String>();
+		for (String classUri: classUris) {
+			VClass vclass = vclassDao.getVClassByURI(classUri);
+			if (vclass != null) {
+				types.put(classUri, vclass.getName());
+			}
+		}
+		return types;
+	}
+
+	/**
 	 * Make these URLs available to all of the pages.
 	 */
 	protected Map<String, String> buildUrlsMap() {
@@ -129,7 +163,8 @@ public abstract class UserAccountsPage {
 		map.put("myAccount", UrlBuilder.getUrl("/accounts/myAccount"));
 		map.put("createPassword", UrlBuilder.getUrl("/accounts/createPassword"));
 		map.put("resetPassword", UrlBuilder.getUrl("/accounts/resetPassword"));
-		map.put("firstTimeExternal", UrlBuilder.getUrl("/accounts/firstTimeExternal"));
+		map.put("firstTimeExternal",
+				UrlBuilder.getUrl("/accounts/firstTimeExternal"));
 		map.put("accountsAjax", UrlBuilder.getUrl("/accountsAjax"));
 
 		return map;

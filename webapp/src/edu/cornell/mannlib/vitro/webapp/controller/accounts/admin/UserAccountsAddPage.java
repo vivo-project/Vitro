@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -26,7 +27,7 @@ public class UserAccountsAddPage extends UserAccountsPage {
 	private static final String PARAMETER_FIRST_NAME = "firstName";
 	private static final String PARAMETER_LAST_NAME = "lastName";
 	private static final String PARAMETER_ROLE = "role";
-	private static final String PARAMETER_ASSOCIATE_WITH_PROFILE = "associate";
+	private static final String PARAMETER_ASSOCIATED_PROFILE_URI = "associatedProfileUri";
 
 	private static final String ERROR_NO_EMAIL = "errorEmailIsEmpty";
 	private static final String ERROR_EMAIL_IN_USE = "errorEmailInUse";
@@ -39,6 +40,7 @@ public class UserAccountsAddPage extends UserAccountsPage {
 	private static final String TEMPLATE_NAME = "userAccounts-add.ftl";
 
 	private final UserAccountsAddPageStrategy strategy;
+	private final boolean matchingIsEnabled;
 
 	/* The request parameters */
 	private boolean submit;
@@ -47,7 +49,7 @@ public class UserAccountsAddPage extends UserAccountsPage {
 	private String firstName = "";
 	private String lastName = "";
 	private String selectedRoleUri = "";
-	private boolean associateWithProfile;
+	private String associatedProfileUri = "";
 
 	/** The result of validating a "submit" request. */
 	private String errorCode = "";
@@ -60,6 +62,9 @@ public class UserAccountsAddPage extends UserAccountsPage {
 
 		this.strategy = UserAccountsAddPageStrategy.getInstance(vreq, this,
 				isEmailEnabled());
+
+		this.matchingIsEnabled = SelfEditingConfiguration.getBean(vreq)
+				.isConfigured();
 
 		parseRequestParameters();
 
@@ -75,8 +80,8 @@ public class UserAccountsAddPage extends UserAccountsPage {
 		firstName = getStringParameter(PARAMETER_FIRST_NAME, "");
 		lastName = getStringParameter(PARAMETER_LAST_NAME, "");
 		selectedRoleUri = getStringParameter(PARAMETER_ROLE, "");
-		associateWithProfile = isParameterAsExpected(
-				PARAMETER_ASSOCIATE_WITH_PROFILE, "yes");
+		associatedProfileUri = getStringParameter(
+				PARAMETER_ASSOCIATED_PROFILE_URI, "");
 
 		strategy.parseAdditionalParameters();
 	}
@@ -125,25 +130,32 @@ public class UserAccountsAddPage extends UserAccountsPage {
 	}
 
 	public void createNewAccount() {
+		// Assemble the fields into a new UserAccount
 		UserAccount u = new UserAccount();
 		u.setEmailAddress(emailAddress);
 		u.setFirstName(firstName);
 		u.setLastName(lastName);
 		u.setExternalAuthId(externalAuthId);
-
 		u.setMd5Password("");
 		u.setOldPassword("");
 		u.setPasswordChangeRequired(false);
 		u.setPasswordLinkExpires(0);
 		u.setLoginCount(0);
 		u.setStatus(Status.INACTIVE);
-
 		u.setPermissionSetUris(Collections.singleton(selectedRoleUri));
 
 		strategy.setAdditionalProperties(u);
 
+		// Create the account.
 		String uri = userAccountsDao.insertUserAccount(u);
 		this.addedAccount = userAccountsDao.getUserAccountByUri(uri);
+
+		// Associate the profile, as appropriate.
+		if (matchingIsEnabled) {
+			SelfEditingConfiguration.getBean(vreq)
+					.associateIndividualWithUserAccount(indDao, dpsDao,
+							this.addedAccount, associatedProfileUri);
+		}
 
 		strategy.notifyUser();
 	}
@@ -156,14 +168,16 @@ public class UserAccountsAddPage extends UserAccountsPage {
 		body.put("firstName", firstName);
 		body.put("lastName", lastName);
 		body.put("selectedRole", selectedRoleUri);
-		if (associateWithProfile) {
-			body.put("associate", Boolean.TRUE);
-		}
 		body.put("roles", buildRolesList());
+		body.put("profileTypes", buildProfileTypesList());
 		body.put("formUrls", buildUrlsMap());
 
 		if (!errorCode.isEmpty()) {
 			body.put(errorCode, Boolean.TRUE);
+		}
+		
+		if (matchingIsEnabled) {
+			body.put("showAssociation", Boolean.TRUE);
 		}
 
 		strategy.addMoreBodyValues(body);

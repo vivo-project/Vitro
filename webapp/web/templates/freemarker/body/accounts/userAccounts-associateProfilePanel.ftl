@@ -21,6 +21,7 @@
                     <label for="associatedProfileName">Associated profile:</label>
                     <span class="acSelectionInfo" id="associatedProfileName"></span>
                     <a href="" id="verifyProfileLink">(verify this match)</a>
+                    <a href="" id="changeProfileLink">(change profile)</a>
                 </p>
                 <input type="hidden" id="associatedProfileUri" name="associatedProfileUri" value="" />
             </div>
@@ -36,7 +37,9 @@
                     <label for="">Create an associated profile</label> 
                     <select name="degreeUri" id="degreeUri" >
                         <option value="" selected="selected">Select one</option>
-                        <option value="" disabled>Bogus</option>
+                        <#list profileTypes?keys as key>
+                            <option value="${key}" >${profileTypes[key]}</option>           
+                        </#list>    
                     </select>    
                 </p>
             </div>
@@ -47,9 +50,20 @@
 
 <script type="text/javascript">
 var associateProfileFieldsData = {
-    ajaxUrl: '${formUrls.accountsAjax}'
+    <#if userUri??>
+        userUri: '${userUri}' ,
+    <#else>    
+        userUri: '' ,
+    </#if>
+    
+    <#if showAssociation??>
+        associationEnabled: true ,
+        ajaxUrl: '${formUrls.accountsAjax}'
+    </#if>
 };
 </script>
 
-${scripts.add('<script type="text/javascript" src="${urls.base}/js/account/accountAssociateProfile.js"></script>')}   
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery.js"></script>',
+              '<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"></script>',
+              '<script type="text/javascript" src="${urls.base}/js/account/accountAssociateProfile.js"></script>')}   
 

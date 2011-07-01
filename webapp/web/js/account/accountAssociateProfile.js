@@ -9,6 +9,7 @@ var associateProfileFields = {
         if (this.disableFormInUnsupportedBrowsers()) {
             return;
         }        
+
         this.mixIn();
         this.initObjects();                 
         this.initPage();       
@@ -44,17 +45,19 @@ var associateProfileFields = {
         this.associatedArea = $('#associated');
         this.associatedProfileNameSpan = $('#associatedProfileName');
         this.verifyAssociatedProfileLink = $('#verifyProfileLink');
+        this.changeAssociatedProfileLink = $('#changeProfileLink');
         this.associatedProfileUriField = $('#associatedProfileUri')
         
         // We want to associate a profile
         this.associationOptionsArea = $('#associationOptions');
+        this.associateProfileNameField = $('#associateProfileName');
     },
     
     // Initial page setup. Called only at page load.
     initPage: function() {
         this.checkForAssociatedProfile();
-
         this.bindEventListeners();
+        this.initAutocomplete();
     },
     
     bindEventListeners: function() {
@@ -72,15 +75,48 @@ var associateProfileFields = {
             return false;
         });   
         
+        this.changeAssociatedProfileLink.click(function() {
+            associateProfileFields.associatedProfileUriField.val('');
+            associateProfileFields.associateProfileNameField.val('');
+            associateProfileFields.showExternalAuthIdNotRecognized();
+            return false;
+        });   
+        
     },
     
+    initAutocomplete: function() {
+        this.associateProfileNameField.autocomplete({
+            minLength: 3,
+            source: function(request, response) {
+                $.ajax({
+                    url: associateProfileFields.ajaxUrl,
+                    dataType: 'json',
+                    data: {
+                        function: "autoCompleteProfile",
+                        term: request.term,
+                        externalAuthId: associateProfileFields.externalAuthIdField.val()
+                    }, 
+                    complete: function(xhr, status) {
+                        console.log('response text' + xhr.responseText);
+                        var results = jQuery.parseJSON(xhr.responseText);
+                        response(results);
+                    }
+                });
+            },
+            select: function(event, ui) {
+                associateProfileFields.showSelectedProfile(ui.item); 
+            }
+        });
+
+    },
+
     checkForAssociatedProfile: function() {
         $.ajax({
             url: associateProfileFields.ajaxUrl,
             dataType: "json",
             data: {
                 function: "checkExternalAuth",
-                userAccountUri: "",
+                userAccountUri: associateProfileFields.userUri,
                 externalAuthId: associateProfileFields.externalAuthIdField.val()
             },
             complete: function(xhr, status) {
@@ -88,7 +124,7 @@ var associateProfileFields = {
                 if (results.idInUse) {
                     associateProfileFields.showExternalAuthIdInUse()
                 } else if (results.matchesProfile) {
-                    associateProfileFields.showExternalAuthIdMatchesProfile(results.profileUri, results.profileUri, results.profileLabel)
+                    associateProfileFields.showExternalAuthIdMatchesProfile(results.profileUri, results.profileUrl, results.profileLabel)
                 } else {
                     associateProfileFields.showExternalAuthIdNotRecognized()
                 }
@@ -122,13 +158,17 @@ var associateProfileFields = {
         this.externalAuthIdInUseMessage.hide();
         this.associatedArea.hide();
         
-        if (this.externalAuthIdField.val().length > 0) {
+        if (this.associationEnabled && this.externalAuthIdField.val().length > 0) {
             this.associationOptionsArea.show();
         } else {
             this.associationOptionsArea.hide();
         }
     },
 
+    showSelectedProfile: function(item) {
+    	this.showExternalAuthIdMatchesProfile(item.uri, item.url, item.label);
+    },
+    
 }
  
 $(document).ready(function() {   
