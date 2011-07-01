@@ -48,8 +48,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private static final String DATA_DIR = "/WEB-INF/ontologies/update/";
 	private static final String LOG_DIR = "logs/";
 	private static final String CHANGED_DATA_DIR = "changedData/";
-	private static final String ASK_QUERY_FILE = DATA_DIR + "ask.sparql";
-	private static final String ASK_EMPTY_QUERY_FILE = DATA_DIR + "askEmpty.sparql";
+	private static final String ASK_QUERY_FILE = DATA_DIR + "askUpdated.sparql";
 	private static final String SUCCESS_ASSERTIONS_FILE = DATA_DIR + "success.n3";
 	private static final String SUCCESS_RDF_FORMAT = "N3";
 	private static final String DIFF_FILE = DATA_DIR + "diff.tab.txt";
@@ -77,8 +76,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			String errorLogFileName = DATA_DIR + LOG_DIR + 	timestampedFileName("knowledgeBaseUpdate.error", "log");
 						
 			UpdateSettings settings = new UpdateSettings();
-			settings.setAskQueryFile(getAskQueryPath(ctx));
-			settings.setAskEmptyQueryFile(getAskEmptyQueryPath(ctx));
+			settings.setAskUpdatedQueryFile(getAskUpdatedQueryPath(ctx));
 			settings.setDataDir(ctx.getRealPath(DATA_DIR));
 			settings.setSparqlConstructAdditionsDir(ctx.getRealPath(SPARQL_CONSTRUCT_ADDITIONS_DIR));
 			settings.setSparqlConstructDeletionsDir(ctx.getRealPath(SPARQL_CONSTRUCT_DELETIONS_DIR));
@@ -109,33 +107,29 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 				return;
 			}
 				
-			try {
-				
-			  KnowledgeBaseUpdater ontologyUpdater = new KnowledgeBaseUpdater(settings);
+			try {		
+			   KnowledgeBaseUpdater ontologyUpdater = new KnowledgeBaseUpdater(settings);
 			  
-			  try {
+			   try {
 				  if (ontologyUpdater.updateRequired()) {
 					  ctx.setAttribute(IndexConstants.INDEX_REBUILD_REQUESTED_AT_STARTUP, Boolean.TRUE);
 					  ctx.setAttribute(KBM_REQURIED_AT_STARTUP, Boolean.TRUE);
 					  //doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
 					  reloadDisplayModel(ctx);
+					  ontologyUpdater.update();
 				  }
-			  } catch (Throwable t){
+			   } catch (IOException ioe) {
+					String errMsg = "IOException updating knowledge base " +
+						"for ontology changes: ";
+					// Tomcat doesn't always seem to print exceptions thrown from
+					// context listeners
+					System.out.println(errMsg);
+					ioe.printStackTrace();
+					throw new RuntimeException(errMsg, ioe);
+			   }	
+			} catch (Throwable t){
 				  log.warn("warning", t);
-			  }
-			  
-			  ontologyUpdater.update();
-				
-			} catch (IOException ioe) {
-				String errMsg = "IOException updating knowledge base " +
-					"for ontology changes: ";
-				// Tomcat doesn't always seem to print exceptions thrown from
-				// context listeners
-				System.out.println(errMsg);
-				ioe.printStackTrace();
-				throw new RuntimeException(errMsg, ioe);
-			}	
-		
+			}
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
@@ -244,13 +238,9 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		// nothing to do	
 	}
 	
-	public static String getAskQueryPath(ServletContext ctx) {
+	public static String getAskUpdatedQueryPath(ServletContext ctx) {
 		return ctx.getRealPath(ASK_QUERY_FILE);
 	
-    }
-	
-	public static String getAskEmptyQueryPath(ServletContext ctx) {
-		return ctx.getRealPath(ASK_EMPTY_QUERY_FILE);
     }
 	
 	private static String timestampedFileName(String prefix, String suffix) {

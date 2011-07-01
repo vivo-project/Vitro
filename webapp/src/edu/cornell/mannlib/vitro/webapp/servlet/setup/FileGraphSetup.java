@@ -86,7 +86,7 @@ public class FileGraphSetup implements ServletContextListener {
 		
 		if ( (aboxChanged || tboxChanged) && !isUpdateRequired(sce.getServletContext()) ) {
 	        	log.info("a full recompute of the Abox will be performed because" +
-	        			" the filegraph abox(s) and/or tbox(s) have changed." );
+	        			" the filegraph abox(s) and/or tbox(s) have changed or are being read for the first time." );
 	            SimpleReasonerSetup.setRecomputeRequired(sce.getServletContext());
 		}
 	}

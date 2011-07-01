@@ -259,7 +259,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
 	   RDB, SDB
    }
    
-   protected boolean isFirstStartup() {
+   public static boolean isFirstStartup() {
 	   return firstStartup;
    }
    

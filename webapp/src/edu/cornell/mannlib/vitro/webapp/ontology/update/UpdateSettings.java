@@ -12,9 +12,7 @@ public class UpdateSettings {
 	private String sparqlConstructAdditionsDir;
 	private String sparqlConstructAdditionsPass2Dir;
 	private String sparqlConstructDeletionsDir;
-	private String askQueryFile;
-	private String askEmptyQueryFile;
-	private String askEverQueryFile;
+	private String askUpdatedQueryFile;
 	private String successAssertionsFile;
 	private String successRDFFormat = "N3";
 	private String diffFile;
@@ -54,23 +52,11 @@ public class UpdateSettings {
 	public void setSparqlConstructDeletionsDir(String sparqlConstructDeletionsDir) {
 		this.sparqlConstructDeletionsDir = sparqlConstructDeletionsDir;
 	}
-	public String getAskQueryFile() {
-		return askQueryFile;
+	public String getAskUpdatedQueryFile() {
+		return askUpdatedQueryFile;
 	}
-	public void setAskQueryFile(String askQueryFile) {
-		this.askQueryFile = askQueryFile;
-	}
-	public String getAskEverQueryFile() {
-		return askEverQueryFile;
-	}
-	public void setAskEverQueryFile(String askEverQueryFile) {
-		this.askEverQueryFile = askEverQueryFile;
-	}
-	public String getAskEmptyQueryFile() {
-		return askEmptyQueryFile;
-	}
-	public void setAskEmptyQueryFile(String askEmptyQueryFile) {
-		this.askEmptyQueryFile = askEmptyQueryFile;
+	public void setAskUpdatedQueryFile(String askQueryFile) {
+		this.askUpdatedQueryFile = askQueryFile;
 	}
 	public String getSuccessAssertionsFile() {
 		return successAssertionsFile;
@@ -156,5 +142,4 @@ public class UpdateSettings {
 	public void setNewTBoxAnnotationsModel(OntModel newTBoxAnnotationsModel) {
 		this.newTBoxAnnotationsModel = newTBoxAnnotationsModel;
 	}
-	
 }
