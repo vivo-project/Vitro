@@ -384,7 +384,7 @@ public class ContextNodeFields implements DocumentModifier{
 		
 		multiValuedQueryForInformationResource = prefix + 
 				"SELECT  (str(?LinkedAuthor) as ?linkedAuthor) (str(?LinkedInformationResource) as ?linkedInformationResource) "
-		         + "(str(?Editor) as ?editor) (str(?SubjectArea) as ?subjectArea) (str(?ResearchAreaOf) as ?researchAreaOf) " +
+		         + "(str(?Editor) as ?editor) (str(?SubjectArea) as ?subjectArea) " +
 		         		"(str(?Features) as ?features) WHERE {"
 					
 					+ " ?uri rdf:type core:InformationResource . "
@@ -392,7 +392,7 @@ public class ContextNodeFields implements DocumentModifier{
 					+  "OPTIONAL { ?uri core:informationResourceInAuthorship ?a . ?a core:linkedAuthor ?b ; core:linkedInformationResource ?d ." +
 							"?b rdfs:label ?LinkedAuthor . ?d rdfs:label ?LinkedInformationResource } . "
 					+  "OPTIONAL { ?uri bibo:editor ?e . ?e rdfs:label ?Editor  . } ."			  
-					+ " OPTIONAL { ?uri core:hasSubjectArea ?f . ?f rdfs:label ?SubjectArea ; core:researchAreaOf ?h . ?h rdfs:label ?ResearchAreaOf . } "			  
+					+ " OPTIONAL { ?uri core:hasSubjectArea ?f . ?f rdfs:label ?SubjectArea . } "			  
 					+ " OPTIONAL { ?uri core:features ?i . ?i rdfs:label ?Features . } . " 
 					
 					+"}" ;
