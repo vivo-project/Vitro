@@ -12,7 +12,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.OntModel;
+
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 
@@ -20,12 +20,9 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.SelectListGenerator;
-import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 /**
  * Generates the edit configuration for a default property form.
@@ -36,7 +33,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 	private Log log = LogFactory.getLog(DefaultObjectPropertyFormGenerator.class);
 	
     @Override
-    public EditConfiguration getEditConfiguration(VitroRequest vreq,
+    public EditConfigurationVTwo getEditConfiguration(VitroRequest vreq,
             HttpSession session) {
         // TODO Generate a edit conf for the default object property form and return it.
     	
@@ -58,6 +55,8 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	String subjectUriJson = (String)vreq.getAttribute("subjectUriJson");
     	String predicateUriJson = (String)vreq.getAttribute("predicateUriJson");
     	String objectUriJson = (String)vreq.getAttribute("objectUriJson");
+    	
+    	
     	
     	//building the editjson object
     	//TODO: There has to be a better way of doing this.
@@ -113,8 +112,10 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     //	vreq.setAttribute("editjson", editjson);
     //	log.debug(vreq.getAttribute("editjson"));
     	
+    	//Alternative: Set
     	
-    	EditConfiguration editConfiguration = new EditConfiguration();
+    	
+    	EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();
     	
     	editConfiguration.setFormUrl(formUrl);
     	editConfiguration.setEditKey(editKey); 
@@ -129,6 +130,11 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 
     	editConfiguration.setVarNameForObject("objectVar");    	
     	editConfiguration.setObject(objectUriJson);
+    	//this needs to be set for the editing to be triggered properly, otherwise the 'prepare' method
+    	//pretends this is a data property editing statement and throws an error
+    	if(objectUriJson != null) {
+    		editConfiguration.setObjectResource(true);
+    	}
     	
     	List<String> n3ForEdit = new ArrayList<String>();
     	n3ForEdit.add("?subject");
@@ -144,9 +150,9 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	
     	editConfiguration.setNewResources(new HashMap<String, String>());
     	
-    	editConfiguration.setUrisInScope(new HashMap<String, String>());
+    	editConfiguration.setUrisInScope(new HashMap<String, List<String>>());
     	
-    	editConfiguration.setLiteralsInScope(new HashMap<String, Literal>());
+    	editConfiguration.setLiteralsInScope(new HashMap<String, List<Literal>>());
     	
     	List<String> urisOnForm = new ArrayList<String>();
     	urisOnForm.add("objectVar");
@@ -198,7 +204,8 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	
     	fields.put("objectVar", field);
     	
-    	editConfiguration.setFields(fields);
+    	//TODO: Review why/how this method signature has changed
+    	//editConfiguration.setFields(fields);
     	
     	editConfiguration.putConfigInSession(editConfiguration, session);
     	
@@ -208,6 +215,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	String formTitle = " ";
     	String submitLabel = " ";
     	
+    	//Here, retrieve model from 
     	Model model = (Model) session.getServletContext().getAttribute("jenaOntModel");
     	
     	//this block is for an edit of an existing object property statement

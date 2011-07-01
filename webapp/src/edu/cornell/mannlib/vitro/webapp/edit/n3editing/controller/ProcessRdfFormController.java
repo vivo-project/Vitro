@@ -30,12 +30,13 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.AdditionsAndRetractions;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditSubmission;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.ProcessRdfForm;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditSubmissionUtils;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.AdditionsAndRetractions;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmission;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.ProcessRdfForm;
 
 /**
  * This servlet will process EditConfigurations with query parameters
@@ -63,15 +64,15 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		VitroRequest vreq = new VitroRequest(request);
 		
 		//get the EditConfiguration 
-		EditConfiguration configuration = getEditConfiguration(request);
+		EditConfigurationVTwo configuration = getEditConfiguration(request);
         if(configuration == null){
             doEditConfigNotFound( vreq, response);            
             return;
         }
 
         //get the EditSubmission
-        EditSubmission submission = new EditSubmission(vreq.getParameterMap(), configuration);        	
-		EditSubmission.putEditSubmissionInSession(request.getSession(), submission);
+        MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq.getParameterMap(), configuration);        	
+        EditSubmissionUtils.putEditSubmissionInSession(request.getSession(), submission);
 
 		boolean hasErrors = doValidationErrors(vreq, configuration, submission, response);
 		if( hasErrors)
@@ -103,9 +104,9 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
         
         doPostEdit(vreq,response);		
 	}
-	private EditConfiguration getEditConfiguration(HttpServletRequest request) {
+	private EditConfigurationVTwo getEditConfiguration(HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		EditConfiguration editConfiguration = EditConfiguration.getConfigFromSession(session, request);		
+		EditConfigurationVTwo editConfiguration = EditConfigurationVTwo.getConfigFromSession(session, request);		
 		return editConfiguration;
 	}
 	    private void doEditConfigNotFound(VitroRequest request, HttpServletResponse response) {
@@ -120,7 +121,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
     }
 
 	private boolean doValidationErrors(VitroRequest vreq,
-			EditConfiguration editConfiguration, EditSubmission submission,
+			EditConfigurationVTwo editConfiguration, MultiValueEditSubmission submission,
 			HttpServletResponse response) throws ServletException, IOException {
 		
 		Map<String, String> errors = submission.getValidationErrors();
@@ -148,10 +149,10 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		private static Log log = LogFactory.getLog(ProcessRdfFormController.class);
 	    static Random random = new Random();
 		
-	    public static Map<String,List<String>> fieldsToAssertionMap( Map<String,Field> fields){
+	    public static Map<String,List<String>> fieldsToAssertionMap( Map<String,FieldVTwo> fields){
 	        Map<String,List<String>> out = new HashMap<String,List<String>>();
 	        for( String fieldName : fields.keySet()){
-	            Field field = fields.get(fieldName);
+	            FieldVTwo field = fields.get(fieldName);
 
 	            List<String> copyOfN3 = new ArrayList<String>();
 	            for( String str : field.getAssertions()){
@@ -162,10 +163,10 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 	        return out;
 	    }
 
-	     public static Map<String,List<String>> fieldsToRetractionMap( Map<String,Field> fields){
+	     public static Map<String,List<String>> fieldsToRetractionMap( Map<String,FieldVTwo> fields){
 	        Map<String,List<String>> out = new HashMap<String,List<String>>();
 	        for( String fieldName : fields.keySet()){
-	            Field field = fields.get(fieldName);
+	            FieldVTwo field = fields.get(fieldName);
 
 	            List<String> copyOfN3 = new ArrayList<String>();
 	            for( String str : field.getRetractions()){

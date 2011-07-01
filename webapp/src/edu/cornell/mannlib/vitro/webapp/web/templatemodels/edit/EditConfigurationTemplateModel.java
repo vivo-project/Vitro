@@ -2,15 +2,15 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit;
 
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 public class EditConfigurationTemplateModel extends BaseTemplateModel {
-    EditConfiguration editConfig;
+    EditConfigurationVTwo editConfig;
     VitroRequest vreq;
     
-    public EditConfigurationTemplateModel( EditConfiguration editConfig, VitroRequest vreq){
+    public EditConfigurationTemplateModel( EditConfigurationVTwo editConfig, VitroRequest vreq){
         this.editConfig = editConfig;
         this.vreq = vreq;
     }

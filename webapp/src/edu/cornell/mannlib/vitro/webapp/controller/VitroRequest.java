@@ -22,7 +22,9 @@ public class VitroRequest extends HttpServletRequestWrapper {
     private static final String FROM_ENCODING = "ISO-8859-1";
     private static final String TO_ENCODING = "UTF-8";
     public static boolean convertParameterEncoding = true;
-
+    //Attribute in case of special model editing such as display model editing
+    public static final String SPECIAL_WRITE_MODEL = "specialWriteModel";
+    
     public static boolean getConvertParameterEncoding() {
         return convertParameterEncoding;
     }
@@ -108,6 +110,18 @@ public class VitroRequest extends HttpServletRequestWrapper {
         	return (WebappDaoFactory) _req.getSession().getServletContext().getAttribute("deductionsWebappDaoFactory");	
         }
     }
+    
+    //Method that retrieves write model, returns special model in case of write model
+    public OntModel getWriteModel() {
+    	//if special write model doesn't exist use get ont model 
+    	if(this.getAttribute(this.SPECIAL_WRITE_MODEL) != null) {
+    		return (OntModel)this.getAttribute(this.SPECIAL_WRITE_MODEL);
+    	} else {
+    		return getJenaOntModel();
+    	}
+    }
+    
+    
     
     public OntModel getJenaOntModel() {
     	Object ontModel = getAttribute("jenaOntModel");

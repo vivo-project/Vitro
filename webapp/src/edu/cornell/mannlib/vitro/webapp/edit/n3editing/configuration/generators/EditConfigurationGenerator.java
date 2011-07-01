@@ -5,8 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators
 import javax.servlet.http.HttpSession;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 
 public interface EditConfigurationGenerator {
-    public EditConfiguration getEditConfiguration( VitroRequest vreq, HttpSession session );
+    public EditConfigurationVTwo getEditConfiguration( VitroRequest vreq, HttpSession session );
 }

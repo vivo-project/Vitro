@@ -24,6 +24,15 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 <vitro:confirmAuthorization />
 
 <%
+	
+	//Check if special model, in which case forward
+	if(request.getParameter("switchToDisplayModel") != null) {
+		//forward to Edit Request Dispatch Controller
+		String queryString = request.getQueryString();
+		System.out.println("Query string is " + queryString);
+		System.out.println("Servlet path is " + request.getServletPath() + " and context path si " + request.getContextPath());
+		response.sendRedirect("http://localhost:8080/vivo/editRequestDispatch?" + queryString);
+	}
     /*
     Decide which form to forward to, set subjectUri, subjectUriJson, predicateUri, and predicateUriJson in request.
     Also get the Individual for the subjectUri and put it in the request scope.

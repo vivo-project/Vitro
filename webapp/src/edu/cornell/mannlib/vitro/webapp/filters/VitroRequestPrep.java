@@ -271,11 +271,17 @@ public class VitroRequestPrep implements Filter {
 	        		}
     				//Changes will be made to the copy, not the original from the servlet context
 	        		wadfj.setSpecialDataModel(useMainOntModel, useTboxOntModel, useDisplayOntModel);
+	        		//Set attribute on VitroRequest that saves special write model
+	        		vreq.setAttribute(vreq.SPECIAL_WRITE_MODEL, useMainOntModel);
 	        		return wadfj;
 	        	}
     		}
     	}
     	//if no parameters exist for switching models, return the original webapp dao factory object
+    	//ensure no attribute there if special write model not being utilized
+    	if(vreq.getAttribute(vreq.SPECIAL_WRITE_MODEL) != null) {
+    		vreq.removeAttribute(vreq.SPECIAL_WRITE_MODEL);
+    	}
     	return inputWadf;
     }
     

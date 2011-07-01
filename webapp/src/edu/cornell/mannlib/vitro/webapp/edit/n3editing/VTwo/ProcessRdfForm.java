@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit;
+package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import com.hp.hpl.jena.shared.Lock;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.ModelChangePreprocessor;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.controller.ProcessRdfFormController.Utilities;
 
@@ -31,7 +31,7 @@ public class ProcessRdfForm {
      * Execute any modelChangePreprocessors in the editConfiguration;
      * 
      */
-    public static void preprocessModels(AdditionsAndRetractions changes, EditConfiguration editConfiguration, VitroRequest request){
+    public static void preprocessModels(AdditionsAndRetractions changes, EditConfigurationVTwo editConfiguration, VitroRequest request){
 
         List<ModelChangePreprocessor> modelChangePreprocessors = editConfiguration.getModelChangePreprocessors();
         if ( modelChangePreprocessors != null ) {
@@ -85,10 +85,10 @@ public class ProcessRdfForm {
 
 
     @SuppressWarnings("static-access")
-    public static AdditionsAndRetractions createNewResource(EditConfiguration editConfiguration , EditSubmission submission){
+    public static AdditionsAndRetractions createNewResource(EditConfigurationVTwo editConfiguration , MultiValueEditSubmission submission){
         List<String> errorMessages = new ArrayList<String>();
         
-        EditN3Generator n3Subber = editConfiguration.getN3Generator();
+        EditN3GeneratorVTwo n3Subber = editConfiguration.getN3Generator();
         
         if(log.isDebugEnabled()){
             log.debug("creating a new relation " + editConfiguration.getPredicateUri());
@@ -100,28 +100,28 @@ public class ProcessRdfForm {
         
         /* ********** URIs and Literals on Form/Parameters *********** */
         //sub in resource uris off form
-        n3Required = n3Subber.subInUris(submission.getUrisFromForm(), n3Required);
-        n3Optional = n3Subber.subInUris(submission.getUrisFromForm(), n3Optional);      
+        n3Required = n3Subber.subInMultiUris(submission.getUrisFromForm(), n3Required);
+        n3Optional = n3Subber.subInMultiUris(submission.getUrisFromForm(), n3Optional);      
         if(log.isDebugEnabled()) {
             logRequiredOpt("substituted in URIs  off from ",n3Required,n3Optional);
         }
         
         //sub in literals from form
-        n3Required = n3Subber.subInLiterals(submission.getLiteralsFromForm(), n3Required);
-        n3Optional = n3Subber.subInLiterals(submission.getLiteralsFromForm(), n3Optional);
+        n3Required = n3Subber.subInMultiLiterals(submission.getLiteralsFromForm(), n3Required);
+        n3Optional = n3Subber.subInMultiLiterals(submission.getLiteralsFromForm(), n3Optional);
         if(log.isDebugEnabled()) {
             logRequiredOpt("substituted in literals off from ",n3Required,n3Optional);
         }
         
         /* ****************** URIs and Literals in Scope ************** */        
-        n3Required = n3Subber.subInUris( editConfiguration.getUrisInScope(), n3Required);
-        n3Optional = n3Subber.subInUris( editConfiguration.getUrisInScope(), n3Optional);
+        n3Required = n3Subber.subInMultiUris( editConfiguration.getUrisInScope(), n3Required);
+        n3Optional = n3Subber.subInMultiUris( editConfiguration.getUrisInScope(), n3Optional);
         if(log.isDebugEnabled()) {
             logRequiredOpt("substituted in URIs from scope ",n3Required,n3Optional);
         }
         
-        n3Required = n3Subber.subInLiterals( editConfiguration.getLiteralsInScope(), n3Required);
-        n3Optional = n3Subber.subInLiterals( editConfiguration.getLiteralsInScope(), n3Optional);
+        n3Required = n3Subber.subInMultiLiterals( editConfiguration.getLiteralsInScope(), n3Required);
+        n3Optional = n3Subber.subInMultiLiterals( editConfiguration.getLiteralsInScope(), n3Optional);
         if(log.isDebugEnabled()) {
             logRequiredOpt("substituted in Literals from scope ",n3Required,n3Optional);
         }
@@ -169,11 +169,11 @@ public class ProcessRdfForm {
     }
 
     @SuppressWarnings("static-access")
-    public static AdditionsAndRetractions editExistingResource(EditConfiguration editConfiguration, EditSubmission submission) {
+    public static AdditionsAndRetractions editExistingResource(EditConfigurationVTwo editConfiguration, MultiValueEditSubmission submission) {
         
         Map<String, List<String>> fieldAssertions = Utilities.fieldsToAssertionMap(editConfiguration.getFields());
         Map<String, List<String>> fieldRetractions = Utilities.fieldsToRetractionMap(editConfiguration.getFields());
-        EditN3Generator n3Subber = editConfiguration.getN3Generator();
+        EditN3GeneratorVTwo n3Subber = editConfiguration.getN3Generator();
 
         /* ********** URIs and Literals on Form/Parameters *********** */
         fieldAssertions = n3Subber.substituteIntoValues(submission.getUrisFromForm(), submission.getLiteralsFromForm(), fieldAssertions);
@@ -246,17 +246,17 @@ public class ProcessRdfForm {
      * This is intended to substitute vars from the EditConfiguration and
      * EditSubmission into the URL to return to.
      */
-    public static String substitueForURL(EditConfiguration configuration, EditSubmission submission){
+    public static String substitueForURL(EditConfigurationVTwo configuration, MultiValueEditSubmission submission){
         
         List<String> entToReturnTo = new ArrayList<String>(1);
         entToReturnTo.add(configuration.getEntityToReturnTo());
         
-        EditN3Generator n3Subber = configuration.getN3Generator();
+        EditN3GeneratorVTwo n3Subber = configuration.getN3Generator();
         // Substitute in URIs from the submission
-        entToReturnTo = n3Subber.subInUris(submission.getUrisFromForm(), entToReturnTo);                       
+        entToReturnTo = n3Subber.subInMultiUris(submission.getUrisFromForm(), entToReturnTo);                       
         
         // Substitute in URIs from the scope of the EditConfiguration                
-        entToReturnTo = n3Subber.subInUris(configuration.getUrisInScope(), entToReturnTo);                
+        entToReturnTo = n3Subber.subInMultiUris(configuration.getUrisInScope(), entToReturnTo);                
         
         //The problem is that subInURI will add < and > around URIs for the N3 syntax.
         //for the URL to return to, replace < and > from URI additions.  

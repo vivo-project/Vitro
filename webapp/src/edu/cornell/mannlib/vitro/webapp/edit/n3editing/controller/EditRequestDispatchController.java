@@ -17,7 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServ
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.EditConfigurationGenerator;
 import edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit.EditConfigurationTemplateModel;
@@ -40,7 +40,13 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     final String DEFAULT_ERROR_FORM = "error.jsp";
     final String DEFAULT_ADD_INDIVIDUAL = "defaultAddMissingIndividualForm.jsp";
     @Override
-    protected ResponseValues processRequest(VitroRequest vreq) {      
+    protected ResponseValues processRequest(VitroRequest vreq) {
+        Map mapTest = vreq.getParameterMap();
+        java.util.Iterator testIterator = mapTest.keySet().iterator();
+        while(testIterator.hasNext()) {
+        	String paramKey = (String) testIterator.next();
+        	System.out.println("Param key is " + paramKey + " and test iterator is value is " +  mapTest.get(paramKey).toString());
+        }
     	try{
         WebappDaoFactory wdf = vreq.getWebappDaoFactory();
         
@@ -48,9 +54,9 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
         //The edit key links submissions to EditConfiguration objects in the session.
         HttpSession session = vreq.getSession();        
         String editKey = 
-            (EditConfiguration.getEditKey(vreq) == null) 
-                ? EditConfiguration.newEditKey(session)
-                : EditConfiguration.getEditKey(vreq);
+            (EditConfigurationVTwo.getEditKey(vreq) == null) 
+                ? EditConfigurationVTwo.newEditKey(session)
+                : EditConfigurationVTwo.getEditKey(vreq);
         vreq.setAttribute("editKey", editKey);
         
         //set title to Edit to maintain functionality from 1.1.1 and avoid updates to Selenium tests
@@ -125,7 +131,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
         // Keep track of what form we are using so it can be returned to after a failed validation 
         // I'd like to get this from the request but sometimes that doesn't work well, internal forwards etc.
          //TODO: this needs to be the same as the mapping in web.xml 
-         vreq.setAttribute("formUrl", "/edit/editRequest?" + vreq.getQueryString());
+         vreq.setAttribute("formUrl", "/edit/editRequestDispatch?" + vreq.getQueryString());
 
          if ("delete".equals(command)) {
              //TODO: delete command is used with the defualt delete form
@@ -155,14 +161,14 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
              HashMap<String,Object> map = new HashMap<String,Object>();
         	 map.put("errorMessage", "skip edit form for object properties is not yet implemented");
         	 return new TemplateResponseValues("error-message.ftl", map);
-         }
+         } 
 
          //use default object property form if nothing else works
          String editConfGeneratorName = DEFAULT_OBJ_FORM;
           
          // *** handle the case where the form is specified as a request parameter ***
          if( predicateUri == null && ( formParam != null && !formParam.isEmpty()) ){
-             //form parameter must be a fully qualified java class name of a EditConfigurationGenerator implementation.
+             //form parameter must be a fully qualified java class name of a EditConfigurationVTwoGenerator implementation.
              editConfGeneratorName = formParam;              
          }
          
@@ -177,7 +183,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          if( objectProp != null ){
              vreq.setAttribute("predicate", objectProp);
              //custom entry form use to be a jsp but it should now be a fully qualified java class name of a 
-             //EditConfigurationGenerator implementation.
+             //EditConfigurationVTwoGenerator implementation.
              customForm = objectProp.getCustomEntryForm();
              if (customForm != null && customForm.length() > 0) {                            
                  //if there is a custom form on the predicate, use that
@@ -185,9 +191,13 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
              }
          }
 
+         // The default object proepty form offers the option to create a new item
+         // instead of selecting from existing individuals in the system.
+         // This is where the request to create a new indivdiual is handled.
+         //
          // Forward to create new is part of the default object property form
-         // it should be handled in that form's EditConfiguration, not here.
-         // The code that sets up the EditConfiguration should decide on 
+         // it should be handled in that form's EditConfigurationVTwo, not here.
+         // The code that sets up the EditConfigurationVTwo should decide on 
          // different configurations and templates to use based on isForwardToCreateNew. 
          //TODO: make sure that forward to create new works on the default object property form
          if( isFowardToCreateNew(vreq, objectProp, command)){
@@ -198,9 +208,9 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          
          /****  make new or get an existing edit configuration ***/         
      
-         EditConfiguration editConfig = makeEditConfiguration( editConfGeneratorName, vreq, session);
+         EditConfigurationVTwo editConfig = makeEditConfigurationVTwo( editConfGeneratorName, vreq, session);
          editConfig.setEditKey(editKey);
-         EditConfiguration.putConfigInSession(editConfig, session);
+         EditConfigurationVTwo.putConfigInSession(editConfig, session);
          
          //what template?
          String template = editConfig.getTemplate();
@@ -208,7 +218,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          
          //what goes in the map for templates?
          Map<String,Object> templateData = new HashMap<String,Object>();
-         templateData.put("editConfiguration", new EditConfigurationTemplateModel( editConfig, vreq));
+         templateData.put("EditConfiguration", new EditConfigurationTemplateModel( editConfig, vreq));
          templateData.put("formTitle", formTitle);
          
          return new TemplateResponseValues(template, templateData);
@@ -222,16 +232,16 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          }
     }
     
-    private EditConfiguration makeEditConfiguration(
+    private EditConfigurationVTwo makeEditConfigurationVTwo(
             String editConfGeneratorName, VitroRequest vreq, HttpSession session) {
     	
-    	EditConfigurationGenerator editConfigurationGenerator = null;
+    	EditConfigurationGenerator EditConfigurationVTwoGenerator = null;
     	
         Object object = null;
         try {
             Class classDefinition = Class.forName(editConfGeneratorName);
             object = classDefinition.newInstance();
-            editConfigurationGenerator = (EditConfigurationGenerator) object;
+            EditConfigurationVTwoGenerator = (EditConfigurationGenerator) object;
         } catch (InstantiationException e) {
             System.out.println(e);
         } catch (IllegalAccessException e) {
@@ -240,19 +250,19 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
             System.out.println(e);
         }    	
         
-        if(editConfigurationGenerator == null){
-        	log.error("could not find editConfigurationGenerator " + editConfGeneratorName);
+        if(EditConfigurationVTwoGenerator == null){
+        	log.error("could not find EditConfigurationVTwoGenerator " + editConfGeneratorName);
         	return null;
         } else {
-            return editConfigurationGenerator.getEditConfiguration(vreq, session);
+            return EditConfigurationVTwoGenerator.getEditConfiguration(vreq, session);
         }
         
     }
 
     /*
          Forward to create new is part of the default object property form
-         it should be handled in that form's EditConfiguration, not here.
-         The code that sets up the EditConfiguration should decide on 
+         it should be handled in that form's EditConfigurationVTwo, not here.
+         The code that sets up the EditConfigurationVTwo should decide on 
          different configurations and templates to use based on isForwardToCreateNew.
      */
     boolean isFowardToCreateNew(VitroRequest vreq, ObjectProperty objectProp, String command){       

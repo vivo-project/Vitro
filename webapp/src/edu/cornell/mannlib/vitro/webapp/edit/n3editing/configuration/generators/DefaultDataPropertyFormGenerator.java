@@ -15,7 +15,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils;
 
 public class DefaultDataPropertyFormGenerator implements EditConfigurationGenerator {
@@ -30,7 +30,7 @@ public class DefaultDataPropertyFormGenerator implements EditConfigurationGenera
 		  }
 
 	@Override
-	public EditConfiguration getEditConfiguration(VitroRequest vreq,
+	public EditConfigurationVTwo getEditConfiguration(VitroRequest vreq,
 			HttpSession session) {
 	    
 		String subjectUri   = vreq.getParameter("subjectUri");
@@ -45,11 +45,11 @@ public class DefaultDataPropertyFormGenerator implements EditConfigurationGenera
 	    int dataHash=0;
 	    
 	    DataProperty prop = (DataProperty)vreq.getAttribute("predicate");
-	    if( prop == null ) return doHelp(vreq, "In DefaultDataPropertyFormGenerator, could not find predicate " + predicateUri);
+	    //if( prop == null ) return doHelp(vreq, "In DefaultDataPropertyFormGenerator, could not find predicate " + predicateUri);
 	    vreq.setAttribute("propertyName",prop.getPublicName());
 
 	    Individual subject = (Individual)vreq.getAttribute("subject");
-	    if( subject == null ) return doHelp(vreq,"In DefaultDataPropertyFormGenerator, could not find subject " + subjectUri);
+	    //if( subject == null ) return doHelp(vreq,"In DefaultDataPropertyFormGenerator, could not find subject " + subjectUri);
 	    vreq.setAttribute("subjectName",subject.getName());
 	    
 	    String rangeDatatypeUri = vreq.getWebappDaoFactory().getDataPropertyDao().getRequiredDatatypeURI(subject, prop);
@@ -99,7 +99,7 @@ public class DefaultDataPropertyFormGenerator implements EditConfigurationGenera
 	    String formUrl = (String)vreq.getAttribute("formUrl");
 	    String editKey = (String)vreq.getAttribute("editKey");
 	    
-    	EditConfiguration editConfiguration = new EditConfiguration();
+    	EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();
 	    
     	List<String> n3ForEdit = new ArrayList<String>();
     	n3ForEdit.add("?subject");
@@ -127,7 +127,7 @@ public class DefaultDataPropertyFormGenerator implements EditConfigurationGenera
 		return null;
 	}
 
-	private EditConfiguration doHelp(VitroRequest vreq, String string) {
+	private EditConfigurationVTwo doHelp(VitroRequest vreq, String string) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -40,14 +40,7 @@ public class EditN3Generator {
         return Collections.EMPTY_LIST;
     }
 
-    /**
-     * This is the method to use to substitute in URIs into variables of target N3 strings.
-     * This takes into account multiple values that would be returned from a select list.
-     * subInUris should no longer be used.
-     */
-    public static List<String> subInMultiUris(Map<String,List<String>> varsToVals, List<String> n3targets){       
-       return null;
-    }
+  
     
     public static List<String> subInUris(Map<String,String> varsToVals, List<String> targets){
         if( varsToVals == null || varsToVals.isEmpty() ) return targets;
@@ -87,15 +80,6 @@ public class EditN3Generator {
             outv.add( subInUris( var,value, target) ) ;
         }
         return outv;
-    }
-
-    /**
-     * This is the method to use to substitute in Literals into variables of target N3 strings.
-     * This takes into account multiple values that would be returned from a select list.
-     * subInUris should no longer be used.
-     */
-    public static List<String> subInMultiLiterals(Map<String,List<String>> varsToVals, List<String> n3targets){       
-       return null;
     }
     
     public  List<String> subInLiterals(Map<String, Literal> varsToVals, List<String> targets){

@@ -1,12 +1,13 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit;
+package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
@@ -28,18 +29,20 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
-import edu.cornell.mannlib.vitro.webapp.edit.elements.EditElement;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditElementVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.BasicValidation;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.N3Validator;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;
 
 public class MultiValueEditSubmission {
 
     String editKey;
-
-    private Map<String,Literal> literalsFromForm ;
-    private Map<String,String> urisFromForm ;
+    
+    //TODO: Need to change below to be able to support multiple values
+    private Map<String,List<Literal>> literalsFromForm ;
+    private Map<String,List<String>> urisFromForm ;
 
     private Map<String,String> validationErrors;
     private BasicValidation basicValidation;
@@ -52,7 +55,7 @@ public class MultiValueEditSubmission {
         literalCreationModel = ModelFactory.createDefaultModel();
     }
     
-    public MultiValueEditSubmission(Map<String,String[]> queryParameters,  EditConfiguration editConfig){
+    public MultiValueEditSubmission(Map<String,String[]> queryParameters,  EditConfigurationVTwo editConfig){
         if( editConfig == null )
             throw new Error("EditSubmission needs an EditConfiguration");            
         this.editKey = editConfig.getEditKey();         
@@ -61,15 +64,25 @@ public class MultiValueEditSubmission {
 
         validationErrors = new HashMap<String,String>();
         
-        this.urisFromForm = new HashMap<String,String>();
+        this.urisFromForm = new HashMap<String,List<String>>();
         for( String var: editConfig.getUrisOnform() ){     
             String[] valuesArray = queryParameters.get( var );
-            String uri = null;
+            //String uri = null;
             List<String> values = (valuesArray != null) ? Arrays.asList(valuesArray) : null;
+            //Iterate through the values and check to see if they should be added or removed from form
+            urisFromForm.put(var, values);
+            for(String uri : values) {
+	            if( uri != null && uri.length() == 0 && editConfig.getNewResources().containsKey(var) ){
+	                log.debug("A new resource URI will be made for var " + var + " since it was blank on the form.");
+	                urisFromForm.remove(var);
+	            }
+            }
+            /*
             if( values != null && values.size() > 0){
                 if(  values.size() == 1 ) {
                     uri = values.get(0);                        
                 } else if( values.size() > 1 ){
+                	//TODO: Change this and above so array/list sent as uri and not single value
                     uri = values.get(0);
                     log.error("Cannot yet handle multiple URIs for a single field, using first URI on list");
                 } 
@@ -81,12 +94,12 @@ public class MultiValueEditSubmission {
             if( uri != null && uri.length() == 0 && editConfig.getNewResources().containsKey(var) ){
                 log.debug("A new resource URI will be made for var " + var + " since it was blank on the form.");
                 urisFromForm.remove(var);
-            }
+            }*/
         }
         
-        this.literalsFromForm =new HashMap<String,Literal>();        
+        this.literalsFromForm =new HashMap<String,List<Literal>>();        
         for(String var: editConfig.getLiteralsOnForm() ){            
-            Field field = editConfig.getField(var);
+            FieldVTwo field = editConfig.getField(var);
             if( field == null ) {
                 log.error("could not find field " + var + " in EditConfiguration" );
                 continue;   
@@ -96,6 +109,20 @@ public class MultiValueEditSubmission {
                 String[] valuesArray = queryParameters.get(var); 
                 List<String> valueList = (valuesArray != null) ? Arrays.asList(valuesArray) : null;                
                 if( valueList != null && valueList.size() > 0 ) {
+                	List<Literal> literalsArray = new ArrayList<Literal>();
+                	//now support multiple values
+                	for(String value:valueList) {
+                		value = EditN3Utils.stripInvalidXMLChars(value);
+                        //Add to array of literals corresponding to this variable
+                        if (!StringUtils.isEmpty(value)) {
+                            literalsArray.add(createLiteral(
+                                                        value, 
+                                                        field.getRangeDatatypeUri(), 
+                                                        field.getRangeLang()));
+                        }
+                	}
+                	literalsFromForm.put(var, literalsArray);
+                	/*
                     String value = valueList.get(0);
                     
                     // remove any characters that are not valid in XML 1.0
@@ -113,6 +140,7 @@ public class MultiValueEditSubmission {
                     if(valueList != null && valueList.size() > 1 )
                         log.debug("For field " + var +", cannot yet handle multiple " +
                                 "Literals for a single field, using first Literal on list");
+                    */
                     
                 }else{
                     log.debug("could not find value for parameter " + var  );
@@ -130,7 +158,8 @@ public class MultiValueEditSubmission {
         }
         
         processEditElementFields(editConfig,queryParameters);
-        
+        //Not checking validation for now
+        /*
         Map<String,String> errors = basicValidation.validateUris( urisFromForm );   
         
         if(editConfig.getValidators() != null ){
@@ -142,17 +171,17 @@ public class MultiValueEditSubmission {
 //                        validationErrors.putAll(errors);
                 }
             }
-        }               
+        } */              
         
         if( log.isDebugEnabled() )
             log.debug( this.toString() );
     }
 
-    protected void processEditElementFields(EditConfiguration editConfig, Map<String,String[]> queryParameters ){
+    protected void processEditElementFields(EditConfigurationVTwo editConfig, Map<String,String[]> queryParameters ){
         for( String fieldName : editConfig.getFields().keySet()){
-            Field field = editConfig.getFields().get(fieldName);
+            FieldVTwo field = editConfig.getFields().get(fieldName);
             if( field != null && field.getEditElement() != null ){
-                EditElement element = field.getEditElement();                
+                EditElementVTwo element = field.getEditElement();                
                 log.debug("Checking EditElement for field " + fieldName + " type: " + element.getClass().getName());
                 
                 //check for validation error messages
@@ -162,10 +191,10 @@ public class MultiValueEditSubmission {
                                 
                 if( errMsgs == null || errMsgs.isEmpty()){                    
                     //only check for uris and literals when element has no validation errors
-                    Map<String,String> urisFromElement = element.getURIs(fieldName, editConfig, queryParameters);
+                    Map<String,List<String>> urisFromElement = element.getURIs(fieldName, editConfig, queryParameters);
                     if( urisFromElement != null )
                         urisFromForm.putAll(urisFromElement);
-                    Map<String,Literal> literalsFromElement = element.getLiterals(fieldName, editConfig, queryParameters);
+                    Map<String,List<Literal>> literalsFromElement = element.getLiterals(fieldName, editConfig, queryParameters);
                     if( literalsFromElement != null )
                         literalsFromForm.putAll(literalsFromElement);
                 }else{
@@ -203,11 +232,11 @@ public class MultiValueEditSubmission {
         return validationErrors;
     }
 
-    public Map<String, Literal> getLiteralsFromForm() {
+    public Map<String, List<Literal>> getLiteralsFromForm() {
         return literalsFromForm;
     }
 
-    public Map<String, String> getUrisFromForm() {
+    public Map<String, List<String>> getUrisFromForm() {
         return urisFromForm;
     }
     /**
@@ -266,11 +295,11 @@ public class MultiValueEditSubmission {
          return new EditLiteral(hourStr + ":" + minuteStr + ":" + secondStr, TIME_URI, null);
          
     }
-    public void setLiteralsFromForm(Map<String, Literal> literalsFromForm) {
+    public void setLiteralsFromForm(Map<String, List<Literal>> literalsFromForm) {
         this.literalsFromForm = literalsFromForm;
     }
 
-    public void setUrisFromForm(Map<String, String> urisFromForm) {
+    public void setUrisFromForm(Map<String, List<String>> urisFromForm) {
         this.urisFromForm = urisFromForm;
     }
 
@@ -283,5 +312,5 @@ public class MultiValueEditSubmission {
         return obj.toString();
     }
 
-    private Log log = LogFactory.getLog(EditSubmission.class);
+    private Log log = LogFactory.getLog(MultiValueEditSubmission.class);
 }
