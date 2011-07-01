@@ -35,7 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.N3Validator;
 
 public class EditSubmission {
-    private String editKey;
+    String editKey;
 
     private Map<String,Literal> literalsFromForm ;
     private Map<String,String> urisFromForm ;

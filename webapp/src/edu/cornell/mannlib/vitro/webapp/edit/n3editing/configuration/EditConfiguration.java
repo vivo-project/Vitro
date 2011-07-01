@@ -634,7 +634,8 @@ public class EditConfiguration {
     public static void putConfigInSession(EditConfiguration ec, HttpSession sess){
         if( sess == null )
             throw new Error("EditConfig: could not put config in session because session was null");
-
+        if( ec.editKey == null )
+            throw new Error("EditConfig: could not put into session because editKey was null.");
 
         Map<String,EditConfiguration> configs = (Map<String,EditConfiguration>)sess.getAttribute("EditConfigurations");
         if( configs == null ){

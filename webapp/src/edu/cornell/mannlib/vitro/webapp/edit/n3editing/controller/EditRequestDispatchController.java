@@ -20,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.EditConfigurationGenerator;
 import edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit.EditConfigurationTemplateModel;
 
 /**
  * This servlet is intended to handle all requests to create a form for use
@@ -195,8 +196,11 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
                      
          vreq.setAttribute("form", editConfGeneratorName);
          
-         /****  make the edit configuration ***/
+         /****  make new or get an existing edit configuration ***/         
+     
          EditConfiguration editConfig = makeEditConfiguration( editConfGeneratorName, vreq, session);
+         editConfig.setEditKey(editKey);
+         EditConfiguration.putConfigInSession(editConfig, session);
          
          //what template?
          String template = editConfig.getTemplate();
@@ -204,7 +208,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          
          //what goes in the map for templates?
          Map<String,Object> templateData = new HashMap<String,Object>();
-         templateData.put("editConfiguration", editConfig);
+         templateData.put("editConfiguration", new EditConfigurationTemplateModel( editConfig, vreq));
          templateData.put("formTitle", formTitle);
          
          return new TemplateResponseValues(template, templateData);
