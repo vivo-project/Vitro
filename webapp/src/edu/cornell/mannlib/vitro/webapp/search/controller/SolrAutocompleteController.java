@@ -99,15 +99,26 @@ public class SolrAutocompleteController extends VitroAjaxController {
 
             List<SearchResult> results = new ArrayList<SearchResult>();
             for (SolrDocument doc : docs) {
-                try{                                      
+                try {                                      
                     String uri = doc.get(VitroSearchTermNames.URI).toString();
-                    // VitroSearchTermNames.NAME_RAW is a multivalued field, so doc.get() returns a list
-                    @SuppressWarnings("unchecked")
-                    String name = ((List<String>) doc.get(VitroSearchTermNames.NAME_RAW)).get(0);
+                    // RY 7/1/2011
+                    // Comment was: VitroSearchTermNames.NAME_RAW is a multivalued field, so doc.get() returns a list.
+                    // Changed to: VitroSearchTermNames.NAME_RAW is a multivalued field, so doc.get() could return a list
+                    // But in fact: I'm no longer seeing any lists returned for individuals with multiple labels. Not sure
+                    // if this is new behavior or what. ???
+                    Object nameRaw = doc.get(VitroSearchTermNames.NAME_RAW);
+                    String name = null;
+                    if (nameRaw instanceof List<?>) {
+                        @SuppressWarnings("unchecked")
+                        List<String> nameRawList = (List<String>) nameRaw;
+                        name = nameRawList.get(0);
+                    } else {
+                        name = (String) nameRaw;
+                    }
                     SearchResult result = new SearchResult(name, uri);
                     results.add(result);
                 } catch(Exception e){
-                    log.error("problem getting usable Individuals from search " +
+                    log.error("problem getting usable individuals from search " +
                             "hits" + e.getMessage());
                 }
             }   
@@ -195,31 +206,48 @@ public class SolrAutocompleteController extends VitroAjaxController {
         
         String acTermName = VitroSearchTermNames.AC_NAME_STEMMED;
         String nonAcTermName = VitroSearchTermNames.NAME_STEMMED;
+        String acQueryStr;
         
         if (queryStr.endsWith(" ")) {
-            // Solr wants whitespace to be escaped with a backslash
-            queryStr = queryStr.replaceAll("\\s+", "\\\\ ");
-            queryStr = nonAcTermName + ":" + queryStr;            
+            acQueryStr = makeTermQuery(nonAcTermName, queryStr, true);    
         } else {
             int indexOfLastWord = queryStr.lastIndexOf(" ") + 1;
-            String queryStr1 = queryStr.substring(0, indexOfLastWord);
-            String queryStr2 = queryStr.substring(indexOfLastWord);
-            queryStr = nonAcTermName + ":\"" + queryStr1 + "\"+" + acTermName + ":" + queryStr2;
+            List<String> terms = new ArrayList<String>(2);
+            
+            String allButLastWord = queryStr.substring(0, indexOfLastWord);
+            if (StringUtils.isNotBlank(allButLastWord)) {
+                terms.add(makeTermQuery(nonAcTermName, allButLastWord, true));
+            }
+            
+            String lastWord = queryStr.substring(indexOfLastWord);
+            if (StringUtils.isNotBlank(lastWord)) {
+                terms.add(makeTermQuery(acTermName, lastWord, false));
+            }
+            
+            acQueryStr = StringUtils.join(terms, " AND ");
         }
         
-        log.debug("Tokenized name query string = " + queryStr);
-        query.setQuery(queryStr);
+        log.debug("Tokenized name query string = " + acQueryStr);
+        query.setQuery(acQueryStr);
 
     }
 
-    private void setUntokenizedNameQuery(SolrQuery query, String queryStr) {
-        
-        queryStr = queryStr.trim();
-        // Solr wants whitespace to be escaped with a backslash
-        queryStr = queryStr.replaceAll("\\s+", "\\\\ ");
-        queryStr = VitroSearchTermNames.AC_NAME_UNTOKENIZED + ":" + queryStr;
+    private void setUntokenizedNameQuery(SolrQuery query, String queryStr) {        
+        queryStr = queryStr.trim();       
+        queryStr = makeTermQuery(VitroSearchTermNames.AC_NAME_UNTOKENIZED, queryStr, true);
         query.setQuery(queryStr);
-
+    }
+    
+    private String makeTermQuery(String term, String queryStr, boolean mayContainWhitespace) {
+        if (mayContainWhitespace) {
+            queryStr = "\"" + escapeWhitespaceInQueryString(queryStr) + "\"";
+        }
+        return term + ":" + queryStr;
+    }
+    
+    private String escapeWhitespaceInQueryString(String queryStr) {
+        // Solr wants whitespace to be escaped with a backslash
+        return queryStr.replaceAll("\\s+", "\\\\ ");
     }
             
     private void doNoQuery(HttpServletResponse response) throws IOException  {

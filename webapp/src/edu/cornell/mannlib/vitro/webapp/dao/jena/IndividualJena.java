@@ -53,7 +53,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
     private OntResource ind = null;
     private WebappDaoFactoryJena webappDaoFactory = null;
     private Float _searchBoostJena = null;
-    private boolean retreivedNullRdfsLabel = false;
+    private boolean retrievedNullRdfsLabel = false;
     
     public IndividualJena(OntResource ind, WebappDaoFactoryJena wadf) {
         this.ind = ind;
@@ -88,13 +88,13 @@ public class IndividualJena extends IndividualImpl implements Individual {
     public String getRdfsLabel() {
         if (this.rdfsLabel != null) {
             return rdfsLabel;
-        } else if( this.rdfsLabel == null && retreivedNullRdfsLabel ){
+        } else if( this.rdfsLabel == null && retrievedNullRdfsLabel ){
         	return null;
         } else { 
             ind.getOntModel().enterCriticalSection(Lock.READ);
             try {
                 this.rdfsLabel = webappDaoFactory.getJenaBaseDao().getLabel(ind);
-                retreivedNullRdfsLabel = this.rdfsLabel == null;
+                retrievedNullRdfsLabel = this.rdfsLabel == null;
                 return this.rdfsLabel;
             } finally {
                 ind.getOntModel().leaveCriticalSection();

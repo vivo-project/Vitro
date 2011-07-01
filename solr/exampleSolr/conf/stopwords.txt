@@ -130,9 +130,6 @@ our
 out
 over
 re
-said
-same
-see
 should
 since
 so
@@ -156,13 +153,10 @@ to
 too
 under
 up
-use
 very
 want
 was
-way
 we
-well
 were
 what
 when

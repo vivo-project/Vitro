@@ -178,9 +178,10 @@ public class IndividualToSolrDocument {
 
     private void addLabel(Individual ind, SolrInputDocument doc) {
         String value = "";
-        if(ind.getRdfsLabel() != null)
-            value = ind.getRdfsLabel();
-        else{
+        String label = ind.getRdfsLabel();
+        if (label != null) {
+            value = label;
+        } else {
             value = ind.getLocalName();
         }            
         doc.addField(term.NAME_RAW, value);

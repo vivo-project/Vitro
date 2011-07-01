@@ -254,7 +254,7 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
                 if (individual != null) {
                     individualsAdded++;                    
                     individuals.add(individual);
-                    log.debug("Adding individual " + uri + " to individuals for display");
+                    log.debug("Adding individual " + uri + " to individual list display");
                 } else {
                     log.debug("No existing individual for search document with uri = " + uri);
                 }
