@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -36,7 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
  */
 public class KnowledgeBaseUpdater {
 
-	//private final Log log = LogFactory.getLog(OntologyUpdater.class);
+	private final Log log = LogFactory.getLog(KnowledgeBaseUpdater.class);
 	
 	private UpdateSettings settings;
 	private ChangeLogger logger;
@@ -62,6 +65,7 @@ public class KnowledgeBaseUpdater {
 			
 			long startTime = System.currentTimeMillis();
             System.out.println("Migrating the knowledge base");
+            log.info("Migrating the knowledge base");
             logger.log("Started knowledge base migration");
 			
 			try {
@@ -82,6 +86,7 @@ public class KnowledgeBaseUpdater {
 
 			long elapsedSecs = (System.currentTimeMillis() - startTime)/1000;		
 			System.out.println("Finished knowledge base migration in " + elapsedSecs + " second" + (elapsedSecs != 1 ? "s" : ""));
+			log.info("Finished knowledge base migration in " + elapsedSecs + " second" + (elapsedSecs != 1 ? "s" : ""));
 		}
 		
 		return updateRequired;
@@ -91,7 +96,9 @@ public class KnowledgeBaseUpdater {
 	private void performUpdate() throws IOException {
 		
 		performSparqlConstructAdditions(settings.getSparqlConstructAdditionsDir(), settings.getAssertionOntModelSelector().getABoxModel());
+		log.info("finished sparql construct additions");
 		performSparqlConstructRetractions(settings.getSparqlConstructDeletionsDir(), settings.getInferenceOntModelSelector().getABoxModel());
+		log.info("finished sparql construct retractions");
 		
 		List<AtomicOntologyChange> rawChanges = getAtomicOntologyChanges();
 		
@@ -99,8 +106,10 @@ public class KnowledgeBaseUpdater {
 		
         //process the TBox before the ABox
 	    updateTBoxAnnotations();
-
-    	updateABox(changes);		
+		log.info("finished updating tbox annotations");
+	   
+    	updateABox(changes);
+		log.info("finished updating abox");
 	}
 	
 	private void performSparqlConstructAdditions(String sparqlConstructDir, OntModel aboxModel) throws IOException {
@@ -186,6 +195,7 @@ public class KnowledgeBaseUpdater {
 					fileContents.append(ln).append('\n');
 				}
 				try {
+					log.info("processing SPARQL construct query from file " + sparqlFiles[i].getName());
 					Query q = QueryFactory.create(fileContents.toString(), Syntax.syntaxARQ);
 					aboxModel.enterCriticalSection(Lock.WRITE);
 					try {
@@ -200,7 +210,7 @@ public class KnowledgeBaseUpdater {
 								   " statement"  + ((num > 1) ? "s" : "") + 
 								   " using the SPARQL construct query from file " + sparqlFiles[i].getName());
                         }
-						
+                        qe.close();
 					} finally {
 						aboxModel.leaveCriticalSection();
 					}
