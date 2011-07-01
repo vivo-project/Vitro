@@ -237,10 +237,10 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
                     if(ent!=null)
                         individuals.add(ent);
                 } catch(Exception e) {
-                    log.error("Problem getting usable Individuals from search hits. " +
+                    log.error("Problem getting usable individuals from search hits. " +
                             e.getMessage());
                 }
-            }            
+            }          
   
             ParamMap pagingLinkParams = new ParamMap();
             pagingLinkParams.put(PARAM_QUERY_TEXT, qtxt);
