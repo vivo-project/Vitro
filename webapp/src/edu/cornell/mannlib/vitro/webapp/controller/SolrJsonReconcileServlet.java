@@ -4,12 +4,13 @@ package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -18,31 +19,25 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.util.Version;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.search.SearchException;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
+import edu.cornell.mannlib.vitro.webapp.search.controller.SolrAutocompleteController.SearchResult;
+import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
+
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.search.QueryParsing;
 
 /**
  * This servlet is for servicing JSON requests from Google Refine's
@@ -53,9 +48,12 @@ import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
  */
 public class SolrJsonReconcileServlet extends VitroHttpServlet {
 
+	private static final String PARAM_QUERY = "term";
     private static final long serialVersionUID = 1L;
     private static String QUERY_PARAMETER_NAME = "term";
+    private static final String PARAM_RDFTYPE = "type";
 	public static final int MAX_QUERY_LENGTH = 500;
+	private static final int DEFAULT_MAX_HIT_COUNT = 1000;
 	private static final Log log = LogFactory.getLog(SolrJsonReconcileServlet.class.getName());
 
 	@Override
@@ -71,8 +69,6 @@ public class SolrJsonReconcileServlet extends VitroHttpServlet {
 		super.doGet(req, resp);
 		resp.setContentType("application/json");
 		VitroRequest vreq = new VitroRequest(req);
-		log.debug("vreq");
-		log.debug(vreq.getWebappDaoFactory());
 
 		try {
 			if (vreq.getParameter("query") != null
@@ -166,9 +162,9 @@ public class SolrJsonReconcileServlet extends VitroHttpServlet {
 		// Run index search
 		JSONObject qJson = null;
 		if (searchWithTypeMap.size() > 0) {
-			qJson = runSearch(searchWithTypeMap, vreq);
+			qJson = runSearch(searchWithTypeMap);
 		} else {
-			qJson = runSearch(searchNoTypeMap, vreq);
+			qJson = runSearch(searchNoTypeMap);
 		}
 		return qJson;
 	}
@@ -228,13 +224,10 @@ public class SolrJsonReconcileServlet extends VitroHttpServlet {
 		return json;
 	}
 
-	private JSONObject runSearch(HashMap<String, JSONObject> currMap,
-			VitroRequest vreq) throws ServletException {
+	private JSONObject runSearch(HashMap<String, JSONObject> currMap) throws ServletException {
 		JSONObject qJson = new JSONObject();
+		
 		try {
-			Analyzer analyzer = getAnalyzer(getServletContext());
-			IndexSearcher searcherForRequest = LuceneIndexFactory
-					.getIndexSearcher(getServletContext());
 
 			for (Map.Entry<String, JSONObject> entry : currMap.entrySet()) {
 				JSONObject resultAllJson = new JSONObject();
@@ -242,6 +235,8 @@ public class SolrJsonReconcileServlet extends VitroHttpServlet {
 				JSONObject json = (JSONObject) entry.getValue();
 				String queryVal = json.getString("query");
 
+				// System.out.println("query: " + json.toString());
+				
 				// continue with properties list
 				String searchType = null;
 				int limit = 3; // default
@@ -265,193 +260,277 @@ public class SolrJsonReconcileServlet extends VitroHttpServlet {
 						JSONObject jsonProperty = properties.getJSONObject(i);
 						String pid = jsonProperty.getString("pid");
 						String v = jsonProperty.getString("v");
-						pvPair[0] = pid;
-						pvPair[1] = v;
-						propertiesList.add(pvPair);
+						if (pid != null && v != null) {
+							pvPair[0] = pid;
+							pvPair[1] = v;
+							propertiesList.add(pvPair);
+						}
 					}
 				}
 
 				// begin search
 				JSONArray resultJsonArr = new JSONArray();
-				Query query = getReconcileQuery(vreq, analyzer,
-						queryVal, searchType, propertiesList);
 
-				TopDocs topDocs = searcherForRequest.search(query, null, limit);
-				if (topDocs != null && topDocs.scoreDocs != null) {
-					int hitsLength = topDocs.scoreDocs.length;
-					if (hitsLength > 0) {
-						for (int i = 0; i < topDocs.scoreDocs.length; i++) {
+				// Solr
+	            SolrQuery query = getQuery(queryVal, searchType, limit, propertiesList);
+	            QueryResponse queryResponse = null;
+	            if (query != null) {
+	            	SolrServer solr = SolrSetup.getSolrServer(getServletContext());
+	            	queryResponse = solr.query(query);
+	            } else {
+	            	log.error("Query for a search was null");                
+	            }
+
+	            SolrDocumentList docs = null;
+	            if (queryResponse != null) {
+	            	docs = queryResponse.getResults();
+	            } else {
+	            	log.error("Query response for a search was null");                
+	            }
+
+	            if (docs != null) {
+	            	
+	                List<SearchResult> results = new ArrayList<SearchResult>();
+	                for (SolrDocument doc : docs) {
+	                    try {                         
+	                        String uri = doc.get(VitroSearchTermNames.URI).toString();
+	                        // RY 7/1/2011
+	                        // Comment was: VitroSearchTermNames.NAME_RAW is a multivalued field, so doc.get() returns a list.
+	                        // Changed to: VitroSearchTermNames.NAME_RAW is a multivalued field, so doc.get() could return a list
+	                        // But in fact: I'm no longer seeing any lists returned for individuals with multiple labels. Not sure
+	                        // if this is new behavior or what. ???
+	                        Object nameRaw = doc.get(VitroSearchTermNames.NAME_RAW);
+	                        String name = null;
+	                        if (nameRaw instanceof List<?>) {
+	                            @SuppressWarnings("unchecked")
+	                            List<String> nameRawList = (List<String>) nameRaw;
+	                            name = nameRawList.get(0);
+	                        } else {
+	                            name = (String) nameRaw;
+	                        }
+	                        
+	                        SearchResult result = new SearchResult(name, uri);
+	                        
+	                        // populate result for Google Refine
 							JSONObject resultJson = new JSONObject();
-							float score = topDocs.scoreDocs[i].score;
-							resultJson.put("score", score);
-
-							Document doc = searcherForRequest
-									.doc(topDocs.scoreDocs[i].doc);
-							String uri = doc.get(Entity2LuceneDoc.term.URI);
-							IndividualDao iDao = vreq.getWebappDaoFactory()
-									.getIndividualDao();
-							Individual ind = iDao.getIndividualByURI(uri);
-							if (ind != null) {
-								String name = ind.getName();
-								// encode # to %23
-								String modUri = uri.replace("#", "%23");
-								resultJson.put("id", modUri);
-								resultJson.put("name", name);
-							}
-							List fields = doc.getFields();
+							resultJson.put("score", doc.getFieldValue("score"));
+							String modUri = result.getUri().replace("#", "%23");
+							resultJson.put("id", modUri);
+							resultJson.put("name", result.getLabel());
+							
+							Collection<Object> rdfTypes = doc.getFieldValues(VitroSearchTermNames.RDFTYPE);
 							JSONArray typesJsonArr = new JSONArray();
-							for (int j = 0; j < fields.size(); j++) {
-								Field field = (Field) fields.get(j);
-								String fieldName = field.name();
-								if ("type".equals(fieldName)) {
-									// e.g. http://aims.fao.org/aos/geopolitical.owl#area
-									String type = field.stringValue();
+							if (rdfTypes != null) {
+
+								for (Object rdfType : rdfTypes) {
+
+									// e.g.
+									// http://aims.fao.org/aos/geopolitical.owl#area
+									String type = (String) rdfType;
 									int lastIndex2 = type.lastIndexOf('/') + 1;
-									String typeName = type
-											.substring(lastIndex2);
+									String typeName = type.substring(lastIndex2);
 									typeName = typeName.replace("#", ":");
 									JSONObject typesJson = new JSONObject();
 									typesJson.put("id", type);
 									typesJson.put("name", typeName);
 									typesJsonArr.put(typesJson);
+
 								}
 							}
+
 							resultJson.put("type", typesJsonArr);
 							resultJson.put("match", "false");
 							resultJsonArr.put(resultJson);
+
+						} catch (Exception e) {
+							log.error("problem getting usable individuals from search "
+									+ "hits" + e.getMessage());
 						}
 					}
-				}
+	            } else {
+	            	log.error("Docs for a search was null");                
+	            }
 				resultAllJson.put("result", resultJsonArr);
 				qJson.put(key, resultAllJson);
+				// System.out.println("results: " + qJson.toString());
 			}
 
 		} catch (JSONException ex) {
 			log.error("JSONException: " + ex);
 			throw new ServletException("JSONReconcileServlet JSONException: "
 					+ ex);
-		} catch (SearchException ex) {
-			log.error("SearchException: " + ex);
-			throw new ServletException("JSONReconcileServlet SearchException: "
-					+ ex);
-		} catch (IOException ex) {
-			log.error("IOException: " + ex);
-			throw new ServletException("JSONReconcileServlet IOException: "
+		} catch (SolrServerException ex) {
+			log.error("JSONException: " + ex);
+			throw new ServletException("JSONReconcileServlet SolrServerException: "
 					+ ex);
 		}
 
 		return qJson;
 	}
 
-	private Analyzer getAnalyzer(ServletContext servletContext)
-			throws SearchException {
-		Object obj = servletContext.getAttribute(LuceneSetup.ANALYZER);
-		if (obj == null || !(obj instanceof Analyzer))
-			throw new SearchException("Could not get anlyzer");
-		else
-			return (Analyzer) obj;
-	}
+    private SolrQuery getQuery(String queryStr, String searchType, int limit, ArrayList<String[]> propertiesList) {
+        
+        if ( queryStr == null) {
+            log.error("There was no parameter '"+ PARAM_QUERY            
+                +"' in the request.");                
+            return null;
+        } else if( queryStr.length() > MAX_QUERY_LENGTH ) {
+            log.debug("The search was too long. The maximum " +
+                    "query length is " + MAX_QUERY_LENGTH );
+            return null;
+        }
+                   
+        SolrQuery query = new SolrQuery();
+        
+        // original code:
+        // query.setStart(0).setRows(DEFAULT_MAX_HIT_COUNT);  
+        // Google Refine specific:
+        query.setStart(0).setRows(limit);
+        
+        setNameQuery(query, queryStr);
+        
+        // Filter by type
+        // e.g. http://xmlns.com/foaf/0.1/Person
+        if (searchType != null) {
+        	query.addFilterQuery(VitroSearchTermNames.RDFTYPE + ":\"" + searchType + "\"");
+        }        
+        
+        // Added score to original code:
+        query.setFields(VitroSearchTermNames.NAME_RAW, VitroSearchTermNames.URI, "*", "score"); // fields to retrieve
+ 
+		// if propertiesList has elements, add extra queries to query
+		Iterator<String[]> it = propertiesList.iterator();
+		while (it.hasNext()) {
+			String[] pvPair = it.next();
+			query.addFilterQuery(tokenizeNameQuery(pvPair[1]), VitroSearchTermNames.RDFTYPE + ":\"" + pvPair[0] + "\"");
+		}       
 
-    private Query makeReconcileNameQuery(String querystr, Analyzer analyzer, HttpServletRequest request) {
-
-    	return makeTokenizedNameQuery(querystr, analyzer, request);
+        // Can't sort on multivalued field, so we sort the results in Java when we get them.
+        // query.setSortField(VitroSearchTermNames.NAME_LOWERCASE, SolrQuery.ORDER.asc);
+        
+        return query;
     }
-	
-    private Query makeTokenizedNameQuery(String querystr, Analyzer analyzer, HttpServletRequest request) {
-    	   
-        String termName = VitroSearchTermNames.NAME_STEMMED;
+ 
+    private void setNameQuery(SolrQuery query, String queryStr) {
 
-        BooleanQuery boolQuery = new BooleanQuery();
-        
-        // Use the query parser to analyze the search term the same way the indexed text was analyzed.
-        // For example, text is lowercased, and function words are stripped out.
-        QueryParser parser = getQueryParser(termName, analyzer);
-        
-        // The wildcard query doesn't play well with stemming. Query term name:tales* doesn't match
-        // "tales", which is indexed as "tale", while query term name:tales does. Obviously we need 
-        // the wildcard for name:tal*, so the only way to get them all to match is use a disjunction 
-        // of wildcard and non-wildcard queries. The query will look have only an implicit disjunction
-        // operator: e.g., +(name:tales name:tales*)
-        try {
-            log.debug("Adding non-wildcard query for " + querystr);
-            Query query = parser.parse(querystr);  
-            boolQuery.add(query, BooleanClause.Occur.SHOULD);
+        if (StringUtils.isBlank(queryStr)) {
+            log.error("No query string");
+        }
 
-            // Prevent ParseException here when adding * after a space.
-            // If there's a space at the end, we don't need the wildcard query.
-            if (! querystr.endsWith(" ")) {
-                log.debug("Adding wildcard query for " + querystr);
-                Query wildcardQuery = parser.parse(querystr + "*");            
-                boolQuery.add(wildcardQuery, BooleanClause.Occur.SHOULD);
+        // original code:
+        // String tokenizeParam = (String) request.getParameter("tokenize"); 
+        // boolean tokenize = "true".equals(tokenizeParam);
+
+        // Note: Stemming is only relevant if we are tokenizing: an untokenized name
+        // query will not be stemmed. So we don't look at the stem parameter until we get to
+        // setTokenizedNameQuery().
+        //if (tokenize) {
+        //    setTokenizedNameQuery(query, queryStr, request);
+        //} else {
+        //    setUntokenizedNameQuery(query, queryStr);
+        //}
+
+        // Google Refine specific
+        setTokenizedNameQuery(query, queryStr);
+    }
+
+    private void setTokenizedNameQuery(SolrQuery query, String queryStr) {
+        query.setQuery(tokenizeNameQuery(queryStr));
+    }
+    
+    private String tokenizeNameQuery(String queryStr) {
+        /* We currently have no use case for a tokenized, unstemmed autocomplete search field, so the option
+         * has been disabled. If needed in the future, will need to add a new field and field type which
+         * is like AC_NAME_STEMMED but doesn't include the stemmer.
+        String stemParam = (String) request.getParameter("stem"); 
+        boolean stem = "true".equals(stemParam);
+        if (stem) {
+            String acTermName = VitroSearchTermNames.AC_NAME_STEMMED;
+            String nonAcTermName = VitroSearchTermNames.NAME_STEMMED;
+        } else {
+            String acTermName = VitroSearchTermNames.AC_NAME_UNSTEMMED;
+            String nonAcTermName = VitroSearchTermNames.NAME_UNSTEMMED;        
+        }
+        */
+        
+        String acTermName = VitroSearchTermNames.AC_NAME_STEMMED;
+        String nonAcTermName = VitroSearchTermNames.NAME_STEMMED;
+        String acQueryStr;
+        
+        if (queryStr.endsWith(" ")) {
+            acQueryStr = makeTermQuery(nonAcTermName, queryStr, true);    
+        } else {
+            int indexOfLastWord = queryStr.lastIndexOf(" ") + 1;
+            List<String> terms = new ArrayList<String>(2);
+            
+            String allButLastWord = queryStr.substring(0, indexOfLastWord);
+            if (StringUtils.isNotBlank(allButLastWord)) {
+                terms.add(makeTermQuery(nonAcTermName, allButLastWord, true));
             }
             
-            log.debug("Name query is: " + boolQuery.toString());
-        } catch (ParseException e) {
-            log.warn(e, e);
+            String lastWord = queryStr.substring(indexOfLastWord);
+            if (StringUtils.isNotBlank(lastWord)) {
+                terms.add(makeTermQuery(acTermName, lastWord, false));
+            }
+            
+            acQueryStr = StringUtils.join(terms, " AND ");
         }
-                
-        return boolQuery;
+        
+        log.debug("Tokenized name query string = " + acQueryStr);
+        return acQueryStr;
     }
 
-    private QueryParser getQueryParser(String searchField, Analyzer analyzer){
-        // searchField indicates which field to search against when there is no term
-        // indicated in the query string.
-        // The analyzer is needed so that we use the same analyzer on the search queries as
-        // was used on the text that was indexed.
-    	QueryParser qp = new QueryParser(Version.LUCENE_29, searchField,analyzer);
-        //this sets the query parser to AND all of the query terms it finds.
-        qp.setDefaultOperator(QueryParser.AND_OPERATOR);
-        return qp;
+    private String makeTermQuery(String term, String queryStr, boolean mayContainWhitespace) {
+        if (mayContainWhitespace) {
+            queryStr = "\"" + escapeWhitespaceInQueryString(queryStr) + "\"";
+        }
+        return term + ":" + queryStr;
     }
 
-    private Query getReconcileQuery(VitroRequest request, Analyzer analyzer, 
-    				String querystr, String typeParam, ArrayList<String[]> propertiesList) throws SearchException{
+    private String escapeWhitespaceInQueryString(String queryStr) {
+        // Solr wants whitespace to be escaped with a backslash
+        return queryStr.replaceAll("\\s+", "\\\\ ");
+    }
 
-    	Query query = null;
-    	try {
-    		if( querystr == null){
-    			log.error("There was no Parameter '"+ QUERY_PARAMETER_NAME            
-    					+"' in the request.");                
-    			return null;
-    		}else if( querystr.length() > MAX_QUERY_LENGTH ){
-    			log.debug("The search was too long. The maximum " +
-    					"query length is " + MAX_QUERY_LENGTH );
-    			return null;
-    		} 
-	
-    		query = makeReconcileNameQuery(querystr, analyzer, request);
+    public class SearchResult implements Comparable<Object> {
+        private String label;
+        private String uri;
+        
+        SearchResult(String label, String uri) {
+            this.label = label;
+            this.uri = uri;
+        }
+        
+        public String getLabel() {
+            return label;
+        }
+        
+        public String getJsonLabel() {
+            return JSONObject.quote(label);
+        }
+        
+        public String getUri() {
+            return uri;
+        }
+        
+        public String getJsonUri() {
+            return JSONObject.quote(uri);
+        }
+        
+        Map<String, String> toMap() {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("label", label);
+            map.put("uri", uri);
+            return map;
+        }
 
-    		// filter by type
-    		if (typeParam != null) {
-    			BooleanQuery boolQuery = new BooleanQuery(); 
-    			boolQuery.add(  new TermQuery(
-    					new Term(VitroSearchTermNames.RDFTYPE, 
-    							typeParam)),
-    							BooleanClause.Occur.MUST);
-    			boolQuery.add(query, BooleanClause.Occur.MUST);
-    			query = boolQuery;
-    		}
-
-			// if propertiesList has elements, add extra queries to query
-			Iterator<String[]> it = propertiesList.iterator();
-			while (it.hasNext()) {
-				String[] pvPair = it.next();
-				Query extraQuery = makeReconcileNameQuery(pvPair[1], analyzer, request);
-				if ( ! StringUtils.isEmpty(pvPair[0]) ) {
-					BooleanQuery boolQuery = new BooleanQuery();
-					boolQuery.add(new TermQuery(new Term(
-							VitroSearchTermNames.RDFTYPE, pvPair[0])),
-							BooleanClause.Occur.MUST);
-					boolQuery.add(extraQuery, BooleanClause.Occur.MUST);
-					extraQuery = boolQuery;
-				}				
-				((BooleanQuery)query).add(extraQuery, BooleanClause.Occur.MUST);
-			}
-		} catch (Exception ex) {
-			throw new SearchException(ex.getMessage());
-		}
-
-    	return query;
+        public int compareTo(Object o) throws ClassCastException {
+            if ( !(o instanceof SearchResult) ) {
+                throw new ClassCastException("Error in SearchResult.compareTo(): expected SearchResult object.");
+            }
+            SearchResult sr = (SearchResult) o;
+            return label.compareToIgnoreCase(sr.getLabel());
+        }
     }
 
 }
