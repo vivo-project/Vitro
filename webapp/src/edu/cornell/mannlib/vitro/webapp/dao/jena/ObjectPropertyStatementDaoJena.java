@@ -293,8 +293,6 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             return Collections.emptyList();
         } 
         
-        // RY One oddity here is that SDB adds the bound variables to the query select terms,
-        // even if they're not included in the query.
         QuerySolutionMap initialBindings = new QuerySolutionMap();
         initialBindings.add("subject", ResourceFactory.createResource(subjectUri));
         initialBindings.add("property", ResourceFactory.createResource(propertyUri));
