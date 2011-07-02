@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -57,38 +58,38 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 public class EditConfigurationVTwo {
     
 	//Strings representing required n3 for RDF
-    List<String> n3Required;
+    List<String> n3Required = Collections.emptyList();
     //String representing optional N3 for RDF
-    List<String> n3Optional;
+    List<String> n3Optional = Collections.emptyList();
     //Names of variables of 'objects' i.e. URIs on form
-    List<String> urisOnform;
+    List<String> urisOnform = Collections.emptyList();
     //Names of variables corresponding to data values i.e. literals on form
-    List<String> literalsOnForm;
+    List<String> literalsOnForm = Collections.emptyList();
     //Names of variables corresponding to Files on form
-    List<String> filesOnForm;
+    List<String> filesOnForm = Collections.emptyList();
     
     //Multi values now supported for uris and literals, so second parameter needs to be List<String>
     //Mapping of variable name for object to values for object, i.e. URIs, e.g. "hasElement" = "<a.com>, <b.com>"
-    Map<String,List<String>> urisInScope;
+    Map<String,List<String>> urisInScope = Collections.emptyMap();
     //Mapping from variable name to values for literals
-    Map<String, List<Literal>> literalsInScope;
+    Map<String, List<Literal>> literalsInScope = Collections.emptyMap();
     
     //Map name of variable to sparql query which should return a one-column result set of URIs corresponding to variable
     //E.g. sparql for inverse of object property
-    Map<String,String> sparqlForAdditionalUrisInScope;
+    Map<String,String> sparqlForAdditionalUrisInScope = Collections.emptyMap();
     //Mapping variable to sparql query returning literals 
-    Map<String,String> sparqlForAdditionalLiteralsInScope;
+    Map<String,String> sparqlForAdditionalLiteralsInScope = Collections.emptyMap();
     
     //Variable names to URI prefixes for variables that are allowed to have new instances created
-    Map<String,String> newResources;
+    Map<String,String> newResources = Collections.emptyMap();
     
     //Variable names to fields, Field = additional configuration for variable
-    Map<String,FieldVTwo> fields;
+    Map<String,FieldVTwo> fields = Collections.emptyMap();
     
     //Mapping variable name to Sparql query to find existing literals corresponding to variable, result set should be one-column multi-row of literals
-    Map<String,String>sparqlForExistingLiterals;
+    Map<String,String>sparqlForExistingLiterals = Collections.emptyMap();
     //Mapping variable name to Sparql query to find existing URIs corresponding to variable, result set should be one-column multi-row of URIs/URI resources
-    Map<String,String>sparqlForExistingUris;
+    Map<String,String>sparqlForExistingUris = Collections.emptyMap();
 
     String subjectUri;
     String varNameForSubject;
@@ -113,13 +114,13 @@ public class EditConfigurationVTwo {
     String formUrl;
     String editKey;
 
-    List<N3Validator> validators;
+    List<N3Validator> validators = Collections.emptyList();
 
 	EditN3GeneratorVTwo n3generator;   
 
-    private List<ModelChangePreprocessor> modelChangePreprocessors;
+    private List<ModelChangePreprocessor> modelChangePreprocessors = Collections.emptyList();
     
-    private List<EditSubmissionVTwoPreprocessor> editSubmissionPreprocessors = null;
+    private List<EditSubmissionVTwoPreprocessor> editSubmissionPreprocessors  = Collections.emptyList();
     
     private ProhibitedFromSearch prohibitedFromSearch;
 

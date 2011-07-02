@@ -16,7 +16,7 @@ public class EditSubmissionUtils {
     
     /* *************** Static utility methods to get EditSub from Session *********** */
 
-    public static MultiValueEditSubmission getEditSubmissionFromSession(HttpSession sess, EditConfiguration editConfig){
+    public static MultiValueEditSubmission getEditSubmissionFromSession(HttpSession sess, EditConfigurationVTwo editConfig){
         Map<String,MultiValueEditSubmission> submissions = 
             (Map<String,MultiValueEditSubmission>)sess.getAttribute(MULTI_VALUED_EDIT_SUBMISSION);
         if( submissions == null )
@@ -40,7 +40,7 @@ public class EditSubmissionUtils {
     public static void clearEditSubmissionInSession(HttpSession sess, MultiValueEditSubmission editSub){
         if( sess == null) return;
         if( editSub == null ) return;
-        Map<String,MultiValueEditSubmission> submissions = (Map<String,MultiValueEditSubmission>)sess.getAttribute("MULTI_VALUED_EDIT_SUBMISSION");
+        Map<String,MultiValueEditSubmission> submissions = (Map<String,MultiValueEditSubmission>)sess.getAttribute(MULTI_VALUED_EDIT_SUBMISSION);
         if( submissions == null ){
             throw new Error("MultiValueEditSubmission: could not get a Map of MultiValueEditSubmission from the session.");
         }
@@ -50,7 +50,7 @@ public class EditSubmissionUtils {
 
     public static void clearAllEditSubmissionsInSession(HttpSession sess ){
         if( sess == null) return;
-        sess.removeAttribute("MULTI_VALUED_EDIT_SUBMISSION");
+        sess.removeAttribute(MULTI_VALUED_EDIT_SUBMISSION);
     }
 
     public static Map<String, String[]> convertParams(
@@ -61,5 +61,5 @@ public class EditSubmissionUtils {
             out.put(key, (String[])item.toArray(new String[item.size()]));
         }
         return out;
-    }             
+    }                 
 }

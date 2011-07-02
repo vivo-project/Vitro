@@ -218,7 +218,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          
          //what goes in the map for templates?
          Map<String,Object> templateData = new HashMap<String,Object>();
-         templateData.put("EditConfiguration", new EditConfigurationTemplateModel( editConfig, vreq));
+         templateData.put("editConfiguration", new EditConfigurationTemplateModel( editConfig, vreq));
          templateData.put("formTitle", formTitle);
          
          return new TemplateResponseValues(template, templateData);

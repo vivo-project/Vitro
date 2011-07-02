@@ -24,6 +24,6 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     }
     
     public String getSubmitToUrl(){
-        return editConfig.getSubmitToUrl();
+        return  getUrl( editConfig.getSubmitToUrl() );
     }
 }

@@ -312,5 +312,5 @@ public class MultiValueEditSubmission {
         return obj.toString();
     }
 
-    private Log log = LogFactory.getLog(MultiValueEditSubmission.class);
+    private Log log = LogFactory.getLog(MultiValueEditSubmission.class);    
 }

@@ -143,9 +143,41 @@ public class EditN3GeneratorVTwo {
      * This takes into account multiple values that would be returned from a select list.
      * subInUris should no longer be used.
      */
-    public static List<String> subInMultiLiterals(Map<String,List<Literal>> varsToVals, List<String> n3targets){       
-       return null;
+    public static List<String> subInMultiLiterals(Map<String,List<Literal>> varsToVals, List<String> n3targets){
+        if( varsToVals == null || varsToVals.isEmpty()) return n3targets;
+
+        ArrayList<String>outv=new ArrayList<String>();
+        for( String n3 : n3targets ){
+            String tmp = n3;
+            for( String key : varsToVals.keySet()){
+                tmp = subInMultiLiterals( key, varsToVals.get(key),tmp);                
+            }            
+        }
+       return n3targets;
     }
+    
+    protected static String subInMultiLiterals(String var, List<Literal>values, String n3){        
+        String tmp = n3;
+        
+        //make the multivalue literal string
+        List<String> n3Values = new ArrayList<String>(values.size());        
+        for( Literal value : values){
+            n3Values.add( formatLiteral(value) );
+        }
+        String valueString = org.apache.commons.lang.StringUtils.join(n3Values, ",");
+        
+        //Substitute it in to n3
+        String varRegex = "\\?" + var + "(?=\\.\\p{Space}|\\p{Space})";
+        
+        String out = null;
+        if( valueString != null )
+            out = tmp.replaceAll(varRegex, Matcher.quoteReplacement( valueString ));
+        else
+            out = n3;
+        
+        return out;
+    }
+    
     
     public  List<String> subInLiterals(Map<String, Literal> varsToVals, List<String> targets){
         if( varsToVals == null || varsToVals.isEmpty()) return targets;
@@ -222,8 +254,9 @@ public class EditN3GeneratorVTwo {
             log.debug("After attempting to substitue in literals, the target N3 was empty" );
             return target;
         }
-    }
-
+    }    
+    
+    
      public Map<String,List<String>> substituteIntoValues
              (Map<String,List<String>> varsToUris,
               Map<String,List<Literal>> varsToLiterals,
@@ -292,7 +325,7 @@ public class EditN3GeneratorVTwo {
      * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
      */
     
-    protected String formatLiteral(Literal literal)
+    protected static String formatLiteral(Literal literal)
     {
         String datatype = literal.getDatatypeURI() ;
         String lang = literal.getLanguage() ;
@@ -407,7 +440,7 @@ public class EditN3GeneratorVTwo {
         }
     }
 
-    protected String formatURI(String uriStr)
+    protected static String formatURI(String uriStr)
     {
         // Not as a qname - write as a quoted URIref
         // Should we unicode escape here?
