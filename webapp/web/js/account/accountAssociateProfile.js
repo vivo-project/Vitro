@@ -5,7 +5,7 @@ var associateProfileFields = {
     /* *** Initial page setup *** */
    
     onLoad: function() {
-        console.log('Here we are');
+        //console.log('Here we are');
         if (this.disableFormInUnsupportedBrowsers()) {
             return;
         }        
