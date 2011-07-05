@@ -97,7 +97,7 @@ public class SolrJsonReconcileServlet extends VitroHttpServlet {
 		}
 	}
 
-	protected JSONObject getResult(VitroRequest vreq, HttpServletRequest req,
+	private JSONObject getResult(VitroRequest vreq, HttpServletRequest req,
 			HttpServletResponse resp) throws ServletException {
 
 		HashMap<String, JSONObject> searchWithTypeMap = new HashMap<String, JSONObject>();
@@ -363,7 +363,7 @@ public class SolrJsonReconcileServlet extends VitroHttpServlet {
 		return qJson;
 	}
 
-    private SolrQuery getQuery(String queryStr, String searchType, int limit, ArrayList<String[]> propertiesList) {
+    protected SolrQuery getQuery(String queryStr, String searchType, int limit, ArrayList<String[]> propertiesList) {
         
         if ( queryStr == null) {
             log.error("There was no parameter '"+ PARAM_QUERY            
