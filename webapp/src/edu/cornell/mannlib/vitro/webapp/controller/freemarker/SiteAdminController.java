@@ -19,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndividuals;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditSiteInformation;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeSiteAdminPage;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
@@ -126,10 +127,17 @@ public class SiteAdminController extends FreemarkerHttpServlet {
 			urls.put("siteInfo", urlBuilder.getPortalUrl("/editForm", new ParamMap("controller", "ApplicationBean")));
 		}
 
+		// TODO this goes away when Menu Management is complete - jblake
 		if (PolicyHelper.isAuthorizedForActions(vreq, MenuN3EditController.REQUIRED_ACTIONS)) {
             urls.put("menuN3Editor", urlBuilder.getPortalUrl("/menuN3Editor"));            
         }
         
+		if (PolicyHelper.isAuthorizedForActions(vreq, new ManageMenus())) {
+			urls.put("menuManagement", UrlBuilder.getUrl("/individual",
+					"uri", "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#DefaultMenu",
+					"switchToDisplayModel", "true"));
+		}
+		
         map.put("urls", urls);
         
         return map;
