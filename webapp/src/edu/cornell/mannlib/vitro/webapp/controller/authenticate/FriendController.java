@@ -28,14 +28,14 @@ import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 /**
  * Back door to log in as the root user.
  * 
- * If the classpath contains a file called sesame.xml, which contains a magic
+ * If the classpath contains a file called friend.xml, which contains a magic
  * line (see below) with today's date, or some date less than a week ago, then
  * you are logged in as root.
  * 
  * If anything else, return a 404.
  */
-public class SesameController extends HttpServlet {
-	private static final Log log = LogFactory.getLog(SesameController.class);
+public class FriendController extends HttpServlet {
+	private static final Log log = LogFactory.getLog(FriendController.class);
 
 	private static final long MILLIS_IN_A_WEEK = 7L * 24L * 60L * 60L * 1000L;
 
@@ -73,7 +73,7 @@ public class SesameController extends HttpServlet {
 
 	private InputStream openTheFile() throws Exception {
 		InputStream stream = this.getClass().getClassLoader()
-				.getResourceAsStream("/sesame.xml");
+				.getResourceAsStream("/friend.xml");
 		if (stream == null) {
 			throw new Exception("can't find the file.");
 		}
@@ -93,7 +93,8 @@ public class SesameController extends HttpServlet {
 
 	private boolean checkDateString(String string) throws Exception {
 		long date = parseDateFromFile(string);
-		return compareAgainstDateRange(date);
+		compareAgainstDateRange(date);
+		return true;
 	}
 
 	private long parseDateFromFile(String string) throws Exception {
@@ -107,10 +108,12 @@ public class SesameController extends HttpServlet {
 		return new SimpleDateFormat("yyyy-MM-dd").parse(m.group()).getTime();
 	}
 
-	private boolean compareAgainstDateRange(long date) {
+	private void compareAgainstDateRange(long date) throws Exception {
 		long now = new Date().getTime();
 		long then = now - MILLIS_IN_A_WEEK;
-		return (date < now) && (date > then);
+		if ((date > now) || (date < then)) {
+			throw new Exception("date out of range.");
+		}
 	}
 
 	private void writeWarningToTheLog(HttpServletRequest req) {
