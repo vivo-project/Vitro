@@ -35,9 +35,9 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseIndex.css
         
         <ul>
             <#list individuals as individual>
-                <li>
-                    <#assign moniker = individual.moniker!>
-                    <a href="${individual.profileUrl}">${individual.name}</a><#if moniker?has_content> <span class="moniker">${moniker}</span></#if>
+                <li>                    
+                    <a href="${individual.profileUrl}">${individual.name}</a>
+                    <#-- <#if individual.moniker?has_content> <span class="moniker">${individual.moniker}</span></#if> -->                    
                     <#assign links = individual.links>
                     <#if links?has_content>
                         <ul class="individualData">

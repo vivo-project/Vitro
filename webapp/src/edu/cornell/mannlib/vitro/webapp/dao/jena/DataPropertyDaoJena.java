@@ -726,7 +726,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             //"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
             //"http://www.w3.org/2000/01/rdf-schema#",
             "http://www.w3.org/2002/07/owl#",
-            "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#",
+            //"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#",
             "http://vitro.mannlib.cornell.edu/ns/vitro/public#"
         ); 
 
@@ -750,7 +750,11 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         "   ?property a owl:DatatypeProperty . \n" +
         "   FILTER ( \n" +
         "       isLiteral(?object) && \n" +
-                PROPERTY_FILTERS + "\n" +
+        "       ( afn:namespace(?property) != \"" + VitroVocabulary.PUBLIC + "\" ) && \n" +
+        "       ( afn:namespace(?property) != \"" + VitroVocabulary.OWL + "\" ) && \n" + 
+        // NIHVIVO-2790 vitro:moniker has been deprecated, but display existing values for editorial management (deletion is encouraged).
+        // This property will be hidden from public display by default.
+        "       ( ?property = <" + VitroVocabulary.MONIKER + "> || afn:namespace(?property) != \"" + VitroVocabulary.vitroURI + "\" ) \n" +           
         "   ) \n" +
         "}";
     
@@ -767,6 +771,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         // QuerySolutionMap initialBindings = new QuerySolutionMap();
         // initialBindings.add("subject", ResourceFactory.createResource(subjectUri));
         String queryString = QueryUtils.subUriForQueryVar(DATA_PROPERTY_QUERY_STRING, "subject", subjectUri);
+        log.debug(queryString);
         
         Query query = null;
         try {

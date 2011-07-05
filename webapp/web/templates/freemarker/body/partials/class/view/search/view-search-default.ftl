@@ -3,7 +3,7 @@
 <#-- Default individual search view -->
 
 <a href="${individual.profileUrl}">${individual.name}</a>
-<#if individual.moniker?has_content> | ${individual.moniker}</#if>
+<#-- <#if individual.moniker?has_content> | ${individual.moniker}</#if> -->
 
 <#if individual.description?has_content>
     <div class="searchFragment">${individual.description}</div>

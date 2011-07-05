@@ -92,8 +92,10 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     
     // Used for editing
     private boolean addAccess = false;
+    
     //To allow for checking of special parameters
     private VitroRequest vitroRequest = null;
+    
     ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, 
             EditingPolicyHelper policyHelper)
         throws InvalidConfigurationException {
@@ -113,13 +115,19 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         
         objectKey = getQueryObjectVariableName();
         
-        // Determine whether a new statement can be added
+
+        setAddAccess(policyHelper, op);
+    }
+
+    // Determine whether a new statement can be added
+    @Override
+    protected void setAddAccess(EditingPolicyHelper policyHelper, Property property) {
         if (policyHelper != null) {
             RequestedAction action = new AddObjectPropStmt(subjectUri, propertyUri, RequestActionConstants.SOME_URI);
             if (policyHelper.isAuthorizedAction(action)) {
                 addAccess = true;
             }
-        }
+        }        
     }
     
     protected List<Map<String, String>> getStatementData() {

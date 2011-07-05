@@ -22,6 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class DataPropertyTemplateModel extends PropertyTemplateModel {
 
@@ -31,6 +32,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     private static final String EDIT_PATH = "edit/editDatapropStmtRequestDispatch.jsp";  
     
     private List<DataPropertyStatementTemplateModel> statements;
+    
     DataPropertyTemplateModel(DataProperty dp, Individual subject, VitroRequest vreq, 
             EditingPolicyHelper policyHelper, List<DataProperty> populatedDataPropertyList) {
         
@@ -52,8 +54,21 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
             log.debug("Data property " + getUri() + " is unpopulated.");
         }
         
-        // Determine whether a new statement can be added
+        setAddAccess(policyHelper, dp);
+        
+    }
+
+    // Determine whether a new statement can be added
+    @Override
+    protected void setAddAccess(EditingPolicyHelper policyHelper, Property property) {
         if (policyHelper != null) {
+            
+            DataProperty dp = (DataProperty) property;
+            
+            // NIHVIVO-2790 vitro:moniker now included in the display, but don't allow new statements
+            if (dp.getURI().equals(VitroVocabulary.MONIKER)) {
+                return;
+            }
             // If the display limit has already been reached, we can't add a new statement
             int displayLimit = dp.getDisplayLimit();
             // Display limit of -1 (default value for new property) means no display limit
@@ -63,7 +78,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
                     addAccess = true;
                 }
             }
-        }
+        }        
     }
     
     @Override 

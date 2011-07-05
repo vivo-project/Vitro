@@ -46,7 +46,9 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     }
     
     protected void setVerboseDisplayValues(Property property) {  
-        // No verbose display for these properties
+        // No verbose display for these properties.
+        // This models previous behavior. In theory the verbose display can be provided, but we may not want
+        // to give anyone access to these properties, since the application is dependent on them.
         if (GroupedPropertyList.VITRO_PROPS_TO_ADD_TO_LIST.contains(property)) {
             return;
         }
@@ -83,6 +85,9 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     protected void setName(String name) {
         this.name = name;
     }
+    
+    // Determine whether a new statement can be added
+    protected abstract void setAddAccess(EditingPolicyHelper policyHelper, Property property);
     
     
     /* Access methods for templates */
