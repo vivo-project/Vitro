@@ -31,7 +31,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividualTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.BaseListedIndividual;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividual;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.TemplateModel;
 
@@ -95,9 +96,9 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
 
                 @SuppressWarnings("unchecked")
                 List<Individual> inds = (List<Individual>)map.get("entities");
-                List<ListedIndividualTemplateModel> indsTm = new ArrayList<ListedIndividualTemplateModel>();
+                List<BaseListedIndividual> indsTm = new ArrayList<BaseListedIndividual>();
                 for ( Individual ind : inds ) {
-                    indsTm.add(new ListedIndividualTemplateModel(ind,vreq));
+                    indsTm.add(new ListedIndividual(ind,vreq));
                 }
                 body.put("individuals", indsTm);
                 

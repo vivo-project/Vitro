@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -59,7 +58,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.ExtendedLinkedDataUtils;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividualTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividual;
 import freemarker.ext.beans.BeansWrapper;
 
 /**
@@ -227,7 +226,8 @@ public class IndividualController extends FreemarkerHttpServlet {
             if (relatedSubjectInd != null) {
                 map = new HashMap<String, Object>();
                 map.put("name", relatedSubjectInd.getName());
-                map.put("url", (new ListedIndividualTemplateModel(relatedSubjectInd, vreq)).getProfileUrl());
+                map.put("url", UrlBuilder.getIndividualProfileUrl(relatedSubjectInd, vreq));
+                map.put("url", (new ListedIndividual(relatedSubjectInd, vreq)).getProfileUrl());
                 String relatingPredicateUri = vreq.getParameter("relatingPredicateUri");
                 if (relatingPredicateUri != null) {
                     ObjectProperty relatingPredicateProp = opDao.getObjectPropertyByURI(relatingPredicateUri);

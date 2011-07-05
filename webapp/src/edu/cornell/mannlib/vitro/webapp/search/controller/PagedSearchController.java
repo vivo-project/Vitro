@@ -68,7 +68,7 @@ import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.LinkTemplateModel;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividualTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.BaseListedIndividual;
 import freemarker.template.Configuration;
 
 /**
@@ -357,7 +357,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
             }           
 
             // Convert search result individuals to template model objects
-            body.put("individuals", ListedIndividualTemplateModel
+            body.put("individuals", BaseListedIndividual
                     .getIndividualTemplateModels(beans, vreq));
 
             body.put("querytext", qtxt);

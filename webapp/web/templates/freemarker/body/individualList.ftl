@@ -35,19 +35,8 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseIndex.css
         
         <ul>
             <#list individuals as individual>
-                <li>                    
-                    <a href="${individual.profileUrl}">${individual.name}</a>
-                    <#-- <#if individual.moniker?has_content> <span class="moniker">${individual.moniker}</span></#if> -->                    
-                    <#assign links = individual.links>
-                    <#if links?has_content>
-                        <ul class="individualData">
-                            <@l.firstLastList>
-                                <#list links as link>
-                                    <li><a class="externalLink" href="${link.url}">${link.anchor}</a></li>
-                                </#list>
-                            </@l.firstLastList>
-                        </ul>
-                    </#if>
+                <li>       
+                    <#include "listedIndividual.ftl">             
                 </li>
             </#list>
         </ul>

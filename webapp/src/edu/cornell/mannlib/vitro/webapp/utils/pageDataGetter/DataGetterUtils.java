@@ -35,7 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividualTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.BaseListedIndividual;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.TemplateModel;
 
@@ -239,7 +239,7 @@ public class DataGetterUtils {
                   jo.put("name",ind.getName());
                   jo.put("thumbUrl", ind.getThumbUrl());
                   jo.put("imageUrl", ind.getImageUrl());
-                  jo.put("profileUrl", UrlBuilder.getIndividualProfileUrl(ind, vreq.getWebappDaoFactory()));
+                  jo.put("profileUrl", UrlBuilder.getIndividualProfileUrl(ind, vreq));
                   
                   String moniker = JSONServlet.getDataPropertyValue(ind, monikerDp, fullWdf);
                   jo.put("moniker", moniker);

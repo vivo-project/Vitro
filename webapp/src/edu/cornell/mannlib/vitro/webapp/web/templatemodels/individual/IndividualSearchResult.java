@@ -45,7 +45,7 @@ public class IndividualSearchResult extends BaseTemplateModel {
     /* Access methods for templates */
 
     public String getProfileUrl() {
-        return UrlBuilder.getIndividualProfileUrl(individual, vreq.getWebappDaoFactory());
+        return UrlBuilder.getIndividualProfileUrl(individual, vreq);
     }    
     
     public String getName() {           

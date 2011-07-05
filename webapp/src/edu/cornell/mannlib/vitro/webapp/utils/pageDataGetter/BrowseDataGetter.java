@@ -27,7 +27,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.utils.JSONtoFmModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassTemplateModel;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividualTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.BaseListedIndividual;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividual;
 
 public class BrowseDataGetter implements PageDataGetter {
     final static Log log = LogFactory.getLog(BrowseDataGetter.class);
@@ -145,9 +146,9 @@ public class BrowseDataGetter implements PageDataGetter {
         List<Individual> inds = vreq.getWebappDaoFactory().getIndividualDao()
             .getIndividualsByVClass(vclass);
         
-        List<ListedIndividualTemplateModel> tInds = new ArrayList<ListedIndividualTemplateModel>(inds.size());
+        List<BaseListedIndividual> tInds = new ArrayList<BaseListedIndividual>(inds.size());
         for( Individual ind : inds){
-            tInds.add(new ListedIndividualTemplateModel(ind, vreq));
+            tInds.add(new ListedIndividual(ind, vreq));
         }
         map.put("individualsInClass", tInds);
 

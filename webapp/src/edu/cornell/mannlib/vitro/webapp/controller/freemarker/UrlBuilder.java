@@ -271,37 +271,18 @@ public class UrlBuilder {
     public static String getPath(Route route, ParamMap params) {
         return getPath(route.path(), params);
     }
-    //Adding method to allow for checking for special parameters
+    
+    public static String getIndividualProfileUrl(Individual individual, VitroRequest vreq) {
+        return getIndividualProfileUrl(individual, individual.getURI(),vreq);
+    }
+
     public static String getIndividualProfileUrl(String individualUri, VitroRequest vreq) {
         Individual individual = new IndividualImpl(individualUri);
         return getIndividualProfileUrl(individual, individualUri, vreq);
-    }
+    }    
     
-    
-    public static String getIndividualProfileUrl(String individualUri, WebappDaoFactory wadf) {
-        Individual individual = new IndividualImpl(individualUri);
-        return getIndividualProfileUrl(individual, individualUri, wadf);
-    }
-    
-    public static String getIndividualProfileUrl(Individual individual, WebappDaoFactory wadf) {
-        String individualUri = individual.getURI();
-        return getIndividualProfileUrl(individual, individualUri, wadf);        
-    }
-    
-    //Trying first with using a form of the method that includes the vitro request
     private static String getIndividualProfileUrl(Individual individual, String individualUri, VitroRequest vreq) {
-    	WebappDaoFactory wadf = vreq.getWebappDaoFactory();
-    	String profileUrl = getIndividualProfileUrl(individual, individualUri, wadf);
-    	if(profileUrl != null) {
-    		HashMap<String, String> specialParams = getSpecialParams(vreq);
-    		if(specialParams.size() != 0) {
-    			profileUrl = addParams(profileUrl, new ParamMap(specialParams));
-    		}
-    	}
-    	return profileUrl;
-    }
-    
-    private static String getIndividualProfileUrl(Individual individual, String individualUri, WebappDaoFactory wadf) {
+        WebappDaoFactory wadf = vreq.getWebappDaoFactory();
         String profileUrl = null;
         try {
             URI uri = new URIImpl(individualUri); // throws exception if individualUri is invalid
@@ -324,10 +305,18 @@ public class UrlBuilder {
         } catch (Exception e) {
             log.warn(e);
             return null;
-        }
-        return profileUrl;        
+        }        
+
+    	if (profileUrl != null) {
+    		HashMap<String, String> specialParams = getSpecialParams(vreq);
+    		if(specialParams.size() != 0) {
+    			profileUrl = addParams(profileUrl, new ParamMap(specialParams));
+    		}
+    	}
+    	
+    	return profileUrl;
     }
-    
+
     public static boolean isUriInDefaultNamespace(String individualUri, VitroRequest vreq) {
         return isUriInDefaultNamespace(individualUri, vreq.getWebappDaoFactory());
     }
