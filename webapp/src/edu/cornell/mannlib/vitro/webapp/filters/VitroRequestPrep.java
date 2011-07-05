@@ -2,11 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.filters;
 
+import static edu.cornell.mannlib.vitro.webapp.controller.VitroRequest.SPECIAL_WRITE_MODEL;
+
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Map;
-import java.util.Set;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -16,14 +17,15 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
@@ -38,7 +40,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.HideFromDisplayByP
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
-import org.apache.commons.dbcp.BasicDataSource;
 
 /**
  * This sets up several objects in the Request scope for each
@@ -51,21 +52,15 @@ import org.apache.commons.dbcp.BasicDataSource;
  *
  */
 public class VitroRequestPrep implements Filter {
-    ServletContext _context;
-    ApplicationBean _appbean;    
-    
-    static FilterFactory filterFactory = null;
-    
-    /**
-     * The filter will be applied to all incoming urls,
-     this is a list of URI patterns to skip.  These are
-     matched against the requestURI sans query paramerts,
-     * ex
-     * "/vitro/index.jsp"
-     * "/vitro/themes/enhanced/css/edit.css"
-     *
-    */
-    Pattern[] skipPatterns = {
+	private static final Log log = LogFactory.getLog(VitroRequestPrep.class.getName());
+
+	/**
+	 * The filter will be applied to all incoming requests, but should skip any
+	 * request whose URI matches any of these patterns. These are matched
+	 * against the requestURI without query parameters, e.g. "/vitro/index.jsp"
+	 * "/vitro/themes/enhanced/css/edit.css"
+	 */
+    private static final Pattern[] skipPatterns = {
             Pattern.compile(".*\\.(gif|GIF|jpg|jpeg)$"),
             Pattern.compile(".*\\.css$"),
             Pattern.compile(".*\\.js$"),
@@ -73,15 +68,28 @@ public class VitroRequestPrep implements Filter {
             Pattern.compile("/.*/images/.*")
     };
 
-    private static final Log log = LogFactory.getLog(VitroRequestPrep.class.getName());
-
+    private ServletContext _context;
+    private ApplicationBean _appbean;    
+    
     @Override
-	public void doFilter(ServletRequest  request,
-                          ServletResponse response,
-                          FilterChain     chain)
-    throws IOException, ServletException {
+	public void init(FilterConfig filterConfig) throws ServletException {
+        _context = filterConfig.getServletContext();
+        
+        Object o =  _context.getAttribute("applicationBean");
+        if (o instanceof ApplicationBean) {
+            _appbean = (ApplicationBean) o; 
+        } else {
+            _appbean = new ApplicationBean();
+        }
+        log.debug("VitroRequestPrep: AppBean theme " + _appbean.getThemeDir());
+    }    
+    
+    @Override
+	public void doFilter(ServletRequest request, ServletResponse response,
+			FilterChain chain) throws IOException, ServletException {
     	// If this isn't an HttpServletRequest, we might as well fail now.
     	HttpServletRequest req = (HttpServletRequest) request;
+    	logRequestUriForDebugging(req);
 
         //don't waste time running this filter again.
         if( req.getAttribute("VitroRequestPrep.setup") != null ){
@@ -92,6 +100,7 @@ public class VitroRequestPrep implements Filter {
             return;
         }
 
+        // don't run this filter for image files, CSS files, etc.
         for( Pattern skipPattern : skipPatterns){
             Matcher match =skipPattern.matcher( req.getRequestURI() );
             if( match.matches()  ){
@@ -100,27 +109,12 @@ public class VitroRequestPrep implements Filter {
                 return;
             }
         }
-        
-        VitroRequest vreq = new VitroRequest(req);
 
-		if (log.isDebugEnabled()) {
-			try {
-				String logRequestStr = vreq.getRequestURI();
-				if ( (vreq.getQueryString() != null) && (vreq.getQueryString().length()>0) ) {
-					logRequestStr += "?" + vreq.getQueryString();
-				}
-				log.debug("RequestURI: "+logRequestStr);
-			} catch (Exception e) {
-				// Just in case something goes horribly wrong
-				// Don't want logging to kill the request
-			}
-		}
+        VitroRequest vreq = new VitroRequest(req);
 
         //-- setup appBean --//
         vreq.setAppBean(_appbean);
         
-        log.debug("VitroRequestPrep: AppBean theme " + vreq.getAppBean().getThemeDir());
-
         //-- setup DAO factory --//
         WebappDaoFactory wdf = getWebappDaoFactory(vreq);
         //TODO: get accept-language from request and set as preferred languages
@@ -133,15 +127,7 @@ public class VitroRequestPrep implements Filter {
     	//This will replace the WebappDaoFactory with a different version if menu management parameter is found
     	wdf = checkForSpecialWDF(vreq, wdf);
     	
-    	// request.setAttribute("aboxModel", setspeicalABoxModel)
-    	// request.setAttribute("tboxModel", speicalTboxModel)
-    	// request.setAttribute("infModel", speicalInfModel) (maybe?)
-    	// request.setAttribute("displayModel", displayModel) 
-    	
-        VitroFilters filters = null;
-		        
-        filters = getFiltersFromContextFilterFactory(req, wdf);
-        
+        VitroFilters filters = getFiltersFromContextFilterFactory(req, wdf);
         if( filters != null ){
             log.debug("Wrapping WebappDaoFactory in filters");
             wdf = new WebappDaoFactoryFiltering(wdf, filters);
@@ -173,21 +159,8 @@ public class VitroRequestPrep implements Filter {
         	(WebappDaoFactory) _context.getAttribute("webappDaoFactory");
     }
 
-    @Override
-	public void init(FilterConfig filterConfig) throws ServletException {
-    	
-        _context = filterConfig.getServletContext();
-        
-        Object o =  _context.getAttribute("applicationBean");
-        if (o instanceof ApplicationBean) {
-            _appbean = (ApplicationBean) o; 
-        } else {
-            _appbean = new ApplicationBean();
-        }
-    }    
-    
-    public VitroFilters getFiltersFromContextFilterFactory( HttpServletRequest request, WebappDaoFactory wdf){
-        FilterFactory ff = getFilterFactory();
+    private VitroFilters getFiltersFromContextFilterFactory( HttpServletRequest request, WebappDaoFactory wdf){
+        FilterFactory ff = (FilterFactory)_context.getAttribute("FilterFactory");
         if( ff == null ){ 
             return null;
         } else {
@@ -195,13 +168,6 @@ public class VitroRequestPrep implements Filter {
         }
     }
     
-    public FilterFactory getFilterFactory(){
-        return(FilterFactory)_context.getAttribute("FilterFactory");        
-    }
-    public static void setFilterFactory(ServletContext sc, FilterFactory ff){
-        sc.setAttribute("FilterFactory", ff);
-    }
-
     @Override
 	public void destroy() {
     	// Nothing to do.
@@ -272,18 +238,31 @@ public class VitroRequestPrep implements Filter {
     				//Changes will be made to the copy, not the original from the servlet context
 	        		wadfj.setSpecialDataModel(useMainOntModel, useTboxOntModel, useDisplayOntModel);
 	        		//Set attribute on VitroRequest that saves special write model
-	        		vreq.setAttribute(vreq.SPECIAL_WRITE_MODEL, useMainOntModel);
+	        		vreq.setAttribute(SPECIAL_WRITE_MODEL, useMainOntModel);
 	        		return wadfj;
 	        	}
     		}
     	}
     	//if no parameters exist for switching models, return the original webapp dao factory object
     	//ensure no attribute there if special write model not being utilized
-    	if(vreq.getAttribute(vreq.SPECIAL_WRITE_MODEL) != null) {
-    		vreq.removeAttribute(vreq.SPECIAL_WRITE_MODEL);
+    	if(vreq.getAttribute(SPECIAL_WRITE_MODEL) != null) {
+    		vreq.removeAttribute(SPECIAL_WRITE_MODEL);
     	}
     	return inputWadf;
     }
     
-    
+	private void logRequestUriForDebugging(HttpServletRequest req) {
+		if (log.isDebugEnabled()) {
+			try {
+				String uriString = req.getRequestURI();
+				String queryString = req.getQueryString();
+				if ((queryString != null) && (queryString.length() > 0)) {
+					uriString += "?" + queryString;
+				}
+				log.debug("RequestURI: " + uriString);
+			} catch (Exception e) {
+				// Don't want to kill the request if the logging fails.
+			}
+		}
+	}
 }
