@@ -21,32 +21,21 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 public class ListedIndividualTemplateModel extends BaseTemplateModel {
 
     private static final Log log = LogFactory.getLog(ListedIndividualTemplateModel.class);
-    
-    private static final String PATH = Route.INDIVIDUAL.path();
-    
+
     protected Individual individual;
-    protected VitroRequest vreq;
-    protected UrlBuilder urlBuilder;
-    
+    protected VitroRequest vreq;    
     
     public ListedIndividualTemplateModel(Individual individual, VitroRequest vreq) {
         this.individual = individual;
         this.vreq = vreq;
-        // Needed for getting portal-sensitive urls. Remove if multi-portal support is removed.
-        this.urlBuilder = new UrlBuilder(vreq.getAppBean());
     }
     
-    public static List<ListedIndividualTemplateModel> getIndividualTemplateModelList(List<Individual> individuals, VitroRequest vreq) {
+    public static List<ListedIndividualTemplateModel> getIndividualTemplateModels(List<Individual> individuals, VitroRequest vreq) {
         List<ListedIndividualTemplateModel> models = new ArrayList<ListedIndividualTemplateModel>(individuals.size());
         for (Individual individual : individuals) {
           models.add(new ListedIndividualTemplateModel(individual, vreq));
         }  
         return models;
-    }
-    
-    private String getView(ClassView view) {
-        ViewFinder vf = new ViewFinder(view);
-        return vf.findClassView(individual, vreq);
     }
     
     /* Access methods for templates */
@@ -105,18 +94,8 @@ public class ListedIndividualTemplateModel extends BaseTemplateModel {
         return individual.getName();
     }
 
-    @Deprecated
-    public String getMoniker() {
-    	return "";
-//        return individual.getMoniker();
-    }
-
     public String getUri() {
         return individual.getURI();
-    }
-    
-    public String getSearchView() {        
-        return getView(ClassView.SEARCH);
-    }
+    }    
     
 }

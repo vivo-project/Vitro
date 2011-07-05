@@ -358,7 +358,7 @@ public class PagedSearchController extends FreemarkerHttpServlet implements Sear
 
             // Convert search result individuals to template model objects
             body.put("individuals", ListedIndividualTemplateModel
-                    .getIndividualTemplateModelList(beans, vreq));
+                    .getIndividualTemplateModels(beans, vreq));
 
             body.put("querytext", qtxt);
             body.put("title", qtxt + " - " + appBean.getApplicationName()

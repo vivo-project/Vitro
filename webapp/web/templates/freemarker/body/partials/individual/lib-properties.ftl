@@ -249,8 +249,7 @@ name will be used as the label. -->
 
 <#-- Most specific types -->
 <#macro mostSpecificTypes individual>
-    <#local types = individual.mostSpecificTypes />
-    <#list types as type>
+    <#list individual.mostSpecificTypes as type>
         <span class="most-specific-type">${type}</span>
     </#list>
 </#macro>

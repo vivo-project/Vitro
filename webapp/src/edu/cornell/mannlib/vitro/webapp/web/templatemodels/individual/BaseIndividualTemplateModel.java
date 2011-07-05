@@ -154,7 +154,6 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         return opsDao.getMostSpecificTypesForIndividual(getUri());  
     }
 
-
     public String getUri() {
         return individual.getURI();
     }

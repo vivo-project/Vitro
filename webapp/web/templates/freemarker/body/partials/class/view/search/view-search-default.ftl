@@ -2,9 +2,8 @@
 
 <#-- Default individual search view -->
 
-<a href="${individual.profileUrl}">${individual.name}</a>
-<#-- <#if individual.moniker?has_content> | ${individual.moniker}</#if> -->
+<#import "lib-properties.ftl" as p>
 
-<#if individual.description?has_content>
-    <div class="searchFragment">${individual.description}</div>
-</#if>
+<a href="${individual.profileUrl}">${individual.name}</a>
+
+<@p.mostSpecificTypes individual />

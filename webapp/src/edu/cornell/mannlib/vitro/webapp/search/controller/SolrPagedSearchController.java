@@ -52,6 +52,7 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryFactory;
 import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.LinkTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualSearchResult;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividualTemplateModel;
 import freemarker.template.Configuration;
 
@@ -301,11 +302,8 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
                 }
             }           
 
-            // Convert search result individuals to template model objects
-            // RY If this diverges significantly from what's used on the index page,
-            // create a different template model.
-            body.put("individuals", ListedIndividualTemplateModel
-                    .getIndividualTemplateModelList(individuals, vreq));
+            body.put("individuals", IndividualSearchResult
+                    .getIndividualTemplateModels(individuals, vreq));
 
             body.put("querytext", qtxt);
             body.put("title", qtxt + " - " + appBean.getApplicationName()

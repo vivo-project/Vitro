@@ -414,9 +414,10 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         DatasetWrapper w = dwf.getDatasetWrapper();
         Dataset dataset = w.getDataset();
         dataset.getLock().enterCriticalSection(Lock.READ);
+        QueryExecution qexec = null;
         try {
             
-            QueryExecution qexec = QueryExecutionFactory.create(query, dataset);
+            qexec = QueryExecutionFactory.create(query, dataset);
             ResultSet results = qexec.execSelect();
             while (results.hasNext()) {
                 QuerySolution soln = results.nextSolution();
@@ -431,6 +432,9 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             
         } finally {
             dataset.getLock().leaveCriticalSection();
+            if (qexec != null) {
+                qexec.close();
+            }
             w.close();
         }
         
