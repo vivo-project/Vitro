@@ -42,8 +42,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayModelDao;
 import edu.cornell.mannlib.vitro.webapp.dao.FlagDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.dao.KeywordDao;
-import edu.cornell.mannlib.vitro.webapp.dao.KeywordIndividualRelationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.LinksDao;
 import edu.cornell.mannlib.vitro.webapp.dao.LinktypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.MenuDao;
@@ -61,14 +59,11 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.PropertyGroupDaoJena;
 
 public class WebappDaoFactoryJena implements WebappDaoFactory {
 
     protected IndividualDao entityWebappDao;
     protected FlagDao flagDao;
-    protected KeywordIndividualRelationDao keys2EntsDao;
-    protected KeywordDao keywordDao;
     protected LinksDao linksDao;
     protected LinktypeDao linktypeDao;
     protected ApplicationDaoJena applicationDao;
@@ -443,34 +438,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         else
             return entityWebappDao = new IndividualDaoJena(this);
     }
-
-    public KeywordIndividualRelationDao getKeys2EntsDao() {
-        if (keys2EntsDao != null)
-            return keys2EntsDao;
-        else
-            return keys2EntsDao = new KeywordIndividualRelationDaoJena(this);
-    }
-
-    public KeywordDao getKeywordDao() {
-        if (keywordDao != null)
-            return keywordDao;
-        else
-            return keywordDao = new KeywordDaoJena(this);
-    }
-
-    public LinksDao getLinksDao() {
-        if (linksDao != null)
-            return linksDao;
-        else
-            return linksDao = new LinksDaoJena(this);
-    }
-
-    public LinktypeDao getLinktypeDao() {
-        if (linktypeDao != null)
-            return linktypeDao;
-        else
-            return linktypeDao = new LinktypeDaoJena(this);
-    }
     
     public ApplicationDao getApplicationDao() {
     	if (applicationDao != null) {
@@ -697,10 +664,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     	//and tbox model
     	WebappDaoFactoryJena specialWadfj = new WebappDaoFactoryJena(specialSelector);
     	entityWebappDao = specialWadfj.getIndividualDao();
-    	keys2EntsDao = specialWadfj.getKeys2EntsDao();
-    	keywordDao = specialWadfj.getKeywordDao();
-    	linksDao = specialWadfj.getLinksDao();
-    	linktypeDao = specialWadfj.getLinktypeDao();
     	vClassGroupDao = specialWadfj.getVClassGroupDao();
     	//To allow for testing, add a property group, this will allow
     	//the unassigned group method section to be executed and main Image to be assigned to that group

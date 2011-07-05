@@ -254,53 +254,6 @@ public class LuceneSearcher implements Searcher {
         close();
     }
 
-    //bdc34 as of 2009-01-30, getting rid of time windows
-//    public synchronized Filter getTimeWindowCachingFilter(){
-//        if( timeWindowCachingFilter == null || timeWinCacheStale() ){
-//            Filter defaultFilter = new QueryFilter( makeDefaultTimeWindowQuery() );
-//            timeWindowCachingFilter = new CachingWrapperFilter( defaultFilter );
-//            timeWinFilterBorn = System.currentTimeMillis();
-//            log.debug("getTimeWindowCachingFilter() made new cache " + timeWinFilterBorn);
-//        }
-//        return timeWindowCachingFilter;
-//    }
-
-    //bdc34 as of 2009-01-30, getting rid of time windows
-//    private final long timeWinCacheShelfLife = ( 60 * 1000 ) * 1; //in msec
-//    private boolean  timeWinCacheStale(){
-//        long dt = (System.currentTimeMillis() - timeWinFilterBorn);
-//        return dt > timeWinCacheShelfLife;
-//    }
-
-
-    //bdc34 as of 2009-01-30, getting rid of time windows
-    /**
-     * Adds a Query that will get doc where the
-     * SUNSET is > NOW  and SUNRISE <= NOW. We'll do
-     * this by creating two RangeQueries, one to
-     * check that SUNRISE is between [BEGINNING_OF_TIME, NOW]
-     * and that SUNSET is between [NOW, END_OF_TIME]
-     * There don't seem to be any GraterThanQuery
-     * or LessThanQuery classes in lucene.
-     */
-//    private BooleanQuery makeDefaultTimeWindowQuery(){
-//        String nowStr = new DateTime().toString(LuceneIndexer.DATE_FORMAT);
-//
-//        Term BEGINNING_OF_TIME = null;
-//        Term now = new Term(Entity2LuceneDoc.term.SUNRISE,nowStr );
-//        RangeQuery sunriseBeforeNow = new RangeQuery(BEGINNING_OF_TIME,now, true);
-//
-//        Term END_OF_TIME = null;
-//        now = new Term(Entity2LuceneDoc.term.SUNSET,nowStr);
-//        RangeQuery sunsetAfterNow = new RangeQuery(now,END_OF_TIME, false);
-//
-//        BooleanQuery qRv = new BooleanQuery();
-//        qRv.add( sunriseBeforeNow, BooleanClause.Occur.MUST);
-//        qRv.add( sunsetAfterNow, BooleanClause.Occur.MUST);
-//
-//        return qRv;
-//    }
-
     /**
      * We need access to the index to make a highligher because
      * we need to 'rewrite' the query.  That takes any wild cards

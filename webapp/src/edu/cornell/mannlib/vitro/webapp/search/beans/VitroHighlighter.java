@@ -51,10 +51,7 @@ public abstract class VitroHighlighter extends UnaryFunctor<String,String> {
         if( ent == null)
             return;
 
-        ent.setBlurb( this.highlight(ent.getBlurb()));
         ent.setName( this.highlight(ent.getName()));
-        ent.setMoniker( this.highlight(ent.getMoniker()));
-        ent.setDescription( this.highlight(ent.getDescription()));
         Iterator edIt = ent.getDataPropertyStatements().iterator();
         while (edIt.hasNext()) {
             DataPropertyStatement dataPropertyStmt = (DataPropertyStatement)edIt.next();
@@ -68,7 +65,6 @@ public abstract class VitroHighlighter extends UnaryFunctor<String,String> {
             object.setName(this.highlight(object.getName()));
         }
         */
-        highlightKeywords(ent);
     }
 
     /**
@@ -83,21 +79,9 @@ public abstract class VitroHighlighter extends UnaryFunctor<String,String> {
         //highlight the name, anchor and moniker and place back in entity object
         if( ent.getName() != null )
             ent.setName(  highlight( stripHtml(ent.getName() )));
-        if( ent.getAnchor() != null )
-            ent.setAnchor(  highlight( stripHtml(ent.getAnchor() )));
-        if( ent.getMoniker() != null )
-            ent.setMoniker( highlight( stripHtml(ent.getMoniker() )));
 
         //make a buffer of text to use the fragmenting hightlighter on
         StringBuffer sb = new StringBuffer("");
-        if(ent.getBlurb() != null){
-            sb.append(ent.getBlurb());
-            sb.append(' ');
-        }
-        if(ent.getDescription() != null ){
-            sb.append(ent.getDescription());
-            sb.append(' ');
-        }
         if(ent.getDataPropertyStatements() != null) {
             Iterator edIt = ent.getDataPropertyStatements().iterator();
             while (edIt.hasNext()) {
@@ -120,22 +104,6 @@ public abstract class VitroHighlighter extends UnaryFunctor<String,String> {
             	}
             }
         }
-        String keywords = ent.getKeywordString();
-        if( keywords != null )
-            sb.append(keywords);
-
-        ent.setDescription(getHighlightFragments(  stripHtml( sb.toString() )));
-    }
-
-    private void highlightKeywords(Individual ent){
-        List<String> terms = ent.getKeywords();
-        if( terms == null || terms.size() == 0) return;
-
-        List<String> replacement = new ArrayList<String>(terms.size());
-        for(String term : ent.getKeywords()){
-            replacement.add( highlight(term ) );
-        }
-        ent.setKeywords(replacement);
     }
 
     private final String stripHtml(String in){

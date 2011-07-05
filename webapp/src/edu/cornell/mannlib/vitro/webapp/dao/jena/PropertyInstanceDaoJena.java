@@ -48,7 +48,7 @@ public class PropertyInstanceDaoJena extends JenaBaseDao implements
     }
 
     public void deleteObjectPropertyStatement(String subjectURI, String propertyURI, String objectURI) {
-    	deleteObjectPropertyStatement(subjectURI, propertyURI, objectURI, getOntModelSelector().getFullModel());
+    	deleteObjectPropertyStatement(subjectURI, propertyURI, objectURI, getOntModelSelector().getABoxModel());
     }
 
     public void deleteObjectPropertyStatement(String subjectURI, String propertyURI, String objectURI, OntModel ontModel) {

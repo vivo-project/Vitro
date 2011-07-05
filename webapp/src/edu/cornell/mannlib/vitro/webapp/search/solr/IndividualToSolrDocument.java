@@ -151,9 +151,7 @@ public class IndividualToSolrDocument {
         StringBuffer allTextValue = new StringBuffer();
         allTextValue.append("");
         allTextValue.append(" ");
-        allTextValue.append(((t=ind.getName()) == null)?"":t);  
-        allTextValue.append(" ");
-        allTextValue.append(((t=ind.getAnchor()) == null)?"":t); 
+        allTextValue.append(((t=ind.getName()) == null)?"":t);   
         allTextValue.append(" ");     
         allTextValue.append(classPublicNames);
 

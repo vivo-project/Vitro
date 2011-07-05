@@ -172,8 +172,6 @@ public class EntityRetryController extends BaseEditController {
 			hash.put("VClassURI", optList);
         }
         
-        hash.put("Moniker", getMonikerOptionsList(individualForEditing, ewDao));
-        
         hash.put("HiddenFromDisplayBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getDisplayOptionsList(individualForEditing));    
         hash.put("ProhibitedFromUpdateBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getUpdateOptionsList(individualForEditing));
 
@@ -279,20 +277,6 @@ public class EntityRetryController extends BaseEditController {
         DateFormat dateOnlyFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         String html = FormUtils.htmlFormFromBean(individualForEditing,action,epo,foo,epo.getBadValueMap());
-        if (individualForEditing.getSunrise() != null)
-            foo.getValues().put("Sunrise", dateOnlyFormat.format(individualForEditing.getSunrise()));
-        if (individualForEditing.getSunset() != null)
-            foo.getValues().put("Sunset", minutesOnlyDateFormat.format(individualForEditing.getSunset()));
-        if (individualForEditing.getTimekey() != null)
-            foo.getValues().put("Timekey", minutesOnlyDateFormat.format(individualForEditing.getTimekey()));
-
-        HashMap defaultsHash = new HashMap();
-        if (action.equals("insert")) {
-            Calendar cal = Calendar.getInstance(TimeZone.getDefault());
-            defaultsHash.put("Sunrise", minutesOnlyDateFormat.format(cal.getTime()));
-            defaultsHash.put("Sunset", "9999-12-31");
-        }
-        epo.setDefaultValueMap(defaultsHash);
 
         List cList = new ArrayList();
         cList.add(new IndividualDataPropertyStatementProcessor());
@@ -326,24 +310,6 @@ public class EntityRetryController extends BaseEditController {
             log.error(e.getStackTrace());
         }
 
-    }
-    
-    private List<Option> getMonikerOptionsList(Individual entity,
-                                               IndividualDao indDao) {
-        ArrayList<Option> monikerOpts = new ArrayList<Option>();
-        monikerOpts.add(new Option("", "none", (entity.getMoniker() == null)));
-        if (entity.getVClassURI() != null) {
-            List<String> monikers = indDao.monikers(entity.getVClassURI());
-            if (monikers != null) {
-                for (String moniker : monikers) {
-                    monikerOpts.add(new Option(
-                            moniker, moniker, 
-                                    moniker.equals(entity.getMoniker())));
-                }
-            }
-        }
-        monikerOpts.add(new Option("", "[new moniker]"));
-        return monikerOpts;
     }
 
     public void doGet (HttpServletRequest request, HttpServletResponse response) {

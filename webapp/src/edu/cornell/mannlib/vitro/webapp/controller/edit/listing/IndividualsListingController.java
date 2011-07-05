@@ -61,7 +61,6 @@ public class IndividualsListingController extends BaseEditController {
         results.add("XX");
         results.add("Individual");
         results.add("class");
-        results.add("moniker");
 
         if (inds != null && inds.size()>0) {
             Iterator indsIt = inds.iterator();
@@ -93,9 +92,6 @@ public class IndividualsListingController extends BaseEditController {
                     results.add(vclassURI);
                 }
 
-                String monikerStr = (ind.getMoniker() != null) ? ind.getMoniker() : "unspecified";
-                results.add(monikerStr);
-
             }
         } else {
             results.add("XX");
@@ -104,14 +100,11 @@ public class IndividualsListingController extends BaseEditController {
 
         request.setAttribute("results",results);
 
-        request.setAttribute("columncount",new Integer(4));
+        request.setAttribute("columncount",new Integer(3));
         request.setAttribute("suppressquery","true");
         request.setAttribute("title", "Individuals in Class "+ ( (vc != null) ? vc.getName() : vclassURI ) );
         request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
-//        request.setAttribute("horizontalJspAddButtonUrl", Controllers.RETRY_URL);
-//        request.setAttribute("horizontalJspAddButtonText", "Add new individual");
-//        request.setAttribute("horizontalJspAddButtonControllerParam", "Individual");
-        
+
         // new individual button
         List <ButtonForm> buttons = new ArrayList<ButtonForm>();
         HashMap<String,String> newIndividualParams=new HashMap<String,String>();

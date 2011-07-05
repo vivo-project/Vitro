@@ -60,29 +60,10 @@ public class VitroFilterUtils {
         private final Comparator<? super Individual> comparator;
 
         public EntitySortTransform( String fieldName, boolean ascending){
-            if ( "timekey".equalsIgnoreCase( fieldName )){
-                if( ascending )
-                    comparator = timekeyComp;
-                else
-                    comparator = timekeyCompDesc;
-
-            } else if ( "sunset".equalsIgnoreCase(  fieldName )){
-                if( ascending )
-                    comparator = sunsetComp;
-                else
-                    comparator = sunsetCompDesc;
-
-            } else if ( "sunrise".equalsIgnoreCase( fieldName )){
-                if( ascending )
-                    comparator = sunriseComp;
-                else
-                    comparator = sunriseCompDesc;
-            } else {
                 if( ascending )
                     comparator = nameComp;
                 else
                     comparator = nameCompDesc;
-            }
         }
 
         @Override
@@ -91,57 +72,6 @@ public class VitroFilterUtils {
             return individuals;
         }
 
-        private static Comparator<? super Individual> timekeyComp =
-                new Comparator<Individual>(){
-                    @Override
-					public int compare(Individual o1, Individual o2) {
-                        Date time1 = o1.getTimekey();
-                        Date time2 = o2.getTimekey();
-                        if( time1 == null && time2 == null )
-                            return 0;
-                        if( time1 == null )
-                            return 1;
-                        if( time2 == null)
-                            return -1;
-                        return time1.compareTo(time2);
-                    }
-                    @Override
-					public String toString(){ return "timekeyComp"; }
-                };
-        private static Comparator<? super Individual> sunsetComp =
-                new Comparator<Individual>(){
-                    @Override
-					public int compare(Individual o1, Individual o2) {
-                        Date time1 = o1.getSunset();
-                        Date time2 = o2.getSunset();
-                        if( time1 == null && time2 == null )
-                            return 0;
-                        if( time1 == null )
-                            return 1;
-                        if( time2 == null)
-                            return -1;
-                        return time1.compareTo(time2);
-                    }
-                    @Override
-					public String toString(){ return "sunsetComp"; }
-                };
-        private static Comparator<? super Individual> sunriseComp =
-                new Comparator<Individual>(){
-                    @Override
-					public int compare(Individual o1, Individual o2) {
-                        Date time1 = o1.getSunrise();
-                        Date time2 = o2.getSunrise();
-                        if( time1 == null && time2 == null )
-                            return 0;
-                        if( time1 == null )
-                            return 1;
-                        if( time2 == null)
-                            return -1;
-                        return time1.compareTo(time2);
-                    }
-                    @Override
-					public String toString(){ return "sunriseComp"; }
-                };
         private static Comparator<? super Individual> nameComp =
                 new Comparator<Individual>(){
             // return ((Individual)o1).getName().compareTo(((Individual)o2).getName());
@@ -164,57 +94,6 @@ public class VitroFilterUtils {
 					public String toString(){ return "nameComp"; }
                 };
 
-               private static Comparator<? super Individual> timekeyCompDesc =
-                new Comparator<Individual>(){
-                    @Override
-					public int compare(Individual o1, Individual o2) {
-                        Date time1 = o1.getTimekey();
-                        Date time2 = o2.getTimekey();
-                        if( time1 == null && time2 == null )
-                            return 0;
-                        if( time1 == null )
-                            return -1;
-                        if( time2 == null)
-                            return 1;
-                        return time2.compareTo(time1);
-                    }
-                    @Override
-					public String toString(){ return "timkeyCompDesc"; }
-                };
-        private static Comparator<? super Individual> sunsetCompDesc =
-                new Comparator<Individual>(){
-                    @Override
-					public int compare(Individual o1, Individual o2) {
-                        Date time1 = o1.getSunset();
-                        Date time2 = o2.getSunset();
-                        if( time1 == null && time2 == null )
-                            return 0;
-                        if( time1 == null )
-                            return -1;
-                        if( time2 == null)
-                            return 1;
-                        return time2.compareTo(time1);
-                    }
-                    @Override
-					public String toString(){ return "sunsetCompDesc"; }
-                };
-        private static Comparator<? super Individual> sunriseCompDesc =
-                new Comparator<Individual>(){
-                    @Override
-					public int compare(Individual o1, Individual o2) {
-                        Date time1 = o1.getSunrise();
-                        Date time2 = o2.getSunrise();
-                        if( time1 == null && time2 == null )
-                            return 0;
-                        if( time1 == null )
-                            return -1;
-                        if( time2 == null)
-                            return 1;
-                        return time2.compareTo(time1);
-                    }
-                    @Override
-					public String toString(){ return "sunriseCompDesc"; }
-                };
         private static Comparator<? super Individual> nameCompDesc =
                 new Comparator<Individual>(){
                     @Override

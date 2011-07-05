@@ -82,31 +82,6 @@ public class PropertyDWR {
        return wdf.getPropertyInstanceDao().getProperty(subjectURI, predicateURI, objectURI);
     }
 
-    /**
-       The following fields are used by this method to write this property
-       to the object property statement table:
-
-         domainEntId
-         rangeEntId
-         PropertyId
-         sunrise - optional
-         sunset - optional
-         qualifier - optional
-
-       Initially this tries an insert, if that fails then an update is attempted.
-       @return -1 for error, 0 for no write due to duplicate, > 0 is auto-gen 
-       objectPropertyStatement.id
-    */
-    @Deprecated
-    public int writeProp(PropertyInstance prop ){
-//        WebContext ctx = WebContextFactory.get();
-//        HttpServletRequest req = ctx.getHttpServletRequest();
-//        VitroRequest vreq = new VitroRequest(req);
-//
-//        return getUnfilteredWebappDaoFactory(vreq).getPropertyInstanceDao().writeProp(prop);
-        return -1;
-    }
-
     public int insertProp( PropertyInstance prop) {
         WebContext ctx = WebContextFactory.get();
         HttpServletRequest req = ctx.getHttpServletRequest();

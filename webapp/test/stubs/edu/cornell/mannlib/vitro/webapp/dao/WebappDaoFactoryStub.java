@@ -13,10 +13,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayModelDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.dao.KeywordDao;
-import edu.cornell.mannlib.vitro.webapp.dao.KeywordIndividualRelationDao;
-import edu.cornell.mannlib.vitro.webapp.dao.LinksDao;
-import edu.cornell.mannlib.vitro.webapp.dao.LinktypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.MenuDao;
 import edu.cornell.mannlib.vitro.webapp.dao.NamespaceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
@@ -196,30 +192,6 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	public ApplicationDao getApplicationDao() {
 		throw new RuntimeException(
 				"WebappDaoFactory.getApplicationDao() not implemented.");
-	}
-
-	@Override
-	public KeywordIndividualRelationDao getKeys2EntsDao() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getKeys2EntsDao() not implemented.");
-	}
-
-	@Override
-	public KeywordDao getKeywordDao() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getKeywordDao() not implemented.");
-	}
-
-	@Override
-	public LinksDao getLinksDao() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getLinksDao() not implemented.");
-	}
-
-	@Override
-	public LinktypeDao getLinktypeDao() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getLinktypeDao() not implemented.");
 	}
 
 	@Override

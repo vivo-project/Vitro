@@ -34,7 +34,6 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -50,7 +49,6 @@ public class IndividualDaoSDB extends IndividualDaoJena {
 
 	private DatasetWrapperFactory dwf;
     private SDBDatasetMode datasetMode;
-	private WebappDaoFactoryJena wadf;
 	
     public IndividualDaoSDB(DatasetWrapperFactory dwf, 
                             SDBDatasetMode datasetMode, 
@@ -176,10 +174,6 @@ public class IndividualDaoSDB extends IndividualDaoJena {
                     "    ?ind a <" + theClass.getURI() + "> . \n" +
 	    		 	"    ?ind  <" + RDFS.label.getURI() + "> ?label \n" +
 	    		 	"} \n" +
-	    		 	"UNION { \n" +
-                    "    ?ind a <" + theClass.getURI() + "> . \n" +
-	    		 	"    ?ind  <" + VitroVocabulary.MONIKER + "> ?moniker \n" +
-	    		 	"} \n" +
 	    		 "} ORDER BY ?ind ?label";
     		ResultSet rs =QueryExecutionFactory.create(
     		        QueryFactory.create(query), dataset)
@@ -194,13 +188,12 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     		        continue;
     		    }
     		    if (uri != null && !uri.equals(currRes.getURI())) {
-    		        Individual ent = makeIndividual(uri, label, moniker);
+    		        Individual ent = makeIndividual(uri, label);
     		        if (ent != null) {
     		            ents.add(ent);
     		        }
     	            uri = currRes.getURI();
     	            label = null;
-    	            moniker = null;
     		    } else if (uri == null) {
     		        uri = currRes.getURI();
     		    }
@@ -208,12 +201,8 @@ public class IndividualDaoSDB extends IndividualDaoJena {
                 if (labelLit != null) {
                     label = labelLit.getLexicalForm();
                 }
-                Literal monikerLit = sol.getLiteral("moniker");
-                if (monikerLit != null) {
-                    moniker = monikerLit.getLexicalForm();
-                }
                 if (!rs.hasNext()) {
-                    Individual ent = makeIndividual(uri, label, moniker);
+                    Individual ent = makeIndividual(uri, label);
                     if (ent != null) {
                         ents.add(ent);
                     }
@@ -250,7 +239,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     		        continue;
     		    }
     		    filteredIndividualList.add(
-    		    		makeIndividual(currRes.getURI(), null, null));
+    		    		makeIndividual(currRes.getURI(), null));
     		}
        	} finally {
     		dataset.getLock().leaveCriticalSection();
@@ -259,14 +248,11 @@ public class IndividualDaoSDB extends IndividualDaoJena {
        	return filteredIndividualList;
     }
     
-    private Individual makeIndividual(String uri, 
-    		                          String label, 
-    		                          String moniker) {
+    private Individual makeIndividual(String uri, String label) {
         Individual ent = new IndividualSDB(uri, 
                 this.dwf, datasetMode, getWebappDaoFactory(), 
                 SKIP_INITIALIZATION);
         ent.setName(label);
-        ent.setMoniker(moniker);
         return ent;
     }
 	

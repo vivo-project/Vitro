@@ -53,14 +53,6 @@ public class DataPropertyStatementFiltering implements DataPropertyStatement {
     public String getDatapropURI() {
         return innerStmt.getDatapropURI();
     }
-
-    public Date getSunrise() {
-        return innerStmt.getSunrise();
-    }
-
-    public Date getSunset() {
-        return innerStmt.getSunset();
-    }
     
     public String getString() {
         return innerStmt.getString();
@@ -88,14 +80,6 @@ public class DataPropertyStatementFiltering implements DataPropertyStatement {
 
     public void setDatapropURI(String datapropURI) {
         innerStmt.setDatapropURI(datapropURI);
-    }
-
-    public void setSunrise(Date date) {
-        innerStmt.setSunrise(date);
-    }
-
-    public void setSunset(Date date) {
-        innerStmt.setSunset(date);
     }
     
 }

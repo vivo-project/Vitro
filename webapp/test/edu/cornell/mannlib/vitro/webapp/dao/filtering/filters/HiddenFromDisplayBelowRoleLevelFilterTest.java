@@ -170,7 +170,6 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 	private static Individual individual(String moniker,
 			RoleLevel displayThreshhold) {
 		Individual i = new IndividualImpl();
-		i.setMoniker(moniker);
 		i.setURI("uri:" + moniker);
 		i.setHiddenFromDisplayBelowRoleLevel(displayThreshhold);
 		return i;
@@ -575,7 +574,7 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 			if (individual == null) {
 				message += ", individual=null";
 			} else {
-				message += ", individual=" + individual.getMoniker();
+				message += ", individual=" + individual.getLocalName();
 			}
 			return message;
 		}
@@ -703,7 +702,7 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 			if (subject == null) {
 				message += ", subject=null";
 			} else {
-				message += ", subject=" + subject.getMoniker();
+				message += ", subject=" + subject.getLocalName();
 			}
 
 			if (predicate == null) {
@@ -760,7 +759,7 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 			if (subject == null) {
 				message += ", subject=null";
 			} else {
-				message += ", subject=" + subject.getMoniker();
+				message += ", subject=" + subject.getLocalName();
 			}
 
 			if (predicate == null) {
@@ -772,7 +771,7 @@ public class HiddenFromDisplayBelowRoleLevelFilterTest extends
 			if (object == null) {
 				message += ", object=null";
 			} else {
-				message += ", object=" + object.getMoniker();
+				message += ", object=" + object.getLocalName();
 			}
 
 			return message;

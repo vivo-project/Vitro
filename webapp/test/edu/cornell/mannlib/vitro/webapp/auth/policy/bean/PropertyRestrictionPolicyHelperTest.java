@@ -47,7 +47,7 @@ public class PropertyRestrictionPolicyHelperTest extends AbstractTestClass {
 			VitroVocabulary.vitroURI, "" };
 
 	private static final String[] PERMITTED_EXCEPTIONS = new String[] {
-			VitroVocabulary.MONIKER, VitroVocabulary.BLURB };
+			VitroVocabulary.MONIKER };
 
 	private OntModel ontModel;
 	private ModelWrapper wrapper;

@@ -65,20 +65,24 @@ public class ListedIndividualTemplateModel extends BaseTemplateModel {
         return thumbUrl == null ? null : getUrl(thumbUrl);
     } 
     
+    @Deprecated
     public Link getPrimaryLink() {
-        Link primaryLink = null;
-        String anchor = individual.getAnchor();
-        String url = individual.getUrl();
-        if ( !(StringUtils.isEmpty(anchor)) && !(StringUtils.isEmpty(url)) ) {
-            primaryLink = new Link();
-            primaryLink.setAnchor(anchor);
-            primaryLink.setUrl(url);           
-        } 
-        return primaryLink;
+//        Link primaryLink = null;
+//        String anchor = individual.getAnchor();
+//        String url = individual.getUrl();
+//        if ( !(StringUtils.isEmpty(anchor)) && !(StringUtils.isEmpty(url)) ) {
+//            primaryLink = new Link();
+//            primaryLink.setAnchor(anchor);
+//            primaryLink.setUrl(url);           
+//        } 
+//        return primaryLink;
+    	return null;
     }
-    
+  
+    @Deprecated
     public List<Link> getAdditionalLinks() {
-        return individual.getLinksList(); // returns an empty list, but not null
+//        return individual.getLinksList(); // returns an empty list, but not null
+    	return new ArrayList<Link>();
     }
     
     public List<Link> getLinks() {
@@ -101,8 +105,10 @@ public class ListedIndividualTemplateModel extends BaseTemplateModel {
         return individual.getName();
     }
 
+    @Deprecated
     public String getMoniker() {
-        return individual.getMoniker();
+    	return "";
+//        return individual.getMoniker();
     }
 
     public String getUri() {

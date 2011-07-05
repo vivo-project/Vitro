@@ -42,7 +42,6 @@ public class VitroVocabulary {
 
     // properties found on the beans
     
-    public static final String DESCRIPTION = vitroURI+"description";
     public static final String DESCRIPTION_ANNOT = vitroURI + "descriptionAnnot";
     public static final String PUBLIC_DESCRIPTION_ANNOT = vitroURI + "publicDescriptionAnnot";
     public static final String SHORTDEF = vitroURI+"shortDef";
@@ -68,32 +67,21 @@ public class VitroVocabulary {
     public static final String NOBODY = "http://vitro.mannlib.cornell.edu/ns/vitro/role#nobody";
     
     public static final String SEARCH_BOOST_ANNOT = vitroURI + "searchBoostAnnot";
-    
-    public static final String SUNRISE = vitroURI+"sunrise";
-    public static final String SUNSET = vitroURI+"sunset";
 
     public static final String DEPENDENT_RESORUCE = "http://vivoweb.org/ontology/core#DependentResource";
     
     //////////////////////////////////////////
 
-
-    public static final String CURATOR_NOTE = vitroURI+"curatorNote";
-
     public static final String MONIKER = vitroURI+"moniker";
-
-    public static final String BLURB = vitroURI+"blurb";
 
     public static final String CLASSGROUP = vitroURI+"ClassGroup";
     public static final String IN_CLASSGROUP = vitroURI+"inClassGroup";
 
     public static final String MODTIME = vitroURI+"modTime";
-    public static final String TIMEKEY = vitroURI+"timekey";
 
     public static final String DISPLAY_RANK = vitroURI+"displayRank";
     public static final String DISPLAY_RANK_ANNOT = vitroURI+"displayRankAnnot";
     public static final String DISPLAY_LIMIT = vitroURI+"displayLimitAnnot";
-
-    public static final String CITATION = vitroURI+"citation";
     
     // ================== property related =================================
 
@@ -102,8 +90,6 @@ public class VitroVocabulary {
     public static final String PROPERTY_OBJECTINDIVIDUALSORTPROPERTY = vitroURI+"objectIndividualSortProperty";
     public static final String PROPERTY_FULLPROPERTYNAMEANNOT = vitroURI+"fullPropertyNameAnnot";
     public static final String PROPERTY_CUSTOMSEARCHVIEWANNOT = vitroURI+"customSearchViewAnnot";
-    //public static final String PROPERTY_SELFEDITPROHIBITEDANNOT = vitroURI+"selfEditProhibitedAnnot";
-    //public static final String PROPERTY_CURATOREDITPROHIBITEDANNOT = vitroURI+"curatorEditProhibitedAnnot";
     public static final String PROPERTY_CUSTOMENTRYFORMANNOT = vitroURI+"customEntryFormAnnot";
     public static final String PROPERTY_CUSTOMDISPLAYVIEWANNOT = vitroURI+"customDisplayViewAnnot";
     public static final String PROPERTY_CUSTOMSHORTVIEWANNOT = vitroURI+"customShortViewAnnot";
@@ -116,19 +102,6 @@ public class VitroVocabulary {
     public static final String SKIP_EDIT_FORM = vitroURI + "skipEditForm";
     public static final String PROPERTY_STUBOBJECTPROPERTYANNOT = vitroURI + "stubObjectPropertyAnnot";
 	public static final String PROPERTY_COLLATEBYSUBCLASSANNOT = vitroURI + "collateBySubclassAnnot";
-	
-    // ================== keyword related ==================================
-
-    public static final String KEYWORD = vitroURI+"Keyword";
-    public static final String KEYWORD_STEM = vitroURI+"keywordStem";
-    public static final String KEYWORD_TYPE = vitroURI+"keywordType";
-    public static final String KEYWORD_SOURCE = vitroURI+"keywordSource";
-    public static final String KEYWORD_ORIGIN = vitroURI+"keywordOrigin";
-    public static final String KEYWORD_COMMENTS = vitroURI+"keywordComment";
-    public static final String KEYWORD_INDIVIDUALRELATION = vitroURI+"KeywordRelation";
-    public static final String KEYWORD_INDIVIDUALRELATION_INVOLVESKEYWORD = vitroURI+"involvesKeyword";
-    public static final String KEYWORD_INDIVIDUALRELATION_INVOLVESINDIVIDUAL = vitroURI+"involvesIndividual";
-    public static final String KEYWORD_INDIVIDUALRELATION_MODE = vitroURI+"keywordMode";
 
     // ================== link related =====================================
 

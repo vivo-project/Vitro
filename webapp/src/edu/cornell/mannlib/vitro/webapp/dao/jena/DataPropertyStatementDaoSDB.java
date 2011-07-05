@@ -89,6 +89,7 @@ public class DataPropertyStatementDaoSDB extends DataPropertyStatementDaoJena
                     boolean addToList = /*allowAnyNameSpace ? st.getObject().canAs(Literal.class) :*/ st.getObject().isLiteral() && 
                           (
                               (RDF.value.equals(st.getPredicate()) || VitroVocabulary.value.equals(st.getPredicate().getURI())) 
+                              || this.MONIKER.equals(st.getPredicate())
                               || !(NONUSER_NAMESPACES.contains(st.getPredicate().getNameSpace()))
                           );
                     if( addToList )

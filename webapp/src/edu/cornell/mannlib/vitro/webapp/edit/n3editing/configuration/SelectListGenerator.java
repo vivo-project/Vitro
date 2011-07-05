@@ -304,14 +304,6 @@ public class SelectListGenerator {
                         if (individuals.size()==0){ 
                             log.error("No individuals of type "+vclass.getName()+" to add to pick list in SelectListGenerator.getOptions(); check portal visibility");
                             optionsMap.put("", "No " + vclass.getName() + " found");
-                        }else{                
-                            for( Individual ind : individuals ) {
-                                // note that don't want the individual URI -- the option should hold 2 copies of the moniker //
-                                if (ind.getMoniker()!=null && ind.getMoniker().trim().length()>0) {
-                                    optionsMap.put(ind.getMoniker(),ind.getMoniker().trim());                        
-                                    ++optionsCount;
-                                }
-                            }
                         }
                     }
                 }

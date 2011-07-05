@@ -52,24 +52,15 @@ public class PropertyRestrictionPolicyHelper {
 	private static final Collection<String> PERMITTED_EXCEPTIONS = Arrays
 			.asList(new String[] {
 					VitroVocabulary.MONIKER,
-					VitroVocabulary.BLURB,
-					VitroVocabulary.DESCRIPTION,
 					VitroVocabulary.MODTIME,
-					VitroVocabulary.TIMEKEY,
 
-					VitroVocabulary.CITATION,
 					VitroVocabulary.IND_MAIN_IMAGE,
 
 					VitroVocabulary.LINK,
 					VitroVocabulary.PRIMARY_LINK,
 					VitroVocabulary.ADDITIONAL_LINK,
 					VitroVocabulary.LINK_ANCHOR,
-					VitroVocabulary.LINK_URL,
-
-					VitroVocabulary.KEYWORD_INDIVIDUALRELATION,
-					VitroVocabulary.KEYWORD_INDIVIDUALRELATION_INVOLVESKEYWORD,
-					VitroVocabulary.KEYWORD_INDIVIDUALRELATION_INVOLVESINDIVIDUAL,
-					VitroVocabulary.KEYWORD_INDIVIDUALRELATION_MODE });
+					VitroVocabulary.LINK_URL });
 
 	/**
 	 * The bean is attached to the ServletContext using this attribute name.

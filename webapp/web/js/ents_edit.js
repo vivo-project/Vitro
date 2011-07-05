@@ -332,8 +332,6 @@ function fillForm(aprop)  {
   var vclass = gProperty.domainClass;
   
   DWRUtil.setValues(gProperty);
-  setDateValue("sunset", gProperty.sunset );
-  setDateValue("sunrise", gProperty.sunrise );
 
   toggleDisabled("newPropButton");
   
@@ -612,23 +610,7 @@ Check to see if property edit form is valid
 *****************************************************************/
 function validateForm(){
   var dateEx = "\nDates should be in the format YYYY-MM-DD";
-  var value = DWRUtil.getValue("sunrise");
-  try{   
-    var date = parseDateString(value);
-  }catch(e){ date = null; }  
-  if( value && value.length > 0 && ! isDate(date)) {
-    alert( "Surise date " + value + " is invalid: \n" + date + dateEx);
-    return false;
-  }
-  
-  value = DWRUtil.getValue("sunset");
-  try{  
-    date = parseDateString(value);
-  }catch(e){ date = null; }
-  if( value && value.length > 0 && ! isDate(date)) {
-    alert( "Sunset date " + value + " is invalid: \n" + date + dateEx);
-    return false;
-  }
+  /* used to check dates here */ 
   return true;
 }
 
@@ -650,15 +632,6 @@ function writeProp()  {
   newP.subjectEntURI= gEntity.URI;
   newP.objectEntURI = selected ;
   
-  try{
-    var date = parseDateString( DWRUtil.getValue("sunrise") );
-    newP.sunrise = ( isDate( date ) ? date : null );
-  }catch(e){ newP.sunrise = null; }    
-  try{
-    var date = parseDateString( DWRUtil.getValue("sunset") );
-    newP.sunset = ( isDate( date ) ? date : null );
-  }catch(e){ newP.sunset = null; }
-
   var callback = function(result){
     editingNewProp = false;
     justwritenProp = newP;

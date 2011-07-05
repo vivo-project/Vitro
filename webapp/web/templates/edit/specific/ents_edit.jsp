@@ -70,19 +70,8 @@
         	<form action="editForm" method="get">
             	<input name="uri" type = "hidden" value="${individual.URI}" />
             	<input name="controller" type = "hidden" value="Entity" />
-            	<input type="submit" class="form-button" value="Edit This Individual"/>
+            	<input type="submit" class="form-button" value="Edit This Individual's Datatype Properties"/>
         	</form><br/>
-        	
-
-        	<c:if test="${!empty individual.linksList}"> 
-            	<form action="editForm" method="get">
-					<select name="uri" class="form-item">
-						<form:option name="ExtraURL"/>
-					</select><br />
-	                <input type="submit" class="form-button" value="Edit Extra URLs"/>
-        	        <input type="hidden" name="controller" value="Link"/>
-            	</form>
-			</c:if>
 	
         	<c:if test="${!empty individual.externalIds}"> 
 	        	<form action="editForm" method="get">
@@ -104,11 +93,6 @@
             	<input type="hidden" name="controller" value="Entity"/>
         	</form>
         	<form action="editForm" method="get">
-            	<input type="submit" class="form-button" value="Add Another URL"/>
-            	<input type="hidden" name="entityUri" value="${individual.URI}"/>
-            	<input type="hidden" name="controller" value="Link"/>
-        	</form>
-        	<form action="editForm" method="get">
             	<input type="submit" class="form-button" value="Add an External Identifier"/>
             	<input type="hidden" name="IndividualURI" value="${individual.URI}"/>
             	<input type="hidden" name="controller" value="ExternalId"/>
@@ -118,10 +102,6 @@
             	<input type="hidden" name="oldURI" value="${individual.URI}"/>
             	<input type="hidden" name="mode" value="renameResource"/>
             	<input type="hidden" name="controller" value="Refactor"/>
-        	</form>
-        	<form action="uploadImages" method="get">
-            	<input type="submit" class="form-button" value="Upload Image"/>
-            	<input type="hidden" name="entityUri" value="${individual.URI}"/>
         	</form>
     	</td>
     </tr>
@@ -216,11 +196,6 @@
                     	<td colspan="9"><select id="entitiesList" class="form-item"><option>select individual</option></select></td>
                 	</tr>
                 	
-                	<!-- no longer available in v.0.7 : something to reimplement in 0.8 or 0.9 -->
-                	<tr style="display:none;">
-                    	<td>Sunrise:</td><td><input id="sunrise" class="form-item" type="text"/></td>
-                    	<td>Sunset:</td><td><input id="sunset" class="form-item" type="text"/></td>
-                	</tr>
                 	
                 	<tr>
                     	<td><input type="button" id="saveButt" class="form-button"
@@ -236,51 +211,6 @@
 
 	</c:if> <!-- end dwr section -->
 
-<!-- __________ Relationships to object nodes (domain id is broader or parent side, range id is narrower or child side) _________________ -->
-
-	<table class="form-background" border="0" cellpadding="2" cellspacing="2" width="100%">
-		<tr><td colspan="3" align="center">
-        	<div style="color: black; cursor: pointer;" onclick="javascript:switchGroupDisplay('oldEditing','oldEditingSw0','${appBean.themeDir}site_icons')" title="old editing" class="navlinkblock" onmouseover="onMouseOverHeading(this)" onmouseout="onMouseOutHeading(this)">
-                <span class="entityRelationsSpan"><img src="${appBean.themeDir}site_icons/plus.gif" id="oldEditingSw0"/>
-                Click here for original-style object property statement editing (should work on any browser)</span>
-			</div>
-		</td></tr>
-	</table>
-
-	<div id="oldEditing" style="display:none;">
-		<table class="form-background" border="0" cellpadding="2" cellspacing="2" width="100%">
-			<tr valign="bottom" align="center">
-    			<td colspan="3"><i>This individual is the subject in the following relationships to other object individuals</i></td>
-			</tr>
-			<tr valign="bottom" align="center">
-    			<td/>
-    			<td valign="bottom" align="center">
-              		<c:if test="${!empty epo.formObject.optionLists['ExistingPropertyInstances']}">
-                    	<form action="editForm" method="edit">
-                        	<select name="multiplexedParam" class="form-item">
-                          		<form:option name="ExistingPropertyInstances"/>
-                        	</select><br/>
-                        	<input type="hidden" name="SubjectEntURI" value="${individual.URI}"/>
-                        	<input type="submit" class="form-button" value="Edit Statement"/>
-                        	<input type="hidden" name="controller" value="ObjectPropertyStatement"/>
-                    	</form>
-               		</c:if>
-    			</td>
-    			<td>
-                	<form action="editForm" method="get">
-                		<input type="hidden" name="SubjectEntURI" value="${individual.URI}"/>
-                		<select name="PropertyURI" class="form-item">
-                    		<form:option name="PropertyURI"/>
-                		</select><br/>
-                		<input type="hidden" name="controller" value="ObjectPropertyStatement"/>
-                		<input type="hidden" name="domainSide" value="true"/>
-                		<input type="submit" class="form-button" value="new link for this individual"/>
-                	</form>
-    			</td>
-			</tr>
-			<tr><td colspan="3"></td></tr>
-		</table>
-	</div><!-- END div  "oldEditing" -->
 	</div><!-- END div "authorized" -->
 </c:if><!-- end if (securityLevel less than MIN_EDIT_ROLE) -->
 </div><!-- END div "anybody" -->

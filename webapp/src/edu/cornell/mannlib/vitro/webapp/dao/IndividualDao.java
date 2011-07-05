@@ -107,19 +107,6 @@ public interface IndividualDao extends ObjectSourceIface {
     
 	void fillVClassForIndividual(Individual individual);
 
-	List<String> monikers(String vclassURI);
-
-	List<String> getKeywordsForIndividual(String individualURI);
-
-	List<String> getKeywordsForIndividualByMode(String individualURI,
-			String modeStr);
-
-	List<Keyword> getKeywordObjectsForIndividual(String individualURI);
-
-	String getNetId(String entityURI);
-
-	String getStatus(String entityURI);
-
 	/**
 	 * Standard way to get a new URI that is not yet used.
 	 * @param individual, may be null
@@ -130,12 +117,4 @@ public interface IndividualDao extends ObjectSourceIface {
 	
 	EditLiteral getLabelEditLiteral(String individualUri);
 	
-    @Deprecated
-    public abstract Individual getIndividualByExternalId(int externalIdType,
-                                                         String externalIdValue);
-
-    @Deprecated
-    Individual getIndividualByExternalId(int externalIdType,
-                                         String externalIdValue,
-                                         String vClassURI);
 }

@@ -18,21 +18,11 @@ public class VitroSearchTermNames {
 
     /** time of index in msec since epoc */
     public static String INDEXEDTIME= "indexedTime";
-    /** timekey of entity in yyyymmddhhmm  */
-    public static String TIMEKEY="TIMEKEY";
-    /** time of sunset/end of entity in yyyymmddhhmm  */
-    public static String SUNSET="SUNSET";
-    /** time of sunrise/start of entity in yyyymmddhhmm  */
-    public static String SUNRISE="SUNRISE";
-    /** entity's moniker */
-    public static String MONIKER="moniker";
     /** text for 'full text' search, this is stemmed */
     public static String ALLTEXT    = "ALLTEXT";
     /** text for 'full text' search, this is unstemmed for
      * use with wildcards and prefix queries */
     public static String ALLTEXTUNSTEMMED = "ALLTEXTUNSTEMMED";
-    /** keywords */
-    public static final String KEYWORDS = "KEYWORDS";
     /** Does the individual have a thumbnail image? 1=yes 0=no */
     public static final String THUMBNAIL = "THUMBNAIL";        
     /** Should individual be included in full text search results? 1=yes 0=no */

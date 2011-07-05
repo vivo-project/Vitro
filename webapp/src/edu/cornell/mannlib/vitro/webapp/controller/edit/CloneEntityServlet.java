@@ -89,20 +89,7 @@ public class CloneEntityServlet extends BaseEditController {
             }
         } else {
             ind.setName("CLONE OF "+ind.getName());
-        }
-        
-        String timeKeyStr = request.getParameter("timekey");
-        if (timeKeyStr!=null && !timeKeyStr.equals("")) {
-            Date timekey = parseStringToDate(timeKeyStr);
-            if (timekey!=null) {
-                ind.setTimekey(timekey);
-            }
-        }
-        // specify other values that do NOT want to be carried over from the existing Individual
-        ind.setSunrise(new DateTime().toDate());
-        // cannot set these values to null because they will still be copies
-        ind.setBlurb("");
-        ind.setDescription("");        
+        }      
  
         String cloneURI=individualDao.insertNewIndividual(ind);
         if (cloneURI == null){ log.error("Error inserting cloned individual"); return; }

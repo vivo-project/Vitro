@@ -111,12 +111,6 @@ public interface WebappDaoFactory {
 
     public ApplicationDao getApplicationDao();
 
-    public KeywordIndividualRelationDao getKeys2EntsDao();
-    public KeywordDao getKeywordDao();
-
-    public LinksDao getLinksDao();
-    public LinktypeDao getLinktypeDao();
-
     public UserAccountsDao getUserAccountsDao();
 
     public VClassGroupDao getVClassGroupDao();

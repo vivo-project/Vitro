@@ -146,7 +146,9 @@ public class RDFUploadController extends BaseEditController {
 		    OntModel tboxChangeModel=null;
 		    Model aboxChangeModel=null;
 		    if (tboxModel != null) {
-		    	tboxChangeModel = xutil.extractTBox(uploadModel);
+		    	boolean AGGRESSIVE = true;
+		    	tboxChangeModel = xutil.extractTBox(uploadModel, AGGRESSIVE);
+		    	// aggressively seek all statements that are part of the TBox  
 		        tboxstmtCount = operateOnModel(
 		        		request.getFullWebappDaoFactory(),
 		                tboxModel,tboxChangeModel,

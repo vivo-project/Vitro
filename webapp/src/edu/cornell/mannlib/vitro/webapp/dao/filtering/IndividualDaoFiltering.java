@@ -63,25 +63,6 @@ class IndividualDaoFiltering extends BaseFiltering implements IndividualDao{
             return null;        
     }
     
-    @Deprecated
-    public Individual getIndividualByExternalId(int externalIdType,
-            String externalIdValue, String classURI) {
-        Individual ind = innerIndividualDao.getIndividualByExternalId(externalIdType,externalIdValue,classURI);
-        if( ind != null &&  filters.getIndividualFilter().fn(ind) )
-            return new IndividualFiltering(ind, filters );
-        else
-            return null;
-    }
-
-    @Deprecated
-    public Individual getIndividualByExternalId(int externalIdType,
-            String externalIdValue) {
-        Individual ind = innerIndividualDao.getIndividualByExternalId(externalIdType,externalIdValue);
-        if( ind != null && filters.getIndividualFilter().fn(ind))
-            return new IndividualFiltering(ind,filters);
-        else
-            return null;
-    }
     public void fillVClassForIndividual(Individual individual) {
         innerIndividualDao.fillVClassForIndividual(individual);
     }
@@ -192,31 +173,6 @@ class IndividualDaoFiltering extends BaseFiltering implements IndividualDao{
         innerIndividualDao.markModified(individual);
     }
 
-    public List<String> getKeywordsForIndividual(String individualURI) {
-        return innerIndividualDao.getKeywordsForIndividual(individualURI);
-    }
-
-    public List<String> getKeywordsForIndividualByMode(String individualURI,
-            String modeStr) {
-        return innerIndividualDao.getKeywordsForIndividualByMode(individualURI,modeStr);
-    }
-
-    public List<Keyword> getKeywordObjectsForIndividual(String individualURI) {
-        return innerIndividualDao.getKeywordObjectsForIndividual(individualURI);
-    }
-
-    public String getNetId(String entityURI) {
-        return innerIndividualDao.getNetId(entityURI);
-    }
-
-    public String getStatus(String entityURI) {
-        return innerIndividualDao.getStatus(entityURI);
-    }
-
-    public List monikers(String vclassURI) {
-        return innerIndividualDao.monikers(vclassURI);
-    }
-
     public String toString(){
         return "IndividualDaoFiltering filter: " + filters.getIndividualFilter().toString() + "\n" +
                 "InnerDao: " + innerIndividualDao.toString();
@@ -229,7 +185,6 @@ class IndividualDaoFiltering extends BaseFiltering implements IndividualDao{
 	public String getUnusedURI(Individual individual) throws InsertException {
 		return innerIndividualDao.getUnusedURI(individual);
 	}
-
 
     @Override
     public EditLiteral getLabelEditLiteral(String individualUri) {

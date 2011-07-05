@@ -34,7 +34,7 @@ public class IndividualDataPropertyStatementProcessor implements ChangeListener 
     }
 
     public void doDeleted(Object oldObj, EditProcessObject epo) {
-        // sunset all data property statements associated with entity
+        // do nothing
     }
 
     private void processDataprops (EditProcessObject epo) {

@@ -30,15 +30,11 @@ import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
-import edu.cornell.mannlib.vitro.webapp.beans.Keyword;
-import edu.cornell.mannlib.vitro.webapp.beans.KeywordIndividualRelation;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.KeywordDao;
-import edu.cornell.mannlib.vitro.webapp.dao.KeywordIndividualRelationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 
 public class EntityEditController extends BaseEditController {
@@ -77,11 +73,9 @@ public class EntityEditController extends BaseEditController {
         request.setAttribute("entity",ent);
 
         ArrayList<String> results = new ArrayList<String>();
-        int colCount = 6;
+        int colCount = 4;
         results.add("Name");
-        results.add("moniker");
         results.add("class");
-        results.add("blurb");
         results.add("display level");
         results.add("edit level");
         results.add("last updated");
@@ -100,8 +94,6 @@ public class EntityEditController extends BaseEditController {
         	rName = "[resource]";
         }
         results.add(rName);
-        String rMoniker = (ent.getMoniker()==null) ? "unspecified" : ent.getMoniker();
-        results.add(rMoniker);
         
         String classStr = "";
         List<VClass> classList = inferredEnt.getVClasses(false);
@@ -123,10 +115,7 @@ public class EntityEditController extends BaseEditController {
 	        }
         }
         results.add(classStr);
-        
-        String rBlurb = (ent.getBlurb()==null) ? "" : ent.getBlurb();
-        results.add(rBlurb);
-        
+                
         results.add(ent.getHiddenFromDisplayBelowRoleLevel()  == null ? "unspecified" : ent.getHiddenFromDisplayBelowRoleLevel().getLabel());
         results.add(ent.getProhibitedFromUpdateBelowRoleLevel() == null ? "unspecified" : ent.getProhibitedFromUpdateBelowRoleLevel().getLabel());
 
@@ -157,11 +146,7 @@ public class EntityEditController extends BaseEditController {
             }
             OptionMap.put("externalIds", externalIdOptionList);
         } catch (Exception e) {e.printStackTrace();}
-        
-        try {
-            OptionMap.put("ExtraURL", FormUtils.makeOptionListFromBeans(ent.getLinksList(), "URI", "Anchor", null, null, false));
-        } catch (Exception e) {e.printStackTrace();}
-        
+                
         List classGroups = vreq.getFullWebappDaoFactory().getVClassGroupDao().getPublicGroupsWithVClasses(true,true,false); // order by displayRank, include uninstantiated classes, don't count the individuals
         Iterator classGroupIt = classGroups.iterator();
         ListOrderedMap optGroupMap = new ListOrderedMap();
@@ -201,28 +186,6 @@ public class EntityEditController extends BaseEditController {
         }
 
         foo.setOptionLists(OptionMap);
-        
-        List<Option> existingKeywordRelations = new LinkedList();
-        KeywordIndividualRelationDao kirDao = vreq.getFullWebappDaoFactory().getKeys2EntsDao();
-        KeywordDao kDao = vreq.getFullWebappDaoFactory().getKeywordDao();
-        List kirs = kirDao.getKeywordIndividualRelationsByIndividualURI(ent.getURI());
-        if (kirs != null) {
-            Iterator kirIt = kirs.iterator();
-            while (kirIt.hasNext()) {
-                KeywordIndividualRelation kir = (KeywordIndividualRelation) kirIt.next();
-                if (kir.getKeyId() > 0) {
-                    Keyword k = kDao.getKeywordById(kir.getKeyId());
-                    if (k != null) {
-                        Option kOpt = new Option();
-                        kOpt.setValue(kir.getURI());
-                        kOpt.setBody(k.getTerm()+" ("+kir.getMode()+")");
-                        existingKeywordRelations.add(kOpt);
-                    }
-                }
-
-            }
-        }
-        foo.getOptionLists().put("existingKeywordRelations",existingKeywordRelations);
 
         epo.setFormObject(foo);
 

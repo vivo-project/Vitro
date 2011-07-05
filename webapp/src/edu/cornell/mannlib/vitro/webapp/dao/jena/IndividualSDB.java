@@ -88,15 +88,11 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 	    		"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
 	    		        "> ?ooo. \n" +
 	    		   "<"+individualURI+">  a ?type . \n" +
-	    		   "<"+individualURI+"> <" + VitroVocabulary.MONIKER + 
-	    		           "> ?moniker \n" +
 	    		 "} \n" +
 	    		 "WHERE { \n" +
 	    		 	"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
 	    		 	        "> ?ooo }  \n" +
 	    		 	" UNION { <"+individualURI+"> a ?type } \n" +
-	    		 	" UNION { <"+individualURI+"> <" + VitroVocabulary.MONIKER +
-	    		 	        "> ?moniker } \n" +
 	    		 "} "; 
     		this.model = QueryExecutionFactory.create(
     		        QueryFactory.create(getStatements), initModel)
@@ -134,18 +130,11 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	    		"CONSTRUCT " +
     	    		"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
     	    		        "> ?ooo. \n" +
-//    	    		   "<"+individualURI+">  a ?type . \n" +
     	    		   "<"+individualURI+">  <" + VitroVocabulary.MONIKER + 
     	    		           "> ?moniker \n" +
     	    		 "} WHERE {" +
     	    		 	"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
     	    		 	        "> ?ooo } \n" +
-    	    		 	"UNION { <" +
-    	    		 	    individualURI+">  <" + VitroVocabulary.MONIKER + 
-    	    		 	        "> ?moniker \n" +
-    	    		 	"}  \n" +
-//    	    		 	"UNION { <"
-//    	    		 	    + individualURI + "> a ?type } \n" +
     	    		 "}";
         		model = QueryExecutionFactory.create(
         		        QueryFactory.create(getStatements), dataset)
@@ -278,39 +267,6 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         } 
     }
 
-    @Deprecated
-    public int getFlag1Numeric() { 
-    	return 1;
-    }
- 
-    @Deprecated
-    public String getFlag1Set() { 
-        return null;
-    }
-
-    @Deprecated
-    public String getFlag2Set() { 
-        return null;
-    }
-
-    @Deprecated
-    public boolean doesFlag1Match(int flagBitMask) { 
-    	return true;
-    }
-
-    @Deprecated
-    public Date getSunrise() {
-        return null;
-    }
-
-    public Date getSunset() {        
-        return null;   
-    }
-
-    public Date getTimekey() { 
-    	return null;
-    }
-
     public Timestamp getModTime() {
         if (modTime != null) {
             return modTime;
@@ -327,62 +283,6 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                 return modTime;
             } finally {
                
-            	ind.getOntModel().leaveCriticalSection();
-            }
-        }
-    }
-
-    public String getMoniker() { 
-        if (moniker != null) {
-            return moniker;
-        } else {         
-        	ind.getOntModel().enterCriticalSection(Lock.READ);
-            try {
-                moniker = webappDaoFactory.getJenaBaseDao()
-                        .getPropertyStringValue(
-                                ind,webappDaoFactory.getJenaBaseDao().MONIKER);
-                if (moniker == null) {
-                    //Changing behavior to moniker because it is taking extra time to get the vclass
-                    //alternative if the moniker isn't filled out.  That time is wasted if the vclass alternative isn't desired.
-                    //see NIHVIVO-2001
-                      moniker = "";
-                  }                
-                return moniker;
-            } finally {
-            	ind.getOntModel().leaveCriticalSection();
-            }
-        }
-    }
-
-    public String getBlurb() { 
-        if (this.blurb != null) {
-            return blurb;
-        } else {
-            constructProperty(ind, VitroVocabulary.BLURB);
-        	ind.getOntModel().enterCriticalSection(Lock.READ);
-            try {
-                blurb = webappDaoFactory.getJenaBaseDao().getPropertyStringValue(ind,webappDaoFactory.getJenaBaseDao().BLURB);
-                return blurb;
-            } finally {
-               
-            	ind.getOntModel().leaveCriticalSection();
-            }
-        }
-    }
-
-    public String getDescription() { 
-        if (this.description != null) {
-            return description;
-        } else {
-            constructProperty(ind, VitroVocabulary.DESCRIPTION);
-        	ind.getOntModel().enterCriticalSection(Lock.READ);
-            try {
-                description = webappDaoFactory.getJenaBaseDao()
-                        .getPropertyStringValue(
-                             ind,webappDaoFactory.getJenaBaseDao().DESCRIPTION);
-                return description;
-            } finally {
-                
             	ind.getOntModel().leaveCriticalSection();
             }
         }
@@ -526,125 +426,6 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         }
 	}
 	
-	
-	public String getAnchor() { 
-        if (this.anchor != null) {
-            return anchor;
-        } else {
-            doUrlAndAnchor();
-            return anchor;
-        }
-    }
-
-    public String getUrl() { 
-        if (this.url != null) {
-            return url;
-        } else {
-            doUrlAndAnchor();
-            return url;
-        }
-    }
-
-    private void doUrlAndAnchor() { 
-        Model tempModel = ModelFactory.createDefaultModel();
-        OntModel ontModel = ModelFactory.createOntologyModel(
-                OntModelSpec.OWL_MEM);
-        DatasetWrapper w = getDatasetWrapper();
-        Dataset dataset = w.getDataset();
-    	dataset.getLock().enterCriticalSection(Lock.READ);
-        try {
-        	StringBuffer selectPrimaryLinkQueryBuff = new StringBuffer().append(
-        		"SELECT ?url ?anchor \n" ).append(" WHERE { \n").append(
-        		"    <" + this.individualURI + "> ").append(
-        		             "<" + VitroVocabulary.PRIMARY_LINK + "> " ).append(
-        		                     "?link . \n").append(
-        		"    ?link <" + VitroVocabulary.LINK_URL + "> ?url . \n" 
-        		        ).append(
-        		"    ?link <" + VitroVocabulary.LINK_ANCHOR + "> ?anchor . \n" 
-        		        ).append(
-        		"} \n");
-        	QueryExecution qexec = QueryExecutionFactory.create(
-                    QueryFactory.create(selectPrimaryLinkQueryBuff.toString())
-                            , dataset);
-        	try {
-        	    ResultSet linkResults = qexec.execSelect();
-        	    if (linkResults.hasNext()) {
-        	        QuerySolution solution = linkResults.next();
-        	        this.setUrl(solution.getLiteral("url").getLexicalForm());
-        	        this.setAnchor(solution.getLiteral("anchor")
-        	                .getLexicalForm());
-        	    }
-        	} finally {
-        	    qexec.close();
-        	}            
-        } finally {
-        	tempModel.close();
-        	ontModel.close();
-        	dataset.getLock().leaveCriticalSection();
-        	w.close();
-        }
-    }
-
-    public List <Link> getLinksList() { 
-        if (this.linksList != null) {
-            return this.linksList;
-        } else {
-            try {
-                webappDaoFactory.getLinksDao().addLinksToIndividual(this);
-            } catch (Exception e) {
-                log.debug(this.getClass().getName() + 
-                        " could not addLinksToIndividual for " + this.getURI());
-            }
-            return this.linksList;
-        }
-    }
-
-    public Link getPrimaryLink() { 
-        if (this.primaryLink != null) {
-            return this.primaryLink;
-        } else {
-            try {
-                webappDaoFactory.getLinksDao().addPrimaryLinkToIndividual(this);
-            } catch (Exception e) {
-                log.debug(this.getClass().getName() + 
-                        " could not addPrimaryLinkToIndividual for " + 
-                                this.getURI());
-            }
-            return this.primaryLink;
-        }
-    }
-
-
-    public List<String> getKeywords() { 
-        if (this.keywords != null) {
-            return this.keywords;
-        } else {
-            try {
-                this.setKeywords(webappDaoFactory.getIndividualDao()
-                        .getKeywordsForIndividual(this.getURI()));
-            } catch (Exception e) {
-                log.debug(this.getClass().getName() + 
-                        " could not getKeywords for " + this.getURI());
-            }
-            return this.keywords;
-        }
-    }
-    
-    public List<Keyword> getKeywordObjects() {
-        if (this.keywordObjects != null) { 
-            return this.keywordObjects;
-        } else {
-            try {
-                this.setKeywordObjects(webappDaoFactory.getIndividualDao()
-                        .getKeywordObjectsForIndividual(this.getURI()));
-            } catch (Exception e) {
-                log.error(this.getClass().getName() + 
-                        " could not get Keyword Objects for " + this.getURI());
-            }
-        }
-        return this.keywordObjects;
-    }
-
     public List<ObjectPropertyStatement> getObjectPropertyStatements() { 
         if (this.objectPropertyStatements != null) {
             return this.objectPropertyStatements;

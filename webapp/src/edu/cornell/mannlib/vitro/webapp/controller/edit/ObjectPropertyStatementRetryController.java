@@ -54,10 +54,21 @@ public class ObjectPropertyStatementRetryController extends BaseEditController {
         Class[] classarray = {PropertyInstanceIface.class};
         try {
         	epo.setInsertMethod(PropertyInstanceDao.class.getMethod("insertProp", classarray));
+        	epo.setUpdateMethod(epo.getInsertMethod());
         } catch (NoSuchMethodException nsme) {
         	log.error("Unable to find "+PropertyInstanceDao.class.getName()+".insertProp("+PropertyInstanceIface.class.getName()+")");
         }
         
+        try {
+        	epo.setDeleteMethod(
+        			PropertyInstanceDao.class.getMethod(
+        					"deletePropertyInstance", classarray));
+        } catch(NoSuchMethodException nsme) {
+        	log.error("Unable to find "+PropertyInstanceDao.class.getName()+
+        			".deletePropertyInstance("+
+        					PropertyInstanceIface.class.getName()+")");
+        }
+                
         String action = "insert";
 
         PropertyInstanceDao piDao = vreq.getFullWebappDaoFactory().getPropertyInstanceDao();

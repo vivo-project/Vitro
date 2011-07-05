@@ -36,31 +36,22 @@ public class JenaBaseDaoCon {
     
     /* ***************** Vitro ontology constants ***************** */
 
-    public    DatatypeProperty   SUNRISE = _constModel.createDatatypeProperty(VitroVocabulary.SUNRISE);
-    public    DatatypeProperty   SUNSET = _constModel.createDatatypeProperty(VitroVocabulary.SUNSET);
     protected AnnotationProperty DATAPROPERTY_ISEXTERNALID = _constModel.createAnnotationProperty(VitroVocabulary.DATAPROPERTY_ISEXTERNALID);
         
     protected AnnotationProperty HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT);    
-    //protected AnnotationProperty PROHIBITED_FROM_CREATE_BELOW_ROLE_LEVEL_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PROHIBITED_FROM_CREATE_BELOW_ROLE_LEVEL_ANNOT);
     protected AnnotationProperty PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT);    
-    //protected AnnotationProperty PROHIBITED_FROM_DELETE_BELOW_ROLE_LEVEL_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PROHIBITED_FROM_DELETE_BELOW_ROLE_LEVEL_ANNOT);
     
-    protected AnnotationProperty   SEARCH_BOOST_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.SEARCH_BOOST_ANNOT);
+    protected AnnotationProperty SEARCH_BOOST_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.SEARCH_BOOST_ANNOT);
     
     protected AnnotationProperty EXAMPLE = _constModel.createAnnotationProperty(VitroVocabulary.EXAMPLE_ANNOT);
     protected AnnotationProperty DESCRIPTION_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.DESCRIPTION_ANNOT);
     protected AnnotationProperty PUBLIC_DESCRIPTION_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PUBLIC_DESCRIPTION_ANNOT);
     protected AnnotationProperty SHORTDEF = _constModel.createAnnotationProperty(VitroVocabulary.SHORTDEF);
 
-    protected DatatypeProperty   CURATOR_NOTE = _constModel.createDatatypeProperty(VitroVocabulary.CURATOR_NOTE);
     protected DatatypeProperty   MONIKER = _constModel.createDatatypeProperty(VitroVocabulary.MONIKER);
-    protected DatatypeProperty   DESCRIPTION = _constModel.createDatatypeProperty(VitroVocabulary.DESCRIPTION);
-    protected DatatypeProperty   BLURB = _constModel.createDatatypeProperty(VitroVocabulary.BLURB);
     protected OntClass           CLASSGROUP = _constModel.createClass(VitroVocabulary.CLASSGROUP);
     protected AnnotationProperty IN_CLASSGROUP = _constModel.createAnnotationProperty(VitroVocabulary.IN_CLASSGROUP);
     protected DatatypeProperty   MODTIME = _constModel.createDatatypeProperty(VitroVocabulary.MODTIME);
-    protected DatatypeProperty   TIMEKEY = _constModel.createDatatypeProperty(VitroVocabulary.TIMEKEY);
-    protected DatatypeProperty   CITATION = _constModel.createDatatypeProperty(VitroVocabulary.CITATION);
 
     protected DatatypeProperty   DISPLAY_RANK = _constModel.createDatatypeProperty(VitroVocabulary.DISPLAY_RANK);
     protected AnnotationProperty DISPLAY_RANK_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.DISPLAY_RANK_ANNOT);
@@ -76,7 +67,6 @@ public class JenaBaseDaoCon {
     protected AnnotationProperty PROPERTY_CUSTOMSHORTVIEWANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PROPERTY_CUSTOMSHORTVIEWANNOT);
     protected AnnotationProperty PROPERTY_CUSTOM_LIST_VIEW_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PROPERTY_CUSTOM_LIST_VIEW_ANNOT);
     protected AnnotationProperty PROPERTY_CUSTOMSEARCHVIEWANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PROPERTY_CUSTOMSEARCHVIEWANNOT);
-    //protected AnnotationProperty PROPERTY_FORCESTUBDELETIONANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PROPERTY_FORCESTUBDELETIONANNOT);
     protected AnnotationProperty PROPERTY_SELECTFROMEXISTINGANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PROPERTY_SELECTFROMEXISTINGANNOT);
     protected AnnotationProperty PROPERTY_OFFERCREATENEWOPTIONANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PROPERTY_OFFERCREATENEWOPTIONANNOT);
     protected AnnotationProperty PROPERTY_INPROPERTYGROUPANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PROPERTY_INPROPERTYGROUPANNOT);
@@ -84,17 +74,6 @@ public class JenaBaseDaoCon {
     protected AnnotationProperty PROPERTY_STUBOBJECTPROPERTYANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PROPERTY_STUBOBJECTPROPERTYANNOT);
     
     protected OntClass 		     PROPERTYGROUP = _constModel.createClass(VitroVocabulary.PROPERTYGROUP);
-
-    protected OntClass           KEYWORD = _constModel.createClass(VitroVocabulary.KEYWORD);
-    protected DatatypeProperty   KEYWORD_STEM = _constModel.createDatatypeProperty(VitroVocabulary.KEYWORD_STEM);
-    protected DatatypeProperty   KEYWORD_TYPE = _constModel.createDatatypeProperty(VitroVocabulary.KEYWORD_TYPE);
-    protected DatatypeProperty   KEYWORD_SOURCE = _constModel.createDatatypeProperty(VitroVocabulary.KEYWORD_SOURCE);
-    protected DatatypeProperty   KEYWORD_ORIGIN = _constModel.createDatatypeProperty(VitroVocabulary.KEYWORD_ORIGIN);
-    protected DatatypeProperty   KEYWORD_COMMENTS = _constModel.createDatatypeProperty(VitroVocabulary.KEYWORD_COMMENTS);
-    protected OntClass           KEYWORD_INDIVIDUALRELATION = _constModel.createClass(VitroVocabulary.KEYWORD_INDIVIDUALRELATION);
-    protected ObjectProperty     KEYWORD_INDIVIDUALRELATION_INVOLVESKEYWORD = _constModel.createObjectProperty(VitroVocabulary.KEYWORD_INDIVIDUALRELATION_INVOLVESKEYWORD);
-    protected ObjectProperty     KEYWORD_INDIVIDUALRELATION_INVOLVESINDIVIDUAL = _constModel.createObjectProperty(VitroVocabulary.KEYWORD_INDIVIDUALRELATION_INVOLVESINDIVIDUAL);
-    protected DatatypeProperty   KEYWORD_INDIVIDUALRELATION_MODE = _constModel.createDatatypeProperty(VitroVocabulary.KEYWORD_INDIVIDUALRELATION_MODE);
 
     protected OntClass           LINK = _constModel.createClass(VitroVocabulary.LINK);
     protected ObjectProperty     PRIMARY_LINK = _constModel.createObjectProperty(VitroVocabulary.PRIMARY_LINK);
@@ -104,22 +83,9 @@ public class JenaBaseDaoCon {
     protected DatatypeProperty   LINK_TYPE = _constModel.createDatatypeProperty(VitroVocabulary.LINK_TYPE);
     protected DatatypeProperty   LINK_DISPLAYRANK = _constModel.createDatatypeProperty(VitroVocabulary.LINK_DISPLAYRANK_URL);
 
-//    protected  OntClass           APPLICATION = null;
-//    protected  DatatypeProperty   APPLICATION_FLAG1NAME = null;
-//    protected  DatatypeProperty   APPLICATION_FLAG2NAME = null;
-//    protected  DatatypeProperty   APPLICATION_FLAG3NAME = null;
-//    protected  DatatypeProperty   APPLICATION_MINSHAREDPORTALID = null;
-//    protected  DatatypeProperty   APPLICATION_MAXSHAREDPORTALID = null;
-//    protected  DatatypeProperty   APPLICATION_KEYWORDHEADING = null;
-//    protected  DatatypeProperty   APPLICATION_ROOTLOGOTYPEIMAGE = null;
-//    protected  DatatypeProperty   APPLICATION_ONLYCURRENT = null;
-//    protected  DatatypeProperty   APPLICATION_MAXPORTALID = null;
-
     protected  OntClass           PORTAL = _constModel.createClass(VitroVocabulary.PORTAL);
     protected  DatatypeProperty   APPLICATION_THEMEDIR = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_THEMEDIR);
     protected  DatatypeProperty   PORTAL_BANNERIMAGE = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_BANNERIMAGE);
-    //protected  DatatypeProperty   PORTAL_FLAG2VALUES = null;
-    //protected  DatatypeProperty   PORTAL_FLAG1VALUES = null;
     protected  DatatypeProperty   APPLICATION_CONTACTMAIL = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_CONTACTMAIL);
     protected  DatatypeProperty   APPLICATION_CORRECTIONMAIL = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_CORRECTIONMAIL);
     protected  DatatypeProperty   PORTAL_SHORTHAND = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_SHORTHAND);
@@ -127,7 +93,6 @@ public class JenaBaseDaoCon {
     protected  DatatypeProperty   APPLICATION_ACKNOWLEGETEXT = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_ACKNOWLEGETEXT);
     protected  DatatypeProperty   PORTAL_BANNERWIDTH = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_BANNERWIDTH);
     protected  DatatypeProperty   PORTAL_BANNERHEIGHT = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_BANNERHEIGHT);
-    //protected  DatatypeProperty   PORTAL_FLAG3VALUES = null;
     protected  DatatypeProperty   APPLICATION_COPYRIGHTURL = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_COPYRIGHTURL);
     protected  DatatypeProperty   APPLICATION_COPYRIGHTANCHOR = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_COPYRIGHTANCHOR);
     protected  DatatypeProperty   PORTAL_ROOTBREADCRUMBURL = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_ROOTBREADCRUMBURL);

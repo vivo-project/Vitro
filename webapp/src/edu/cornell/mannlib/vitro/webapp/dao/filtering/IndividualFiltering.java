@@ -211,21 +211,6 @@ public class IndividualFiltering implements Individual {
     }
 
     @Override
-    public String getAnchor() {
-        return _innerIndividual.getAnchor();
-    }
-
-    @Override
-    public String getBlurb() {
-        return _innerIndividual.getBlurb();
-    }  
-    
-    @Override
-    public String getDescription() {
-        return _innerIndividual.getDescription();
-    }
-
-    @Override
     public List<DataPropertyStatement> getExternalIds() {
         return _innerIndividual.getExternalIds();
     }
@@ -252,26 +237,6 @@ public class IndividualFiltering implements Individual {
 	}
 
     @Override
-	public List<String> getKeywords() {
-        return _innerIndividual.getKeywords();
-    }
-
-    @Override
-    public String getKeywordString() {
-        return _innerIndividual.getKeywordString();
-    }
-
-    @Override
-    public List<Link> getLinksList() {
-        return _innerIndividual.getLinksList();
-    }
-
-    @Override
-    public Link getPrimaryLink() {
-        return _innerIndividual.getPrimaryLink();
-    }
-
-    @Override
     public String getLocalName() {
         return _innerIndividual.getLocalName();
     }
@@ -279,11 +244,6 @@ public class IndividualFiltering implements Individual {
     @Override
     public Timestamp getModTime() {
         return _innerIndividual.getModTime();
-    }
-
-    @Override
-    public String getMoniker() {
-        return _innerIndividual.getMoniker();
     }
 
     @Override
@@ -302,40 +262,8 @@ public class IndividualFiltering implements Individual {
     }
 
     @Override
-    public String getStatus() {
-        return _innerIndividual.getStatus();
-    }
-
-
-    @Override
-    public int getStatusId() {
-        return _innerIndividual.getStatusId();
-    }
-
-
-    @Override
-    public Date getSunrise() {
-        return _innerIndividual.getSunrise();
-    }
-
-    @Override
-    public Date getSunset() {
-        return _innerIndividual.getSunset();
-    }
-
-    @Override
-    public Date getTimekey() {
-        return _innerIndividual.getTimekey();
-    }
-
-    @Override
     public String getURI() {
         return _innerIndividual.getURI();
-    }
-
-    @Override
-    public String getUrl() {
-        return _innerIndividual.getUrl();
     }
 
     @Override
@@ -354,16 +282,6 @@ public class IndividualFiltering implements Individual {
     }
 
     @Override
-    public void setAnchor(String in) {
-        _innerIndividual.setAnchor(in);
-    }
-
-    @Override
-    public void setBlurb(String in) {
-        _innerIndividual.setBlurb(in);
-    }
-
-    @Override
     public void setDatatypePropertyList(List<DataProperty> datatypePropertyList) {
         _innerIndividual.setDatatypePropertyList(datatypePropertyList);
     }
@@ -371,11 +289,6 @@ public class IndividualFiltering implements Individual {
     @Override
     public void setPopulatedDataPropertyList(List<DataProperty> dataPropertyList) {
         _innerIndividual.setPopulatedDataPropertyList(dataPropertyList);
-    }
-    
-    @Override
-    public void setDescription(String in) {
-        _innerIndividual.setDescription(in);
     }
 
     @Override
@@ -397,22 +310,7 @@ public class IndividualFiltering implements Individual {
 	public void setMainImageUri(String mainImageUri) {
     	_innerIndividual.setMainImageUri(mainImageUri);
 	}
-
-    @Override
-    public void setKeywords(List<String> keywords) {
-        _innerIndividual.setKeywords(keywords);
-    }
-
-    @Override
-    public void setLinksList(List<Link> linksList) {
-        _innerIndividual.setLinksList(linksList);
-    }
-
-    @Override
-    public void setPrimaryLink(Link link) {
-        _innerIndividual.setPrimaryLink(link);
-    }
-
+    
     @Override
     public void setLocalName(String localName) {
         _innerIndividual.setLocalName(localName);
@@ -421,11 +319,6 @@ public class IndividualFiltering implements Individual {
     @Override
     public void setModTime(Timestamp in) {
         _innerIndividual.setModTime(in);
-    }
-
-    @Override
-    public void setMoniker(String in) {
-        _innerIndividual.setMoniker(in);
     }
 
     @Override
@@ -447,40 +340,10 @@ public class IndividualFiltering implements Individual {
     public void setPopulatedObjectPropertyList(List<ObjectProperty> propertyList) {
         _innerIndividual.setPopulatedObjectPropertyList(propertyList);
     }
-    
-    @Override
-    public void setStatus(String s) {
-        _innerIndividual.setStatus(s);
-    }
-
-    @Override
-    public void setStatusId(int in) {
-        _innerIndividual.setStatusId(in);
-    }
-
-    @Override
-    public void setSunrise(Date in) {
-        _innerIndividual.setSunrise(in);
-    }
-
-    @Override
-    public void setSunset(Date in) {
-        _innerIndividual.setSunset(in);
-    }
-
-    @Override
-    public void setTimekey(Date in) {
-        _innerIndividual.setTimekey(in);
-    }
 
     @Override
     public void setURI(String URI) {
         _innerIndividual.setURI(URI);
-    }
-
-    @Override
-    public void setUrl(String url) {
-        _innerIndividual.setUrl(url);
     }
 
     @Override
@@ -493,18 +356,9 @@ public class IndividualFiltering implements Individual {
         _innerIndividual.setVClassURI(in);
     }
 
-//    public void shallowCopy(Individual target) {
-//        _innerIndividual.shallowCopy(target);
-//    }
-
     @Override
     public void sortForDisplay() {
         _innerIndividual.sortForDisplay();
-    }
-
-    @Override
-    public List<Keyword> getKeywordObjects() {
-        return _innerIndividual.getKeywordObjects();
     }
 
     @Override
@@ -530,11 +384,6 @@ public class IndividualFiltering implements Individual {
     @Override
 	public void setDataPropertyMap(Map<String, DataProperty> propertyMap) {
         _innerIndividual.setDataPropertyMap(propertyMap);
-    }
-
-    @Override
-    public void setKeywordObjects(List<Keyword> keywords) {
-        _innerIndividual.setKeywordObjects(keywords);
     }
 
     @Override

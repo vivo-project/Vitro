@@ -13,10 +13,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayModelDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.dao.KeywordDao;
-import edu.cornell.mannlib.vitro.webapp.dao.KeywordIndividualRelationDao;
-import edu.cornell.mannlib.vitro.webapp.dao.LinksDao;
-import edu.cornell.mannlib.vitro.webapp.dao.LinktypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.MenuDao;
 import edu.cornell.mannlib.vitro.webapp.dao.NamespaceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
@@ -166,22 +162,6 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
 
     public String getUserURI() {
         return innerWebappDaoFactory.getUserURI();
-    }
-
-    public KeywordIndividualRelationDao getKeys2EntsDao() {
-        return innerWebappDaoFactory.getKeys2EntsDao();
-    }
-
-    public KeywordDao getKeywordDao() {
-        return innerWebappDaoFactory.getKeywordDao();
-    }
-
-    public LinksDao getLinksDao() {
-        return innerWebappDaoFactory.getLinksDao();
-    }
-
-    public LinktypeDao getLinktypeDao() {
-        return innerWebappDaoFactory.getLinktypeDao();
     }
 
     public ApplicationDao getApplicationDao() {

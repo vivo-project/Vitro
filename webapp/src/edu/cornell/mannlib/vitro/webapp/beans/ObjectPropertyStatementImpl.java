@@ -9,7 +9,7 @@ import java.util.Date;
  * a class representing a particular instance of an object property
  *
  */
-public class ObjectPropertyStatementImpl implements VitroTimeWindowedResource, ObjectPropertyStatement
+public class ObjectPropertyStatementImpl implements ObjectPropertyStatement
 {
     private String subjectURI = null;
     private Individual subject = null;
@@ -42,22 +42,6 @@ public class ObjectPropertyStatementImpl implements VitroTimeWindowedResource, O
     }
 
     /* (non-Javadoc)
-     * @see edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement#getDescription()
-     */
-    public String getDescription() {
-        return description;
-    }
-
-
-    /* (non-Javadoc)
-     * @see edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement#setDescription(java.lang.String)
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-
-    /* (non-Javadoc)
      * @see edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement#isSubjectOriented()
      */
     public boolean isSubjectOriented() {
@@ -86,22 +70,6 @@ public class ObjectPropertyStatementImpl implements VitroTimeWindowedResource, O
     public void setSubjectURI(String subjectURI) {
         this.subjectURI = subjectURI;
     }
-
-    /* (non-Javadoc)
-     * @see edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement#getQualifier()
-     */
-    public String getQualifier() {
-        return qualifier;
-    }
-
-
-    /* (non-Javadoc)
-     * @see edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement#setQualifier(java.lang.String)
-     */
-    public void setQualifier(String qualifier) {
-        this.qualifier = qualifier;
-    }
-
 
     /* (non-Javadoc)
      * @see edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement#getObjectURI()
@@ -196,32 +164,6 @@ public class ObjectPropertyStatementImpl implements VitroTimeWindowedResource, O
         }
     }
 
-    private Date sunrise = null;
-    /* (non-Javadoc)
-     * @see edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement#setSunrise(java.util.Date)
-     */
-    public void setSunrise(Date date) {
-        sunrise = date;
-    }
-    /* (non-Javadoc)
-     * @see edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement#getSunrise()
-     */
-    public Date getSunrise(){
-        return sunrise;
-    }
-
-    private Date sunset = null;
-    /* (non-Javadoc)
-     * @see edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement#setSunset(java.util.Date)
-     */
-    public void setSunset(Date date) {
-        sunset = date;
-    }
-    /* (non-Javadoc)
-     * @see edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement#getSunset()
-     */
-    public Date getSunset(){ return sunset; }
-
     /* (non-Javadoc)
      * @see edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement#toPropertyInstance()
      */
@@ -231,7 +173,6 @@ public class ObjectPropertyStatementImpl implements VitroTimeWindowedResource, O
         pi.setPropertyURI(propertyURI);
         pi.setSubjectEntURI(subjectURI);
         pi.setObjectEntURI(objectURI);
-        pi.setQualifier(qualifier);
         pi.setSubjectSide(subjectOriented);
         return pi;
     }

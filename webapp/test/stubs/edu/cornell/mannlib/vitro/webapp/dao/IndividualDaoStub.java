@@ -170,60 +170,9 @@ public class IndividualDaoStub implements IndividualDao {
 	}
 
 	@Override
-	public List<String> monikers(String vclassURI) {
-		throw new RuntimeException(
-				"IndividualDaoStub.monikers() not implemented.");
-	}
-
-	@Override
-	public List<String> getKeywordsForIndividual(String individualURI) {
-		throw new RuntimeException(
-				"IndividualDaoStub.getKeywordsForIndividual() not implemented.");
-	}
-
-	@Override
-	public List<String> getKeywordsForIndividualByMode(String individualURI,
-			String modeStr) {
-		throw new RuntimeException(
-				"IndividualDaoStub.getKeywordsForIndividualByMode() not implemented.");
-	}
-
-	@Override
-	public List<Keyword> getKeywordObjectsForIndividual(String individualURI) {
-		throw new RuntimeException(
-				"IndividualDaoStub.getKeywordObjectsForIndividual() not implemented.");
-	}
-
-	@Override
-	public String getNetId(String entityURI) {
-		throw new RuntimeException(
-				"IndividualDaoStub.getNetId() not implemented.");
-	}
-
-	@Override
-	public String getStatus(String entityURI) {
-		throw new RuntimeException(
-				"IndividualDaoStub.getStatus() not implemented.");
-	}
-
-	@Override
 	public String getUnusedURI(Individual individual) throws InsertException {
 		throw new RuntimeException(
 				"IndividualDaoStub.getUnusedURI() not implemented.");
-	}
-
-	@Override
-	public Individual getIndividualByExternalId(int externalIdType,
-			String externalIdValue) {
-		throw new RuntimeException(
-				"IndividualDaoStub.getIndividualByExternalId() not implemented.");
-	}
-
-	@Override
-	public Individual getIndividualByExternalId(int externalIdType,
-			String externalIdValue, String vClassURI) {
-		throw new RuntimeException(
-				"IndividualDaoStub.getIndividualByExternalId() not implemented.");
 	}
 
     @Override

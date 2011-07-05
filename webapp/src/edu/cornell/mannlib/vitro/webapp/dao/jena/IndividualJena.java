@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.text.Collator;
 import java.util.ArrayList;
@@ -153,41 +151,6 @@ public class IndividualJena extends IndividualImpl implements Individual {
         }
     }
 
-    @Deprecated
-    public int getFlag1Numeric() {
-    	return 1;
-    }
-
-    @Deprecated
-    public String getFlag1Set() {
-    	return "1";
-    }
-
-    @Deprecated
-    public String getFlag2Set() {
-    	return "";
-    }
-
-    @Deprecated
-    public boolean doesFlag1Match(int flagBitMask) {
-    	return true;
-    }
-
-    @Deprecated
-    public Date getSunrise() {
-    	return null;
-    }
-
-    @Deprecated
-    public Date getSunset() {
-    	return null;
-    }
-
-    @Deprecated
-    public Date getTimekey() {
-    	return null;
-    }
-
     public Timestamp getModTime() {
         if (modTime != null) {
             return modTime;
@@ -204,118 +167,6 @@ public class IndividualJena extends IndividualImpl implements Individual {
             }
         }
     }
-
-    public String getMoniker() {
-        if (moniker != null) {
-            return moniker;
-        } else {
-            ind.getOntModel().enterCriticalSection(Lock.READ);
-            try {
-                moniker = webappDaoFactory.getJenaBaseDao().getPropertyStringValue(ind,webappDaoFactory.getJenaBaseDao().MONIKER);
-                if (moniker == null) {
-                  //Changing behavior to moniker because it is taking extra time to get the vclass
-                  //alternative if the moniker isn't filled out.  That time is wasted if the vclass alternative isn't desired.
-                  //see NIHVIVO-2001
-                    moniker = "";
-                }
-                return moniker;
-            } finally {
-                ind.getOntModel().leaveCriticalSection();
-            }
-        }
-    }
-
-    /* 2009-01-27 hold off on individual-level filtering for now
-    @Override
-    public RoleLevel getHiddenFromDisplayBelowRoleLevel(){
-        if( this.hiddenFromDisplayBelowRoleLevel != null )
-            return this.hiddenFromDisplayBelowRoleLevel;
-        
-        OntModel model = ind.getOntModel(); 
-        model.enterCriticalSection(Lock.READ);
-        try {
-            NodeIterator it = model.listObjectsOfProperty(ind, model.getAnnotationProperty(VitroVocabulary.HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT));
-            if( it == null )
-                return BaseResourceBean.RoleLevel.values()[0];
-            BaseResourceBean.RoleLevel role = BaseResourceBean.RoleLevel.values()[0];            
-            while( it.hasNext() ) {
-                RDFNode node = it.nextNode();
-                if( node != null && node.isURIResource() ) {
-                    BaseResourceBean.RoleLevel foundRole = BaseResourceBean.RoleLevel.getRoleByUri( node.asNode().getURI() );
-                    if( role.compareTo(foundRole ) < 0 ) { // find the lowest of all levels
-                        role = foundRole;
-                    }
-                }
-            }
-            return this.hiddenFromDisplayBelowRoleLevel = role;
-        } finally {
-            model.leaveCriticalSection();
-        }
-    }
-
-    /**
-     * this seems like a mismatch with the RDF storage model.
-     * We could have multiple statements in the model that associated
-     * the individual with multiple or redundant edit display levels.
-     */
-    
-    /*
-    @Override
-    public RoleLevel getProhibitedFromUpdateBelowRoleLevel() {
-        if( this.prohibitedFromUpdateBelowRoleLevel != null )
-            return this.prohibitedFromUpdateBelowRoleLevel;
-        
-        OntModel model = ind.getOntModel(); 
-        model.enterCriticalSection(Lock.READ);
-        try {
-            NodeIterator it = model.listObjectsOfProperty(ind, model.getAnnotationProperty(VitroVocabulary.PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT));
-            if( it == null )
-                return BaseResourceBean.RoleLevel.values()[0];
-            BaseResourceBean.RoleLevel role = BaseResourceBean.RoleLevel.values()[0];
-            while( it.hasNext() ){
-                RDFNode node = it.nextNode();
-                if( node != null && node.isURIResource() ) {
-                    BaseResourceBean.RoleLevel foundRole = BaseResourceBean.RoleLevel.getRoleByUri( node.asNode().getURI() );
-                    if( role.compareTo(foundRole ) < 0 ) // find the lowest of all roles
-                        role = foundRole;                    
-                }
-            } 
-            return this.prohibitedFromUpdateBelowRoleLevel = role;            
-        } finally {
-            model.leaveCriticalSection();
-        }                
-    }
-    */
-  
-
-    public String getBlurb() {
-        if (this.blurb != null) {
-            return blurb;
-        } else {
-            ind.getOntModel().enterCriticalSection(Lock.READ);
-            try {
-                blurb = webappDaoFactory.getJenaBaseDao().getPropertyStringValue(ind,webappDaoFactory.getJenaBaseDao().BLURB);
-                return blurb;
-            } finally {
-                ind.getOntModel().leaveCriticalSection();
-            }
-        }
-    }
-
-    public String getDescription() {
-        if (this.description != null) {
-            return description;
-        } else {
-            ind.getOntModel().enterCriticalSection(Lock.READ);
-            try {
-                description = webappDaoFactory.getJenaBaseDao().getPropertyStringValue(ind,webappDaoFactory.getJenaBaseDao().DESCRIPTION);
-                return description;
-            } finally {
-                ind.getOntModel().leaveCriticalSection();
-            }
-        }
-    }
-
 
     public Float getSearchBoost(){
         if( this._searchBoostJena != null ){
@@ -380,122 +231,12 @@ public class IndividualJena extends IndividualImpl implements Individual {
 		return this.imageInfo.getThumbnail().getBytestreamAliasUrl();
 	}
 
-	public String getAnchor() {
-        if (this.anchor != null) {
-            return anchor;
-        } else {
-            doUrlAndAnchor();
-            return anchor;
-        }
-    }
-
-    public String getUrl() {
-        if (this.url != null) {
-            return url;
-        } else {
-            doUrlAndAnchor();
-            return url;
-        }
-    }
-
-    private void doUrlAndAnchor() {
-        ind.getOntModel().enterCriticalSection(Lock.READ);
-        try {
-            if (webappDaoFactory.getJenaBaseDao().PRIMARY_LINK != null) {
-                Iterator links = ind.listPropertyValues(webappDaoFactory.getJenaBaseDao().PRIMARY_LINK);
-                if (links.hasNext()) {
-                    try {
-                        com.hp.hpl.jena.ontology.Individual linkInd = ((com.hp.hpl.jena.ontology.Individual)((Resource) links.next()).as(com.hp.hpl.jena.ontology.Individual.class));
-                        if (webappDaoFactory.getJenaBaseDao().LINK_ANCHOR != null) {
-                            try {
-                                Literal l = (Literal) linkInd.getPropertyValue(webappDaoFactory.getJenaBaseDao().LINK_ANCHOR);
-                                if (l != null) {
-                                    anchor = l.getString();
-                                }
-                            } catch (ClassCastException e) {}
-                        }
-                        if (webappDaoFactory.getJenaBaseDao().LINK_URL != null) {
-                            try {
-                                Literal l = (Literal) linkInd.getPropertyValue(webappDaoFactory.getJenaBaseDao().LINK_URL);
-                                if (l != null) {
-                                    try {
-                                        url = URLDecoder.decode(l.getString(), "UTF-8");
-                                    } catch (UnsupportedEncodingException use) {}
-                                }
-                            } catch (ClassCastException e) {}
-                        }
-                    } catch (ClassCastException cce) {}
-                }
-            }
-        } finally {
-            ind.getOntModel().leaveCriticalSection();
-        }
-    }
-
-    public List <Link> getLinksList() {
-        if (this.linksList != null) {
-            return this.linksList;
-        } else {
-            try {
-                webappDaoFactory.getLinksDao().addLinksToIndividual( this );
-            } catch (Exception e) {
-                log.debug(this.getClass().getName()+" could not addLinksToIndividual for "+this.getURI());
-            }
-            return this.linksList;
-        }
-    }
-
-    public Link getPrimaryLink() {
-        if (this.primaryLink != null) {
-            return this.primaryLink;
-        } else {
-            try {
-                webappDaoFactory.getLinksDao().addPrimaryLinkToIndividual( this );
-            } catch (Exception e) {
-                log.debug(this.getClass().getName()+" could not addPrimaryLinkToIndividual for "+this.getURI());
-            }
-            return this.primaryLink;
-        }
-    }
-
-
-    public List<String> getKeywords() {
-        if (this.keywords != null) {
-            return this.keywords;
-        } else {
-            try {
-                this.setKeywords(webappDaoFactory.getIndividualDao().getKeywordsForIndividual(this.getURI()));
-            } catch (Exception e) {
-                log.debug(this.getClass().getName()+" could not getKeywords for "+this.getURI());
-            }
-            return this.keywords;
-        }
-    }
-    
-    public List<Keyword> getKeywordObjects() {
-        if (this.keywordObjects != null) {
-            return this.keywordObjects;
-        } else {
-            try {
-                this.setKeywordObjects(webappDaoFactory.getIndividualDao().getKeywordObjectsForIndividual(this.getURI()));
-            } catch (Exception e) {
-                log.error(this.getClass().getName()+" could not get Keyword Objects for "+this.getURI());
-            }
-        }
-        return this.keywordObjects;
-    }
-
     public List<ObjectPropertyStatement> getObjectPropertyStatements() {
         if (this.objectPropertyStatements != null) {
             return this.objectPropertyStatements;
         } else {
             try {
                 webappDaoFactory.getObjectPropertyStatementDao().fillExistingObjectPropertyStatements(this);
-                //Iterator stmtIt = this.getObjectPropertyStatements().iterator();
-                //while (stmtIt.hasNext()) {
-                //    ObjectPropertyStatement stmt = (ObjectPropertyStatement) stmtIt.next();
-                //    stmt.setObject(webappDaoFactory.getIndividualDao().getIndividualByURI(stmt.getObject().getURI()));
-                //}
             } catch (Exception e) {
                 log.error(this.getClass().getName()+" could not fill existing ObjectPropertyStatements for "+this.getURI(), e);
             }

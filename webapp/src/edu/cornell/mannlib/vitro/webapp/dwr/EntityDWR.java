@@ -63,47 +63,6 @@ public class EntityDWR {
     }
 
     /**
-       Gets entities that can be in a propertyId relation with classId but
-       excludes entity with id of ignoredEntId.  If classId < 0 then it the
-       query is not limited by vclass.
-       @param propertyId - which relation to get entities for column properties.id
-       @param ignoredEntId - the entity with this id is excluded from the
-       result collection.  Set to < 0 if you don't want to ignore any entities.
-       @param classId - if > 0 then only ents with this vClassId or which are subclasses
-       of this are included in results.
-       @param domainSide - if true, return RANGE entities of relation, if false return
-        DOMAIN entities of relation.
-       @return - Entities that can satisify the property.  Only the name and id of the
-        object will be filled out.
-    */
-    @Deprecated
-    public Collection getEntitiesByProperties(String propertyURI,
-                                              String ignoredEntURI,
-                                              String classURI,
-                                              boolean domainSide ){
-    	return new LinkedList();
-//        WebContext ctx = WebContextFactory.get();
-//        HttpServletRequest req = ctx.getHttpServletRequest();
-//        VitroRequest vreq = new VitroRequest(req);
-//        IndividualDao entityWADao = vreq.getWebappDaoFactory().getIndividualDao();
-//        
-//        return entityWADao.getIndividualsByProperty(
-//                propertyURI,ignoredEntURI,classURI,domainSide);
-    }
-
-    /**
-     *  Gets the monikers for a vclass.
-     */
-    public List monikers( String vClassURI ){
-        WebContext ctx = WebContextFactory.get();
-        HttpServletRequest req = ctx.getHttpServletRequest();
-        VitroRequest vreq = new VitroRequest(req);
-        IndividualDao entityWADao = vreq.getWebappDaoFactory().getIndividualDao();
-                
-        return entityWADao.monikers( vClassURI );
-    }
-
-    /**
      * Gets all of the entities given the vclass.
      * This returns a collection of EntityWebapp objects.
      */

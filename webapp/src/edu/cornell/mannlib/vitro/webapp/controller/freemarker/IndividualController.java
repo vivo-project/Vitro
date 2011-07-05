@@ -111,7 +111,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	            return doHelp();
 	        }
 	        
-	        if( individual == null || checkForHidden(vreq, individual) || checkForSunset(vreq, individual)){
+	        if( individual == null ){
 	        	return doNotFound(vreq);
 	        }
 
@@ -255,7 +255,6 @@ public class IndividualController extends FreemarkerHttpServlet {
 		
     	IndividualDao iwDao = vreq.getWebappDaoFactory().getIndividualDao();
         
-        individual.setKeywords(iwDao.getKeywordsForIndividualByMode(individual.getURI(),"visible"));
         individual.sortForDisplay();
 
         return new IndividualTemplateModel(individual, vreq);
@@ -582,18 +581,6 @@ public class IndividualController extends FreemarkerHttpServlet {
 						
 		return null;
 	}  
-	
-	@SuppressWarnings("unused")
-	private boolean checkForSunset(VitroRequest vreq, Individual entity) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @SuppressWarnings("unused")
-	private boolean checkForHidden(VitroRequest vreq, Individual entity){ 
-        // TODO Auto-generated method stub
-        return false;
-    }
     
 	/**
 	 * If this entity represents a File Bytestream, get its alias URL so we can

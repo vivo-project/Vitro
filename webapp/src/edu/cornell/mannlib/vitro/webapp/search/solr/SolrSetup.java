@@ -17,6 +17,7 @@ import org.apache.solr.client.solrj.impl.XMLResponseParser;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.DatasetFactory;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
@@ -73,8 +74,8 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             
             OntModel abox = ModelContext.getBaseOntModelSelector(context).getABoxModel();            
             OntModel inferences = (OntModel)context.getAttribute( JenaBaseDao.INFERENCE_ONT_MODEL_ATTRIBUTE_NAME);
-            Dataset dataset = WebappDaoFactoryJena.makeInMemoryDataset(abox, inferences);
-            
+            Dataset dataset = DatasetFactory.create(ModelContext.getJenaOntModel(context));
+
             OntModel jenaOntModel = ModelContext.getJenaOntModel(context);
             
             List<DocumentModifier> modifiers = new ArrayList<DocumentModifier>();
