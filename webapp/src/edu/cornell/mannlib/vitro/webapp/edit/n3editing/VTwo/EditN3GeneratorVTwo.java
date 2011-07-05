@@ -33,7 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTw
 public class EditN3GeneratorVTwo {
 	
     EditConfigurationVTwo editConfig;
-    Log log = LogFactory.getLog( EditN3GeneratorVTwo.class );
+    static final Log log = LogFactory.getLog( EditN3GeneratorVTwo.class );
 
     public EditN3GeneratorVTwo( EditConfigurationVTwo editConfig ){
         this.editConfig = editConfig;
@@ -62,10 +62,10 @@ public class EditN3GeneratorVTwo {
              for( String key : keySet) {
             	 List<String> value = varsToVals.get(key);
             	 String valueString = value.toString();
-            	 System.out.println("Value String is " + valueString);
+            	 log.debug("Value String is " + valueString);
             	 valueString = org.apache.commons.lang.StringUtils.join(value, ">, <");
             	 valueString = "<" + valueString + ">";
-            	 System.out.println("Value string is " + valueString);
+            	 log.debug("Value string is " + valueString);
                  temp = subInUris( key, valueString, temp)  ;
              }
              outv.add(temp);

@@ -30,7 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfigu
  */
 public class EditN3Generator {
     EditConfiguration editConfig;
-    Log log = LogFactory.getLog( EditN3Generator.class );
+    static final Log log = LogFactory.getLog( EditN3Generator.class );
 
     public EditN3Generator( EditConfiguration editConfig ){
         this.editConfig = editConfig;
