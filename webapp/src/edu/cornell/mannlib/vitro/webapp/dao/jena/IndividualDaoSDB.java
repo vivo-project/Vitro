@@ -113,11 +113,11 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         	// If so, we will use it in a slightly strange way.  Unfortunately,
         	// performance is quite bad if we add several graph variables in 
         	// order to account for the fact that an individual's type 
-        	// declaration may be in a different graph from its label or 
-        	// moniker.  Thus, we will run two queries: one with a single
+        	// declaration may be in a different graph from its label.
+        	// Thus, we will run two queries: one with a single
         	// graph variable to get the list of URIs, and a second against
-        	// the union graph to get individuals with their labels and 
-        	// monikers.  We will then toss out any individual in the second
+        	// the union graph to get individuals with their labels.
+        	// We will then toss out any individual in the second
         	// list that is not also in the first list.
         	// Annoying, yes, but better than the alternative.
         	// Note that both queries need to sort identically or 
@@ -166,7 +166,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     	try {
     	    
     		String query = 
-	    		"SELECT DISTINCT ?ind ?label ?moniker " +
+	    		"SELECT DISTINCT ?ind ?label " +
 	    		"WHERE " +
 	    		 "{ \n" +
                     "{   ?ind a <" + theClass.getURI() + "> } \n" +
@@ -180,7 +180,6 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     		        .execSelect();
     		String uri = null;
     		String label = null;
-    		String moniker = null;
     		while (rs.hasNext()) {
     		    QuerySolution sol = rs.nextSolution();
     		    Resource currRes = sol.getResource("ind");
@@ -223,7 +222,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
        	dataset.getLock().enterCriticalSection(Lock.READ);
        	try {
     		String query = 
-    			"SELECT DISTINCT ?ind ?label ?moniker " +
+    			"SELECT DISTINCT ?ind " +
     			"WHERE " +
     			"{ GRAPH ?g { \n" +
                 	"{   ?ind a <" + theClass.getURI() + "> } \n" +
