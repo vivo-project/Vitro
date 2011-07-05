@@ -61,7 +61,7 @@ var associateProfileFields = {
     },
     
     bindEventListeners: function() {
-        console.log('bindEventListeners');
+        //console.log('bindEventListeners');
 
         this.externalAuthIdField.change(function() {
             associateProfileFields.checkForAssociatedProfile();
@@ -97,7 +97,7 @@ var associateProfileFields = {
                         externalAuthId: associateProfileFields.externalAuthIdField.val()
                     }, 
                     complete: function(xhr, status) {
-                        console.log('response text' + xhr.responseText);
+                        //console.log('response text' + xhr.responseText);
                         var results = jQuery.parseJSON(xhr.responseText);
                         response(results);
                     }
@@ -143,7 +143,7 @@ var associateProfileFields = {
     },
  
     showExternalAuthIdMatchesProfile: function(profileUri, profileUrl, profileLabel) {
-        console.log('showExternalAuthIdMatchesProfile: profileUri=' + profileUri + ', profileUrl=' + profileUrl + ', profileLabel='+ profileLabel);
+        //console.log('showExternalAuthIdMatchesProfile: profileUri=' + profileUri + ', profileUrl=' + profileUrl + ', profileLabel='+ profileLabel);
 
         this.externalAuthIdInUseMessage.hide();
         this.associatedArea.show();
