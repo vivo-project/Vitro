@@ -100,8 +100,9 @@ public class SolrJsonReconcileServletTest extends AbstractTestClass {
 		    Pattern regex = Pattern.compile(modStr);
 		    Matcher regexMatcher = regex.matcher(resultStr);
 		    Assert.assertTrue(message, regexMatcher.find());
-		} catch (PatternSyntaxException ex) {
+		} catch (PatternSyntaxException e) {
 		    // Syntax error in the regular expression
+			System.err.println("SolrJsonReconcileServletTest testAssertTrue PatternSyntaxException: " + e);
 		}
 	}
 }
