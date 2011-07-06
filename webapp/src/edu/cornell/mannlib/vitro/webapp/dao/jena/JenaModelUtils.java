@@ -188,7 +188,7 @@ public class JenaModelUtils {
 	        StringBuffer buff = new StringBuffer();
 	        buff.append("PREFIX afn: <http://jena.hpl.hp.com/ARQ/function#> \n")
 	        .append("CONSTRUCT { \n")
-	        .append("  ?res <" + property.getURI() + "> ?o WHERE { \n");
+	        .append("  ?res <" + property.getURI() + "> ?o } WHERE { \n");
 	        if (graphURI != null) {
 	            buff.append("    GRAPH " + graphURI + " { \n");
 	        }
@@ -197,6 +197,7 @@ public class JenaModelUtils {
 	        if (graphURI != null) {
 	            buff.append("    } \n");
 	        }
+	        buff.append("}");
 	        Query constructProp = QueryFactory.create(buff.toString());
 	        QueryExecution qe = QueryExecutionFactory.create(constructProp, dataset);
 	        try {
