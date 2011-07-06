@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
+package edu.cornell.mannlib.vitro.webapp.web.templatemodels.searchresult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,20 +16,19 @@ import edu.cornell.mannlib.vitro.webapp.web.ViewFinder;
 import edu.cornell.mannlib.vitro.webapp.web.ViewFinder.ClassView;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
-public class IndividualSearchResult extends BaseTemplateModel {
+public abstract class BaseIndividualSearchResult extends BaseTemplateModel {
 
-    private static final Log log = LogFactory.getLog(IndividualSearchResult.class);
+    private static final Log log = LogFactory.getLog(BaseIndividualSearchResult.class);
     
     protected Individual individual;
     protected VitroRequest vreq;
        
-    public IndividualSearchResult(Individual individual, VitroRequest vreq) {
-        this.individual = individual;
-        this.vreq = vreq;
-
+    public BaseIndividualSearchResult(Individual individual, VitroRequest vreq) {
+       this.individual = individual;
+       this.vreq = vreq;
     }
 
-    private String getView(ClassView view) {
+    protected String getView(ClassView view) {
         ViewFinder vf = new ViewFinder(view);
         return vf.findClassView(individual, vreq);
     }

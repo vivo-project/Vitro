@@ -45,8 +45,8 @@ import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.Entity2LuceneDoc.VitroLuceneTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneIndexFactory;
 import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.BaseListedIndividual;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividual;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.BaseListedIndividual;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividual;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.TemplateModel;
 
@@ -109,7 +109,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
                 body.putAll(map);
 
                 List<Individual> inds = (List<Individual>)map.get("entities");
-                List<BaseListedIndividual> indsTm = new ArrayList<BaseListedIndividual>();
+                List<ListedIndividual> indsTm = new ArrayList<ListedIndividual>();
                 for(Individual ind : inds ){
                     indsTm.add(new ListedIndividual(ind,vreq));
                 }

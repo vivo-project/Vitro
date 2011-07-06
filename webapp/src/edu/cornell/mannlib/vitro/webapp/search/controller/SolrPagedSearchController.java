@@ -52,8 +52,8 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryFactory;
 import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.LinkTemplateModel;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualSearchResult;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.BaseListedIndividual;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.BaseListedIndividual;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.searchresult.IndividualSearchResult;
 import freemarker.template.Configuration;
 
 /**

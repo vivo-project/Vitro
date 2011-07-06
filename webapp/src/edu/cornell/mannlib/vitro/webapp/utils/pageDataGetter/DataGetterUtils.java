@@ -35,7 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.BaseListedIndividual;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.BaseListedIndividual;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.TemplateModel;
 

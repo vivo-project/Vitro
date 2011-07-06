@@ -58,7 +58,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.ExtendedLinkedDataUtils;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividual;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividual;
 import freemarker.ext.beans.BeansWrapper;
 
 /**

@@ -26,8 +26,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.utils.JSONtoFmModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassTemplateModel;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.BaseListedIndividual;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividual;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.BaseListedIndividual;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividual;
 import freemarker.core.Environment;
 import freemarker.template.TemplateModelException;
 
@@ -162,7 +162,7 @@ public class BrowseWidget extends Widget {
         List<Individual> inds = vreq.getWebappDaoFactory().getIndividualDao()
             .getIndividualsByVClass(vclass);
         
-        List<BaseListedIndividual> tInds = new ArrayList<BaseListedIndividual>(inds.size());
+        List<ListedIndividual> tInds = new ArrayList<ListedIndividual>(inds.size());
         for( Individual ind : inds){
             tInds.add(new ListedIndividual(ind, vreq));
         }
