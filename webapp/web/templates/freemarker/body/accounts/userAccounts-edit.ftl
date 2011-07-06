@@ -52,61 +52,59 @@
     </#if>
 
 <section id="edit-account" role="region">
-    <fieldset>
+    <form method="POST" action="${formUrls.edit}" id="userAccountForm" class="customForm" role="edit account">
         <legend>Edit new account</legend>
+        
+        <label for="email-address">Email address<span class="requiredHint"> *</span></label>
+        <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
 
-        <form method="POST" action="${formUrls.edit}" id="userAccountForm" class="customForm" role="edit account">
-            <label for="email-address">Email address<span class="requiredHint"> *</span></label>
-            <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
+        <label for="first-name">First name<span class="requiredHint"> *</span></label> 
+        <input type="text" name="firstName" value="${firstName}" id="first-name" role="input" />
 
-            <label for="first-name">First name<span class="requiredHint"> *</span></label> 
-            <input type="text" name="firstName" value="${firstName}" id="first-name" role="input" />
+        <label for="last-name">Last name<span class="requiredHint"> *</span></label> 
+        <input type="text" name="lastName" value="${lastName}" id="last-name" role="input" />
 
-            <label for="last-name">Last name<span class="requiredHint"> *</span></label> 
-            <input type="text" name="lastName" value="${lastName}" id="last-name" role="input" />
+        <#include "userAccounts-associateProfilePanel.ftl">
 
-            <#include "userAccounts-associateProfilePanel.ftl">
+        <#if roles?has_content>
+            <p>Roles<span class="requiredHint"> *</span> </p>
+            <#list roles as role>
+                <input type="radio" name="role" value="${role.uri}" role="radio" <#if selectedRole = role.uri>checked</#if> />
+                <label class="inline" for="${role.label}"> ${role.label}</label>
+                <br />
+            </#list>
+        </#if>
 
-            <#if roles?has_content>
-                <p>Roles<span class="requiredHint"> *</span> </p>
-                <#list roles as role>
-                    <input type="radio" name="role" value="${role.uri}" role="radio" <#if selectedRole = role.uri>checked</#if> />
-                    <label class="inline" for="${role.label}"> ${role.label}</label>
-                    <br />
-                </#list>
-            </#if>
+        <#if emailIsEnabled??>
+            <input type="checkbox" name="resetPassword" value="" id="reset-password" role="checkbox" <#if resetPassword??>checked</#if> />
+            <label  class="inline" for="reset-password"> Reset password</label>
 
-            <#if emailIsEnabled??>
-                <input type="checkbox" name="resetPassword" value="" id="reset-password" role="checkbox" <#if resetPassword??>checked</#if> />
-                <label  class="inline" for="reset-password"> Reset password</label>
+            <p class="note">
+                Note: Instructions for resetting the password will 
+                be emailed to the address entered above. The password will not 
+                be reset until the user follows the link provided in this email.
+            </p>
+        <#else>
+            <table>
+                <tr>
+                    <td>
+                        <label for="new-password">New password<span class="requiredHint"> *</span></label>
+                        <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
+                    </td>
+                    <td>
+                        <label for="confirm-password">Confirm initial password<span class="requiredHint"> *</span></label> 
+                        <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
+                    </td>
+                </tr>
+            </table>
+            <p>Minimum of ${minimumLength} characters in length.</p>
+            <p>Leaving this blank means that the password will not be changed.</p>
+        </#if>
 
-                <p class="note">
-                    Note: Instructions for resetting the password will 
-                    be emailed to the address entered above. The password will not 
-                    be reset until the user follows the link provided in this email.
-                </p>
-            <#else>
-                <table>
-                    <tr>
-                        <td>
-                            <label for="new-password">New password<span class="requiredHint"> *</span></label>
-                            <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
-                        </td>
-                        <td>
-                            <label for="confirm-password">Confirm initial password<span class="requiredHint"> *</span></label> 
-                            <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
-                        </td>
-                    </tr>
-                </table>
-                <p>Minimum of ${minimumLength} characters in length.</p>
-                <p>Leaving this blank means that the password will not be changed.</p>
-            </#if>
+        <input type="submit" name="submitEdit" value="Save changes" class="submit" /> or <a class="cancel" href="${formUrls.list}">Cancel</a>
 
-            <input type="submit" name="submitEdit" value="Save changes" class="submit" /> or <a class="cancel" href="${formUrls.list}">Cancel</a>
-
-            <p class="requiredHint">* required fields</p>
-        </form>
-    </fieldset>
+        <p class="requiredHint">* required fields</p>
+    </form>
 </section>
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/account.css" />')}

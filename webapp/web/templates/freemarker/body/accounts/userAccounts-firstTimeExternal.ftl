@@ -32,32 +32,30 @@
     </#if>
 
 <section id="first-time-login" role="region">
-    <fieldset>
-        <p>Please provide your contact information to finish creating your account.</p>
+    <p>Please provide your contact information to finish creating your account.</p>
 
-        <form method="POST" action="${formUrls.firstTimeExternal}" class="customForm" role="my account">
-            <input type="hidden" name="externalAuthId" value="${externalAuthId}" role="input" />
-            <input type="hidden" name="afterLoginUrl" value="${afterLoginUrl}" role="input" />
-        
-            <label for="first-name">First name<span class="requiredHint"> *</span></label> 
-            <input type="text" name="firstName" value="${firstName}" id="first-name" role="input" />
+    <form method="POST" action="${formUrls.firstTimeExternal}" class="customForm" role="my account">
+        <input type="hidden" name="externalAuthId" value="${externalAuthId}" role="input" />
+        <input type="hidden" name="afterLoginUrl" value="${afterLoginUrl}" role="input" />
+    
+        <label for="first-name">First name<span class="requiredHint"> *</span></label> 
+        <input type="text" name="firstName" value="${firstName}" id="first-name" role="input" />
 
-            <label for="last-name">Last name<span class="requiredHint"> *</span></label> 
-            <input type="text" name="lastName" value="${lastName}" id="last-name" role="input" />
+        <label for="last-name">Last name<span class="requiredHint"> *</span></label> 
+        <input type="text" name="lastName" value="${lastName}" id="last-name" role="input" />
 
-            <label for="email-address">Email address<span class="requiredHint"> *</span></label>
-            <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
+        <label for="email-address">Email address<span class="requiredHint"> *</span></label>
+        <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
 
-            <#if emailIsEnabled??>
-                <p class="note">
-                    Note: An email will be sent to the address entered above notifying 
-                    that an account has been created.
-                </p>
-            </#if>
+        <#if emailIsEnabled??>
+            <p class="note">
+                Note: An email will be sent to the address entered above notifying 
+                that an account has been created.
+            </p>
+        </#if>
 
-            <input type="submit" name="submit" value="Create account" class="submit"/> or <a class="cancel" href="${urls.home}">Cancel</a>
-        </form>
-    </fieldset>
+        <input type="submit" name="submit" value="Create account" class="submit"/> or <a class="cancel" href="${urls.home}">Cancel</a>
+    </form>
 </section>
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/account.css" />')}

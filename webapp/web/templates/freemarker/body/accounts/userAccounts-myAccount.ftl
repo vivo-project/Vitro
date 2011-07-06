@@ -58,36 +58,34 @@
     </#if>
 
 <section id="my-account" role="region">
-    <fieldset>
+    <form method="POST" action="${formUrls.myAccount}" class="customForm" role="my account">
         <legend>My account</legend>
+        
+        <label for="email-address">Email address<span class="requiredHint"> *</span></label>
+        <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
 
-        <form method="POST" action="${formUrls.myAccount}" class="customForm" role="my account">
-            <label for="email-address">Email address<span class="requiredHint"> *</span></label>
-            <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
+        <p class="note">Note: if email changes, a confirmation email will be sent to the new email address entered above.</p>
+        
+        <label for="first-name">First name<span class="requiredHint"> *</span></label> 
+        <input type="text" name="firstName" value="${firstName}" id="first-name" role="input" />
 
-            <p class="note">Note: if email changes, a confirmation email will be sent to the new email address entered above.</p>
-            
-            <label for="first-name">First name<span class="requiredHint"> *</span></label> 
-            <input type="text" name="firstName" value="${firstName}" id="first-name" role="input" />
+        <label for="last-name">Last name<span class="requiredHint"> *</span></label> 
+        <input type="text" name="lastName" value="${lastName}" id="last-name" role="input" />
 
-            <label for="last-name">Last name<span class="requiredHint"> *</span></label> 
-            <input type="text" name="lastName" value="${lastName}" id="last-name" role="input" />
+        <#if !externalAuth??>
+            <label for="new-password">New password</label>
+            <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
 
-            <#if !externalAuth??>
-                <label for="new-password">New password</label>
-                <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
+            <p class="note">Minimum of ${minimumLength} characters in length. Leaving this blank means that the password will not be changed.</p>
 
-                <p class="note">Minimum of ${minimumLength} characters in length. Leaving this blank means that the password will not be changed.</p>
+            <label for="confirm-password">Confirm new password</label> 
+            <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
+        </#if>
 
-                <label for="confirm-password">Confirm new password</label> 
-                <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
-            </#if>
+        <p><input type="submit" name="submitMyAccount" value="Save changes" class="submit" /></p>
 
-            <p><input type="submit" name="submitMyAccount" value="Save changes" class="submit" /></p>
-
-            <p class="requiredHint">* required fields</p>
-        </form>
-    </fieldset>
+        <p class="requiredHint">* required fields</p>
+    </form>
 </section>
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/account.css" />')}
