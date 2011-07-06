@@ -38,7 +38,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
         
         this.value = literal.getLexicalForm();
         this.vitroRequest = vreq;
-        setEditAccess(literal, policyHelper);
+        setEditAccess(literal, policyHelper, propertyUri);
        
     }
     
@@ -58,7 +58,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
         if (literals.size() > 0) {
             Literal literal = literals.get(0);
             value = literal.getLexicalForm();
-            setEditAccess(literal, policyHelper);
+            setEditAccess(literal, policyHelper, propertyUri);
         } 
     }
     
@@ -66,9 +66,10 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
         this.value = value;
     }
     
-    protected void setEditAccess(Literal value, EditingPolicyHelper policyHelper) {
+    protected void setEditAccess(Literal value, EditingPolicyHelper policyHelper, String propertyUri) {
         
         if (policyHelper != null) { // we're editing         
+            
             DataPropertyStatement dps = new DataPropertyStatementImpl(subjectUri, propertyUri, value.getLexicalForm());
             // Language and datatype are needed to get the correct hash value
             dps.setLanguage(value.getLanguage());
@@ -77,7 +78,9 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
             
             // Determine whether the statement can be edited
             RequestedAction action = new EditDataPropStmt(dps);
-            if (policyHelper.isAuthorizedAction(action)) {
+            // vitro:moniker is deprecated. We display existing data values so editors can move them to other properties
+            // and delete, but don't allow editing.
+            if ( ( ! propertyUri.equals(VitroVocabulary.MONIKER) ) && policyHelper.isAuthorizedAction(action)) {
                 markEditable();
             }      
             
