@@ -2,7 +2,7 @@
 
 <#-- Confirmation that the user has changed his email account. -->
 
-<#assign subject = "Your VIVO email account has been changed." />
+<#assign subject = "Your ${siteName} email account has been changed." />
 
 <#assign html>
 <html>

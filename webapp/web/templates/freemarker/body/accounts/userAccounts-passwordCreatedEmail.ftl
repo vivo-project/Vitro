@@ -2,7 +2,7 @@
 
 <#-- Confirmation that an password has been created. -->
 
-<#assign subject = "Password successfully created." />
+<#assign subject = "Your ${siteName} password has successfully been created." />
 
 <#assign html>
 <html>

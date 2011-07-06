@@ -2,7 +2,7 @@
 
 <#-- Confirmation that an account has been created for an externally-authenticated user. -->
 
-<#assign subject = "Your VIVO account has been created." />
+<#assign subject = "Your ${siteName} account has been created." />
 
 <#assign html>
 <html>

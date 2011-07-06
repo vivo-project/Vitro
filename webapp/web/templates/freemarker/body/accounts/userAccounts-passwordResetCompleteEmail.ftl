@@ -2,7 +2,7 @@
 
 <#-- Confirmation that a password has been reset. -->
 
-<#assign subject = "Password changed." />
+<#assign subject = "Your ${siteName} password changed." />
 
 <#assign html>
 <html>
