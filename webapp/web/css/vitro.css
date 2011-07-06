@@ -89,13 +89,13 @@
 }
 .searchTOC h4 {    
     color: #fff;
-    padding: 0 0 0 0;
+    padding: .2em 0 .2em 0;
 }
 .searchTOC ul {
-    width: 160px;
+    width: 180px;
     border: 1px solid #dde4e3;
     background: #f1f2ee;
-    padding: 0 10px 0px 10px;
+    padding: 0;
     margin-top: 4px;
     text-align: left;
 }
@@ -103,6 +103,8 @@
     display: block;
     border-bottom: 1px solid #dde4e3;
     font-size: 14px;
+    padding-top: .5em;
+    padding-bottom: .5em;
 }
 .searchTOC ul li:hover {
     background-color:#f7f9f9;
@@ -112,7 +114,7 @@
 }
 .searchTOC ul a {
     display: block;
-    padding-left: 15px;
+    padding-left: 25px;
 }
 
 /* ------------------------------------------------->  */
