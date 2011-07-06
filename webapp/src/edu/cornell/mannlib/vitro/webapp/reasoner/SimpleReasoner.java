@@ -21,7 +21,6 @@ import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -72,6 +71,13 @@ public class SimpleReasoner extends StatementListener {
 		this.inferenceModel = inferenceModel;
 		this.inferenceRebuildModel = inferenceRebuildModel;
 		this.scratchpadModel = scratchpadModel;
+		
+		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);
+		try {
+			inferenceRebuildModel.removeAll();
+		} finally {
+			inferenceRebuildModel.leaveCriticalSection();			
+		}
 		
 	    aboxModel.register(this);
 	}
