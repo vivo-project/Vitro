@@ -2,7 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -145,9 +148,10 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         return individual.getName();
     }
 
-    public List<String> getMostSpecificTypes() {
+    public Collection<String> getMostSpecificTypes() {
         ObjectPropertyStatementDao opsDao = vreq.getWebappDaoFactory().getObjectPropertyStatementDao();
-        return opsDao.getMostSpecificTypesForIndividual(getUri());  
+        Map<String, String> types = opsDao.getMostSpecificTypesForIndividual(getUri()); 
+        return types.values();
     }
 
     public String getUri() {

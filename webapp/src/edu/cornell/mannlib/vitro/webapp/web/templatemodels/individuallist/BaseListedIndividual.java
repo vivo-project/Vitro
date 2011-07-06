@@ -4,18 +4,15 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.Link;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
-import edu.cornell.mannlib.vitro.webapp.web.ViewFinder;
-import edu.cornell.mannlib.vitro.webapp.web.ViewFinder.ClassView;
+import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 public abstract class BaseListedIndividual extends BaseTemplateModel {
@@ -60,7 +57,21 @@ public abstract class BaseListedIndividual extends BaseTemplateModel {
 
     public String getUri() {
         return individual.getURI();
-    }    
+    }  
+    
+    public List<String> getMostSpecificTypes() {
+        ObjectPropertyStatementDao opsDao = vreq.getWebappDaoFactory().getObjectPropertyStatementDao();
+        Map<String, String> types = opsDao.getMostSpecificTypesForIndividual(individual.getURI()); 
+        List<String> typeLabels = new ArrayList<String>(types.size());
+        String displayedType = (String) vreq.getAttribute("displayType");
+        for (String type : types.keySet()) {
+            // Don't display a mostSpecificType that is the same as the type being displayed on the page
+            if ( ! type.equals(displayedType) ) {
+                typeLabels.add(types.get(type));
+            }
+        }
+        return typeLabels;
+    }
 
     
 }

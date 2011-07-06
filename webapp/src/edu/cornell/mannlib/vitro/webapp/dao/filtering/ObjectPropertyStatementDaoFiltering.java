@@ -95,7 +95,7 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
     }
 
     @Override 
-    public List<String> getMostSpecificTypesForIndividual(String subjectUri) {
+    public Map<String, String> getMostSpecificTypesForIndividual(String subjectUri) {
         return innerObjectPropertyStatementDao.getMostSpecificTypesForIndividual(subjectUri);
     }
     

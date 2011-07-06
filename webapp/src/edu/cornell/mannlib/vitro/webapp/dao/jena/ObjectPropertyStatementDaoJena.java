@@ -385,7 +385,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
     protected static final String MOST_SPECIFIC_TYPE_QUERY = 
         "PREFIX rdfs: <" + VitroVocabulary.RDFS + "> \n" +
         "PREFIX vitro: <" + VitroVocabulary.vitroURI + "> \n" +
-        "SELECT ?label WHERE { \n" +
+        "SELECT ?label ?type WHERE { \n" +
         "    ?subject vitro:mostSpecificType ?type . \n" +
         "    ?type rdfs:label ?label \n" +
         "} ORDER BY ?label ";
@@ -395,7 +395,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
      * Finds all mostSpecificTypes of an individual.
      * Returns a list of type labels.
      * **/
-    public List<String> getMostSpecificTypesForIndividual(String subjectUri) {
+    public Map<String, String> getMostSpecificTypesForIndividual(String subjectUri) {
         
         String queryString = QueryUtils.subUriForQueryVar(MOST_SPECIFIC_TYPE_QUERY, "subject", subjectUri);
         
@@ -407,10 +407,10 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         } catch(Throwable th){
             log.error("Could not create SPARQL query for query string. " + th.getMessage());
             log.error(queryString);
-            return Collections.emptyList();
+            return Collections.emptyMap();
         }        
         
-        List<String> types = new ArrayList<String>();
+        Map<String, String> types = new HashMap<String, String>();
         DatasetWrapper w = dwf.getDatasetWrapper();
         Dataset dataset = w.getDataset();
         dataset.getLock().enterCriticalSection(Lock.READ);
@@ -420,13 +420,22 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             qexec = QueryExecutionFactory.create(query, dataset);
             ResultSet results = qexec.execSelect();
             while (results.hasNext()) {
-                QuerySolution soln = results.nextSolution();
-                RDFNode node = soln.get("label");
-                if (node.isLiteral()) {
-                    String label = node.asLiteral().getLexicalForm();
-                    if (! StringUtils.isBlank(label)) {
-                        types.add(label);
-                    }
+                QuerySolution soln = results.nextSolution();       
+
+                RDFNode typeNode = soln.get("type");
+                String type = null;
+                if (typeNode.isURIResource()) {
+                     type = typeNode.asResource().getURI();
+                }
+                
+                RDFNode labelNode = soln.get("label");
+                String label = null;
+                if (labelNode.isLiteral()) {
+                    label = labelNode.asLiteral().getLexicalForm();
+                }
+                
+                if (StringUtils.isNotBlank(type) && StringUtils.isNotBlank(label)) {
+                    types.put(type, label);
                 }
             }
             

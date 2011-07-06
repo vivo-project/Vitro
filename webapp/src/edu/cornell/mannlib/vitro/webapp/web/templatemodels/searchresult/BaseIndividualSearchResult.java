@@ -3,7 +3,9 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.searchresult;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -51,9 +53,10 @@ public abstract class BaseIndividualSearchResult extends BaseTemplateModel {
         return individual.getName();
     }
     
-    public List<String> getMostSpecificTypes() {
+    public Collection<String> getMostSpecificTypes() {
         ObjectPropertyStatementDao opsDao = vreq.getWebappDaoFactory().getObjectPropertyStatementDao();
-        return opsDao.getMostSpecificTypesForIndividual(individual.getURI());  
+        Map<String, String> types = opsDao.getMostSpecificTypesForIndividual(individual.getURI()); 
+        return types.values();  
     }
     
     public String getSearchView() {        

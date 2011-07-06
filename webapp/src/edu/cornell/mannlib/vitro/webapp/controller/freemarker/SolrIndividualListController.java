@@ -81,7 +81,9 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
                         + VClass.class.getName() + ".");
             }
             
-            body.put("vclassId", vclass.getURI());
+            String vclassUri = vclass.getURI();
+            body.put("vclassId", vclassUri);
+            vreq.setAttribute("displayType", vclassUri); // used by the template model object
             
             if (vclass != null) {
                 String alpha = getAlphaParameter(vreq);
