@@ -34,9 +34,13 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.AccessSpecialDataModels;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
@@ -116,8 +120,14 @@ public class VitroRequestPrep implements Filter {
             }
         }
 
+        // If we're not authorized for this request, skip the chain and redirect.
+        if (!authorizedForSpecialModel(req)) {
+        	VitroHttpServlet.redirectUnauthorizedRequest(req, resp);
+        	return;
+        }
+        
         VitroRequest vreq = new VitroRequest(req);
-
+        
         //-- setup appBean --//
         vreq.setAppBean(_appbean);
         
@@ -174,6 +184,16 @@ public class VitroRequestPrep implements Filter {
         }
     }
     
+	private boolean authorizedForSpecialModel(HttpServletRequest req) {
+		if (isParameterPresent(req, SWITCH_TO_DISPLAY_MODEL)) {
+			return PolicyHelper.isAuthorizedForActions(req, new ManageMenus());
+		} else if (anyOtherSpecialProperties(req)){
+			return PolicyHelper.isAuthorizedForActions(req, new AccessSpecialDataModels());
+		} else {
+			return true;
+		}
+	}
+
     @Override
 	public void destroy() {
     	// Nothing to do.
@@ -222,10 +242,10 @@ public class VitroRequestPrep implements Filter {
 
     }
 
-	private boolean anyOtherSpecialProperties(VitroRequest vreq) {
-		return isParameterPresent(vreq, USE_MODEL_PARAM)
-				|| isParameterPresent(vreq, USE_TBOX_MODEL_PARAM)
-				|| isParameterPresent(vreq, USE_DISPLAY_MODEL_PARAM);
+	private boolean anyOtherSpecialProperties(HttpServletRequest req) {
+		return isParameterPresent(req, USE_MODEL_PARAM)
+				|| isParameterPresent(req, USE_TBOX_MODEL_PARAM)
+				|| isParameterPresent(req, USE_DISPLAY_MODEL_PARAM);
 	}
 
 	/**

@@ -29,6 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LogoutRedirector;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 
 public class VitroHttpServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -128,23 +129,25 @@ public class VitroHttpServlet extends HttpServlet {
 
 		log.debug("Servlet '" + this.getClass().getSimpleName()
 				+ "' is not authorized for actions: " + actions);
-
-		LoginStatusBean statusBean = LoginStatusBean.getBean(request);
-		if (statusBean.isLoggedIn()) {
-			redirectToInsufficientAuthorizationPage(request, response);
-			return false;
-		} else {
-			redirectToLoginPage(request, response);
-			return false;
-		}
+		redirectUnauthorizedRequest(request, response);
+		return false;
 	}
 
 	// ----------------------------------------------------------------------
 	// static utility methods for all Vitro servlets
 	// ----------------------------------------------------------------------
 
+	public static void redirectUnauthorizedRequest(HttpServletRequest request,
+			HttpServletResponse response) {
+		if (LoginStatusBean.getBean(request).isLoggedIn()) {
+			redirectToInsufficientAuthorizationPage(request, response);
+		} else {
+			redirectToLoginPage(request, response);
+		}
+	}
+	
 	/**
-	 * Logged in, but with insufficent authorization. Send them to the home page
+	 * Logged in, but with insufficient authorization. Send them to the home page
 	 * with a message. They won't be coming back.
 	 */
 	public static void redirectToInsufficientAuthorizationPage(
@@ -180,7 +183,8 @@ public class VitroHttpServlet extends HttpServlet {
 		if ((queryString == null) || queryString.isEmpty()) {
 			return request.getRequestURI();
 		} else {
-			return request.getRequestURI() + "?" + queryString;
+			return request.getRequestURI() + "?"
+					+ UrlBuilder.urlEncode(queryString);
 		}
 	}
 
