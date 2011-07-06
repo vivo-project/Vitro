@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -34,6 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.SolrIndividualListController;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
@@ -148,6 +150,7 @@ public class SolrJsonServlet extends VitroHttpServlet {
                 log.debug("parameter vclassId URI parameter expected ");
                 throw new Exception("parameter vclassId URI parameter expected ");
             }
+            vreq.setAttribute("displayType", vitroClassIdStr);
             rObj = getSolrIndividualsByVClass(vclass.getURI(),req, getServletContext());
         }catch(Exception ex){
             errorMessage = ex.toString();
@@ -267,7 +270,8 @@ public class SolrJsonServlet extends VitroHttpServlet {
             
         return map;
    }
-   
+ 
+
     //Factoring out to allow for results to be processed from query for both lucene and solr
     //Map given to process method includes the actual individuals returned from the search
     public static JSONObject processVClassResults(Map<String, Object> map, VitroRequest vreq, ServletContext context, boolean multipleVclasses) throws Exception{
@@ -275,7 +279,20 @@ public class SolrJsonServlet extends VitroHttpServlet {
          return rObj;
     } 
 
-    static String getDataPropertyValue(Individual ind, DataProperty dp, WebappDaoFactory wdf){
+
+    public static String getMostSpecificTypeName(Individual individual, WebappDaoFactory wdf) {
+        ObjectPropertyStatementDao opsDao = wdf.getObjectPropertyStatementDao();
+        Map<String, String> types = opsDao.getMostSpecificTypesForIndividual(individual.getURI());  
+        Collection<String> typeLabels = types.values();
+        Iterator<String> i = typeLabels.iterator();
+        // Temporarily just returning one vaue since that's what the js expects. Fix later.
+        if (i.hasNext()) {
+            return i.next();
+        }
+        return "";
+    }
+
+    public static String getDataPropertyValue(Individual ind, DataProperty dp, WebappDaoFactory wdf){
         List<Literal> values = wdf.getDataPropertyStatementDao()
             .getDataPropertyValuesForIndividualByProperty(ind, dp);
         if( values == null || values.isEmpty() )

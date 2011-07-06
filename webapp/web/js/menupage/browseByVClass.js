@@ -95,7 +95,7 @@ var browseByVClass = {
         }
         
         $.getJSON(url, function(results) {
-            individualList = "";
+            var individualList = "";
             
             // Catch exceptions when empty individuals result set is returned
             // This is very likely to happen now since we don't have individual counts for each letter and always allow the result set to be filtered by any letter
@@ -103,26 +103,30 @@ var browseByVClass = {
                 browseByVClass.emptyResultSet(results.vclass, alpha)
             } else {
                 $.each(results.individuals, function(i, item) {
-                    label = results.individuals[i].label;
-                    moniker = results.individuals[i].moniker;
-                    vclassName = results.individuals[i].vclassName;
-                    uri = results.individuals[i].URI;
-                    profileUrl = results.individuals[i].profileUrl;
-                    if ( results.individuals[i].thumbUrl ) {
-                        image = browseByVClass.baseUrl + results.individuals[i].thumbUrl;
+                    var individual, 
+                        label, 
+                        vclassName, 
+                        uri, 
+                        profileUrl, 
+                        image, 
+                        listItem;
+                        
+                    individual = results.individuals[i];
+                    label = individual.label;
+                    vclassName = individual.vclassName;
+                    uri = individual.URI;
+                    profileUrl = individual.profileUrl;
+                    if ( individual.thumbUrl ) {
+                        image = browseByVClass.baseUrl + individual.thumbUrl;
                     }
                     // Build the content of each list item, piecing together each component
                     listItem = '<li class="individual" role="listitem" role="navigation">';
-                    if ( typeof results.individuals[i].thumbUrl !== "undefined" ) {
+                    if ( typeof individual.thumbUrl !== "undefined" ) {
                         listItem += '<img src="'+ image +'" width="90" alt="'+ label +'" /><h1 class="thumb">';
                     } else {
                         listItem += '<h1>';
                     }
                     listItem += '<a href="'+ profileUrl +'" title="View the profile page for '+ label +'">'+ label +'</a></h1>';
-                    // Include the moniker only if it's not empty and not equal to the VClass name
-                    if ( moniker != vclassName && moniker != "" ) {
-                        listItem += '<span class="title">'+ moniker +'</span>';
-                    }
                     listItem += '</li>';
                     // browseByVClass.individualsInVClass.append(listItem);
                     individualList += listItem;

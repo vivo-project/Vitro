@@ -24,7 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
-import edu.cornell.mannlib.vitro.webapp.controller.JSONServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.SolrJsonServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.PageController;
@@ -170,8 +170,7 @@ public class DataGetterUtils {
           fNameDp.setURI("http://xmlns.com/foaf/0.1/firstName");
           DataProperty lNameDp = (new DataProperty());
           lNameDp.setURI("http://xmlns.com/foaf/0.1/lastName");
-          DataProperty monikerDp = (new DataProperty());
-          monikerDp.setURI( VitroVocabulary.MONIKER);
+
           //this property is vivo specific
           DataProperty preferredTitleDp = (new DataProperty());
           preferredTitleDp.setURI("http://vivoweb.org/ontology/core#preferredTitle");
@@ -241,13 +240,11 @@ public class DataGetterUtils {
                   jo.put("imageUrl", ind.getImageUrl());
                   jo.put("profileUrl", UrlBuilder.getIndividualProfileUrl(ind, vreq));
                   
-                  String moniker = JSONServlet.getDataPropertyValue(ind, monikerDp, fullWdf);
-                  jo.put("moniker", moniker);
-                  jo.put("vclassName", JSONServlet.getVClassName(ind,moniker,fullWdf));
+                  jo.put("vclassName", SolrJsonServlet.getMostSpecificTypeName(ind,fullWdf));
                                       
-                  jo.put("preferredTitle", JSONServlet.getDataPropertyValue(ind, preferredTitleDp, fullWdf));
-                  jo.put("firstName", JSONServlet.getDataPropertyValue(ind, fNameDp, fullWdf));                     
-                  jo.put("lastName", JSONServlet.getDataPropertyValue(ind, lNameDp, fullWdf));
+                  jo.put("preferredTitle", SolrJsonServlet.getDataPropertyValue(ind, preferredTitleDp, fullWdf));
+                  jo.put("firstName", SolrJsonServlet.getDataPropertyValue(ind, fNameDp, fullWdf));                     
+                  jo.put("lastName", SolrJsonServlet.getDataPropertyValue(ind, lNameDp, fullWdf));
                   
                   jInds.put(jo);
               }
