@@ -27,6 +27,13 @@
     Macros for generating property lists
 ------------------------------------------------------------------------------>
 
+<#macro dataPropertyListing property editable>
+    <#if property?has_content> <#-- true when the property is in the list, even if not populated (when editing) -->
+        <@addLinkWithLabel property editable />
+        <@dataPropertyList property editable />
+    </#if>
+</#macro>
+
 <#macro dataPropertyList property editable>
     <#list property.statements as statement>
         <@propertyListItem property statement editable >${statement.value}</@propertyListItem>
@@ -85,7 +92,7 @@ name will be used as the label. -->
 <#macro addLinkWithLabel property editable label="${property.name?capitalize}" extraParams="">
     <#local addLink><@addLink property editable label extraParams /></#local>
     <#local verboseDisplay><@verboseDisplay property /></#local>
-    <#-- Display the label when user is in edit mode, even if there's no add link (due to 
+    <#-- Changed to display the label when user is in edit mode, even if there's no add link (due to 
     displayLimitAnnot, for example). Otherwise the display looks odd, since neighboring 
     properties have labels. 
     <#if addLink?has_content || verboseDisplay?has_content>
@@ -250,7 +257,8 @@ name will be used as the label. -->
 <#-- Most specific types -->
 <#macro mostSpecificTypes individual>
     <#list individual.mostSpecificTypes as type>
-        <span class="most-specific-type">${type}</span>
+        <span class="display-title">${type}</span>
     </#list>
 </#macro>
+
 
