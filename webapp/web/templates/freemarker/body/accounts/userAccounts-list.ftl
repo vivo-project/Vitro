@@ -82,7 +82,7 @@
         <thead>
             <tr>
                 <th scope="col">
-                    <input class="delete-all" type="checkbox" name="delete-all">
+                    <input class="delete-all hidden" type="checkbox" name="delete-all">
                     Email Address
                     <nav class="account-alpha-browse">
                         <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=ASC" title="ascending order"></a> 

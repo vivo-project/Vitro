@@ -18,7 +18,7 @@ $(document).ready(function(){
     
     //Delete accounts
     //Show is javascript is enable
-    $('input:checkbox[name=delete-all]').show();
+    $('input:checkbox[name=delete-all]').removeClass('hidden');
     
     $('input:checkbox[name=delete-all]').click(function(){
          if ( this.checked ) {
