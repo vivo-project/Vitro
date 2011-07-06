@@ -10,6 +10,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openrdf.model.impl.URIImpl;
 
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
+
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -113,20 +116,15 @@ public class BaseResourceBean implements ResourceBean {
             this.localName = null;
         } else {
             this.URI = URI;
-            try {
-                URIImpl uri = new URIImpl(URI);
-                this.namespace = uri.getNamespace();
-                this.localName = uri.getLocalName();
-            } catch (Exception e) {
-                log.error("Exception processing URI "+URI);
-                e.printStackTrace();
-            }
+            Resource uri = ResourceFactory.createResource(URI);
+            this.namespace = uri.getNameSpace();
+            this.localName = uri.getLocalName();
         }
     }
     
     public String getNamespace() {
         if( namespace == null && this.URI != null)
-            buildLocalAndNS( this.URI);        
+            buildLocalAndNS(this.URI);        
         return namespace;
     }
     public void setNamespace(String namespace) {
@@ -141,6 +139,7 @@ public class BaseResourceBean implements ResourceBean {
             buildLocalAndNS(this.URI);        
         return localName;
     }
+    
     public void setLocalName(String localName) {
         this.localName = localName;
         if (namespace != null && localName != null) {
