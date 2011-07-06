@@ -3,6 +3,11 @@
 package edu.cornell.mannlib.vitro.webapp.filters;
 
 import static edu.cornell.mannlib.vitro.webapp.controller.VitroRequest.SPECIAL_WRITE_MODEL;
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.CONTEXT_DISPLAY_TBOX;
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.SWITCH_TO_DISPLAY_MODEL;
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.USE_DISPLAY_MODEL_PARAM;
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.USE_MODEL_PARAM;
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.USE_TBOX_MODEL_PARAM;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -16,6 +21,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
@@ -32,7 +38,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.FilterFactory;
@@ -89,6 +94,7 @@ public class VitroRequestPrep implements Filter {
 			FilterChain chain) throws IOException, ServletException {
     	// If this isn't an HttpServletRequest, we might as well fail now.
     	HttpServletRequest req = (HttpServletRequest) request;
+    	HttpServletResponse resp = (HttpServletResponse) response;
     	logRequestUriForDebugging(req);
 
         //don't waste time running this filter again.
@@ -153,7 +159,7 @@ public class VitroRequestPrep implements Filter {
         chain.doFilter(req, response);
     }
 
-    private WebappDaoFactory getWebappDaoFactory(VitroRequest vreq){
+	private WebappDaoFactory getWebappDaoFactory(VitroRequest vreq){
     	WebappDaoFactory webappDaoFactory = vreq.getWebappDaoFactory();
         return (webappDaoFactory != null) ? webappDaoFactory :
         	(WebappDaoFactory) _context.getAttribute("webappDaoFactory");
@@ -173,84 +179,122 @@ public class VitroRequestPrep implements Filter {
     	// Nothing to do.
     }
 
-    //check if special model - this is for enabling the use of a different model for menu management 
-    //Also enables the use of a completely different model and tbox if uris are passed
+	/**
+	 * Check if special model is requested - this is for enabling the use of a different
+	 * model for menu management. Also enables the use of a completely different
+	 * model and tbox if uris are passed.
+	 */
     private WebappDaoFactory checkForSpecialWDF(VitroRequest vreq, WebappDaoFactory inputWadf) {
-    	String useMenuModelParam = vreq.getParameter(DisplayVocabulary.SWITCH_TO_DISPLAY_MODEL);
-    	boolean useMenu = (useMenuModelParam != null);
-    	//other parameters to be passed in in case want to use specific models
-    	String useMainModelUri = vreq.getParameter(DisplayVocabulary.USE_MODEL_PARAM);
-    	String useTboxModelUri = vreq.getParameter(DisplayVocabulary.USE_TBOX_MODEL_PARAM);
-    	String useDisplayModelUri = vreq.getParameter(DisplayVocabulary.USE_DISPLAY_MODEL_PARAM);
+    	// If this isn't a Jena WADF, then there's nothing to be done.
+    	if (!(inputWadf instanceof WebappDaoFactoryJena)) {
+    		log.warn("Can't set special models: " +
+    				"WebappDaoFactory is not a WebappDaoFactoryJena");
+        	removeSpecialWriteModel(vreq);
+    		return inputWadf;
+    	}
+
+    	WebappDaoFactoryJena wadf = (WebappDaoFactoryJena) inputWadf;
     	
-    	if(useMenu || (useMainModelUri != null && !useMainModelUri.isEmpty() && useTboxModelUri != null && !useTboxModelUri.isEmpty())) {    		
-    		log.debug("Menu switching parameters exist, Use Menu: " + useMenu + " - UseModelUri:" + useMainModelUri + " - UseTboxModelUri:" + useTboxModelUri + " - useDisplayModelUri:" + useDisplayModelUri);
-    		if(inputWadf instanceof WebappDaoFactoryJena) {
-    			//Create a copy of the input WADF to be sent over and then set
-        		WebappDaoFactoryJena wadfj = new WebappDaoFactoryJena((WebappDaoFactoryJena) inputWadf);
-        		log.debug("Created copy of input webapp dao factory to be overwritten");
-    			//WebappDaoFactoryJena wadfj = (WebappDaoFactoryJena) wadf;
-    			OntModel useMainOntModel = null, useTboxOntModel = null, useDisplayOntModel = null;
-    			Model tboxModel = null, displayModel = null;
-    			BasicDataSource bds = JenaDataSourceSetupBase.getApplicationDataSource(_context);
-	        	String dbType = ConfigurationProperties.getBean(_context).getProperty( // database type
-	        				"VitroConnection.DataSource.dbtype", "MySQL");
-    			if(useMenu) {
-    				log.debug("Display model editing mode");
-    				//if using special models for menu management, get main menu model from context and set tbox and display uris to be used
-	    			useMainOntModel = (OntModel) _context.getAttribute("displayOntModel");
-	    			//Hardcoding tbox model uri for now
-	        		useTboxModelUri =  DisplayVocabulary.DISPLAY_TBOX_MODEL_URI;
-	        		useDisplayModelUri = DisplayVocabulary.DISPLAY_DISPLAY_MODEL_URI;
-	        		//Get tbox and display display model from servlet context otherwise load in directly from database
-	    			useTboxOntModel = (OntModel) _context.getAttribute(DisplayVocabulary.CONTEXT_DISPLAY_TBOX);
-	    			useDisplayOntModel = (OntModel) _context.getAttribute(DisplayVocabulary.CONTEXT_DISPLAY_DISPLAY);
-    			} else {
-    				log.debug("Display model editing mode not triggered, using model uri " + useMainModelUri);
-    				//If main model uri passed as parameter then retrieve model from parameter
-    				Model mainModel = JenaDataSourceSetupBase.makeDBModel(bds, useMainModelUri, OntModelSpec.OWL_MEM, JenaDataSourceSetupBase.TripleStoreType.RDB, dbType, _context);
-    				//if this uri exists and model exists, then set up ont model version
-    				if(mainModel != null) {
-    					log.debug("main model uri exists");
-    					useMainOntModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, mainModel);
-    				} else {
-    					log.error("Main Model Uri " + useMainModelUri + " did not retrieve model");
-    				}
-    			}
-    			
-    			
-    			if(!useMenu || useTboxOntModel == null){
-		        	tboxModel = JenaDataSourceSetupBase.makeDBModel(bds, useTboxModelUri, OntModelSpec.OWL_MEM, JenaDataSourceSetupBase.TripleStoreType.RDB, dbType, _context);
-		        	useTboxOntModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, tboxModel);
-    			} 
-    			if(!useMenu || useDisplayOntModel == null) {
-		    		//Set "display model" for display model
-		        	displayModel = JenaDataSourceSetupBase.makeDBModel(bds, useDisplayModelUri, OntModelSpec.OWL_MEM, JenaDataSourceSetupBase.TripleStoreType.RDB, dbType, _context);
-		        	useDisplayOntModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, displayModel);
-    			}
-    			//Set special model for wadfj
-	        	if(useMainOntModel != null) {
-	        		log.debug("Switching to use of input model");
-	        		//If menu model, preserve existing display model so the navigation elements remain
-	        		if(useMenu) {
-	        			useDisplayOntModel = null;
-	        		}
-    				//Changes will be made to the copy, not the original from the servlet context
-	        		wadfj.setSpecialDataModel(useMainOntModel, useTboxOntModel, useDisplayOntModel);
-	        		//Set attribute on VitroRequest that saves special write model
-	        		vreq.setAttribute(SPECIAL_WRITE_MODEL, useMainOntModel);
-	        		return wadfj;
-	        	}
-    		}
-    	}
-    	//if no parameters exist for switching models, return the original webapp dao factory object
-    	//ensure no attribute there if special write model not being utilized
-    	if(vreq.getAttribute(SPECIAL_WRITE_MODEL) != null) {
-    		vreq.removeAttribute(SPECIAL_WRITE_MODEL);
-    	}
-    	return inputWadf;
+    	// If they asked for the display model, give it to them.
+		if (isParameterPresent(vreq, SWITCH_TO_DISPLAY_MODEL)) {
+			OntModel mainOntModel = (OntModel)_context.getAttribute("displayOntModel");
+			OntModel tboxOntModel = (OntModel) _context.getAttribute(CONTEXT_DISPLAY_TBOX);
+	   		setSpecialWriteModel(vreq, mainOntModel);
+			return createNewWebappDaoFactory(wadf, mainOntModel, tboxOntModel, null);
+		}
+    	
+		// If they asked for other models by URI, set them.
+		if (anyOtherSpecialProperties(vreq)) {
+			BasicDataSource bds = JenaDataSourceSetupBase.getApplicationDataSource(_context);
+			String dbType = ConfigurationProperties.getBean(_context)
+					.getProperty("VitroConnection.DataSource.dbtype", "MySQL");
+
+	    	OntModel mainOntModel = createSpecialModel(vreq, USE_MODEL_PARAM, bds, dbType);
+	    	OntModel tboxOntModel = createSpecialModel(vreq, USE_TBOX_MODEL_PARAM, bds, dbType);
+	    	OntModel displayOntModel = createSpecialModel(vreq, USE_DISPLAY_MODEL_PARAM, bds, dbType);
+	   		setSpecialWriteModel(vreq, mainOntModel);
+	    	return createNewWebappDaoFactory(wadf, mainOntModel, tboxOntModel, displayOntModel);
+		}
+		
+		// Otherwise, there's nothing special about this request.
+    	removeSpecialWriteModel(vreq);
+		return wadf;
+
     }
-    
+
+	private boolean anyOtherSpecialProperties(VitroRequest vreq) {
+		return isParameterPresent(vreq, USE_MODEL_PARAM)
+				|| isParameterPresent(vreq, USE_TBOX_MODEL_PARAM)
+				|| isParameterPresent(vreq, USE_DISPLAY_MODEL_PARAM);
+	}
+
+	/**
+	 * If the request asks for a special model by URI, create it from the
+	 * Database.
+	 * 
+	 * @return the model they asked for, or null if they didn't ask for one.
+	 * @throws IllegalStateException
+	 *             if it's not found.
+	 */
+	private OntModel createSpecialModel(VitroRequest vreq, String key,
+			BasicDataSource bds, String dbType) {
+		if (!isParameterPresent(vreq, key)) {
+			return null;
+		}
+		
+		String modelUri = vreq.getParameter(key);
+		Model model = JenaDataSourceSetupBase.makeDBModel(bds, modelUri,
+				OntModelSpec.OWL_MEM,
+				JenaDataSourceSetupBase.TripleStoreType.RDB, dbType, _context);
+		if (model != null) {
+			return ModelFactory
+					.createOntologyModel(OntModelSpec.OWL_MEM, model);
+		} else {
+			throw new IllegalStateException("Main Model Uri " + modelUri
+					+ " did not retrieve model");
+		}
+	}
+
+	private void removeSpecialWriteModel(VitroRequest vreq) {
+		if (vreq.getAttribute(SPECIAL_WRITE_MODEL) != null) {
+			vreq.removeAttribute(SPECIAL_WRITE_MODEL);
+		}
+	}
+	
+	private void setSpecialWriteModel(VitroRequest vreq, OntModel mainOntModel) {
+		if (mainOntModel != null) {
+			vreq.setAttribute(SPECIAL_WRITE_MODEL, mainOntModel);
+		}
+	}
+
+	/**
+	 * Create a copy of the WADF, and set the special models onto it. 
+	 * If a model is null, it will have no effect.
+	 */
+	private WebappDaoFactory createNewWebappDaoFactory(
+			WebappDaoFactoryJena inputWadf, OntModel mainOntModel,
+			OntModel tboxOntModel, OntModel displayOntModel) {
+		WebappDaoFactoryJena wadfj = new WebappDaoFactoryJena(inputWadf);
+		wadfj.setSpecialDataModel(mainOntModel, tboxOntModel, displayOntModel);
+		return wadfj;
+	}
+
+	private boolean isParameterPresent(HttpServletRequest req, String key) {
+		return getNonEmptyParameter(req, key) != null;
+	}
+
+	/**
+	 * Return a non-empty parameter from the request, or a null.
+	 */
+	private String getNonEmptyParameter(HttpServletRequest req, String key) {
+		String value = req.getParameter(key);
+		if ((value == null) || value.isEmpty()) {
+			return null;
+		} else {
+			return value;
+		}
+	}
+	
 	private void logRequestUriForDebugging(HttpServletRequest req) {
 		if (log.isDebugEnabled()) {
 			try {
@@ -265,4 +309,5 @@ public class VitroRequestPrep implements Filter {
 			}
 		}
 	}
+	
 }
