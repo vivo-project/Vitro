@@ -53,8 +53,6 @@
 
 <section id="add-account" role="region">
     <form method="POST" action="${formUrls.add}" class="customForm" role="add new account">
-        <legend>Add new account</legend>
-    
         <label for="email-address">Email address<span class="requiredHint"> *</span></label>
         <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input "/>
 

@@ -59,8 +59,6 @@
 
 <section id="my-account" role="region">
     <form method="POST" action="${formUrls.myAccount}" class="customForm" role="my account">
-        <legend>My account</legend>
-        
         <label for="email-address">Email address<span class="requiredHint"> *</span></label>
         <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
 

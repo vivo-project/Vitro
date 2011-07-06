@@ -53,8 +53,6 @@
 
 <section id="edit-account" role="region">
     <form method="POST" action="${formUrls.edit}" id="userAccountForm" class="customForm" role="edit account">
-        <legend>Edit new account</legend>
-        
         <label for="email-address">Email address<span class="requiredHint"> *</span></label>
         <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
 
