@@ -246,6 +246,7 @@ public class IndexBuilder extends Thread {
                     try{
                         indexer.removeFromIndex(deleteMe);                    
                     }catch(Exception ex){ 
+                    	log.debug(ex.getMessage());
                         log.debug("could not remove individual " + deleteMe 
                                 + " from index, usually this is harmless",ex);
                     }
