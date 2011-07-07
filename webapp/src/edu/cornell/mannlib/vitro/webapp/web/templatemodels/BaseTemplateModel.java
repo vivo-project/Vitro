@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels;
 
-import java.util.HashMap;
-
 import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
@@ -17,8 +15,19 @@ public abstract class BaseTemplateModel {
 
     private static final Log log = LogFactory.getLog(BaseTemplateModel.class);
     
-    protected static ServletContext servletContext = null;
-    public VitroRequest vitroRequest = null;
+    protected static ServletContext servletContext;
+    protected final VitroRequest vreq;
+    
+    protected BaseTemplateModel(VitroRequest vreq) {
+        this.vreq = vreq;
+    }
+    
+    // Some BaseTemplateModel classes don't need vreq, so provide an
+    // argumentless constructor.
+    protected BaseTemplateModel() { 
+        this.vreq = null;
+    };
+    
     // Convenience method so subclasses can call getUrl(path)
     protected String getUrl(String path) {
         return UrlBuilder.getUrl(path);

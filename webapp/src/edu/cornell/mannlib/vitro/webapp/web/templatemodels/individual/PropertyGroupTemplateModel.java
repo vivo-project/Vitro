@@ -28,6 +28,7 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
     PropertyGroupTemplateModel(VitroRequest vreq, PropertyGroup group, 
             Individual subject, EditingPolicyHelper policyHelper, 
             List<DataProperty> populatedDataPropertyList, List<ObjectProperty> populatedObjectPropertyList) {
+
         this.name = group.getName();
         
         List<Property> propertyList = group.getPropertyList();

@@ -16,12 +16,11 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.SiteAdminControlle
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 
 public class User extends BaseTemplateModel {
-    private final VitroRequest vreq;
     private final UserAccount currentUser;
     private final String profileUrl;
     
     public User(VitroRequest vreq) {
-        this.vreq = vreq;
+        super(vreq);
         this.currentUser = LoginStatusBean.getCurrentUser(vreq);
         this.profileUrl = figureAssociatedProfileUrl();
     }

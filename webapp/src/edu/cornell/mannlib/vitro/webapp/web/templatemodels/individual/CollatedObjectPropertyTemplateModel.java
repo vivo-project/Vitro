@@ -23,9 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateModel {
 

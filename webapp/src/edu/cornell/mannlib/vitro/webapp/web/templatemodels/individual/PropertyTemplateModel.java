@@ -31,13 +31,12 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     protected String propertyUri;
     protected Map<String, Object> verboseDisplay = null;
     protected String subjectUri = null;
-    protected VitroRequest vreq;
     protected boolean addAccess = false;
     
     PropertyTemplateModel(Property property, Individual subject, EditingPolicyHelper policyHelper, VitroRequest vreq) {
+        super(vreq);
         subjectUri = subject.getURI(); 
         propertyUri = property.getURI();
-        this.vreq = vreq;
         localName = property.getLocalName();        
         log.debug("Local name for property " + propertyUri + ": " + localName);
         setVerboseDisplayValues(property);

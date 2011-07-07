@@ -25,7 +25,8 @@ public abstract class PropertyStatementTemplateModel extends BaseTemplateModel {
     protected String propertyUri = null;
     private List<EditAccess> editAccessList = null;
     
-    PropertyStatementTemplateModel(String subjectUri, String propertyUri, EditingPolicyHelper policyHelper) {
+    PropertyStatementTemplateModel(String subjectUri, String propertyUri, EditingPolicyHelper policyHelper, VitroRequest vreq) {
+        super(vreq);
         // Instantiate the list even if not editing, so calls to getEditUrl() and getDeleteUrl() from 
         // dump methods don't generate an error when they call isEditable() and isDeletable().
         editAccessList = new ArrayList<EditAccess>(); 

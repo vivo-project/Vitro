@@ -56,8 +56,8 @@ public class GroupedPropertyList extends BaseTemplateModel {
     private List<PropertyGroupTemplateModel> groups;
     
     GroupedPropertyList(Individual subject, VitroRequest vreq, EditingPolicyHelper policyHelper) {
+        super(vreq);
         this.subject = subject;
-        this.vreq = vreq;
         this.wdf = vreq.getWebappDaoFactory();
         
         boolean editing = policyHelper != null;

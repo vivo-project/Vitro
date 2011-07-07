@@ -32,15 +32,14 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
     private static final Log log = LogFactory.getLog(BaseIndividualTemplateModel.class);
     
     protected Individual individual;
-    protected VitroRequest vreq;
     protected UrlBuilder urlBuilder;
-    protected GroupedPropertyList propertyList = null;
-    protected LoginStatusBean loginStatusBean = null;
-    private EditingPolicyHelper policyHelper = null;
+    protected GroupedPropertyList propertyList;
+    protected LoginStatusBean loginStatusBean;
+    private EditingPolicyHelper policyHelper;
 
     public BaseIndividualTemplateModel(Individual individual, VitroRequest vreq) {
+        super(vreq);
         this.individual = individual;
-        this.vreq = vreq;
         this.loginStatusBean = LoginStatusBean.getBean(vreq);
         // Needed for getting portal-sensitive urls. Remove if multi-portal support is removed.
         this.urlBuilder = new UrlBuilder(vreq.getAppBean());

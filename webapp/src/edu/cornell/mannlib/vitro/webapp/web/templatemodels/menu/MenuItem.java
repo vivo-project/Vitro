@@ -21,9 +21,9 @@ public class MenuItem extends BaseTemplateModel {
     }
     
     public MenuItem(String linkText, String path, boolean active){
-        this.text= linkText;
+        this.text = linkText;
         this.path = path;
-        this.active= active;
+        this.active = active;
     }
     
     public String getLinkText() {

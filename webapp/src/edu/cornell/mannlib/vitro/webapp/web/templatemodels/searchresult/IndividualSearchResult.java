@@ -13,7 +13,6 @@ public class IndividualSearchResult extends BaseIndividualSearchResult {
     private static final Log log = LogFactory.getLog(IndividualSearchResult.class);
     
     protected Individual individual;
-    protected VitroRequest vreq;
        
     public IndividualSearchResult(Individual individual, VitroRequest vreq) {
         super(individual, vreq);

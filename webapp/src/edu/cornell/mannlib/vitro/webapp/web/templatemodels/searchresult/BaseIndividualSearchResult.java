@@ -23,11 +23,10 @@ public abstract class BaseIndividualSearchResult extends BaseTemplateModel {
     private static final Log log = LogFactory.getLog(BaseIndividualSearchResult.class);
     
     protected Individual individual;
-    protected VitroRequest vreq;
        
     public BaseIndividualSearchResult(Individual individual, VitroRequest vreq) {
-       this.individual = individual;
-       this.vreq = vreq;
+        super(vreq);
+        this.individual = individual;
     }
 
     protected String getView(ClassView view) {

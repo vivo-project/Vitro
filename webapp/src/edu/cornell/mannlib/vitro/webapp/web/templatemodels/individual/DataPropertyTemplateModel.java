@@ -37,7 +37,6 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
             EditingPolicyHelper policyHelper, List<DataProperty> populatedDataPropertyList) {
         
         super(dp, subject, policyHelper, vreq);
-        vitroRequest = vreq;
         setName(dp.getPublicName());
 
         statements = new ArrayList<DataPropertyStatementTemplateModel>();
@@ -106,7 +105,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
                     "predicateUri", propertyUri);
             
             //Check if special parameters being sent            
-            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vitroRequest);
+            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vreq);
             if(specialParams.size() > 0) {
             	params.putAll(specialParams);
             }

@@ -17,12 +17,10 @@ public class MainMenu extends Menu {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(MainMenu.class);
     
-    protected VitroRequest vreq;
-    
     public MainMenu(){ }
     
     public MainMenu(VitroRequest vreq) {
-        this.vreq = vreq;
+        super(vreq);
     }
 
     public void addItem(String text, String path) {

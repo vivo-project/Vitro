@@ -101,7 +101,6 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         throws InvalidConfigurationException {
         
         super(op, subject, policyHelper, vreq); 
-        this.vitroRequest = vreq;
         setName(op.getDomainPublic());
         
         // Get the config for this object property

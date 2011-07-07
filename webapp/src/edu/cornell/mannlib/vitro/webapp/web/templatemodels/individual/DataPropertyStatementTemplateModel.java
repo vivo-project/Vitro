@@ -34,10 +34,9 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
     //Extended to include vitro request to check for special parameters
     DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, 
             Literal literal, EditingPolicyHelper policyHelper, VitroRequest vreq) {
-        super(subjectUri, propertyUri, policyHelper);
+        super(subjectUri, propertyUri, policyHelper, vreq);
         
         this.value = literal.getLexicalForm();
-        this.vitroRequest = vreq;
         setEditAccess(literal, policyHelper, propertyUri);
        
     }
@@ -49,8 +48,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
      * rdfs:label.
      */
     DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, VitroRequest vreq, EditingPolicyHelper policyHelper) {
-        super(subjectUri, propertyUri, policyHelper);
-        vitroRequest = vreq;
+        super(subjectUri, propertyUri, policyHelper, vreq);
         DataPropertyStatementDao dpsDao = vreq.getWebappDaoFactory().getDataPropertyStatementDao();
         List<Literal> literals = dpsDao.getDataPropertyValuesForIndividualByProperty(subjectUri, propertyUri);
         
@@ -112,9 +110,9 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
             if (! isDeletable()) {
                 params.put("deleteProhibited", "prohibited");
             }
-            //Check if special parameters being sent
             
-            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vitroRequest);
+            //Check if special parameters being sent
+            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vreq);
             if(specialParams.size() > 0) {
             	params.putAll(specialParams);
             }
@@ -131,11 +129,13 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
                     "predicateUri", propertyUri,
                     "datapropKey", dataPropHash,
                     "cmd", "delete");
+            
             //Check if special parameters being sent
-            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vitroRequest);
+            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vreq);
             if(specialParams.size() > 0) {
             	params.putAll(specialParams);
             }
+            
             deleteUrl = UrlBuilder.getUrl(EDIT_PATH, params);
         }
         return deleteUrl;

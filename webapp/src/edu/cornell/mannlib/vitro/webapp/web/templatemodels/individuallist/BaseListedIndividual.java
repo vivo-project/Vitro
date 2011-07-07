@@ -19,12 +19,11 @@ public abstract class BaseListedIndividual extends BaseTemplateModel {
 
     private static final Log log = LogFactory.getLog(BaseListedIndividual.class);
 
-    protected Individual individual;
-    protected VitroRequest vreq;    
+    protected Individual individual;  
     
     public BaseListedIndividual(Individual individual, VitroRequest vreq) {
+        super(vreq);
         this.individual = individual;
-        this.vreq = vreq;
     }
     
     public static List<ListedIndividual> getIndividualTemplateModels(List<Individual> individuals, VitroRequest vreq) {
