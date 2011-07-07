@@ -55,9 +55,9 @@ public class JSONReconcileServletTest extends AbstractTestClass {
 			jsonResult = reconcile.getMetadata(request, response, defaultNamespace, defaultTypeList, serverName, serverPort);
 			schemaSpaceOutput = jsonResult.getString("schemaSpace");
 		} catch (ServletException e) {
-			System.err.println("SolrJsonReconcileServletTest getMetadata ServletException: " + e);
+			System.err.println("JSONReconcileServletTest getMetadata ServletException: " + e);
 		} catch (JSONException e) {
-			System.err.println("SolrJsonReconcileServletTest getMetadata JSONException: " + e);
+			System.err.println("JSONReconcileServletTest getMetadata JSONException: " + e);
 		}
 		Assert.assertNotNull("output should not be null", jsonResult);
 		Assert.assertEquals("schemaSpaceOutput", defaultNamespace, schemaSpaceOutput);
@@ -99,7 +99,7 @@ public class JSONReconcileServletTest extends AbstractTestClass {
 		    Assert.assertTrue(message, regexMatcher.find());
 		} catch (PatternSyntaxException e) {
 		    // Syntax error in the regular expression
-			System.err.println("SolrJsonReconcileServletTest testAssertTrue PatternSyntaxException: " + e);
+			System.err.println("JSONReconcileServletTest testAssertTrue PatternSyntaxException: " + e);
 		}
 	}
 }
