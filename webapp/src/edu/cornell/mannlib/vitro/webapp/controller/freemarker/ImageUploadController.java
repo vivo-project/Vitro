@@ -25,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPro
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ForwardResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -519,7 +520,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private String formAction(String entityUri, String action,
 			String placeholderUrl) {
-		UrlBuilder.ParamMap params = new UrlBuilder.ParamMap(
+		ParamMap params = new ParamMap(
 				PARAMETER_ENTITY_URI, entityUri, PARAMETER_ACTION, action,
 				PARAMETER_PLACEHOLDER_URL, placeholderUrl);
 		return UrlBuilder.getPath(URL_HERE, params);

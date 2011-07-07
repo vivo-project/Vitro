@@ -245,25 +245,25 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 
     // Define the URLs that are accessible to the templates. Note that we do not create menus here,
     // because we want the templates to be free to define the link text and where the links are displayed.
-    private final Map<String, String> getUrls(String themeDir, UrlBuilder urlBuilder, VitroRequest vreq) {
+    private final Map<String, String> getUrls(String themeDir, VitroRequest vreq) {
         Map<String, String> urls = new HashMap<String, String>();
         
-        urls.put("home", urlBuilder.getHomeUrl());
+        urls.put("home", UrlBuilder.getHomeUrl());
         
         // Templates use this to construct urls.
         urls.put("base", UrlBuilder.contextPath);
 
-        urls.put("about", urlBuilder.getPortalUrl(Route.ABOUT));
+        urls.put("about", UrlBuilder.getUrl(Route.ABOUT));
         if (FreemarkerEmailFactory.isConfigured(vreq)) {
-            urls.put("contact", urlBuilder.getPortalUrl(Route.CONTACT));
+            urls.put("contact", UrlBuilder.getUrl(Route.CONTACT));
         }
-        urls.put("search", urlBuilder.getPortalUrl(Route.SEARCH));  
-        urls.put("termsOfUse", urlBuilder.getPortalUrl(Route.TERMS_OF_USE));  
-        urls.put("login", urlBuilder.getLoginUrl());          
-        urls.put("logout", urlBuilder.getLogoutUrl());       
+        urls.put("search", UrlBuilder.getUrl(Route.SEARCH));  
+        urls.put("termsOfUse", UrlBuilder.getUrl(Route.TERMS_OF_USE));  
+        urls.put("login", UrlBuilder.getLoginUrl());          
+        urls.put("logout", UrlBuilder.getLogoutUrl());       
         urls.put("myAccount", UrlBuilder.getUrl("/accounts/myAccount"));       
-        urls.put("siteAdmin", urlBuilder.getPortalUrl(Route.SITE_ADMIN));  
-        urls.put("themeImages", urlBuilder.getPortalUrl(themeDir + "/images"));
+        urls.put("siteAdmin", UrlBuilder.getUrl(Route.SITE_ADMIN));  
+        urls.put("themeImages", UrlBuilder.getUrl(themeDir + "/images"));
         urls.put("images", UrlBuilder.getUrl("/images"));
         urls.put("theme", UrlBuilder.getUrl(themeDir));
         urls.put("index", UrlBuilder.getUrl("/browse"));   
@@ -351,9 +351,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         map.put("title", getTitle(siteName, vreq));
 
         String themeDir = getThemeDir(appBean);
-        UrlBuilder urlBuilder = new UrlBuilder(appBean);
         
-        map.put("urls", getUrls(themeDir, urlBuilder, vreq)); 
+        map.put("urls", getUrls(themeDir, vreq)); 
 
         map.put("themeDir", themeDir);
         map.put("currentTheme", themeDir.substring(themeDir.lastIndexOf('/')+1));
@@ -368,7 +367,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
         map.put("user", new User(vreq));
         
-        map.put("version", getRevisionInfo(urlBuilder));
+        map.put("version", getRevisionInfo());
         
         map.put("copyright", getCopyrightInfo(appBean));    
         map.put("siteTagline", appBean.getShortHand());
@@ -418,11 +417,11 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return copyright;
     }
     
-    private final Map<String, Object> getRevisionInfo(UrlBuilder urlBuilder) {
+    private final Map<String, Object> getRevisionInfo() {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("label", RevisionInfoBean.getBean(getServletContext())
                 .getReleaseLabel());
-        map.put("moreInfoUrl", urlBuilder.getPortalUrl("/revisionInfo"));
+        map.put("moreInfoUrl", UrlBuilder.getUrl("/revisionInfo"));
         return map;
     }
 

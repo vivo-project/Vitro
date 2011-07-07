@@ -76,9 +76,8 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         
         verboseDisplay.put("localName", property.getLocalNameWithPrefix());
         verboseDisplay.put("displayRank", getPropertyDisplayTier(property));
-        
-        UrlBuilder urlBuilder = new UrlBuilder(vreq.getAppBean());
-        String editUrl = urlBuilder.getPortalUrl(getPropertyEditRoute(), "uri", property.getURI());
+       
+        String editUrl = UrlBuilder.getUrl(getPropertyEditRoute(), "uri", property.getURI());
         verboseDisplay.put("propertyEditUrl", editUrl);
     }
     

@@ -52,24 +52,22 @@ public class SiteAdminController extends FreemarkerHttpServlet {
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
         Map<String, Object> body = new HashMap<String, Object>();        
-
-        UrlBuilder urlBuilder = new UrlBuilder(vreq.getAppBean());
         
     	if (PolicyHelper.isAuthorizedForActions(vreq, new EditIndividuals())) {
     		body.put("dataInput", getDataInputData(vreq));
     	}
 
-        body.put("siteConfig", getSiteConfigurationData(vreq, urlBuilder));
+        body.put("siteConfig", getSiteConfigurationData(vreq));
 
         // rjy7 There is a risk that the login levels required to show the links will get out
         // of step with the levels required by the pages themselves. We should implement a 
         // mechanism similar to what's used on the front end to display links to Site Admin
         // and Revision Info iff the user has access to those pages.
         if (PolicyHelper.isAuthorizedForActions(vreq, new EditOntology())) {
-        	body.put("ontologyEditor", getOntologyEditorData(vreq, urlBuilder));
+        	body.put("ontologyEditor", getOntologyEditorData(vreq));
         }
 		if (PolicyHelper.isAuthorizedForActions(vreq, new UseAdvancedDataToolsPages())) {
-            body.put("dataTools", getDataToolsData(vreq, urlBuilder));
+            body.put("dataTools", getDataToolsData(vreq));
             
             // Only for DataStar. Should handle without needing a DataStar-specific version of this controller.
             //body.put("customReports", getCustomReportsData(vreq));
@@ -114,22 +112,22 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         return map;
     }
     
-    private Map<String, Object> getSiteConfigurationData(VitroRequest vreq, UrlBuilder urlBuilder) {
+    private Map<String, Object> getSiteConfigurationData(VitroRequest vreq) {
 
         Map<String, Object> map = new HashMap<String, Object>();
         Map<String, String> urls = new HashMap<String, String>();
         
         if (PolicyHelper.isAuthorizedForActions(vreq, new ManageUserAccounts())) {
-        	urls.put("userList", urlBuilder.getPortalUrl("/accountsAdmin"));
+        	urls.put("userList", UrlBuilder.getUrl("/accountsAdmin"));
         }
  
 		if (PolicyHelper.isAuthorizedForActions(vreq, new EditSiteInformation())) {
-			urls.put("siteInfo", urlBuilder.getPortalUrl("/editForm", new ParamMap("controller", "ApplicationBean")));
+			urls.put("siteInfo", UrlBuilder.getUrl("/editForm", new ParamMap("controller", "ApplicationBean")));
 		}
 
 		// TODO this goes away when Menu Management is complete - jblake
 		if (PolicyHelper.isAuthorizedForActions(vreq, MenuN3EditController.REQUIRED_ACTIONS)) {
-            urls.put("menuN3Editor", urlBuilder.getPortalUrl("/menuN3Editor"));            
+            urls.put("menuN3Editor", UrlBuilder.getUrl("/menuN3Editor"));            
         }
         
 		if (PolicyHelper.isAuthorizedForActions(vreq, new ManageMenus())) {
@@ -143,7 +141,7 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         return map;
     }
     
-    private Map<String, Object> getOntologyEditorData(VitroRequest vreq, UrlBuilder urlBuilder) {
+    private Map<String, Object> getOntologyEditorData(VitroRequest vreq) {
 
         Map<String, Object> map = new HashMap<String, Object>();
  
@@ -171,25 +169,25 @@ public class SiteAdminController extends FreemarkerHttpServlet {
                 
         Map<String, String> urls = new HashMap<String, String>();
         
-        urls.put("ontologies", urlBuilder.getPortalUrl("/listOntologies"));
-        urls.put("classHierarchy", urlBuilder.getPortalUrl("/showClassHierarchy"));
-        urls.put("classGroups", urlBuilder.getPortalUrl("/listGroups"));
-        urls.put("dataPropertyHierarchy", urlBuilder.getPortalUrl("/showDataPropertyHierarchy"));
-        urls.put("propertyGroups", urlBuilder.getPortalUrl("/listPropertyGroups"));            
-        urls.put("objectPropertyHierarchy", urlBuilder.getPortalUrl("/showObjectPropertyHierarchy", new ParamMap("iffRoot", "true")));
+        urls.put("ontologies", UrlBuilder.getUrl("/listOntologies"));
+        urls.put("classHierarchy", UrlBuilder.getUrl("/showClassHierarchy"));
+        urls.put("classGroups", UrlBuilder.getUrl("/listGroups"));
+        urls.put("dataPropertyHierarchy", UrlBuilder.getUrl("/showDataPropertyHierarchy"));
+        urls.put("propertyGroups", UrlBuilder.getUrl("/listPropertyGroups"));            
+        urls.put("objectPropertyHierarchy", UrlBuilder.getUrl("/showObjectPropertyHierarchy", new ParamMap("iffRoot", "true")));
         map.put("urls", urls);
         
         return map;
     }
 
-    private Map<String, Object> getDataToolsData(VitroRequest vreq, UrlBuilder urlBuilder) {
+    private Map<String, Object> getDataToolsData(VitroRequest vreq) {
 
         Map<String, Object> map = new HashMap<String, Object>();
         
         Map<String, String> urls = new HashMap<String, String>();
         urls.put("ingest", UrlBuilder.getUrl("/ingest"));
-        urls.put("rdfData", urlBuilder.getPortalUrl("/uploadRDFForm"));
-        urls.put("rdfExport", urlBuilder.getPortalUrl("/export"));
+        urls.put("rdfData", UrlBuilder.getUrl("/uploadRDFForm"));
+        urls.put("rdfExport", UrlBuilder.getUrl("/export"));
         urls.put("sparqlQuery", UrlBuilder.getUrl("/admin/sparqlquery"));
         urls.put("sparqlQueryBuilder", UrlBuilder.getUrl("/admin/sparqlquerybuilder"));
         map.put("urls", urls);

@@ -32,7 +32,6 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
     private static final Log log = LogFactory.getLog(BaseIndividualTemplateModel.class);
     
     protected Individual individual;
-    protected UrlBuilder urlBuilder;
     protected GroupedPropertyList propertyList;
     protected LoginStatusBean loginStatusBean;
     private EditingPolicyHelper policyHelper;
@@ -42,7 +41,6 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         this.individual = individual;
         this.loginStatusBean = LoginStatusBean.getBean(vreq);
         // Needed for getting portal-sensitive urls. Remove if multi-portal support is removed.
-        this.urlBuilder = new UrlBuilder(vreq.getAppBean());
         
         // If editing, create a helper object to check requested actions against policies
         if (isEditable()) {
@@ -100,7 +98,7 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
     }
     
     public String getEditUrl() {
-        return urlBuilder.getPortalUrl(Route.INDIVIDUAL_EDIT, "uri", getUri());
+        return UrlBuilder.getUrl(Route.INDIVIDUAL_EDIT, "uri", getUri());
     }
 
     public GroupedPropertyList getPropertyList() {

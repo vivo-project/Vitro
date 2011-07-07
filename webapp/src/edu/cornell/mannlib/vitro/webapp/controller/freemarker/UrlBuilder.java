@@ -9,13 +9,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
 
-import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -27,8 +25,6 @@ public class UrlBuilder {
     private static final Log log = LogFactory.getLog(UrlBuilder.class.getName());
 
     protected static String contextPath = null;   
-    
-    private ApplicationBean application;
         
     public enum Route {
         ABOUT("/about"),
@@ -113,53 +109,23 @@ public class UrlBuilder {
         }
     }
     
-    public UrlBuilder(ApplicationBean application) {
-        this.application = application;
-    }
-    
-    public String getHomeUrl() {
-        //String rootBreadCrumbUrl = application.getRootBreadCrumbURL();
-        //String path = StringUtils.isEmpty(rootBreadCrumbUrl) ? "" : rootBreadCrumbUrl;
-        //return getUrl(path);
+    private UrlBuilder() { }
+  
+    public static String getHomeUrl() {
     	return getUrl("");
     }
     
     // Used by templates to build urls.
-    public String getBaseUrl() {
+    public static String getBaseUrl() {
         return contextPath;
     }
     
-	public String getLoginUrl() {
-		return getPortalUrl(Route.AUTHENTICATE, "return", "true");
+	public static String getLoginUrl() {
+		return getUrl(Route.AUTHENTICATE, "return", "true");
 	}
     
-    public String getLogoutUrl() {
-        return getPortalUrl(Route.LOGOUT);
-    }
-
-    public String getPortalUrl(String path) {
-        return getUrl(path);
-    }
-    
-    public String getPortalUrl(String path, ParamMap params) {
-        return getUrl(path, params);
-    }
-
-    public String getPortalUrl(String path, String...params) {
-        ParamMap urlParams = new ParamMap(params);
-        return getPortalUrl(path, urlParams);
-    }
-    
-    public String getPortalUrl(Route route) {
-        return getPortalUrl(route.path());
-    }
-    
-    public String getPortalUrl(Route route, ParamMap params) {
-        return getPortalUrl(route.path(), params);
-    }
-
-    public String getPortalUrl(Route route, String...params) {
-        return getPortalUrl(route.path(), params);
+    public static String getLogoutUrl() {
+        return getUrl(Route.LOGOUT);
     }
     
     public static class ParamMap extends HashMap<String, String> { 
@@ -201,8 +167,6 @@ public class UrlBuilder {
         }
         
     }
-    
-    /********** Static utility methods **********/
     
     public static String getUrl(String path) {
     	
