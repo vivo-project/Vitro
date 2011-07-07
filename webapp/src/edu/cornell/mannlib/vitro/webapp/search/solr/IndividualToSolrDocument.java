@@ -306,7 +306,7 @@ public class IndividualToSolrDocument {
     public String getQueryForId(String uri ){
         return term.DOCID + ':' + getIdForUri(uri);
     }
-
+    
     public Individual unTranslate(Object result) {
         Individual ent = null;
 
