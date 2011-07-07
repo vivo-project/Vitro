@@ -122,8 +122,8 @@ public class SolrIndexer implements IndexerIface {
     @Override
     public void removeFromIndex(String uri) throws IndexingException {
         if( uri != null ){            
-            try {                        
-                server.deleteByQuery( individualToSolrDoc.getQueryForId(uri));
+            try {
+                server.deleteById(individualToSolrDoc.getIdForUri(uri));
                 log.debug("deleted " + " " + uri);                                       
             } catch (SolrServerException e) {
                 log.error( "could not delete individual " + uri, e);
