@@ -23,6 +23,7 @@ mydomain:user01
 	auth:md5password "garbage" ;
 	auth:passwordChangeExpires 0 ;
 	auth:loginCount 5 ;
+	auth:lastLoginTime 100 ;
 	auth:status "ACTIVE" ;
 	auth:hasPermissionSet mydomain:role1 ;
 	.
@@ -35,6 +36,7 @@ mydomain:user02
 	auth:md5password "garbage" ;
 	auth:passwordChangeExpires 0 ;
 	auth:loginCount 5 ;
+	auth:lastLoginTime 100 ;
 	auth:status "INACTIVE" ;
 	auth:hasPermissionSet mydomain:role1 ;
 	.
@@ -47,6 +49,7 @@ mydomain:user03
 	auth:md5password "garbage" ;
 	auth:passwordChangeExpires 0 ;
 	auth:loginCount 0 ;
+	auth:lastLoginTime 1 ;
 	auth:status "INACTIVE" ;
 	auth:hasPermissionSet mydomain:role1 ;
 	auth:hasPermissionSet mydomain:role2 ;
@@ -60,6 +63,7 @@ mydomain:user04
 #	auth:md5password NONE ;
 	auth:passwordChangeExpires 0 ;
 	auth:loginCount 9 ;
+	auth:lastLoginTime 3 ;
 	auth:status "ACTIVE" ;
 	.
 	
@@ -71,6 +75,7 @@ mydomain:user05
 	auth:md5password "garbage" ;
 #	auth:passwordChangeExpires NONE ;
 	auth:loginCount 2 ;
+	auth:lastLoginTime 100 ;
 	auth:status "ACTIVE" ;
 	auth:hasPermissionSet mydomain:role1 ;
 	.
@@ -83,6 +88,7 @@ mydomain:user06
 	auth:md5password "garbage" ;
 	auth:passwordChangeExpires 0 ;
 #	auth:loginCount NONE ;
+	auth:lastLoginTime 2 ;
 	auth:status "INACTIVE" ;
 	auth:hasPermissionSet mydomain:role1 ;
 	.
@@ -95,6 +101,7 @@ mydomain:user07
 	auth:md5password "garbage" ;
 	auth:passwordChangeExpires 0 ;
 	auth:loginCount 1 ;
+#	auth:lastLoginTime NONE ;
 #	auth:status NONE ;
 	auth:hasPermissionSet mydomain:role2 ;
 	.
@@ -108,6 +115,7 @@ mydomain:user08
 	auth:md5password "garbage" ;
 	auth:passwordChangeExpires 0 ;
 	auth:loginCount 7 ;
+	auth:lastLoginTime 1122334455667788 ;
 	auth:status "ACTIVE" ;
 	.
 	
@@ -119,6 +127,7 @@ mydomain:user09
 	auth:md5password "garbage" ;
 	auth:passwordChangeExpires 0 ;
 	auth:loginCount 3 ;
+	auth:lastLoginTime 1000000000000000 ;
 	auth:status "ACTIVE" ;
 	auth:hasPermissionSet mydomain:role1 ;
 	.
@@ -129,8 +138,9 @@ mydomain:user10
 	auth:firstName "Bob" ;
 	auth:lastName "Caruso" ;
 	auth:md5password "garbage" ;
-	auth:passwordChangeExpires "1100234965897" ;
+	auth:passwordChangeExpires 1100234965897 ;
 	auth:loginCount 50 ;
+	auth:lastLoginTime 1020304050607080 ;
 	auth:status "ACTIVE" ;
 	auth:hasPermissionSet mydomain:role2 ;
 	.

@@ -7,6 +7,7 @@ import static edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsS
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,9 +34,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 
 /**
  * Handle the List page.
- * 
- * TODO: agree with Manolo how to do the column heads as links that change the
- * sort order
  * 
  * TODO: auto-complete
  */
@@ -242,6 +240,15 @@ public class UserAccountsListPage extends UserAccountsPage {
 			return account.getLoginCount();
 		}
 
+		public Date getLastLoginTime() {
+			long time = account.getLastLoginTime();
+			if (time > 0L) {
+				return new Date(time);
+			} else {
+				return null;
+			}
+		}
+
 		public String getStatus() {
 			Status status = account.getStatus();
 			if (status == null) {
@@ -299,7 +306,7 @@ public class UserAccountsListPage extends UserAccountsPage {
 			HttpSession session = req.getSession();
 			Object o = session.getAttribute(ATTRIBUTE);
 			session.removeAttribute(ATTRIBUTE);
-			
+
 			if (o instanceof Message) {
 				((Message) o).applyToBodyMap(body);
 			}

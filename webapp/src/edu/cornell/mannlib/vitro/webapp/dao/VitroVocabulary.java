@@ -157,6 +157,7 @@ public class VitroVocabulary {
     public static final String USERACCOUNT_MD5_PASSWORD = VITRO_AUTH + "md5password";
     public static final String USERACCOUNT_OLD_PASSWORD = VITRO_AUTH + "oldpassword";
     public static final String USERACCOUNT_LOGIN_COUNT = VITRO_AUTH + "loginCount";
+    public static final String USERACCOUNT_LAST_LOGIN_TIME = VITRO_AUTH + "lastLoginTime";
     public static final String USERACCOUNT_STATUS = VITRO_AUTH + "status";
     public static final String USERACCOUNT_PASSWORD_LINK_EXPIRES = VITRO_AUTH + "passwordLinkExpires";
     public static final String USERACCOUNT_PASSWORD_CHANGE_REQUIRED = VITRO_AUTH + "passwordChangeRequired";

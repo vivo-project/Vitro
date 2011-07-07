@@ -122,6 +122,14 @@
                         <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=count&orderDirection=DESC" title="descending order"></a>
                     </nav>
                 </th>
+
+                <th scope="col">
+                    Last Login Time
+                    <nav class="account-alpha-browse">
+                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=lastLogin&orderDirection=ASC" title="ascending order"></a> 
+                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=lastLogin&orderDirection=DESC" title="descending order"></a>
+                    </nav>
+                </th>
             </tr>
         </thead>
     
@@ -144,6 +152,13 @@
                         </#list>
                     </td>
                     <td>${account.loginCount}</td>
+                    <td>
+                        <#if account.lastLoginTime??>
+                            ${account.lastLoginTime?datetime?string.full}
+                        <#else>
+                            &nbsp;
+                        </#if>
+                    </td>
                 </tr>
             </#list>
         </tbody>

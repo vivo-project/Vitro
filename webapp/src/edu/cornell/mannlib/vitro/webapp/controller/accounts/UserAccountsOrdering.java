@@ -34,7 +34,8 @@ public class UserAccountsOrdering {
 
 	public enum Field {
 		EMAIL("email"), FIRST_NAME("firstName"), LAST_NAME("lastName"), STATUS(
-				"status"), ROLE("ps"), LOGIN_COUNT("count");
+				"status"), ROLE("ps"), LOGIN_COUNT("count"), LAST_LOGIN_TIME(
+				"lastLogin");
 
 		public static Field DEFAULT_FIELD = EMAIL;
 

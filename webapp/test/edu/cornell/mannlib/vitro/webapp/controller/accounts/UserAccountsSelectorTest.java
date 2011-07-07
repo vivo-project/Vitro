@@ -84,6 +84,7 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 		assertEquals("password", "garbage", acct.getMd5Password());
 		assertEquals("expires", 1100234965897L, acct.getPasswordLinkExpires());
 		assertEquals("loginCount", 50, acct.getLoginCount());
+		assertEquals("lastLogin", 1020304050607080L, acct.getLastLoginTime());
 		assertEquals("status", UserAccount.Status.ACTIVE, acct.getStatus());
 		assertEqualSets(
 				"permissions",
@@ -107,6 +108,7 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 		assertEquals("password", "garbage", acct.getMd5Password());
 		assertEquals("expires", 0L, acct.getPasswordLinkExpires());
 		assertEquals("loginCount", 7, acct.getLoginCount());
+		assertEquals("lastLogin", 1122334455667788L, acct.getLastLoginTime());
 		assertEquals("status", UserAccount.Status.ACTIVE, acct.getStatus());
 		assertEqualSets("permissions", Collections.<String> emptySet(),
 				acct.getPermissionSetUris());
@@ -237,6 +239,23 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 		assertSelectedUris(10, "user10", "user04", "user08");
 	}
 
+	@Test
+	public void sortByLastLoginTimeAscending() {
+		UserAccountsOrdering orderBy = new UserAccountsOrdering(
+				Field.LAST_LOGIN_TIME, Direction.ASCENDING);
+		selectOnCriteria(3, 1, orderBy, "", "");
+		// user06 has no login count: reads as 0.
+		assertSelectedUris(10, "user07", "user03", "user06");
+	}
+	
+	@Test
+	public void sortByLastLoginTimeDescending() {
+		UserAccountsOrdering orderBy = new UserAccountsOrdering(
+				Field.LAST_LOGIN_TIME, Direction.DESCENDING);
+		selectOnCriteria(3, 1, orderBy, "", "");
+		assertSelectedUris(10, "user08", "user10", "user09");
+	}
+	
 	// ----------------------------------------------------------------------
 	// filtering tests
 	// ----------------------------------------------------------------------

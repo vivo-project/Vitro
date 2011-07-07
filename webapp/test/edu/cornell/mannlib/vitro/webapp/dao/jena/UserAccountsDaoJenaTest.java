@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
@@ -86,6 +85,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		assertEquals("linkExpires", 0L, u.getPasswordLinkExpires());
 		assertEquals("changeRequired", false, u.isPasswordChangeRequired());
 		assertEquals("loginCount", 5, u.getLoginCount());
+		assertEquals("loginTime", 12345678L, u.getLastLoginTime());
 		assertEquals("status", Status.ACTIVE, u.getStatus());
 		assertEquals("externalAuthId", "user1", u.getExternalAuthId());
 		assertEquals("permissionSetUris", Collections.singleton(URI_ROLE1),
@@ -141,6 +141,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		in.setPasswordLinkExpires(999966663333L);
 		in.setPasswordChangeRequired(true);
 		in.setLoginCount(42);
+		in.setLastLoginTime(8877665544332211L);
 		in.setStatus(Status.INACTIVE);
 		in.setExternalAuthId("newUser");
 		in.setPermissionSetUris(buildSet(URI_ROLE1, URI_ROLE2));
@@ -157,6 +158,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		assertEquals("linkExpires", 999966663333L, u.getPasswordLinkExpires());
 		assertEquals("changeRequired", true, u.isPasswordChangeRequired());
 		assertEquals("loginCount", 42, u.getLoginCount());
+		assertEquals("lastLoginTime", 8877665544332211L, u.getLastLoginTime());
 		assertEquals("status", Status.INACTIVE, u.getStatus());
 		assertEquals("externalAuthId", "newUser", u.getExternalAuthId());
 		assertEquals("permissionSetUris", buildSet(URI_ROLE1, URI_ROLE2),
@@ -188,6 +190,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		up.setPasswordLinkExpires(1L);
 		up.setPasswordChangeRequired(false);
 		up.setLoginCount(43);
+		up.setLastLoginTime(1020304050607080L);
 		up.setStatus(Status.ACTIVE);
 		up.setExternalAuthId("updatedUser1");
 		up.setPermissionSetUris(buildSet(URI_ROLE1, URI_ROLE3));
@@ -204,6 +207,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		assertEquals("changeExpires", 1L, u.getPasswordLinkExpires());
 		assertEquals("changeRequired", false, u.isPasswordChangeRequired());
 		assertEquals("loginCount", 43, u.getLoginCount());
+		assertEquals("lastLoginTime", 1020304050607080L, u.getLastLoginTime());
 		assertEquals("status", Status.ACTIVE, u.getStatus());
 		assertEquals("externalAuthId", "updatedUser1", u.getExternalAuthId());
 		assertEquals("permissionSetUris", buildSet(URI_ROLE1, URI_ROLE3),

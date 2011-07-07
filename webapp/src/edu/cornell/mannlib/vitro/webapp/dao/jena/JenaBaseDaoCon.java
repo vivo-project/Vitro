@@ -127,6 +127,7 @@ public class JenaBaseDaoCon {
     protected  DatatypeProperty   USERACCOUNT_MD5_PASSWORD = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_MD5_PASSWORD);
     protected  DatatypeProperty   USERACCOUNT_OLD_PASSWORD = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_OLD_PASSWORD);
     protected  DatatypeProperty   USERACCOUNT_LOGIN_COUNT = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_LOGIN_COUNT);
+    protected  DatatypeProperty   USERACCOUNT_LAST_LOGIN_TIME = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_LAST_LOGIN_TIME);
     protected  DatatypeProperty   USERACCOUNT_STATUS = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_STATUS);
     protected  DatatypeProperty   USERACCOUNT_PASSWORD_LINK_EXPIRES = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_PASSWORD_LINK_EXPIRES);
     protected  DatatypeProperty   USERACCOUNT_PASSWORD_CHANGE_REQUIRED = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_PASSWORD_CHANGE_REQUIRED);

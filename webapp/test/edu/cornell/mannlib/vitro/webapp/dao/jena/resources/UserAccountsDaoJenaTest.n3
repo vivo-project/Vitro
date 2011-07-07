@@ -16,6 +16,7 @@ mydomain:user01
 	auth:md5password "garbage" ;
 	auth:passwordChangeExpires 0 ;
 	auth:loginCount 5 ;
+	auth:lastLoginTime 12345678 ;
 	auth:status "ACTIVE" ;
 	auth:externalAuthId "user1";
 	auth:hasPermissionSet mydomain:role1 ;

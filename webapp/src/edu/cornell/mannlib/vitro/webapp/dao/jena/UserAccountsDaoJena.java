@@ -98,6 +98,7 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 			u.setPasswordChangeRequired(getPropertyBooleanValue(r,
 					USERACCOUNT_PASSWORD_CHANGE_REQUIRED));
 			u.setLoginCount(getPropertyIntValue(r, USERACCOUNT_LOGIN_COUNT));
+			u.setLastLoginTime(getPropertyLongValue(r, USERACCOUNT_LAST_LOGIN_TIME));
 			u.setStatusFromString(getPropertyStringValue(r, USERACCOUNT_STATUS));
 			u.setExternalAuthId(getPropertyStringValue(r,
 					USERACCOUNT_EXTERNAL_AUTH_ID));
@@ -190,6 +191,8 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 					userAccount.isPasswordChangeRequired(), model);
 			addPropertyIntValue(res, USERACCOUNT_LOGIN_COUNT,
 					userAccount.getLoginCount(), model);
+			addPropertyLongValue(res, USERACCOUNT_LAST_LOGIN_TIME,
+					userAccount.getLastLoginTime(), model);
 			if (userAccount.getStatus() != null) {
 				addPropertyStringValue(res, USERACCOUNT_STATUS, userAccount
 						.getStatus().toString(), model);
@@ -247,6 +250,8 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 					userAccount.isPasswordChangeRequired(), model, true);
 			updatePropertyIntValue(res, USERACCOUNT_LOGIN_COUNT,
 					userAccount.getLoginCount(), model);
+			updatePropertyLongValue(res, USERACCOUNT_LAST_LOGIN_TIME,
+					userAccount.getLastLoginTime(), model);
 			if (userAccount.getStatus() == null) {
 				updatePropertyStringValue(res, USERACCOUNT_STATUS, null, model);
 			} else {

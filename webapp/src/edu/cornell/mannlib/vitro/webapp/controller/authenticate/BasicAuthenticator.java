@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -137,6 +138,7 @@ public class BasicAuthenticator extends Authenticator {
 	 */
 	private void recordLoginOnUserRecord(UserAccount userAccount) {
 		userAccount.setLoginCount(userAccount.getLoginCount() + 1);
+		userAccount.setLastLoginTime(new Date().getTime());
 		getUserAccountsDao().updateUserAccount(userAccount);
 	}
 

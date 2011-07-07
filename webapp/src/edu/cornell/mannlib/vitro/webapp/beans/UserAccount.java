@@ -54,6 +54,7 @@ public class UserAccount {
 	private boolean passwordChangeRequired = false;
 
 	private int loginCount = 0; // Never negative.
+	private long lastLoginTime = 0L; // Never negative.
 	private Status status = Status.INACTIVE; // Might be null.
 	private String externalAuthId = ""; // Never null.
 
@@ -141,6 +142,14 @@ public class UserAccount {
 
 	public void setLoginCount(int loginCount) {
 		this.loginCount = Math.max(0, loginCount);
+	}
+
+	public long getLastLoginTime() {
+		return lastLoginTime;
+	}
+
+	public void setLastLoginTime(long lastLoginTime) {
+		this.lastLoginTime = Math.max(0, lastLoginTime);
 	}
 
 	public Status getStatus() {

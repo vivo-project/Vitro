@@ -141,6 +141,7 @@ public class UserAccountsAddPage extends UserAccountsPage {
 		u.setPasswordChangeRequired(false);
 		u.setPasswordLinkExpires(0);
 		u.setLoginCount(0);
+		u.setLastLoginTime(0L);
 		u.setStatus(Status.INACTIVE);
 		u.setPermissionSetUris(Collections.singleton(selectedRoleUri));
 
