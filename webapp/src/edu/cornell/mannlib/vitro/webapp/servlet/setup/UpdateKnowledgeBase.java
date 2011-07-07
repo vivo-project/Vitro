@@ -112,7 +112,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			  
 			   try {
 				  if (ontologyUpdater.updateRequired()) {
-					  ctx.setAttribute(IndexConstants.INDEX_REBUILD_REQUESTED_AT_STARTUP, Boolean.TRUE);
+					  //ctx.setAttribute(IndexConstants.INDEX_REBUILD_REQUESTED_AT_STARTUP, Boolean.TRUE);
 					  ctx.setAttribute(KBM_REQURIED_AT_STARTUP, Boolean.TRUE);
 					  //doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
 					  reloadDisplayModel(ctx);

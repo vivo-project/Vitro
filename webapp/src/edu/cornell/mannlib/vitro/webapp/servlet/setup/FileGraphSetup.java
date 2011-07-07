@@ -84,11 +84,14 @@ public class FileGraphSetup implements ServletContextListener {
 			t.printStackTrace();
 		}
 		
-		if ( (aboxChanged || tboxChanged) && !isUpdateRequired(sce.getServletContext()) ) {
-	        	log.info("a full recompute of the Abox will be performed because" +
-	        			" the filegraph abox(s) and/or tbox(s) have changed or are being read for the first time." );
-	            SimpleReasonerSetup.setRecomputeRequired(sce.getServletContext());
-		}
+		if (isUpdateRequired(sce.getServletContext()))  {
+        	log.info("mostSpecificType will be computed because a knowledge base migration was performed." );
+            SimpleReasonerSetup.setMSTComputeRequired(sce.getServletContext());
+	    } else if (aboxChanged || tboxChanged) {
+        	log.info("a full recompute of the Abox will be performed because" +
+			" the filegraph abox(s) and/or tbox(s) have changed or are being read for the first time." );
+	    	SimpleReasonerSetup.setRecomputeRequired(sce.getServletContext());
+	    }
 	}
 	
 	/*

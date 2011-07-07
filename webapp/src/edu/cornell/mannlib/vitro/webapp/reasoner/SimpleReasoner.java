@@ -71,14 +71,7 @@ public class SimpleReasoner extends StatementListener {
 		this.inferenceModel = inferenceModel;
 		this.inferenceRebuildModel = inferenceRebuildModel;
 		this.scratchpadModel = scratchpadModel;
-		
-		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);
-		try {
-			inferenceRebuildModel.removeAll();
-		} finally {
-			inferenceRebuildModel.leaveCriticalSection();			
-		}
-		
+				
 	    aboxModel.register(this);
 	}
 	
@@ -334,7 +327,8 @@ public class SimpleReasoner extends StatementListener {
 						}	
 					}
 				} else {
-					log.warn("Didn't find target class (the object of the added rdf:type statement) in the TBox: " + ((Resource)stmt.getObject()).getURI());
+					if ( !(stmt.getObject().asResource().getNameSpace()).equals(OWL.NS)) 
+					   log.warn("Didn't find target class (the object of the added rdf:type statement) in the TBox"); 
 				}
 			} else {
 				log.warn("The object of this rdf:type assertion has a null URI: " + stmtString(stmt));
@@ -785,7 +779,10 @@ public class SimpleReasoner extends StatementListener {
 				}
 				 
 				if (ontClass == null) {
-					log.warn("(setMostSpecificType) Didn't find target class (the object of the added rdf:type statement) in the TBox: " + (stmt.getObject().asResource()).getURI());
+					if ( !(stmt.getObject().asResource().getNameSpace()).equals(OWL.NS)) {
+					    log.warn("(setMostSpecificType) Didn't find target class (the object of the added rdf:type statement) in the TBox: " +
+						      	(stmt.getObject().asResource()).getURI() + "\nstatement is: " + stmtString(stmt));
+					}
 					continue;
 				}
 					
@@ -1060,7 +1057,83 @@ public class SimpleReasoner extends StatementListener {
 		
 		log.info("ABox inference model updated");
 	}
+
+	/*
+	 * Special for version 1.3 
+	 */
+	public synchronized void recomputeMostSpecificType() {
+		
+		// recompute the inferences 
+		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);	
+		aboxModel.enterCriticalSection(Lock.WRITE);	
+		tboxModel.enterCriticalSection(Lock.READ);
+		
+		try {
+			inferenceRebuildModel.removeAll();
+			StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, (RDFNode) null);
+			
+			log.info("Computing mostSpecificType annotations");
+			while (iter.hasNext()) {				
+				Statement stmt = iter.next();
+				setMostSpecificTypes(stmt.getSubject(), inferenceRebuildModel);
+			}
+		} catch (Exception e) {
+			 log.error("Exception while recomputing ABox inference model", e);
+			 inferenceRebuildModel.removeAll(); // don't do this in the finally, it's needed in the case
+                                                // where there isn't an exception
+			 return;
+		} finally {
+   			 aboxModel.leaveCriticalSection();
+			 tboxModel.leaveCriticalSection();
+			 inferenceRebuildModel.leaveCriticalSection();
+		}			
+		
+			
+		// reflect the recomputed inferences into the application inference
+		// model.
+		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);
+		scratchpadModel.enterCriticalSection(Lock.WRITE);
+        log.info("Updating ABox inference model");
+
+		try {		
+			// Add everything from the recomputed inference model that is not already
+			// in the current inference model to the current inference model.
+			inferenceModel.enterCriticalSection(Lock.READ);
+			
+			try {
+				scratchpadModel.removeAll();
+				StmtIterator iter = inferenceRebuildModel.listStatements();
 				
+				while (iter.hasNext()) {				
+					Statement stmt = iter.next();
+					if (!inferenceModel.contains(stmt)) {
+					   scratchpadModel.add(stmt);
+					}
+				}
+			} catch (Exception e) {		
+				log.error("Exception while reconciling the current and recomputed ABox inference models", e);
+			} finally {
+				inferenceModel.leaveCriticalSection();			
+			}
+			
+			inferenceModel.enterCriticalSection(Lock.WRITE);
+			try {
+				inferenceModel.add(scratchpadModel);
+			} catch (Exception e){
+				log.error("Exception while reconciling the current and recomputed ABox inference models", e);
+			} finally {
+				inferenceModel.leaveCriticalSection();
+			}
+		} finally {
+			inferenceRebuildModel.removeAll();
+			scratchpadModel.removeAll();
+			inferenceRebuildModel.leaveCriticalSection();
+			scratchpadModel.leaveCriticalSection();			
+		}
+		
+		log.info("ABox inference model updated");
+	}
+
 	public static SimpleReasoner getSimpleReasonerFromServletContext(ServletContext ctx) {
 	    Object simpleReasoner = ctx.getAttribute("simpleReasoner");
 	    

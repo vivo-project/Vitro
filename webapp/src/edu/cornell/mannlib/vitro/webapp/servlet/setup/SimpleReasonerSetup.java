@@ -98,8 +98,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	        // the simple reasoner will register itself as a listener to the ABox assertions
 	        SimpleReasoner simpleReasoner = new SimpleReasoner(unionOms.getTBoxModel(), assertionsOms.getABoxModel(), inferencesOms.getABoxModel(), rebuildModel, scratchModel);
 	        
-	        if (isRecomputeRequired(sce.getServletContext())) {
-	            
+	        if (isRecomputeRequired(sce.getServletContext())) {   
 	            log.info("ABox inference recompute required");
 	            
 	            int sleeps = 0;
@@ -112,7 +111,19 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	            }
 	            
 	            simpleReasoner.recompute();
+	        } else if ( isMSTComputeRequired(sce.getServletContext()) ) {
+	            log.info("most specific type computation required");
 	            
+	            int sleeps = 0;
+	            while (sleeps < 1000 && pelletListener.isReasoning()) {
+	                if ((sleeps % 30) == 0) {
+	                    log.info("Waiting for initial TBox reasoning to complete");
+	                }
+	                Thread.sleep(100);   
+	                sleeps++;
+	            }
+	            
+	            simpleReasoner.recomputeMostSpecificType();
 	        }
 
 	        assertionsOms.getTBoxModel().register(new SimpleReasonerTBoxListener(simpleReasoner));
@@ -142,4 +153,14 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	    return (ctx.getAttribute(RECOMPUTE_REQUIRED_ATTR) != null);
 	}
   
+	private static final String MSTCOMPUTE_REQUIRED_ATTR = 
+        SimpleReasonerSetup.class.getName() + ".MSTComputeRequired";
+
+	public static void setMSTComputeRequired(ServletContext ctx) {
+	    ctx.setAttribute(MSTCOMPUTE_REQUIRED_ATTR, true);
+	}
+	
+	private static boolean isMSTComputeRequired(ServletContext ctx) {
+	    return (ctx.getAttribute(MSTCOMPUTE_REQUIRED_ATTR) != null);
+	}
 }
