@@ -26,8 +26,11 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
  * Is somebody already using it (other than ourselves)? Does it match an
  * existing Profile? Neither?
  * 
- * If the userAccountUri or the externalAuthId is empty, or if there is any
- * error, say "neither".
+ * If we are creating a new account, the userAccountUri will be empty, so if
+ * someone is using the externalAuthID, their URI won't match ours, which is
+ * what we want.
+ * 
+ * If the externalAuthId is empty, or if there is any error, say "neither".
  */
 class ExternalAuthChecker extends AjaxResponder {
 	private static final Log log = LogFactory.getLog(ExternalAuthChecker.class);
@@ -97,11 +100,6 @@ class ExternalAuthChecker extends AjaxResponder {
 	}
 
 	private void checkForMatchingProfile() {
-		if (userAccountUri.isEmpty()) {
-			log.debug("userAccountUri is empty");
-			return;
-		}
-
 		List<Individual> inds = SelfEditingConfiguration.getBean(vreq)
 				.getAssociatedIndividuals(indDao, externalAuthId);
 		if (inds.isEmpty()) {
