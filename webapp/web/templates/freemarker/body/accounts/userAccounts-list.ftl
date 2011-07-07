@@ -59,7 +59,7 @@
     </select>
 </section>
 
-<form method="POST" action="${formUrls.list}" class="customForm" role="">
+<form method="POST" action="${formUrls.list}" class="customForm" role="search accounts">
     <section id="search-accounts">
         <input type="text" name="" />
         <input class="submit" type="submit" value="Search accounts"/>
@@ -73,7 +73,7 @@
     </section>
 </form>
 
-<form method="POST" action="${formUrls.list}" id="account-display" class="customForm" role="">
+<form method="POST" action="${formUrls.list}" id="account-display" class="customForm" role="accounts display">
     <@p.accountsNav />
     
     <table id="account">
