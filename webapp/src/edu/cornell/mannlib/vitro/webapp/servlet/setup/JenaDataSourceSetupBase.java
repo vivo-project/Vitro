@@ -372,7 +372,6 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
             return defaultformat;
     }
     
-    protected final static String DB_TYPE = "MySQL";
     private static VitroJenaModelMaker vjmm = null;
     private static VitroJenaSDBModelMaker vsmm = null;
     private static final String sdbModelMaker = "vitroJenaSDBModelMaker";
@@ -380,6 +379,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     
     protected void makeModelMakerFromConnectionProperties(TripleStoreType type, ServletContext ctx){
     	String jdbcUrl = getJdbcUrl(ctx);
+      String dbtypeStr = ConfigurationProperties.getBean(ctx).getProperty("VitroConnection.DataSource.dbtype","MySQL");
     	String username = ConfigurationProperties.getBean(ctx).getProperty(
     	        "VitroConnection.DataSource.username");
     	String password = ConfigurationProperties.getBean(ctx).getProperty(
@@ -387,12 +387,12 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     	
     	if (TripleStoreType.RDB.equals(type)){
     		vjmm = new VitroJenaModelMaker(
-    		        jdbcUrl, username, password, DB_TYPE, ctx);
+    		        jdbcUrl, username, password, dbtypeStr, ctx);
     	}
     	
     	else if(TripleStoreType.SDB.equals(type)){
     		StoreDesc storeDesc = new StoreDesc(
-    		        LayoutType.LayoutTripleNodesHash, DatabaseType.MySQL);
+    		        LayoutType.LayoutTripleNodesHash, DatabaseType.fetch(dbtypeStr));
     	    BasicDataSource bds = JenaDataSourceSetup.makeBasicDataSource(
     	            getDbDriverClassName(ctx), jdbcUrl, username, password, ctx);
     	    try {
