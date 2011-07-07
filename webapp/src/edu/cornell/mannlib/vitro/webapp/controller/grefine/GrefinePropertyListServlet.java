@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.controller;
+package edu.cornell.mannlib.vitro.webapp.controller.grefine;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,6 +27,8 @@ import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;

@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.controller;
+package edu.cornell.mannlib.vitro.webapp.controller.grefine;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,6 +24,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 

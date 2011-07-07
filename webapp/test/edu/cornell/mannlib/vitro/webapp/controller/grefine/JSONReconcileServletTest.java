@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.controller;
+package edu.cornell.mannlib.vitro.webapp.controller.grefine;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -30,12 +30,9 @@ import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
  */
 public class JSONReconcileServletTest extends AbstractTestClass {
 
-
-
-
 	private HttpServletRequestStub request;
 	private HttpServletResponseStub response;
-	private SolrJsonReconcileServlet reconcile;
+	private JSONReconcileServlet reconcile;
 
 	@Before
 	public void setup() throws Exception {
@@ -43,7 +40,7 @@ public class JSONReconcileServletTest extends AbstractTestClass {
 		request.setRequestUrl(new URL("http://vivo.this.that/reconcile"));
 		request.setMethod("POST");
 		response = new HttpServletResponseStub();
-		reconcile = new SolrJsonReconcileServlet();
+		reconcile = new JSONReconcileServlet();
 	}
 	
 	@Test
