@@ -85,14 +85,14 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 				if (classPropertiesMap.size() > 0) {
 					for (Iterator<VClass> iter = classPropertiesMap.keySet().iterator(); iter.hasNext();) { // add results to schema
 						VClass vc = (VClass) iter.next();
-						System.out.println("vc uri: " + vc.getURI());
-						System.out.println("vc name: " + vc.getName());	
+						//System.out.println("vc uri: " + vc.getURI());
+						//System.out.println("vc name: " + vc.getName());	
 
 						ArrayList<DataProperty> vcProps = (ArrayList<DataProperty>)classPropertiesMap.get(vc);
 						for (DataProperty prop: vcProps) {
 							String nameStr = prop.getPublicName()==null ? prop.getName()==null ? null : prop.getName() : prop.getPublicName();
-								System.out.println("--- uri: " + prop.getURI());
-								System.out.println("--- name: " + nameStr);
+								//System.out.println("--- uri: " + prop.getURI());
+								//System.out.println("--- name: " + nameStr);
 					        	// top level
 								JSONObject propertiesItemJson = new JSONObject();
 								JSONObject rootSchemaJson = new JSONObject();
