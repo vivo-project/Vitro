@@ -933,6 +933,7 @@ public class SimpleReasoner extends StatementListener {
 				setMostSpecificTypes(stmt.getSubject(), inferenceRebuildModel);
 			}
 			
+ /*			
 			log.info("Computing property-based ABox inferences");			
 			iter = tboxModel.listStatements((Resource) null, RDFS.subPropertyOf, (RDFNode) null);
 			int numStmts = 0;
@@ -974,6 +975,7 @@ public class SimpleReasoner extends StatementListener {
                     log.info("Still computing property-based ABox inferences...");
                 }
 			}
+	*/
 		} catch (Exception e) {
 			 log.error("Exception while recomputing ABox inference model", e);
 			 inferenceRebuildModel.removeAll(); // don't do this in the finally, it's needed in the case
@@ -985,6 +987,7 @@ public class SimpleReasoner extends StatementListener {
 			 inferenceRebuildModel.leaveCriticalSection();
 		}			
 		
+			
 		// reflect the recomputed inferences into the application inference
 		// model.
 		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);

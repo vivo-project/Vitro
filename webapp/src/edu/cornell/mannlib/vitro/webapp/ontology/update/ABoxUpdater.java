@@ -344,75 +344,26 @@ public class ABoxUpdater {
 
 	    Model retractions = ModelFactory.createDefaultModel();
 		
-		// Remove statements where the deleted class is the subject  (e.g. statements with vitro annotation properties as the predicate)
-		aboxModel.enterCriticalSection(Lock.WRITE);
-	    try {
-	       int count = 0;
-		   StmtIterator iter = aboxModel.listStatements(deletedClass, (Property) null, (RDFNode) null);
-		   
-		   while (iter.hasNext()) {
-			   Statement oldStatement = iter.next();
-			   count++;
-			   retractions.add(oldStatement);
-			   //logChange(oldStatement, false);
-		   }
-		   
-		   if (count > 0) {
-			   logger.log("Removed " + count + " subject reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class");
-		   }
-		} finally {
-			aboxModel.leaveCriticalSection();
-		}
-
 		// Remove instances of the deleted class
 		aboxModel.enterCriticalSection(Lock.WRITE);
 	    try {
-	    	int count = 0;
-	    	StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, deletedClass);
+	       int count = 0;
+	       StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, deletedClass);
 
-    		while (iter.hasNext()) {
+    	   while (iter.hasNext()) {
 			   count++;
 			   Statement typeStmt = iter.next();
 			   retractions.add(typeStmt);
-
-			   StmtIterator iter2 = aboxModel.listStatements(typeStmt.getSubject(), (Property) null, (RDFNode) null);
-			   while (iter2.hasNext()) {
-				   retractions.add(iter2.next());
-			   }   
-		   }
+		   }   
 		   
 		   //log summary of changes
 		   if (count > 0) {
-			   logger.log("Removed " + count + " instance" + ((count > 1) ? "s" : "") + " of the "  + deletedClass.getURI() + " class");
+			   logger.log("Removed " + count + " " + deletedClass.getURI() + " type assertion" + ((count > 1) ? "s" : ""));
 		   }
 		   
 		   aboxModel.remove(retractions);
 		   record.recordRetractions(retractions);		
 		   
-		} finally {
-			aboxModel.leaveCriticalSection();
-		}
-
-	    // Remove other object references to the deleted class - what would these be? nothing, I think.
-		aboxModel.enterCriticalSection(Lock.WRITE);
-	    try {
-	       int count = 0;
-	       StmtIterator iter = aboxModel.listStatements((Resource) null, (Property) null, deletedClass);
-   
-		   while (iter.hasNext()) {
-			   count++;
-			   Statement oldStatement = iter.next();
-			   retractions.add(oldStatement);
-			   //logChange(oldStatement, false);
-		   }
-		   
-		   //log summary of changes
-		   if (count > 0) {
-			   logger.log("Removed " + count + " object reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class");
-		   }
-
-		   aboxModel.remove(retractions);
-		   record.recordRetractions(retractions);		   
 		} finally {
 			aboxModel.leaveCriticalSection();
 		}

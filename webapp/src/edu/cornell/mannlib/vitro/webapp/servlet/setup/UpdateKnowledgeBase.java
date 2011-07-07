@@ -245,7 +245,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	
 	private static String timestampedFileName(String prefix, String suffix) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-sss");
-		return prefix + "." + sdf.format(new Date()) + suffix;
+		return prefix + "." + sdf.format(new Date()) + "." + suffix;
 	}
 	
 	private class ModelDirectoryNotFoundException extends RuntimeException {
