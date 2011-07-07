@@ -26,7 +26,6 @@ public class Field {
         STRINGS_VIA_DATATYPE_PROPERTY, 
         INDIVIDUALS_VIA_OBJECT_PROPERTY, 
         INDIVIDUALS_VIA_VCLASS, 
-        MONIKERS_VIA_VCLASS, 
         CHILD_VCLASSES, 
         CHILD_VCLASSES_WITH_PARENT,
         VCLASSGROUP,
@@ -287,8 +286,6 @@ public class Field {
             return Field.OptionsType.INDIVIDUALS_VIA_OBJECT_PROPERTY;
         } else if ("INDIVIDUALS_VIA_VCLASS".equalsIgnoreCase(s)) {
             return Field.OptionsType.INDIVIDUALS_VIA_VCLASS;
-        } else if ("MONIKERS_VIA_VCLASS".equalsIgnoreCase(s)) {
-            return Field.OptionsType.MONIKERS_VIA_VCLASS;
         } else if ("DATETIME".equalsIgnoreCase(s)) {
             return Field.OptionsType.DATETIME;
         } else if ("CHILD_VCLASSES".equalsIgnoreCase(s)) {            

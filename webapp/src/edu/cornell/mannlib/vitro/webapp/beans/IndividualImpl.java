@@ -307,7 +307,6 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     public static final String [] INCLUDED_IN_JSON = {
          "URI",
          "name",
-         "moniker",
          "vClassId"
     };
 
