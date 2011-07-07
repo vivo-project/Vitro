@@ -14,6 +14,9 @@
 .searchhits li {    
     margin-top: 1em; 
 }
+.searchhits li a{    
+    margin-right: .4em; 
+}
 span.SearchTerm,
 h1 span.SearchTerm,
 a:link span.SearchTerm,
@@ -50,13 +53,15 @@ a:visited span.SearchTerm {
 div.searchTips li {
     line-height: 2em;
 }
-
 /* Search results */
 .display-title {
     font-size: .825em;
     color: #5e6363;
     border-left: 1px solid #A6B1B0;
-    padding-left: .35em;
-    padding-right: .35em;
+    padding-left: .7em;
+    padding-right: .3em;
+    margin-right: 0;
 }
-
+.display-title:first-child {
+    margin-left: .5em;
+}
