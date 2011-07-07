@@ -90,10 +90,10 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             
             /* setup solr indexer */
             SolrIndexer solrIndexer = new SolrIndexer(server, indToSolrDoc);            
-            if( solrIndexer.isIndexEmpty() ){
+           /* if( solrIndexer.isIndexEmpty() ){
                 log.info("solr index is empty, requesting rebuild");
                 sce.getServletContext().setAttribute(IndexConstants.INDEX_REBUILD_REQUESTED_AT_STARTUP, Boolean.TRUE);         
-            }            
+            } */           
             
             // This is where the builder gets the list of places to try to
             // get objects to index. It is filtered so that non-public text
@@ -111,7 +111,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             SearchReindexingListener srl = new SearchReindexingListener(builder);
             ModelContext.registerListenerForChanges(ctx, srl);
                                     
-            if( sce.getServletContext().getAttribute(IndexConstants.INDEX_REBUILD_REQUESTED_AT_STARTUP) instanceof Boolean &&
+           /* if( sce.getServletContext().getAttribute(IndexConstants.INDEX_REBUILD_REQUESTED_AT_STARTUP) instanceof Boolean &&
                 (Boolean)sce.getServletContext().getAttribute(IndexConstants.INDEX_REBUILD_REQUESTED_AT_STARTUP) ){
                 log.info("Rebuild of solr index required before startup.");
                 builder.doIndexRebuild();                                               
@@ -122,7 +122,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
                         log.info("Still rebuilding solr index");
                     Thread.sleep(500);
                 }               
-            }
+            }*/
             
             log.info("Setup of Solr index completed.");   
         } catch (Throwable e) {
