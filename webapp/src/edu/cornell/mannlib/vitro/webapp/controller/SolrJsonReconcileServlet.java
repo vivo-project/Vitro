@@ -37,6 +37,7 @@ import org.apache.solr.common.SolrDocumentList;
 /**
  * This servlet is for servicing JSON requests from Google Refine's
  * Reconciliation Service.
+ * TODO: Should create a separate package for Google Refine related servlets
  * 
  * @author Eliza Chan (elc2013@med.cornell.edu)
  * 
@@ -161,6 +162,9 @@ public class SolrJsonReconcileServlet extends VitroHttpServlet {
 		} else {
 			qJson = runSearch(searchNoTypeMap);
 		}
+		// TODO: the domain of the id value should be the same as that of the reconcile service
+		// and not the namespace. e.g. if the reconcile servlet domain is http://mac123456:8080/vivo, id
+		// should be http://mac123456:8080/vivo/individual/jsmith
 		return qJson;
 	}
 
