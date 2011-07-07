@@ -150,3 +150,33 @@ padding-right: 5px;
 #reset-password p.note {
      margin-top: 0;
 }
+/* ASSOCIATE PROFILE ------>  */
+.explanatoryText {
+    color:#999;
+    font-size:.8em;
+    font-style:bold;
+    width:280px;
+    margin-left:10px;
+    line-height:15px; 
+}
+#associated {
+    float:right;
+    margin-top:-98px;
+    margin-right:80px;
+    display:none; 
+}
+#associated label {
+    margin-bottom:5px;
+}
+#associationOptions {
+    float:right;
+    margin-top:-98px;
+    margin-right:80px;
+    display:none; 
+}
+#verifyProfileLink {
+    margin-left:10px;
+}
+#externalAuthIdInUse {
+    color: #f70;
+}
