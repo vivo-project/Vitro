@@ -19,7 +19,7 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
 
     private static final Log log = LogFactory.getLog(UncollatedObjectPropertyTemplateModel.class);  
     
-    private List<ObjectPropertyStatementTemplateModel> statements;
+    private final List<ObjectPropertyStatementTemplateModel> statements;
     
     UncollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, 
             VitroRequest vreq, EditingPolicyHelper policyHelper, 

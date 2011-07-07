@@ -26,10 +26,10 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
     private static final Log log = LogFactory.getLog(DataPropertyStatementTemplateModel.class); 
     private static final String EDIT_PATH = "edit/editDatapropStmtRequestDispatch.jsp";  
     
-    protected String value = null;
+    protected String value;
     
     // Used for editing
-    protected String dataPropHash = null;
+    protected String dataPropHash;
    
     //Extended to include vitro request to check for special parameters
     DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, 

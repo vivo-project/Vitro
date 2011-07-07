@@ -31,7 +31,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     private static final String TYPE = "data";
     private static final String EDIT_PATH = "edit/editDatapropStmtRequestDispatch.jsp";  
     
-    private List<DataPropertyStatementTemplateModel> statements;
+    private final List<DataPropertyStatementTemplateModel> statements;
     
     DataPropertyTemplateModel(DataProperty dp, Individual subject, VitroRequest vreq, 
             EditingPolicyHelper policyHelper, List<DataProperty> populatedDataPropertyList) {

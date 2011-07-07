@@ -44,19 +44,17 @@ public class GroupedPropertyList extends BaseTemplateModel {
     
     @SuppressWarnings("serial")
     protected static final List<String> VITRO_PROPS_TO_ADD_TO_LIST = new ArrayList<String>() {{
-        add(VitroVocabulary.PRIMARY_LINK);
-        add(VitroVocabulary.ADDITIONAL_LINK);
         add(VitroVocabulary.IND_MAIN_IMAGE);
     }}; 
     
-    private Individual subject;
-    private VitroRequest vreq;
-    private WebappDaoFactory wdf;
+    private final Individual subject;
+    private final VitroRequest vreq;
+    private final WebappDaoFactory wdf;
 
     private List<PropertyGroupTemplateModel> groups;
     
     GroupedPropertyList(Individual subject, VitroRequest vreq, EditingPolicyHelper policyHelper) {
-        super(vreq);
+        this.vreq = vreq;
         this.subject = subject;
         this.wdf = vreq.getWebappDaoFactory();
         

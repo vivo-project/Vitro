@@ -18,13 +18,8 @@ public class Menu extends BaseTemplateModel {
 
     protected List<MenuItem> items;
     
-    public Menu(VitroRequest vreq) {
-        super(vreq);
-        items = new ArrayList<MenuItem>();       
-    }
-    
-    public Menu() {
-        items = new ArrayList<MenuItem>();       
+    public Menu() {  
+        items = new ArrayList<MenuItem>();
     }
     
     public void addItem(String text, String path) {

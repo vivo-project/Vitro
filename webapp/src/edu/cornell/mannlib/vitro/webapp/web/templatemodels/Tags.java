@@ -6,7 +6,7 @@ import java.util.LinkedHashSet;
 
 public class Tags extends BaseTemplateModel {
     
-    protected LinkedHashSet<String> tags = null;
+    protected final LinkedHashSet<String> tags;
 
     public Tags() {
         this.tags = new LinkedHashSet<String>();

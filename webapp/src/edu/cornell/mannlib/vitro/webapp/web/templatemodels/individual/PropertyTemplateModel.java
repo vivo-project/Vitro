@@ -26,15 +26,17 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
 
     private static final Log log = LogFactory.getLog(PropertyTemplateModel.class); 
     
+    protected final VitroRequest vreq;
+    protected final String subjectUri;
+    protected final String propertyUri;
+    private final String localName;
+
+    protected Map<String, Object> verboseDisplay;
+    protected boolean addAccess; // defaults to false
     private String name;
-    private String localName;
-    protected String propertyUri;
-    protected Map<String, Object> verboseDisplay = null;
-    protected String subjectUri = null;
-    protected boolean addAccess = false;
-    
+
     PropertyTemplateModel(Property property, Individual subject, EditingPolicyHelper policyHelper, VitroRequest vreq) {
-        super(vreq);
+        this.vreq = vreq;
         subjectUri = subject.getURI(); 
         propertyUri = property.getURI();
         localName = property.getLocalName();        

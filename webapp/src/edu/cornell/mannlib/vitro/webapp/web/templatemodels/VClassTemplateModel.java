@@ -15,7 +15,7 @@ public class VClassTemplateModel extends BaseTemplateModel {
     private static final Log log = LogFactory.getLog(VClassTemplateModel.class);
     private static final String PATH = Route.INDIVIDUAL_LIST.path();
     
-    private VClass vclass;
+    private final VClass vclass;
     
     public VClassTemplateModel(VClass vclass) {
         this.vclass = vclass;

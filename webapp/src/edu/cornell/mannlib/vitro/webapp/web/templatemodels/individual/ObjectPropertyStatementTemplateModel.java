@@ -25,11 +25,11 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     
     private static final String EDIT_PATH = "edit/editRequestDispatch.jsp";
 
-    private Map<String, String> data;
+    private final Map<String, String> data;
     
     // Used for editing
-    private String objectUri;
-    private String templateName;
+    private final String objectUri;
+    private final String templateName;
 
     //Updating to include Vitro Request
     ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, String objectKey, 
@@ -40,18 +40,6 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
         this.objectUri = data.get(objectKey);
         this.templateName = templateName;
         setEditAccess(policyHelper);
-    }
-
-    /** 
-     * This method handles the special case where we are creating a DataPropertyStatementTemplateModel 
-     * outside the GroupedPropertyList. Specifically, it allows vitro:primaryLink and vitro:additionalLink 
-     * to be treated like object property statements and thus have editing links. (In a future version, 
-     * these properties will be replaced by vivo core ontology properties.) It could potentially be used 
-     * for other properties outside the property list as well.
-     */
-    ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, 
-            VitroRequest vreq, EditingPolicyHelper policyHelper) {
-        super(subjectUri, propertyUri, policyHelper, vreq); 
     }
 
     private void setEditAccess(EditingPolicyHelper policyHelper) {

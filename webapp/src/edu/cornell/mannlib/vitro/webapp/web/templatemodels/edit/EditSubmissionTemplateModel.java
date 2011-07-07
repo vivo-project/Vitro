@@ -9,7 +9,12 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditSubmission;
 
 public class EditSubmissionTemplateModel {
-    private EditSubmission editSub;
+    
+    private final EditSubmission editSub;
+
+    public EditSubmissionTemplateModel(EditSubmission editSub){
+        this.editSub = editSub;
+    }
     
     public Map<String, Literal> getLiteralsFromForm() {
         return editSub.getLiteralsFromForm();
@@ -23,11 +28,4 @@ public class EditSubmissionTemplateModel {
         return editSub.getUrisFromForm();
     }
 
-    public EditSubmissionTemplateModel(EditSubmission editSub){
-        this.editSub = editSub;
-    }
-
-
-    
-    
 }

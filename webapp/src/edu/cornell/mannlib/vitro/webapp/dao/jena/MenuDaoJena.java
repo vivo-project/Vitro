@@ -76,6 +76,7 @@ public class MenuDaoJena extends JenaBaseDao implements MenuDao {
         //run SPARQL query to get menu and menu items        
         QueryExecution qexec = QueryExecutionFactory.create(menuQuery, displayModel, initialBindings );
         try{
+            // ryounes Seems suspicious that a dao is creating a template model object. What's this all about?
             MainMenu menu = new MainMenu();
             
             /* bdc34: currently there is no good way to decide which url to show

@@ -9,7 +9,12 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmission;
 
 public class MultiValueEditSubmissionTemplateModel {
-    private MultiValueEditSubmission editSub;
+    
+    private final MultiValueEditSubmission editSub;
+
+    public MultiValueEditSubmissionTemplateModel(MultiValueEditSubmission editSub){
+        this.editSub = editSub;
+    }
     
     public Map<String, List<Literal>> getLiteralsFromForm() {
         return editSub.getLiteralsFromForm();
@@ -24,11 +29,4 @@ public class MultiValueEditSubmissionTemplateModel {
         return editSub.getUrisFromForm();
     }
 
-    public MultiValueEditSubmissionTemplateModel(MultiValueEditSubmission editSub){
-        this.editSub = editSub;
-    }
-
-
-    
-    
 }

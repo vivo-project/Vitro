@@ -16,16 +16,6 @@ public abstract class BaseTemplateModel {
     private static final Log log = LogFactory.getLog(BaseTemplateModel.class);
     
     protected static ServletContext servletContext;
-    protected final VitroRequest vreq;
-    
-    protected BaseTemplateModel(VitroRequest vreq) {
-        this.vreq = vreq;
-    }
-    
-    // Provide no-arg constructor for types that don't need vreq.
-    protected BaseTemplateModel() { 
-        this.vreq = null;
-    };
     
     // Convenience method so subclasses can call getUrl(path)
     protected String getUrl(String path) {

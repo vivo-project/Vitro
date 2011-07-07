@@ -19,8 +19,8 @@ public abstract class BaseObjectPropertyDataPostProcessor implements
 
     private static final Log log = LogFactory.getLog(BaseObjectPropertyDataPostProcessor.class); 
     
-    protected ObjectPropertyTemplateModel objectPropertyTemplateModel;
-    protected WebappDaoFactory wdf;
+    protected final ObjectPropertyTemplateModel objectPropertyTemplateModel;
+    protected final WebappDaoFactory wdf;
     
     public BaseObjectPropertyDataPostProcessor(ObjectPropertyTemplateModel optm, WebappDaoFactory wdf) {
         this.objectPropertyTemplateModel = optm;

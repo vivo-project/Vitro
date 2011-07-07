@@ -7,10 +7,11 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 public class EditConfigurationTemplateModel extends BaseTemplateModel {
-    EditConfigurationVTwo editConfig;
-    VitroRequest vreq;
     
-    public EditConfigurationTemplateModel( EditConfigurationVTwo editConfig, VitroRequest vreq){
+    final EditConfigurationVTwo editConfig;
+    final VitroRequest vreq;
+    
+    public EditConfigurationTemplateModel(EditConfigurationVTwo editConfig, VitroRequest vreq){
         this.editConfig = editConfig;
         this.vreq = vreq;
     }

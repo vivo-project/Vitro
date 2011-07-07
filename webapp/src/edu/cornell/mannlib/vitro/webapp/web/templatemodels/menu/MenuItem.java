@@ -11,8 +11,8 @@ public class MenuItem extends BaseTemplateModel {
 
     private static final Log log = LogFactory.getLog(MenuItem.class.getName());
     
-    private String text;
-    private String path;
+    private final String text;
+    private final String path;
     private boolean active;
     
     public MenuItem(String linkText, String path) {

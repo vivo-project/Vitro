@@ -91,10 +91,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     private String objectKey;    
     
     // Used for editing
-    private boolean addAccess = false;
-    
-    //To allow for checking of special parameters
-    private VitroRequest vitroRequest = null;
+    private boolean addAccess; // defaults to false
     
     ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, 
             EditingPolicyHelper policyHelper)
@@ -588,7 +585,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                     "predicateUri", propertyUri);  
             
             //Check if special parameters being sent
-            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vitroRequest);
+            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vreq);
             if(specialParams.size() > 0) {
             	params.putAll(specialParams);
             }

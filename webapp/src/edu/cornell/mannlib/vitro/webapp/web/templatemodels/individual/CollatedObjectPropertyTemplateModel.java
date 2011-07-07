@@ -38,7 +38,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
     private static final Pattern ORDER_BY_SUBCLASS_PATTERN = 
         Pattern.compile("ORDER\\s+BY\\s+(DESC\\s*\\(\\s*)?\\?" + SUBCLASS_VARIABLE_NAME, Pattern.CASE_INSENSITIVE);
     
-    private SortedMap<String, List<ObjectPropertyStatementTemplateModel>> subclasses;
+    private final SortedMap<String, List<ObjectPropertyStatementTemplateModel>> subclasses;
     
     CollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, 
             VitroRequest vreq, EditingPolicyHelper policyHelper,
@@ -46,9 +46,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         throws InvalidConfigurationException {
         
         super(op, subject, vreq, policyHelper); 
-        
-        subclasses = new TreeMap<String, List<ObjectPropertyStatementTemplateModel>>();
-        
+
         if (populatedObjectPropertyList.contains(op)) {
             log.debug("Getting data for populated object property " + op.getURI());
             
@@ -66,6 +64,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
             }
         } else {
             log.debug("Object property " + getUri() + " is unpopulated.");
+            subclasses = new TreeMap<String, List<ObjectPropertyStatementTemplateModel>>();
         }
     }
     

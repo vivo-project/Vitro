@@ -16,8 +16,8 @@ public class VClassGroupTemplateModel extends BaseTemplateModel {
 
 	private static final Log log = LogFactory.getLog(VClassGroupTemplateModel.class.getName());
 	
-    private VClassGroup vClassGroup = null;
-    private List<VClassTemplateModel> classes = null;
+    private final VClassGroup vClassGroup;
+    private List<VClassTemplateModel> classes;
     
     public VClassGroupTemplateModel(VClassGroup vClassGroup) {
         this.vClassGroup = vClassGroup;

@@ -22,8 +22,8 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
 
     private static final Log log = LogFactory.getLog(PropertyGroupTemplateModel.class); 
     
-    private String name;
-    private List<PropertyTemplateModel> properties;
+    private final String name;
+    private final List<PropertyTemplateModel> properties;
       
     PropertyGroupTemplateModel(VitroRequest vreq, PropertyGroup group, 
             Individual subject, EditingPolicyHelper policyHelper, 
