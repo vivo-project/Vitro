@@ -16,6 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 /** 
@@ -46,12 +47,15 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     }
     
     protected void setVerboseDisplayValues(Property property) {  
-        // No verbose display for these properties.
+        
+        // No verbose display for vitro and vitro public properties.
         // This models previous behavior. In theory the verbose display can be provided, but we may not want
         // to give anyone access to these properties, since the application is dependent on them.
-        if (GroupedPropertyList.VITRO_PROPS_TO_ADD_TO_LIST.contains(property)) {
+        String namespace = property.getNamespace();        
+        if (VitroVocabulary.vitroURI.equals(namespace) || VitroVocabulary.VITRO_PUBLIC.equals(namespace)) {
             return;
         }
+        
         Boolean verboseDisplayValue = (Boolean) vreq.getSession().getAttribute("verbosePropertyDisplay");
         if ( ! Boolean.TRUE.equals(verboseDisplayValue))  {
             return;
