@@ -51,7 +51,7 @@
 #individual-intro a.icon-rdf {
     font-size: 1.125em;
 }
-ul#links-additional{
+ul#webpages{
     margin-bottom: 5px;
 }
 /* <------ INDIVIDUAL INTRO FOR PERSON*/
@@ -169,8 +169,8 @@ ul.individual-emails li {
     font-size: .875em;
     line-height: 1.3em;
 }
-ul#links-additional li, 
-ul#links-primary li,
+ 
+ul#webpages li,
 ul#primary-email li,
 ul#additional-emails li {
     word-wrap: break-word;

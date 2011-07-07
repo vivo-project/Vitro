@@ -184,40 +184,6 @@ name will be used as the label. -->
     Macros for specific properties
 ------------------------------------------------------------------------------>
 
-<#-- Vitro namespace links
-
-     Currently the page displays the vitro namespace links properties. Future versions 
-     will use the vivo core ontology links property, eliminating the need for special handling.
-     
-     Note that this macro has a side-effect in the calls to propertyGroups.pullProperty().
--->
-<#macro vitroLinks propertyGroups namespaces editable linkListClass="individual-urls">
-    <#local primaryLink = propertyGroups.pullProperty("${namespaces.vitro}primaryLink")!>
-    <#local additionalLinks = propertyGroups.pullProperty("${namespaces.vitro}additionalLink")!>
-
-    <#if (primaryLink?has_content || additionalLinks?has_content)> <#-- true when the property is in the list, even if not populated (when editing) -->
-        <nav role="navigation">
-            <#local primaryLinkLabel = "Primary Web Page">            
-            <#if primaryLink.statements?has_content> <#-- if there are any statements -->
-                <#if editable><@propertyLabel primaryLink primaryLinkLabel /></#if>
-                <ul class="${linkListClass}" id="links-primary" role="list">
-                    <@objectPropertyList primaryLink editable />
-                </ul>
-            <#else>
-                <#-- Show add link only if there isn't a primaryLink already (displayLimitAnnnot not 
-                supported for object properties). -->
-                <@addLinkWithLabel primaryLink editable primaryLinkLabel /> 
-            </#if>
-            <@addLinkWithLabel additionalLinks editable "Additional Web Pages" />
-            <#if additionalLinks.statements?has_content> <#-- if there are any statements -->
-                <ul class="${linkListClass}" id="links-additional" role="list">
-                    <@objectPropertyList additionalLinks editable />
-                </ul>
-            </#if>
-        </nav>
-    </#if>
-</#macro>
-
 <#-- Image 
 
      Values for showPlaceholder: "always", "never", "with_add_link" 

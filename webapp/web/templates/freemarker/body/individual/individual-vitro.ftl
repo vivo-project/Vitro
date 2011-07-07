@@ -48,9 +48,6 @@
             </ul>
         </nav>
                 
-        <#-- Links -->
-        <@p.vitroLinks propertyGroups namespaces editable  />
-
     <#if individualProductExtension??>
         ${individualProductExtension}
     <#else>

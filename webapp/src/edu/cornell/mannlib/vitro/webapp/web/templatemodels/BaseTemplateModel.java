@@ -22,8 +22,7 @@ public abstract class BaseTemplateModel {
         this.vreq = vreq;
     }
     
-    // Some BaseTemplateModel classes don't need vreq, so provide an
-    // argumentless constructor.
+    // Provide no-arg constructor for types that don't need vreq.
     protected BaseTemplateModel() { 
         this.vreq = null;
     };
