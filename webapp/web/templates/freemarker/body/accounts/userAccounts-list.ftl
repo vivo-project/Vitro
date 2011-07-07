@@ -4,8 +4,8 @@
 
 <#import "userAccounts-accountsNav.ftl" as p>
 
-<form method="POST" action="${formUrls.add}" class="customForm" role="">
-    <h3>User accounts | <input type="submit" class="submit add-account" value="Add new account" /></h3>
+<form method="POST" action="${formUrls.add}" id="add-account" class="customForm" role="Add account">
+    <h3><span>User accounts | </span><input type="submit" class="submit add-account" value="Add new account" /></h3>
 </form>
 
 <#if newUserAccount?? >
@@ -83,7 +83,7 @@
             <tr>
                 <th scope="col">
                     <input class="delete-all hidden" type="checkbox" name="delete-all">
-                    Email Address
+                    <span>Email Address</span>
                     <nav class="account-alpha-browse">
                         <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=ASC" title="ascending order"></a> 
                         <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=DESC" title="descending order"></a>

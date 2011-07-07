@@ -32,6 +32,20 @@ table#account th {
     border-bottom: none;
     padding-left: 6px;
 }
+/* Fix for IE8 and 9
+table#account thead tr:first-child th:first-child {
+    position: relative;
+}
+table#account input.delete-all {
+    position: absolute;
+    left: 5px;
+    top: 10px;
+}
+table#account thead span {
+    position: absolute;
+    left: 30px;
+}
+*/
 table#account td {
     vertical-align: top;
     padding: .5em;
