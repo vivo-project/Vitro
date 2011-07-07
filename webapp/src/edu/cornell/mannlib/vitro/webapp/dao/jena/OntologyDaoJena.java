@@ -38,10 +38,30 @@ public class OntologyDaoJena extends JenaBaseDao implements OntologyDao {
     	}
     }
     
-    private com.hp.hpl.jena.ontology.Ontology getOntology(String ontologyURI, OntModel ontModel) {
+    private com.hp.hpl.jena.ontology.Ontology getOntology(String ontologyURI, 
+                                                          OntModel ontModel) {
+    	
+    	// Something non-ideal happens here.  There are places in the code that
+    	// call getOntology() but don't pass the URI of the ontology resource 
+    	// itself.  Instead, they pass the namespace that would appear
+    	// in a PREFIX declaration.  For example, we might have an ontology with
+    	// the namespace http://example.org/ontology# .
+    	// A class in this namespace might have the URI 
+    	// http://example.org/ontology#SomeClass .  The ontology resource 
+    	// itself, however, may have the URI http://example.org/ontology 
+    	// (no final hash mark).  To support assumptions in the code,
+    	// this method calls adjustOntologyURI to remove a trailing hash
+    	// mark if an ontology resource is not found at the specified URI.
     	try {
     		ontModel.enterCriticalSection(Lock.READ);
-    		return ontModel.getOntology(adjustOntologyURI(ontologyURI));
+    		com.hp.hpl.jena.ontology.Ontology o = ontModel.getOntology(
+    				ontologyURI);
+    		if (o != null) {
+    			return o;
+    		} else {
+    			return ontModel.getOntology(
+        				adjustOntologyURI(ontologyURI));
+    		}
     	} finally {
     		ontModel.leaveCriticalSection();
     	}
