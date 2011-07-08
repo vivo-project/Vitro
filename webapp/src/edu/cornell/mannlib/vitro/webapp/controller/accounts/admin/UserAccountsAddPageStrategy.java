@@ -92,6 +92,7 @@ public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 			Map<String, Object> body = new HashMap<String, Object>();
 			body.put("userAccount", page.getAddedAccount());
 			body.put("passwordLink", buildCreatePasswordLink());
+			body.put("siteName", getSiteName());
 
 			FreemarkerEmailMessage email = FreemarkerEmailFactory
 					.createNewMessage(vreq);

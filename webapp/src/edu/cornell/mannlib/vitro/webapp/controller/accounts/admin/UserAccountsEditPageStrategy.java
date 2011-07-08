@@ -116,11 +116,6 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 			sentEmail = true;
 		}
 		
-		private String getSiteName() {
-	        ApplicationBean appBean = vreq.getAppBean();
-	        return appBean.getApplicationName();		    
-		}
-
 		private String buildResetPasswordLink() {
 			try {
 				String email = page.getUpdatedAccount().getEmailAddress();

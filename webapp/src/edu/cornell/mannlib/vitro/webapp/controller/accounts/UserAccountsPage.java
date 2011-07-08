@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -184,6 +185,11 @@ public abstract class UserAccountsPage {
 	protected boolean checkPasswordLength(String pw) {
 		return pw.length() >= UserAccount.MIN_PASSWORD_LENGTH
 				&& pw.length() <= UserAccount.MAX_PASSWORD_LENGTH;
+	}
+
+	protected String getSiteName() {
+        ApplicationBean appBean = vreq.getAppBean();
+        return appBean.getApplicationName();		    
 	}
 
 }
