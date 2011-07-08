@@ -23,7 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.SolrJsonServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
-import edu.cornell.mannlib.vitro.webapp.utils.JSONtoFmModel;
+import edu.cornell.mannlib.vitro.webapp.utils.JsonToFmModelTemporaryName;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividual;
@@ -84,11 +84,11 @@ public class BrowseWidget extends Widget {
         map.put("class", new VClassTemplateModel(vclass));
         
         JSONObject vclassRes = SolrJsonServlet.getSolrIndividualsByVClass(vclass.getURI(), request, context);        
-        map.put("totalCount", JSONtoFmModel.convertJSONObjectToMap( (String) vclassRes.get("totalCount") ));
-        map.put("alpha", JSONtoFmModel.convertJSONObjectToMap( (String) vclassRes.get("alpha") ));
-        map.put("individuals", JSONtoFmModel.convertJSONArrayToList( (JSONArray) vclassRes.get("individuals") ));
-        map.put("pages", JSONtoFmModel.convertJSONArrayToList( (JSONArray) vclassRes.get("pages") ));
-        map.put("letters", JSONtoFmModel.convertJSONArrayToList( (JSONArray) vclassRes.get("letters") ));
+        map.put("totalCount", JsonToFmModelTemporaryName.convertJSONObjectToMap( (String) vclassRes.get("totalCount") ));
+        map.put("alpha", JsonToFmModelTemporaryName.convertJSONObjectToMap( (String) vclassRes.get("alpha") ));
+        map.put("individuals", JsonToFmModelTemporaryName.convertJSONArrayToList( (JSONArray) vclassRes.get("individuals") ));
+        map.put("pages", JsonToFmModelTemporaryName.convertJSONArrayToList( (JSONArray) vclassRes.get("pages") ));
+        map.put("letters", JsonToFmModelTemporaryName.convertJSONArrayToList( (JSONArray) vclassRes.get("letters") ));
         
         return map;
     }

@@ -39,7 +39,7 @@ import org.json.JSONTokener;
  * 
  * @author janv
  */
-public final class JSONtoFmModel
+public final class JsonToFmModelTemporaryName
 {
     public static String ROOT_ARRAY = "root";
     
@@ -157,7 +157,7 @@ public final class JSONtoFmModel
     // for debugging only
     public static String toString(Map<String, Object> map)
     {
-        return JSONtoFmModel.toStringBuffer(map, 0).toString();
+        return JsonToFmModelTemporaryName.toStringBuffer(map, 0).toString();
     }
     
     @SuppressWarnings("unchecked")
@@ -179,7 +179,7 @@ public final class JSONtoFmModel
             if (entry.getValue() instanceof Map)
             {
                 sb.append(tabs).append(entry.getKey()).append(":").append(entry.getValue().getClass()).append("\n");
-                sb.append(JSONtoFmModel.toStringBuffer((Map<String, Object>)entry.getValue(), indent+1));
+                sb.append(JsonToFmModelTemporaryName.toStringBuffer((Map<String, Object>)entry.getValue(), indent+1));
             }
             else if (entry.getValue() instanceof List)
             {
