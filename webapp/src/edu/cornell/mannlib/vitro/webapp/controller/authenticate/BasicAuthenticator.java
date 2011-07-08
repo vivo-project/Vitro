@@ -18,6 +18,7 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
@@ -139,6 +140,7 @@ public class BasicAuthenticator extends Authenticator {
 	private void recordLoginOnUserRecord(UserAccount userAccount) {
 		userAccount.setLoginCount(userAccount.getLoginCount() + 1);
 		userAccount.setLastLoginTime(new Date().getTime());
+		userAccount.setStatus(Status.ACTIVE);
 		getUserAccountsDao().updateUserAccount(userAccount);
 	}
 
