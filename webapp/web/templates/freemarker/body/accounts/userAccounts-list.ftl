@@ -81,14 +81,15 @@
 
         <thead>
             <tr>
-                <th scope="col">
-                    <input class="delete-all hidden" type="checkbox" name="delete-all">
-                    <span>Email Address</span>
-                    <nav class="account-alpha-browse">
-                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=ASC" title="ascending order"></a> 
-                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=DESC" title="descending order"></a>
-                    </nav>
+               <th scope="col"> <input  class="delete-all hidden" type="checkbox" name="delete-all">
+                   <span>Email Address</span>
+
+                   <nav class="account-alpha-browse">
+                       <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=ASC" title="ascending order"></a> 
+                       <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=DESC" title="descending order"></a>
+                   </nav>
                 </th>
+                
                 <th scope="col">
                     First name
                     <nav class="account-alpha-browse">
@@ -115,13 +116,13 @@
                 
                 <th scope="col">Roles</th>
                 
-                <th scope="col">
+                <#--<th scope="col">
                     Login count
                     <nav class="account-alpha-browse">
                         <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=count&orderDirection=ASC" title="ascending order"></a> 
                         <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=count&orderDirection=DESC" title="descending order"></a>
                     </nav>
-                </th>
+                </th>-->
 
                 <th scope="col">
                     Last Login Time
@@ -151,7 +152,7 @@
                             <div>${permissionSet}</div>
                         </#list>
                     </td>
-                    <td>${account.loginCount}</td>
+                    <#--<td>${account.loginCount}</td>-->
                     <td>
                         <#if account.lastLoginTime??>
                             ${account.lastLoginTime?datetime?string.full}

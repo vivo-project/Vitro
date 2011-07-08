@@ -27,36 +27,28 @@ table#account th {
     background-color: #F7F9F9;
     height: 40px;
     color: #064D68;
-    padding-top: 7px;
+    padding-top: 5px;
     border: 1px solid #d9e4ea;
     border-bottom: none;
     padding-left: 6px;
-}
-/* Fix for IE8 and 9
-table#account thead tr:first-child th:first-child {
-    position: relative;
-}
-table#account input.delete-all {
-    position: absolute;
-    left: 5px;
-    top: 10px;
-}
-table#account thead span {
-    position: absolute;
-    left: 30px;
-}
-*/
-table#account td {
-    vertical-align: top;
-    padding: .5em;
-    border: 1px solid #d9e4ea; 
     font-size: .9em;
-}  
+}
+table#account th {
+    text-align: left;
+} /*Fix for IE8 and 9, force text in a cell to be aligned to the left*/
 table#account tr {
     background-color: #fff;
 }
 table#account tr:nth-child(2n+1) {
     background-color: rgba(200, 200, 180,.25);
+}
+table#account td {
+    vertical-align: top;
+    padding: .5em;
+    border: 1px solid #d9e4ea; 
+    font-size: .825em;
+    padding-top: .5em;
+    padding-bottom: .5em;
 }
 #filter-roles {
     float: left;
