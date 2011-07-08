@@ -54,21 +54,6 @@
 ul#webpages{
     margin-bottom: 5px;
 }
-/* <------ INDIVIDUAL INTRO FOR PERSON*/
-#individual-intro.person {
-    margin-bottom: 30px;
-    position: relative;
-    width: 100%;
-}
-#individual-intro.person #individual-info {
-    float: left;
-    width: 78%;
-    margin-bottom: 20px;
-}
-#individual-intro.person .individual-overview {
-    width: 100%;
-    float: none;
-}
 /* <------ INDIVIDUAL INTRO - LEFT SIDE CONTENT */
 #share-contact {
     position: relative;
@@ -103,21 +88,6 @@ h2#mainImage, #share-contact h2 {
     line-height: 1em;
     padding-bottom: 0.3em
 }
-ul#individual-tools-people {
-    margin-top: 5px;
-    height: 20px;
-    padding-bottom: 20px;
-    list-style-type: none;
-    clear: both;
-    margin-bottom: 15px;
-}
-ul#individual-tools-people li {
-    position: relative;
-    display: block;
-    padding-right: 7px;
-    float: left;
-    margin-bottom: 20px;
-}
 ul#individual-tools {
     margin-top: 10px;
     margin-bottom: 10px;
@@ -127,6 +97,23 @@ ul#individual-tools {
 ul#individual-tools li {
     padding-right: 9px;
     float: left;
+}
+img#uriIcon {
+    cursor: pointer;
+}
+.qtip-content h5 {
+    margin: 0;
+    padding: 0;
+}
+input#uriLink {
+    margin: 0;
+    width: 350px;
+    font-size: .8em;
+}
+a.close {
+    float: right;
+    margin-right: .3em;
+    font-size: .8em;
 }
 ul#individual-phone {
     clear: both;
@@ -152,11 +139,6 @@ ul#individual-phone li:first-child {
     font-size: .875em;
     line-height: 1.7em;
 }
-ul.individual-urls-people {
-    clear: both;
-    list-style-type: circle;
-    padding-left: 24px;
-}
 ul.individual-emails {
     clear: both;
     padding-left: 0;
@@ -164,7 +146,6 @@ ul.individual-emails {
 #additional-emails li:last-child {
     margin-bottom: 20px;
 }
-ul.individual-urls-people li,
 ul.individual-emails li {
     font-size: .875em;
     line-height: 1.3em;
