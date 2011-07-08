@@ -328,6 +328,8 @@ public class VClassGroupCache {
             } else if (VitroVocabulary.IN_CLASSGROUP.equals(stmt.getPredicate()
                     .getURI())) {
                 requestCacheUpdate();
+            } else if(VitroVocabulary.DISPLAY_RANK.equals(stmt.getPredicate().getURI())){
+            	requestCacheUpdate();
             }
         }
     }
