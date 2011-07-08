@@ -92,7 +92,7 @@ var associateProfileFields = {
                     url: associateProfileFields.ajaxUrl,
                     dataType: 'json',
                     data: {
-                        function: "autoCompleteProfile",
+                        action: "autoCompleteProfile",
                         term: request.term,
                         externalAuthId: associateProfileFields.externalAuthIdField.val()
                     }, 
@@ -115,7 +115,7 @@ var associateProfileFields = {
             url: associateProfileFields.ajaxUrl,
             dataType: "json",
             data: {
-                function: "checkExternalAuth",
+                action: "checkExternalAuth",
                 userAccountUri: associateProfileFields.userUri,
                 externalAuthId: associateProfileFields.externalAuthIdField.val()
             },

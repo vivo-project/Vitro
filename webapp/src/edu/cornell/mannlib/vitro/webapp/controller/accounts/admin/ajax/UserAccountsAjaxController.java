@@ -26,7 +26,7 @@ public class UserAccountsAjaxController extends VitroAjaxController {
 	private static final Log log = LogFactory
 			.getLog(UserAccountsAjaxController.class);
 
-	private static final String PARAMETER_FUNCTION = "function";
+	private static final String PARAMETER_ACTION = "action";
 
 	@Override
 	protected Actions requiredActions(VitroRequest vreq) {
@@ -37,7 +37,7 @@ public class UserAccountsAjaxController extends VitroAjaxController {
 	protected void doRequest(VitroRequest vreq, HttpServletResponse resp)
 			throws ServletException, IOException {
 		try {
-			String function = vreq.getParameter(PARAMETER_FUNCTION);
+			String function = vreq.getParameter(PARAMETER_ACTION);
 			if ("checkExternalAuth".equals(function)) {
 				new ExternalAuthChecker(this, vreq, resp).processRequest();
 			} else if ("autoCompleteProfile".equals(function)) {
