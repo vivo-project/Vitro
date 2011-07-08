@@ -116,16 +116,16 @@
                 
                 <th scope="col">Roles</th>
                 
-                <#--<th scope="col">
-                    Login count
+                <th scope="col">
+                    Login&nbsp;count
                     <nav class="account-alpha-browse">
                         <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=count&orderDirection=ASC" title="ascending order"></a> 
                         <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=count&orderDirection=DESC" title="descending order"></a>
                     </nav>
-                </th>-->
+                </th>
 
                 <th scope="col">
-                    Last Login Time
+                    Last&nbsp;Login
                     <nav class="account-alpha-browse">
                         <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=lastLogin&orderDirection=ASC" title="ascending order"></a> 
                         <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=lastLogin&orderDirection=DESC" title="descending order"></a>
@@ -152,12 +152,11 @@
                             <div>${permissionSet}</div>
                         </#list>
                     </td>
-                    <#--<td>${account.loginCount}</td>-->
+                    <td>${account.loginCount}</td>
                     <td>
                         <#if account.lastLoginTime??>
-                            ${account.lastLoginTime?datetime?string.full}
-                        <#else>
-                            &nbsp;
+                            ${account.lastLoginTime?date?string.medium}
+                            <br />${account.lastLoginTime?time?string.short}
                         </#if>
                     </td>
                 </tr>

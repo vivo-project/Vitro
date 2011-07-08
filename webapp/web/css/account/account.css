@@ -50,6 +50,9 @@ table#account td {
     padding-top: .5em;
     padding-bottom: .5em;
 }
+table#account td  a{
+    word-wrap: break-word;
+}
 #filter-roles {
     float: left;
     padding-bottom: 20px;
