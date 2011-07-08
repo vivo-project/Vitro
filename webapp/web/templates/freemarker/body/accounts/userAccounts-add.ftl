@@ -74,7 +74,7 @@
         <#if emailIsEnabled??>
             <p class="note">
                 Note: An email will be sent to the address entered above 
-                notifying the user that an account has been created. 
+                notifying that an account has been created. 
                 It will include instructions for activating the account and creating a password.
             </p>
         <#else>
@@ -84,15 +84,16 @@
                         <label for="initial-password">Initial password<span class="requiredHint"> *</span></label>
                         <input type="password" name="initialPassword" value="${initialPassword}" id="initial-password" role="input "/>
                     </td>
+                    <td>&nbsp;</td>
                     <td>
                         <label for="confirm-password">Confirm initial password<span class="requiredHint"> *</span></label> 
                         <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
                     </td>
                 </tr>
             </table>
-            <p>Minimum of ${minimumLength} characters in length.</p>
+            <p class="explanatoryText" style="margin-top:-8px">Minimum of ${minimumLength} characters in length.</p>
         </#if>
-
+        <br />
         <input type="submit" name="submitAdd" value="Add new account" class="submit"/> or <a class="cancel" href="${formUrls.list}">Cancel</a>
 
         <p class="requiredHint">* required fields</p>

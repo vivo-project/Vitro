@@ -89,16 +89,17 @@
                         <label for="new-password">New password<span class="requiredHint"> *</span></label>
                         <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
                     </td>
+                    <td>&nbsp;</td>
                     <td>
-                        <label for="confirm-password">Confirm initial password<span class="requiredHint"> *</span></label> 
+                        <label for="confirm-password">Confirm new password<span class="requiredHint"> *</span></label> 
                         <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
                     </td>
                 </tr>
             </table>
-            <p>Minimum of ${minimumLength} characters in length.</p>
-            <p>Leaving this blank means that the password will not be changed.</p>
+            <p class="explanatoryText" style="margin-top:-8px">Minimum of ${minimumLength} characters in length.</p>
+            <p class="explanatoryText">Leaving this blank means that the password will not be changed.</p>
         </#if>
-
+        <br />
         <input type="submit" name="submitEdit" value="Save changes" class="submit" /> or <a class="cancel" href="${formUrls.list}">Cancel</a>
 
         <p class="requiredHint">* required fields</p>

@@ -51,6 +51,9 @@ var associateProfileFields = {
         // We want to associate a profile
         this.associationOptionsArea = $('#associationOptions');
         this.associateProfileNameField = $('#associateProfileName');
+
+        // Container <div> elements to provide background shading -- tlw72
+        this.associateProfileBackgroundOneArea = $('#associateProfileBackgroundOne');
     },
     
     // Initial page setup. Called only at page load.
@@ -140,6 +143,8 @@ var associateProfileFields = {
         this.externalAuthIdInUseMessage.show();
         this.associatedArea.hide();
         this.associationOptionsArea.hide();
+        this.associateProfileBackgroundOneArea.css("background-color","#fff");
+        this.associateProfileBackgroundOneArea.css("border","none");
     },
  
     showExternalAuthIdMatchesProfile: function(profileUri, profileUrl, profileLabel) {
@@ -148,6 +153,8 @@ var associateProfileFields = {
         this.externalAuthIdInUseMessage.hide();
         this.associatedArea.show();
         this.associationOptionsArea.hide();
+        this.associateProfileBackgroundOneArea.css("background-color","#f1f2ee");
+        this.associateProfileBackgroundOneArea.css("border","1px solid #ccc");
         
         this.associatedProfileNameSpan.html(profileLabel);
         this.associatedProfileUriField.val(profileUri);
@@ -160,8 +167,12 @@ var associateProfileFields = {
         
         if (this.associationEnabled && this.externalAuthIdField.val().length > 0) {
             this.associationOptionsArea.show();
+            this.associateProfileBackgroundOneArea.css("background-color","#f1f2ee");
+            this.associateProfileBackgroundOneArea.css("border","1px solid #ccc");
         } else {
             this.associationOptionsArea.hide();
+            this.associateProfileBackgroundOneArea.css("background-color","#fff");
+            this.associateProfileBackgroundOneArea.css("border","none");
         }
     },
 
