@@ -42,7 +42,6 @@ public class SimpleReasonerSetup implements ServletContextListener {
 		try {	
 		    // set up Pellet reasoning for the TBox	
 			
-			
 			OntModelSelector assertionsOms = ModelContext.getBaseOntModelSelector(sce.getServletContext());
 			OntModelSelector inferencesOms = ModelContext.getInferenceOntModelSelector(sce.getServletContext());
 			OntModelSelector unionOms = ModelContext.getUnionOntModelSelector(sce.getServletContext());
@@ -110,9 +109,9 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	                sleeps++;
 	            }
 	            
-	            simpleReasoner.recompute();
+        		new Thread(new ABoxRecomputer(simpleReasoner,false)).start();
 	        } else if ( isMSTComputeRequired(sce.getServletContext()) ) {
-	            log.info("most specific type computation required");
+	            log.info("mostSpecificType computation required");
 	            
 	            int sleeps = 0;
 	            while (sleeps < 1000 && pelletListener.isReasoning()) {
@@ -123,7 +122,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	                sleeps++;
 	            }
 	            
-	            simpleReasoner.recomputeMostSpecificType();
+	            new Thread(new ABoxRecomputer(simpleReasoner,true)).start();
 	        }
 
 	        assertionsOms.getTBoxModel().register(new SimpleReasonerTBoxListener(simpleReasoner));
@@ -163,4 +162,23 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	private static boolean isMSTComputeRequired(ServletContext ctx) {
 	    return (ctx.getAttribute(MSTCOMPUTE_REQUIRED_ATTR) != null);
 	}
+	
+    private class ABoxRecomputer implements Runnable {
+        
+        private SimpleReasoner simpleReasoner;
+        private boolean justMST;
+        
+        public ABoxRecomputer(SimpleReasoner simpleReasoner, boolean justMST) {
+            this.simpleReasoner = simpleReasoner;
+            this.justMST = justMST;
+        }
+        
+        public void run() {
+        	if (justMST) {
+        		simpleReasoner.recomputeMostSpecificType();      		
+        	} else {
+                simpleReasoner.recompute();
+        	}
+        }
+    }
 }

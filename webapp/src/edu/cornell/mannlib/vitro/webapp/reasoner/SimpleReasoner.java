@@ -100,8 +100,8 @@ public class SimpleReasoner extends StatementListener {
 
 		try {
 			if (stmt.getPredicate().equals(RDF.type)) {
-			    addedABoxTypeAssertion(stmt, inferenceModel);
-			    setMostSpecificTypes(stmt.getSubject(), inferenceModel);
+			    addedABoxTypeAssertion(stmt, inferenceModel, new HashSet<String>());
+			    setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
 			} 
 	       /* uncomment this to enable subproperty/equivalent property inferencing. sjm222 5/13/2011	
 			else {
@@ -110,7 +110,7 @@ public class SimpleReasoner extends StatementListener {
 	       */
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
-			log.error("Exception while adding inferences: ", e);
+			log.error("Exception while adding inferences: " + e.getMessage());
 		}
 	}
 	
@@ -125,7 +125,7 @@ public class SimpleReasoner extends StatementListener {
 		try {
 			if (stmt.getPredicate().equals(RDF.type)) {
 			    removedABoxTypeAssertion(stmt, inferenceModel);
-			    setMostSpecificTypes(stmt.getSubject(), inferenceModel);
+			    setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
 			}
 			/* uncomment this to enable subproperty/equivalent property inferencing. sjm222 5/13/2011
 			else {
@@ -134,7 +134,7 @@ public class SimpleReasoner extends StatementListener {
 			*/
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
-			log.error("Exception while retracting inferences: ", e);
+			log.error("Exception while retracting inferences: " + e.getMessage());
 		}
 	}
 
@@ -207,7 +207,7 @@ public class SimpleReasoner extends StatementListener {
 			
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
-			log.error("Exception while adding inference(s): ", e);
+			log.error("Exception while adding inference(s): " + e.getMessage());
 		}
 	}
 
@@ -275,7 +275,7 @@ public class SimpleReasoner extends StatementListener {
 			*/
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
-			log.error("Exception while removing inference(s): ", e);
+			log.error("Exception while removing inference(s): " + e.getMessage());
 		}
 	}
 
@@ -288,9 +288,8 @@ public class SimpleReasoner extends StatementListener {
 	 * A assert that B is of that type.
 	 * 
 	 */
-	public void addedABoxTypeAssertion(Statement stmt, Model inferenceModel) {
-		
-		//System.out.println("sjm: addedABoxTypeAssertion: " + stmtString(stmt));
+	public void addedABoxTypeAssertion(Statement stmt, Model inferenceModel, HashSet<String> unknownTypes) {
+				
 		tboxModel.enterCriticalSection(Lock.READ);
 		
 		try {
@@ -298,9 +297,9 @@ public class SimpleReasoner extends StatementListener {
 			OntClass cls = null;
 			
 			if ( (stmt.getObject().asResource()).getURI() != null ) {
+				
 			    cls = tboxModel.getOntClass(stmt.getObject().asResource().getURI()); 
-			    
-				if (cls != null) {
+			    if (cls != null) {
 					
 					List<OntClass> parents = (cls.listSuperClasses(false)).toList();		
 					parents.addAll((cls.listEquivalentClasses()).toList());	
@@ -327,8 +326,13 @@ public class SimpleReasoner extends StatementListener {
 						}	
 					}
 				} else {
-					if ( !(stmt.getObject().asResource().getNameSpace()).equals(OWL.NS)) 
-					   log.warn("Didn't find target class (the object of the added rdf:type statement) in the TBox"); 
+					if ( !(stmt.getObject().asResource().getNameSpace()).equals(OWL.NS)) {
+						if (!unknownTypes.contains(stmt.getObject().asResource().getURI())) {
+							unknownTypes.add(stmt.getObject().asResource().getURI());
+					        log.warn("Didn't find the target class (the object of an added rdf:type statement) in the TBox: " +
+						          	 (stmt.getObject().asResource()).getURI() + ". No class subsumption reasoning will be done based on type assertions of this type.");
+						}
+					}
 				}
 			} else {
 				log.warn("The object of this rdf:type assertion has a null URI: " + stmtString(stmt));
@@ -405,9 +409,7 @@ public class SimpleReasoner extends StatementListener {
 	 */
 	
 	public void removedABoxTypeAssertion(Statement stmt, Model inferenceModel) {
-		
-		//System.out.println("sjm: removedABoxTypeAssertion: " + stmtString(stmt));
-		
+				
 		tboxModel.enterCriticalSection(Lock.READ);
 		
 		// convert this method to use generic resources - not get ontclass, not cls.listSuperClasses...
@@ -454,7 +456,8 @@ public class SimpleReasoner extends StatementListener {
 						}	
 					}
 				} else {
-					log.warn("Didn't find target class (the object of the removed rdf:type statement) in the TBox: " + ((Resource)stmt.getObject()).getURI());
+					log.warn("Didn't find target class (the object of the removed rdf:type statement) in the TBox: "
+							+ ((Resource)stmt.getObject()).getURI() + ". No class subsumption reasoning will be performed based on the removal of this assertion.");
 				}
 			} else {
 				log.warn("The object of this rdf:type assertion has a null URI: " + stmtString(stmt));
@@ -598,7 +601,7 @@ public class SimpleReasoner extends StatementListener {
 				
 				if (!inferenceModel.contains(infStmt)) {
 					inferenceModel.add(infStmt);
-					setMostSpecificTypes(infStmt.getSubject(), inferenceModel);
+					setMostSpecificTypes(infStmt.getSubject(), inferenceModel, new HashSet<String>());
 				} 
 			}
 		} finally {
@@ -641,7 +644,7 @@ public class SimpleReasoner extends StatementListener {
 				
 				if (inferenceModel.contains(infStmt)) {
 					inferenceModel.remove(infStmt);
-					setMostSpecificTypes(infStmt.getSubject(), inferenceModel);
+					setMostSpecificTypes(infStmt.getSubject(), inferenceModel, new HashSet<String>());
 				} 
 			}
 		} finally {
@@ -744,13 +747,12 @@ public class SimpleReasoner extends StatementListener {
      * indicate them for the individual with the core:mostSpecificType
      * annotation.
 	 */
-	public void setMostSpecificTypes(Resource individual, Model inferenceModel) {
-	
-		//System.out.println("sjm: setMostSpecificTypes called for individual " + individual.getURI());
+	public void setMostSpecificTypes(Resource individual, Model inferenceModel, HashSet<String> unknownTypes) {
+			
 		inferenceModel.enterCriticalSection(Lock.WRITE);
 		aboxModel.enterCriticalSection(Lock.READ);
 		tboxModel.enterCriticalSection(Lock.READ);
-		
+				
 		try {
 			OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
 			unionModel.addSubModel(aboxModel);
@@ -780,8 +782,11 @@ public class SimpleReasoner extends StatementListener {
 				 
 				if (ontClass == null) {
 					if ( !(stmt.getObject().asResource().getNameSpace()).equals(OWL.NS)) {
-					    log.warn("(setMostSpecificType) Didn't find target class (the object of the added rdf:type statement) in the TBox: " +
-						      	(stmt.getObject().asResource()).getURI() + "\nstatement is: " + stmtString(stmt));
+						if (!unknownTypes.contains(stmt.getObject().asResource().getURI())) {
+						   unknownTypes.add(stmt.getObject().asResource().getURI());
+					       log.warn("Didn't find the target class (the object of an added rdf:type statement) in the TBox: " +
+						          	(stmt.getObject().asResource()).getURI() + ". No mostSpecificType computation will be done based on type assertions of this type.");
+						}
 					}
 					continue;
 				}
@@ -914,20 +919,29 @@ public class SimpleReasoner extends StatementListener {
 	 */
 	public synchronized void recomputeABox() {
 		
+		HashSet<String> unknownTypes = new HashSet<String>();
+		
 		// recompute the inferences 
 		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);	
 		aboxModel.enterCriticalSection(Lock.WRITE);	
 		tboxModel.enterCriticalSection(Lock.READ);
 		
 		try {
+			log.info("Computing class-based ABox inferences");
 			inferenceRebuildModel.removeAll();
 			StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, (RDFNode) null);
 			
-			log.info("Computing class-based ABox inferences");
+			int numStmts = 0;
+			
 			while (iter.hasNext()) {				
 				Statement stmt = iter.next();
-				addedABoxTypeAssertion(stmt, inferenceRebuildModel);
-				setMostSpecificTypes(stmt.getSubject(), inferenceRebuildModel);
+				addedABoxTypeAssertion(stmt, inferenceRebuildModel, unknownTypes);
+				setMostSpecificTypes(stmt.getSubject(), inferenceRebuildModel, unknownTypes);
+				
+				numStmts++;
+                if ((numStmts % 8000) == 0) {
+                    log.info("Still computing class-based ABox inferences...");
+                }
 			}
 			
  /*			
@@ -984,14 +998,16 @@ public class SimpleReasoner extends StatementListener {
 			 inferenceRebuildModel.leaveCriticalSection();
 		}			
 		
-			
+		log.info("Finished computing class-based ABox inferences");
+		
 		// reflect the recomputed inferences into the application inference
 		// model.
 		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);
 		scratchpadModel.enterCriticalSection(Lock.WRITE);
         log.info("Updating ABox inference model");
 		// Remove everything from the current inference model that is not
-		// in the recomputed inference model		
+		// in the recomputed inference model	
+        int num = 0;
 		try {
 			inferenceModel.enterCriticalSection(Lock.READ);
 			
@@ -1002,8 +1018,13 @@ public class SimpleReasoner extends StatementListener {
 				while (iter.hasNext()) {				
 					Statement stmt = iter.next();
 					if (!inferenceRebuildModel.contains(stmt)) {
-					   scratchpadModel.add(stmt);
+					   scratchpadModel.add(stmt);  
 					}
+					
+					num++;
+	                if ((num % 8000) == 0) {
+	                    log.info("Still updating ABox inference model (removing outdated inferences)...");
+	                }
 				}
 			} catch (Exception e) {
 				log.error("Exception while reconciling the current and recomputed ABox inference models", e);
@@ -1033,6 +1054,11 @@ public class SimpleReasoner extends StatementListener {
 					if (!inferenceModel.contains(stmt)) {
 					   scratchpadModel.add(stmt);
 					}
+										
+					num++;
+	                if ((num % 8000) == 0) {
+	                    log.info("Still updating ABox inference model (adding new inferences)...");
+	                }
 				}
 			} catch (Exception e) {		
 				log.error("Exception while reconciling the current and recomputed ABox inference models", e);
@@ -1063,6 +1089,8 @@ public class SimpleReasoner extends StatementListener {
 	 */
 	public synchronized void recomputeMostSpecificType() {
 		
+		HashSet<String> unknownTypes = new HashSet<String>();
+		
 		// recompute the inferences 
 		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);	
 		aboxModel.enterCriticalSection(Lock.WRITE);	
@@ -1073,9 +1101,16 @@ public class SimpleReasoner extends StatementListener {
 			StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, (RDFNode) null);
 			
 			log.info("Computing mostSpecificType annotations");
+			int numStmts = 0;
+			
 			while (iter.hasNext()) {				
 				Statement stmt = iter.next();
-				setMostSpecificTypes(stmt.getSubject(), inferenceRebuildModel);
+				setMostSpecificTypes(stmt.getSubject(), inferenceRebuildModel, unknownTypes);
+				
+				numStmts++;
+                if ((numStmts % 8000) == 0) {
+                    log.info("Still computing mostSpecificType annotations...");
+                }
 			}
 		} catch (Exception e) {
 			 log.error("Exception while recomputing ABox inference model", e);
@@ -1088,12 +1123,13 @@ public class SimpleReasoner extends StatementListener {
 			 inferenceRebuildModel.leaveCriticalSection();
 		}			
 		
+		log.info("Finished computing mostSpecificType annotations");
 			
 		// reflect the recomputed inferences into the application inference
 		// model.
 		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);
 		scratchpadModel.enterCriticalSection(Lock.WRITE);
-        log.info("Updating ABox inference model");
+        log.info("Updating ABox inference model with mostSpecificType annotations");
 
 		try {		
 			// Add everything from the recomputed inference model that is not already
@@ -1103,12 +1139,19 @@ public class SimpleReasoner extends StatementListener {
 			try {
 				scratchpadModel.removeAll();
 				StmtIterator iter = inferenceRebuildModel.listStatements();
+			
+				int numStmts = 0;
 				
 				while (iter.hasNext()) {				
 					Statement stmt = iter.next();
 					if (!inferenceModel.contains(stmt)) {
 					   scratchpadModel.add(stmt);
 					}
+				
+					numStmts++;
+	                if ((numStmts % 8000) == 0) {
+	                    log.info("Still updating ABox inference model with mostSpecificType annotations...");
+	                }
 				}
 			} catch (Exception e) {		
 				log.error("Exception while reconciling the current and recomputed ABox inference models", e);
@@ -1131,7 +1174,7 @@ public class SimpleReasoner extends StatementListener {
 			scratchpadModel.leaveCriticalSection();			
 		}
 		
-		log.info("ABox inference model updated");
+		log.info("ABox inference model updated with mostSpecificType annotations");
 	}
 
 	public static SimpleReasoner getSimpleReasonerFromServletContext(ServletContext ctx) {
