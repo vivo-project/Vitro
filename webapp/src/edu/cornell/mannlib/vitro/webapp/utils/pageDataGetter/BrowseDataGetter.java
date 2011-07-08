@@ -27,7 +27,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.utils.JSONtoFmModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassTemplateModel;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.BaseListedIndividual;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividual;
 
 public class BrowseDataGetter implements PageDataGetter {

@@ -74,7 +74,7 @@
         <#if emailIsEnabled??>
             <p class="note">
                 Note: An email will be sent to the address entered above 
-                notifying that an account has been created. 
+                notifying the user that an account has been created. 
                 It will include instructions for activating the account and creating a password.
             </p>
         <#else>

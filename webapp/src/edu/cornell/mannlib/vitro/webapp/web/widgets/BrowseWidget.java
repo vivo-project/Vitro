@@ -19,14 +19,13 @@ import org.json.JSONObject;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.controller.JSONServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.SolrJsonServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.utils.JSONtoFmModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassTemplateModel;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.BaseListedIndividual;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividual;
 import freemarker.core.Environment;
 import freemarker.template.TemplateModelException;
@@ -84,7 +83,7 @@ public class BrowseWidget extends Widget {
         VClass vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(classUri);
         map.put("class", new VClassTemplateModel(vclass));
         
-        JSONObject vclassRes = JSONServlet.getLuceneIndividualsByVClass(vclass.getURI(), request, context);        
+        JSONObject vclassRes = SolrJsonServlet.getSolrIndividualsByVClass(vclass.getURI(), request, context);        
         map.put("totalCount", JSONtoFmModel.convertJSONObjectToMap( (String) vclassRes.get("totalCount") ));
         map.put("alpha", JSONtoFmModel.convertJSONObjectToMap( (String) vclassRes.get("alpha") ));
         map.put("individuals", JSONtoFmModel.convertJSONArrayToList( (JSONArray) vclassRes.get("individuals") ));

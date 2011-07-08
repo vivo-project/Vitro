@@ -9,8 +9,6 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.vocabulary.XSD;
 
-import edu.cornell.mannlib.vitro.webapp.search.controller.AutocompleteController;
-
 /* This class is used to order authorships on the add author form. It should be removed in favor of using whatever 
  * method is used to order authorships on the publication profile page instead. I've implemented this due to 
  * time constraints.

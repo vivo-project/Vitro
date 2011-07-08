@@ -280,16 +280,10 @@ public class SolrJsonServlet extends VitroHttpServlet {
     } 
 
 
-    public static String getMostSpecificTypeName(Individual individual, WebappDaoFactory wdf) {
+    public static Collection<String> getMostSpecificTypes(Individual individual, WebappDaoFactory wdf) {
         ObjectPropertyStatementDao opsDao = wdf.getObjectPropertyStatementDao();
-        Map<String, String> types = opsDao.getMostSpecificTypesForIndividual(individual.getURI());  
-        Collection<String> typeLabels = types.values();
-        Iterator<String> i = typeLabels.iterator();
-        // Temporarily just returning one vaue since that's what the js expects. Fix later.
-        if (i.hasNext()) {
-            return i.next();
-        }
-        return "";
+        Map<String, String> mostSpecificTypes = opsDao.getMostSpecificTypesForIndividual(individual.getURI());  
+        return mostSpecificTypes.values();
     }
 
     public static String getDataPropertyValue(Individual ind, DataProperty dp, WebappDaoFactory wdf){

@@ -241,7 +241,7 @@ public class DataGetterUtils {
                     jo.put("imageUrl", ind.getImageUrl());
                     jo.put("profileUrl", UrlBuilder.getIndividualProfileUrl(ind, vreq));
                       
-                    jo.put("vclassName", SolrJsonServlet.getMostSpecificTypeName(ind,fullWdf));
+                    jo.put("mostSpecificTypes", SolrJsonServlet.getMostSpecificTypes(ind,fullWdf));
                                           
                     jo.put("preferredTitle", SolrJsonServlet.getDataPropertyValue(ind, preferredTitleDp, fullWdf));
                     jo.put("firstName", SolrJsonServlet.getDataPropertyValue(ind, fNameDp, fullWdf));                     
