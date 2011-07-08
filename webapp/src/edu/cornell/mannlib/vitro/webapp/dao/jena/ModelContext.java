@@ -95,6 +95,7 @@ public class ModelContext {
         ModelContext.getInferenceOntModel(ctx).register(ml);
         ModelContext.getUnionOntModelSelector(ctx).getABoxModel().register(ml);
         ModelContext.getBaseOntModelSelector(ctx).getABoxModel().register(ml);
+        ModelContext.getBaseOntModelSelector(ctx).getApplicationMetadataModel().register(ml);
         ModelContext.getInferenceOntModelSelector(ctx).getABoxModel().register(ml);
 	}
 	
