@@ -39,7 +39,7 @@ table#account th {
 table#account tr {
     background-color: #fff;
 }
-table#account tr:nth-child(2n+1) {
+table#account tr:nth-child(2n) {
     background-color: rgba(200, 200, 180,.25);
 }
 table#account td {
