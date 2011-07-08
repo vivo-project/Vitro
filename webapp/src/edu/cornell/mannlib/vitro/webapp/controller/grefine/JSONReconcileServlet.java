@@ -39,7 +39,6 @@ import org.apache.solr.common.SolrDocumentList;
 /**
  * This servlet is for servicing JSON requests from Google Refine's
  * Reconciliation Service.
- * TODO: Should create a separate package for Google Refine related servlets
  * 
  * @author Eliza Chan (elc2013@med.cornell.edu)
  * 
@@ -76,6 +75,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 				String responseStr = (vreq.getParameter("callback") == null) ? qJson
 						.toString() : vreq.getParameter("callback") + "("
 						+ qJson.toString() + ")";
+				System.out.println("JSONReconcileServlet result: " + responseStr);
 				ServletOutputStream out = resp.getOutputStream();
 				out.print(responseStr);
 			} else { // metadata
@@ -119,6 +119,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 			// "q2":{"query":"Dina","type":"http://xmlns.com/foaf/0.1/Person","type_strict":"should"}}
 			String qStr = (String) qObj;
 			queries.add(qStr);
+			System.out.println("JSONReconcileServlet query: " + qStr);
 			log.debug("\nquery: " + qStr + "\n");
 		}
 
@@ -388,7 +389,8 @@ public class JSONReconcileServlet extends VitroHttpServlet {
         // Google Refine specific:
         query.setStart(0).setRows(limit);
         
-        setNameQuery(query, queryStr);
+        // TODO: works better without using tokenizeNameQuery(), need to investigate a bit more
+        query.setQuery(queryStr);
         
         // Filter by type
         // e.g. http://xmlns.com/foaf/0.1/Person
@@ -412,32 +414,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
         return query;
     }
  
-    private void setNameQuery(SolrQuery query, String queryStr) {
 
-        if (StringUtils.isBlank(queryStr)) {
-            log.error("No query string");
-        }
-
-        // original code:
-        // String tokenizeParam = (String) request.getParameter("tokenize"); 
-        // boolean tokenize = "true".equals(tokenizeParam);
-
-        // Note: Stemming is only relevant if we are tokenizing: an untokenized name
-        // query will not be stemmed. So we don't look at the stem parameter until we get to
-        // setTokenizedNameQuery().
-        //if (tokenize) {
-        //    setTokenizedNameQuery(query, queryStr, request);
-        //} else {
-        //    setUntokenizedNameQuery(query, queryStr);
-        //}
-
-        // Google Refine specific
-        setTokenizedNameQuery(query, queryStr);
-    }
-
-    private void setTokenizedNameQuery(SolrQuery query, String queryStr) {
-        query.setQuery(tokenizeNameQuery(queryStr));
-    }
     
     private String tokenizeNameQuery(String queryStr) {
         /* We currently have no use case for a tokenized, unstemmed autocomplete search field, so the option
