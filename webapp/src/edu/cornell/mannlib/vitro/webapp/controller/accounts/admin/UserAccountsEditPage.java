@@ -18,6 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.accounts.user.UserAccountsUse
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 
 /**
  * Handle the "Edit Account" form display and submission.
@@ -34,6 +35,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 	private static final String PARAMETER_LAST_NAME = "lastName";
 	private static final String PARAMETER_ROLE = "role";
 	private static final String PARAMETER_ASSOCIATED_PROFILE_URI = "associatedProfileUri";
+	private static final String PARAMETER_NEW_PROFILE_CLASS_URI = "degreeUri";
 
 	private static final String ERROR_NO_EMAIL = "errorEmailIsEmpty";
 	private static final String ERROR_EMAIL_IN_USE = "errorEmailInUse";
@@ -57,6 +59,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 	private String lastName = "";
 	private String selectedRoleUri = "";
 	private String associatedProfileUri = "";
+	private String newProfileClassUri = "";
 
 	private UserAccount userAccount;
 
@@ -93,6 +96,8 @@ public class UserAccountsEditPage extends UserAccountsPage {
 		selectedRoleUri = getStringParameter(PARAMETER_ROLE, "");
 		associatedProfileUri = getStringParameter(
 				PARAMETER_ASSOCIATED_PROFILE_URI, "");
+		newProfileClassUri = getStringParameter(
+				PARAMETER_NEW_PROFILE_CLASS_URI, "");
 
 		strategy.parseAdditionalParameters();
 	}
@@ -174,25 +179,27 @@ public class UserAccountsEditPage extends UserAccountsPage {
 		Map<String, Object> body = new HashMap<String, Object>();
 
 		body.put("userUri", userUri);
-		
+
 		if (isSubmit()) {
 			body.put("emailAddress", emailAddress);
 			body.put("externalAuthId", externalAuthId);
 			body.put("firstName", firstName);
 			body.put("lastName", lastName);
 			body.put("selectedRole", selectedRoleUri);
+			body.put(PARAMETER_NEW_PROFILE_CLASS_URI, newProfileClassUri);
 		} else {
 			body.put("emailAddress", userAccount.getEmailAddress());
 			body.put("externalAuthId", userAccount.getExternalAuthId());
 			body.put("firstName", userAccount.getFirstName());
 			body.put("lastName", userAccount.getLastName());
 			body.put("selectedRole", getExistingRoleUri());
+			body.put(PARAMETER_NEW_PROFILE_CLASS_URI, "");
 		}
 
 		if (!isRootUser()) {
 			body.put("roles", buildRolesList());
 		}
-		
+
 		body.put("profileTypes", buildProfileTypesList());
 		body.put("formUrls", buildUrlsMapWithEditUrl());
 
@@ -244,6 +251,19 @@ public class UserAccountsEditPage extends UserAccountsPage {
 
 		// Associate the profile, as appropriate.
 		if (matchingIsEnabled) {
+			if (!newProfileClassUri.isEmpty()) {
+				try {
+					String newProfileUri = UserAccountsProfileCreator
+							.createProfile(indDao, dpsDao, newProfileClassUri,
+									userAccount);
+					associatedProfileUri = newProfileUri;
+				} catch (InsertException e) {
+					log.error("Failed to create new profile of class '"
+							+ newProfileClassUri + "' for user '"
+							+ userAccount.getEmailAddress() + "'");
+				}
+			}
+
 			SelfEditingConfiguration.getBean(vreq)
 					.associateIndividualWithUserAccount(indDao, dpsDao,
 							userAccount, associatedProfileUri);

@@ -6,6 +6,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
@@ -14,13 +17,14 @@ import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsPage;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 
 /**
  * Handle the "Add new account" form display and submission.
- * 
- * TODO Associate a profile from this account
  */
 public class UserAccountsAddPage extends UserAccountsPage {
+	private static final Log log = LogFactory.getLog(UserAccountsAddPage.class);
+
 	private static final String PARAMETER_SUBMIT = "submitAdd";
 	private static final String PARAMETER_EMAIL_ADDRESS = "emailAddress";
 	private static final String PARAMETER_EXTERNAL_AUTH_ID = "externalAuthId";
@@ -28,6 +32,7 @@ public class UserAccountsAddPage extends UserAccountsPage {
 	private static final String PARAMETER_LAST_NAME = "lastName";
 	private static final String PARAMETER_ROLE = "role";
 	private static final String PARAMETER_ASSOCIATED_PROFILE_URI = "associatedProfileUri";
+	private static final String PARAMETER_NEW_PROFILE_CLASS_URI = "degreeUri";
 
 	private static final String ERROR_NO_EMAIL = "errorEmailIsEmpty";
 	private static final String ERROR_EMAIL_IN_USE = "errorEmailInUse";
@@ -50,6 +55,7 @@ public class UserAccountsAddPage extends UserAccountsPage {
 	private String lastName = "";
 	private String selectedRoleUri = "";
 	private String associatedProfileUri = "";
+	private String newProfileClassUri = "";
 
 	/** The result of validating a "submit" request. */
 	private String errorCode = "";
@@ -82,6 +88,8 @@ public class UserAccountsAddPage extends UserAccountsPage {
 		selectedRoleUri = getStringParameter(PARAMETER_ROLE, "");
 		associatedProfileUri = getStringParameter(
 				PARAMETER_ASSOCIATED_PROFILE_URI, "");
+		newProfileClassUri = getStringParameter(
+				PARAMETER_NEW_PROFILE_CLASS_URI, "");
 
 		strategy.parseAdditionalParameters();
 	}
@@ -153,6 +161,19 @@ public class UserAccountsAddPage extends UserAccountsPage {
 
 		// Associate the profile, as appropriate.
 		if (matchingIsEnabled) {
+			if (!newProfileClassUri.isEmpty()) {
+				try {
+					String newProfileUri = UserAccountsProfileCreator
+							.createProfile(indDao, dpsDao, newProfileClassUri,
+									this.addedAccount);
+					associatedProfileUri = newProfileUri;
+				} catch (InsertException e) {
+					log.error("Failed to create new profile of class '"
+							+ newProfileClassUri + "' for user '"
+							+ this.addedAccount.getEmailAddress() + "'");
+				}
+			}
+
 			SelfEditingConfiguration.getBean(vreq)
 					.associateIndividualWithUserAccount(indDao, dpsDao,
 							this.addedAccount, associatedProfileUri);
@@ -164,19 +185,20 @@ public class UserAccountsAddPage extends UserAccountsPage {
 	public final ResponseValues showPage() {
 		Map<String, Object> body = new HashMap<String, Object>();
 
-		body.put("emailAddress", emailAddress);
-		body.put("externalAuthId", externalAuthId);
-		body.put("firstName", firstName);
-		body.put("lastName", lastName);
+		body.put(PARAMETER_EMAIL_ADDRESS, emailAddress);
+		body.put(PARAMETER_EXTERNAL_AUTH_ID, externalAuthId);
+		body.put(PARAMETER_FIRST_NAME, firstName);
+		body.put(PARAMETER_LAST_NAME, lastName);
 		body.put("selectedRole", selectedRoleUri);
 		body.put("roles", buildRolesList());
 		body.put("profileTypes", buildProfileTypesList());
+		body.put(PARAMETER_NEW_PROFILE_CLASS_URI, newProfileClassUri);
 		body.put("formUrls", buildUrlsMap());
 
 		if (!errorCode.isEmpty()) {
 			body.put(errorCode, Boolean.TRUE);
 		}
-		
+
 		if (matchingIsEnabled) {
 			body.put("showAssociation", Boolean.TRUE);
 		}
