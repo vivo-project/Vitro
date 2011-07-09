@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -141,9 +142,9 @@ public abstract class UserAccountsPage {
 		String seedClassUri = PERSON_CLASS_URI;
 		List<String> classUris = vclassDao.getAllSubClassURIs(seedClassUri);
 		classUris.add(seedClassUri);
-		
+
 		SortedMap<String, String> types = new TreeMap<String, String>();
-		for (String classUri: classUris) {
+		for (String classUri : classUris) {
 			VClass vclass = vclassDao.getVClassByURI(classUri);
 			if (vclass != null) {
 				types.put(classUri, vclass.getName());
@@ -188,8 +189,41 @@ public abstract class UserAccountsPage {
 	}
 
 	protected String getSiteName() {
-        ApplicationBean appBean = vreq.getAppBean();
-        return appBean.getApplicationName();		    
+		ApplicationBean appBean = vreq.getAppBean();
+		return appBean.getApplicationName();
 	}
 
+	protected ProfileInfo buildProfileInfo(String uri) {
+		Individual ind = indDao.getIndividualByURI(uri);
+		if (ind == null) {
+			return null;
+		} else {
+			return new ProfileInfo(ind.getRdfsLabel(), uri,
+					UrlBuilder.getIndividualProfileUrl(uri, vreq));
+		}
+	}
+
+	public static class ProfileInfo {
+		private final String label;
+		private final String uri;
+		private final String url;
+
+		public ProfileInfo(String label, String uri, String url) {
+			this.label = label;
+			this.uri = uri;
+			this.url = url;
+		}
+
+		public String getLabel() {
+			return label;
+		}
+
+		public String getUri() {
+			return uri;
+		}
+
+		public String getUrl() {
+			return url;
+		}
+	}
 }

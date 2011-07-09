@@ -1,18 +1,15 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 var associateProfileFields = {
-
-    /* *** Initial page setup *** */
-   
     onLoad: function() {
-        //console.log('Here we are');
         if (this.disableFormInUnsupportedBrowsers()) {
             return;
         }        
 
         this.mixIn();
-        this.initObjects();                 
-        this.initPage();       
+        this.initObjectReferences();                 
+        this.bindEventListeners();
+        this.setInitialState();       
     },
 
     disableFormInUnsupportedBrowsers: function() {       
@@ -33,8 +30,7 @@ var associateProfileFields = {
         $.extend(this, associateProfileFieldsData);
     },
     
-    // On page load, create references for easy access to form elements.
-    initObjects: function() {
+    initObjectReferences: function() {
         this.form = $('#userAccountForm');
         
         // The external auth ID field and messages
@@ -51,26 +47,18 @@ var associateProfileFields = {
         // We want to associate a profile
         this.associationOptionsArea = $('#associationOptions');
         this.associateProfileNameField = $('#associateProfileName');
-
+        this.newProfileClassSelector = $('#degreeUri');
+        
         // Container <div> elements to provide background shading -- tlw72
         this.associateProfileBackgroundOneArea = $('#associateProfileBackgroundOne');
     },
-    
-    // Initial page setup. Called only at page load.
-    initPage: function() {
-        this.checkForAssociatedProfile();
-        this.bindEventListeners();
-        this.initAutocomplete();
-    },
-    
-    bindEventListeners: function() {
-        //console.log('bindEventListeners');
 
+    bindEventListeners: function() {
         this.externalAuthIdField.change(function() {
-            associateProfileFields.checkForAssociatedProfile();
+            associateProfileFields.externalAuthIdFieldHasChanged();
         }); 
         this.externalAuthIdField.keyup(function() {
-            associateProfileFields.checkForAssociatedProfile();
+            associateProfileFields.externalAuthIdFieldHasChanged();
         }); 
         
         this.verifyAssociatedProfileLink.click(function() {
@@ -79,15 +67,15 @@ var associateProfileFields = {
         });   
         
         this.changeAssociatedProfileLink.click(function() {
-            associateProfileFields.associatedProfileUriField.val('');
-            associateProfileFields.associateProfileNameField.val('');
-            associateProfileFields.showExternalAuthIdNotRecognized();
+            associateProfileFields.showAssociatingOptionsArea();
             return false;
         });   
         
-    },
-    
-    initAutocomplete: function() {
+        this.newProfileClassSelector.change(function() {
+            console.log('selector has changed.')
+            associateProfileFields.newProfileClassHasChanged();
+        });
+        
         this.associateProfileNameField.autocomplete({
             minLength: 3,
             source: function(request, response) {
@@ -100,20 +88,35 @@ var associateProfileFields = {
                         externalAuthId: associateProfileFields.externalAuthIdField.val()
                     }, 
                     complete: function(xhr, status) {
-                        //console.log('response text' + xhr.responseText);
                         var results = jQuery.parseJSON(xhr.responseText);
                         response(results);
                     }
                 });
             },
             select: function(event, ui) {
-                associateProfileFields.showSelectedProfile(ui.item); 
+                associateProfileFields.showAssociatedProfileArea(ui.item.label, ui.item.uri, ui.item.url); 
             }
         });
 
+        
     },
+    
+    setInitialState: function() {
+        if (this.externalAuthIdField.val().length == 0) {
+            this.hideAllOptionals();
+        } else if (this.associatedProfileInfo) {
+            this.showAssociatedProfileArea(this.associatedProfileInfo.label, this.associatedProfileInfo.uri, this.associatedProfileInfo.url);
+        } else {
+            this.showAssociatingOptionsArea();
+        }
+    },
+    
+    externalAuthIdFieldHasChanged: function() {
+        if (this.externalAuthIdField.val().length == 0) {
+            this.hideAllOptionals();
+            return;
+        }
 
-    checkForAssociatedProfile: function() {
         $.ajax({
             url: associateProfileFields.ajaxUrl,
             dataType: "json",
@@ -125,59 +128,77 @@ var associateProfileFields = {
             complete: function(xhr, status) {
                 var results = $.parseJSON(xhr.responseText);
                 if (results.idInUse) {
-                    associateProfileFields.showExternalAuthIdInUse()
+                    associateProfileFields.showExternalAuthInUseMessage()
                 } else if (results.matchesProfile) {
-                    associateProfileFields.showExternalAuthIdMatchesProfile(results.profileUri, results.profileUrl, results.profileLabel)
+                    associateProfileFields.showAssociatedProfileArea(results.profileLabel, results.profileUri, results.profileUrl)
                 } else {
-                    associateProfileFields.showExternalAuthIdNotRecognized()
+                    associateProfileFields.showAssociatingOptionsArea();
                 }
             }
         });
     },
-
+    
     openVerifyWindow: function() {
         window.open(this.verifyUrl, 'verifyMatchWindow', 'width=640,height=640,scrollbars=yes,resizable=yes,status=yes,toolbar=no,menubar=no,location=no');
     },
-        
-    showExternalAuthIdInUse: function() {
-        this.externalAuthIdInUseMessage.show();
-        this.associatedArea.hide();
-        this.associationOptionsArea.hide();
-        this.associateProfileBackgroundOneArea.css("background-color","#fff");
-        this.associateProfileBackgroundOneArea.css("border","none");
-    },
- 
-    showExternalAuthIdMatchesProfile: function(profileUri, profileUrl, profileLabel) {
-        //console.log('showExternalAuthIdMatchesProfile: profileUri=' + profileUri + ', profileUrl=' + profileUrl + ', profileLabel='+ profileLabel);
-
-        this.externalAuthIdInUseMessage.hide();
-        this.associatedArea.show();
-        this.associationOptionsArea.hide();
-        this.associateProfileBackgroundOneArea.css("background-color","#f1f2ee");
-        this.associateProfileBackgroundOneArea.css("border","1px solid #ccc");
-        
-        this.associatedProfileNameSpan.html(profileLabel);
-        this.associatedProfileUriField.val(profileUri);
-        this.verifyUrl = profileUrl;
-    },
-       
-    showExternalAuthIdNotRecognized: function() {
-        this.externalAuthIdInUseMessage.hide();
-        this.associatedArea.hide();
-        
-        if (this.associationEnabled && this.externalAuthIdField.val().length > 0) {
-            this.associationOptionsArea.show();
-            this.associateProfileBackgroundOneArea.css("background-color","#f1f2ee");
-            this.associateProfileBackgroundOneArea.css("border","1px solid #ccc");
+    
+    newProfileClassHasChanged: function() {
+        if (this.newProfileClassSelector.val().length == 0) {
+            this.associateProfileNameField.disabled = false;
         } else {
-            this.associationOptionsArea.hide();
-            this.associateProfileBackgroundOneArea.css("background-color","#fff");
-            this.associateProfileBackgroundOneArea.css("border","none");
+            this.associateProfileNameField.val('');
+            this.associateProfileNameField.disabled = true;
         }
     },
+    
+    hideAllOptionals: function() {
+        this.hideExternalAuthInUseMessage();
+        this.hideAssociatedProfileArea();
+        this.hideAssociatingOptionsArea();
+    },
+    
+    hideExternalAuthInUseMessage: function() {
+        this.externalAuthIdInUseMessage.hide();
+    },
+    
+    hideAssociatedProfileArea: function() {
+        this.associatedArea.hide();
+        this.associatedProfileUriField.val('');
+    },
+    
+    hideAssociatingOptionsArea: function() {
+        this.associationOptionsArea.hide();
+        this.associateProfileNameField.val('');
+        this.newProfileClassSelector.selectedIndex = 0;
+    },
+    
+    showExternalAuthInUseMessage: function() {
+        this.hideAssociatedProfileArea();
+        this.hideAssociatingOptionsArea();
 
-    showSelectedProfile: function(item) {
-    	this.showExternalAuthIdMatchesProfile(item.uri, item.url, item.label);
+        this.externalAuthIdInUseMessage.show();
+    },
+    
+    showAssociatedProfileArea: function(name, uri, url) {
+        this.hideExternalAuthInUseMessage();
+        this.hideAssociatingOptionsArea();
+
+        if (this.associationEnabled) {
+            this.associatedProfileNameSpan.html(name);
+            this.associatedProfileUriField.val(uri);
+            this.verifyUrl = url;
+            this.associatedArea.show();
+        }
+    },
+    
+    showAssociatingOptionsArea: function() {
+        this.hideExternalAuthInUseMessage();
+        this.hideAssociatedProfileArea();
+
+        if (this.associationEnabled) {
+            this.newProfileClassHasChanged();
+            this.associationOptionsArea.show();
+        }
     },
     
 }

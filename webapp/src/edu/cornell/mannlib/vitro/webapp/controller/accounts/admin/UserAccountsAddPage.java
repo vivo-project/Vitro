@@ -195,6 +195,11 @@ public class UserAccountsAddPage extends UserAccountsPage {
 		body.put(PARAMETER_NEW_PROFILE_CLASS_URI, newProfileClassUri);
 		body.put("formUrls", buildUrlsMap());
 
+		if (!associatedProfileUri.isEmpty()) {
+			body.put("associatedProfileInfo",
+					buildProfileInfo(associatedProfileUri));
+		}
+
 		if (!errorCode.isEmpty()) {
 			body.put(errorCode, Boolean.TRUE);
 		}

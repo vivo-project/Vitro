@@ -4,12 +4,14 @@ package edu.cornell.mannlib.vitro.webapp.controller.accounts.admin;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -187,6 +189,11 @@ public class UserAccountsEditPage extends UserAccountsPage {
 			body.put("lastName", lastName);
 			body.put("selectedRole", selectedRoleUri);
 			body.put(PARAMETER_NEW_PROFILE_CLASS_URI, newProfileClassUri);
+
+			if (!associatedProfileUri.isEmpty()) {
+				body.put("associatedProfileInfo",
+						buildProfileInfo(associatedProfileUri));
+			}
 		} else {
 			body.put("emailAddress", userAccount.getEmailAddress());
 			body.put("externalAuthId", userAccount.getExternalAuthId());
@@ -194,6 +201,13 @@ public class UserAccountsEditPage extends UserAccountsPage {
 			body.put("lastName", userAccount.getLastName());
 			body.put("selectedRole", getExistingRoleUri());
 			body.put(PARAMETER_NEW_PROFILE_CLASS_URI, "");
+
+			List<Individual> associatedInds = SelfEditingConfiguration.getBean(
+					vreq).getAssociatedIndividuals(indDao, userAccount);
+			if (!associatedInds.isEmpty()) {
+				body.put("associatedProfileInfo",
+						buildProfileInfo(associatedInds.get(0).getURI()));
+			}
 		}
 
 		if (!isRootUser()) {

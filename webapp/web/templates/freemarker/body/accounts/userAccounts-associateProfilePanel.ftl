@@ -41,7 +41,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/auto
                 <select name="degreeUri" id="degreeUri" >
                     <option value="" selected="selected">Select one</option>
                     <#list profileTypes?keys as key>
-                        <option value="${key}" >${profileTypes[key]}</option>           
+                        <option value="${key}" <#if degreeUri = key> selected </#if> >${profileTypes[key]}</option>           
                     </#list>    
                 </select>    
             </p>
@@ -54,6 +54,18 @@ var associateProfileFieldsData = {
         userUri: '${userUri}' ,
     <#else>    
         userUri: '' ,
+    </#if>
+    
+    <#if associationIsReset??>
+        associationIsReset: 'true' ,
+    </#if>
+    
+    <#if associatedProfileInfo??>
+        associatedProfileInfo: {
+            label: '${associatedProfileInfo.label}',
+            uri: '${associatedProfileInfo.uri}',
+            url: '${associatedProfileInfo.url}'
+        },
     </#if>
     
     <#if showAssociation??>
