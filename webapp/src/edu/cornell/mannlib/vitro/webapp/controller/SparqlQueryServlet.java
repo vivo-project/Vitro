@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -239,6 +240,12 @@ public class SparqlQueryServlet extends BaseEditController {
                     resultModel = qe.execConstruct();
                 }else if ( query.isDescribeType() ){
                     resultModel = qe.execDescribe();
+                }else if(query.isAskType()){
+                	//Irrespective of the ResultFormatParam, this always prints a boolean to the default OutputStream.
+                	String result = (qe.execAsk() == true) ? "true" : "false";
+                	PrintWriter p = response.getWriter();
+                	p.write(result);
+                    return;
                 }
                 response.setContentType(rdfFormatSymbols.get(rdfResultFormatParam));
                 OutputStream out = response.getOutputStream();
