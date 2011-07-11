@@ -59,7 +59,7 @@
             urlPatternToCancelTo = request.getParameter("url");
         }
         // If a different cancel return path has been designated, use it. Otherwise, use the regular return path.
-        if (cancel != null && cancel.equals("true") && !StringUtils.isEmpty(urlPatternToCancelTo)) {
+        if ("true".equals(cancel) && !StringUtils.isEmpty(urlPatternToCancelTo)) {
             urlPattern = urlPatternToCancelTo;
         }
         else if (!StringUtils.isEmpty(urlPatternToReturnTo)) {
