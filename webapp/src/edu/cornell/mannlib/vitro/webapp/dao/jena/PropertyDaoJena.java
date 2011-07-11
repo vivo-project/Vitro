@@ -20,15 +20,13 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.sparql.resultset.ResultSetMem;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
@@ -404,7 +402,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         return classSet;
     }
      
-    protected Iterator<QuerySolution> getPropertyQueryResults(Query query) {        
+    protected ResultSet getPropertyQueryResults(Query query) {        
         log.debug("SPARQL query:\n" + query.toString());
         
         // RY Removing prebinding due to Jena bug: when isLiteral(?object) or 
@@ -417,17 +415,12 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         DatasetWrapper w = dwf.getDatasetWrapper();
         Dataset dataset = w.getDataset();
         dataset.getLock().enterCriticalSection(Lock.READ);
+        ResultSet rs = null;
         try {
             QueryExecution qexec = QueryExecutionFactory.create(
                     query, dataset); //, subjectBinding);
             try {
-                ResultSet rs = qexec.execSelect();
-                // consume iterator before wrapper w is closed in finally block
-                List<QuerySolution> results = new ArrayList<QuerySolution>();
-                while (rs.hasNext()) {
-                    results.add(rs.next());
-                }
-                return results.iterator();
+                rs = new ResultSetMem(qexec.execSelect());
             } finally {
                 qexec.close();
             }
@@ -435,6 +428,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
             dataset.getLock().leaveCriticalSection();
             w.close();
         }
+        return rs;
     }
     
 }

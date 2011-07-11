@@ -27,6 +27,7 @@ import com.hp.hpl.jena.ontology.SomeValuesFromRestriction;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -783,7 +784,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         }                     
         log.debug("Data property query string:\n" + query);         
      
-        Iterator<QuerySolution> results = getPropertyQueryResults(query);
+        ResultSet results = getPropertyQueryResults(query);
         List<DataProperty> properties = new ArrayList<DataProperty>();
         while (results.hasNext()) {
             QuerySolution sol = results.next();

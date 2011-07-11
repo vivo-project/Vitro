@@ -18,6 +18,7 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.sparql.resultset.ResultSetMem;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
@@ -29,6 +30,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 public class QueryUtils {
     
     private static final Log log = LogFactory.getLog(QueryUtils.class);
+    
+    private QueryUtils() { }
     
     protected static Map<String,Object> querySolutionToObjectValueMap( QuerySolution soln){
         Map<String,Object> map = new HashMap<String,Object>();
@@ -110,12 +113,11 @@ public class QueryUtils {
         
         Dataset dataset = vreq.getDataset();
         dataset.getLock().enterCriticalSection(Lock.READ);
-queryStr = " SELECT ?x WHERE { ?x ?p ?y } LIMIT 10";
         QueryExecution qexec = null;
         ResultSet results = null;
         try {
             qexec = QueryExecutionFactory.create(queryStr, dataset);                    
-            results = qexec.execSelect();
+            results = new ResultSetMem(qexec.execSelect());
         } catch (Exception e) {
             log.error(e, e);
         } finally {
@@ -124,32 +126,8 @@ queryStr = " SELECT ?x WHERE { ?x ?p ?y } LIMIT 10";
                 qexec.close();
             }
         } 
-         try {
-        /* DEBUGGING */
-        int maxRank = 0;
-        if (results.hasNext()) { // there is at most one result
-            log.debug("found a rank");
-            QuerySolution soln = results.next(); 
-            RDFNode node = soln.get("rank");
-            if (node != null && node.isLiteral()) {
-                log.debug("node value =" + node.asLiteral().getLexicalForm());
-                try {
-                    int rank = node.asLiteral().getInt(); 
-                    if (rank > maxRank) {  
-                        log.debug("setting maxRank to " + rank);
-                        maxRank = rank;
-                    }
-                } catch (Exception e) {
-                    log.error("Error getting int value for rank: " + e.getMessage());
-                }
-            }
-        }
-         } catch (Exception e) {
-             log.error(e, e);
-         }
         
         return results;
     }
-    
 
 }

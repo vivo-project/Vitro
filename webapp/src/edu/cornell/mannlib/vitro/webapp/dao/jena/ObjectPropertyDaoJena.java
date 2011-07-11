@@ -871,7 +871,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         } 
         log.debug("Object property query:\n" + query);
         
-        Iterator<QuerySolution> results = getPropertyQueryResults(query);
+        ResultSet results = getPropertyQueryResults(query);
         List<ObjectProperty> properties = new ArrayList<ObjectProperty>();
         while (results.hasNext()) {
             QuerySolution soln = results.next();
@@ -916,7 +916,8 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 ObjectProperty prop = getObjectPropertyByURI(soln.getResource("property").getURI());
                 String filename = soln.getLiteral("filename").getLexicalForm();
                 customListViewConfigFileMap.put(prop, filename);                
-            }           
+            }       
+            qexec.close();
         }        
         return customListViewConfigFileMap.get(op);
     }

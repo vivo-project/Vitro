@@ -338,8 +338,9 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
         DatasetWrapper w = dwf.getDatasetWrapper();
         Dataset dataset = w.getDataset();
         dataset.getLock().enterCriticalSection(Lock.READ);
+        QueryExecution qexec = null;
         try {
-            QueryExecution qexec = QueryExecutionFactory.create(
+            qexec = QueryExecutionFactory.create(
                     queryString, dataset);
             ResultSet results = qexec.execSelect(); 
     
@@ -351,6 +352,9 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
         } finally {
             dataset.getLock().leaveCriticalSection();
             w.close();
+            if (qexec != null) {
+                qexec.close();
+            }
         }
         return values;         
     }
