@@ -45,7 +45,7 @@ class IndexWorkerThread extends Thread{
             // done so shut this thread down.
             stopRequested = true;            	          
 	    }  			    
-		log.info("Worker number " + threadNum + " exiting.");
+		log.debug("Worker number " + threadNum + " exiting.");
 	}
 	
 	protected void addDocsToIndex() {
