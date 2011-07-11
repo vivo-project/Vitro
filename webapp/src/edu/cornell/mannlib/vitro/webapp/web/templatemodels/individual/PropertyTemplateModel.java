@@ -72,7 +72,7 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         String roleLevelLabel = roleLevel != null ? roleLevel.getLabel() : "";
         verboseDisplay.put("displayLevel", roleLevelLabel);
 
-        roleLevel = property.getHiddenFromDisplayBelowRoleLevel();
+        roleLevel = property.getProhibitedFromUpdateBelowRoleLevel();
         roleLevelLabel = roleLevel != null ? roleLevel.getLabel() : "";
         verboseDisplay.put("updateLevel", roleLevelLabel);   
         
