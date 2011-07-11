@@ -10,6 +10,7 @@ public class VitroVocabulary {
     
     public static final String VITRO_AUTH = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#";
     public static final String VITRO_PUBLIC = "http://vitro.mannlib.cornell.edu/ns/vitro/public#";
+    public static final String VITRO_PUBLIC_ONTOLOGY = "http://vitro.mannlib.cornell.edu/ns/vitro/public";
     
     
     /** BJL23 2008-02-25:
