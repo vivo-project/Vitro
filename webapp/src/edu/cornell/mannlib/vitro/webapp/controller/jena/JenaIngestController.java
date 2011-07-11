@@ -675,17 +675,24 @@ public class JenaIngestController extends BaseEditController {
 	}
 	
 	private void processMergeIndividualRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
-		  String uri1 = vreq.getParameter("uri1");
-		  String uri2 = vreq.getParameter("uri2");
+		  String uri1 = vreq.getParameter("uri1"); // get primary uri
+		  String uri2 = vreq.getParameter("uri2"); // get secondary uri
+		  String usePrimaryLabelOnly = vreq.getParameter("usePrimaryLabelOnly");
+		  
 		  if(uri1!=null){
 			  JenaIngestUtils utils = new JenaIngestUtils();
+			  /*
+			   * get baseOnt, Ont and infOnt models
+			   */
 			  OntModel baseOntModel = (OntModel) getServletContext().getAttribute("baseOntModel");
 		      OntModel ontModel = (OntModel)
 			  getServletContext().getAttribute("jenaOntModel");
 			  OntModel infOntModel = (OntModel)
 			  getServletContext().getAttribute(JenaBaseDao.INFERENCE_ONT_MODEL_ATTRIBUTE_NAME);
-			  String result = utils.doMerge(uri1,uri2,baseOntModel,ontModel,infOntModel);
-			  // vreq.getSession().setAttribute("leftoverModel", utils.getLeftOverModel());
+			  /*
+			   * calling method that does the merge operation.
+			   */
+			  String result = utils.doMerge(uri1,uri2,baseOntModel,ontModel,infOntModel,usePrimaryLabelOnly);
 			  getServletContext().setAttribute("leftoverModel", utils.getLeftOverModel());
 			  vreq.setAttribute("result",result);
 			  vreq.setAttribute("title","Merge Individuals");
