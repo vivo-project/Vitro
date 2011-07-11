@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openrdf.model.vocabulary.RDFS;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
@@ -598,24 +599,33 @@ public class JenaIngestUtils {
 		}
 	}
 	
-	public String doMerge(String uri1,String uri2,OntModel baseOntModel,OntModel ontModel,OntModel infOntModel){
+	public String doMerge(String uri1,String uri2,OntModel baseOntModel,OntModel ontModel,OntModel infOntModel,String usePrimaryLabelOnly){
 		
 		boolean functionalPresent = false;
-		Resource res1 = baseOntModel.getResource(uri1);
-		Resource res2 = baseOntModel.getResource(uri2);
+		Resource res1 = baseOntModel.getResource(uri1); // primary resource
+		Resource res2 = baseOntModel.getResource(uri2); // secondary resource
 		String result = null;
 		baseOntModel.enterCriticalSection(Lock.WRITE);
 		
+		/*
+		 * get statements of both the resources
+		 */
 		StmtIterator stmtItr1 = baseOntModel.listStatements(res1,(Property)null,(RDFNode)null);
 		StmtIterator stmtItr2 = baseOntModel.listStatements(res2,(Property)null,(RDFNode)null);
 		StmtIterator stmtItr3 = baseOntModel.listStatements((Resource)null,(Property)null,(RDFNode)res2);
 		
+		/*
+		 * if primary resource has no statements, return
+		 */
 		if(!stmtItr1.hasNext()){
 			result = "resource 1 not present";
 			res1.removeAll((Property)null);
 			baseOntModel.leaveCriticalSection();
 			return result;
 		}
+		/*
+		 * if secondary resource has no statements, return
+		 */
 		else if(!stmtItr2.hasNext()){
 			result = "resource 2 not present";
 			res2.removeAll((Property)null);
@@ -628,23 +638,44 @@ public class JenaIngestUtils {
 		infOntModel.enterCriticalSection(Lock.WRITE);
 		try{
 		
+			/*
+			 * Iterate through statements of secondary resource
+			 */
+			
 		while(stmtItr2.hasNext()){
 		
 			Statement stmt = stmtItr2.next();
 			Property prop = stmt.getPredicate();
 			OntProperty oprop = baseOntModel.getOntProperty(prop.getURI());
+			
+			/*
+			 * if the property is null or functional then dump the statement into leftover model
+			 * else add it to base, ont and inf models as a part of primary resource.
+			 */
 		    if(oprop!=null && oprop.isFunctionalProperty()){
 		    	leftoverModel.add(res2,stmt.getPredicate(),stmt.getObject());
-		    	functionalPresent = true;
+		    	functionalPresent = true;	
+		    }
+		    /*
+		     * if the checkbox is checked, use primary resource rdfs:labels only and dump secondary resource rdfs:labels
+		     * into leftoverModel
+		     */
+		    else if(prop.getURI().equals("http://www.w3.org/2000/01/rdf-schema#label") && 
+		    		usePrimaryLabelOnly!=null && !usePrimaryLabelOnly.isEmpty()){
+		    		leftoverModel.add(res2,stmt.getPredicate(),stmt.getObject());
+			    	functionalPresent = true;		
 		    }
 		    else{
-		    baseOntModel.add(res1,stmt.getPredicate(),stmt.getObject()); 
-		    ontModel.add(res1,stmt.getPredicate(),stmt.getObject());
-		    infOntModel.add(res1,stmt.getPredicate(),stmt.getObject());
-		    counter++;
+		    	baseOntModel.add(res1,stmt.getPredicate(),stmt.getObject()); 
+		    	ontModel.add(res1,stmt.getPredicate(),stmt.getObject());
+		    	infOntModel.add(res1,stmt.getPredicate(),stmt.getObject());
+		    	counter++;
 		    }
 		}
-		  
+		  /*
+		   * replace secondary resource with primary resource in all the statements where
+		   * secondary resource is present as an object.
+		   */
 		while(stmtItr3.hasNext()){
 			Statement stmt = stmtItr3.nextStatement();
 			Resource sRes = stmt.getSubject();
@@ -655,6 +686,11 @@ public class JenaIngestUtils {
 		}
 		Resource ontRes = ontModel.getResource(res2.getURI());
 		Resource infRes = infOntModel.getResource(res2.getURI());
+		
+		/*
+		 * Remove all the statements of secondary resource from all the models.
+		 */
+		
 		baseOntModel.removeAll((Resource)null,(Property)null,(RDFNode)res2);
 		ontModel.removeAll((Resource)null,(Property)null,(RDFNode)res2);
 		infOntModel.removeAll((Resource)null,(Property)null,(RDFNode)res2);
