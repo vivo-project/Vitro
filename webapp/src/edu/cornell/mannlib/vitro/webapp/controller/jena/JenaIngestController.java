@@ -13,6 +13,7 @@ import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,6 +70,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
@@ -106,6 +108,8 @@ public class JenaIngestController extends BaseEditController {
 	private static final String RENAME_RESOURCE = "/jenaIngest/renameResource.jsp";
 	private static final String RENAME_RESULT = "/jenaIngest/renameResult.jsp";
 
+	private static final Map<String, Model> attachedModels = new HashMap<String, Model>();
+	
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response){
     	if (!isAuthorizedToDisplayPage(request, response, new Actions(
@@ -820,17 +824,28 @@ public class JenaIngestController extends BaseEditController {
 	}
 	
 	private void doAttachModel(String modelName, ModelMaker modelMaker) {
+		if (attachedModels.containsKey(modelName)) {
+			return;
+		}
 		Model m = modelMaker.getModel(modelName);
-		OntModel vitroJenaModel = (OntModel) getServletContext().getAttribute("baseOntModel");
-		System.out.println("Attaching "+modelName+" ("+m.hashCode()+") to webapp");
-		vitroJenaModel.addSubModel(m);
+		ModelContext.getBaseOntModelSelector(getServletContext()).getTBoxModel().addSubModel(m);
+		ModelContext.getBaseOntModelSelector(getServletContext()).getABoxModel().addSubModel(m);
+		ModelContext.getUnionOntModelSelector(getServletContext()).getABoxModel().addSubModel(m);
+		ModelContext.getUnionOntModelSelector(getServletContext()).getTBoxModel().addSubModel(m);
+		attachedModels.put(modelName, m);
+		log.info("Attached " + modelName + " (" + m.hashCode() + ") to webapp");
 	}
 	
 	private void doDetachModel(String modelName, ModelMaker modelMaker) {
-		Model m = modelMaker.getModel(modelName);
-		OntModel vitroJenaModel = (OntModel) getServletContext().getAttribute("baseOntModel");
-		System.out.println("Detaching "+modelName+" ("+m.hashCode()+") from webapp");
-		vitroJenaModel.removeSubModel(m);
+		Model m = attachedModels.get(modelName);
+		if (m == null) {
+			return;
+		}
+		ModelContext.getBaseOntModelSelector(getServletContext()).getTBoxModel().removeSubModel(m);
+		ModelContext.getBaseOntModelSelector(getServletContext()).getABoxModel().removeSubModel(m);
+		ModelContext.getUnionOntModelSelector(getServletContext()).getABoxModel().removeSubModel(m);
+		ModelContext.getUnionOntModelSelector(getServletContext()).getTBoxModel().removeSubModel(m);
+		log.info("Detached " + modelName + " (" + m.hashCode() + ") from webapp");
 	}
 	
 	private void doRenameBNodes(VitroRequest vreq, String namespaceEtc, boolean patternBoolean, String pattern, String[] sourceModel) {
