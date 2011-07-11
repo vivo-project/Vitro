@@ -46,7 +46,7 @@
     
     <#if errorMessage?has_content>
         <section id="error-alert" role="alert">
-            <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon"/>
+            <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon" />
             <p>${errorMessage}</p>
         </section>
     </#if>
@@ -65,7 +65,7 @@
         <#include "userAccounts-associateProfilePanel.ftl">
 
         <#if roles?has_content>
-            <p>Roles<span class="requiredHint"> *</span> </p>
+            <p>Roles<span class="requiredHint"> *</span></p>
             <#list roles as role>
                 <input type="radio" name="role" value="${role.uri}" role="radio" <#if selectedRole = role.uri>checked</#if> />
                 <label class="inline" for="${role.label}"> ${role.label}</label>
