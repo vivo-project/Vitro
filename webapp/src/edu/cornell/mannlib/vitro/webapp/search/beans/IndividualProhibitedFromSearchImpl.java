@@ -57,18 +57,28 @@ public class IndividualProhibitedFromSearchImpl implements IndividualProhibitedF
     private Query makeAskQueryForUri( String uri ){
         String queryString =
             "PREFIX fn: <http://www.w3.org/2005/xpath-functions#> \n" +
+            
             "ASK { \n" +
             "    <"+uri+"> <" + RDF.type.getURI() + "> ?type . \n" +             
+            
             "  FILTER ( \n" + 
+            
             "     (  fn:starts-with( str(?type), \"" + VitroVocabulary.vitroURI + "\" ) \n" +
             "        && \n"+
-            "        ! fn:starts-with( str(?type), \"" + VitroVocabulary.vitroURI + "Flag\" ) ) || \n" +            
+            "        ! fn:starts-with( str(?type), \"" + VitroVocabulary.vitroURI + "Flag\" ) ) || \n" +  
+            
             "     fn:starts-with( str(?type), \"" + VitroVocabulary.PUBLIC + "\" ) || \n" +
+            
             "     str(?type) = \"" + OWL.ObjectProperty.getURI() + "\"  || \n" +
+            
             "     str(?type) = \"" + OWL.DatatypeProperty.getURI() + "\"  || \n" +
+            
             "     str(?type) = \"" + OWL.AnnotationProperty.getURI() + "\"  \n" +
+            
             "   )\n" +
             "}" ;                
+        
+        
         return QueryFactory.create( queryString );
     }
 }

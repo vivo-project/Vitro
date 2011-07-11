@@ -40,10 +40,6 @@ public class IndividualToSolrDocument {
     
     public List<DocumentModifier> documentModifiers = new ArrayList<DocumentModifier>();
     
-    private static List<String> contextNodeClassNames = new ArrayList<String>();
-    
-    private static List<String> blackListedClasses = new ArrayList<String>();
-            
     public IndividualToSolrDocument(
             ClassProhibitedFromSearch classesProhibitedFromSearch, 
     		IndividualProhibitedFromSearch individualProhibitedFromSearch){
@@ -60,8 +56,7 @@ public class IndividualToSolrDocument {
         this.classesProhibitedFromSearch = classesProhibitedFromSearch;
         this.individualProhibitedFromSearch = individualProhibitedFromSearch;
         this.documentModifiers = docModifiers;
-        fillContextNodes();
-        fillInBlackListedClasses();
+
     }
     
 
@@ -259,9 +254,11 @@ public class IndividualToSolrDocument {
                 //index individuals of type owl:Thing, just don't add owl:Thing as the type field in the index
                 continue;
             } else if(clz.getURI().startsWith(OWL.NS)){
-                throw new SkipIndividualException("not indexing " + ind.getURI() + " because of type " + clz.getURI() );                
-            } else if(contextNodeClassNames.contains(superLclName) || blackListedClasses.contains(superLclName)) { // check to see if context node is being indexed.
-                throw new SkipIndividualException("not indexing " + ind.getURI() + " because of context node type " + clz.getURI() );
+                throw new SkipIndividualException("not indexing " + ind.getURI() + " because of type " + clz.getURI() );    
+            } 
+            // do not index individuals of type Role, AdvisingRelationShip, Authorship, etc.(see search.n3 for more information)
+            else if(classesProhibitedFromSearch.isClassProhibitedFromSearch(clz.getURI())){
+            	 throw new SkipIndividualException("not indexing " + ind.getURI() + " because of prohibited type " + clz.getURI() );
             } else {
                 if( !prohibited && classesProhibitedFromSearch.isClassProhibitedFromSearch(clz.getURI()))
                     prohibited = true;
@@ -334,41 +331,6 @@ public class IndividualToSolrDocument {
             }
         }
     }
-    
-    private void fillContextNodes(){
-    	IndividualToSolrDocument.contextNodeClassNames.add("Role");
-        IndividualToSolrDocument.contextNodeClassNames.add("AttendeeRole");
-        IndividualToSolrDocument.contextNodeClassNames.add("ClinicalRole");
-        IndividualToSolrDocument.contextNodeClassNames.add("LeaderRole");
-        IndividualToSolrDocument.contextNodeClassNames.add("MemberRole");
-        IndividualToSolrDocument.contextNodeClassNames.add("OutreachProviderRole");
-        IndividualToSolrDocument.contextNodeClassNames.add("PresenterRole");
-        IndividualToSolrDocument.contextNodeClassNames.add("ResearcherRole");
-        IndividualToSolrDocument.contextNodeClassNames.add("InvestigatorRole");
-        IndividualToSolrDocument.contextNodeClassNames.add("CoPrincipalInvestigatorRole");
-        IndividualToSolrDocument.contextNodeClassNames.add("PrincipalInvestigatorRole");
-        IndividualToSolrDocument.contextNodeClassNames.add("ServiceProviderRole");
-        IndividualToSolrDocument.contextNodeClassNames.add("TeacherRole");
-        IndividualToSolrDocument.contextNodeClassNames.add("Position");
-        IndividualToSolrDocument.contextNodeClassNames.add("FacultyAdministrativePosition");
-        IndividualToSolrDocument.contextNodeClassNames.add("FacultyPosition");
-        IndividualToSolrDocument.contextNodeClassNames.add("LibrarianPosition");
-        IndividualToSolrDocument.contextNodeClassNames.add("Non-AcademicPosition");
-        IndividualToSolrDocument.contextNodeClassNames.add("Non-FacultyAcademicPosition");
-        IndividualToSolrDocument.contextNodeClassNames.add("PostdoctoralPosition");
-        IndividualToSolrDocument.contextNodeClassNames.add("AdvisingRelationship");
-        IndividualToSolrDocument.contextNodeClassNames.add("Authorship");
-        IndividualToSolrDocument.contextNodeClassNames.add("AcademicDegree");
-        
-    }
-    
-    // bk392 : Ideally this needs to be removed and the check for a blacklisted class
-    // has to made by firing a query against the display model which contains
-    // blacklisted classes (grabbed from search.n3)
-    private void fillInBlackListedClasses() {
-        //class that needs to be excluded from search
-    	IndividualToSolrDocument.blackListedClasses.add("URLLink");
-	}
 
     public static float NAME_BOOST = 1.2F;
     
