@@ -220,6 +220,7 @@
 	<target name="deploy" description="--> Build the app and install in Tomcat">
 		<!-- the inner "deploy" would just do a sync that will be done by productDeploy -->
 		<innercall target="revisionInfo" />
+		<innercall target="deploySolr" />
 		<antcall target="productDeploy" />
 	</target>
 
