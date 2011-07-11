@@ -31,17 +31,23 @@ table#account th {
     border: 1px solid #d9e4ea;
     border-bottom: none;
     padding-left: 6px;
+    font-size: .9em;
 }
+table#account th {
+    text-align: left;
+} /*Fix for IE8 and 9, force text in a cell to be aligned to the left*/
 table#account td {
     vertical-align: top;
     padding: .5em;
     border: 1px solid #d9e4ea; 
-    font-size: .9em;
+    font-size: .825em;
+    padding-top: .5em;
+    padding-bottom: .5em;
 }  
-table#account tr {
-    background-color: #fff;
+table#account td  a {
+   word-wrap: break-word;
 }
-table#account tr:nth-child(2n+1) {
+table#account tr:nth-child(2n) {
     background-color: rgba(200, 200, 180,.25);
 }
 #filter-roles {

@@ -82,8 +82,7 @@
         <thead>
             <tr>
                <th scope="col"> <input  class="delete-all hidden" type="checkbox" name="delete-all">
-                   <span>Email Address</span>
-
+                   Email Address
                    <nav class="account-alpha-browse">
                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=ASC" title="ascending order"></a> 
                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=DESC" title="descending order"></a>
