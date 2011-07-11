@@ -9,7 +9,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/auto
         <div style="margin-left:8px">
             <label for="externalAuthId">External Auth. ID / Matching ID</label> 
             <input type="text" name="externalAuthId" value="${externalAuthId}" id="externalAuthId" role="input "/>
-            <span id="externalAuthIdInUse"  style="display: none;" >This Account Reference is already in use.</span>
+            <span id="externalAuthIdInUse"  style="display: none;" >This Identifier is already in use.</span>
             <p class="explanatoryText" style="margin-top:-8px">Can be used to associate the account with the user's profile via the matching property.</p>
         </div>
     </div>
