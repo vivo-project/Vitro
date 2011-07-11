@@ -41,6 +41,8 @@ public class IndividualToSolrDocument {
     public List<DocumentModifier> documentModifiers = new ArrayList<DocumentModifier>();
     
     private static List<String> contextNodeClassNames = new ArrayList<String>();
+    
+    private static List<String> blackListedClasses = new ArrayList<String>();
             
     public IndividualToSolrDocument(
             ClassProhibitedFromSearch classesProhibitedFromSearch, 
@@ -58,10 +60,12 @@ public class IndividualToSolrDocument {
         this.classesProhibitedFromSearch = classesProhibitedFromSearch;
         this.individualProhibitedFromSearch = individualProhibitedFromSearch;
         this.documentModifiers = docModifiers;
-        fillContextNodes(); 
+        fillContextNodes();
+        fillInBlackListedClasses();
     }
     
-    @SuppressWarnings("static-access")
+
+	@SuppressWarnings("static-access")
     public SolrInputDocument translate(Individual ind) throws IndexingException{
         try{    	            	      	        	
         	log.debug("translating " + ind.getURI());
@@ -256,7 +260,7 @@ public class IndividualToSolrDocument {
                 continue;
             } else if(clz.getURI().startsWith(OWL.NS)){
                 throw new SkipIndividualException("not indexing " + ind.getURI() + " because of type " + clz.getURI() );                
-            } else if(contextNodeClassNames.contains(superLclName)) { // check to see if context node is being indexed.
+            } else if(contextNodeClassNames.contains(superLclName) || blackListedClasses.contains(superLclName)) { // check to see if context node is being indexed.
                 throw new SkipIndividualException("not indexing " + ind.getURI() + " because of context node type " + clz.getURI() );
             } else {
                 if( !prohibited && classesProhibitedFromSearch.isClassProhibitedFromSearch(clz.getURI()))
@@ -355,8 +359,16 @@ public class IndividualToSolrDocument {
         IndividualToSolrDocument.contextNodeClassNames.add("AdvisingRelationship");
         IndividualToSolrDocument.contextNodeClassNames.add("Authorship");
         IndividualToSolrDocument.contextNodeClassNames.add("AcademicDegree");
+        
     }
     
+    // bk392 : Ideally this needs to be removed and the check for a blacklisted class
+    // has to made by firing a query against the display model which contains
+    // blacklisted classes (grabbed from search.n3)
+    private void fillInBlackListedClasses() {
+        //class that needs to be excluded from search
+    	IndividualToSolrDocument.blackListedClasses.add("URLLink");
+	}
 
     public static float NAME_BOOST = 1.2F;
     
