@@ -215,7 +215,7 @@ var associateProfileFields = {
             this.associateProfileBackgroundOneArea.css("background-color","#f1f2ee");
             this.associateProfileBackgroundOneArea.css("border","1px solid #ccc");
         }
-    },
+    }
     
 }
  
