@@ -33,7 +33,7 @@ public class QueryUtils {
     
     private QueryUtils() { }
     
-    protected static Map<String,Object> querySolutionToObjectValueMap( QuerySolution soln){
+    public static Map<String,Object> querySolutionToObjectValueMap( QuerySolution soln){
         Map<String,Object> map = new HashMap<String,Object>();
         Iterator<String> varNames = soln.varNames();
         while(varNames.hasNext()){
@@ -45,7 +45,7 @@ public class QueryUtils {
         return map;
     }
  
-    protected static Map<String,String> querySolutionToStringValueMap( QuerySolution soln ){
+    public static Map<String,String> querySolutionToStringValueMap( QuerySolution soln ){
         Map<String,String> map = new HashMap<String,String>();
         Iterator<String> varNames = soln.varNames();
         while(varNames.hasNext()){
@@ -57,7 +57,7 @@ public class QueryUtils {
         return map;
     }
     
-    protected static Object nodeToObject( RDFNode node ){
+    public static Object nodeToObject( RDFNode node ){
         if( node == null ){
             return "";
         }else if( node.isLiteral() ){
@@ -74,7 +74,7 @@ public class QueryUtils {
         }
     }
 
-    protected static String nodeToString( RDFNode node ){
+    public static String nodeToString( RDFNode node ){
         if( node == null ){
             return "";
         }else if( node.isLiteral() ){
