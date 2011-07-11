@@ -36,8 +36,6 @@ public class VitroRequest extends HttpServletRequestWrapper {
     private Map<String,String[]> convertedParameterMap;
 
     private HttpServletRequest _req;
-    
-    private boolean isSinglePortal;
 
     public VitroRequest(HttpServletRequest _req) {
         super(_req);

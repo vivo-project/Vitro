@@ -150,7 +150,6 @@ public class SparqlQueryServlet extends BaseEditController {
 		}
 		
 		String queryParam = vreq.getParameter("query");
-		boolean graphPresent = false;
 		String[] tokens = queryParam.split("\\s");
 	    for(int i = 0; i < tokens.length; i++){
 	    	if("graph".equalsIgnoreCase(tokens[i])){

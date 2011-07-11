@@ -303,8 +303,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         Dataset dataset = w.getDataset();
         dataset.getLock().enterCriticalSection(Lock.READ);
         try {
-            
-            
+
             QueryExecution qexec = (constructedModel == null) 
                     ? QueryExecutionFactory.create(
                             query, dataset, initialBindings)

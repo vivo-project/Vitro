@@ -2,21 +2,24 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.shared.Lock;
+
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
 /** 
  * Utilities for executing queries and working with query results. 
@@ -102,4 +105,51 @@ public class QueryUtils {
     public static String subUriForQueryVar(String queryString, String varName, String uri) {
         return queryString.replaceAll("\\?" + varName + "\\b", "<" + uri + ">");
     }
+    
+    public static ResultSet getQueryResults(String queryStr, VitroRequest vreq) {
+        
+        Dataset dataset = vreq.getDataset();
+        dataset.getLock().enterCriticalSection(Lock.READ);
+queryStr = " SELECT ?x WHERE { ?x ?p ?y } LIMIT 10";
+        QueryExecution qexec = null;
+        ResultSet results = null;
+        try {
+            qexec = QueryExecutionFactory.create(queryStr, dataset);                    
+            results = qexec.execSelect();
+        } catch (Exception e) {
+            log.error(e, e);
+        } finally {
+            dataset.getLock().leaveCriticalSection();
+            if (qexec != null) {
+                qexec.close();
+            }
+        } 
+         try {
+        /* DEBUGGING */
+        int maxRank = 0;
+        if (results.hasNext()) { // there is at most one result
+            log.debug("found a rank");
+            QuerySolution soln = results.next(); 
+            RDFNode node = soln.get("rank");
+            if (node != null && node.isLiteral()) {
+                log.debug("node value =" + node.asLiteral().getLexicalForm());
+                try {
+                    int rank = node.asLiteral().getInt(); 
+                    if (rank > maxRank) {  
+                        log.debug("setting maxRank to " + rank);
+                        maxRank = rank;
+                    }
+                } catch (Exception e) {
+                    log.error("Error getting int value for rank: " + e.getMessage());
+                }
+            }
+        }
+         } catch (Exception e) {
+             log.error(e, e);
+         }
+        
+        return results;
+    }
+    
+
 }
