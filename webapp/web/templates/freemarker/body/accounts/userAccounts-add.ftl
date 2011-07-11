@@ -46,7 +46,7 @@
     
     <#if errorMessage?has_content>
         <section id="error-alert" role="alert">
-            <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon"/>
+            <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon" />
             <p>${errorMessage}</p>
         </section>
     </#if>
@@ -54,13 +54,13 @@
 <section id="add-account" role="region">
     <form method="POST" action="${formUrls.add}" class="customForm" role="add new account">
         <label for="email-address">Email address<span class="requiredHint"> *</span></label>
-        <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input "/>
+        <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
 
         <label for="first-name">First name<span class="requiredHint"> *</span></label> 
-        <input type="text" name="firstName" value="${firstName}" id="first-name" role="input "/>
+        <input type="text" name="firstName" value="${firstName}" id="first-name" role="input" />
 
         <label for="last-name">Last name<span class="requiredHint"> *</span></label> 
-        <input type="text" name="lastName" value="${lastName}" id="last-name" role="input "/>
+        <input type="text" name="lastName" value="${lastName}" id="last-name" role="input" />
 
         <#include "userAccounts-associateProfilePanel.ftl">
 
@@ -82,7 +82,7 @@
                 <tr>
                     <td>
                         <label for="initial-password">Initial password<span class="requiredHint"> *</span></label>
-                        <input type="password" name="initialPassword" value="${initialPassword}" id="initial-password" role="input "/>
+                        <input type="password" name="initialPassword" value="${initialPassword}" id="initial-password" role="input" />
                     </td>
                     <td>&nbsp;</td>
                     <td>
@@ -91,10 +91,12 @@
                     </td>
                 </tr>
             </table>
+            
             <p class="explanatoryText" style="margin-top:-8px">Minimum of ${minimumLength} characters in length.</p>
         </#if>
+        
         <br />
-        <input type="submit" name="submitAdd" value="Add new account" class="submit"/> or <a class="cancel" href="${formUrls.list}">Cancel</a>
+        <input type="submit" name="submitAdd" value="Add new account" class="submit" /> or <a class="cancel" href="${formUrls.list}">Cancel</a>
 
         <p class="requiredHint">* required fields</p>
     </form>
