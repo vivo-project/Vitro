@@ -64,7 +64,7 @@
 
         <#include "userAccounts-associateProfilePanel.ftl">
 
-        <p>Roles<span class="requiredHint"> *</span> </p>
+        <p>Roles<span class="requiredHint"> *</span></p>
         <#list roles as role>
             <input type="radio" name="role" value="${role.uri}" role="radio" <#if selectedRole = role.uri>checked</#if> />
             <label class="inline" for="${role.label}"> ${role.label}</label>
