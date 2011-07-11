@@ -60,7 +60,15 @@ var associateProfileFields = {
         this.externalAuthIdField.keyup(function() {
             associateProfileFields.externalAuthIdFieldHasChanged();
         }); 
-        
+
+        this.externalAuthIdField.bind("propertychange", function() {
+            associateProfileFields.externalAuthIdFieldHasChanged();
+        });  
+
+        this.externalAuthIdField.bind("input", function() {
+            associateProfileFields.externalAuthIdFieldHasChanged();
+        });
+              
         this.verifyAssociatedProfileLink.click(function() {
             associateProfileFields.openVerifyWindow();
             return false;
@@ -144,10 +152,10 @@ var associateProfileFields = {
     
     newProfileClassHasChanged: function() {
         if (this.newProfileClassSelector.val().length == 0) {
-            this.associateProfileNameField.disabled = false;
+            this.associateProfileNameField.attr("disabled","");
         } else {
             this.associateProfileNameField.val('');
-            this.associateProfileNameField.disabled = true;
+            this.associateProfileNameField.attr("disabled","disabled");
         }
     },
     
@@ -163,13 +171,17 @@ var associateProfileFields = {
     
     hideAssociatedProfileArea: function() {
         this.associatedArea.hide();
+        this.associateProfileBackgroundOneArea.css("background-color","#fff");
+        this.associateProfileBackgroundOneArea.css("border","none");
         this.associatedProfileUriField.val('');
     },
     
     hideAssociatingOptionsArea: function() {
         this.associationOptionsArea.hide();
+        this.associateProfileBackgroundOneArea.css("background-color","#fff");
+        this.associateProfileBackgroundOneArea.css("border","none");
         this.associateProfileNameField.val('');
-        this.newProfileClassSelector.selectedIndex = 0;
+        this.newProfileClassSelector.get(0).selectedIndex = 0;
     },
     
     showExternalAuthInUseMessage: function() {
@@ -188,6 +200,8 @@ var associateProfileFields = {
             this.associatedProfileUriField.val(uri);
             this.verifyUrl = url;
             this.associatedArea.show();
+            this.associateProfileBackgroundOneArea.css("background-color","#f1f2ee");
+            this.associateProfileBackgroundOneArea.css("border","1px solid #ccc");
         }
     },
     
@@ -198,6 +212,8 @@ var associateProfileFields = {
         if (this.associationEnabled) {
             this.newProfileClassHasChanged();
             this.associationOptionsArea.show();
+            this.associateProfileBackgroundOneArea.css("background-color","#f1f2ee");
+            this.associateProfileBackgroundOneArea.css("border","1px solid #ccc");
         }
     },
     
