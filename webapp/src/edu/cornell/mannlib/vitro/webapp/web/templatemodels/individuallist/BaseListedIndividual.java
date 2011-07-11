@@ -38,7 +38,7 @@ public abstract class BaseListedIndividual extends BaseTemplateModel {
     /* Access methods for templates */
     
     public String getProfileUrl() {
-        return UrlBuilder.getIndividualProfileUrl(individual, vreq);
+        return cleanURIForDisplay( UrlBuilder.getIndividualProfileUrl(individual, vreq) );
     }    
 
     public String getImageUrl() {
@@ -52,11 +52,11 @@ public abstract class BaseListedIndividual extends BaseTemplateModel {
     } 
     
     public String getName() {           
-        return individual.getName();
+        return cleanTextForDisplay( individual.getName() );
     }
 
     public String getUri() {
-        return individual.getURI();
+        return cleanURIForDisplay( individual.getURI() );
     }  
     
     public List<String> getMostSpecificTypes() {

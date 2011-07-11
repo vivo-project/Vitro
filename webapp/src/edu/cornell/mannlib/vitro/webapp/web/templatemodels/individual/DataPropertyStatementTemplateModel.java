@@ -36,7 +36,9 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
             Literal literal, EditingPolicyHelper policyHelper, VitroRequest vreq) {
         super(subjectUri, propertyUri, policyHelper, vreq);
         
-        this.value = literal.getLexicalForm();
+        //attempt to strip any odd HTML
+        this.value = cleanTextForDisplay( literal.getLexicalForm() );
+        
         setEditAccess(literal, policyHelper, propertyUri);
        
     }

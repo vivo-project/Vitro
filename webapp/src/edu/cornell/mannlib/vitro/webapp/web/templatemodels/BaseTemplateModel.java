@@ -10,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
+import edu.cornell.mannlib.vitro.webapp.web.AntiScript;
 
 public abstract class BaseTemplateModel {
 
@@ -32,6 +33,22 @@ public abstract class BaseTemplateModel {
         return UrlBuilder.getUrl(path, params);
     }
 
+    /**
+     * Used to do any processing for display of URIs or URLs.  
+     * Currently this only checks for XSS exploits.
+     */
+    protected String cleanURIForDisplay( String dirty ){
+        return AntiScript.cleanURI(dirty, getServletContext());
+    }
+    
+    /**
+     * Used to do any processing for display of general text.  
+     * Currently this only checks for XSS exploits.
+     */
+    protected String cleanTextForDisplay( String dirty){
+        return AntiScript.cleanHtml(dirty, getServletContext());
+    }
+    
     public static ServletContext getServletContext() {
         return servletContext;
     }
@@ -39,5 +56,6 @@ public abstract class BaseTemplateModel {
     public static void setServletContext(ServletContext context) {
         servletContext = context;
     }
+ 
     
 }

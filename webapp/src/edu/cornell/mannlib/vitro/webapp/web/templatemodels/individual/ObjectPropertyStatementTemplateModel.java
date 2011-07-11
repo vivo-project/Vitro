@@ -16,7 +16,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
-import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class ObjectPropertyStatementTemplateModel extends PropertyStatementTemplateModel {
@@ -37,7 +36,7 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
         super(subjectUri, propertyUri, policyHelper, vreq);
         
         this.data = data;
-        this.objectUri = data.get(objectKey);
+        this.objectUri = cleanURIForDisplay( data.get(objectKey) );
         this.templateName = templateName;
         setEditAccess(policyHelper);
     }
@@ -66,7 +65,7 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     /* Access methods for templates */
 
     public Object get(String key) {
-        return data.get(key);
+        return cleanTextForDisplay( data.get(key) );
     }
     
     public String getEditUrl() {

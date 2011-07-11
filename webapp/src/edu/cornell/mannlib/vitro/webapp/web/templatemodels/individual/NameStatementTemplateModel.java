@@ -39,7 +39,7 @@ public class NameStatementTemplateModel extends
         EditLiteral literal = iDao.getLabelEditLiteral(subjectUri);
         
         if (literal != null) {
-            value = literal.getLexicalForm();
+            value = cleanTextForDisplay( literal.getLexicalForm() );
             setEditAccess(literal, policyHelper);
         } else {
             // If the individual has no rdfs:label, use the local name. It will not be editable. (This replicates previous behavior;
