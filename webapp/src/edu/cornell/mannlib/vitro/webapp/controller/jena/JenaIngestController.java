@@ -845,6 +845,7 @@ public class JenaIngestController extends BaseEditController {
 		ModelContext.getBaseOntModelSelector(getServletContext()).getABoxModel().removeSubModel(m);
 		ModelContext.getUnionOntModelSelector(getServletContext()).getABoxModel().removeSubModel(m);
 		ModelContext.getUnionOntModelSelector(getServletContext()).getTBoxModel().removeSubModel(m);
+		attachedModels.remove(modelName);
 		log.info("Detached " + modelName + " (" + m.hashCode() + ") from webapp");
 	}
 	
