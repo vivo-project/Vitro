@@ -161,5 +161,9 @@ webapp/web/js/raphael/*
 # See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/js/sparql/prototype.js
 
+# Apache Solr search platform. See /doc/3rd-party-licenses.txt for LICENSE file
 solr/**/*
 solr/*
+
+# OWASP AntiSamy Project.  See /doc/3rd-party-licenses.txt for LICENSE file
+webapp/src/edu/cornell/mannlib/vitro/webapp/web/antisamy-vitro-1.4.4.xml
