@@ -8,8 +8,8 @@
 <#assign existingClassGroupStyle = " " />
 <#assign selectClassGroupStyle = 'class="hidden"' />
 <#if menuAction = "Add">
-	<#assign existingClassGroupStyle = 'class="hidden"' />
-	<#assign selectClassGroupStyle = " " />
+    <#assign existingClassGroupStyle = 'class="hidden"' />
+    <#assign selectClassGroupStyle = " " />
 </#if>
 
 <h3>${menuAction} menu item</h3>
@@ -47,7 +47,7 @@
        <section id="existingContentType" name="existingContentType" ${existingClassGroupStyle}>
            <p>Selected content type for the associated page</p>
            <p>
-               <span id="selectedContentTypeValue" name="selectedContentTypeValue">${associatedPage}</span>
+               <span id="selectedContentTypeValue" name="selectedContentTypeValue"><em>${associatedPage}</em></span>
                <a id="changeContentType" name="changeContentType" href="#">Change content type</a>
            </p>
        </section>
@@ -79,12 +79,12 @@
                     <input type="checkbox" id="classInClassGroup" name="classInClassGroup" value="${classInClassGroup.URI}" 
                     <#if includeAllClasses = true>checked</#if> />
                      <#if isIndividualsForClassesPage?has_content>
-                    		<#list includeClasses as includeClass>
-                    			<#if includeClass = classInClassGroup.URI>
-                    				checked
-                    			</#if>
-                    		</#list>
-                   	</#if>
+                            <#list includeClasses as includeClass>
+                                <#if includeClass = classInClassGroup.URI>
+                                    checked
+                                </#if>
+                            </#list>
+                    </#if>
                     <label class="inline" for="${classInClassGroup.name}"> ${classInClassGroup.name}</label>
                     <span class="ui-icon-sortable"></span> <#--sortable icon for dragging and dropping menu items-->
                 </li>
@@ -92,22 +92,20 @@
             </ul>
         </section>
         
-        <#if internalClass?has_content>
-     		<#assign enableInternalClass = '<p>To enable this option, you must first select an institutional internal class for your instance</p>' />
-        	<#assign disableClass = 'class="disable"' />
-     	<#else>
-     		<#assign enableInternalClass = '' />
-    		<#assign disableClass = '' />
-     	</#if>
-    	<input type="checkbox" ${disableClass} name="display-internalClass" value="${internalClass}" id="display-internalClass" 
-     	<#if pageInternalOnly?has_content>
-     		checked
-     	</#if>
-    	 />
-     <label ${disableClass} for="display-internalClass}">Only display ${associatedPage} within my institution</label>
-     ${enableInternalClass}
+        <section id="internal-class" role="region">
+            <#if internalClass?has_content>
+                <#assign enableInternalClass = '<p>To enable this option, you must first select an institutional internal class for your instance</p>' />
+                <#assign disableClass = 'class="disable"' />
+            <#else>
+                <#assign enableInternalClass = '' />
+                <#assign disableClass = '' />
+            </#if>
         
+            <input type="checkbox" ${disableClass} name="display-internalClass" value="${internalClass}" id="display-internalClass" <#if pageInternalOnly?has_content>checked</#if> />
+            <label ${disableClass} class="inline" for="display-internalClass">Only display <em>${associatedPage}</em> within my institution</label>
         
+            ${enableInternalClass}
+        </section>
         <input type="submit" name="submit-${menuAction}" value="Save changes" class="submit" /> or <a class="cancel" href="${formUrls}">Cancel</a>
 
         <p class="requiredHint">* required fields</p>

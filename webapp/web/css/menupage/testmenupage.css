@@ -42,3 +42,7 @@ ul#selectedClasses {
 #edit-menu-item input.submit {
     margin-top: 20px;
 }
+#internal-class {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
