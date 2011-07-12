@@ -159,7 +159,7 @@ public class SimpleReasoner extends StatementListener {
 			log.error("Exception while retracting inferences: " + e.getMessage());
 		}
 	}
-
+	
 	/*
 	 * Performs incremental selected ABox reasoning based
 	 * on changes to the class or property hierarchy.
@@ -1244,6 +1244,7 @@ public class SimpleReasoner extends StatementListener {
         @Override
         public void run() {  
       
+        	log.info("starting DeltaComputer.run");
         	Model retractions = aBoxDeltaModeler1.getRetractions();
         	boolean finished = (retractions.size() == 0);
         	String qualifier = "(1)";
@@ -1252,7 +1253,7 @@ public class SimpleReasoner extends StatementListener {
     			retractions.enterCriticalSection(Lock.READ);	
     			
     			try {
-    	   	       	log.info("started computing inferences for batch " + qualifier + " update");
+    	   	       	log.info("run: started computing inferences for batch " + qualifier + " update");
     				StmtIterator iter = retractions.listStatements();
     	
     				int num = 0;
@@ -1260,7 +1261,9 @@ public class SimpleReasoner extends StatementListener {
     					Statement stmt = iter.next();
     					
     					try {
-    						removedStatement(stmt);
+    				        removedABoxTypeAssertion(stmt, inferenceModel);
+    				        setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
+    				        //TODO update this part when subproperty inferencing is added.
     					} catch (Exception e) {
     						log.error("exception while computing inferences for batch " + qualifier + " update: " +  e.getMessage());
     					}
@@ -1269,7 +1272,6 @@ public class SimpleReasoner extends StatementListener {
 		                if ((num % 6000) == 0) {
 		                    log.info("still computing inferences for batch " + qualifier + " update...");
 		                }	
-
     				}
     			} finally {
     	    		retractions.removeAll();	
@@ -1292,6 +1294,8 @@ public class SimpleReasoner extends StatementListener {
     				log.info("switching from batch mode 2 to batch mode 1");
     			} else {
     				finished = true;
+    		       	batchMode1 = false;
+    	        	batchMode2 = false;   
     				log.info("finished processing retractions in batch mode");
     			}	
         	}
@@ -1306,8 +1310,11 @@ public class SimpleReasoner extends StatementListener {
                 aBoxDeltaModeler2.getRetractions().removeAll();
          	}
  
-        	batchMode1 = false;
-        	batchMode2 = false;    		
+        	if (batchMode1 || batchMode2) {
+        		log.warn("Unexpected condition at the end of DeltaComputer.run method: batchMode1=" + batchMode1 + ", batchMode2 =" + batchMode2 + ". (both should be false)" );
+            	batchMode1 = false;
+            	batchMode2 = false;    		        		
+        	}
         }        
     }
     	
