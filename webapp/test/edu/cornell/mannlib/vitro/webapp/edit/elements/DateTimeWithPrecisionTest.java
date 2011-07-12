@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.edit.elements;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import org.junit.runners.Parameterized.Parameters;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.datatypes.xsd.XSDDateTime;
 import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
@@ -384,4 +386,38 @@ public class DateTimeWithPrecisionTest {
         Assert.assertEquals(VitroVocabulary.Precision.DAY.uri(), precisionURI);
     }
         
+
+    @Test
+    public void basicGetMapForTemplateTest()  throws Exception{          
+        String FIELDNAME = "testfield";        
+        Field field = new Field();
+        field.setName(FIELDNAME);
+        DateTimeWithPrecision dtwp = new DateTimeWithPrecision(field);
+        
+        EditConfiguration config = new EditConfiguration();
+        EditSubmission sub = null;
+        
+        Map<String,String> urisInScope = new HashMap<String,String>();
+        urisInScope.put(dtwp.getPrecisionVariableName(),
+                VitroVocabulary.Precision.MINUTE.uri());
+        config.setUrisInScope(urisInScope);
+                
+        Map<String,Literal> literalsInScope = new HashMap<String,Literal>();
+        literalsInScope.put(dtwp.getValueVariableName(),
+                            ResourceFactory.createTypedLiteral("1999-02-15T10:00",XSDDatatype.XSDdateTime) );
+        config.setLiteralsInScope(literalsInScope);        
+        
+        Map<String,Object> map = dtwp.getMapForTemplate(config,sub);
+        Assert.assertEquals("year wrong", "1999", map.get("year"));
+        Assert.assertEquals("month wrong", "2", map.get("month"));
+        Assert.assertEquals("day wrong", "15", map.get("day"));
+        Assert.assertEquals("hour wrong", "10", map.get("hour"));
+        Assert.assertEquals("minute wrong", "0", map.get("minute"));  
+        Assert.assertEquals("second wrong", "", map.get("second"));
+        
+        Assert.assertEquals("precision wrong", VitroVocabulary.Precision.MINUTE.uri(), map.get("existingPrecision"));
+        
+        Assert.assertEquals("fieldname wrong", FIELDNAME, map.get("fieldName"));                    
+    }
+    
 }
