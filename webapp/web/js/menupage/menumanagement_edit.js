@@ -22,8 +22,7 @@ var menuManagementEdit = {
            return false;
         });
         this.selectClassGroupDropdown.change(function() {
-        	alert("class group change");
-        	chooseClassGroup();
+        	menuManagementEdit.chooseClassGroup();
         });
     },
     showClassGroups: function() {
@@ -43,14 +42,12 @@ var menuManagementEdit = {
     	this.existingContentType.removeClass("hide");
     	this.selectClassesMessage.removeClass("hide");
 		this.classesForClassGroup.removeClass("hide");
-    }
-   ,
+    },
     chooseClassGroup: function() {
     	
-    	var uri = "/dataservice?getSolrIndividualsByVClass=1&vclassId=";
+    	var url = "dataservice?getVClassesForVClassGroup=1&classgroupUri=";
     	var vclassUri = this.selectClassGroupDropdown.val();
-    	uri += encodeURIComponent(vclassUri);
-    	alert("URI for class group " + uri);
+    	url += encodeURIComponent(vclassUri);
     	//Make ajax call to retrieve vclasses
 	  $.getJSON(url, function(results) {
 		  
@@ -58,25 +55,26 @@ var menuManagementEdit = {
              
           } else {
         	  //update existing content type with correct class group name and hide class group select again
-        	  this.hideClassGroups();
+        	  var _this = menuManagementEdit;
+        	  _this.hideClassGroups();
         	  
-        	  this.selectedGroupForPage.html(results.classGroupName);
+        	  _this.selectedGroupForPage.html(results.classGroupName);
           		//retrieve classes for class group and display with all selected
-        	  this.classesForClassGroup.empty();
-        	  this.classesForClassGroup.append("<ul id='selectedClasses' name='selectedClasses'>");
-        	  this.classesForClassGroup.append('<li class="ui-state-default">' + 
+        	  _this.classesForClassGroup.empty();
+        	  _this.classesForClassGroup.append("<ul id='selectedClasses' name='selectedClasses'>");
+        	  _this.classesForClassGroup.append('<li class="ui-state-default">' + 
                       '<input type="checkbox" name="allSelected" id="allSelected" value="all" checked</#if>' +  
                       '<label class="inline" for="All"> All</label>' +
                '</li>');
               $.each(results.classes, function(i, item) {
             	  var thisClass = results.classes[i];
             	  var thisClassName = thisClass.name;
-            	  this.classesForClassGroup.append(' <li class="ui-state-default">' + 
+            	  menuManagementEdit.classesForClassGroup.append(' <li class="ui-state-default">' + 
                           '<input type="checkbox" name="classInClassGroup" value="' + thisClass.URI + '" />' +  
                          '<label class="inline" for="' + thisClassName + '"> ' + thisClassName + '</label>' + 
                           '</li>');
               });
-        	  this.classesForClassGroup.append("</ul>");
+        	  _this.classesForClassGroup.append("</ul>");
 				
               
           }
