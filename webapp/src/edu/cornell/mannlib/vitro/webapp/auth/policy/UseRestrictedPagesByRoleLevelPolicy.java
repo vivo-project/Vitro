@@ -20,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenu
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManagePortals;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageTabs;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.RefreshVisualizationCacheAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeIndividualEditingPanel;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeRevisionInfo;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeSiteAdminPage;
@@ -110,6 +111,8 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		} else if (whatToAuth instanceof EditOwnAccount) {
 			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
 			
+		} else if (whatToAuth instanceof RefreshVisualizationCacheAction) {
+			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
 		} else {
 			result = defaultDecision("Unrecognized action");
 		}
