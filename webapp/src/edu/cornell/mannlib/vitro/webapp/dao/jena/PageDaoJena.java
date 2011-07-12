@@ -313,6 +313,7 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         initialBindings.add("pageUri", ResourceFactory.createResource(pageUri));
         
         Model displayModel = getOntModelSelector().getDisplayModel();
+        displayModel.enterCriticalSection(false);
         try{                    
             QueryExecution qexec = QueryExecutionFactory.create( classGroupPageQuery, displayModel , initialBindings);
             try{
@@ -347,6 +348,7 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
          initialBindings.add("pageUri", ResourceFactory.createResource(pageUri));
          
          Model displayModel = getOntModelSelector().getDisplayModel();
+         displayModel.enterCriticalSection(false);
          try{
              QueryExecution qexec = QueryExecutionFactory.create( classIntersectionPageQuery, displayModel , initialBindings);
              try{
@@ -401,6 +403,7 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         List<String> classes = new ArrayList<String>();
         
         Model displayModel = getOntModelSelector().getDisplayModel();
+        displayModel.enterCriticalSection(false);
         try{
             QueryExecution qexec = QueryExecutionFactory.create( individualsForClassesQuery, displayModel , initialBindings);
             try{
