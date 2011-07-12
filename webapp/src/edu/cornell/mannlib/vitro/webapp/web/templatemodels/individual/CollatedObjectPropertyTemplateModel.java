@@ -5,13 +5,10 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,7 +35,8 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
     private static final Pattern ORDER_BY_SUBCLASS_PATTERN = 
         Pattern.compile("ORDER\\s+BY\\s+(DESC\\s*\\(\\s*)?\\?" + SUBCLASS_VARIABLE_NAME, Pattern.CASE_INSENSITIVE);
     
-    private final SortedMap<String, List<ObjectPropertyStatementTemplateModel>> subclasses;
+    private final List<SubclassTemplateModel> subclasses;
+    private final VClassDao vclassDao;
     
     CollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, 
             VitroRequest vreq, EditingPolicyHelper policyHelper,
@@ -47,6 +45,8 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         
         super(op, subject, vreq, policyHelper); 
 
+        vclassDao = vreq.getWebappDaoFactory().getVClassDao();
+        
         if (populatedObjectPropertyList.contains(op)) {
             log.debug("Getting data for populated object property " + op.getURI());
             
@@ -59,12 +59,16 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
             /* Collate the data */
            subclasses = collate(subjectUri, propertyUri, statementData, policyHelper);
             
-            for (List<ObjectPropertyStatementTemplateModel> list : subclasses.values()) {
-                postprocessStatementList(list);
-            }
+           for (SubclassTemplateModel subclass : subclasses) {
+               List<ObjectPropertyStatementTemplateModel> list = subclass.getStatements();
+               postprocessStatementList(list);
+           }
+
+           Collections.sort(subclasses);
+           
         } else {
             log.debug("Object property " + getUri() + " is unpopulated.");
-            subclasses = new TreeMap<String, List<ObjectPropertyStatementTemplateModel>>();
+            subclasses = new ArrayList<SubclassTemplateModel>();
         }
     }
     
@@ -131,7 +135,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
                 }                
             }
             // Sort the data for this object from most to least specific subclass, with nulls at end
-            Collections.sort(dataForThisObject, new SubclassComparator()); 
+            Collections.sort(dataForThisObject, new DataComparatorBySubclass()); 
             filteredList.add(dataForThisObject.get(0));
         }
 
@@ -143,13 +147,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         }
     }
     
-    private class SubclassComparator implements Comparator<Map<String, String>> {
-        
-        private VClassDao vclassDao;
-        
-        SubclassComparator() {
-            this.vclassDao = vreq.getWebappDaoFactory().getVClassDao();
-        }
+    private class DataComparatorBySubclass implements Comparator<Map<String, String>> {
 
         @Override
         public int compare(Map<String, String> map1, Map<String, String> map2) {
@@ -188,64 +186,107 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
     }
     
     // Collate the statements by subclass. 
-    private SortedMap<String, List<ObjectPropertyStatementTemplateModel>> collate(String subjectUri, String propertyUri,
+    private List<SubclassTemplateModel> collate(String subjectUri, String propertyUri,
             List<Map<String, String>> statementData, EditingPolicyHelper policyHelper) {
-    
-        SortedMap<String, List<ObjectPropertyStatementTemplateModel>> subclassMap = 
-            new TreeMap<String, List<ObjectPropertyStatementTemplateModel>>();
-        
+  
         String objectKey = getObjectKey();
         
-        Map<String, String> subclassUrisToNames = new HashMap<String, String>();
+        List<SubclassTemplateModel> subclasses = new ArrayList<SubclassTemplateModel>();
         
         for (Map<String, String> map : statementData) {
             
             String subclassUri = map.get(SUBCLASS_VARIABLE_NAME);
+
+            VClass vclass = vclassDao.getVClassByURI(subclassUri);
             
-            // Rows with no subclass are put into a subclass map with an empty name.
-            if (subclassUri == null) {
-                subclassUri = "";
-            }
-            
-            // Keep a map of subclass uris to subclass names, so we don't have
-            // to keep recomputing from the dao each time we hit the same subclass.
-            String subclassName;  
-            if (subclassUri.isEmpty()) {
-                subclassName = "";
-            } else if ( subclassUrisToNames.containsKey(subclassUri) ) {
-                subclassName = subclassUrisToNames.get(subclassUri);
-            } else {
-                subclassName = getSubclassName(subclassUri, vreq);
-                subclassUrisToNames.put(subclassUri, subclassName);
+            List<ObjectPropertyStatementTemplateModel> listForThisSubclass = null;
+
+            for (SubclassTemplateModel subclass : subclasses) {
+                VClass subclassVClass = subclass.getVClass();
+                if ( ( vclass == null && subclassVClass == null ) ||
+                        ( vclass != null && vclass.equals(subclassVClass) ) ) {
+                    listForThisSubclass = subclass.getStatements();
+                    break;
+                }
             }
 
-            List<ObjectPropertyStatementTemplateModel> listForThisSubclass;
-            if ( subclassMap.containsKey(subclassName) ) {
-                listForThisSubclass = subclassMap.get(subclassName);              
-            } else {
-                listForThisSubclass = new ArrayList<ObjectPropertyStatementTemplateModel>();  
-                subclassMap.put(subclassName, listForThisSubclass);
+            if (listForThisSubclass == null) {
+                listForThisSubclass = new ArrayList<ObjectPropertyStatementTemplateModel>(); 
+                subclasses.add(new SubclassTemplateModel(vclass, listForThisSubclass));
             }
-            
+
             listForThisSubclass.add(new ObjectPropertyStatementTemplateModel(subjectUri, 
                     propertyUri, objectKey, map, policyHelper, getTemplateName(), vreq));
+
         } 
- 
-        return subclassMap; 
+        
+        return subclasses;
     }
     
-    private String getSubclassName(String subclassUri, VitroRequest vreq) {
-        if (subclassUri.isEmpty()) {
-           return "";
-        }         
-        VClassDao vclassDao = vreq.getWebappDaoFactory().getVClassDao();
-        VClass vclass = vclassDao.getVClassByURI(subclassUri);
-        return vclass != null ? vclass.getName() : "";
-    }
+//    class SubclassComparatorByDisplayRank implements Comparator<String> {
+//        
+//        private List<VClass> vclasses;
+//
+//        SubclassComparatorByDisplayRank(List<VClass> vclasses) {
+//            this.vclasses = vclasses;
+//        }
+//        
+//        @Override
+//        public int compare(String nameLeft, String nameRight) {
+//            
+//            if (StringUtils.isBlank(uriLeft)) {
+//                return StringUtils.isBlank(uriRight) ? 0 : 1;
+//            }
+//            
+//            VClass vclassLeft = vclassDao.getVClassByURI(uriLeft);
+//            VClass vclassRight = vclassDao.getVClassByURI(uriRight);
+//            
+//            if (vclassLeft == null) {
+//                return vclassRight == null ? 0 : 1;
+//            }
+//            
+//            int rankLeft = vclassLeft.getDisplayRank();
+//            int rankRight = vclassRight.getDisplayRank();
+//            
+//            int intCompare = 0;
+//            
+//            // Values < 1 are undefined and go at end, not beginning
+//            if (rankLeft < 1) {
+//                intCompare = rankRight < 1 ? 0 : 1;
+//            } else if (rankRight < 1) {
+//                intCompare = -1;
+//            } else {           
+//                intCompare = ((Integer)rankLeft).compareTo(rankRight);
+//            }
+//            
+//            if (intCompare != 0) {
+//                return intCompare;
+//            }
+//
+//            // If display ranks are equal, sort by name            
+//            if (nameLeft == null) {
+//                return nameRight == null ? 0 : 1;
+//            } 
+//            if (nameRight == null) {
+//                return -1;
+//            }
+//            return nameLeft.compareToIgnoreCase(nameRight);
+//
+//        }        
+//    }
+    
+//    private String getSubclassName(String subclassUri) {
+//        if (subclassUri.isEmpty()) {
+//           return "";
+//        }         
+//        VClass vclass = vclassDao.getVClassByURI(subclassUri);
+//        return vclass != null ? vclass.getName() : "";
+//    }
+    
     
     /* Access methods for templates */
     
-    public Map<String, List<ObjectPropertyStatementTemplateModel>> getSubclasses() {
+    public List<SubclassTemplateModel> getSubclasses() {
         return subclasses;
     }
     

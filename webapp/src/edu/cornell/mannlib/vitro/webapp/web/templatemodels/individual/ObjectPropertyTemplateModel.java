@@ -111,7 +111,6 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         
         objectKey = getQueryObjectVariableName();
         
-
         setAddAccess(policyHelper, op);
     }
 
