@@ -103,7 +103,7 @@ public class VitroVocabulary {
     public static final String SKIP_EDIT_FORM = vitroURI + "skipEditForm";
     public static final String PROPERTY_STUBOBJECTPROPERTYANNOT = vitroURI + "stubObjectPropertyAnnot";
 	public static final String PROPERTY_COLLATEBYSUBCLASSANNOT = vitroURI + "collateBySubclassAnnot";
-
+    public static final String IS_INTERNAL_CLASSANNOT = vitroURI + "isMenuPageIntersectionClass";
     // ================== link related =====================================
 
     public static final String LINK = vitroURI+"Link";

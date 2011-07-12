@@ -322,6 +322,15 @@ public class MenuManagementEdit extends VitroHttpServlet {
 					ResourceFactory.createProperty(DisplayVocabulary.GETINDIVIDUALS_FOR_CLASS),
 					ResourceFactory.createResource(classUri)));
 		}
+		//Also check if internal class checked
+		String internalClass = vreq.getParameter("display-internalClass");
+		if(internalClass != null && !internalClass.isEmpty()) {
+			//The value should be the internal class uri
+			dgModel.add(dgModel.createStatement(
+					dataGetterResource, 
+					ResourceFactory.createProperty(DisplayVocabulary.RESTRICT_RESULTS_BY),
+					ResourceFactory.createResource(internalClass)));
+		}
 		return dgModel;
 	}
 

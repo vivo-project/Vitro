@@ -26,22 +26,22 @@ var menuManagementEdit = {
         });
     },
     showClassGroups: function() {
-    	if(!this.existingContentType.hasClass("hide")) {
-    		this.existingContentType.addClass("hide");
-    		this.selectClassesMessage.addClass("hide");
-    		this.classesForClassGroup.addClass("hide");
+    	if(!this.existingContentType.hasClass("hidden")) {
+    		this.existingContentType.addClass("hidden");
+    		this.selectClassesMessage.addClass("hidden");
+    		this.classesForClassGroup.addClass("hidden");
     	} 
-		this.selectContentType.removeClass("hide");
+		this.selectContentType.removeClass("hidden");
 
     },
     hideClassGroups: function() {
-    	if(!this.selectContentType.hasClass("hide")) {
+    	if(!this.selectContentType.hasClass("hidden")) {
     		
-    		this.selectContentType.addClass("hide");
+    		this.selectContentType.addClass("hidden");
     	}
-    	this.existingContentType.removeClass("hide");
-    	this.selectClassesMessage.removeClass("hide");
-		this.classesForClassGroup.removeClass("hide");
+    	this.existingContentType.removeClass("hidden");
+    	this.selectClassesMessage.removeClass("hidden");
+		this.classesForClassGroup.removeClass("hidden");
     },
     chooseClassGroup: function() {
     	
@@ -56,13 +56,13 @@ var menuManagementEdit = {
           } else {
         	  //update existing content type with correct class group name and hide class group select again
         	  var _this = menuManagementEdit;
-        	  _this.hideClassGroups();
+        	  menuManagementEdit.hideClassGroups();
         	  
-        	  _this.selectedGroupForPage.html(results.classGroupName);
+        	  menuManagementEdit.selectedGroupForPage.html(results.classGroupName);
           		//retrieve classes for class group and display with all selected
-        	  _this.classesForClassGroup.empty();
-        	  _this.classesForClassGroup.append("<ul id='selectedClasses' name='selectedClasses'>");
-        	  _this.classesForClassGroup.append('<li class="ui-state-default">' + 
+        	  menuManagementEdit.classesForClassGroup.empty();
+        	  menuManagementEdit.classesForClassGroup.append('<ul id="selectedClasses" name="selectedClasses">');
+        	  menuManagementEdit.classesForClassGroup.append('<li class="ui-state-default">' + 
                       '<input type="checkbox" name="allSelected" id="allSelected" value="all" checked/>' +  
                       '<label class="inline" for="All"> All</label>' +
                '</li>');
@@ -75,7 +75,7 @@ var menuManagementEdit = {
                          '<label class="inline" for="' + thisClassName + '"> ' + thisClassName + '</label>' + 
                           '</li>');
               });
-        	  _this.classesForClassGroup.append("</ul>");
+              menuManagementEdit.classesForClassGroup.append("</ul>");
 				
               
           }

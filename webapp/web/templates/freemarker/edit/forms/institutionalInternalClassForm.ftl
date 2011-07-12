@@ -2,13 +2,13 @@
 
 <#-- 
 Institutional Internal Class Form 
-Associated with generator:
-edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.InstitutionalInternalClassForm
+edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.InstitutionalInternalClassForm.
+
 -->
 
 
 
-<h2>Lorem ipsum dolor sit amet</h2>
+<h2>Set up Institutional Internal Class</h2>
 
 <form class="editForm" action = "${editConfiguration.submitToUrl}">
 	

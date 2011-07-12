@@ -62,6 +62,7 @@ public class DisplayVocabulary {
     public static final String HAS_TEXT_REPRESENTATION = NS + "hasMenuText";
     
     
+    
     /** <p>The namespace of the vocabulary as a string</p>
      *  @see #NS */
     public static String getURI() {return NS;}

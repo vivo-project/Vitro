@@ -18,6 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 
 import com.hp.hpl.jena.ontology.OntModel;
@@ -36,6 +37,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 public class MenuManagementController extends FreemarkerHttpServlet {
     private static final Log log = LogFactory.getLog(MenuManagementController.class);
     protected final static String SUBMIT_FORM = "/processEditDisplayModel"; 
+    protected final static String CANCEL_FORM = "/individual?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fontologies%2Fdisplay%2F1.1%23DefaultMenu&switchToDisplayModel=true"; 
 
     protected final static String EDIT_FORM = "testMenuManagement.ftl"; 
     protected final static String CMD_PARAM = "cmd";
@@ -76,6 +78,9 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     	}
     	//Form url submission
     	data.put("formUrls", vreq.getContextPath() + SUBMIT_FORM);
+    	data.put("cancelUrl", vreq.getContextPath() + CANCEL_FORM);
+    	//This will be reset if internal class exists
+    	data.put("internalClass", "");
     	return new TemplateResponseValues(EDIT_FORM, data);
     	
     }
@@ -109,6 +114,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
 		Map<String, Object> data = new HashMap<String,Object>();
     	data.put("menuAction", "Add");
     	//Generate empty values for fields
+    	data.put("menuItem", "");
     	data.put("menuName", "");
     	data.put("prettyUrl", "");
     	data.put("associatedPage", "");
@@ -266,6 +272,21 @@ public class MenuManagementController extends FreemarkerHttpServlet {
 		this.getClassesForDataGetter(writeModel, dataGetter, data);
 		//Also save the class group for display
 		this.getClassGroupForDataGetter(writeModel, dataGetter, data);
+		//Check whether institutional internal class exists
+		this.checkInstitutionalInternalClass(writeModel, data);
+		this.checkIfPageInternal(writeModel, data);
+		
+	}
+
+	private void checkIfPageInternal(OntModel writeModel,
+			Map<String, Object> data) {
+		if(data.containsKey("internalClass") && data.containsKey("restrictClasses")) {
+			List<String> restrictClasses = (List<String>)data.get("restrictClasses");
+			String internalClass = (String) data.get("internalClass");
+			if(restrictClasses.contains(internalClass)) {
+				data.put("pageInternalOnly", true);
+			}
+		}
 		
 	}
 
@@ -279,41 +300,55 @@ public class MenuManagementController extends FreemarkerHttpServlet {
 		
 	}
 
+	//Instead of returning vclasses, just returning class Uris as vclasses appear to need their own template
+	//to show up correctly
 	private void getClassesForDataGetter(OntModel writeModel, Resource dataGetter,
 			Map<String, Object> data) {
-    	VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(getServletContext());
+    	
 
 		StmtIterator classesIt = writeModel.listStatements(dataGetter, 
 				ResourceFactory.createProperty(DisplayVocabulary.GETINDIVIDUALS_FOR_CLASS), 
 				(RDFNode) null);
-		//TODO: Copied from IndividualsForClassesDataGetter, perhaps could reuse in separate method
-		VClassGroup classesGroup = new VClassGroup();
-    	classesGroup.setURI("displayClasses");
-    	List<VClass> vClasses = new ArrayList<VClass>();
+		
+    	//Just need the class uris
+    	List<String> classUris = new ArrayList<String>();
 
 		while(classesIt.hasNext()) {
 			String classUri = classesIt.nextStatement().getResource().getURI();
-    		VClass vclass = vcgc.getCachedVClass(classUri);
-    		if(vclass != null) {
-    			
-    			log.debug("VClass does exist for " + classUri + " and entity count is " + vclass.getEntityCount());
-    			vClasses.add(vclass);
-    		} else {
-    			log.debug("Vclass " + classUri + " does not exist in the cache");
-    			log.error("Error occurred, vclass does not exist for this uri " + classUri);
-    			//Throw exception here
-    		}
+    		classUris.add(classUri);
 		}
-		data.put("includeClasses", classesGroup);
-		//TODO: Check if classes included are equivalent to classes in class group, and set "includeAllClasses" to true if so
-
+		data.put("includeClasses", classUris);
+		
+		//This checks whether restrict classes returned and include institutional internal class
+		//TODO: Create separate method to get restricted classes
+		//Get restrict classes - specifically internal class 
+		List<String> restrictClassUris = new ArrayList<String>();
+		StmtIterator restrictClassesIt = writeModel.listStatements(dataGetter, 
+				ResourceFactory.createProperty(DisplayVocabulary.RESTRICT_RESULTS_BY), 
+				(RDFNode) null);
+		while(restrictClassesIt.hasNext()) {
+			String restrictClassUri = restrictClassesIt.nextStatement().getResource().getURI();
+    		restrictClassUris.add(restrictClassUri);
+		}
+		data.put("restrictClasses", restrictClassUris);
+		
+		
 	}
 	
-	//TODO: Create method to get restricted classes
-	//Get restrict classes - specifically internal class 
-	//VClassGroup restrictClassesGroup = new VClassGroup();
-	//restrictClassesGroup.setURI("restrictClasses");
-	//List<VClass> restrictVClasses = new ArrayList<VClass>();
+	
+	//Check whether any classes exist with internal class restrictions
+	private void checkInstitutionalInternalClass(OntModel writeModel, 
+			Map<String, Object> data) {
+		OntModel mainModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
+		StmtIterator internalIt = mainModel.listStatements(null, ResourceFactory.createProperty(VitroVocabulary.IS_INTERNAL_CLASSANNOT), (RDFNode) null);
+		//List<String> internalClasses = new ArrayList<String>();
+		if(internalIt.hasNext()) {
+			//internalClasses.add(internalIt.nextStatement().getResource().getURI());
+			String internalClass = internalIt.nextStatement().getResource().getURI();
+			data.put("internalClass", internalClass);
+		}
+		
+	}
 
     //Get the class page
 	private void getClassGroupForDataGetter(OntModel writeModel, Resource dataGetter,

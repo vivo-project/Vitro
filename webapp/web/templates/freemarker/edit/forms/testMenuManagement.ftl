@@ -6,9 +6,9 @@
 
 <#-- some additional processing here which shows or hides the class group selection and classes based on initial action-->
 <#assign existingClassGroupStyle = " " />
-<#assign selectClassGroupStyle = 'class="hide"' />
+<#assign selectClassGroupStyle = 'class="hidden"' />
 <#if menuAction = "Add">
-	<#assign existingClassGroupStyle = 'class="hide"' />
+	<#assign existingClassGroupStyle = 'class="hidden"' />
 	<#assign selectClassGroupStyle = " " />
 </#if>
 
@@ -65,8 +65,8 @@
        </section> 
        
         <#-- Select classes in a class group -->    
-        <p id="selectClassesMessage" name="selectClassesMessage">Select content to display</p>
-        <section id="classesInSelectedGroup" name="classesInSelectedGroup">
+        <p id="selectClassesMessage" name="selectClassesMessage" ${existingClassGroupStyle}>Select content to display</p>
+        <section id="classesInSelectedGroup" name="classesInSelectedGroup" ${existingClassGroupStyle}>
             
             <ul id="selectedClasses" name="selectedClasses">
                 <#--Adding a default class for "ALL" in case all classes selected-->
@@ -76,13 +76,37 @@
                 </li>
                 <#list classGroup as classInClassGroup>
                 <li class="ui-state-default">
-                    <input type="checkbox" id="classInClassGroup" name="classInClassGroup" value="${classInClassGroup.URI}" <#if includeAllClasses = true>checked</#if> />
+                    <input type="checkbox" id="classInClassGroup" name="classInClassGroup" value="${classInClassGroup.URI}" 
+                    <#if includeAllClasses = true>checked</#if> />
+                     <#if isIndividualsForClassesPage?has_content>
+                    		<#list includeClasses as includeClass>
+                    			<#if includeClass = classInClassGroup.URI>
+                    				checked
+                    			</#if>
+                    		</#list>
+                   	</#if>
                     <label class="inline" for="${classInClassGroup.name}"> ${classInClassGroup.name}</label>
                     <span class="ui-icon-sortable"></span> <#--sortable icon for dragging and dropping menu items-->
                 </li>
                 </#list>
             </ul>
         </section>
+        
+        <#if internalClass?has_content>
+     		<#assign enableInternalClass = '<p>To enable this option, you must first select an institutional internal class for your instance</p>' />
+        	<#assign disableClass = 'class="disable"' />
+     	<#else>
+     		<#assign enableInternalClass = '' />
+    		<#assign disableClass = '' />
+     	</#if>
+    	<input type="checkbox" ${disableClass} name="display-internalClass" value="${internalClass}" id="display-internalClass" 
+     	<#if pageInternalOnly?has_content>
+     		checked
+     	</#if>
+    	 />
+     <label ${disableClass} for="display-internalClass}">Only display ${associatedPage} within my institution</label>
+     ${enableInternalClass}
+        
         
         <input type="submit" name="submit-${menuAction}" value="Save changes" class="submit" /> or <a class="cancel" href="${formUrls}">Cancel</a>
 
