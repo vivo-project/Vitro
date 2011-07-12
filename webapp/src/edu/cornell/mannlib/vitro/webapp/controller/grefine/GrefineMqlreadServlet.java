@@ -52,7 +52,6 @@ public class GrefineMqlreadServlet extends VitroHttpServlet {
 		super.doGet(req, resp);
 		resp.setContentType("application/json");
 		VitroRequest vreq = new VitroRequest(req);
-		
 		try {
 			if (vreq.getParameter("query") != null) {
 				
@@ -61,7 +60,7 @@ public class GrefineMqlreadServlet extends VitroHttpServlet {
 				String responseStr = (vreq.getParameter("callback") == null) ? qJson
 						.toString() : vreq.getParameter("callback") + "("
 						+ qJson.toString() + ")";
-				System.out.println(responseStr);
+				// System.out.println(responseStr);
 				ServletOutputStream out = resp.getOutputStream();
 				out.print(responseStr);
 			}

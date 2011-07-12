@@ -75,7 +75,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 				String responseStr = (vreq.getParameter("callback") == null) ? qJson
 						.toString() : vreq.getParameter("callback") + "("
 						+ qJson.toString() + ")";
-				System.out.println("JSONReconcileServlet result: " + responseStr);
+				// System.out.println("JSONReconcileServlet result: " + responseStr);
 				ServletOutputStream out = resp.getOutputStream();
 				out.print(responseStr);
 			} else { // metadata
@@ -119,7 +119,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 			// "q2":{"query":"Dina","type":"http://xmlns.com/foaf/0.1/Person","type_strict":"should"}}
 			String qStr = (String) qObj;
 			queries.add(qStr);
-			System.out.println("JSONReconcileServlet query: " + qStr);
+			// System.out.println("JSONReconcileServlet query: " + qStr);
 			log.debug("\nquery: " + qStr + "\n");
 		}
 
