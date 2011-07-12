@@ -196,20 +196,19 @@ public class ApplicationBean {
     public String getCopyrightAnchor() {
         return copyrightAnchor;
     }
-    
+
+    // TODO deprecate or remove the following three legacy methods?
+
     public String getRootBreadCrumbURL() {
     	return "";
-    	//TODO implement me
     }
     
     public String getRootBreadCrumbAnchor() {
     	return "";
-    	//TODO implement me
     }
     
     public String getShortHand() {
-    	return "implement ApplicationBean.getShortHand()";
-    	// TODO implement me
+    	return "";
     }
 
     /**
