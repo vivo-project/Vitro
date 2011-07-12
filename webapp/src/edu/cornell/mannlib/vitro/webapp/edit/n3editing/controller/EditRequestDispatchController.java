@@ -37,6 +37,8 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     public static Log log = LogFactory.getLog(EditRequestDispatchController.class);
     
     final String DEFAULT_OBJ_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultObjectPropertyFormGenerator";
+    final String DEFAULT_DATA_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDataPropertyFormGenerator";
+
     final String DEFAULT_ERROR_FORM = "error.jsp";
     final String DEFAULT_ADD_INDIVIDUAL = "defaultAddMissingIndividualForm.jsp";
     @Override
@@ -219,7 +221,9 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          //what goes in the map for templates?
          Map<String,Object> templateData = new HashMap<String,Object>();
          templateData.put("editConfiguration", new EditConfigurationTemplateModel( editConfig, vreq));
-         templateData.put("formTitle", formTitle);
+         //templateData.put("formTitle", formTitle);
+         //templateData.put("pageData", retrieveEditData(vreq));
+         //retrieveEditData(vreq, templateData);
          
          return new TemplateResponseValues(template, templateData);
          }catch(Throwable th){
@@ -323,4 +327,8 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     	HashMap<String,Object> map = new HashMap<String,Object>();
    	 map.put("errorMessage", "help is not yet implemented");
    	 return new TemplateResponseValues("error-message.ftl", map);    }
+    
+    
+    
+    
 }

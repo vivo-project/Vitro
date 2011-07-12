@@ -119,64 +119,12 @@ public class FieldVTwo {
     private EditElementVTwo editElement=null;;
         
     /* *********************** Constructors ************************** */
-
-    public FieldVTwo(String config, String varName) {
-        name=varName;
-        JSONObject jsonObj  = null;
-        try{
-            jsonObj = new JSONObject(config);
-        }catch (JSONException je){
-            throw new Error(je);
-        }
-        originalJson = config;
-        setValuesFromJson(jsonObj, varName);
-    }
-
-    public FieldVTwo(JSONObject obj, String varName) {
-        setValuesFromJson(obj, varName);
-    }
-
+    
     public FieldVTwo() {}
         
     private static String[] parameterNames = {"editElement","newResource","validators","optionsType","predicateUri","objectClassUri","rangeDatatypeUri","rangeLang","literalOptions","assertions"};
     static{  Arrays.sort(parameterNames); }
     
-    private void setValuesFromJson(JSONObject obj, String fieldName){
-        try{
-            this.name = fieldName;
-            setNewResource(obj.getBoolean("newResource"));
-            validators = EditConfigurationVTwo.JsonArrayToStringList(obj.getJSONArray("validators"));
-            setOptionsType(obj.getString("optionsType"));
-            predicateUri = obj.getString("predicateUri");
-            objectClassUri = obj.getString("objectClassUri");
-            
-            rangeDatatypeUri = obj.getString("rangeDatatypeUri");
-            if( rangeDatatypeUri != null && rangeDatatypeUri.trim().length() == 0)
-                rangeDatatypeUri = null;
-            
-            rangeLang = obj.getString("rangeLang");
-            if( rangeLang != null && rangeLang.trim().length() == 0)
-                rangeLang = null;
-                        
-            setLiteralOptions(obj.getJSONArray("literalOptions"));
-            setAssertions(EditConfigurationVTwo.JsonArrayToStringList(obj.getJSONArray("assertions")));
-                                          
-            setEditElement( obj, fieldName);           
-            
-            //check for odd parameters
-            JSONArray names = obj.names();
-            int size = names.length();
-            for(int i=0 ; i < size ; i++ ){
-                String name = (String)names.optString(i);
-                if( Arrays.binarySearch(parameterNames, name) < 0 )                
-                    log.debug("setValuesFromJson(): the field  " + fieldName + " has the unrecognized parameter " + name);                                      
-            }
-            
-        }catch(JSONException ex){
-            throw new Error(ex);
-        }
-    }
-
     public void setEditElement(EditElementVTwo editElement){
         this.editElement = editElement;
     }
@@ -385,11 +333,6 @@ public class FieldVTwo {
             throw new IllegalArgumentException("A Field object may not have both rangeDatatypeUri and rangeLanguage set");
         
         this.rangeLang = rangeLang;
-    }
-    
-    public FieldVTwo copy(){
-       FieldVTwo copy = new FieldVTwo(this.originalJson, name);       
-       return copy;
     }
 
     public EditElementVTwo getEditElement(){

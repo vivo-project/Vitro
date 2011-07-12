@@ -42,8 +42,9 @@ public class DisplayVocabulary {
     public static final String FOR_CLASSGROUP = NS + "forClassGroup";
     public static final String CLASS_INTERSECTION = NS + "intersectsWithClass";
     public static final String HAS_CLASS_INTERSECTION = NS + "hasClassIntersection";
-    
+    public static final String ITEM_TO_PAGE = NS + "toPage";
     /**Data Getter object properties **/
+    public static final String HAS_DATA_GETTER = NS + "hasDataGetter";
     public static final String GETINDIVIDUALS_FOR_CLASS = NS + "getIndividualsForClass";
     public static final String 	RESTRICT_RESULTS_BY = NS + "restrictResultsByClass";
 
@@ -54,6 +55,7 @@ public class DisplayVocabulary {
     public static final DatatypeProperty REQUIRES_BODY_TEMPLATE = m_model.createDatatypeProperty(NS + "requiresBodyTemplate");
     //bk392 for extracting properties beyond context nodes.
     public static final DatatypeProperty QUERY_FOR_EDUCATIONAL_TRAINING = m_model.createDatatypeProperty(NS + "queryForEducationalTraining");
+    public static final DatatypeProperty LINK_TEXT = m_model.createDatatypeProperty(NS + "linkText");
 
     /* URIs for storing menu.n3 */
     public static final String MENU_TEXT_RES = NS + "MenuText";    

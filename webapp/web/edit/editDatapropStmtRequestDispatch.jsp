@@ -27,6 +27,13 @@
 <vitro:confirmAuthorization />
 
 <%
+	//Check if special model, in which case forward
+	if(request.getParameter("switchToDisplayModel") != null) {
+		//forward to Edit Request Dispatch Controller
+		String queryString = request.getQueryString();
+		response.sendRedirect("http://localhost:8080/vivo/editRequestDispatch?" + queryString);
+	}
+
     // Decide which form to forward to, set subjectUri, subjectUriJson, predicateUri, predicateUriJson in request
     // Also get the Individual for the subjectUri and put it in the request scope
     // If a datapropKey is sent it as an http parameter, then set datapropKey and datapropKeyJson in request, and

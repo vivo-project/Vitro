@@ -55,7 +55,7 @@
         <label class="inline" for="custom"> Custom template</label>
         
         <#if selectedTemplateType = "custom">
-            <input type="text" name="customTemplate" />*
+            <input type="text" name="customTemplate" value="${customTemplate}"/>*
         </#if>
             
         <p>Select content type for the associated page</p>
