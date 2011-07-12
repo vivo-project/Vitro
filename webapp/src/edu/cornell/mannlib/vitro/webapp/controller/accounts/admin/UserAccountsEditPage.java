@@ -33,6 +33,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 	private static final String PARAMETER_USER_URI = "editAccount";
 	private static final String PARAMETER_EMAIL_ADDRESS = "emailAddress";
 	private static final String PARAMETER_EXTERNAL_AUTH_ID = "externalAuthId";
+	private static final String PARAMETER_EXTERNAL_AUTH_ONLY = "externalAuthOnly";
 	private static final String PARAMETER_FIRST_NAME = "firstName";
 	private static final String PARAMETER_LAST_NAME = "lastName";
 	private static final String PARAMETER_ROLE = "role";
@@ -57,6 +58,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 	private String userUri = "";
 	private String emailAddress = "";
 	private String externalAuthId = "";
+	private boolean externalAuthOnly;
 	private String firstName = "";
 	private String lastName = "";
 	private String selectedRoleUri = "";
@@ -93,6 +95,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 		userUri = getStringParameter(PARAMETER_USER_URI, "");
 		emailAddress = getStringParameter(PARAMETER_EMAIL_ADDRESS, "");
 		externalAuthId = getStringParameter(PARAMETER_EXTERNAL_AUTH_ID, "");
+		externalAuthOnly = isFlagOnRequest(PARAMETER_EXTERNAL_AUTH_ONLY);
 		firstName = getStringParameter(PARAMETER_FIRST_NAME, "");
 		lastName = getStringParameter(PARAMETER_LAST_NAME, "");
 		selectedRoleUri = getStringParameter(PARAMETER_ROLE, "");
@@ -190,6 +193,10 @@ public class UserAccountsEditPage extends UserAccountsPage {
 			body.put("selectedRole", selectedRoleUri);
 			body.put(PARAMETER_NEW_PROFILE_CLASS_URI, newProfileClassUri);
 
+			if (externalAuthOnly) {
+				body.put(PARAMETER_EXTERNAL_AUTH_ONLY, Boolean.TRUE);
+			}
+
 			if (!associatedProfileUri.isEmpty()) {
 				body.put("associatedProfileInfo",
 						buildProfileInfo(associatedProfileUri));
@@ -201,6 +208,10 @@ public class UserAccountsEditPage extends UserAccountsPage {
 			body.put("lastName", userAccount.getLastName());
 			body.put("selectedRole", getExistingRoleUri());
 			body.put(PARAMETER_NEW_PROFILE_CLASS_URI, "");
+
+			if (userAccount.isExternalAuthOnly()) {
+				body.put(PARAMETER_EXTERNAL_AUTH_ONLY, Boolean.TRUE);
+			}
 
 			List<Individual> associatedInds = SelfEditingConfiguration.getBean(
 					vreq).getAssociatedIndividuals(indDao, userAccount);
@@ -252,11 +263,20 @@ public class UserAccountsEditPage extends UserAccountsPage {
 		userAccount.setLastName(lastName);
 		userAccount.setExternalAuthId(externalAuthId);
 
+		if (externalAuthOnly) {
+			userAccount.setMd5Password("");
+			userAccount.setOldPassword("");
+			userAccount.setPasswordChangeRequired(false);
+			userAccount.setPasswordLinkExpires(0L);
+		}
+
 		if (isRootUser()) {
 			userAccount.setPermissionSetUris(Collections.<String> emptySet());
+			userAccount.setExternalAuthOnly(false);
 		} else {
 			userAccount.setPermissionSetUris(Collections
 					.singleton(selectedRoleUri));
+			userAccount.setExternalAuthOnly(externalAuthOnly);
 		}
 		strategy.setAdditionalProperties(userAccount);
 
@@ -295,4 +315,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 		return userAccount;
 	}
 
+	boolean isExternalAuthOnly() {
+		return externalAuthOnly;
+	}
 }

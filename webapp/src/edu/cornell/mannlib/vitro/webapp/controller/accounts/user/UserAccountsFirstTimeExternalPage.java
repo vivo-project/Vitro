@@ -192,6 +192,7 @@ public class UserAccountsFirstTimeExternalPage extends UserAccountsPage {
 		u.setExternalAuthId(externalAuthId);
 		u.setPasswordChangeRequired(false);
 		u.setPasswordLinkExpires(0);
+		u.setExternalAuthOnly(true);
 		u.setLoginCount(0);
 		u.setStatus(Status.ACTIVE);
 		u.setPermissionSetUris(Collections

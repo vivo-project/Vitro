@@ -9,7 +9,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsPage;
@@ -58,7 +57,7 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 	private static class EmailStrategy extends UserAccountsEditPageStrategy {
 		private static final String PARAMETER_RESET_PASSWORD = "resetPassword";
 		private static final String EMAIL_TEMPLATE = "userAccounts-passwordResetPendingEmail.ftl";
-		
+
 		public static final String RESET_PASSWORD_URL = "/accounts/resetPassword";
 
 		private boolean resetPassword;
@@ -81,7 +80,7 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 
 		@Override
 		protected void setAdditionalProperties(UserAccount u) {
-			if (resetPassword) {
+			if (resetPassword && !page.isExternalAuthOnly()) {
 				u.setPasswordLinkExpires(figureExpirationDate().getTime());
 			}
 		}
@@ -97,6 +96,9 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 		@Override
 		protected void notifyUser() {
 			if (!resetPassword) {
+				return;
+			}
+			if (page.isExternalAuthOnly()) {
 				return;
 			}
 
@@ -115,7 +117,7 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 
 			sentEmail = true;
 		}
-		
+
 		private String buildResetPasswordLink() {
 			try {
 				String email = page.getUpdatedAccount().getEmailAddress();
@@ -165,6 +167,11 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 
 		@Override
 		protected String additionalValidations() {
+			if (page.isExternalAuthOnly()) {
+				// No need to check the password info on external-only accounts
+				return "";
+			}
+
 			if (newPassword.isEmpty() && confirmPassword.isEmpty()) {
 				return "";
 			} else if (!checkPasswordLength(newPassword)) {
@@ -186,7 +193,7 @@ public abstract class UserAccountsEditPageStrategy extends UserAccountsPage {
 
 		@Override
 		protected void setAdditionalProperties(UserAccount u) {
-			if (!newPassword.isEmpty()) {
+			if (!page.isExternalAuthOnly() && !newPassword.isEmpty()) {
 				u.setMd5Password(Authenticator.applyMd5Encoding(newPassword));
 				u.setPasswordChangeRequired(true);
 			}

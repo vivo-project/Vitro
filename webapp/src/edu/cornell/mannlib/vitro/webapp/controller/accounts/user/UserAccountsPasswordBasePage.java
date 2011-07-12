@@ -81,15 +81,22 @@ public abstract class UserAccountsPasswordBasePage extends UserAccountsPage {
 		}
 
 		if (userAccount.getPasswordLinkExpires() == 0L) {
-			log.warn("Password request for '" + userEmail
+			log.info("Password request for '" + userEmail
 					+ "' is bogus: password change is not pending.");
+			bogusMessage = passwordChangeNotPendingMessage();
+			return;
+		}
+
+		if (userAccount.isExternalAuthOnly()) {
+			log.info("Password request for '" + userEmail
+					+ "' is bogus: account is external auth only.");
 			bogusMessage = passwordChangeNotPendingMessage();
 			return;
 		}
 
 		Date expirationDate = new Date(userAccount.getPasswordLinkExpires());
 		if (expirationDate.before(new Date())) {
-			log.warn("Password request for '" + userEmail
+			log.info("Password request for '" + userEmail
 					+ "' is bogus: expiration date has passed.");
 			bogusMessage = BOGUS_STANDARD_MESSAGE;
 			return;
@@ -146,5 +153,6 @@ public abstract class UserAccountsPasswordBasePage extends UserAccountsPage {
 	}
 
 	protected abstract String passwordChangeNotPendingMessage();
+
 	protected abstract String templateName();
 }

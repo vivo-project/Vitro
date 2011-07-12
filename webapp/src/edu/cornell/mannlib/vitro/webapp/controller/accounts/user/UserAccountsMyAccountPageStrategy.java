@@ -107,7 +107,7 @@ public abstract class UserAccountsMyAccountPageStrategy extends
 
 		private static final String ERROR_WRONG_PASSWORD_LENGTH = "errorPasswordIsWrongLength";
 		private static final String ERROR_PASSWORDS_DONT_MATCH = "errorPasswordsDontMatch";
-		
+
 		private static final String EMAIL_TEMPLATE = "userAccounts-confirmEmailChangedEmail.ftl";
 
 		private final String originalEmail;
@@ -129,12 +129,16 @@ public abstract class UserAccountsMyAccountPageStrategy extends
 
 		@Override
 		public String additionalValidations() {
-			if (newPassword.isEmpty() && confirmPassword.isEmpty()) {
-				return "";
-			} else if (!newPassword.equals(confirmPassword)) {
-				return ERROR_PASSWORDS_DONT_MATCH;
-			} else if (!checkPasswordLength(newPassword)) {
-				return ERROR_WRONG_PASSWORD_LENGTH;
+			if (!page.isExternalAuthOnly()) {
+				if (newPassword.isEmpty() && confirmPassword.isEmpty()) {
+					return "";
+				} else if (!newPassword.equals(confirmPassword)) {
+					return ERROR_PASSWORDS_DONT_MATCH;
+				} else if (!checkPasswordLength(newPassword)) {
+					return ERROR_WRONG_PASSWORD_LENGTH;
+				} else {
+					return "";
+				}
 			} else {
 				return "";
 			}
@@ -150,7 +154,7 @@ public abstract class UserAccountsMyAccountPageStrategy extends
 
 		@Override
 		public void setAdditionalProperties(UserAccount userAccount) {
-			if (!newPassword.isEmpty()) {
+			if (!newPassword.isEmpty() && !page.isExternalAuthOnly()) {
 				userAccount.setMd5Password(Authenticator
 						.applyMd5Encoding(newPassword));
 				userAccount.setPasswordChangeRequired(false);

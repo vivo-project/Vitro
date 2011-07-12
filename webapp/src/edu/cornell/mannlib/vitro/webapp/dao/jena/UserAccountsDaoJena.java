@@ -97,8 +97,11 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 					USERACCOUNT_PASSWORD_LINK_EXPIRES));
 			u.setPasswordChangeRequired(getPropertyBooleanValue(r,
 					USERACCOUNT_PASSWORD_CHANGE_REQUIRED));
+			u.setExternalAuthOnly(getPropertyBooleanValue(r,
+					USERACCOUNT_EXTERNAL_AUTH_ONLY));
 			u.setLoginCount(getPropertyIntValue(r, USERACCOUNT_LOGIN_COUNT));
-			u.setLastLoginTime(getPropertyLongValue(r, USERACCOUNT_LAST_LOGIN_TIME));
+			u.setLastLoginTime(getPropertyLongValue(r,
+					USERACCOUNT_LAST_LOGIN_TIME));
 			u.setStatusFromString(getPropertyStringValue(r, USERACCOUNT_STATUS));
 			u.setExternalAuthId(getPropertyStringValue(r,
 					USERACCOUNT_EXTERNAL_AUTH_ID));
@@ -189,6 +192,8 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 					userAccount.getPasswordLinkExpires(), model);
 			addPropertyBooleanValue(res, USERACCOUNT_PASSWORD_CHANGE_REQUIRED,
 					userAccount.isPasswordChangeRequired(), model);
+			addPropertyBooleanValue(res, USERACCOUNT_EXTERNAL_AUTH_ONLY,
+					userAccount.isExternalAuthOnly(), model);
 			addPropertyIntValue(res, USERACCOUNT_LOGIN_COUNT,
 					userAccount.getLoginCount(), model);
 			addPropertyLongValue(res, USERACCOUNT_LAST_LOGIN_TIME,
@@ -248,6 +253,8 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 			updatePropertyBooleanValue(res,
 					USERACCOUNT_PASSWORD_CHANGE_REQUIRED,
 					userAccount.isPasswordChangeRequired(), model, true);
+			updatePropertyBooleanValue(res, USERACCOUNT_EXTERNAL_AUTH_ONLY,
+					userAccount.isExternalAuthOnly(), model, true);
 			updatePropertyIntValue(res, USERACCOUNT_LOGIN_COUNT,
 					userAccount.getLoginCount(), model);
 			updatePropertyLongValue(res, USERACCOUNT_LAST_LOGIN_TIME,

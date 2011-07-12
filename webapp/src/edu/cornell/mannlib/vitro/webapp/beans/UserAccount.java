@@ -58,6 +58,9 @@ public class UserAccount {
 	private Status status = Status.INACTIVE; // Might be null.
 	private String externalAuthId = ""; // Never null.
 
+	/** If this is true, the User Interface will not allow setting a password. */
+	private boolean externalAuthOnly = false;
+
 	/** This may be empty, but should never be null. */
 	private Set<String> permissionSetUris = Collections.emptySet();
 
@@ -134,6 +137,14 @@ public class UserAccount {
 	public void setPasswordChangeRequired(Boolean passwordChangeRequired) {
 		this.passwordChangeRequired = nonNull(passwordChangeRequired,
 				Boolean.FALSE);
+	}
+
+	public boolean isExternalAuthOnly() {
+		return externalAuthOnly;
+	}
+
+	public void setExternalAuthOnly(Boolean externalAuthOnly) {
+		this.externalAuthOnly = nonNull(externalAuthOnly, Boolean.FALSE);
 	}
 
 	public int getLoginCount() {
@@ -213,7 +224,9 @@ public class UserAccount {
 				+ (", oldPassword=" + oldPassword)
 				+ (", passwordLinkExpires=" + passwordLinkExpires)
 				+ (", passwordChangeRequired=" + passwordChangeRequired)
+				+ (", externalAuthOnly=" + externalAuthOnly)
 				+ (", loginCount=" + loginCount) + (", status=" + status)
+				+ (", lastLoginTime=" + lastLoginTime)
 				+ (", externalAuthId=" + externalAuthId)
 				+ (", rootUser=" + rootUser)
 				+ (", permissionSetUris=" + permissionSetUris) + "]";

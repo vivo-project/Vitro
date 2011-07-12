@@ -28,6 +28,7 @@ public class UserAccountsAddPage extends UserAccountsPage {
 	private static final String PARAMETER_SUBMIT = "submitAdd";
 	private static final String PARAMETER_EMAIL_ADDRESS = "emailAddress";
 	private static final String PARAMETER_EXTERNAL_AUTH_ID = "externalAuthId";
+	private static final String PARAMETER_EXTERNAL_AUTH_ONLY = "externalAuthOnly";
 	private static final String PARAMETER_FIRST_NAME = "firstName";
 	private static final String PARAMETER_LAST_NAME = "lastName";
 	private static final String PARAMETER_ROLE = "role";
@@ -51,6 +52,7 @@ public class UserAccountsAddPage extends UserAccountsPage {
 	private boolean submit;
 	private String emailAddress = "";
 	private String externalAuthId = "";
+	private boolean externalAuthOnly;
 	private String firstName = "";
 	private String lastName = "";
 	private String selectedRoleUri = "";
@@ -83,6 +85,7 @@ public class UserAccountsAddPage extends UserAccountsPage {
 		submit = isFlagOnRequest(PARAMETER_SUBMIT);
 		emailAddress = getStringParameter(PARAMETER_EMAIL_ADDRESS, "");
 		externalAuthId = getStringParameter(PARAMETER_EXTERNAL_AUTH_ID, "");
+		externalAuthOnly = isFlagOnRequest(PARAMETER_EXTERNAL_AUTH_ONLY);
 		firstName = getStringParameter(PARAMETER_FIRST_NAME, "");
 		lastName = getStringParameter(PARAMETER_LAST_NAME, "");
 		selectedRoleUri = getStringParameter(PARAMETER_ROLE, "");
@@ -144,6 +147,7 @@ public class UserAccountsAddPage extends UserAccountsPage {
 		u.setFirstName(firstName);
 		u.setLastName(lastName);
 		u.setExternalAuthId(externalAuthId);
+		u.setExternalAuthOnly(externalAuthOnly);
 		u.setMd5Password("");
 		u.setOldPassword("");
 		u.setPasswordChangeRequired(false);
@@ -195,6 +199,10 @@ public class UserAccountsAddPage extends UserAccountsPage {
 		body.put(PARAMETER_NEW_PROFILE_CLASS_URI, newProfileClassUri);
 		body.put("formUrls", buildUrlsMap());
 
+		if (externalAuthOnly) {
+			body.put(PARAMETER_EXTERNAL_AUTH_ONLY, Boolean.TRUE);
+		}
+
 		if (!associatedProfileUri.isEmpty()) {
 			body.put("associatedProfileInfo",
 					buildProfileInfo(associatedProfileUri));
@@ -219,6 +227,10 @@ public class UserAccountsAddPage extends UserAccountsPage {
 
 	public boolean wasPasswordEmailSent() {
 		return this.strategy.wasPasswordEmailSent();
+	}
+
+	boolean isExternalAuthOnly() {
+		return externalAuthOnly;
 	}
 
 }

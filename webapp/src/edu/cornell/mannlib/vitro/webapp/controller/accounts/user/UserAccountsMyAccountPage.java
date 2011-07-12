@@ -134,6 +134,9 @@ public class UserAccountsMyAccountPage extends UserAccountsPage {
 		}
 		body.put("formUrls", buildUrlsMap());
 
+		if (userAccount.isExternalAuthOnly()) {
+			body.put("externalAuthOnly", Boolean.TRUE);
+		}
 		if (!errorCode.isEmpty()) {
 			body.put(errorCode, Boolean.TRUE);
 		}
@@ -159,4 +162,7 @@ public class UserAccountsMyAccountPage extends UserAccountsPage {
 		confirmationCode = strategy.getConfirmationCode();
 	}
 
+	boolean isExternalAuthOnly() {
+		return (userAccount != null) && userAccount.isExternalAuthOnly();
+	}
 }

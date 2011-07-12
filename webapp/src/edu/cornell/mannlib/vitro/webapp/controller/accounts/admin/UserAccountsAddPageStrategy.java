@@ -57,7 +57,8 @@ public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 
 	private static class EmailStrategy extends UserAccountsAddPageStrategy {
 		public static final String CREATE_PASSWORD_URL = "/accounts/createPassword";
-		private static final String EMAIL_TEMPLATE = "userAccounts-acctCreatedEmail.ftl";
+		private static final String EMAIL_TEMPLATE_WITH_PASSWORD = "userAccounts-acctCreatedEmail.ftl";
+		private static final String EMAIL_TEMPLATE_NO_PASSWORD = "userAccounts-acctCreatedExternalOnlyEmail.ftl";
 
 		private boolean sentEmail;
 
@@ -78,8 +79,13 @@ public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 
 		@Override
 		protected void setAdditionalProperties(UserAccount u) {
-			u.setPasswordLinkExpires(figureExpirationDate().getTime());
-			u.setStatus(Status.INACTIVE);
+			if (page.isExternalAuthOnly()) {
+				u.setPasswordLinkExpires(0L);
+				u.setStatus(Status.ACTIVE);
+			} else {
+				u.setPasswordLinkExpires(figureExpirationDate().getTime());
+				u.setStatus(Status.INACTIVE);
+			}
 		}
 
 		@Override
@@ -98,7 +104,11 @@ public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 					.createNewMessage(vreq);
 			email.addRecipient(TO, page.getAddedAccount().getEmailAddress());
 			email.setSubject("Your VIVO account has been created.");
-			email.setTemplate(EMAIL_TEMPLATE);
+			if (page.isExternalAuthOnly()) {
+				email.setTemplate(EMAIL_TEMPLATE_NO_PASSWORD);
+			} else {
+				email.setTemplate(EMAIL_TEMPLATE_WITH_PASSWORD);
+			}
 			email.setBodyMap(body);
 			email.processTemplate();
 			email.send();
@@ -156,6 +166,11 @@ public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 
 		@Override
 		protected String additionalValidations() {
+			if (page.isExternalAuthOnly()) {
+				// No need to check the password info on external-only accounts
+				return "";
+			}
+
 			if (initialPassword.isEmpty()) {
 				return ERROR_NO_PASSWORD;
 			} else if (!checkPasswordLength()) {
@@ -182,8 +197,11 @@ public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 
 		@Override
 		protected void setAdditionalProperties(UserAccount u) {
-			u.setMd5Password(Authenticator.applyMd5Encoding(initialPassword));
-			u.setPasswordChangeRequired(true);
+			if (!page.isExternalAuthOnly()) {
+				u.setMd5Password(Authenticator
+						.applyMd5Encoding(initialPassword));
+				u.setPasswordChangeRequired(true);
+			}
 			u.setStatus(Status.ACTIVE);
 		}
 

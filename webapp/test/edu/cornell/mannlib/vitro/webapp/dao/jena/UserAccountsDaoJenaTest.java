@@ -84,6 +84,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		assertEquals("oldPassword", "", u.getOldPassword());
 		assertEquals("linkExpires", 0L, u.getPasswordLinkExpires());
 		assertEquals("changeRequired", false, u.isPasswordChangeRequired());
+		assertEquals("externalOnly", false, u.isExternalAuthOnly());
 		assertEquals("loginCount", 5, u.getLoginCount());
 		assertEquals("loginTime", 12345678L, u.getLastLoginTime());
 		assertEquals("status", Status.ACTIVE, u.getStatus());
@@ -140,6 +141,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		in.setOldPassword("oldHash");
 		in.setPasswordLinkExpires(999966663333L);
 		in.setPasswordChangeRequired(true);
+		in.setExternalAuthOnly(true);
 		in.setLoginCount(42);
 		in.setLastLoginTime(8877665544332211L);
 		in.setStatus(Status.INACTIVE);
@@ -157,6 +159,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		assertEquals("oldPassword", "oldHash", u.getOldPassword());
 		assertEquals("linkExpires", 999966663333L, u.getPasswordLinkExpires());
 		assertEquals("changeRequired", true, u.isPasswordChangeRequired());
+		assertEquals("externalOnly", true, u.isExternalAuthOnly());
 		assertEquals("loginCount", 42, u.getLoginCount());
 		assertEquals("lastLoginTime", 8877665544332211L, u.getLastLoginTime());
 		assertEquals("status", Status.INACTIVE, u.getStatus());
@@ -189,6 +192,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		up.setOldPassword("oldHash");
 		up.setPasswordLinkExpires(1L);
 		up.setPasswordChangeRequired(false);
+		up.setExternalAuthOnly(false);
 		up.setLoginCount(43);
 		up.setLastLoginTime(1020304050607080L);
 		up.setStatus(Status.ACTIVE);
@@ -206,6 +210,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		assertEquals("oldPassword", "oldHash", u.getOldPassword());
 		assertEquals("changeExpires", 1L, u.getPasswordLinkExpires());
 		assertEquals("changeRequired", false, u.isPasswordChangeRequired());
+		assertEquals("externalOnly", false, u.isExternalAuthOnly());
 		assertEquals("loginCount", 43, u.getLoginCount());
 		assertEquals("lastLoginTime", 1020304050607080L, u.getLastLoginTime());
 		assertEquals("status", Status.ACTIVE, u.getStatus());
