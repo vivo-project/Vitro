@@ -1219,18 +1219,19 @@ public class SimpleReasoner extends StatementListener {
 	    if (event instanceof BulkUpdateEvent) {	
 	    	if (((BulkUpdateEvent) event).getBegin()) {
 	    		
-	    		log.info("received BulkUpdateEvent(true)");
+	    		log.info("received BulkUpdateEvent(begin)");
 	    		
 	    		if (batchMode1 || batchMode2) {
-	    			log.error("received a BulkUpdateEvent while already processing one; this event will be ignored and ABox reasoning may not be performed properly");
+	    			log.info("received a BulkUpdateEvent(begin) while already in batch update mode; this event will be ignored.");
 	    			return;  
 	    		} else {
 	    			batchMode1 = true;
 	    			batchMode2 = false;
 	    			aBoxDeltaModeler1.getRetractions().removeAll();
+	    			log.info("started processing retractions in batch mode");
 	    		}
 	    	} else {
-	    		log.info("received BulkUpdateEvent(false)");
+	    		log.info("received BulkUpdateEvent(end)");
 	    		new Thread(new DeltaComputer()).start();
 	    	}
 	    }
@@ -1251,7 +1252,7 @@ public class SimpleReasoner extends StatementListener {
     			retractions.enterCriticalSection(Lock.READ);	
     			
     			try {
-    	   	       	log.info("started computing inferences for batch " + qualifier + "  update");
+    	   	       	log.info("started computing inferences for batch " + qualifier + " update");
     				StmtIterator iter = retractions.listStatements();
     	
     				int num = 0;
@@ -1261,19 +1262,19 @@ public class SimpleReasoner extends StatementListener {
     					try {
     						removedStatement(stmt);
     					} catch (Exception e) {
-    						log.error("exception while computing inferences for batch " + qualifier + "  update: " +  e.getMessage());
+    						log.error("exception while computing inferences for batch " + qualifier + " update: " +  e.getMessage());
     					}
     					
 						num++;
 		                if ((num % 6000) == 0) {
-		                    log.info("still computing inferences for batch " + qualifier + "  update...");
+		                    log.info("still computing inferences for batch " + qualifier + " update...");
 		                }	
 
     				}
     			} finally {
     	    		retractions.removeAll();	
     	   			retractions.leaveCriticalSection();
-    				log.info("finished computing inferences for batch " + qualifier + "  update");
+    				log.info("finished computing inferences for batch " + qualifier + " update");
     			}			
     			
     			
