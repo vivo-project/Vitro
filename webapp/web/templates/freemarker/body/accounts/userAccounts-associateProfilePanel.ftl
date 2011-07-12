@@ -38,10 +38,10 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/auto
             <p> - or - </p>
             <p> 
                 <label for="">Create the associated profile</label> 
-                <select name="degreeUri" id="degreeUri" >
+                <select name="newProfileClassUri" id="newProfileClassUri" >
                     <option value="" selected="selected">Select one</option>
                     <#list profileTypes?keys as key>
-                        <option value="${key}" <#if degreeUri = key> selected </#if> >${profileTypes[key]}</option>           
+                        <option value="${key}" <#if newProfileClassUri = key> selected </#if> >${profileTypes[key]}</option>           
                     </#list>    
                 </select>    
             </p>

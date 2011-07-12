@@ -37,7 +37,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 	private static final String PARAMETER_LAST_NAME = "lastName";
 	private static final String PARAMETER_ROLE = "role";
 	private static final String PARAMETER_ASSOCIATED_PROFILE_URI = "associatedProfileUri";
-	private static final String PARAMETER_NEW_PROFILE_CLASS_URI = "degreeUri";
+	private static final String PARAMETER_NEW_PROFILE_CLASS_URI = "newProfileClassUri";
 
 	private static final String ERROR_NO_EMAIL = "errorEmailIsEmpty";
 	private static final String ERROR_EMAIL_IN_USE = "errorEmailInUse";

@@ -47,7 +47,7 @@ var associateProfileFields = {
         // We want to associate a profile
         this.associationOptionsArea = $('#associationOptions');
         this.associateProfileNameField = $('#associateProfileName');
-        this.newProfileClassSelector = $('#degreeUri');
+        this.newProfileClassSelector = $('#newProfileClassUri');
         
         // Container <div> elements to provide background shading -- tlw72
         this.associateProfileBackgroundOneArea = $('#associateProfileBackgroundOne');
