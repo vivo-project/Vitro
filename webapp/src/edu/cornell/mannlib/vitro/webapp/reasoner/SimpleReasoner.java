@@ -63,6 +63,7 @@ public class SimpleReasoner extends StatementListener {
 	private CumulativeDeltaModeler aBoxDeltaModeler1 = null;
 	private CumulativeDeltaModeler aBoxDeltaModeler2 = null;
 	private boolean batchMode1, batchMode2;
+	private boolean stopRequested;
 
 	/**
 	 * @param tboxModel - input.  This model contains both asserted and inferred TBox axioms
@@ -82,6 +83,7 @@ public class SimpleReasoner extends StatementListener {
 		this.batchMode2 = false;
 		aBoxDeltaModeler1 = new CumulativeDeltaModeler();
 		aBoxDeltaModeler2 = new CumulativeDeltaModeler();
+		stopRequested = false;
 				
 	    aboxModel.getBaseModel().register(this);
 	}
@@ -103,6 +105,7 @@ public class SimpleReasoner extends StatementListener {
 		aBoxDeltaModeler2 = new CumulativeDeltaModeler();
 		this.batchMode1 = false;
 		this.batchMode2 = false;
+		stopRequested = false;
 	}
 	
 	/*
@@ -964,6 +967,11 @@ public class SimpleReasoner extends StatementListener {
                 if ((numStmts % 8000) == 0) {
                     log.info("Still computing class-based ABox inferences...");
                 }
+                
+                if (stopRequested) {
+                	log.info("a stopRequested signal was received during recomputeABox. Halting Processing.");
+                	return;
+                }
 			}
 			
  /*			
@@ -1047,6 +1055,11 @@ public class SimpleReasoner extends StatementListener {
 	                if ((num % 8000) == 0) {
 	                    log.info("Still updating ABox inference model (removing outdated inferences)...");
 	                }
+	                
+	                if (stopRequested) {
+	                	log.info("a stopRequested signal was received during recomputeABox. Halting Processing.");
+	                	return;
+	                }
 				}
 			} catch (Exception e) {
 				log.error("Exception while reconciling the current and recomputed ABox inference models", e);
@@ -1080,6 +1093,11 @@ public class SimpleReasoner extends StatementListener {
 					num++;
 	                if ((num % 8000) == 0) {
 	                    log.info("Still updating ABox inference model (adding new inferences)...");
+	                }
+	                
+	                if (stopRequested) {
+	                	log.info("a stopRequested signal was received during recomputeABox. Halting Processing.");
+	                	return;
 	                }
 				}
 			} catch (Exception e) {		
@@ -1133,6 +1151,11 @@ public class SimpleReasoner extends StatementListener {
                 if ((numStmts % 8000) == 0) {
                     log.info("Still computing mostSpecificType annotations...");
                 }
+                
+                if (stopRequested) {
+                	log.info("a stopRequested signal was received during recomputeMostSpecificType. Halting Processing.");
+                	return;
+                }
 			}
 		} catch (Exception e) {
 			 log.error("Exception while recomputing ABox inference model", e);
@@ -1174,6 +1197,11 @@ public class SimpleReasoner extends StatementListener {
 	                if ((numStmts % 8000) == 0) {
 	                    log.info("Still updating ABox inference model with mostSpecificType annotations...");
 	                }
+	                
+	                if (stopRequested) {
+	                	log.info("a stopRequested signal was received during recomputeMostSpecificType. Halting Processing.");
+	                	return;
+	                }
 				}
 			} catch (Exception e) {		
 				log.error("Exception while reconciling the current and recomputed ABox inference models", e);
@@ -1199,19 +1227,15 @@ public class SimpleReasoner extends StatementListener {
 		log.info("ABox inference model updated with mostSpecificType annotations");
 	}
 
-	public static SimpleReasoner getSimpleReasonerFromServletContext(ServletContext ctx) {
-	    Object simpleReasoner = ctx.getAttribute("simpleReasoner");
+	public static boolean isSimpleReasonerSetupComplete(ServletContext ctx) {
+	    Object string = ctx.getAttribute("SimpleReasonerSetupState");
 	    
-	    if (simpleReasoner instanceof SimpleReasoner) {
-	        return (SimpleReasoner) simpleReasoner;
+	    if (string instanceof String) {
+	        return true;
 	    } else {
-	        return null;
-	    }
+	        return false;
+	    }	
 	}
-
-	public static boolean isABoxReasoningAsynchronous(ServletContext ctx) {
-	   return (getSimpleReasonerFromServletContext(ctx) == null);	
-	}	
 	
 	@Override
 	public synchronized void notifyEvent(Model model, Object event) {
@@ -1232,7 +1256,7 @@ public class SimpleReasoner extends StatementListener {
 	    		}
 	    	} else {
 	    		log.info("received BulkUpdateEvent(end)");
-	    		new Thread(new DeltaComputer()).start();
+	    		new Thread(new DeltaComputer(),"DeltaComputer").start();
 	    	}
 	    }
 	}
@@ -1249,7 +1273,7 @@ public class SimpleReasoner extends StatementListener {
         	boolean finished = (retractions.size() == 0);
         	String qualifier = "(1)";
         	
-        	while (!finished) {
+        	while (!finished && !stopRequested) {
     			retractions.enterCriticalSection(Lock.READ);	
     			
     			try {
@@ -1272,6 +1296,11 @@ public class SimpleReasoner extends StatementListener {
 		                if ((num % 6000) == 0) {
 		                    log.info("still computing inferences for batch " + qualifier + " update...");
 		                }	
+		                
+		                if (stopRequested) {
+		                	log.info("a stopRequested signal was received during DeltaComputer.run. Halting Processing.");
+		                	return;
+		                }
     				}
     			} finally {
     	    		retractions.removeAll();	
@@ -1298,6 +1327,11 @@ public class SimpleReasoner extends StatementListener {
     	        	batchMode2 = false;   
     				log.info("finished processing retractions in batch mode");
     			}	
+    			
+                if (stopRequested) {
+                	log.info("a stopRequested signal was received during DeltaComputer.run. Halting Processing.");
+                	return;
+                }
         	}
         	
         	if (aBoxDeltaModeler1.getRetractions().size() > 0) {
@@ -1317,7 +1351,14 @@ public class SimpleReasoner extends StatementListener {
         	}
         }        
     }
-    	
+    
+	/**
+	 * This is called when the system shuts down.
+	 */
+	public void setStopRequested() {
+	    stopRequested = true;
+	}
+    
     public static String stmtString(Statement statement) {
     	return  " [subject = " + statement.getSubject().getURI() +
     			"] [property = " + statement.getPredicate().getURI() +

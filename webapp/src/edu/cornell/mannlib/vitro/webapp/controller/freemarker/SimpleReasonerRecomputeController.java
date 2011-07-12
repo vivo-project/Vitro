@@ -32,30 +32,35 @@ public class SimpleReasonerRecomputeController extends FreemarkerHttpServlet {
         
         String messageStr = "";
         try {
-            SimpleReasoner simpleReasoner = SimpleReasoner
-                    .getSimpleReasonerFromServletContext(
-                            vreq.getSession().getServletContext());
-            if (simpleReasoner == null) {
+            if (!SimpleReasoner.isSimpleReasonerSetupComplete(vreq.getSession().getServletContext())) {
                 messageStr = "No SimpleReasoner has been set up.";
             } else {
             	String signal = (String) vreq.getParameter("signal");
-                if (simpleReasoner.isRecomputing()) {
-                    messageStr = 
-                         "The SimpleReasoner is currently in the process of " +
-                         "recomputing inferences.";
-                } else{
-                	String restart = (String)getServletContext().getAttribute("restart");
-                	if(restart == null || restart.equals("showButton") || signal == null){
-                		body.put("link", "show");
-                    	messageStr = null;
-                    	getServletContext().setAttribute("restart", "yes");
-                	}
-                	else if(signal!=null && signal.equals("Recompute")){
-                		new Thread(new Recomputer(simpleReasoner)).start();
-                        messageStr = "Recomputation of inferences started";
-                        getServletContext().setAttribute("restart", "showButton");
-                	}	
-                }
+            	
+        	    Object simpleReasoner = vreq.getSession().getServletContext().getAttribute(SimpleReasoner.class.getName());
+        	    
+        	    if (simpleReasoner instanceof SimpleReasoner) {
+        	    	 
+ 	                if (((SimpleReasoner)simpleReasoner).isRecomputing()) {
+	                    messageStr = 
+	                         "The SimpleReasoner is currently in the process of " +
+	                         "recomputing inferences.";
+	                } else{
+	                	String restart = (String)getServletContext().getAttribute("restart");
+	                	if(restart == null || restart.equals("showButton") || signal == null){
+	                		body.put("link", "show");
+	                    	messageStr = null;
+	                    	getServletContext().setAttribute("restart", "yes");
+	                	}
+	                	else if(signal!=null && signal.equals("Recompute")){
+	                		new Thread(new Recomputer(((SimpleReasoner)simpleReasoner))).start();
+	                        messageStr = "Recomputation of inferences started";
+	                        getServletContext().setAttribute("restart", "showButton");
+	                	}	
+	                }
+        	    } else {
+        	    	log.equals("The attribute with name " + SimpleReasoner.class.getName() + " is not an instance of SimpleReasoner");
+        	    }
             }
             
         } catch (Exception e) {

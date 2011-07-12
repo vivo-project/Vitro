@@ -302,7 +302,7 @@ public class IndividualController extends FreemarkerHttpServlet {
             }
             // If still no custom template defined, and inferencing is asynchronous (under RDB), check
             // the superclasses of the vclass for a custom template specification. 
-            if (customTemplate == null && SimpleReasoner.isABoxReasoningAsynchronous(getServletContext())) { 
+            if (customTemplate == null && SimpleReasoner.isSimpleReasonerSetupComplete(getServletContext())) { 
                 log.debug("Checking superclasses for custom template specification because ABox reasoning is asynchronous");
                 for (VClass directVClass : directClasses) {
                     VClassDao vcDao = vreq.getWebappDaoFactory().getVClassDao();

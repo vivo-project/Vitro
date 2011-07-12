@@ -96,6 +96,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	        
 	        // the simple reasoner will register itself as a listener to the ABox assertions
 	        SimpleReasoner simpleReasoner = new SimpleReasoner(unionOms.getTBoxModel(), assertionsOms.getABoxModel(), inferencesOms.getABoxModel(), rebuildModel, scratchModel);
+	        sce.getServletContext().setAttribute(SimpleReasoner.class.getName(),simpleReasoner);
 	        
 	        if (isRecomputeRequired(sce.getServletContext())) {   
 	            log.info("ABox inference recompute required");
@@ -109,7 +110,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	                sleeps++;
 	            }
 	            
-        		new Thread(new ABoxRecomputer(simpleReasoner,false)).start();
+        		new Thread(new ABoxRecomputer(simpleReasoner),"ABoxRecompuer").start();
 	        } else if ( isMSTComputeRequired(sce.getServletContext()) ) {
 	            log.info("mostSpecificType computation required");
 	            
@@ -122,12 +123,11 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	                sleeps++;
 	            }
 	            
-	            new Thread(new ABoxRecomputer(simpleReasoner,true)).start();
+	            new Thread(new MostSpecificTypeRecomputer(simpleReasoner),"MostSpecificTypeComputer").start();
 	        }
 
 	        assertionsOms.getTBoxModel().register(new SimpleReasonerTBoxListener(simpleReasoner));
-	        
-	        sce.getServletContext().setAttribute("simpleReasoner",simpleReasoner);
+	        sce.getServletContext().setAttribute("SimpleReasonerSetupState","complete");
 	        
 	        log.info("Simple reasoner connected for the ABox");
 	        
@@ -137,8 +137,22 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	}
 	
 	@Override
-	public void contextDestroyed(ServletContextEvent arg0) {
-		// nothing to do
+	public void contextDestroyed(ServletContextEvent sce) {
+        SimpleReasoner simpleReasoner = getSimpleReasonerFromServletContext(sce.getServletContext());
+	    
+	    if (simpleReasoner != null) {
+	    	simpleReasoner.setStopRequested();
+	    } 
+	}
+	
+	public static SimpleReasoner getSimpleReasonerFromServletContext(ServletContext ctx) {
+	    Object simpleReasoner = ctx.getAttribute(SimpleReasoner.class.getName());
+	    
+	    if (simpleReasoner instanceof SimpleReasoner) {
+	        return (SimpleReasoner) simpleReasoner;
+	    } else {
+	        return null;
+	    }
 	}
 	
 	private static final String RECOMPUTE_REQUIRED_ATTR = 
@@ -166,19 +180,26 @@ public class SimpleReasonerSetup implements ServletContextListener {
     private class ABoxRecomputer implements Runnable {
         
         private SimpleReasoner simpleReasoner;
-        private boolean justMST;
         
-        public ABoxRecomputer(SimpleReasoner simpleReasoner, boolean justMST) {
+        public ABoxRecomputer(SimpleReasoner simpleReasoner) {
             this.simpleReasoner = simpleReasoner;
-            this.justMST = justMST;
         }
         
         public void run() {
-        	if (justMST) {
-        		simpleReasoner.recomputeMostSpecificType();      		
-        	} else {
-                simpleReasoner.recompute();
-        	}
+            simpleReasoner.recompute();
+        }
+    }
+    
+    private class MostSpecificTypeRecomputer implements Runnable {
+        
+        private SimpleReasoner simpleReasoner;
+        
+        public MostSpecificTypeRecomputer(SimpleReasoner simpleReasoner) {
+            this.simpleReasoner = simpleReasoner;
+        }
+        
+        public void run() {
+        	simpleReasoner.recomputeMostSpecificType();      		
         }
     }
 }

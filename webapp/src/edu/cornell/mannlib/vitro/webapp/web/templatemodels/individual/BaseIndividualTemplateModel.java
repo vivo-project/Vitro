@@ -55,7 +55,7 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         boolean isVClass = individual.isVClass(vClassUri);  
         // If reasoning is asynchronous (under RDB), this inference may not have been made yet. 
         // Check the superclasses of the individual's vclass.
-        if (!isVClass && SimpleReasoner.isABoxReasoningAsynchronous(getServletContext())) { 
+        if (!isVClass && SimpleReasoner.isSimpleReasonerSetupComplete(getServletContext())) { 
             log.debug("Checking superclasses to see if individual is a " + vClassUri + " because reasoning is asynchronous");
             List<VClass> directVClasses = individual.getVClasses(true);
             for (VClass directVClass : directVClasses) {
