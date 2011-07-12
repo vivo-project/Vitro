@@ -223,7 +223,7 @@
       <analyzer>
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>
         <!-- in this example, we will only use synonyms at query time -->
-        <filter class="solr.SynonymFilterFactory" synonyms="syn.txt" ignoreCase="true" expand="true"/>
+       <!-- <filter class="solr.SynonymFilterFactory" synonyms="syn.txt" ignoreCase="true" expand="true"/> -->
         
         <!-- Case insensitive stop word removal.
           add enablePositionIncrements=true in both the index and query
