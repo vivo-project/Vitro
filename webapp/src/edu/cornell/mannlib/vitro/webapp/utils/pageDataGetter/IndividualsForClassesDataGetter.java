@@ -4,39 +4,25 @@ package edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.ServletContext;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
-import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.SolrIndividualListController;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController.PageRecord;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.BaseListedIndividual;
-import edu.cornell.mannlib.vitro.webapp.controller.JSONServlet;
-import freemarker.ext.beans.BeansWrapper;
-import freemarker.template.TemplateModel;
 
 /**
  * This will pass these variables to the template:
@@ -52,9 +38,7 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
         Map<String, List<String>> classIntersectionsMap = vreq.getWebappDaoFactory().getPageDao().getClassesAndRestrictionsForPage(pageUri);
         
         
-        //Use Individual List Controller to get all the individuals and related data
-        String alpha = IndividualListController.getAlphaParameter(vreq);
-        int pageParam = IndividualListController.getPageParameter(vreq);
+        //Use Individual List Controller to get all the individuals and related data                
         List<Individual> inds = new ArrayList<Individual>();
         try{
         	List<String> classes = classIntersectionsMap.get("classes");
@@ -182,6 +166,24 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
     protected static void setAllClassCountsToZero(VClassGroup vcg){
         for(VClass vc : vcg){
             vc.setEntityCount(0);
+        }
+    }
+    
+    protected static String getAlphaParameter(VitroRequest request){
+        return request.getParameter("alpha");
+    }
+    
+    protected static int getPageParameter(VitroRequest request) {
+        String pageStr = request.getParameter("page");
+        if( pageStr != null ){
+            try{
+                return Integer.parseInt(pageStr);                
+            }catch(NumberFormatException nfe){
+                log.debug("could not parse page parameter");
+                return 1;
+            }                
+        }else{                   
+            return 1;
         }
     }
 }

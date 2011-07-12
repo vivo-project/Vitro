@@ -186,13 +186,21 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
     @Override
     public Map<String, String> getPageMappings() {
         Model displayModel = getOntModelSelector().getDisplayModel();
-        QueryExecution qexec = QueryExecutionFactory.create( pageQuery, displayModel );
-        
         Map<String,String> rv = new HashMap<String,String>();
-        ResultSet resultSet = qexec.execSelect();
-        while(resultSet.hasNext()){
-            QuerySolution soln = resultSet.next();
-            rv.put(nodeToString(soln.get("urlMapping")) , nodeToString( soln.get("pageUri") ));
+        displayModel.enterCriticalSection(false);
+        try{
+        QueryExecution qexec = QueryExecutionFactory.create( pageQuery, displayModel );        
+            try{            
+                ResultSet resultSet = qexec.execSelect();
+                while(resultSet.hasNext()){
+                    QuerySolution soln = resultSet.next();
+                    rv.put(nodeToString(soln.get("urlMapping")) , nodeToString( soln.get("pageUri") ));
+                }
+            }finally{
+                qexec.close();
+            }
+        }finally{
+            displayModel.leaveCriticalSection();
         }
         return rv; 
     }
@@ -211,8 +219,11 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
       displayModel.enterCriticalSection(false);
       try{
           QueryExecution qexec = QueryExecutionFactory.create(pageQuery,displayModel,initialBindings );
-          list = executeQueryToCollection( qexec );
-          qexec.close();
+          try{
+              list = executeQueryToCollection( qexec );
+          }finally{
+              qexec.close();
+          }
       }finally{
           displayModel.leaveCriticalSection();
       }
@@ -236,12 +247,15 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
       displayModel.enterCriticalSection(false);
       try{
           QueryExecution qexec = QueryExecutionFactory.create(pageDataGettersQuery, displayModel, initialBindings);
-          ResultSet rs = qexec.execSelect();
-          while(rs.hasNext()){
-              QuerySolution soln = rs.next();
-              dataGetters.add( nodeToString( soln.get("dataGetter" ) ));
+          try{
+              ResultSet rs = qexec.execSelect();
+              while(rs.hasNext()){
+                  QuerySolution soln = rs.next();
+                  dataGetters.add( nodeToString( soln.get("dataGetter" ) ));
+              }
+          }finally{
+              qexec.close();
           }
-          qexec.close();
       }finally{
           displayModel.leaveCriticalSection();
       }
@@ -257,23 +271,31 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
     @Override
     public String getHomePageUri(){
         Model displayModel = getOntModelSelector().getDisplayModel();
-        QueryExecution qexec = QueryExecutionFactory.create( homePageUriQuery, displayModel );
-        
         List<String> rv = new ArrayList<String>();
-        ResultSet resultSet = qexec.execSelect();        
-        while(resultSet.hasNext()){
-            QuerySolution soln = resultSet.next();
-            rv.add( nodeToString(soln.get("pageUri")) );        
-        }
-        if( rv.size() == 0 ){
-            log.error("No display:HomePage defined in display model.");
-            return null;
-        }
-        if( rv.size() > 1 ){
-            log.error("More than one display:HomePage defined in display model.");
-            for( String hp : rv ){
-                log.error("home page: " + hp);
+        displayModel.enterCriticalSection(false);
+        try{
+            QueryExecution qexec = QueryExecutionFactory.create( homePageUriQuery, displayModel );
+            try{                
+                ResultSet resultSet = qexec.execSelect();        
+                while(resultSet.hasNext()){
+                    QuerySolution soln = resultSet.next();
+                    rv.add( nodeToString(soln.get("pageUri")) );        
+                }
+                if( rv.size() == 0 ){
+                    log.error("No display:HomePage defined in display model.");
+                    return null;
+                }
+                if( rv.size() > 1 ){
+                    log.error("More than one display:HomePage defined in display model.");
+                    for( String hp : rv ){
+                        log.error("home page: " + hp);
+                    }
+                }
+            }finally{
+                qexec.close();            
             }
+        }finally{
+            displayModel.leaveCriticalSection();
         }
         return rv.get(0);
     }
@@ -291,22 +313,29 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         initialBindings.add("pageUri", ResourceFactory.createResource(pageUri));
         
         Model displayModel = getOntModelSelector().getDisplayModel();
-        QueryExecution qexec = QueryExecutionFactory.create( classGroupPageQuery, displayModel , initialBindings);
-        
-        List<String> classGroupsForPage = new ArrayList<String>();
-        ResultSet resultSet = qexec.execSelect();        
-        while(resultSet.hasNext()){
-            QuerySolution soln = resultSet.next();
-            classGroupsForPage.add( nodeToString(soln.get("classGroup")) );        
+        try{                    
+            QueryExecution qexec = QueryExecutionFactory.create( classGroupPageQuery, displayModel , initialBindings);
+            try{
+                List<String> classGroupsForPage = new ArrayList<String>();
+                ResultSet resultSet = qexec.execSelect();        
+                while(resultSet.hasNext()){
+                    QuerySolution soln = resultSet.next();
+                    classGroupsForPage.add( nodeToString(soln.get("classGroup")) );        
+                }
+                if( classGroupsForPage.size() == 0 ){
+                    log.debug("No classgroup info defined in display model for "+ pageUri);
+                    return null;
+                }
+                if( classGroupsForPage.size() > 1 ){
+                    log.error("More than one display:forClassGroup defined in display model for page " + pageUri);            
+                }        
+                return classGroupsForPage.get(0);
+            }finally{
+                qexec.close();
+            }            
+        }finally{
+            displayModel.leaveCriticalSection();
         }
-        if( classGroupsForPage.size() == 0 ){
-            log.debug("No classgroup info defined in display model for "+ pageUri);
-            return null;
-        }
-        if( classGroupsForPage.size() > 1 ){
-            log.error("More than one display:forClassGroup defined in display model for page " + pageUri);            
-        }        
-        return classGroupsForPage.get(0);
     }
     
     /**
@@ -318,32 +347,40 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
          initialBindings.add("pageUri", ResourceFactory.createResource(pageUri));
          
          Model displayModel = getOntModelSelector().getDisplayModel();
-         QueryExecution qexec = QueryExecutionFactory.create( classIntersectionPageQuery, displayModel , initialBindings);
-        //Assuming unique labels or could use URI itself?
-         //TODO: Review whether to use labels or URIs
-         
-        
-         ResultSet resultSet = qexec.execSelect();        
-         while(resultSet.hasNext()){
-             QuerySolution soln = resultSet.next();
-             //Results format should be ?page hasClassIntersection <a>. <a> intersectsWithClass ?c; <a> intersects With Class ?e.
-             String intersectionLabel = nodeToString(soln.get("label"));
-             
-             //first time encountering label, set up
-             if(!classIntersectionsMap.containsKey(intersectionLabel)) {
-            	classIntersectionsMap.put(intersectionLabel, new ArrayList<String>());
-             } 
-             
-             List<String> classes = classIntersectionsMap.get(intersectionLabel);
-             classes.add(nodeToString(soln.get("class")));
-             //classIntersections.add( nodeToString(soln.get("classIntersection")) );        
+         try{
+             QueryExecution qexec = QueryExecutionFactory.create( classIntersectionPageQuery, displayModel , initialBindings);
+             try{
+                //Assuming unique labels or could use URI itself?
+                 //TODO: Review whether to use labels or URIs
+                 
+                
+                 ResultSet resultSet = qexec.execSelect();        
+                 while(resultSet.hasNext()){
+                     QuerySolution soln = resultSet.next();
+                     //Results format should be ?page hasClassIntersection <a>. <a> intersectsWithClass ?c; <a> intersects With Class ?e.
+                     String intersectionLabel = nodeToString(soln.get("label"));
+                     
+                     //first time encountering label, set up
+                     if(!classIntersectionsMap.containsKey(intersectionLabel)) {
+                    	classIntersectionsMap.put(intersectionLabel, new ArrayList<String>());
+                     } 
+                     
+                     List<String> classes = classIntersectionsMap.get(intersectionLabel);
+                     classes.add(nodeToString(soln.get("class")));
+                     //classIntersections.add( nodeToString(soln.get("classIntersection")) );        
+                 }
+                 if( classIntersectionsMap.size() == 0 ){
+                     log.debug("No class intersections info defined in display model for "+ pageUri);
+                     return null;
+                 }
+                    
+            	return classIntersectionsMap;
+             }finally{
+                 qexec.close();
+             }
+         }finally{
+             displayModel.leaveCriticalSection();
          }
-         if( classIntersectionsMap.size() == 0 ){
-             log.debug("No class intersections info defined in display model for "+ pageUri);
-             return null;
-         }
-            
-    	return classIntersectionsMap;
     }
    
     
@@ -362,40 +399,50 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
     	QuerySolutionMap initialBindings = new QuerySolutionMap();
         initialBindings.add("pageUri", ResourceFactory.createResource(pageUri));
         List<String> classes = new ArrayList<String>();
-        Model displayModel = getOntModelSelector().getDisplayModel();
-        QueryExecution qexec = QueryExecutionFactory.create( individualsForClassesQuery, displayModel , initialBindings);
-        HashMap<String, String> restrictClassesPresentMap = new HashMap<String, String>();
-        List<String>  restrictClasses = new ArrayList<String>();
-       
-        ResultSet resultSet = qexec.execSelect();        
-        while(resultSet.hasNext()){
-            QuerySolution soln = resultSet.next();
-            String dg = nodeToString(soln.get("dg"));
-            classes.add(nodeToString(soln.get("class")));
-            String restrictClass = nodeToString(soln.get("restrictClass"));
-            if(!restrictClassesPresentMap.containsKey(restrictClass)) {
-            	restrictClasses.add(restrictClass);
-            	restrictClassesPresentMap.put(restrictClass, "true");
-            }
-        }
         
-        if( classes.size() == 0 ){
-            log.debug("No classes  defined in display model for "+ pageUri);
-            return null;
+        Model displayModel = getOntModelSelector().getDisplayModel();
+        try{
+            QueryExecution qexec = QueryExecutionFactory.create( individualsForClassesQuery, displayModel , initialBindings);
+            try{
+                HashMap<String, String> restrictClassesPresentMap = new HashMap<String, String>();
+                List<String>  restrictClasses = new ArrayList<String>();
+               
+                ResultSet resultSet = qexec.execSelect();        
+                while(resultSet.hasNext()){
+                    QuerySolution soln = resultSet.next();
+                    String dg = nodeToString(soln.get("dg"));
+                    classes.add(nodeToString(soln.get("class")));
+                    String restrictClass = nodeToString(soln.get("restrictClass"));
+                    if(!restrictClassesPresentMap.containsKey(restrictClass)) {
+                    	restrictClasses.add(restrictClass);
+                    	restrictClassesPresentMap.put(restrictClass, "true");
+                    }
+                }
+                
+                if( classes.size() == 0 ){
+                    log.debug("No classes  defined in display model for "+ pageUri);
+                    return null;
+                }
+                classesAndRestrictions.put("classes", classes);  
+                classesAndRestrictions.put("restrictClasses", restrictClasses);
+                return classesAndRestrictions;
+            }finally{
+                qexec.close();
+            }
+        }finally{
+            displayModel.leaveCriticalSection();
         }
-        classesAndRestrictions.put("classes", classes);  
-        classesAndRestrictions.put("restrictClasses", restrictClasses);
-        return classesAndRestrictions;
     }
     
     
    
     
-    /* ****************************************************************************** */
+    /* *************************** Utility methods ********************************* */
     
     /**
      * Converts a sparql query that returns a multiple rows to a list of maps.
      * The maps will have column names as keys to the values.
+     * This method will not close qexec.
      */
     protected List<Map<String, Object>> executeQueryToCollection(
             QueryExecution qexec) {

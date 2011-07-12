@@ -47,6 +47,7 @@ public class IndexBuilder extends Thread {
     protected long reindexInterval = 1000 * 60 /* msec */ ;        
     
     protected int numberOfThreads = 10;
+    protected List<AdditionalURIsToIndex> additionalURIsFinders;
     
     public static final boolean UPDATE_DOCS = false;
     public static final boolean NEW_DOCS = true;
@@ -56,19 +57,20 @@ public class IndexBuilder extends Thread {
     public IndexBuilder(
                 ServletContext context,
                 IndexerIface indexer,
-                WebappDaoFactory wdf){
+                WebappDaoFactory wdf,
+                List<AdditionalURIsToIndex> additionalURIsFinders){
         super("IndexBuilder");
         this.indexer = indexer;
         this.wdf = wdf;
         this.context = context;            
-        
+        this.additionalURIsFinders = additionalURIsFinders;
         this.changedUris = new HashSet<String>();    
         this.start();
     }
     
     protected IndexBuilder(){
         //for testing only
-        this( null, null, null);        
+        this( null, null, null, null);        
     }
     
     public void setWdf(WebappDaoFactory wdf){    	

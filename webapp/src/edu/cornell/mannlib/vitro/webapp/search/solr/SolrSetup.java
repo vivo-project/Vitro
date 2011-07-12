@@ -32,6 +32,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.search.IndexConstants;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearchImpl;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
+import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForContextNodes;
+import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsToIndex;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
 
@@ -102,7 +104,11 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             VitroFilters vf = VitroFilterUtils.getPublicFilter(context);
             wadf = new WebappDaoFactoryFiltering(wadf, vf);            
             
-            IndexBuilder builder = new IndexBuilder(context, solrIndexer, wadf);
+            //make objects that will find additional URIs for context nodes etc
+            List<AdditionalURIsToIndex> uriFinders = new ArrayList<AdditionalURIsToIndex>();
+            uriFinders.add( new AdditionalURIsForContextNodes(jenaOntModel) );
+            
+            IndexBuilder builder = new IndexBuilder(context, solrIndexer, wadf, uriFinders);
             // to the servlet context so we can access it later in the webapp.
             context.setAttribute(IndexBuilder.class.getName(), builder);
             
