@@ -48,14 +48,16 @@ public class PropertyInstanceDaoJena extends JenaBaseDao implements
     }
 
     public void deleteObjectPropertyStatement(String subjectURI, String propertyURI, String objectURI) {
-    	deleteObjectPropertyStatement(subjectURI, propertyURI, objectURI, getOntModelSelector().getABoxModel());
+    	deleteObjectPropertyStatement(subjectURI, propertyURI, objectURI, getOntModelSelector());
     }
 
-    public void deleteObjectPropertyStatement(String subjectURI, String propertyURI, String objectURI, OntModel ontModel) {
+    public void deleteObjectPropertyStatement(String subjectURI, String propertyURI, String objectURI, OntModelSelector ontModelSelector) {
+        OntModel ontModel = ontModelSelector.getABoxModel();
+        OntModel tboxModel = ontModelSelector.getTBoxModel();
         ontModel.enterCriticalSection(Lock.WRITE);
         try {
             Resource subjRes = ontModel.getResource(subjectURI);
-            Property pred = ontModel.getProperty(propertyURI);
+            Property pred = tboxModel.getProperty(propertyURI);
             OntProperty invPred = null;                        
             if (pred.canAs(OntProperty.class)) {
             	invPred = ((OntProperty)pred.as(OntProperty.class)).getInverse();
