@@ -18,14 +18,12 @@ var menuManagementEdit = {
     bindEventListeners: function() {        
         // Listeners for vClass switching
         this.changeContentType.click(function() {
-        	alert("change content type");
            menuManagementEdit.showClassGroups();
            return false;
         });
         this.selectClassGroupDropdown.change(function() {
-        	alert("select class group dropdown");
+        	alert("class group change");
         	chooseClassGroup();
-        	return false;
         });
     },
     showClassGroups: function() {

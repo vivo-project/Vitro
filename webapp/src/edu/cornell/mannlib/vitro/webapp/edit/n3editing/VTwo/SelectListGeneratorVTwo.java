@@ -281,34 +281,7 @@ public class SelectListGeneratorVTwo {
                         }
                     }
                 }
-                break;
-            case MONIKERS_VIA_VCLASS: //so we have a vclass URI
-                vclassUri = field.getObjectClassUri();
-                if (vclassUri==null || vclassUri.equals("")){
-                    log.error("no vclassUri found for field \""+fieldName+"\" in SelectListGenerator.getOptions() when OptionsType MONIKERS_VIA_VCLASS specified");
-                } else {
-                    // first test to see whether there's a default "leave blank" value specified with the literal options
-                    String defaultOption=null;
-                    if ((defaultOption=getDefaultOption(field))!=null) {
-                        optionsMap.put(LEFT_BLANK, defaultOption);
-                    }
-                    // now populate the options                
-                    if( wDaoFact == null ) log.error("could not get WebappDaoFactory from request in SelectListGenerator.getOptions().");
-    
-                    VClass vclass = wDaoFact.getVClassDao().getVClassByURI( vclassUri );
-                    if( vclass == null ) { 
-                        log.error("Cannot find owl:Class " + vclassUri + " in the model" );
-                        optionsMap.put("", "Could not find class " + vclassUri);
-                    }else{                
-                        List<Individual> individuals = wDaoFact.getIndividualDao().getIndividualsByVClassURI(vclass.getURI(),-1,-1);                                   
-                        if (individuals.size()==0){ 
-                            log.error("No individuals of type "+vclass.getName()+" to add to pick list in SelectListGenerator.getOptions(); check portal visibility");
-                            optionsMap.put("", "No " + vclass.getName() + " found");
-                        }
-                    }
-                }
-                break;
-                
+                break;            
             case CHILD_VCLASSES: //so we have a vclass URI
                 vclassUri = field.getObjectClassUri();
                 if (vclassUri==null || vclassUri.equals("")){
