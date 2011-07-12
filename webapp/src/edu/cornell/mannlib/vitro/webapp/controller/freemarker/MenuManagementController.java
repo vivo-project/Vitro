@@ -114,6 +114,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     	data.put("selectedTemplateType", "default");
     	//defaults to regular class group page
     	data.put("associatedPage", "");
+    	data.put("associatedPageURI", "");
     	return data;
 	}
 
