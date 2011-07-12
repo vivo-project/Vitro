@@ -336,9 +336,11 @@ public class SolrJsonServlet extends VitroHttpServlet {
     	}
 	
         Map<String,String> options = SelectListGenerator.getOptions(editConfig, field, (new VitroRequest(req)).getFullWebappDaoFactory());
-        resp.setContentType("application/json");
-        ServletOutputStream out = resp.getOutputStream();
+                        
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("application/json;charset=UTF-8");
         
+        ServletOutputStream out = resp.getOutputStream();
         out.println("[");                
         for(String key : options.keySet()){
             JSONArray jsonObj = new JSONArray();            
@@ -405,8 +407,9 @@ public class SolrJsonServlet extends VitroHttpServlet {
             }catch(JSONException je ){
                 throw new ServletException(je.getMessage());
             }
-        }
-        resp.setContentType("application/json");
+        }        
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("application/json;charset=UTF-8");
         ServletOutputStream out = resp.getOutputStream();
         out.print( ja.toString() );
         log.debug("done with getEntitiesByVClassContinuation()");
@@ -439,9 +442,8 @@ public class SolrJsonServlet extends VitroHttpServlet {
         VitroRequest vreq = new VitroRequest(req);
         String vclassURI = vreq.getParameter("vclassURI");
         WebappDaoFactory daos = (new VitroRequest(req)).getFullWebappDaoFactory();
-        resp.setCharacterEncoding("UTF-8");
-               
-        // ServletOutputStream doesn't support UTF-8
+        resp.setCharacterEncoding("UTF-8");                      
+                        
         PrintWriter out = resp.getWriter();
         resp.getWriter();
         
@@ -511,7 +513,7 @@ public class SolrJsonServlet extends VitroHttpServlet {
             }
         }
         
-        resp.setContentType("application/json");
+        resp.setContentType("application/json;charset=UTF-8");
         out.print( ja.toString() );
         
         log.debug("done with getEntitiesByVClass()");
