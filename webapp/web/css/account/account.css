@@ -50,6 +50,12 @@ table#account td  a {
 table#account tr:nth-child(2n) {
     background-color: rgba(200, 200, 180,.25);
 }
+input#externalAuthChkBox {
+    height:18px;
+    width:18px;
+    margin-top:10px;
+    margin-bottom:10px;
+}
 #filter-roles {
     float: left;
     padding-bottom: 20px;

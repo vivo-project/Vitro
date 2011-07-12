@@ -64,6 +64,7 @@
 
         <#include "userAccounts-associateProfilePanel.ftl">
 
+        <p><input id="externalAuthChkBox" type="checkbox" name="externalAuthOnly"  <#if externalAuthOnly?? >checked</#if>  /><span>Externally Authenticated Only</span></p>
         <#if roles?has_content>
             <p>Roles<span class="requiredHint"> *</span></p>
             <#list roles as role>
@@ -74,30 +75,34 @@
         </#if>
 
         <#if emailIsEnabled??>
-            <input type="checkbox" name="resetPassword" value="" id="reset-password" role="checkbox" <#if resetPassword??>checked</#if> />
-            <label  class="inline" for="reset-password"> Reset password</label>
+            <div id="pwdResetContainer" <#if externalAuthOnly?? >class="hidden"</#if> >
+                <input type="checkbox" name="resetPassword" value="" id="reset-password" role="checkbox" <#if resetPassword??>checked</#if> />
+                <label  class="inline" for="reset-password"> Reset password</label>
 
-            <p class="note">
-                Note: Instructions for resetting the password will 
-                be emailed to the address entered above. The password will not 
-                be reset until the user follows the link provided in this email.
-            </p>
+                <p class="note">
+                    Note: Instructions for resetting the password will 
+                    be emailed to the address entered above. The password will not 
+                    be reset until the user follows the link provided in this email.
+                </p>
+            </div>
         <#else>
-            <table>
-                <tr>
-                    <td>
-                        <label for="new-password">New password<span class="requiredHint"> *</span></label>
-                        <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
-                    </td>
-                    <td>&nbsp;</td>
-                    <td>
-                        <label for="confirm-password">Confirm new password<span class="requiredHint"> *</span></label> 
-                        <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
-                    </td>
-                </tr>
-            </table>
-            <p class="explanatoryText" style="margin-top:-8px">Minimum of ${minimumLength} characters in length.</p>
-            <p class="explanatoryText">Leaving this blank means that the password will not be changed.</p>
+            <div id="passwordContainer" <#if externalAuthOnly?? >class="hidden"</#if> >
+                <table>
+                    <tr>
+                        <td>
+                            <label for="new-password">New password<span class="requiredHint"> *</span></label>
+                            <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
+                        </td>
+                        <td>&nbsp;</td>
+                        <td>
+                            <label for="confirm-password">Confirm new password<span class="requiredHint"> *</span></label> 
+                            <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
+                        </td>
+                    </tr>
+                </table>
+                <p class="explanatoryText" style="margin-top:-8px">Minimum of ${minimumLength} characters in length.</p>
+                <p class="explanatoryText">Leaving this blank means that the password will not be changed.</p>
+            </div>
         </#if>
         <br />
         <input type="submit" name="submitEdit" value="Save changes" class="submit" /> or <a class="cancel" href="${formUrls.list}">Cancel</a>
@@ -108,3 +113,5 @@
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/account.css" />')}
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/customForm.css" />')}
+
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/account/accountExternalAuthFlag.js"></script>')}

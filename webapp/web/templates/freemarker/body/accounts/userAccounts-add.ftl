@@ -64,6 +64,7 @@
 
         <#include "userAccounts-associateProfilePanel.ftl">
 
+        <p><input id="externalAuthChkBox" type="checkbox" name="externalAuthOnly" <#if externalAuthOnly?? >checked</#if>  /><span>Externally Authenticated Only</span></p>
         <p>Roles<span class="requiredHint"> *</span></p>
         <#list roles as role>
             <input type="radio" name="role" value="${role.uri}" role="radio" <#if selectedRole = role.uri>checked</#if> />
@@ -78,21 +79,23 @@
                 It will include instructions for activating the account and creating a password.
             </p>
         <#else>
-            <table>
-                <tr>
-                    <td>
-                        <label for="initial-password">Initial password<span class="requiredHint"> *</span></label>
-                        <input type="password" name="initialPassword" value="${initialPassword}" id="initial-password" role="input" />
-                    </td>
-                    <td>&nbsp;</td>
-                    <td>
-                        <label for="confirm-password">Confirm initial password<span class="requiredHint"> *</span></label> 
-                        <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
-                    </td>
-                </tr>
-            </table>
+            <div id="passwordContainer">
+                <table>
+                    <tr>
+                        <td>
+                            <label for="initial-password">Initial password<span class="requiredHint"> *</span></label>
+                            <input type="password" name="initialPassword" value="${initialPassword}" id="initial-password" role="input" />
+                        </td>
+                        <td>&nbsp;</td>
+                        <td>
+                            <label for="confirm-password">Confirm initial password<span class="requiredHint"> *</span></label> 
+                            <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
+                        </td>
+                    </tr>
+                </table>
             
-            <p class="explanatoryText" style="margin-top:-8px">Minimum of ${minimumLength} characters in length.</p>
+                <p class="explanatoryText" style="margin-top:-8px">Minimum of ${minimumLength} characters in length.</p>
+            </div>
         </#if>
         
         <br />
@@ -104,3 +107,5 @@
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/account.css" />')}
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/customForm.css" />')}
+
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/account/accountExternalAuthFlag.js"></script>')}
