@@ -63,14 +63,15 @@ var menuManagementEdit = {
         	  _this.classesForClassGroup.empty();
         	  _this.classesForClassGroup.append("<ul id='selectedClasses' name='selectedClasses'>");
         	  _this.classesForClassGroup.append('<li class="ui-state-default">' + 
-                      '<input type="checkbox" name="allSelected" id="allSelected" value="all" checked</#if>' +  
+                      '<input type="checkbox" name="allSelected" id="allSelected" value="all" checked/>' +  
                       '<label class="inline" for="All"> All</label>' +
                '</li>');
               $.each(results.classes, function(i, item) {
             	  var thisClass = results.classes[i];
             	  var thisClassName = thisClass.name;
+            	  //When first selecting new content type, all classes should be selected
             	  menuManagementEdit.classesForClassGroup.append(' <li class="ui-state-default">' + 
-                          '<input type="checkbox" name="classInClassGroup" value="' + thisClass.URI + '" />' +  
+                          '<input type="checkbox" checked name="classInClassGroup" value="' + thisClass.URI + '" />' +  
                          '<label class="inline" for="' + thisClassName + '"> ' + thisClassName + '</label>' + 
                           '</li>');
               });

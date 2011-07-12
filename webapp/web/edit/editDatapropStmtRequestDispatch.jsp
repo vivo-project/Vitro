@@ -31,7 +31,7 @@
 	if(request.getParameter("switchToDisplayModel") != null) {
 		//forward to Edit Request Dispatch Controller
 		String queryString = request.getQueryString();
-		response.sendRedirect("http://localhost:8080/vivo/editRequestDispatch?" + queryString);
+		response.sendRedirect(request.getContextPath() + "/editRequestDispatch?" + queryString);
 	}
 
     // Decide which form to forward to, set subjectUri, subjectUriJson, predicateUri, predicateUriJson in request

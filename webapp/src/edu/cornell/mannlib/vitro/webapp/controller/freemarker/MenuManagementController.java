@@ -75,7 +75,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     		//Throw some kind of error or do nothing
     	}
     	//Form url submission
-    	data.put("formUrls", SUBMIT_FORM);
+    	data.put("formUrls", vreq.getContextPath() + SUBMIT_FORM);
     	return new TemplateResponseValues(EDIT_FORM, data);
     	
     }
@@ -98,6 +98,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
 	private Map<String, Object> processDeleteMenuItem(VitroRequest vreq) {
 		String menuItem = getMenuItem(vreq);
 		Map<String, Object> data = new HashMap<String,Object>();
+    	data.put("menuItem", menuItem);
     	data.put("menuAction", "Remove");
     	this.getMenuItemData(vreq, menuItem, data);
     	this.getPageData(vreq, data);    	
@@ -110,11 +111,16 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     	//Generate empty values for fields
     	data.put("menuName", "");
     	data.put("prettyUrl", "");
+    	data.put("associatedPage", "");
+    	data.put("associatedPageURI", "");
+    	data.put("classGroup", new ArrayList<String>());
+    	//not a page already assigned a class group
+    	data.put("isClassGroupPage", false);
+    	data.put("includeAllClasses", false);
     	data.put("classGroups", this.getClassGroups());
     	data.put("selectedTemplateType", "default");
     	//defaults to regular class group page
-    	data.put("associatedPage", "");
-    	data.put("associatedPageURI", "");
+
     	return data;
 	}
 
@@ -125,7 +131,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     	}
 		//Get parameter for menu item
     	String menuItem = getMenuItem(vreq);
-    	
+    	data.put("menuItem", menuItem);
 		
     	data.put("menuAction", "Edit");
     	//Get All class groups

@@ -55,7 +55,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
  *then process the parameters and then make the necessary changes to the model.
  */
 public class MenuManagementEdit extends VitroHttpServlet {
-   private static final String CMD_PARAM = "CMD";
+   private static final String CMD_PARAM = "cmd";
    private final static String EDIT_FORM = "testMenuManagement.ftl"; 
    private final static String EDIT_PARAM_VALUE = "Edit";
    private final static String DELETE_PARAM_VALUE = "Remove";
@@ -73,8 +73,17 @@ public class MenuManagementEdit extends VitroHttpServlet {
                     .getRequestDispatcher("/edit/postEditCleanUp.jsp");
             rd.forward(request, resp);*/
     	VitroRequest vreq = new VitroRequest(rawRequest);
+    	java.util.Enumeration paramNames = vreq.getParameterNames();
+    	while(paramNames.hasMoreElements()) {
+    		String pName = (String)paramNames.nextElement();
+    		System.out.println("Param name is " + pName + " -a nd value is " + vreq.getParameter(pName));
+    	}
     	String command = getCommand(vreq);
-    	processCommand(command, vreq);
+    	if(command != null) {
+    		processCommand(command, vreq);
+    	} else {
+    		System.out.println("Command is null");
+    	}
         //Need to redirect correctly
     	//if(!isReorder(command)){
     	//RequestDispatcher rd = rawRequest.getRequestDispatcher(REDIRECT_URL);
@@ -114,6 +123,10 @@ public class MenuManagementEdit extends VitroHttpServlet {
     	//Get parameters for menu item being edited
     	String menuItem = vreq.getParameter("menuItem");
     	OntModel displayModel = getDisplayModel(vreq);
+    	if(displayModel == null) {
+    		//Throw some kind of exception
+    		System.out.println("Display model not being retrieved correctly");
+    	}
     	//if Add, then create new menu item and new page elements, and use the values above
     	
     	if(isAdd(command)){
@@ -150,9 +163,55 @@ public class MenuManagementEdit extends VitroHttpServlet {
     
     private void processReorder(OntModel displayModel, VitroRequest vreq) {
 		//Get the new menu positions for all the elements
-		
+    	String predicate = vreq.getParameter("predicate");
+    	//Assuming these two are in the same order
+    	String[]individuals = vreq.getParameterValues("individuals");
+		String[] positions = vreq.getParameterValues("positions");
+		if(individuals.length > 0 && positions.length > 0 && individuals.length == positions.length) {
+			removeStatements = removePositionStatements(displayModel, individuals);
+			addStatements = addPositionStatements(displayModel, individuals, positions); 
+		} else {
+			//Throw an error?
+		}
 	}
 
+
+	private Model removePositionStatements(OntModel displayModel,
+			String[] individuals) {
+		Model removePositionStatements = ModelFactory.createDefaultModel();
+		
+		for(String individual: individuals) {
+			Resource individualResource = ResourceFactory.createResource(individual);
+			
+			removePositionStatements.add(displayModel.listStatements(
+					individualResource, 
+					DisplayVocabulary.MENU_POSITION, 
+					(RDFNode) null));
+			
+		}
+		
+		return removePositionStatements;
+	}
+
+	private Model addPositionStatements(OntModel displayModel,
+			String[] individuals, String[] positions) {
+		Model addPositionStatements = ModelFactory.createDefaultModel();
+		int index = 0;
+		int len = individuals.length;
+		for(index = 0; index < len; index++) {
+			Resource individualResource = ResourceFactory.createResource(individuals[index]);
+			int position = new Integer(positions[index]).intValue();
+			
+			addPositionStatements.add(addPositionStatements.createStatement(
+					individualResource, 
+					DisplayVocabulary.MENU_POSITION, 
+					addPositionStatements.createTypedLiteral(position)));
+			
+		}
+		return addPositionStatements;
+	}
+
+	
 
 	private void processDelete(String menuItem, OntModel displayModel,
 			String command, VitroRequest vreq) {
@@ -254,7 +313,7 @@ public class MenuManagementEdit extends VitroHttpServlet {
 	
 	private Model getIndividualsForClassesDataGetter(VitroRequest vreq, Resource dataGetterResource, 
 			Model addModel, OntModel displayModel) {
-		String[] selectedClasses = vreq.getParameterValues("selectedClasses");
+		String[] selectedClasses = vreq.getParameterValues("classInClassGroup");
 		Model dgModel = ModelFactory.createDefaultModel();
 		dgModel.add(dgModel.createStatement(dataGetterResource, RDF.type, DisplayVocabulary.CLASSINDIVIDUALS_PAGE_TYPE));
 		for(String classUri: selectedClasses) {

@@ -30,8 +30,8 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 		//forward to Edit Request Dispatch Controller
 		String queryString = request.getQueryString();
 		//Instead of edit request which is what we'll do later, here we'll forward to Menu Management Controller
-		//response.sendRedirect("http://localhost:8080/vivo/editRequestDispatch?" + queryString);
-		response.sendRedirect("http://localhost:8080/vivo/editDisplayModel?" + queryString);
+		//response.sendRedirect("editRequestDispatch?" + queryString);
+		response.sendRedirect(request.getContextPath() + "/editDisplayModel?" + queryString);
 	}
     /*
     Decide which form to forward to, set subjectUri, subjectUriJson, predicateUri, and predicateUriJson in request.

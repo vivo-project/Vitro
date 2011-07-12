@@ -17,6 +17,9 @@
 <section>
     <form method="POST" action="${formUrls}">
     	<input type="hidden" name="cmd" id="cmd" value="${menuAction}"/>
+    	<input type="hidden" name="menuItem" id="menuItem" value="${menuItem}"/>
+    	<input type="hidden" name="switchToDisplayModel" id="switchToDisplayModel" value="true"/>
+    	
         <legend>${menuAction} menu item</legend>
          
         <label for="menu-name">Name *</label>
@@ -76,7 +79,7 @@
              </li>
              <#list classGroup as classInClassGroup>
                 <li class="ui-state-default">
-                    <input type="checkbox" name="classInClassGroup" value="${classInClassGroup.URI}" 
+                    <input type="checkbox" id="classInClassGroup" name="classInClassGroup" value="${classInClassGroup.URI}" 
                     	<#if includeAllClasses = true>checked</#if> />
                     <label class="inline" for="${classInClassGroup.name}"> ${classInClassGroup.name}</label>
                     <span class="ui-icon-sortable"></span> <#--sortable icon for dragging and dropping menu items-->
