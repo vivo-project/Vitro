@@ -36,6 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 
@@ -225,7 +226,18 @@ public class RDFUploadController extends BaseEditController {
     		                    String userURI) {
         mainModel.enterCriticalSection(Lock.WRITE);
         try {
-            mainModel.getBaseModel().notifyEvent(new EditEvent(userURI,true));
+        	
+        	EditEvent startEvent = null, endEvent = null;
+        	
+        	if (remove) {
+        		startEvent = new BulkUpdateEvent(userURI, true);
+        		endEvent = new BulkUpdateEvent(userURI, false);
+        	} else {
+        		startEvent = new EditEvent(userURI, true);
+        		endEvent = new EditEvent(userURI, false);
+        	}
+         	
+            mainModel.getBaseModel().notifyEvent(startEvent);
             try {                
                 if (makeClassgroups) {
                     Model classgroupModel = 
@@ -239,7 +251,7 @@ public class RDFUploadController extends BaseEditController {
                     mainModel.add(changesModel);
                 } 
             } finally {
-                mainModel.getBaseModel().notifyEvent(new EditEvent(userURI,false));
+                mainModel.getBaseModel().notifyEvent(endEvent);
             }
         } finally {
             mainModel.leaveCriticalSection();

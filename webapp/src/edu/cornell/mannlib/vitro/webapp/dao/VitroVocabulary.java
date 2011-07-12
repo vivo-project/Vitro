@@ -184,6 +184,7 @@ public class VitroVocabulary {
     public static final String EDIT_EVENT_AGENT = vitroURI+"editEventAgent";
     public static final String EDIT_EVENT_DATETIME = vitroURI+"editEventDateTime";
 
+    public static final String BULK_UPDATE_EVENT = vitroURI+"BulkUpdateEvent";
     public static final String INDIVIDUAL_EDIT_EVENT = vitroURI+"IndividualEditEvent";
     public static final String INDIVIDUAL_CREATION_EVENT = vitroURI+"IndividualCreationEvent";
     public static final String INDIVIDUAL_UPDATE_EVENT = vitroURI+"IndividualUpdateEvent";

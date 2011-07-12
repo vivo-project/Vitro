@@ -32,6 +32,9 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vitro.webapp.dao.jena.CumulativeDeltaModeler;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
+
 /**
  * Allows for real-time incremental materialization or retraction of RDFS-
  * style class and property subsumption based ABox inferences as statements
@@ -57,6 +60,10 @@ public class SimpleReasoner extends StatementListener {
 	
 	private AnnotationProperty mostSpecificType = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createAnnotationProperty(mostSpecificTypePropertyURI);
 	
+	private CumulativeDeltaModeler aBoxDeltaModeler1 = null;
+	private CumulativeDeltaModeler aBoxDeltaModeler2 = null;
+	private boolean batchMode1, batchMode2;
+
 	/**
 	 * @param tboxModel - input.  This model contains both asserted and inferred TBox axioms
 	 * @param aboxModel - input.  This model contains asserted ABox statements
@@ -70,9 +77,13 @@ public class SimpleReasoner extends StatementListener {
 		this.aboxModel = aboxModel; 
 		this.inferenceModel = inferenceModel;
 		this.inferenceRebuildModel = inferenceRebuildModel;
-		this.scratchpadModel = scratchpadModel;
+		this.scratchpadModel = scratchpadModel;	
+		this.batchMode1 = false;
+		this.batchMode2 = false;
+		aBoxDeltaModeler1 = new CumulativeDeltaModeler();
+		aBoxDeltaModeler2 = new CumulativeDeltaModeler();
 				
-	    aboxModel.register(this);
+	    aboxModel.getBaseModel().register(this);
 	}
 	
 	/**
@@ -88,6 +99,10 @@ public class SimpleReasoner extends StatementListener {
 		this.inferenceModel = inferenceModel;
 		this.inferenceRebuildModel = ModelFactory.createDefaultModel();
 		this.scratchpadModel = ModelFactory.createDefaultModel();
+		aBoxDeltaModeler1 = new CumulativeDeltaModeler();
+		aBoxDeltaModeler2 = new CumulativeDeltaModeler();
+		this.batchMode1 = false;
+		this.batchMode2 = false;
 	}
 	
 	/*
@@ -124,14 +139,21 @@ public class SimpleReasoner extends StatementListener {
 	
 		try {
 			if (stmt.getPredicate().equals(RDF.type)) {
-			    removedABoxTypeAssertion(stmt, inferenceModel);
-			    setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
+				if (batchMode1) {
+					 aBoxDeltaModeler1.removedStatement(stmt);
+				} else if (batchMode2) {
+					 aBoxDeltaModeler2.removedStatement(stmt);
+				} else {
+			         removedABoxTypeAssertion(stmt, inferenceModel);
+			         setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
+				}
 			}
 			/* uncomment this to enable subproperty/equivalent property inferencing. sjm222 5/13/2011
 			else {
 				removedABoxAssertion(stmt, inferenceModel);
 			}
 			*/
+			
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
 			log.error("Exception while retracting inferences: " + e.getMessage());
@@ -1191,6 +1213,103 @@ public class SimpleReasoner extends StatementListener {
 	   return (getSimpleReasonerFromServletContext(ctx) == null);	
 	}	
 	
+	@Override
+	public synchronized void notifyEvent(Model model, Object event) {
+		
+	    if (event instanceof BulkUpdateEvent) {	
+	    	if (((BulkUpdateEvent) event).getBegin()) {
+	    		
+	    		log.info("received BulkUpdateEvent(true)");
+	    		
+	    		if (batchMode1 || batchMode2) {
+	    			log.error("received a BulkUpdateEvent while already processing one; this event will be ignored and ABox reasoning may not be performed properly");
+	    			return;  
+	    		} else {
+	    			batchMode1 = true;
+	    			batchMode2 = false;
+	    			aBoxDeltaModeler1.getRetractions().removeAll();
+	    		}
+	    	} else {
+	    		log.info("received BulkUpdateEvent(false)");
+	    		new Thread(new DeltaComputer()).start();
+	    	}
+	    }
+	}
+	
+    private class DeltaComputer extends Thread {      
+        public DeltaComputer() {
+        }
+        
+        @Override
+        public void run() {  
+      
+        	Model retractions = aBoxDeltaModeler1.getRetractions();
+        	boolean finished = (retractions.size() == 0);
+        	String qualifier = "(1)";
+        	
+        	while (!finished) {
+    			retractions.enterCriticalSection(Lock.READ);	
+    			
+    			try {
+    	   	       	log.info("started computing inferences for batch " + qualifier + "  update");
+    				StmtIterator iter = retractions.listStatements();
+    	
+    				int num = 0;
+    				while (iter.hasNext()) {				
+    					Statement stmt = iter.next();
+    					
+    					try {
+    						removedStatement(stmt);
+    					} catch (Exception e) {
+    						log.error("exception while computing inferences for batch " + qualifier + "  update: " +  e.getMessage());
+    					}
+    					
+						num++;
+		                if ((num % 6000) == 0) {
+		                    log.info("still computing inferences for batch " + qualifier + "  update...");
+		                }	
+
+    				}
+    			} finally {
+    	    		retractions.removeAll();	
+    	   			retractions.leaveCriticalSection();
+    				log.info("finished computing inferences for batch " + qualifier + "  update");
+    			}			
+    			
+    			
+    			if (batchMode1 && (aBoxDeltaModeler2.getRetractions().size() > 0)) {
+    				retractions = aBoxDeltaModeler2.getRetractions();
+    				batchMode2 = true;
+    				batchMode1 = false;
+    				qualifier = "(2)";
+    				log.info("switching from batch mode 1 to batch mode 2");
+    			} else if (batchMode2 && (aBoxDeltaModeler1.getRetractions().size() > 0)) {
+    				retractions = aBoxDeltaModeler1.getRetractions();
+    				batchMode1 = true;
+    				batchMode2 = false;
+    				qualifier = "(1)";
+    				log.info("switching from batch mode 2 to batch mode 1");
+    			} else {
+    				finished = true;
+    				log.info("finished processing retractions in batch mode");
+    			}	
+        	}
+        	
+        	if (aBoxDeltaModeler1.getRetractions().size() > 0) {
+        	   log.warn("Unexpected condition: the aBoxDeltaModeler1 retractions model was not empty at the end of the DeltaComputer.run method");
+               aBoxDeltaModeler1.getRetractions().removeAll();
+        	}
+
+        	if (aBoxDeltaModeler2.getRetractions().size() > 0) {
+         	   log.warn("Unexpected condition: the aBoxDeltaModeler2 retractions model was not empty at the end of the DeltaComputer.run method");
+                aBoxDeltaModeler2.getRetractions().removeAll();
+         	}
+ 
+        	batchMode1 = false;
+        	batchMode2 = false;    		
+        }        
+    }
+    	
     public static String stmtString(Statement statement) {
     	return  " [subject = " + statement.getSubject().getURI() +
     			"] [property = " + statement.getPredicate().getURI() +
