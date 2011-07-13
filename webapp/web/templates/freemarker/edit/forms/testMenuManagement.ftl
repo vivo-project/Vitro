@@ -34,12 +34,12 @@
         
         <br />
         
-        <input type="radio" name="selectedTemplate" value="custom" <#if selectedTemplateType = "custom">checked</#if> role="input" />
+        <input type="radio" name="selectedTemplate" class="custom-template" value="custom" <#if selectedTemplateType = "custom">checked</#if> role="input" />
         <label class="inline" for="custom"> Custom template</label>
         
         <#if selectedTemplateType = "custom">
         <section id="custom-template" role="region">
-            <input class="custom-template" type="text" name="customTemplate" value="${customTemplate}" size="30" role="input" /><span class="requiredHint"> *</span>
+            <input type="text" name="customTemplate" value="${customTemplate}" size="30" role="input" /><span class="requiredHint"> *</span>
        </section>
         </#if>
         
