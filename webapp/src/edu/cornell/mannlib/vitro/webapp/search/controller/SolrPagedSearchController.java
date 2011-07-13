@@ -663,17 +663,17 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
         
         HashMap<Result,String> resultsToTemplates = new HashMap<Result,String>();
         
-        //set up HTML format
+        // set up HTML format
         resultsToTemplates.put(Result.PAGED, "search-pagedResults.ftl");
         resultsToTemplates.put(Result.ERROR, "search-error.ftl");
-        resultsToTemplates.put(Result.BAD_QUERY, "search-badQuery.ftl");        
+        // resultsToTemplates.put(Result.BAD_QUERY, "search-badQuery.ftl");        
         templateTable.put(Format.HTML, Collections.unmodifiableMap(resultsToTemplates));
         
-        //set up XML format
+        // set up XML format
         resultsToTemplates = new HashMap<Result,String>();
         resultsToTemplates.put(Result.PAGED, "search-xmlResults.ftl");
         resultsToTemplates.put(Result.ERROR, "search-xmlError.ftl");
-        resultsToTemplates.put(Result.BAD_QUERY, "search-xmlBadQuery.ftl");        
+        // resultsToTemplates.put(Result.BAD_QUERY, "search-xmlBadQuery.ftl");        
         templateTable.put(Format.XML, Collections.unmodifiableMap(resultsToTemplates));
         
         return Collections.unmodifiableMap(templateTable);
