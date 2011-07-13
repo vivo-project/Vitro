@@ -102,8 +102,6 @@ public class CloneEntityServlet extends BaseEditController {
             propertyInstanceDao.insertProp(currPI);
         }
 
-        // addIndividualToLuceneIndex( context, cloneURI );
-
         String encodedCloneURI = URLEncoder.encode(cloneURI, "UTF-8");
         response.sendRedirect("entityEdit?uri="+encodedCloneURI);
         //response.sendRedirect("entity?home="+portalIdStr+"&id="+newEntityId);

@@ -26,7 +26,7 @@ public class DisplayVocabulary {
     private static final String NS = DISPLAY_NS;
     
     /* Individuals */
-    public static final String PRIMARY_LUCENE_INDEX_URI = NS + "PrimaryLuceneIndex";
+    public static final String PRIMARY_SEARCH_INDEX_URI = NS + "PrimarySearchIndex";
     
     //bk392 for extracting properties beyond context nodes.
     public static final String CONTEXT_NODES_URI = NS + "QueryForContextNodes";

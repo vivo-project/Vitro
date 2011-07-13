@@ -24,8 +24,8 @@ import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
  *
  * That IndexBuilder will be associated with a object that implements the IndexerIface.
  *
- * An example of the IndexerIface is LuceneIndexer.
- * An example of the IndexBuilder and LuceneIndexer getting setup is in LuceneSetup.
+ * An example of the IndexerIface is SolrIndexer.
+ * An example of the IndexBuilder and SolrIndexer setup is in SolrSetup.
  *
  * @author bdc34
  */

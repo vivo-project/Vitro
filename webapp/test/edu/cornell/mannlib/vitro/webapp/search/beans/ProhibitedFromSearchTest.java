@@ -110,7 +110,7 @@ public class ProhibitedFromSearchTest {
 	@Test
 	public void testPrimaryIndex(){		
 		String primaryIndexN3 = 
-			"<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#PrimaryLuceneIndex>" +
+			"<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#PrimarySearchIndex>" +
 			"<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#excludeClass>" +
 			"<http://vivoweb.org/ontology/core#NonAcademic> . ";		
 		
@@ -119,7 +119,7 @@ public class ProhibitedFromSearchTest {
 		m.add( r.listStatements() );
 		
 		Assert.assertTrue(m.size() == 1);	
-		ProhibitedFromSearch pfs = new ProhibitedFromSearch( DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, m);
+		ProhibitedFromSearch pfs = new ProhibitedFromSearch( DisplayVocabulary.PRIMARY_SEARCH_INDEX_URI, m);
 		Assert.assertNotNull(pfs.prohibitedClasses);
 		Assert.assertEquals(1, pfs.prohibitedClasses.size() );
 		Assert.assertTrue(pfs.isClassProhibitedFromSearch("http://vivoweb.org/ontology/core#NonAcademic"));

@@ -47,7 +47,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.search.IndexConstants;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
-import edu.cornell.mannlib.vitro.webapp.search.beans.VitroHighlighter;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryFactory;
 import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
@@ -63,8 +62,6 @@ import freemarker.template.Configuration;
  * 
  */
 
-// This will be renamed to PagedSearchController once everything is using Solr and we can
-// delete the Lucene version. 
 public class SolrPagedSearchController extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -614,10 +611,6 @@ public class SolrPagedSearchController extends FreemarkerHttpServlet {
     }
     
     public static final int MAX_QUERY_LENGTH = 500;
-
-    public VitroHighlighter getHighlighter(VitroQuery q) {
-        throw new Error("PagedSearchController.getHighlighter() is unimplemented");
-    }
 
     public VitroQueryFactory getQueryFactory() {
         throw new Error("PagedSearchController.getQueryFactory() is unimplemented");

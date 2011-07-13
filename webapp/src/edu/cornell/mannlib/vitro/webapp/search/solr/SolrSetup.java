@@ -70,8 +70,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             server.setMaxRetries(1);            
             context.setAttribute(LOCAL_SOLR_SERVER, server);
             
-            /* setup the individual to solr doc translation */            
-            //first we need a ent2luceneDoc translator
+            /* set up the individual to solr doc translation */            
             OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
             
             OntModel abox = ModelContext.getBaseOntModelSelector(context).getABoxModel();            
@@ -86,7 +85,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             modifiers.add(new NameBoost());
             
             IndividualToSolrDocument indToSolrDoc = new IndividualToSolrDocument(
-            		new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel),
+            		new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_SEARCH_INDEX_URI, displayOntModel),
             		new IndividualProhibitedFromSearchImpl(context), 
             		modifiers);                        
             

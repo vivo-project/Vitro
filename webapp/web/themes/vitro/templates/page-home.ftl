@@ -24,7 +24,7 @@
                     <li>Create or load ontologies in OWL format</li>
                     <li>Edit instances and relationships</li>
                     <li>Build a public web site to display your data</li>
-                    <li>Search your data with Lucene</li>
+                    <li>Search your data</li>
                 </ul>
             </section> <!-- #intro -->
             

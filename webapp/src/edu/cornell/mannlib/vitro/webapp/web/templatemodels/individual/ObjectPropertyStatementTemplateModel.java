@@ -30,7 +30,6 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     private final String objectUri;
     private final String templateName;
 
-    //Updating to include Vitro Request
     ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, String objectKey, 
             Map<String, String> data, EditingPolicyHelper policyHelper, String templateName, VitroRequest vreq) {
         super(subjectUri, propertyUri, policyHelper, vreq);

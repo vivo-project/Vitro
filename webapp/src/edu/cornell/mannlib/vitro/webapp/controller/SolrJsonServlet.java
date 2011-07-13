@@ -271,9 +271,7 @@ public class SolrJsonServlet extends VitroHttpServlet {
         return map;
    }
  
-
-    //Factoring out to allow for results to be processed from query for both lucene and solr
-    //Map given to process method includes the actual individuals returned from the search
+    // Map given to process method includes the actual individuals returned from the search
     public static JSONObject processVClassResults(Map<String, Object> map, VitroRequest vreq, ServletContext context, boolean multipleVclasses) throws Exception{
          JSONObject rObj = DataGetterUtils.processVclassResultsJSON(map, vreq, multipleVclasses);
          return rObj;
@@ -331,7 +329,7 @@ public class SolrJsonServlet extends VitroHttpServlet {
 		    .getAttribute("displayOntModel");
     	if (displayOntModel != null) {
 	     	ProhibitedFromSearch pfs = new ProhibitedFromSearch(
-				DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel);
+				DisplayVocabulary.PRIMARY_SEARCH_INDEX_URI, displayOntModel);
 	     	editConfig.setProhibitedFromSearch(pfs);
     	}
 	

@@ -13,8 +13,8 @@ import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
  * IndexBuilder will manage getting lists of object to index and then use
  * an object that implements IndexerIface to stuff the backend index.
  *
- * An example is LuceneIndexer which is set up and associated with a
- * IndexBuilder in LuceneSetup.
+ * An example is SolrIndexer which is set up and associated with a
+ * IndexBuilder in SolrSetup.
  *
  * @author bdc34
  *

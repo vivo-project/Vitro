@@ -5,7 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.search;
 public class VitroSearchTermNames {
     /** Id of entity, vclass or tab */
     public static String URI         = "URI";
-    /** lucene document id */
+    /** search document id */
     public static String DOCID      = "DocId";
     /** java class of the object that the Doc represents. */
     public static String JCLASS     = "JCLASS";

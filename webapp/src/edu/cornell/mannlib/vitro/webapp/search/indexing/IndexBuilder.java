@@ -22,7 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  * The IndexBuilder is used to rebuild or update a search index.
  * There should only be one IndexBuilder in a vitro web application.
  * It uses an implementation of a back-end through an object that
- * implements IndexerIface.  An example of a back-end is LuceneIndexer.
+ * implements IndexerIface.  An example of a back-end is SolrIndexer.
  *
  * See the class SearchReindexingListener for an example of how a model change
  * listener can use an IndexBuilder to keep the full text index in sncy with 

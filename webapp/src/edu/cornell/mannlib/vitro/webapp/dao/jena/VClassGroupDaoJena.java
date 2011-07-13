@@ -320,7 +320,7 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
     public void removeClassesHiddenFromSearch(List<VClassGroup> groups) {        
         OntModel displayOntModel = getOntModelSelector().getDisplayModel();
         ProhibitedFromSearch pfs = new ProhibitedFromSearch(
-                DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel);
+                DisplayVocabulary.PRIMARY_SEARCH_INDEX_URI, displayOntModel);
         for (VClassGroup group : groups) {
             List<VClass> classList = new ArrayList<VClass>();
             for (VClass vclass : group.getVitroClassList()) {

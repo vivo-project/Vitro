@@ -134,7 +134,7 @@ public class IndividualToSolrDocument {
     private void checkForSkipBasedOnNS(Individual ind) throws SkipIndividualException {
         String id = ind.getURI();                  
         if(id == null){            
-            throw new SkipIndividualException("cannot add individuals without URIs to lucene Index");
+            throw new SkipIndividualException("cannot add individuals without URIs to search index");
         }else if( id.startsWith(VitroVocabulary.vitroURI) ||
                 id.startsWith(VitroVocabulary.VITRO_PUBLIC) ||
                 id.startsWith(VitroVocabulary.PSEUDO_BNODE_NS) ||

@@ -266,7 +266,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 //                    .getAttribute("displayOntModel");
 //            if (displayOntModel != null) {
 //                ProhibitedFromSearch pfs = new ProhibitedFromSearch(
-//                    DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel);
+//                    DisplayVocabulary.PRIMARY_SEARCH_INDEX_URI, displayOntModel);
 //                if( editConfiguration != null )
 //                    editConfiguration.setProhibitedFromSearch(pfs);
 //            }
