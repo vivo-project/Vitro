@@ -269,6 +269,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         urls.put("theme", UrlBuilder.getUrl(themeDir));
         urls.put("index", UrlBuilder.getUrl("/browse"));   
         urls.put("currentPage", getCurrentPageUrl(vreq));
+        urls.put("referringPage", getReferringPageUrl(vreq));
         
 		if (PolicyHelper.isAuthorizedForActions(vreq, new EditOwnAccount())) {
 			urls.put("myAccount", UrlBuilder.getUrl("/accounts/myAccount"));
@@ -285,6 +286,11 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         }
         path = normalizeServletName(path);        
         return UrlBuilder.getUrl(path);
+    }
+    
+    private String getReferringPageUrl(HttpServletRequest request) {
+		String referrer = request.getHeader("referer");
+		return (referrer == null) ? UrlBuilder.getHomeUrl() : referrer;
     }
 
     protected TemplateModel wrap(Object obj, int exposureLevel) throws TemplateModelException {
