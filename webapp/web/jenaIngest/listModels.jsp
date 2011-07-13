@@ -103,7 +103,7 @@ function init(){
                 <input type="hidden" name="action" value="attachModel"/>
                 <input type="hidden" name="modelName" value="<%=modelName%>"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
-                <input type="submit" name="submit" value="attach to webapp"/>
+                <input type="submit" name="submit" value="attach to TBox (ontology)"/>
             </form>
             </td>
             <td>
@@ -111,7 +111,7 @@ function init(){
                 <input type="hidden" name="action" value="detachModel"/>
                 <input type="hidden" name="modelName" value="<%=modelName%>"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
-                <input type="submit" name="submit" value="detach from webapp"/>
+                <input type="submit" name="submit" value="detach from TBox (ontology)"/>
             </form>
             </td>
             <td>

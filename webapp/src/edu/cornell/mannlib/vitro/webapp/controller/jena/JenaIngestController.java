@@ -141,6 +141,7 @@ public class JenaIngestController extends BaseEditController {
 			processCleanLiteralsRequest(vreq, maker, modelType);
 		} else if("outputModel".equals(actionStr)) {
 			processOutputModelRequest(vreq, response, maker, modelType);
+            return; // don't attempt to display a JSP
 		} else if("clearModel".equals(actionStr)) {
 			processClearModelRequest(vreq, maker, modelType);
 		} else if("setWriteLayer".equals(actionStr)) {
@@ -344,7 +345,6 @@ public class JenaIngestController extends BaseEditController {
 		} finally {
 			model.leaveCriticalSection();
 		}
-		return;
 	}
 	
 	private void processCleanLiteralsRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
