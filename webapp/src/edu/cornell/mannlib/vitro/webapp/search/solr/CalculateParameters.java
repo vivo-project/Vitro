@@ -38,7 +38,7 @@ public class CalculateParameters implements DocumentModifier {
 
     private boolean shutdown = false;
 	private Dataset dataset;
-    public static int totalInd=1;
+   // public static int totalInd=1;
     
     private static final String prefix = "prefix owl: <http://www.w3.org/2002/07/owl#> "
 		+ " prefix vitroDisplay: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>  "
@@ -64,7 +64,7 @@ public class CalculateParameters implements DocumentModifier {
     
 	public CalculateParameters(Dataset dataset){
 		 this.dataset =dataset;
-		 new Thread(new TotalInd(this.dataset,totalCountQuery)).start();
+		// new Thread(new TotalInd(this.dataset,totalCountQuery)).start();
 	}
 	
 	public CalculateParameters(){
@@ -99,8 +99,8 @@ public class CalculateParameters implements DocumentModifier {
 			dataset.getLock().leaveCriticalSection();
 		}
 
-		beta = (float)Conn/totalInd;
-		beta *= 100;
+		beta = (float)Conn;
+		//beta *= 100;
 		beta += 1;
 		
 		// sigmoid function to keep beta between 0 to 1;
@@ -286,8 +286,8 @@ class TotalInd implements Runnable{
 					soln = results.next();
 					totalInd = Integer.parseInt(soln.getLiteral(resultVars.get(0)).getLexicalForm());
 				}
-				CalculateParameters.totalInd = totalInd;
-				log.info("Total number of individuals in the system are : " + CalculateParameters.totalInd);
+				//CalculateParameters.totalInd = totalInd;
+				//log.info("Total number of individuals in the system are : " + CalculateParameters.totalInd);
 			}catch(Throwable t){
 				log.error(t,t);
 			}finally{
