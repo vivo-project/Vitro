@@ -1,8 +1,6 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#--Since we are going to use one template for adding and editing a menu item,
-    it will be necessary to provide a freemarker variable that lets us know if you are in edit or add mode. This is up 
-    to you Huda the way you implement it. -->
+<#--Template for adding and editing menu items -->
 
 <#-- some additional processing here which shows or hides the class group selection and classes based on initial action-->
 <#assign existingClassGroupStyle = " " />
@@ -16,50 +14,51 @@
 
 <section id="${menuAction?lower_case}-menu-item" role="region">
     <form method="POST" action="${formUrls}" class="customForm" role="${menuAction} menu item">
-        <input type="hidden" name="cmd" id="cmd" value="${menuAction}" />
-        <input type="hidden" name="menuItem" id="menuItem" value="${menuItem}" />
-        <input type="hidden" name="switchToDisplayModel" id="switchToDisplayModel" value="true" />
+        <input type="hidden" name="cmd" id="cmd" value="${menuAction}" role="input" />
+        <input type="hidden" name="menuItem" id="menuItem" value="${menuItem}" role="input" />
+        <input type="hidden" name="switchToDisplayModel" id="switchToDisplayModel" value="true" role="input" />
          
         <label for="menu-name">Name<span class="requiredHint"> *</span></label>
-        <input type="text" name="menuName" value="${menuName}" />
+        <input type="text" name="menuName" value="${menuName}" role="input" />
 
         <label for="pretty-url">Pretty URL<span class="requiredHint"> *</span></label> 
-        <input type="text" name="prettyUrl" value="${prettyUrl}" />
+        <input type="text" name="prettyUrl" value="${prettyUrl}" role="input" />
         <p class="note">(Format: /<prettyURL> - ie. /people)</p>
 
         <#--Commented out for now -->
     
         <p>Template<span class="requiredHint"> *</span></p>
         
-        <input type="radio" name="selectedTemplate" value="default" <#if selectedTemplateType = "default">checked</#if> />
+        <input type="radio" class="default-template" name="selectedTemplate" value="default" <#if selectedTemplateType = "default">checked</#if> role="radio" />
         <label class="inline" for="default"> Default</label>
         
         <br />
         
-        <input type="radio" name="selectedTemplate" value="custom" <#if selectedTemplateType = "custom">checked</#if> />
+        <input type="radio" name="selectedTemplate" value="custom" <#if selectedTemplateType = "custom">checked</#if> role="input" />
         <label class="inline" for="custom"> Custom template</label>
         
         <#if selectedTemplateType = "custom">
-            <br />
-            <input class="custom-template" type="text" name="customTemplate" value="${customTemplate}" /><span class="requiredHint"> *</span>
+        <section id="custom-template" role="region">
+            <input class="custom-template" type="text" name="customTemplate" value="${customTemplate}" size="30" role="input" /><span class="requiredHint"> *</span>
+       </section>
         </#if>
         
-       <section id="existingContentType" name="existingContentType" ${existingClassGroupStyle}>
+       <section id="existingContentType" name="existingContentType" ${existingClassGroupStyle} role="region">
            <p>Selected content type for the associated page</p>
            <p>
-               <span id="selectedContentTypeValue" name="selectedContentTypeValue"><em>${associatedPage}</em></span>
-               <a id="changeContentType" name="changeContentType" href="#">Change content type</a>
+               <span id="selectedContentTypeValue" name="selectedContentTypeValue">${associatedPage}</span>
+               <a href="#" id="changeContentType" name="changeContentType">Change content type</a>
            </p>
        </section>
     
         <#-- Select class group -->
-        <section id="selectContentType" name="selectContentType" ${selectClassGroupStyle}>     
+        <section id="selectContentType" name="selectContentType" ${selectClassGroupStyle} role="region">     
            <label for="selectClassGroup">Select content type for the associated page<span class="requiredHint"> *</span></label>
            
-           <select name="selectClassGroup" id="selectClassGroup">
-               <option value="-1"> </option>
+           <select name="selectClassGroup" id="selectClassGroup" role="combobox">
+               <option value="-1" role="option">Select one</option>
                <#list classGroups as aClassGroup>
-                    <option value="${aClassGroup.URI}" <#if aClassGroup.URI = associatedPageURI>selected</#if> >${aClassGroup.publicName}</option>
+                    <option value="${aClassGroup.URI}" <#if aClassGroup.URI = associatedPageURI>selected</#if> role="option">${aClassGroup.publicName}</option>
                </#list>
            </select>
        </section> 
@@ -67,17 +66,15 @@
         <#-- Select classes in a class group -->    
         <p id="selectClassesMessage" name="selectClassesMessage" ${existingClassGroupStyle}>Select content to display</p>
         <section id="classesInSelectedGroup" name="classesInSelectedGroup" ${existingClassGroupStyle}>
-            
-            <ul id="selectedClasses" name="selectedClasses">
+            <ul id="selectedClasses" name="selectedClasses" role="menu">
                 <#--Adding a default class for "ALL" in case all classes selected-->
-                <li class="ui-state-default">
-                    <input type="checkbox" name="allSelected" id="allSelected" value="all" <#if isClassGroupPage = true || includeAllClasses = true>checked</#if> 
+                <li class="ui-state-default" role="menuitem">
+                    <input type="checkbox" name="allSelected" id="allSelected" value="all" <#if isClassGroupPage = true || includeAllClasses = true>checked</#if> />
                     <label class="inline" for="All"> All</label>
                 </li>
                 <#list classGroup as classInClassGroup>
-                <li class="ui-state-default">
-                    <input type="checkbox" id="classInClassGroup" name="classInClassGroup" value="${classInClassGroup.URI}" 
-                    <#if includeAllClasses = true>checked</#if> />
+                <li class="ui-state-default" role="menuitem">
+                    <input type="checkbox" id="classInClassGroup" name="classInClassGroup" value="${classInClassGroup.URI}" <#if includeAllClasses = true>checked</#if> />
                      <#if isIndividualsForClassesPage?has_content>
                             <#list includeClasses as includeClass>
                                 <#if includeClass = classInClassGroup.URI>
@@ -94,20 +91,19 @@
         
         <section id="internal-class" role="region">
             <#if internalClass?has_content>
-            	<#assign enableInternalClass = '' />
-                <#assign disableClass = '' />
-                
+                <#assign enableInternalClass = '' />
+                <#assign disableClass = 'class="inline"' />
             <#else>
-               <#assign enableInternalClass = '<p>To enable this option, you must first select an institutional internal class for your instance</p>' />
-                <#assign disableClass = 'class="disable"' />
+                <#assign enableInternalClass = '<p class="note">To enable this option, you must first select an institutional internal class for your instance</p>' />
+                <#assign disableClass = 'class="disable inline" disabled="disabled"' />
             </#if>
         
-            <input type="checkbox" ${disableClass} name="display-internalClass" value="${internalClassUri}" id="display-internalClass" <#if pageInternalOnly?has_content>checked</#if> />
+            <input type="checkbox" ${disableClass} name="display-internalClass" value="${internalClassUri}" id="display-internalClass" <#if pageInternalOnly?has_content>checked</#if> role="input" />
             <label ${disableClass} class="inline" for="display-internalClass">Only display <em>${associatedPage}</em> within my institution</label>
         
             ${enableInternalClass}
         </section>
-        <input type="submit" name="submit-${menuAction}" value="Save changes" class="submit" /> or <a class="cancel" href="${formUrls}">Cancel</a>
+        <input type="submit" name="submit-${menuAction}" value="Save changes" class="submit" role="input" /> or <a class="cancel" href="${formUrls}">Cancel</a>
 
         <p class="requiredHint">* required fields</p>
     </form>
@@ -119,4 +115,5 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/menupage/testme
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/customForm.css" />')}
 
 <#-- Add necessary javascript files associated with this page -->
-${scripts.add('<script type="text/javascript" src="${urls.base}/js/menupage/menumanagement_edit.js"></script>')}   
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/menupage/menumanagement_edit.js"></script>')}
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/menupage/menuManagementUtils.js"></script>')}      

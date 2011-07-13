@@ -10,12 +10,6 @@
 #edit-menu-item p {
     margin-top: 15px;
 }
-#add-menu-item input[type="text"],
-#edit-menu-item input[type="text"],
-#add-menu-item select,
-#edit-menu-item select {
-    width: 20em;
-}
 #add-menu-item input[name="prettyUrl"],
 #edit-menu-item input[name="prettyUrl"] {
     margin-bottom: 0;
@@ -45,4 +39,7 @@ ul#selectedClasses {
 #internal-class {
     margin-top: 10px;
     margin-bottom: 10px;
+}
+ul#selectedClasses li {
+    margin-left: .4em;
 }
