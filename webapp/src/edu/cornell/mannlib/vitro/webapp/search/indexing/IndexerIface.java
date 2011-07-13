@@ -21,12 +21,8 @@ import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
  */
 public interface IndexerIface {
 
-    public void addObj2Doc(Obj2DocIface o2d);
-    public List<Obj2DocIface> getObj2DocList();
-
     /**
-     * Check if indexing is currently running in a different thread.
-     * @return
+     * Check if indexing is currently running.
      */
     public boolean isIndexing();
 

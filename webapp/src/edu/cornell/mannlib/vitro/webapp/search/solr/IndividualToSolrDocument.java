@@ -98,7 +98,7 @@ public class IndividualToSolrDocument {
         	addThumbnailExistance(ind, doc);           
                         
             //time of index in millis past epoc
-            doc.addField(term.INDEXEDTIME,(new DateTime()).getMillis()); 
+            doc.addField(term.INDEXEDTIME, new Long( (new DateTime()).getMillis() ) ); 
             
             if(!prohibited){
                addAllText( ind, doc, classPublicNames, objectNames );

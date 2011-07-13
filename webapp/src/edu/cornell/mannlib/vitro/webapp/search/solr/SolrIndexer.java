@@ -21,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexerIface;
 
+
 public class SolrIndexer implements IndexerIface {
     private final static Log log = LogFactory.getLog(SolrIndexer.class);
     
@@ -28,6 +29,25 @@ public class SolrIndexer implements IndexerIface {
     protected boolean indexing;        
     protected HashSet<String> urisIndexed;    
     protected IndividualToSolrDocument individualToSolrDoc;
+    
+    /**
+     * System is shutting down if true.
+     */
+    protected boolean shutdownRequested = false;
+    
+    /**
+     * This records when a full re-index starts so that once it is done
+     * all the documents on the Solr service that are earlier than the
+     * reindexStart can be removed. 
+     */
+    protected long reindexStart = 0L;
+    
+    /**
+     * If true, then a full index rebuild was requested and reindexStart
+     * will be used to determine what documents to remove from the index
+     * once the re-index is complete.
+     */
+    protected boolean doingFullIndexRebuild = false;
     
     public SolrIndexer( SolrServer server, IndividualToSolrDocument indToDoc){
         this.server = server; 
@@ -56,57 +76,18 @@ public class SolrIndexer implements IndexerIface {
                 solrDoc = individualToSolrDoc.translate(ind);
 
                 if( solrDoc != null){
-                    //sending each doc individually is inefficient
-                   // Collection<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
-                   // docs.add( solrDoc );
                     UpdateResponse res = server.add( solrDoc );
                     log.debug("response after adding docs to server: "+ res);                
                 }else{
-                    log.debug("removing from index " + ind.getURI());
-                    //TODO: how do we delete document?                    
-                    //writer.deleteDocuments((Term)obj2doc.getIndexId(ind));
+                    log.debug("removing from index " + ind.getURI());                    
+                    removeFromIndex(ind.getURI());
                 }                            
             }
         } catch (IOException ex) {
             throw new IndexingException(ex.getMessage());
         } catch (SolrServerException ex) {
             throw new IndexingException(ex.getMessage());
-        }        
-        
-    	if( ! indexing )
-    		throw new IndexingException("SolrIndexer: must call " +
-    		"startIndexing() before index().");        
-
-    	if( ind == null )
-    		log.debug("Individual to index was null, ignoring.");
-
-    	try{
-    		if( urisIndexed.contains(ind.getURI()) ){
-    			log.debug("already indexed " + ind.getURI() );
-    			return;
-    		}else{
-    			SolrInputDocument solrDoc = null;
-    			synchronized(this){
-    				urisIndexed.add(ind.getURI());
-    			}
-    			log.debug("indexing " + ind.getURI());      
-
-    			solrDoc = individualToSolrDoc.translate(ind);
-
-    			if( solrDoc != null){
-    				UpdateResponse res = server.add( solrDoc );
-    				log.debug("response after adding docs to server: "+ res);                
-    			}else{
-    				log.debug("removing from index " + ind.getURI());
-    				//TODO: how do we delete document?                    
-    				//writer.deleteDocuments((Term)obj2doc.getIndexId(ind));
-    			}                            
-    		}
-    	} catch (IOException ex) {
-    		throw new IndexingException(ex.getMessage());
-    	} catch (SolrServerException ex) {
-    		throw new IndexingException(ex.getMessage());    		
-    	}        
+        }                 
     }
 
     @Override
@@ -116,7 +97,8 @@ public class SolrIndexer implements IndexerIface {
 
     @Override
     public void prepareForRebuild() throws IndexingException {
-        // TODO Auto-generated method stub        
+        reindexStart = System.currentTimeMillis();
+        doingFullIndexRebuild = true;
     }
 
     @Override
@@ -134,30 +116,23 @@ public class SolrIndexer implements IndexerIface {
     }
 
     @Override
-    public synchronized void startIndexing() throws IndexingException {        
-        while( indexing ){ //wait for indexing to end.
-            log.debug("SolrIndexer.startIndexing() waiting...");
-            try{ wait(); } catch(InterruptedException ex){}
+    public synchronized void startIndexing() throws IndexingException {
+        if( indexing)
+            log.debug("SolrIndexer.startIndexing() Indexing in progress, waiting for completion...");
+        while( indexing && ! shutdownRequested ){ //wait for indexing to end.            
+            try{ wait( 250 ); } 
+            catch(InterruptedException ex){}
         }
                
-        log.debug("Starting to index");        
+        log.debug("Starting to index");
         indexing = true;
         urisIndexed = new HashSet<String>();        
         notifyAll();        
-    }
-    
-    
-    public synchronized void addObj2Doc(Obj2DocIface o2d) {
-        //no longer used
-    }
-
-    public synchronized List<Obj2DocIface> getObj2DocList() {
-        //no longer used
-        return null;
-    }
+    }        
     
     @Override
     public void abortIndexingAndCleanUp() {
+        shutdownRequested = true;
         try{
             server.commit();            
         }catch(SolrServerException e){
@@ -187,15 +162,25 @@ public class SolrIndexer implements IndexerIface {
         } catch(IOException e){
         	log.error("Could not commit to solr server", e);
         }
-//        try {
-//            server.optimize();
-//        } catch (Exception e) {
-//            log.error("Could not optimize solr server", e);
-//        }
+        if( doingFullIndexRebuild ){
+            removeDocumentsFromBeforeRebuild( );
+        }
         indexing = false;
         notifyAll();
     }
 
+    protected void removeDocumentsFromBeforeRebuild(){
+        try {
+            server.deleteByQuery("indexedTime:[ * TO " + reindexStart + " ]");
+            server.commit();            
+        } catch (SolrServerException e) {
+            log.error("could not delete documents from before rebuild.",e);            
+        } catch (IOException e) {
+            log.error("could not delete documents from before rebuild.",e);
+        }
+    }
+    
+    
     @Override
     public long getModified() {
     	long modified = 0;
@@ -211,7 +196,6 @@ public class SolrIndexer implements IndexerIface {
     			modified = (Long)docs.get(0).getFieldValue("indexedTime");	
     		}
     	} catch (SolrServerException e) {
-    		// TODO Auto-generated catch block
     		log.error(e,e);
     	}
 
@@ -228,14 +212,9 @@ public class SolrIndexer implements IndexerIface {
     			return true;
     		}
     	} catch (SolrServerException e) {
-    		// TODO Auto-generated catch block
     		log.error(e,e);
     	}
         return false;
     }
-
-    
-   
-   
 
 }

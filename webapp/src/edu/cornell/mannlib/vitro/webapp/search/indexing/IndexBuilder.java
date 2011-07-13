@@ -243,18 +243,19 @@ public class IndexBuilder extends Thread {
             indexer.startIndexing();
             reindexRequested = false;
             
-            if( ! forceNewIndex ){                
+            if( ! forceNewIndex ){
+                //if this is not a full reindex, deleted indivdiuals
+                //need to be removed from the index
                 for(String deleteMe : deletes ){
                     try{
                         indexer.removeFromIndex(deleteMe);                    
-                    }catch(Exception ex){ 
-                    	log.debug(ex.getMessage());
+                    }catch(Exception ex){             
                         log.debug("could not remove individual " + deleteMe 
                                 + " from index, usually this is harmless",ex);
                     }
                 }
-            }            
-
+            }
+                        
             indexUriList(updates, newDocs);
         } catch (AbortIndexing abort){
             if( log != null)
@@ -313,10 +314,7 @@ public class IndexBuilder extends Thread {
         }
         
         IndexWorkerThread.resetCount();        
-    }        
-
-    
-   
+    }               
     
     /* maybe ObjectSourceIface should be replaced with just an iterator. */
     protected class UriToIndividualIterator implements Iterator<Individual>{        
