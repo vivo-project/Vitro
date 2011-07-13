@@ -8,11 +8,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.hp.hpl.jena.query.QueryParseException;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -171,23 +174,42 @@ public class IndexBuilder extends Thread {
 	 * Sets updatedUris and deletedUris lists.
 	 */
 	private void makeAddAndDeleteLists( Collection<String> uris){	    
+		
+		uris.addAll(getAdditionalURIsToIndex(uris));
+		
 		/* clear updateInds and deletedUris.  This is the only method that should set these. */
 		this.updatedInds = new ArrayList<String>();
 		this.deletedInds = new ArrayList<String>();
 				
     	for( String uri: uris){
     		if( uri != null ){
-    			Individual ind = wdf.getIndividualDao().getIndividualByURI(uri);
-    			if( ind != null)
-    				this.updatedInds.add(uri);
-    			else{
-    				log.debug("found delete in changed uris");
-    				this.deletedInds.add(uri);
+    			try{
+	    				Individual ind = wdf.getIndividualDao().getIndividualByURI(uri);
+	    			if( ind != null)
+	    				this.updatedInds.add(uri);
+	    			else{
+	    				log.debug("found delete in changed uris");
+	    				this.deletedInds.add(uri);
+	    			}
+    			} catch(QueryParseException ex){
+    				log.error("could not get Individual "+ uri,ex);
     			}
     		}
     	}    		    	            	
 	}	
   
+	private Set<String> getAdditionalURIsToIndex(Collection<String> uris) {
+		
+		Set<String> listOfAdditionalURIs = new HashSet<String>();
+		
+		for(String uri: uris){
+			//grab the uris from AdditionalURIsToIndex
+			listOfAdditionalURIs.addAll(additionalURIsFinders.get(0).findAdditionalURIsToIndex(uri));
+		}
+		
+		return listOfAdditionalURIs;
+	}
+
 	/**
 	 * This rebuilds the whole index.
 	 */
