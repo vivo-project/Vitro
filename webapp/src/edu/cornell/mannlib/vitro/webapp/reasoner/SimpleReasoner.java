@@ -952,7 +952,7 @@ public class SimpleReasoner extends StatementListener {
 		tboxModel.enterCriticalSection(Lock.READ);
 		
 		try {
-			log.info("Computing class-based ABox inferences in a separate thread.");
+			log.info("Computing class-based ABox inferences.");
 			inferenceRebuildModel.removeAll();
 			StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, (RDFNode) null);
 			
@@ -1140,7 +1140,7 @@ public class SimpleReasoner extends StatementListener {
 			inferenceRebuildModel.removeAll();
 			StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, (RDFNode) null);
 			
-			log.info("Computing mostSpecificType annotations in a separate thread");
+			log.info("Computing mostSpecificType annotations.");
 			int numStmts = 0;
 			
 			while (iter.hasNext()) {				
