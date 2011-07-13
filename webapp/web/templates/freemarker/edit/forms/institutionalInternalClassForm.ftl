@@ -24,7 +24,7 @@ edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.Institu
         	${noLocalOntologiesMessage}
         </section>
        
-       	<#else if useExistingInternalClass = true> 
+       	<#elseif useExistingInternalClass?has_content> 
         <section id="existingLocalClass">
         	<#--Populated based on class list returned-->
         	<select id="existingLocalClasses" name="existingLocalClasses">
@@ -33,7 +33,7 @@ edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.Institu
 	            </#list>
         	</select>
         </section>
-        <#else if createNewClass = true>
+        <#elseif createNewClass?has_content>
         <section id="createNewLocalClass">
         	<h2>Create a new class</h2>
          	<label for="menu-name">Name<span class="requiredHint"> *</span></label>

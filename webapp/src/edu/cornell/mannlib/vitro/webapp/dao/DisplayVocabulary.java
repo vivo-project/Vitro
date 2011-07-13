@@ -26,6 +26,7 @@ public class DisplayVocabulary {
     private static final String NS = DISPLAY_NS;
     
     /* Individuals */
+    public static final String DEFAULT_MENU = NS + "DefaultMenu";
     public static final String SEARCH_INDEX_URI = NS + "SearchIndex";
     
     //bk392 for extracting properties beyond context nodes.
@@ -43,11 +44,13 @@ public class DisplayVocabulary {
     public static final String CLASS_INTERSECTION = NS + "intersectsWithClass";
     public static final String HAS_CLASS_INTERSECTION = NS + "hasClassIntersection";
     public static final String ITEM_TO_PAGE = NS + "toPage";
+    public static final String HAS_ELEMENT = NS + "hasElement";
+
     /**Data Getter object properties **/
     public static final String HAS_DATA_GETTER = NS + "hasDataGetter";
     public static final String GETINDIVIDUALS_FOR_CLASS = NS + "getIndividualsForClass";
     public static final String 	RESTRICT_RESULTS_BY = NS + "restrictResultsByClass";
-
+    
 
     /* Data Properties */
     public static final DatatypeProperty URL_MAPPING = m_model.createDatatypeProperty(NS + "urlMapping");

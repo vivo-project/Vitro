@@ -39,7 +39,7 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
     private static List<String> localNamespaces = new ArrayList<String>();
     private static List<VClass> localNamespaceClasses = new ArrayList<VClass>();
     private static final String CREATE_CLASS_PARAM = "createClass";
-    
+    private static final String REDIRECT_PAGE = "/siteAdmin";
     @Override
     protected Actions requiredActions(VitroRequest vreq) {
     	return REQUIRED_ACTIONS;
@@ -93,7 +93,6 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
 	}
 
 	private void processCreateOntologies(VitroRequest vreq, Map<String, Object> data) {
-		data.put("ontologiesExist", false);
 		data.put("submitAction", "");
 		
 	}
@@ -106,22 +105,22 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
 
 	private void processCreateNewClass(VitroRequest vreq, Map<String, Object> data) {
 		//this may need to be changed on the basis of how new classes interact with new ontologies 
-		data.put("ontolgiesExist", true);
 		data.put("submitAction", "createClass");
+		data.put("createNewClass", true);
 	}
 
 	private boolean isCreateNewClass(VitroRequest vreq) {
 		String command = vreq.getParameter("cmd");
-		if(command.equals(CREATE_CLASS_PARAM)) {
+		if(command != null && command.equals(CREATE_CLASS_PARAM)) {
 			return true;
 		}
-		//If no classes in local namespaces, then need to enable creation of new classes
-		return(localNamespaceClasses.size() == 0);
+		//If local namespace exists but no classes in local namespaces, then need to enable creation of new classes
+		return(localNamespaces.size() > 0 && localNamespaceClasses.size() == 0);
 	}
 
 	private void processSelectExistingClass(VitroRequest vreq, Map<String, Object> data) {
 		//Check if internal class is already set and be sure to include that in the data to be returned
-		data.put("ontologiesExist", true);
+		data.put("useExistingInternalClass", true);
 		data.put("submitAction", "save");
 	}
 
@@ -140,8 +139,14 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
     	data.put("existingLocalNamespaces", localNamespaceClasses);
     	String noLocalOntologiesMessage = "There are currently no local ontologies.  You must create a new ontology";
     	data.put("noLocalOntologiesMessage", noLocalOntologiesMessage);
-    	if(localNamespaces.size() > 1) {
-    		data.put("multipleLocalNamespaces", true);
+    	if(localNamespaces.size() == 0) {
+    		data.put("ontologiesExist", false);
+    	}
+    	else {
+    		data.put("ontologiesExist", true);
+    		if(localNamespaces.size() > 1) {
+    			data.put("multipleLocalNamespaces", true);
+    		}
     	} 
 	}
 

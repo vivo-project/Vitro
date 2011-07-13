@@ -155,8 +155,8 @@ public class MenuManagementEdit extends VitroHttpServlet {
     		addStatements.write(a, "N3");
     		log.debug(a.toString());
     		a.close();
-     		//displayModel.remove(removeStatements);
-     		//displayModel.add(addStatements);
+     		displayModel.remove(removeStatements);
+     		displayModel.add(addStatements);
     	
     	} catch(Exception ex) {
     		
@@ -448,8 +448,11 @@ public class MenuManagementEdit extends VitroHttpServlet {
 	private void removeMenuName(OntModel displayModel, Model removeModel, VitroRequest vreq,
 			Resource menuItemResource, Resource pageResource) {
 		String menuName = vreq.getParameter("menuName");
-		removeModel.add(displayModel.listStatements(menuItemResource, DisplayVocabulary.LINK_TEXT, (RDFNode) null));
-		removeModel.add(removeModel.createStatement(
+		removeModel.add(displayModel.listStatements(
+				menuItemResource, 
+				DisplayVocabulary.LINK_TEXT, 
+				(RDFNode) null));
+		removeModel.add(displayModel.listStatements(
 				pageResource, 
 				ResourceFactory.createProperty(DisplayVocabulary.TITLE), 
 				(RDFNode) null));
@@ -459,6 +462,10 @@ public class MenuManagementEdit extends VitroHttpServlet {
 	private void generateStatementsForAdd(Model addModel, OntModel displayModel, Resource menuItemResource, Resource pageResource) {
     	//Need to generate the menu item and page in their entirety
 		//Menu item
+		addModel.add(addModel.createStatement(
+				ResourceFactory.createResource(DisplayVocabulary.DEFAULT_MENU)
+				,ResourceFactory.createProperty(DisplayVocabulary.HAS_ELEMENT),
+				menuItemResource));
 		addModel.add(addModel.createStatement(menuItemResource, RDF.type, DisplayVocabulary.NAVIGATION_ELEMENT));
 		addModel.add(addModel.createStatement(menuItemResource, 
 				DisplayVocabulary.MENU_POSITION, 

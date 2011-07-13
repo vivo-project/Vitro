@@ -38,7 +38,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     private static final Log log = LogFactory.getLog(MenuManagementController.class);
     protected final static String SUBMIT_FORM = "/processEditDisplayModel"; 
     protected final static String CANCEL_FORM = "/individual?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fontologies%2Fdisplay%2F1.1%23DefaultMenu&switchToDisplayModel=true"; 
-
+    protected final static String DELETE_FORM = "menuManagement-remove.ftl";
     protected final static String EDIT_FORM = "testMenuManagement.ftl"; 
     protected final static String CMD_PARAM = "cmd";
     protected final static String EDIT_PARAM_VALUE = "edit";
@@ -64,18 +64,19 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     	//if no menu item passed, return empty data
     	//TODO: Check if exception needs to be thrown   		
     	String cmd = getCommand(vreq); 
-    	
+    	String template = EDIT_FORM;
     	if(cmd.equals(ADD_PARAM_VALUE)) {
     		processAddMenuItem(vreq, data);
     	} else if(cmd.equals(EDIT_PARAM_VALUE)) {
     		processEditMenuItem(vreq, data);
     	} else if(cmd.equals(DELETE_PARAM_VALUE)) {
     		processDeleteMenuItem(vreq, data);
+    		template = DELETE_FORM;
     	} else {
     		//Throw some kind of error or do nothing
     	}
     	
-    	return new TemplateResponseValues(EDIT_FORM, data);
+    	return new TemplateResponseValues(template, data);
     	
     }
     
@@ -109,8 +110,8 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     	data.put("menuAction", "Remove");
     	//Generate empty values for fields
     	//TODO: Remove these if only portion of template utilized
-    	data.put("menuItem", "");
-    	data.put("menuName", "");
+   
+    
     	data.put("prettyUrl", "");
     	data.put("associatedPage", "");
     	data.put("associatedPageURI", "");
