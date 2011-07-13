@@ -59,12 +59,8 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     protected ResponseValues processRequest(VitroRequest vreq) {
        //Parameters should include the menu item being edited/added/removed/reordered
     	Map<String, Object> data = new HashMap<String,Object>();
-    	
-
     	//if no menu item passed, return empty data
-    	//TODO: Check if exception needs to be thrown
-    
-    		
+    	//TODO: Check if exception needs to be thrown   		
     	String cmd = getCommand(vreq); 
     	
     	if(cmd.equals(ADD_PARAM_VALUE)) {
@@ -76,13 +72,18 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     	} else {
     		//Throw some kind of error or do nothing
     	}
+    	
+    	this.initializeData(data, vreq);
+    	return new TemplateResponseValues(EDIT_FORM, data);
+    	
+    }
+    
+    //Certain parameters are always passed
+    private void initializeData(Map<String, Object> data, VitroRequest vreq) {
     	//Form url submission
     	data.put("formUrls", vreq.getContextPath() + SUBMIT_FORM);
     	data.put("cancelUrl", vreq.getContextPath() + CANCEL_FORM);
-    	//This will be reset if internal class exists
-    	data.put("internalClass", "");
-    	return new TemplateResponseValues(EDIT_FORM, data);
-    	
+    	data.put("internalClassUri", "");
     }
 
     //Based on parameters, ascertain command
@@ -105,6 +106,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
 		Map<String, Object> data = new HashMap<String,Object>();
     	data.put("menuItem", menuItem);
     	data.put("menuAction", "Remove");
+    	
     	this.getMenuItemData(vreq, menuItem, data);
     	this.getPageData(vreq, data);    	
 		return data;
@@ -126,7 +128,8 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     	data.put("classGroups", this.getClassGroups());
     	data.put("selectedTemplateType", "default");
     	//defaults to regular class group page
-
+     	//Check whether institutional internal class exists
+		this.checkInstitutionalInternalClass(data);
     	return data;
 	}
 
@@ -138,12 +141,11 @@ public class MenuManagementController extends FreemarkerHttpServlet {
 		//Get parameter for menu item
     	String menuItem = getMenuItem(vreq);
     	data.put("menuItem", menuItem);
-		
     	data.put("menuAction", "Edit");
     	//Get All class groups
     	data.put("classGroups", this.getClassGroups());
-    	
-    	
+     	//Check whether institutional internal class exists
+		this.checkInstitutionalInternalClass(data);
     	//Get data for menu item and associated page
     	this.getMenuItemData(vreq, menuItem, data);
     	this.getPageData(vreq, data);    	
@@ -244,6 +246,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     //All items will have data getter except for Browse or Home page
     //Home can be edited but not removed
     private void getPageDataGetterInfo(OntModel writeModel, Resource page, Map<String, Object> data) {
+    	
     	//Alternative is to do this via sparql query
     	StmtIterator dataGetterIt = writeModel.listStatements(page, ResourceFactory.createProperty(DisplayVocabulary.HAS_DATA_GETTER), (RDFNode) null);
     	while(dataGetterIt.hasNext()) {
@@ -272,8 +275,6 @@ public class MenuManagementController extends FreemarkerHttpServlet {
 		this.getClassesForDataGetter(writeModel, dataGetter, data);
 		//Also save the class group for display
 		this.getClassGroupForDataGetter(writeModel, dataGetter, data);
-		//Check whether institutional internal class exists
-		this.checkInstitutionalInternalClass(writeModel, data);
 		this.checkIfPageInternal(writeModel, data);
 		
 	}
@@ -295,6 +296,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
 		//This is a class group page so 
 		data.put("isClassGroupPage", true);
 		data.put("includeAllClasses", true);
+		
 		//Get the class group
 		this.getClassGroupForDataGetter(writeModel, dataGetter, data);
 		
@@ -337,8 +339,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
 	
 	
 	//Check whether any classes exist with internal class restrictions
-	private void checkInstitutionalInternalClass(OntModel writeModel, 
-			Map<String, Object> data) {
+	private void checkInstitutionalInternalClass(Map<String, Object> data) {
 		OntModel mainModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
 		StmtIterator internalIt = mainModel.listStatements(null, ResourceFactory.createProperty(VitroVocabulary.IS_INTERNAL_CLASSANNOT), (RDFNode) null);
 		//List<String> internalClasses = new ArrayList<String>();
@@ -346,6 +347,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
 			//internalClasses.add(internalIt.nextStatement().getResource().getURI());
 			String internalClass = internalIt.nextStatement().getResource().getURI();
 			data.put("internalClass", internalClass);
+			data.put("internalClassUri", internalClass);
 		}
 		
 	}

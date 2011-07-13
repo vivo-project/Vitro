@@ -13,6 +13,7 @@ var menuManagementEdit = {
     	 this.classesForClassGroup = $('#classesInSelectedGroup');
     	 this.selectedGroupForPage = $('#selectedContentTypeValue');
     	 this.selectClassesMessage = $('#selectClassesMessage');
+    	 this.allClassesSelectedCheckbox = $('#allSelected');
     	
     },
     bindEventListeners: function() {        
@@ -23,6 +24,9 @@ var menuManagementEdit = {
         });
         this.selectClassGroupDropdown.change(function() {
         	menuManagementEdit.chooseClassGroup();
+        });
+        this.allClassesSelectedCheckbox.change(function() {
+        	menuManagementEdit.toggleClassSelection();
         });
     },
     showClassGroups: function() {
@@ -43,6 +47,17 @@ var menuManagementEdit = {
     	this.selectClassesMessage.removeClass("hidden");
 		this.classesForClassGroup.removeClass("hidden");
     },
+    toggleClassSelection:function() {
+    	/*To do: please fix so selecting all selects all classes and deselecting
+    	 * any class will deselect all
+    	 */
+    	/*
+    	if(this.allClassesSelectedCheckbox.is(':checked')) {
+    		$('#classInClassGroup').attr('checked', 'checked');
+    	} else {
+    		$('#classInClassGroup').removeAttr('checked');
+    	}*/
+    },
     chooseClassGroup: function() {
     	
     	var url = "dataservice?getVClassesForVClassGroup=1&classgroupUri=";
@@ -61,21 +76,23 @@ var menuManagementEdit = {
         	  menuManagementEdit.selectedGroupForPage.html(results.classGroupName);
           		//retrieve classes for class group and display with all selected
         	  menuManagementEdit.classesForClassGroup.empty();
-        	  menuManagementEdit.classesForClassGroup.append('<ul id="selectedClasses" name="selectedClasses">');
-        	  menuManagementEdit.classesForClassGroup.append('<li class="ui-state-default">' + 
-                      '<input type="checkbox" name="allSelected" id="allSelected" value="all" checked/>' +  
+        	  var appendHtml = '<ul id="selectedClasses" name="selectedClasses">';
+        	 	appendHtml += '<ul id="selectedClasses" name="selectedClasses">';
+        	 appendHtml += '<li class="ui-state-default">' + 
+                      '<input type="checkbox" name="allSelected" id="allSelected" value="all" checked="checked" />' +  
                       '<label class="inline" for="All"> All</label>' +
-               '</li>');
+               '</li>';
               $.each(results.classes, function(i, item) {
             	  var thisClass = results.classes[i];
             	  var thisClassName = thisClass.name;
             	  //When first selecting new content type, all classes should be selected
-            	  menuManagementEdit.classesForClassGroup.append(' <li class="ui-state-default">' + 
-                          '<input type="checkbox" checked name="classInClassGroup" value="' + thisClass.URI + '" />' +  
+            	  appendHtml += ' <li class="ui-state-default">' + 
+                          '<input type="checkbox" checked="checked" name="classInClassGroup" value="' + thisClass.URI + '" />' +  
                          '<label class="inline" for="' + thisClassName + '"> ' + thisClassName + '</label>' + 
-                          '</li>');
+                          '</li>';
               });
-              menuManagementEdit.classesForClassGroup.append("</ul>");
+              appendHtml += "</ul>";
+              menuManagementEdit.classesForClassGroup.append(appendHtml);
 				
               
           }

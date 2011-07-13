@@ -94,14 +94,15 @@
         
         <section id="internal-class" role="region">
             <#if internalClass?has_content>
-                <#assign enableInternalClass = '<p>To enable this option, you must first select an institutional internal class for your instance</p>' />
-                <#assign disableClass = 'class="disable"' />
-            <#else>
-                <#assign enableInternalClass = '' />
+            	<#assign enableInternalClass = '' />
                 <#assign disableClass = '' />
+                
+            <#else>
+               <#assign enableInternalClass = '<p>To enable this option, you must first select an institutional internal class for your instance</p>' />
+                <#assign disableClass = 'class="disable"' />
             </#if>
         
-            <input type="checkbox" ${disableClass} name="display-internalClass" value="${internalClass}" id="display-internalClass" <#if pageInternalOnly?has_content>checked</#if> />
+            <input type="checkbox" ${disableClass} name="display-internalClass" value="${internalClassUri}" id="display-internalClass" <#if pageInternalOnly?has_content>checked</#if> />
             <label ${disableClass} class="inline" for="display-internalClass">Only display <em>${associatedPage}</em> within my institution</label>
         
             ${enableInternalClass}

@@ -85,10 +85,10 @@ public class MenuManagementEdit extends VitroHttpServlet {
     		System.out.println("Command is null");
     	}
         //Need to redirect correctly
-    	//if(!isReorder(command)){
-    	//RequestDispatcher rd = rawRequest.getRequestDispatcher(REDIRECT_URL);
-    	//rd.forward(rawRequest, resp);
-    	//}
+    	if(!isReorder(command)){
+    		RequestDispatcher rd = rawRequest.getRequestDispatcher(REDIRECT_URL);
+    		rd.forward(rawRequest, resp);
+    	}
     }
 
 
@@ -234,11 +234,13 @@ public class MenuManagementEdit extends VitroHttpServlet {
 
 
 	private void processAdd(String menuItem, OntModel displayModel, String command, VitroRequest vreq) {
-    	Resource menuItemResource = createNewMenuItem(menuItem, displayModel);
+		String menuName = vreq.getParameter("menuName");
+    	Resource menuItemResource = createNewMenuItem(menuName, displayModel);
 		Resource pageResource = createNewPage(menuItemResource, displayModel);
-		associateMenuItemToPage(menuItemResource, pageResource);
 		//no statements to remove, just to add
 		addStatements = getStatementsToAdd(vreq, command, displayModel, menuItemResource, pageResource);
+		addStatements.add(associateMenuItemToPage(menuItemResource, pageResource));
+
     }
     
     //Get last menu item positin
@@ -285,7 +287,7 @@ public class MenuManagementEdit extends VitroHttpServlet {
     	String classGroup = vreq.getParameter("selectClassGroup");
     	//Selected class
     	
-    	String allClasses = vreq.getParameter("allSelected");
+    	
     	//For this, need to check whether All or not b/c this will identify the data getter type
     	//There should be a "specify data getter" method that specifices the data getter
     	Resource dataGetterResource = getDataGetter(vreq, addModel, displayModel, pageResource);
@@ -299,7 +301,7 @@ public class MenuManagementEdit extends VitroHttpServlet {
     				classGroupResource));
     		//If "All selected" then use class group else use individuals for classes
     		Model dataGetterModel = ModelFactory.createDefaultModel();
-    		if(allClasses != null && !allClasses.isEmpty()) {
+    		if(!internalClassSelected(vreq) && allClassesSelected(vreq)) {
     			dataGetterModel = getClassGroupDataGetter(vreq, dataGetterResource, addModel, displayModel);
     		} else {
     			dataGetterModel = getIndividualsForClassesDataGetter(vreq, dataGetterResource, addModel, displayModel);
@@ -309,6 +311,16 @@ public class MenuManagementEdit extends VitroHttpServlet {
     		
     	}
 		
+	}
+	
+	private boolean allClassesSelected(VitroRequest vreq) {
+		String allClasses = vreq.getParameter("allSelected");
+		return (allClasses != null && !allClasses.isEmpty());
+	}
+	
+	private boolean internalClassSelected(VitroRequest vreq) {
+    	String internalClass = vreq.getParameter("display-internalClass");
+    	return (internalClass != null && !internalClass.isEmpty());
 	}
 	
 	private Model getIndividualsForClassesDataGetter(VitroRequest vreq, Resource dataGetterResource, 
@@ -322,9 +334,10 @@ public class MenuManagementEdit extends VitroHttpServlet {
 					ResourceFactory.createProperty(DisplayVocabulary.GETINDIVIDUALS_FOR_CLASS),
 					ResourceFactory.createResource(classUri)));
 		}
+		
 		//Also check if internal class checked
-		String internalClass = vreq.getParameter("display-internalClass");
-		if(internalClass != null && !internalClass.isEmpty()) {
+		if(internalClassSelected(vreq)) {
+			String internalClass = vreq.getParameter("display-internalClass");
 			//The value should be the internal class uri
 			dgModel.add(dgModel.createStatement(
 					dataGetterResource, 
@@ -445,7 +458,7 @@ public class MenuManagementEdit extends VitroHttpServlet {
 		String dataGetterUriBase = pageResource.getURI() + "-dataGetter";
 		String dataGetterUri = dataGetterUriBase;
 		int counter = 0;
-		while(displayModel.getResource(dataGetterUriBase) != null) {
+		while(displayModel.getIndividual(dataGetterUriBase) != null) {
 			dataGetterUri = dataGetterUriBase + counter;
 			counter++;
 		}
@@ -510,8 +523,10 @@ public class MenuManagementEdit extends VitroHttpServlet {
 	}
 	
 	//Create connection
-	private void associateMenuItemToPage(Resource menuItemResource, Resource pageResource) {
-		menuItemResource.addProperty(DisplayVocabulary.TO_PAGE, pageResource);
+	private Model associateMenuItemToPage(Resource menuItemResource, Resource pageResource) {
+		Model m = ModelFactory.createDefaultModel();
+		m.add(m.createStatement(menuItemResource, DisplayVocabulary.TO_PAGE, pageResource));
+		return m;
 	}
 	
 	//Add to model
@@ -522,7 +537,7 @@ public class MenuManagementEdit extends VitroHttpServlet {
 		String menuUriBase = DisplayVocabulary.DISPLAY_NS + menuName.replaceAll(" ", "") + "MenuItem";
 		String menuUri = menuUriBase;
 		int counter = 0;
-		while(displayModel.getResource(menuUri) != null) {
+		while(displayModel.getIndividual(menuUri) != null) {
 			menuUri = menuUriBase + counter;
 			counter++;
 		}
