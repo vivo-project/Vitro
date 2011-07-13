@@ -6,8 +6,7 @@
      is also used to generate the property statement during a deletion.  
  -->
 
-<#-- Anchor is here for convenience during development. Should be removed before release -->
-<a href="${profileUrl(statement.menuItem)}">${statement.linkText}</a>
+${statement.linkText}
 
 <script type="text/javascript">
     menuItemData.push({
