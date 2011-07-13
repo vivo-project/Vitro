@@ -29,7 +29,7 @@
     ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/jquery_plugins/isotope/jquery.isotope.min.js"></script>')}
     <script>
         var initHeight = $("#isotope-container").height();
-        initHeight = (initHeight + 100)/3 ;
+        initHeight = (initHeight/2.5)+200 ;
         $("#isotope-container").css("height",initHeight + "px");
     </script>
     <script>
