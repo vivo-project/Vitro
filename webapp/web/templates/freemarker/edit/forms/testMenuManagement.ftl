@@ -103,7 +103,7 @@
         
             ${enableInternalClass}
         </section>
-        <input type="submit" name="submit-${menuAction}" value="Save changes" class="submit" role="input" /> or <a class="cancel" href="${formUrls}">Cancel</a>
+        <input type="submit" name="submit-${menuAction}" value="Save changes" class="submit" role="input" /> or <a class="cancel" href="${cancelUrl}">Cancel</a>
 
         <p class="requiredHint">* required fields</p>
     </form>
