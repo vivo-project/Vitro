@@ -89,8 +89,10 @@
     margin-right:25px;
 }
 #isotope-container {
-    height:1250px;
     overflow:visible;
+}
+#isotope-container li {
+    width:290px;
 }
 /* <------ SEARCH RESULTS PAGE*/
 .searchTOC {    
