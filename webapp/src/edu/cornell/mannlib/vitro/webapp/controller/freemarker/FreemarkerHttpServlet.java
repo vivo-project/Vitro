@@ -18,7 +18,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOwnAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
@@ -261,13 +263,16 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         urls.put("termsOfUse", UrlBuilder.getUrl(Route.TERMS_OF_USE));  
         urls.put("login", UrlBuilder.getLoginUrl());          
         urls.put("logout", UrlBuilder.getLogoutUrl());       
-        urls.put("myAccount", UrlBuilder.getUrl("/accounts/myAccount"));       
         urls.put("siteAdmin", UrlBuilder.getUrl(Route.SITE_ADMIN));  
         urls.put("themeImages", UrlBuilder.getUrl(themeDir + "/images"));
         urls.put("images", UrlBuilder.getUrl("/images"));
         urls.put("theme", UrlBuilder.getUrl(themeDir));
         urls.put("index", UrlBuilder.getUrl("/browse"));   
         urls.put("currentPage", getCurrentPageUrl(vreq));
+        
+		if (PolicyHelper.isAuthorizedForActions(vreq, new EditOwnAccount())) {
+			urls.put("myAccount", UrlBuilder.getUrl("/accounts/myAccount"));
+		}
         
         return urls;
     }
