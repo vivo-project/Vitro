@@ -41,6 +41,8 @@ public class DataGetterUtils {
         //Get types associated with page
         Map<String,Object> data = new HashMap<String,Object>();
         List<String> dataGetters = (List<String>)page.get("dataGetters");
+        //TODO: Change back to debug
+        log.info("Retrieved data getters for Page " + pageUri + " = " + dataGetters.toString());
         if( dataGetters != null ){
             for( String dataGetter : dataGetters){
                 Map<String,Object> moreData = null;

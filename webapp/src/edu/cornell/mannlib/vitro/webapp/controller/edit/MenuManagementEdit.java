@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -62,8 +63,8 @@ public class MenuManagementEdit extends VitroHttpServlet {
    private final static String ADD_PARAM_VALUE = "Add";
    private final static String REORDER_PARAM_VALUE = "Reorder";
    private final static String REDIRECT_URL = "/individual?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fontologies%2Fdisplay%2F1.1%23DefaultMenu&switchToDisplayModel=true";
-   private Model removeStatements = ModelFactory.createDefaultModel();
-   private Model addStatements = ModelFactory.createDefaultModel();
+   private static Model removeStatements = null; 
+   private static Model addStatements = null; 
     
     @Override
     protected void doPost(HttpServletRequest rawRequest, HttpServletResponse resp)
@@ -72,12 +73,10 @@ public class MenuManagementEdit extends VitroHttpServlet {
            RequestDispatcher rd = request
                     .getRequestDispatcher("/edit/postEditCleanUp.jsp");
             rd.forward(request, resp);*/
+    	removeStatements = ModelFactory.createDefaultModel();
+    	addStatements = ModelFactory.createDefaultModel();
     	VitroRequest vreq = new VitroRequest(rawRequest);
-    	java.util.Enumeration paramNames = vreq.getParameterNames();
-    	while(paramNames.hasMoreElements()) {
-    		String pName = (String)paramNames.nextElement();
-    		System.out.println("Param name is " + pName + " -a nd value is " + vreq.getParameter(pName));
-    	}
+    	
     	String command = getCommand(vreq);
     	if(command != null) {
     		processCommand(command, vreq);
@@ -86,8 +85,9 @@ public class MenuManagementEdit extends VitroHttpServlet {
     	}
         //Need to redirect correctly
     	if(!isReorder(command)){
-    		RequestDispatcher rd = rawRequest.getRequestDispatcher(REDIRECT_URL);
-    		rd.forward(rawRequest, resp);
+    		resp.sendRedirect(rawRequest.getContextPath() + REDIRECT_URL);
+    	} else {
+    		//Provide some JSON message back to reorder
     	}
     }
 
@@ -125,7 +125,7 @@ public class MenuManagementEdit extends VitroHttpServlet {
     	OntModel displayModel = getDisplayModel(vreq);
     	if(displayModel == null) {
     		//Throw some kind of exception
-    		System.out.println("Display model not being retrieved correctly");
+    		log.error("Display model not being retrieved correctly");
     	}
     	//if Add, then create new menu item and new page elements, and use the values above
     	
@@ -145,11 +145,16 @@ public class MenuManagementEdit extends VitroHttpServlet {
     	//Edits to model occur here
     	displayModel.enterCriticalSection(Lock.WRITE);
     	try {
-    		System.out.println("Statement to be revmoed are ");
-			removeStatements.write(System.out, "N3");
-    		
-    		System.out.println("Statements to be added are ");
-    		addStatements.write(System.out, "N3");
+    		log.debug("Statement to be removed are ");
+    		StringWriter r = new StringWriter();
+			removeStatements.write(r, "N3");
+    		log.debug(r.toString());
+    		r.close();
+    		log.debug("Statements to be added are ");
+    		StringWriter a = new StringWriter();
+    		addStatements.write(a, "N3");
+    		log.debug(a.toString());
+    		a.close();
      		//displayModel.remove(removeStatements);
      		//displayModel.add(addStatements);
     	
@@ -218,7 +223,7 @@ public class MenuManagementEdit extends VitroHttpServlet {
     	Resource menuItemResource = getExistingMenuItem(menuItem, displayModel);
 		Resource pageResource = getExistingPage(menuItemResource, displayModel);
 		//What statements should be added and removed
-   		removeStatements = getStatementsToRemove(command, displayModel, menuItemResource, pageResource);
+   		removeStatements.add(getStatementsToRemove(command, displayModel, menuItemResource, pageResource));
    		//No statements to add
 	}
 
@@ -227,9 +232,24 @@ public class MenuManagementEdit extends VitroHttpServlet {
 			String command, VitroRequest vreq) {
     	Resource menuItemResource = getExistingMenuItem(menuItem, displayModel);
 		Resource pageResource = getExistingPage(menuItemResource, displayModel);
-		//What statements should be added and removed
-   		removeStatements = getStatementsToRemove(command, displayModel, menuItemResource, pageResource);
-		addStatements = getStatementsToAdd(vreq, command, displayModel, menuItemResource, pageResource);
+		//if home page process separately
+		if(isHomePage(displayModel, pageResource)) {
+			processHomePage(vreq, displayModel, menuItemResource, pageResource);
+		} else {
+			//What statements should be added and removed
+	   		removeStatements.add(getStatementsToRemove(command, displayModel, menuItemResource, pageResource));
+			addStatements.add(getStatementsToAdd(vreq, command, displayModel, menuItemResource, pageResource));
+		}
+	}
+
+	
+	//Home page expects only menu name to change
+	//No other edits are currently supported
+	private void processHomePage(VitroRequest vreq, OntModel displayModel, Resource menuItemResource, Resource pageResource) {
+		//remove statements for existing linkText and title
+		removeMenuName(displayModel, removeStatements, vreq, menuItemResource, pageResource);
+		//add new statements for link text and title, setting equal to new menu name
+		updateMenuName(addStatements, vreq, menuItemResource, pageResource);
 	}
 
 
@@ -238,7 +258,7 @@ public class MenuManagementEdit extends VitroHttpServlet {
     	Resource menuItemResource = createNewMenuItem(menuName, displayModel);
 		Resource pageResource = createNewPage(menuItemResource, displayModel);
 		//no statements to remove, just to add
-		addStatements = getStatementsToAdd(vreq, command, displayModel, menuItemResource, pageResource);
+		addStatements.add(getStatementsToAdd(vreq, command, displayModel, menuItemResource, pageResource));
 		addStatements.add(associateMenuItemToPage(menuItemResource, pageResource));
 
     }
@@ -425,6 +445,17 @@ public class MenuManagementEdit extends VitroHttpServlet {
 		
 	}
 
+	private void removeMenuName(OntModel displayModel, Model removeModel, VitroRequest vreq,
+			Resource menuItemResource, Resource pageResource) {
+		String menuName = vreq.getParameter("menuName");
+		removeModel.add(displayModel.listStatements(menuItemResource, DisplayVocabulary.LINK_TEXT, (RDFNode) null));
+		removeModel.add(removeModel.createStatement(
+				pageResource, 
+				ResourceFactory.createProperty(DisplayVocabulary.TITLE), 
+				(RDFNode) null));
+		
+	}
+	
 	private void generateStatementsForAdd(Model addModel, OntModel displayModel, Resource menuItemResource, Resource pageResource) {
     	//Need to generate the menu item and page in their entirety
 		//Menu item
@@ -482,7 +513,7 @@ public class MenuManagementEdit extends VitroHttpServlet {
 					(RDFNode) null));
 			removeModel.add(displayModel.listStatements(
 					pageResource, 
-					DisplayVocabulary.URL_MAPPING, 
+					DisplayVocabulary.REQUIRES_BODY_TEMPLATE, 
 					(RDFNode) null));
 		    //remove data getter properties - the link between page and data getter remains
 			Resource dataGetter = getDataGetterFromDisplayModel(pageResource, displayModel);
@@ -552,6 +583,12 @@ public class MenuManagementEdit extends VitroHttpServlet {
     	} else {
     		return (OntModel) getServletContext().getAttribute("http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadata");
     	}
+    }
+    
+    //Is home page
+    private boolean isHomePage(OntModel writeModel, Resource page) {
+    	StmtIterator homePageIt = writeModel.listStatements(page, RDF.type, ResourceFactory.createResource(DisplayVocabulary.HOME_PAGE_TYPE));
+    	return (homePageIt.hasNext());
     }
 
     Log log = LogFactory.getLog(MenuManagementEdit.class);

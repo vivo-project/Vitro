@@ -47,7 +47,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     //since forwarding from edit Request dispatch for now
     
     protected final static String ITEM_PARAM = "objectUri";
-    
+     
     public final static Actions REQUIRED_ACTIONS = new Actions(new ManageMenus());
     
     @Override
@@ -59,21 +59,22 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     protected ResponseValues processRequest(VitroRequest vreq) {
        //Parameters should include the menu item being edited/added/removed/reordered
     	Map<String, Object> data = new HashMap<String,Object>();
+    	this.initializeData(data, vreq);
+
     	//if no menu item passed, return empty data
     	//TODO: Check if exception needs to be thrown   		
     	String cmd = getCommand(vreq); 
     	
     	if(cmd.equals(ADD_PARAM_VALUE)) {
-    		data = processAddMenuItem(vreq);
+    		processAddMenuItem(vreq, data);
     	} else if(cmd.equals(EDIT_PARAM_VALUE)) {
-    		data = processEditMenuItem(vreq);
+    		processEditMenuItem(vreq, data);
     	} else if(cmd.equals(DELETE_PARAM_VALUE)) {
-    		data = processDeleteMenuItem(vreq);
+    		processDeleteMenuItem(vreq, data);
     	} else {
     		//Throw some kind of error or do nothing
     	}
     	
-    	this.initializeData(data, vreq);
     	return new TemplateResponseValues(EDIT_FORM, data);
     	
     }
@@ -84,6 +85,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     	data.put("formUrls", vreq.getContextPath() + SUBMIT_FORM);
     	data.put("cancelUrl", vreq.getContextPath() + CANCEL_FORM);
     	data.put("internalClassUri", "");
+    	
     }
 
     //Based on parameters, ascertain command
@@ -101,19 +103,29 @@ public class MenuManagementController extends FreemarkerHttpServlet {
 		return command;
 	}
 
-	private Map<String, Object> processDeleteMenuItem(VitroRequest vreq) {
+	private void processDeleteMenuItem(VitroRequest vreq , Map<String, Object> data) {
 		String menuItem = getMenuItem(vreq);
-		Map<String, Object> data = new HashMap<String,Object>();
     	data.put("menuItem", menuItem);
     	data.put("menuAction", "Remove");
-    	
+    	//Generate empty values for fields
+    	//TODO: Remove these if only portion of template utilized
+    	data.put("menuItem", "");
+    	data.put("menuName", "");
+    	data.put("prettyUrl", "");
+    	data.put("associatedPage", "");
+    	data.put("associatedPageURI", "");
+    	data.put("classGroup", new ArrayList<String>());
+    	//not a page already assigned a class group
+    	data.put("isClassGroupPage", false);
+    	data.put("includeAllClasses", false);
+    	data.put("classGroups", this.getClassGroups());
+    	data.put("selectedTemplateType", "default");
+    	//
     	this.getMenuItemData(vreq, menuItem, data);
     	this.getPageData(vreq, data);    	
-		return data;
 	}
 
-	private Map<String, Object> processAddMenuItem(VitroRequest vreq) {
-		Map<String, Object> data = new HashMap<String,Object>();
+	private void processAddMenuItem(VitroRequest vreq, Map<String, Object> data) {
     	data.put("menuAction", "Add");
     	//Generate empty values for fields
     	data.put("menuItem", "");
@@ -130,13 +142,11 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     	//defaults to regular class group page
      	//Check whether institutional internal class exists
 		this.checkInstitutionalInternalClass(data);
-    	return data;
 	}
 
-	private Map<String, Object> processEditMenuItem(VitroRequest vreq) {
-		Map<String, Object> data = new HashMap<String,Object>();
+	private void processEditMenuItem(VitroRequest vreq, Map<String, Object> data) {
 		if(!hasMenuItem(vreq)) {
-    		return data;
+    		return;
     	}
 		//Get parameter for menu item
     	String menuItem = getMenuItem(vreq);
@@ -149,7 +159,6 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     	//Get data for menu item and associated page
     	this.getMenuItemData(vreq, menuItem, data);
     	this.getPageData(vreq, data);    	
-		return data;
 	}
     
     private String getMenuItem(VitroRequest vreq) {
@@ -226,6 +235,13 @@ public class MenuManagementController extends FreemarkerHttpServlet {
 		StmtIterator homePageIt = writeModel.listStatements(page, RDF.type, ResourceFactory.createResource(DisplayVocabulary.HOME_PAGE_TYPE));
 		if (homePageIt.hasNext()) {
 			data.put("isHomePage", true);
+			data.put("isClassGroupPage", false);
+        	//Home Page does not have a "group" associated with
+        	data.put("associatedPage", "");
+        	data.put("associatedPageURI", "");
+        	data.put("classGroup", new ArrayList<String>());
+        	data.put("includeAllClasses", false);
+	    	
 		}
 	}
     
@@ -246,6 +262,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     //All items will have data getter except for Browse or Home page
     //Home can be edited but not removed
     private void getPageDataGetterInfo(OntModel writeModel, Resource page, Map<String, Object> data) {
+    	
     	
     	//Alternative is to do this via sparql query
     	StmtIterator dataGetterIt = writeModel.listStatements(page, ResourceFactory.createProperty(DisplayVocabulary.HAS_DATA_GETTER), (RDFNode) null);
@@ -343,9 +360,8 @@ public class MenuManagementController extends FreemarkerHttpServlet {
 		OntModel mainModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
 		StmtIterator internalIt = mainModel.listStatements(null, ResourceFactory.createProperty(VitroVocabulary.IS_INTERNAL_CLASSANNOT), (RDFNode) null);
 		//List<String> internalClasses = new ArrayList<String>();
-		if(internalIt.hasNext()) {
-			//internalClasses.add(internalIt.nextStatement().getResource().getURI());
-			String internalClass = internalIt.nextStatement().getResource().getURI();
+		if(internalIt.hasNext()) {			
+			String internalClass = internalIt.nextStatement().getSubject().getURI();
 			data.put("internalClass", internalClass);
 			data.put("internalClassUri", internalClass);
 		}

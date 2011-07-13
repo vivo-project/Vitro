@@ -87,9 +87,20 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         "    ?pageUri rdf:type <" + DisplayVocabulary.HOME_PAGE_TYPE + "> .\n"+                
         "} \n" ;
 
+    /*
     static final protected String classGroupPageQueryString = 
         prefixes + "\n" +
         "SELECT ?classGroup WHERE { ?pageUri <" + DisplayVocabulary.FOR_CLASSGROUP + "> ?classGroup . }";
+    */
+    //Updated class group page query string
+    static final protected String classGroupPageQueryString = 
+    	prefixes + "\n" + 
+    	 "SELECT ?classGroup WHERE {\n" +
+         "    ?pageUri display:hasDataGetter ?dg .\n"+    
+         " 	 ?dg rdf:type <" + DisplayVocabulary.CLASSGROUP_PAGE_TYPE + ">. \n" + 
+         " ?dg <" + DisplayVocabulary.FOR_CLASSGROUP + "> ?classGroup . \n" +
+         "} \n" ;
+    
     
     static final protected String classIntersectionPageQueryString = 
     	prefixes + "\n" + 
