@@ -322,6 +322,9 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<copy tofile="${solr.docbase}">
 			<fileset file="${solr.war}" />
 		</copy>
+		<war destfile="${solr.docbase}" update="true">
+			<classes dir="${webapp.dir}/config/solr/" />
+		</war>
 
 		<!-- Create the context configuration XML with expanded properties. -->
 		<copy tofile="${solr.context.config}" filtering="true">
@@ -336,7 +339,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
           target: deploySolr                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="deploySolr" depends="prepareSolr" unless="noSolrDeploy">
-		<copy todir="${tomcat.home}/conf/Catalina/localhost">
+		<copy todir="${tomcat.home}/conf/Catalina/localhost" overwrite="true" >
 			<fileset file="${solr.context.config}" />
 		</copy>
 	</target>
