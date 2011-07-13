@@ -8,10 +8,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openrdf.model.impl.URIImpl;
 
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader;
@@ -90,7 +89,8 @@ public class BaseResourceBean implements ResourceBean {
 			} else if (roles.contains(PermissionSetsLoader.URI_SELF_EDITOR)) {
 				return SELF;
 			} else {
-				return PUBLIC;
+				// Logged in but with no recognized role? Make them SELF
+				return SELF;
 			}
 		}
     }
