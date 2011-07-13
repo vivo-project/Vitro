@@ -15,6 +15,8 @@
 </#if>
 
 <#assign noDataNotification>
+    <span class="rebuildSearchIndex"><h4>Expecting content?</h4> <p>Try <a title="Rebuild the search index for this site" href="${urls.base}/SearchIndex">rebuilding the search index</a>.</p></span>
+    
     <h3>There is currently no content in the system</h3>
     
     <#if user.loggedIn>

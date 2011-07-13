@@ -58,11 +58,29 @@
     font-size: .9em;
     line-height: 30px;
 }
-#flash-message{
+#flash-message {
     background-color: #7285a0;
     padding: .5em;  
     margin-bottom: 10px;
 }
+.rebuildSearchIndex {
+    float: right;
+    padding: .6em;
+    background: #ffc;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+}
+.rebuildSearchIndex h4,
+.rebuildSearchIndex p {
+    margin: 0;
+    padding: 0;
+}
+.rebuildSearchIndex p {
+    font-size: .8em;
+}
+
+
 /* <------ INDEX PAGE*/
 .siteMap h2 {
     padding-bottom: 0;
