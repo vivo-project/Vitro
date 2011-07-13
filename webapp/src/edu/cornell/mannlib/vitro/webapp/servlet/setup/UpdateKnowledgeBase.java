@@ -7,7 +7,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -26,13 +29,15 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.util.ResourceUtils;
+import com.hp.hpl.jena.vocabulary.RDF;
 
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.UpdateSettings;
-import edu.cornell.mannlib.vitro.webapp.search.IndexConstants;
 
 /**
  * Invokes process to test whether the knowledge base needs any updating
@@ -56,7 +61,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private static final String ADDED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + "addedData.n3";
 	private static final String SPARQL_CONSTRUCT_ADDITIONS_DIR = DATA_DIR + "sparqlConstructs/additions/";
 	private static final String SPARQL_CONSTRUCT_DELETIONS_DIR = DATA_DIR + "sparqlConstructs/deletions/";
-	private static final String MISC_REPLACEMENTS_FILE = DATA_DIR + "miscReplacements.rdf";
+	//private static final String MISC_REPLACEMENTS_FILE = DATA_DIR + "miscReplacements.rdf";
 	private static final String OLD_TBOX_MODEL_DIR = DATA_DIR + "oldVersion/";
 	private static final String NEW_TBOX_MODEL_DIR = "/WEB-INF/filegraph/tbox/";
 	private static final String OLD_TBOX_ANNOTATIONS_DIR = DATA_DIR + "oldAnnotations/";
@@ -115,7 +120,10 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 					  //ctx.setAttribute(IndexConstants.INDEX_REBUILD_REQUESTED_AT_STARTUP, Boolean.TRUE);
 					  ctx.setAttribute(KBM_REQURIED_AT_STARTUP, Boolean.TRUE);
 					  //doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
-					  reloadDisplayModel(ctx);
+					  //reloadDisplayModel(ctx);
+					  log.info("Migrating display model");
+					  doMigrateDisplayModel(ctx);
+					  log.info("Display model migrated");
 					  ontologyUpdater.update();
 				  }
 			   } catch (IOException ioe) {
@@ -201,6 +209,69 @@ public class UpdateKnowledgeBase implements ServletContextListener {
             }
 	    } else {
 	        log.error("No display model found in context");
+	    }
+	}
+	
+	private void doMigrateDisplayModel(ServletContext ctx) {
+		Object o = ctx.getAttribute("displayOntModel");
+	    if (!(o instanceof OntModel)) {
+	    	return;
+	    }
+	    OntModel displayModel = (OntModel) o;
+	    migrateDisplayModel(displayModel);
+	}
+	
+	public static void migrateDisplayModel(Model displayModel) {
+	    Resource indexRes = displayModel.getResource(
+	    		DisplayVocabulary.DISPLAY_NS + "PrimaryLuceneIndex");
+	    ResourceUtils.renameResource(
+	    		indexRes, DisplayVocabulary.DISPLAY_NS + "SearchIndex");
+	    Iterator<Resource> pageIt = displayModel.listResourcesWithProperty(
+	    		RDF.type, displayModel.getResource(
+	    				DisplayVocabulary.PAGE_TYPE));
+	    while (pageIt.hasNext()) {
+	    	Resource pageRes = pageIt.next();
+	    	Resource classgroupType = displayModel.getResource(
+					DisplayVocabulary.CLASSGROUP_PAGE_TYPE);
+	    	Property forClassGroup = displayModel.getProperty(
+	    			DisplayVocabulary.FOR_CLASSGROUP);
+	    	if (pageRes.hasProperty(RDF.type, classgroupType)) {
+	    		displayModel.remove(pageRes, RDF.type, classgroupType);
+	    		StmtIterator fcgIt = pageRes.listProperties(forClassGroup);
+	    		List<Resource> classGroupResources = new ArrayList<Resource>();
+	    		while (fcgIt.hasNext()) {
+	    			Statement fcgStmt = fcgIt.nextStatement();
+	    			RDFNode classGroupNode = fcgStmt.getObject();
+	    			if (!classGroupNode.isURIResource()) {
+	    				continue;
+	    			}
+	    			classGroupResources.add((Resource) classGroupNode);
+	    		}
+ 	    		int classGroupIndex = 0;
+ 	    		Iterator<Resource> classGroupResIt = 
+ 	    		        classGroupResources.iterator();
+	    		while (classGroupResIt.hasNext()) {
+	    			classGroupIndex++;
+	    			Resource classGroupRes = classGroupResIt.next();
+	    			String URIsuffix = "DataGetter" + classGroupIndex;
+	    			String dataGetterURI = (!pageRes.isAnon()) 
+	    			        ? pageRes.getURI() + URIsuffix
+	    			        : DisplayVocabulary.DISPLAY_NS + 
+	    			                "page-" + pageRes.getId().toString() + "-"
+	    			                + URIsuffix;
+	    			Resource dataGetterRes = displayModel.createResource(
+	    					dataGetterURI);
+	    			pageRes.addProperty(
+	    					displayModel.getProperty(
+	    							DisplayVocabulary.HAS_DATA_GETTER), 
+	    							        dataGetterRes);
+	    			dataGetterRes.addProperty(forClassGroup, classGroupRes);
+	    			dataGetterRes.addProperty(RDF.type, classgroupType);
+	    			displayModel.removeAll(pageRes, RDF.type, classgroupType);
+	    			displayModel.removeAll(
+	    					pageRes, forClassGroup, (RDFNode) null);
+	    		}	    		
+	    	}
 	    }
 	}
 	
