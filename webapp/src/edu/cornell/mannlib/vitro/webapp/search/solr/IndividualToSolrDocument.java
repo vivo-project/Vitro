@@ -38,6 +38,8 @@ public class IndividualToSolrDocument {
     
     private IndividualProhibitedFromSearch individualProhibitedFromSearch;
     
+    private final String label = "http://www.w3.org/2000/01/rdf-schema#label";
+    
     public List<DocumentModifier> documentModifiers = new ArrayList<DocumentModifier>();
     
     public IndividualToSolrDocument(
@@ -145,7 +147,6 @@ public class IndividualToSolrDocument {
 
     private void addAllText(Individual ind, SolrInputDocument doc, StringBuffer classPublicNames, StringBuffer objectNames) {
         String t=null;
-        
         //ALLTEXT, all of the 'full text'
         StringBuffer allTextValue = new StringBuffer();
         allTextValue.append("");
@@ -160,6 +161,9 @@ public class IndividualToSolrDocument {
             Iterator<DataPropertyStatement> dataPropertyStmtIter = dataPropertyStatements.iterator();
             while (dataPropertyStmtIter.hasNext()) {
                 DataPropertyStatement dataPropertyStmt =  dataPropertyStmtIter.next();
+               if(dataPropertyStmt.getDatapropURI().equals(label)){ // we don't want label to be added to alltext
+                	continue;
+               }
                 allTextValue.append(" ");
                 allTextValue.append(((t=dataPropertyStmt.getData()) == null)?"":t);
             }
@@ -170,7 +174,7 @@ public class IndividualToSolrDocument {
         String alltext = allTextValue.toString();
         doc.addField(term.ALLTEXT, alltext);
         doc.addField(term.ALLTEXTUNSTEMMED, alltext);
-        doc.addField(term.ALLTEXT_PHONETIC, alltext);        
+        doc.addField(term.ALLTEXT_PHONETIC, alltext);
     }
 
     private void addLabel(Individual ind, SolrInputDocument doc) {
@@ -187,8 +191,7 @@ public class IndividualToSolrDocument {
         doc.addField(term.NAME_STEMMED, value);
         doc.addField(term.NAME_PHONETIC, value);
         doc.addField(term.AC_NAME_UNTOKENIZED, value);
-        doc.addField(term.AC_NAME_STEMMED, value);
-        // doc.addField(term.AC_NAME_TOKENIZED, value);            
+        doc.addField(term.AC_NAME_STEMMED, value);         
     }
 
     /**
