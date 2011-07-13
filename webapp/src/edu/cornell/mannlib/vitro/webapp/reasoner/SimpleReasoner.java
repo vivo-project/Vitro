@@ -62,8 +62,8 @@ public class SimpleReasoner extends StatementListener {
 	
 	private CumulativeDeltaModeler aBoxDeltaModeler1 = null;
 	private CumulativeDeltaModeler aBoxDeltaModeler2 = null;
-	private boolean batchMode1, batchMode2;
-	private boolean stopRequested;
+	private boolean batchMode1 = false, batchMode2 = false;
+	private boolean stopRequested = false;
 
 	/**
 	 * @param tboxModel - input.  This model contains both asserted and inferred TBox axioms
@@ -1158,7 +1158,7 @@ public class SimpleReasoner extends StatementListener {
                 }
 			}
 		} catch (Exception e) {
-			 log.error("Exception while recomputing ABox inference model", e);
+			 log.error("Exception while computing mostSpecificType annotations", e);
 			 inferenceRebuildModel.removeAll(); // don't do this in the finally, it's needed in the case
                                                 // where there isn't an exception
 			 return;
@@ -1227,14 +1227,12 @@ public class SimpleReasoner extends StatementListener {
 		log.info("ABox inference model updated with mostSpecificType annotations");
 	}
 
-	public static boolean isSimpleReasonerSetupComplete(ServletContext ctx) {
-	    Object string = ctx.getAttribute("SimpleReasonerSetupState");
-	    
-	    if (string instanceof String) {
-	        return true;
-	    } else {
-	        return false;
-	    }	
+	public  boolean isABoxReasoningAsynchronous() {
+         if (batchMode1 || batchMode2) {
+        	 return true;
+         } else {
+        	 return false;
+         }
 	}
 	
 	@Override
@@ -1271,25 +1269,31 @@ public class SimpleReasoner extends StatementListener {
         	log.info("starting DeltaComputer.run");
         	Model retractions = aBoxDeltaModeler1.getRetractions();
         	boolean finished = (retractions.size() == 0);
+        	boolean abort = false;
         	String qualifier = "(1)";
         	
         	while (!finished && !stopRequested) {
     			retractions.enterCriticalSection(Lock.READ);	
+    			StmtIterator iter = null;
     			
     			try {
     	   	       	log.info("run: started computing inferences for batch " + qualifier + " update");
-    				StmtIterator iter = retractions.listStatements();
+    				iter = retractions.listStatements();
     	
     				int num = 0;
-    				while (iter.hasNext()) {				
+    				while (iter.hasNext() && !stopRequested) {				
     					Statement stmt = iter.next();
     					
     					try {
     				        removedABoxTypeAssertion(stmt, inferenceModel);
     				        setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
     				        //TODO update this part when subproperty inferencing is added.
+    					} catch (NullPointerException npe) {
+    						 abort = true;
+    						 break;
     					} catch (Exception e) {
-    						log.error("exception while computing inferences for batch " + qualifier + " update: " +  e.getMessage());
+    						log.error("exception in batch mode ",e);
+    						//log.error("exception while computing inferences for batch " + qualifier + " update: " +  e.getMessage());
     					}
     					
 						num++;
@@ -1303,12 +1307,23 @@ public class SimpleReasoner extends StatementListener {
 		                }
     				}
     			} finally {
+    				iter.close();
     	    		retractions.removeAll();	
     	   			retractions.leaveCriticalSection();
-    				log.info("finished computing inferences for batch " + qualifier + " update");
     			}			
     			
+                if (abort) {
+                	log.info("a NullPointerException was received while computing inferences in batch " + qualifier + " mode. Halting inference computation.");
+                	return;
+                }
+                
+                if (stopRequested) {
+                	log.info("a stopRequested signal was received during DeltaComputer.run. Halting Processing.");
+                	return;
+                }
     			
+   				log.info("finished computing inferences for batch " + qualifier + " update");
+   				
     			if (batchMode1 && (aBoxDeltaModeler2.getRetractions().size() > 0)) {
     				retractions = aBoxDeltaModeler2.getRetractions();
     				batchMode2 = true;
@@ -1327,11 +1342,6 @@ public class SimpleReasoner extends StatementListener {
     	        	batchMode2 = false;   
     				log.info("finished processing retractions in batch mode");
     			}	
-    			
-                if (stopRequested) {
-                	log.info("a stopRequested signal was received during DeltaComputer.run. Halting Processing.");
-                	return;
-                }
         	}
         	
         	if (aBoxDeltaModeler1.getRetractions().size() > 0) {
@@ -1356,7 +1366,7 @@ public class SimpleReasoner extends StatementListener {
 	 * This is called when the system shuts down.
 	 */
 	public void setStopRequested() {
-	    stopRequested = true;
+	    this.stopRequested = true;
 	}
     
     public static String stmtString(Statement statement) {

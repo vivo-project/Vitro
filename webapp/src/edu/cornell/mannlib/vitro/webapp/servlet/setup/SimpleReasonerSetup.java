@@ -127,7 +127,6 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	        }
 
 	        assertionsOms.getTBoxModel().register(new SimpleReasonerTBoxListener(simpleReasoner));
-	        sce.getServletContext().setAttribute("SimpleReasonerSetupState","complete");
 	        
 	        log.info("Simple reasoner connected for the ABox");
 	        
@@ -138,9 +137,11 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
+		log.info("received contextDestroyed notification");
         SimpleReasoner simpleReasoner = getSimpleReasonerFromServletContext(sce.getServletContext());
 	    
 	    if (simpleReasoner != null) {
+	    	log.info("sending stop request to SimpleReasoner");
 	    	simpleReasoner.setStopRequested();
 	    } 
 	}

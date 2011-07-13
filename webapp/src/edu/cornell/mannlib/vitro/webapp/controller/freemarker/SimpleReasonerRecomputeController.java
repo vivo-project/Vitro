@@ -32,13 +32,14 @@ public class SimpleReasonerRecomputeController extends FreemarkerHttpServlet {
         
         String messageStr = "";
         try {
-            if (!SimpleReasoner.isSimpleReasonerSetupComplete(vreq.getSession().getServletContext())) {
+        	
+        	Object simpleReasoner = vreq.getSession().getServletContext().getAttribute(SimpleReasoner.class.getName());
+        	
+            if ((simpleReasoner instanceof SimpleReasoner) && !((SimpleReasoner)simpleReasoner).isABoxReasoningAsynchronous()) {
                 messageStr = "No SimpleReasoner has been set up.";
             } else {
             	String signal = (String) vreq.getParameter("signal");
             	
-        	    Object simpleReasoner = vreq.getSession().getServletContext().getAttribute(SimpleReasoner.class.getName());
-        	    
         	    if (simpleReasoner instanceof SimpleReasoner) {
         	    	 
  	                if (((SimpleReasoner)simpleReasoner).isRecomputing()) {
