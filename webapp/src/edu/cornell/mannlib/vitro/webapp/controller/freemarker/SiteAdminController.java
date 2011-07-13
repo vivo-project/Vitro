@@ -21,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntolo
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditSiteInformation;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.RefreshVisualizationCacheAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeSiteAdminPage;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
@@ -190,6 +191,11 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         urls.put("rdfExport", UrlBuilder.getUrl("/export"));
         urls.put("sparqlQuery", UrlBuilder.getUrl("/admin/sparqlquery"));
         urls.put("sparqlQueryBuilder", UrlBuilder.getUrl("/admin/sparqlquerybuilder"));
+        
+        if (PolicyHelper.isAuthorizedForActions(vreq, new Actions(new RefreshVisualizationCacheAction()))) {
+        	urls.put("visualizationTool", UrlBuilder.getUrl("/vis/tools"));            
+        }
+        
         map.put("urls", urls);
         
         return map;
