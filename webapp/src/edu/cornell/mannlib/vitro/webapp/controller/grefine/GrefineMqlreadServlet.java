@@ -77,15 +77,62 @@ public class GrefineMqlreadServlet extends VitroHttpServlet {
 
 		try {
 			// parse query
+			ArrayList<String> subjectUriList = new ArrayList<String>();
+			Map<String, JSONArray> propertyUriMap = new HashMap<String, JSONArray>();
 			String query = vreq.getParameter("query");
-			System.out.println("query: " + query);
+			parseQuery(query, subjectUriList, propertyUriMap);
 			
+			// run SPARQL query to get the results
+			JSONArray resultAllJsonArr = new JSONArray();
+	        DataPropertyStatementDao dpsDao = vreq.getWebappDaoFactory().getDataPropertyStatementDao();
+	        for (String subjectUri: subjectUriList) {
+	        	JSONObject subjectPropertyResultJson = new JSONObject();
+	        	subjectPropertyResultJson.put("id", subjectUri);
+	        	for (Map.Entry<String, JSONArray> entry : propertyUriMap.entrySet()) {
+	        		int limit = 10; // default
+	        		String propertyUri = entry.getKey();
+	        		JSONArray propertyUriOptions = entry.getValue();
+	        		for (int i=0; i<propertyUriOptions.length(); i++) {
+	        			JSONObject propertyUriOption = (JSONObject)propertyUriOptions.get(i);
+	        			limit = ((Integer)propertyUriOption.get("limit")).intValue();
+	        		}
+	        		List<Literal> literals = dpsDao.getDataPropertyValuesForIndividualByProperty(subjectUri, propertyUri);
+	                // Make sure the subject has a value for this property 
+	                if (literals.size() > 0) {
+	                	int counter = 0;
+	                	JSONArray valueJsonArr = new JSONArray();
+	                	for (Literal literal: literals) {
+	                		if (counter <= limit) {
+	                			String value = literal.getLexicalForm();
+	                			valueJsonArr.put(value);
+	                		}
+	                		counter++;
+	                	}
+	                	subjectPropertyResultJson.put(propertyUri, valueJsonArr);
+	                }
+	        	}
+	        	resultAllJsonArr.put(subjectPropertyResultJson);
+	        }
+	        resultAllJson.put("result", resultAllJsonArr);
+
+		} catch (JSONException e) {
+			log.error("GrefineMqlreadServlet getResult JSONException: " + e);
+		}
+
+		// System.out.println(resultAllJson);
+		return resultAllJson;
+	}
+
+	/**
+	 * Construct json from query String
+	 * @param query
+	 * @param subjectUriList
+	 * @param propertyUriMap
+	 */
+	private void parseQuery(String query, ArrayList<String> subjectUriList, Map<String, JSONArray> propertyUriMap) {
+		try {
 			JSONObject rawJson = new JSONObject(query);
 			JSONArray qJsonArr = rawJson.getJSONArray("query");
-			
-
-			ArrayList<String> subjectUriList = new ArrayList();
-			Map<String, JSONArray> propertyUriMap = new HashMap();
 			for (int i=0; i<qJsonArr.length(); i++) {
 				Object obj = qJsonArr.get(i);
 
@@ -118,46 +165,9 @@ public class GrefineMqlreadServlet extends VitroHttpServlet {
 					}
 				}
 			}
-			
-			// run SPARQL query to get the results
-			JSONArray resultAllJsonArr = new JSONArray();
-	        DataPropertyStatementDao dpsDao = vreq.getWebappDaoFactory().getDataPropertyStatementDao();
-	        for (String subjectUri: subjectUriList) {
-	        	JSONObject subjectPropertyResultJson = new JSONObject();
-	        	subjectPropertyResultJson.put("id", subjectUri);
-	        	for (Map.Entry<String, JSONArray> entry : propertyUriMap.entrySet()) {
-	        		int limit = 10; // default
-					String propertyUri = entry.getKey();
-					JSONArray propertyUriOptions = entry.getValue();
-					for (int i=0; i<propertyUriOptions.length(); i++) {
-						JSONObject propertyUriOption = (JSONObject)propertyUriOptions.get(i);
-						limit = ((Integer)propertyUriOption.get("limit")).intValue();
-					}
-					List<Literal> literals = dpsDao.getDataPropertyValuesForIndividualByProperty(subjectUri, propertyUri);
-			        // Make sure the subject has a value for this property 
-			        if (literals.size() > 0) {
-			        	int counter = 0;
-			        	JSONArray valueJsonArr = new JSONArray();
-			        	for (Literal literal: literals) {
-			        		if (counter <= limit) {
-			        			String value = literal.getLexicalForm();
-			        			valueJsonArr.put(value);
-			        		}
-			        		counter++;
-			        	}
-			        	subjectPropertyResultJson.put(propertyUri, valueJsonArr);
-			        } 
-	        	}
-	        	resultAllJsonArr.put(subjectPropertyResultJson);
-	        }
-	        resultAllJson.put("result", resultAllJsonArr);
-
 		} catch (JSONException e) {
-			log.error("JSONException: " + e);
-			throw new ServletException("GrefineMqlreadServlet JSONException: " + e);
+			log.error("GrefineMqlreadServlet parseQuery JSONException: " + e);
 		}
+ 	}
 
-		// System.out.println(resultAllJson);
-		return resultAllJson;
-	}
 }
