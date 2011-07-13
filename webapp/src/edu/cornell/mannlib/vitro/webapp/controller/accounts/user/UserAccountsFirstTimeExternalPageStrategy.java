@@ -68,6 +68,7 @@ public abstract class UserAccountsFirstTimeExternalPageStrategy extends
 		public void notifyUser(UserAccount ua) {
 			Map<String, Object> body = new HashMap<String, Object>();
 			body.put("userAccount", ua);
+			body.put("siteName", getSiteName());
 
 			FreemarkerEmailMessage email = FreemarkerEmailFactory
 					.createNewMessage(vreq);

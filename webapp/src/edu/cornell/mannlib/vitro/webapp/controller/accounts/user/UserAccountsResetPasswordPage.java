@@ -57,6 +57,7 @@ public class UserAccountsResetPasswordPage extends UserAccountsPasswordBasePage 
 	private void notifyUser() {
 		Map<String, Object> body = new HashMap<String, Object>();
 		body.put("userAccount", userAccount);
+		body.put("siteName", getSiteName());
 
 		FreemarkerEmailMessage email = FreemarkerEmailFactory
 				.createNewMessage(vreq);

@@ -173,6 +173,7 @@ public abstract class UserAccountsMyAccountPageStrategy extends
 
 			Map<String, Object> body = new HashMap<String, Object>();
 			body.put("userAccount", page.getUserAccount());
+			body.put("siteName", getSiteName());
 
 			FreemarkerEmailMessage email = FreemarkerEmailFactory
 					.createNewMessage(vreq);
