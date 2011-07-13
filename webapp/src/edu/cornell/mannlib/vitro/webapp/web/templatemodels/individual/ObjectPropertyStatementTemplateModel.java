@@ -34,8 +34,9 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
             Map<String, String> data, EditingPolicyHelper policyHelper, String templateName, VitroRequest vreq) {
         super(subjectUri, propertyUri, policyHelper, vreq);
         
+        cleanMapValuesForDisplay( data );
         this.data = data;
-        this.objectUri = cleanURIForDisplay( data.get(objectKey) );
+        this.objectUri = data.get(objectKey);        
         this.templateName = templateName;
         setEditAccess(policyHelper);
     }

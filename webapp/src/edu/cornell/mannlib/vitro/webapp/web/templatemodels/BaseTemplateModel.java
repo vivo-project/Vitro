@@ -2,12 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels;
 
+import java.util.Map;
+
 import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.web.AntiScript;
@@ -46,7 +47,15 @@ public abstract class BaseTemplateModel {
      * Currently this only checks for XSS exploits.
      */
     protected String cleanTextForDisplay( String dirty){
-        return AntiScript.cleanHtml(dirty, getServletContext());
+        return AntiScript.cleanText(dirty, getServletContext());
+    }
+    
+    /**
+     * Used to do any processing for display of values in
+     * a map.  Map may be modified. 
+     */
+    protected <T> void cleanMapValuesForDisplay( Map<T,String> map){
+        AntiScript.cleanMapValues(map, getServletContext());
     }
     
     public static ServletContext getServletContext() {

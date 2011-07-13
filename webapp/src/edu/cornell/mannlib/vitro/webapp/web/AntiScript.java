@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.web;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 
@@ -36,11 +37,11 @@ public class AntiScript {
      * will be returned instead of the HTML.  This might not be ideal so
      * consider changing it once we see how this works. Other options include
      * returning an empty string or some other error message.  Returning 
-     * the unscanned HTML is not a secure option as it may contain scripts.
+     * the un-scanned HTML is not a secure option as it may contain scripts.
      * 
      * This will return null if dirtyInput is null.
      */
-    public static String cleanHtml( String dirtyInput, ServletContext context){
+    public static String cleanText( String dirtyInput, ServletContext context){
         if( dirtyInput == null )
             return null;
         
@@ -58,10 +59,20 @@ public class AntiScript {
     }
     
     /**
-     * Method to clean a URL or URI.  Might do the same thing as cleanHTML().
+     * Method to clean a URL or URI.  
      */
     public static String cleanURI( String dirtyInput, ServletContext context){
-        return cleanHtml(dirtyInput,context);
+        return cleanText(dirtyInput,context);
+    }
+    
+    /**
+     * Method to clean all of the values in a map where the values are of
+     * type String.
+     */
+    public static <T> void cleanMapValues( Map<T,String> map, ServletContext context){
+        for( T key : map.keySet() ){            
+            map.put(key, cleanText(map.get(key), context));
+        }        
     }
     
     /**
