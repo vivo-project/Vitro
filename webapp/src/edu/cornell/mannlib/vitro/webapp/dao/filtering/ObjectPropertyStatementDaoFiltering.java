@@ -3,6 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.dao.filtering;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,6 +13,7 @@ import net.sf.jga.algorithms.Filter;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 
@@ -85,14 +88,49 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
     @Override
     public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
             String subjectUri, String propertyUri, String objectKey, String query) {
-        return innerObjectPropertyStatementDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, objectKey, query);
+        return getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, objectKey, query, null);
     }
     
     @Override
     public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
             String subjectUri, String propertyUri, String objectKey, String query, Set<String> queryStrings) {
-        return innerObjectPropertyStatementDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, objectKey, query, queryStrings);
-    }
+        
+        List<Map<String, String>> data = innerObjectPropertyStatementDao.
+                                            getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, objectKey, query, queryStrings);
+        
+        /* Filter the data
+         * 
+         * Filtering is applied to a list of ObjectPropertyStatements. Create these statements, mapped
+         * to the item in data that they are built from, apply filtering to the statements, then get
+         * the associated data out of the original list.
+         */
+        Map<ObjectPropertyStatement, Map<String, String>> stmtsToData = 
+            new HashMap<ObjectPropertyStatement, Map<String, String>>(data.size());
+
+        for (Map<String, String> map : data) {
+            String objectUri = map.get(objectKey);
+            ObjectPropertyStatement statement = new ObjectPropertyStatementImpl(subjectUri, propertyUri, objectUri);
+            stmtsToData.put(statement, map);
+        }
+        
+        List<ObjectPropertyStatement> stmtList = new ArrayList<ObjectPropertyStatement>(stmtsToData.keySet());
+        
+        // Apply the filters to the list of statements
+        List<ObjectPropertyStatement> filteredStatements = filterAndWrapList(stmtList, filters);     
+        
+        // Get the data associated with the filtered statements out of the map
+        List<Map<String, String>> filteredData = new ArrayList<Map<String, String>>(filteredStatements.size());
+        for (ObjectPropertyStatement ops : filteredStatements) {        
+            if (ops instanceof ObjectPropertyStatementFiltering) {
+                ops = ((ObjectPropertyStatementFiltering)ops).innerStmt;
+            } 
+            filteredData.add(stmtsToData.get(ops));
+        }       
+        
+        // Return the filtered list of data
+        return filteredData;
+
+    }    
 
     @Override 
     public Map<String, String> getMostSpecificTypesForIndividual(String subjectUri) {
