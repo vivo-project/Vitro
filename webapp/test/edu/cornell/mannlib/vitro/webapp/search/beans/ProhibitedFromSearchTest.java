@@ -110,7 +110,7 @@ public class ProhibitedFromSearchTest {
 	@Test
 	public void testPrimaryIndex(){		
 		String primaryIndexN3 = 
-			"<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#PrimarySearchIndex>" +
+			"<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#SearchIndex>" +
 			"<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#excludeClass>" +
 			"<http://vivoweb.org/ontology/core#NonAcademic> . ";		
 		
