@@ -326,6 +326,9 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 			<classes dir="${webapp.dir}/config/solr/" />
 		</war>
 
+		<!-- if no mask is define, go with an unsecured installation. -->
+		<property name="vitro.local.solr.ipaddress.mask" value=".*" />
+		
 		<!-- Create the context configuration XML with expanded properties. -->
 		<copy tofile="${solr.context.config}" filtering="true">
 			<fileset file="${solr.context.config.example}" />
