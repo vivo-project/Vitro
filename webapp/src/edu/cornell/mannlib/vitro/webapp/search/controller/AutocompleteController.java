@@ -33,14 +33,13 @@ import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 
 /**
  * AutocompleteController generates autocomplete content
- * through a Solr search. 
+ * via the search index. 
  */
 
-// RY Rename to AutocompleteController once the transition to Solr is complete.
-public class SolrAutocompleteController extends VitroAjaxController {
+public class AutocompleteController extends VitroAjaxController {
 
     private static final long serialVersionUID = 1L;
-    private static final Log log = LogFactory.getLog(SolrAutocompleteController.class);
+    private static final Log log = LogFactory.getLog(AutocompleteController.class);
     
     //private static final String TEMPLATE_DEFAULT = "autocompleteResults.ftl";
     

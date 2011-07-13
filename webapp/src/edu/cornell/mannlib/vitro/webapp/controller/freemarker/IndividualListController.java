@@ -39,10 +39,10 @@ import freemarker.template.TemplateModel;
 /** 
  * Generates a list of individuals for display in a template 
  */
-public class SolrIndividualListController extends FreemarkerHttpServlet {
+public class IndividualListController extends FreemarkerHttpServlet {
   
     private static final long serialVersionUID = 1L;   
-    private static final Log log = LogFactory.getLog(SolrIndividualListController.class.getName());
+    private static final Log log = LogFactory.getLog(IndividualListController.class.getName());
 
     private static final int INDIVIDUAL_LIST_CONTROLLER_MAX_RESULTS = 30000;
     private static final int INDIVIDUALS_PER_PAGE = 30;
@@ -233,13 +233,13 @@ public class SolrIndividualListController extends FreemarkerHttpServlet {
         }
 
         if ( response == null ) {         
-            throw new ServletException("Could not run search in SolrIndividualListController");        
+            throw new ServletException("Could not run search in IndividualListController");        
         }
 
         SolrDocumentList docs = response.getResults();
         
         if (docs == null) {
-            throw new ServletException("Could not run search in SorlIndividualListController");    
+            throw new ServletException("Could not run search in IndividualListController");    
         }
 
         // get list of individuals for the search results

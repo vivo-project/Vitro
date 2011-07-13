@@ -23,9 +23,9 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
-import edu.cornell.mannlib.vitro.webapp.controller.SolrJsonServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.JsonServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.SolrIndividualListController.PageRecord;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController.PageRecord;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
@@ -231,11 +231,11 @@ public class DataGetterUtils {
                     jo.put("imageUrl", ind.getImageUrl());
                     jo.put("profileUrl", UrlBuilder.getIndividualProfileUrl(ind, vreq));
                       
-                    jo.put("mostSpecificTypes", SolrJsonServlet.getMostSpecificTypes(ind,fullWdf));
+                    jo.put("mostSpecificTypes", JsonServlet.getMostSpecificTypes(ind,fullWdf));
                                           
-                    jo.put("preferredTitle", SolrJsonServlet.getDataPropertyValue(ind, preferredTitleDp, fullWdf));
-                    jo.put("firstName", SolrJsonServlet.getDataPropertyValue(ind, fNameDp, fullWdf));                     
-                    jo.put("lastName", SolrJsonServlet.getDataPropertyValue(ind, lNameDp, fullWdf));
+                    jo.put("preferredTitle", JsonServlet.getDataPropertyValue(ind, preferredTitleDp, fullWdf));
+                    jo.put("firstName", JsonServlet.getDataPropertyValue(ind, fNameDp, fullWdf));                     
+                    jo.put("lastName", JsonServlet.getDataPropertyValue(ind, lNameDp, fullWdf));
                       
                     jInds.put(jo);
                 }

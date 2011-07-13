@@ -62,10 +62,10 @@ import freemarker.template.Configuration;
  * 
  */
 
-public class SolrPagedSearchController extends FreemarkerHttpServlet {
+public class PagedSearchController extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private static final Log log = LogFactory.getLog(SolrPagedSearchController.class);
+    private static final Log log = LogFactory.getLog(PagedSearchController.class);
     
     private static final int DEFAULT_HITS_PER_PAGE = 25;
     private static final int DEFAULT_MAX_HIT_COUNT = 1000;   

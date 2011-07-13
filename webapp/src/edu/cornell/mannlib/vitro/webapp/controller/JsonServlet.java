@@ -33,7 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.SolrIndividualListController;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -49,10 +49,10 @@ import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.DataGetterUtils;
  * @author bdc34
  *
  */
-public class SolrJsonServlet extends VitroHttpServlet {
+public class JsonServlet extends VitroHttpServlet {
     
     private static final long serialVersionUID = 1L;
-    private static final Log log = LogFactory.getLog(SolrJsonServlet.class);
+    private static final Log log = LogFactory.getLog(JsonServlet.class);
     private static final int REPLY_SIZE = 256;
     
     @Override
@@ -254,11 +254,11 @@ public class SolrJsonServlet extends VitroHttpServlet {
     
     //Including version for Solr query for Vclass Intersections
     private static Map<String,Object> getSolrVClassIntersectionResults(List<String> vclassURIs, VitroRequest vreq, ServletContext context){
-        String alpha = SolrIndividualListController.getAlphaParameter(vreq);
-        int page = SolrIndividualListController.getPageParameter(vreq);
+        String alpha = IndividualListController.getAlphaParameter(vreq);
+        int page = IndividualListController.getPageParameter(vreq);
         Map<String,Object> map = null;
         try {
-	         map = SolrIndividualListController.getResultsForVClassIntersections(
+	         map = IndividualListController.getResultsForVClassIntersections(
 	                 vclassURIs, 
 	                 page, 
 	                 alpha, 
