@@ -99,7 +99,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	        sce.getServletContext().setAttribute(SimpleReasoner.class.getName(),simpleReasoner);
 	        
 	        if (isRecomputeRequired(sce.getServletContext())) {   
-	            log.info("ABox inference recompute required");
+	            log.info("ABox inference recompute required. It will be done in a separate thread.");
 	            
 	            int sleeps = 0;
 	            while (sleeps < 1000 && pelletListener.isReasoning()) {
@@ -112,7 +112,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	            
         		new Thread(new ABoxRecomputer(simpleReasoner),"ABoxRecompuer").start();
 	        } else if ( isMSTComputeRequired(sce.getServletContext()) ) {
-	            log.info("mostSpecificType computation required");
+	            log.info("mostSpecificType computation required. It will be done in a separate thread.");
 	            
 	            int sleeps = 0;
 	            while (sleeps < 1000 && pelletListener.isReasoning()) {
