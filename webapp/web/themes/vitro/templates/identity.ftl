@@ -18,7 +18,9 @@
                         <ul class="dropdown">
                             <li id="user-menu"><a href="#">${user.loginName}</a>
                                 <ul class="sub_menu">
-                                     <li role="listitem"><a href="${urls.myAccount}">My account</a></li>
+                                     <#if urls.myAccount??>
+                                         <li role="listitem"><a href="${urls.myAccount}">My account</a></li>
+                                     </#if>
                                      <li role="listitem"><a href="${urls.logout}">Log out</a></li>
                                 </ul>
                             </li>
