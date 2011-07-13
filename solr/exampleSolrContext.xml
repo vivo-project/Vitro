@@ -5,7 +5,7 @@
         for IPv4 requests, localhost is 127.0.0.1
         for IPv6 requests, localhost is 0:0:0:0:0:0:0:1 -->
     <Valve className="org.apache.catalina.valves.RemoteAddrValve" 
-        allow="127\.0\.0\.1,0:0:0:0:0:0:0:1"/>
+        allow="${vitro.local.solr.ipaddress.mask}"/>
 
    <Environment
         type="java.lang.String" 
