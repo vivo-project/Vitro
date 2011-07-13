@@ -15,17 +15,10 @@ public class SubclassTemplateModel extends BaseTemplateModel implements Comparab
     private final VClass vclass;
     private final List<ObjectPropertyStatementTemplateModel> statements;
     
-    /* A dummy SubclassTemplateModel object is created for statements not belonging to any
-     * real subclass. The template will recognize it because getName() returns an empty string.
-     * This parallels the dummy PropertyGroupTemplateModel created for properties not
-     * belonging to any real group.
-     */ 
-    SubclassTemplateModel(List<ObjectPropertyStatementTemplateModel> statements) {
-        this(null, statements);
-    }
-    
     SubclassTemplateModel(VClass vclass, List<ObjectPropertyStatementTemplateModel> statements) {
-        this.vclass = vclass;
+        // NB vclass may be null. If the statements don't belong to any subclass, a dummy SubclassTemplateModel
+        // is created with a null vclass, so that the data can be presented in a uniform way to the template.
+        this.vclass = vclass; 
         this.statements = statements;
     }
 
