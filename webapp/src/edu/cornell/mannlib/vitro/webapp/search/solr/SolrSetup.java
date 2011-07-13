@@ -85,7 +85,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             modifiers.add(new NameBoost());
             
             IndividualToSolrDocument indToSolrDoc = new IndividualToSolrDocument(
-            		new ProhibitedFromSearch(DisplayVocabulary.PRIMARY_SEARCH_INDEX_URI, displayOntModel),
+            		new ProhibitedFromSearch(DisplayVocabulary.SEARCH_INDEX_URI, displayOntModel),
             		new IndividualProhibitedFromSearchImpl(context), 
             		modifiers);                        
             

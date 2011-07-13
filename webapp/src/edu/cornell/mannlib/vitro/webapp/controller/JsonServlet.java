@@ -329,7 +329,7 @@ public class JsonServlet extends VitroHttpServlet {
 		    .getAttribute("displayOntModel");
     	if (displayOntModel != null) {
 	     	ProhibitedFromSearch pfs = new ProhibitedFromSearch(
-				DisplayVocabulary.PRIMARY_SEARCH_INDEX_URI, displayOntModel);
+				DisplayVocabulary.SEARCH_INDEX_URI, displayOntModel);
 	     	editConfig.setProhibitedFromSearch(pfs);
     	}
 	

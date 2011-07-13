@@ -476,7 +476,7 @@ public class MenuEditingFormGenerator implements EditConfigurationGenerator {
 	                .getAttribute("displayOntModel");
 	        if (displayOntModel != null) {
 	            ProhibitedFromSearch pfs = new ProhibitedFromSearch(
-	                DisplayVocabulary.PRIMARY_SEARCH_INDEX_URI, displayOntModel);
+	                DisplayVocabulary.SEARCH_INDEX_URI, displayOntModel);
 	            if( editConfiguration != null )
 	                editConfiguration.setProhibitedFromSearch(pfs);
 	        }

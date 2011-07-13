@@ -119,7 +119,7 @@ public class ProhibitedFromSearchTest {
 		m.add( r.listStatements() );
 		
 		Assert.assertTrue(m.size() == 1);	
-		ProhibitedFromSearch pfs = new ProhibitedFromSearch( DisplayVocabulary.PRIMARY_SEARCH_INDEX_URI, m);
+		ProhibitedFromSearch pfs = new ProhibitedFromSearch( DisplayVocabulary.SEARCH_INDEX_URI, m);
 		Assert.assertNotNull(pfs.prohibitedClasses);
 		Assert.assertEquals(1, pfs.prohibitedClasses.size() );
 		Assert.assertTrue(pfs.isClassProhibitedFromSearch("http://vivoweb.org/ontology/core#NonAcademic"));
