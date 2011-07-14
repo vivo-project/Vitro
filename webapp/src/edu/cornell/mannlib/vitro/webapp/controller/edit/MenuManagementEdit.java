@@ -130,7 +130,7 @@ public class MenuManagementEdit extends VitroHttpServlet {
     		log.error("Display model not being retrieved correctly");
     	}
     	//if Add, then create new menu item and new page elements, and use the values above
-    	
+    	String errorMessage = "";
     	if(isAdd(command)){
     		processAdd(menuItem, displayModel, command, vreq);
     	}
@@ -141,7 +141,7 @@ public class MenuManagementEdit extends VitroHttpServlet {
     	} else if(isDelete(command)) {
     		processDelete(menuItem, displayModel, command, vreq);
     	} else if(isReorder(command)) {
-    		processReorder(displayModel, vreq, resp);
+    		errorMessage = processReorder(displayModel, vreq);
     	}
     	
     	//Edits to model occur here
@@ -161,32 +161,39 @@ public class MenuManagementEdit extends VitroHttpServlet {
      		displayModel.add(addStatements);
     	
     	} catch(Exception ex) {
-    		
+    		log.error("An error occurred in processing command", ex);
+    		errorMessage += "An error occurred and the operation could not be completed successfully.";
     	}finally {
     		displayModel.leaveCriticalSection();
     	}
     	
+    	//if reorder, need to send back an AJAX response
+    	if(isReorder(command)){
+    		sendReorderResponse(errorMessage, resp);
+    	}
+    	
     }
     
-    private void processReorder(OntModel displayModel, VitroRequest vreq, HttpServletResponse resp) {
-		//Get the new menu positions for all the elements
-    	String predicate = vreq.getParameter("predicate");
-    	//Assuming these two are in the same order
+    private String processReorder(OntModel displayModel, VitroRequest vreq) {
+    	//Assuming individual uris passed in the order of their new menu positions
     	String[]individuals = vreq.getParameterValues("individuals");
-		String[] positions = vreq.getParameterValues("positions");
 		String errorMessage = null;
-		if(individuals.length > 0 && positions.length > 0 && individuals.length == positions.length) {
+		if(individuals.length > 0 ) {
 			removeStatements = removePositionStatements(displayModel, individuals);
-			addStatements = addPositionStatements(displayModel, individuals, positions); 
+			addStatements = addPositionStatements(displayModel, individuals); 
 		} else {
-			errorMessage = "Number of individuals and positions is out of synch";
+			errorMessage = "No individuals passed";
 		}
-		try{
+		return errorMessage;
+	}
+    
+    private void sendReorderResponse(String errorMessage, HttpServletResponse resp) {
+    	try{
 			JSONObject rObj = new JSONObject();
 			resp.setCharacterEncoding("UTF-8");
 			resp.setContentType("application/json;charset=UTF-8");
       
-			if( errorMessage != null ){
+			if( errorMessage != null && !errorMessage.isEmpty()){
 				rObj.put("errorMessage", errorMessage);
 				resp.setStatus(500 /*HttpURLConnection.HTTP_SERVER_ERROR*/);
 			}else{
@@ -197,7 +204,7 @@ public class MenuManagementEdit extends VitroHttpServlet {
 		} catch(Exception ex) {
 			log.error("Error creating JSON object for response", ex);
 		}
-	}
+    }
 
 
 	private Model removePositionStatements(OntModel displayModel,
@@ -218,14 +225,13 @@ public class MenuManagementEdit extends VitroHttpServlet {
 	}
 
 	private Model addPositionStatements(OntModel displayModel,
-			String[] individuals, String[] positions) {
+			String[] individuals) {
 		Model addPositionStatements = ModelFactory.createDefaultModel();
 		int index = 0;
 		int len = individuals.length;
 		for(index = 0; index < len; index++) {
 			Resource individualResource = ResourceFactory.createResource(individuals[index]);
-			int position = new Integer(positions[index]).intValue();
-			
+			int position = index + 1;
 			addPositionStatements.add(addPositionStatements.createStatement(
 					individualResource, 
 					DisplayVocabulary.MENU_POSITION, 

@@ -17,6 +17,10 @@ public class DisplayVocabulary {
     /** <p>The ontology model that holds the vocabulary terms</p> */
     private static OntModel m_model = ModelFactory.createOntologyModel( OntModelSpec.OWL_MEM, null );
     
+    //URL for menu management
+    public static final String PROCESS_MENU_MANAGEMENT_URL = "/processEditDisplayModel";
+    public static final String REORDER_MENU_URL = PROCESS_MENU_MANAGEMENT_URL + "?cmd=Reorder";
+
     /*Uris for Models for Display*/
     
     public static final String DISPLAY_TBOX_MODEL_URI = "http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadataTBOX";
