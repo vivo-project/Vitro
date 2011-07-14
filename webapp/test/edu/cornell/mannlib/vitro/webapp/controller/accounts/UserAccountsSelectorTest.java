@@ -268,6 +268,12 @@ public class UserAccountsSelectorTest extends AbstractTestClass {
 	}
 
 	@Test
+	public void filterAgainstRole2() {
+		selectOnCriteria(20, 1, DEFAULT_ORDERING, NS_MINE + "role2", "");
+		assertSelectedUris(2, "user03", "user10");
+	}
+	
+	@Test
 	public void filterAgainstNoSuchRole() {
 		selectOnCriteria(20, 1, DEFAULT_ORDERING, "BogusRole", "");
 		assertSelectedUris(0);

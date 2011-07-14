@@ -184,7 +184,7 @@ public class UserAccountsSelector {
 		if (!roleFilterUri.isEmpty()) {
 			String clean = escapeForRegex(roleFilterUri);
 			filters += "OPTIONAL { ?uri auth:hasPermissionSet ?role } \n"
-					+ "    FILTER (REGEX(str(?role), '" + clean + "'))";
+					+ "    FILTER (REGEX(str(?role), '^" + clean + "$'))";
 		}
 
 		if ((!roleFilterUri.isEmpty()) && (!searchTerm.isEmpty())) {

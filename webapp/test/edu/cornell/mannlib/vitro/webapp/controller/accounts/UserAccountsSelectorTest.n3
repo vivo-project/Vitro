@@ -103,7 +103,7 @@ mydomain:user07
 	auth:loginCount 1 ;
 #	auth:lastLoginTime NONE ;
 #	auth:status NONE ;
-	auth:hasPermissionSet mydomain:role2 ;
+	auth:hasPermissionSet mydomain:role22 ;
 	.
 	
 mydomain:user08
@@ -153,5 +153,12 @@ mydomain:role1
 mydomain:role2
 	a auth:PermissionSet ;
 	rdfs:label "Role 2" ;
+	.
+	
+# this is intentionally a typographical extension of mydomain:role2 
+#    to test that our reg-exp filters correctly.
+mydomain:role22
+	a auth:PermissionSet ;
+	rdfs:label "Role 22" ;
 	.
 	
