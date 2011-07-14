@@ -16,6 +16,62 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 public class AdditionalURIsForContextNodesTest {
 
+    @Test 
+    public void testPositionChanges(){
+        String n3 = 
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n5423> <http://vivoweb.org/ontology/core#organizationForPosition> <http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n5431> . \n" +
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n5423> <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType> <http://vivoweb.org/ontology/core#AcademicDepartment> . \n" +
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n5423> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#Department> . \n" +
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n5423> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Agent> . \n" +
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n5423> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Thing> . \n" +
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n5423> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Organization> . \n" +
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n5423> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#AcademicDepartment> . \n" +
+                        
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n5431> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#DependentResource> . \n" +
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n5431> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#DependentResource> . \n" +
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n5431> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#Position> . \n" +
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n5431> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Thing> . \n" +
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n5431> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#FacultyPosition> . \n" +
+
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n932> <http://vivoweb.org/ontology/core#personInPosition> <http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n5431> . \n" +
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n932> <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType> <http://vivoweb.org/ontology/core#FacultyMember> . \n" +
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n932> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Agent> . \n" +
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n932> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> . \n" +
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n932> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Thing> . \n" +
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n932> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#FacultyMember> . \n" +                       
+                
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n5398> <http://vivoweb.org/ontology/core#start> <http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n5425> . \n" +
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n5398> <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType> <http://vivoweb.org/ontology/core#DateTimeInterval> . \n" +
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n5398> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Thing> . \n" +
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n5398> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#DateTimeInterval> . \n" +
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n5425> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Thing> . \n" +
+        "<http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n5425> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#DateTimeValue> . \n" +
+
+        "<http://vivoweb.org/ontology/core#AcademicDepartment> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> . \n" +        
+        "<http://vivoweb.org/ontology/core#Position> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> . \n" +
+        "<http://vivoweb.org/ontology/core#FacultyMember> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> . \n" +
+        "<http://xmlns.com/foaf/0.1/Organization> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> . \n" +
+        "<http://xmlns.com/foaf/0.1/Person> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> . \n" +
+        "<http://xmlns.com/foaf/0.1/Agent> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> . \n" +
+        "<http://vivoweb.org/ontology/core#DateTimeInterval> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> . \n" +
+        "<http://vivoweb.org/ontology/core#Department> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> . \n" ;
+        
+        //make a test model with an person, an authorship context node and a book 
+        OntModel model = ModelFactory.createOntologyModel();
+        model.read( new StringReader(n3), null,  "N3");
+                
+        //make an AdditionalURIsForContextNodesTest object with that model
+        AdditionalURIsForContextNodes uriFinder = new AdditionalURIsForContextNodes( model );
+        
+        //if the person changes then the org needs to be updated
+        List<String> uris = uriFinder.findAdditionalURIsToIndex( "http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n932");       
+        assertTrue("did not find org for context node", uris.contains("http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n5423" ));
+        
+        //if the org changes then the person needs to be updated
+        uris = uriFinder.findAdditionalURIsToIndex( "http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n5423");       
+        assertTrue("did not find person for context node", uris.contains("http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n932" ));                        
+    }
+    
     @Test
     public void testPersonOnOrgChange() {                
 
@@ -61,5 +117,7 @@ public class AdditionalURIsForContextNodesTest {
         assertTrue("did not find person for context node", uris.contains("http://vivo.scripps.edu/individual/n14979" ));
                 
     }
+    
+    
 
 }
