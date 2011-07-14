@@ -16,14 +16,14 @@ var menuManagementEdit = {
         this.selectClassGroupDropdown = $('#selectClassGroup');
         this.classesForClassGroup = $('#classesInSelectedGroup');
         this.selectedGroupForPage = $('#selectedContentTypeValue');
-        this.selectClassesMessage = $('#selectClassesMessage');
+        // this.selectClassesMessage = $('#selectClassesMessage');
         this.allClassesSelectedCheckbox = $('#allSelected');
         
     },
     bindEventListeners: function() {        
         // Listeners for vClass switching
         this.changeContentType.click(function() {
-           menuManagementEdit.showClassGroups();
+           menuManagementEdit.showClasses();
            return false;
         });
         this.selectClassGroupDropdown.change(function() {
@@ -42,22 +42,10 @@ var menuManagementEdit = {
             menuManagementEdit.customTemplate.removeClass('hidden');
         });
     },
-    showClassGroups: function() {
-        if(!this.existingContentType.hasClass("hidden")) {
-            this.existingContentType.addClass("hidden");
-            this.selectClassesMessage.addClass("hidden");
-            this.classesForClassGroup.addClass("hidden");
-        } 
-        this.selectContentType.removeClass("hidden");
-
+    showClasses: function() {
+        this.classesForClassGroup.addClass("hidden");
     },
-    hideClassGroups: function() {
-        if(!this.selectContentType.hasClass("hidden")) {
-            
-            this.selectContentType.addClass("hidden");
-        }
-        this.existingContentType.removeClass("hidden");
-        this.selectClassesMessage.removeClass("hidden");
+    hideClasses: function() {
         this.classesForClassGroup.removeClass("hidden");
     },
     toggleClassSelection: function() {
@@ -99,28 +87,25 @@ var menuManagementEdit = {
           } else {
               //update existing content type with correct class group name and hide class group select again
               var _this = menuManagementEdit;
-              menuManagementEdit.hideClassGroups();
+              menuManagementEdit.hideClasses();
       
               menuManagementEdit.selectedGroupForPage.html(results.classGroupName);
                 //retrieve classes for class group and display with all selected
-              menuManagementEdit.classesForClassGroup.empty();
-              var appendHtml = '<ul id="selectedClasses" name="selectedClasses">';
-                appendHtml += '<ul id="selectedClasses" name="selectedClasses">';
-             appendHtml += '<li class="ui-state-default">' + 
-                      '<input type="checkbox" name="allSelected" id="allSelected" value="all" checked="checked" />' +  
-                      '<label class="inline" for="All"> All</label>' +
-               '</li>';
+              var selectedClassesList = menuManagementEdit.classesForClassGroup.children('ul#selectedClasses');
+              
+              selectedClassesList.empty();
+              selectedClassesList.append('<li class="ui-state-default"> <input type="checkbox" name="allSelected" id="allSelected" value="all" checked="checked" /> <label class="inline" for="All"> All</label> </li>');
+              
               $.each(results.classes, function(i, item) {
                   var thisClass = results.classes[i];
                   var thisClassName = thisClass.name;
                   //When first selecting new content type, all classes should be selected
-                  appendHtml += ' <li class="ui-state-default">' + 
+                  appendHtml = ' <li class="ui-state-default">' + 
                           '<input type="checkbox" checked="checked" name="classInClassGroup" value="' + thisClass.URI + '" />' +  
                          '<label class="inline" for="' + thisClassName + '"> ' + thisClassName + '</label>' + 
                           '</li>';
+                  selectedClassesList.append(appendHtml);
               });
-              appendHtml += "</ul>";
-              menuManagementEdit.classesForClassGroup.append(appendHtml);
               menuManagementEdit.toggleClassSelection();
           }
  
