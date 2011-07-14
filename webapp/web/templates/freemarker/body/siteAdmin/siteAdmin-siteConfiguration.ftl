@@ -13,13 +13,8 @@
                 <li><a href="${siteConfig.urls.siteInfo}">Site information</a></li>
             </#if>
             
-            <#if siteConfig.urls.menuN3Editor??>
-                <#-- once new menu management is ready to go, we'll want to remove menu.n3 editor -->
-                <li><a href="${siteConfig.urls.menuN3Editor}">menu.n3 editor</a></li>
-            </#if>
-            
                 <li><a href="${urls.base}/processInstitutionalInternalClass">Institutional internal class</a></li>
-            
+                
             <#if siteConfig.urls.menuManagement??>
                 <li><a href="${siteConfig.urls.menuManagement}">Menu management</a> (in development)</li>
             </#if>
