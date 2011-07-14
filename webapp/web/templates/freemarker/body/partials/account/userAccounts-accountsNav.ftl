@@ -5,6 +5,7 @@
     and delete function.
 ------------------------------------------------------------------------------>
 
+
 <#assign counts=[25, 50, 100] /> <#-- accounts per page-->
 
 <#macro accountsNav accountsCount=counts>
@@ -17,12 +18,13 @@
       -->
 
       <nav class="display-tools">
-          <span>| n accounts | </span>  
+          <span>| ${total} accounts | </span>  
 
           <select name="accountsPerPage" class="accounts-per-page">
               <#list accountsCount as count>
-              <option value="${count}" <#if accountsPerPage= count>selected</#if> >${count}</option>
+              <option value="${count}" <#if accountsPerPage=count>selected</#if> >${count}</option>
               </#list>
+             <option value="${total}" <#if accountsPerPage=total>selected</#if> >All</option>
               <!--     
                   When accountsPerPage changes, 
                   set pageIndex to 1 

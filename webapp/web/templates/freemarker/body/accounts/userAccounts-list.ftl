@@ -44,24 +44,25 @@
         </p>
     </section>
 </#if>
-
-<section id="filter-roles">
-    <select name="roleFilterUri" id="">
-        <option value="" <#if roleFilterUri = "">selected</#if> >Filter by roles</option>
-        <#list roles as role>
-        <option value="${role.uri}" <#if roleFilterUri = role.uri>selected</#if> >${role.label}</option>
-        </#list>
-        <!--
-        When roleFilterUri or searchTerm changes,
-        pageIndex should be set to 1. When any of these changes (including pageIndex), the form 
-        should be submitted.
-        -->
-    </select>
-</section>
+<form method="POST" action="${formUrls.list}" class="customForm" role="filter by roles">
+    <section id="filter-roles">
+        <select name="roleFilterUri" id="roleFilterUri">
+            <option value="" <#if roleFilterUri = "">selected</#if> >Filter by roles</option>
+            <#list roles as role>
+            <option value="${role.uri}" <#if roleFilterUri = role.uri>selected</#if> >${role.label}</option>
+            </#list>
+            <!--
+            When roleFilterUri or searchTerm changes,
+            pageIndex should be set to 1. When any of these changes (including pageIndex), the form 
+            should be submitted.
+            -->
+        </select>
+    </section>
+</form>
 
 <form method="POST" action="${formUrls.list}" class="customForm" role="search accounts">
     <section id="search-accounts">
-        <input type="text" name="" />
+        <input type="text" name="searchTerm" />
         <input class="submit" type="submit" value="Search accounts"/>
         <!--
             When searchTerm changes, 
