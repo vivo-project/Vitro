@@ -54,17 +54,16 @@ var associateProfileFields = {
     },
 
     bindEventListeners: function() {
+        this.idCache = {};
         this.externalAuthIdField.change(function() {
             associateProfileFields.externalAuthIdFieldHasChanged();
         }); 
         this.externalAuthIdField.keyup(function() {
             associateProfileFields.externalAuthIdFieldHasChanged();
         }); 
-
         this.externalAuthIdField.bind("propertychange", function() {
             associateProfileFields.externalAuthIdFieldHasChanged();
         });  
-
         this.externalAuthIdField.bind("input", function() {
             associateProfileFields.externalAuthIdFieldHasChanged();
         });
@@ -84,9 +83,14 @@ var associateProfileFields = {
             associateProfileFields.newProfileClassHasChanged();
         });
         
+        this.acCache = {};  
         this.associateProfileNameField.autocomplete({
             minLength: 3,
             source: function(request, response) {
+                if (request.term in associateProfileFields.acCache) {
+                    response(associateProfileFields.acCache[request.term]);
+                    return;
+                }
                 $.ajax({
                     url: associateProfileFields.ajaxUrl,
                     dataType: 'json',
@@ -97,6 +101,7 @@ var associateProfileFields = {
                     }, 
                     complete: function(xhr, status) {
                         var results = jQuery.parseJSON(xhr.responseText);
+                        associateProfileFields.acCache[request.term] = results;  
                         response(results);
                     }
                 });
@@ -120,8 +125,16 @@ var associateProfileFields = {
     },
     
     externalAuthIdFieldHasChanged: function() {
-        if (this.externalAuthIdField.val().length == 0) {
+        var externalAuthId = this.externalAuthIdField.val();
+        
+        if (externalAuthId.length == 0) {
             this.hideAllOptionals();
+            return;
+        }
+        
+        if (externalAuthId in this.idCache) {
+            var results = this.idCache[externalAuthId];
+            this.applyAjaxResultsForExternalAuthIdField(results)
             return;
         }
 
@@ -131,21 +144,26 @@ var associateProfileFields = {
             data: {
                 action: "checkExternalAuth",
                 userAccountUri: associateProfileFields.userUri,
-                externalAuthId: associateProfileFields.externalAuthIdField.val()
+                externalAuthId: externalAuthId
             },
             complete: function(xhr, status) {
                 var results = $.parseJSON(xhr.responseText);
-                if (results.idInUse) {
-                    associateProfileFields.showExternalAuthInUseMessage()
-                } else if (results.matchesProfile) {
-                    associateProfileFields.showAssociatedProfileArea(results.profileLabel, results.profileUri, results.profileUrl)
-                } else {
-                    associateProfileFields.showAssociatingOptionsArea();
-                }
+                associateProfileFields.idCache[externalAuthId] = results;  
+                associateProfileFields.applyAjaxResultsForExternalAuthIdField(results);
             }
         });
     },
-    
+
+    applyAjaxResultsForExternalAuthIdField: function(results) {
+        if (results.idInUse) {
+            this.showExternalAuthInUseMessage()
+        } else if (results.matchesProfile) {
+            this.showAssociatedProfileArea(results.profileLabel, results.profileUri, results.profileUrl)
+        } else {
+            this.showAssociatingOptionsArea();
+        }
+    },
+        
     openVerifyWindow: function() {
         window.open(this.verifyUrl, 'verifyMatchWindow', 'width=640,height=640,scrollbars=yes,resizable=yes,status=yes,toolbar=no,menubar=no,location=no');
     },
