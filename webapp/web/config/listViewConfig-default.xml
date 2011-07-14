@@ -7,25 +7,31 @@
 
 <list-view-config>
     <query-select>    
-        PREFIX vitro: &lt;http://vitro.mannlib.cornell.edu/ns/vitro/0.7#&gt;
-        PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;  
         PREFIX afn:  &lt;http://jena.hpl.hp.com/ARQ/function#&gt;
-          
+        PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;  
+        PREFIX vitro: &lt;http://vitro.mannlib.cornell.edu/ns/vitro/0.7#&gt;
+        
         SELECT <collated> ?subclass </collated>
-               ?object ?label ?localName WHERE {
+               ?object 
+               ?label 
+               ?localName WHERE {
                
             ?subject ?property ?object
-            LET (?localName := afn:localname(?object)) 
-            <collated> OPTIONAL { ?object a ?subclass } 
+                LET (?localName := afn:localname(?object)) 
+                
+            OPTIONAL { ?object rdfs:label ?label } 
+            
+            <collated> 
+            OPTIONAL { ?object a ?subclass } 
             FILTER ( afn:namespace(?subclass) != "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" )   
-            </collated>
-        OPTIONAL { ?object rdfs:label ?label } 
+            </collated>       
+        
         } ORDER BY <collated> ?subclass </collated> ?label ?label ?localName  
     </query-select>
 
     <query-construct>
-        PREFIX vitro: &lt;http://vitro.mannlib.cornell.edu/ns/vitro/0.7#&gt;
         PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;  
+        PREFIX vitro: &lt;http://vitro.mannlib.cornell.edu/ns/vitro/0.7#&gt;
 
         CONSTRUCT {
             ?subject ?property ?object .
@@ -34,16 +40,13 @@
         } WHERE {
             { 
                 ?subject ?property ?object 
-            }
-            UNION {
+            } UNION {            
                 ?subject ?property ?object .
                 ?object a ?subclass . 
-            } 
-            UNION {
+            } UNION {         
                 ?subject ?property ?object .
                 ?object rdfs:label ?label .
-            } 
-            
+            }             
         }
     </query-construct>
     
