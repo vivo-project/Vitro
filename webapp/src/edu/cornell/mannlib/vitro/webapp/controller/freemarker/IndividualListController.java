@@ -204,7 +204,8 @@ public class IndividualListController extends FreemarkerHttpServlet {
         Map<String,Object> rvMap = new HashMap<String,Object>();  
         try{
              // make query for multiple rdf types 
-	         SolrQuery query = getQuery(vclassURIs, alpha);     
+	         SolrQuery query = getQuery(vclassURIs, alpha); 
+	         log.debug("Executed solr query for " + vclassURIs.toString());
 	         rvMap = getResultsForVClassQuery(query, page, alpha, indDao, context);
 	         List<Individual> individuals = (List<Individual>) rvMap.get("entities");
 		     if (individuals == null) 

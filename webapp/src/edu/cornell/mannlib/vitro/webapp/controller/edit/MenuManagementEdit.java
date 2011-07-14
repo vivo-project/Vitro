@@ -349,10 +349,16 @@ public class MenuManagementEdit extends VitroHttpServlet {
     		if(!internalClassSelected(vreq) && allClassesSelected(vreq)) {
     			dataGetterModel = getClassGroupDataGetter(vreq, dataGetterResource, addModel, displayModel);
     		} else {
-    			dataGetterModel = getIndividualsForClassesDataGetter(vreq, dataGetterResource, addModel, displayModel);
+    			dataGetterModel = getIndividualsForClassesDataGetter(vreq, dataGetterResource, addModel, displayModel, pageResource);
     		}
     		
+    		
     		addModel.add(dataGetterModel);
+    		//Also add special template to page
+    		addModel.add(addModel.createStatement(pageResource, 
+    				DisplayVocabulary.REQUIRES_BODY_TEMPLATE, 
+    				addModel.createTypedLiteral(DisplayVocabulary.INTERNAL_CLASS_TEMPLATE)));
+    				
     		
     	}
 		
@@ -369,12 +375,12 @@ public class MenuManagementEdit extends VitroHttpServlet {
 	}
 	
 	private Model getIndividualsForClassesDataGetter(VitroRequest vreq, Resource dataGetterResource, 
-			Model addModel, OntModel displayModel) {
+			Model addModel, OntModel displayModel, Resource pageResource) {
 		String[] selectedClasses = vreq.getParameterValues("classInClassGroup");
 		Model dgModel = ModelFactory.createDefaultModel();
 		dgModel.add(dgModel.createStatement(dataGetterResource, 
 				RDF.type, 
-				ResourceFactory.createResource(DisplayVocabulary.CLASSINDIVIDUALS_PAGE_TYPE)));
+				ResourceFactory.createResource(DisplayVocabulary.CLASSINDIVIDUALS_INTERNAL_TYPE)));
 		for(String classUri: selectedClasses) {
 			dgModel.add(dgModel.createStatement(
 					dataGetterResource, 
@@ -388,8 +394,8 @@ public class MenuManagementEdit extends VitroHttpServlet {
 			//The value should be the internal class uri
 			dgModel.add(dgModel.createStatement(
 					dataGetterResource, 
-					ResourceFactory.createProperty(DisplayVocabulary.RESTRICT_RESULTS_BY),
-					ResourceFactory.createResource(internalClass)));
+					ResourceFactory.createProperty(DisplayVocabulary.RESTRICT_RESULTS_BY_INTERNAL),
+					dgModel.createLiteral("true")));
 		}
 		return dgModel;
 	}

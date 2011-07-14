@@ -24,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.BrowseDataGetter;
 import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetter;
 import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.ClassGroupPageData;
 import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.IndividualsForClassesDataGetter;
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.InternalClassesDataGetter;
 import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.DataGetterUtils;
 /**
  * Controller for getting data for pages defined in the display model. 
@@ -140,9 +141,10 @@ public class PageController extends FreemarkerHttpServlet{
             getPageDataGetterMap(context).put(cgpd.getType(), cgpd);      
             BrowseDataGetter bdg = new BrowseDataGetter();
             getPageDataGetterMap(context).put(bdg.getType(), bdg);
-            //TODO: Check if can include by type here
             IndividualsForClassesDataGetter cidg =  new IndividualsForClassesDataGetter();
             getPageDataGetterMap(context).put(cidg.getType(), cidg);
+            InternalClassesDataGetter internalCdg =  new InternalClassesDataGetter();
+            getPageDataGetterMap(context).put(internalCdg.getType(), internalCdg);
             
         }
     }

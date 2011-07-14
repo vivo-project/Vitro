@@ -43,6 +43,8 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
     static protected Query classIntersectionPageQuery;
     static protected Query individualsForClassesQuery;
     static protected Query individualsForClassesRestrictedQuery;
+    static protected Query institutionalInternalClassQuery;
+    static protected Query individualsForClassesInternalQuery;
 
 
     static final String prefixes = 
@@ -100,17 +102,7 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
          " 	 ?dg rdf:type <" + DisplayVocabulary.CLASSGROUP_PAGE_TYPE + ">. \n" + 
          " ?dg <" + DisplayVocabulary.FOR_CLASSGROUP + "> ?classGroup . \n" +
          "} \n" ;
-    
-    
-    static final protected String classIntersectionPageQueryString = 
-    	prefixes + "\n" + 
-        "SELECT ?classIntersection ?label ?class ?WHERE { ?pageUri <" + DisplayVocabulary.HAS_CLASS_INTERSECTION + "> ?classIntersection . \n " + 
-        " ?classIntersection <" + DisplayVocabulary.CLASS_INTERSECTION + "> ?class . \n "+
-        " ?classIntersection rdfs:label ?label . \n" +
-        "}";
-    	//prefixes + "\n" + 
-        //"SELECT ?classIntersection WHERE { ?pageUri <" + DisplayVocabulary.CLASS_INTERSECTION + "> ?classIntersection . }";
-
+   
     //Query to get what classes are to be employed on the page 
     static final protected String individualsForClassesDataGetterQueryString = 
     	prefixes + "\n" + 
@@ -122,14 +114,30 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
          "} \n" ;
         
     //Given a data getter, check if results are to be restricted by class
-    //Also possible to merge these two into the same query
-    
     static final protected String individualsForClassesRestrictedQueryString =     
     	prefixes + "\n" +    
     	 "SELECT ?restrictClass WHERE {\n" +
          "    ?dg <"+ DisplayVocabulary.RESTRICT_RESULTS_BY + "> ?restrictClass .\n" +    
          "} \n" ;
-    //	 "    ?pageUri display:hasDataGetter ?dg .\n"+    
+   
+    //Is this data getter using internal class
+    static final protected String institutionalInternalClassQueryString  =     
+    	prefixes + "\n" +    
+   	 "SELECT ?restrictByInternalClass WHERE {\n" +
+        "    ?dg <"+ DisplayVocabulary.RESTRICT_RESULTS_BY_INTERNAL + "> ?restrictsByInternalClass .\n" +    
+        "} \n" ;
+    
+    //Query to get classes employed on internal class page
+    //Query to get what classes are to be employed on the page 
+    static final protected String individualsForClassesInternalQueryString = 
+    	prefixes + "\n" + 
+    	 "SELECT ?dg ?class ?isInternal WHERE {\n" +
+         "    ?pageUri display:hasDataGetter ?dg .\n"+    
+         " 	 ?dg rdf:type <" + DisplayVocabulary.CLASSINDIVIDUALS_INTERNAL_TYPE + ">. \n" + 
+         " ?dg <" + DisplayVocabulary.GETINDIVIDUALS_FOR_CLASS + "> ?class . \n" +
+         "    ?dg <"+ DisplayVocabulary.RESTRICT_RESULTS_BY_INTERNAL + "> ?isInternal .\n" +    
+         "} \n" ;
+    
 	
     static{
         try{    
@@ -167,14 +175,7 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         }catch(Throwable th){
             log.error("could not create SPARQL query for classGroupPageQuery " + th.getMessage());
             log.error(classGroupPageQueryString);
-        }
-        try{    
-            classIntersectionPageQuery=QueryFactory.create(classIntersectionPageQueryString);
-        }catch(Throwable th){
-            log.error("could not create SPARQL query for classIntersectionPageQuery " + th.getMessage());
-            log.error(classIntersectionPageQueryString);
-        }  
-        
+        } 
         try{    
             individualsForClassesQuery=QueryFactory.create(individualsForClassesDataGetterQueryString);
         }catch(Throwable th){
@@ -188,6 +189,23 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
             log.error("could not create SPARQL query for individualsForClassesRestrictedQuery " + th.getMessage());
             log.error(individualsForClassesDataGetterQueryString);
         }  
+        //Check if data getter uses internal class
+        try{    
+            institutionalInternalClassQuery=QueryFactory.create(institutionalInternalClassQueryString);
+        }catch(Throwable th){
+            log.error("could not create SPARQL query for institutionalInternalClassQuery " + th.getMessage());
+            log.error(institutionalInternalClassQueryString);
+        } 
+        //Check which classes set for page and whether or not page should only have internal classes
+        try{    
+            individualsForClassesInternalQuery = QueryFactory.create(individualsForClassesInternalQueryString);
+        }catch(Throwable th){
+            log.error("could not create SPARQL query for individualsForClassesInternalQuery " + th.getMessage());
+            log.error(individualsForClassesInternalQueryString);
+        } 
+        
+        
+        
     }        
     
     public PageDaoJena(WebappDaoFactoryJena wadf) {
@@ -350,52 +368,6 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         }
     }
     
-    /**
-     * Get the set of intersections for page - each intersection has a label and includes names of the classes for class intersection.  Multiple classes possible.
-     */
-    public Map<String, List<String>> getClassIntersections(String pageUri) {
-    	Map<String, List<String>> classIntersectionsMap = new HashMap<String, List<String>>();
-    	 QuerySolutionMap initialBindings = new QuerySolutionMap();
-         initialBindings.add("pageUri", ResourceFactory.createResource(pageUri));
-         
-         Model displayModel = getOntModelSelector().getDisplayModel();
-         displayModel.enterCriticalSection(false);
-         try{
-             QueryExecution qexec = QueryExecutionFactory.create( classIntersectionPageQuery, displayModel , initialBindings);
-             try{
-                //Assuming unique labels or could use URI itself?
-                 //TODO: Review whether to use labels or URIs
-                 
-                
-                 ResultSet resultSet = qexec.execSelect();        
-                 while(resultSet.hasNext()){
-                     QuerySolution soln = resultSet.next();
-                     //Results format should be ?page hasClassIntersection <a>. <a> intersectsWithClass ?c; <a> intersects With Class ?e.
-                     String intersectionLabel = nodeToString(soln.get("label"));
-                     
-                     //first time encountering label, set up
-                     if(!classIntersectionsMap.containsKey(intersectionLabel)) {
-                    	classIntersectionsMap.put(intersectionLabel, new ArrayList<String>());
-                     } 
-                     
-                     List<String> classes = classIntersectionsMap.get(intersectionLabel);
-                     classes.add(nodeToString(soln.get("class")));
-                     //classIntersections.add( nodeToString(soln.get("classIntersection")) );        
-                 }
-                 if( classIntersectionsMap.size() == 0 ){
-                     log.debug("No class intersections info defined in display model for "+ pageUri);
-                     return null;
-                 }
-                    
-            	return classIntersectionsMap;
-             }finally{
-                 qexec.close();
-             }
-         }finally{
-             displayModel.leaveCriticalSection();
-         }
-    }
-   
     
     /*
      * Get the classes for which to get individuals returned. This should return a list of class uris. 
@@ -448,6 +420,44 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         }
     }
     
+    //Get classes for page along with whether or not internal class
+    public Map<String, Object> getClassesAndCheckInternal(String pageUri) {
+   	 	Map<String, Object> classesAndRestrictions = new HashMap<String, Object>();
+    	QuerySolutionMap initialBindings = new QuerySolutionMap();
+        initialBindings.add("pageUri", ResourceFactory.createResource(pageUri));
+        List<String> classes = new ArrayList<String>();
+        
+        Model displayModel = getOntModelSelector().getDisplayModel();
+        displayModel.enterCriticalSection(false);
+        try{
+            QueryExecution qexec = QueryExecutionFactory.create( individualsForClassesInternalQuery, displayModel , initialBindings);
+            try{
+                ResultSet resultSet = qexec.execSelect();        
+                while(resultSet.hasNext()){
+                    QuerySolution soln = resultSet.next();
+                    String dg = nodeToString(soln.get("dg"));
+                    classes.add(nodeToString(soln.get("class")));
+                    String isInternal = nodeToString(soln.get("isInternal"));
+                    if(isInternal != null && !isInternal.isEmpty()) {
+                    	log.debug("Internal value is "+ isInternal);
+                    	//Retrieve and add internal class
+                    	classesAndRestrictions.put("isInternal", isInternal);
+                    }
+                }
+                
+                if( classes.size() == 0 ){
+                    log.debug("No classes  defined in display model for "+ pageUri);
+                    return null;
+                }
+                classesAndRestrictions.put("classes", classes);  
+                return classesAndRestrictions;
+            }finally{
+                qexec.close();
+            }
+        }finally{
+            displayModel.leaveCriticalSection();
+        }
+    }
     
    
     

@@ -242,7 +242,7 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
 	//Get current internal class
 	private String retrieveCurrentInternalClass() {
 		String internalClassUri = "";
-		OntModel mainModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
+		Model mainModel = ModelContext.getBaseOntModelSelector(getServletContext()).getTBoxModel();;
 		StmtIterator internalIt = mainModel.listStatements(null, 
 				ResourceFactory.createProperty(VitroVocabulary.IS_INTERNAL_CLASSANNOT), 
 				(RDFNode) null);

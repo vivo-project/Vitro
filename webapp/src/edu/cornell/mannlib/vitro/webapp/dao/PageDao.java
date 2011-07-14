@@ -22,9 +22,9 @@ public interface PageDao {
     String getHomePageUri();
    
     String getClassGroupPage(String pageUri);
-    
-    Map<String, List<String>> getClassIntersections(String pageUri);
-    
+        
     Map<String, List<String>> getClassesAndRestrictionsForPage(String pageUri);
+
+    Map<String, Object> getClassesAndCheckInternal(String pageUri);
 
 }

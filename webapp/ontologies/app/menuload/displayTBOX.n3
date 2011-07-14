@@ -1,0 +1,85 @@
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+owl:Ontology
+      a       owl:Class .
+
+rdfs:range
+      a       owl:ObjectProperty .
+
+owl:AnnotationProperty
+      a       owl:Class .
+
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#urlMapping>
+      a       owl:DatatypeProperty .
+
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#requiresBodyTemplate>
+      a       owl:DatatypeProperty .
+
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#toPage>
+      a       owl:ObjectProperty .
+
+rdfs:label
+      a       owl:DatatypeProperty .
+
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#excludeClass>
+      a       owl:ObjectProperty .
+
+owl:DatatypeProperty
+      a       owl:Class .
+
+rdfs:comment
+      a       owl:DatatypeProperty .
+
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#forClassGroup>
+      a       owl:ObjectProperty .
+
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#menuPosition>
+      a       owl:DatatypeProperty .
+
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#Page>
+      a       owl:Class .
+
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#HomePage>
+      a       owl:Class .
+
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#hasDataGetter>
+      a       owl:ObjectProperty .
+
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#ClassGroupPage>
+      a       owl:Class .
+
+owl:Class
+      a       owl:Class .
+
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#hasElement>
+      a       owl:ObjectProperty .
+
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#title>
+      a       owl:DatatypeProperty .
+
+owl:ObjectProperty
+      a       owl:Class .
+
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#MainMenu>
+      a       owl:Class .
+
+rdfs:domain
+      a       owl:ObjectProperty .
+
+owl:versionInfo
+      a       owl:DatatypeProperty .
+
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#listViewConfigFile>
+      a       owl:DatatypeProperty .
+
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#linkText>
+      a       owl:DatatypeProperty .
+
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#NavigationElement>
+      a       owl:Class .
+
+<http://vitro.mannlib.cornell.edu/ns/vitro/0.7#customDisplayViewAnnot>
+      a       owl:DatatypeProperty .

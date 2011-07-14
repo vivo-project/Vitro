@@ -276,7 +276,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     			String dataGetterType = dataGetterTypes.nextStatement().getResource().getURI();
     			if(dataGetterType.equals(DisplayVocabulary.CLASSGROUP_PAGE_TYPE)) {
     				this.retrieveClassGroupPage(writeModel, dataGetter, data);
-    			} else if(dataGetterType.equals(DisplayVocabulary.CLASSINDIVIDUALS_PAGE_TYPE)) {
+    			} else if(dataGetterType.equals(DisplayVocabulary.CLASSINDIVIDUALS_INTERNAL_TYPE)) {
     				this.retrieveIndividualsForClassesPage(writeModel, dataGetter, data);
     			} else {
     				//Not sure what to do here
@@ -286,13 +286,14 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     
     }
   
+    //Based on institutional internal page and not general individualsForClasses
     private void retrieveIndividualsForClassesPage(OntModel writeModel,
 		Resource dataGetter, Map<String, Object> data) {
 		data.put("isIndividualsForClassesPage", true);
 		data.put("isClassGroupPage", false);
 		data.put("includeAllClasses", false);
 		//Get the classes and put them here
-		this.getClassesForDataGetter(writeModel, dataGetter, data);
+		this.getClassesForInternalDataGetter(writeModel, dataGetter, data);
 		//Also save the class group for display
 		this.getClassGroupForDataGetter(writeModel, dataGetter, data);
 		this.checkIfPageInternal(writeModel, data);
@@ -301,12 +302,10 @@ public class MenuManagementController extends FreemarkerHttpServlet {
 
 	private void checkIfPageInternal(OntModel writeModel,
 			Map<String, Object> data) {
-		if(data.containsKey("internalClass") && data.containsKey("restrictClasses")) {
-			List<String> restrictClasses = (List<String>)data.get("restrictClasses");
-			String internalClass = (String) data.get("internalClass");
-			if(restrictClasses.contains(internalClass)) {
-				data.put("pageInternalOnly", true);
-			}
+		//if internal class exists, and data getter indicates page is internal
+		if(data.containsKey("internalClass") && data.containsKey("isInternal")) {
+			data.put("pageInternalOnly", true);
+			
 		}
 		
 	}
@@ -324,7 +323,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
 
 	//Instead of returning vclasses, just returning class Uris as vclasses appear to need their own template
 	//to show up correctly
-	private void getClassesForDataGetter(OntModel writeModel, Resource dataGetter,
+	private void getClassesForInternalDataGetter(OntModel writeModel, Resource dataGetter,
 			Map<String, Object> data) {
     	
 
@@ -344,22 +343,20 @@ public class MenuManagementController extends FreemarkerHttpServlet {
 		//This checks whether restrict classes returned and include institutional internal class
 		//TODO: Create separate method to get restricted classes
 		//Get restrict classes - specifically internal class 
-		List<String> restrictClassUris = new ArrayList<String>();
-		StmtIterator restrictClassesIt = writeModel.listStatements(dataGetter, 
-				ResourceFactory.createProperty(DisplayVocabulary.RESTRICT_RESULTS_BY), 
-				(RDFNode) null);
-		while(restrictClassesIt.hasNext()) {
-			String restrictClassUri = restrictClassesIt.nextStatement().getResource().getURI();
-    		restrictClassUris.add(restrictClassUri);
-		}
-		data.put("restrictClasses", restrictClassUris);
 		
+		StmtIterator internalIt = writeModel.listStatements(dataGetter, 
+				ResourceFactory.createProperty(DisplayVocabulary.RESTRICT_RESULTS_BY_INTERNAL), 
+				(RDFNode) null);
+		if(internalIt.hasNext()) {
+			data.put("isInternal", internalIt.nextStatement().getLiteral().getString());
+		}
 		
 	}
 	
 	
 	//Check whether any classes exist with internal class restrictions
 	private void checkInstitutionalInternalClass(Map<String, Object> data) {
+		//TODO: replace with more generic ModelContext retrieval method
 		OntModel mainModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
 		StmtIterator internalIt = mainModel.listStatements(null, ResourceFactory.createProperty(VitroVocabulary.IS_INTERNAL_CLASSANNOT), (RDFNode) null);
 		//List<String> internalClasses = new ArrayList<String>();
