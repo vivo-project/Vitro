@@ -87,7 +87,7 @@ public class User extends BaseTemplateModel {
     	return PolicyHelper.isAuthorizedForActions(vreq, RevisionInfoController.REQUIRED_ACTIONS);
     }
     
-    public boolean getHasSearchIndexRebuildAccess() {
+    public boolean isAuthorizedToRebuildSearchIndex() {
         return PolicyHelper.isAuthorizedForActions(vreq, IndexController.REQUIRED_ACTIONS);
     }
     
