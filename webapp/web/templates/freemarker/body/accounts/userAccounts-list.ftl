@@ -44,12 +44,13 @@
         </p>
     </section>
 </#if>
-<form method="POST" action="${formUrls.list}" class="customForm" role="filter by roles">
-    <section id="filter-roles">
+
+<section id="filter-roles">
+    <form method="POST" action="${formUrls.list}" class="customForm" role="filter by roles">
         <select name="roleFilterUri" id="roleFilterUri">
             <option value="" <#if roleFilterUri = "">selected</#if> >Filter by roles</option>
             <#list roles as role>
-            <option value="${role.uri}" <#if roleFilterUri = role.uri>selected</#if> >${role.label}</option>
+            <option value="${formUrls.list}?roleFilterUri=${role.uri}" <#if roleFilterUri = role.uri>selected</#if> >${role.label}</option>
             </#list>
             <!--
             When roleFilterUri or searchTerm changes,
@@ -57,11 +58,11 @@
             should be submitted.
             -->
         </select>
-    </section>
-</form>
+    </form>
+</section>
 
-<form method="POST" action="${formUrls.list}" class="customForm" role="search accounts">
-    <section id="search-accounts">
+<section id="search-accounts">
+    <form method="POST" action="${formUrls.list}" class="customForm" role="search accounts">
         <input type="text" name="searchTerm" />
         <input class="submit" type="submit" value="Search accounts"/>
         <!--
@@ -71,8 +72,8 @@
             set orderField to "email" 
             submit the form (submit action is "list") 
         -->
-    </section>
-</form>
+    </form>
+</section>
 
 <form method="POST" action="${formUrls.list}" id="account-display" class="customForm" role="accounts display">
     <@p.accountsNav />
