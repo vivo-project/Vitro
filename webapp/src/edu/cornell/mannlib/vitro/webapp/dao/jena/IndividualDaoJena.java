@@ -217,19 +217,10 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
            
         String entURI = null;
         
-    	Resource cls = null;
-        OntModel tboxModel = getOntModelSelector().getTBoxModel();
-        tboxModel.enterCriticalSection(Lock.READ);
-        try {
-            try {
-                cls = tboxModel.getOntClass(ent.getVClassURI());
-            } catch (Exception e) {}
-            if (cls==null) {
-                cls = OWL.Thing; // This assumes we want OWL-DL compatibility. Individuals cannot be untyped.
-            }
-        } finally {
-        	tboxModel.leaveCriticalSection();
-        }
+    	Resource cls = (ent.getVClassURI() != null) 
+            ? ontModel.getResource(ent.getVClassURI())
+            : OWL.Thing; // This assumes we want OWL-DL compatibility.
+                         // Individuals cannot be untyped.
         
         ontModel.enterCriticalSection(Lock.WRITE);
         try {
