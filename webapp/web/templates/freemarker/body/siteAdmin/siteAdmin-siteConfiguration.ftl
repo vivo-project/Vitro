@@ -18,8 +18,10 @@
                 <li><a href="${siteConfig.urls.menuN3Editor}">menu.n3 editor</a></li>
             </#if>
             
+                <li><a href="${urls.base}/processInstitutionalInternalClass">Institutional internal class</a></li>
+            
             <#if siteConfig.urls.menuManagement??>
-                <li><a href="${siteConfig.urls.menuManagement}">Menu Management</a> (in development)</li>
+                <li><a href="${siteConfig.urls.menuManagement}">Menu management</a> (in development)</li>
             </#if>
             
             <#if siteConfig.urls.userList??>
@@ -29,3 +31,4 @@
         </ul>
     </div>
 </#if>
+
