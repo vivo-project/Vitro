@@ -49,10 +49,7 @@ public class FileBasedProhibitedFromSearch extends ProhibitedFromSearch {
         
         if( modelOnlyForPFS.size() == 0 ){
             log.warn("No class exclusion statements found.");
-        }       
-        
-        
-        modelOnlyForPFS.write( System.out , "N3-PP");
+        }                       
         
         return modelOnlyForPFS;
     }
