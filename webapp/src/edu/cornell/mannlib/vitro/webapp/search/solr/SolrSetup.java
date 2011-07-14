@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.solr;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.apache.solr.client.solrj.impl.XMLResponseParser;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
+import com.hp.hpl.jena.tdb.base.file.FileBase;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
@@ -30,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.search.IndexConstants;
 import edu.cornell.mannlib.vitro.webapp.search.beans.AdditionalURIsToIndex;
+import edu.cornell.mannlib.vitro.webapp.search.beans.FileBasedProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearchImpl;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForContextNodes;
@@ -84,8 +87,13 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             modifiers.add(new ContextNodeFields(jenaOntModel));
             modifiers.add(new NameBoost());
             
-            IndividualToSolrDocument indToSolrDoc = new IndividualToSolrDocument(
-            		new ProhibitedFromSearch(DisplayVocabulary.SEARCH_INDEX_URI, displayOntModel),
+            // setup probhibited froms earch based on N3 files in the
+            // directory WEB-INF/ontologies/search
+            File dir = new File(sce.getServletContext().getRealPath("/WEB-INF/ontologies/search"));            
+            ProhibitedFromSearch pfs = new FileBasedProhibitedFromSearch(DisplayVocabulary.SEARCH_INDEX_URI, dir);
+            
+            IndividualToSolrDocument indToSolrDoc = new IndividualToSolrDocument(            
+                    pfs,
             		new IndividualProhibitedFromSearchImpl(context), 
             		modifiers);                        
             

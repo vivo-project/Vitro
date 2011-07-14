@@ -32,7 +32,7 @@ public class ProhibitedFromSearch implements ClassProhibitedFromSearch{
 	private static final String queryForProhibitedClasses = "SELECT ?prohibited WHERE{" +
 			"?searchConfig <" + DisplayVocabulary.EXCLUDE_CLASS + "> ?prohibited . }";
 		
-	private static final Log log = LogFactory.getLog(ProhibitedFromSearch.class.getName()); 
+	protected static final Log log = LogFactory.getLog(ProhibitedFromSearch.class.getName()); 
 		
 	public ProhibitedFromSearch(String URI, OntModel model){
 		this.ProhibitedFromSearchURI = URI;
