@@ -1172,6 +1172,12 @@ public class SimpleReasoner extends StatementListener {
 				} catch (NullPointerException npe) {
 					log.error("a NullPointerException was received while computing mostSpecificType annotations. Halting inference computation.");	
 					return;
+				} catch (JenaException je) {
+					 if (je.getMessage().equals("Statement models must no be null")) {
+						 log.error("Exception while computing mostSpecificType annotations.: " + je.getMessage() + ". Halting inference computation.");
+		                 return; 
+					 } 
+					 log.error("Exception while computing mostSpecificType annotations.: " + je.getMessage());	
 				} catch (Exception e) {
 					log.error("Exception while computing mostSpecificType annotations", e);	
 				}
