@@ -280,7 +280,7 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
             
             + " ?uri rdf:type foaf:Organization . \n"                        
             + " ?uri core:organizationForPosition ?positionNode .\n" 
-            + " ?positionNode core:positionForPerson ?person . \n"
+            + " ?person core:personInPosition ?positionNode . \n"
             +"}" );
         
         
@@ -291,7 +291,7 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
             
             + " ?uri rdf:type foaf:Person . \n"       
             + " ?uri core:personInPosition ?positionNode .\n" 
-            + " ?positionNode core:positionForOrganization ?org . \n"
+            + " ?org core:organizationForPosition ?positionNode . \n"
             +"}" );
         return queries;     
     }
