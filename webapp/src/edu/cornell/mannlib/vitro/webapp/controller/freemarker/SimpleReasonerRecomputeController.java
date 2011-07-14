@@ -35,33 +35,30 @@ public class SimpleReasonerRecomputeController extends FreemarkerHttpServlet {
         	
         	Object simpleReasoner = vreq.getSession().getServletContext().getAttribute(SimpleReasoner.class.getName());
         	
-            if ((simpleReasoner instanceof SimpleReasoner) && !((SimpleReasoner)simpleReasoner).isABoxReasoningAsynchronous()) {
+            if (!(simpleReasoner instanceof SimpleReasoner)) {
                 messageStr = "No SimpleReasoner has been set up.";
+            } else if ( ((SimpleReasoner)simpleReasoner).isABoxReasoningAsynchronous() ) {
+                messageStr = "mostSpecificType annotations are currently being computed and so a recompute can not be started. Please try again later.";
             } else {
             	String signal = (String) vreq.getParameter("signal");
-            	
-        	    if (simpleReasoner instanceof SimpleReasoner) {
-        	    	 
- 	                if (((SimpleReasoner)simpleReasoner).isRecomputing()) {
-	                    messageStr = 
-	                         "The SimpleReasoner is currently in the process of " +
-	                         "recomputing inferences.";
-	                } else{
-	                	String restart = (String)getServletContext().getAttribute("restart");
-	                	if(restart == null || restart.equals("showButton") || signal == null){
-	                		body.put("link", "show");
-	                    	messageStr = null;
-	                    	getServletContext().setAttribute("restart", "yes");
-	                	}
-	                	else if(signal!=null && signal.equals("Recompute")){
-	                		new Thread(new Recomputer(((SimpleReasoner)simpleReasoner))).start();
-	                        messageStr = "Recomputation of inferences started";
-	                        getServletContext().setAttribute("restart", "showButton");
-	                	}	
-	                }
-        	    } else {
-        	    	log.equals("The attribute with name " + SimpleReasoner.class.getName() + " is not an instance of SimpleReasoner");
-        	    }
+            	    	 
+                if (((SimpleReasoner)simpleReasoner).isRecomputing()) {
+                    messageStr = 
+                         "The SimpleReasoner is currently in the process of " +
+                         "recomputing inferences.";
+                } else{
+                	String restart = (String)getServletContext().getAttribute("restart");
+                	if(restart == null || restart.equals("showButton") || signal == null){
+                		body.put("link", "show");
+                    	messageStr = null;
+                    	getServletContext().setAttribute("restart", "yes");
+                	}
+                	else if(signal!=null && signal.equals("Recompute")){
+                		new Thread(new Recomputer(((SimpleReasoner)simpleReasoner))).start();
+                        messageStr = "Recomputation of inferences started";
+                        getServletContext().setAttribute("restart", "showButton");
+                	}	
+                }
             }
             
         } catch (Exception e) {
