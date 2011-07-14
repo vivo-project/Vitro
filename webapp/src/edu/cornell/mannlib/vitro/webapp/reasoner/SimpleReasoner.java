@@ -7,8 +7,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -951,17 +949,26 @@ public class SimpleReasoner extends StatementListener {
 		aboxModel.enterCriticalSection(Lock.WRITE);	
 		tboxModel.enterCriticalSection(Lock.READ);
 		
+		StmtIterator iter = null;
+		
 		try {
 			log.info("Computing class-based ABox inferences.");
 			inferenceRebuildModel.removeAll();
-			StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, (RDFNode) null);
+			iter = aboxModel.listStatements((Resource) null, RDF.type, (RDFNode) null);
 			
 			int numStmts = 0;
 			
-			while (iter.hasNext()) {				
+			while (iter.hasNext()) {	
 				Statement stmt = iter.next();
-				addedABoxTypeAssertion(stmt, inferenceRebuildModel, unknownTypes);
-				setMostSpecificTypes(stmt.getSubject(), inferenceRebuildModel, unknownTypes);
+				try {
+					addedABoxTypeAssertion(stmt, inferenceRebuildModel, unknownTypes);
+					setMostSpecificTypes(stmt.getSubject(), inferenceRebuildModel, unknownTypes);
+				} catch (NullPointerException npe) {
+                	log.error("a NullPointerException was received while recomputing the ABox inferences. Halting inference computation.");
+                    return;
+				} catch (Exception e) {
+					 log.error("Exception while recomputing ABox inference model", e);
+				}
 				
 				numStmts++;
                 if ((numStmts % 8000) == 0) {
@@ -1023,6 +1030,7 @@ public class SimpleReasoner extends StatementListener {
                                                 // where there isn't an exception
 			 return;
 		} finally {
+			 iter.close();
    			 aboxModel.leaveCriticalSection();
 			 tboxModel.leaveCriticalSection();
 			 inferenceRebuildModel.leaveCriticalSection();
@@ -1043,7 +1051,7 @@ public class SimpleReasoner extends StatementListener {
 			
 			try {
 				scratchpadModel.removeAll();
-				StmtIterator iter = inferenceModel.listStatements();
+				iter = inferenceModel.listStatements();
 				
 				while (iter.hasNext()) {				
 					Statement stmt = iter.next();
@@ -1064,6 +1072,7 @@ public class SimpleReasoner extends StatementListener {
 			} catch (Exception e) {
 				log.error("Exception while reconciling the current and recomputed ABox inference models", e);
 			} finally {
+				iter.close();
 	            inferenceModel.leaveCriticalSection();
 			}
 			
@@ -1072,6 +1081,7 @@ public class SimpleReasoner extends StatementListener {
 				inferenceModel.remove(scratchpadModel);
 			} catch (Exception e){
 				log.error("Exception while reconciling the current and recomputed ABox inference models", e);
+				return;
 			} finally {
 				inferenceModel.leaveCriticalSection();
 			}
@@ -1082,7 +1092,7 @@ public class SimpleReasoner extends StatementListener {
 			
 			try {
 				scratchpadModel.removeAll();
-				StmtIterator iter = inferenceRebuildModel.listStatements();
+				iter = inferenceRebuildModel.listStatements();
 				
 				while (iter.hasNext()) {				
 					Statement stmt = iter.next();
@@ -1102,7 +1112,9 @@ public class SimpleReasoner extends StatementListener {
 				}
 			} catch (Exception e) {		
 				log.error("Exception while reconciling the current and recomputed ABox inference models", e);
+				return;
 			} finally {
+				iter.close();
 				inferenceModel.leaveCriticalSection();			
 			}
 			
@@ -1111,6 +1123,7 @@ public class SimpleReasoner extends StatementListener {
 				inferenceModel.add(scratchpadModel);
 			} catch (Exception e){
 				log.error("Exception while reconciling the current and recomputed ABox inference models", e);
+				return;
 			} finally {
 				inferenceModel.leaveCriticalSection();
 			}
@@ -1127,7 +1140,7 @@ public class SimpleReasoner extends StatementListener {
 	/*
 	 * Special for version 1.3 
 	 */
-	public synchronized void recomputeMostSpecificType() {
+	public synchronized void computeMostSpecificType() {
 		
 		HashSet<String> unknownTypes = new HashSet<String>();
 		
@@ -1136,16 +1149,26 @@ public class SimpleReasoner extends StatementListener {
 		aboxModel.enterCriticalSection(Lock.WRITE);	
 		tboxModel.enterCriticalSection(Lock.READ);
 		
+		StmtIterator iter = null;
+		
 		try {
 			inferenceRebuildModel.removeAll();
-			StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, (RDFNode) null);
+			iter = aboxModel.listStatements((Resource) null, RDF.type, (RDFNode) null);
 			
 			log.info("Computing mostSpecificType annotations.");
 			int numStmts = 0;
 			
 			while (iter.hasNext()) {				
 				Statement stmt = iter.next();
-				setMostSpecificTypes(stmt.getSubject(), inferenceRebuildModel, unknownTypes);
+				
+				try {
+				    setMostSpecificTypes(stmt.getSubject(), inferenceRebuildModel, unknownTypes);
+				} catch (NullPointerException npe) {
+					log.error("a NullPointerException was received while computing mostSpecificType annotations. Halting inference computation.");	
+					return;
+				} catch (Exception e) {
+					log.error("Exception while computing mostSpecificType annotations", e);	
+				}
 				
 				numStmts++;
                 if ((numStmts % 8000) == 0) {
@@ -1153,7 +1176,7 @@ public class SimpleReasoner extends StatementListener {
                 }
                 
                 if (stopRequested) {
-                	log.info("a stopRequested signal was received during recomputeMostSpecificType. Halting Processing.");
+                	log.info("a stopRequested signal was received during computeMostSpecificType. Halting Processing.");
                 	return;
                 }
 			}
@@ -1163,6 +1186,7 @@ public class SimpleReasoner extends StatementListener {
                                                 // where there isn't an exception
 			 return;
 		} finally {
+			 iter.close();
    			 aboxModel.leaveCriticalSection();
 			 tboxModel.leaveCriticalSection();
 			 inferenceRebuildModel.leaveCriticalSection();
@@ -1183,7 +1207,7 @@ public class SimpleReasoner extends StatementListener {
 			
 			try {
 				scratchpadModel.removeAll();
-				StmtIterator iter = inferenceRebuildModel.listStatements();
+				iter = inferenceRebuildModel.listStatements();
 			
 				int numStmts = 0;
 				
@@ -1205,7 +1229,9 @@ public class SimpleReasoner extends StatementListener {
 				}
 			} catch (Exception e) {		
 				log.error("Exception while reconciling the current and recomputed ABox inference models", e);
+				return;
 			} finally {
+				iter.close();
 				inferenceModel.leaveCriticalSection();			
 			}
 			
@@ -1214,6 +1240,7 @@ public class SimpleReasoner extends StatementListener {
 				inferenceModel.add(scratchpadModel);
 			} catch (Exception e){
 				log.error("Exception while reconciling the current and recomputed ABox inference models", e);
+				return;
 			} finally {
 				inferenceModel.leaveCriticalSection();
 			}
@@ -1311,17 +1338,17 @@ public class SimpleReasoner extends StatementListener {
     	    		retractions.removeAll();	
     	   			retractions.leaveCriticalSection();
     			}			
-    			
-                if (abort) {
-                	log.info("a NullPointerException was received while computing inferences in batch " + qualifier + " mode. Halting inference computation.");
-                	return;
-                }
-                
+ 
                 if (stopRequested) {
                 	log.info("a stopRequested signal was received during DeltaComputer.run. Halting Processing.");
                 	return;
                 }
-    			
+                
+                if (abort) {
+                	log.error("a NullPointerException was received while computing inferences in batch " + qualifier + " mode. Halting inference computation.");
+                	return;
+                }
+                
    				log.info("finished computing inferences for batch " + qualifier + " update");
    				
     			if (batchMode1 && (aBoxDeltaModeler2.getRetractions().size() > 0)) {

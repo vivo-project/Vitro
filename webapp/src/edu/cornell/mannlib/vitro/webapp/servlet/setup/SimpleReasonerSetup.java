@@ -110,7 +110,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	                sleeps++;
 	            }
 	            
-        		new Thread(new ABoxRecomputer(simpleReasoner),"ABoxRecompuer").start();
+        		new Thread(new ABoxRecomputer(simpleReasoner),"ABoxRecomputer").start();
 	        } else if ( isMSTComputeRequired(sce.getServletContext()) ) {
 	            log.info("mostSpecificType computation required. It will be done in a separate thread.");
 	            
@@ -200,7 +200,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
         }
         
         public void run() {
-        	simpleReasoner.recomputeMostSpecificType();      		
+        	simpleReasoner.computeMostSpecificType();      		
         }
     }
 }
