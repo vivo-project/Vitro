@@ -342,6 +342,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
           target: deploySolr                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="deploySolr" depends="prepareSolr" unless="noSolrDeploy">
+		<unwar src="${solr.docbase}" dest="${tomcat.home}/webapps/${solr.context.name}" />
 		<copy todir="${tomcat.home}/conf/Catalina/localhost" overwrite="true" >
 			<fileset file="${solr.context.config}" />
 		</copy>

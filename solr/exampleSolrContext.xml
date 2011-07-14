@@ -1,5 +1,4 @@
-<Context docBase="${solr.docbase}" 
-    crossContext="true" override="true">
+<Context crossContext="true" override="true">
 
    <!-- For security, restrict access to clients on this machine
         for IPv4 requests, localhost is 127.0.0.1
