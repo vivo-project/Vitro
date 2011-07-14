@@ -15,9 +15,10 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.rdf.model.RDFNode;
-
+import com.hp.hpl.jena.rdf.model.Statement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
@@ -63,15 +64,14 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
     	retrieveLocalClasses(vreq, data);
     	if(isSubmission(vreq)){
     		processSubmission(vreq, data);
-    	} else if(isSelectExistingClass(vreq)) {
-    		//Local namespace(s) exist and user can select an existing class
-    		processSelectExistingClass(vreq, data);
-    		
     	} else if(isCreateNewClass(vreq)) {
     		//Local namespace(s) exist and user wishes to create a new class
     		//Either cmd = create new or no local classes exist at all and one must be created
     		processCreateNewClass(vreq, data);
-    	} else if(isCreateOntologies(vreq)) {
+    	} else if(isSelectExistingClass(vreq)) {
+    		//Local namespace(s) exist and user can select an existing class
+    		processSelectExistingClass(vreq, data);
+    	}  else if(isCreateOntologies(vreq)) {
     		//Not being handled expliclity but message will display indicating
     		//no local namespaces exist and one must be created
     		processCreateOntologies(vreq, data);
@@ -240,7 +240,10 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
 				ResourceFactory.createProperty(VitroVocabulary.IS_INTERNAL_CLASSANNOT), 
 				(RDFNode) null);
 		if(internalIt.hasNext()){
-			internalClassUri = internalIt.nextStatement().getResource().getURI();
+			Statement s = internalIt.nextStatement();
+			if(s.getObject().isResource()){
+				internalClassUri = internalIt.nextStatement().getResource().getURI();
+			}
 		}
 		return internalClassUri;
 	}

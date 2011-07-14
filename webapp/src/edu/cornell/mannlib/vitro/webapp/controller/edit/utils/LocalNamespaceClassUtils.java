@@ -30,7 +30,9 @@ public class LocalNamespaceClassUtils {
     	   String classUri = v.getURI();
     	   System.out.println("uri is " + classUri + " and namespace is " + classNamespace);
     	   if(namespaces.containsKey(classNamespace)){
-    		   localClasses.put(classUri, v.getName() + " ( " + namespaces.get(classNamespace) + ")");
+    		   String namespaceLabel = namespaces.get(classNamespace);
+    		   String prefix = namespaceLabel.substring(namespaceLabel.indexOf("(") + 1, namespaceLabel.indexOf(")"));
+    		   localClasses.put(classUri, v.getName() + " ( " + prefix + ")");
     	   }
        }
        return localClasses;
