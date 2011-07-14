@@ -79,7 +79,6 @@ var associateProfileFields = {
         });   
         
         this.newProfileClassSelector.change(function() {
-            console.log('selector has changed.')
             associateProfileFields.newProfileClassHasChanged();
         });
         
