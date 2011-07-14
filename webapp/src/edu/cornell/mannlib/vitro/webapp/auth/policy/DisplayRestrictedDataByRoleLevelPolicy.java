@@ -51,6 +51,14 @@ public class DisplayRestrictedDataByRoleLevelPolicy implements PolicyIface {
 		}
 
 		RoleLevel userRole = HasRoleLevel.getUsersRoleLevel(whoToAuth);
+		/*
+		 * This policy treats a self-editor as no better than public. If you
+		 * want self-editors to see their own properties, some other policy must
+		 * grant that.
+		 */
+		if (userRole == RoleLevel.SELF) {
+			userRole = RoleLevel.PUBLIC;
+		}
 
 		PolicyDecision result;
 		if (whatToAuth instanceof DisplayDataProperty) {
@@ -66,7 +74,7 @@ public class DisplayRestrictedDataByRoleLevelPolicy implements PolicyIface {
 		} else {
 			result = defaultDecision("Unrecognized action");
 		}
-		
+
 		log.debug("decision for '" + whatToAuth + "' is " + result);
 		return result;
 	}
