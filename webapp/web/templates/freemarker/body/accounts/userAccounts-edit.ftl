@@ -87,21 +87,13 @@
             </div>
         <#else>
             <div id="passwordContainer" <#if externalAuthOnly?? >class="hidden"</#if> >
-                <table>
-                    <tr>
-                        <td>
-                            <label for="new-password">New password<span class="requiredHint"> *</span></label>
-                            <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
-                        </td>
-                        <td>&nbsp;</td>
-                        <td>
-                            <label for="confirm-password">Confirm new password<span class="requiredHint"> *</span></label> 
-                            <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
-                        </td>
-                    </tr>
-                </table>
+
+                <label for="new-password">New password</label>
+                <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
                 <p class="explanatoryText" style="margin-top:-8px">Minimum of ${minimumLength} characters in length.</p>
                 <p class="explanatoryText">Leaving this blank means that the password will not be changed.</p>
+                <label for="confirm-password">Confirm new password</label> 
+                <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
             </div>
         </#if>
         <br />
