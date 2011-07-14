@@ -341,6 +341,7 @@ public class VClassGroupCache {
             ServletContext servletContext = sce.getServletContext();
             VClassGroupCache vcgc = new VClassGroupCache(servletContext);
             servletContext.setAttribute(ATTRIBUTE_NAME,vcgc);
+            log.info("Building initial VClassGroupCache");
             vcgc.doSynchronousRebuild();            
             log.info("VClassGroupCache added to context");            
         }
