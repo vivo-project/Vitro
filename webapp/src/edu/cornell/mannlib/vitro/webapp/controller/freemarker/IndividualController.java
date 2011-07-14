@@ -47,6 +47,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Rdf
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
@@ -142,6 +143,8 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        body.put("individual", wrap(itm, BeansWrapper.EXPOSE_SAFE));
 	        body.put("headContent", getRdfLinkTag(itm));	       
 	        
+	        //If special values required for individuals like menu, include values in template values
+	        this.includeSpecialEditingValues(vreq, body);
 	        String template = getIndividualTemplate(individual, vreq);
 	                
 	        return new TemplateResponseValues(template, body);
@@ -208,6 +211,13 @@ public class IndividualController extends FreemarkerHttpServlet {
         }
         
         return map;
+    }
+    
+    //Get special values for cases such as Menu Management editing
+    private void includeSpecialEditingValues(VitroRequest vreq, Map<String, Object> body) {
+    	if(vreq.getAttribute(VitroRequest.SPECIAL_WRITE_MODEL) != null) {
+    		body.put("reorderUrl", DisplayVocabulary.REORDER_MENU_URL);
+    	}
     }
     
     private Map<String, Object> getRelatedSubject(VitroRequest vreq) {

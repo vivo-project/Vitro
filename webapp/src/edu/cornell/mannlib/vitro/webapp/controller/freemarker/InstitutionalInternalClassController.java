@@ -33,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.LocalNamespaceClassUtils;
 /*
  * Custom controller for menu management.  This will be replaced later once N3 Editing
@@ -131,8 +132,8 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
 	}
 
 	private void processSelectExistingClass(VitroRequest vreq, Map<String, Object> data) {
-		//Check if internal class is already set and be sure to include that in the data to be returned
-		data.put("useExistingInternalClass", true);
+		//Check if local classes exist and use for selection
+		data.put("useExistingLocalClass", true);
 		data.put("submitAction", "Save");
 	}
 
@@ -188,13 +189,18 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
 		if(classUri != null && !classUri.isEmpty()) {
 			Model writeModel = ModelContext.getBaseOntModelSelector(getServletContext()).getTBoxModel();
 			writeModel.enterCriticalSection(Lock.WRITE);
+			writeModel.notifyEvent(new EditEvent(null,true));
 			try {
+				log.debug("Should be removing these statements " + writeModel.listStatements(null, 
+						ResourceFactory.createProperty(VitroVocabulary.IS_INTERNAL_CLASSANNOT), 
+						(RDFNode) null).toList().toString());
 				//remove existing internal classes if there are any as assuming only one
-				writeModel.remove(
-						writeModel.listStatements(null, 
+				writeModel.removeAll(null, 
 								ResourceFactory.createProperty(VitroVocabulary.IS_INTERNAL_CLASSANNOT), 
-								(RDFNode) null));
-				
+								(RDFNode) null);
+				log.debug("Are there any statements left for internal class annotation:  " + writeModel.listStatements(null, 
+						ResourceFactory.createProperty(VitroVocabulary.IS_INTERNAL_CLASSANNOT), 
+						(RDFNode) null).toList().toString());
 				writeModel.add(
 						writeModel.createStatement(
 								ResourceFactory.createResource(classUri),
@@ -203,6 +209,7 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
 			} catch(Exception ex) {
 				log.error("Error occurred in adding statement for " + classUri + " becoming internal class", ex);
 			} finally {
+				writeModel.notifyEvent(new EditEvent(null,true));
 				writeModel.leaveCriticalSection();
 			}
 		}
@@ -239,11 +246,11 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
 		StmtIterator internalIt = mainModel.listStatements(null, 
 				ResourceFactory.createProperty(VitroVocabulary.IS_INTERNAL_CLASSANNOT), 
 				(RDFNode) null);
-		if(internalIt.hasNext()){
+		while(internalIt.hasNext()){
 			Statement s = internalIt.nextStatement();
-			if(s.getObject().isResource()){
-				internalClassUri = internalIt.nextStatement().getResource().getURI();
-			}
+			//The class IS an internal class so the subject is what we're looking for
+			internalClassUri = s.getSubject().getURI();
+			log.debug("Found internal class uri " + internalClassUri);
 		}
 		return internalClassUri;
 	}
