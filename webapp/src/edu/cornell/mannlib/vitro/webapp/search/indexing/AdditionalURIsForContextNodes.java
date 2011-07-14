@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.search.indexing;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -28,6 +29,8 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
     private OntModel model;
 	private static final List<String> multiValuedQueriesForAgent = new ArrayList<String>();	
 	private static final String multiValuedQueryForInformationResource;
+	private static final List<String>queryList;
+	
 	private Log log = LogFactory.getLog(AdditionalURIsForContextNodes.class);
     
     
@@ -38,9 +41,6 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
     @Override
     public List<String> findAdditionalURIsToIndex(String uri) {
     	
-    	List<String> queryList = new ArrayList<String>();
-    	queryList.add(multiValuedQueryForInformationResource);
-    	queryList.addAll(multiValuedQueriesForAgent);
     	
     	List<String> uriList = new ArrayList<String>();
 
@@ -174,6 +174,9 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
                       
                     + " OPTIONAL { ?c core:leaderRoleOf ?e . } . "                    
                     +"}");
+        
+        
+        
 	}
 	
 	//multivalued query for core:InformationResource
@@ -195,5 +198,113 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
 	
 	}
 
-    
+
+	protected static List<String> queriesForAuthorship(){
+	    List<String> queries = new ArrayList<String>();
+	    
+	    //get additional URIs of information resources from author side
+	    queries.add(
+	     prefix  
+         + "SELECT  (str(?a) as ?infoResource) WHERE {\n"
+            
+         + " ?uri rdf:type foaf:Person . \n"
+         + " ?uri core:authorInAuthorship ?aship .\n"                       
+         +  "OPTIONAL { ?aship core:linkedInformationResource ?a } .\n"            
+         +"}" );
+	    
+	    //get additional URIs of authors from information resource side
+        queries.add(
+         prefix  
+         + "SELECT  (str(?a) as ?author ) WHERE {\n"
+            
+         + " ?uri rdf:type core:InformationResource . \n"
+         + " ?uri core:informationResourceInAuthorship ?aship .\n"                       
+         +  "OPTIONAL { ?aship core:linkedAuthor ?a } .\n"            
+         +"}" );
+	    return queries;
+	}
+	
+	protected static List<String> queriesForURLLink(){
+	    List<String> queries = new ArrayList<String>();
+        
+        //get additional URIs when URLLink is changed
+        queries.add(
+         prefix  
+         + "SELECT  (str(?x) as ?individual) WHERE {\n"
+         
+         + " ?uri rdf:type  core:URLLink . \n"
+         + " ?uri core:webpageOf ?x .\n"            
+         +"}" );
+        
+        return queries;	    
+	}
+	
+	protected static List<String> queriesForEducationalTraining(){
+        List<String> queries = new ArrayList<String>();
+        
+        //if person changes, no additional URIs need to be
+        //changed because the person is not displayed on the
+        //degree individual or on the degree granting organization
+        
+        //if the degree changes, the person needs to be updated
+        //since the degree name is shown on the person page.
+        queries.add(
+            prefix  
+            + " SELECT  (str(?person) as ?personUri) WHERE {\n"
+            
+            + " ?uri rdf:type core:AcademicDegree . \n"                        
+            + " ?uri core:degreeOutcomeOf ?edTrainingNode .\n" 
+            + " ?edTrainingNode core:educationalTrainingOf ?person . \n"
+            +"}" );
+        
+        //if the organization changes the person needs to be updated
+        //since the organization name is shown on the person page.
+        queries.add(
+            prefix  
+            + " SELECT  (str(?person) as ?personUri) WHERE {\n"
+            
+            + " ?uri rdf:type foaf:Organization . \n"                        
+            + " ?uri core:organizationGrantingDegree ?edTrainingNode .\n" 
+            + " ?edTrainingNode core:educationalTrainingOf ?person . \n"
+            +"}" );
+        return queries;     
+    }
+	
+	protected static List<String> queriesForPosition(){
+        List<String> queries = new ArrayList<String>();  
+                
+        //If an organization changes, update people
+        queries.add(
+            prefix  
+            + " SELECT  (str(?person) as ?personUri) WHERE {\n"
+            
+            + " ?uri rdf:type foaf:Organization . \n"                        
+            + " ?uri core:organizationForPosition ?positionNode .\n" 
+            + " ?positionNode core:positionForPerson ?person . \n"
+            +"}" );
+        
+        
+        //if people change, update organizations 
+        queries.add(
+            prefix  
+            + " SELECT  (str(?org) as ?orgUri) WHERE {\n"
+            
+            + " ?uri rdf:type foaf:Person . \n"       
+            + " ?uri core:personInPosition ?positionNode .\n" 
+            + " ?positionNode core:positionForOrganization ?org . \n"
+            +"}" );
+        return queries;     
+    }
+	
+	static{
+	    List<String> tmpList = new ArrayList<String>();
+	    tmpList.add(multiValuedQueryForInformationResource);
+	    tmpList.addAll(multiValuedQueriesForAgent);
+	    tmpList.addAll( queriesForAuthorship());
+	    tmpList.addAll(queriesForURLLink());
+	    tmpList.addAll(queriesForEducationalTraining());
+	    tmpList.addAll(queriesForPosition());
+	    
+        queryList = Collections.unmodifiableList(tmpList);
+	}
 }
