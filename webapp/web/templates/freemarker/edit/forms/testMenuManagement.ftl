@@ -24,24 +24,18 @@
         <label for="pretty-url">Pretty URL<span class="requiredHint"> *</span></label> 
         <input type="text" name="prettyUrl" value="${prettyUrl}" role="input" />
         <p class="note">(Format: /<prettyURL> - ie. /people)</p>
-
-        <#--Commented out for now -->
     
         <p>Template<span class="requiredHint"> *</span></p>
         
         <input type="radio" class="default-template" name="selectedTemplate" value="default" <#if selectedTemplateType = "default">checked</#if> role="radio" />
         <label class="inline" for="default"> Default</label>
-        
         <br />
-        
         <input type="radio" name="selectedTemplate" class="custom-template" value="custom" <#if selectedTemplateType = "custom">checked</#if> role="input" />
         <label class="inline" for="custom"> Custom template</label>
         
-        <#if selectedTemplateType = "custom">
-        <section id="custom-template" role="region">
-            <input type="text" name="customTemplate" value="${customTemplate}" size="30" role="input" /><span class="requiredHint"> *</span>
-       </section>
-        </#if>
+        <section id="custom-template" <#if selectedTemplateType != 'custom'>class="hidden" </#if>role="region">
+            <input type="text" name="customTemplate" value="${customTemplate!}" size="30" role="input" /><span class="requiredHint"> *</span>
+        </section>
         
        <section id="existingContentType" name="existingContentType" ${existingClassGroupStyle} role="region">
            <p>Selected content type for the associated page</p>
@@ -116,4 +110,3 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/cust
 
 <#-- Add necessary javascript files associated with this page -->
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/menupage/menumanagement_edit.js"></script>')}
-${scripts.add('<script type="text/javascript" src="${urls.base}/js/menupage/menuManagementUtils.js"></script>')}      
