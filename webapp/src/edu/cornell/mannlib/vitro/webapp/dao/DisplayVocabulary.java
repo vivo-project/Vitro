@@ -16,10 +16,6 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 public class DisplayVocabulary {
     /** <p>The ontology model that holds the vocabulary terms</p> */
     private static OntModel m_model = ModelFactory.createOntologyModel( OntModelSpec.OWL_MEM, null );
-    
-    //URL for menu management
-    public static final String PROCESS_MENU_MANAGEMENT_URL = "/processEditDisplayModel";
-    public static final String REORDER_MENU_URL = PROCESS_MENU_MANAGEMENT_URL + "?cmd=Reorder";
 
     /*Uris for Models for Display*/
     
@@ -42,6 +38,7 @@ public class DisplayVocabulary {
     public static final String HOME_PAGE_TYPE = NS + "HomePage";
     public static final String CLASSGROUP_PAGE_TYPE = NS + "ClassGroupPage";
     public static final String CLASSINDIVIDUALS_PAGE_TYPE = NS + "IndividualsForClassesPage";
+    public static final String CLASSINDIVIDUALS_INTERNAL_TYPE = NS + "InternalClassesPage";
 
     /* Object Properties */
     public static final String FOR_CLASSGROUP = NS + "forClassGroup";
@@ -54,7 +51,9 @@ public class DisplayVocabulary {
     public static final String HAS_DATA_GETTER = NS + "hasDataGetter";
     public static final String GETINDIVIDUALS_FOR_CLASS = NS + "getIndividualsForClass";
     public static final String 	RESTRICT_RESULTS_BY = NS + "restrictResultsByClass";
-    
+    //specific case for internal class, value is true or false
+    public static final String 	RESTRICT_RESULTS_BY_INTERNAL = NS + "restrictResultsByInternalClass";
+
 
     /* Data Properties */
     public static final DatatypeProperty URL_MAPPING = m_model.createDatatypeProperty(NS + "urlMapping");
@@ -117,6 +116,10 @@ public class DisplayVocabulary {
     //Attribute values used to store display tbox/display display model in servlet context
     public static final String CONTEXT_DISPLAY_TBOX = "displayOntModelTBOX";
     public static final String CONTEXT_DISPLAY_DISPLAY = "displayOntModelDisplayModel";
+    
+    //URL for menu management
+    public static final String PROCESS_MENU_MANAGEMENT_URL = "/processEditDisplayModel";
+    public static final String REORDER_MENU_URL = PROCESS_MENU_MANAGEMENT_URL + "?cmd=Reorder&" + SWITCH_TO_DISPLAY_MODEL + "=true";
     /* URIs for some individuals in the dispaly ontology */
         
     
