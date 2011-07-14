@@ -81,6 +81,9 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
 	        }
     	}
         
+    	if( log.isDebugEnabled() )
+    	    log.debug( "additional uris for " + uri + " are " + uriList);
+    	
         return uriList;
     }
     
@@ -95,18 +98,22 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
         + " prefix bibo: <http://purl.org/ontology/bibo/>  ";
     
 	static{
+	    
+	    // If a person changes then update
+	    // organizations for positions
 		multiValuedQueriesForAgent.add(prefix +
 				"SELECT " +
-				" (str(?f) as ?positionForPerson) (str(?i) as ?positionInOrganization) " +
+				" (str(?i) as ?positionInOrganization) " +
 				" WHERE {" 
 				
 				+ "?uri rdf:type foaf:Agent  ; ?b ?c . "
 				+ " ?c rdf:type core:Position . "
-				
-				+ " OPTIONAL   { ?c core:positionForPerson ?f . } . "
+							
 				+ " OPTIONAL { ?c core:positionInOrganization ?i . } . "
 				+ " }");
 		
+        // If a person changes then update
+		// advisee, linkedAuthor and informationResource
 		multiValuedQueriesForAgent.add(prefix +
 				"SELECT (str(?d) as ?advisee) " +
 				" (str(?f) as ?linkedAuthor) (str(?h) as ?linkedInformationResource)  WHERE {" 
@@ -120,23 +127,30 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
 				
 				+ " } ");
 		
+	    // If a person changes then update
+		// award giver
 		multiValuedQueriesForAgent.add(prefix +
-				"SELECT (str(?d) as ?awardConferredBy)  (str(?e) as ?awardOrHonorFor) " +
+				"SELECT (str(?d) as ?awardConferredBy)  " +
 				"WHERE {"
 				
 				+ "?uri rdf:type foaf:Agent  ; ?b ?c . "
 				+ " ?c rdf:type core:AwardReceipt . "
 				
 				+ " OPTIONAL { ?c core:awardConferredBy ?d . } . "
-				+ " OPTIONAL { ?c core:awardOrHonorFor ?e . } ."
 				+ " }");
 		
+        // If a person changes then update
+		// organization for role
 		multiValuedQueriesForAgent.add(prefix +
-				"SELECT (str(?Organization) as ?organization)  WHERE {" 
+				"SELECT (str(?Organization) as ?organization)  " +
+				"WHERE {"
+				
 				+ "?uri rdf:type foaf:Agent  ; ?b ?c . "
 				+ " ?c rdf:type core:Role ; core:roleIn ?Organization ."
 				+ " }");
 		
+        // If a person changes then update
+		// organization in educational training
 		multiValuedQueriesForAgent.add(prefix + 
 				"SELECT  " +
 		         	"(str(?e) as ?trainingAtOrganization) WHERE {"
@@ -144,10 +158,22 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
 					+ " ?uri rdf:type foaf:Agent ; ?b ?c . "
 					+ " ?c rdf:type core:EducationalTraining . "
 					  
-					+ " OPTIONAL { ?c core:trainingAtOrganization ?e . } . " 
-					
+					+ " OPTIONAL { ?c core:trainingAtOrganization ?e . } . " 					
 					+"}");
 		
+		// If an organizatoin changes then update
+        // people in head of relations
+        multiValuedQueriesForAgent.add(
+                " # for organization, get leader  \n" +
+                prefix + 
+                "SELECT  " +
+                    "(str(?e) as ?LeaderPerson ) WHERE {"
+                    
+                    + " ?uri rdf:type foaf:Agent ; ?b ?c . "
+                    + " ?c rdf:type core:LeaderRole . "
+                      
+                    + " OPTIONAL { ?c core:leaderRoleOf ?e . } . "                    
+                    +"}");
 	}
 	
 	//multivalued query for core:InformationResource
