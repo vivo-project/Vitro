@@ -37,7 +37,6 @@ ul#selectedClasses {
     margin-top: 20px;
 }
 #internal-class {
-    margin-top: 20px;
     margin-bottom: 10px;
     padding: 0.8em 1em;
     background: #f4f4f4;
@@ -53,4 +52,7 @@ ul#selectedClasses {
 }
 ul#selectedClasses li {
     margin-left: .4em;
+}
+#selectClassesMessage {
+   padding-top: 15px;
 }

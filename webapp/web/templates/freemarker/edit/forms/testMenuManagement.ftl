@@ -61,6 +61,23 @@
         <p id="selectClassesMessage" name="selectClassesMessage" ${existingClassGroupStyle}>Select content to display</p>
         <section id="classesInSelectedGroup" name="classesInSelectedGroup" ${existingClassGroupStyle}>
             <ul id="selectedClasses" name="selectedClasses" role="menu">
+                
+                 <section id="internal-class" role="region">
+                        <#if internalClass?has_content>
+                            <#assign enableInternalClass = '' />
+                            <#assign disableClass = 'class="inline"' />
+                        <#else>
+                            <#assign enableInternalClass = '<p class="note">To enable this option, you must first select an <a href="${urls.base}/processInstitutionalInternalClass">institutional internal class</a> for your instance</p>' />
+                            <#assign disableClass = 'class="disable inline" disabled="disabled"' />
+                        </#if>
+
+                        <input type="checkbox" ${disableClass} name="display-internalClass" value="${internalClassUri}" id="display-internalClass" <#if pageInternalOnly?has_content>checked</#if> role="input" />
+                        <label ${disableClass} class="inline" for="display-internalClass">Only display <em>${associatedPage}</em> within my institution</label>
+
+                        ${enableInternalClass}
+                    </section>
+                
+                
                 <#--Adding a default class for "ALL" in case all classes selected-->
                 <li class="ui-state-default" role="menuitem">
                     <input type="checkbox" name="allSelected" id="allSelected" value="all" <#if isClassGroupPage = true || includeAllClasses = true>checked</#if> />
@@ -83,20 +100,6 @@
             </ul>
         </section>
         
-        <section id="internal-class" role="region">
-            <#if internalClass?has_content>
-                <#assign enableInternalClass = '' />
-                <#assign disableClass = 'class="inline"' />
-            <#else>
-                <#assign enableInternalClass = '<p class="note">To enable this option, you must first select an <a href="${urls.base}/processInstitutionalInternalClass">institutional internal class</a> for your instance</p>' />
-                <#assign disableClass = 'class="disable inline" disabled="disabled"' />
-            </#if>
-        
-            <input type="checkbox" ${disableClass} name="display-internalClass" value="${internalClassUri}" id="display-internalClass" <#if pageInternalOnly?has_content>checked</#if> role="input" />
-            <label ${disableClass} class="inline" for="display-internalClass">Only display <em>${associatedPage}</em> within my institution</label>
-        
-            ${enableInternalClass}
-        </section>
         <input type="submit" name="submit-${menuAction}" value="Save changes" class="submit" role="input" /> or <a class="cancel" href="${cancelUrl}">Cancel</a>
 
         <p class="requiredHint">* required fields</p>
