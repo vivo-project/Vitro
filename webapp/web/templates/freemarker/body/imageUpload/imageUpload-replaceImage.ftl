@@ -27,6 +27,8 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/uploadImages.cs
         <label>Replace Photo <span> (JPEG, GIF or PNG)</span></label>
 
         <input type="file" name="datafile" size="30">
+         <p class="note">Maximum file size: ${maxFileSize} megabytes<br />
+        Minimum image dimensions: ${thumbnailWidth}x${thumbnailHeight} pixels</p>
         <input class="submit" type="submit" value="Upload photo"> 
 
         <span class="or"> or <a class="cancel"  href="${cancelUrl}">Cancel</a></span>
