@@ -19,6 +19,8 @@ import com.hp.hpl.jena.query.QueryParseException;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.search.beans.AdditionalURIsToIndex;
+import edu.cornell.mannlib.vitro.webapp.search.beans.IndexerIface;
 
 
 /**
@@ -50,7 +52,6 @@ public class IndexBuilder extends Thread {
     protected long reindexInterval = 1000 * 60 /* msec */ ;        
     
     protected int numberOfThreads = 10;
-    protected List<AdditionalURIsToIndex> additionalURIsFinders;
     
     public static final boolean UPDATE_DOCS = false;
     public static final boolean NEW_DOCS = true;
@@ -60,20 +61,18 @@ public class IndexBuilder extends Thread {
     public IndexBuilder(
                 ServletContext context,
                 IndexerIface indexer,
-                WebappDaoFactory wdf,
-                List<AdditionalURIsToIndex> additionalURIsFinders){
+                WebappDaoFactory wdf ){
         super("IndexBuilder");
         this.indexer = indexer;
         this.wdf = wdf;
         this.context = context;            
-        this.additionalURIsFinders = additionalURIsFinders;
         this.changedUris = new HashSet<String>();    
         this.start();
     }
     
     protected IndexBuilder(){
         //for testing only
-        this( null, null, null, null);        
+        this( null, null, null);        
     }
     
     public void setWdf(WebappDaoFactory wdf){    	
@@ -173,9 +172,7 @@ public class IndexBuilder extends Thread {
 	/**
 	 * Sets updatedUris and deletedUris lists.
 	 */
-	private void makeAddAndDeleteLists( Collection<String> uris){	    
-		
-		uris.addAll(getAdditionalURIsToIndex(uris));
+	private void makeAddAndDeleteLists( Collection<String> uris){	    				
 		
 		/* clear updateInds and deletedUris.  This is the only method that should set these. */
 		this.updatedInds = new ArrayList<String>();
@@ -197,18 +194,6 @@ public class IndexBuilder extends Thread {
     		}
     	}    		    	            	
 	}	
-  
-	private Set<String> getAdditionalURIsToIndex(Collection<String> uris) {
-		
-		Set<String> listOfAdditionalURIs = new HashSet<String>();
-		
-		for(String uri: uris){
-			//grab the uris from AdditionalURIsToIndex
-			listOfAdditionalURIs.addAll(additionalURIsFinders.get(0).findAdditionalURIsToIndex(uri));
-		}
-		
-		return listOfAdditionalURIs;
-	}
 
 	/**
 	 * This rebuilds the whole index.

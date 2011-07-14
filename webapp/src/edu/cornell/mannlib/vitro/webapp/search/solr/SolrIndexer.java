@@ -18,8 +18,8 @@ import org.apache.solr.common.SolrInputDocument;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
+import edu.cornell.mannlib.vitro.webapp.search.beans.IndexerIface;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
-import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexerIface;
 
 
 public class SolrIndexer implements IndexerIface {

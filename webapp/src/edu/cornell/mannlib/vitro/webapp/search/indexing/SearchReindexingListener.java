@@ -1,7 +1,8 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.dao.jena;
+package edu.cornell.mannlib.vitro.webapp.search.indexing;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -15,7 +16,7 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
-import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
+import edu.cornell.mannlib.vitro.webapp.search.beans.AdditionalURIsToIndex;
 
 /**
  * This class is thread safe.  Notice that doAsyncIndexBuild() is frequently 
@@ -23,11 +24,16 @@ import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
  */
 public class SearchReindexingListener implements ModelChangedListener {						
 	private IndexBuilder indexBuilder;
+    private List<AdditionalURIsToIndex> additionalUriFinders;
 	
-	public SearchReindexingListener(IndexBuilder indexBuilder) {
+	public SearchReindexingListener(IndexBuilder indexBuilder, List<AdditionalURIsToIndex> addUrisList ) {
 		if(indexBuilder == null )
 			throw new IllegalArgumentException("Constructor parameter indexBuilder must not be null");		
-		this.indexBuilder = indexBuilder;		
+		this.indexBuilder = indexBuilder;	
+		if( addUrisList != null )
+		    this.additionalUriFinders = addUrisList;
+		else
+		    this.additionalUriFinders = Collections.emptyList();
 	}	
 
 	private synchronized void addChange(Statement stmt){	    
@@ -59,6 +65,10 @@ public class SearchReindexingListener implements ModelChangedListener {
 		if( stmt.getObject().isURIResource() ){
 			indexBuilder.addToChangedUris(((Resource) stmt.getObject()).getURI());			
 		}	
+		
+		for( AdditionalURIsToIndex au : additionalUriFinders ){
+		    indexBuilder.addToChangedUris( au.findAdditionalURIsToIndex(stmt) );
+		}
 	}
 
 	private void requestAsyncIndexUpdate(){

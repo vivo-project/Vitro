@@ -27,14 +27,14 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.SearchReindexingListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.search.IndexConstants;
+import edu.cornell.mannlib.vitro.webapp.search.beans.AdditionalURIsToIndex;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearchImpl;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForContextNodes;
-import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsToIndex;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
+import edu.cornell.mannlib.vitro.webapp.search.indexing.SearchReindexingListener;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
 
 public class SolrSetup implements javax.servlet.ServletContextListener{   
@@ -61,8 +61,8 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
                 return;
             }            
             CommonsHttpSolrServer server;                       
+            //It would be nice to use the default binary handler but there seem to be library problems 
             server = new CommonsHttpSolrServer(new URL( solrServerUrl ),null,new XMLResponseParser(),false); 
-            //server = new CommonsHttpSolrServer(new URL( solrServerUrl ));
             server.setSoTimeout(10000);  // socket read timeout
             server.setConnectionTimeout(10000);
             server.setDefaultMaxConnectionsPerHost(100);
@@ -90,11 +90,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             		modifiers);                        
             
             /* setup solr indexer */
-            SolrIndexer solrIndexer = new SolrIndexer(server, indToSolrDoc);            
-           /* if( solrIndexer.isIndexEmpty() ){
-                log.info("solr index is empty, requesting rebuild");
-                sce.getServletContext().setAttribute(IndexConstants.INDEX_REBUILD_REQUESTED_AT_STARTUP, Boolean.TRUE);         
-            } */           
+            SolrIndexer solrIndexer = new SolrIndexer(server, indToSolrDoc);                  
             
             // This is where the builder gets the list of places to try to
             // get objects to index. It is filtered so that non-public text
@@ -102,32 +98,19 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             WebappDaoFactory wadf = (WebappDaoFactory) context.getAttribute("webappDaoFactory");
             VitroFilters vf = VitroFilterUtils.getPublicFilter(context);
             wadf = new WebappDaoFactoryFiltering(wadf, vf);            
+                        
+            IndexBuilder builder = new IndexBuilder(context, solrIndexer, wadf );
+            // to the servlet context so we can access it later in the webapp.
+            context.setAttribute(IndexBuilder.class.getName(), builder);
             
             //make objects that will find additional URIs for context nodes etc
             List<AdditionalURIsToIndex> uriFinders = new ArrayList<AdditionalURIsToIndex>();
             uriFinders.add( new AdditionalURIsForContextNodes(jenaOntModel) );
             
-            IndexBuilder builder = new IndexBuilder(context, solrIndexer, wadf, uriFinders);
-            // to the servlet context so we can access it later in the webapp.
-            context.setAttribute(IndexBuilder.class.getName(), builder);
-            
             // set up listeners so search index builder is notified of changes to model
             ServletContext ctx = sce.getServletContext();
-            SearchReindexingListener srl = new SearchReindexingListener(builder);
+            SearchReindexingListener srl = new SearchReindexingListener(builder, uriFinders);
             ModelContext.registerListenerForChanges(ctx, srl);
-                                    
-           /* if( sce.getServletContext().getAttribute(IndexConstants.INDEX_REBUILD_REQUESTED_AT_STARTUP) instanceof Boolean &&
-                (Boolean)sce.getServletContext().getAttribute(IndexConstants.INDEX_REBUILD_REQUESTED_AT_STARTUP) ){
-                log.info("Rebuild of solr index required before startup.");
-                builder.doIndexRebuild();                                               
-                int n = 0;
-                while( builder.isReindexRequested() || builder.isIndexing() ){
-                    n++;
-                    if( n % 20 == 0 ) //output message every 10 sec. 
-                        log.info("Still rebuilding solr index");
-                    Thread.sleep(500);
-                }               
-            }*/
             
             log.info("Setup of Solr index completed.");   
         } catch (Throwable e) {

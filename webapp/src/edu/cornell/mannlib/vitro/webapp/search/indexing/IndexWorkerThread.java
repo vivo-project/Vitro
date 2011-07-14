@@ -9,6 +9,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
+import edu.cornell.mannlib.vitro.webapp.search.beans.IndexerIface;
 import edu.cornell.mannlib.vitro.webapp.search.solr.IndividualToSolrDocument;
 
 class IndexWorkerThread extends Thread{

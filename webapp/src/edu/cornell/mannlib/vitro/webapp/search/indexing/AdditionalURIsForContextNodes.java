@@ -22,7 +22,10 @@ import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.shared.Lock;
+
+import edu.cornell.mannlib.vitro.webapp.search.beans.AdditionalURIsToIndex;
 
 public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
 
@@ -39,8 +42,30 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
     }
     
     @Override
-    public List<String> findAdditionalURIsToIndex(String uri) {
-    	
+    public List<String> findAdditionalURIsToIndex(Statement stmt) {
+                
+        if( stmt != null ){
+            List<String>urisToIndex = new ArrayList<String>();
+            if(stmt.getSubject() != null && stmt.getSubject().isURIResource() ){        
+                String subjUri = stmt.getSubject().getURI();
+                if( subjUri != null){
+                    urisToIndex.addAll( findAdditionalURIsToIndex(subjUri));
+                }
+            }
+            
+            if( stmt.getObject() != null && stmt.getObject().isURIResource() ){
+                String objUri = stmt.getSubject().getURI();
+                if( objUri != null){
+                    urisToIndex.addAll( findAdditionalURIsToIndex(objUri));
+                }
+            }
+            return urisToIndex;
+        }else{
+            return Collections.emptyList();
+        }                
+    }
+    
+    protected List<String> findAdditionalURIsToIndex(String uri) {    	        
     	
     	List<String> uriList = new ArrayList<String>();
 
@@ -307,4 +332,7 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
 	    
         queryList = Collections.unmodifiableList(tmpList);
 	}
+
+
+
 }
