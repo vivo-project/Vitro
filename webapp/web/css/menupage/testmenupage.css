@@ -37,8 +37,19 @@ ul#selectedClasses {
     margin-top: 20px;
 }
 #internal-class {
-    margin-top: 10px;
+    margin-top: 20px;
     margin-bottom: 10px;
+    padding: 0.8em 1em;
+    background: #f4f4f4;
+    margin-right: .4em;
+    width: 65%;
+}
+#internal-class label {
+    color: #7F8993;
+}
+#internal-class p.note {
+    color: #595B5B;
+    padding-left: 25px;
 }
 ul#selectedClasses li {
     margin-left: .4em;

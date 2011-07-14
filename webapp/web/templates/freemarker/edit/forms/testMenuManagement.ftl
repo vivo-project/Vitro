@@ -88,7 +88,7 @@
                 <#assign enableInternalClass = '' />
                 <#assign disableClass = 'class="inline"' />
             <#else>
-                <#assign enableInternalClass = '<p class="note">To enable this option, you must first select an institutional internal class for your instance</p>' />
+                <#assign enableInternalClass = '<p class="note">To enable this option, you must first select an <a href="${urls.base}/processInstitutionalInternalClass">institutional internal class</a> for your instance</p>' />
                 <#assign disableClass = 'class="disable inline" disabled="disabled"' />
             </#if>
         
