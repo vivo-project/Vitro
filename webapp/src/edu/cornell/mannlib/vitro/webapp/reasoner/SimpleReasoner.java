@@ -24,6 +24,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.shared.JenaException;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
@@ -965,8 +966,14 @@ public class SimpleReasoner extends StatementListener {
 				} catch (NullPointerException npe) {
                 	log.error("a NullPointerException was received while recomputing the ABox inferences. Halting inference computation.");
                     return;
+				} catch (JenaException je) {
+					 if (je.getMessage().equals("Statement models must no be null")) {
+						 log.error("Exception while recomputing ABox inference model: " + je.getMessage() + ". Halting inference computation.");
+		                 return; 
+					 } 
+					 log.error("Exception while recomputing ABox inference model: " + je.getMessage());
 				} catch (Exception e) {
-					 log.error("Exception while recomputing ABox inference model", e);
+					 log.error("Exception while recomputing ABox inference model: " + e.getMessage());
 				}
 				
 				numStmts++;
