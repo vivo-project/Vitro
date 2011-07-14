@@ -74,14 +74,14 @@
                 </li>
                 <#list classGroup as classInClassGroup>
                 <li class="ui-state-default" role="menuitem">
-                    <input type="checkbox" id="classInClassGroup" name="classInClassGroup" value="${classInClassGroup.URI}" <#if includeAllClasses = true>checked</#if> />
+                    <input type="checkbox" id="classInClassGroup" name="classInClassGroup" value="${classInClassGroup.URI}" <#if includeAllClasses = true>checked</#if> 
                      <#if isIndividualsForClassesPage?has_content>
                             <#list includeClasses as includeClass>
                                 <#if includeClass = classInClassGroup.URI>
                                     checked
                                 </#if>
                             </#list>
-                    </#if>
+                    </#if> />
                     <label class="inline" for="${classInClassGroup.name}"> ${classInClassGroup.name}</label>
                     <span class="ui-icon-sortable"></span> <#--sortable icon for dragging and dropping menu items-->
                 </li>

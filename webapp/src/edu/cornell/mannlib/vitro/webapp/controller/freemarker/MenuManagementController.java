@@ -287,8 +287,10 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     }
   
     private void retrieveIndividualsForClassesPage(OntModel writeModel,
-			Resource dataGetter, Map<String, Object> data) {
+		Resource dataGetter, Map<String, Object> data) {
 		data.put("isIndividualsForClassesPage", true);
+		data.put("isClassGroupPage", false);
+		data.put("includeAllClasses", false);
 		//Get the classes and put them here
 		this.getClassesForDataGetter(writeModel, dataGetter, data);
 		//Also save the class group for display

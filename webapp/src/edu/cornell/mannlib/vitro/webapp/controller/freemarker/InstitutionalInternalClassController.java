@@ -6,9 +6,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+
+import javax.servlet.http.HttpServletResponse;
+
+import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenu
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
@@ -36,8 +43,8 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
     private static final String EDIT_FORM = "/processInstitutionalInternalClass";
     public final static Actions REQUIRED_ACTIONS = new Actions(new ManageMenus());
     private static final String DISPLAY_FORM = "/institutionalInternalClassForm.ftl";
-    private static List<String> localNamespaces = new ArrayList<String>();
-    private static List<VClass> localNamespaceClasses = new ArrayList<VClass>();
+    private static HashMap<String, String> localNamespaces = new HashMap<String, String>();
+    private static HashMap<String, String> localNamespaceClasses = new HashMap<String, String>();
     private static final String CREATE_CLASS_PARAM = "createClass";
     private static final String REDIRECT_PAGE = "/siteAdmin";
     @Override
@@ -54,9 +61,12 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
     	Map<String, Object> data = new HashMap<String,Object>();
     	//Get all local classes and namespace information
     	retrieveLocalClasses(vreq, data);
-    	if(isSelectExistingClass(vreq)) {
+    	if(isSubmission(vreq)){
+    		processSubmission(vreq, data);
+    	} else if(isSelectExistingClass(vreq)) {
     		//Local namespace(s) exist and user can select an existing class
     		processSelectExistingClass(vreq, data);
+    		
     	} else if(isCreateNewClass(vreq)) {
     		//Local namespace(s) exist and user wishes to create a new class
     		//Either cmd = create new or no local classes exist at all and one must be created
@@ -65,8 +75,6 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
     		//Not being handled expliclity but message will display indicating
     		//no local namespaces exist and one must be created
     		processCreateOntologies(vreq, data);
-    	} else if(isSubmission(vreq)){
-    		processSubmission(vreq, data);
     	} else {
     		
     	}
@@ -75,14 +83,18 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
     	
     	//Check if existing local namespaces
     	
-    	data.put("formUrl", EDIT_FORM);
-    	
+    	data.put("formUrl", vreq.getContextPath() + EDIT_FORM);
+    	data.put("cancelUrl", vreq.getContextPath() + REDIRECT_PAGE);
+
     	//if no local namespaces, then provide message to display
     	//if existing namespace(s), then check
     	//if single namespace, retrieve all classes belonging to that local namespace
     	//if multiple namespaces, generate select list with namespaces
     	//for instertion: VClassDaoJena.insertVClass
     	//
+    	if(isSubmission(vreq)){
+    		return redirectToSiteAdmin();
+    	} 
     	return new TemplateResponseValues(DISPLAY_FORM, data);
     	
     }
@@ -105,7 +117,7 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
 
 	private void processCreateNewClass(VitroRequest vreq, Map<String, Object> data) {
 		//this may need to be changed on the basis of how new classes interact with new ontologies 
-		data.put("submitAction", "createClass");
+		data.put("submitAction", "Create Class");
 		data.put("createNewClass", true);
 	}
 
@@ -121,7 +133,7 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
 	private void processSelectExistingClass(VitroRequest vreq, Map<String, Object> data) {
 		//Check if internal class is already set and be sure to include that in the data to be returned
 		data.put("useExistingInternalClass", true);
-		data.put("submitAction", "save");
+		data.put("submitAction", "Save");
 	}
 
 	private boolean isSelectExistingClass(VitroRequest vreq) {
@@ -135,8 +147,8 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
 		localNamespaces = LocalNamespaceClassUtils.getLocalOntologyNamespaces(vreq);
     	//Get classes for local namespaces
     	localNamespaceClasses = LocalNamespaceClassUtils.getLocalNamespacesClasses(vreq, localNamespaces);
-    	data.put("existingLocalClasses", localNamespaces);
-    	data.put("existingLocalNamespaces", localNamespaceClasses);
+    	data.put("existingLocalClasses", localNamespaceClasses);
+    	data.put("existingLocalNamespaces", localNamespaces);
     	String noLocalOntologiesMessage = "There are currently no local ontologies.  You must create a new ontology";
     	data.put("noLocalOntologiesMessage", noLocalOntologiesMessage);
     	if(localNamespaces.size() == 0) {
@@ -146,7 +158,12 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
     		data.put("ontologiesExist", true);
     		if(localNamespaces.size() > 1) {
     			data.put("multipleLocalNamespaces", true);
+    		} else {
+    			data.put("multipleLocalNamespaces", false);
+    			data.put("existingLocalNamespace", localNamespaces.keySet().iterator().next());
     		}
+    		//Get current internal class if it exists
+    		data.put("existingInternalClass", retrieveCurrentInternalClass());
     	} 
 	}
 
@@ -172,6 +189,12 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
 			Model writeModel = ModelContext.getBaseOntModelSelector(getServletContext()).getTBoxModel();
 			writeModel.enterCriticalSection(Lock.WRITE);
 			try {
+				//remove existing internal classes if there are any as assuming only one
+				writeModel.remove(
+						writeModel.listStatements(null, 
+								ResourceFactory.createProperty(VitroVocabulary.IS_INTERNAL_CLASSANNOT), 
+								(RDFNode) null));
+				
 				writeModel.add(
 						writeModel.createStatement(
 								ResourceFactory.createResource(classUri),
@@ -203,6 +226,23 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
 	private String getExistingClassUri(VitroRequest vreq) {
 		return vreq.getParameter("existingLocalClasses");
 		
+	}
+	
+	private RedirectResponseValues redirectToSiteAdmin() {
+		return new RedirectResponseValues(REDIRECT_PAGE, HttpServletResponse.SC_SEE_OTHER);
+	}
+	
+	//Get current internal class
+	private String retrieveCurrentInternalClass() {
+		String internalClassUri = "";
+		OntModel mainModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
+		StmtIterator internalIt = mainModel.listStatements(null, 
+				ResourceFactory.createProperty(VitroVocabulary.IS_INTERNAL_CLASSANNOT), 
+				(RDFNode) null);
+		if(internalIt.hasNext()){
+			internalClassUri = internalIt.nextStatement().getResource().getURI();
+		}
+		return internalClassUri;
 	}
 	
 }

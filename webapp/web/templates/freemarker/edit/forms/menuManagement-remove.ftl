@@ -7,8 +7,10 @@
 <section id="remove-menu-item" role="region">
     <form method="POST" action="${formUrls}" class="customForm" role="remove menu item">
         <input type="hidden" name="menuItem" id="menuItem" value="${menuItem}" role="input" />
-        
-        <p>Are you sure you want to remove <em>${menuItem}</em> menu item?</p>
+        <input type="hidden" name="cmd" id="cmd" value="Remove" role="input" />
+        <input type="hidden" name="switchToDisplayModel" id="switchToDisplayModel" value="true" role="input" />
+
+        <p>Are you sure you want to remove <em>${menuName}</em> menu item?</p>
 
         <input type="submit" name="removeMenuItem" value="Remove menu item" class="submit" role="input" /> or <a class="cancel" href="${cancelUrl}">Cancel</a>
     </form>

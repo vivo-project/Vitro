@@ -11,9 +11,9 @@ edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.Institu
 <h3>Institutional Internal Class</h3>
 
 <section id="introMessage" role="region">
-	This class will be used to designate those individuals internal to your institution.
+	<p>This class will be used to designate those individuals internal to your institution.
 	This will allow you to limit the individuals displayed on your menu pages (People, Research, etc.) 
-	to only those within your institution.
+	to only those within your institution.</p>
 </section>
 
 <section>
@@ -21,17 +21,19 @@ edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.Institu
        <input type="hidden" name="submitForm" id="submitForm" value="true" />
        <#if ontologiesExist = false>
         <section id="noLocalOntologyExists">
-        	${noLocalOntologiesMessage}
+        	<p>${noLocalOntologiesMessage}</p>
         </section>
        
        	<#elseif useExistingInternalClass?has_content> 
         <section id="existingLocalClass">
         	<#--Populated based on class list returned-->
         	<select id="existingLocalClasses" name="existingLocalClasses">
-	        	<#list localClasses as localClass>
-	                    <option value="${localClass.URI}" <#if existingInternalClass.URI = localClass.URI>selected</#if> >${localClass.name}</option>
+        		<#assign classUris = existingLocalClasses?keys />
+	        	<#list classUris as localClassUri>
+	                    <option value="${localClassUri}" <#if existingInternalClass = localClassUri>selected</#if> >${existingLocalClasses[localClassUri]}</option>
 	            </#list>
         	</select>
+        	<p>Can't find an appropriate class? Create a <a href="${formUrl}?cmd=createClass">new one</a>.</p>
         </section>
         <#elseif createNewClass?has_content>
         <section id="createNewLocalClass">
@@ -42,20 +44,26 @@ edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.Institu
         	<#--If more than one local namespace, generate select-->
         	<#if multipleLocalNamespaces = true>
         	<select id="existingLocalNamespaces" name="existingLocalNamespaces">
-	        	<#list existingLocalNamespaces as existingNamespace>
-	                  <option value="${existingNamespace.URI}">"${existingNamespace.URI}"</option>
+        		<#assign namespaceUris = existingLocalNamespaces?keys /> 
+	        	<#list namespaceUris as existingNamespace>
+	                  <option value="${existingNamespace}">${existingLocalNamespaces[existingNamespace]}</option>
 	            </#list>
         	</select>
         	<#else>
-        		<input type="hidden" id="existingLocalNamespaces" name="existingLocalNamespaces" value="{existingLocalNamespaces[0]}"/>
+        		<input type="hidden" id="existingLocalNamespaces" name="existingLocalNamespaces" value="${existingLocalNamespace}"/>
         	</#if>
         	
         </section>
         <#else>
         	Problematic section as above should all have been handled
         </#if>
-        <input type="submit" name="submit-internalClass" value="${submitAction}" class="submit" /> or <a class="cancel" href="${cancelUrl}">Cancel</a>
-		<p class="requiredHint">* required fields</p>
+        
+        <#if ontologiesExist = true>
+        	<input type="submit" name="submit-internalClass" value="${submitAction}" class="submit" /> or <a class="cancel" href="${cancelUrl}">Cancel</a>
+			<p class="requiredHint">* required fields</p>
+			
+		</#if>
+		
     </form>
 </section>
 

@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONObject;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
@@ -79,7 +81,7 @@ public class MenuManagementEdit extends VitroHttpServlet {
     	
     	String command = getCommand(vreq);
     	if(command != null) {
-    		processCommand(command, vreq);
+    		processCommand(command, vreq, resp);
     	} else {
     		System.out.println("Command is null");
     	}
@@ -119,7 +121,7 @@ public class MenuManagementEdit extends VitroHttpServlet {
     
     //Parameter retrieval is identical, but in one case an entirey new menu item needs to be created
     //along with a new page
-    public void processCommand(String command, VitroRequest vreq) {
+    public void processCommand(String command, VitroRequest vreq, HttpServletResponse resp) {
     	//Get parameters for menu item being edited
     	String menuItem = vreq.getParameter("menuItem");
     	OntModel displayModel = getDisplayModel(vreq);
@@ -139,7 +141,7 @@ public class MenuManagementEdit extends VitroHttpServlet {
     	} else if(isDelete(command)) {
     		processDelete(menuItem, displayModel, command, vreq);
     	} else if(isReorder(command)) {
-    		processReorder(displayModel, vreq);
+    		processReorder(displayModel, vreq, resp);
     	}
     	
     	//Edits to model occur here
@@ -166,17 +168,34 @@ public class MenuManagementEdit extends VitroHttpServlet {
     	
     }
     
-    private void processReorder(OntModel displayModel, VitroRequest vreq) {
+    private void processReorder(OntModel displayModel, VitroRequest vreq, HttpServletResponse resp) {
 		//Get the new menu positions for all the elements
     	String predicate = vreq.getParameter("predicate");
     	//Assuming these two are in the same order
     	String[]individuals = vreq.getParameterValues("individuals");
 		String[] positions = vreq.getParameterValues("positions");
+		String errorMessage = null;
 		if(individuals.length > 0 && positions.length > 0 && individuals.length == positions.length) {
 			removeStatements = removePositionStatements(displayModel, individuals);
 			addStatements = addPositionStatements(displayModel, individuals, positions); 
 		} else {
-			//Throw an error?
+			errorMessage = "Number of individuals and positions is out of synch";
+		}
+		try{
+			JSONObject rObj = new JSONObject();
+			resp.setCharacterEncoding("UTF-8");
+			resp.setContentType("application/json;charset=UTF-8");
+      
+			if( errorMessage != null ){
+				rObj.put("errorMessage", errorMessage);
+				resp.setStatus(500 /*HttpURLConnection.HTTP_SERVER_ERROR*/);
+			}else{
+				rObj.put("errorMessage", "");
+			}            
+           Writer writer = resp.getWriter();
+           writer.write(rObj.toString());
+		} catch(Exception ex) {
+			log.error("Error creating JSON object for response", ex);
 		}
 	}
 
@@ -347,7 +366,9 @@ public class MenuManagementEdit extends VitroHttpServlet {
 			Model addModel, OntModel displayModel) {
 		String[] selectedClasses = vreq.getParameterValues("classInClassGroup");
 		Model dgModel = ModelFactory.createDefaultModel();
-		dgModel.add(dgModel.createStatement(dataGetterResource, RDF.type, DisplayVocabulary.CLASSINDIVIDUALS_PAGE_TYPE));
+		dgModel.add(dgModel.createStatement(dataGetterResource, 
+				RDF.type, 
+				ResourceFactory.createResource(DisplayVocabulary.CLASSINDIVIDUALS_PAGE_TYPE)));
 		for(String classUri: selectedClasses) {
 			dgModel.add(dgModel.createStatement(
 					dataGetterResource, 
@@ -370,7 +391,9 @@ public class MenuManagementEdit extends VitroHttpServlet {
 	private Model getClassGroupDataGetter(VitroRequest vreq, Resource dataGetterResource, Model addModel, 
 			OntModel displayModel) {
 			Model dgModel = ModelFactory.createDefaultModel();
-			dgModel.add(dgModel.createStatement(dataGetterResource, RDF.type, DisplayVocabulary.CLASSGROUP_PAGE_TYPE));
+			dgModel.add(dgModel.createStatement(dataGetterResource, 
+					RDF.type, 
+					ResourceFactory.createResource(DisplayVocabulary.CLASSGROUP_PAGE_TYPE)));
 			return dgModel;
 	}
 
@@ -471,7 +494,9 @@ public class MenuManagementEdit extends VitroHttpServlet {
 				DisplayVocabulary.MENU_POSITION, 
 				addModel.createTypedLiteral(getLastPosition(displayModel))));
 		//page resource, type, title and url mapping, and what data getter associated
-		addModel.add(addModel.createStatement(pageResource, RDF.type, DisplayVocabulary.PAGE_TYPE));
+		addModel.add(addModel.createStatement(pageResource, 
+				RDF.type, 
+				ResourceFactory.createResource(DisplayVocabulary.PAGE_TYPE)));
 		//Need to create a data getter
 		Model dataGetterStatements = generateDataGetter(pageResource, displayModel);
 		addModel.add(dataGetterStatements);
