@@ -165,13 +165,16 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             int maxHitCount = DEFAULT_MAX_HIT_COUNT ;
             if( startIndex >= DEFAULT_MAX_HIT_COUNT  - hitsPerPage )
                 maxHitCount = startIndex + DEFAULT_MAX_HIT_COUNT ;
-
             log.debug("maxHitCount is " + maxHitCount);
 
-            String qtxt = vreq.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
-            
+            String qtxt = vreq.getParameter(VitroQuery.QUERY_PARAMETER_NAME);            
             log.debug("Query text is \""+ qtxt + "\""); 
 
+            String badQueryMsg = badQueryText( qtxt );
+            if( badQueryMsg != null ){
+                return doFailedSearch(badQueryMsg, qtxt, format);
+            }
+                
             SolrQuery query = getQuery(qtxt, maxHitCount, vreq);            
             SolrServer solr = SolrSetup.getSolrServer(getServletContext());
             QueryResponse response = null;
@@ -330,6 +333,16 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         }        
     }
 
+
+    private String badQueryText(String qtxt) {
+        if( qtxt == null || "".equals( qtxt.trim() ) )
+            return "Please enter a search term.";
+        
+        if( qtxt.equals("*:*") )
+            return "Search term was invalid" ;
+        
+        return null;
+    }
 
     /**
      * Get the class groups represented for the individuals in the documents.
