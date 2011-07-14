@@ -216,7 +216,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     //Get special values for cases such as Menu Management editing
     private void includeSpecialEditingValues(VitroRequest vreq, Map<String, Object> body) {
     	if(vreq.getAttribute(VitroRequest.SPECIAL_WRITE_MODEL) != null) {
-    		body.put("reorderUrl", DisplayVocabulary.REORDER_MENU_URL);
+    		body.put("reorderUrl", vreq.getContextPath() + DisplayVocabulary.REORDER_MENU_URL);
     	}
     }
     
