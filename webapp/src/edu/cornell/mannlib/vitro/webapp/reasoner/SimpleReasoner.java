@@ -126,7 +126,7 @@ public class SimpleReasoner extends StatementListener {
 	       */
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
-			log.error("Exception while adding inferences: " + e.getMessage());
+			log.error("Exception while computing inferences: " + e.getMessage());
 		}
 	}
 	
@@ -154,7 +154,6 @@ public class SimpleReasoner extends StatementListener {
 				removedABoxAssertion(stmt, inferenceModel);
 			}
 			*/
-			
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
 			log.error("Exception while retracting inferences: " + e.getMessage());

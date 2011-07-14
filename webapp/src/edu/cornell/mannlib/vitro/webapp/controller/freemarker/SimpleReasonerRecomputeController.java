@@ -38,7 +38,7 @@ public class SimpleReasonerRecomputeController extends FreemarkerHttpServlet {
             if (!(simpleReasoner instanceof SimpleReasoner)) {
                 messageStr = "No SimpleReasoner has been set up.";
             } else if ( ((SimpleReasoner)simpleReasoner).isABoxReasoningAsynchronous() ) {
-                messageStr = "mostSpecificType annotations are currently being computed and so a recompute can not be started. Please try again later.";
+                messageStr = "SimpleReasoner is currently in asynchronous mode so a recompute can not be started. Please try again later.";
             } else {
             	String signal = (String) vreq.getParameter("signal");
             	    	 
