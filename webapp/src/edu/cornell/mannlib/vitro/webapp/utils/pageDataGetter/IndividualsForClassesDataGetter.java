@@ -37,66 +37,11 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
         //This is the old technique of getting class intersections
         Map<String, List<String>> classIntersectionsMap = vreq.getWebappDaoFactory().getPageDao().getClassesAndRestrictionsForPage(pageUri);
         
-        
-        //Use Individual List Controller to get all the individuals and related data                
-        List<Individual> inds = new ArrayList<Individual>();
         try{
         	List<String> classes = classIntersectionsMap.get("classes");
         	List<String> restrictClasses = classIntersectionsMap.get("restrictClasses");
-        	//Get vclass group
-        	//Anonymous vclass group
-        	VClassGroup classesGroup = new VClassGroup();
-        	classesGroup.setURI("displayClasses");
-        	VClassGroup restrictClassesGroup = new VClassGroup();
-        	restrictClassesGroup.setURI("restrictClasses");
-        	List<VClass> vClasses = new ArrayList<VClass>();
-        	List<VClass> restrictVClasses = new ArrayList<VClass>();
-        	VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
-        	for(String classUri: classes) {
-        		//VClass vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(classUri);
-        		//Retrieve vclass from cache to get the count
-        		VClass vclass = vcgc.getCachedVClass(classUri);
-        		if(vclass != null) {
-        			
-        			log.debug("VClass does exist for " + classUri + " and entity count is " + vclass.getEntityCount());
-        			vClasses.add(vclass);
-        		} else {
-        			log.debug("Vclass " + classUri + " does not exist in the cache");
-        			log.error("Error occurred, vclass does not exist for this uri " + classUri);
-        			//Throw exception here
-        		}
-        	}
-        	classesGroup.setVitroClassList(vClasses);
-        	//What is individual count? Total?
-        	//classesGroup.setIndividualCount(vClasses.size());
-        	data.put("vClassGroup", classesGroup);
-        	List<String> urlEncodedRestrictClasses = new ArrayList<String>();
-        	if(restrictClasses.size() > 0) {
-        		//classes for restriction are not displayed so don't need to include their class individual counts
-        		for(String restrictClassUri: restrictClasses) {
-        			VClass vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(restrictClassUri);
-            		if(vclass != null) {
-            			restrictVClasses.add(vclass);
-            		} else {
-            			log.error("Error occurred, vclass does not exist for this uri " + restrictClassUri);
-            		}
-            		//Assuming utf-8?
-            		urlEncodedRestrictClasses.add(URLEncoder.encode(restrictClassUri, "UTF-8"));
-        		}
-        	
-        		restrictClassesGroup.setVitroClassList(restrictVClasses);
-        		restrictClassesGroup.setIndividualCount(restrictVClasses.size());
-        	} else {
-        		
-        	}
-        	String[] restrictClassesArray = new String[urlEncodedRestrictClasses.size()];
-        	restrictClassesArray = urlEncodedRestrictClasses.toArray(restrictClassesArray);
-        	
-        	//In case just want uris
-        	data.put("restrictClasses", StringUtils.join(restrictClassesArray, ","));
-        	data.put("restrictVClasses", restrictVClasses);
-        	//not sure if this is useful
-        	data.put("restrictVClassGroup", restrictClassesGroup);
+        	log.debug("Retrieving classes for " + classes.toString() + " and restricting by " + restrictClasses.toString());
+        	processClassesAndRestrictions(vreq, context, data, classes, restrictClasses);
         	 //Also add data service url
             //Hardcoding for now, need a more dynamic way of doing this
             data.put("dataServiceUrlIndividualsByVClass", this.getDataServiceUrl());
@@ -106,6 +51,79 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
              
         return data;
     }        
+    
+    protected void processClassesAndRestrictions(VitroRequest vreq, ServletContext context, 
+    		HashMap<String, Object> data, List<String> classes, List<String> restrictClasses ) {
+    	processClassesForDisplay(context, data, classes);
+    	processRestrictionClasses(vreq, context, data, restrictClasses);
+    }
+    
+    private void processClassesForDisplay(ServletContext context, HashMap<String, Object> data, List<String> classes) {
+    	VClassGroup classesGroup = new VClassGroup();
+    	classesGroup.setURI("displayClasses");
+    	
+    	List<VClass> vClasses = new ArrayList<VClass>();
+  
+    	VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+    	for(String classUri: classes) {
+    		//VClass vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(classUri);
+    		//Retrieve vclass from cache to get the count
+    		VClass vclass = vcgc.getCachedVClass(classUri);
+    		if(vclass != null) {
+    			
+    			log.debug("VClass does exist for " + classUri + " and entity count is " + vclass.getEntityCount());
+    			vClasses.add(vclass);
+    		} else {
+    			log.debug("Vclass " + classUri + " does not exist in the cache");
+    			log.error("Error occurred, vclass does not exist for this uri " + classUri);
+    			//Throw exception here
+    		}
+    	}
+    	classesGroup.setVitroClassList(vClasses);
+    	//Set vclass group
+    	data.put("vClassGroup", classesGroup);
+    }	
+    
+    private void processRestrictionClasses(VitroRequest vreq, ServletContext context, 
+    		HashMap<String, Object> data, List<String> restrictClasses) {
+    	try {
+	    	VClassGroup restrictClassesGroup = new VClassGroup();
+	    	restrictClassesGroup.setURI("restrictClasses");
+	    	
+	    	List<VClass> restrictVClasses = new ArrayList<VClass>();
+	    	
+	    	List<String> urlEncodedRestrictClasses = new ArrayList<String>();
+	    	if(restrictClasses.size() > 0) {
+	    		//classes for restriction are not displayed so don't need to include their class individual counts
+	    		for(String restrictClassUri: restrictClasses) {
+	    			VClass vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(restrictClassUri);
+	        		if(vclass != null) {
+	        			log.debug("Found restrict class and adding to list " + restrictClassUri);
+	        			restrictVClasses.add(vclass);
+	        		} else {
+	        			log.error("Error occurred, vclass does not exist for this uri " + restrictClassUri);
+	        		}
+	        		//Assuming utf-8?
+	        		urlEncodedRestrictClasses.add(URLEncoder.encode(restrictClassUri, "UTF-8"));
+	    		}
+	    	
+	    		restrictClassesGroup.setVitroClassList(restrictVClasses);
+	    		restrictClassesGroup.setIndividualCount(restrictVClasses.size());
+	    	} else {
+	    		
+	    	}
+	    	String[] restrictClassesArray = new String[urlEncodedRestrictClasses.size()];
+	    	restrictClassesArray = urlEncodedRestrictClasses.toArray(restrictClassesArray);
+	    	
+	    	//In case just want uris
+	    	data.put("restrictClasses", StringUtils.join(restrictClassesArray, ","));
+	    	data.put("restrictVClasses", restrictVClasses);
+	    	//not sure if this is useful
+	    	data.put("restrictVClassGroup", restrictClassesGroup);
+    	} catch(Exception ex) {
+    		log.error("An error occurred in processing restriction classes ", ex);
+    	}
+    }
     
     public static VClassGroupTemplateModel getClassGroup(String classGroupUri, ServletContext context, VitroRequest vreq){
         

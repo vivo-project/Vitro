@@ -201,11 +201,12 @@ public class JsonServlet extends VitroHttpServlet {
         try{            
             VitroRequest vreq = new VitroRequest(req);
             VClass vclass=null;
-            
+            log.info("Retrieving solr individuals by vclasses");
             // Could have multiple vclass ids sent in
             String[] vitroClassIdStr = vreq.getParameterValues("vclassId");            
             if ( vitroClassIdStr != null && vitroClassIdStr.length > 0){    
             	for(String vclassId: vitroClassIdStr) {
+            		log.info("Using VClass " + vclassId);
 	                vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(vclassId);
 	                if (vclass == null) {
 	                    log.debug("Couldn't retrieve vclass ");   
@@ -254,7 +255,8 @@ public class JsonServlet extends VitroHttpServlet {
     
     //Including version for Solr query for Vclass Intersections
     private static Map<String,Object> getSolrVClassIntersectionResults(List<String> vclassURIs, VitroRequest vreq, ServletContext context){
-        String alpha = IndividualListController.getAlphaParameter(vreq);
+        log.info("Retrieving Solr intersection results for " + vclassURIs.toString());
+    	String alpha = IndividualListController.getAlphaParameter(vreq);
         int page = IndividualListController.getPageParameter(vreq);
         Map<String,Object> map = null;
         try {
