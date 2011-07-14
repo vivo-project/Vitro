@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.dao.filtering;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,8 +14,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 
@@ -111,10 +109,10 @@ class DataPropertyStatementDaoFiltering extends BaseFiltering implements DataPro
          * 
          * Filtering is applied to a list of DataPropertyStatement. Create these statements, mapped
          * to the literal that they are built from, apply filtering to the statements, then get
-         * the associated literals out of the original list.
+         * the associated literals out of the original list. Use a LinkedHashMap to preserve the ordering.
          */
         Map<DataPropertyStatement, Literal> stmtsToLiterals = 
-            new HashMap<DataPropertyStatement, Literal>(literals.size());
+            new LinkedHashMap<DataPropertyStatement, Literal>(literals.size());
 
         for (Literal literal : literals) {
             String value = literal.getLexicalForm();

@@ -3,8 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.dao.filtering;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -102,10 +101,10 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
          * 
          * Filtering is applied to a list of ObjectPropertyStatements. Create these statements, mapped
          * to the item in data that they are built from, apply filtering to the statements, then get
-         * the associated data out of the original list.
+         * the associated data out of the original list. Use a LinkedHashMap to preserve the ordering.
          */
         Map<ObjectPropertyStatement, Map<String, String>> stmtsToData = 
-            new HashMap<ObjectPropertyStatement, Map<String, String>>(data.size());
+            new LinkedHashMap<ObjectPropertyStatement, Map<String, String>>(data.size());
 
         for (Map<String, String> map : data) {
             String objectUri = map.get(objectKey);
