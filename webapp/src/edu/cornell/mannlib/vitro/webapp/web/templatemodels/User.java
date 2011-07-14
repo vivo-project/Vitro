@@ -14,6 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.RevisionInfoController;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.SiteAdminController;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.search.controller.IndexController;
 
 public class User extends BaseTemplateModel {
     private final VitroRequest vreq;
@@ -84,6 +85,10 @@ public class User extends BaseTemplateModel {
     
     public boolean getHasRevisionInfoAccess() {
     	return PolicyHelper.isAuthorizedForActions(vreq, RevisionInfoController.REQUIRED_ACTIONS);
+    }
+    
+    public boolean getHasSearchIndexRebuildAccess() {
+        return PolicyHelper.isAuthorizedForActions(vreq, IndexController.REQUIRED_ACTIONS);
     }
     
     public boolean getHasProfile() {
