@@ -482,7 +482,7 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
 				+ " ?c rdf:type core:ResearcherRole ; core:roleIn ?d .\n"
 				+ " }");
 		
-		// If the grant changes, update the person 
+		// If the grant changes, update the researcher 
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?person)  \n" +
 				"WHERE {\n"
@@ -491,7 +491,35 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
 				+ " ?c rdf:type core:ResearcherRole ; core:researcherRoleOf ?d .\n"
 				+ " }");
 		
-		// If the project changes, update the person 
+		// If the grant changes, update the principal investigator 
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?person)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type core:Grant  ; ?b ?c . \n"
+				+ " ?c rdf:type core:PrincipalInvestigatorRole ; core:principalInvestigatorRoleOf ?d .\n"
+				+ " }");
+
+		// If the grant changes, update the co-principal investigator 
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?person)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type core:Grant  ; ?b ?c . \n"
+				+ " ?c rdf:type core:CoPrincipalInvestigatorRole ; core:co-PrincipalInvestigatorRoleOf ?d .\n"
+				+ " }");
+		
+		
+		// If the grant changes, update the investigator 
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?person)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type core:Grant  ; ?b ?c . \n"
+				+ " ?c rdf:type core:InvestigatorRole ; core:investigatorRoleOf ?d .\n"
+				+ " }");
+		
+		// If the project changes, update the researcher 
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?person)  \n" +
 				"WHERE {\n"
@@ -499,6 +527,8 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
 				+ "?uri rdf:type core:Project  ; ?b ?c . \n"
 				+ " ?c rdf:type core:ResearcherRole ; core:researcherRoleOf ?d .\n"
 				+ " }");
+		
+		
 		
 		//	core:EditorRole -- core:editorRoleOf, core:forInformationResource (person, informationresource)
 		
@@ -621,68 +651,6 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
 				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
 				+ " ?c rdf:type core:ReviewerRole ; core:forInformationResource ?d .\n"
 				+ " }");
-
-		//	core:InvestigatorRole - core:researcherRoleOf, core:investigatorRoleOf
-		
-		// If the person changes, update the investigator role in organization
-		multiValuedQueriesForRole.add(prefix +
-				"SELECT (str(?d) as ?organization) \n " +
-				"WHERE {\n"
-				
-				+ "?uri rdf:type foaf:Person  ; ?b ?c .\n "
-				+ " ?c rdf:type core:InvestigatorRole ; core:roleIn ?d .\n"
-				+ " }");
-		
-		// If the organization changes, update the investigator role and reseacher role of person 
-		multiValuedQueriesForRole.add(prefix +
-				"SELECT (str(?d) as ?person1) (str(?e) as ?person2) \n" +
-				"WHERE {\n"
-				
-				+ "?uri rdf:type foaf:Organization  ; ?b ?c .\n "
-				+ " ?c rdf:type core:InvestigatorRole ; core:investigatorRoleOf ?d ; core:researcherRoleOf ?e . \n"
-				+ " }");
-		
-		
-		//	core:PrincipalInvestigatorRole -- core:principalInvestigatorRoleOf, core:investigatorRoleOf, core:researcherRoleOf	
-
-		// If the person changes, update the principal investigator role in organization
-		multiValuedQueriesForRole.add(prefix +
-				"SELECT (str(?d) as ?organization) \n " +
-				"WHERE {\n"
-				
-				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
-				+ " ?c rdf:type core:PrincipalInvestigatorRole ; core:roleIn ?d .\n"
-				+ " }");
-		
-		// If the organization changes, update the investigator role and reseacher role of person 
-		multiValuedQueriesForRole.add(prefix +
-				"SELECT (str(?d) as ?person1) (str(?e) as ?person2) (str(?f) as ?person3) \n" +
-				"WHERE {\n"
-				
-				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
-				+ " ?c rdf:type core:PrincipalInvestigatorRole ; core:investigatorRoleOf ?d ; core:principalInvestigatorRoleOf ?e ; core:researcherRoleOf ?f . \n"
-				+ " }");
-		
-		
-		//	core:Co-PrincipalInvestigatorRole -- core:co-PrincipalInvestigatorRoleOf, core:investigatorRoleOf, core:researcherRoleOf
-		// If the person changes, update the principal investigator role in organization
-		multiValuedQueriesForRole.add(prefix +
-				"SELECT (str(?d) as ?organization)  \n" +
-				"WHERE {\n"
-				
-				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
-				+ " ?c rdf:type core:Co-PrincipalInvestigatorRole ; core:roleIn ?d .\n"
-				+ " }");
-		
-		// If the organization changes, update the investigator role and reseacher role of person 
-		multiValuedQueriesForRole.add(prefix +
-				"SELECT (str(?d) as ?person1) (str(?e) as ?person2) (str(?f) as ?person3)\n " +
-				"WHERE {\n"
-				
-				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
-				+ " ?c rdf:type core:Co-PrincipalInvestigatorRole ; core:investigatorRoleOf ?d ; core:co-PrincipalInvestigatorRoleOf ?e ; core:researcherRoleOf ?f . \n"
-				+ " }");
-		
 		
 	}
 	
