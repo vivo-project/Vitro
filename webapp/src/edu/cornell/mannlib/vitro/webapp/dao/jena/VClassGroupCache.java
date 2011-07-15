@@ -16,11 +16,13 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
@@ -208,6 +210,24 @@ public class VClassGroupCache {
         return groups;
     }
 
+    protected static boolean isClassNameChange(Statement stmt, OntModel jenaOntModel) {
+        // Check if the stmt is a rdfs:label change and that the
+        // subject is an owl:Class.
+        if( RDFS.label.equals( stmt.getPredicate() )) {                
+            jenaOntModel.enterCriticalSection(Lock.READ);
+            try{                                                  
+                return jenaOntModel.contains(
+                        ResourceFactory.createStatement(
+                                ResourceFactory.createResource(stmt.getSubject().getURI()), 
+                                RDF.type, 
+                                OWL.Class));
+            }finally{
+                jenaOntModel.leaveCriticalSection();
+            }
+        }else{
+            return false;
+        }
+    }
     
     /* ******************** RebuildGroupCacheThread **************** */
     
@@ -310,7 +330,7 @@ public class VClassGroupCache {
     }        
 
     /* ****************** Jena Model Change Listener***************************** */
-    private class VClassGroupCacheChangeListener extends StatementListener {        
+    protected class VClassGroupCacheChangeListener extends StatementListener {        
         public void addedStatement(Statement stmt) {
             checkAndDoUpdate(stmt);
         }
@@ -332,26 +352,13 @@ public class VClassGroupCache {
                 requestCacheUpdate();
             } else if(VitroVocabulary.DISPLAY_RANK.equals(stmt.getPredicate().getURI())){
             	requestCacheUpdate();
-            } else if( isVClassGroupNameChange(stmt) ) {
-                requestCacheUpdate();
-            }
-        }
-
-        protected boolean isVClassGroupNameChange(Statement stmt) {
-            // Check if the stmt is a rdfs:label change and that the
-            // subject is a VClassGroup.
-            if( RDFS.label.equals( stmt.getPredicate() )) {
+            } else {
                 OntModel jenaOntModel = ModelContext.getJenaOntModel(context);
-                jenaOntModel.enterCriticalSection(Lock.READ);
-                try{
-                    return jenaOntModel.contains(stmt.getSubject(), RDF.type, ResourceFactory.createResource(VitroVocabulary.CLASSGROUP));
-                }finally{
-                    jenaOntModel.leaveCriticalSection();
+                if( isClassNameChange(stmt, jenaOntModel) ) {            
+                    requestCacheUpdate();
                 }
-            }else{
-                return false;
             }
-        }
+        }       
     }
     
     /* ******************** ServletContextListener **************** */
