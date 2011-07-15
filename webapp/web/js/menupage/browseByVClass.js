@@ -26,23 +26,23 @@ var browseByVClass = {
     },
     
     // Event listeners. Called on page load
-    bindEventListeners: function() {        
+    bindEventListeners: function() {
         // Listeners for vClass switching
         this.vgraphVClassLinks.click(function() {
-            uri = $(this).attr('data-uri');
+            var uri = $(this).attr('data-uri');
             browseByVClass.getIndividuals(uri);
         });
         
         this.browseVClassLinks.click(function() {
-            uri = $(this).attr('data-uri');
+            var uri = $(this).attr('data-uri');
             browseByVClass.getIndividuals(uri);
             return false;
         });
         
         // Listener for alpha switching
         this.alphaIndexLinks.click(function() {
-            uri = $('#browse-classes li a.selected').attr('data-uri');
-            alpha = $(this).attr('data-alpha');
+            var uri = $('#browse-classes li a.selected').attr('data-uri');
+            var alpha = $(this).attr('data-alpha');
             browseByVClass.getIndividuals(uri, alpha);
             return false;
         });
@@ -54,9 +54,9 @@ var browseByVClass = {
     // Listener for page switching -- separate from the rest because it needs to be callable
     paginationListener: function() {
         $('.pagination li a').click(function() {
-            uri = $('#browse-classes li a.selected').attr('data-uri');
-            alpha = $('#alpha-browse-individuals li a.selected').attr('data-alpha');
-            page = $(this).attr('data-page');
+            var uri = $('#browse-classes li a.selected').attr('data-uri');
+            var alpha = $('#alpha-browse-individuals li a.selected').attr('data-alpha');
+            var page = $(this).attr('data-page');
             browseByVClass.getIndividuals(uri, alpha, page);
             return false;
         });
@@ -71,7 +71,7 @@ var browseByVClass = {
     
     // Where all the magic happens -- gonna fetch me some individuals
     getIndividuals: function(vclassUri, alpha, page, scroll) {
-        url = this.dataServiceUrl + encodeURIComponent(vclassUri);
+        var url = this.dataServiceUrl + encodeURIComponent(vclassUri);
         if ( alpha && alpha != "all") {
             url += '&alpha=' + alpha;
         }
@@ -87,8 +87,8 @@ var browseByVClass = {
         // Scroll to #menupage-intro page unless told otherwise
         if ( scroll != false ) {
             // only scroll back up if we're past the top of the #browse-by section
-            scrollPosition = browseByVClass.getPageScroll();
-            browseByOffset = $('#browse-by').offset();
+            var scrollPosition = browseByVClass.getPageScroll();
+            var browseByOffset = $('#browse-by').offset();
             if ( scrollPosition[1] > browseByOffset.top) {
                 $.scrollTo('#menupage-intro', 500);
             }
@@ -102,10 +102,11 @@ var browseByVClass = {
             if ( results.individuals.length == 0 ) {
                 browseByVClass.emptyResultSet(results.vclass, alpha)
             } else {
+                var vclassName = results.vclass.name;
                 $.each(results.individuals, function(i, item) {
                     var individual, 
                         label, 
-                        vclassName, 
+                        mostSpecificTypes, 
                         uri, 
                         profileUrl, 
                         image, 
@@ -113,7 +114,8 @@ var browseByVClass = {
                         
                     individual = results.individuals[i];
                     label = individual.label;
-                    vclassName = individual.vclassName;
+                    mostSpecificTypes = individual.mostSpecificTypes;
+                    moreInfo = browseByVClass.getMoreInfo(mostSpecificTypes, vclassName);
                     uri = individual.URI;
                     profileUrl = individual.profileUrl;
                     if ( individual.thumbUrl ) {
@@ -127,8 +129,10 @@ var browseByVClass = {
                         listItem += '<h1>';
                     }
                     listItem += '<a href="'+ profileUrl +'" title="View the profile page for '+ label +'">'+ label +'</a></h1>';
+                    if ( moreInfo != '' ) {
+                        listItem += '<span class="title">'+ moreInfo +'</span>';
+                    }
                     listItem += '</li>';
-                    // browseByVClass.individualsInVClass.append(listItem);
                     individualList += listItem;
                 })
                 
@@ -140,10 +144,9 @@ var browseByVClass = {
                 
                 // Check to see if we're dealing with pagination
                 if ( results.pages.length ) {
-                    pages = results.pages;
+                    var pages = results.pages;
                     browseByVClass.pagination(pages, page);
-                }                
-
+                }
             }
             
             // Set selected class, alpha and page
@@ -152,6 +155,32 @@ var browseByVClass = {
             browseByVClass.selectedVClass(results.vclass.URI);
             browseByVClass.selectedAlpha(alpha);
         });
+    },
+    
+    // Handle mostSpecificType as array
+    // * remove requested class for redundancy
+    // * allow override by another property (passed as argument)
+    getMoreInfo: function(mostSpecificTypes, requestedClass, override) {
+        var requestedClassIndex = $.inArray(requestedClass, mostSpecificTypes);
+        if ( requestedClassIndex > -1 ) {
+            mostSpecificTypes.splice(requestedClassIndex, 1);
+        }
+        var mostSpecificTypeCount = mostSpecificTypes.length;
+        
+        if ( typeof override !== "undefined" ) {
+            return override;
+        } else {
+            if ( mostSpecificTypeCount > 1 ) {
+                var assembledList = '<ul class="mostSpecificTypes">';
+                $.each(mostSpecificTypes, function(i, item) {
+                    assembledList += '<li>'+ item +'</li>';
+                })
+                assembledList += '</ul>';
+                return assembledList;
+            } else {
+                return mostSpecificTypes;
+            }
+        }
     },
     
     // getPageScroll() by quirksmode.org
@@ -172,12 +201,12 @@ var browseByVClass = {
     
     // Print out the pagination nav if called
     pagination: function(pages, page) {
-        pagination = '<div class="pagination menupage">';
+        var pagination = '<div class="pagination menupage">';
         pagination += '<h3>page</h3>';
         pagination += '<ul>';
         $.each(pages, function(i, item) {
-            anchorOpen = '<a class="round" href="#" title="View page '+ pages[i].text +' of the results" data-page="'+ pages[i].index +'">';
-            anchorClose = '</a>';
+            var anchorOpen = '<a class="round" href="#" title="View page '+ pages[i].text +' of the results" data-page="'+ pages[i].index +'">';
+            var anchorClose = '</a>';
             
             pagination += '<li class="round';
             // Test for active page
@@ -236,7 +265,7 @@ var browseByVClass = {
         var nothingToSeeHere;
         
         this.wipeSlate();
-        alpha = this.selectedAlpha(alpha);
+        var alpha = this.selectedAlpha(alpha);
         
         if ( alpha != "all" ) {
             nothingToSeeHere = '<p class="no-individuals">There are no '+ vclass.name +' individuals whose name starts with <em>'+ alpha.toUpperCase() +'</em>.</p> <p class="no-individuals">Please try another letter or browse all.</p>';

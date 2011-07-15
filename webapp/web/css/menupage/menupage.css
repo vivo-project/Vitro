@@ -253,6 +253,18 @@ li.individual h1.thumb {
 #individuals-in-class span.org {
     display: block;
 }
+ul.mostSpecificTypes li {
+    float: left;
+    display: block;
+    padding: 0 10px;
+    border-right: 1px solid #c9c8c8;
+}
+ul.mostSpecificTypes li:first-child {
+    padding-left: 0;
+}
+ul.mostSpecificTypes li:last-child {
+    border-right: none
+}
 p.no-individuals {
     margin: 1em 2em;
 }
