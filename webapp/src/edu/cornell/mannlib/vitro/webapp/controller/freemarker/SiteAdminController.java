@@ -55,80 +55,73 @@ public class SiteAdminController extends FreemarkerHttpServlet {
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
+        
         Map<String, Object> body = new HashMap<String, Object>();        
-        
-    	if (PolicyHelper.isAuthorizedForActions(vreq, new EditIndividuals())) {
-    		body.put("dataInput", getDataInputData(vreq));
-    	}
 
-        body.put("siteConfig", getSiteConfigUrls(vreq));
-        
-        if (PolicyHelper.isAuthorizedForActions(vreq, new UseMiscellaneousAdminPages())) {
-            body.put("indexCacheRebuild", getIndexCacheRebuildUrls(vreq));
-        }        
+        body.put("dataInput", getDataInputData(vreq));
+        body.put("siteConfig", getSiteConfigUrls(vreq));        
+        body.put("indexCacheRebuild", getIndexCacheRebuildUrls(vreq));     
+        body.put("ontologyEditor", getOntologyEditorData(vreq));
+        body.put("dataTools", getDataToolsUrls(vreq));
 
-        if (PolicyHelper.isAuthorizedForActions(vreq, new EditOntology())) {
-        	body.put("ontologyEditor", getOntologyEditorData(vreq));
-        }
-        
-		if (PolicyHelper.isAuthorizedForActions(vreq, new UseAdvancedDataToolsPages())) {
-            body.put("dataTools", getDataToolsUrls(vreq));
-        }
-        
         return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
- 
     }
     
     private Map<String, String> getIndexCacheRebuildUrls(VitroRequest vreq) {
+        
         Map<String, String> urls = new HashMap<String, String>();
 
-        urls.put("recomputeInferences", UrlBuilder.getUrl("/RecomputeInferences"));     
-        
-        urls.put("rebuildClassGroupCache", UrlBuilder.getUrl("/browse?clearcache=1"));
-        
-        if (PolicyHelper.isAuthorizedForActions(vreq, IndexController.REQUIRED_ACTIONS)) {
-            urls.put("rebuildSearchIndex", UrlBuilder.getUrl("/SearchIndex"));            
-        }
-        
-            
-        if (PolicyHelper.isAuthorizedForActions(vreq, new RefreshVisualizationCacheAction())) {
-            urls.put("rebuildVisCache", UrlBuilder.getUrl("/vis/tools"));            
-        }
+        if (PolicyHelper.isAuthorizedForActions(vreq, new UseMiscellaneousAdminPages())) {
 
+            urls.put("recomputeInferences", UrlBuilder.getUrl("/RecomputeInferences"));     
+        
+            urls.put("rebuildClassGroupCache", UrlBuilder.getUrl("/browse?clearcache=1"));
+        
+            if (PolicyHelper.isAuthorizedForActions(vreq, IndexController.REQUIRED_ACTIONS)) {
+                urls.put("rebuildSearchIndex", UrlBuilder.getUrl("/SearchIndex"));            
+            }
+                    
+            if (PolicyHelper.isAuthorizedForActions(vreq, new RefreshVisualizationCacheAction())) {
+                urls.put("rebuildVisCache", UrlBuilder.getUrl("/vis/tools"));            
+            }
+        }
         return urls;
     }
 
     private Map<String, Object> getDataInputData(VitroRequest vreq) {
     
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("formAction", UrlBuilder.getUrl("/edit/editRequestDispatch.jsp"));
         
-        WebappDaoFactory wadf = vreq.getFullWebappDaoFactory();
-        
-        // Create map for data input entry form options list
-        List classGroups = wadf.getVClassGroupDao().getPublicGroupsWithVClasses(true,true,false); // order by displayRank, include uninstantiated classes, don't get the counts of individuals
+        if (PolicyHelper.isAuthorizedForActions(vreq, new EditIndividuals())) {
 
-        
-        Set<String> seenGroupNames = new HashSet<String>();
-        
-        Iterator classGroupIt = classGroups.iterator();
-        LinkedHashMap<String, List> orderedClassGroups = new LinkedHashMap<String, List>(classGroups.size());
-        while (classGroupIt.hasNext()) {
-            VClassGroup group = (VClassGroup)classGroupIt.next();            
-            List opts = FormUtils.makeOptionListFromBeans(group.getVitroClassList(),"URI","PickListName",null,null,false);
-            if( seenGroupNames.contains(group.getPublicName() )){
-                //have a duplicate classgroup name, stick in the URI
-                orderedClassGroups.put(group.getPublicName() + " ("+group.getURI()+")", opts);
-            }else if( group.getPublicName() == null ){
-                //have an unlabeled group, stick in the URI
-                orderedClassGroups.put("unnamed group ("+group.getURI()+")", opts);
-            }else{
-                orderedClassGroups.put(group.getPublicName(),opts);
-                seenGroupNames.add(group.getPublicName());
-            }             
+            map.put("formAction", UrlBuilder.getUrl("/edit/editRequestDispatch.jsp"));
+            
+            WebappDaoFactory wadf = vreq.getFullWebappDaoFactory();
+            
+            // Create map for data input entry form options list
+            List classGroups = wadf.getVClassGroupDao().getPublicGroupsWithVClasses(true,true,false); // order by displayRank, include uninstantiated classes, don't get the counts of individuals
+    
+            Set<String> seenGroupNames = new HashSet<String>();
+            
+            Iterator classGroupIt = classGroups.iterator();
+            LinkedHashMap<String, List> orderedClassGroups = new LinkedHashMap<String, List>(classGroups.size());
+            while (classGroupIt.hasNext()) {
+                VClassGroup group = (VClassGroup)classGroupIt.next();            
+                List opts = FormUtils.makeOptionListFromBeans(group.getVitroClassList(),"URI","PickListName",null,null,false);
+                if( seenGroupNames.contains(group.getPublicName() )){
+                    //have a duplicate classgroup name, stick in the URI
+                    orderedClassGroups.put(group.getPublicName() + " ("+group.getURI()+")", opts);
+                }else if( group.getPublicName() == null ){
+                    //have an unlabeled group, stick in the URI
+                    orderedClassGroups.put("unnamed group ("+group.getURI()+")", opts);
+                }else{
+                    orderedClassGroups.put(group.getPublicName(),opts);
+                    seenGroupNames.add(group.getPublicName());
+                }             
+            }
+            
+            map.put("groupedClassOptions", orderedClassGroups);
         }
-        
-        map.put("groupedClassOptions", orderedClassGroups);
         return map;
     }
     
@@ -161,37 +154,40 @@ public class SiteAdminController extends FreemarkerHttpServlet {
 
         Map<String, Object> map = new HashMap<String, Object>();
  
-        String pelletError = null;
-        String pelletExplanation = null;
-        Object plObj = getServletContext().getAttribute("pelletListener");
-        if ( (plObj != null) && (plObj instanceof PelletListener) ) {
-            PelletListener pelletListener = (PelletListener) plObj;
-            if (!pelletListener.isConsistent()) {
-                pelletError = "INCONSISTENT ONTOLOGY: reasoning halted.";
-                pelletExplanation = pelletListener.getExplanation();
-            } else if ( pelletListener.isInErrorState() ) {
-                pelletError = "An error occurred during reasoning. Reasoning has been halted. See error log for details.";
+        if (PolicyHelper.isAuthorizedForActions(vreq, new EditOntology())) {
+            
+            String pelletError = null;
+            String pelletExplanation = null;
+            Object plObj = getServletContext().getAttribute("pelletListener");
+            if ( (plObj != null) && (plObj instanceof PelletListener) ) {
+                PelletListener pelletListener = (PelletListener) plObj;
+                if (!pelletListener.isConsistent()) {
+                    pelletError = "INCONSISTENT ONTOLOGY: reasoning halted.";
+                    pelletExplanation = pelletListener.getExplanation();
+                } else if ( pelletListener.isInErrorState() ) {
+                    pelletError = "An error occurred during reasoning. Reasoning has been halted. See error log for details.";
+                }
             }
-        }
-
-        if (pelletError != null) {
-            Map<String, String> pellet = new HashMap<String, String>();
-            pellet.put("error", pelletError);
-            if (pelletExplanation != null) {
-                pellet.put("explanation", pelletExplanation);
+    
+            if (pelletError != null) {
+                Map<String, String> pellet = new HashMap<String, String>();
+                pellet.put("error", pelletError);
+                if (pelletExplanation != null) {
+                    pellet.put("explanation", pelletExplanation);
+                }
+                map.put("pellet", pellet);
             }
-            map.put("pellet", pellet);
+                    
+            Map<String, String> urls = new HashMap<String, String>();
+            
+            urls.put("ontologies", UrlBuilder.getUrl("/listOntologies"));
+            urls.put("classHierarchy", UrlBuilder.getUrl("/showClassHierarchy"));
+            urls.put("classGroups", UrlBuilder.getUrl("/listGroups"));
+            urls.put("dataPropertyHierarchy", UrlBuilder.getUrl("/showDataPropertyHierarchy"));
+            urls.put("propertyGroups", UrlBuilder.getUrl("/listPropertyGroups"));            
+            urls.put("objectPropertyHierarchy", UrlBuilder.getUrl("/showObjectPropertyHierarchy", new ParamMap("iffRoot", "true")));
+            map.put("urls", urls);
         }
-                
-        Map<String, String> urls = new HashMap<String, String>();
-        
-        urls.put("ontologies", UrlBuilder.getUrl("/listOntologies"));
-        urls.put("classHierarchy", UrlBuilder.getUrl("/showClassHierarchy"));
-        urls.put("classGroups", UrlBuilder.getUrl("/listGroups"));
-        urls.put("dataPropertyHierarchy", UrlBuilder.getUrl("/showDataPropertyHierarchy"));
-        urls.put("propertyGroups", UrlBuilder.getUrl("/listPropertyGroups"));            
-        urls.put("objectPropertyHierarchy", UrlBuilder.getUrl("/showObjectPropertyHierarchy", new ParamMap("iffRoot", "true")));
-        map.put("urls", urls);
         
         return map;
     }
@@ -199,11 +195,14 @@ public class SiteAdminController extends FreemarkerHttpServlet {
     private Map<String, String> getDataToolsUrls(VitroRequest vreq) {
 
         Map<String, String> urls = new HashMap<String, String>();
-        urls.put("ingest", UrlBuilder.getUrl("/ingest"));
-        urls.put("rdfData", UrlBuilder.getUrl("/uploadRDFForm"));
-        urls.put("rdfExport", UrlBuilder.getUrl("/export"));
-        urls.put("sparqlQuery", UrlBuilder.getUrl("/admin/sparqlquery"));
-        urls.put("sparqlQueryBuilder", UrlBuilder.getUrl("/admin/sparqlquerybuilder"));
+        
+        if (PolicyHelper.isAuthorizedForActions(vreq, new UseAdvancedDataToolsPages())) {            
+            urls.put("ingest", UrlBuilder.getUrl("/ingest"));
+            urls.put("rdfData", UrlBuilder.getUrl("/uploadRDFForm"));
+            urls.put("rdfExport", UrlBuilder.getUrl("/export"));
+            urls.put("sparqlQuery", UrlBuilder.getUrl("/admin/sparqlquery"));
+            urls.put("sparqlQueryBuilder", UrlBuilder.getUrl("/admin/sparqlquerybuilder"));
+        }
         
         return urls;
     }
