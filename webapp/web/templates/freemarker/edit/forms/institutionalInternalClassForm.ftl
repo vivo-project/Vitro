@@ -21,7 +21,7 @@ edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.Institu
         <#--If no local ontologies, display message for user to create a local ontology-->
         <#if ontologiesExist = false>
         <section id="noLocalOntologyExists" role="region">
-            <p>There are currently no local ontologies. You must create a <a href='${urls.base}/editForm?controller=Ontology'>new local ontology</a></p>
+            <p>There are currently no local ontologies. You must create a <a href='${urls.base}/editForm?controller=Ontology'>new local ontology.</a></p>
         </section>
         
         <#--else if local ontologies exist and local classes exist, show drop-down of local classes-->

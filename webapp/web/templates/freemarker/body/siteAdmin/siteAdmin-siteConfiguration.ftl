@@ -8,23 +8,22 @@
         <h3>Site Configuration</h3>
         
         <ul>
+            <#if siteConfig.siteInfo?has_content>
+                <li><a href="${siteConfig.siteInfo}">Site information</a></li>
+            </#if>
+            
+            <#if siteConfig.menuManagement?has_content>
+                <li><a href="${siteConfig.menuManagement}">Menu management</a></li>
+            </#if>
+            
+            <#if siteConfig.internalClass?has_content>
+                <li><a href="${siteConfig.internalClass}">Institutional internal class</a></li>
 
-            <#if siteConfig.urls.siteInfo??>
-                <li><a href="${siteConfig.urls.siteInfo}">Site information</a></li>
             </#if>
             
-            <#if siteConfig.urls.menuManagement??>
-                <li><a href="${siteConfig.urls.menuManagement}">Menu management</a></li>
-            </#if>
-            
-            <#if siteConfig.urls.internalClass??>
-                <li><a href="${siteConfig.urls.internalClass}">Institutional internal class</a></li>
-            </#if>
-            
-            <#if siteConfig.urls.userList??>
-                <li><a href="${siteConfig.urls.userList}">User accounts</a></li>
-            </#if>
-            
+            <#if siteConfig.userAccounts?has_content>
+                <li><a href="${siteConfig.userAccounts}">User accounts</a></li>
+            </#if>           
         </ul>
     </div>
 </#if>

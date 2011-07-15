@@ -2,15 +2,15 @@
 
 <#-- Template for Site Administration Ontology Editor -->
 
-<#if ontologyEditor??>
+<#if ontologyEditor?has_content>
     <div class="pageBodyGroup">
 
         <h3>Ontology Editor</h3>
         
-        <#if ontologyEditor.pellet??>
+        <#if ontologyEditor.pellet?has_content>
             <div class="notice">
                 <p>${ontologyEditor.pellet.error}</p>
-                <#if ontologyEditor.pellet.explanation??>
+                <#if ontologyEditor.pellet.explanation?has_content>
                     <p>Cause: ${ontologyEditor.pellet.explanation}</p>
                 </#if>
             </div>

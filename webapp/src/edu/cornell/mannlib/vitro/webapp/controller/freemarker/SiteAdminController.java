@@ -61,51 +61,41 @@ public class SiteAdminController extends FreemarkerHttpServlet {
     		body.put("dataInput", getDataInputData(vreq));
     	}
 
-        body.put("siteConfig", getSiteConfigurationData(vreq));
+        body.put("siteConfig", getSiteConfigUrls(vreq));
         
-        body.put("indexCacheRebuild", getIndexCacheRebuildData(vreq));
+        if (PolicyHelper.isAuthorizedForActions(vreq, new UseMiscellaneousAdminPages())) {
+            body.put("indexCacheRebuild", getIndexCacheRebuildUrls(vreq));
+        }        
 
-        // rjy7 There is a risk that the login levels required to show the links will get out
-        // of step with the levels required by the pages themselves. We should implement a 
-        // mechanism similar to what's used on the front end to display links to Site Admin
-        // and Revision Info iff the user has access to those pages.
         if (PolicyHelper.isAuthorizedForActions(vreq, new EditOntology())) {
         	body.put("ontologyEditor", getOntologyEditorData(vreq));
         }
+        
 		if (PolicyHelper.isAuthorizedForActions(vreq, new UseAdvancedDataToolsPages())) {
-            body.put("dataTools", getDataToolsData(vreq));
-            
-            // Only for DataStar. Should handle without needing a DataStar-specific version of this controller.
-            //body.put("customReports", getCustomReportsData(vreq));
+            body.put("dataTools", getDataToolsUrls(vreq));
         }
         
         return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
  
     }
     
-    private Object getIndexCacheRebuildData(VitroRequest vreq) {
-        
-        Map<String, Object> map = new HashMap<String, Object>();
+    private Map<String, String> getIndexCacheRebuildUrls(VitroRequest vreq) {
         Map<String, String> urls = new HashMap<String, String>();
+
+        urls.put("recomputeInferences", UrlBuilder.getUrl("/RecomputeInferences"));     
+        
+        urls.put("rebuildClassGroupCache", UrlBuilder.getUrl("/browse?clearcache=1"));
         
         if (PolicyHelper.isAuthorizedForActions(vreq, IndexController.REQUIRED_ACTIONS)) {
             urls.put("rebuildSearchIndex", UrlBuilder.getUrl("/SearchIndex"));            
         }
         
-        if (PolicyHelper.isAuthorizedForActions(vreq, new UseMiscellaneousAdminPages())) {
-            urls.put("recomputeInferences", UrlBuilder.getUrl("/RecomputeInferences"));            
-        }
-        
-        if (PolicyHelper.isAuthorizedForActions(vreq, new UseMiscellaneousAdminPages())) {
-            urls.put("rebuildClassGroupCache", UrlBuilder.getUrl("/browse?clearcache=1"));            
-        }
-        
+            
         if (PolicyHelper.isAuthorizedForActions(vreq, new RefreshVisualizationCacheAction())) {
             urls.put("rebuildVisCache", UrlBuilder.getUrl("/vis/tools"));            
         }
-        
-        map.put("urls", urls);
-        return map;
+
+        return urls;
     }
 
     private Map<String, Object> getDataInputData(VitroRequest vreq) {
@@ -117,8 +107,7 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         
         // Create map for data input entry form options list
         List classGroups = wadf.getVClassGroupDao().getPublicGroupsWithVClasses(true,true,false); // order by displayRank, include uninstantiated classes, don't get the counts of individuals
-        
-        //boolean classGroupDisplayAssumptionsMet = checkClassGroupDisplayAssumptions(classGroups);   
+
         
         Set<String> seenGroupNames = new HashSet<String>();
         
@@ -143,17 +132,16 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         return map;
     }
     
-    private Map<String, Object> getSiteConfigurationData(VitroRequest vreq) {
+    private Map<String, String> getSiteConfigUrls(VitroRequest vreq) {
 
-        Map<String, Object> map = new HashMap<String, Object>();
         Map<String, String> urls = new HashMap<String, String>();
         
         if (PolicyHelper.isAuthorizedForActions(vreq, new ManageUserAccounts())) {
-        	urls.put("userList", UrlBuilder.getUrl("/accountsAdmin"));
+        	urls.put("userAccounts", UrlBuilder.getUrl("/accountsAdmin"));
         }
  
         if (PolicyHelper.isAuthorizedForActions(vreq, new EditSiteInformation())) {
-            urls.put("siteInfo", UrlBuilder.getUrl("/editForm", new ParamMap("controller", "ApplicationBean")));
+            urls.put("siteInfo", UrlBuilder.getUrl("/editForm", "controller", "ApplicationBean"));
         }
         
         if (PolicyHelper.isAuthorizedForActions(vreq, new ManageMenus())) {
@@ -166,9 +154,7 @@ public class SiteAdminController extends FreemarkerHttpServlet {
             urls.put("internalClass", UrlBuilder.getUrl("/processInstitutionalInternalClass"));
         }
         
-        map.put("urls", urls);
-        
-        return map;
+        return urls;
     }
     
     private Map<String, Object> getOntologyEditorData(VitroRequest vreq) {
@@ -210,10 +196,8 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         return map;
     }
 
-    private Map<String, Object> getDataToolsData(VitroRequest vreq) {
+    private Map<String, String> getDataToolsUrls(VitroRequest vreq) {
 
-        Map<String, Object> map = new HashMap<String, Object>();
-        
         Map<String, String> urls = new HashMap<String, String>();
         urls.put("ingest", UrlBuilder.getUrl("/ingest"));
         urls.put("rdfData", UrlBuilder.getUrl("/uploadRDFForm"));
@@ -221,9 +205,7 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         urls.put("sparqlQuery", UrlBuilder.getUrl("/admin/sparqlquery"));
         urls.put("sparqlQueryBuilder", UrlBuilder.getUrl("/admin/sparqlquerybuilder"));
         
-        map.put("urls", urls);
-        
-        return map;
+        return urls;
     }
 
 }
