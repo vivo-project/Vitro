@@ -5,6 +5,7 @@ var menuManagementEdit = {
         this.initObjects();
         this.bindEventListeners();
         this.toggleClassSelection();
+        //this.validateMenuItemForm();
     },
     initObjects: function() {
         this.defaultTemplateRadio = $('input.default-template');
@@ -23,7 +24,7 @@ var menuManagementEdit = {
     bindEventListeners: function() {        
         // Listeners for vClass switching
         this.changeContentType.click(function() {
-           menuManagementEdit.showClasses();
+           menuManagementEdit.showClassGroups();
            return false;
         });
         this.selectClassGroupDropdown.change(function() {
@@ -41,12 +42,35 @@ var menuManagementEdit = {
             // If checked, hide this input element
             menuManagementEdit.customTemplate.removeClass('hidden');
         });
+        $("form").submit(function () { 
+            var validationError = menuManagementEdit.validateMenuItemForm();
+            if (validationError == "") {
+            	alert("validation error is empty, submit");
+                   $(this).submit();
+               } else{
+            	   alert("validation error is not empty");
+                   $('#error-alert').removeClass('hidden');
+                   $('#error-alert p').html(validationError);
+                   return false;
+               } 
+         });
     },
-    showClasses: function() {
+    showClassGroups: function() { //User has clicked change content type
+    	//Show the section with the class group dropdown
+    	this.selectContentType.removeClass("hidden");
+    	//Hide the "change content type" section which shows the selected class group
+    	this.existingContentType.addClass("hidden");
+    	//Hide the checkboxes for classes within the class group
         this.classesForClassGroup.addClass("hidden");
     },
-    hideClasses: function() {
-        this.classesForClassGroup.removeClass("hidden");
+    hideClassGroups: function() { //User has selected class group/content type, page should show classes for class group and 'existing' type with change link
+    	//Hide the class group dropdown
+    	this.selectContentType.addClass("hidden");
+    	//Show the "change content type" section which shows the selected class group
+    	this.existingContentType.removeClass("hidden");
+    	//Show the classes in the class group
+    	this.classesForClassGroup.removeClass("hidden");
+    	
     },
     toggleClassSelection: function() {
         /*To do: please fix so selecting all selects all classes and deselecting
@@ -75,6 +99,31 @@ var menuManagementEdit = {
             $('input:checkbox[name=allSelected]').removeAttr('checked');
         });
     },
+    validateMenuItemForm: function() {
+        var validationError = "";
+        
+        //Check menu name
+        if ($("input[type=text][name=menuName]").val() == ""){
+            validationError += "You must supply a Name<br />";
+            }
+        //Check pretty url     
+        if ($("input[type=text][name=prettyUrl]").val() == ""){
+            validationError += "You must supply a Pretty URL<br />";
+        }
+            
+
+        //if ($("input[name='selectedTemplate']:checked").val() == "custom") {
+
+           // if ($("input[name=customTemplate]").val() == ""){
+               // validationError += " * Enter custom template \n"; 
+            //}
+        //}
+        //check select class group
+        if ($("#selectClassGroup").val() =='-1'){
+           validationError += "You must supply a Content type<br />"; 
+        }
+        return validationError;
+    },
     chooseClassGroup: function() {        
         var url = "dataservice?getVClassesForVClassGroup=1&classgroupUri=";
         var vclassUri = this.selectClassGroupDropdown.val();
@@ -87,7 +136,7 @@ var menuManagementEdit = {
           } else {
               //update existing content type with correct class group name and hide class group select again
               var _this = menuManagementEdit;
-              menuManagementEdit.hideClasses();
+              menuManagementEdit.hideClassGroups();
       
               menuManagementEdit.selectedGroupForPage.html(results.classGroupName);
                 //retrieve classes for class group and display with all selected
