@@ -18,7 +18,7 @@
             </#if>
             
             <#if siteConfig.urls.internalClass??>
-                <li><a href="${urls.base}/processInstitutionalInternalClass">Institutional internal class</a></li>
+                <li><a href="${siteConfig.urls.internalClass}">Institutional internal class</a></li>
             </#if>
             
             <#if siteConfig.urls.userList??>
