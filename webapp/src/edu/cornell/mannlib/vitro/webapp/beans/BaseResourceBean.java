@@ -35,10 +35,10 @@ public class BaseResourceBean implements ResourceBean {
     
     public enum RoleLevel { PUBLIC("http://vitro.mannlib.cornell.edu/ns/vitro/role#public","public","public"),
                             SELF("http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor","self-authenticated","self"),
-                            EDITOR("http://vitro.mannlib.cornell.edu/ns/vitro/role#editor","editor,curator,dbAdmin","editor"),
-                            CURATOR("http://vitro.mannlib.cornell.edu/ns/vitro/role#curator","curator,dbAdmin","curator"),
-                            DB_ADMIN("http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin","dbAdmin only","DBA"),
-                            NOBODY("http://vitro.mannlib.cornell.edu/ns/vitro/role#nobody","nobody","nobody");
+                            EDITOR("http://vitro.mannlib.cornell.edu/ns/vitro/role#editor","editor, curator, site administrator","editor"),
+                            CURATOR("http://vitro.mannlib.cornell.edu/ns/vitro/role#curator","curator, site administrator","curator"),
+                            DB_ADMIN("http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin","site administrator","siteAdmin"),
+                            NOBODY("http://vitro.mannlib.cornell.edu/ns/vitro/role#nobody","root user","root");
     
         private final String uri;
         private final String label;
