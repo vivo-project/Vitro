@@ -3,7 +3,7 @@
 <#-- Template for Site Administration advanced data tools panel -->
 
 <#if dataTools??>
-    <div class="pageBodyGroup">
+    <section class="pageBodyGroup">
     
         <h3>Advanced Data Tools</h3>
         
@@ -13,7 +13,6 @@
             <li><a href="${dataTools.urls.rdfExport}">RDF export</a></li>
             <li><a href="${dataTools.urls.sparqlQuery}">SPARQL query</a></li>
             <li><a href="${dataTools.urls.sparqlQueryBuilder}">SPARQL query builder</a></li>         
-            <li><a href="${dataTools.urls.visualizationTool}">Visualization Tools</a></li>
         </ul>
-    </div>
+    </section>
 </#if>
