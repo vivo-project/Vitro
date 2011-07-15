@@ -52,3 +52,6 @@ ul#selectedClasses {
 ul#selectedClasses li {
     margin-left: .4em;
 }
+#error-alert{
+    height: auto !important;
+}

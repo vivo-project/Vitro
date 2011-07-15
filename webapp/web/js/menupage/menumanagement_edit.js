@@ -49,6 +49,7 @@ var menuManagementEdit = {
                } else{
                    $('#error-alert').removeClass('hidden');
                    $('#error-alert p').html(validationError);
+                   $.scrollTo({ top:0, left:0}, 500)
                    return false;
                } 
          });
@@ -111,7 +112,7 @@ var menuManagementEdit = {
           
         if ($("input:radio[name=selectedTemplate]:checked").val() == "custom") {
         	if($("input[name=customTemplate]").val() == "") {
-        		validationError += " * Enter custom template <br />"; 
+        		validationError += "You must supply a Template<br />"; 
         	}
         }
         
@@ -123,7 +124,7 @@ var menuManagementEdit = {
         	var noClassesSelected = $("input[name='classInClassGroup']:checked").length;
         	if(noClassesSelected == 0) {
         		//at least one class should be selected
-        		validationError += "You must have at least one class selected <br />";
+        		validationError += "You must supply some content for displaying <br />";
         	}
         }
       
