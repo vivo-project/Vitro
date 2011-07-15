@@ -45,10 +45,8 @@ var menuManagementEdit = {
         $("form").submit(function () { 
             var validationError = menuManagementEdit.validateMenuItemForm();
             if (validationError == "") {
-            	alert("validation error is empty, submit");
                    $(this).submit();
                } else{
-            	   alert("validation error is not empty");
                    $('#error-alert').removeClass('hidden');
                    $('#error-alert p').html(validationError);
                    return false;
@@ -84,7 +82,6 @@ var menuManagementEdit = {
         }*/
         // Check/unckeck all classes for selection
         $('input:checkbox[name=allSelected]').click(function(){
-             // alert($('input:checkbox[name=classInClassGroup]'));
              if ( this.checked ) {
              // if checked, select all the checkboxes
              $('input:checkbox[name=classInClassGroup]').attr('checked','checked');
@@ -110,18 +107,28 @@ var menuManagementEdit = {
         if ($("input[type=text][name=prettyUrl]").val() == ""){
             validationError += "You must supply a Pretty URL<br />";
         }
-            
-
-        //if ($("input[name='selectedTemplate']:checked").val() == "custom") {
-
-           // if ($("input[name=customTemplate]").val() == ""){
-               // validationError += " * Enter custom template \n"; 
-            //}
-        //}
-        //check select class group
-        if ($("#selectClassGroup").val() =='-1'){
-           validationError += "You must supply a Content type<br />"; 
+          
+        if ($("input:radio[name=selectedTemplate]:checked").val() == "custom") {
+        	if($("input[name=customTemplate]").val() == "") {
+        		validationError += " * Enter custom template <br />"; 
+        	}
         }
+        
+        //if no class group selected, this is an error
+        if ($("#selectClassGroup").val() =='-1'){
+            validationError += "You must supply a Content type<br />"; 
+        } else {
+        	//class group has been selected, make sure there is at least one class selected
+        	var noClassesSelected = $("input[name='classInClassGroup']:checked").length;
+        	if(noClassesSelected == 0) {
+        		//at least one class should be selected
+        		validationError += "You must have at least one class selected <br />";
+        	}
+        }
+      
+       
+        //check select class group
+       
         return validationError;
     },
     chooseClassGroup: function() {        
