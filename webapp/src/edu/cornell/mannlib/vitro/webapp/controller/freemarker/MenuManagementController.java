@@ -82,8 +82,6 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     
     //Certain parameters are always passed
     private void initializeData(Map<String, Object> data, VitroRequest vreq) {
-    	//Form url submission
-    	data.put("title", getCommand(vreq) + " Menu Item");
     	data.put("formUrls", vreq.getContextPath() + SUBMIT_FORM);
     	data.put("cancelUrl", vreq.getContextPath() + CANCEL_FORM);
     	data.put("internalClassUri", "");
@@ -109,10 +107,8 @@ public class MenuManagementController extends FreemarkerHttpServlet {
 		String menuItem = getMenuItem(vreq);
     	data.put("menuItem", menuItem);
     	data.put("menuAction", "Remove");
+    	data.put("title", "Remove Menu Item");
     	//Generate empty values for fields
-    	//TODO: Remove these if only portion of template utilized
-   
-    
     	data.put("prettyUrl", "");
     	data.put("associatedPage", "");
     	data.put("associatedPageURI", "");
@@ -128,7 +124,8 @@ public class MenuManagementController extends FreemarkerHttpServlet {
 	}
 
 	private void processAddMenuItem(VitroRequest vreq, Map<String, Object> data) {
-    	data.put("menuAction", "Add");
+    	data.put("title", "Add Menu Item");
+		data.put("menuAction", "Add");
     	//Generate empty values for fields
     	data.put("menuItem", "");
     	data.put("menuName", "");
@@ -150,6 +147,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
 		if(!hasMenuItem(vreq)) {
     		return;
     	}
+		data.put("title", "Edit Menu Item");
 		//Get parameter for menu item
     	String menuItem = getMenuItem(vreq);
     	data.put("menuItem", menuItem);
