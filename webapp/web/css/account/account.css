@@ -137,6 +137,13 @@ form.customForm p.note {
 #my-account input[type="password"] {
     width: 20em;
 }
+#search-feedback {
+    clear: both;
+}
+#search-feedback span,
+#filter-roles span {
+    font-size: .8em;
+}
 /* CREATE PASSWORD ------>  */
 #create-password p.note {
      margin-top: 0;

@@ -58,6 +58,10 @@
             should be submitted.
             -->
         </select>
+        
+        <#if roleFilterUri?has_content>
+             <span><a href="${formUrls.list}"> View all accounts</a></span>
+        </#if>
     </form>
 </section>
 
@@ -74,7 +78,11 @@
         -->
     </form>
 </section>
-
+<#if searchTerm?has_content>
+<section id="search-feedback">
+    <p>Search results for "<strong>${searchTerm}</strong>" | <span><a href="${formUrls.list}"> View all accounts</a></span></p>
+</section>
+</#if>
 <form method="POST" action="${formUrls.list}" id="account-display" class="customForm" role="accounts display">
     <@p.accountsNav />
     
