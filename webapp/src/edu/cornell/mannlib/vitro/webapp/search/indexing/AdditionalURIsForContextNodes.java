@@ -453,7 +453,7 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
 		
 		//	core:PresenterRole -- core:presenterRoleOf
 		
-		// If the person changes, update the presenter role in organization
+		// If the person changes, update the presentation
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?organization)  \n" +
 				"WHERE {\n"
@@ -462,18 +462,18 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
 				+ " ?c rdf:type core:PresenterRole ; core:roleIn ?d .\n"
 				+ " }");
 		
-		// If the organization changes, update the presenter role of person 
+		// If the presentation changes, update the person 
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?person)  \n" +
 				"WHERE {\n"
 				
-				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
+				+ "?uri rdf:type core:Presentation  ; ?b ?c . \n"
 				+ " ?c rdf:type core:PresenterRole ; core:presenterRoleOf ?d .\n"
 				+ " }");
 		
 		//	core:ResearcherRole -- core:researcherRoleOf
 		
-		// If the person changes, update the researcher role in organization
+		// If the person changes, update the grant
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?organization)  \n" +
 				"WHERE {\n"
@@ -482,16 +482,23 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
 				+ " ?c rdf:type core:ResearcherRole ; core:roleIn ?d .\n"
 				+ " }");
 		
-		// If the organization changes, update the researcher role of person 
+		// If the grant changes, update the person 
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?person)  \n" +
 				"WHERE {\n"
 				
-				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
+				+ "?uri rdf:type core:Grant  ; ?b ?c . \n"
 				+ " ?c rdf:type core:ResearcherRole ; core:researcherRoleOf ?d .\n"
 				+ " }");
 		
-		
+		// If the project changes, update the person 
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?person)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type core:Project  ; ?b ?c . \n"
+				+ " ?c rdf:type core:ResearcherRole ; core:researcherRoleOf ?d .\n"
+				+ " }");
 		
 		//	core:EditorRole -- core:editorRoleOf, core:forInformationResource (person, informationresource)
 		

@@ -318,5 +318,203 @@ public class AdditionalURIsForContextNodesTest {
     
     }
     
+    
+    @Test
+    public void testPresenterRoleChangesForPresentation(){
+    	String n3 =
+    		"<http://vivo.scripps.edu/individual/n5596> <http://vivoweb.org/ontology/core#hasPresenterRole> <http://vivo.scripps.edu/individual/n1294> . \n" +
+			"<http://vivo.scripps.edu/individual/n5596> <http://www.w3.org/2000/01/rdf-schema#label> \"5, Test\" . \n" +
+			"<http://vivo.scripps.edu/individual/n5596> <http://xmlns.com/foaf/0.1/lastName> \"5\"^^<http://www.w3.org/2001/XMLSchema#string> . \n" +
+			"<http://vivo.scripps.edu/individual/n5596> <http://xmlns.com/foaf/0.1/firstName> \"Test\"^^<http://www.w3.org/2001/XMLSchema#string> . \n" +
+			"<http://vivo.scripps.edu/individual/n5596> <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType> <http://xmlns.com/foaf/0.1/Person> . \n" +
+			"<http://vivo.scripps.edu/individual/n5596> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Agent> . \n" +
+			"<http://vivo.scripps.edu/individual/n5596> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> . \n" +
+			"<http://vivo.scripps.edu/individual/n5596> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Thing> . \n" +
+    				
+			"<http://vivo.scripps.edu/individual/n1294> <http://vivoweb.org/ontology/core#presenterRoleOf> <http://vivo.scripps.edu/individual/n5596> . \n" +
+			"<http://vivo.scripps.edu/individual/n1294> <http://www.w3.org/2000/01/rdf-schema#label> \"Presenter Role\"^^<http://www.w3.org/2001/XMLSchema#string> . \n" +
+			"<http://vivo.scripps.edu/individual/n1294> <http://vivoweb.org/ontology/core#dateTimeInterval> <http://vivo.scripps.edu/individual/n1304> . \n" +
+			"<http://vivo.scripps.edu/individual/n1294> <http://vivoweb.org/ontology/core#roleIn> <http://vivo.scripps.edu/individual/n1305> . \n" +
+			"<http://vivo.scripps.edu/individual/n1294> <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType> <http://vivoweb.org/ontology/core#PresenterRole> . \n" +
+			"<http://vivo.scripps.edu/individual/n1294> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#Role> . \n" +
+			"<http://vivo.scripps.edu/individual/n1294> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#PresenterRole> . \n" +
+			"<http://vivo.scripps.edu/individual/n1294> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Thing> . \n" +
+    						
+			"<http://vivo.scripps.edu/individual/n1305> <http://www.w3.org/2000/01/rdf-schema#label> \"Presentation 1\"^^<http://www.w3.org/2001/XMLSchema#string> . \n" +
+			"<http://vivo.scripps.edu/individual/n1305> <http://vivoweb.org/ontology/core#relatedRole> <http://vivo.scripps.edu/individual/n1294> . \n" +
+			"<http://vivo.scripps.edu/individual/n1305> <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType> <http://vivoweb.org/ontology/core#Presentation> . \n" +
+			"<http://vivo.scripps.edu/individual/n1305> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#Presentation> . \n" +
+			"<http://vivo.scripps.edu/individual/n1305> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/NET/c4dm/event.owl#Event> . \n" +
+			"<http://vivo.scripps.edu/individual/n1305> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Thing> . \n" ;
+    	
+    	
+        //make a test model with an person, a presenter role node and a presentation 
+        OntModel model = ModelFactory.createOntologyModel();
+        model.read( new StringReader(n3), null,  "N3");
+                
+        //make an AdditionalURIsForContextNodesTest object with that model
+        AdditionalURIsForContextNodes uriFinder = new AdditionalURIsForContextNodes( model );
+        
+        //if the person changes then the presentation needs to be updated
+        List<String> uris = uriFinder.findAdditionalURIsToIndex( "http://vivo.scripps.edu/individual/n5596");       
+        assertTrue("did not find service for clinical role", uris.contains("http://vivo.scripps.edu/individual/n1305" ));
+        
+        //if the presentation changes then the person needs to be updated
+        uris = uriFinder.findAdditionalURIsToIndex( "http://vivo.scripps.edu/individual/n1305");       
+        assertTrue("did not find person for clinical role", uris.contains("http://vivo.scripps.edu/individual/n5596" ));   
 
+    }
+    
+    
+    @Test
+    public void testPresenterRoleChangesForInvitedTalk(){
+    	String n3 =
+    		
+    		"<http://vivo.scripps.edu/individual/n4112> <http://vivoweb.org/ontology/core#hasPresenterRole> <http://vivo.scripps.edu/individual/n4144> . \n " + 
+			"<http://vivo.scripps.edu/individual/n4112> <http://www.w3.org/2000/01/rdf-schema#label> \"6, Test\" . \n " + 
+			"<http://vivo.scripps.edu/individual/n4112> <http://xmlns.com/foaf/0.1/lastName> \"6\"^^<http://www.w3.org/2001/XMLSchema#string> . \n " + 
+			"<http://vivo.scripps.edu/individual/n4112> <http://xmlns.com/foaf/0.1/firstName> \"Test\"^^<http://www.w3.org/2001/XMLSchema#string> . \n " + 
+			"<http://vivo.scripps.edu/individual/n4112> <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType> <http://xmlns.com/foaf/0.1/Person> . \n " + 
+			"<http://vivo.scripps.edu/individual/n4112> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Agent> . \n " + 
+			"<http://vivo.scripps.edu/individual/n4112> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> . \n " + 
+			"<http://vivo.scripps.edu/individual/n4112> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Thing> . \n " + 
+    				
+			"<http://vivo.scripps.edu/individual/n4144> <http://vivoweb.org/ontology/core#presenterRoleOf> <http://vivo.scripps.edu/individual/n4112> . \n " + 
+			"<http://vivo.scripps.edu/individual/n4144> <http://www.w3.org/2000/01/rdf-schema#label> \"Presenter Role 2\"^^<http://www.w3.org/2001/XMLSchema#string> . \n " + 
+			"<http://vivo.scripps.edu/individual/n4144> <http://vivoweb.org/ontology/core#dateTimeInterval> <http://vivo.scripps.edu/individual/n4136> . \n " + 
+			"<http://vivo.scripps.edu/individual/n4144> <http://vivoweb.org/ontology/core#roleIn> <http://vivo.scripps.edu/individual/n4107> . \n " + 
+			"<http://vivo.scripps.edu/individual/n4144> <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType> <http://vivoweb.org/ontology/core#PresenterRole> . \n " + 
+			"<http://vivo.scripps.edu/individual/n4144> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#Role> . \n " + 
+			"<http://vivo.scripps.edu/individual/n4144> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#PresenterRole> . \n " + 
+			"<http://vivo.scripps.edu/individual/n4144> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Thing> . \n " + 
+			
+			"<http://vivo.scripps.edu/individual/n4107> <http://www.w3.org/2000/01/rdf-schema#label> \"Invited Talk 1\"^^<http://www.w3.org/2001/XMLSchema#string> . \n " + 
+			"<http://vivo.scripps.edu/individual/n4107> <http://vivoweb.org/ontology/core#relatedRole> <http://vivo.scripps.edu/individual/n4144> . \n " + 
+			"<http://vivo.scripps.edu/individual/n4107> <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType> <http://vivoweb.org/ontology/core#InvitedTalk> . \n " + 
+			"<http://vivo.scripps.edu/individual/n4107> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#Presentation> . \n " + 
+			"<http://vivo.scripps.edu/individual/n4107> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/NET/c4dm/event.owl#Event> . \n " + 
+			"<http://vivo.scripps.edu/individual/n4107> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Thing> . \n " + 
+			"<http://vivo.scripps.edu/individual/n4107> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#InvitedTalk> . \n " ;
+
+        //make a test model with an person, a presenter role node and an invited talk 
+        OntModel model = ModelFactory.createOntologyModel();
+        model.read( new StringReader(n3), null,  "N3");
+                
+        //make an AdditionalURIsForContextNodesTest object with that model
+        AdditionalURIsForContextNodes uriFinder = new AdditionalURIsForContextNodes( model );
+        
+        //if the person changes then the invited talk needs to be updated
+        List<String> uris = uriFinder.findAdditionalURIsToIndex( "http://vivo.scripps.edu/individual/n4112");       
+        assertTrue("did not find service for clinical role", uris.contains("http://vivo.scripps.edu/individual/n4107" ));
+        
+        //if the invited talk changes then the person needs to be updated
+        uris = uriFinder.findAdditionalURIsToIndex( "http://vivo.scripps.edu/individual/n4107");       
+        assertTrue("did not find person for clinical role", uris.contains("http://vivo.scripps.edu/individual/n4112" ));  
+    				
+    }
+    
+    
+    @Test
+    public void testResearcherRoleForGrant(){
+    	
+    	String n3 =
+    		
+    		"<http://vivo.scripps.edu/individual/n4957> <http://www.w3.org/2000/01/rdf-schema#label> \"7, Test\" . \n" +
+			"<http://vivo.scripps.edu/individual/n4957> <http://xmlns.com/foaf/0.1/lastName> \"7\"^^<http://www.w3.org/2001/XMLSchema#string> . \n" +
+			"<http://vivo.scripps.edu/individual/n4957> <http://xmlns.com/foaf/0.1/firstName> \"Test\"^^<http://www.w3.org/2001/XMLSchema#string> . \n" +
+			"<http://vivo.scripps.edu/individual/n4957> <http://vivoweb.org/ontology/core#hasResearcherRole> <http://vivo.scripps.edu/individual/n4288> . \n" +
+			"<http://vivo.scripps.edu/individual/n4957> <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType> <http://xmlns.com/foaf/0.1/Person> . \n" +
+			"<http://vivo.scripps.edu/individual/n4957> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Agent> . \n" +
+			"<http://vivo.scripps.edu/individual/n4957> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> . \n" +
+			"<http://vivo.scripps.edu/individual/n4957> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Thing> . \n" +
+    				
+			"<http://vivo.scripps.edu/individual/n4288> <http://www.w3.org/2000/01/rdf-schema#label> \"Researcher Role\"^^<http://www.w3.org/2001/XMLSchema#string> . \n" +
+			"<http://vivo.scripps.edu/individual/n4288> <http://vivoweb.org/ontology/core#dateTimeInterval> <http://vivo.scripps.edu/individual/n4251> . \n" +
+			"<http://vivo.scripps.edu/individual/n4288> <http://vivoweb.org/ontology/core#roleIn> <http://vivo.scripps.edu/individual/n4252> . \n" +
+			"<http://vivo.scripps.edu/individual/n4288> <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType> <http://vivoweb.org/ontology/core#ResearcherRole> . \n" +
+			"<http://vivo.scripps.edu/individual/n4288> <http://vivoweb.org/ontology/core#researcherRoleOf> <http://vivo.scripps.edu/individual/n4957> . \n" +
+			"<http://vivo.scripps.edu/individual/n4288> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#Role> . \n" +
+			"<http://vivo.scripps.edu/individual/n4288> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#ResearcherRole> . \n" +
+			"<http://vivo.scripps.edu/individual/n4288> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Thing> . \n" +
+    						
+			"<http://vivo.scripps.edu/individual/n4252> <http://www.w3.org/2000/01/rdf-schema#label> \"Grant1\"^^<http://www.w3.org/2001/XMLSchema#string> . \n" +
+			"<http://vivo.scripps.edu/individual/n4252> <http://vivoweb.org/ontology/core#relatedRole> <http://vivo.scripps.edu/individual/n4288> . \n" +
+			"<http://vivo.scripps.edu/individual/n4252> <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType> <http://vivoweb.org/ontology/core#Grant> . \n" +
+			"<http://vivo.scripps.edu/individual/n4252> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#Agreement> . \n" +
+			"<http://vivo.scripps.edu/individual/n4252> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Thing> . \n" +
+			"<http://vivo.scripps.edu/individual/n4252> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#Grant> . \n" ;
+    	
+    	
+        //make a test model with an person, a researcher role node and a grant
+        OntModel model = ModelFactory.createOntologyModel();
+        model.read( new StringReader(n3), null,  "N3");
+                
+        //make an AdditionalURIsForContextNodesTest object with that model
+        AdditionalURIsForContextNodes uriFinder = new AdditionalURIsForContextNodes( model );
+        
+        //if the person changes then the grant needs to be updated
+        List<String> uris = uriFinder.findAdditionalURIsToIndex( "http://vivo.scripps.edu/individual/n4957");       
+        assertTrue("did not find service for clinical role", uris.contains("http://vivo.scripps.edu/individual/n4252" ));
+        
+        //if the grant changes then the person needs to be updated
+        uris = uriFinder.findAdditionalURIsToIndex( "http://vivo.scripps.edu/individual/n4252");       
+        assertTrue("did not find person for clinical role", uris.contains("http://vivo.scripps.edu/individual/n4957" ));  
+
+    		
+    }
+    
+    @Test
+    public void testResearcherRoleForProject(){
+    	
+    	String n3 =
+    		
+    		"<http://vivo.scripps.edu/individual/n2029> <http://www.w3.org/2000/01/rdf-schema#label> \"8, Test\" . \n " +
+			"<http://vivo.scripps.edu/individual/n2029> <http://xmlns.com/foaf/0.1/lastName> \"8\"^^<http://www.w3.org/2001/XMLSchema#string> . \n " +
+			"<http://vivo.scripps.edu/individual/n2029> <http://xmlns.com/foaf/0.1/firstName> \"Test\"^^<http://www.w3.org/2001/XMLSchema#string> . \n " +
+			"<http://vivo.scripps.edu/individual/n2029> <http://vivoweb.org/ontology/core#hasResearcherRole> <http://vivo.scripps.edu/individual/n556> . \n " +
+			"<http://vivo.scripps.edu/individual/n2029> <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType> <http://xmlns.com/foaf/0.1/Person> . \n " +
+			"<http://vivo.scripps.edu/individual/n2029> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Agent> . \n " +
+			"<http://vivo.scripps.edu/individual/n2029> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> . \n " +
+			"<http://vivo.scripps.edu/individual/n2029> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Thing> . \n " +
+    				
+			"<http://vivo.scripps.edu/individual/n556> <http://www.w3.org/2000/01/rdf-schema#label> \"Researcher Role 2\"^^<http://www.w3.org/2001/XMLSchema#string> . \n " +
+			"<http://vivo.scripps.edu/individual/n556> <http://vivoweb.org/ontology/core#dateTimeInterval> <http://vivo.scripps.edu/individual/n568> . \n " +
+			"<http://vivo.scripps.edu/individual/n556> <http://vivoweb.org/ontology/core#roleIn> <http://vivo.scripps.edu/individual/n564> . \n " +
+			"<http://vivo.scripps.edu/individual/n556> <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType> <http://vivoweb.org/ontology/core#ResearcherRole> . \n " +
+			"<http://vivo.scripps.edu/individual/n556> <http://vivoweb.org/ontology/core#researcherRoleOf> <http://vivo.scripps.edu/individual/n2029> . \n " +
+			"<http://vivo.scripps.edu/individual/n556> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#Role> . \n " +
+			"<http://vivo.scripps.edu/individual/n556> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#ResearcherRole> . \n " +
+			"<http://vivo.scripps.edu/individual/n556> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Thing> . \n " +
+
+    						
+			"<http://vivo.scripps.edu/individual/n564> <http://www.w3.org/2000/01/rdf-schema#label> \"Project2\"^^<http://www.w3.org/2001/XMLSchema#string> . \n " +
+			"<http://vivo.scripps.edu/individual/n564> <http://vivoweb.org/ontology/core#relatedRole> <http://vivo.scripps.edu/individual/n556> . \n " +
+			"<http://vivo.scripps.edu/individual/n564> <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType> <http://vivoweb.org/ontology/core#Project> . \n " +
+			"<http://vivo.scripps.edu/individual/n564> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#Project> . \n " +
+			"<http://vivo.scripps.edu/individual/n564> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Thing> . \n " +
+			"<http://vivo.scripps.edu/individual/n564> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vivoweb.org/ontology/core#Process> . \n " ;
+    	
+    	
+    	
+        //make a test model with an person, a researcher role node and a project
+        OntModel model = ModelFactory.createOntologyModel();
+        model.read( new StringReader(n3), null,  "N3");
+                
+        //make an AdditionalURIsForContextNodesTest object with that model
+        AdditionalURIsForContextNodes uriFinder = new AdditionalURIsForContextNodes( model );
+        
+        //if the person changes then the project needs to be updated
+        List<String> uris = uriFinder.findAdditionalURIsToIndex( "http://vivo.scripps.edu/individual/n2029");       
+        assertTrue("did not find service for clinical role", uris.contains("http://vivo.scripps.edu/individual/n564" ));
+        
+        //if the project changes then the person needs to be updated
+        uris = uriFinder.findAdditionalURIsToIndex( "http://vivo.scripps.edu/individual/n564");       
+        assertTrue("did not find person for clinical role", uris.contains("http://vivo.scripps.edu/individual/n2029" ));  
+
+    	
+    	
+    }
+    
+    
+    
 }
