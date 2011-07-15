@@ -64,19 +64,11 @@ public class User extends BaseTemplateModel {
     }
     
     public String getFirstName() {
-    	if (currentUser == null) {
-    		return "";
-    	} else {
-    		return currentUser.getFirstName();
-    	}
+        return currentUser == null ? "" : currentUser.getFirstName();
     }
     
     public String getLastName() {
-    	if (currentUser == null) {
-    		return "";
-    	} else {
-    		return currentUser.getLastName();
-    	}
+        return currentUser == null ? "" : currentUser.getLastName();
     }
     
     public boolean getHasSiteAdminAccess() {

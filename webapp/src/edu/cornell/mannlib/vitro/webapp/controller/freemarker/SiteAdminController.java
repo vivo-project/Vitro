@@ -20,11 +20,12 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndivi
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditSiteInformation;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousCuratorPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.RefreshVisualizationCacheAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeSiteAdminPage;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousCuratorPages;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
@@ -32,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
+import edu.cornell.mannlib.vitro.webapp.search.controller.IndexController;
 
 public class SiteAdminController extends FreemarkerHttpServlet {
 	
@@ -60,6 +62,8 @@ public class SiteAdminController extends FreemarkerHttpServlet {
     	}
 
         body.put("siteConfig", getSiteConfigurationData(vreq));
+        
+        body.put("indexCacheRebuild", getIndexCacheRebuildData(vreq));
 
         // rjy7 There is a risk that the login levels required to show the links will get out
         // of step with the levels required by the pages themselves. We should implement a 
@@ -79,6 +83,31 @@ public class SiteAdminController extends FreemarkerHttpServlet {
  
     }
     
+    private Object getIndexCacheRebuildData(VitroRequest vreq) {
+        
+        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, String> urls = new HashMap<String, String>();
+        
+        if (PolicyHelper.isAuthorizedForActions(vreq, IndexController.REQUIRED_ACTIONS)) {
+            urls.put("rebuildSearchIndex", UrlBuilder.getUrl("/SearchIndex"));            
+        }
+        
+        if (PolicyHelper.isAuthorizedForActions(vreq, new UseMiscellaneousAdminPages())) {
+            urls.put("recomputeInferences", UrlBuilder.getUrl("/RecomputeInferences"));            
+        }
+        
+        if (PolicyHelper.isAuthorizedForActions(vreq, new UseMiscellaneousAdminPages())) {
+            urls.put("rebuildClassGroupCache", UrlBuilder.getUrl("/browse?clearcache=1"));            
+        }
+        
+        if (PolicyHelper.isAuthorizedForActions(vreq, new RefreshVisualizationCacheAction())) {
+            urls.put("rebuildVisCache", UrlBuilder.getUrl("/vis/tools"));            
+        }
+        
+        map.put("urls", urls);
+        return map;
+    }
+
     private Map<String, Object> getDataInputData(VitroRequest vreq) {
     
         Map<String, Object> map = new HashMap<String, Object>();
@@ -192,51 +221,9 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         urls.put("sparqlQuery", UrlBuilder.getUrl("/admin/sparqlquery"));
         urls.put("sparqlQueryBuilder", UrlBuilder.getUrl("/admin/sparqlquerybuilder"));
         
-        if (PolicyHelper.isAuthorizedForActions(vreq, new Actions(new RefreshVisualizationCacheAction()))) {
-        	urls.put("visualizationTool", UrlBuilder.getUrl("/vis/tools"));            
-        }
-        
         map.put("urls", urls);
         
         return map;
     }
-
-    /*
-     * There is a problem where labels are being used as keys for a map of 
-     * classgroups that gets passed to the templates. This representation isn't an accurate 
-     * reflection of the model since classgroups could have two labels, multiple classgroups 
-     * could have the same label, and a classgroup could have no lables.
-     * 
-     *  Check the assumptions and use the URIs as the key if the assumptions are not
-     *  meet. see issue NIHVIVO-1635.
-     */
-//    private boolean checkClassGroupDisplayAssumptions( List<VClassGroup> groups){
-//        //Assumption A: all of the classgroups have a non-null rdfs:label
-//        //Assumption B: none of the classgroups have the same rdfs:label
-//        //the assumption that all classgroups have only one rdfs:label is not checked
-//        boolean rvalue = true;
-//        Set<String> seenPublicNames = new HashSet<String>();
-//        
-//        for( VClassGroup group :groups ){
-//            //check Assumption A
-//            if( group.getPublicName() == null){
-//                rvalue = false;
-//                break;
-//            }
-//                            
-//            //check Assumption B
-//            if( seenPublicNames.contains(group.getPublicName()) ){
-//                rvalue = false;
-//                break;
-//            }
-//            seenPublicNames.add(group.getPublicName());            
-//        }
-//        
-//        
-//        if( !rvalue )
-//            log.error("The rdfs:labels on the classgroups in the system do " +
-//                    "not meet the display assumptions.  Falling back to alternative.");
-//        return rvalue;
-//    }
 
 }
