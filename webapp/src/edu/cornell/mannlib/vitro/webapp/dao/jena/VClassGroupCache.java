@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -17,9 +16,13 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
@@ -307,7 +310,7 @@ public class VClassGroupCache {
     }        
 
     /* ****************** Jena Model Change Listener***************************** */
-    private class VClassGroupCacheChangeListener extends StatementListener {
+    private class VClassGroupCacheChangeListener extends StatementListener {        
         public void addedStatement(Statement stmt) {
             checkAndDoUpdate(stmt);
         }
@@ -316,7 +319,7 @@ public class VClassGroupCache {
             checkAndDoUpdate(stmt);
         }
 
-        private void checkAndDoUpdate(Statement stmt) {
+        protected void checkAndDoUpdate(Statement stmt) {
             if (stmt == null)
                 return;
             if (log.isDebugEnabled()) {
@@ -325,11 +328,28 @@ public class VClassGroupCache {
             }
             if (RDF.type.getURI().equals(stmt.getPredicate().getURI())) {
                 requestCacheUpdate();
-            } else if (VitroVocabulary.IN_CLASSGROUP.equals(stmt.getPredicate()
-                    .getURI())) {
+            } else if (VitroVocabulary.IN_CLASSGROUP.equals(stmt.getPredicate().getURI())) {
                 requestCacheUpdate();
             } else if(VitroVocabulary.DISPLAY_RANK.equals(stmt.getPredicate().getURI())){
             	requestCacheUpdate();
+            } else if( isVClassGroupNameChange(stmt) ) {
+                requestCacheUpdate();
+            }
+        }
+
+        protected boolean isVClassGroupNameChange(Statement stmt) {
+            // Check if the stmt is a rdfs:label change and that the
+            // subject is a VClassGroup.
+            if( RDFS.label.equals( stmt.getPredicate() )) {
+                OntModel jenaOntModel = ModelContext.getJenaOntModel(context);
+                jenaOntModel.enterCriticalSection(Lock.READ);
+                try{
+                    return jenaOntModel.contains(stmt.getSubject(), RDF.type, ResourceFactory.createResource(VitroVocabulary.CLASSGROUP));
+                }finally{
+                    jenaOntModel.leaveCriticalSection();
+                }
+            }else{
+                return false;
             }
         }
     }

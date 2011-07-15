@@ -78,16 +78,20 @@ public class ModelContext {
 	
 	/**
 	 * Register a listener to the models needed to get changes to:
-	 *   class membership
-	 *   inferred class membership
-	 *   class group membership,   
-	 *   object properties,
-	 *   data properties,
-	 *   inferred object properties,
-	 *   rdfs:label annotations
-	 * This listener does not need:
-	 *   other annotations
-	 *   change to TBox  
+	 *   Basic abox statemetns:
+	 *      abox object property statements
+	 *      abox data property statements
+	 *      abox rdf:type statements
+	 *      inferred types of individuals in abox
+	 *      class group membership of individuals in abox
+	 *      rdfs:labe annotations of things in abox.            
+	 *   
+	 *   Basic application annotations:
+	 *       changes to annotations on classes
+	 *       changes to annotations on class gorups
+	 *       changes to annotations on properties
+	 *       
+	 *   Changes to application model
 	 */
 	public static void registerListenerForChanges(ServletContext ctx, ModelChangedListener ml){
 	    ModelContext.getJenaOntModel(ctx).register(ml);
@@ -97,6 +101,9 @@ public class ModelContext {
         ModelContext.getBaseOntModelSelector(ctx).getABoxModel().register(ml);
         ModelContext.getBaseOntModelSelector(ctx).getApplicationMetadataModel().register(ml);
         ModelContext.getInferenceOntModelSelector(ctx).getABoxModel().register(ml);
+        
+        ModelContext.getBaseOntModelSelector(ctx).getTBoxModel().register(ml);
+        
 	}
 	
 }
