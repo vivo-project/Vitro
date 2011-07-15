@@ -13,5 +13,4 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/admin.css" />')
     <#include "siteAdmin-siteConfiguration.ftl">
     <#include "siteAdmin-ontologyEditor.ftl">
     <#include "siteAdmin-advancedDataTools.ftl">
-    <#include "siteAdmin-customReports.ftl">
 </div>
