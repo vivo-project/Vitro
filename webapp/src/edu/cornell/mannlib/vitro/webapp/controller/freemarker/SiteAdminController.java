@@ -20,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndivi
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditSiteInformation;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousCuratorPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.RefreshVisualizationCacheAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeSiteAdminPage;
@@ -122,21 +123,20 @@ public class SiteAdminController extends FreemarkerHttpServlet {
         	urls.put("userList", UrlBuilder.getUrl("/accountsAdmin"));
         }
  
-		if (PolicyHelper.isAuthorizedForActions(vreq, new EditSiteInformation())) {
-			urls.put("siteInfo", UrlBuilder.getUrl("/editForm", new ParamMap("controller", "ApplicationBean")));
-		}
-
-		// TODO this goes away when Menu Management is complete - jblake
-		if (PolicyHelper.isAuthorizedForActions(vreq, MenuN3EditController.REQUIRED_ACTIONS)) {
-            urls.put("menuN3Editor", UrlBuilder.getUrl("/menuN3Editor"));            
+        if (PolicyHelper.isAuthorizedForActions(vreq, new EditSiteInformation())) {
+            urls.put("siteInfo", UrlBuilder.getUrl("/editForm", new ParamMap("controller", "ApplicationBean")));
         }
         
-		if (PolicyHelper.isAuthorizedForActions(vreq, new ManageMenus())) {
-			urls.put("menuManagement", UrlBuilder.getUrl("/individual",
-					"uri", "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#DefaultMenu",
-					"switchToDisplayModel", "true"));
-		}
-		
+        if (PolicyHelper.isAuthorizedForActions(vreq, new ManageMenus())) {
+            urls.put("menuManagement", UrlBuilder.getUrl("/individual",
+                    "uri", "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#DefaultMenu",
+                    "switchToDisplayModel", "true"));
+        }
+        
+        if (PolicyHelper.isAuthorizedForActions(vreq, new UseMiscellaneousCuratorPages())) {
+            urls.put("internalClass", UrlBuilder.getUrl("/processInstitutionalInternalClass"));
+        }
+        
         map.put("urls", urls);
         
         return map;

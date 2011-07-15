@@ -17,7 +17,9 @@
                 <li><a href="${siteConfig.urls.menuManagement}">Menu management</a></li>
             </#if>
             
+            <#if siteConfig.urls.internalClass??>
                 <li><a href="${urls.base}/processInstitutionalInternalClass">Institutional internal class</a></li>
+            </#if>
             
             <#if siteConfig.urls.userList??>
                 <li><a href="${siteConfig.urls.userList}">User accounts</a></li>
