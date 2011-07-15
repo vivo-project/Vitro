@@ -61,7 +61,7 @@ public abstract class BaseListedIndividual extends BaseTemplateModel {
     
     public List<String> getMostSpecificTypes() {
         ObjectPropertyStatementDao opsDao = vreq.getWebappDaoFactory().getObjectPropertyStatementDao();
-        Map<String, String> types = opsDao.getMostSpecificTypesForIndividual(individual.getURI()); 
+        Map<String, String> types = opsDao.getMostSpecificTypesInClassgroupsForIndividual(individual.getURI()); 
         List<String> typeLabels = new ArrayList<String>(types.size());
         String displayedType = (String) vreq.getAttribute("displayType");
         for (String type : types.keySet()) {

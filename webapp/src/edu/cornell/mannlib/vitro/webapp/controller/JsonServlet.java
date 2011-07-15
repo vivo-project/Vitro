@@ -282,7 +282,7 @@ public class JsonServlet extends VitroHttpServlet {
 
     public static Collection<String> getMostSpecificTypes(Individual individual, WebappDaoFactory wdf) {
         ObjectPropertyStatementDao opsDao = wdf.getObjectPropertyStatementDao();
-        Map<String, String> mostSpecificTypes = opsDao.getMostSpecificTypesForIndividual(individual.getURI());  
+        Map<String, String> mostSpecificTypes = opsDao.getMostSpecificTypesInClassgroupsForIndividual(individual.getURI());  
         return mostSpecificTypes.values();
     }
 

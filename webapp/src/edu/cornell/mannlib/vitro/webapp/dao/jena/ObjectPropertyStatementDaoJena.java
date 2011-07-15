@@ -400,7 +400,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
      * Finds all mostSpecificTypes of an individual.
      * Returns a list of type labels.
      * **/
-    public Map<String, String> getMostSpecificTypesForIndividual(String subjectUri) {
+    public Map<String, String> getMostSpecificTypesInClassgroupsForIndividual(String subjectUri) {
         
         String queryString = QueryUtils.subUriForQueryVar(MOST_SPECIFIC_TYPE_QUERY, "subject", subjectUri);
         

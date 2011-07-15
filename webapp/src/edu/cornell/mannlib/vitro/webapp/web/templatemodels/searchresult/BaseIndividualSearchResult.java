@@ -55,7 +55,7 @@ public abstract class BaseIndividualSearchResult extends BaseTemplateModel {
     
     public Collection<String> getMostSpecificTypes() {
         ObjectPropertyStatementDao opsDao = vreq.getWebappDaoFactory().getObjectPropertyStatementDao();
-        Map<String, String> types = opsDao.getMostSpecificTypesForIndividual(individual.getURI()); 
+        Map<String, String> types = opsDao.getMostSpecificTypesInClassgroupsForIndividual(individual.getURI()); 
         return types.values();  
     }
     

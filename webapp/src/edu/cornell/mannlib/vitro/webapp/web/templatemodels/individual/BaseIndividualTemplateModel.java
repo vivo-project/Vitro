@@ -150,7 +150,7 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
 
     public Collection<String> getMostSpecificTypes() {
         ObjectPropertyStatementDao opsDao = vreq.getWebappDaoFactory().getObjectPropertyStatementDao();
-        Map<String, String> types = opsDao.getMostSpecificTypesForIndividual(getUri()); 
+        Map<String, String> types = opsDao.getMostSpecificTypesInClassgroupsForIndividual(getUri()); 
         return types.values();
     }
 
