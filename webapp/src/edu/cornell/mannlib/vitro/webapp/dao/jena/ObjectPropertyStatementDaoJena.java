@@ -385,14 +385,16 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         
     }
     
-    protected static final String MOST_SPECIFIC_TYPE_QUERY = 
-        "PREFIX rdfs: <" + VitroVocabulary.RDFS + "> \n" +
-        "PREFIX vitro: <" + VitroVocabulary.vitroURI + "> \n" +
-        "SELECT ?label ?type WHERE { \n" +
-        "    ?subject vitro:mostSpecificType ?type . \n" +
-        "    ?type rdfs:label ?label \n" +
-        "} ORDER BY ?label ";
-    
+    protected static final String MOST_SPECIFIC_TYPE_QUERY = ""
+        + "PREFIX rdfs: <" + VitroVocabulary.RDFS + "> \n"
+        + "PREFIX vitro: <" + VitroVocabulary.vitroURI + "> \n"
+        + "SELECT ?label ?type WHERE { \n"
+        + "    ?subject vitro:mostSpecificType ?type . \n"
+        + "    ?type rdfs:label ?label . \n"
+        + "    ?type vitro:inClassGroup ?classGroup . \n"
+        + "    ?classGroup a ?ClassGroup \n"
+        + "} ORDER BY ?label ";
+
     @Override
     /** 
      * Finds all mostSpecificTypes of an individual.
