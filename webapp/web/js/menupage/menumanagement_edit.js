@@ -47,7 +47,6 @@ var menuManagementEdit = {
             if (validationError == "") {
                    $(this).submit();
                } else{
-            	   alert(validationError);
                    $('#error-alert').removeClass('hidden');
                    $('#error-alert p').html(validationError);
                    return false;
