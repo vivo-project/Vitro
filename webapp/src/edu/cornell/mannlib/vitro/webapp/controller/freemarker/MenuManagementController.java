@@ -83,6 +83,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     //Certain parameters are always passed
     private void initializeData(Map<String, Object> data, VitroRequest vreq) {
     	//Form url submission
+    	data.put("title", getCommand(vreq) + " Menu Item");
     	data.put("formUrls", vreq.getContextPath() + SUBMIT_FORM);
     	data.put("cancelUrl", vreq.getContextPath() + CANCEL_FORM);
     	data.put("internalClassUri", "");

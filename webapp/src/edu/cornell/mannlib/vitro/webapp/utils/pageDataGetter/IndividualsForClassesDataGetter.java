@@ -31,7 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateMo
  */
 public class IndividualsForClassesDataGetter implements PageDataGetter{
     private static final Log log = LogFactory.getLog(IndividualsForClassesDataGetter.class);
-    
+    protected static String restrictClassesTemplateName = "restricted";
     public Map<String,Object> getData(ServletContext context, VitroRequest vreq, String pageUri, Map<String, Object> page ){
         HashMap<String, Object> data = new HashMap<String,Object>();
         //This is the old technique of getting class intersections
@@ -116,7 +116,7 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
 	    	restrictClassesArray = urlEncodedRestrictClasses.toArray(restrictClassesArray);
 	    	
 	    	//In case just want uris
-	    	data.put("restrictClasses", StringUtils.join(restrictClassesArray, ","));
+	    	data.put(getRestrictClassesTemplateName(), StringUtils.join(restrictClassesArray, ","));
 	    	data.put("restrictVClasses", restrictVClasses);
 	    	//not sure if this is useful
 	    	data.put("restrictVClassGroup", restrictClassesGroup);
@@ -203,5 +203,11 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
         }else{                   
             return 1;
         }
+    }
+    
+    //Get template parameter
+    private static String getRestrictClassesTemplateName() {
+    	return restrictClassesTemplateName;
+
     }
 }

@@ -120,7 +120,7 @@ public class DisplayVocabulary {
     //URL for menu management
     public static final String PROCESS_MENU_MANAGEMENT_URL = "/processEditDisplayModel";
     public static final String REORDER_MENU_URL = PROCESS_MENU_MANAGEMENT_URL + "?cmd=Reorder&" + SWITCH_TO_DISPLAY_MODEL + "=true";
-    public static final String INTERNAL_CLASS_TEMPLATE = "menupage--individualsforclasses.ftl";
+
     /* URIs for some individuals in the dispaly ontology */
 
 	public static final String HOME_MENU_ITEM = DISPLAY_NS + "HomeMenuItem";

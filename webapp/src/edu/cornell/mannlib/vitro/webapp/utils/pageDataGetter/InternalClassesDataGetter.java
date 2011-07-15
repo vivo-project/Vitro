@@ -41,9 +41,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 public class InternalClassesDataGetter extends IndividualsForClassesDataGetter{
     private static final Log log = LogFactory.getLog(InternalClassesDataGetter.class);
     
+
     @Override
     public Map<String,Object> getData(ServletContext context, VitroRequest vreq, String pageUri, Map<String, Object> page ){
-        HashMap<String, Object> data = new HashMap<String,Object>();
+    	//Set restricted classes template
+    	super.restrictClassesTemplateName = "internalClass";
+    	HashMap<String, Object> data = new HashMap<String,Object>();
         //This is the old technique of getting class intersections
         Map<String, Object> classIntersectionsMap = vreq.getWebappDaoFactory().getPageDao().getClassesAndCheckInternal(pageUri);
         

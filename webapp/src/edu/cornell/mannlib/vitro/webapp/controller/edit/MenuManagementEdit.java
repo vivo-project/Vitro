@@ -352,14 +352,7 @@ public class MenuManagementEdit extends VitroHttpServlet {
     			dataGetterModel = getIndividualsForClassesDataGetter(vreq, dataGetterResource, addModel, displayModel, pageResource);
     		}
     		
-    		
     		addModel.add(dataGetterModel);
-    		//Also add special template to page
-    		addModel.add(addModel.createStatement(pageResource, 
-    				DisplayVocabulary.REQUIRES_BODY_TEMPLATE, 
-    				addModel.createTypedLiteral(DisplayVocabulary.INTERNAL_CLASS_TEMPLATE)));
-    				
-    		
     	}
 		
 	}
