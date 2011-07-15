@@ -39,7 +39,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     protected final static String SUBMIT_FORM = "/processEditDisplayModel"; 
     protected final static String CANCEL_FORM = "/individual?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fontologies%2Fdisplay%2F1.1%23DefaultMenu&switchToDisplayModel=true"; 
     protected final static String DELETE_FORM = "menuManagement-remove.ftl";
-    protected final static String EDIT_FORM = "testMenuManagement.ftl"; 
+    protected final static String EDIT_FORM = "menuManagement.ftl"; 
     protected final static String CMD_PARAM = "cmd";
     protected final static String EDIT_PARAM_VALUE = "edit";
     protected final static String DELETE_PARAM_VALUE = "delete";

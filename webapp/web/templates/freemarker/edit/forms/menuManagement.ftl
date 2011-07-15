@@ -64,19 +64,19 @@
             <p id="selectClassesMessage" name="selectClassesMessage">Select content to display</p>
 
             <section id="internal-class" role="region">
-                    <#if internalClass?has_content>
-                        <#assign enableInternalClass = '' />
-                        <#assign disableClass = 'class="inline"' />
-                    <#else>
-                        <#assign enableInternalClass = '<p class="note">To enable this option, you must first select an <a href="${urls.base}/processInstitutionalInternalClass">institutional internal class</a> for your instance</p>' />
-                        <#assign disableClass = 'class="disable inline" disabled="disabled"' />
-                    </#if>
-
-                    <input type="checkbox" ${disableClass} name="display-internalClass" value="${internalClassUri}" id="display-internalClass" <#if pageInternalOnly?has_content>checked</#if> role="input" />
-                    <label ${disableClass} class="inline" for="display-internalClass">Only display <em>${associatedPage}</em> within my institution</label>
-
-                    ${enableInternalClass}
-                </section>
+                <#if internalClass?has_content>
+                    <#assign enableInternalClass = '' />
+                    <#assign disableClass = 'class="inline"' />
+                <#else>
+                    <#assign enableInternalClass = '<p class="note">To enable this option, you must first select an <a href="${urls.base}/processInstitutionalInternalClass">institutional internal class</a> for your instance</p>' />
+                    <#assign disableClass = 'class="disable inline" disabled="disabled"' />
+                </#if>
+                
+                <input type="checkbox" ${disableClass} name="display-internalClass" value="${internalClassUri}" id="display-internalClass" <#if pageInternalOnly?has_content>checked</#if> role="input" />
+                <label ${disableClass} class="inline" for="display-internalClass">Only display <em>${associatedPage}</em> within my institution</label>
+                
+                ${enableInternalClass}
+            </section>
                 
             <ul id="selectedClasses" name="selectedClasses" role="menu">
                 <#--Adding a default class for "ALL" in case all classes selected-->
@@ -95,6 +95,7 @@
                             </#list>
                     </#if> />
                     <label class="inline" for="${classInClassGroup.name}"> ${classInClassGroup.name}</label>
+                    <#-- PLACEHOLDER - not yet implemented) -->
                     <span class="ui-icon-sortable"></span> <#--sortable icon for dragging and dropping menu items-->
                 </li>
                 </#list>
