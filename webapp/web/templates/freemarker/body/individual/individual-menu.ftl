@@ -15,7 +15,7 @@
 <#-- List the menu items -->
 <ul class="menuItems">
     <#list hasElement.statements as statement>
-        <li class="menuItem"><#include "${hasElement.template}"> <span class="controls"><@p.editingLinks "hasElement" statement editable /></span></li>
+        <li class="menuItem" id="order_${statement_index}"><#include "${hasElement.template}"> <span class="controls"><@p.editingLinks "hasElement" statement editable /></span></li>
     </#list>
 </ul>
 
@@ -37,13 +37,9 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/jquery-ui
 <script type="text/javascript">
     // <#-- We need the controller to provide ${reorderUrl}. This is where ajax request will be sent on drag-n-drop events. -->
     var menuManagementData = {
-        // <#-- reorderUrl: '${reorderUrl}', -->
+        reorderUrl: '${reorderUrl}',
         positionPredicate: '${positionPredicate}'
     };
 </script>
 
-<#-- Since the individual page can currently be viewed by anonymous users, only invoke sortable if logged in for now
-     Jim is working on this (see NIHVIVO-2749) -->
-<#if editable>
-    ${scripts.add('<script type="text/javascript" src="${urls.base}/js/individual/menuManagement.js"></script>')}
-</#if>
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/individual/menuManagement.js"></script>')}

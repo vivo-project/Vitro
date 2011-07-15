@@ -35,16 +35,12 @@ var menuManagement = {
         this.menuItemsList.sortable({
             cursor: 'move',
             update: function(event, ui) {
-                alert("Congrats! You just reordered a menu item. (not really)");
-                // Once we figure out how the editing will work, we'll call reorderMenuItems
-                // and get rid of the debug alert.
-                    // menuManagement.reorderMenutItems(event, ui);
+                menuManagement.reorderMenuItems(event, ui);
             }
         });
     },
     
     // Reorder menu items. Called after menu item drag-and-drop
-    // This is all make-believe at the moment. Just an example to demonstrate to Huda how this could work.
     reorderMenuItems: function(event, ui) {
         var menuItems = $('li.menuItem').map(function(index, el) {
             return $(this).data('menuItemUri');
@@ -66,9 +62,7 @@ var menuManagement = {
                     // Set the new position for this element. The only function of this value 
                     // is so we can reset an element to its original position in case reordering fails.
                     menuManagement.setPosition(this, pos);                
-                });
-                // Set the form rank field value.
-                $('#rank').val(pos + 1);        
+                });      
             },
             error: function(request, status, error) {
                 // ui is undefined after removal of a menu item.
@@ -128,20 +122,6 @@ var menuManagement = {
         });
          
         return matchingMenuItem;       
-    },
-    
-    // Event listeners
-    
-    // Disable drag-n-drop and associated cues if only one menu item remains
-    // Good chance we won't need this if Huda's able to hook into standard delete for n3 editing (loads confirmation in separate page)
-    disableMenuItemsDD: function() {
-        var menuItems = this.menuItemsList.children('li');
-        
-        this.menuItemsList.sortable({ disable: true } );
-
-        this.menuItemsList.removeClass('dragNdrop');
-        
-        menuItems.removeAttr('title');
     }
 };
 
