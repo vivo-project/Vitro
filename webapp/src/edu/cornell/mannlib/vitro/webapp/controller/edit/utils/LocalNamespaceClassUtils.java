@@ -56,16 +56,19 @@ public class LocalNamespaceClassUtils {
         
     	//Get all namespacs
     	//There's an APP for that!
-    	 OntologyDao dao = vreq.getFullWebappDaoFactory().getOntologyDao();
-         List<Ontology> onts = dao.getAllOntologies();
-         for(Ontology on: onts) {
-        	String uri = on.getURI();
-        	if(uri.startsWith(defaultNamespacePattern)) {
-        		String name =  on.getName();
-        		String prefix = on.getPrefix();
-        		foundNamespaces.put(uri, name + " (" + prefix + ")");
-        	}
-         }
+        //defualt namespace pattern is null if the default namespace does not employ /individual
+        if(defaultNamespacePattern != null) {
+	    	 OntologyDao dao = vreq.getFullWebappDaoFactory().getOntologyDao();
+	         List<Ontology> onts = dao.getAllOntologies();
+	         for(Ontology on: onts) {
+	        	String uri = on.getURI();
+	        	if(uri.startsWith(defaultNamespacePattern)) {
+	        		String name =  on.getName();
+	        		String prefix = on.getPrefix();
+	        		foundNamespaces.put(uri, name + " (" + prefix + ")");
+	        	}
+	         }
+        }
     	
         return foundNamespaces;
     }
@@ -73,7 +76,13 @@ public class LocalNamespaceClassUtils {
     public static String getDefaultOntologyNamespace(VitroRequest vreq) {
     	String defaultNamespace= vreq.getWebappDaoFactory().getDefaultNamespace();
     	//Assuming following linked data approach so expects /individual at end
-    	defaultNamespace = defaultNamespace.substring(0, defaultNamespace.lastIndexOf("/individual")) + "/ontology/";
-    	return defaultNamespace;
+    	int lastIndex = defaultNamespace.lastIndexOf("/individual");
+    	//if namespace is correct
+    	if(lastIndex != -1) {
+    		defaultNamespace = defaultNamespace.substring(0, lastIndex) + "/ontology/";
+    		return defaultNamespace;
+    	} else {
+    		return null;
+    	}
     }
 }

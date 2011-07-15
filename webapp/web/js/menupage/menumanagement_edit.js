@@ -47,6 +47,7 @@ var menuManagementEdit = {
             if (validationError == "") {
                    $(this).submit();
                } else{
+            	   alert(validationError);
                    $('#error-alert').removeClass('hidden');
                    $('#error-alert p').html(validationError);
                    return false;
@@ -82,6 +83,7 @@ var menuManagementEdit = {
         }*/
         // Check/unckeck all classes for selection
         $('input:checkbox[name=allSelected]').click(function(){
+             // alert($('input:checkbox[name=classInClassGroup]'));
              if ( this.checked ) {
              // if checked, select all the checkboxes
              $('input:checkbox[name=classInClassGroup]').attr('checked','checked');
