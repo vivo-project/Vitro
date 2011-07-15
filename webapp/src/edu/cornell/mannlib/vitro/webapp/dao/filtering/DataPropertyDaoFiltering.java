@@ -2,13 +2,16 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.filtering;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_LITERAL;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-
+import net.sf.jga.fn.UnaryFunctor;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -66,8 +69,14 @@ class DataPropertyDaoFiltering extends BaseFiltering implements DataPropertyDao{
     }
 
     public Collection<DataProperty> getAllPossibleDatapropsForIndividual(String individualURI) {
-        return filter(innerDataPropertyDao.getAllPossibleDatapropsForIndividual(individualURI),
-                filters.getDataPropertyFilter());
+        List<DataProperty> filteredProps = new ArrayList<DataProperty>();
+        for (DataProperty dp: innerDataPropertyDao.getAllPossibleDatapropsForIndividual(individualURI)) {
+        	DataPropertyStatementImpl dps = new DataPropertyStatementImpl(individualURI, dp.getURI(), SOME_LITERAL);
+			if (filters.getDataPropertyStatementFilter().fn(dps)) {
+        		filteredProps.add(dp);
+        	}
+        }
+        return filteredProps;
     }
     
     public String getRequiredDatatypeURI(Individual individual, DataProperty dataProperty) {
