@@ -9,6 +9,10 @@
     <#assign existingClassGroupStyle = 'class="hidden"' />
     <#assign selectClassGroupStyle = " " />
 </#if>
+<section id="error-alert" role="alert" class="hidden">
+    <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon" />
+    <p></p>
+</section>
 
 <h3>${menuAction} menu item</h3>
 
