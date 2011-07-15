@@ -36,6 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.FileBasedProhibitedFromSear
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearchImpl;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForContextNodes;
+import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForObjectProperties;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.SearchReindexingListener;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
@@ -113,6 +114,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             
             //make objects that will find additional URIs for context nodes etc
             List<AdditionalURIsToIndex> uriFinders = new ArrayList<AdditionalURIsToIndex>();
+            uriFinders.add( new AdditionalURIsForObjectProperties(jenaOntModel) );
             uriFinders.add( new AdditionalURIsForContextNodes(jenaOntModel) );
             
             // set up listeners so search index builder is notified of changes to model
