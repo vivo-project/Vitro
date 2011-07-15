@@ -10,6 +10,9 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.RebuildVClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -29,6 +32,16 @@ public class BrowseController extends FreemarkerHttpServlet {
         return "Index of Contents";
     }
     
+    
+    @Override
+    protected Actions requiredActions(VitroRequest vreq) {
+        if ( vreq.getParameter("clearcache") != null )
+            return new Actions(new RebuildVClassGroupCache() );
+        else
+            return Actions.AUTHORIZED;
+    }
+
+
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
         
@@ -55,8 +68,12 @@ public class BrowseController extends FreemarkerHttpServlet {
             templateName = Template.TITLED_MESSAGE.toString();
         }
         
-        if ( vreq.getParameter("clearcache") != null ) //mainly for debugging
-            clearGroupCache();
+        if ( vreq.getParameter("clearcache") != null ) {
+            //mainly for debugging
+            if( PolicyHelper.isAuthorizedForActions(vreq, new RebuildVClassGroupCache()) ){
+                clearGroupCache();
+            }
+        }
         
         return new TemplateResponseValues(templateName, body);
     }

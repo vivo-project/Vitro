@@ -10,6 +10,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasRoleLevel;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.RebuildVClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.AccessSpecialDataModels;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndividuals;
@@ -110,7 +111,9 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 			
 		} else if (whatToAuth instanceof EditOwnAccount) {
 			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
-			
+
+		} else if (whatToAuth instanceof RebuildVClassGroupCache) {
+            result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
 		} else if (whatToAuth instanceof RefreshVisualizationCacheAction) {
 			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
 		} else {
