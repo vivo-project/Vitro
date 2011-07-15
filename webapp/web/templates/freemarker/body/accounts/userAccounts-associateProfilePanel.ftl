@@ -70,8 +70,9 @@ var associateProfileFieldsData = {
     
     <#if showAssociation??>
         associationEnabled: true ,
-        ajaxUrl: '${formUrls.accountsAjax}'
     </#if>
+
+    ajaxUrl: '${formUrls.accountsAjax}'
 };
 </script>
 
