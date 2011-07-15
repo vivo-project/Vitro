@@ -32,6 +32,7 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
     private OntModel model;
 	private static final List<String> multiValuedQueriesForAgent = new ArrayList<String>();	
 	private static final String multiValuedQueryForInformationResource;
+	private static final List<String> multiValuedQueriesForRole = new ArrayList<String>();
 	private static final List<String>queryList;
 	
 	private Log log = LogFactory.getLog(AdditionalURIsForContextNodes.class);
@@ -113,77 +114,77 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
     }
     
     
-    private static final String prefix = "prefix owl: <http://www.w3.org/2002/07/owl#> "
-        + " prefix vitroDisplay: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>  "
-        + " prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  "
-        + " prefix core: <http://vivoweb.org/ontology/core#>  "
-        + " prefix foaf: <http://xmlns.com/foaf/0.1/> "
-        + " prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> "
-        + " prefix localNav: <http://vitro.mannlib.cornell.edu/ns/localnav#>  "
-        + " prefix bibo: <http://purl.org/ontology/bibo/>  ";
+    private static final String prefix = "prefix owl: <http://www.w3.org/2002/07/owl#> \n"
+        + " prefix vitroDisplay: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>  \n"
+        + " prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  \n"
+        + " prefix core: <http://vivoweb.org/ontology/core#>  \n"
+        + " prefix foaf: <http://xmlns.com/foaf/0.1/> \n"
+        + " prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"
+        + " prefix localNav: <http://vitro.mannlib.cornell.edu/ns/localnav#>  \n"
+        + " prefix bibo: <http://purl.org/ontology/bibo/>  \n";
     
 	static{
 	    
 	    // If a person changes then update
 	    // organizations for positions
 		multiValuedQueriesForAgent.add(prefix +
-				"SELECT " +
-				" (str(?i) as ?positionInOrganization) " +
-				" WHERE {" 
+				"SELECT \n" +
+				" (str(?i) as ?positionInOrganization) \n" +
+				" WHERE {\n" 
 				
-				+ "?uri rdf:type foaf:Agent  ; ?b ?c . "
-				+ " ?c rdf:type core:Position . "
+				+ "?uri rdf:type foaf:Agent  ; ?b ?c . \n"
+				+ " ?c rdf:type core:Position . \n"
 							
-				+ " OPTIONAL { ?c core:positionInOrganization ?i . } . "
+				+ " OPTIONAL { ?c core:positionInOrganization ?i . } . \n"
 				+ " }");
 		
         // If a person changes then update
 		// advisee, linkedAuthor and informationResource
 		multiValuedQueriesForAgent.add(prefix +
-				"SELECT (str(?d) as ?advisee) " +
-				" (str(?f) as ?linkedAuthor) (str(?h) as ?linkedInformationResource)  WHERE {" 
+				"SELECT (str(?d) as ?advisee) \n" +
+				" (str(?f) as ?linkedAuthor) (str(?h) as ?linkedInformationResource)  WHERE {\n" 
 				
-				+ "?uri rdf:type foaf:Agent  ; ?b ?c . "
-				+ " ?c rdf:type core:Relationship . "
+				+ "?uri rdf:type foaf:Agent  ; ?b ?c . \n"
+				+ " ?c rdf:type core:Relationship . \n"
 				
-				+ " OPTIONAL  { ?c core:advisee ?d . } . "
-				+ " OPTIONAL   { ?c core:linkedAuthor ?f . } . "
-				+ " OPTIONAL { ?c core:linkedInformationResource ?h . } . "
+				+ " OPTIONAL  { ?c core:advisee ?d . } . \n"
+				+ " OPTIONAL   { ?c core:linkedAuthor ?f . } . \n"
+				+ " OPTIONAL { ?c core:linkedInformationResource ?h . } . \n"
 				
 				+ " } ");
 		
 	    // If a person changes then update
 		// award giver
 		multiValuedQueriesForAgent.add(prefix +
-				"SELECT (str(?d) as ?awardConferredBy)  " +
-				"WHERE {"
+				"SELECT (str(?d) as ?awardConferredBy)  \n" +
+				"WHERE {\n"
 				
-				+ "?uri rdf:type foaf:Agent  ; ?b ?c . "
-				+ " ?c rdf:type core:AwardReceipt . "
+				+ "?uri rdf:type foaf:Agent  ; ?b ?c . \n"
+				+ " ?c rdf:type core:AwardReceipt . \n"
 				
-				+ " OPTIONAL { ?c core:awardConferredBy ?d . } . "
+				+ " OPTIONAL { ?c core:awardConferredBy ?d . } . \n"
 				+ " }");
 		
         // If a person changes then update
 		// organization for role
 		multiValuedQueriesForAgent.add(prefix +
-				"SELECT (str(?Organization) as ?organization)  " +
-				"WHERE {"
+				"SELECT (str(?Organization) as ?organization)  \n" +
+				"WHERE {\n"
 				
-				+ "?uri rdf:type foaf:Agent  ; ?b ?c . "
-				+ " ?c rdf:type core:Role ; core:roleIn ?Organization ."
+				+ "?uri rdf:type foaf:Agent  ; ?b ?c . \n"
+				+ " ?c rdf:type core:Role ; core:roleIn ?Organization .\n"
 				+ " }");
 		
         // If a person changes then update
 		// organization in educational training
 		multiValuedQueriesForAgent.add(prefix + 
-				"SELECT  " +
-		         	"(str(?e) as ?trainingAtOrganization) WHERE {"
+				"SELECT  \n" +
+		         	"(str(?e) as ?trainingAtOrganization) WHERE {\n"
 					
-					+ " ?uri rdf:type foaf:Agent ; ?b ?c . "
-					+ " ?c rdf:type core:EducationalTraining . "
+					+ " ?uri rdf:type foaf:Agent ; ?b ?c . \n"
+					+ " ?c rdf:type core:EducationalTraining . \n"
 					  
-					+ " OPTIONAL { ?c core:trainingAtOrganization ?e . } . " 					
+					+ " OPTIONAL { ?c core:trainingAtOrganization ?e . } . \n" 					
 					+"}");
 		
 		// If an organizatoin changes then update
@@ -191,13 +192,13 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
         multiValuedQueriesForAgent.add(
                 " # for organization, get leader  \n" +
                 prefix + 
-                "SELECT  " +
-                    "(str(?e) as ?LeaderPerson ) WHERE {"
+                "SELECT  \n" +
+                    "(str(?e) as ?LeaderPerson ) WHERE {\n"
                     
-                    + " ?uri rdf:type foaf:Agent ; ?b ?c . "
-                    + " ?c rdf:type core:LeaderRole . "
+                    + " ?uri rdf:type foaf:Agent ; ?b ?c . \n"
+                    + " ?c rdf:type core:LeaderRole . \n"
                       
-                    + " OPTIONAL { ?c core:leaderRoleOf ?e . } . "                    
+                    + " OPTIONAL { ?c core:leaderRoleOf ?e . } . \n"                    
                     +"}");
         
         
@@ -208,16 +209,16 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
 	static {
 		
 		multiValuedQueryForInformationResource = prefix + 
-				"SELECT  (str(?b) as ?linkedAuthor) (str(?d) as ?linkedInformationResource) "
-		         + "(str(?e) as ?editor) " +
-		         		"(str(?i) as ?features) WHERE {"
+				"SELECT  (str(?b) as ?linkedAuthor) (str(?d) as ?linkedInformationResource) \n"
+		         + "(str(?e) as ?editor) \n" +
+		         		"(str(?i) as ?features) WHERE {\n"
 					
-					+ " ?uri rdf:type core:InformationResource . "
+					+ " ?uri rdf:type core:InformationResource . \n"
 					  
-					+  "OPTIONAL { ?uri core:informationResourceInAuthorship ?a . ?a core:linkedAuthor ?b ; core:linkedInformationResource ?d ." +
+					+  "OPTIONAL { ?uri core:informationResourceInAuthorship ?a . ?a core:linkedAuthor ?b ; core:linkedInformationResource ?d .\n" +
 							"} . "
-					+  "OPTIONAL { ?uri bibo:editor ?e . } ."			  
-					+ " OPTIONAL { ?uri core:features ?i . } . " 
+					+  "OPTIONAL { ?uri bibo:editor ?e . } .\n"			  
+					+ " OPTIONAL { ?uri core:features ?i . } . \n" 
 					
 					+"}" ;
 	
@@ -322,9 +323,367 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
     }
 	
 	static{
+		//	core:AttendeeRole
+		// If the person changes, update the attendee role in organization
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?organization) \n " +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
+				+ " ?c rdf:type core:AttendeeRole ; core:roleIn ?d .\n"
+				+ " }");
+		
+		// If the organization changes, update the attendee role of person 
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?person)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
+				+ " ?c rdf:type core:AttendeeRole ; core:roleOf ?d .\n"
+				+ " }");	
+			
+		//	core:ClinicalRole  -- core:clinicalRoleOf
+		
+		// If the person changes, update the clinical role in project
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?project)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
+				+ " ?c rdf:type core:ClinicalRole ; core:roleIn ?d .\n"
+				+ " }");
+		
+		// If the project changes, update the clinical role of person 
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?person)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type core:Project  ; ?b ?c . \n"
+				+ " ?c rdf:type core:ClinicalRole ; core:clinicalRoleOf ?d .\n "
+				+ " }");
+		
+		// If the service changes, update the clinical role of person 
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?person)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type core:Service  ; ?b ?c . \n"
+				+ " ?c rdf:type core:ClinicalRole ; core:clinicalRoleOf ?d .\n "
+				+ " }");
+		
+		
+		//	core:LeaderRole -- core:leaderRoleOf
+		
+		// If the person changes, update the leader role in organization
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?organization)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
+				+ " ?c rdf:type core:LeaderRole ; core:roleIn ?d .\n"
+				+ " }");
+		
+		// If the organization changes, update the leader role of person 
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?person)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
+				+ " ?c rdf:type core:LeaderRole ; core:leaderRoleOf ?d .\n"
+				+ " }");
+		
+		//	core:MemberRole -- core:memberRoleOf
+		
+		// If the person changes, update the member role in organization
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?organization)  \n" +
+				"WHERE \n{"
+				
+				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
+				+ " ?c rdf:type core:MemberRole ; core:roleIn ?d .\n"
+				+ " }");
+		
+		// If the organization changes, update the member role of person 
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?person)  \n" +
+				"WHERE {"
+				
+				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
+				+ " ?c rdf:type core:MemberRole ; core:memberRoleOf ?d .\n"
+				+ " }");
+		//	core:OrganizerRole -- core:organizerRoleOf
+		
+		// If the person changes, update the organizer role in organization
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?organization)  \n" +
+				"WHERE {"
+				
+				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
+				+ " ?c rdf:type core:OrganizerRole ; core:roleIn ?d .\n"
+				+ " }");
+		
+		// If the organization changes, update the organizer role of person 
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?person)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
+				+ " ?c rdf:type core:OrganizerRole ; core:organizerRoleOf ?d .\n"
+				+ " }");
+		//	core:OutreachProviderRole -- core:outreachProviderRoleOf
+		
+		// If the person changes, update the outreach provider role in organization
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?organization)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
+				+ " ?c rdf:type core:OutreachProviderRole ; core:roleIn ?d .\n"
+				+ " }");
+		
+		// If the organization changes, update the outreach provider role of person 
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?person)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
+				+ " ?c rdf:type core:OutreachProviderRole ; core:outreachProviderRoleOf ?d .\n"
+				+ " }");
+		
+		
+		//	core:PresenterRole -- core:presenterRoleOf
+		
+		// If the person changes, update the presenter role in organization
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?organization)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
+				+ " ?c rdf:type core:PresenterRole ; core:roleIn ?d .\n"
+				+ " }");
+		
+		// If the organization changes, update the presenter role of person 
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?person)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
+				+ " ?c rdf:type core:PresenterRole ; core:presenterRoleOf ?d .\n"
+				+ " }");
+		
+		//	core:ResearcherRole -- core:researcherRoleOf
+		
+		// If the person changes, update the researcher role in organization
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?organization)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
+				+ " ?c rdf:type core:ResearcherRole ; core:roleIn ?d .\n"
+				+ " }");
+		
+		// If the organization changes, update the researcher role of person 
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?person)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
+				+ " ?c rdf:type core:ResearcherRole ; core:researcherRoleOf ?d .\n"
+				+ " }");
+		
+		
+		
+		//	core:EditorRole -- core:editorRoleOf, core:forInformationResource (person, informationresource)
+		
+		// If the person changes, update the editor role in organization
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?organization)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
+				+ " ?c rdf:type core:EditorRole ; core:roleIn ?d .\n"
+				+ " }");
+		
+		
+		// If the organization changes, update the editor role of person 
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?person)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
+				+ " ?c rdf:type core:EditorRole ; core:editorRoleOf ?d .\n"
+				+ " }");
+		
+		// If the person changes, update the information resource associated with editor role
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?informationResource)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
+				+ " ?c rdf:type core:EditorRole ; core:forInformationResource ?d .\n"
+				+ " }");
+		
+		// If the organization changes, update the information resource associated with editor role
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?informationResource)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
+				+ " ?c rdf:type core:EditorRole ; core:forInformationResource ?d .\n"
+				+ " }");
+		
+		//	core:ServiceProviderRole -- core:serviceProviderRoleOf
+		
+		// If the person changes, update the service provider role in organization
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?organization)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
+				+ " ?c rdf:type core:ServiceProviderRole ; core:roleIn ?d .\n"
+				+ " }");
+		
+		// If the organization changes, update the service provider role of person 
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?person)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
+				+ " ?c rdf:type core:ServiceProviderRole ; core:serviceProviderRoleOf ?d .\n"
+				+ " }");
+		
+		
+		//	core:TeacherRole -- core:teacherRoleOf
+		
+		// If the person changes, update the teacher role in organization
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?organization)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
+				+ " ?c rdf:type core:TeacherRole ; core:roleIn ?d .\n"
+				+ " }");
+		
+		// If the organization changes, update the teacher role of person 
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?person)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
+				+ " ?c rdf:type core:TeacherRole ; core:teacherRoleOf ?d .\n"
+				+ " }");
+		
+
+		//	core:ReviewerRole -- core:forInformationResource, core:reviewerRoleOf
+//		core:PeerReviewerRole -- core:forInformationResource, core:reviewerRoleOf
+		
+		// If the person changes, update the reviewer role in organization
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?organization)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
+				+ " ?c rdf:type core:ReviewerRole ; core:roleIn ?d .\n"
+				+ " }");
+		
+		
+		// If the organization changes, update the reviewer role of person 
+	
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?person)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
+				+ " ?c rdf:type core:ReviewerRole ; core:reviewerRoleOf ?d .\n"
+				+ " }");
+		
+		// If the person changes, update the information resource associated with reviewer role
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?informationResource) \n " +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
+				+ " ?c rdf:type core:ReviewerRole ; core:forInformationResource ?d .\n"
+				+ " }");
+		
+		// If the organization changes, update the information resource associated with reviewer role
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?informationResource)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
+				+ " ?c rdf:type core:ReviewerRole ; core:forInformationResource ?d .\n"
+				+ " }");
+
+		//	core:InvestigatorRole - core:researcherRoleOf, core:investigatorRoleOf
+		
+		// If the person changes, update the investigator role in organization
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?organization) \n " +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Person  ; ?b ?c .\n "
+				+ " ?c rdf:type core:InvestigatorRole ; core:roleIn ?d .\n"
+				+ " }");
+		
+		// If the organization changes, update the investigator role and reseacher role of person 
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?person1) (str(?e) as ?person2) \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Organization  ; ?b ?c .\n "
+				+ " ?c rdf:type core:InvestigatorRole ; core:investigatorRoleOf ?d ; core:researcherRoleOf ?e . \n"
+				+ " }");
+		
+		
+		//	core:PrincipalInvestigatorRole -- core:principalInvestigatorRoleOf, core:investigatorRoleOf, core:researcherRoleOf	
+
+		// If the person changes, update the principal investigator role in organization
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?organization) \n " +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
+				+ " ?c rdf:type core:PrincipalInvestigatorRole ; core:roleIn ?d .\n"
+				+ " }");
+		
+		// If the organization changes, update the investigator role and reseacher role of person 
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?person1) (str(?e) as ?person2) (str(?f) as ?person3) \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
+				+ " ?c rdf:type core:PrincipalInvestigatorRole ; core:investigatorRoleOf ?d ; core:principalInvestigatorRoleOf ?e ; core:researcherRoleOf ?f . \n"
+				+ " }");
+		
+		
+		//	core:Co-PrincipalInvestigatorRole -- core:co-PrincipalInvestigatorRoleOf, core:investigatorRoleOf, core:researcherRoleOf
+		// If the person changes, update the principal investigator role in organization
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?organization)  \n" +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
+				+ " ?c rdf:type core:Co-PrincipalInvestigatorRole ; core:roleIn ?d .\n"
+				+ " }");
+		
+		// If the organization changes, update the investigator role and reseacher role of person 
+		multiValuedQueriesForRole.add(prefix +
+				"SELECT (str(?d) as ?person1) (str(?e) as ?person2) (str(?f) as ?person3)\n " +
+				"WHERE {\n"
+				
+				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
+				+ " ?c rdf:type core:Co-PrincipalInvestigatorRole ; core:investigatorRoleOf ?d ; core:co-PrincipalInvestigatorRoleOf ?e ; core:researcherRoleOf ?f . \n"
+				+ " }");
+		
+		
+	}
+	
+	static{
 	    List<String> tmpList = new ArrayList<String>();
 	    tmpList.add(multiValuedQueryForInformationResource);
 	    tmpList.addAll(multiValuedQueriesForAgent);
+	    tmpList.addAll(multiValuedQueriesForRole);
 	    tmpList.addAll( queriesForAuthorship());
 	    tmpList.addAll(queriesForURLLink());
 	    tmpList.addAll(queriesForEducationalTraining());
@@ -332,7 +691,5 @@ public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
 	    
         queryList = Collections.unmodifiableList(tmpList);
 	}
-
-
 
 }
