@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -388,7 +389,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
     protected static final String MOST_SPECIFIC_TYPE_QUERY = ""
         + "PREFIX rdfs: <" + VitroVocabulary.RDFS + "> \n"
         + "PREFIX vitro: <" + VitroVocabulary.vitroURI + "> \n"
-        + "SELECT ?label ?type WHERE { \n"
+        + "SELECT DISTINCT ?label ?type WHERE { \n"
         + "    ?subject vitro:mostSpecificType ?type . \n"
         + "    ?type rdfs:label ?label . \n"
         + "    ?type vitro:inClassGroup ?classGroup . \n"
@@ -397,7 +398,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 
     @Override
     /** 
-     * Finds all mostSpecificTypes of an individual.
+     * Finds all mostSpecificTypes of an individual that are members of a classgroup.
      * Returns a list of type labels.
      * **/
     public Map<String, String> getMostSpecificTypesInClassgroupsForIndividual(String subjectUri) {
@@ -415,7 +416,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             return Collections.emptyMap();
         }        
         
-        Map<String, String> types = new HashMap<String, String>();
+        Map<String, String> types = new LinkedHashMap<String, String>();
         DatasetWrapper w = dwf.getDatasetWrapper();
         Dataset dataset = w.getDataset();
         dataset.getLock().enterCriticalSection(Lock.READ);
