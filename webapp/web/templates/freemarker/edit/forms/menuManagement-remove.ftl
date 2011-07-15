@@ -16,5 +16,5 @@
     </form>
 </section>
 
-${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/menupage/testmenupage.css" />')}
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/menupage/menuManagement.css" />')}
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/customForm.css" />')}
