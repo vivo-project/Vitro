@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -276,6 +277,7 @@ public class IndividualFilteringTest extends AbstractTestClass {
 				extractDataPropUris(ind.getDataPropertyList()));
 	}
 
+	@Ignore
 	@Test
 	public void testGetPopulatedDataPropertyList() {
 		assertEqualSets("populated data property list",

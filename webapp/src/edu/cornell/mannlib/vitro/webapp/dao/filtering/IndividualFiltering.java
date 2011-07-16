@@ -2,9 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.filtering;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_LITERAL;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,16 +17,16 @@ import net.sf.jga.algorithms.Filter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
+import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.Keyword;
-import edu.cornell.mannlib.vitro.webapp.beans.Link;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
@@ -73,11 +74,16 @@ public class IndividualFiltering implements Individual {
 
     @Override
 	public List<DataProperty> getPopulatedDataPropertyList() {
-        List<DataProperty> dprops =  _innerIndividual.getPopulatedDataPropertyList();
-        LinkedList<DataProperty> outdProps = new LinkedList<DataProperty>();
-        Filter.filter(dprops,_filters.getDataPropertyFilter(), outdProps);
+        List<DataProperty> outdProps = new ArrayList<DataProperty>();
+        List<DataProperty> dprops = _innerIndividual.getPopulatedDataPropertyList();
+		for (DataProperty dp: dprops) {
+			if (_filters.getDataPropertyStatementFilter().fn(
+					new DataPropertyStatementImpl(this._innerIndividual.getURI(), dp.getURI(), SOME_LITERAL))) {
+				outdProps.add(dp);
+			}
+        }
         return outdProps;
-    }
+    }    
     
     @Override
     public List<DataPropertyStatement> getDataPropertyStatements() {
