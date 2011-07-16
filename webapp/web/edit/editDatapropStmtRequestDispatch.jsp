@@ -89,7 +89,8 @@
     }
     vreq.setAttribute("subject", subject);
 
-    DataProperty dataproperty = wdf.getDataPropertyDao().getDataPropertyByURI( predicateUri );
+    WebappDaoFactory unfilteredWdf = vreq.getAssertionsWebappDaoFactory();
+    DataProperty dataproperty = unfilteredWdf.getDataPropertyDao().getDataPropertyByURI( predicateUri );
     if( dataproperty == null) {
         // No dataproperty will be returned for rdfs:label, but we shouldn't throw an error.
         // This is controlled by the Jena layer, so we can't change the behavior.
