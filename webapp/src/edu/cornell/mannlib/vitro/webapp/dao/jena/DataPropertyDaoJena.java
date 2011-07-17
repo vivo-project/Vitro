@@ -59,10 +59,9 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     
     protected static final Log log = LogFactory.getLog(DataPropertyDaoJena.class.getName());
     
-    private class DataPropertyRanker implements Comparator {
-        public int compare (Object o1, Object o2) {
-            DataProperty dp1 = (DataProperty) o1;
-            DataProperty dp2 = (DataProperty) o2;
+    private class DataPropertyRanker implements Comparator<DataProperty> {
+        @Override
+		public int compare (DataProperty dp1, DataProperty dp2) {
             int diff = dp1.getDisplayTier() - dp2.getDisplayTier();
             if (diff==0)
                 return dp1.getPublicName().compareTo(dp2.getPublicName());
@@ -127,22 +126,23 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         removeABoxStatementsWithPredicate(URI);
     }
 
-    public void fillDataPropertiesForIndividual(Individual entity) {
+    @Override
+	public void fillDataPropertiesForIndividual(Individual entity) {
         if( entity == null ) return;
-        List dataprops = new ArrayList();
+        List<DataProperty> dataprops = new ArrayList<DataProperty>();
         dataprops.addAll( getDataPropertyStatements(entity.getDataPropertyStatements()) );
         entity.setDatatypePropertyList(dataprops);
     }
 
-    private List getDataPropertyStatements(List dataPropertyStmts) {
-        if( dataPropertyStmts == null || dataPropertyStmts.size() < 1) return new ArrayList();
-        HashMap hash = new HashMap();
-        String uris ="";
-        Iterator it = dataPropertyStmts.iterator();
-        while(it.hasNext()){
-            DataPropertyStatement dataPropertyStmt = (DataPropertyStatement)it.next();
+    private List<DataProperty> getDataPropertyStatements(List<DataPropertyStatement> dataPropertyStmts) {
+		if (dataPropertyStmts == null || dataPropertyStmts.isEmpty()) {
+			return new ArrayList<DataProperty>();
+		}
+
+		HashMap<String, DataProperty> hash = new HashMap<String, DataProperty>();
+        for (DataPropertyStatement dataPropertyStmt: dataPropertyStmts) {
             if (hash.containsKey(dataPropertyStmt.getDatapropURI())) {
-                DataProperty p = (DataProperty) hash.get(dataPropertyStmt.getDatapropURI());
+                DataProperty p = hash.get(dataPropertyStmt.getDatapropURI());
                 p.addDataPropertyStatement(dataPropertyStmt);
             } else {
             	OntModel ontModel = getOntModelSelector().getTBoxModel();
@@ -160,12 +160,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             }
         }
 
-        List dataprops = new ArrayList();
-        Iterator keyIt = hash.keySet().iterator();
-        while (keyIt.hasNext()) {
-            Object key = keyIt.next();
-            dataprops.add(hash.get(key));
-        }
+        List<DataProperty> dataprops = new ArrayList<DataProperty>(hash.values());
         Collections.sort(dataprops, new DataPropertyRanker());
         return dataprops;
     }
