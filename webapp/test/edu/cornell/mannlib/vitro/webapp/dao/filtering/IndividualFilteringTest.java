@@ -318,6 +318,7 @@ public class IndividualFilteringTest extends AbstractTestClass {
 				extractObjectPropUris(ind.getObjectPropertyList()));
 	}
 
+	@Ignore
 	@Test
 	public void testPopulatedObjectPropertyList() {
 		assertEqualSets("populated object properties",

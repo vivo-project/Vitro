@@ -6,6 +6,7 @@ import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.Reque
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,7 +18,6 @@ import net.sf.jga.algorithms.Filter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
@@ -26,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
@@ -74,6 +75,9 @@ public class IndividualFiltering implements Individual {
 
     @Override
 	public List<DataProperty> getPopulatedDataPropertyList() {
+		// I'd rather filter on the actual DataPropertyStatements here, but
+		// Individual.getPopulatedDataPropertyList doesn't actually populate
+		// the DataProperty with statements. - jblake
         List<DataProperty> outdProps = new ArrayList<DataProperty>();
         List<DataProperty> dprops = _innerIndividual.getPopulatedDataPropertyList();
 		for (DataProperty dp: dprops) {
@@ -136,51 +140,39 @@ public class IndividualFiltering implements Individual {
     
     @Override
     public List<ObjectProperty> getPopulatedObjectPropertyList() {
-        List <ObjectProperty> oprops = _innerIndividual.getPopulatedObjectPropertyList();
-//        List<ObjectProperty> outOProps = new LinkedList<ObjectProperty>();
-//        Filter.filter(oprops, _filters.getObjectPropertyFilter(), outOProps);
-        return ObjectPropertyDaoFiltering.filterAndWrap(oprops, _filters);
+		// I'd rather filter on the actual ObjectPropertyStatements here, but
+		// Individual.getPopulatedObjectPropertyList doesn't actually populate
+		// the ObjectProperty with statements. - jblake
+        List<ObjectProperty> outOProps = new ArrayList<ObjectProperty>();
+        List<ObjectProperty> oProps = _innerIndividual.getPopulatedObjectPropertyList();
+		for (ObjectProperty op: oProps) {
+			if (_filters.getObjectPropertyStatementFilter().fn(
+					new ObjectPropertyStatementImpl(this._innerIndividual.getURI(), op.getURI(), SOME_LITERAL))) {
+				outOProps.add(op);
+			}
+        }
+        return outOProps;
     }
 
     /* ********************* methods that need delegated filtering *************** */
     @Override
     public List<ObjectPropertyStatement> getObjectPropertyStatements() {
-
-        List<ObjectPropertyStatement> stmts = _innerIndividual.getObjectPropertyStatements();
-        return filterObjectPropertyStatements(stmts); 
-//
-//         //filter ObjectPropertyStatements from inner
-//        List<ObjectPropertyStatement> filteredStmts = new LinkedList<ObjectPropertyStatement>();
-//        Filter.filter(stmts, _filters.getObjectPropertyStatementFilter(), filteredStmts);
-//
-//        //filter ObjectPropertyStatement based the related entity/individual
-//        ListIterator<ObjectPropertyStatement> stmtIt = filteredStmts.listIterator();
-//        while( stmtIt.hasNext() ){
-//            ObjectPropertyStatement ostmt = stmtIt.next();
-//            if( ostmt != null ){
-//                stmtIt.remove();
-//                continue;
-//            } else if( ostmt.getObject() == null ){
-//                continue;
-//            } else if( _filters.getIndividualFilter().fn( ostmt.getObject() )){
-//                    ostmt.setObject( new IndividualFiltering((Individual) ostmt.getObject(), _filters) );
-//            }else{
-//                    stmtIt.remove();
-//            }
-//        }
-//        return stmts;
+        return filterObjectPropertyStatements(_innerIndividual.getObjectPropertyStatements()); 
     }
 
     @Override
     public List<ObjectPropertyStatement> getObjectPropertyStatements(String propertyUri) {
-        List<ObjectPropertyStatement> stmts = _innerIndividual.getObjectPropertyStatements(propertyUri);
-        return filterObjectPropertyStatements(stmts);       
+        return filterObjectPropertyStatements(_innerIndividual.getObjectPropertyStatements(propertyUri));       
     }
     
-    private List<ObjectPropertyStatement> filterObjectPropertyStatements(List<ObjectPropertyStatement> opStmts) {
-        return ObjectPropertyStatementDaoFiltering.filterAndWrapList(opStmts, _filters); 
-    }
-
+	private List<ObjectPropertyStatement> filterObjectPropertyStatements(List<ObjectPropertyStatement> opStmts) {
+		if (opStmts == null) {
+			return Collections.emptyList();
+		}
+		ArrayList<ObjectPropertyStatement> filtered = new ArrayList<ObjectPropertyStatement>();
+		Filter.filter(opStmts, _filters.getObjectPropertyStatementFilter(),	filtered);
+		return filtered;
+	}
 
     
     //TODO: may cause problems since one can get ObjectPropertyStatement list from
