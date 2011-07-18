@@ -189,12 +189,12 @@ public class DataGetterUtils {
                 for(String vclassId: vitroClassIdStr) {
                     vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(vclassId);
                     if (vclass == null) {
-                        log.debug("Couldn't retrieve vclass ");   
+                        log.info("Couldn't retrieve vclass ");   
                         throw new Exception (errorMessage = "Class " + vclassId + " not found");
                     }  
                   }
             }else{
-                log.debug("parameter vclassId URI parameter expected ");
+                log.info("parameter vclassId URI parameter expected ");
                 throw new Exception("parameter vclassId URI parameter expected ");
             }
             List<String> vclassIds = Arrays.asList(vitroClassIdStr);                           
@@ -222,7 +222,7 @@ public class DataGetterUtils {
                 rObj.put("alpha", map.get("alpha"));
                                   
                 List<Individual> inds = (List<Individual>)map.get("entities");
-    
+                log.info("Number of individuals returned from request: " + inds.size());
                 JSONArray jInds = new JSONArray();
                 for(Individual ind : inds ){
                     JSONObject jo = new JSONObject();

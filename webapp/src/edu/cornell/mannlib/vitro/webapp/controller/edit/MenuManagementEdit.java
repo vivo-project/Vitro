@@ -83,7 +83,7 @@ public class MenuManagementEdit extends VitroHttpServlet {
     	if(command != null) {
     		processCommand(command, vreq, resp);
     	} else {
-    		System.out.println("Command is null");
+    		log.error("Command is null");
     	}
         //Need to redirect correctly
     	if(!isReorder(command)){
@@ -551,6 +551,11 @@ public class MenuManagementEdit extends VitroHttpServlet {
 			removeModel.add(displayModel.listStatements(
 					pageResource, 
 					DisplayVocabulary.REQUIRES_BODY_TEMPLATE, 
+					(RDFNode) null));
+			//Also need to get rid of link text in addition to title
+			removeModel.add(displayModel.listStatements(
+					menuItemResource, 
+					DisplayVocabulary.LINK_TEXT,
 					(RDFNode) null));
 		    //remove data getter properties - the link between page and data getter remains
 			Resource dataGetter = getDataGetterFromDisplayModel(pageResource, displayModel);

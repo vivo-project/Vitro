@@ -249,6 +249,7 @@ public class JsonServlet extends VitroHttpServlet {
     public static JSONObject getSolrIndividualsByVClasses(List<String> vclassURIs, HttpServletRequest req, ServletContext context) throws Exception {
    	 	VitroRequest vreq = new VitroRequest(req);        
         Map<String, Object> map = getSolrVClassIntersectionResults(vclassURIs, vreq, context);
+        log.info("Results returned from Solr for " + vclassURIs.toString() + " are of size " + map.size());
         JSONObject rObj = processVClassResults(map, vreq, context, true);                    
         return rObj;     
    }
