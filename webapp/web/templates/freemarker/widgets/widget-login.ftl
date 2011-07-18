@@ -47,7 +47,7 @@
             </#if>
 
             <label for="loginName">Email</label>
-            <input id="loginName" name="loginName" class="text-field focus" type="text" value="${loginName!}" required autofocus />
+            <input id="loginName" name="loginName" class="text-field focus" type="text" value="${loginName!}" autocapitalize="off" required autofocus />
 
             <label for="loginPassword">Password</label>
             <input id="loginPassword" name="loginPassword" class="text-field" type="password" required />
