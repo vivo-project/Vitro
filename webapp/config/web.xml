@@ -873,27 +873,15 @@
     <url-pattern>/listObjectPropertyStatements</url-pattern>
   </servlet-mapping>
 
-  <!-- 
   <servlet>
     <servlet-name>IndividualListController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController</servlet-class>
-  </servlet>
-  -->
-  <servlet>
-    <servlet-name>IndividualListController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.SolrIndividualListController</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>IndividualListController</servlet-name>
     <url-pattern>/individuallist</url-pattern>
   </servlet-mapping>
 
-  <!--
-  <servlet>
-    <servlet-name>IndividualListRdf</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.EntityURLController</servlet-class>
-  </servlet>
-  -->
   <servlet>
     <servlet-name>IndividualListRdf</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.IndividualListRdfController</servlet-class>
@@ -903,15 +891,9 @@
     <url-pattern>/listrdf/*</url-pattern>
   </servlet-mapping>
 
-  <!--   
   <servlet>
     <servlet-name>SearchController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.PagedSearchController</servlet-class>
-  </servlet> 
-  -->
-  <servlet>
-    <servlet-name>SearchController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.SolrPagedSearchController</servlet-class>
   </servlet>
  
   <servlet-mapping>
@@ -932,15 +914,9 @@
     <url-pattern>/searchcontroller</url-pattern>
   </servlet-mapping>
 
-  <!--
   <servlet>
     <servlet-name>AutocompleteController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.AutocompleteController</servlet-class>
-  </servlet>
-  -->
-  <servlet>
-    <servlet-name>AutocompleteController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.search.controller.SolrAutocompleteController</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>AutocompleteController</servlet-name>
@@ -987,15 +963,9 @@
     <url-pattern>/contact</url-pattern>
   </servlet-mapping>
 
-  <!--
   <servlet>
     <servlet-name>JSON Service</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.JSONServlet</servlet-class>
-  </servlet>
-  -->
-  <servlet>
-    <servlet-name>JSON Service</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.SolrJsonServlet</servlet-class>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.JsonServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>JSON Service</servlet-name>
