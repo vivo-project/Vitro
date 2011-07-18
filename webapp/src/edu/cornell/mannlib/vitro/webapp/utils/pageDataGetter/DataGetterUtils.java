@@ -47,6 +47,7 @@ public class DataGetterUtils {
             for( String dataGetter : dataGetters){
                 Map<String,Object> moreData = null;
                 PageDataGetter getter = dataGetterMap.get(dataGetter);
+                log.info("Retrieved data getter for " + dataGetter);
                 try{
                     moreData = getAdditionalData(pageUri, dataGetter, page, vreq, getter, context);
                     if( moreData != null)
@@ -141,6 +142,7 @@ public class DataGetterUtils {
       
         if( getter != null ){
             try{
+            	log.info("Retrieve data for this data getter for " + pageUri);
                 return getter.getData(context, vreq, pageUri, page);
             }catch(Throwable th){
                 log.error(th,th);

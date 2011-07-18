@@ -84,6 +84,7 @@ public class JsonServlet extends VitroHttpServlet {
                 getVClassesForVClassGroup(req,resp);
                 return;
             } else if( vreq.getParameter("getSolrIndividualsByVClasses") != null ){
+            	log.info("AJAX request to retrieve individuals by vclasses");
             	getSolrIndividualsByVClasses(req,resp);
                 return;
             } else if( vreq.getParameter("getDataForPage") != null ){
@@ -196,25 +197,26 @@ public class JsonServlet extends VitroHttpServlet {
     
     // Accepts multiple vclasses and returns individuals which correspond to the intersection of those classes (i.e. have all those types) 
     private void getSolrIndividualsByVClasses( HttpServletRequest req, HttpServletResponse resp ){
-        String errorMessage = null;
+        log.info("Executing retrieval of individuals by vclasses");
+    	String errorMessage = null;
         JSONObject rObj = null;
         try{            
             VitroRequest vreq = new VitroRequest(req);
             VClass vclass=null;
             log.info("Retrieving solr individuals by vclasses");
             // Could have multiple vclass ids sent in
-            String[] vitroClassIdStr = vreq.getParameterValues("vclassId");            
+            String[] vitroClassIdStr = vreq.getParameterValues("vclassId");  
             if ( vitroClassIdStr != null && vitroClassIdStr.length > 0){    
             	for(String vclassId: vitroClassIdStr) {
-            		log.info("Using VClass " + vclassId);
+            		log.info("Iterating throug vclasses, using VClass " + vclassId);
 	                vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(vclassId);
 	                if (vclass == null) {
-	                    log.debug("Couldn't retrieve vclass ");   
+	                    log.error("Couldn't retrieve vclass ");   
 	                    throw new Exception (errorMessage = "Class " + vclassId + " not found");
 	                }   
             	}
             }else{
-                log.debug("parameter vclassId URI parameter expected ");
+                log.error("parameter vclassId URI parameter expected but not found");
                 throw new Exception("parameter vclassId URI parameter expected ");
             }
             List<String> vclassIds = Arrays.asList(vitroClassIdStr);
@@ -247,7 +249,8 @@ public class JsonServlet extends VitroHttpServlet {
     }
     
     public static JSONObject getSolrIndividualsByVClasses(List<String> vclassURIs, HttpServletRequest req, ServletContext context) throws Exception {
-   	 	VitroRequest vreq = new VitroRequest(req);        
+   	 	VitroRequest vreq = new VitroRequest(req);   
+   	 	log.info("Retrieve solr results for vclasses" + vclassURIs.toString());
         Map<String, Object> map = getSolrVClassIntersectionResults(vclassURIs, vreq, context);
         log.info("Results returned from Solr for " + vclassURIs.toString() + " are of size " + map.size());
         JSONObject rObj = processVClassResults(map, vreq, context, true);                    
@@ -259,6 +262,7 @@ public class JsonServlet extends VitroHttpServlet {
         log.info("Retrieving Solr intersection results for " + vclassURIs.toString());
     	String alpha = IndividualListController.getAlphaParameter(vreq);
         int page = IndividualListController.getPageParameter(vreq);
+        log.info("Alpha and page parameters are " + alpha + " and " + page);
         Map<String,Object> map = null;
         try {
 	         map = IndividualListController.getResultsForVClassIntersections(
