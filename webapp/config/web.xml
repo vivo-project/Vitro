@@ -156,7 +156,7 @@
   </listener>
 
   <listener>
-    <listener-class> edu.cornell.mannlib.vivo.auth.policy.RestrictHomeMenuItemEditingPolicy$Setup</listener-class>
+    <listener-class> edu.cornell.mannlib.vitro.webapp.auth.policy.RestrictHomeMenuItemEditingPolicy$Setup</listener-class>
   </listener>
 
   <!-- The Solr index uses a "public" filter, so the PropertyRestrictionPolicyHelper must already be set up. -->
