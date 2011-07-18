@@ -73,8 +73,7 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
     		for(VClass v: vclassList) {
     			int oldCount = v.getEntityCount();
     			//Making a copy so as to ensure we don't touch the values in the cache
-    			VClass copyVClass = new VClass(v.getURI());
-    			copyVClass.setEntityCount(oldCount);
+    			VClass copyVClass = makeCopyVClass(v);
     			int count = retrieveCount(vreq, context, v, restrictClasses);
     			if(oldCount != count) {
     				log.debug("Old count was " + v.getEntityCount() + " and New count for " + v.getURI() + " is " + count);
@@ -88,6 +87,16 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
     	}
 	}
 
+    private VClass makeCopyVClass(VClass v) {
+    	VClass copyVClass = new VClass(v.getURI());
+		copyVClass.setLocalName(copyVClass.getLocalName());
+		copyVClass.setDisplayRank(v.getDisplayRank());
+		copyVClass.setName(v.getName());
+		copyVClass.setNamespace(v.getNamespace());
+		copyVClass.setEntityCount(v.getEntityCount());
+		return copyVClass;
+    }
+    
     //update class count based on restrict classes
 	private int retrieveCount(VitroRequest vreq, ServletContext context, VClass v, List<VClass> restrictClasses) {
 		//Execute solr query that returns only count of individuals
