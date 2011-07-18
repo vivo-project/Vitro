@@ -20,7 +20,7 @@
         <noscript>
             <section id="error-alert">
                 <img src="${urls.images}/iconAlertBig.png" alt="Alert Icon"/>
-                <p>In order to edit content, you'll need to enable JavaScript.</p>
+                <p>In order to edit content, you'll need to enable JavaScript. Here are the <a href="http://www.enable-javascript.com">instructions for enabling JavaScript in your web browser</a>.</p>
             </section>
         </noscript>
     </#if>
@@ -57,8 +57,8 @@
             <input class="checkbox-remember-me" name="remember-me" type="checkbox" value="" />  
             <label class="label-remember-me" for="remember-me">Remember me</label> -->
             <#-- mb863: forgot password and request an account won't be part of VIVO r1.2
-            <p class="forgot-password"><a href="#">Forgot your password?</a></p>    
-            <p class="request-account"><a class="blue button" href="#">Request an account</a> </p> -->                       
+            <p class="forgot-password"><a href="#">Forgot your password?</a></p>
+            <p class="request-account"><a class="blue button" href="#">Request an account</a> </p> -->
         </form>
 
     </section><!-- #log-in -->
