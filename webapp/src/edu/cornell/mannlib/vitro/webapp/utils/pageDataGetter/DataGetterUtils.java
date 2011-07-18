@@ -26,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.JsonServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController.PageRecord;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
@@ -152,6 +153,14 @@ public class DataGetterUtils {
             return Collections.emptyMap();
         }
     }
+    
+    /**
+     * Get Individual count for Solr query for intersection of multiple classes
+     */
+    public static long getIndividualCountForIntersection(VitroRequest vreq, ServletContext context, List<String> classUris) {
+    	 return IndividualListController.getIndividualCount(classUris, vreq.getWebappDaoFactory().getIndividualDao(), context);
+    }
+    
     
     /**
      * Process results related to VClass or vclasses. Handles both single and multiple vclasses being sent.
@@ -296,5 +305,7 @@ public class DataGetterUtils {
         }
         return map;        
     }
+    
+    
     
 }

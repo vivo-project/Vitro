@@ -250,22 +250,25 @@ public class IndividualListController extends FreemarkerHttpServlet {
         List<Individual> individuals = new ArrayList<Individual>(INDIVIDUALS_PER_PAGE); 
         int individualsAdded = 0;
         int index = (page-1) * INDIVIDUALS_PER_PAGE;
-        while (individualsAdded < INDIVIDUALS_PER_PAGE && index < hitCount) {
-            SolrDocument doc = docs.get(index);
-            if (doc != null) {
-                String uri = doc.get(VitroSearchTermNames.URI).toString();
-                Individual individual = indDao.getIndividualByURI( uri ); 
-                if (individual != null) {
-                    individualsAdded++;                    
-                    individuals.add(individual);
-                    log.debug("Adding individual " + uri + " to individual list display");
-                } else {
-                    log.debug("No existing individual for search document with uri = " + uri);
-                }
-            } 
-            index++;
+        if(docs.size() > 0) {
+	        while (individualsAdded < INDIVIDUALS_PER_PAGE && index < hitCount) {
+	            SolrDocument doc = docs.get(index);
+	            if (doc != null) {
+	                String uri = doc.get(VitroSearchTermNames.URI).toString();
+	                Individual individual = indDao.getIndividualByURI( uri ); 
+	                if (individual != null) {
+	                    individualsAdded++;                    
+	                    individuals.add(individual);
+	                    log.debug("Adding individual " + uri + " to individual list display");
+	                } else {
+	                    log.debug("No existing individual for search document with uri = " + uri);
+	                }
+	            } 
+	            index++;
+	        }
+        } else {
+        	log.debug("Docs size is 0");
         }
-         
         // Test index < hitCount ensures that there are still some docs left
         if ( hitCount > INDIVIDUALS_PER_PAGE && index < hitCount ){
             rvMap.put("showPages", Boolean.TRUE);
@@ -284,7 +287,24 @@ public class IndividualListController extends FreemarkerHttpServlet {
         return rvMap;
     }
      
-    private static SolrQuery getQuery(List<String> vclassUris, String alpha){
+    //Get count of individuals without actually getting the results
+    public static long getIndividualCount(List<String> vclassUris, IndividualDao indDao, ServletContext context) {
+    	SolrQuery query = getQuery(vclassUris, null, 0);
+    	try {
+	    	Map<String,Object> rvMap = getResultsForVClassQuery(query, 1, null, indDao, context);
+	    	Long count = (Long) rvMap.get("totalCount");
+	    	return count.longValue();
+    	} catch(Exception ex) {
+    		log.error("An error occured in retrieving individual count", ex);
+    	}
+    	return 0;
+    }
+    
+    private static SolrQuery getQuery(List<String> vclassUris, String alpha) {
+    	return getQuery(vclassUris, alpha, INDIVIDUAL_LIST_CONTROLLER_MAX_RESULTS);
+    }
+    
+    private static SolrQuery getQuery(List<String> vclassUris, String alpha, int numberRows){
 
         String queryText = "";
  
@@ -307,13 +327,13 @@ public class IndividualListController extends FreemarkerHttpServlet {
             
             SolrQuery query = new SolrQuery(queryText);
             log.debug("Query text is " + queryText);
-           
+          
             // Get all available results from index rather than just those for the current page.
             // Otherwise, if there are a large number of non-existent individuals in the search
             // index, the current page of results might not retrieve any existing individuals,
             // and nothing gets returned.
             query.setStart(0)
-                 .setRows(INDIVIDUAL_LIST_CONTROLLER_MAX_RESULTS)
+                 .setRows(numberRows)
                  // Need a single-valued field for sorting
                  .setSortField(VitroSearchTermNames.NAME_LOWERCASE_SINGLE_VALUED, SolrQuery.ORDER.asc);
             

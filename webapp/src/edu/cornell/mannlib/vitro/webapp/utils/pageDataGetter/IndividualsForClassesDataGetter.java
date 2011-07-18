@@ -19,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
@@ -56,9 +57,52 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
     		HashMap<String, Object> data, List<String> classes, List<String> restrictClasses ) {
     	processClassesForDisplay(context, data, classes);
     	processRestrictionClasses(vreq, context, data, restrictClasses);
+    	processIntersections(vreq, context, data);
     }
     
-    private void processClassesForDisplay(ServletContext context, HashMap<String, Object> data, List<String> classes) {
+    //At this point, data specifices whether or not intersections included
+    private void processIntersections(VitroRequest vreq,
+			ServletContext context, HashMap<String, Object> data) {
+    	VClassGroup classesGroup = (VClassGroup) data.get("vClassGroup");
+    	List<VClass> vclassList = classesGroup.getVitroClassList();
+    	List<VClass> restrictClasses = (List<VClass>) data.get("restrictVClasses");
+    	//if there are restrict classes, then update counts
+    	if(restrictClasses.size() > 0) {
+    		List<VClass> newVClassList = new ArrayList<VClass>();
+    		//Iterate through vclasses and get updated counts
+    		for(VClass v: vclassList) {
+    			int oldCount = v.getEntityCount();
+    			//Making a copy so as to ensure we don't touch the values in the cache
+    			VClass copyVClass = new VClass(v.getURI());
+    			copyVClass.setEntityCount(oldCount);
+    			int count = retrieveCount(vreq, context, v, restrictClasses);
+    			if(oldCount != count) {
+    				log.debug("Old count was " + v.getEntityCount() + " and New count for " + v.getURI() + " is " + count);
+    				copyVClass.setEntityCount(count);
+    			} 
+    			newVClassList.add(copyVClass);
+    		}
+    		classesGroup.setVitroClassList(newVClassList);
+    		//TODO: Do we need to do this again or will this already be reset?
+    		data.put("vClassGroup", classesGroup);
+    	}
+	}
+
+    //update class count based on restrict classes
+	private int retrieveCount(VitroRequest vreq, ServletContext context, VClass v, List<VClass> restrictClasses) {
+		//Execute solr query that returns only count of individuals
+		log.debug("Entity count is " + v.getEntityCount());
+		List<String> classUris = new ArrayList<String>();
+		classUris.add(v.getURI());
+		for(VClass r: restrictClasses) {
+			classUris.add(r.getURI());
+		}
+		long count =  DataGetterUtils.getIndividualCountForIntersection(vreq, context, classUris);
+		return new Long(count).intValue();
+
+	}
+
+	private void processClassesForDisplay(ServletContext context, HashMap<String, Object> data, List<String> classes) {
     	VClassGroup classesGroup = new VClassGroup();
     	classesGroup.setURI("displayClasses");
     	
@@ -70,7 +114,6 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
     		//Retrieve vclass from cache to get the count
     		VClass vclass = vcgc.getCachedVClass(classUri);
     		if(vclass != null) {
-    			
     			log.debug("VClass does exist for " + classUri + " and entity count is " + vclass.getEntityCount());
     			vClasses.add(vclass);
     		} else {
