@@ -225,12 +225,13 @@ public class IndividualToSolrDocument {
             Iterator<ObjectPropertyStatement> objectPropertyStmtIter = objectPropertyStatements.iterator();
             while (objectPropertyStmtIter.hasNext()) {
                 ObjectPropertyStatement objectPropertyStmt = objectPropertyStmtIter.next();
-                if( "http://www.w3.org/2002/07/owl#differentFrom".equals(objectPropertyStmt.getPropertyURI()) )
+                if( "http://www.w3.org/2002/07/owl#differentFrom".equals(objectPropertyStmt.getPropertyURI()) ){
                     continue;
+                }
                 try {
                     objectNames.append(" ");
                     String t=null;
-                    objectNames.append(((t=objectPropertyStmt.getObject().getName()) == null)?"":t);   
+                    objectNames.append(((t=objectPropertyStmt.getObject().getRdfsLabel()) == null)?"":t);   
                     addUri.append(" ");
                     addUri.append(((t=objectPropertyStmt.getObject().getURI()) == null)?"":t);
                 } catch (Exception e) { 
