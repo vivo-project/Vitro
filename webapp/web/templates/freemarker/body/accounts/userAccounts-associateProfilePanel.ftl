@@ -4,23 +4,24 @@
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/autocomplete.css" />',
                    '<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css" />')}
-
+<section id="externalAuthMatchId">
     <div id="associateProfileBackgroundOne">
-        <div style="margin-left:8px">
+        <div id="alignExternalAuthId">
         <#if showAssociation??>
              <label for="externalAuthId">External Auth. ID / Matching ID</label> 
             <input type="text" name="externalAuthId" value="${externalAuthId}" id="externalAuthId" role="input "/>
-            <span id="externalAuthIdInUse"  style="display: none;" >This Identifier is already in use.</span>
-            <p class="explanatoryText" style="margin-top:-8px">Can be used to associate the account with the user's profile via the matching property.</p>
+            <span id="externalAuthIdInUse" >This Identifier is already in use.</span>
+            <p class="explanatoryText">Can be used to associate the account with the user's profile via the matching property.</p>
         <#else>
             <label for="externalAuthId">External Authentication ID</label> 
             <input type="text" name="externalAuthId" value="${externalAuthId}" id="externalAuthId" role="input "/>
-            <span id="externalAuthIdInUse"  style="display: none;" >This Identifier is already in use.</span>
+            <span id="externalAuthIdInUse" >This Identifier is already in use.</span>
         </#if>
         </div>
     </div>
+    </section>
     <#-- If there is an associated profile, show these -->
-    <div id="associated">
+    <section id="associated">
         <div id="associateProfileBackgroundTwo">
             <p>
                 <label for="associatedProfileName">Associated profile:</label>
@@ -30,10 +31,10 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/auto
             </p>
             <input type="hidden" id="associatedProfileUri" name="associatedProfileUri" value="" />
         </div>
-    </div>
+    </section>
             
     <#-- If we haven't selected one, show these instead -->
-    <div id="associationOptions">
+    <section id="associationOptions">
         <div id="associateProfileBackgroundThree">
             <p>
                 <label for="associateProfileName">Select the associated profile</label>
@@ -52,7 +53,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/auto
                 </select>    
             </p>
         </div>
-    </div>
+    </section>
 
 <script type="text/javascript">
 var associateProfileFieldsData = {

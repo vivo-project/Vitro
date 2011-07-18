@@ -168,6 +168,7 @@ padding-right: 5px;
     width:280px;
     margin-left:10px;
     line-height:15px; 
+    margin-top:-8px !important;
 }
 #associated {
     float:right;
@@ -185,6 +186,10 @@ padding-right: 5px;
 }
 #externalAuthIdInUse {
     color: #f70;
+    display: none;
+}
+#alignExternalAuthId {
+    margin-left:8px;
 }
 #associateProfileBackgroundOne {
     background-color:#fff;
@@ -251,6 +256,9 @@ padding-right: 5px;
     -webkit-border-bottom-left-radius: 5px;
     -webkit-border-bottom-right-radius: 5px;
 }
+#externalAuthId {
+    width: 12em;
+}
 
 /* MISCELLANEOUS ------>  */
 form.customForm input[name="firstName"],
@@ -258,7 +266,4 @@ form.customForm input[name="lastName"],
 form.customForm input[name="newPassword"],
 form.customForm input[name="confirmPassword"] {
     width: 10em;
-}
-#externalAuthId {
-    width: 12em;
 }
