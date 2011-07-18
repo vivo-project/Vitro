@@ -324,8 +324,8 @@ public class ContextNodeFields implements DocumentModifier{
 				
 				+ " OPTIONAL  { ?c core:hrJobTitle ?HRJobTitle . } . "
 				+ " OPTIONAL { ?c core:involvedOrganizationName ?InvolvedOrganizationName . } ."
-				+ " OPTIONAL   { ?c core:positionForPerson ?f . ?f rdfs:label ?PositionForPerson . FILTER (?f != ?uri) . } . "
-				+ " OPTIONAL { ?c core:positionInOrganization ?i . ?i rdfs:label ?PositionInOrganization . FILTER (?i != ?uri) . } . "
+				+ " OPTIONAL   { ?c core:positionForPerson ?f . ?f rdfs:label ?PositionForPerson .  } . "
+				+ " OPTIONAL { ?c core:positionInOrganization ?i . ?i rdfs:label ?PositionInOrganization .  } . "
 				+ " OPTIONAL { ?c core:titleOrRole ?TitleOrRole . } . "
 				+ " }");
 		
@@ -338,7 +338,7 @@ public class ContextNodeFields implements DocumentModifier{
 				
 				+ " OPTIONAL  { ?c core:advisee ?d . ?d rdfs:label ?Advisee . } . "
 				+ " OPTIONAL { ?c core:degreeCandidacy ?e . ?e rdfs:label ?DegreeCandidacy . } ."
-				+ " OPTIONAL   { ?c core:linkedAuthor ?f . ?f rdfs:label ?LinkedAuthor . FILTER (?f != ?uri) . } . "
+				+ " OPTIONAL   { ?c core:linkedAuthor ?f . ?f rdfs:label ?LinkedAuthor . } . "
 				+ " OPTIONAL { ?c core:linkedInformationResource ?h . ?h rdfs:label ?LinkedInformationResource . } . "
 				+ " } ");
 		
@@ -349,8 +349,8 @@ public class ContextNodeFields implements DocumentModifier{
 				+ "?uri rdf:type foaf:Agent  ; ?b ?c . "
 				+ " ?c rdf:type core:AwardReceipt . "
 				
-				+ " OPTIONAL { ?c core:awardConferredBy ?d . ?d rdfs:label ?AwardConferredBy } . "
-				+ " OPTIONAL { ?c core:awardOrHonorFor ?e . ?e rdfs:label ?AwardOrHonorFor . FILTER (?e != ?uri) .} ."
+				+ " OPTIONAL { ?c core:awardConferredBy ?d . ?d rdfs:label ?AwardConferredBy . } . "
+				+ " OPTIONAL { ?c core:awardOrHonorFor ?e . ?e rdfs:label ?AwardOrHonorFor . } ."
 				+ " OPTIONAL { ?c core:description ?Description . } . "
 				+ " }");
 		
@@ -359,7 +359,6 @@ public class ContextNodeFields implements DocumentModifier{
 				+ "?uri rdf:type foaf:Agent  ; ?b ?c . "
 				+ " ?c rdf:type core:Role ; core:roleIn ?Organization ."
 				+ " ?Organization rdfs:label ?OrganizationLabel . "
-				+ " FILTER (?Organization != ?uri) ."
 				+ " }");
 		
 		multiValuedQueriesForAgent.add(prefix + 
@@ -373,7 +372,7 @@ public class ContextNodeFields implements DocumentModifier{
 					+  "OPTIONAL { ?c core:degreeEarned ?d . ?d rdfs:label ?AcademicDegreeLabel ; core:abbreviation ?AcademicDegreeAbbreviation . } . "
 					+  "OPTIONAL { ?c core:majorField ?MajorField .} ."			  
 					+ " OPTIONAL { ?c core:departmentOrSchool ?DepartmentOrSchool . }"			  
-					+ " OPTIONAL { ?c core:trainingAtOrganization ?e . ?e rdfs:label ?TrainingAtOrganizationLabel .  FILTER (?e != ?uri) . } . " 
+					+ " OPTIONAL { ?c core:trainingAtOrganization ?e . ?e rdfs:label ?TrainingAtOrganizationLabel . } . " 
 					+"}");
 		
 	}
@@ -389,7 +388,7 @@ public class ContextNodeFields implements DocumentModifier{
 					+ " ?uri rdf:type core:InformationResource . "
 					  
 					+  "OPTIONAL { ?uri core:informationResourceInAuthorship ?a . ?a core:linkedAuthor ?b ; core:linkedInformationResource ?d ." +
-							"?b rdfs:label ?LinkedAuthor . ?d rdfs:label ?LinkedInformationResource .  FILTER (?d != ?uri) .} . "
+							"?b rdfs:label ?LinkedAuthor . ?d rdfs:label ?LinkedInformationResource .} . "
 					+  "OPTIONAL { ?uri bibo:editor ?e . ?e rdfs:label ?Editor  . } ."			  
 					+ " OPTIONAL { ?uri core:hasSubjectArea ?f . ?f rdfs:label ?SubjectArea . } "			  
 					+ " OPTIONAL { ?uri core:features ?i . ?i rdfs:label ?Features . } . " 
