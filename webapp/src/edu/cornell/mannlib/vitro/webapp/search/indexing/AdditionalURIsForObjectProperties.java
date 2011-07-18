@@ -26,7 +26,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-import edu.cornell.mannlib.vitro.webapp.search.beans.AdditionalURIsToIndex;
+import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
 
 /**
  * For a given statement, return the URIs that may need to be updated in
@@ -35,7 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.AdditionalURIsToIndex;
  * 
  * Context nodes are not handled here. They are taken care of in AdditionalURIsForContextNodex.
  */
-public class AdditionalURIsForObjectProperties implements AdditionalURIsToIndex {
+public class AdditionalURIsForObjectProperties implements StatementToURIsToUpdate {
     protected static final Log log = LogFactory.getLog(AdditionalURIsForObjectProperties.class);
     
     protected Model model;              

@@ -15,7 +15,7 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.search.beans.AdditionalURIsToIndex;
+import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
 
 /**
  * If a class changes classgroups, then all members of that class
@@ -29,7 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.AdditionalURIsToIndex;
  * changes, all members of the class core:Summer need to be update so they get the new classgroup values. 
  */
 public class AdditionalURIsForClassGroupChanges implements
-        AdditionalURIsToIndex {
+        StatementToURIsToUpdate {
 
     private OntModel model;
 

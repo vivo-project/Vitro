@@ -20,7 +20,7 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.search.beans.AdditionalURIsToIndex;
+import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
 
 /**
  * @author bdc34
@@ -43,7 +43,7 @@ public class AdditionalURIsForClassGroupChangesTest {
         OntModel model = ModelFactory.createOntologyModel();
         model.read( new StringReader(n3ForPresentationClass), null,  "N3");
         
-        AdditionalURIsToIndex uriFinder = new AdditionalURIsForClassGroupChanges( model );
+        StatementToURIsToUpdate uriFinder = new AdditionalURIsForClassGroupChanges( model );
         List<String> uris = uriFinder.findAdditionalURIsToIndex( 
                 ResourceFactory.createStatement(
                         ResourceFactory.createResource("http://vivoweb.org/ontology/core#Presentation"),

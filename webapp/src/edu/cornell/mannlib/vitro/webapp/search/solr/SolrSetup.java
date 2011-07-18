@@ -19,7 +19,6 @@ import org.apache.solr.client.solrj.impl.XMLResponseParser;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
-import com.hp.hpl.jena.tdb.base.file.FileBase;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
@@ -29,13 +28,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
-import edu.cornell.mannlib.vitro.webapp.search.IndexConstants;
-import edu.cornell.mannlib.vitro.webapp.search.beans.AdditionalURIsToIndex;
 import edu.cornell.mannlib.vitro.webapp.search.beans.FileBasedProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearchImpl;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
+import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForContextNodes;
+import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForDataProperties;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForObjectProperties;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.SearchReindexingListener;
@@ -107,19 +105,20 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             WebappDaoFactory wadf = (WebappDaoFactory) context.getAttribute("webappDaoFactory");
             VitroFilters vf = VitroFilterUtils.getPublicFilter(context);
             wadf = new WebappDaoFactoryFiltering(wadf, vf);            
-                        
-            IndexBuilder builder = new IndexBuilder(context, solrIndexer, wadf );
-            // to the servlet context so we can access it later in the webapp.
-            context.setAttribute(IndexBuilder.class.getName(), builder);
             
-            //make objects that will find additional URIs for context nodes etc
-            List<AdditionalURIsToIndex> uriFinders = new ArrayList<AdditionalURIsToIndex>();
+          //make objects that will find additional URIs for context nodes etc
+            List<StatementToURIsToUpdate> uriFinders = new ArrayList<StatementToURIsToUpdate>();
+            uriFinders.add( new AdditionalURIsForDataProperties() );
             uriFinders.add( new AdditionalURIsForObjectProperties(jenaOntModel) );
             uriFinders.add( new AdditionalURIsForContextNodes(jenaOntModel) );
             
+            IndexBuilder builder = new IndexBuilder( solrIndexer, wadf, uriFinders );
+            // to the servlet context so we can access it later in the webapp.
+            context.setAttribute(IndexBuilder.class.getName(), builder);                        
+            
             // set up listeners so search index builder is notified of changes to model
             ServletContext ctx = sce.getServletContext();
-            SearchReindexingListener srl = new SearchReindexingListener(builder, uriFinders);
+            SearchReindexingListener srl = new SearchReindexingListener( builder );
             ModelContext.registerListenerForChanges(ctx, srl);
             
             log.info("Setup of Solr index completed.");   

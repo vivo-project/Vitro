@@ -7,8 +7,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.ServletContext;
 
@@ -16,11 +16,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.query.QueryParseException;
+import com.hp.hpl.jena.rdf.model.Statement;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.search.beans.AdditionalURIsToIndex;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndexerIface;
+import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
 
 
 /**
@@ -31,42 +33,78 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.IndexerIface;
  *
  * See the class SearchReindexingListener for an example of how a model change
  * listener can use an IndexBuilder to keep the full text index in sncy with 
- * updates to a model. It calls IndexBuilder.addToChangedUris().
- *
- * @author bdc34
- *
+ * updates to a model. It calls IndexBuilder.addToChangedUris().  
  */
 public class IndexBuilder extends Thread {
     private WebappDaoFactory wdf;    
-	private final IndexerIface indexer;
-    private final ServletContext context;       
+	private final IndexerIface indexer;           
+
+    /** Statements that have changed in the model.  The SearchReindexingListener
+     * and other similar objects will use methods on IndexBuilder to add statements
+     * to this queue. This should only be accessed from blocks synchronized on
+     * the changedStmtQueue object.   
+     */
+    protected List<Statement> changedStmtQueue;
     
-    /* changedUris should only be accessed from synchronized blocks */
-    private HashSet<String> changedUris = null;
+    /** This is the list of URIs that need to be updated in the search
+     * index.  The IndexBuilder thread will process Statements in changedStmtQueue
+     * to create this set of URIs. 
+     * This should only be accessed by the IndexBuilder thread.  */
+    private HashSet<String> urisRequiringUpdate;
     
-    private List<String> updatedInds = null;
-    private List<String> deletedInds = null;    
+    /** This is a list of objects that will compute what URIs need to be
+     * updated in the search index when a statement changes.  */     
+    protected List<StatementToURIsToUpdate> stmtToURIsToIndexFunctions;    
     
-    private boolean reindexRequested = false;    
+    /**
+     * updatedUris will only be accessed from the IndexBuilder thread
+     * so it doesn't need to be synchronized.
+     */
+    private List<String> updatedUris = null;
+    /**
+     * deletedUris will only be accessed from the IndexBuilder thread
+     * so it doesn't need to be synchronized.
+     */
+    private List<String> deletedUris = null;    
+    
+    /**
+     * Indicates that a full index re-build has been requested.
+     */
+    private boolean reindexRequested = false;
+    
+    /** Indicates that a stop of the indexing objects has been requested. */
     protected boolean stopRequested = false;
+    
+    /** Length of pause between a model change an the start of indexing. */
     protected long reindexInterval = 1000 * 60 /* msec */ ;        
     
+    /** Number of threads to use during indexing. */
     protected int numberOfThreads = 10;
     
-    public static final boolean UPDATE_DOCS = false;
-    public static final boolean NEW_DOCS = true;
+    public static final int MAX_REINDEX_THREADS= 10;
+    public static final int MAX_UPDATE_THREADS= 10;    
+    public static final int MAX_THREADS = Math.max( MAX_UPDATE_THREADS, MAX_REINDEX_THREADS);
+    
+    //public static final boolean UPDATE_DOCS = false;
+    //public static final boolean NEW_DOCS = true;
       
     private static final Log log = LogFactory.getLog(IndexBuilder.class);
 
-    public IndexBuilder(
-                ServletContext context,
-                IndexerIface indexer,
-                WebappDaoFactory wdf ){
+    public IndexBuilder(IndexerIface indexer,
+                        WebappDaoFactory wdf,
+                        List<StatementToURIsToUpdate> stmtToURIsToIndexFunctions ){
         super("IndexBuilder");
+        
         this.indexer = indexer;
-        this.wdf = wdf;
-        this.context = context;            
-        this.changedUris = new HashSet<String>();    
+        this.wdf = wdf;            
+                
+        if( stmtToURIsToIndexFunctions != null )
+            this.stmtToURIsToIndexFunctions = stmtToURIsToIndexFunctions;
+        else
+            this.stmtToURIsToIndexFunctions = Collections.emptyList();
+        
+        this.changedStmtQueue = new LinkedList<Statement>();
+        this.urisRequiringUpdate = new HashSet<String>();
         this.start();
     }
     
@@ -75,21 +113,32 @@ public class IndexBuilder extends Thread {
         this( null, null, null);        
     }
     
-    public void setWdf(WebappDaoFactory wdf){    	
-        this.wdf = wdf;
-    }
-
-    public boolean isIndexing(){
-        return indexer.isIndexing();
-    }
-
+    /**
+     * Use this method to add URIs that need to be indexed.  Should be
+     * able to add to changedStmtQueue while indexing is in process. 
+     * 
+     * If you have a statement that has been added or removed from the 
+     * RDF model and you would like it to take effect in the search
+     * index this is the method you should use.  Follow the adding of
+     * your changes with a call to doUpdateIndex().
+     */
+    public void addToChanged(Statement stmt){
+        synchronized(changedStmtQueue){
+            changedStmtQueue.add(stmt);
+        }
+    } 
+    
+    /**
+     * This method will cause the IndexBuilder to completely rebuild
+     * the index.
+     */
     public synchronized void doIndexRebuild() {
-    	//set flag for full index rebuild
-    	this.reindexRequested = true; 	
-    	//wake up     						
-    	this.notifyAll();    	
+        //set flag for full index rebuild
+        this.reindexRequested = true;   
+        //wake up                           
+        this.notifyAll();       
     }
-
+    
     /** 
      * This will re-index Individuals that changed because of modtime or because they
      * were added with addChangedUris(). 
@@ -98,30 +147,11 @@ public class IndexBuilder extends Thread {
     	//wake up thread and it will attempt to index anything in changedUris
         this.notifyAll();    	    	   
     }
-   
-    /**
-     * Use this method to add URIs that need to be indexed. 
-     */
-    public synchronized void addToChangedUris(String uri){
-    	changedUris.add(uri);
-    }
-    
-    /**
-     * Use this method to add URIs that need to be indexed. 
-     */
-    public synchronized void addToChangedUris(Collection<String> uris){
-    	changedUris.addAll(uris);    	
-    }
-    
-	public synchronized boolean isReindexRequested() {
-		return reindexRequested;
-	}
-	
-	public synchronized boolean isThereWorkToDo(){
-		return isReindexRequested() || ! changedUris.isEmpty() ;
-	}
-	
-	
+       
+    public boolean isIndexing(){
+        return indexer.isIndexing();
+    }    	
+		
 	/**
 	 * This is called when the system shuts down.
 	 */
@@ -135,11 +165,11 @@ public class IndexBuilder extends Thread {
     public void run() {
         while(! stopRequested ){                        
             try{
-                if( !stopRequested && isReindexRequested() ){
+                if( !stopRequested && reindexRequested ){
                     log.debug("full re-index requested");
                     indexRebuild();
                 }else if( !stopRequested && isThereWorkToDo() ){                       
-                    Thread.sleep(250); //wait a bit to let a bit more work to come into the queue
+                    Thread.sleep(500); //wait a bit to let a bit more work to come into the queue
                     log.debug("work found for IndexBuilder, starting update");
                     updatedIndex();
                 }else if( !stopRequested && ! isThereWorkToDo() ){
@@ -163,30 +193,47 @@ public class IndexBuilder extends Thread {
 
   
 	/* ******************** non-public methods ************************* */
-    private synchronized Collection<String> getAndEmptyChangedUris(){
-    	Collection<String> out = changedUris;     	    
-    	changedUris = new HashSet<String>();
-    	return out;
+    private synchronized Collection<String> getAndEmptyChangedStatements(){
+        List<Statement> localChangedStmt = null;
+        synchronized( changedStmtQueue ){
+            localChangedStmt = new ArrayList<Statement>(changedStmtQueue.size());
+            localChangedStmt.addAll( changedStmtQueue );
+            changedStmtQueue.clear();            
+        }
+         
+        Collection<String> urisToUpdate = new HashSet<String>();
+    	for( Statement stmt : localChangedStmt){
+    	    if( stmt == null )
+    	        continue;
+    	    for( StatementToURIsToUpdate stu : stmtToURIsToIndexFunctions ){
+    	        urisToUpdate.addAll( stu.findAdditionalURIsToIndex(stmt) );
+    	    }
+    	}
+    	    	
+    	return urisToUpdate;
     }
     
 	/**
-	 * Sets updatedUris and deletedUris lists.
+	 * Sets updatedUris and deletedUris lists from the changedStmtQueue.
+	 * updatedUris and deletedUris will only be accessed from the IndexBuilder thread
+	 * so they don't need to be synchronized.
 	 */
 	private void makeAddAndDeleteLists( Collection<String> uris){	    				
-		
+	    IndividualDao indDao = wdf.getIndividualDao();
+	    
 		/* clear updateInds and deletedUris.  This is the only method that should set these. */
-		this.updatedInds = new ArrayList<String>();
-		this.deletedInds = new ArrayList<String>();
-				
+		this.updatedUris = new LinkedList<String>();
+		this.deletedUris = new LinkedList<String>();
+						
     	for( String uri: uris){
     		if( uri != null ){
     			try{
-	    				Individual ind = wdf.getIndividualDao().getIndividualByURI(uri);
+    			    Individual ind = indDao.getIndividualByURI(uri);    			    
 	    			if( ind != null)
-	    				this.updatedInds.add(uri);
+	    				this.updatedUris.add(uri);
 	    			else{
 	    				log.debug("found delete in changed uris");
-	    				this.deletedInds.add(uri);
+	    				this.deletedUris.add(uri);
 	    			}
     			} catch(QueryParseException ex){
     				log.error("could not get Individual "+ uri,ex);
@@ -201,12 +248,13 @@ public class IndexBuilder extends Thread {
     protected void indexRebuild() {
         log.info("Rebuild of search index is starting.");
 
-        // clear out changed uris since we are doing a full index rebuild
-        getAndEmptyChangedUris();
+        // clear out changed URIs since we are doing a full index rebuild
+        getAndEmptyChangedStatements();
        
         log.debug("Getting all URIs in the model");
         Iterator<String> uris = wdf.getIndividualDao().getAllOfThisTypeIterator();
         
+        this.numberOfThreads = MAX_REINDEX_THREADS;
         doBuild(uris, Collections.<String>emptyList() );
         
         if( log != null )  //log might be null if system is shutting down.
@@ -214,13 +262,16 @@ public class IndexBuilder extends Thread {
     }
       
     protected void updatedIndex() {
-        log.debug("Starting updateIndex()");
-        //long since = indexer.getModified() - 60000;                               
-        //List updatedUris = wdf.getIndividualDao().getUpdatedSinceIterator(since);        
+        log.debug("Starting updateIndex()");       
                      
-        makeAddAndDeleteLists( getAndEmptyChangedUris() );                           
+        makeAddAndDeleteLists( getAndEmptyChangedStatements() );
         
-        doBuild( updatedInds.iterator(), deletedInds );
+        this.numberOfThreads = Math.max( MAX_UPDATE_THREADS, updatedUris.size() / 20); 
+        doBuild( updatedUris.iterator(), deletedUris );
+        
+        this.updatedUris = null;
+        this.deletedUris = null;
+        
         log.debug("Ending updateIndex()");
     }
     
@@ -239,9 +290,8 @@ public class IndexBuilder extends Thread {
      * checking if an object is on the index is slow.
      */
     private void doBuild(Iterator<String> updates, Collection<String> deletes ){
-        boolean aborted = false;
-        boolean newDocs = reindexRequested;
-        boolean forceNewIndex = reindexRequested;
+        boolean aborted = false;        
+        boolean updateRequested = ! reindexRequested;
         
         try {
             if( reindexRequested )
@@ -250,9 +300,8 @@ public class IndexBuilder extends Thread {
             indexer.startIndexing();
             reindexRequested = false;
             
-            if( ! forceNewIndex ){
-                //if this is not a full reindex, deleted indivdiuals
-                //need to be removed from the index
+            if( updateRequested ){
+                //if this is not a full reindex, deleted indivdiuals need to be removed from the index
                 for(String deleteMe : deletes ){
                     try{
                         indexer.removeFromIndex(deleteMe);                    
@@ -263,7 +312,7 @@ public class IndexBuilder extends Thread {
                 }
             }
                         
-            indexUriList(updates, newDocs);
+            indexUriList(updates);
         } catch (AbortIndexing abort){
             if( log != null)
                 log.debug("aborting the indexing because thread stop was requested");
@@ -284,9 +333,12 @@ public class IndexBuilder extends Thread {
      * Use the back end indexer to index each object that the Iterator returns.
      * @throws AbortIndexing 
      */
-    private void indexUriList(Iterator<String> updateUris , boolean newDocs) throws AbortIndexing{
+    private void indexUriList(Iterator<String> updateUris ) throws AbortIndexing{
         //make a copy of numberOfThreads so the local copy is safe during this method.
         int numberOfThreads = this.numberOfThreads;
+        if( numberOfThreads > MAX_THREADS )
+            numberOfThreads = MAX_THREADS;            
+            
         IndexWorkerThread.setStartTime(System.currentTimeMillis());
                                                                                                                               
         //make lists of work URIs for workers
@@ -367,10 +419,15 @@ public class IndexBuilder extends Thread {
             work.get( counter % workers ).add( uris.next() );
             counter ++;
         }
-        log.info("Number of individuals to be indexed : " + counter);
+        log.debug("Number of individuals to be indexed : " + counter);
         return work;        
     }
     
+    protected boolean isThereWorkToDo(){
+        synchronized( changedStmtQueue ){
+            return reindexRequested || ! changedStmtQueue.isEmpty() ;
+        }
+    }
     
     private class AbortIndexing extends Exception {
     	// Just a vanilla exception

@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.indexing;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -16,24 +15,18 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
-import edu.cornell.mannlib.vitro.webapp.search.beans.AdditionalURIsToIndex;
 
 /**
  * This class is thread safe.  Notice that doAsyncIndexBuild() is frequently 
  * called because the inference system does not seem to send notifyEvents. 
  */
 public class SearchReindexingListener implements ModelChangedListener {						
-	private IndexBuilder indexBuilder;
-    private List<AdditionalURIsToIndex> additionalUriFinders;
+	private IndexBuilder indexBuilder;    
 	
-	public SearchReindexingListener(IndexBuilder indexBuilder, List<AdditionalURIsToIndex> addUrisList ) {
+	public SearchReindexingListener(IndexBuilder indexBuilder ) {
 		if(indexBuilder == null )
 			throw new IllegalArgumentException("Constructor parameter indexBuilder must not be null");		
-		this.indexBuilder = indexBuilder;	
-		if( addUrisList != null )
-		    this.additionalUriFinders = addUrisList;
-		else
-		    this.additionalUriFinders = Collections.emptyList();
+		this.indexBuilder = indexBuilder;			
 	}	
 
 	private synchronized void addChange(Statement stmt){	    
@@ -56,19 +49,8 @@ public class SearchReindexingListener implements ModelChangedListener {
 	        }
 	        log.debug("changed statement: sub='" + sub + "' pred='" + pred +"' obj='" + obj + "'");
         }
-		
-		if( stmt.getSubject().isURIResource() ){			
-			indexBuilder.addToChangedUris(stmt.getSubject().getURI());
-			log.debug("subject: " + stmt.getSubject().getURI());
-		}
 				
-		if( stmt.getObject().isURIResource() ){
-			indexBuilder.addToChangedUris(((Resource) stmt.getObject()).getURI());			
-		}	
-		
-		for( AdditionalURIsToIndex au : additionalUriFinders ){
-		    indexBuilder.addToChangedUris( au.findAdditionalURIsToIndex(stmt) );
-		}
+		indexBuilder.addToChanged(stmt);		
 	}
 
 	private void requestAsyncIndexUpdate(){

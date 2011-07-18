@@ -25,9 +25,9 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.shared.Lock;
 
-import edu.cornell.mannlib.vitro.webapp.search.beans.AdditionalURIsToIndex;
+import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
 
-public class AdditionalURIsForContextNodes implements AdditionalURIsToIndex {
+public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
 
     private OntModel model;
 	private static final List<String> multiValuedQueriesForAgent = new ArrayList<String>();	
