@@ -443,17 +443,16 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     }
     
     private String getSnippet(SolrDocument doc, QueryResponse response) {
-      String docId = doc.get(VitroSearchTermNames.DOCID).toString();
-      StringBuffer text = new StringBuffer("");
-      Map<String, Map<String, List<String>>> highlights = response.getHighlighting();
-      if (highlights != null && highlights.get(docId) != null) {
-        List<String> snippets = highlights.get(docId).get(VitroSearchTermNames.ALLTEXT);
-        if (snippets != null && snippets.size() > 0) {
-          text.append("... " + snippets.get(0) + " ...");
+        String docId = doc.get(VitroSearchTermNames.DOCID).toString();
+        StringBuffer text = new StringBuffer();
+        Map<String, Map<String, List<String>>> highlights = response.getHighlighting();
+        if (highlights != null && highlights.get(docId) != null) {
+            List<String> snippets = highlights.get(docId).get(VitroSearchTermNames.ALLTEXT);
+            if (snippets != null && snippets.size() > 0) {
+                text.append("... " + snippets.get(0) + " ...");
+            }       
         }
-        
-      }
-      return text.toString();
+        return text.toString();
     }       
 
     private SolrQuery getQuery(String queryText, int maxHitCount, VitroRequest vreq) {
