@@ -103,28 +103,28 @@ var menuManagementEdit = {
         
         //Check menu name
         if ($("input[type=text][name=menuName]").val() == ""){
-            validationError += "You must supply a Name<br />";
+            validationError += "You must supply a name<br />";
             }
         //Check pretty url     
         if ($("input[type=text][name=prettyUrl]").val() == ""){
-            validationError += "You must supply a Pretty URL<br />";
+            validationError += "You must supply a pretty URL<br />";
         }
           
         if ($("input:radio[name=selectedTemplate]:checked").val() == "custom") {
         	if($("input[name=customTemplate]").val() == "") {
-        		validationError += "You must supply a Template<br />"; 
+        		validationError += "You must supply a template<br />"; 
         	}
         }
         
         //if no class group selected, this is an error
         if ($("#selectClassGroup").val() =='-1'){
-            validationError += "You must supply a Content type<br />"; 
+            validationError += "You must supply a content type<br />"; 
         } else {
         	//class group has been selected, make sure there is at least one class selected
         	var noClassesSelected = $("input[name='classInClassGroup']:checked").length;
         	if(noClassesSelected == 0) {
         		//at least one class should be selected
-        		validationError += "You must supply some content for displaying <br />";
+        		validationError += "You must supply some content to display<br />";
         	}
         }
       
