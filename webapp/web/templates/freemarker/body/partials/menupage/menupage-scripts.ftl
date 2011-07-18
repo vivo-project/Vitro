@@ -19,6 +19,9 @@
     var menupageData = {
         baseUrl: '${urls.base}',
         dataServiceUrl: '${dataServiceUrlIndividualsByVClass}',
+        <#if internalClass?has_content>
+            internalClassUri: '${internalClass}',
+        </#if>
         defaultBrowseVClassUri: '${firstNonEmptyVClass}'
     };
 </script>
