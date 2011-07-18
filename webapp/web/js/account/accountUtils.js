@@ -9,15 +9,20 @@ function changeAction(form, url) {
 $(document).ready(function(){
 
     //Accounts per page
-    //Hide is javascrip is enable
+    //Hide if javascript is enabled
     $('input[name="accounts-per-page"]').addClass('hidden');
     
     $('.accounts-per-page').change(function() {
+        // ensure both accounts-per-page select elements are
+        // set to the same value before submitting
+        var selectedValue = $(this).val();
+        $('.accounts-per-page').val(selectedValue);
+        alert(selectedValue);
         $('#account-display').submit();
     });
     
     //Delete accounts
-    //Show is javascript is enable
+    //Show is javascript is enabled
     $('input:checkbox[name=delete-all]').removeClass('hidden');
     
     $('input:checkbox[name=delete-all]').click(function(){
