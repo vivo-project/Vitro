@@ -205,11 +205,11 @@ public class IndividualListController extends FreemarkerHttpServlet {
         try{
              // make query for multiple rdf types 
 	         SolrQuery query = getQuery(vclassURIs, alpha); 
-	         log.info("Executed solr query for " + vclassURIs.toString());
+	         log.debug("Executed solr query for " + vclassURIs.toString());
 	         rvMap = getResultsForVClassQuery(query, page, alpha, indDao, context);
 	         List<Individual> individuals = (List<Individual>) rvMap.get("entities");
 		     if (individuals == null) 
-		       log.info("entities list is null for vclass " + vclassURIs.toString() );     
+		       log.debug("entities list is null for vclass " + vclassURIs.toString() );     
         } catch(Throwable th) {
        	    log.error("Error retrieving individuals corresponding to intersection multiple classes." + vclassURIs.toString(), th);
         }

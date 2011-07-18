@@ -42,13 +42,12 @@ public class DataGetterUtils {
         //Get types associated with page
         Map<String,Object> data = new HashMap<String,Object>();
         List<String> dataGetters = (List<String>)page.get("dataGetters");
-        //TODO: Change back to debug
-        log.info("Retrieved data getters for Page " + pageUri + " = " + dataGetters.toString());
+        log.debug("Retrieved data getters for Page " + pageUri + " = " + dataGetters.toString());
         if( dataGetters != null ){
             for( String dataGetter : dataGetters){
                 Map<String,Object> moreData = null;
                 PageDataGetter getter = dataGetterMap.get(dataGetter);
-                log.info("Retrieved data getter for " + dataGetter);
+                log.debug("Retrieved data getter for " + dataGetter);
                 try{
                     moreData = getAdditionalData(pageUri, dataGetter, page, vreq, getter, context);
                     if( moreData != null)
@@ -143,7 +142,7 @@ public class DataGetterUtils {
       
         if( getter != null ){
             try{
-            	log.info("Retrieve data for this data getter for " + pageUri);
+            	log.debug("Retrieve data for this data getter for " + pageUri);
                 return getter.getData(context, vreq, pageUri, page);
             }catch(Throwable th){
                 log.error(th,th);
@@ -200,12 +199,12 @@ public class DataGetterUtils {
                 for(String vclassId: vitroClassIdStr) {
                     vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(vclassId);
                     if (vclass == null) {
-                        log.info("Couldn't retrieve vclass ");   
+                        log.error("Couldn't retrieve vclass ");   
                         throw new Exception (errorMessage = "Class " + vclassId + " not found");
                     }  
                   }
             }else{
-                log.info("parameter vclassId URI parameter expected ");
+                log.error("parameter vclassId URI parameter expected ");
                 throw new Exception("parameter vclassId URI parameter expected ");
             }
             List<String> vclassIds = Arrays.asList(vitroClassIdStr);                           
@@ -233,7 +232,7 @@ public class DataGetterUtils {
                 rObj.put("alpha", map.get("alpha"));
                                   
                 List<Individual> inds = (List<Individual>)map.get("entities");
-                log.info("Number of individuals returned from request: " + inds.size());
+                log.debug("Number of individuals returned from request: " + inds.size());
                 JSONArray jInds = new JSONArray();
                 for(Individual ind : inds ){
                     JSONObject jo = new JSONObject();
