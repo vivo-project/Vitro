@@ -110,7 +110,7 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
          "    ?pageUri display:hasDataGetter ?dg .\n"+    
          " 	 ?dg rdf:type <" + DisplayVocabulary.CLASSINDIVIDUALS_PAGE_TYPE + ">. \n" + 
          " ?dg <" + DisplayVocabulary.GETINDIVIDUALS_FOR_CLASS + "> ?class . \n" +
-         "    ?dg <"+ DisplayVocabulary.RESTRICT_RESULTS_BY + "> ?restrictClass .\n" +    
+         "    OPTIONAL {?dg <"+ DisplayVocabulary.RESTRICT_RESULTS_BY + "> ?restrictClass } .\n" +    
          "} \n" ;
         
     //Given a data getter, check if results are to be restricted by class
@@ -128,14 +128,14 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         "} \n" ;
     
     //Query to get classes employed on internal class page
-    //Query to get what classes are to be employed on the page 
+    //and restriction classes if they exist
     static final protected String individualsForClassesInternalQueryString = 
     	prefixes + "\n" + 
     	 "SELECT ?dg ?class ?isInternal WHERE {\n" +
          "    ?pageUri display:hasDataGetter ?dg .\n"+    
          " 	 ?dg rdf:type <" + DisplayVocabulary.CLASSINDIVIDUALS_INTERNAL_TYPE + ">. \n" + 
          " ?dg <" + DisplayVocabulary.GETINDIVIDUALS_FOR_CLASS + "> ?class . \n" +
-         "    ?dg <"+ DisplayVocabulary.RESTRICT_RESULTS_BY_INTERNAL + "> ?isInternal .\n" +    
+         " OPTIONAL {  ?dg <"+ DisplayVocabulary.RESTRICT_RESULTS_BY_INTERNAL + "> ?isInternal } .\n" +    
          "} \n" ;
     
 	
@@ -399,7 +399,7 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
                     String dg = nodeToString(soln.get("dg"));
                     classes.add(nodeToString(soln.get("class")));
                     String restrictClass = nodeToString(soln.get("restrictClass"));
-                    if(!restrictClassesPresentMap.containsKey(restrictClass)) {
+                    if(!restrictClass.isEmpty() && !restrictClassesPresentMap.containsKey(restrictClass)) {
                     	restrictClasses.add(restrictClass);
                     	restrictClassesPresentMap.put(restrictClass, "true");
                     }
@@ -437,8 +437,9 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
                     QuerySolution soln = resultSet.next();
                     String dg = nodeToString(soln.get("dg"));
                     classes.add(nodeToString(soln.get("class")));
+                    //node to string will convert null to empty string
                     String isInternal = nodeToString(soln.get("isInternal"));
-                    if(isInternal != null && !isInternal.isEmpty()) {
+                    if(!isInternal.isEmpty()) {
                     	log.debug("Internal value is "+ isInternal);
                     	//Retrieve and add internal class
                     	classesAndRestrictions.put("isInternal", isInternal);

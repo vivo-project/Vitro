@@ -71,8 +71,8 @@ public class InternalClassesDataGetter extends IndividualsForClassesDataGetter{
 			ServletContext context, Map<String, Object> classIntersectionsMap) {
 		List<String> restrictClasses = new ArrayList<String>();
 		String internalClass = (String) classIntersectionsMap.get("isInternal");
-		//how should this be stored? boolean or otherwise?
-		if(internalClass.equals("true")) {
+		//if internal class restriction specified and is true
+		if(internalClass != null && internalClass.equals("true")) {
 			//Get internal class
 			Model mainModel = ModelContext.getBaseOntModelSelector(context).getTBoxModel();;
 			StmtIterator internalIt = mainModel.listStatements(null, ResourceFactory.createProperty(VitroVocabulary.IS_INTERNAL_CLASSANNOT), (RDFNode) null);
