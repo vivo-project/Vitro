@@ -89,7 +89,7 @@
     }
     vreq.setAttribute("subject", subject);
 
-    WebappDaoFactory unfilteredWdf = vreq.getAssertionsWebappDaoFactory();
+    WebappDaoFactory unfilteredWdf = vreq.getUnfilteredWebappDaoFactory();
     DataProperty dataproperty = unfilteredWdf.getDataPropertyDao().getDataPropertyByURI( predicateUri );
     if( dataproperty == null) {
         // No dataproperty will be returned for rdfs:label, but we shouldn't throw an error.

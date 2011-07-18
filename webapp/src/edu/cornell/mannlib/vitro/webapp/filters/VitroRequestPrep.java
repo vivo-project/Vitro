@@ -47,7 +47,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.FilterFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.HideFromDisplayByPolicyFilter;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 /**
@@ -164,6 +166,11 @@ public class VitroRequestPrep implements Filter {
         	        vreq.getAssertionsOntModel(), vreq.getInferenceOntModel());
         	vreq.setDataset(dataset);
         }
+        
+        vreq.setUnfilteredWebappDaoFactory(new WebappDaoFactorySDB(
+                ModelContext.getUnionOntModelSelector(
+                        vreq.getSession().getServletContext()),
+                        vreq.getDataset()));
         
         req.setAttribute("VitroRequestPrep.setup", new Integer(1));
         chain.doFilter(req, response);

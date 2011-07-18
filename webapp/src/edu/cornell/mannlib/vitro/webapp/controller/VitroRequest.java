@@ -58,6 +58,18 @@ public class VitroRequest extends HttpServletRequestWrapper {
     	return (WebappDaoFactory) getAttribute("webappDaoFactory");
     }
     
+    public void setUnfilteredWebappDaoFactory(WebappDaoFactory wdf) {
+    	setAttribute("unfilteredWebappDaoFactory", wdf);
+    }
+    
+    /** Gets a WebappDaoFactory with request-specific dataset but no filtering. 
+     * Use this for any servlets that need to bypass filtering.
+     * @return
+     */
+    public WebappDaoFactory getUnfilteredWebappDaoFactory() {
+    	return (WebappDaoFactory) getAttribute("unfilteredWebappDaoFactory");
+    }
+    
     public void setFullWebappDaoFactory(WebappDaoFactory wdf) {
     	setAttribute("fullWebappDaoFactory", wdf);
     }

@@ -172,7 +172,7 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         if (! StringUtils.isBlank(idMatchingProperty)) {
             // Use assertions model to side-step filtering. We need to get the value regardless of whether the property
             // is visible to the current user.
-            WebappDaoFactory wdf = vreq.getAssertionsWebappDaoFactory();
+            WebappDaoFactory wdf = vreq.getUnfilteredWebappDaoFactory();
             Collection<DataPropertyStatement> ids = 
                 wdf.getDataPropertyStatementDao().getDataPropertyStatementsForIndividualByDataPropertyURI(individual, idMatchingProperty);
             if (ids.size() > 0) {
