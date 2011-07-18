@@ -22,7 +22,6 @@
             <#if indexCacheRebuild.recomputeInferences?has_content>
                 <li><a href="${indexCacheRebuild.recomputeInferences}">Recompute inferences</a></li>
             </#if>
-            
         </ul>
     </section>
 </#if>

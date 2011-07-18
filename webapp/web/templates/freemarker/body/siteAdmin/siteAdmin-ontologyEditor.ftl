@@ -3,8 +3,7 @@
 <#-- Template for Site Administration Ontology Editor -->
 
 <#if ontologyEditor?has_content>
-    <div class="pageBodyGroup">
-
+    <section class="pageBodyGroup">
         <h3>Ontology Editor</h3>
         
         <#if ontologyEditor.pellet?has_content>
@@ -19,19 +18,20 @@
         <ul>
             <li><a href="${ontologyEditor.urls.ontologies}">Ontology list</a></li>
         </ul>
-    
+        
         <h4>Class Management</h4>
+        
         <ul>
-            <li><a href="${ontologyEditor.urls.classHierarchy}">Class hierarchy</a></li> 
+            <li><a href="${ontologyEditor.urls.classHierarchy}">Class hierarchy</a></li>
             <li><a href="${ontologyEditor.urls.classGroups}">Class groups</a></li>
         </ul>
-    
+        
         <h4>Property Management</h4>
+        
         <ul>
             <li><a href="${ontologyEditor.urls.objectPropertyHierarchy}">Object property hierarchy</a></li>
-            <li><a href="${ontologyEditor.urls.dataPropertyHierarchy}">Data property hierarchy</a></li>      
+            <li><a href="${ontologyEditor.urls.dataPropertyHierarchy}">Data property hierarchy</a></li>
             <li><a href="${ontologyEditor.urls.propertyGroups}">Property groups</a></li>
         </ul>
-
-    </div>                       
+    </section>
 </#if>

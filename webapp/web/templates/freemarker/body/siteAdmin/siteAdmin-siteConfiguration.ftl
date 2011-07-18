@@ -3,8 +3,7 @@
 <#-- Template for Site Administration site configuration panel -->
 
 <#if siteConfig?has_content>
-    <div class="pageBodyGroup">
-        
+    <section class="pageBodyGroup">
         <h3>Site Configuration</h3>
         
         <ul>
@@ -25,6 +24,5 @@
                 <li><a href="${siteConfig.userAccounts}">User accounts</a></li>
             </#if>           
         </ul>
-    </div>
+    </section>
 </#if>
-
