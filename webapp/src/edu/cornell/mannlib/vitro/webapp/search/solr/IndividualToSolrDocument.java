@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.solr;
 
+import org.jsoup.Jsoup;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -149,11 +151,6 @@ public class IndividualToSolrDocument {
         String t=null;
         //ALLTEXT, all of the 'full text'
         StringBuffer allTextValue = new StringBuffer();
-        allTextValue.append("");
-        allTextValue.append(" ");
-        allTextValue.append(((t=ind.getName()) == null)?"":t);   
-        allTextValue.append(" ");     
-        allTextValue.append(classPublicNames);
 
         //collecting data property statements
         List<DataPropertyStatement> dataPropertyStatements = ind.getDataPropertyStatements();
@@ -170,8 +167,17 @@ public class IndividualToSolrDocument {
         }
          
         allTextValue.append(objectNames.toString());
+        
+        try {
+            String stripped = Jsoup.parse(allTextValue.toString()).text();
+            allTextValue.setLength(0);
+            allTextValue.append(stripped);
+        } catch(Exception e) {
+            log.debug("Could not strip HTML during search indexing. " + e);
+        }
                 
         String alltext = allTextValue.toString();
+        
         doc.addField(term.ALLTEXT, alltext);
         doc.addField(term.ALLTEXTUNSTEMMED, alltext);
         doc.addField(term.ALLTEXT_PHONETIC, alltext);

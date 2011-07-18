@@ -63,4 +63,8 @@ public abstract class BaseIndividualSearchResult extends BaseTemplateModel {
         return getView(ClassView.SEARCH);
     }
     
+    public String getSnippet() {        
+        return individual.getSearchSnippet();
+    }
+    
 }

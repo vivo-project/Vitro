@@ -564,7 +564,7 @@
 <field name="indexedTime" type="long" indexed="true" stored="true"/>
 <field name="NAME_PHONETIC" type ="phonetic" indexed="true" stored="false" multiValued="true"/>
 
-<field name="ALLTEXT" type="text" indexed="true" stored="false" multiValued="true"/>
+<field name="ALLTEXT" type="text" indexed="true" stored="true" multiValued="true"/>
 <field name="ALLTEXTUNSTEMMED" type="textgen" indexed="true" stored="false" multiValued="true"/>
 <field name="ALLTEXT_PHONETIC" type="phonetic" indexed="true" stored="false" multiValued="true"/>
 

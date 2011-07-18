@@ -54,6 +54,7 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     protected String mainImageUri = NOT_INITIALIZED;
     protected ImageInfo imageInfo = null;
     protected Float searchBoost;
+    protected String searchSnippet;
     
     /** indicates if sortForDisplay has been called  */
     protected boolean sorted = false;
@@ -276,6 +277,9 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
 
     public Float getSearchBoost() { return searchBoost;  }    
     public void setSearchBoost(Float boost) { searchBoost = boost; }
+    
+    public String getSearchSnippet() { return searchSnippet; }
+    public void setSearchSnippet(String snippet) { searchSnippet = snippet; }
     
     /**
      * Sorts the ents2ents records into the proper order for display.

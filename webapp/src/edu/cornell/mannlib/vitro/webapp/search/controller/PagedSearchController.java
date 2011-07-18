@@ -235,8 +235,10 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                     Individual ent = new IndividualImpl();
                     ent.setURI(uri);
                     ent = iDao.getIndividualByURI(uri);
-                    if(ent!=null)
-                        individuals.add(ent);
+                    if(ent!=null) {
+                      ent.setSearchSnippet(getSnippet(doc, response));
+                      individuals.add(ent);
+                    }
                 } catch(Exception e) {
                     log.error("Problem getting usable individuals from search hits. " +
                             e.getMessage());
@@ -438,6 +440,19 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             }
         }
         return typesInHits;
+    }
+    
+    private String getSnippet(SolrDocument doc, QueryResponse response) {
+      String docId = doc.get(VitroSearchTermNames.DOCID).toString();
+      StringBuffer text = new StringBuffer("");
+      if (response.getHighlighting() != null && response.getHighlighting().get(docId) != null) {
+        List<String> snippets = response.getHighlighting().get(docId).get(VitroSearchTermNames.ALLTEXT);
+        if (snippets != null && snippets.size() > 0) {
+          text.append("... " + snippets.get(0) + " ...");
+        }
+        
+      }
+      return text.toString();
     }       
 
     private SolrQuery getQuery(String queryText, int maxHitCount, VitroRequest vreq) {

@@ -714,6 +714,11 @@
        <int name="rows">10</int>
        <str name="q.alt">*:*</str>
        <str name="fl">*,score</str>
+       <str name="hl">true</str>
+       <str name="hl.fl">ALLTEXT</str>
+       <str name="hl.fragsize">160</str>
+       <str name="hl.simple.pre"><![CDATA[<strong>]]></str>
+       <str name="hl.simple.post"><![CDATA[</strong>]]></str>
      </lst>
     <!-- In addition to defaults, "appends" params can be specified
          to identify values which should be appended to the list of

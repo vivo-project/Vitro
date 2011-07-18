@@ -98,4 +98,7 @@ public interface Individual extends ResourceBean, Comparable<Individual> {
     
     Float getSearchBoost();
     void setSearchBoost( Float boost );
+    
+    String getSearchSnippet();
+    void setSearchSnippet( String snippet );
 }

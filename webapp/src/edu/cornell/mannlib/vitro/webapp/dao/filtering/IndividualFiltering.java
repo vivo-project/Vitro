@@ -448,6 +448,11 @@ public class IndividualFiltering implements Individual {
     public void setSearchBoost(Float boost) { _innerIndividual.setSearchBoost( boost ); }
     @Override
     public Float getSearchBoost() {return _innerIndividual.getSearchBoost(); }
+    
+    @Override
+    public void setSearchSnippet(String snippet) { _innerIndividual.setSearchSnippet( snippet ); }
+    @Override
+    public String getSearchSnippet() {return _innerIndividual.getSearchSnippet(); }
 
     @Override
     public List<String> getDataValues(String propertyUri) {
