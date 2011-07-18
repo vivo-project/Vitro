@@ -96,8 +96,8 @@
                 <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
             </div>
         </#if>
-        <br />
-        <input type="submit" name="submitEdit" value="Save changes" class="submit" /> or <a class="cancel" href="${formUrls.list}">Cancel</a>
+
+        <p><input type="submit" name="submitEdit" value="Save changes" class="submit" /> or <a class="cancel" href="${formUrls.list}">Cancel</a></p>
 
         <p class="requiredHint">* required fields</p>
     </form>

@@ -89,8 +89,7 @@
             </div>
         </#if>
         
-        <br />
-        <input type="submit" name="submitAdd" value="Add new account" class="submit" /> or <a class="cancel" href="${formUrls.list}">Cancel</a>
+        <p><input type="submit" name="submitAdd" value="Add new account" class="submit" /> or <a class="cancel" href="${formUrls.list}">Cancel</a></p>
 
         <p class="requiredHint">* required fields</p>
     </form>

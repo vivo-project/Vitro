@@ -128,14 +128,6 @@ form.customForm p.note {
 }
 #add-account p.note {
     margin-top: 20px;
-    width: 400px;
-}
-#add-account input[type="text"],
-#create-account input[type="text"],
-#edit-account input[type="text"],
-#my-account input[type="text"],
-#my-account input[type="password"] {
-    width: 20em;
 }
 #search-feedback {
     clear: both;
@@ -151,12 +143,10 @@ form.customForm p.note {
 /* EDIT ACCOUNT ------>  */
 #edit-account p.note {
      margin-top: 3px;
-     width: 400px;
 }
 /* MY ACCOUNT ------>  */
 #my-account p.note {
      padding-bottom: 10px;
-     width: 400px;
 }
 #my-account input#email-address,
 #my-account input#new-password {
@@ -169,6 +159,7 @@ padding-right: 5px;
 #reset-password p.note {
      margin-top: 0;
 }
+
 /* ASSOCIATE PROFILE ------>  */
 .explanatoryText {
     color:#999;
@@ -204,12 +195,12 @@ padding-right: 5px;
     width:100%;
     border:none;
     border-right:none;
-	border-bottom-left-radius: 5px;
-	border-top-left-radius: 5px;
-	-moz-border-radius-bottomleft: 5px;
-	-moz-border-radius-topleft: 5px;
-	-webkit-border-bottom-left-radius: 5px;
-	-webkit-border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-top-left-radius: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    -moz-border-radius-topleft: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -webkit-border-top-left-radius: 5px;
 }
 #associateProfileBackgroundTwo {
     background-color:#f1f2ee;
@@ -220,12 +211,12 @@ padding-right: 5px;
     margin-right:-8px;
     border:1px solid #ccc;
     border-left:none;
-	border-top-right-radius: 5px;
-	-moz-border-radius-topright: 5px;
-	-webkit-border-top-right-radius: 5px;
-	border-bottom-right-radius: 5px;
-	-moz-border-radius-bottomright: 5px;
-	-webkit-border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
+    -moz-border-radius-topright: 5px;
+    -webkit-border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    -moz-border-radius-bottomright: 5px;
+    -webkit-border-bottom-right-radius: 5px;
 }
 #associateProfileBackgroundThree {
     background-color:#f1f2ee;
@@ -239,9 +230,9 @@ padding-right: 5px;
     border:1px solid #ccc;
     border-left:none;
     border-bottom:none;
-	border-top-right-radius: 5px;
-	-moz-border-radius-topright: 5px;
-	-webkit-border-top-right-radius: 5px;
+    border-top-right-radius: 5px;
+    -moz-border-radius-topright: 5px;
+    -webkit-border-top-right-radius: 5px;
 }
 #associateProfileBackgroundFour {
     background-color:#f1f2ee;
@@ -254,9 +245,20 @@ padding-right: 5px;
     border:1px solid #ccc;
     border-top:none;
     border-bottom-left-radius: 5px;
-	border-bottom-right-radius: 5px;
-	-moz-border-radius-bottomleft: 5px;
-	-moz-border-radius-bottomright: 5px;
-	-webkit-border-bottom-left-radius: 5px;
-	-webkit-border-bottom-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    -moz-border-radius-bottomright: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+}
+
+/* MISCELLANEOUS ------>  */
+form.customForm input[name="firstName"],
+form.customForm input[name="lastName"],
+form.customForm input[name="newPassword"],
+form.customForm input[name="confirmPassword"] {
+    width: 10em;
+}
+#externalAuthId {
+    width: 12em;
 }
