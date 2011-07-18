@@ -63,7 +63,7 @@
     padding: .5em;  
     margin-bottom: 10px;
 }
-.rebuildSearchIndex {
+.contentNote {
     float: right;
     padding: .6em;
     background: #ffc;
@@ -71,12 +71,12 @@
     -webkit-border-radius: 6px;
     border-radius: 6px;
 }
-.rebuildSearchIndex h4,
-.rebuildSearchIndex p {
+.contentNote h4,
+.contentNote p {
     margin: 0;
     padding: 0;
 }
-.rebuildSearchIndex p {
+.contentNote p {
     font-size: .8em;
 }
 
