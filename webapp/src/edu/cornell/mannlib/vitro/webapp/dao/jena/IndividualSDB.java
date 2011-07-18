@@ -129,9 +129,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	    	String getStatements = 
     	    		"CONSTRUCT " +
     	    		"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
-    	    		        "> ?ooo. \n" +
-    	    		   "<"+individualURI+">  <" + VitroVocabulary.MONIKER + 
-    	    		           "> ?moniker \n" +
+    	    		        "> ?ooo \n" +
     	    		 "} WHERE {" +
     	    		 	"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
     	    		 	        "> ?ooo } \n" +

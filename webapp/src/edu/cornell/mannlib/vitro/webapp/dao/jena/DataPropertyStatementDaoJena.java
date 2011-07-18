@@ -172,14 +172,27 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
     public Collection<DataPropertyStatement> getDataPropertyStatementsForIndividualByDataPropertyURI(Individual entity,
             String datapropURI) {
     	Collection<DataPropertyStatement> edList = new ArrayList<DataPropertyStatement>();
-    	if (entity.getURI() == null) {
+    	if (entity.getURI() == null || datapropURI == null) {
 			return edList;
 		}
+    	// do something nicer if we're not dealing with a blank node
+    	Resource res = ResourceFactory.createResource(entity.getURI());
+    	if (!VitroVocabulary.PSEUDO_BNODE_NS.equals(entity.getNamespace())) {
+    		for (Literal lit : this.getDataPropertyValuesForIndividualByProperty(res.getURI(), datapropURI)) {
+    			DataPropertyStatement ed = new DataPropertyStatementImpl();
+    			fillDataPropertyStatementWithJenaLiteral(ed, lit);
+                ed.setIndividualURI(entity.getURI());
+                ed.setIndividual(entity);
+                ed.setDatapropURI(datapropURI);
+                edList.add(ed);
+    		}
+    		return edList;
+    	}
+        // do something annoying if we are dealing with a blank node
     	try {	
 	    	getOntModel().enterCriticalSection(Lock.READ);
-	        OntResource ontRes = (VitroVocabulary.PSEUDO_BNODE_NS.equals(entity.getNamespace())) 
-	        		? (OntResource) getOntModel().createResource(new AnonId(entity.getLocalName())).as(OntResource.class)
-	        		: getOntModel().getOntResource(entity.getURI());
+	        OntResource ontRes = (OntResource) getOntModel().createResource(
+	        		new AnonId(entity.getLocalName())).as(OntResource.class);
 	        if (ontRes == null) {
 	        	return edList;
 	        }
