@@ -158,9 +158,9 @@ public class IndividualToSolrDocument {
             Iterator<DataPropertyStatement> dataPropertyStmtIter = dataPropertyStatements.iterator();
             while (dataPropertyStmtIter.hasNext()) {
                 DataPropertyStatement dataPropertyStmt =  dataPropertyStmtIter.next();
-               if(dataPropertyStmt.getDatapropURI().equals(label)){ // we don't want label to be added to alltext
-                	continue;
-               }
+                if(dataPropertyStmt.getDatapropURI().equals(label)){ // we don't want label to be added to alltext
+                    continue;
+                }
                 allTextValue.append(" ");
                 allTextValue.append(((t=dataPropertyStmt.getData()) == null)?"":t);
             }
