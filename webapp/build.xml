@@ -155,12 +155,12 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 			<fileset file="${webapp.dir}/config/dwr.xml" />
 		</copy>
 
-		<!-- copy the ontologies and the submodels into the war directory. -->
+		<!-- copy the ontologies and the filegraphs into the war directory. -->
 		<copy todir="${war-webinf.dir}">
 			<fileset dir="${webapp.dir}" includes="ontologies" />
 			<fileset dir="${webapp.dir}" includes="ontologies/**/*" />
-			<fileset dir="${webapp.dir}" includes="submodels" />
-			<fileset dir="${webapp.dir}" includes="submodels/**/*" />
+			<fileset dir="${webapp.dir}" includes="filegraph" />
+			<fileset dir="${webapp.dir}" includes="filegraph/**/*" />
 		</copy>
 
 		<!-- use the production Log4J properties, unless a debug version exists. -->
