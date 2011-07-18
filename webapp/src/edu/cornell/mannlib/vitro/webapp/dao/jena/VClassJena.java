@@ -124,7 +124,7 @@ public class VClassJena extends VClass {
     public  String getExample()  {
     	
         if (this.myExample != null) {
-            return myName;
+            return myExample;
         } else {
             cls.getOntModel().enterCriticalSection(Lock.READ);
             try {
