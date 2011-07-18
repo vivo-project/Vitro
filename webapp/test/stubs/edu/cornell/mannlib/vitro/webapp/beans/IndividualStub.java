@@ -421,4 +421,14 @@ public class IndividualStub implements Individual {
 		throw new RuntimeException(
 				"Individual.setSearchBoost() not implemented.");
 	}
+
+	@Override
+	public String getSearchSnippet() {
+		throw new RuntimeException("Individual.getSearchSnippet() not implemented.");
+	}
+
+	@Override
+	public void setSearchSnippet(String snippet) {
+		throw new RuntimeException("Individual.setSearchSnippet() not implemented.");
+	}
 }
