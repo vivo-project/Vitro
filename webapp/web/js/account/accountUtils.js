@@ -17,7 +17,6 @@ $(document).ready(function(){
         // set to the same value before submitting
         var selectedValue = $(this).val();
         $('.accounts-per-page').val(selectedValue);
-        alert(selectedValue);
         $('#account-display').submit();
     });
     
