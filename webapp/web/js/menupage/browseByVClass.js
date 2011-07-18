@@ -73,9 +73,6 @@ var browseByVClass = {
     // Where all the magic happens -- gonna fetch me some individuals
     getIndividuals: function(vclassUri, alpha, page, scroll) {
         var url = this.dataServiceUrl + encodeURIComponent(vclassUri);
-        if ( this.internalClassUri !== "undefined" ) {
-            url += '&vclassId='+ this.internalClassUri +'&page=1';
-        }
         if ( alpha && alpha != "all") {
             url += '&alpha=' + alpha;
         }
