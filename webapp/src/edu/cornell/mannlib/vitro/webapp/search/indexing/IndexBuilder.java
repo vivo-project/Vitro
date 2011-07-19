@@ -11,6 +11,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -189,6 +191,19 @@ public class IndexBuilder extends Thread {
         
         if(log != null )//may be null on shutdown 
             log.info("Stopping IndexBuilder thread");
+    }
+    
+    
+    public static void checkIndexOnRootLogin(HttpServletRequest req){
+    	HttpSession session = req.getSession();
+    	ServletContext context = session.getServletContext();
+    	IndexBuilder indexBuilder = (IndexBuilder)context.getAttribute(IndexBuilder.class.getName());
+    	
+    	log.debug("Checking if the index is empty");
+    	if(indexBuilder.indexer.isIndexEmpty()){
+    		log.info("Index is empty. Running a full index rebuild!");
+    		indexBuilder.doIndexRebuild();
+    	}
     }
 
   
