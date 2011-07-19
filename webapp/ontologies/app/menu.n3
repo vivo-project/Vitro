@@ -8,17 +8,13 @@
 
 #### Default Menu ####
 
-display:DefaultMenu 
+display:DefaultMenu
     a  display:MainMenu ;
-    display:hasElement display:EventsMenuItem ;
-    display:hasElement display:HomeMenuItem ;
-    display:hasElement display:OrganizationsMenuItem ;
-    display:hasElement display:PeopleMenuItem ;
-    display:hasElement display:ResearchMenuItem .
+    display:hasElement display:HomeMenuItem .
 
 #### Menu Items for Default Menu ####
 
-display:HomeMenuItem 
+display:HomeMenuItem
     a display:NavigationElement ;
     display:menuPosition 1;
     display:linkText "Home";
@@ -26,8 +22,8 @@ display:HomeMenuItem
 
 ########## Pages ############
 
-display:Home 
-    a display:HomePage ;    
+display:Home
+    a display:HomePage ;
     a display:Page ;
-    display:title "Home" ;    
+    display:title "Home" ;
     display:urlMapping "/" .
