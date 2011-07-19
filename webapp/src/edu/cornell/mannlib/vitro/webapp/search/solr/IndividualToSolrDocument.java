@@ -168,6 +168,9 @@ public class IndividualToSolrDocument {
          
         allTextValue.append(objectNames.toString());
         
+        allTextValue.append(' ');                      
+        allTextValue.append(classPublicNames);
+        
         try {
             String stripped = Jsoup.parse(allTextValue.toString()).text();
             allTextValue.setLength(0);
