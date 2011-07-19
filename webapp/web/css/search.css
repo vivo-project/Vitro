@@ -14,8 +14,11 @@
 .searchhits li {    
     margin-top: 1em; 
 }
-.searchhits li a{    
+.searchhits li a {    
     margin-right: .4em; 
+}
+p.snippets {
+    font-size: .8em;
 }
 span.SearchTerm,
 h1 span.SearchTerm,

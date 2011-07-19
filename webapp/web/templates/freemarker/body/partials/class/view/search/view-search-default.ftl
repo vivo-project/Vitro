@@ -8,4 +8,4 @@
 
 <@p.mostSpecificTypes individual />
 
-<p>${individual.snippet}</p>
+<p class="snippet">${individual.snippet}</p>
