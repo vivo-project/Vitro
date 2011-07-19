@@ -7,16 +7,20 @@
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseIndex.css" />')}
 
 <section class="individualList">
-   <h2>${title} <span class="rdfLink"><a class="icon-rdf" href="${rdfUrl}" title="View the ${title} list in RDF format">RDF</a></span></h2>
-    <#if subtitle??>
+    <h2>${title} 
+        <#if rdfUrl?has_content>
+            <span class="rdfLink"><a class="icon-rdf" href="${rdfUrl}" title="View the ${title} list in RDF format">RDF</a></span>
+        </#if>
+    </h2>
+    <#if subtitle?has_content>
         <h4>${subtitle}</h4>
     </#if>
     
-    <#if message??>
-        <p>${message}</p>
+    <#if errorMessage?has_content>
+        <p>${errorMessage}</p>
     <#else>
         <#assign pagination>
-            <#if (pages?size > 1) >
+            <#if (pages?has_content && pages?size > 1)>
                 pages:
                 <ul class="pagination">
                     <#list pages as page>

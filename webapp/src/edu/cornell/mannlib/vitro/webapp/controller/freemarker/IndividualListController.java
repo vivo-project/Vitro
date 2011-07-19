@@ -31,10 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.BaseListedIndividual;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividual;
-import freemarker.ext.beans.BeansWrapper;
-import freemarker.template.TemplateModel;
 
 /** 
  * Generates a list of individuals for display in a template 
@@ -86,6 +83,18 @@ public class IndividualListController extends FreemarkerHttpServlet {
             vreq.setAttribute("displayType", vclassUri); // used by the template model object
             
             if (vclass != null) {
+                
+                // Set title and subtitle. 
+                VClassGroup classGroup = vclass.getGroup();  
+                String title;
+                if (classGroup == null) {
+                    title = vclass.getName();
+                } else {
+                    title = classGroup.getPublicName();
+                    body.put("subtitle", vclass.getName());
+                }
+                body.put("title", title);
+  
                 String alpha = getAlphaParameter(vreq);
                 int page = getPageParameter(vreq);
                 Map<String,Object> map = getResultsForVClass(
@@ -99,40 +108,23 @@ public class IndividualListController extends FreemarkerHttpServlet {
                 @SuppressWarnings("unchecked")
                 List<Individual> inds = (List<Individual>)map.get("entities");
                 List<ListedIndividual> indsTm = new ArrayList<ListedIndividual>();
-                for ( Individual ind : inds ) {
-                    indsTm.add(new ListedIndividual(ind,vreq));
+                if (inds != null) {
+                    for ( Individual ind : inds ) {
+                        indsTm.add(new ListedIndividual(ind,vreq));
+                    }
                 }
-                body.put("individuals", indsTm);
-                
-                List<TemplateModel> wpages = new ArrayList<TemplateModel>();
-                @SuppressWarnings("unchecked")
-                List<PageRecord> pages = (List<PageRecord>)body.get("pages");
-                BeansWrapper wrapper = new BeansWrapper();
-                for( PageRecord pr: pages ){
-                    wpages.add( wrapper.wrap(pr) );
-                }
-
-                // Set title and subtitle. Title will be retrieved later in getTitle().   
-                VClassGroup classGroup = vclass.getGroup();  
-                String title;
-                if (classGroup == null) {
-                    title = vclass.getName();
-                } else {
-                    title = classGroup.getPublicName();
-                    body.put("subtitle", vclass.getName());
-                }
-                body.put("title", title);  
-                body.put("rdfUrl", UrlBuilder.getUrl("/listrdf", "vclass", vclass.getURI()));                         
+                body.put("individuals", indsTm);    
+                body.put("rdfUrl", UrlBuilder.getUrl("/listrdf", "vclass", vclass.getURI()));    
             }   
-
+        } catch (SearchException e) {
+            errorMessage = "Error retrieving results for display.";
         } catch (HelpException help){
             errorMessage = "Request attribute 'vclass' or request parameter 'vclassId' must be set before calling. Its value must be a class uri."; 
         } catch (Throwable e) {
             return new ExceptionResponseValues(e);
         }
-
+        
         if (errorMessage != null) {
-            templateName = Template.ERROR_MESSAGE.toString();
             body.put("errorMessage", errorMessage);
         }
         
@@ -143,6 +135,14 @@ public class IndividualListController extends FreemarkerHttpServlet {
         private static final long serialVersionUID = 1L;
 
         public HelpException(String string) {
+            super(string);
+        }
+    }
+    
+    public static class SearchException extends Throwable {
+        private static final long serialVersionUID = 1L;
+        
+        public SearchException(String string) {
             super(string);
         }
     }
@@ -182,7 +182,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
     }
     
     public static Map<String,Object> getResultsForVClass(String vclassURI, int page, String alpha, IndividualDao indDao, ServletContext context) 
-    throws IOException, ServletException{
+    throws IOException, SearchException{
    	 	Map<String,Object> rvMap = new HashMap<String,Object>();    
    	 	try{
 		     //make query for this rdf:type
@@ -192,10 +192,15 @@ public class IndividualListController extends FreemarkerHttpServlet {
 	   		 rvMap = getResultsForVClassQuery(query, page, alpha, indDao, context);
 		     List<Individual> individuals = (List<Individual>) rvMap.get("entities");
 		     if (individuals == null) 
-	             log.debug("entities list is null for vclass " + vclassURI );                        
-	   	 } catch(Throwable th) {
-	   		 log.error("An error occurred retrieving results for vclass query", th);
-	   	 }
+	             log.debug("entities list is null for vclass " + vclassURI ); 
+   	 	} catch (ServletException e) {
+   	 	    String msg = "An error occurred retrieving results for vclass query";
+   	 	    log.error(msg, e);
+   	 	    // Throw this up to processRequest, so the template gets the error message.
+   	 	    throw new SearchException(msg);
+	   	} catch(Throwable th) {
+	   		log.error("An error occurred retrieving results for vclass query", th);
+	    }
         return rvMap;
     }
     
@@ -209,7 +214,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
 	         rvMap = getResultsForVClassQuery(query, page, alpha, indDao, context);
 	         List<Individual> individuals = (List<Individual>) rvMap.get("entities");
 		     if (individuals == null) 
-		       log.debug("entities list is null for vclass " + vclassURIs.toString() );     
+		       log.debug("entities list is null for vclass " + vclassURIs.toString() ); 
         } catch(Throwable th) {
        	    log.error("Error retrieving individuals corresponding to intersection multiple classes." + vclassURIs.toString(), th);
         }
@@ -276,7 +281,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
             rvMap.put("pages", pageRecords);                    
         }else{
             rvMap.put("showPages", Boolean.FALSE);
-            rvMap.put("pages", Collections.emptyList());
+            rvMap.put("pages",  Collections.emptyList());
         }
                          
         rvMap.put("alpha",alpha);
