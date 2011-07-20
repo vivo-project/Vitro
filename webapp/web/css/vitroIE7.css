@@ -185,3 +185,8 @@ input#externalAuthChkBox {
     padding-left: 8px;
     padding-top: 4px;
 }
+/* Fix menu management main page */
+span.controls {
+    margin-top: -30px;
+    padding-right: 5px;
+}
