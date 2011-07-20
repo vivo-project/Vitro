@@ -83,7 +83,7 @@
 
                 <label for="initial-password">Initial password<span class="requiredHint"> *</span></label>
                 <input type="password" name="initialPassword" value="${initialPassword}" id="initial-password" role="input" />
-                <p class="explanatoryText" style="margin-top:-8px">Minimum of ${minimumLength} characters in length.</p>
+                <p class="note" style="margin-top:-10px">Minimum of ${minimumLength} characters in length.</p>
                 <label for="confirm-password">Confirm initial password<span class="requiredHint"> *</span></label> 
                 <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
             </div>

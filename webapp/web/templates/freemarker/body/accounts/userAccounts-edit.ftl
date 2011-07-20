@@ -90,8 +90,8 @@
 
                 <label for="new-password">New password</label>
                 <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
-                <p class="explanatoryText" style="margin-top:-8px">Minimum of ${minimumLength} characters in length.</p>
-                <p class="explanatoryText">Leaving this blank means that the password will not be changed.</p>
+                <p class="note" style="margin-top:-10px">Minimum of ${minimumLength} characters in length.<br />
+                Leaving this blank means that the password will not be changed.</p>
                 <label for="confirm-password">Confirm new password</label> 
                 <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
             </div>
