@@ -4,6 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -131,6 +133,8 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
     			//Throw exception here
     		}
     	}
+    	//Sort these classes
+    	Collections.sort(vClasses);
     	classesGroup.setVitroClassList(vClasses);
     	//Set vclass group
     	data.put("vClassGroup", classesGroup);
