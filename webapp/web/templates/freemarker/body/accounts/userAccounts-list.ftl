@@ -149,13 +149,14 @@
                     <td>
                         <#if account.deletable>
                             <input type="checkbox" name="deleteAccount" value="${account.uri}" />
+                            <#assign disableDeleteAccount = '' />
                             <!-- ignored unless submit action is formUrls.delete -->
                         <#else>
-                            <input type="checkbox" name="deleteAccount" value="${account.uri}" disabled />
+                             <#assign disableDeleteAccount = 'class="disable-delete"' />
                         </#if>
     
                         <#if account.editUrl != "">
-                            <a href="${account.editUrl}" >${account.emailAddress}</a>
+                            <a ${disableDeleteAccount} href="${account.editUrl}" >${account.emailAddress}</a>
                             <!-- when this link is clicked, editAccount is noticed and all other fields are ignored. -->
                         <#else>
                             ${account.emailAddress}
