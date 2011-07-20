@@ -5,7 +5,6 @@
 /* Fix for homepage in IE6 browsers */
 body {
     background-position: center, 0;
-    background-repeat: no-repeat;
 }
 #intro h2 { 
     margin-left: 24px; 
