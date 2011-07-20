@@ -78,6 +78,9 @@ public class IndexBuilder extends Thread {
     /** Length of pause between a model change an the start of indexing. */
     protected long reindexInterval = 1000 * 60 /* msec */ ;        
     
+    /** Length of pause between when work comes into queue to when indexing starts */
+    protected long waitAfterNewWorkInterval = 500; //msec
+    
     /** Number of threads to use during indexing. */
     protected int numberOfThreads = 10;
     
@@ -155,7 +158,7 @@ public class IndexBuilder extends Thread {
 	/**
 	 * This is called when the system shuts down.
 	 */
-	public synchronized void stopIndexingThread() {
+	public synchronized void stopIndexingThread() {	    
 	    stopRequested = true;
 	    this.notifyAll();		    
 	    this.interrupt();
@@ -169,17 +172,17 @@ public class IndexBuilder extends Thread {
                     log.debug("full re-index requested");
                     indexRebuild();
                 }else if( !stopRequested && isThereWorkToDo() ){                       
-                    Thread.sleep(500); //wait a bit to let a bit more work to come into the queue
+                    Thread.sleep(waitAfterNewWorkInterval); //wait a bit to let a bit more work to come into the queue
                     log.debug("work found for IndexBuilder, starting update");
                     updatedIndex();
-                }else if( !stopRequested && ! isThereWorkToDo() ){
+                } else {
                     log.debug("there is no indexing working to do, waiting for work");              
                     synchronized (this) { this.wait(reindexInterval); }                         
                 }
             } catch (InterruptedException e) {
                 log.debug("woken up",e);
             }catch(Throwable e){
-                if( log != null )//may be null on shutdown
+                if( ! stopRequested && log != null )//may be null on shutdown
                     log.error(e,e);
             }
         }
@@ -187,30 +190,37 @@ public class IndexBuilder extends Thread {
         if( indexer != null)
             indexer.abortIndexingAndCleanUp();
         
-        if(log != null )//may be null on shutdown 
+        if(! stopRequested && log != null )//may be null on shutdown 
             log.info("Stopping IndexBuilder thread");
     }
 
   
 	/* ******************** non-public methods ************************* */
-    private synchronized Collection<String> getAndEmptyChangedStatements(){
+    
+    private List<Statement> getAndEmptyChangedStatements(){
         List<Statement> localChangedStmt = null;
         synchronized( changedStmtQueue ){
             localChangedStmt = new ArrayList<Statement>(changedStmtQueue.size());
             localChangedStmt.addAll( changedStmtQueue );
             changedStmtQueue.clear();            
         }
-         
+        return localChangedStmt;        
+    }
+    
+    /**
+     * For a collection of statements, find the URIs that need to be updated in
+     * the index.
+     */
+    private Collection<String> statementsToUris( Collection<Statement> localChangedStmt ){
         Collection<String> urisToUpdate = new HashSet<String>();
-    	for( Statement stmt : localChangedStmt){
-    	    if( stmt == null )
-    	        continue;
-    	    for( StatementToURIsToUpdate stu : stmtToURIsToIndexFunctions ){
-    	        urisToUpdate.addAll( stu.findAdditionalURIsToIndex(stmt) );
-    	    }
-    	}
-    	    	
-    	return urisToUpdate;
+        for( Statement stmt : localChangedStmt){
+            if( stmt == null )
+                continue;
+            for( StatementToURIsToUpdate stu : stmtToURIsToIndexFunctions ){
+                urisToUpdate.addAll( stu.findAdditionalURIsToIndex(stmt) );
+            }
+        }               
+        return urisToUpdate;        
     }
     
 	/**
@@ -264,7 +274,7 @@ public class IndexBuilder extends Thread {
     protected void updatedIndex() {
         log.debug("Starting updateIndex()");       
                      
-        makeAddAndDeleteLists( getAndEmptyChangedStatements() );
+        makeAddAndDeleteLists( statementsToUris(getAndEmptyChangedStatements()) );
         
         this.numberOfThreads = Math.max( MAX_UPDATE_THREADS, updatedUris.size() / 20); 
         doBuild( updatedUris.iterator(), deletedUris );
@@ -289,13 +299,13 @@ public class IndexBuilder extends Thread {
      * to false, and a check is made before adding, it will work fine; but
      * checking if an object is on the index is slow.
      */
-    private void doBuild(Iterator<String> updates, Collection<String> deletes ){
-        boolean aborted = false;        
+    private void doBuild(Iterator<String> updates, Collection<String> deletes ){               
         boolean updateRequested = ! reindexRequested;
         
         try {
-            if( reindexRequested )
+            if( reindexRequested ){
                 indexer.prepareForRebuild();
+            }
             
             indexer.startIndexing();
             reindexRequested = false;
@@ -311,29 +321,21 @@ public class IndexBuilder extends Thread {
                     }
                 }
             }
-                        
+            
             indexUriList(updates);
-        } catch (AbortIndexing abort){
-            if( log != null)
-                log.debug("aborting the indexing because thread stop was requested");
-            aborted = true;                            
+            
         } catch (Exception e) {
-            log.error(e,e);
+            if( log != null) log.debug("Exception during indexing",e);            
         }
         
-        if( aborted ){
-            indexer.abortIndexingAndCleanUp();
-        }else{
-            indexer.endIndexing();
-        }
-        
+        indexer.endIndexing();                
     }
     
     /**
      * Use the back end indexer to index each object that the Iterator returns.
      * @throws AbortIndexing 
      */
-    private void indexUriList(Iterator<String> updateUris ) throws AbortIndexing{
+    private void indexUriList(Iterator<String> updateUris ) {
         //make a copy of numberOfThreads so the local copy is safe during this method.
         int numberOfThreads = this.numberOfThreads;
         if( numberOfThreads > MAX_THREADS )
@@ -427,12 +429,6 @@ public class IndexBuilder extends Thread {
         synchronized( changedStmtQueue ){
             return reindexRequested || ! changedStmtQueue.isEmpty() ;
         }
-    }
-    
-    private class AbortIndexing extends Exception {
-    	// Just a vanilla exception
-    }  
-
-    
+    }        
 }
 

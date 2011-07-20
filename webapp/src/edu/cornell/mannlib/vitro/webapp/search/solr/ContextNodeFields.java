@@ -47,11 +47,6 @@ public class ContextNodeFields implements DocumentModifier{
 	private Log log = LogFactory.getLog(ContextNodeFields.class);	          
    
     public ContextNodeFields(Model model){    
-//        synchronized( ContextNodeFields.class){
-//            if( threadPool == null ){
-//                threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE, new ContextNodeFieldsThreadFactory());
-//            }            
-//        }        
         this.model = model;           
     }    
 		
@@ -60,11 +55,7 @@ public class ContextNodeFields implements DocumentModifier{
         log.debug("retrieving context node values..");    	    		
         
 		StringBuffer objectProperties = singleThreadExecute( individual, multiValuedQueriesForAgent);
-	
-		//change fields of solr document
-		//SolrInputField targetField = doc.getField(VitroSearchTermNames.targetInfo);
-		//targetField.addValue(" " + runQuery(individual, multiValuedQueryForInformationResource), targetField.getBoost());
-	
+		
 		SolrInputField field = doc.getField(VitroSearchTermNames.ALLTEXT);
 		
     	field.addValue(objectProperties + " " + runQuery(individual, multiValuedQueryForInformationResource), field.getBoost());
@@ -77,37 +68,7 @@ public class ContextNodeFields implements DocumentModifier{
             propertyValues.append(runQuery(individual, query));            
         }                    
         return propertyValues;        
-    }
-    
-    /** experimental, may not work */
-    private StringBuffer multiThreadExecute(Individual individual,  List<String> queries ){
-        int queryCount = queries.size();
-        
-        List<QueryRunner> tasks = new ArrayList<QueryRunner>(queryCount);
-        List<Future<QueryRunner>> completedTasks = new ArrayList<Future<QueryRunner>>(queryCount);    
-        
-        //Make a task for each query and start it.
-        for(String query : queries ){
-            QueryRunner queryTask = new QueryRunner(individual, query);
-            tasks.add(queryTask);
-            completedTasks.add( threadPool.submit( queryTask , queryTask));
-        }
-                    
-        //Wait for each thread to finish and collect results
-        StringBuffer objectProperties = new StringBuffer(" ");                      
-        for(int i = 0 ; i < queryCount; i++){
-            try {
-                completedTasks.get(i).get();
-                objectProperties.append(  tasks.get(i).getPropertyValues() ) ;                  
-            } catch (InterruptedException e) {
-                log.error("Thread interrupted");
-            } catch (ExecutionException e) {
-                log.error("problem during execution",e);
-                e.printStackTrace();
-            }
-        }       
-        return objectProperties;
-    }
+    }       
 
     public StringBuffer runQuery( Individual individual, String query ){
         StringBuffer propertyValues = new StringBuffer();
@@ -394,48 +355,7 @@ public class ContextNodeFields implements DocumentModifier{
 					+ " OPTIONAL { ?uri core:features ?i . ?i rdfs:label ?Features . } . " 
 					+"}" ;
 	
-	}
-	
-	
-	
-	private class QueryRunner implements Runnable {
-		
-		private final Individual ind;
-		private final String query;
-		private final StringBuffer propertyValues = new StringBuffer();
-						
-		public QueryRunner(Individual ind, String query){
-			this.ind = ind;
-			this.query = query;
-		}
-		
-		public String getPropertyValues(){
-            return propertyValues.toString();
-        }
-		
-		public void run(){			
-			propertyValues.append(runQuery(ind, query));
-		}
-	}
-
-	
-	// count for thread names
-	private static Integer threadCounter = 0;
-	
-	private static String getNewThreadName(){
-	    synchronized(threadCounter){
-	        Integer i = threadCounter;
-	        threadCounter = threadCounter + 1;
-	        return "IndexBuilder-ContextNodeFields-" + i.toString();
-	    }        
-    }
-	
-	private class ContextNodeFieldsThreadFactory implements ThreadFactory{
-        @Override
-        public Thread newThread(Runnable r) {
-            return new Thread( getNewThreadName() );
-        }	    
-	}
+	}			
 
 	public void shutdown(){
 	    shutdown=true;	

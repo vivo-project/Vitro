@@ -134,37 +134,32 @@ public class SolrIndexer implements IndexerIface {
     public void abortIndexingAndCleanUp() {
         shutdownRequested = true;
         try{
-            server.commit();            
-        }catch(SolrServerException e){
-            if( log != null)
-                log.debug("could not commit to solr server, " +
-                		"this should not be a problem since solr will do autocommit");
-        } catch (IOException e) {
-            if( log != null)
-                log.debug("could not commit to solr server, " +
-                        "this should not be a problem since solr will do autocommit");
-        }
-        try{
             individualToSolrDoc.shutdown();
         }catch(Exception e){
             if( log != null)
                 log.debug(e,e);
-        }
+        }                
+        endIndexing();
     }
    
     @Override
     public synchronized void endIndexing() {
         try {
+            if( doingFullIndexRebuild ){
+                removeDocumentsFromBeforeRebuild( );
+            }
+         } catch (Throwable e) {
+             if( log != null)
+                 log.debug("could not remove documents from before build, " ,e);
+        }
+        try {
            UpdateResponse res = server.commit();
            log.debug("Response after committing to server: "+ res );
-        } catch (SolrServerException e) {
-            log.error("Could not commit to solr server", e);
-        } catch(IOException e){
-        	log.error("Could not commit to solr server", e);
-        }
-        if( doingFullIndexRebuild ){
-            removeDocumentsFromBeforeRebuild( );
-        }
+        } catch (Throwable e) {
+            if( log != null)
+                log.debug("could not commit to solr server, " +
+                        "this should not be a problem since solr will do autocommit");
+        }                
         indexing = false;
         notifyAll();
     }

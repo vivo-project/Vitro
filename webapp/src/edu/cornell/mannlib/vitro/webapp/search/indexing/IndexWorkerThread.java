@@ -54,33 +54,38 @@ class IndexWorkerThread extends Thread{
 		while( individualsToIndex.hasNext() ){		    
 		    //need to stop right away if requested to 
 		    if( stopRequested ) return;		    
-		    
-	        //build the document and add it to the index
-		    Individual ind = null;
-	        try {
-	            ind = individualsToIndex.next();	            
-	            indexer.index( ind );
-            } catch (IndexingException e) {
-                if( stopRequested )
-                    return;
-                
-                if( ind != null )
-                    log.error("Could not index individual " + ind.getURI() , e );
-                else
-                    log.warn("Could not index, individual was null");
-            }
-		    
-			
-			synchronized(this){
-				count++;
-				if( log.isInfoEnabled() ){            
-					if( (count % 100 ) == 0 && count > 0 ){
-						long dt = (System.currentTimeMillis() - starttime);
-						log.info("individuals indexed: " + count + " in " + dt + " msec " +
-								" time per individual = " + (dt / count) + " msec" );                          
-					}                
-				} 
-			}
+		    try{
+    	        //build the document and add it to the index
+    		    Individual ind = null;
+    	        try {
+    	            ind = individualsToIndex.next();	            
+    	            indexer.index( ind );
+                } catch (IndexingException e) {
+                    if( stopRequested )
+                        return;
+                    
+                    if( ind != null )
+                        log.error("Could not index individual " + ind.getURI() , e );
+                    else
+                        log.warn("Could not index, individual was null");
+                }
+    		    
+    			
+    			synchronized(this){
+    				count++;
+    				if( log.isInfoEnabled() ){            
+    					if( (count % 100 ) == 0 && count > 0 ){
+    						long dt = (System.currentTimeMillis() - starttime);
+    						log.info("individuals indexed: " + count + " in " + dt + " msec " +
+    								" time per individual = " + (dt / count) + " msec" );                          
+    					}                
+    				} 
+    			}
+		    }catch(Throwable th){
+		        //on tomcat shutdown odd exceptions get thrown and log can be null
+		        if( log != null )
+		            log.debug("Exception during index building",th);		            
+		    }
 		}
 	}
 	
