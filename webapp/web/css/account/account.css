@@ -171,14 +171,14 @@ padding-right: 5px;
     margin-top:-8px !important;
 }
 #associated {
-    float:right;
+    float:right; 
     display:none;
 }
 #associated label {
     margin-bottom:5px;
 }
 #associationOptions {
-    float:right;
+    float:right; 
     display:none;
 }
 #verifyProfileLink {
@@ -192,12 +192,12 @@ padding-right: 5px;
     margin-left:8px;
 }
 #associateProfileBackgroundOne {
-    background-color:#fff;
-    padding:5px 0 5px 0;
+    background-color:#fff; 
+    padding:7px 0 5px 0;
     margin-left:-8px;
     margin-right:-8px;
-    padding-top:7px;
-    width:100%;
+    width:500px;
+    z-index:10;
     border:none;
     border-right:none;
     border-bottom-left-radius: 5px;
@@ -209,11 +209,10 @@ padding-right: 5px;
 }
 #associateProfileBackgroundTwo {
     background-color:#f1f2ee;
-    padding-top:7px;
-    padding-bottom:42px;
-    padding-right:94px;
-    margin-top:-112px;
+    padding:7px 94px 42px 0;
+    margin-top:-112px; 
     margin-right:-8px;
+    z-index:-100;
     border:1px solid #ccc;
     border-left:none;
     border-top-right-radius: 5px;
@@ -225,13 +224,11 @@ padding-right: 5px;
 }
 #associateProfileBackgroundThree {
     background-color:#f1f2ee;
-    padding-left:12px;
-    padding-top:7px;
-    padding-bottom:26px;
-    padding-right:94px;
-    margin-top:-112px;
+    padding:7px 94px 26px 12px;
+    margin-top:-112px; 
     margin-left:-12px;
     margin-right:-8px;
+    z-index:-100;
     border:1px solid #ccc;
     border-left:none;
     border-bottom:none;
@@ -241,12 +238,11 @@ padding-right: 5px;
 }
 #associateProfileBackgroundFour {
     background-color:#f1f2ee;
-    padding-left:12px;
-    padding-bottom:26px;
-    padding-right:94px;
+    padding:0 94px 26px 12px;
     margin-top:-8px;
     margin-left:-12px;
     margin-right:-8px;
+    z-index:-100;
     border:1px solid #ccc;
     border-top:none;
     border-bottom-left-radius: 5px;
