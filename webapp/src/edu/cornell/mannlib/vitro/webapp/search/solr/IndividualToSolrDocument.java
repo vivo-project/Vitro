@@ -118,8 +118,13 @@ public class IndividualToSolrDocument {
             
             return doc;
         }catch(SkipIndividualException ex){
-            //indicates that this individual should not be indexed
+            //indicates that this individual should not be indexed by returning null
             log.debug(ex);
+            return null;
+        }catch(Throwable th){
+            //Odd exceptions from jena get thrown on shutdown
+            if( log != null )
+                log.debug(th);
             return null;
         }
     }
