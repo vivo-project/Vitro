@@ -263,3 +263,6 @@ form.customForm input[name="newPassword"],
 form.customForm input[name="confirmPassword"] {
     width: 10em;
 }
+a.disable-delete {
+    padding-left: 24px;
+}
