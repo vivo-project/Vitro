@@ -487,7 +487,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	    String formatParam = (String) vreq.getParameter("format");
 	    if ( formatParam == null ) {
 	        Matcher m = URI_PATTERN.matcher(url);
-    		if ( m.matches() && m.groupCount() == 1 ) {			
+    		if ( m.matches() && m.groupCount() == 1 ) {	
     			ContentType c = checkAcceptHeaderForLinkedDataRequest(url, vreq);			
     			if ( c != null ) {
     				String redirectUrl = "/individual/" + m.group(1) + "/" + m.group(1) ; 
@@ -753,7 +753,7 @@ public class IndividualController extends FreemarkerHttpServlet {
         body.put("title","Individual Not Found");
         body.put("errorMessage", "The individual was not found in the system.");
         
-        return new TemplateResponseValues(Template.TITLED_ERROR_MESSAGE.toString(), body);
+        return new TemplateResponseValues(Template.TITLED_ERROR_MESSAGE.toString(), body, HttpServletResponse.SC_NOT_FOUND);
     }
 
     public static Map<String, Float> getAcceptedContentTypes() {

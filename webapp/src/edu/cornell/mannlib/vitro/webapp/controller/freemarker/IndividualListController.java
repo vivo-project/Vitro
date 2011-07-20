@@ -274,8 +274,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
         } else {
         	log.debug("Docs size is 0");
         }
-        // Test index < hitCount ensures that there are still some docs left
-        if ( hitCount > INDIVIDUALS_PER_PAGE && index < hitCount ){
+        if ( hitCount > INDIVIDUALS_PER_PAGE ){
             rvMap.put("showPages", Boolean.TRUE);
             List<PageRecord> pageRecords = makePagesList(hitCount, INDIVIDUALS_PER_PAGE, page);
             rvMap.put("pages", pageRecords);                    
