@@ -12,13 +12,14 @@
 }
 /* Search results */
 .searchhits li {    
-    margin-top: 1em; 
+    margin-top: 1em;
 }
 .searchhits li a {    
     margin-right: .4em; 
 }
-p.snippets {
+p.snippet {
     font-size: .8em;
+    line-height: 1.4em;
 }
 span.SearchTerm,
 h1 span.SearchTerm,
