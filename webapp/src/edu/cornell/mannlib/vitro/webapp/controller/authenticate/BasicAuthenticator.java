@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.IsRootUser;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -132,6 +133,11 @@ public class BasicAuthenticator extends Authenticator {
 		setSessionTimeoutLimit(userAccount, session);
 		recordInUserSessionMap(userAccount.getUri(), session);
 		notifyOtherUsers(userAccount.getUri(), session);
+		
+		if (IsRootUser.isRootUser(RequestIdentifiers
+				.getIdBundleForRequest(request))) {
+			// Insert method call here.
+		}
 	}
 
 	/**

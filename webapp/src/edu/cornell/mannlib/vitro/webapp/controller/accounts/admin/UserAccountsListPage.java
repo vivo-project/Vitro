@@ -18,6 +18,9 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageRootAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
@@ -183,10 +186,36 @@ public class UserAccountsListPage extends UserAccountsPage {
 			UserAccountsSelection selection) {
 		List<UserAccountWrapper> list = new ArrayList<UserAccountWrapper>();
 		for (UserAccount account : selection.getUserAccounts()) {
-			list.add(new UserAccountWrapper(account,
-					findPermissionSetLabels(account)));
+			UserAccountWrapper wrapper = new UserAccountWrapper(account,
+					findPermissionSetLabels(account), permittedToEdit(account),
+					permittedToDelete(account));
+			list.add(wrapper);
 		}
 		return list;
+	}
+
+	private boolean permittedToEdit(UserAccount account) {
+		if (!account.isRootUser()) {
+			return true;
+		}
+		if (PolicyHelper.isAuthorizedForActions(vreq, new ManageRootAccount())) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean permittedToDelete(UserAccount account) {
+		if (!permittedToEdit(account)) {
+			return false;
+		}
+		UserAccount loggedInUser = LoginStatusBean.getCurrentUser(vreq);
+		if (loggedInUser == null) {
+			return false;
+		}
+		if (account.getUri().equals(loggedInUser.getUri())) {
+			return false;
+		}
+		return true;
 	}
 
 	private List<String> findPermissionSetLabels(UserAccount account) {
@@ -212,12 +241,21 @@ public class UserAccountsListPage extends UserAccountsPage {
 		private final UserAccount account;
 		private final List<String> permissionSets;
 		private final String editUrl;
+		private final boolean deletable;
 
 		public UserAccountWrapper(UserAccount account,
-				List<String> permissionSets) {
+				List<String> permissionSets, boolean showEditUrl,
+				boolean permitDelete) {
 			this.account = account;
 			this.permissionSets = permissionSets;
-			this.editUrl = UserAccountsPage.editAccountUrl(account.getUri());
+			this.deletable = permitDelete;
+
+			if (showEditUrl) {
+				this.editUrl = UserAccountsPage
+						.editAccountUrl(account.getUri());
+			} else {
+				this.editUrl = "";
+			}
 		}
 
 		public String getUri() {
@@ -264,6 +302,10 @@ public class UserAccountsListPage extends UserAccountsPage {
 
 		public String getEditUrl() {
 			return editUrl;
+		}
+
+		public boolean isDeletable() {
+			return deletable;
 		}
 
 	}
@@ -332,13 +374,14 @@ public class UserAccountsListPage extends UserAccountsPage {
 		private void applyToBodyMap(Map<String, Object> body) {
 			if (type == Type.NEW_ACCOUNT) {
 				body.put("newUserAccount", new UserAccountWrapper(userAccount,
-						Collections.<String> emptyList()));
+						Collections.<String> emptyList(), true, false));
 				if (emailWasSent) {
 					body.put("emailWasSent", Boolean.TRUE);
 				}
 			} else if (type == Type.UPDATED_ACCOUNT) {
 				body.put("updatedUserAccount", new UserAccountWrapper(
-						userAccount, Collections.<String> emptyList()));
+						userAccount, Collections.<String> emptyList(), true,
+						false));
 				if (emailWasSent) {
 					body.put("emailWasSent", Boolean.TRUE);
 				}

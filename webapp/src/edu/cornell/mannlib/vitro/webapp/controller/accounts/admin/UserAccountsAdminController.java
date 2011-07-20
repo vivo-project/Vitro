@@ -82,10 +82,14 @@ public class UserAccountsAdminController extends FreemarkerHttpServlet {
 
 	private ResponseValues handleDeleteRequest(VitroRequest vreq) {
 		UserAccountsDeleter deleter = new UserAccountsDeleter(vreq);
-		Collection<String> deletedUris = deleter.delete();
+		if (deleter.isBogus()) {
+			return showHomePage(vreq, deleter.getBogusMessage());
+		} else {
+			Collection<String> deletedUris = deleter.delete();
 
-		UserAccountsListPage.Message.showDeletions(vreq, deletedUris);
-		return redirectToList();
+			UserAccountsListPage.Message.showDeletions(vreq, deletedUris);
+			return redirectToList();
+		}
 	}
 
 	private ResponseValues handleListRequest(VitroRequest vreq) {

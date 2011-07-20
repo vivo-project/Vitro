@@ -11,6 +11,9 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageRootAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
@@ -114,6 +117,16 @@ public class UserAccountsEditPage extends UserAccountsPage {
 					+ "' is bogus: no such user");
 			bogusMessage = UserAccountsUserController.BOGUS_STANDARD_MESSAGE;
 			return;
+		}
+		if (userAccount.isRootUser()) {
+			if (!PolicyHelper.isAuthorizedForActions(vreq,
+					new ManageRootAccount())) {
+				log.warn("User is attempting to edit the root account, "
+						+ "but is not authorized to do so. Logged in as: "
+						+ LoginStatusBean.getCurrentUser(vreq));
+				bogusMessage = UserAccountsUserController.BOGUS_STANDARD_MESSAGE;
+				return;
+			}
 		}
 	}
 
