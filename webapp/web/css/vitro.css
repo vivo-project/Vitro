@@ -157,6 +157,7 @@ ul.dropdown li a {
 ul.dropdown li#user-menu { 
     background: url(../images/arrowDownOverAccount.gif) right 9px no-repeat;
     min-width:110px;
+    position: relative;
 }
 ul.dropdown li#user-menu a { 
     margin-right: 28px;
