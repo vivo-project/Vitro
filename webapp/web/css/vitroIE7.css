@@ -151,3 +151,37 @@ table#account th {
 p.requiredHint {
     clear: left;
 }
+input#externalAuthChkBox {
+    height: 18px;
+    width: 18px;
+}
+#associated {
+    display: none; 
+    float: none;
+}
+#associationOptions {
+    display: none; 
+    float: none;
+}
+#associateProfileBackgroundOne {
+    width: 443px;
+    border-bottom: none;
+}
+#associateProfileBackgroundTwo {
+    width: 435px;
+    padding-left: 8px;
+    padding-top: 8px;
+    padding-bottom: 14px;
+    border-top: none;
+}
+#associateProfileBackgroundThree {
+    width: 435px;
+    padding-left: 8px;
+    padding-top: 8px;
+    border-top: none;
+}
+#associateProfileBackgroundFour {
+    width: 435px;
+    padding-left: 8px;
+    padding-top: 4px;
+}
