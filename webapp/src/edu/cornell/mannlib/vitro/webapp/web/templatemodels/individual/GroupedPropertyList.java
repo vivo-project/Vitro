@@ -445,11 +445,6 @@ public class GroupedPropertyList extends BaseTemplateModel {
         }        
         return null;
     }
-    
-    @Deprecated
-    public PropertyTemplateModel getPropertyAndRemoveFromList(String propertyUri) {
-        return pullProperty(propertyUri);
-    }
 
     public PropertyTemplateModel pullProperty(String propertyUri) {
         

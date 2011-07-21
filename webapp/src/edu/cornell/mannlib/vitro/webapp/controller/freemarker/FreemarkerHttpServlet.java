@@ -298,6 +298,10 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return wrapper.wrap(obj);
     }
     
+    protected TemplateModel wrap(Object obj, BeansWrapper wrapper) throws TemplateModelException {
+        return wrapper.wrap(obj);
+    }
+    
     protected BeansWrapper getBeansWrapper(int exposureLevel) {
         BeansWrapper wrapper = new DefaultObjectWrapper();
         wrapper.setExposureLevel(exposureLevel);
