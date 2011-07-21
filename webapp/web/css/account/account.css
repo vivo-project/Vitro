@@ -266,3 +266,10 @@ form.customForm input[name="confirmPassword"] {
 a.disable-delete {
     padding-left: 24px;
 }
+#passwordContainer p.note {
+    margin-top: -10px;
+    padding-bottom: 5px;
+}
+#passwordContainer {
+    margin-top: 20px;
+}

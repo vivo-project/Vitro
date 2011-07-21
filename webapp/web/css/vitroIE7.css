@@ -148,12 +148,15 @@ table#account th {
     margin-top: 0;
     margin-left: 5px;
 }
+#add-account span.requiredHint {
+    float: none;
+}
 p.requiredHint {
     clear: left;
 }
 input#externalAuthChkBox {
-    height: 18px;
-    width: 18px;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 #associated {
     display: none; 
