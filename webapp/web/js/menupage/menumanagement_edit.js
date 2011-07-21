@@ -19,12 +19,13 @@ var menuManagementEdit = {
         this.selectedGroupForPage = $('#selectedContentTypeValue');
         // this.selectClassesMessage = $('#selectClassesMessage');
         this.allClassesSelectedCheckbox = $('#allSelected');
-        
+        this.displayInternalMessage = $('#internal-class label em');
     },
     bindEventListeners: function() {        
         // Listeners for vClass switching
         this.changeContentType.click(function() {
            menuManagementEdit.showClassGroups();
+         
            return false;
         });
         this.selectClassGroupDropdown.change(function() {
@@ -53,6 +54,10 @@ var menuManagementEdit = {
                    return false;
                } 
          });
+    },
+    updateInternalClassMessage:function(classGroupName) { //User has changed content type 
+    	//Set content type within internal class message
+    	this.displayInternalMessage.filter(":first").html(classGroupName);
     },
     showClassGroups: function() { //User has clicked change content type
     	//Show the section with the class group dropdown
@@ -148,7 +153,9 @@ var menuManagementEdit = {
               menuManagementEdit.hideClassGroups();
       
               menuManagementEdit.selectedGroupForPage.html(results.classGroupName);
-                //retrieve classes for class group and display with all selected
+              //update content type in message to "display x within my institution"
+              menuManagementEdit.updateInternalClassMessage(results.classGroupName);
+              //retrieve classes for class group and display with all selected
               var selectedClassesList = menuManagementEdit.classesForClassGroup.children('ul#selectedClasses');
               
               selectedClassesList.empty();
