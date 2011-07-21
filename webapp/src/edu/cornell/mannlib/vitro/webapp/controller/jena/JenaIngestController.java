@@ -101,7 +101,7 @@ public class JenaIngestController extends BaseEditController {
 	private static final String WORKFLOW_STEP_JSP = "/jenaIngest/workflowStep.jsp";
 	private static final String GENERATE_TBOX_JSP = "/jenaIngest/generateTBox.jsp";
 	private static final String PERMANENT_URI = "/jenaIngest/permanentURI.jsp";
-	private static final String MERGE_INDIVIDUALS = "/jenaIngest/mergeIndividuals.jsp";
+	private static final String MERGE_RESOURCES = "/jenaIngest/mergeResources.jsp";
 	private static final String MERGE_RESULT = "/jenaIngest/merge_result.jsp";
 	private static final String SPARQL_CONSTRUCT_CLASS = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7/sparql#SPARQLCONSTRUCTQuery";
 	private static final String SPARQL_QUERYSTR_PROP = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7/sparql#queryStr";
@@ -174,8 +174,8 @@ public class JenaIngestController extends BaseEditController {
 			processGenerateTBoxRequest(vreq, maker, modelType);
 		} else if("permanentURI".equals(actionStr)){
 			processPermanentURIRequest(vreq, maker, modelType);		  
-		} else if("mergeIndividuals".equals(actionStr)){
-			processMergeIndividualRequest(vreq, maker, modelType);
+		} else if("mergeResources".equals(actionStr)){
+			processMergeResourceRequest(vreq, maker, modelType);
 		} else if("renameResource".equals(actionStr)){
 			processRenameResourceRequest(vreq, response, maker, modelType);
 	    } else if("mergeResult".equals(actionStr)){
@@ -674,7 +674,7 @@ public class JenaIngestController extends BaseEditController {
 		}
 	}
 	
-	private void processMergeIndividualRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+	private void processMergeResourceRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
 		  String uri1 = vreq.getParameter("uri1"); // get primary uri
 		  String uri2 = vreq.getParameter("uri2"); // get secondary uri
 		  String usePrimaryLabelOnly = vreq.getParameter("usePrimaryLabelOnly");
@@ -695,12 +695,12 @@ public class JenaIngestController extends BaseEditController {
 			  String result = utils.doMerge(uri1,uri2,baseOntModel,ontModel,infOntModel,usePrimaryLabelOnly);
 			  getServletContext().setAttribute("leftoverModel", utils.getLeftOverModel());
 			  vreq.setAttribute("result",result);
-			  vreq.setAttribute("title","Merge Individuals");
+			  vreq.setAttribute("title","Merge Resources");
 			  vreq.setAttribute("bodyJsp",MERGE_RESULT);
 		  }
 		  else{
-			  vreq.setAttribute("title","Merge Individuals");
-			  vreq.setAttribute("bodyJsp",MERGE_INDIVIDUALS);  
+			  vreq.setAttribute("title","Merge Resources");
+			  vreq.setAttribute("bodyJsp",MERGE_RESOURCES);  
 		  }
 	}
 	

@@ -23,28 +23,27 @@
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript" src="js/jenaIngest/ingestUtils.js"></script>
 
-<h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Merge Individuals</h2>
+<h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Merge Resources</h2>
 
-<p>This tool allows two individuals with different URIs to be collapsed into a 
-   single URI.  Any statements using the "duplicate individual URI" will be 
-   rewritten using the "primary individual URI."  If there are multiple 
+<p>This tool allows two resources with different URIs to be collapsed into a 
+   single URI. Any statements using the "duplicate resource URI" will be 
+   rewritten using the "primary resource URI."  If there are multiple 
    statements for a property that can have only a single value, the extra
    statements will be retracted from the model and offered for download.</p>
 <p>This tool operates on the main web application model only, not on any 
    of the additional Jena models.</p> 
 
 <form id="takeuri" action="ingest" method="get">
-<input type="hidden" name="action" value="mergeIndividuals"/>
-<table>
-<tr>
-    <td>Primary individual URI</td><td><input id="uri1" type="text" size="52" name="uri1"/></td>
-</tr>
-<tr>
-    <td>Duplicate individual URI</td><td><input id="uri2" type="text" size="52" name="uri2"/></td>
-</tr>
-</table>
-<input type="checkbox" name="usePrimaryLabelOnly" value="Use Primary Label Only">Retain rdfs:labels only from Primary Individual</input>
-<br></br>
-<input class="submit"type="submit" name="submit" value="Merge individuals" /></p>
-</form>
+    <input type="hidden" name="action" value="mergeResources"/>
+    <table>
+    <tr>
+        <td>Primary resource URI</td><td><input id="uri1" type="text" size="52" name="uri1"/></td>
+    </tr>
+    <tr>
+        <td>Duplicate resource URI</td><td><input id="uri2" type="text" size="52" name="uri2"/></td>
+    </tr>
+    </table>
+    <input type="checkbox" name="usePrimaryLabelOnly" value="Use Primary Label Only">Retain rdfs:labels only from Primary Resource</input>
 
+    <p><input class="submit"type="submit" name="submit" value="Merge resources" /></p>
+</form>
