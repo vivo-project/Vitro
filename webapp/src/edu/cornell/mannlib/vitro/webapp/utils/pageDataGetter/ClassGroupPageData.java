@@ -65,7 +65,14 @@ public class ClassGroupPageData implements PageDataGetter{
             }
             
         }
-                    
+        log.debug("Retrieved class group " + group.getURI() + " and returning to template");  
+        //if debug enabled, print out the number of entities within each class in the class gorup
+        if(log.isDebugEnabled()){
+        	List<VClass> groupClasses = group.getVitroClassList();
+        	for(VClass v: groupClasses) {
+        		log.debug("Class " + v.getName() + " - " + v.getURI() + " has " + v.getEntityCount() + " entities");
+        	}
+        }
         data.put("vClassGroup", group);  //may put null     
         //Also add data service url
         //Hardcoding for now, need a more dynamic way of doing this

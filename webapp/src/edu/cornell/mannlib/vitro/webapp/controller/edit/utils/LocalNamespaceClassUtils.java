@@ -82,6 +82,7 @@ public class LocalNamespaceClassUtils {
     		defaultNamespace = defaultNamespace.substring(0, lastIndex) + "/ontology/";
     		return defaultNamespace;
     	} else {
+    		log.error("Default namespace " + defaultNamespace + " should have /individual, returning null for default namespace");
     		return null;
     	}
     }

@@ -56,10 +56,12 @@ public class InternalClassesDataGetter extends IndividualsForClassesDataGetter{
         try{
         	List<String> classes = (List<String>)classIntersectionsMap.get("classes");
         	List<String> restrictClasses = retrieveRestrictClasses(context, classIntersectionsMap);
+        	log.debug("Retrieving classes for " + classes.toString() + " and restricting by " + restrictClasses.toString());
         	processClassesAndRestrictions(vreq, context, data, classes, restrictClasses);
         	 //Also add data service url
             //Hardcoding for now, need a more dynamic way of doing this
             data.put("dataServiceUrlIndividualsByVClass", this.getDataServiceUrl());
+            log.debug("Using data service url " + this.getDataServiceUrl());
         } catch(Exception ex) {
         	log.error("An error occurred retrieving Vclass Intersection individuals", ex);
         }
