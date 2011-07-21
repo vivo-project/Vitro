@@ -10,7 +10,7 @@
 
 <h3>Menu management</h3>
 
-<#assign hasElement = propertyGroups.pullProperty("${namespaces.display}hasElement")>
+<#assign hasElement = propertyGroups.pullProperty("${namespaces.display}hasElement")!>
 
 <#-- List the menu items -->
 <ul class="menuItems">
