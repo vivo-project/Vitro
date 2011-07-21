@@ -71,7 +71,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
            
         // If editing this page, merge in object properties applicable to the individual that are currently
         // unpopulated, so the properties are displayed to allow statements to be added to these properties.
-        // RY In future, we should limit this to properties that the user CAN add properties to.
+        // RY In future, we should limit this to properties that the user has permission to add properties to.
         if (editing) {
             mergeAllPossibleObjectProperties(populatedObjectPropertyList, propertyList);
         }
@@ -314,17 +314,13 @@ public class GroupedPropertyList extends BaseTemplateModel {
                  // If the property is not assigned to any group, add it to the group for unassigned properties
                  } else if (p.getGroupURI()==null) {
                      if (groupForUnassignedProperties!=null) { 
-                         // RY How could it happen that it's already in the group? Maybe we can remove this test.
                          if (!alreadyOnPropertyList(groupForUnassignedProperties.getPropertyList(),p)) {                          
                              groupForUnassignedProperties.getPropertyList().add(p);
-                             if (log.isDebugEnabled()) {
-                                 log.debug("adding property " + getLabel(p) + " to group for unassigned properties");
-                             }                             
+                             log.debug("adding property " + getLabel(p) + " to group for unassigned properties");                            
                          }
                      } 
                  // Otherwise, if the property is assigned to this group, add it to the group if it's not already there
                  } else if (p.getGroupURI().equals(pg.getURI())) {
-                     // RY How could it happen that it's already in the group? Maybe we can remove this case.
                      if (!alreadyOnPropertyList(pg.getPropertyList(),p)) {
                          pg.getPropertyList().add(p);
                      }
