@@ -70,8 +70,9 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
     	List<VClass> restrictClasses = (List<VClass>) data.get("restrictVClasses");
     	//if there are restrict classes, then update counts
     	if(restrictClasses.size() > 0) {
+    		log.debug("Restriction classes exist");
     		List<VClass> newVClassList = new ArrayList<VClass>();
-    		//Iterate through vclasses and get updated counts
+    		//Iterate through vclasses and get updated counts, iterated and saved in same order as initially included
     		for(VClass v: vclassList) {
     			int oldCount = v.getEntityCount();
     			//Making a copy so as to ensure we don't touch the values in the cache
@@ -116,7 +117,7 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
 	private void processClassesForDisplay(ServletContext context, HashMap<String, Object> data, List<String> classes) {
     	VClassGroup classesGroup = new VClassGroup();
     	classesGroup.setURI("displayClasses");
-    	
+    	log.debug("Processing classes that will be displayed");
     	List<VClass> vClasses = new ArrayList<VClass>();
   
     	VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
@@ -135,7 +136,9 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
     	}
     	//Sort these classes
     	Collections.sort(vClasses);
+    	log.debug("Sorting complete for V Classes");
     	classesGroup.setVitroClassList(vClasses);
+    	log.debug("Returning vitro class list in data for template");
     	//Set vclass group
     	data.put("vClassGroup", classesGroup);
     }	
@@ -172,6 +175,7 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
 	    	restrictClassesArray = urlEncodedRestrictClasses.toArray(restrictClassesArray);
 	    	
 	    	//In case just want uris
+	    	log.debug("Variable name for including restriction classes " +  getRestrictClassesTemplateName());
 	    	data.put(getRestrictClassesTemplateName(), StringUtils.join(restrictClassesArray, ","));
 	    	data.put("restrictVClasses", restrictVClasses);
 	    	//not sure if this is useful
