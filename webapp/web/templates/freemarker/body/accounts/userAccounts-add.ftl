@@ -79,14 +79,14 @@
                 It will include instructions for activating the account and creating a password.
             </p>
         <#else>
-            <div id="passwordContainer">
-
+            <section id="passwordContainer" role="region">
                 <label for="initial-password">Initial password<span class="requiredHint"> *</span></label>
                 <input type="password" name="initialPassword" value="${initialPassword}" id="initial-password" role="input" />
-                <p class="note" style="margin-top:-10px">Minimum of ${minimumLength} characters in length.</p>
+                <p class="note">Minimum of ${minimumLength} characters in length.</p>
+                
                 <label for="confirm-password">Confirm initial password<span class="requiredHint"> *</span></label> 
                 <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
-            </div>
+            </section>
         </#if>
         
         <p><input type="submit" name="submitAdd" value="Add new account" class="submit" /> or <a class="cancel" href="${formUrls.list}">Cancel</a></p>

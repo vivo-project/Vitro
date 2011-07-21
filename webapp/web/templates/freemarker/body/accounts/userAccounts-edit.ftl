@@ -75,7 +75,7 @@
         </#if>
 
         <#if emailIsEnabled??>
-            <div id="pwdResetContainer" <#if externalAuthOnly?? >class="hidden"</#if> >
+            <section id="pwdResetContainer" <#if externalAuthOnly?? >class="hidden"</#if> role="region">
                 <input type="checkbox" name="resetPassword" value="" id="reset-password" role="checkbox" <#if resetPassword??>checked</#if> />
                 <label  class="inline" for="reset-password"> Reset password</label>
 
@@ -84,17 +84,17 @@
                     be emailed to the address entered above. The password will not 
                     be reset until the user follows the link provided in this email.
                 </p>
-            </div>
+            </section>
         <#else>
-            <div id="passwordContainer" <#if externalAuthOnly?? >class="hidden"</#if> >
-
+            <section id="passwordContainer" <#if externalAuthOnly?? >class="hidden"</#if> role="region">
                 <label for="new-password">New password</label>
                 <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
-                <p class="note" style="margin-top:-10px">Minimum of ${minimumLength} characters in length.<br />
+                <p class="note">Minimum of ${minimumLength} characters in length.<br />
                 Leaving this blank means that the password will not be changed.</p>
+                
                 <label for="confirm-password">Confirm new password</label> 
                 <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
-            </div>
+            </section>
         </#if>
 
         <p><input type="submit" name="submitEdit" value="Save changes" class="submit" /> or <a class="cancel" href="${formUrls.list}">Cancel</a></p>
