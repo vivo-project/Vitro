@@ -70,7 +70,7 @@
         	<form action="editForm" method="get">
             	<input name="uri" type = "hidden" value="${individual.URI}" />
             	<input name="controller" type = "hidden" value="Entity" />
-            	<input type="submit" class="form-button" value="Edit This Individual's Datatype Properties"/>
+            	<input type="submit" class="form-button" value="Edit This Individual"/>
         	</form><br/>
 	
         	<c:if test="${!empty individual.externalIds}"> 
