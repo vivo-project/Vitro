@@ -165,7 +165,10 @@ public class InstitutionalInternalClassController extends FreemarkerHttpServlet 
     		}
     		//Get current internal class if it exists
     		data.put("existingInternalClass", retrieveCurrentInternalClass());
-    	} 
+    	}
+    	//Place default namespace within data to pass back to template
+    	String defaultNamespace = vreq.getWebappDaoFactory().getDefaultNamespace();
+    	data.put("defaultNamespace", defaultNamespace);
 	}
 
     
