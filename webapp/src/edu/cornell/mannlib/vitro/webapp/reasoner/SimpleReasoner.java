@@ -583,10 +583,15 @@ public class SimpleReasoner extends StatementListener {
 		tboxModel.enterCriticalSection(Lock.READ);
 		
 		try {
-			ExtendedIterator<OntClass> iter = cls.listSubClasses(false);
+			List<OntClass> subclasses = null;
+			subclasses = (cls.listSubClasses(false)).toList();		
+			subclasses.addAll((cls.listEquivalentClasses()).toList());
 			
+			Iterator<OntClass> iter = subclasses.iterator();
+						
 			while (iter.hasNext()) {		
 				OntClass childClass = iter.next();
+				if (childClass.equals(cls)) break;
 				Statement stmt = ResourceFactory.createStatement(subject, RDF.type, childClass);
 				if (aboxModel.contains(stmt)) return true;
 			}
