@@ -20,6 +20,8 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
@@ -60,6 +62,15 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
             }
         } finally {
             ontModel.leaveCriticalSection();
+        }
+        OntModel tboxModel = getOntModelSelector().getTBoxModel();
+        tboxModel.enterCriticalSection(Lock.WRITE);
+        try {
+            Resource groupRes = ResourceFactory.createResource(vcg.getURI());            
+            tboxModel.removeAll(groupRes, null, null);
+            tboxModel.removeAll(null, null, groupRes);
+        } finally {
+            tboxModel.leaveCriticalSection();
         }
     }
 
@@ -123,16 +134,15 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
     public List<VClassGroup> getPublicGroupsWithVClasses(boolean displayOrder, boolean includeUninstantiatedClasses,
             boolean getIndividualCount) {
         VClassDao classDao = getWebappDaoFactory().getVClassDao();
+        List<VClassGroup> groups = new ArrayList<VClassGroup>();
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            List<VClassGroup> groups = new ArrayList<VClassGroup>();
             ClosableIterator<Individual> groupIt = getOntModel().listIndividuals(CLASSGROUP);
             try {
                 while (groupIt.hasNext()) {
                     Individual grp = (Individual) groupIt.next();
                     VClassGroup vgrp = groupFromGroupIndividual(grp);
-                    if (vgrp!=null) {
-                        classDao.addVClassesToGroup(vgrp, includeUninstantiatedClasses, getIndividualCount);
+                    if (vgrp != null) {
                         groups.add(vgrp);
                     }
                 }    
@@ -140,43 +150,24 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
             } finally {
                 groupIt.close();
             }
-            // BJL23 2008-12-18
-            // It's often problematic that classes don't show up in editing picklists until they're in a classgroup.
-            // I'm going to try adding all other classes to a classgroup called "ungrouped"
-            // We really need to rework these methods and move the filtering behavior into the nice filtering framework
-            /* commenting this out until I rework the filtering DAO to use this method */
-            /*
-            List<VClass> ungroupedClasses = new ArrayList<VClass>();
-            List<VClass> allClassList = getWebappDaoFactory().getVClassDao().getAllVclasses();
-            Iterator<VClass> allClassIt = allClassList.iterator();
-            while (allClassIt.hasNext()) {
-            	VClass cls = allClassIt.next();
-            	if (cls.getGroupURI()==null) {
-            		ungroupedClasses.add(cls);
-            	}
-            }
-            if (ungroupedClasses.size()>0) {
-            	VClassGroup ungrouped = new VClassGroup();
-            	ungrouped.setPublicName("ungrouped");
-            	groups.add(ungrouped);
-            }
-            */
-            if (groups.size()>0) {                
-                return groups;
-            } else {
-                /* bdc34: the effect of the following code is that 
-                 * classgroups will get empty vclasses added to them
-                 * when includeUninstantiatedClasses == false and all
-                 * the vclasses are empty.
-                 * This may not be the desired behavior. 
-                 */
-                classDao.addVClassesToGroups(groups);                
-                return groups;
-            }
         } finally {
             getOntModel().leaveCriticalSection();
         }
-
+        for (VClassGroup vgrp : groups) {
+            classDao.addVClassesToGroup(vgrp, includeUninstantiatedClasses, getIndividualCount);
+        }
+        if (groups.size()>0) {                
+            return groups;
+        } else {
+            /* bdc34: the effect of the following code is that 
+             * classgroups will get empty vclasses added to them
+             * when includeUninstantiatedClasses == false and all
+             * the vclasses are empty.
+             * This may not be the desired behavior. 
+             */
+            classDao.addVClassesToGroups(groups);                
+                return groups;
+        }
     }
     
     

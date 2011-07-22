@@ -19,6 +19,7 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
@@ -55,6 +56,15 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
             }
         } finally {
             getOntModel().leaveCriticalSection();
+        }
+        OntModel tboxModel = getOntModelSelector().getTBoxModel();
+        tboxModel.enterCriticalSection(Lock.WRITE);
+        try {
+            Resource groupRes = ResourceFactory.createResource(group.getURI());            
+            tboxModel.removeAll(groupRes, null, null);
+            tboxModel.removeAll(null, null, groupRes);
+        } finally {
+            tboxModel.leaveCriticalSection();
         }
 	}
 	
