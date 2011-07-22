@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -254,7 +255,6 @@ public class GroupedPropertyList extends BaseTemplateModel {
             log.warn("groupList has no groups on entering addPropertiesToGroups(); will create a new group");
             PropertyGroup dummyGroup = pgDao.createDummyPropertyGroup(null, 1);
             dummyGroup.getPropertyList().addAll(propertyList);
-            sortGroupPropertyList(dummyGroup.getName(), propertyList);
             groupList.add(dummyGroup);
             return groupList;            
         } 
@@ -303,48 +303,46 @@ public class GroupedPropertyList extends BaseTemplateModel {
     private void populateGroupListWithProperties(List<PropertyGroup> groupList, 
             PropertyGroup groupForUnassignedProperties, List<Property> propertyList) {
         
-        // Assign the properties to the groups
+        // Clear out the property lists on the groups
         for (PropertyGroup pg : groupList) {
-             if (pg.getPropertyList().size()>0) {
-                 pg.getPropertyList().clear();
-             }
-             for (Property p : propertyList) {
-                 if (p.getURI() == null) {
-                     log.error("Property p has null URI in populateGroupsListWithProperties()");
-                 // If the property is not assigned to any group, add it to the group for unassigned properties
-                 } else if (p.getGroupURI()==null) {
-                     if (groupForUnassignedProperties!=null) { 
-                         // RY How could it happen that it's already in the group? Maybe we can remove this test.
-                         if (!alreadyOnPropertyList(groupForUnassignedProperties.getPropertyList(),p)) {                          
-                             groupForUnassignedProperties.getPropertyList().add(p);
-                             if (log.isDebugEnabled()) {
-                                 log.debug("adding property " + getLabel(p) + " to group for unassigned properties");
-                             }                             
-                         }
-                     } 
-                 // Otherwise, if the property is assigned to this group, add it to the group if it's not already there
-                 } else if (p.getGroupURI().equals(pg.getURI())) {
-                     // RY How could it happen that it's already in the group? Maybe we can remove this case.
-                     if (!alreadyOnPropertyList(pg.getPropertyList(),p)) {
-                         pg.getPropertyList().add(p);
-                     }
-                 }
-             }
-             sortGroupPropertyList(pg.getName(), pg.getPropertyList());
+            if (pg.getPropertyList().size()>0) {
+                pg.getPropertyList().clear();
+            }                        
         }
-    }
-    
-    private void sortGroupPropertyList(String groupName, List<Property> propertyList) {
-        if (propertyList.size()>1) {
-            try {
-                Collections.sort(propertyList,new Property.DisplayComparatorIgnoringPropertyGroup());
-            } catch (Exception ex) {
-                log.error("Exception sorting property group "+ groupName + " property list: "+ex.getMessage());
-            }
-        }       
+        
+        // Assign the properties to the groups
+        for (Property p : propertyList) {
+            if (p.getURI() == null) {
+                log.error("Property p has null URI in populateGroupListWithProperties()");
+            // If the property is not assigned to any group, add it to the group for unassigned properties
+            } else {
+                String groupUriForProperty = p.getGroupURI();                
+                boolean assignedToGroup = false;
+  
+                if (groupUriForProperty != null) {
+                    for (PropertyGroup pg : groupList) {
+                         String groupUri = pg.getURI();
+                         if (groupUriForProperty.equals(groupUri)) {
+                             pg.getPropertyList().add(p);
+                             assignedToGroup = true;
+                             break;
+                         }
+                    }
+                }
+                
+                // Either the property is not assigned to a group, or it is assigned to a group
+                // not in the list (i.e., a non-existent group).
+                if (! assignedToGroup) {
+                    if (groupForUnassignedProperties!=null) {                          
+                        groupForUnassignedProperties.getPropertyList().add(p);
+                        log.debug("adding property " + getLabel(p) + " to group for unassigned properties");                            
+                    }                        
+                }
+             } 
+         }
     }
 
-    private class PropertyRanker implements Comparator {
+    private class PropertyRanker implements Comparator<Property> {
     
         WebappDaoFactory wdf;
         PropertyGroupDao pgDao;
@@ -354,9 +352,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
             this.pgDao = wdf.getPropertyGroupDao();
         }
         
-        public int compare (Object o1, Object o2) {
-            Property p1 = (Property) o1;
-            Property p2 = (Property) o2;
+        public int compare(Property p1, Property p2) {
             
             // sort first by property group rank; if the same, then sort by property rank
             final int MAX_GROUP_RANK=99;
