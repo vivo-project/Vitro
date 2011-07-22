@@ -30,9 +30,11 @@ public class Classes2ClassesDaoJena extends JenaBaseDao implements Classes2Class
     	deleteClasses2Classes(c2c, getOntModelSelector().getTBoxModel());
     }
 
+//TODO restore write locks once reasoner is able to handle these update asynchronously.
+
     public void deleteClasses2Classes( Classes2Classes c2c, OntModel ontModel )
     {
-        ontModel.enterCriticalSection(Lock.WRITE);
+//        ontModel.enterCriticalSection(Lock.WRITE);
         getOntModel().getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),true));
         try {
             OntResource subclass = getOntClass(ontModel,c2c.getSubclassURI());
@@ -48,7 +50,7 @@ public class Classes2ClassesDaoJena extends JenaBaseDao implements Classes2Class
             }
         } finally {
         	getOntModel().getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),false));
-            ontModel.leaveCriticalSection();
+//            ontModel.leaveCriticalSection();
         }
     }
 
@@ -58,7 +60,7 @@ public class Classes2ClassesDaoJena extends JenaBaseDao implements Classes2Class
 
     public void insertNewClasses2Classes( Classes2Classes c2c, OntModel ontModel )
     {
-        ontModel.enterCriticalSection(Lock.WRITE);
+//        ontModel.enterCriticalSection(Lock.WRITE);
         getOntModel().getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),true));
         try {
             Resource subclass = ontModel.getResource(c2c.getSubclassURI());
@@ -68,7 +70,7 @@ public class Classes2ClassesDaoJena extends JenaBaseDao implements Classes2Class
             }
         } finally {
         	getOntModel().getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),false));
-            ontModel.leaveCriticalSection();
+//            ontModel.leaveCriticalSection();
         }
     }
 
