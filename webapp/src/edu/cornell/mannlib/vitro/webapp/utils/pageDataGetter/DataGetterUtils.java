@@ -118,6 +118,8 @@ public class DataGetterUtils {
             //TODO: Check if can include by type here
             IndividualsForClassesDataGetter cidg =  new IndividualsForClassesDataGetter();
             getPageDataGetterMap(context).put(cidg.getType(), cidg);
+            InternalClassesDataGetter internalCdg =  new InternalClassesDataGetter();
+            getPageDataGetterMap(context).put(internalCdg.getType(), internalCdg);
                 
         }
     }
@@ -215,11 +217,12 @@ public class DataGetterUtils {
                           new JSONObject().put("URI",vclass.getURI())
                                   .put("name",vclass.getName()));
             } else {
-                //For now, utilize very first first VClass (assume that that is the one to be employed)
+                //For now, utilize very last VClass (assume that that is the one to be employed)
                 //TODO: Find more general way of dealing with this
                 //put multiple ones in?
                 if(vclassIds.size() > 0) {
-                    vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(vclassIds.get(0));
+                	int numberVClasses = vclassIds.size();
+                    vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(vclassIds.get(numberVClasses - 1));
                     rObj.put("vclass", new JSONObject().put("URI",vclass.getURI())
                               .put("name",vclass.getName()));
                 } 
