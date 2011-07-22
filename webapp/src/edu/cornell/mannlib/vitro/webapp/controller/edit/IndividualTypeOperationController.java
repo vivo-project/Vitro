@@ -55,7 +55,7 @@ public class IndividualTypeOperationController extends BaseEditController {
             return;
         }
 
-        IndividualDao dao = request.getFullWebappDaoFactory().getIndividualDao();
+        IndividualDao dao = request.getAssertionsWebappDaoFactory().getIndividualDao();
         
         if (request.getParameter("_cancel") == null) {
 	        try {
