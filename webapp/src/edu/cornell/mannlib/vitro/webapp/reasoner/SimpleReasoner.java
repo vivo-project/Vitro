@@ -602,35 +602,33 @@ public class SimpleReasoner extends StatementListener {
 	 * inferred model, assert that it is of type A.
 	 */
 	public void addedSubClass(OntClass subClass, OntClass superClass, Model inferenceModel) {
-		
 		log.debug("subClass = " + subClass.getURI() + " superClass = " + superClass.getURI());
-		
-		aboxModel.enterCriticalSection(Lock.WRITE);
-		inferenceModel.enterCriticalSection(Lock.WRITE);
-		
+		OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+		unionModel.addSubModel(aboxModel);
+		unionModel.addSubModel(inferenceModel);
+        List<Resource> subjectList = new ArrayList<Resource>();
+		aboxModel.enterCriticalSection(Lock.READ);
 		try {
-			OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-			unionModel.addSubModel(aboxModel);
-			unionModel.addSubModel(inferenceModel);
-					
 			StmtIterator iter = unionModel.listStatements((Resource) null, RDF.type, subClass);
-	
 			while (iter.hasNext()) {
-				
 				Statement stmt = iter.next();
-				Statement infStmt = ResourceFactory.createStatement(stmt.getSubject(), RDF.type, superClass);
-				
-				inferenceModel.enterCriticalSection(Lock.WRITE);
-				
-				if (!inferenceModel.contains(infStmt)) {
-					inferenceModel.add(infStmt);
-					setMostSpecificTypes(infStmt.getSubject(), inferenceModel, new HashSet<String>());
-				} 
-			}
+                subjectList.add(stmt.getSubject());
+            }
 		} finally {
 			aboxModel.leaveCriticalSection();
-			inferenceModel.leaveCriticalSection();
 		}
+        for (Resource subject : subjectList) {
+			Statement infStmt = ResourceFactory.createStatement(subject, RDF.type, superClass);	
+			inferenceModel.enterCriticalSection(Lock.WRITE);		
+            try {		
+			    if (!inferenceModel.contains(infStmt)) {
+				    inferenceModel.add(infStmt);
+				    setMostSpecificTypes(subject, inferenceModel, new HashSet<String>());
+		        }
+            } finally {
+                inferenceModel.leaveCriticalSection();
+            } 
+        }
 	}
 	
 	/*
@@ -641,38 +639,33 @@ public class SimpleReasoner extends StatementListener {
 	 * of A (including A itself)
 	 */
 	public void removedSubClass(OntClass subClass, OntClass superClass, Model inferenceModel) {
-		
 		log.debug("subClass = " + subClass.getURI() + ". superClass = " + superClass.getURI());
-
-		aboxModel.enterCriticalSection(Lock.WRITE);
-		inferenceModel.enterCriticalSection(Lock.WRITE);
-		
-		try {
-			OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-			unionModel.addSubModel(aboxModel);
-			unionModel.addSubModel(inferenceModel);
-					
-			StmtIterator iter = unionModel.listStatements((Resource) null, RDF.type, subClass);
-	
-			while (iter.hasNext()) {
-				
-				Statement stmt = iter.next();
-				Resource ind = stmt.getSubject();
-				
-				if (entailedType(ind,superClass)) continue;
-				
-				Statement infStmt = ResourceFactory.createStatement(ind, RDF.type, superClass);
-				
-				inferenceModel.enterCriticalSection(Lock.WRITE);
-				
-				if (inferenceModel.contains(infStmt)) {
-					inferenceModel.remove(infStmt);
-					setMostSpecificTypes(infStmt.getSubject(), inferenceModel, new HashSet<String>());
-				} 
-			}
-		} finally {
-			aboxModel.leaveCriticalSection();
-			inferenceModel.leaveCriticalSection();
+		OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+		unionModel.addSubModel(aboxModel);
+		unionModel.addSubModel(inferenceModel);
+		List<Resource> subjectList = new ArrayList<Resource>();
+        aboxModel.enterCriticalSection(Lock.READ);
+        try {		
+		    StmtIterator iter = unionModel.listStatements((Resource) null, RDF.type, subClass);
+		    while (iter.hasNext()) {
+			    Statement stmt = iter.next();
+			    subjectList.add(stmt.getSubject());	
+            }
+        } finally {
+            aboxModel.leaveCriticalSection();
+        }
+        for (Resource ind : subjectList) {
+			if (entailedType(ind,superClass)) continue;
+			Statement infStmt = ResourceFactory.createStatement(ind, RDF.type, superClass);
+			inferenceModel.enterCriticalSection(Lock.WRITE);
+			try {
+			    if (inferenceModel.contains(infStmt)) {
+				    inferenceModel.remove(infStmt);
+				    setMostSpecificTypes(infStmt.getSubject(), inferenceModel, new HashSet<String>());
+			    } 
+            } finally {
+                inferenceModel.leaveCriticalSection();
+            }
 		}
 	}
 
