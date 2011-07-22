@@ -29,6 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LogoutEvent;
+import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 
 /**
  * The "standard" implementation of Authenticator.
@@ -136,8 +137,7 @@ public class BasicAuthenticator extends Authenticator {
 		
 		if (IsRootUser.isRootUser(RequestIdentifiers
 				.getIdBundleForRequest(request))) {
-			// Insert method call here.
-		}
+			IndexBuilder.checkIndexOnRootLogin(request);		}
 	}
 
 	/**

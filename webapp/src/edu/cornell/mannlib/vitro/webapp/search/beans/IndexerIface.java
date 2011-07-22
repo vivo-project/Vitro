@@ -56,4 +56,6 @@ public interface IndexerIface {
      * This may be called instead of endIndexing()
      */
     public void abortIndexingAndCleanUp();
+    
+    public boolean isIndexEmpty();
 }
