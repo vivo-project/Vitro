@@ -195,8 +195,8 @@ public class IndexBuilder extends Thread {
         if(! stopRequested && log != null )//may be null on shutdown 
             log.info("Stopping IndexBuilder thread");
     }
-
-  
+    
+    
     public static void checkIndexOnRootLogin(HttpServletRequest req){
     	HttpSession session = req.getSession();
     	ServletContext context = session.getServletContext();

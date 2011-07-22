@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,13 +23,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -51,7 +51,6 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
 import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryFactory;
 import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.LinkTemplateModel;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.BaseListedIndividual;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.searchresult.IndividualSearchResult;
 import freemarker.template.Configuration;
 
@@ -67,8 +66,8 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(PagedSearchController.class);
     
-    private static final int DEFAULT_HITS_PER_PAGE = 25;
-    private static final int DEFAULT_MAX_HIT_COUNT = 1000;   
+    protected static final int DEFAULT_HITS_PER_PAGE = 25;
+    protected static final int DEFAULT_MAX_HIT_COUNT = 1000;   
 
     private static final String PARAM_XML_REQUEST = "xml";
     private static final String PARAM_START_INDEX = "startIndex";
@@ -146,26 +145,8 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             log.debug("IndividualDao is " + iDao.toString() + " Public classes in the classgroup are " + grpDao.getPublicGroupsWithVClasses().toString());
             log.debug("VClassDao is "+ vclassDao.toString() );            
             
-            int startIndex = 0;
-            try{ 
-                startIndex = Integer.parseInt(vreq.getParameter(PARAM_START_INDEX)); 
-            }catch (Throwable e) { 
-                startIndex = 0; 
-            }            
-            log.debug("startIndex is " + startIndex);                       
-            
-            int hitsPerPage = DEFAULT_HITS_PER_PAGE;
-            try{ 
-                hitsPerPage = Integer.parseInt(vreq.getParameter(PARAM_HITS_PER_PAGE)); 
-            } catch (Throwable e) { 
-                hitsPerPage = DEFAULT_HITS_PER_PAGE; 
-            }                        
-            log.debug("hitsPerPage is " + hitsPerPage);
-            
-            int maxHitCount = DEFAULT_MAX_HIT_COUNT ;
-            if( startIndex >= DEFAULT_MAX_HIT_COUNT  - hitsPerPage )
-                maxHitCount = startIndex + DEFAULT_MAX_HIT_COUNT ;
-            log.debug("maxHitCount is " + maxHitCount);
+            int startIndex = getStartIndex(vreq);            
+            int hitsPerPage = getHitsPerPage( vreq );           
 
             String qtxt = vreq.getParameter(VitroQuery.QUERY_PARAMETER_NAME);            
             log.debug("Query text is \""+ qtxt + "\""); 
@@ -175,42 +156,27 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                 return doFailedSearch(badQueryMsg, qtxt, format);
             }
                 
-            SolrQuery query = getQuery(qtxt, maxHitCount, vreq);            
+            SolrQuery query = getQuery(qtxt, hitsPerPage, startIndex, vreq);            
             SolrServer solr = SolrSetup.getSolrServer(getServletContext());
-            QueryResponse response = null;
-           
+            QueryResponse response = null;           
             
             try {
                 response = solr.query(query);
-
-            } catch (Throwable t) {
-                log.error("in first pass at search: " + t);
-                // this is a hack to deal with odd cases where search and index threads interact
-                try{
-                    wait(150);
-                    response = solr.query(query);
-                } catch (Exception ex) {
-                    log.error(ex);
-                    String msg = makeBadSearchMessage(qtxt, ex.getMessage());
-                    if (msg == null) {
-                        msg = "The search request contained errors.";
-                    }
-                    return doFailedSearch(msg, qtxt, format);
-                }
+            } catch (Exception ex) {                
+                String msg = makeBadSearchMessage(qtxt, ex.getMessage());
+                log.error("could not run Solr query",ex);
+                return doFailedSearch(msg, qtxt, format);              
             }
             
             if (response == null) {
-                log.error("Search response was null");                
-                String msg = "The search request contained errors.";
-                return doFailedSearch(msg, qtxt, format);
+                log.error("Search response was null");                                
+                return doFailedSearch("The search request contained errors.", qtxt, format);
             }
             
             SolrDocumentList docs = response.getResults();
-
             if (docs == null) {
                 log.error("Document list for a search was null");                
-                String msg = "The search request contained errors.";
-                return doFailedSearch(msg, qtxt,format);
+                return doFailedSearch("The search request contained errors.", qtxt,format);
             }
                        
             long hitCount = docs.getNumFound();
@@ -218,30 +184,20 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             if ( hitCount < 1 ) {                
                 return doNoHits(qtxt,format);
             }            
-
-            long lastHitToShow = 0;
-            if ((startIndex + hitsPerPage) > hitCount ) {
-                lastHitToShow = hitCount;
-            } else {
-                lastHitToShow = startIndex + hitsPerPage;
-            }
             
-            List<Individual> individuals = new LinkedList<Individual>();      
-            for(int i = startIndex; i < lastHitToShow; i++){
-                try {                    
-                    SolrDocument doc = docs.get(i);
-                    String uri = doc.get(VitroSearchTermNames.URI).toString();
-                    log.debug("Retrieving individual with uri "+ uri);
-                    Individual ent = new IndividualImpl();
-                    ent.setURI(uri);
-                    ent = iDao.getIndividualByURI(uri);
-                    if(ent!=null) {
-                      ent.setSearchSnippet(getSnippet(doc, response));
-                      individuals.add(ent);
+            List<Individual> individuals = new ArrayList<Individual>(docs.size());
+            Iterator<SolrDocument> docIter = docs.iterator();
+            while( docIter.hasNext() ){
+                try {                                    
+                    SolrDocument doc = docIter.next();
+                    String uri = doc.get(VitroSearchTermNames.URI).toString();                    
+                    Individual ind = iDao.getIndividualByURI(uri);
+                    if(ind != null) {
+                      ind.setSearchSnippet( getSnippet(doc, response) );
+                      individuals.add(ind);
                     }
                 } catch(Exception e) {
-                    log.error("Problem getting usable individuals from search hits. " +
-                            e.getMessage());
+                    log.error("Problem getting usable individuals from search hits. ",e);
                 }
             }          
   
@@ -275,31 +231,19 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                     body.put("typeName", type.getName());
             }
             
-            /* Add classgroup and type refinement links to body */
+            /* Add ClassGroup and type refinement links to body */
             if( wasHtmlRequested ){                                
-                // Search request includes no classgroup and no type, so add classgroup search refinement links.
-                if ( !classGroupFilterRequested && !typeFilterRequested ) { 
-                    List<VClassGroup> classgroups = getClassGroups(grpDao, docs, maxHitCount);
-                    List<VClassGroupSearchLink> classGroupLinks = new ArrayList<VClassGroupSearchLink>(classgroups.size());
-                    for (VClassGroup vcg : classgroups) {
-                        if (vcg.getPublicName() != null) {
-                            classGroupLinks.add(new VClassGroupSearchLink(qtxt, vcg));
-                        }
-                    }
-                    body.put("classGroupLinks", classGroupLinks);                       
-     
-                // Search request is for a classgroup, so add rdf:type search refinement links
-                // but try to filter out classes that are subclasses
-                } else if ( classGroupFilterRequested && !typeFilterRequested ) {  
-                    List<VClass> vClasses = getVClasses(vclassDao, docs);
-                    List<VClassSearchLink> vClassLinks = new ArrayList<VClassSearchLink>(vClasses.size());
-                    for (VClass vc : vClasses) {
-                        vClassLinks.add(new VClassSearchLink(qtxt, vc));
-                    }
-                    body.put("classLinks", vClassLinks);                       
+                if ( !classGroupFilterRequested && !typeFilterRequested ) {
+                    // Search request includes no ClassGroup and no type, so add ClassGroup search refinement links.
+                    body.put("classGroupLinks", getClassGroupsLinks(grpDao, docs, response, qtxt));                            
+                } else if ( classGroupFilterRequested && !typeFilterRequested ) {
+                    // Search request is for a ClassGroup, so add rdf:type search refinement links
+                    // but try to filter out classes that are subclasses
+                    body.put("classLinks", getVClassLinks(vclassDao, docs, response, qtxt));                       
                     pagingLinkParams.put(PARAM_CLASSGROUP, classGroupParam);
 
                 } else {
+                    //search request is for a class so there are no more refinements
                     pagingLinkParams.put(PARAM_RDFTYPE, typeParam);
                 }
             }           
@@ -314,9 +258,10 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             body.put("hitCount", hitCount);
             body.put("startIndex", startIndex);
             
-            body.put("pagingLinks", getPagingLinks(startIndex, hitsPerPage,
-                    hitCount, maxHitCount, vreq.getServletPath(),
-                    pagingLinkParams));
+            body.put("pagingLinks", 
+                    getPagingLinks(startIndex, hitsPerPage, hitCount,  
+                                   vreq.getServletPath(),
+                                   pagingLinkParams));
 
             if (startIndex != 0) {
                 body.put("prevPage", getPreviousPageLink(startIndex,
@@ -336,6 +281,28 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     }
 
 
+    private int getHitsPerPage(VitroRequest vreq) {
+        int hitsPerPage = DEFAULT_HITS_PER_PAGE;
+        try{ 
+            hitsPerPage = Integer.parseInt(vreq.getParameter(PARAM_HITS_PER_PAGE)); 
+        } catch (Throwable e) { 
+            hitsPerPage = DEFAULT_HITS_PER_PAGE; 
+        }                        
+        log.debug("hitsPerPage is " + hitsPerPage);  
+        return hitsPerPage;
+    }
+
+    private int getStartIndex(VitroRequest vreq) {
+        int startIndex = 0;
+        try{ 
+            startIndex = Integer.parseInt(vreq.getParameter(PARAM_START_INDEX)); 
+        }catch (Throwable e) { 
+            startIndex = 0; 
+        }            
+        log.debug("startIndex is " + startIndex);
+        return startIndex;
+    }
+
     private String badQueryText(String qtxt) {
         if( qtxt == null || "".equals( qtxt.trim() ) )
             return "Please enter a search term.";
@@ -348,80 +315,103 @@ public class PagedSearchController extends FreemarkerHttpServlet {
 
     /**
      * Get the class groups represented for the individuals in the documents.
+     * @param qtxt 
      */
-    private List<VClassGroup> getClassGroups(VClassGroupDao grpDao, SolrDocumentList docs, int maxHitCount) {        
-        LinkedHashMap<String,VClassGroup> grpMap = grpDao.getClassGroupMap();
-        int n = grpMap.size();
+    private List<VClassGroupSearchLink> getClassGroupsLinks(VClassGroupDao grpDao, SolrDocumentList docs, QueryResponse rsp, String qtxt) {                                 
+        Map<String,Long> cgURItoCount = new HashMap<String,Long>();
         
-        HashSet<String> classGroupsInHits = new HashSet<String>(n);
-        int grpsFound = 0;
+        List<VClassGroup> classgroups = new ArrayList<VClassGroup>( );
+        List<FacetField> ffs = rsp.getFacetFields();
+        for(FacetField ff : ffs){
+            if(VitroSearchTermNames.CLASSGROUP_URI.equals(ff.getName())){
+                List<Count> counts = ff.getValues();
+                for( Count ct: counts){                    
+                    VClassGroup vcg = grpDao.getGroupByURI( ct.getName() );
+                    if( vcg == null ){
+                        log.debug("could not get classgroup for URI " + ct.getName());
+                    }else{
+                        classgroups.add(vcg);
+                        cgURItoCount.put(vcg.getURI(),  ct.getCount());
+                    }                    
+                }                
+            }            
+        }
         
-        long maxHits = Math.min(docs.getNumFound(), maxHitCount);
-        for(int i = 0; i < maxHits && n > grpsFound ;i++){
-            try{
-                SolrDocument doc = docs.get(i);        
-                Collection<Object> grps = doc.getFieldValues(VitroSearchTermNames.CLASSGROUP_URI);     
-                if (grps != null) {
-                    for (Object o : grps) {                            
-                        String groupUri = o.toString();
-                        if( groupUri != null && !classGroupsInHits.contains(groupUri)){
-                            classGroupsInHits.add(groupUri);
-                            grpsFound++;
-                            if( grpsFound >= n )
-                                break;
-                        }                        
-                    }
-                }
-            } catch(Exception e) {
-                log.error("problem getting VClassGroups from search hits " 
-                        + e.getMessage() );
-                e.printStackTrace();
-            }
-        }            
-        
-        List<String> classgroupURIs= Collections.list(Collections.enumeration(classGroupsInHits));        
-        List<VClassGroup> classgroups = new ArrayList<VClassGroup>( classgroupURIs.size() );
-        for(String cgUri: classgroupURIs){
-            if( cgUri != null && ! "".equals(cgUri) ){
-                VClassGroup vcg = grpDao.getGroupByURI( cgUri );
-                if( vcg == null ){
-                    log.debug("could not get classgroup for URI " + cgUri);
-                }else{
-                    classgroups.add(vcg);
-                }
-            }          
-        }        
         grpDao.sortGroupList(classgroups);     
-                
-        return classgroups;
+        
+        List<VClassGroupSearchLink> classGroupLinks = new ArrayList<VClassGroupSearchLink>(classgroups.size());
+        for (VClassGroup vcg : classgroups) {
+            long count = cgURItoCount.get( vcg.getURI() );
+            if (vcg.getPublicName() != null && count > 0 )  {
+                classGroupLinks.add(new VClassGroupSearchLink(qtxt, vcg, count));
+            }
+        }
+        return classGroupLinks;
     }
 
-    private List<VClass> getVClasses(VClassDao vclassDao, SolrDocumentList docs){        
+    private List<VClassSearchLink> getVClassLinks(VClassDao vclassDao, SolrDocumentList docs, QueryResponse rsp, String qtxt){        
         HashSet<String> typesInHits = getVClassUrisForHits(docs);                                
         List<VClass> classes = new ArrayList<VClass>(typesInHits.size());
+        Map<String,Long> typeURItoCount = new HashMap<String,Long>();
         
-        Iterator<String> it = typesInHits.iterator();
-        while(it.hasNext()){
-            String typeUri = it.next();
-            try{
-                if( VitroVocabulary.OWL_THING.equals(typeUri))
-                    continue;
-                VClass type = vclassDao.getVClassByURI(typeUri);
-                if( type != null &&
-                    ! type.isAnonymous() &&
-                      type.getName() != null && !"".equals(type.getName()) &&
-                      type.getGroupURI() != null ) //don't display classes that aren't in classgroups                      
-                    classes.add(type);
-            }catch(Exception ex){
-                if( log.isDebugEnabled() )
-                    log.debug("could not add type " + typeUri, ex);
-            }                        
+//        Iterator<String> it = typesInHits.iterator();
+//        while(it.hasNext()){
+//            String typeUri = it.next();
+//            try{
+//                if( VitroVocabulary.OWL_THING.equals(typeUri))
+//                    continue;
+//                VClass type = vclassDao.getVClassByURI(typeUri);
+//                if( type != null &&
+//                    ! type.isAnonymous() &&
+//                      type.getName() != null && !"".equals(type.getName()) &&
+//                      type.getGroupURI() != null ) //don't display classes that aren't in classgroups                      
+//                    classes.add(type);
+//            }catch(Exception ex){
+//                if( log.isDebugEnabled() )
+//                    log.debug("could not add type " + typeUri, ex);
+//            }                        
+//        }
+        
+        List<FacetField> ffs = rsp.getFacetFields();
+        for(FacetField ff : ffs){
+            if(VitroSearchTermNames.RDFTYPE.equals(ff.getName())){
+                List<Count> counts = ff.getValues();
+                for( Count ct: counts){  
+                    String typeUri = ct.getName();
+                    long count = ct.getCount();
+                    try{                                                   
+                        if( VitroVocabulary.OWL_THING.equals(typeUri) ||
+                            count == 0 )
+                            continue;
+                        VClass type = vclassDao.getVClassByURI(typeUri);
+                        if( type != null &&
+                            ! type.isAnonymous() &&
+                              type.getName() != null && !"".equals(type.getName()) &&
+                              type.getGroupURI() != null ){ //don't display classes that aren't in classgroups                                   
+                            typeURItoCount.put(typeUri,count);
+                            classes.add(type);
+                        }
+                    }catch(Exception ex){
+                        if( log.isDebugEnabled() )
+                            log.debug("could not add type " + typeUri, ex);
+                    }                                                
+                }                
+            }            
         }
+        
+        
         Collections.sort(classes, new Comparator<VClass>(){
             public int compare(VClass o1, VClass o2) {                
                 return o1.compareTo(o2);
             }});
-        return classes;
+        
+        List<VClassSearchLink> vClassLinks = new ArrayList<VClassSearchLink>(classes.size());
+        for (VClass vc : classes) {                        
+            long count = typeURItoCount.get(vc.getURI());
+            vClassLinks.add(new VClassSearchLink(qtxt, vc, count ));
+        }
+        
+        return vClassLinks;
     }       
         
     private HashSet<String> getVClassUrisForHits(SolrDocumentList docs){
@@ -455,51 +445,68 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         return text.toString();
     }       
 
-    private SolrQuery getQuery(String queryText, int maxHitCount, VitroRequest vreq) {
+    private SolrQuery getQuery(String queryText, int hitsPerPage, int startIndex, VitroRequest vreq) {
         SolrQuery query = new SolrQuery(queryText);
         
-        // Solr requires these values, but we don't want them to be the real values for this page
-        // of results, else the refinement links won't work correctly: each page of results needs to
-        // show refinement links generated for all results, not just for the results on the current page.
-        query.setStart(0)
-             .setRows(maxHitCount);
+        query.setStart( startIndex )
+             .setRows(hitsPerPage);
 
-        // Classgroup filtering
+        // ClassGroup filtering param
         String classgroupParam = (String) vreq.getParameter(PARAM_CLASSGROUP);
-        if ( ! StringUtils.isBlank(classgroupParam) ) {           
+        
+        // rdf:type filtering param
+        String typeParam = (String) vreq.getParameter(PARAM_RDFTYPE);
+        
+        if ( ! StringUtils.isBlank(classgroupParam) ) {
+            // ClassGroup filtering
             log.debug("Firing classgroup query ");
             log.debug("request.getParameter(classgroup) is "+ classgroupParam);
             query.addFilterQuery(VitroSearchTermNames.CLASSGROUP_URI + ":\"" + classgroupParam + "\"");
-        }
-
-        // rdf:type filtering
-        String typeParam = (String) vreq.getParameter(PARAM_RDFTYPE);
-        if (  ! StringUtils.isBlank(typeParam) ) {                         
+            
+            //with ClassGroup filtering we want type facets
+            query.add("facet","true");
+            query.add("facet.limit","-1");
+            query.add("facet.field",VitroSearchTermNames.RDFTYPE);
+            
+        }else if (  ! StringUtils.isBlank(typeParam) ) {
+            // rdf:type filtering
             log.debug("Firing type query ");
             log.debug("request.getParameter(type) is "+ typeParam);   
             query.addFilterQuery(VitroSearchTermNames.RDFTYPE + ":\"" + typeParam + "\"");
-        }
-                
-        //query.setQuery(queryText);
+            
+            //with type filtering we don't have facets.            
+        }else{ 
+            //When no filtering is set, we want ClassGroup facets
+            query.add("facet","true");
+            query.add("facet.limit","-1");
+            query.add("facet.field",VitroSearchTermNames.CLASSGROUP_URI);        
+        }                        
+        
         log.debug("Query = " + query.toString());
         return query;
-    }
-
-    private class VClassGroupSearchLink extends LinkTemplateModel {
-        
-        VClassGroupSearchLink(String querytext, VClassGroup classgroup) {
+    }   
+    
+    protected class VClassGroupSearchLink extends LinkTemplateModel {        
+        long count = 0;
+        VClassGroupSearchLink(String querytext, VClassGroup classgroup, long count) {
             super(classgroup.getPublicName(), "/search", PARAM_QUERY_TEXT, querytext, PARAM_CLASSGROUP, classgroup.getURI());
+            this.count = count;
         }
-    }
-    
-    private class VClassSearchLink extends LinkTemplateModel {
         
-        VClassSearchLink(String querytext, VClass type) {
-            super(type.getName(), "/search", PARAM_QUERY_TEXT, querytext, PARAM_RDFTYPE, type.getURI());
-        }
+        public String getCount() { return Long.toString(count); }
     }
     
-    private List<PagingLink> getPagingLinks(int startIndex, int hitsPerPage, long hitCount, int maxHitCount, String baseUrl, ParamMap params) {
+    protected class VClassSearchLink extends LinkTemplateModel {
+        long count = 0;
+        VClassSearchLink(String querytext, VClass type, long count) {
+            super(type.getName(), "/search", PARAM_QUERY_TEXT, querytext, PARAM_RDFTYPE, type.getURI());
+            this.count = count;
+        }
+        
+        public String getCount() { return Long.toString(count); }               
+    }
+    
+    protected static List<PagingLink> getPagingLinks(int startIndex, int hitsPerPage, long hitCount, String baseUrl, ParamMap params) {
 
         List<PagingLink> pagingLinks = new ArrayList<PagingLink>();
         
@@ -508,17 +515,23 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             return pagingLinks;
         }
         
+        int maxHitCount = DEFAULT_MAX_HIT_COUNT ;
+        if( startIndex >= DEFAULT_MAX_HIT_COUNT  - hitsPerPage )
+            maxHitCount = startIndex + DEFAULT_MAX_HIT_COUNT ;                
+            
         for (int i = 0; i < hitCount; i += hitsPerPage) {
             params.put(PARAM_START_INDEX, String.valueOf(i));
             if ( i < maxHitCount - hitsPerPage) {
                 int pageNumber = i/hitsPerPage + 1;
-                if (i >= startIndex && i < (startIndex + hitsPerPage)) {
+                boolean iIsCurrentPage = (i >= startIndex && i < (startIndex + hitsPerPage)); 
+                if ( iIsCurrentPage ) {
                     pagingLinks.add(new PagingLink(pageNumber));
                 } else {
                     pagingLinks.add(new PagingLink(pageNumber, baseUrl, params));
                 }
             } else {
                 pagingLinks.add(new PagingLink("more...", baseUrl, params));
+                break;
             }
         }   
         
@@ -535,7 +548,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         return UrlBuilder.getUrl(baseUrl, params);
     }
     
-    private class PagingLink extends LinkTemplateModel {
+    protected static class PagingLink extends LinkTemplateModel {
         
         PagingLink(int pageNumber, String baseUrl, ParamMap params) {
             super(String.valueOf(pageNumber), baseUrl, params);

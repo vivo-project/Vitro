@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.File;
 import java.sql.SQLException;
@@ -15,6 +16,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.graph.Graph;
+import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -57,6 +59,12 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     //these files are loaded everytime the system starts up
     public static String APPPATH_LOAD = APPPATH + "menuload/";
     protected static String SUBMODELS = "/WEB-INF/submodels/";
+    
+    //All files in this directory will be reloaded every startup
+    //and attached as sub-models to the displayOntModel.
+    static final String DISPLAY_MODEL_LOAD_AT_STARTUP_DIR =
+        APPPATH + "loadedAtStartup";
+    
     protected static boolean firstStartup = false;
 
     String DB_USER =   "jenatest";                          // database user id
@@ -404,6 +412,39 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     	
 		return;
 		
+    }
+    
+    /**
+     * Read all the files in the directory as RDF files
+     * and return a model build from all RDF data found in those files.
+     * This will attempt to load formats supported by getRdfFormat().
+     */
+    public static OntModel getModelFromDir( File dir){
+        if( dir == null )
+            throw new IllegalStateException("Must pass a File to getModelFromDir()");
+        if( !dir.isDirectory() )
+            throw new IllegalStateException("Directory must be a File object for a directory");
+        if( !dir.canRead() )
+            throw new IllegalStateException("getModelFromDir(): Directory " +
+                    " must be readable, check premissions on " + dir.getAbsolutePath());
+        
+        OntModel model = ModelFactory.createOntologyModel();
+        for( File file : dir.listFiles()){
+            if( file.isFile() 
+                && file.canRead() 
+                && file.getName() != null ){
+                String format = getRdfFormat( file.getName() );
+                try{                   
+                    model.read( new FileInputStream(file), null, format);
+                }catch( Throwable th){
+                    log.warn("Could not load file " + 
+                            file.getAbsolutePath() + file.separator + file.getName() +
+                            " check that it contains valid " + format + " data.", 
+                            th);
+                }
+            }
+        }                                               
+        return model;
     }
     
     public static void setVitroJenaModelMaker(VitroJenaModelMaker vjmm, 
