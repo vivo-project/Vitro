@@ -354,44 +354,12 @@ public class GroupedPropertyList extends BaseTemplateModel {
         
         public int compare(Property p1, Property p2) {
             
-            // sort first by property group rank; if the same, then sort by property rank
-            final int MAX_GROUP_RANK=99;
-            
-            int p1GroupRank=MAX_GROUP_RANK;
-            try {
-                if (p1.getGroupURI()!=null) {
-                    PropertyGroup pg1 = pgDao.getGroupByURI(p1.getGroupURI());
-                    if (pg1!=null) {
-                        p1GroupRank=pg1.getDisplayRank();
-                    }
-                }
-            } catch (Exception ex) {
-                log.error("Cannot retrieve p1GroupRank for group "+p1.getLabel());
-            }
-            
-            int p2GroupRank=MAX_GROUP_RANK;
-            try {
-                if (p2.getGroupURI()!=null) {
-                    PropertyGroup pg2 = pgDao.getGroupByURI(p2.getGroupURI());
-                    if (pg2!=null) {
-                        p2GroupRank=pg2.getDisplayRank();
-                    }
-                }
-            } catch (Exception ex) {
-                log.error("Cannot retrieve p2GroupRank for group "+p2.getLabel());
-            }
-            
-            // int diff = pgDao.getGroupByURI(p1.getGroupURI()).getDisplayRank() - pgDao.getGroupByURI(p2.getGroupURI()).getDisplayRank();
-            int diff=p1GroupRank - p2GroupRank;
+            int diff = determineDisplayRank(p1) - determineDisplayRank(p2);
             if (diff==0) {
-                diff = determineDisplayRank(p1) - determineDisplayRank(p2);
-                if (diff==0) {
-                    return getLabel(p1).compareTo(getLabel(p2));
-                } else {
-                    return diff;
-                }
+                return getLabel(p1).compareTo(getLabel(p2));
+            } else {
+                return diff;
             }
-            return diff;
         }
         
         private int determineDisplayRank(Property p) {
@@ -400,7 +368,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
                 return dp.getDisplayTier();
             } else if (p instanceof ObjectProperty) {
                 ObjectProperty op = (ObjectProperty)p;
-                String tierStr = op.getDomainDisplayTier(); // no longer used: p.isSubjectSide() ? op.getDomainDisplayTier() : op.getRangeDisplayTier();
+                String tierStr = op.getDomainDisplayTier(); 
                 try {
                     return Integer.parseInt(tierStr);
                 } catch (NumberFormatException ex) {
