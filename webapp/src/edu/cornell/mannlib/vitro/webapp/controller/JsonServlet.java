@@ -54,6 +54,7 @@ public class JsonServlet extends VitroHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(JsonServlet.class);
     private static final int REPLY_SIZE = 256;
+    private static final int INDIVIDUALS_PER_PAGE = 30;
     
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -267,7 +268,7 @@ public class JsonServlet extends VitroHttpServlet {
         try {
 	         map = IndividualListController.getResultsForVClassIntersections(
 	                 vclassURIs, 
-	                 page, 
+	                 page, INDIVIDUALS_PER_PAGE,
 	                 alpha, 
 	                 vreq.getWebappDaoFactory().getIndividualDao(), 
 	                 context);  
