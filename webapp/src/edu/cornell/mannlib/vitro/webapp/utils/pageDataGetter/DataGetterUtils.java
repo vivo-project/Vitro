@@ -243,11 +243,8 @@ public class DataGetterUtils {
                     jo.put("imageUrl", ind.getImageUrl());
                     jo.put("profileUrl", UrlBuilder.getIndividualProfileUrl(ind, vreq));
                       
-                    jo.put("mostSpecificTypes", JsonServlet.getMostSpecificTypes(ind,fullWdf));
-                                          
-                    jo.put("preferredTitle", JsonServlet.getDataPropertyValue(ind, preferredTitleDp, fullWdf));
-                    jo.put("firstName", JsonServlet.getDataPropertyValue(ind, fNameDp, fullWdf));                     
-                    jo.put("lastName", JsonServlet.getDataPropertyValue(ind, lNameDp, fullWdf));
+                    jo.put("mostSpecificTypes", JsonServlet.getMostSpecificTypes(ind,fullWdf));                                          
+                    jo.put("preferredTitle", JsonServlet.getDataPropertyValue(ind, preferredTitleDp, fullWdf));                    
                       
                     jInds.put(jo);
                 }

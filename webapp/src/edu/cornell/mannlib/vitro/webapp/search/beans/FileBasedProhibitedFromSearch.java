@@ -8,6 +8,8 @@ import java.io.FileInputStream;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
+
 public class FileBasedProhibitedFromSearch extends ProhibitedFromSearch {
 
     /**
@@ -17,42 +19,12 @@ public class FileBasedProhibitedFromSearch extends ProhibitedFromSearch {
      * @param dir to find N3 files in.
      */
     public FileBasedProhibitedFromSearch(String uri, File dir){    
-        super( uri, getModelFromDir(dir));
+        super( uri, JenaDataSourceSetupBase.getModelFromDir(dir));
     }
     
     public FileBasedProhibitedFromSearch(String URI, OntModel model) {
         super(URI, model);
     }
 
-    protected static OntModel getModelFromDir( File dir){
-        if( dir == null )
-            throw new IllegalStateException("Must pass a File to FileBasedProhibitedFromSearch");
-        if( !dir.isDirectory() )
-            throw new IllegalStateException("Parameter dir to FileBasedProhibitedFromSearch " +
-                    "must be a File object for a directory");
-        if( !dir.canRead() )
-            throw new IllegalStateException("Parameter dir to FileBasedProhibitedFromSearch must " +
-                    "be a directory that is readable, check premissions on " + dir.getAbsolutePath());
-        
-        OntModel modelOnlyForPFS = ModelFactory.createOntologyModel();
-        for( File file : dir.listFiles()){
-            if( file.isFile() 
-                && file.canRead() 
-                && file.getName() != null 
-                && file.getName().endsWith(".n3")){
-                try{
-                    modelOnlyForPFS.read( new FileInputStream(file), null, "N3");
-                }catch( Throwable th){
-                    log.warn("could not load file " + 
-                            file.getAbsolutePath() + file.separator + file.getName(), th);
-                }
-            }
-        }
-        
-        if( modelOnlyForPFS.size() == 0 ){
-            log.warn("No class exclusion statements found.");
-        }                       
-        
-        return modelOnlyForPFS;
-    }
+    
 }
