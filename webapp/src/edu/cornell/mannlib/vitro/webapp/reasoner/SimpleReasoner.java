@@ -366,14 +366,19 @@ public class SimpleReasoner extends StatementListener {
 						if (parentClass.isAnon()) continue;
 						
 						Statement infStmt = ResourceFactory.createStatement(stmt.getSubject(), RDF.type, parentClass);
-						inferenceModel.enterCriticalSection(Lock.WRITE);
+						aboxModel.enterCriticalSection(Lock.READ);
 						try {
-							if (!inferenceModel.contains(infStmt) && !infStmt.equals(stmt) ) {
-							    //log.debug("Adding this inferred statement:  " + infStmt.toString() );
-								inferenceModel.add(infStmt);
+							inferenceModel.enterCriticalSection(Lock.WRITE);
+							try {
+								if (!inferenceModel.contains(infStmt) && !aboxModel.contains(infStmt))  {
+								    //log.debug("Adding this inferred statement:  " + infStmt.toString() );
+									inferenceModel.add(infStmt);
+							    }
+							} finally {
+								inferenceModel.leaveCriticalSection();
 							}
 						} finally {
-							inferenceModel.leaveCriticalSection();
+							aboxModel.leaveCriticalSection();
 						}	
 					}
 				} else {
@@ -435,13 +440,18 @@ public class SimpleReasoner extends StatementListener {
 					}
 					
 					Statement infStmt = ResourceFactory.createStatement(stmt.getSubject(), superProp, stmt.getObject());
-					inferenceModel.enterCriticalSection(Lock.WRITE);
+					aboxModel.enterCriticalSection(Lock.READ);
 					try {
-						if (!inferenceModel.contains(infStmt) && !infStmt.equals(stmt) ) {
-							inferenceModel.add(infStmt);
+						inferenceModel.enterCriticalSection(Lock.WRITE);
+						try {
+							if (!inferenceModel.contains(infStmt) && !aboxModel.contains(infStmt) ) {
+								inferenceModel.add(infStmt);
+							}
+						} finally {
+							inferenceModel.leaveCriticalSection();
 						}
 					} finally {
-						inferenceModel.leaveCriticalSection();
+						aboxModel.leaveCriticalSection();
 					}	
 				}
 			} else {
@@ -458,7 +468,6 @@ public class SimpleReasoner extends StatementListener {
 	 * that B is of that type.
 	 * 
 	 */
-	
 	public void removedABoxTypeAssertion(Statement stmt, Model inferenceModel) {
 				
 		tboxModel.enterCriticalSection(Lock.READ);
@@ -474,6 +483,20 @@ public class SimpleReasoner extends StatementListener {
 			    cls = tboxModel.getOntClass(stmt.getObject().asResource().getURI()); 
 			    
 				if (cls != null) {
+					if (entailedType(stmt.getSubject(),cls)) {
+						inferenceModel.enterCriticalSection(Lock.WRITE);
+						try {
+							//don't have to check aboxmodel here because this is the
+							//statement being removed.
+							if (!inferenceModel.contains(stmt)) {
+								inferenceModel.add(stmt);
+							}
+						} finally {
+							inferenceModel.leaveCriticalSection();
+						}	
+						
+						return;
+					} 
 					
 					List<OntClass> parents = null;
 					parents = (cls.listSuperClasses(false)).toList();		
@@ -652,14 +675,19 @@ public class SimpleReasoner extends StatementListener {
 		}
         for (Resource subject : subjectList) {
 			Statement infStmt = ResourceFactory.createStatement(subject, RDF.type, superClass);	
-			inferenceModel.enterCriticalSection(Lock.WRITE);		
+			
+			inferenceModel.enterCriticalSection(Lock.WRITE);
+			aboxModel.enterCriticalSection(Lock.READ);
             try {		
-			    if (!inferenceModel.contains(infStmt)) {
-				    inferenceModel.add(infStmt);
-				    setMostSpecificTypes(subject, inferenceModel, new HashSet<String>());
-		        }
+				if (!inferenceModel.contains(infStmt) ) {
+					if (!aboxModel.contains(infStmt)) {
+						inferenceModel.add(infStmt);
+					}
+					setMostSpecificTypes(infStmt.getSubject(), inferenceModel, new HashSet<String>());
+				} 
             } finally {
                 inferenceModel.leaveCriticalSection();
+                aboxModel.leaveCriticalSection();
             } 
         }
 	}
@@ -672,7 +700,6 @@ public class SimpleReasoner extends StatementListener {
 	 * of A (including A itself)
 	 */
 	public void removedSubClass(OntClass subClass, OntClass superClass, Model inferenceModel) {
-		log.debug("subClass = " + subClass.getURI() + ". superClass = " + superClass.getURI());
 		OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
 		unionModel.addSubModel(aboxModel);
 		unionModel.addSubModel(inferenceModel);
@@ -688,14 +715,16 @@ public class SimpleReasoner extends StatementListener {
             aboxModel.leaveCriticalSection();
         }
         for (Resource ind : subjectList) {
-			if (entailedType(ind,superClass)) continue;
+			if (entailedType(ind,superClass)) {
+				continue;
+			}
 			Statement infStmt = ResourceFactory.createStatement(ind, RDF.type, superClass);
 			inferenceModel.enterCriticalSection(Lock.WRITE);
 			try {
 			    if (inferenceModel.contains(infStmt)) {
 				    inferenceModel.remove(infStmt);
-				    setMostSpecificTypes(infStmt.getSubject(), inferenceModel, new HashSet<String>());
 			    } 
+			    setMostSpecificTypes(ind, inferenceModel, new HashSet<String>());
             } finally {
                 inferenceModel.leaveCriticalSection();
             }
@@ -708,8 +737,6 @@ public class SimpleReasoner extends StatementListener {
 	 * assert the same relationship for predicate A
 	 */
 	public void addedSubProperty(OntProperty subProp, OntProperty superProp, Model inferenceModel) {
-		
-		log.debug("subProperty = " + subProp.getURI() + " superProperty = " + subProp.getURI());
 		
 		if ( !((subProp.isObjectProperty() && superProp.isObjectProperty()) || (subProp.isDatatypeProperty() && superProp.isDatatypeProperty())) ) {
 		   log.warn("sub-property and super-property do not have the same type. No inferencing will be performed. sub-property: " + subProp.getURI() + " super-property:" + superProp.getURI());
@@ -801,7 +828,7 @@ public class SimpleReasoner extends StatementListener {
 		inferenceModel.enterCriticalSection(Lock.WRITE);
 		aboxModel.enterCriticalSection(Lock.READ);
 		tboxModel.enterCriticalSection(Lock.READ);
-				
+		
 		try {
 			OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
 			unionModel.addSubModel(aboxModel);
