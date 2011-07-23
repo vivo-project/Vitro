@@ -1116,7 +1116,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	    classE.setLabel("class E", "en-US");
 
 	    OntClass classF = tBox.createClass("http://test.vivo/F");
-	    classE.setLabel("class F", "en-US");
+	    classF.setLabel("class F", "en-US");
 
 	    OntClass classG = tBox.createClass("http://test.vivo/G");
 	    classE.setLabel("class G", "en-US");
