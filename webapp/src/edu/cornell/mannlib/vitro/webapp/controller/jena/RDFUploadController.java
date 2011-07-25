@@ -133,6 +133,12 @@ public class RDFUploadController extends BaseEditController {
 		        }
 		    }
 		}
+
+        if (!directRead) {
+           if (!uploadModel.getDocumentManager().getProcessImports()) {
+               uploadModel.loadImports();
+           }
+        }
 		
 		/* ********** Do the model changes *********** */
 		if( !directRead && uploadModel != null ){

@@ -117,7 +117,9 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	this.datasetMode = datasetMode;
     	this.dwf = datasetWrapperFactory;
     	
-    	if (skipInitialization) {
+        // TODO revisit.  Skipping initialization no longer
+        // buys us anything when we call noTriplesFor()
+    	if (false && skipInitialization) {
             OntModel ontModel = ModelFactory.createOntologyModel(
                     OntModelSpec.OWL_MEM);
             this.ind = ontModel.createOntResource(individualURI);  

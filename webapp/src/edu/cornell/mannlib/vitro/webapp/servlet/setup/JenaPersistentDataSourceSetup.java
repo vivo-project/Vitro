@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 
+import com.hp.hpl.jena.ontology.OntDocumentManager;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -37,6 +38,8 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
 	    if (AbortStartup.isStartupAborted(ctx)) {
             return;
         }
+
+        OntDocumentManager.getInstance().setProcessImports(false);
         
         // user accounts Model
         try {
