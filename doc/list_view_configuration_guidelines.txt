@@ -5,8 +5,10 @@ List view configuration guidelines
 REGISTERING THE LIST VIEW
 -------------------------
 
-A custom list view is associated with an object property in the RDF files in the directory /vivo/productMods/WEB-INF/ontologies/app/loadedAtStartup 
-To register a list view, create a new .rdf or .n3 file in that directory.  The file must be well formed RDF/XML or N3.
+A custom list view is associated with an object property in the RDF files in
+the directory /vivo/productMods/WEB-INF/ontologies/app/loadedAtStartup. 
+To register a list view, create a new .rdf or .n3 file in that directory.  
+The file must be well formed RDF/XML or N3.
  
 Example of registering a new association in a file named newListViews.n3:
 
@@ -14,7 +16,8 @@ Example of registering a new association in a file named newListViews.n3:
     <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#listViewConfigFile>
     "listViewConfig-authorInAuthorship.xml" .
 
-Place this file in /vivo/productMods/WEB-INF/ontologies/app/loadedAtStartup, redeploy and restart tomcat to put the new custom list view in effect.     
+Place this file in /vivo/productMods/WEB-INF/ontologies/app/loadedAtStartup, 
+redeploy and restart tomcat to put the new custom list view in effect.     
 
 -----------------
 REQUIRED ELEMENTS
