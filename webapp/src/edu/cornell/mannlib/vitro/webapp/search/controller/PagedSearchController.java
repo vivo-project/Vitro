@@ -488,7 +488,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         return query;
     }   
     
-    protected class VClassGroupSearchLink extends LinkTemplateModel {        
+    public class VClassGroupSearchLink extends LinkTemplateModel {        
         long count = 0;
         VClassGroupSearchLink(String querytext, VClassGroup classgroup, long count) {
             super(classgroup.getPublicName(), "/search", PARAM_QUERY_TEXT, querytext, PARAM_CLASSGROUP, classgroup.getURI());
@@ -498,7 +498,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         public String getCount() { return Long.toString(count); }
     }
     
-    protected class VClassSearchLink extends LinkTemplateModel {
+    public class VClassSearchLink extends LinkTemplateModel {
         long count = 0;
         VClassSearchLink(String querytext, VClass type, long count) {
             super(type.getName(), "/search", PARAM_QUERY_TEXT, querytext, PARAM_RDFTYPE, type.getURI());
