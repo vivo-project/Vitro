@@ -254,7 +254,6 @@ public class GroupedPropertyList extends BaseTemplateModel {
             log.warn("groupList has no groups on entering addPropertiesToGroups(); will create a new group");
             PropertyGroup dummyGroup = pgDao.createDummyPropertyGroup(null, 1);
             dummyGroup.getPropertyList().addAll(propertyList);
-            sortGroupPropertyList(dummyGroup.getName(), propertyList);
             groupList.add(dummyGroup);
             return groupList;            
         } 
@@ -303,44 +302,46 @@ public class GroupedPropertyList extends BaseTemplateModel {
     private void populateGroupListWithProperties(List<PropertyGroup> groupList, 
             PropertyGroup groupForUnassignedProperties, List<Property> propertyList) {
         
-        // Assign the properties to the groups
+        // Clear out the property lists on the groups
         for (PropertyGroup pg : groupList) {
-             if (pg.getPropertyList().size()>0) {
-                 pg.getPropertyList().clear();
-             }
-             for (Property p : propertyList) {
-                 if (p.getURI() == null) {
-                     log.error("Property p has null URI in populateGroupsListWithProperties()");
-                 // If the property is not assigned to any group, add it to the group for unassigned properties
-                 } else if (p.getGroupURI()==null) {
-                     if (groupForUnassignedProperties!=null) { 
-                         if (!alreadyOnPropertyList(groupForUnassignedProperties.getPropertyList(),p)) {                          
-                             groupForUnassignedProperties.getPropertyList().add(p);
-                             log.debug("adding property " + getLabel(p) + " to group for unassigned properties");                            
-                         }
-                     } 
-                 // Otherwise, if the property is assigned to this group, add it to the group if it's not already there
-                 } else if (p.getGroupURI().equals(pg.getURI())) {
-                     if (!alreadyOnPropertyList(pg.getPropertyList(),p)) {
-                         pg.getPropertyList().add(p);
-                     }
-                 }
-             }
-             sortGroupPropertyList(pg.getName(), pg.getPropertyList());
+            if (pg.getPropertyList().size()>0) {
+                pg.getPropertyList().clear();
+            }                        
         }
-    }
-    
-    private void sortGroupPropertyList(String groupName, List<Property> propertyList) {
-        if (propertyList.size()>1) {
-            try {
-                Collections.sort(propertyList,new Property.DisplayComparatorIgnoringPropertyGroup());
-            } catch (Exception ex) {
-                log.error("Exception sorting property group "+ groupName + " property list: "+ex.getMessage());
-            }
-        }       
+        
+        // Assign the properties to the groups
+        for (Property p : propertyList) {
+            if (p.getURI() == null) {
+                log.error("Property p has null URI in populateGroupListWithProperties()");
+            // If the property is not assigned to any group, add it to the group for unassigned properties
+            } else {
+                String groupUriForProperty = p.getGroupURI();                
+                boolean assignedToGroup = false;
+  
+                if (groupUriForProperty != null) {
+                    for (PropertyGroup pg : groupList) {
+                         String groupUri = pg.getURI();
+                         if (groupUriForProperty.equals(groupUri)) {
+                             pg.getPropertyList().add(p);
+                             assignedToGroup = true;
+                             break;
+                         }
+                    }
+                }
+                
+                // Either the property is not assigned to a group, or it is assigned to a group
+                // not in the list (i.e., a non-existent group).
+                if (! assignedToGroup) {
+                    if (groupForUnassignedProperties!=null) {                          
+                        groupForUnassignedProperties.getPropertyList().add(p);
+                        log.debug("adding property " + getLabel(p) + " to group for unassigned properties");                            
+                    }                        
+                }
+             } 
+         }
     }
 
-    private class PropertyRanker implements Comparator {
+    private class PropertyRanker implements Comparator<Property> {
     
         WebappDaoFactory wdf;
         PropertyGroupDao pgDao;
@@ -350,48 +351,14 @@ public class GroupedPropertyList extends BaseTemplateModel {
             this.pgDao = wdf.getPropertyGroupDao();
         }
         
-        public int compare (Object o1, Object o2) {
-            Property p1 = (Property) o1;
-            Property p2 = (Property) o2;
+        public int compare(Property p1, Property p2) {
             
-            // sort first by property group rank; if the same, then sort by property rank
-            final int MAX_GROUP_RANK=99;
-            
-            int p1GroupRank=MAX_GROUP_RANK;
-            try {
-                if (p1.getGroupURI()!=null) {
-                    PropertyGroup pg1 = pgDao.getGroupByURI(p1.getGroupURI());
-                    if (pg1!=null) {
-                        p1GroupRank=pg1.getDisplayRank();
-                    }
-                }
-            } catch (Exception ex) {
-                log.error("Cannot retrieve p1GroupRank for group "+p1.getLabel());
-            }
-            
-            int p2GroupRank=MAX_GROUP_RANK;
-            try {
-                if (p2.getGroupURI()!=null) {
-                    PropertyGroup pg2 = pgDao.getGroupByURI(p2.getGroupURI());
-                    if (pg2!=null) {
-                        p2GroupRank=pg2.getDisplayRank();
-                    }
-                }
-            } catch (Exception ex) {
-                log.error("Cannot retrieve p2GroupRank for group "+p2.getLabel());
-            }
-            
-            // int diff = pgDao.getGroupByURI(p1.getGroupURI()).getDisplayRank() - pgDao.getGroupByURI(p2.getGroupURI()).getDisplayRank();
-            int diff=p1GroupRank - p2GroupRank;
+            int diff = determineDisplayRank(p1) - determineDisplayRank(p2);
             if (diff==0) {
-                diff = determineDisplayRank(p1) - determineDisplayRank(p2);
-                if (diff==0) {
-                    return getLabel(p1).compareTo(getLabel(p2));
-                } else {
-                    return diff;
-                }
+                return getLabel(p1).compareTo(getLabel(p2));
+            } else {
+                return diff;
             }
-            return diff;
         }
         
         private int determineDisplayRank(Property p) {
@@ -400,7 +367,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
                 return dp.getDisplayTier();
             } else if (p instanceof ObjectProperty) {
                 ObjectProperty op = (ObjectProperty)p;
-                String tierStr = op.getDomainDisplayTier(); // no longer used: p.isSubjectSide() ? op.getDomainDisplayTier() : op.getRangeDisplayTier();
+                String tierStr = op.getDomainDisplayTier(); 
                 try {
                     return Integer.parseInt(tierStr);
                 } catch (NumberFormatException ex) {
