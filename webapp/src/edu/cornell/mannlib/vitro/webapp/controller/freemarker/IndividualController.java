@@ -60,7 +60,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.jena.ExtendedLinkedDataUtils;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividual;
-import freemarker.ext.beans.BeansWrapper;
+import freemarker.ext.beans.ReadOnlyBeansWrapper;
 
 /**
  * Handles requests for entity information.
@@ -140,11 +140,14 @@ public class IndividualController extends FreemarkerHttpServlet {
     		 * This is still safe, because we are only putting BaseTemplateModel objects
     		 * into the data model: no real data can be modified. 
     		 */
-	        body.put("individual", wrap(itm, BeansWrapper.EXPOSE_SAFE));
+	        //body.put("individual", wrap(itm, BeansWrapper.EXPOSE_SAFE));
+    		body.put("individual", wrap(itm, new ReadOnlyBeansWrapper()));
+    		
 	        body.put("headContent", getRdfLinkTag(itm));	       
 	        
 	        //If special values required for individuals like menu, include values in template values
-	        this.includeSpecialEditingValues(vreq, body);
+	        body.putAll(getSpecialEditingValues(vreq));
+	        
 	        String template = getIndividualTemplate(individual, vreq);
 	                
 	        return new TemplateResponseValues(template, body);
@@ -214,10 +217,15 @@ public class IndividualController extends FreemarkerHttpServlet {
     }
     
     //Get special values for cases such as Menu Management editing
-    private void includeSpecialEditingValues(VitroRequest vreq, Map<String, Object> body) {
+    private Map<String, Object> getSpecialEditingValues(VitroRequest vreq) {
+        
+        Map<String, Object> map = new HashMap<String, Object>();
+        
     	if(vreq.getAttribute(VitroRequest.SPECIAL_WRITE_MODEL) != null) {
-    		body.put("reorderUrl", vreq.getContextPath() + DisplayVocabulary.REORDER_MENU_URL);
+    		map.put("reorderUrl", UrlBuilder.getUrl(DisplayVocabulary.REORDER_MENU_URL));
     	}
+    	
+    	return map;
     }
     
     private Map<String, Object> getRelatedSubject(VitroRequest vreq) {

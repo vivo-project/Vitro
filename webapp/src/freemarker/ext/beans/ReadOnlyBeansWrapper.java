@@ -27,11 +27,13 @@ public class ReadOnlyBeansWrapper extends BeansWrapper {
     @Override
     protected void finetuneMethodAppearance(Class cls, Method method, MethodAppearanceDecision decision) {
         
-        if ( method.getName().startsWith("set") ||
-                method.getReturnType() == null ) {
+        // How to define a setter? This is an approximation: a method whose name
+        // starts with "set" or returns void.
+        if ( method.getName().startsWith("set") ) {
             decision.setExposeMethodAs(null);
-        }
-        
+        } else if ( method.getReturnType().getName().equals("void") ) {
+            decision.setExposeMethodAs(null);
+        }        
     }
     
 }

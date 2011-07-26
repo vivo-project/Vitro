@@ -276,7 +276,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
          * there are groups or not.
          */
         if (groupCount == 0) {
-            log.warn("groupList has no groups on entering addPropertiesToGroups(); will create a new group");
+            log.warn("groupList has no groups on entering addPropertiesToGroups(); creating a dummy group");
             PropertyGroup dummyGroup = pgDao.createDummyPropertyGroup(null, 1);
             dummyGroup.getPropertyList().addAll(propertyList);
             groupList.add(dummyGroup);
@@ -312,7 +312,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
             }
             groupCount -= removedCount;
         } catch (Exception ex) {
-            log.error("Exception on trying to prune groups list with properties: "
+            log.error("Exception on trying to prune unpopulated groups from group list: "
                     + ex.getMessage());
         }
 
