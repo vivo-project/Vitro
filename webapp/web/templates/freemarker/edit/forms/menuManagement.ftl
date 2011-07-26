@@ -65,8 +65,9 @@
         <section id="classesInSelectedGroup" name="classesInSelectedGroup" ${existingClassGroupStyle}>
             <#-- Select classes in a class group -->    
             <p id="selectClassesMessage" name="selectClassesMessage">Select content to display<span class="requiredHint"> *</span></p>
+            
             <#include "menuManagement--classIntersections.ftl">
-                
+            
             <ul id="selectedClasses" name="selectedClasses" role="menu">
                 <#--Adding a default class for "ALL" in case all classes selected-->
                 <li class="ui-state-default" role="menuitem">
