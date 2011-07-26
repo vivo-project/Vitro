@@ -158,12 +158,9 @@ public class OntologyDaoJena extends JenaBaseDao implements OntologyDao {
                 if (o == null) {
                     log.error("OntologyDaoJena.updateOntology() could not find ontology "+ontology.getURI()+" in Jena model");
                 } else {
-                    if (ontology.getName() != null && ontology.getName().length()>0) {
-                        o.setLabel(ontology.getName(), PREFERRED_LANGUAGES[0]);
-                    }
-                    if (ontology.getPrefix() != null && ontology.getPrefix().length()>0) {
-                        updatePropertyStringValue(o,ONTOLOGY_PREFIX_ANNOT,ontology.getPrefix(),ontModel);
-                    }
+                    updateRDFSLabel(o, ontology.getName());
+                    updatePropertyStringValue(o, ONTOLOGY_PREFIX_ANNOT, 
+                            ontology.getPrefix(), ontModel);
                 }
             } finally {
                 ontModel.leaveCriticalSection();
