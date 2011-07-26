@@ -415,6 +415,17 @@
     <servlet-name>HomePageController</servlet-name>
     <url-pattern>/home</url-pattern>
   </servlet-mapping>
+  
+    <servlet>
+    <servlet-name>PageController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.PageController</servlet-class>    
+  </servlet>
+  <!--  PageController lacks a servlet-mapping since it gets called by getNamedDispatcher 
+  <servlet-mapping>
+    <servlet-name>PageController</servlet-name>
+    <url-pattern>NONE</url-pattern>    
+  </servlet-mapping>
+  -->
         
   <servlet>
     <servlet-name>FreemarkerTestController</servlet-name>
