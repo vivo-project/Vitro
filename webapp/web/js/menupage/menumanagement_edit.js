@@ -5,7 +5,6 @@ var menuManagementEdit = {
         this.initObjects();
         this.bindEventListeners();
         this.toggleClassSelection();
-        //this.validateMenuItemForm();
     },
     initObjects: function() {
         this.defaultTemplateRadio = $('input.default-template');
@@ -17,7 +16,6 @@ var menuManagementEdit = {
         this.selectClassGroupDropdown = $('#selectClassGroup');
         this.classesForClassGroup = $('#classesInSelectedGroup');
         this.selectedGroupForPage = $('#selectedContentTypeValue');
-        // this.selectClassesMessage = $('#selectClassesMessage');
         this.allClassesSelectedCheckbox = $('#allSelected');
         this.displayInternalMessage = $('#internal-class label em');
     },
@@ -31,9 +29,6 @@ var menuManagementEdit = {
         this.selectClassGroupDropdown.change(function() {
             menuManagementEdit.chooseClassGroup();
         });
-        // this.allClassesSelectedCheckbox.change(function() {
-        //     menuManagementEdit.toggleClassSelection();
-        // });
         
         // Listeners for template field
         this.defaultTemplateRadio.click(function(){
@@ -56,39 +51,29 @@ var menuManagementEdit = {
          });
     },
     updateInternalClassMessage:function(classGroupName) { //User has changed content type 
-    	//Set content type within internal class message
-    	this.displayInternalMessage.filter(":first").html(classGroupName);
+        //Set content type within internal class message
+        this.displayInternalMessage.filter(":first").html(classGroupName);
     },
     showClassGroups: function() { //User has clicked change content type
-    	//Show the section with the class group dropdown
-    	this.selectContentType.removeClass("hidden");
-    	//Hide the "change content type" section which shows the selected class group
-    	this.existingContentType.addClass("hidden");
-    	//Hide the checkboxes for classes within the class group
+        //Show the section with the class group dropdown
+        this.selectContentType.removeClass("hidden");
+        //Hide the "change content type" section which shows the selected class group
+        this.existingContentType.addClass("hidden");
+        //Hide the checkboxes for classes within the class group
         this.classesForClassGroup.addClass("hidden");
     },
     hideClassGroups: function() { //User has selected class group/content type, page should show classes for class group and 'existing' type with change link
-    	//Hide the class group dropdown
-    	this.selectContentType.addClass("hidden");
-    	//Show the "change content type" section which shows the selected class group
-    	this.existingContentType.removeClass("hidden");
-    	//Show the classes in the class group
-    	this.classesForClassGroup.removeClass("hidden");
-    	
+        //Hide the class group dropdown
+        this.selectContentType.addClass("hidden");
+        //Show the "change content type" section which shows the selected class group
+        this.existingContentType.removeClass("hidden");
+        //Show the classes in the class group
+        this.classesForClassGroup.removeClass("hidden");
+        
     },
     toggleClassSelection: function() {
-        /*To do: please fix so selecting all selects all classes and deselecting
-         * any class will deselect all
-         */
-        /*
-        if(this.allClassesSelectedCheckbox.is(':checked')) {
-            $('#classInClassGroup').attr('checked', 'checked');
-        } else {
-            $('#classInClassGroup').removeAttr('checked');
-        }*/
         // Check/unckeck all classes for selection
         $('input:checkbox[name=allSelected]').click(function(){
-             // alert($('input:checkbox[name=classInClassGroup]'));
              if ( this.checked ) {
              // if checked, select all the checkboxes
              $('input:checkbox[name=classInClassGroup]').attr('checked','checked');
@@ -116,21 +101,22 @@ var menuManagementEdit = {
         }
           
         if ($("input:radio[name=selectedTemplate]:checked").val() == "custom") {
-        	if($("input[name=customTemplate]").val() == "") {
-        		validationError += "You must supply a template<br />"; 
-        	}
+            if ($("input[name=customTemplate]").val() == "") {
+                validationError += "You must supply a template<br />"; 
+            }
         }
         
         //if no class group selected, this is an error
         if ($("#selectClassGroup").val() =='-1'){
             validationError += "You must supply a content type<br />"; 
         } else {
-        	//class group has been selected, make sure there is at least one class selected
-        	var noClassesSelected = $("input[name='classInClassGroup']:checked").length;
-        	if(noClassesSelected == 0) {
-        		//at least one class should be selected
-        		validationError += "You must supply some content to display<br />";
-        	}
+            //class group has been selected, make sure there is at least one class selected
+            var allSelected = $('input[name="allSelected"]:checked').length;
+            var noClassesSelected = $("input[name='classInClassGroup']:checked").length;
+            if (allSelected == 0 && noClassesSelected == 0) {
+                //at least one class should be selected
+                validationError += "You must select the type of content to display<br />";
+            }
         }
       
        
