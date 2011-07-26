@@ -6,7 +6,7 @@
 
 <#assign hasElement = propertyGroups.pullProperty("${namespaces.display}hasElement")!>
 
-<#if hasElemental?has_content>
+<#if hasElement?has_content>
     <script type="text/javascript">
         var menuItemData = [];
     </script>
