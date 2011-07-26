@@ -578,6 +578,9 @@
 <field name="modType" type="ignored"/>
 <field name="JCLASS" type="ignored"/>
 
+<!-- field for storing locations of thumbnails -->
+<field name="THUMBNAIL_URL" type="string" indexed="false" stored="true"/>
+
 <!-- Copy nameLowercase to sortable field. -->
 <copyField source="nameLowercase" dest="nameLowercaseSingleValued" />
    

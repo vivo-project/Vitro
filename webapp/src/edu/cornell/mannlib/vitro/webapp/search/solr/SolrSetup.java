@@ -85,6 +85,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             modifiers.add(new CalculateParameters(dataset));
             modifiers.add(new ContextNodeFields(jenaOntModel));
             modifiers.add(new NameBoost());
+            modifiers.add(new ThumbnailImageURL(jenaOntModel));
             
             // setup probhibited froms earch based on N3 files in the
             // directory WEB-INF/ontologies/search
