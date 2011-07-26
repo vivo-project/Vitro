@@ -5,7 +5,8 @@
 <#-- some additional processing here which shows or hides the class group selection and classes based on initial action-->
 <#assign existingClassGroupStyle = " " />
 <#assign selectClassGroupStyle = 'class="hidden"' />
-<#if menuAction = "Add">
+<#-- Reveal the class group and hide the class selects if adding a new menu item or editing an existing menu item with an empty class group (no classes)-->
+<#if menuAction == "Add" || !classGroup?has_content>
     <#assign existingClassGroupStyle = 'class="hidden"' />
     <#assign selectClassGroupStyle = " " />
 </#if>
@@ -28,7 +29,7 @@
         <label for="pretty-url">Pretty URL<span class="requiredHint"> *</span></label> 
         <input type="text" name="prettyUrl" value="${prettyUrl}" role="input" />
         <p class="note">(Format: /<prettyURL> - ie. /people)</p>
-    
+        
         <p>Template<span class="requiredHint"> *</span></p>
         
         <input type="radio" class="default-template" name="selectedTemplate" value="default" <#if selectedTemplateType = "default">checked</#if> role="radio" />
@@ -38,17 +39,17 @@
         <label class="inline" for="custom"> Custom template</label>
         
         <section id="custom-template" <#if selectedTemplateType != 'custom'>class="hidden" </#if>role="region">
-            <input type="text" name="customTemplate" value="${customTemplate!}" size="30" role="input" /><span class="requiredHint"> *</span>
+            <input type="text" name="customTemplate" value="${customTemplate!}" size="40" role="input" /><span class="requiredHint"> *</span>
         </section>
         
-       <section id="existingContentType" name="existingContentType" ${existingClassGroupStyle} role="region">
-           <p>Selected content type for the associated page</p>
-           <p>
-               <span id="selectedContentTypeValue" name="selectedContentTypeValue">${associatedPage}</span>
-               <a href="#" id="changeContentType" name="changeContentType">Change content type</a>
-           </p>
-       </section>
-    
+        <section id="existingContentType" name="existingContentType" ${existingClassGroupStyle} role="region">
+            <p>Selected content type for the associated page</p>
+            <p>
+                <span id="selectedContentTypeValue" name="selectedContentTypeValue">${associatedPage}</span>
+                <a href="#" id="changeContentType" name="changeContentType">Change content type</a>
+            </p>
+        </section>
+        
         <#-- Select class group -->
         <section id="selectContentType" name="selectContentType" ${selectClassGroupStyle} role="region">     
            <label for="selectClassGroup">Select content type for the associated page<span class="requiredHint"> *</span></label>
@@ -59,9 +60,7 @@
                     <option value="${aClassGroup.URI}" <#if aClassGroup.URI = associatedPageURI>selected</#if> role="option">${aClassGroup.publicName}</option>
                </#list>
            </select>
-       </section> 
-       
-        
+        </section> 
         
         <section id="classesInSelectedGroup" name="classesInSelectedGroup" ${existingClassGroupStyle}>
             <#-- Select classes in a class group -->    
@@ -71,7 +70,7 @@
             <ul id="selectedClasses" name="selectedClasses" role="menu">
                 <#--Adding a default class for "ALL" in case all classes selected-->
                 <li class="ui-state-default" role="menuitem">
-                    <input type="checkbox" name="allSelected" id="allSelected" value="all" <#if isClassGroupPage = true || includeAllClasses = true>checked</#if> />
+                    <input type="checkbox" name="allSelected" id="allSelected" value="all" <#if !isIndividualsForClassesPage?has_content>checked</#if> />
                     <label class="inline" for="All"> All</label>
                 </li>
                 <#list classGroup as classInClassGroup>
