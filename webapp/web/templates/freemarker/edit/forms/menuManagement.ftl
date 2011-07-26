@@ -66,21 +66,7 @@
         <section id="classesInSelectedGroup" name="classesInSelectedGroup" ${existingClassGroupStyle}>
             <#-- Select classes in a class group -->    
             <p id="selectClassesMessage" name="selectClassesMessage">Select content to display<span class="requiredHint"> *</span></p>
-
-            <section id="internal-class" role="region">
-                <#if internalClass?has_content>
-                    <#assign enableInternalClass = '' />
-                    <#assign disableClass = 'class="inline"' />
-                <#else>
-                    <#assign enableInternalClass = '<p class="note">To enable this option, you must first select an <a href="${urls.base}/processInstitutionalInternalClass">institutional internal class</a> for your instance</p>' />
-                    <#assign disableClass = 'class="disable inline" disabled="disabled"' />
-                </#if>
-                
-                <input type="checkbox" ${disableClass} name="display-internalClass" value="${internalClassUri}" id="display-internalClass" <#if pageInternalOnly?has_content>checked</#if> role="input" />
-                <label ${disableClass} class="inline" for="display-internalClass">Only display <em>${associatedPage}</em> within my institution</label>
-                
-                ${enableInternalClass}
-            </section>
+			<#include "menuManagement--classIntersections.ftl">
                 
             <ul id="selectedClasses" name="selectedClasses" role="menu">
                 <#--Adding a default class for "ALL" in case all classes selected-->
