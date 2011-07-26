@@ -35,6 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForContextNodes;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForDataProperties;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForObjectProperties;
+import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForTypeStatements;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.SearchReindexingListener;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
@@ -111,6 +112,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             uriFinders.add( new AdditionalURIsForDataProperties() );
             uriFinders.add( new AdditionalURIsForObjectProperties(jenaOntModel) );
             uriFinders.add( new AdditionalURIsForContextNodes(jenaOntModel) );
+            uriFinders.add( new AdditionalURIsForTypeStatements() );
             
             IndexBuilder builder = new IndexBuilder( solrIndexer, wadf, uriFinders );
             // to the servlet context so we can access it later in the webapp.
