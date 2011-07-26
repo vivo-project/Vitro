@@ -29,6 +29,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -293,11 +294,15 @@ public class MenuManagementEdit extends VitroHttpServlet {
     	StmtIterator positions = displayModel.listStatements(null, DisplayVocabulary.MENU_POSITION, (RDFNode) null);
     	int maxPosition = 1;
     	while(positions.hasNext()) {
-    		int pos = positions.nextStatement().getInt();
+    		Statement s = positions.nextStatement();
+    		log.debug("Position statement is " + s);
+    		int pos = s.getInt();
+    		log.debug("position is " + pos);
     		if(pos > maxPosition) {
     			maxPosition = pos;
     		}
     	}
+    	log.debug("Maximum menu item position is " + maxPosition);
     	return  maxPosition;
     }
     
@@ -495,9 +500,11 @@ public class MenuManagementEdit extends VitroHttpServlet {
 				,ResourceFactory.createProperty(DisplayVocabulary.HAS_ELEMENT),
 				menuItemResource));
 		addModel.add(addModel.createStatement(menuItemResource, RDF.type, DisplayVocabulary.NAVIGATION_ELEMENT));
+		int newMenuPosition = getLastPosition(displayModel) + 1;
+		log.debug("new menu position is " + newMenuPosition);
 		addModel.add(addModel.createStatement(menuItemResource, 
 				DisplayVocabulary.MENU_POSITION, 
-				addModel.createTypedLiteral(getLastPosition(displayModel))));
+				addModel.createTypedLiteral(newMenuPosition)));
 		//page resource, type, title and url mapping, and what data getter associated
 		addModel.add(addModel.createStatement(pageResource, 
 				RDF.type, 
