@@ -15,7 +15,7 @@
         <#include "menu.ftl">
         
             <section id="intro" role="region">
-                <h2>What is VITRO?</h2>
+                <h2>What is Vitro?</h2>
                 
                 <p>Vitro is a general-purpose web-based ontology and instance editor with customizable public browsing. Vitro is a Java web application that runs in a Tomcat servlet container.</p>
                 <p>With Vitro, you can:</p>
