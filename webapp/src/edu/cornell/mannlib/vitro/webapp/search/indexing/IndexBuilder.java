@@ -204,7 +204,7 @@ public class IndexBuilder extends Thread {
     	
     	log.debug("Checking if the index is empty");
     	if(indexBuilder.indexer.isIndexEmpty()){
-    		log.info("Index is empty. Running a full index rebuild!");
+    		log.info("Search index is empty. Running a full index rebuild.");
     		indexBuilder.doIndexRebuild();
     	}
     }	
