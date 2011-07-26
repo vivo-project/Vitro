@@ -28,7 +28,7 @@
 
         <label for="pretty-url">Pretty URL<span class="requiredHint"> *</span></label> 
         <input type="text" name="prettyUrl" value="${prettyUrl}" role="input" />
-        <p class="note">(Format: /<prettyURL> - ie. /people)</p>
+        <p class="note">(Format: /<prettyURL> - e.g., /people)</p>
         
         <p>Template<span class="requiredHint"> *</span></p>
         
@@ -65,8 +65,9 @@
         <section id="classesInSelectedGroup" name="classesInSelectedGroup" ${existingClassGroupStyle}>
             <#-- Select classes in a class group -->    
             <p id="selectClassesMessage" name="selectClassesMessage">Select content to display<span class="requiredHint"> *</span></p>
-			<#include "menuManagement--classIntersections.ftl">
-                
+            
+            <#include "menuManagement--classIntersections.ftl">
+            
             <ul id="selectedClasses" name="selectedClasses" role="menu">
                 <#--Adding a default class for "ALL" in case all classes selected-->
                 <li class="ui-state-default" role="menuitem">
