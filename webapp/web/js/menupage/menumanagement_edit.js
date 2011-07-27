@@ -91,28 +91,32 @@ var menuManagementEdit = {
     validateMenuItemForm: function() {
         var validationError = "";
         
-        //Check menu name
-        if ($("input[type=text][name=menuName]").val() == ""){
+        // Check menu name
+        if ($('input[type=text][name=menuName]').val() == "") {
             validationError += "You must supply a name<br />";
             }
-        //Check pretty url     
-        if ($("input[type=text][name=prettyUrl]").val() == ""){
+        // Check pretty url     
+        if ($('input[type=text][name=prettyUrl]').val() == "") {
             validationError += "You must supply a pretty URL<br />";
         }
-          
-        if ($("input:radio[name=selectedTemplate]:checked").val() == "custom") {
-            if ($("input[name=customTemplate]").val() == "") {
+        if ($('input[type=text][name=prettyUrl]').val().charAt(0) != "/") {
+            validationError += "The pretty URL must begin with a leading forward slash<br />";
+        }
+        
+        // Check custom template
+        if ($('input:radio[name=selectedTemplate]:checked').val() == "custom") {
+            if ($('input[name=customTemplate]').val() == "") {
                 validationError += "You must supply a template<br />"; 
             }
         }
         
-        //if no class group selected, this is an error
-        if ($("#selectClassGroup").val() =='-1'){
+        // if no class group selected, this is an error
+        if ($('#selectClassGroup').val() =='-1') {
             validationError += "You must supply a content type<br />"; 
         } else {
             //class group has been selected, make sure there is at least one class selected
             var allSelected = $('input[name="allSelected"]:checked').length;
-            var noClassesSelected = $("input[name='classInClassGroup']:checked").length;
+            var noClassesSelected = $('input[name="classInClassGroup"]:checked').length;
             if (allSelected == 0 && noClassesSelected == 0) {
                 //at least one class should be selected
                 validationError += "You must select the type of content to display<br />";
