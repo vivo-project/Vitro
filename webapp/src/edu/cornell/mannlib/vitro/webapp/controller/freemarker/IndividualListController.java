@@ -319,14 +319,15 @@ public class IndividualListController extends FreemarkerHttpServlet {
             }     
             
             SolrQuery query = new SolrQuery(queryText);
-            
-            query.setStart( page > 0 ? pageSize * page + 1 : 0 )
-                 .setRows( pageSize );
+
+            //page count starts at 1, row count starts at 0
+            int startRow = (page-1) * pageSize ;            
+            query.setStart( startRow ).setRows( pageSize );
             
             // Need a single-valued field for sorting
             query.setSortField(VitroSearchTermNames.NAME_LOWERCASE_SINGLE_VALUED, SolrQuery.ORDER.asc);
 
-            log.debug("Query text is " + queryText);
+            log.debug("Query is " + query.toString());
             return query;
             
         } catch (Exception ex){
