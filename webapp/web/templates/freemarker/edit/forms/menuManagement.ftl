@@ -28,7 +28,7 @@
 
         <label for="pretty-url">Pretty URL<span class="requiredHint"> *</span></label> 
         <input type="text" name="prettyUrl" value="${prettyUrl}" role="input" />
-        <p class="note">(Format: /<prettyURL> - e.g., /people)</p>
+        <p class="note">Must begin with a leading forward slash: / (e.g., /people)</p>
         
         <p>Template<span class="requiredHint"> *</span></p>
         
