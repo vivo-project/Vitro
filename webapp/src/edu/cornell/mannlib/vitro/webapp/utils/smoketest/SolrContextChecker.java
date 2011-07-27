@@ -16,7 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
  * TODO: This is just an initial test implementation and will continue
  * to change.
  */
-public class SolrContextChecker implements SmokeTestsRunner {
+public class SolrContextChecker implements SmokeTest {
 
 	@Override
 	public TestResult test(VitroRequest vreq) {
@@ -36,6 +36,11 @@ public class SolrContextChecker implements SmokeTestsRunner {
 		}
 	
 		return testResult;
+	}
+	
+	@Override
+	public String getName(){
+		return SolrContextChecker.class.getName();
 	}
 
 }

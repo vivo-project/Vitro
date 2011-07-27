@@ -4,6 +4,10 @@
 <#-- TODO: This is an initial implementation and will continue to evolve. -->
 
 
-<#if SolrContextChecker??>
-	<h2>${SolrContextChecker.result}</h2>
+<#if results??>
+	<#list results as x>
+		<#if x??>
+			<h2>${x.result}</h2>
+		</#if>
+	</#list>
 </#if>

@@ -8,7 +8,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
  * Any class that wishes to output status to smoketest.ftl 
  * implements this interface.
  */
-public interface SmokeTestsRunner {
+public interface SmokeTest {
 	
 	public TestResult test(VitroRequest vreq);
+	
+	public String getName();
 }

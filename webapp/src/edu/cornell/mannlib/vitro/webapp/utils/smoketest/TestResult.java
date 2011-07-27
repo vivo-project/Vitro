@@ -11,11 +11,11 @@ package edu.cornell.mannlib.vitro.webapp.utils.smoketest;
 public class TestResult {
 	
 	private String result = "";
-	private boolean message = false;
+	private boolean success = false;
 	
 	public TestResult(String result, boolean message) {
 		this.result = result;
-		this.message = message;
+		this.success = message;
 	}
 	
 	public String getResult(){
@@ -23,7 +23,7 @@ public class TestResult {
 	}
 	
 	public boolean getMessage(){
-		return message;
+		return success;
 	}
 	
 
