@@ -581,6 +581,9 @@
 <!-- field for storing locations of thumbnails -->
 <field name="THUMBNAIL_URL" type="string" indexed="false" stored="true"/>
 
+<!-- field for source institution's name -->
+<field name="SITE_URL" type="string" indexed="true" stored="true"/>
+
 <!-- Copy nameLowercase to sortable field. -->
 <copyField source="nameLowercase" dest="nameLowercaseSingleValued" />
    

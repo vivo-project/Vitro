@@ -70,4 +70,7 @@ public class VitroSearchTermNames {
     
     /** download url location for thumbnail */
 	public static final String THUMBNAIL_URL = "THUMBNAIL_URL";
+	
+	/** source institution url */
+	public static final String SITE_URL = "SITE_URL";
 }
