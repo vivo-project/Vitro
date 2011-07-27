@@ -628,19 +628,38 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         this.dwf = base.dwf;
     }
     
-    //Method for using special model for webapp dao factory, such as display model
-    
+    /**
+     * Method for using special model for webapp dao factory, such as display model.  
+     * The goal here is to modify this WebappDaoFactory so that it is using the
+     * specialModel, specialTboxModel and the specialDisplayModel for individual 
+     * editing. 
+     * 
+     * DAOs related to the application configuration, user accounts, and namespaces
+     * should remain unchanged.
+     */    
     public void setSpecialDataModel(OntModel specialModel, OntModel specialTboxModel, OntModel specialDisplayModel) {
+        if( specialModel == null )
+            throw new IllegalStateException( "specialModel must not be null");
+        
     	//Can we get the "original" models here from somewhere?
     	OntModelSelector originalSelector = this.getOntModelSelector();
-    	//Set up model selector for the new webapp dao factory object with the input model
-    	//The selector is used by the object property dao, therefore should be set up even though we 
+    	
+    	//Set up model selector for this special WDF
+    	//The selector is used by the object property DAO, therefore should be set up even though we 
     	//use the new webapp dao factory object to generate portions to overwrite the regular webapp dao factory
+    	
+    	//The WDF expects the full model in the OntModelSelect that has 
+    	//both the ABox and TBox.  This is used to run SPARQL queries against.    	
+    	OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+        unionModel.addSubModel(specialModel);
+        
     	OntModelSelectorImpl specialSelector = new OntModelSelectorImpl();
-    	specialSelector.setFullModel(specialModel);
-    	specialSelector.setApplicationMetadataModel(specialModel);
+    	specialSelector.setFullModel(unionModel);
+    	specialSelector.setApplicationMetadataModel(specialModel);    	
+    	
     	if(specialDisplayModel != null) {
     		specialSelector.setDisplayModel(specialDisplayModel);
+    	    unionModel.addSubModel(specialDisplayModel);
     	} else {
     		OntModel selectorDisplayModel = originalSelector.getDisplayModel();
     		if(selectorDisplayModel != null) {
@@ -648,14 +667,15 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     		}
     	}
     	if(specialTboxModel != null) {
+    	    unionModel.addSubModel(specialTboxModel);
     		specialSelector.setTBoxModel(specialTboxModel);
     	} else {
     		OntModel selectorTboxModel = originalSelector.getTBoxModel();
     		if(selectorTboxModel != null) {
     			specialSelector.setTBoxModel(originalSelector.getTBoxModel());
     		}
-    	}
-    
+    	}    	    
+    	
     	specialSelector.setABoxModel(specialModel);
     	specialSelector.setUserAccountsModel(specialModel);
     	//although we're only use part of the new wadf and copy over below, the object property dao
@@ -675,6 +695,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     	dataPropertyStatementDao = specialWadfj.getDataPropertyStatementDao();
     	//Why can't we set the selector to be the same?
     	ontModelSelector = specialSelector;
+    	
     }
    
 }

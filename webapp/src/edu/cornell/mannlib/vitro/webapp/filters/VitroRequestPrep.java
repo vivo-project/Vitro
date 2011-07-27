@@ -137,17 +137,20 @@ public class VitroRequestPrep implements Filter {
         WebappDaoFactory wdf = getWebappDaoFactory(vreq);
         //TODO: get accept-language from request and set as preferred languages
         
+        // if there is a WebappDaoFactory in the session, use it
     	Object o = req.getSession().getAttribute("webappDaoFactory");
     	if (o instanceof WebappDaoFactory) {
     		wdf = (WebappDaoFactory) o;
     		log.debug("Found a WebappDaoFactory in the session and using it for this request");
     	}
-    	//This will replace the WebappDaoFactory with a different version if menu management parameter is found
+    	
+    	//replace the WebappDaoFactory with a different version if menu management parameter is found
     	wdf = checkForSpecialWDF(vreq, wdf);
     	
+    	//get any filters from the ContextFitlerFactory
         VitroFilters filters = getFiltersFromContextFilterFactory(req, wdf);
         if( filters != null ){
-            log.debug("Wrapping WebappDaoFactory in filters");
+            log.debug("Wrapping WebappDaoFactory in filters from ContextFitlerFactory");
             wdf = new WebappDaoFactoryFiltering(wdf, filters);
         }
                                
@@ -212,6 +215,9 @@ public class VitroRequestPrep implements Filter {
 	 * model and tbox if uris are passed.
 	 */
     private WebappDaoFactory checkForSpecialWDF(VitroRequest vreq, WebappDaoFactory inputWadf) {
+        //TODO: Does the dataset in the vreq get set when using a special WDF? Does it need to?
+        //TODO: Does the unfiltered WDF get set when using a special WDF? Does it need to?
+        
     	// If this isn't a Jena WADF, then there's nothing to be done.
     	if (!(inputWadf instanceof WebappDaoFactoryJena)) {
     		log.warn("Can't set special models: " +
@@ -295,12 +301,19 @@ public class VitroRequestPrep implements Filter {
 	}
 
 	/**
-	 * Create a copy of the WADF, and set the special models onto it. 
+	 * The goal here is to return a new WDF that is set to
+	 * have the mainOntModel as its ABox, the tboxOntModel as it
+	 * TBox and displayOntModel as it display model.
+	 * 
+	 * Right now this is achieved by creating a copy of 
+	 * the WADF, and setting the special models onto it.
+	 *  
 	 * If a model is null, it will have no effect.
 	 */
 	private WebappDaoFactory createNewWebappDaoFactory(
 			WebappDaoFactoryJena inputWadf, OntModel mainOntModel,
 			OntModel tboxOntModel, OntModel displayOntModel) {
+	    
 		WebappDaoFactoryJena wadfj = new WebappDaoFactoryJena(inputWadf);
 		wadfj.setSpecialDataModel(mainOntModel, tboxOntModel, displayOntModel);
 		return wadfj;
