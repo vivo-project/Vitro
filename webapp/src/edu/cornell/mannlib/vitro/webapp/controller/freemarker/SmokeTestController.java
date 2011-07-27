@@ -29,7 +29,7 @@ public class SmokeTestController extends FreemarkerHttpServlet {
 	
 	@Override
 	protected ResponseValues processRequest(VitroRequest vreq){
-		
+			    
 		SolrContextChecker solrContextChecker = new SolrContextChecker();
 		TestResult result = solrContextChecker.test(vreq);
 		
@@ -37,7 +37,25 @@ public class SmokeTestController extends FreemarkerHttpServlet {
         
         body.put("SolrContextChecker", result);
 		
-		
+        //Deepak,
+        //This controller will need to load a list of tests.
+        //The list should be in files in a directory.
+        //ex.
+        // vivo/WEB-INF/classes/resources/smokeTests/vitroTests.txt
+        // vivo/WEB-INF/classes/resources/smokeTests/vivoTests.txt
+        // vivo/WEB-INF/classes/resources/smokeTests/otherTests.txt
+		// 
+        // This controller should:
+        // 1) look for that directory,
+        // 2) get a list of all files in that directory
+        // 3) For each file:
+        // 4)   For each line in the file:
+        // 5)      Assume that the line has a fully qualified java class name
+        //         and name and make a new instance of that class.
+        //         If that class can be created and it is a SmokeTest, run
+        //         the test and save the results in a list.
+        // 6) put the result list in the template variable map
+        
 		return new TemplateResponseValues(TEMPLATE_NAME, body);
 	}
 }
