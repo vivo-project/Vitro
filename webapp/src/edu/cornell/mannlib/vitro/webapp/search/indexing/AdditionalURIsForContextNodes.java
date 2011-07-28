@@ -4,8 +4,10 @@ package edu.cornell.mannlib.vitro.webapp.search.indexing;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,40 +32,61 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
 public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
 
     private OntModel model;
-	private static final List<String> multiValuedQueriesForAgent = new ArrayList<String>();	
+	private Set<String> alreadyChecked;
+	private long accumulatedTime = 0;
+	
+    private static final List<String> multiValuedQueriesForAgent = new ArrayList<String>();	
 	private static final String multiValuedQueryForInformationResource;
 	private static final List<String> multiValuedQueriesForRole = new ArrayList<String>();
-	private static final List<String>queryList;
+	private static final List<String>queryList;	
 	
 	private Log log = LogFactory.getLog(AdditionalURIsForContextNodes.class);
     
     
     public AdditionalURIsForContextNodes( OntModel jenaOntModel){
-        this.model = jenaOntModel;
+        this.model = jenaOntModel; 
     }
     
     @Override
     public List<String> findAdditionalURIsToIndex(Statement stmt) {
                 
         if( stmt != null ){
+            long start = System.currentTimeMillis();
+            
             List<String>urisToIndex = new ArrayList<String>();
             if(stmt.getSubject() != null && stmt.getSubject().isURIResource() ){        
                 String subjUri = stmt.getSubject().getURI();
-                if( subjUri != null){
+                if( subjUri != null && ! alreadyChecked.contains( subjUri )){
                     urisToIndex.addAll( findAdditionalURIsToIndex(subjUri));
+                    alreadyChecked.add(subjUri);    
                 }
             }
             
             if( stmt.getObject() != null && stmt.getObject().isURIResource() ){
                 String objUri = stmt.getSubject().getURI();
-                if( objUri != null){
+                if( objUri != null && ! alreadyChecked.contains(objUri)){
                     urisToIndex.addAll( findAdditionalURIsToIndex(objUri));
+                    alreadyChecked.add(objUri);
                 }
             }
+            
+            accumulatedTime += (System.currentTimeMillis() - start ) ;
             return urisToIndex;
         }else{
             return Collections.emptyList();
         }                
+    }
+    
+    @Override
+    public void startIndexing() { 
+        alreadyChecked = new HashSet<String>();
+        accumulatedTime = 0L;
+    }
+
+    @Override
+    public void endIndxing() {
+        log.debug( "Accumulated time for this run of the index: " + accumulatedTime + " msec");
+        alreadyChecked = null;        
     }
     
     protected List<String> findAdditionalURIsToIndex(String uri) {    	        

@@ -26,4 +26,11 @@ public class AdditionalURIsForTypeStatements implements StatementToURIsToUpdate 
         }
     }
 
+    @Override
+    public void startIndexing() { /* nothing to prepare */ }
+
+    @Override
+    public void endIndxing() { /* nothing to do */ }
+
+    
 }

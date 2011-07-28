@@ -62,5 +62,10 @@ public class AdditionalURIsForClassGroupChanges implements
             return Collections.emptyList();
         }
     }
+    
+    @Override
+    public void startIndexing() { /* nothing to prepare */ }
 
+    @Override
+    public void endIndxing() { /* nothing to do */ }
 }

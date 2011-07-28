@@ -55,6 +55,12 @@ public class AdditionalURIsForObjectProperties implements StatementToURIsToUpdat
             return doObjectPropertyStmt( stmt );
     }
 
+    @Override
+    public void startIndexing() { /* nothing to prepare */ }
+
+    @Override
+    public void endIndxing() { /* nothing to do */ }
+    
     protected List<String> doObjectPropertyStmt(Statement stmt) {
         // Only need to consider the object since the subject 
         // will already be updated in search index as part of 
@@ -140,5 +146,7 @@ public class AdditionalURIsForObjectProperties implements StatementToURIsToUpdat
         "SELECT ?related WHERE { \n" +        
         "  ?uri ?p ?related  \n " +
         "  filter( isURI( ?related ) && ?p != rdf:type )  \n" +                
-        "}" ;     
+        "}" ;
+    
+    
 }
