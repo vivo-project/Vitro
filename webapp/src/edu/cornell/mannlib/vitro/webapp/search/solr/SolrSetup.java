@@ -108,15 +108,12 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             VitroFilters vf = VitroFilterUtils.getPublicFilter(context);
             wadf = new WebappDaoFactoryFiltering(wadf, vf);            
             
-          //make objects that will find additional URIs for context nodes etc
-            List<StatementToURIsToUpdate> uriFinders = new ArrayList<StatementToURIsToUpdate>();
-            uriFinders.add( new AdditionalURIsForDataProperties() );
-            uriFinders.add( new AdditionalURIsForObjectProperties(jenaOntModel) );
-            uriFinders.add( new AdditionalURIsForContextNodes(jenaOntModel) );
-            uriFinders.add( new AdditionalURIsForTypeStatements() );
+            // make objects that will find additional URIs for context nodes etc
+            List<StatementToURIsToUpdate> uriFinders = makeURIFinders(jenaOntModel);
             
+            // Make the IndexBuilder
             IndexBuilder builder = new IndexBuilder( solrIndexer, wadf, uriFinders );
-            // to the servlet context so we can access it later in the webapp.
+            // Save it to the servlet context so we can access it later in the webapp.
             context.setAttribute(IndexBuilder.class.getName(), builder);                        
             
             // set up listeners so search index builder is notified of changes to model
@@ -131,6 +128,19 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
        
     }
 
+    /**
+     * Make a list of StatementToURIsToUpdate objects for use by the
+     * IndexBuidler.
+     */
+    public List<StatementToURIsToUpdate> makeURIFinders( OntModel jenaOntModel ){
+        List<StatementToURIsToUpdate> uriFinders = new ArrayList<StatementToURIsToUpdate>();
+        uriFinders.add( new AdditionalURIsForDataProperties() );
+        uriFinders.add( new AdditionalURIsForObjectProperties(jenaOntModel) );
+        uriFinders.add( new AdditionalURIsForContextNodes(jenaOntModel) );
+        uriFinders.add( new AdditionalURIsForTypeStatements() );
+        return uriFinders;
+    }
+    
     
     @Override
     public void contextDestroyed(ServletContextEvent sce) {       

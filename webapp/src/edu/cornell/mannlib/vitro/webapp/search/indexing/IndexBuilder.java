@@ -227,6 +227,10 @@ public class IndexBuilder extends Thread {
      * the index.
      */
     private Collection<String> statementsToUris( Collection<Statement> localChangedStmt ){
+        //inform StatementToURIsToUpdate that index is starting
+        for( StatementToURIsToUpdate stu : stmtToURIsToIndexFunctions )
+            stu.startIndexing();        
+                
         Collection<String> urisToUpdate = new HashSet<String>();
         for( Statement stmt : localChangedStmt){
             if( stmt == null )
@@ -234,7 +238,12 @@ public class IndexBuilder extends Thread {
             for( StatementToURIsToUpdate stu : stmtToURIsToIndexFunctions ){
                 urisToUpdate.addAll( stu.findAdditionalURIsToIndex(stmt) );
             }
-        }               
+        }
+        
+        //inform StatementToURIsToUpdate that they are done
+        for( StatementToURIsToUpdate stu : stmtToURIsToIndexFunctions )
+            stu.endIndxing();
+        
         return urisToUpdate;        
     }
     

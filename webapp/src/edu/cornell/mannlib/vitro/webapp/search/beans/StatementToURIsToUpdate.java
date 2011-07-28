@@ -22,4 +22,8 @@ public interface StatementToURIsToUpdate {
      * @return List of URIs.
      */
     List<String> findAdditionalURIsToIndex(Statement stmt);
+    
+    void startIndexing();
+    
+    void endIndxing();
 }
