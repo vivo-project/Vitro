@@ -6,7 +6,7 @@
      Build script for the Vivo Products.
                    
      jeb228                                                                
-     ======================================================================-->
+     ======================================================================-->
 <project name="vivoProduct" default="describe">
 
 	<!--
@@ -251,6 +251,13 @@
     <target name="productWar"  depends="productRevisionInfo">
 		<jar basedir="${build.dir}/war" destfile="${build.dir}/${webapp.name}.war"/>
     </target>
+
+	<!-- ================================= 
+          target: jar              
+         ================================= -->
+	<target name="jar" depends="revisionInfo" description="--> Build the app and create a JAR file">
+		<jar basedir="${build.dir}/war/WEB-INF/classes" destfile="${build.dir}/${webapp.name}.jar" />
+	</target>
 
 	<!-- ================================= 
           target: licenser             
