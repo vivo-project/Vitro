@@ -18,8 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 
-import com.hp.hpl.jena.datatypes.RDFDatatype;
-import com.hp.hpl.jena.datatypes.xsd.XSDDateTime;
+import com.clarkparsia.pellet.sparqldl.engine.QueryExec;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntResource;
@@ -40,7 +39,6 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
@@ -59,7 +57,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
-import edu.cornell.mannlib.vitro.webapp.utils.FlagMathUtils;
 
 public class IndividualSDB extends IndividualImpl implements Individual {
 
@@ -91,15 +88,11 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 	    		"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
 	    		        "> ?ooo. \n" +
 	    		   "<"+individualURI+">  a ?type . \n" +
-	    		   "<"+individualURI+"> <" + VitroVocabulary.MONIKER + 
-	    		           "> ?moniker \n" +
 	    		 "} \n" +
 	    		 "WHERE { \n" +
 	    		 	"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
 	    		 	        "> ?ooo }  \n" +
 	    		 	" UNION { <"+individualURI+"> a ?type } \n" +
-	    		 	" UNION { <"+individualURI+"> <" + VitroVocabulary.MONIKER +
-	    		 	        "> ?moniker } \n" +
 	    		 "} "; 
     		this.model = QueryExecutionFactory.create(
     		        QueryFactory.create(getStatements), initModel)
@@ -124,7 +117,9 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	this.datasetMode = datasetMode;
     	this.dwf = datasetWrapperFactory;
     	
-    	if (skipInitialization) {
+        // TODO revisit.  Skipping initialization no longer
+        // buys us anything when we call noTriplesFor()
+    	if (false && skipInitialization) {
             OntModel ontModel = ModelFactory.createOntologyModel(
                     OntModelSpec.OWL_MEM);
             this.ind = ontModel.createOntResource(individualURI);  
@@ -136,19 +131,10 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	    	String getStatements = 
     	    		"CONSTRUCT " +
     	    		"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
-    	    		        "> ?ooo. \n" +
-//    	    		   "<"+individualURI+">  a ?type . \n" +
-    	    		   "<"+individualURI+">  <" + VitroVocabulary.MONIKER + 
-    	    		           "> ?moniker \n" +
+    	    		        "> ?ooo \n" +
     	    		 "} WHERE {" +
     	    		 	"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
     	    		 	        "> ?ooo } \n" +
-    	    		 	"UNION { <" +
-    	    		 	    individualURI+">  <" + VitroVocabulary.MONIKER + 
-    	    		 	        "> ?moniker \n" +
-    	    		 	"}  \n" +
-//    	    		 	"UNION { <"
-//    	    		 	    + individualURI + "> a ?type } \n" +
     	    		 "}";
         		model = QueryExecutionFactory.create(
         		        QueryFactory.create(getStatements), dataset)
@@ -281,282 +267,6 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         } 
     }
 
-    public int getFlag1Numeric() { 
-        if (flag1Numeric > -1) {
-            return flag1Numeric;
-        } else {
-            doFlag1();
-            return flag1Numeric;
-        }
-    }
- 
-    public String getFlag1Set() { 
-        if (flag1Set != null) {
-            return flag1Set;
-        } else {
-            doFlag1();
-            return flag1Set;
-        }
-    }
-
-    public String getFlag2Set() { 
-        if (flag2Set != null) {
-            return flag2Set;
-        } else {
-            doFlag2();
-            return flag2Set;
-        }
-    }
-
-    /* Consider the flagBitMask as a mask to & with flags.
-   if flagBitMask bit zero is set then return true if
-   the individual is in portal 2,
-   if flagBitMask bit 1 is set then return true if
-   the individua is in portal 4
-   etc.
-   Portal uris look like this:
-   "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#Flag1Value1Thing"
-    */
-    public boolean doesFlag1Match(int flagBitMask) { 
-        Long [] numerics = FlagMathUtils.numeric2numerics(flagBitMask);      
-        DatasetWrapper w = getDatasetWrapper();
-        Dataset dataset = w.getDataset();
-        dataset.getLock().enterCriticalSection(Lock.READ);
-        try{
-            for( Long numericPortal : numerics){
-                int portalid = FlagMathUtils.numeric2Portalid(numericPortal);
-                String portalTypeUri = VitroVocabulary.vitroURI + 
-                        "Flag1Value" + portalid + "Thing";
-                String Ask = "ASK { <" + this.individualURI + 
-                        "> <" +RDF.type+ "> <" + portalTypeUri +">} "; 
-                if(!QueryExecutionFactory.create(
-                        QueryFactory.create(Ask), dataset).execAsk()) {
-                	return false;
-                }
-            }
-        }finally{
-        	dataset.getLock().leaveCriticalSection();
-        	w.close();
-        }
-        return true;
-    }
-
-    private void doFlag1() {
-        if( webappDaoFactory.getPortalDao().isSinglePortal() ){
-            flag1Set = "0";
-            flag1Numeric = 1;
-        }else{
-        	String getObjects = null;
-            Model tempModel = ModelFactory.createDefaultModel();
-            OntModel ontModel = ModelFactory.createOntologyModel(
-                    OntModelSpec.OWL_MEM);
-            DatasetWrapper w = getDatasetWrapper();
-            Dataset dataset = w.getDataset();
-            dataset.getLock().enterCriticalSection(Lock.READ);
-            try {
-            	ClosableIterator typeIt = null;
-                int portalNumeric = 0;
-                String portalSet = "";
-                try{
-                	getObjects = 
-                		"CONSTRUCT{<" + this.individualURI + "> <" + 
-                		        RDF.type + "> ?object}" +
-            			"WHERE{ <" + this.individualURI + "> <" + 
-            			        RDF.type + "> ?object }";
-            		tempModel = QueryExecutionFactory.create(
-            		        QueryFactory.create(
-            		                getObjects), dataset).execConstruct();
-            		ontModel.add(tempModel.listStatements());
-            	    OntResource ontRes = ontModel.createOntResource(
-            	            this.individualURI);
-            	    typeIt = ontRes.getOntModel().listStatements(
-            	            ontRes, RDF.type ,(String) null);
-            	    while (typeIt.hasNext()) {
-                        Statement stmt = (Statement) typeIt.next();
-                        Resource type = (Resource)stmt.getObject();
-                        String typeName = type.getLocalName();
-                        if(type.getNameSpace() != null 
-                                && type.getNameSpace().equals(
-                                        VitroVocabulary.vitroURI) 
-                                && typeName.indexOf("Flag1Value")==0) {
-                            try {
-                                int portalNumber = Integer.decode(
-                                        typeName.substring(10,typeName.length()-5));
-                                portalNumeric = portalNumeric | (1 << portalNumber);
-                                if (portalSet.length() > 0) {
-                                    portalSet+=",";
-                                }
-                                portalSet+=Integer.toString(portalNumber);
-                            } catch (Exception e) {
-                            	log.warn("could not convert into a " +
-                            			"portal id:'" + typeName + "' " + e.getMessage());
-                            }
-                        }
-                    }
-                }finally{
-                    if( typeIt != null ) typeIt.close() ;
-                }
-                flag1Set = portalSet;
-                flag1Numeric = portalNumeric;
-            } finally {
-                tempModel.close();
-                ontModel.close();
-                dataset.getLock().leaveCriticalSection();
-            	w.close();
-            }        
-        }
-    }
-
-    
-    private void doFlag2() {
-        if( webappDaoFactory.getPortalDao().isSinglePortal() ){
-            flag2Set = "";
-            flag2Numeric = 0 ;
-        }else{
-        	String getObjects = null;
-            Model tempModel = ModelFactory.createDefaultModel();
-            OntModel ontModel = ModelFactory.createOntologyModel(
-                    OntModelSpec.OWL_MEM);
-            DatasetWrapper w = getDatasetWrapper();
-            Dataset dataset = w.getDataset();
-        	dataset.getLock().enterCriticalSection(Lock.READ);
-            try {
-                ClosableIterator typeIt=null;
-                String flagSet = "";
-                try{
-                	getObjects = 
-                		"CONSTRUCT{<" + this.individualURI + "> <" + 
-                		        RDF.type + "> ?object}" +
-            			"WHERE{ <" + this.individualURI + "> <" + 
-            			        RDF.type + "> ?object }";
-            		tempModel = QueryExecutionFactory.create(
-            		        QueryFactory.create(
-            		                getObjects), dataset).execConstruct();
-            		ontModel.add(tempModel.listStatements());
-            	    OntResource ontRes = ontModel.createOntResource(
-            	            this.individualURI);
-            	    typeIt = ontRes.getOntModel().listStatements(
-            	            ontRes, RDF.type ,(String) null);
-            	    while (typeIt.hasNext()) {
-                        Statement stmt = (Statement) typeIt.next();
-                        Resource type = (Resource)stmt.getObject();
-                        String typeName = type.getLocalName();
-                        if(type.getNameSpace() != null 
-                                && type.getNameSpace().equals(
-                                        VitroVocabulary.vitroURI) 
-                                && typeName.indexOf("Flag2Value")==0) {
-                            try {
-                                String flagValue = 
-                                        ((WebappDaoFactoryJena) webappDaoFactory)
-                                                .getFlag2ClassLabelMap().get(type);
-                                if (flagSet.length() > 0) {
-                                    flagSet+=",";
-                                }
-                                flagSet+=flagValue;
-                            } catch (Exception e) {
-                            	log.error(e,e);
-                            }
-                        }
-                    }
-                }finally{
-                    if( typeIt != null ) typeIt.close() ;
-                }
-                flag2Set = flagSet;
-            } finally {
-            	tempModel.close();
-                ontModel.close();
-            	dataset.getLock().leaveCriticalSection();
-            	w.close();
-            }
-        }        
-    }
-
-
-    public Date getSunrise() {
-        if( this.sunrise == null ){            
-            String[] graphVars = { "?g" };
-            String queryStr = 
-                "SELECT ?value " +
-                "WHERE { GRAPH ?g { <" + individualURI + "> " + 
-                        "<" + webappDaoFactory.getJenaBaseDao().SUNRISE + "> " + 
-                        "?value} \n" + 
-                        //WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
-                        "}";
-            DatasetWrapper w = getDatasetWrapper();
-            Dataset dataset = w.getDataset();
-            dataset.getLock().enterCriticalSection(Lock.READ);
-            try{            
-                ResultSet rs = QueryExecutionFactory.create(QueryFactory.create(queryStr), dataset)
-                    .execSelect();
-                if( rs.hasNext()){
-                    QuerySolution qs = rs.nextSolution();
-                    if( qs.get("value") != null ){
-                        Literal value = qs.get("value").asLiteral();
-                        RDFDatatype datatype = value.getDatatype();
-                        XSDDateTime xsdDt = (XSDDateTime)datatype.parse( value.getLexicalForm() );
-                        sunrise = xsdDt.asCalendar().getTime();
-                    }
-                }            
-            }catch(Exception ex){
-                log.error("could not get sunrise: " + ex.getMessage(),ex);
-            }finally{
-                dataset.getLock().leaveCriticalSection();
-                w.close();
-            }
-        }        
-        return sunrise;        
-    }
-
-    public Date getSunset() {        
-        if( this.sunset == null ){            
-            String[] graphVars = { "?g" };
-            String queryStr = 
-                "SELECT ?value " +
-                "WHERE { GRAPH ?g { <" + individualURI + "> " + 
-                        "<"+webappDaoFactory.getJenaBaseDao().SUNSET+"> ?value} }";
-            DatasetWrapper w = getDatasetWrapper();
-            Dataset dataset = w.getDataset();
-            dataset.getLock().enterCriticalSection(Lock.READ);
-            try{          
-                ResultSet rs = QueryExecutionFactory.create(QueryFactory.create(queryStr), dataset)
-                    .execSelect();
-                if( rs.hasNext()){
-                    QuerySolution qs = rs.nextSolution();
-                    if( qs.get("value") != null ){
-                        Literal value = qs.get("value").asLiteral();
-                        RDFDatatype datatype = value.getDatatype();
-                        XSDDateTime xsdDt = (XSDDateTime)datatype.parse( value.getLexicalForm() );
-                        sunset = xsdDt.asCalendar().getTime();
-                    }
-                }
-            }catch(Exception ex){
-                log.error("could not get sunset: " + ex.getMessage(),ex);
-            }finally{
-                dataset.getLock().leaveCriticalSection();
-                w.close();
-            }
-        }        
-        return sunset;          
-    }
-
-    public Date getTimekey() { 
-        if (timekey != null) {
-            return timekey;
-        } else {
-            constructProperty(ind, VitroVocabulary.TIMEKEY);
-        	ind.getOntModel().enterCriticalSection(Lock.READ);
-            try {
-                timekey = webappDaoFactory.getJenaBaseDao()
-                        .getPropertyDateTimeValue(
-                                ind,webappDaoFactory.getJenaBaseDao().TIMEKEY);
-                return timekey;
-            } finally {
-              
-            	ind.getOntModel().leaveCriticalSection();
-            }
-        }
-    }
-
     public Timestamp getModTime() {
         if (modTime != null) {
             return modTime;
@@ -578,62 +288,6 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         }
     }
 
-    public String getMoniker() { 
-        if (moniker != null) {
-            return moniker;
-        } else {         
-        	ind.getOntModel().enterCriticalSection(Lock.READ);
-            try {
-                moniker = webappDaoFactory.getJenaBaseDao()
-                        .getPropertyStringValue(
-                                ind,webappDaoFactory.getJenaBaseDao().MONIKER);
-                if (moniker == null) {
-                    //Changing behavior to moniker because it is taking extra time to get the vclass
-                    //alternative if the moniker isn't filled out.  That time is wasted if the vclass alternative isn't desired.
-                    //see NIHVIVO-2001
-                      moniker = "";
-                  }                
-                return moniker;
-            } finally {
-            	ind.getOntModel().leaveCriticalSection();
-            }
-        }
-    }
-
-    public String getBlurb() { 
-        if (this.blurb != null) {
-            return blurb;
-        } else {
-            constructProperty(ind, VitroVocabulary.BLURB);
-        	ind.getOntModel().enterCriticalSection(Lock.READ);
-            try {
-                blurb = webappDaoFactory.getJenaBaseDao().getPropertyStringValue(ind,webappDaoFactory.getJenaBaseDao().BLURB);
-                return blurb;
-            } finally {
-               
-            	ind.getOntModel().leaveCriticalSection();
-            }
-        }
-    }
-
-    public String getDescription() { 
-        if (this.description != null) {
-            return description;
-        } else {
-            constructProperty(ind, VitroVocabulary.DESCRIPTION);
-        	ind.getOntModel().enterCriticalSection(Lock.READ);
-            try {
-                description = webappDaoFactory.getJenaBaseDao()
-                        .getPropertyStringValue(
-                             ind,webappDaoFactory.getJenaBaseDao().DESCRIPTION);
-                return description;
-            } finally {
-                
-            	ind.getOntModel().leaveCriticalSection();
-            }
-        }
-    }
-
     private synchronized void constructProperty(OntResource ind, String propertyURI) {
         DatasetWrapper w = getDatasetWrapper();
         Dataset dataset = w.getDataset();
@@ -642,8 +296,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             String[] graphVars = { "?g" };
             String queryStr = 
                 "CONSTRUCT { <"+ind.getURI()+"> <" + propertyURI + "> ?value } \n" +
-                    "WHERE { GRAPH ?g {  \n" +
-                    "<" + ind.getURI() +"> <" + propertyURI + "> ?value } \n" + 
+                    "WHERE {  \n" +
+                    "<" + ind.getURI() +"> <" + propertyURI + "> ?value \n" + 
                     WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
                     "\n} ";
             Query query = QueryFactory.create(queryStr);
@@ -703,13 +357,13 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 		if (this.mainImageUri != NOT_INITIALIZED) {
 			return mainImageUri;
 		} else {
-			for (ObjectPropertyStatement stmt : getObjectPropertyStatements()) {
-				if (stmt.getPropertyURI()
-						.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
-					mainImageUri = stmt.getObjectURI();
-					return mainImageUri;
-				}
-			}
+			List<ObjectPropertyStatement> mainImgStmts = 
+					getObjectPropertyStatements(VitroVocabulary.IND_MAIN_IMAGE);
+			if (mainImgStmts != null && mainImgStmts.size() > 0) {
+				// arbitrarily return the first value in the list
+				mainImageUri = mainImgStmts.get(0).getObjectURI();
+				return mainImageUri;				
+			} 
 			return null;
 		}
 	}
@@ -749,22 +403,22 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 	    if( _hasThumb != null ){
 	        return _hasThumb;	    
         }else{            
-            String[] graphVars = { "?g" };
             String ask = 
-                "ASK { GRAPH ?g  " +
-                "  { <" + individualURI + "> <http://vitro.mannlib.cornell.edu/ns/vitro/public#mainImage> ?mainImage . \n" +
-                "    ?mainImage <http://vitro.mannlib.cornell.edu/ns/vitro/public#thumbnailImage> ?thumbImage . }\n"  +                      
-                        WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
-                "}";
-            DatasetWrapper w = getDatasetWrapper();
+                "ASK { " +
+                "    <" + individualURI + "> <http://vitro.mannlib.cornell.edu/ns/vitro/public#mainImage> ?mainImage . \n" +
+                "    ?mainImage <http://vitro.mannlib.cornell.edu/ns/vitro/public#thumbnailImage> ?thumbImage . }\n"  ;                     
+          DatasetWrapper w = getDatasetWrapper();
             Dataset dataset = w.getDataset();
             dataset.getLock().enterCriticalSection(Lock.READ);
-            try{                
-                _hasThumb = QueryExecutionFactory.create(QueryFactory.create(ask), dataset).execAsk();                      
+            QueryExecution qexec = null;
+            try{            
+                qexec = QueryExecutionFactory.create(QueryFactory.create(ask), dataset);
+                _hasThumb = qexec.execAsk();
             }catch(Exception ex){
                 _hasThumb = false;
                 log.error(ex,ex);
             }finally{
+                if(qexec!=null) qexec.close();
                 dataset.getLock().leaveCriticalSection();
                 w.close();
             }
@@ -772,129 +426,6 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         }
 	}
 	
-	
-	public String getAnchor() { 
-        if (this.anchor != null) {
-            return anchor;
-        } else {
-            doUrlAndAnchor();
-            return anchor;
-        }
-    }
-
-    public String getUrl() { 
-        if (this.url != null) {
-            return url;
-        } else {
-            doUrlAndAnchor();
-            return url;
-        }
-    }
-
-    private void doUrlAndAnchor() { 
-        Model tempModel = ModelFactory.createDefaultModel();
-        OntModel ontModel = ModelFactory.createOntologyModel(
-                OntModelSpec.OWL_MEM);
-        DatasetWrapper w = getDatasetWrapper();
-        Dataset dataset = w.getDataset();
-    	dataset.getLock().enterCriticalSection(Lock.READ);
-        try {
-            String graphVars[] = { "?g" };
-        	StringBuffer selectPrimaryLinkQueryBuff = new StringBuffer().append(
-        		"SELECT ?url ?anchor \n" ).append(
-        		"WHERE{ GRAPH ?g { \n " ).append(
-        		"    <" + this.individualURI + "> ").append(
-        		             "<" + VitroVocabulary.PRIMARY_LINK + "> " ).append(
-        		                     "?link . \n").append(
-        		"    ?link <" + VitroVocabulary.LINK_URL + "> ?url . \n" 
-        		        ).append(
-        		"    ?link <" + VitroVocabulary.LINK_ANCHOR + "> ?anchor . \n" 
-        		        ).append(
-        		"} \n")
-        		.append(WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode))
-        		.append("}");
-        	QueryExecution qexec = QueryExecutionFactory.create(
-                    QueryFactory.create(selectPrimaryLinkQueryBuff.toString())
-                            , dataset);
-        	try {
-        	    ResultSet linkResults = qexec.execSelect();
-        	    if (linkResults.hasNext()) {
-        	        QuerySolution solution = linkResults.next();
-        	        this.setUrl(solution.getLiteral("url").getLexicalForm());
-        	        this.setAnchor(solution.getLiteral("anchor")
-        	                .getLexicalForm());
-        	    }
-        	} finally {
-        	    qexec.close();
-        	}            
-        } finally {
-        	tempModel.close();
-        	ontModel.close();
-        	dataset.getLock().leaveCriticalSection();
-        	w.close();
-        }
-    }
-
-    public List <Link> getLinksList() { 
-        if (this.linksList != null) {
-            return this.linksList;
-        } else {
-            try {
-                webappDaoFactory.getLinksDao().addLinksToIndividual(this);
-            } catch (Exception e) {
-                log.debug(this.getClass().getName() + 
-                        " could not addLinksToIndividual for " + this.getURI());
-            }
-            return this.linksList;
-        }
-    }
-
-    public Link getPrimaryLink() { 
-        if (this.primaryLink != null) {
-            return this.primaryLink;
-        } else {
-            try {
-                webappDaoFactory.getLinksDao().addPrimaryLinkToIndividual(this);
-            } catch (Exception e) {
-                log.debug(this.getClass().getName() + 
-                        " could not addPrimaryLinkToIndividual for " + 
-                                this.getURI());
-            }
-            return this.primaryLink;
-        }
-    }
-
-
-    public List<String> getKeywords() { 
-        if (this.keywords != null) {
-            return this.keywords;
-        } else {
-            try {
-                this.setKeywords(webappDaoFactory.getIndividualDao()
-                        .getKeywordsForIndividual(this.getURI()));
-            } catch (Exception e) {
-                log.debug(this.getClass().getName() + 
-                        " could not getKeywords for " + this.getURI());
-            }
-            return this.keywords;
-        }
-    }
-    
-    public List<Keyword> getKeywordObjects() {
-        if (this.keywordObjects != null) { 
-            return this.keywordObjects;
-        } else {
-            try {
-                this.setKeywordObjects(webappDaoFactory.getIndividualDao()
-                        .getKeywordObjectsForIndividual(this.getURI()));
-            } catch (Exception e) {
-                log.error(this.getClass().getName() + 
-                        " could not get Keyword Objects for " + this.getURI());
-            }
-        }
-        return this.keywordObjects;
-    }
-
     public List<ObjectPropertyStatement> getObjectPropertyStatements() { 
         if (this.objectPropertyStatements != null) {
             return this.objectPropertyStatements;
@@ -924,14 +455,13 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         DatasetWrapper w = getDatasetWrapper();
         Dataset dataset = w.getDataset();
     	dataset.getLock().enterCriticalSection(Lock.READ);
+        QueryExecution qexec = null;
     	try {
-    	    String[] graphVars = { "?g" };
     		String valuesOfProperty = 
-    			"CONSTRUCT{<" + this.individualURI + "> <" + propertyURI + "> ?object}" +
-    			"WHERE{ GRAPH ?g { <" + this.individualURI + "> <" + propertyURI + "> ?object} \n" +
-    			WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
-    			"}";
-    	    tempModel = QueryExecutionFactory.create(QueryFactory.create(valuesOfProperty), dataset).execConstruct();
+    			"CONSTRUCT{ <" + this.individualURI + "> <" + propertyURI + "> ?object }" +
+    			"WHERE{ <" + this.individualURI + "> <" + propertyURI + "> ?object } \n";
+            qexec = QueryExecutionFactory.create(QueryFactory.create(valuesOfProperty), dataset);
+    	    tempModel = qexec.execConstruct();
     	    ontModel.add(tempModel.listStatements());
     	    Resource ontRes = ontModel.getResource(this.individualURI);
     	    StmtIterator sit = ontRes.listProperties(ontRes.getModel().getProperty(propertyURI));
@@ -955,6 +485,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     			}
     		}
      	} finally {
+            if(qexec!=null) qexec.close();
     		tempModel.close();
     		ontModel.close();
      		dataset.getLock().leaveCriticalSection();
@@ -974,13 +505,10 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	Dataset dataset = w.getDataset();
     	dataset.getLock().enterCriticalSection(Lock.READ);
     	try {
-    	    String[] graphVars = { "?g" };
     		String valuesOfProperty = 
     			"SELECT ?object" +
-    			"WHERE{ GRAPH ?g { <" + this.individualURI + "> <" + 
-    			        propertyURI + "> ?object} \n" +
-    			        WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +       
-    			 "}";
+    			"WHERE{ <" + this.individualURI + "> <" + 
+    			        propertyURI + "> ?object } \n";
     		ResultSet values = QueryExecutionFactory.create(
     		        QueryFactory.create(valuesOfProperty), dataset)
     		                .execSelect();
@@ -1014,13 +542,10 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	Dataset dataset = w.getDataset();
     	dataset.getLock().enterCriticalSection(Lock.READ);
     	try {
-    	    String[] graphVars = { "?g" };
     		String valueOfProperty = 
     			"SELECT ?object " +
-    			"WHERE{ GRAPH ?g { <" + this.individualURI + "> <" + 
-    			        propertyURI + "> ?object} \n" +
-    			        WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
-    			"}";
+    			"WHERE{ <" + this.individualURI + "> <" + 
+    			        propertyURI + "> ?object } \n";
     		QueryExecution qe = QueryExecutionFactory.create(
                     QueryFactory.create(valueOfProperty), dataset);
     		try {
@@ -1196,21 +721,18 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 		if (ind.getModel().contains((Resource) null, RDF.type, (RDFNode) null)){
 		    tempModel = ind.getModel();
 		} else {
+			String[] graphVars = { "?g" };
     		String getTypes = 
         		"CONSTRUCT{ <" + this.individualURI + "> <" + RDF.type +
         		        "> ?types }\n" +
-        		"WHERE{ GRAPH " + 
-        		((direct) 
-        		    ? "<http://vitro.mannlib.cornell.edu/default/vitro-kb-2>" 
-        		    : "?g") 
-        		+ " { <" + this.individualURI +"> <" +RDF.type+ "> ?types } \n" ;
-    		
-    		    if (!direct) {
-    		        String[] graphVars = { "?g" };
-    		        getTypes += WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode);
-    		    }
-    		
-        		getTypes += "} \n";        	
+        		"WHERE{ GRAPH ?g"   
+        		+ " { <" + this.individualURI +"> <" +RDF.type+ "> ?types } \n" 
+   		        + WebappDaoFactorySDB.getFilterBlock(
+   		        		graphVars, (direct 
+   		        				? WebappDaoFactorySDB.SDBDatasetMode
+   		        						.ASSERTIONS_ONLY 
+   		        			    : datasetMode)) 
+        		+ "} \n";        	
         	DatasetWrapper w = getDatasetWrapper();
         	Dataset dataset = w.getDataset();
         	dataset.getLock().enterCriticalSection(Lock.READ);
@@ -1335,7 +857,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 
 		while(itr.hasNext()) {
 			String typeURI = itr.next().getURI();
-			if (pfs.isClassProhibited(typeURI)) {
+			if (pfs.isClassProhibitedFromSearch(typeURI)) {
 				return true;
 			}
 		}

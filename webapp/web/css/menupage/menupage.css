@@ -193,14 +193,12 @@ ul#browse-classes a {
 ul#alpha-browse-individuals {
     float: left;
     width: 619px;
-    margin-left: 1px;
-    padding-left: 10px;
     list-style: none;
 }
 ul#alpha-browse-individuals li {
     float: left;
     margin-right: 4px;
-    padding-top: 8px;
+    padding-top: 0px;
 }
 ul#alpha-browse-individuals li:last-child {
     border-bottom: 0;
@@ -222,7 +220,6 @@ ul#alpha-browse-individuals a {
     min-height: 170px;
 }
 h3.selected-class {
-    margin: 0 0 0 1em;
     padding: .8em 0 0 0;
 }
 #individuals-in-class ul {
@@ -255,6 +252,18 @@ li.individual h1.thumb {
 }
 #individuals-in-class span.org {
     display: block;
+}
+ul.mostSpecificTypes li {
+    float: left;
+    display: block;
+    padding: 0 10px;
+    border-right: 1px solid #c9c8c8;
+}
+ul.mostSpecificTypes li:first-child {
+    padding-left: 0;
+}
+ul.mostSpecificTypes li:last-child {
+    border-right: none
 }
 p.no-individuals {
     margin: 1em 2em;
@@ -297,3 +306,4 @@ p.no-individuals {
     -webkit-border-radius: 3px;
     border-radius: 3px;
 }
+

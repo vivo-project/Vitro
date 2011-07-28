@@ -1,0 +1,40 @@
+# $This file is distributed under the terms of the license in /doc/license.txt$ 
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix mydomain: <http://vivo.mydomain.edu/individual/> .
+
+### This file is for the test UserAccountsSelectorTest.java.
+
+mydomain:user01
+	a auth:UserAccount ;
+	auth:emailAddress "email@able.edu" ;
+	auth:firstName "Zack" ;
+	auth:lastName "Roberts" ;
+	auth:md5password "garbage" ;
+	auth:passwordChangeExpires 0 ;
+	auth:loginCount 5 ;
+	auth:lastLoginTime 12345678 ;
+	auth:status "ACTIVE" ;
+	auth:externalAuthId "user1";
+	auth:hasPermissionSet mydomain:role1 ;
+	.
+	
+mydomain:role1
+	a auth:PermissionSet ;
+	rdfs:label "Role 1" ;
+	auth:hasPermission mydomain:permissionA ;
+	.
+	
+mydomain:role2
+	a auth:PermissionSet ;
+	rdfs:label "Role 2" ;
+	.
+	
+mydomain:permissionA
+    a auth:Permission ;
+    rdfs:label "Permission A" ;
+    .
+    

@@ -3,11 +3,9 @@
 package edu.cornell.mannlib.vitro.webapp.controller.edit.listing;
 
 import java.net.URLEncoder;
-import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -23,10 +21,10 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.ButtonForm;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -44,19 +42,13 @@ public class PropertyWebappsListingController extends BaseEditController {
     private int NUM_COLS = 9;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new EditOntology()))) {
+        	return;
+        }
+
         VitroRequest vrequest = new VitroRequest(request);
-        Portal portal = vrequest.getPortal();
 
         String noResultsMsgStr = "No object properties found";
-
-        if(!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request, response);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
 
         String ontologyUri = request.getParameter("ontologyUri");
 
@@ -167,7 +159,7 @@ public class PropertyWebappsListingController extends BaseEditController {
                     
                     String propNameStr = ObjectPropertyHierarchyListingController.getDisplayLabel(prop);
                     try {
-                        results.add("<a href=\"./propertyEdit?uri="+URLEncoder.encode(prop.getURI(),"UTF-8")+"&amp;home="+portal.getPortalId()+"\">" + propNameStr + "</a>"); // column 1
+                        results.add("<a href=\"./propertyEdit?uri="+URLEncoder.encode(prop.getURI(),"UTF-8")+"\">" + propNameStr + "</a>"); // column 1
                     } catch (Exception e) {
                         results.add(propNameStr); // column 2
                     }
@@ -201,20 +193,16 @@ public class PropertyWebappsListingController extends BaseEditController {
         request.setAttribute("columncount",new Integer(NUM_COLS));
         request.setAttribute("suppressquery","true");
         request.setAttribute("title","Object Properties");
-        request.setAttribute("portalBean",portal);
         request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
-        request.setAttribute("home", portal.getPortalId());
         
         // new way of adding more than one button
         List <ButtonForm> buttons = new ArrayList<ButtonForm>();
         HashMap<String,String> newPropParams=new HashMap<String,String>();
         newPropParams.put("controller", "Property");
-        newPropParams.put("home", String.valueOf(portal.getPortalId()));
         ButtonForm newPropButton = new ButtonForm(Controllers.RETRY_URL,"buttonForm","Add new object property",newPropParams);
         buttons.add(newPropButton);
         HashMap<String,String> rootPropParams=new HashMap<String,String>();
         rootPropParams.put("iffRoot", "true");
-        rootPropParams.put("home", String.valueOf(portal.getPortalId()));
         String temp;
         if ( (temp=vrequest.getParameter("ontologyUri")) != null) {
         	rootPropParams.put("ontologyUri",temp);

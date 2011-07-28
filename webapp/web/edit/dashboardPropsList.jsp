@@ -1,41 +1,23 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
-<%@ taglib uri="http://vitro.mannlib.cornell.edu/vitro/tags/PropertyEditLink" prefix="edLnk" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Property" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataProperty" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.KeywordProperty" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Property" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
-<%@ page import="edu.cornell.mannlib.vedit.beans.LoginStatusBean" %>
 <%! 
 public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.dashboardPropsList.jsp");
 %>
-<%
-boolean showSelfEdits=false;
-boolean showCuratorEdits=false;
-if( VitroRequestPrep.isSelfEditing(request) ) {
-    showSelfEdits=true;
-    log.debug("self editing active");
-} else {
-    log.debug("self editing inactive");
-}
-if (LoginStatusBean.getBean(request).isLoggedInAtLeast(LoginStatusBean.EDITOR)) {
-	showCuratorEdits=true;
-	log.debug("curator editing active");
-} else {
-	log.debug("curator editing inactive");
-}%>
+
 <c:set var='entity' value='${requestScope.entity}'/><%-- just moving this into page scope for easy use --%>
-<c:set var='portal' value='${requestScope.portalBean}'/><%-- likewise --%>
 <%
 	log.debug("Starting dashboardPropsList.jsp");
 

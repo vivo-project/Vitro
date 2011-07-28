@@ -6,7 +6,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.VClass" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration" %>
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
@@ -23,7 +23,7 @@
     WebappDaoFactory wdf = vreq.getWebappDaoFactory();  
 %>
 
-<%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.SelectListGenerator"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.SelectListGenerator"%>
 <%@page import="java.util.Map"%>
 <%@page import="com.hp.hpl.jena.ontology.OntModel"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch"%>
@@ -128,10 +128,10 @@
         	
             log.debug("property set to offer \"create new\" option; custom form: ["+prop.getCustomEntryForm()+"]");
             formTitle   = "Select an existing "+classOfObjectFillers.getName()+" for "+subject.getName();
-            submitLabel = "select existing";
+            submitLabel = "Select existing";
         } else {
             formTitle   = "Add an entry to: <em>"+prop.getDomainPublic()+"</em>";
-            submitLabel = "save entry";
+            submitLabel = "Save entry";
         }
     }
     
@@ -143,7 +143,7 @@
                 .getAttribute("displayOntModel");
         if (displayOntModel != null) {
             ProhibitedFromSearch pfs = new ProhibitedFromSearch(
-                DisplayVocabulary.PRIMARY_LUCENE_INDEX_URI, displayOntModel);
+                DisplayVocabulary.SEARCH_INDEX_URI, displayOntModel);
             if( editConfig != null )
                 editConfig.setProhibitedFromSearch(pfs);
         }
@@ -181,7 +181,7 @@
 
 <c:if test="${requestScope.predicate.offerCreateNewOption == true}">
  	<c:if test="${requestScope.rangeOptionsExist == true }">
-    	<p>If you don't find the appropriate entry on the selection list:</p>
+    	<p style="margin-top: 2.2em">If you don't find the appropriate entry on the selection list above:</p>
   	</c:if>
   	<c:if test="${requestScope.rangeOptionsExist == false }">
   		<p style="margin-top: 5em">Please create a new entry.</p>  		    
@@ -193,7 +193,7 @@
         <input type="hidden" value="${param.objectUri}" name="objectUri"/>        
 		<input type="hidden" value="create" name="cmd"/>        
 		<v:input type="typesForCreateNew" id="typeOfNew" />
-        <v:input type="submit" id="submit" value="add a new item to this list" cancel="${offerCancel}"/>
+        <v:input type="submit" id="submit" value="Add a new item of this type" cancel="${offerCancel}"/>
 	</form>                            
 </c:if>
 

@@ -17,7 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
  * Date: Oct 18, 2007
  * Time: 3:08:33 PM
  */
-public interface Individual extends ResourceBean, VitroTimeWindowedResource, Comparable<Individual> {
+public interface Individual extends ResourceBean, Comparable<Individual> {
     String getName();
     void setName(String in);
 
@@ -30,15 +30,6 @@ public interface Individual extends ResourceBean, VitroTimeWindowedResource, Com
     
     String getVClassURI();
     void setVClassURI(String in);
-
-    //Date getSunrise();
-    void setSunrise(Date in);
-
-    //Date getSunset();
-    void setSunset(Date in);
-
-    Date getTimekey();
-    void setTimekey(Date in);
 
     Timestamp getModTime();
     void setModTime(Timestamp in);
@@ -92,70 +83,12 @@ public interface Individual extends ResourceBean, VitroTimeWindowedResource, Com
     List<DataPropertyStatement> getExternalIds();
     void setExternalIds(List<DataPropertyStatement> externalIds);
 
-    String getMoniker();
-    void setMoniker(String in);
-
-    String getDescription();
-    void setDescription(String in);
-
-    String getAnchor();
-    void setAnchor(String in);
-
-    String getBlurb();
-    void setBlurb(String in);
-
-    int getStatusId();
-    void setStatusId(int in);
-
-    String getStatus();
-    void setStatus(String s);
-
     void setMainImageUri(String mainImageUri);
     String getMainImageUri();
     
     String getImageUrl();
     String getThumbUrl();
     boolean hasThumb();
-
-    String getUrl();
-    void setUrl(String url);
-
-    List<Link> getLinksList();
-    void setLinksList(List<Link> linksList);
-    
-    Link getPrimaryLink();
-    void setPrimaryLink(Link link);
-
-    String getFlag1Set();
-    void setFlag1Set(String in);
-    int getFlag1Numeric();
-    void setFlag1Numeric(int i);
-
-    /* Consider the flagBitMask as a mask to & with flags.
-    if flagBitMask bit zero is set then return true if
-    the individual is in portal 2,
-    if flagBitMask bit 1 is set then return true if
-    the individual is in portal 4
-    etc.
-     */
-    boolean doesFlag1Match(int flagBitMask);
-
-    String getFlag2Set();
-    void setFlag2Set(String in);
-    int getFlag2Numeric();
-    void setFlag2Numeric(int i);
-
-    String getFlag3Set();
-    void setFlag3Set(String in);
-    int getFlag3Numeric();
-    void setFlag3Numeric(int i);
-
-    List<String> getKeywords();
-    void setKeywords(List<String> keywords);
-    String getKeywordString();
-    
-    List<Keyword> getKeywordObjects();
-    void setKeywordObjects(List<Keyword> keywords);
 
     void sortForDisplay();
 
@@ -165,4 +98,7 @@ public interface Individual extends ResourceBean, VitroTimeWindowedResource, Com
     
     Float getSearchBoost();
     void setSearchBoost( Float boost );
+    
+    String getSearchSnippet();
+    void setSearchSnippet( String snippet );
 }

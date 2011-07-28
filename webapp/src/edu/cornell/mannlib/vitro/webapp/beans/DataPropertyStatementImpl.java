@@ -8,7 +8,7 @@ import java.util.Date;
  * a class representing an particular instance of a data property
  *
  */
-public class DataPropertyStatementImpl implements VitroTimeWindowedResource, DataPropertyStatement
+public class DataPropertyStatementImpl implements DataPropertyStatement
 {
     private Individual individual = null;
     private String individualURI = null;
@@ -16,11 +16,7 @@ public class DataPropertyStatementImpl implements VitroTimeWindowedResource, Dat
     private String datapropURI = null;
     private String datatypeURI = null;
     private String language = null;
-
-    private Date sunrise = null;
-    private Date sunset = null;
-    //private String qualifier = null;
-
+    
     public DataPropertyStatementImpl(){
     }
 
@@ -84,30 +80,6 @@ public class DataPropertyStatementImpl implements VitroTimeWindowedResource, Dat
         this.language = language;
     }
 
-    public Date getSunrise() {
-        return sunrise;
-    }
-
-    public void setSunrise(Date sunrise) {
-        this.sunrise = sunrise;
-    }
-
-    public Date getSunset() {
-        return sunset;
-    }
-
-    public void setSunset(Date sunset) {
-        this.sunset = sunset;
-    }
-    /*
-    public String getQualifier() {
-        return qualifier;
-    }
-
-    public void setQualifier(String qualifier) {
-        this.qualifier = qualifier;
-    }
-    */
     public String getString(){
         String out = "instance of dataprop: " + datapropURI;
 

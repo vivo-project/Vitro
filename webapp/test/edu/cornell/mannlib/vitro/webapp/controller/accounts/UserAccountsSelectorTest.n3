@@ -1,0 +1,164 @@
+# $This file is distributed under the terms of the license in /doc/license.txt$ 
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix mydomain: <http://vivo.mydomain.edu/individual/> .
+
+### This file is for the test UserAccountsSelectorTest.java.
+
+#
+# Note: each optional field (everything except URI and emailAddress) is missing 
+# from some user account.
+#
+# Note: user accounts have 0, 1, or 2 permission sets.
+#
+
+mydomain:user01
+	a auth:UserAccount ;
+	auth:emailAddress "email@able.edu" ;
+	auth:firstName "Zack" ;
+	auth:lastName "Roberts" ;
+	auth:md5password "garbage" ;
+	auth:passwordChangeExpires 0 ;
+	auth:loginCount 5 ;
+	auth:lastLoginTime 100 ;
+	auth:status "ACTIVE" ;
+	auth:hasPermissionSet mydomain:role1 ;
+	.
+	
+mydomain:user02
+	a auth:UserAccount ;
+	auth:emailAddress "email@bob.edu" ;
+#	auth:firstName NONE ;
+	auth:lastName "Cole" ;
+	auth:md5password "garbage" ;
+	auth:passwordChangeExpires 0 ;
+	auth:loginCount 5 ;
+	auth:lastLoginTime 100 ;
+	auth:status "INACTIVE" ;
+	auth:hasPermissionSet mydomain:role1 ;
+	.
+	
+mydomain:user03
+	a auth:UserAccount ;
+	auth:emailAddress "email@charlie.edu" ;
+	auth:firstName "Ralph" ;
+#	auth:lastName NONE ;
+	auth:md5password "garbage" ;
+	auth:passwordChangeExpires 0 ;
+	auth:loginCount 0 ;
+	auth:lastLoginTime 1 ;
+	auth:status "INACTIVE" ;
+	auth:hasPermissionSet mydomain:role1 ;
+	auth:hasPermissionSet mydomain:role2 ;
+	.
+	
+mydomain:user04
+	a auth:UserAccount ;
+	auth:emailAddress "email@delta.edu" ;
+	auth:firstName "Queen" ;
+	auth:lastName "Latifah" ;
+#	auth:md5password NONE ;
+	auth:passwordChangeExpires 0 ;
+	auth:loginCount 9 ;
+	auth:lastLoginTime 3 ;
+	auth:status "ACTIVE" ;
+	.
+	
+mydomain:user05
+	a auth:UserAccount ;
+	auth:emailAddress "email@echo.edu" ;
+	auth:firstName "Paul" ;
+	auth:lastName "Archibob" ;
+	auth:md5password "garbage" ;
+#	auth:passwordChangeExpires NONE ;
+	auth:loginCount 2 ;
+	auth:lastLoginTime 100 ;
+	auth:status "ACTIVE" ;
+	auth:hasPermissionSet mydomain:role1 ;
+	.
+	
+mydomain:user06
+	a auth:UserAccount ;
+	auth:emailAddress "email@foxtrot.edu" ;
+	auth:firstName "Nancy" ;
+	auth:lastName "Xavier" ;
+	auth:md5password "garbage" ;
+	auth:passwordChangeExpires 0 ;
+#	auth:loginCount NONE ;
+	auth:lastLoginTime 2 ;
+	auth:status "INACTIVE" ;
+	auth:hasPermissionSet mydomain:role1 ;
+	.
+	
+mydomain:user07
+	a auth:UserAccount ;
+	auth:emailAddress "email@golf.edu" ;
+	auth:firstName "Oprah" ;
+	auth:lastName "Winfrey" ;
+	auth:md5password "garbage" ;
+	auth:passwordChangeExpires 0 ;
+	auth:loginCount 1 ;
+#	auth:lastLoginTime NONE ;
+#	auth:status NONE ;
+	auth:hasPermissionSet mydomain:role22 ;
+	.
+	
+mydomain:user08
+	a auth:UserAccount ;
+	a auth:RootUserAccount ;
+	auth:emailAddress "email@henry.edu" ;
+	auth:firstName "Mary" ;
+	auth:lastName "McInerney" ;
+	auth:md5password "garbage" ;
+	auth:passwordChangeExpires 0 ;
+	auth:loginCount 7 ;
+	auth:lastLoginTime 1122334455667788 ;
+	auth:status "ACTIVE" ;
+	.
+	
+mydomain:user09
+	a auth:UserAccount ;
+	auth:emailAddress "email@indigo.edu" ;
+	auth:firstName "Jim" ;
+	auth:lastName "Blake" ;
+	auth:md5password "garbage" ;
+	auth:passwordChangeExpires 0 ;
+	auth:loginCount 3 ;
+	auth:lastLoginTime 1000000000000000 ;
+	auth:status "ACTIVE" ;
+	auth:hasPermissionSet mydomain:role1 ;
+	.
+	
+mydomain:user10
+	a auth:UserAccount ;
+	auth:emailAddress "email@jones.edu" ;
+	auth:firstName "Bob" ;
+	auth:lastName "Caruso" ;
+	auth:md5password "garbage" ;
+	auth:passwordChangeExpires 1100234965897 ;
+	auth:loginCount 50 ;
+	auth:lastLoginTime 1020304050607080 ;
+	auth:status "ACTIVE" ;
+	auth:hasPermissionSet mydomain:role2 ;
+	.
+	
+mydomain:role1
+	a auth:PermissionSet ;
+	rdfs:label "Role 1" ;
+	.
+	
+mydomain:role2
+	a auth:PermissionSet ;
+	rdfs:label "Role 2" ;
+	.
+	
+# this is intentionally a typographical extension of mydomain:role2 
+#    to test that our reg-exp filters correctly.
+mydomain:role22
+	a auth:PermissionSet ;
+	rdfs:label "Role 22" ;
+	.
+	

@@ -3,15 +3,12 @@
 package edu.cornell.mannlib.vitro.webapp.search.beans;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import org.joda.time.DateTime;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
-import org.joda.time.DateTime;
 
 public abstract class VitroQuery {
     /**
@@ -25,14 +22,12 @@ public abstract class VitroQuery {
     DateTime earliest;
     DateTime latest;
     Map parameters = null;
-    PortalFlag portalState = null;
 
     /**
-     * Make a VitroQuery with the request parameters and portalState
-     * saves for when the query needs to be created.
+     * Make a VitroQuery with the request parameters 
+     * for when the query needs to be created.
      */
-    public VitroQuery(VitroRequest request, PortalFlag portalState){
-        this.portalState = portalState;
+    public VitroQuery(VitroRequest request){
         parameters =request.getParameterMap();
         if( parameters == null )
             parameters = Collections.EMPTY_MAP;
@@ -47,10 +42,6 @@ public abstract class VitroQuery {
      */
     public Map getParameters(){
         return parameters;
-    }
-
-    public PortalFlag getPortalState(){
-        return portalState;
     }
 
     public abstract String getTerms();

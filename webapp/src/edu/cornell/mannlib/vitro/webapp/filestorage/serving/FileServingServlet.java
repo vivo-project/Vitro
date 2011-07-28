@@ -78,8 +78,8 @@ public class FileServingServlet extends VitroHttpServlet {
 		String path = request.getServletPath() + request.getPathInfo();
 		log.debug("Path is '" + path + "'");
 
-		FileInfo fileInfo = FileInfo.instanceFromAliasUrl(request
-				.getFullWebappDaoFactory(), path);
+		FileInfo fileInfo = FileInfo.instanceFromAliasUrl(
+				request.getFullWebappDaoFactory(), path, getServletContext());
 		log.debug("File info is '" + fileInfo + "'");
 		if (fileInfo == null) {
 			String message = "The request path is not valid for the File servlet: '"
@@ -107,7 +107,8 @@ public class FileServingServlet extends VitroHttpServlet {
 		// Open the actual byte stream.
 		InputStream in;
 		try {
-			in = fileStorage.getInputStream(fileInfo.getBytestreamUri(), actualFilename);
+			in = fileStorage.getInputStream(fileInfo.getBytestreamUri(),
+					actualFilename);
 		} catch (FileNotFoundException e) {
 			log.error(e, e);
 			response.sendError(SC_INTERNAL_SERVER_ERROR, e.toString());

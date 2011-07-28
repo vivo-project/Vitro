@@ -22,9 +22,9 @@ import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.util.FormUtils;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 
 public class BaseEditController extends VitroHttpServlet {
@@ -108,12 +108,11 @@ public class BaseEditController extends VitroHttpServlet {
     }
 
     protected void setRequestAttributes(HttpServletRequest request, EditProcessObject epo){
-        Portal portal = (Portal)request.getAttribute("portalBean");
+    	VitroRequest vreq = new VitroRequest(request);
         request.setAttribute("epoKey",epo.getKey());
         request.setAttribute("epo",epo);
         request.setAttribute("globalErrorMsg",epo.getAttribute("globalErrorMsg"));
-        request.setAttribute("portalBean",portal);
-        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
+        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
     }
 
     protected void populateBeanFromParams(Object bean, HttpServletRequest request) {

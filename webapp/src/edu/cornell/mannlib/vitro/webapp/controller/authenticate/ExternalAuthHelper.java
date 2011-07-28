@@ -13,7 +13,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 
 /**
  * Capture the properties used by the External Authorization system, and use
@@ -34,8 +34,8 @@ public class ExternalAuthHelper {
 	/** This configuration property points to the external authorization server. */
 	private static final String PROPERTY_EXTERNAL_AUTH_SERVER_URL = "externalAuth.serverUrl";
 
-	/** This configuration property says which HTTP header holds the username. */
-	public static final String PROPERTY_EXTERNAL_AUTH_USERNAME_HEADER = "externalAuth.netIdHeaderName";
+	/** This configuration property says which HTTP header holds the auth ID. */
+	public static final String PROPERTY_EXTERNAL_AUTH_ID_HEADER = "externalAuth.netIdHeaderName";
 
 	// ----------------------------------------------------------------------
 	// static methods
@@ -58,17 +58,17 @@ public class ExternalAuthHelper {
 			return DUMMY_HELPER;
 		}
 
-		ServletContext context = session.getServletContext();
+		ServletContext ctx = session.getServletContext();
 
-		Object attr = context.getAttribute(BEAN_ATTRIBUTE);
+		Object attr = ctx.getAttribute(BEAN_ATTRIBUTE);
 		if (attr instanceof ExternalAuthHelper) {
 			log.trace("Found a bean: " + attr);
 			return (ExternalAuthHelper) attr;
 		}
 
-		ExternalAuthHelper bean = buildBean();
+		ExternalAuthHelper bean = buildBean(ctx);
 		log.debug("Created a bean: " + bean);
-		setBean(context, bean);
+		setBean(ctx, bean);
 		return bean;
 	}
 
@@ -78,11 +78,11 @@ public class ExternalAuthHelper {
 		context.setAttribute(BEAN_ATTRIBUTE, bean);
 	}
 
-	private static ExternalAuthHelper buildBean() {
-		String externalAuthServerUrl = ConfigurationProperties
+	private static ExternalAuthHelper buildBean(ServletContext ctx) {
+		String externalAuthServerUrl = ConfigurationProperties.getBean(ctx)
 				.getProperty(PROPERTY_EXTERNAL_AUTH_SERVER_URL);
-		String externalAuthHeaderName = ConfigurationProperties
-				.getProperty(PROPERTY_EXTERNAL_AUTH_USERNAME_HEADER);
+		String externalAuthHeaderName = ConfigurationProperties.getBean(ctx)
+				.getProperty(PROPERTY_EXTERNAL_AUTH_ID_HEADER);
 
 		return new ExternalAuthHelper(externalAuthServerUrl,
 				externalAuthHeaderName);
@@ -134,7 +134,7 @@ public class ExternalAuthHelper {
 		}
 	}
 
-	public String getExternalUsername(HttpServletRequest request) {
+	public String getExternalAuthId(HttpServletRequest request) {
 		if (request == null) {
 			log.error("request is null.");
 			return null;
@@ -143,13 +143,13 @@ public class ExternalAuthHelper {
 		if (externalAuthHeaderName == null) {
 			log.error("User asked for external authentication, "
 					+ "but deploy.properties doesn't contain a value for '"
-					+ PROPERTY_EXTERNAL_AUTH_USERNAME_HEADER + "'");
+					+ PROPERTY_EXTERNAL_AUTH_ID_HEADER + "'");
 			return null;
 		}
 
-		String username = request.getHeader(externalAuthHeaderName);
-		log.debug("username=" + username);
-		return username;
+		String externalAuthId = request.getHeader(externalAuthHeaderName);
+		log.debug("externalAuthId=" + externalAuthId);
+		return externalAuthId;
 	}
 
 	@Override

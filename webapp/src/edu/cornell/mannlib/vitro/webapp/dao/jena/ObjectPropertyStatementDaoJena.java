@@ -5,10 +5,12 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -38,11 +40,12 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualUpdateEvent;
 
 public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements ObjectPropertyStatementDao {
 
-    protected static final Log log = LogFactory.getLog(ObjectPropertyStatementDaoJena.class);
+    private static final Log log = LogFactory.getLog(ObjectPropertyStatementDaoJena.class);
     
     private DatasetWrapperFactory dwf;
     
@@ -251,19 +254,6 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         return 0;
     }
 
-    @Override 
-    public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
-            String subjectUri, 
-            String propertyUri, 
-            String objectKey,
-            String queryString) {
-        
-        return getObjectPropertyStatementsForIndividualByProperty(
-                subjectUri, propertyUri, objectKey, null);
-        
-    }
-    
-    @Override
     /*
      * SPARQL-based method for getting values related to a single object property.
      * We cannot return a List<ObjectPropertyStatement> here, the way the corresponding method of
@@ -271,12 +261,24 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
      * custom queries that could request any data in addition to just the object of the statement.
      * However, we do need to get the object of the statement so that we have it to create editing links.
      */
+    
+    @Override 
     public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
             String subjectUri, 
             String propertyUri, 
-            String objectKey,
-            String queryString, 
-            Set<String> constructQueryStrings ) {  
+            String objectKey, String queryString) {
+        
+        return getObjectPropertyStatementsForIndividualByProperty(
+                subjectUri, propertyUri, objectKey, objectKey, null);
+        
+    }
+    
+    @Override
+    public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
+            String subjectUri, 
+            String propertyUri, 
+            String objectKey, 
+            String queryString, Set<String> constructQueryStrings ) {  
         
         Model constructedModel = constructModelForSelectQueries(
                 subjectUri, propertyUri, constructQueryStrings);
@@ -292,8 +294,6 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             return Collections.emptyList();
         } 
         
-        // RY One oddity here is that SDB adds the bound variables to the query select terms,
-        // even if they're not included in the query.
         QuerySolutionMap initialBindings = new QuerySolutionMap();
         initialBindings.add("subject", ResourceFactory.createResource(subjectUri));
         initialBindings.add("property", ResourceFactory.createResource(propertyUri));
@@ -303,10 +303,10 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         DatasetWrapper w = dwf.getDatasetWrapper();
         Dataset dataset = w.getDataset();
         dataset.getLock().enterCriticalSection(Lock.READ);
+        QueryExecution qexec = null;
         try {
-            
-            
-            QueryExecution qexec = (constructedModel == null) 
+
+            qexec = (constructedModel == null) 
                     ? QueryExecutionFactory.create(
                             query, dataset, initialBindings)
                     : QueryExecutionFactory.create(
@@ -317,15 +317,17 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             while (results.hasNext()) {
                 QuerySolution soln = results.nextSolution();
                 RDFNode node = soln.get(objectKey);
-                if (node.isLiteral()) {
-                    continue;
+                if (node.isURIResource()) {
+                    list.add(QueryUtils.querySolutionToStringValueMap(soln));
                 }
-                list.add(QueryUtils.querySolutionToStringValueMap(soln));
             }
             
         } finally {
             dataset.getLock().leaveCriticalSection();
             w.close();
+            if (qexec != null) {
+                qexec.close();
+            }
         }
         return list;
     }
@@ -361,7 +363,6 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             initialBindings.add(
                     "property", ResourceFactory.createResource(propertyUri));
         
-            List<Map<String, String>> list = new ArrayList<Map<String, String>>();
             DatasetWrapper w = dwf.getDatasetWrapper();
             Dataset dataset = w.getDataset();
             dataset.getLock().enterCriticalSection(Lock.READ);
@@ -385,4 +386,73 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         
     }
     
+    protected static final String MOST_SPECIFIC_TYPE_QUERY = ""
+        + "PREFIX rdfs: <" + VitroVocabulary.RDFS + "> \n"
+        + "PREFIX vitro: <" + VitroVocabulary.vitroURI + "> \n"
+        + "SELECT DISTINCT ?label ?type WHERE { \n"
+        + "    ?subject vitro:mostSpecificType ?type . \n"
+        + "    ?type rdfs:label ?label . \n"
+        + "    ?type vitro:inClassGroup ?classGroup . \n"
+        + "    ?classGroup a ?ClassGroup \n"
+        + "} ORDER BY ?label ";
+
+    @Override
+    /** 
+     * Finds all mostSpecificTypes of an individual that are members of a classgroup.
+     * Returns a list of type labels.
+     * **/
+    public Map<String, String> getMostSpecificTypesInClassgroupsForIndividual(String subjectUri) {
+        
+        String queryString = QueryUtils.subUriForQueryVar(MOST_SPECIFIC_TYPE_QUERY, "subject", subjectUri);
+        
+        log.debug("Query string for vitro:mostSpecificType : " + queryString);
+        
+        Query query = null;
+        try {
+            query = QueryFactory.create(queryString, Syntax.syntaxARQ);
+        } catch(Throwable th){
+            log.error("Could not create SPARQL query for query string. " + th.getMessage());
+            log.error(queryString);
+            return Collections.emptyMap();
+        }        
+        
+        Map<String, String> types = new LinkedHashMap<String, String>();
+        DatasetWrapper w = dwf.getDatasetWrapper();
+        Dataset dataset = w.getDataset();
+        dataset.getLock().enterCriticalSection(Lock.READ);
+        QueryExecution qexec = null;
+        try {
+            
+            qexec = QueryExecutionFactory.create(query, dataset);
+            ResultSet results = qexec.execSelect();
+            while (results.hasNext()) {
+                QuerySolution soln = results.nextSolution();       
+
+                RDFNode typeNode = soln.get("type");
+                String type = null;
+                if (typeNode.isURIResource()) {
+                     type = typeNode.asResource().getURI();
+                }
+                
+                RDFNode labelNode = soln.get("label");
+                String label = null;
+                if (labelNode.isLiteral()) {
+                    label = labelNode.asLiteral().getLexicalForm();
+                }
+                
+                if (StringUtils.isNotBlank(type) && StringUtils.isNotBlank(label)) {
+                    types.put(type, label);
+                }
+            }
+            
+        } finally {
+            dataset.getLock().leaveCriticalSection();
+            if (qexec != null) {
+                qexec.close();
+            }
+            w.close();
+        }
+        
+        return types;        
+    }
 }

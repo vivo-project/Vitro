@@ -1,0 +1,584 @@
+#
+# An unexpected error has been detected by Java Runtime Environment:
+#
+# java.lang.OutOfMemoryError: requested 16 bytes for CHeapObj-new. Out of swap space?
+#
+#  Internal Error (allocation.inline.hpp:42), pid=16825, tid=312474480
+#  Error: CHeapObj-new
+#
+# Java VM: Java HotSpot(TM) Server VM (11.0-b16 mixed mode linux-x86)
+# If you would like to submit a bug report, please visit:
+#   http://java.sun.com/webapps/bugreport/crash.jsp
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x09748800):  VMThread [stack: 0x1297f000,0x12a00000] [id=16830]
+
+Stack: [0x1297f000,0x12a00000],  sp=0x129fee00,  free space=511k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+V  [libjvm.so+0x6064fb]
+V  [libjvm.so+0x2d37f1]
+V  [libjvm.so+0x19ad85]
+V  [libjvm.so+0x474b8e]
+V  [libjvm.so+0x477b0b]
+V  [libjvm.so+0x475b39]
+V  [libjvm.so+0x4ecceb]
+V  [libjvm.so+0x5158b7]
+V  [libjvm.so+0x477baf]
+V  [libjvm.so+0x6146e7]
+V  [libjvm.so+0x613cfc]
+V  [libjvm.so+0x613ed1]
+V  [libjvm.so+0x613aaf]
+V  [libjvm.so+0x506709]
+C  [libpthread.so.0+0x596e]
+
+VM_Operation (0x119fe5d0): HeapIterateOperation, mode: safepoint, requested by thread 0x0994fc00
+
+
+---------------  P R O C E S S  ---------------
+
+Java Threads: ( => current thread )
+  0x09d48000 JavaThread "http-8080-5" daemon [_thread_blocked, id=16892, stack(0x0eb0d000,0x0eb5e000)]
+  0x09d47800 JavaThread "http-8080-4" daemon [_thread_blocked, id=16891, stack(0x0eb5e000,0x0ebaf000)]
+  0x09d47400 JavaThread "http-8080-3" daemon [_thread_blocked, id=16890, stack(0x0ebaf000,0x0ec00000)]
+  0x09d46c00 JavaThread "http-8080-2" daemon [_thread_blocked, id=16887, stack(0x11b7a000,0x11bcb000)]
+  0x10032c00 JavaThread "TP-Monitor" daemon [_thread_blocked, id=16886, stack(0x1125e000,0x112af000)]
+  0x0f50bc00 JavaThread "TP-Processor4" daemon [_thread_in_native, id=16885, stack(0x112af000,0x11300000)]
+  0x0f797800 JavaThread "TP-Processor3" daemon [_thread_blocked, id=16884, stack(0x11406000,0x11457000)]
+  0x10095400 JavaThread "TP-Processor2" daemon [_thread_blocked, id=16883, stack(0x11457000,0x114a8000)]
+  0x1001bc00 JavaThread "TP-Processor1" daemon [_thread_blocked, id=16882, stack(0x114a8000,0x114f9000)]
+  0x09a43c00 JavaThread "http-8080-1" daemon [_thread_blocked, id=16881, stack(0x1170d000,0x1175e000)]
+  0x10034c00 JavaThread "http-8080-Acceptor-0" daemon [_thread_in_native, id=16880, stack(0x1175e000,0x117af000)]
+  0x0f797000 JavaThread "ContainerBackgroundProcessor[StandardEngine[Catalina]]" daemon [_thread_blocked, id=16879, stack(0x117af000,0x11800000)]
+  0x0fa87400 JavaThread "VClassGroupCache.RebuildGroupCacheThread" daemon [_thread_blocked, id=16874, stack(0x0f245000,0x0f296000)]
+  0x0f81fc00 JavaThread "IndexBuilder" [_thread_blocked, id=16867, stack(0x0f42c000,0x0f47d000)]
+  0x0f5e2800 JavaThread "Timer-0" daemon [_thread_blocked, id=16858, stack(0x10c05000,0x10c56000)]
+  0x10ec1c00 JavaThread "pool-3-thread-1" [_thread_blocked, id=16857, stack(0x1191b000,0x1196c000)]
+  0x1111a000 JavaThread "pool-1-thread-1" [_thread_blocked, id=16852, stack(0x125af000,0x12600000)]
+  0x0994fc00 JavaThread "YJPAgent-RequestListener" daemon [_thread_blocked, id=16842, stack(0x119af000,0x11a00000)]
+  0x09b6ec00 JavaThread "YJPAgent-Telemetry" daemon [_thread_blocked, id=16841, stack(0x11faf000,0x12000000)]
+  0x12609000 JavaThread "Low Memory Detector" daemon [_thread_blocked, id=16839, stack(0x123ba000,0x1240b000)]
+  0x12607c00 JavaThread "CompilerThread1" daemon [_thread_blocked, id=16838, stack(0x1240b000,0x1248c000)]
+  0x128de000 JavaThread "CompilerThread0" daemon [_thread_blocked, id=16837, stack(0x1248c000,0x1250d000)]
+  0x128e4800 JavaThread "YJPAgent-OOMESnapshotDetector" daemon [_thread_in_native, id=16836, stack(0x1250d000,0x1255e000)]
+  0x128e0400 JavaThread "YJPAgent-CPUSampler" daemon [_thread_blocked, id=16835, stack(0x1255e000,0x125af000)]
+  0x128e0c00 JavaThread "Signal Dispatcher" daemon [_thread_blocked, id=16833, stack(0x1271f000,0x12770000)]
+  0x12801000 JavaThread "Finalizer" daemon [_thread_blocked, id=16832, stack(0x127af000,0x12800000)]
+  0x097cf400 JavaThread "Reference Handler" daemon [_thread_blocked, id=16831, stack(0x12929000,0x1297a000)]
+  0x096c4800 JavaThread "main" [_thread_in_native, id=16826, stack(0xb7534000,0xb7585000)]
+
+Other Threads:
+=>0x09748800 VMThread [stack: 0x1297f000,0x12a00000] [id=16830]
+  0x1260a400 WatcherThread [stack: 0x12339000,0x123ba000] [id=16840]
+
+VM state:at safepoint (normal execution)
+
+VM Mutex/Monitor currently owned by a thread:  ([mutex/lock_event])
+[0x096c93b8] UNKNOWN - owner thread: 0x09748800
+[0x096c97c8] UNKNOWN - owner thread: 0x0994fc00
+
+Heap
+ PSYoungGen      total 185664K, used 96829K [0xa2480000, 0xb3a40000, 0xb3a40000)
+  eden space 97280K, 36% used [0xa2480000,0xa471bb30,0xa8380000)
+  from space 88384K, 69% used [0xae3f0000,0xb1fe3c40,0xb3a40000)
+  to   space 93568K, 0% used [0xa8380000,0xa8380000,0xadee0000)
+ PSOldGen        total 1222912K, used 1034292K [0x17640000, 0x62080000, 0xa2480000)
+  object space 1222912K, 84% used [0x17640000,0x5684d2b8,0x62080000)
+ PSPermGen       total 40576K, used 34605K [0x13640000, 0x15de0000, 0x17640000)
+  object space 40576K, 85% used [0x13640000,0x1580b630,0x15de0000)
+
+Dynamic libraries:
+00010000-06000000 rwxp 00000000 00:00 0 
+06000000-06676000 r-xp 00000000 08:09 5250207    /home/opt/jdk1.6.0_11/jre/lib/i386/server/libjvm.so
+06676000-066bb000 rwxp 00675000 08:09 5250207    /home/opt/jdk1.6.0_11/jre/lib/i386/server/libjvm.so
+066bb000-06ade000 rwxp 00000000 00:00 0 
+06ade000-08048000 rwxp 00000000 00:00 0 
+08048000-08052000 r-xp 00000000 08:09 5254499    /home/opt/jdk1.6.0_11/bin/java
+08052000-08053000 rwxp 00009000 08:09 5254499    /home/opt/jdk1.6.0_11/bin/java
+08053000-0e684000 rwxp 00000000 00:00 0          [heap]
+0e684000-0eb0d000 rwxp 00000000 00:00 0 
+0eb0d000-0eb10000 ---p 00000000 00:00 0 
+0eb10000-0eb5e000 rwxp 00000000 00:00 0 
+0eb5e000-0eb61000 ---p 00000000 00:00 0 
+0eb61000-0ebaf000 rwxp 00000000 00:00 0 
+0ebaf000-0ebb2000 ---p 00000000 00:00 0 
+0ebb2000-0ec00000 rwxp 00000000 00:00 0 
+0ec00000-0ed00000 rwxp 00000000 00:00 0 
+0ed00000-0ed16000 rwxp 00000000 00:00 0 
+0ed16000-0ed20000 r-xs 00052000 08:04 825966     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/xstream-1.2.2.jar
+0ed20000-0ed25000 r-xs 00076000 08:04 825930     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/xsdlib.jar
+0ed25000-0ed27000 r-xs 00005000 08:04 826024     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/xpp3_min-1.1.3.4.O.jar
+0ed27000-0ed2f000 r-xs 00028000 08:04 826017     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/xml-apis.jar
+0ed2f000-0ed45000 r-xs 00110000 08:04 826047     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/xercesImpl.jar
+0ed45000-0ed48000 r-xs 0001e000 08:04 826041     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/xbean-spring-2.5.jar
+0ed48000-0ed84000 r-xs 00248000 08:04 826016     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/xbean-2.1.0.jar
+0ed84000-0eda5000 r-xs 00265000 08:04 825986     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/xalan.jar
+0eda5000-0edab000 r-xs 0006e000 08:04 825999     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/wstx-asl-3.0.0.jar
+0edab000-0edaf000 r-xs 0001c000 08:04 826026     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/wsdl4j-1.5.2.jar
+0edaf000-0edb2000 r-xs 0001f000 08:04 825950     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/trippi-1.3.2-core.jar
+0edb2000-0edbb000 r-xs 00060000 08:04 826060     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/tdb-0.8.7.jar
+0edbb000-0edbd000 r-xs 0000a000 08:04 826032     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/taglibs-string.jar
+0edbd000-0edbe000 r-xs 00003000 08:04 826076     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/taglibs-random.jar
+0edbe000-0edbf000 r-xs 00006000 08:04 825980     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/taglibs-mailer.jar
+0edbf000-0edc1000 r-xs 00005000 08:04 826001     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/stax-api-1.0.1.jar
+0edc1000-0edfe000 r-xs 00294000 08:04 825961     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/spring2.5.6.jar
+0edfe000-0ee00000 r-xs 00003000 08:04 826064     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sparqltag.jar
+0ee00000-0ee2e000 r-xs 00276000 08:04 825473     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/solrjClient.jar
+0ee2e000-0ee2f000 r-xs 00002000 08:04 825973     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/slf4j-log4j12-1.5.6.jar
+0ee2f000-0ee31000 r-xs 00004000 08:04 825962     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/slf4j-api-1.5.6.jar
+0ee31000-0ee37000 r-xs 00040000 08:04 826055     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-sail-rdbms-2.2.3.jar
+0ee37000-0ee3a000 r-xs 00016000 08:04 826003     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-sail-nativerdf-2.2.3.jar
+0ee3a000-0ee3c000 r-xs 0000c000 08:04 826071     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-sail-memory-2.2.3.jar
+0ee3c000-0ee3e000 r-xs 00004000 08:04 825991     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-sail-inferencer-2.2.3.jar
+0ee3e000-0ee40000 r-xs 00007000 08:04 825985     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-sail-api-2.2.3.jar
+0ee40000-0ee41000 r-xs 00000000 08:04 825983     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-runtime-2.2.3.jar
+0ee41000-0ee43000 r-xs 00003000 08:04 826052     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-rio-turtle-2.2.3.jar
+0ee43000-0ee44000 r-xs 00002000 08:04 826043     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-rio-trix-2.2.3.jar
+0ee44000-0ee45000 r-xs 00001000 08:04 825994     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-rio-trig-2.2.3.jar
+0ee45000-0ee47000 r-xs 00007000 08:04 826028     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-rio-rdfxml-2.2.3.jar
+0ee47000-0ee49000 r-xs 00002000 08:04 825949     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-rio-ntriples-2.2.3.jar
+0ee49000-0ee4b000 r-xs 00000000 08:04 826040     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-rio-n3-2.2.3.jar
+0ee4b000-0ee4c000 r-xs 00004000 08:04 826018     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-rio-api-2.2.3.jar
+0ee4c000-0ee4e000 r-xs 00004000 08:04 825935     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-repository-sail-2.2.3.jar
+0ee4e000-0ee4f000 r-xs 00005000 08:04 825953     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-repository-manager-2.2.3.jar
+0ee4f000-0ee51000 r-xs 00003000 08:04 825946     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-repository-http-2.2.3.jar
+0ee51000-0ee53000 r-xs 00003000 08:04 825996     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-repository-event-2.2.3.jar
+0ee53000-0ee54000 r-xs 00002000 08:04 825937     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-repository-dataset-2.2.3.jar
+0ee54000-0ee56000 r-xs 00002000 08:04 825978     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-repository-contextaware-2.2.3.jar
+0ee56000-0ee58000 r-xs 00007000 08:04 826065     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-repository-api-2.2.3.jar
+0ee58000-0ee59000 r-xs 00001000 08:04 826031     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-queryresultio-text-2.2.3.jar
+0ee59000-0ee5b000 r-xs 00003000 08:04 825970     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-queryresultio-sparqlxml-2.2.3.jar
+0ee5b000-0ee5c000 r-xs 00001000 08:04 825993     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-queryresultio-sparqljson-2.2.3.jar
+0ee5c000-0ee5e000 r-xs 00002000 08:04 826050     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-queryresultio-binary-2.2.3.jar
+0ee5e000-0ee5f000 r-xs 00003000 08:04 825933     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-queryresultio-api-2.2.3.jar
+0ee5f000-0ee62000 r-xs 0001e000 08:04 826013     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-queryparser-sparql-2.2.3.jar
+0ee62000-0ee66000 r-xs 00020000 08:04 826025     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-queryparser-serql-2.2.3.jar
+0ee66000-0ee67000 r-xs 00001000 08:04 825984     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-queryparser-api-2.2.3.jar
+0ee67000-0ee6a000 r-xs 00013000 08:04 826063     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-queryalgebra-model-2.2.3.jar
+0ee6a000-0ee6e000 r-xs 00015000 08:04 825924     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-queryalgebra-evaluation-2.2.3.jar
+0ee6e000-0ee70000 r-xs 00008000 08:04 826053     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-query-2.2.3.jar
+0ee70000-0ee73000 r-xs 0000b000 08:04 825948     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-model-2.2.3.jar
+0ee73000-0ee75000 r-xs 00009000 08:04 825957     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-http-server-spring-2.2.3.jar
+0ee75000-0ee77000 r-xs 00004000 08:04 826023     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-http-protocol-2.2.3.jar
+0ee77000-0ee78000 r-xs 00003000 08:04 826068     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-http-client-2.2.3.jar
+0ee78000-0ee79000 r-xs 00007000 08:04 826056     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sesame-console-2.2.3.jar
+0ee79000-0ee85000 r-xs 00071000 08:04 826051     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sdb-1.3.2.jar
+0ee85000-0ee8a000 r-xs 00015000 08:04 825969     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/sdb-1.3.2-tests.jar
+0ee8a000-0eea6000 r-xs 0051b000 08:04 825952     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/saxon9he.jar
+0eea6000-0eea7000 r-xs 00004000 08:04 825995     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/saaj.jar
+0eea7000-0eea9000 r-xs 00004000 08:04 825968     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/rsslib4j-0.2.jar
+0eea9000-0eeac000 r-xs 00018000 08:04 826030     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/rowset-20040728-v101.jar
+0eeac000-0eead000 r-xs 00004000 08:04 826049     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/relaxngDatatype.jar
+0eead000-0eeb4000 r-xs 00077000 08:04 825944     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/pellet-test.jar
+0eeb4000-0eeba000 r-xs 0002d000 08:04 826005     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/pellet-rules.jar
+0eeba000-0eec1000 r-xs 0005c000 08:04 825932     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/pellet-query.jar
+0eec1000-0eec3000 r-xs 00010000 08:04 826007     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/pellet-pellint.jar
+0eec3000-0eec5000 r-xs 00018000 08:04 826009     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/pellet-owlapiv3.jar
+0eec5000-0eec7000 r-xs 00010000 08:04 826020     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/pellet-owlapi.jar
+0eec7000-0eec8000 r-xs 0000d000 08:04 826067     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/pellet-modularity.jar
+0eec8000-0eecd000 r-xs 00029000 08:04 825934     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/pellet-jena.jar
+0eecd000-0eecf000 r-xs 00006000 08:04 826034     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/pellet-explanation.jar
+0eecf000-0eed0000 r-xs 0000c000 08:04 825979     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/pellet-el.jar
+0eed0000-0eed1000 r-xs 00006000 08:04 825990     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/pellet-dig.jar
+0eed1000-0eed6000 r-xs 0003c000 08:04 826000     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/pellet-datatypes.jar
+0eed6000-0eedf000 r-xs 00090000 08:04 826027     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/pellet-core.jar
+0eedf000-0eeed000 r-xs 00190000 08:04 825987     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/ojdbc14_g.jar
+0eeed000-0ef00000 r-xs 000fe000 08:04 825936     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/lucene-core-2.9.3.jar
+0ef00000-0efff000 rwxp 00000000 00:00 0 
+0efff000-0f000000 ---p 00000000 00:00 0 
+0f000000-0f0fa000 rwxp 00000000 00:00 0 
+0f0fa000-0f100000 ---p 00000000 00:00 0 
+0f100000-0f1fd000 rwxp 00000000 00:00 0 
+0f1fd000-0f200000 ---p 00000000 00:00 0 
+0f200000-0f205000 rwxp 00000000 00:00 0 
+0f205000-0f207000 r-xs 00011000 08:04 825939     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/pellet-cli.jar
+0f207000-0f20c000 r-xs 0002d000 08:04 826045     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/lucene-analyzers-2.9.3.jar
+0f20c000-0f213000 r-xs 00053000 08:04 826002     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/log4j-1.2.14.jar
+0f213000-0f222000 r-xs 00071000 08:04 826035     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/joda-time-1.4.jar
+0f222000-0f245000 r-xs 001ad000 08:04 826038     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/jena-2.6.3.jar
+0f245000-0f248000 ---p 00000000 00:00 0 
+0f248000-0f41f000 rwxp 00000000 00:00 0 
+0f41f000-0f425000 r-xs 00059000 08:04 825959     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/mail-1.4.jar
+0f425000-0f42c000 r-xs 0003c000 08:04 826011     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/ldap.jar
+0f42c000-0f42f000 ---p 00000000 00:00 0 
+0f42f000-0f500000 rwxp 00000000 00:00 0 
+0f500000-0f5fc000 rwxp 00000000 00:00 0 
+0f5fc000-0f600000 ---p 00000000 00:00 0 
+0f600000-0f6fb000 rwxp 00000000 00:00 0 
+0f6fb000-0f700000 ---p 00000000 00:00 0 
+0f700000-0f7ff000 rwxp 00000000 00:00 0 
+0f7ff000-0f800000 ---p 00000000 00:00 0 
+0f800000-0f8ff000 rwxp 00000000 00:00 0 
+0f8ff000-0f900000 ---p 00000000 00:00 0 
+0f900000-0f9fc000 rwxp 00000000 00:00 0 
+0f9fc000-0fa00000 ---p 00000000 00:00 0 
+0fa00000-0fb00000 rwxp 00000000 00:00 0 
+0fb00000-0fbf0000 rwxp 00000000 00:00 0 
+0fbf0000-0fc00000 ---p 00000000 00:00 0 
+0fc00000-0fd00000 rwxp 00000000 00:00 0 
+0fd00000-0fdfe000 rwxp 00000000 00:00 0 
+0fdfe000-0fe00000 ---p 00000000 00:00 0 
+0fe00000-0ff00000 rwxp 00000000 00:00 0 
+0ff00000-0ffff000 rwxp 00000000 00:00 0 
+0ffff000-10000000 ---p 00000000 00:00 0 
+10000000-100fc000 rwxp 00000000 00:00 0 
+100fc000-10100000 ---p 00000000 00:00 0 
+10100000-101e5000 rwxp 00000000 00:00 0 
+101e5000-10200000 ---p 00000000 00:00 0 
+10200000-102fd000 rwxp 00000000 00:00 0 
+102fd000-10300000 ---p 00000000 00:00 0 
+10300000-103e1000 rwxp 00000000 00:00 0 
+103e1000-10400000 ---p 00000000 00:00 0 
+10400000-104e2000 rwxp 00000000 00:00 0 
+104e2000-10500000 ---p 00000000 00:00 0 
+10500000-105ff000 rwxp 00000000 00:00 0 
+105ff000-10600000 ---p 00000000 00:00 0 
+10600000-106ed000 rwxp 00000000 00:00 0 
+106ed000-10700000 ---p 00000000 00:00 0 
+10700000-107f7000 rwxp 00000000 00:00 0 
+107f7000-10800000 ---p 00000000 00:00 0 
+10800000-108fb000 rwxp 00000000 00:00 0 
+108fb000-10900000 ---p 00000000 00:00 0 
+10900000-109fb000 rwxp 00000000 00:00 0 
+109fb000-10a00000 ---p 00000000 00:00 0 
+10a00000-10afc000 rwxp 00000000 00:00 0 
+10afc000-10b00000 ---p 00000000 00:00 0 
+10b00000-10bff000 rwxp 00000000 00:00 0 
+10bff000-10c00000 ---p 00000000 00:00 0 
+10c00000-10c01000 rwxp 00000000 00:00 0 
+10c01000-10c03000 r-xs 00038000 08:04 825976     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/mysql-connector-java-3.0.16-ga-bin.jar
+10c03000-10c05000 r-xs 0000a000 08:04 826069     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/lucene-highlighter-2.9.3.jar
+10c05000-10c08000 ---p 00000000 00:00 0 
+10c08000-10c56000 rwxp 00000000 00:00 0 
+10c56000-10c64000 r-xs 0065f000 08:09 5250039    /home/opt/jdk1.6.0_11/jre/lib/charsets.jar
+10c64000-10c6a000 r-xs 00034000 08:04 826014     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/junit-4.8.1.jar
+10c6a000-10c71000 r-xs 00028000 08:04 826073     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/jgrapht-jdk1.5.jar
+10c71000-10c7a000 r-xs 00065000 08:04 826004     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/jga-0.8.jar
+10c7a000-10c93000 r-xs 00157000 08:04 826010     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/jena-2.6.3-tests.jar
+10c93000-10c9e000 r-xs 000e7000 08:04 826019     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/jena-2.6.3-test-sources.jar
+10c9e000-10cb7000 r-xs 0021e000 08:04 825971     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/jena-2.6.3-sources.jar
+10cb7000-10cb9000 r-xs 00023000 08:04 825954     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/jdom.jar
+10cb9000-10cbc000 r-xs 00023000 08:04 826070     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/jdom-1.0.jar
+10cbc000-10cbe000 r-xs 00003000 08:04 826054     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/jcl-over-slf4j-1.5.5.jar
+10cbe000-10cc0000 r-xs 0001c000 08:04 826072     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/jcalendar.jar
+10cc0000-10cc2000 r-xs 00006000 08:04 825956     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/jaxrpc.jar
+10cc2000-10cc4000 r-xs 0000e000 08:04 825974     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/jakarta-oro-2.0.8.jar
+10cc4000-10ccd000 r-xs 00058000 08:04 825981     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/jakarta-jstl1.2-standard.jar
+10ccd000-10ccf000 r-xs 00004000 08:04 826039     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/jakarta-jstl1.2-jstl.jar
+10ccf000-10ce3000 r-xs 001bd000 08:04 825945     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/jai_core.jar
+10ce3000-10ce7000 r-xs 0003c000 08:04 825998     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/jai_codec.jar
+10ce7000-10d00000 r-xs 002fd000 08:04 825972     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/icu4j-3.4.4.jar
+10d00000-10dff000 rwxp 00000000 00:00 0 
+10dff000-10e00000 ---p 00000000 00:00 0 
+10e00000-10ef6000 rwxp 00000000 00:00 0 
+10ef6000-10f00000 ---p 00000000 00:00 0 
+10f00000-10ff3000 rwxp 00000000 00:00 0 
+10ff3000-11000000 ---p 00000000 00:00 0 
+11000000-110fc000 rwxp 00000000 00:00 0 
+110fc000-11100000 ---p 00000000 00:00 0 
+11100000-111fd000 rwxp 00000000 00:00 0 
+111fd000-11200000 ---p 00000000 00:00 0 
+11200000-11203000 r-xs 0003a000 08:04 825989     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/jtidy-8.0-20060801.124516-2.jar
+11203000-11206000 r-xs 00023000 08:04 825960     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/iri-0.8.jar
+11206000-11214000 r-xs 00170000 08:04 826057     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/iText-5.0.2.jar
+11214000-11218000 r-xs 00025000 08:04 826061     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/gson-1.4.jar
+11218000-11228000 r-xs 000d2000 08:04 826015     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/freemarker.jar
+11228000-11239000 r-xs 000ce000 08:04 826058     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/fedora-client.jar
+11239000-1125e000 r-xs 001c8000 08:04 826033     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/arq-2.8.5.jar
+1125e000-11261000 ---p 00000000 00:00 0 
+11261000-112af000 rwxp 00000000 00:00 0 
+112af000-112b2000 ---p 00000000 00:00 0 
+112b2000-11300000 rwxp 00000000 00:00 0 
+11300000-113e1000 rwxp 00000000 00:00 0 
+113e1000-11400000 ---p 00000000 00:00 0 
+11400000-11406000 r-xs 0004c000 08:04 826036     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/dwr-2.0.M2.8.jar
+11406000-11409000 ---p 00000000 00:00 0 
+11409000-11457000 rwxp 00000000 00:00 0 
+11457000-1145a000 ---p 00000000 00:00 0 
+1145a000-114a8000 rwxp 00000000 00:00 0 
+114a8000-114ab000 ---p 00000000 00:00 0 
+114ab000-114f9000 rwxp 00000000 00:00 0 
+114f9000-11600000 rwxs 00000000 00:04 29884432   /SYSV42341490 (deleted)
+11600000-11700000 rwxp 00000000 00:00 0 
+11700000-11702000 r-xs 00032000 08:04 826059     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/iri-0.8-sources.jar
+11702000-11707000 r-xs 00048000 08:04 826062     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/dom4j-1.6.1.jar
+11707000-11709000 r-xs 0000c000 08:04 825997     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/cos.jar
+11709000-1170d000 r-xs 0001b000 08:04 825967     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/concurrent.jar
+1170d000-11710000 ---p 00000000 00:00 0 
+11710000-1175e000 rwxp 00000000 00:00 0 
+1175e000-11761000 ---p 00000000 00:00 0 
+11761000-117af000 rwxp 00000000 00:00 0 
+117af000-117b2000 ---p 00000000 00:00 0 
+117b2000-11800000 rwxp 00000000 00:00 0 
+11800000-118f5000 rwxp 00000000 00:00 0 
+118f5000-11900000 ---p 00000000 00:00 0 
+11900000-11901000 rwxp 00000000 00:00 0 
+11901000-11903000 r-xs 0000d000 08:04 825951     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/commons-logging-1.1.1.jar
+11903000-11908000 r-xs 00041000 08:04 825925     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/commons-lang-2.6.jar
+11908000-1190b000 r-xs 00024000 08:04 825940     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/commons-io-2.0.1.jar
+1190b000-11911000 r-xs 00045000 08:04 825958     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/commons-httpclient-3.1.jar
+11911000-11914000 r-xs 0000c000 08:04 825929     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/commons-fileupload-1.2.1.jar
+11914000-11917000 r-xs 0000f000 08:04 826006     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/commons-discovery-0.2.jar
+11917000-1191b000 r-xs 0001f000 08:04 825943     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/commons-digester-1.7.jar
+1191b000-1191e000 ---p 00000000 00:00 0 
+1191e000-1196d000 rwxp 00000000 00:00 0 
+1196d000-119af000 rwxp 00000000 00:00 0 
+119af000-119b2000 ---p 00000000 00:00 0 
+119b2000-11a00000 rwxp 00000000 00:00 0 
+11a00000-11b00000 rwxp 00000000 00:00 0 
+11b00000-11b3c000 rwxp 00000000 00:00 0 
+11b3c000-11b3e000 r-xs 0000e000 08:04 825942     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/commons-pool-1.3.jar
+11b3e000-11b41000 r-xs 00025000 08:04 825931     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/commons-dbcp-1.4.jar
+11b41000-11b4f000 r-xs 0007f000 08:04 826074     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/commons-collections-3.2.1.jar
+11b4f000-11b51000 r-xs 0000a000 08:04 825977     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/commons-codec-1.3.jar
+11b51000-11b52000 r-xs 00008000 08:04 825926     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/commons-cli-1.1.jar
+11b52000-11b57000 r-xs 00032000 08:04 826008     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/commons-betwixt-0.7.jar
+11b57000-11b5b000 r-xs 00026000 08:04 825927     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/commons-beanutils-core.jar
+11b5b000-11b5f000 r-xs 0001e000 08:04 825923     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/aterm-java-1.6.jar
+11b5f000-11b64000 r-xs 0003c000 08:04 825941     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/arq-2.8.5-tests.jar
+11b64000-11b69000 r-xs 00068000 08:04 826075     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/antlr-2.7.7.jar
+11b69000-11b6b000 r-xs 00005000 08:04 826022     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/aduna-commons-xml-2.2.jar
+11b6b000-11b6d000 r-xs 00003000 08:04 826037     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/aduna-commons-webapp-core-2.3.jar
+11b6d000-11b6f000 r-xs 00002000 08:04 826046     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/aduna-commons-text-2.2.jar
+11b6f000-11b71000 r-xs 00003000 08:04 825965     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/aduna-commons-platform-info-2.4.jar
+11b71000-11b73000 r-xs 00002000 08:04 825963     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/aduna-commons-net-2.2.jar
+11b73000-11b74000 r-xs 00002000 08:04 825928     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/aduna-commons-lang-2.2.jar
+11b74000-11b75000 r-xs 00005000 08:04 826021     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/aduna-commons-iteration-2.3.jar
+11b75000-11b76000 r-xs 00005000 08:04 825975     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/aduna-commons-io-2.4.jar
+11b76000-11b77000 r-xs 00006000 08:04 826042     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/aduna-commons-i18n-1.0.jar
+11b77000-11b78000 r-xs 00003000 08:04 825988     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/aduna-commons-concurrent-2.2.jar
+11b78000-11b7a000 r-xs 00006000 08:04 826029     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/aduna-commons-collections-2.3.jar
+11b7a000-11b7d000 ---p 00000000 00:00 0 
+11b7d000-11bcb000 rwxp 00000000 00:00 0 
+11bcb000-11bcd000 r-xp 00000000 08:04 60701      /lib/libnss_mdns4.so.2
+11bcd000-11bce000 r-xp 00001000 08:04 60701      /lib/libnss_mdns4.so.2
+11bce000-11bcf000 rwxp 00002000 08:04 60701      /lib/libnss_mdns4.so.2
+11bcf000-11bdf000 r-xp 00000000 08:04 9220       /lib/tls/i686/cmov/libresolv-2.11.1.so
+11bdf000-11be0000 r-xp 00010000 08:04 9220       /lib/tls/i686/cmov/libresolv-2.11.1.so
+11be0000-11be1000 rwxp 00011000 08:04 9220       /lib/tls/i686/cmov/libresolv-2.11.1.so
+11be1000-11be3000 rwxp 00000000 00:00 0 
+11be3000-11be7000 r-xp 00000000 08:04 9213       /lib/tls/i686/cmov/libnss_dns-2.11.1.so
+11be7000-11be8000 r-xp 00004000 08:04 9213       /lib/tls/i686/cmov/libnss_dns-2.11.1.so
+11be8000-11be9000 rwxp 00005000 08:04 9213       /lib/tls/i686/cmov/libnss_dns-2.11.1.so
+11be9000-11beb000 r-xp 00000000 08:04 60702      /lib/libnss_mdns4_minimal.so.2
+11beb000-11bec000 r-xp 00001000 08:04 60702      /lib/libnss_mdns4_minimal.so.2
+11bec000-11bed000 rwxp 00002000 08:04 60702      /lib/libnss_mdns4_minimal.so.2
+11bed000-11bee000 r-xs 000c1000 08:04 825642     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/oim.vivo.scimapcore.jar
+11bee000-11bf0000 r-xs 00004000 08:04 825922     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/aduna-appbase-webapp-base-core-3.4.jar
+11bf0000-11bf1000 r-xs 00001000 08:04 825982     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/aduna-appbase-logging-file-3.4.jar
+11bf1000-11bf2000 r-xs 00001000 08:04 826012     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/aduna-appbase-logging-api-3.4.jar
+11bf2000-11bf4000 r-xs 00004000 08:04 825992     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/aduna-appbase-core-3.4.jar
+11bf4000-11bf6000 r-xs 0000e000 08:04 826048     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/activation-1.1.jar
+11bf6000-11bfa000 r-xs 00018000 08:04 826066     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/XmlSchema-1.0.3.jar
+11bfa000-11c00000 r-xs 00091000 08:09 5250038    /home/opt/jdk1.6.0_11/jre/lib/jsse.jar
+11c00000-11cf8000 rwxp 00000000 00:00 0 
+11cf8000-11d00000 ---p 00000000 00:00 0 
+11d00000-11dff000 rwxp 00000000 00:00 0 
+11dff000-11e00000 ---p 00000000 00:00 0 
+11e00000-11efb000 rwxp 00000000 00:00 0 
+11efb000-11f00000 ---p 00000000 00:00 0 
+11f00000-11f1e000 rwxp 00000000 00:00 0 
+11f1e000-11f25000 r-xs 00110000 08:09 5250291    /home/opt/jdk1.6.0_11/jre/lib/resources.jar
+11f25000-11f26000 r-xs 0000c000 08:04 825964     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/json-taglib-0.4.1.jar
+11f26000-11fa0000 rwxp 00000000 00:00 0 
+11fa0000-11fa7000 r-xp 00000000 08:09 5250233    /home/opt/jdk1.6.0_11/jre/lib/i386/libnio.so
+11fa7000-11fa8000 rwxp 00006000 08:09 5250233    /home/opt/jdk1.6.0_11/jre/lib/i386/libnio.so
+11fa8000-11fae000 r-xp 00000000 08:09 5250192    /home/opt/jdk1.6.0_11/jre/lib/i386/libmanagement.so
+11fae000-11faf000 rwxp 00005000 08:09 5250192    /home/opt/jdk1.6.0_11/jre/lib/i386/libmanagement.so
+11faf000-11fb2000 ---p 00000000 00:00 0 
+11fb2000-12000000 rwxp 00000000 00:00 0 
+12000000-120fd000 rwxp 00000000 00:00 0 
+120fd000-12100000 ---p 00000000 00:00 0 
+12100000-121ff000 rwxp 00000000 00:00 0 
+121ff000-12200000 ---p 00000000 00:00 0 
+12200000-122fb000 rwxp 00000000 00:00 0 
+122fb000-12300000 ---p 00000000 00:00 0 
+12300000-12301000 r-xs 00002000 08:04 826044     /usr/local/apache-tomcat-6.0.10/webapps/vivo/WEB-INF/lib/csv-1.0.jar
+12301000-12325000 rwxp 00000000 00:00 0 
+12325000-12338000 r-xp 00000000 08:09 5250193    /home/opt/jdk1.6.0_11/jre/lib/i386/libnet.so
+12338000-12339000 rwxp 00013000 08:09 5250193    /home/opt/jdk1.6.0_11/jre/lib/i386/libnet.so
+12339000-1233a000 ---p 00000000 00:00 0 
+1233a000-123ba000 rwxp 00000000 00:00 0 
+123ba000-123bd000 ---p 00000000 00:00 0 
+123bd000-1240b000 rwxp 00000000 00:00 0 
+1240b000-1240e000 ---p 00000000 00:00 0 
+1240e000-1248c000 rwxp 00000000 00:00 0 
+1248c000-1248f000 ---p 00000000 00:00 0 
+1248f000-1250d000 rwxp 00000000 00:00 0 
+1250d000-12510000 ---p 00000000 00:00 0 
+12510000-1255e000 rwxp 00000000 00:00 0 
+1255e000-12561000 ---p 00000000 00:00 0 
+12561000-125af000 rwxp 00000000 00:00 0 
+125af000-125b2000 ---p 00000000 00:00 0 
+125b2000-12600000 rwxp 00000000 00:00 0 
+12600000-12700000 rwxp 00000000 00:00 0 
+12700000-12701000 rwxp 00000000 00:00 0 
+12701000-12702000 rwxs 00000000 00:04 29917203   /SYSV42341491 (deleted)
+12702000-12704000 rwxp 00000000 00:00 0 
+12704000-12707000 r-xs 000cb000 08:09 5250319    /home/opt/jdk1.6.0_11/jre/lib/ext/localedata.jar
+12707000-1270f000 r-xs 00076000 08:04 525983     /usr/local/apache-tomcat-6.0.10/lib/jasper.jar
+1270f000-12710000 r-xs 00006000 08:04 525990     /usr/local/apache-tomcat-6.0.10/lib/el-api.jar
+12710000-12712000 r-xs 00017000 08:04 525998     /usr/local/apache-tomcat-6.0.10/lib/jasper-el.jar
+12712000-12715000 r-xs 0001a000 08:04 525987     /usr/local/apache-tomcat-6.0.10/lib/catalina-ha.jar
+12715000-1271f000 r-xs 000a2000 08:04 525984     /usr/local/apache-tomcat-6.0.10/lib/tomcat-coyote.jar
+1271f000-12722000 ---p 00000000 00:00 0 
+12722000-12770000 rwxp 00000000 00:00 0 
+12770000-127af000 r-xp 00000000 08:04 795504     /usr/lib/locale/en_US.utf8/LC_CTYPE
+127af000-127b2000 ---p 00000000 00:00 0 
+127b2000-12800000 rwxp 00000000 00:00 0 
+12800000-128f9000 rwxp 00000000 00:00 0 
+128f9000-12900000 ---p 00000000 00:00 0 
+12900000-12903000 r-xs 00006000 08:04 525994     /usr/local/apache-tomcat-6.0.10/lib/tomcat-i18n-fr.jar
+12903000-12910000 r-xs 000f4000 08:04 525989     /usr/local/apache-tomcat-6.0.10/lib/catalina.jar
+12910000-12912000 r-xs 00014000 08:04 525991     /usr/local/apache-tomcat-6.0.10/lib/servlet-api.jar
+12912000-12914000 r-xs 00007000 08:04 525995     /usr/local/apache-tomcat-6.0.10/lib/tomcat-i18n-es.jar
+12914000-12916000 r-xs 00012000 08:04 525988     /usr/local/apache-tomcat-6.0.10/lib/jsp-api.jar
+12916000-12918000 r-xs 0000a000 08:04 525985     /usr/local/apache-tomcat-6.0.10/lib/catalina-ant.jar
+12918000-1291d000 r-xs 00030000 08:04 525993     /usr/local/apache-tomcat-6.0.10/lib/catalina-tribes.jar
+1291d000-12929000 r-xs 0013b000 08:04 525997     /usr/local/apache-tomcat-6.0.10/lib/jasper-jdt.jar
+12929000-1292c000 ---p 00000000 00:00 0 
+1292c000-1297a000 rwxp 00000000 00:00 0 
+1297a000-1297f000 r-xs 00050000 08:06 69         /tmp/yjp201007231244.jar
+1297f000-12980000 ---p 00000000 00:00 0 
+12980000-12a33000 rwxp 00000000 00:00 0 
+12a33000-12bc3000 r-xs 02ef0000 08:09 5250275    /home/opt/jdk1.6.0_11/jre/lib/rt.jar
+12bc3000-12bc4000 ---p 00000000 00:00 0 
+12bc4000-12c44000 rwxp 00000000 00:00 0 
+12c44000-12c45000 ---p 00000000 00:00 0 
+12c45000-12cd9000 rwxp 00000000 00:00 0 
+12cd9000-12ce5000 rwxp 00000000 00:00 0 
+12ce5000-12f3b000 rwxp 00000000 00:00 0 
+12f3b000-1313d000 rwxp 00000000 00:00 0 
+1313d000-13151000 rwxp 00000000 00:00 0 
+13151000-1315d000 rwxp 00000000 00:00 0 
+1315d000-133b3000 rwxp 00000000 00:00 0 
+133b3000-135b4000 rwxp 00000000 00:00 0 
+135b4000-1363f000 rwxp 00000000 00:00 0 
+1363f000-15de0000 rwxp 00000000 00:00 0 
+15de0000-17640000 rwxp 00000000 00:00 0 
+17640000-62080000 rwxp 00000000 00:00 0 
+62080000-a2480000 rwxp 00000000 00:00 0 
+a2480000-b3a41000 rwxp 00000000 00:00 0 
+b3a41000-b3a43000 r-xs 00008000 08:04 525986     /usr/local/apache-tomcat-6.0.10/lib/tomcat-i18n-ja.jar
+b3a43000-b3a5e000 rwxp 00000000 00:00 0 
+b3a5e000-b3b03000 rwxp 00000000 00:00 0 
+b3b03000-b41b3000 rwxp 00000000 00:00 0 
+b41b3000-b6b03000 rwxp 00000000 00:00 0 
+b6b03000-b6b12000 r-xp 00000000 08:09 5250210    /home/opt/jdk1.6.0_11/jre/lib/i386/libzip.so
+b6b12000-b6b14000 rwxp 0000e000 08:09 5250210    /home/opt/jdk1.6.0_11/jre/lib/i386/libzip.so
+b6b14000-b6b37000 r-xp 00000000 08:09 5250212    /home/opt/jdk1.6.0_11/jre/lib/i386/libjava.so
+b6b37000-b6b39000 rwxp 00023000 08:09 5250212    /home/opt/jdk1.6.0_11/jre/lib/i386/libjava.so
+b6b39000-b6b44000 r-xp 00000000 08:09 5250245    /home/opt/jdk1.6.0_11/jre/lib/i386/libverify.so
+b6b44000-b6b45000 rwxp 0000b000 08:09 5250245    /home/opt/jdk1.6.0_11/jre/lib/i386/libverify.so
+b6b45000-b6b46000 ---p 00000000 00:00 0 
+b6b46000-b7346000 rwxp 00000000 00:00 0 
+b7346000-b734c000 r-xp 00000000 08:04 7436       /lib/tls/i686/cmov/libnss_compat-2.11.1.so
+b734c000-b734d000 r-xp 00006000 08:04 7436       /lib/tls/i686/cmov/libnss_compat-2.11.1.so
+b734d000-b734e000 rwxp 00007000 08:04 7436       /lib/tls/i686/cmov/libnss_compat-2.11.1.so
+b734e000-b734f000 r-xs 00002000 08:04 525996     /usr/local/apache-tomcat-6.0.10/lib/annotations-api.jar
+b734f000-b7352000 r-xs 00025000 08:04 525992     /usr/local/apache-tomcat-6.0.10/lib/tomcat-dbcp.jar
+b7352000-b7359000 r-xs 00000000 08:04 101751     /usr/lib/gconv/gconv-modules.cache
+b7359000-b7361000 rwxs 00000000 08:06 29         /tmp/hsperfdata_bdc34/16825
+b7361000-b738a000 rwxp 00000000 00:00 0 
+b738a000-b74d5000 r-xp 00000000 08:09 2098489    /home/opt/yourkit-9.0.7/bin/linux-x86-32/libyjpagent.so
+b74d5000-b74ef000 rwxp 0014a000 08:09 2098489    /home/opt/yourkit-9.0.7/bin/linux-x86-32/libyjpagent.so
+b74ef000-b7501000 rwxp 00000000 00:00 0 
+b7501000-b7514000 r-xp 00000000 08:04 7422       /lib/tls/i686/cmov/libnsl-2.11.1.so
+b7514000-b7515000 r-xp 00012000 08:04 7422       /lib/tls/i686/cmov/libnsl-2.11.1.so
+b7515000-b7516000 rwxp 00013000 08:04 7422       /lib/tls/i686/cmov/libnsl-2.11.1.so
+b7516000-b7518000 rwxp 00000000 00:00 0 
+b7518000-b751a000 r-xs 00003000 08:04 525952     /usr/local/apache-tomcat-6.0.10/bin/tomcat-juli.jar
+b751a000-b751c000 r-xs 00001000 08:04 525962     /usr/local/apache-tomcat-6.0.10/bin/commons-daemon.jar
+b751c000-b751e000 r-xs 00003000 08:04 525959     /usr/local/apache-tomcat-6.0.10/bin/bootstrap.jar
+b751e000-b751f000 rwxp 00000000 00:00 0 
+b751f000-b7529000 r-xp 00000000 08:04 9214       /lib/tls/i686/cmov/libnss_files-2.11.1.so
+b7529000-b752a000 r-xp 00009000 08:04 9214       /lib/tls/i686/cmov/libnss_files-2.11.1.so
+b752a000-b752b000 rwxp 0000a000 08:04 9214       /lib/tls/i686/cmov/libnss_files-2.11.1.so
+b752b000-b7532000 r-xp 00000000 08:04 9221       /lib/tls/i686/cmov/librt-2.11.1.so
+b7532000-b7533000 r-xp 00006000 08:04 9221       /lib/tls/i686/cmov/librt-2.11.1.so
+b7533000-b7534000 rwxp 00007000 08:04 9221       /lib/tls/i686/cmov/librt-2.11.1.so
+b7534000-b7537000 ---p 00000000 00:00 0 
+b7537000-b7585000 rwxp 00000000 00:00 0 
+b7585000-b75a9000 r-xp 00000000 08:04 6725       /lib/tls/i686/cmov/libm-2.11.1.so
+b75a9000-b75aa000 r-xp 00023000 08:04 6725       /lib/tls/i686/cmov/libm-2.11.1.so
+b75aa000-b75ab000 rwxp 00024000 08:04 6725       /lib/tls/i686/cmov/libm-2.11.1.so
+b75ab000-b75ac000 rwxp 00000000 00:00 0 
+b75ac000-b76ff000 r-xp 00000000 08:04 4024       /lib/tls/i686/cmov/libc-2.11.1.so
+b76ff000-b7700000 ---p 00153000 08:04 4024       /lib/tls/i686/cmov/libc-2.11.1.so
+b7700000-b7702000 r-xp 00153000 08:04 4024       /lib/tls/i686/cmov/libc-2.11.1.so
+b7702000-b7703000 rwxp 00155000 08:04 4024       /lib/tls/i686/cmov/libc-2.11.1.so
+b7703000-b7706000 rwxp 00000000 00:00 0 
+b7706000-b7708000 r-xp 00000000 08:04 5520       /lib/tls/i686/cmov/libdl-2.11.1.so
+b7708000-b7709000 r-xp 00001000 08:04 5520       /lib/tls/i686/cmov/libdl-2.11.1.so
+b7709000-b770a000 rwxp 00002000 08:04 5520       /lib/tls/i686/cmov/libdl-2.11.1.so
+b770a000-b7711000 r-xp 00000000 08:09 5250240    /home/opt/jdk1.6.0_11/jre/lib/i386/jli/libjli.so
+b7711000-b7713000 rwxp 00006000 08:09 5250240    /home/opt/jdk1.6.0_11/jre/lib/i386/jli/libjli.so
+b7713000-b7714000 rwxp 00000000 00:00 0 
+b7714000-b7729000 r-xp 00000000 08:04 9219       /lib/tls/i686/cmov/libpthread-2.11.1.so
+b7729000-b772a000 r-xp 00014000 08:04 9219       /lib/tls/i686/cmov/libpthread-2.11.1.so
+b772a000-b772b000 rwxp 00015000 08:04 9219       /lib/tls/i686/cmov/libpthread-2.11.1.so
+b772b000-b772d000 rwxp 00000000 00:00 0 
+b772d000-b7735000 r-xp 00000000 08:04 9216       /lib/tls/i686/cmov/libnss_nis-2.11.1.so
+b7735000-b7736000 r-xp 00007000 08:04 9216       /lib/tls/i686/cmov/libnss_nis-2.11.1.so
+b7736000-b7737000 rwxp 00008000 08:04 9216       /lib/tls/i686/cmov/libnss_nis-2.11.1.so
+b7737000-b773d000 r-xp 00000000 08:09 5250222    /home/opt/jdk1.6.0_11/jre/lib/i386/native_threads/libhpi.so
+b773d000-b773e000 rwxp 00006000 08:09 5250222    /home/opt/jdk1.6.0_11/jre/lib/i386/native_threads/libhpi.so
+b773e000-b773f000 rwxp 00000000 00:00 0 
+b773f000-b7740000 ---p 00000000 00:00 0 
+b7740000-b7742000 rwxp 00000000 00:00 0 
+b7742000-b7743000 r-xp 00000000 00:00 0          [vdso]
+b7743000-b775e000 r-xp 00000000 08:04 2817       /lib/ld-2.11.1.so
+b775e000-b775f000 r-xp 0001a000 08:04 2817       /lib/ld-2.11.1.so
+b775f000-b7760000 rwxp 0001b000 08:04 2817       /lib/ld-2.11.1.so
+b7760000-b9360000 rwxp 00000000 00:00 0 
+b9400000-bfc00000 rwxp 00000000 00:00 0 
+bfc0c000-bfc21000 rwxp 00000000 00:00 0          [stack]
+bfd00000-c0000000 rwxp 00000000 00:00 0 
+
+VM Arguments:
+jvm_args: -agentpath:/home/opt/yourkit-9.0.7/bin/linux-x86-32/libyjpagent.so=disablestacktelemetry,disableexceptiontelemetry,builtinprobes=none,delay=10000,sessionname=Tomcat -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -Djava.util.logging.config.file=/usr/local/tomcat/conf/logging.properties -Xmx2500m -Dfile.encoding=UTF-8 -Djava.endorsed.dirs=/usr/local/tomcat/endorsed -Dcatalina.base=/usr/local/tomcat -Dcatalina.home=/usr/local/tomcat -Djava.io.tmpdir=/usr/local/tomcat/temp 
+java_command: org.apache.catalina.startup.Bootstrap start
+Launcher Type: SUN_STANDARD
+
+Environment Variables:
+JAVA_HOME=/home/opt/jdk1.6.0_11
+PATH=/sbin:/usr/sbin:/home/bdc34/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/home/opt/scala/bin
+USERNAME=bdc34
+LD_LIBRARY_PATH=/home/opt/jdk1.6.0_11/jre/lib/i386/server:/home/opt/jdk1.6.0_11/jre/lib/i386:/home/opt/jdk1.6.0_11/jre/../lib/i386
+SHELL=/bin/bash
+DISPLAY=:0.0
+
+Signal Handlers:
+SIGSEGV: [libjvm.so+0x606fd0], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGBUS: [libjvm.so+0x606fd0], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGFPE: [libjvm.so+0x504690], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGPIPE: [libjvm.so+0x504690], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGXFSZ: [libjvm.so+0x504690], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGILL: [libjvm.so+0x504690], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGUSR1: SIG_DFL, sa_mask[0]=0x00000000, sa_flags=0x00000000
+SIGUSR2: [libjvm.so+0x506b60], sa_mask[0]=0x00000000, sa_flags=0x10000004
+SIGHUP: [libjvm.so+0x506900], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGINT: SIG_IGN, sa_mask[0]=0x00000000, sa_flags=0x00000000
+SIGTERM: [libjvm.so+0x506900], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGQUIT: [libjvm.so+0x506900], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+
+
+---------------  S Y S T E M  ---------------
+
+OS:squeeze/sid
+
+uname:Linux 2.6.32-31-generic #61-Ubuntu SMP Fri Apr 8 18:24:35 UTC 2011 i686
+libc:glibc 2.11.1 NPTL 2.11.1 
+rlimit: STACK 8192k, CORE 0k, NPROC infinity, NOFILE 1024, AS infinity
+load average:1.35 1.26 1.04
+
+CPU:total 2 (2 cores per cpu, 1 threads per core) family 6 model 7 stepping 10, cmov, cx8, fxsr, mmx, sse, sse2, sse3, ssse3
+
+Memory: 4k page, physical 3602612k(383144k free), swap 4393704k(4036356k free)
+
+vm_info: Java HotSpot(TM) Server VM (11.0-b16) for linux-x86 JRE (1.6.0_11-b03), built on Nov 10 2008 01:21:35 by "java_re" with gcc 3.2.1-7a (J2SE release)
+
+time: Fri Jun 24 16:10:19 2011
+elapsed time: 166 seconds
+

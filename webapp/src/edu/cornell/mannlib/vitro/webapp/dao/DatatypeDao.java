@@ -22,6 +22,6 @@ public interface DatatypeDao {
 
     public abstract int getDatatypeIdByURI(String uri);
 
-    public abstract List /* of Datatype */getAllDatatypes();
+    public abstract List<Datatype> getAllDatatypes();
 
 }

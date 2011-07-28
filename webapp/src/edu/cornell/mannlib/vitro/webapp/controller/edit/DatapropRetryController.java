@@ -23,13 +23,12 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
 import edu.cornell.mannlib.vedit.util.FormUtils;
-import edu.cornell.mannlib.vedit.validator.impl.EnumValuesValidator;
 import edu.cornell.mannlib.vedit.validator.impl.IntValidator;
 import edu.cornell.mannlib.vedit.validator.impl.XMLNameValidator;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionListener;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.RoleLevelOptionsSetup;
@@ -37,22 +36,16 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
-import edu.cornell.mannlib.vitro.webapp.edit.listener.impl.EditProhibitionListener;
 
 
 public class DatapropRetryController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(DatapropRetryController.class.getName());
 
-    public void doPost (HttpServletRequest request, HttpServletResponse response) {
-
-        if (!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error("DatapropRetryController encountered exception calling super.doGet()");
+    @Override
+	public void doPost (HttpServletRequest request, HttpServletResponse response) {
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new EditOntology()))) {
+        	return;
         }
 
         //create an EditProcessObject for this and put it in the session
@@ -122,19 +115,14 @@ public class DatapropRetryController extends BaseEditController {
             log.error("DatapropRetryController could not find the getDataPropertyByURI method in the facade");
         }
 
-        Portal currPortal = vreq.getPortal();
-        int currPortalId = 1;
-        if (currPortal != null) {
-            currPortalId = currPortal.getPortalId();
-        }
         //make a postinsert pageforwarder that will send us to a new class's fetch screen
-        epo.setPostInsertPageForwarder(new DataPropertyInsertPageForwarder(currPortalId));
+        epo.setPostInsertPageForwarder(new DataPropertyInsertPageForwarder());
         //make a postdelete pageforwarder that will send us to the list of properties
-        epo.setPostDeletePageForwarder(new UrlForwarder("listDatatypeProperties?home="+currPortalId));
+        epo.setPostDeletePageForwarder(new UrlForwarder("listDatatypeProperties"));
 
         //set up any listeners
         List changeListenerList = new ArrayList();
-        changeListenerList.add(new EditProhibitionListener(getServletContext()));
+        changeListenerList.add(new PropertyRestrictionListener(getServletContext()));
         epo.setChangeListenerList(changeListenerList);
 
 
@@ -203,15 +191,9 @@ public class DatapropRetryController extends BaseEditController {
     }
 
     class DataPropertyInsertPageForwarder implements PageForwarder {
-
-        private int portalId = 1;
-
-        public DataPropertyInsertPageForwarder(int currPortalId) {
-            portalId = currPortalId;
-        }
-
+    	
         public void doForward(HttpServletRequest request, HttpServletResponse response, EditProcessObject epo){
-            String newPropertyUrl = "datapropEdit?home="+portalId+"&uri=";
+            String newPropertyUrl = "datapropEdit?uri=";
             DataProperty p = (DataProperty) epo.getNewBean();
             try {
                 newPropertyUrl += URLEncoder.encode(p.getURI(),"UTF-8");

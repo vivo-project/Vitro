@@ -9,10 +9,10 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.edit.EditLiteral" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Generator" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Generator" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditSubmission" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 <%@ page import="org.apache.commons.logging.Log" %>
@@ -21,10 +21,9 @@
 <%@ page import="java.util.*" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.RdfLiteralHash"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.beans.DataProperty"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
-<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 
 <%--
 Current stop gap solution for back button problems
@@ -42,7 +41,10 @@ and set a flag in the request to indicate "back button confusion"
     log.debug("Starting datapropertyBackButtonProblems.jsp");
 %>
 
-<vitro:confirmLoginStatus level="CURATOR" allowSelfEditing="true" />
+<%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousPages" %>
+<% request.setAttribute("requestedActions", new UseMiscellaneousPages()); %>
+<vitro:confirmAuthorization />
 
 <%
     List<String> errorMessages = new ArrayList<String>();

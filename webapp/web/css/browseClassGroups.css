@@ -64,16 +64,18 @@ ul#browse-classgroups .count-classes {
     border: 1px solid #dde6e5;
     background: #fff;
     min-height: 230px;
+    padding-top: 10px;
 }
 a.browse-superclass {
     position: absolute;
     right: 0.5em;
     font-size: 0.9em;
+    top: 3px;
 }
 ul#classes-in-classgroup {
     float: left;
     width: 90%;
-    padding: 0 10px 15px 22px;
+    padding: 0 10px 0 22px;
     margin-top: 20px;
     margin-bottom: 10px;
 }
@@ -87,16 +89,18 @@ ul#classes-in-classgroup li {
     width: 100%;
     border-bottom: 1px solid #dde4e3;
     font-size: 14px;
+    height: 35px;
+    line-height: 35px;
 }
 ul#classes-in-classgroup li:last-child {
     border-bottom: none
 }
 ul#classes-in-classgroup a {
     display: block;
+    padding-left: 15px;
+    height: 35px;
     color: #5e6363;
     text-decoration: none;
-    padding: .5em 0 .5em 0.938em;
-    line-height: 1.5em;
 }
 ul#classes-in-classgroup .count-individuals {
     font-size: 12px;

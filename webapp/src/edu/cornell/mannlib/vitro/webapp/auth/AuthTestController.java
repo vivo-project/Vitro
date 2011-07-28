@@ -11,10 +11,10 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
@@ -32,8 +32,7 @@ public class AuthTestController extends VitroHttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse res )
     throws IOException, ServletException{
         super.doGet(req,res);
-        HttpSession session = req.getSession(false);
-        IdentifierBundle ids = ServletIdentifierBundleFactory.getIdBundleForRequest(req,session,getServletContext());
+        IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(req);
         ServletOutputStream out = res.getOutputStream();
 
         listIdentifiers(out,ids);
@@ -61,12 +60,12 @@ public class AuthTestController extends VitroHttpServlet {
 
     private void checkAuths(ServletOutputStream out, IdentifierBundle ids, ServletContext servletContext)
     throws IOException{
-        ServletPolicyList policy = ServletPolicyList.getPolicies(servletContext);
+        PolicyList policy = ServletPolicyList.getPolicies(servletContext);
         out.println("<h1>Authorization tests:</h1>");
 
-        if( policy == null ) { out.println("No Policy objects found in ServletContext. ");
-
-        }
+		if (policy.isEmpty()) {
+			out.println("No Policy objects found in ServletContext. ");
+		}
         out.println("<table>");
         for(RequestedAction action: actions){
             out.println("<tr><td>"+action.getClass().getName()+"</td>");

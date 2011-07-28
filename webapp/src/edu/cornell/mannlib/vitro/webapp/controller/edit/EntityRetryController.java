@@ -35,11 +35,13 @@ import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vedit.validator.impl.RequiredFieldValidator;
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndividuals;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -57,14 +59,8 @@ public class EntityRetryController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(EntityRetryController.class.getName());
 
     public void doPost (HttpServletRequest request, HttpServletResponse response) {
-
-        if (!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error("EntityRetryController encountered exception calling super.doGet()");
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new EditIndividuals()))) {
+        	return;
         }
 
         VitroRequest vreq = new VitroRequest(request);
@@ -95,12 +91,6 @@ public class EntityRetryController extends BaseEditController {
         VClassGroupDao cgDao = myWebappDaoFactory.getVClassGroupDao();
         DataPropertyDao dpDao = myWebappDaoFactory.getDataPropertyDao();
 
-        Portal currPortal = vreq.getPortal();
-        int currPortalId = 1;
-        if (currPortal != null) {
-            currPortalId = currPortal.getPortalId();
-        }
-
         Individual individualForEditing = null;
         if (epo.getUseRecycledBean()) {
             individualForEditing = (Individual)epo.getNewBean();
@@ -116,10 +106,6 @@ public class EntityRetryController extends BaseEditController {
                 }
             } else {
                 individualForEditing = new IndividualImpl();
-                //set portal flag to current portal if not editing in a combined portal
-                if (currPortal.getPortalId() < vreq.getAppBean().getMaxPortalId()) {
-                	individualForEditing.setFlag1Set(Integer.valueOf(currPortal.getPortalId()).toString());
-                }
                 if (vreq.getParameter("VClassURI") != null) {
                     individualForEditing.setVClassURI(vreq.getParameter("VClassURI"));
                 }
@@ -142,8 +128,8 @@ public class EntityRetryController extends BaseEditController {
         epo.getValidatorMap().put("Name",lnList);
 
         //make a postinsert pageforwarder that will send us to a new entity's fetch screen
-        epo.setPostInsertPageForwarder(new EntityInsertPageForwarder(currPortalId));
-        epo.setPostDeletePageForwarder(new UrlForwarder(siteAdminUrl + "?home="+currPortalId));
+        epo.setPostInsertPageForwarder(new EntityInsertPageForwarder());
+        epo.setPostDeletePageForwarder(new UrlForwarder(siteAdminUrl));
 
         //set the getMethod so we can retrieve a new bean after we've inserted it
         try {
@@ -185,8 +171,6 @@ public class EntityRetryController extends BaseEditController {
     		optList.add(opt);
 			hash.put("VClassURI", optList);
         }
-        
-        hash.put("Moniker", getMonikerOptionsList(individualForEditing, ewDao));
         
         hash.put("HiddenFromDisplayBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getDisplayOptionsList(individualForEditing));    
         hash.put("ProhibitedFromUpdateBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getUpdateOptionsList(individualForEditing));
@@ -293,20 +277,6 @@ public class EntityRetryController extends BaseEditController {
         DateFormat dateOnlyFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         String html = FormUtils.htmlFormFromBean(individualForEditing,action,epo,foo,epo.getBadValueMap());
-        if (individualForEditing.getSunrise() != null)
-            foo.getValues().put("Sunrise", dateOnlyFormat.format(individualForEditing.getSunrise()));
-        if (individualForEditing.getSunset() != null)
-            foo.getValues().put("Sunset", minutesOnlyDateFormat.format(individualForEditing.getSunset()));
-        if (individualForEditing.getTimekey() != null)
-            foo.getValues().put("Timekey", minutesOnlyDateFormat.format(individualForEditing.getTimekey()));
-
-        HashMap defaultsHash = new HashMap();
-        if (action.equals("insert")) {
-            Calendar cal = Calendar.getInstance(TimeZone.getDefault());
-            defaultsHash.put("Sunrise", minutesOnlyDateFormat.format(cal.getTime()));
-            defaultsHash.put("Sunset", "9999-12-31");
-        }
-        epo.setDefaultValueMap(defaultsHash);
 
         List cList = new ArrayList();
         cList.add(new IndividualDataPropertyStatementProcessor());
@@ -316,15 +286,15 @@ public class EntityRetryController extends BaseEditController {
         epo.getAdditionalDaoMap().put("DataPropertyStatement",myWebappDaoFactory.getDataPropertyStatementDao()); // EntityDatapropProcessor will look for this
         epo.getAdditionalDaoMap().put("DataProperty",myWebappDaoFactory.getDataPropertyDao()); // EntityDatapropProcessor will look for this
 
-        Portal portal = (new VitroRequest(request)).getPortal();
+        ApplicationBean appBean = vreq.getAppBean();
+        
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("formHtml",html);
         request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
         request.setAttribute("formJsp","/templates/edit/specific/entity_retry.jsp");
         request.setAttribute("epoKey",epo.getKey());
-        request.setAttribute("portalBean",portal);
         request.setAttribute("title","Individual Editing Form");
-        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
+        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+appBean.getThemeDir()+"css/edit.css\"/>");
         request.setAttribute("scripts", "/js/edit/entityRetry.js");
         // NC Commenting this out for now. Going to pass on DWR for moniker and use jQuery instead
         // request.setAttribute("bodyAttr"," onLoad=\"monikerInit()\"");
@@ -341,24 +311,6 @@ public class EntityRetryController extends BaseEditController {
         }
 
     }
-    
-    private List<Option> getMonikerOptionsList(Individual entity,
-                                               IndividualDao indDao) {
-        ArrayList<Option> monikerOpts = new ArrayList<Option>();
-        monikerOpts.add(new Option("", "none", (entity.getMoniker() == null)));
-        if (entity.getVClassURI() != null) {
-            List<String> monikers = indDao.monikers(entity.getVClassURI());
-            if (monikers != null) {
-                for (String moniker : monikers) {
-                    monikerOpts.add(new Option(
-                            moniker, moniker, 
-                                    moniker.equals(entity.getMoniker())));
-                }
-            }
-        }
-        monikerOpts.add(new Option("", "[new moniker]"));
-        return monikerOpts;
-    }
 
     public void doGet (HttpServletRequest request, HttpServletResponse response) {
         doPost(request, response);
@@ -366,14 +318,8 @@ public class EntityRetryController extends BaseEditController {
 
     class EntityInsertPageForwarder implements PageForwarder {
 
-        private int portalId = 1;
-
-        public EntityInsertPageForwarder(int currPortalId) {
-            portalId = currPortalId;
-        }
-
         public void doForward(HttpServletRequest request, HttpServletResponse response, EditProcessObject epo){
-            String newEntityUrl = "entityEdit?home="+portalId+"&uri=";
+            String newEntityUrl = "entityEdit?uri=";
             Individual ent = (Individual) epo.getNewBean();
             //log.error(ent.getName() + " : " + ent.getURI()+" ; "+ent.getNamespace()+" ; "+ent.getLocalName());
             if (ent != null && ent.getURI() != null) {
@@ -386,7 +332,7 @@ public class EntityRetryController extends BaseEditController {
             } else {
                 try {
                 	String siteAdminUrl = request.getContextPath() + Controllers.SITE_ADMIN;
-                    response.sendRedirect(siteAdminUrl + "?home="+portalId);
+                    response.sendRedirect(siteAdminUrl);
                 } catch (IOException e) {
                     log.error("EntityInsertPageForwarder could not redirect to about page.");
                 }

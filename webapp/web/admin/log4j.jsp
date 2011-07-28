@@ -3,7 +3,6 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 <%@ page import="org.apache.log4j.*" %>
 <%@ page import="java.util.*" %>
-<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 
  <%--
   This JSP will display all the log4j Logger objects, their
@@ -13,7 +12,10 @@
   Brian Cauros bdc34@cornell.edu
   based on work by Volker Mentzner. --%>
 
-<vitro:confirmLoginStatus level="DBA" bean="loginBean" />
+<%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages" %>
+<% request.setAttribute("requestedActions", new UseMiscellaneousAdminPages()); %>
+<vitro:confirmAuthorization />
 
 <%
 try {

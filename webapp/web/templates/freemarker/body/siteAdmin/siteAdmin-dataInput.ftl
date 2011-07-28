@@ -4,9 +4,8 @@
 
 <#import "lib-form.ftl" as form>
 
-<#if dataInput??>
-    <div class="pageBodyGroup">
-        
+<#if dataInput?has_content>
+    <section class="pageBodyGroup">
         <h3>Data Input</h3>
 
         <form action="${dataInput.formAction}" method="get">
@@ -16,6 +15,5 @@
             <input type="hidden" name="editform" value="newIndividualForm.jsp"/>
             <input type="submit" id="submit" value="Add individual of this class"/>
         </form>
-            
-    </div>
+    </section>
 </#if>

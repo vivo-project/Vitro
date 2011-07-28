@@ -19,36 +19,29 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
-import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 
 public class PropertyEditController extends BaseEditController {
 
 	private static final Log log = LogFactory.getLog(PropertyEditController.class.getName());
 	
     public void doPost (HttpServletRequest request, HttpServletResponse response) {
-        final int NUM_COLS=17;
-
-        if (!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error("PropertyEditController caught exception calling doGet()");
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new EditOntology()))) {
+        	return;
         }
 
+        final int NUM_COLS=17;
+
         VitroRequest vreq = new VitroRequest(request);
-        Portal portal = vreq.getPortal();
         
         ObjectPropertyDao propDao = vreq.getFullWebappDaoFactory().getObjectPropertyDao();
         VClassDao vcDao = vreq.getFullWebappDaoFactory().getVClassDao();
@@ -88,7 +81,7 @@ public class PropertyEditController extends BaseEditController {
         	ObjectProperty parent = propDao.getObjectPropertyByURI(p.getParentURI());
         	if (parent != null && parent.getURI() != null) {
         		try {
-        			parentPropertyStr = "<a href=\"propertyEdit?uri="+URLEncoder.encode(parent.getURI(),"UTF-8")+"&amp;home="+portal.getPortalId()+"\">"+parent.getLocalNameWithPrefix()+"</a>";
+        			parentPropertyStr = "<a href=\"propertyEdit?uri="+URLEncoder.encode(parent.getURI(),"UTF-8")+"\">"+parent.getLocalNameWithPrefix()+"</a>";
         		} catch (UnsupportedEncodingException e) {e.printStackTrace();}
         	}
     	} 
@@ -102,7 +95,7 @@ public class PropertyEditController extends BaseEditController {
         			if (domainClass.isAnonymous()) {
         				domainStr = domainClass.getLocalNameWithPrefix();
         			} else {
-        				domainStr = "<a href=\"vclassEdit?uri="+URLEncoder.encode(domainClass.getURI(),"UTF-8")+"&amp;home="+portal.getPortalId()+"\">"+domainClass.getLocalNameWithPrefix()+"</a>";
+        				domainStr = "<a href=\"vclassEdit?uri="+URLEncoder.encode(domainClass.getURI(),"UTF-8")+"\">"+domainClass.getLocalNameWithPrefix()+"</a>";
         			}
         		} catch (UnsupportedEncodingException e) {e.printStackTrace();}
         	}
@@ -117,7 +110,7 @@ public class PropertyEditController extends BaseEditController {
         			if (rangeClass.isAnonymous()) {
         				rangeStr = rangeClass.getLocalNameWithPrefix();
         			} else {
-        				rangeStr = "<a href=\"vclassEdit?uri="+URLEncoder.encode(rangeClass.getURI(),"UTF-8")+"&amp;home="+portal.getPortalId()+"\">"+rangeClass.getLocalNameWithPrefix()+"</a>";
+        				rangeStr = "<a href=\"vclassEdit?uri="+URLEncoder.encode(rangeClass.getURI(),"UTF-8")+"\">"+rangeClass.getLocalNameWithPrefix()+"</a>";
         			}
         		} catch (UnsupportedEncodingException e) {e.printStackTrace();}
         	}
@@ -214,9 +207,8 @@ public class PropertyEditController extends BaseEditController {
         request.setAttribute("epoKey",epo.getKey());
         request.setAttribute("propertyWebapp", p);
         request.setAttribute("bodyJsp","/templates/edit/specific/props_edit.jsp");
-        request.setAttribute("portalBean",portal);
         request.setAttribute("title","Object Property Control Panel");
-        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
+        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
             rd.forward(request, response);

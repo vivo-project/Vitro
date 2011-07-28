@@ -2,40 +2,29 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.security.Principal;
-import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequestWrapper;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Dataset;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
-import edu.cornell.mannlib.vitro.webapp.flags.AuthFlag;
-import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
-import edu.cornell.mannlib.vitro.webapp.flags.SunsetFlag;
-
-public class VitroRequest implements HttpServletRequest {
+//HttpServletRequest
+public class VitroRequest extends HttpServletRequestWrapper {
 
     private static final String FROM_ENCODING = "ISO-8859-1";
     private static final String TO_ENCODING = "UTF-8";
     public static boolean convertParameterEncoding = true;
-
+    //Attribute in case of special model editing such as display model editing
+    public static final String SPECIAL_WRITE_MODEL = "specialWriteModel";
+    
     public static boolean getConvertParameterEncoding() {
         return convertParameterEncoding;
     }
@@ -47,10 +36,9 @@ public class VitroRequest implements HttpServletRequest {
     private Map<String,String[]> convertedParameterMap;
 
     private HttpServletRequest _req;
-    
-    private boolean isSinglePortal;
 
     public VitroRequest(HttpServletRequest _req) {
+        super(_req);
         if( _req == null )
             throw new IllegalArgumentException("Non-null HttpServletRequest needed" +
                     "to construct a VitroRequest");
@@ -70,6 +58,18 @@ public class VitroRequest implements HttpServletRequest {
     	return (WebappDaoFactory) getAttribute("webappDaoFactory");
     }
     
+    public void setUnfilteredWebappDaoFactory(WebappDaoFactory wdf) {
+    	setAttribute("unfilteredWebappDaoFactory", wdf);
+    }
+    
+    /** Gets a WebappDaoFactory with request-specific dataset but no filtering. 
+     * Use this for any servlets that need to bypass filtering.
+     * @return
+     */
+    public WebappDaoFactory getUnfilteredWebappDaoFactory() {
+    	return (WebappDaoFactory) getAttribute("unfilteredWebappDaoFactory");
+    }
+    
     public void setFullWebappDaoFactory(WebappDaoFactory wdf) {
     	setAttribute("fullWebappDaoFactory", wdf);
     }
@@ -80,6 +80,10 @@ public class VitroRequest implements HttpServletRequest {
     
     public void setDataset(Dataset dataset) {
     	setAttribute("dataset", dataset);
+    }
+    
+    public void setJenaOntModel(OntModel ontModel) {
+    	setAttribute("jenaOntModel", ontModel);
     }
     
     /** gets assertions + inferences WebappDaoFactory with no filtering **/
@@ -117,7 +121,23 @@ public class VitroRequest implements HttpServletRequest {
         }
     }
     
+    //Method that retrieves write model, returns special model in case of write model
+    public OntModel getWriteModel() {
+    	//if special write model doesn't exist use get ont model 
+    	if(this.getAttribute(this.SPECIAL_WRITE_MODEL) != null) {
+    		return (OntModel)this.getAttribute(this.SPECIAL_WRITE_MODEL);
+    	} else {
+    		return getJenaOntModel();
+    	}
+    }
+    
+    
+    
     public OntModel getJenaOntModel() {
+    	Object ontModel = getAttribute("jenaOntModel");
+    	if (ontModel instanceof OntModel) {
+    		return (OntModel) ontModel;
+    	}
     	OntModel jenaOntModel = (OntModel)_req.getSession().getAttribute( JenaBaseDao.JENA_ONT_MODEL_ATTRIBUTE_NAME );
     	if ( jenaOntModel == null ) {
     		jenaOntModel = (OntModel)_req.getSession().getServletContext().getAttribute( JenaBaseDao.JENA_ONT_MODEL_ATTRIBUTE_NAME );
@@ -141,60 +161,12 @@ public class VitroRequest implements HttpServletRequest {
     	return jenaOntModel;    	
     }
 
-    public Portal getPortal(){
-        return(Portal) getAttribute("portalBean");
-    }
-    public void setPortal(Portal p){
-        setAttribute("portalBean", p);
-        setAttribute("portal", p);
-    }
-    
-    public int getPortalId(){        
-        String idstr =  (String)getAttribute("home");
-        
-        if( idstr == null ){
-            WebappDaoFactory wdf = getWebappDaoFactory();        
-            Portal[] portals = wdf.getPortalDao().getAllPortals().toArray(new Portal[0]);
-            return portals[0].getPortalId();            
-        }
-        
-        try{
-            return Integer.parseInt(idstr);
-        }catch( Throwable th){
-            throw new Error("home parameter was not set in request");
-        }
-        
-    }
-    public void setPortalId(String in){
-        setAttribute("home",in);
-    }
-
-    public PortalFlag getPortalFlag(){
-        return(PortalFlag) getAttribute("portalFlag");
-    }
-    public void setPortalFlag(PortalFlag pf){
-        setAttribute("portalFlag", pf);
-    }
-
-    public SunsetFlag getSunsetFlag(){
-        return (SunsetFlag) getAttribute("sunsetFlag");
-    }
-    public void setSunsetFlag(SunsetFlag sf){
-        setAttribute("sunsetFlag",sf);
-    }
-
     public ApplicationBean getAppBean(){
-        return (ApplicationBean) getAttribute("appBean");
+        //return (ApplicationBean) getAttribute("appBean");
+    	return getWebappDaoFactory().getApplicationDao().getApplicationBean();
     }
     public void setAppBean(ApplicationBean ab){
         setAttribute("appBean",ab);
-    }
-
-    public AuthFlag getAuthFlag(){
-        return (AuthFlag)getAttribute("authFlag");
-    }
-    public void setAuthFlag(AuthFlag af){
-        setAttribute("authFlag",af);
     }
 
     /* These methods are overridden so that we might convert URL-encoded request parameters to UTF-8
@@ -273,212 +245,212 @@ public class VitroRequest implements HttpServletRequest {
     }
 
     /* *********** delegated methods *********** */
-    public Object getAttribute(String name) {
-        return _req.getAttribute(name);
-    }
-
-    public Enumeration getAttributeNames() {
-        return _req.getAttributeNames();
-    }
-
-    public String getAuthType() {
-        return _req.getAuthType();
-    }
-
-    public String getCharacterEncoding() {
-        return _req.getCharacterEncoding();
-    }
-
-    public int getContentLength() {
-        return _req.getContentLength();
-    }
-
-    public String getContentType() {
-        return _req.getContentType();
-    }
-
-    public String getContextPath() {
-        return _req.getContextPath();
-    }
-
-    public Cookie[] getCookies() {
-        return _req.getCookies();
-    }
-
-    public long getDateHeader(String name) {
-        return _req.getDateHeader(name);
-    }
-
-    public String getHeader(String name) {
-        return _req.getHeader(name);
-    }
-
-    public Enumeration getHeaderNames() {
-        return _req.getHeaderNames();
-    }
-
-    public Enumeration getHeaders(String name) {
-        return _req.getHeaders(name);
-    }
-
-    public ServletInputStream getInputStream() throws IOException {
-        return _req.getInputStream();
-    }
-
-    public int getIntHeader(String name) {
-        return _req.getIntHeader(name);
-    }
-
-    public String getLocalAddr() {
-        return _req.getLocalAddr();
-    }
-
-    public Locale getLocale() {
-        return _req.getLocale();
-    }
-
-    public Enumeration getLocales() {
-        return _req.getLocales();
-    }
-
-    public String getLocalName() {
-        return _req.getLocalName();
-    }
-
-    public int getLocalPort() {
-        return _req.getLocalPort();
-    }
-
-    public String getMethod() {
-        return _req.getMethod();
-    }
-
-    public Enumeration getParameterNames() {
-        return _req.getParameterNames();
-    }
-
-    public String getPathInfo() {
-        return _req.getPathInfo();
-    }
-
-    public String getPathTranslated() {
-        return _req.getPathTranslated();
-    }
-
-    public String getProtocol() {
-        return _req.getProtocol();
-    }
-
-    public String getQueryString() {
-        return _req.getQueryString();
-    }
-
-    public BufferedReader getReader() throws IOException {
-        return _req.getReader();
-    }
-
-    @Deprecated
-    public String getRealPath(String path) {
-        return _req.getRealPath(path);
-    }
-
-    public String getRemoteAddr() {
-        return _req.getRemoteAddr();
-    }
-
-    public String getRemoteHost() {
-        return _req.getRemoteHost();
-    }
-
-    public int getRemotePort() {
-        return _req.getRemotePort();
-    }
-
-    public String getRemoteUser() {
-        return _req.getRemoteUser();
-    }
-
-    public RequestDispatcher getRequestDispatcher(String path) {
-        return _req.getRequestDispatcher(path);
-    }
-
-    public String getRequestedSessionId() {
-        return _req.getRequestedSessionId();
-    }
-
-    public String getRequestURI() {
-        return _req.getRequestURI();
-    }
-
-    public StringBuffer getRequestURL() {
-        return _req.getRequestURL();
-    }
-
-    public String getScheme() {
-        return _req.getScheme();
-    }
-
-    public String getServerName() {
-        return _req.getServerName();
-    }
-
-    public int getServerPort() {
-        return _req.getServerPort();
-    }
-
-    public String getServletPath() {
-        return _req.getServletPath();
-    }
-
-    public HttpSession getSession() {
-        return _req.getSession();
-    }
-
-    public HttpSession getSession(boolean create) {
-        return _req.getSession(create);
-    }
-
-    public Principal getUserPrincipal() {
-        return _req.getUserPrincipal();
-    }
-
-    public boolean isRequestedSessionIdFromCookie() {
-        return _req.isRequestedSessionIdFromCookie();
-    }
-
-    @Deprecated
-    public boolean isRequestedSessionIdFromUrl() {
-        return _req.isRequestedSessionIdFromUrl();
-    }
-
-    public boolean isRequestedSessionIdFromURL() {
-        return _req.isRequestedSessionIdFromURL();
-    }
-
-    public boolean isRequestedSessionIdValid() {
-        return _req.isRequestedSessionIdValid();
-    }
-
-    public boolean isSecure() {
-        return _req.isSecure();
-    }
-
-    public boolean isUserInRole(String role) {
-        return _req.isUserInRole(role);
-    }
-
-    public void removeAttribute(String name) {
-        _req.removeAttribute(name);
-    }
-
-    public void setAttribute(String name, Object o) {
-        _req.setAttribute(name, o);
-    }
-
-    public void setCharacterEncoding(String env)
-            throws UnsupportedEncodingException {
-        _req.setCharacterEncoding(env);
-    }
+//    public Object getAttribute(String name) {
+//        return _req.getAttribute(name);
+//    }
+//
+//    public Enumeration getAttributeNames() {
+//        return _req.getAttributeNames();
+//    }
+//
+//    public String getAuthType() {
+//        return _req.getAuthType();
+//    }
+//
+//    public String getCharacterEncoding() {
+//        return _req.getCharacterEncoding();
+//    }
+//
+//    public int getContentLength() {
+//        return _req.getContentLength();
+//    }
+//
+//    public String getContentType() {
+//        return _req.getContentType();
+//    }
+//
+//    public String getContextPath() {
+//        return _req.getContextPath();
+//    }
+//
+//    public Cookie[] getCookies() {
+//        return _req.getCookies();
+//    }
+//
+//    public long getDateHeader(String name) {
+//        return _req.getDateHeader(name);
+//    }
+//
+//    public String getHeader(String name) {
+//        return _req.getHeader(name);
+//    }
+//
+//    public Enumeration getHeaderNames() {
+//        return _req.getHeaderNames();
+//    }
+//
+//    public Enumeration getHeaders(String name) {
+//        return _req.getHeaders(name);
+//    }
+//
+//    public ServletInputStream getInputStream() throws IOException {
+//        return _req.getInputStream();
+//    }
+//
+//    public int getIntHeader(String name) {
+//        return _req.getIntHeader(name);
+//    }
+//
+//    public String getLocalAddr() {
+//        return _req.getLocalAddr();
+//    }
+//
+//    public Locale getLocale() {
+//        return _req.getLocale();
+//    }
+//
+//    public Enumeration getLocales() {
+//        return _req.getLocales();
+//    }
+//
+//    public String getLocalName() {
+//        return _req.getLocalName();
+//    }
+//
+//    public int getLocalPort() {
+//        return _req.getLocalPort();
+//    }
+//
+//    public String getMethod() {
+//        return _req.getMethod();
+//    }
+//
+//    public Enumeration getParameterNames() {
+//        return _req.getParameterNames();
+//    }
+//
+//    public String getPathInfo() {
+//        return _req.getPathInfo();
+//    }
+//
+//    public String getPathTranslated() {
+//        return _req.getPathTranslated();
+//    }
+//
+//    public String getProtocol() {
+//        return _req.getProtocol();
+//    }
+//
+//    public String getQueryString() {
+//        return _req.getQueryString();
+//    }
+//
+//    public BufferedReader getReader() throws IOException {
+//        return _req.getReader();
+//    }
+//
+//    @Deprecated
+//    public String getRealPath(String path) {
+//        return _req.getRealPath(path);
+//    }
+//
+//    public String getRemoteAddr() {
+//        return _req.getRemoteAddr();
+//    }
+//
+//    public String getRemoteHost() {
+//        return _req.getRemoteHost();
+//    }
+//
+//    public int getRemotePort() {
+//        return _req.getRemotePort();
+//    }
+//
+//    public String getRemoteUser() {
+//        return _req.getRemoteUser();
+//    }
+//
+//    public RequestDispatcher getRequestDispatcher(String path) {
+//        return _req.getRequestDispatcher(path);
+//    }
+//
+//    public String getRequestedSessionId() {
+//        return _req.getRequestedSessionId();
+//    }
+//
+//    public String getRequestURI() {
+//        return _req.getRequestURI();
+//    }
+//
+//    public StringBuffer getRequestURL() {
+//        return _req.getRequestURL();
+//    }
+//
+//    public String getScheme() {
+//        return _req.getScheme();
+//    }
+//
+//    public String getServerName() {
+//        return _req.getServerName();
+//    }
+//
+//    public int getServerPort() {
+//        return _req.getServerPort();
+//    }
+//
+//    public String getServletPath() {
+//        return _req.getServletPath();
+//    }
+//
+//    public HttpSession getSession() {
+//        return _req.getSession();
+//    }
+//
+//    public HttpSession getSession(boolean create) {
+//        return _req.getSession(create);
+//    }
+//
+//    public Principal getUserPrincipal() {
+//        return _req.getUserPrincipal();
+//    }
+//
+//    public boolean isRequestedSessionIdFromCookie() {
+//        return _req.isRequestedSessionIdFromCookie();
+//    }
+//
+//    @Deprecated
+//    public boolean isRequestedSessionIdFromUrl() {
+//        return _req.isRequestedSessionIdFromUrl();
+//    }
+//
+//    public boolean isRequestedSessionIdFromURL() {
+//        return _req.isRequestedSessionIdFromURL();
+//    }
+//
+//    public boolean isRequestedSessionIdValid() {
+//        return _req.isRequestedSessionIdValid();
+//    }
+//
+//    public boolean isSecure() {
+//        return _req.isSecure();
+//    }
+//
+//    public boolean isUserInRole(String role) {
+//        return _req.isUserInRole(role);
+//    }
+//
+//    public void removeAttribute(String name) {
+//        _req.removeAttribute(name);
+//    }
+//
+//    public void setAttribute(String name, Object o) {
+//        _req.setAttribute(name, o);
+//    }
+//
+//    public void setCharacterEncoding(String env)
+//            throws UnsupportedEncodingException {
+//        _req.setCharacterEncoding(env);
+//    }
 
 
 }

@@ -4,21 +4,30 @@
 #admin {
     font-size: .8em;
     padding-top: 0;
-    padding-right: 40px;
 }
 #admin h3 {
     display: inline-block;
     padding: 3px 6px 3px 10px;
     margin-bottom: 5px;
     font-size: 14px;
+    float: left;
 }
 #admin .uri-link {
     padding-left: 11px;
     padding-bottom: 5px;
+    clear: left;
 }
 #admin a.edit-individual {
-    padding-left: 5px;
+    padding-left: 0;
     border-left: none;
+    padding-top: 8px;
+}
+#verbose-mode {
+    float: right;
+    padding-left: 10px;
+}
+#verbose-mode .small {
+    padding: 5px 6px 4px;
 }
 /* <------ INDIVIDUAL INTRO FOR ANY CLASS*/
 #individual-intro {
@@ -30,7 +39,7 @@
 #individual-intro h1 {
     padding-bottom: 8px;  
 }
-#individual-intro span.preferred-title {
+#individual-intro span.display-title {
     padding-left: 10px;
     margin-left: 10px;
 }
@@ -42,23 +51,8 @@
 #individual-intro a.icon-rdf {
     font-size: 1.125em;
 }
-ul#links-additional{
-    margin-bottom: 5px;
-}
-/* <------ INDIVIDUAL INTRO FOR PERSON*/
-#individual-intro.person {
-    margin-bottom: 30px;
-    position: relative;
-    width: 100%;
-}
-#individual-intro.person #individual-info {
-    float: left;
-    width: 78%;
-    margin-bottom: 20px;
-}
-#individual-intro.person .individual-overview {
-    width: 100%;
-    float: none;
+img#uriIcon {
+    cursor: pointer;
 }
 /* <------ INDIVIDUAL INTRO - LEFT SIDE CONTENT */
 #share-contact {
@@ -85,7 +79,7 @@ img.individual-photo {
 #mainImage {
     position: absolute;
     padding: 5px 5px 8px 5px;
-    background-color: #fff;
+    background-color: rgba(255, 255, 255, 0.6);
     top: 6px;
     left: 6px;
 }
@@ -93,78 +87,6 @@ h2#mainImage, #share-contact h2 {
     font-size: 1em;
     line-height: 1em;
     padding-bottom: 0.3em
-}
-ul#individual-tools-people {
-    margin-top: 5px;
-    height: 20px;
-    padding-bottom: 20px;
-    list-style-type: none;
-    clear: both;
-    margin-bottom: 15px;
-}
-ul#individual-tools-people li {
-    position: relative;
-    display: block;
-    padding-right: 7px;
-    float: left;
-    margin-bottom: 20px;
-}
-ul#individual-tools {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    height: 20px;
-    list-style-type: none;
-}
-ul#individual-tools li {
-    padding-right: 9px;
-    float: left;
-}
-ul#individual-email {
-    clear: both;
-    list-style-type: circle;
-}
-ul#individual-email li {
-    font-size: .875em;
-}
-ul#individual-email li:first-child {
-    font-size: .875em;
-    margin-top: 10px;
-}
-ul#individual-phone {
-    clear: both;
-    list-style-type: circle;
-}
-ul#individual-phone li {
-    font-size: .875em;
-}
-ul#individual-phone li:last-child {
-    margin-bottom: 15px;
-}
-ul#individual-phone li:first-child {
-    margin-top: 10px;
-}
-.icon-phone, .icon-email {
-    padding-right: 5px;
-}
-#individual-intro ul.individual-urls {
-    list-style-type: circle;
-    margin-left: 20px;
-}
-#individual-intro ul.individual-urls li {
-    font-size: .875em;
-    line-height: 1.7em;
-}
-ul.individual-urls-people {
-    clear: both;
-    list-style-type: circle;
-    padding-left: 24px;
-}
-ul.individual-urls-people li {
-    font-size: .875em;
-    line-height: 1.3em;
-}
-ul#links-additional li, ul#links-primary li {
-    word-wrap: break-word;
 }
 #photo-wrapper {
     position: relative;
@@ -176,10 +98,7 @@ ul#links-additional li, ul#links-primary li {
     float: left;
     width: 98%;
 }
-#individual-info.withThumb {
-    width: 78%;
-}
-h1.fn .preferred-title {
+h1.fn .display-title {
     padding-left: 10px;
     margin-left: 10px;
 }
@@ -188,50 +107,8 @@ h1.fn .preferred-title {
 }
 #individual-info nav {
     float: left;
-    width: 78%;
+    width: 74%;
     clear: left;
-}
-#individual-intro .individual-overview {
-    margin-bottom: 30px;
-    margin-top: 10px;
-    display: inline;
-    clear: both;
-    float: left;
-}
-/* <------ INDIVIDUAL VISUALIZATION */
-#visualization {
-    padding: 0 0 40px 30px;
-    padding-top: 0;
-    float: right;
-    background-color: #fff;
-}
-#visualization h3 {
-    padding-top: 10px;
-    margin-bottom: 10px;
-}
-.publication-year-range {
-    display: block;
-    padding-top: 5px;
-}
-/* <------ COAUTHORS */
-#co-authors {
-    padding: 0 20px 30px 20px;
-}
-img.co-author {
-    margin-right: 5px;
-    margin-bottom: 5px;
-}
-#co-authors h3 {
-    margin-bottom: 10px;
-}
-#co-authors ul li {
-    display: block;
-    float: left;
-}
-p.view-all-coauthors {
-    clear: both;
-    width:  200px;
-    text-align: left;
 }
 /* PROPERTY GROUP MENU------>  */
 #property-group-menu {
@@ -331,7 +208,7 @@ article.property ul.subclass-property-list li {
 }
 .edit-mainImage {
     position: absolute;
-    background: #fff;
+    background: rgba(255, 255, 255, 0.6);
     padding: 0 6px 0 0;
     top: 6px;
     left: 6px;
@@ -345,15 +222,18 @@ a.edit-mainImage img.edit-individual {
     position: absolute;
     top: 6px;
     left: 36px;
-    background: #fff;
+    background: rgba(255, 255, 255, 0.6);
     padding: 0 6px 0 8px;
 }
 .middle {
     vertical-align: middle;
 }
-/* MISCELLANEOUS------>  */
-.listDateTime {
-    padding: 0.2em 0.4em;
-    font-size: 0.8em;
-    background: #f4f4f4;
+/* VERBOSE DISPLAY------>  */
+section.verbosePropertyListing {
+    display: inline-block;
+    background-color: #eaebec;
+    padding: 10px;
+}
+h2#overview .verbosePropertyListing {
+    display: block;
 }

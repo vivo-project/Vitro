@@ -2,26 +2,25 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
+import edu.cornell.mannlib.vitro.webapp.web.AntiScript;
 
 public abstract class BaseTemplateModel {
 
     private static final Log log = LogFactory.getLog(BaseTemplateModel.class);
     
-    protected static ServletContext servletContext = null;
-
-    // Wrap UrlBuilder method so templates can call ${item.url}
-    public String getUrl(String path) {
+    protected static ServletContext servletContext;
+    
+    // Convenience method so subclasses can call getUrl(path)
+    protected String getUrl(String path) {
         return UrlBuilder.getUrl(path);
     }
 
@@ -35,6 +34,30 @@ public abstract class BaseTemplateModel {
         return UrlBuilder.getUrl(path, params);
     }
 
+    /**
+     * Used to do any processing for display of URIs or URLs.  
+     * Currently this only checks for XSS exploits.
+     */
+    protected String cleanURIForDisplay( String dirty ){
+        return AntiScript.cleanURI(dirty, getServletContext());
+    }
+    
+    /**
+     * Used to do any processing for display of general text.  
+     * Currently this only checks for XSS exploits.
+     */
+    protected String cleanTextForDisplay( String dirty){
+        return AntiScript.cleanText(dirty, getServletContext());
+    }
+    
+    /**
+     * Used to do any processing for display of values in
+     * a map.  Map may be modified. 
+     */
+    protected <T> void cleanMapValuesForDisplay( Map<T,String> map){
+        AntiScript.cleanMapValues(map, getServletContext());
+    }
+    
     public static ServletContext getServletContext() {
         return servletContext;
     }
@@ -42,9 +65,6 @@ public abstract class BaseTemplateModel {
     public static void setServletContext(ServletContext context) {
         servletContext = context;
     }
+ 
     
-    public String dump() {
-        return toString(); // fallback when subclass doesn't define a class-specific dump()
-    }
-
 }

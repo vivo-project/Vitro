@@ -9,6 +9,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -278,9 +279,9 @@ public class OperationController extends BaseEditController {
                 }
                 if (fieldValid){
                     if (currValue.length()==0) {
-                        HashMap defaultHash = epo.getDefaultValueMap();
+                        Map<String, String> defaultHash = epo.getDefaultValueMap();
                         try {
-                            String defaultValue = (String)defaultHash.get(currParam);
+                            String defaultValue = defaultHash.get(currParam);
                             if (defaultValue != null)
                                 currValue=defaultValue;
                         } catch (Exception e) {}
@@ -319,11 +320,11 @@ public class OperationController extends BaseEditController {
     }
     
     private void notifyChangeListeners(EditProcessObject epo, String action) {
-    	List changeListeners = epo.getChangeListenerList();
+    	List<ChangeListener> changeListeners = epo.getChangeListenerList();
         if (changeListeners != null){
-            Iterator changeIt = changeListeners.iterator();
+            Iterator<ChangeListener> changeIt = changeListeners.iterator();
             while (changeIt.hasNext()) {
-                ChangeListener cl = (ChangeListener) changeIt.next();
+                ChangeListener cl = changeIt.next();
                 if (action.equals("insert"))
                     cl.doInserted(epo.getNewBean(),epo);
                 else if (action.equals("update"))

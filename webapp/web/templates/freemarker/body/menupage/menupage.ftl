@@ -9,7 +9,7 @@
     
     <#include "menupage-browse.ftl">
     
-    ${stylesheets.add("/css/menupage/menupage.css")}
+    ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/menupage/menupage.css" />')}
     
     <#include "menupage-scripts.ftl">
 <#else>

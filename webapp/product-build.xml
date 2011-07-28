@@ -36,6 +36,8 @@
 	<property name="war-lib.dir" location="${war-webinf.dir}/lib" />
 	<property name="test-classes.dir" location="${build.dir}/testclasses" />
 	<property name="servletjars.dir" location="${build.dir}/servletjars" />
+	
+	<property name="javac.deprecation" value="true" />
 
 
 	<!-- Is there a "src" directory in the product? -->
@@ -141,7 +143,7 @@
 		<javac srcdir="${product.source.dir}"
 		       destdir="${product.classes.dir}"
 		       debug="true"
-		       deprecation="true"
+		       deprecation="${javac.deprecation}"
 		       encoding="UTF8"
 			   includeantruntime="false"
 		       optimize="true"
@@ -218,6 +220,7 @@
 	<target name="deploy" description="--> Build the app and install in Tomcat">
 		<!-- the inner "deploy" would just do a sync that will be done by productDeploy -->
 		<innercall target="revisionInfo" />
+		<innercall target="deploySolr" />
 		<antcall target="productDeploy" />
 	</target>
 
@@ -233,6 +236,21 @@
 			<fileset dir="${build.dir}/war" />
 		</sync>
 	</target>
+
+	<!-- ================================= 
+          target: war              
+         ================================= -->
+	<target name="war" description="--> Build the app and create a WAR file">
+		<innercall target="revisionInfo" />
+		<antcall target="productWar" />
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: productWar                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="productWar"  depends="productRevisionInfo">
+		<jar basedir="${build.dir}/war" destfile="${build.dir}/${webapp.name}.war"/>
+    </target>
 
 	<!-- ================================= 
           target: licenser             

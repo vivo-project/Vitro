@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -26,16 +27,17 @@ import com.hp.hpl.jena.sdb.SDBFactory;
 import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.util.StoreUtils;
 
-import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 
 // This ContextListener must run after the JenaDataSourceSetup ContextListener
 
 public class FileGraphSetup implements ServletContextListener {
 
-	private static String ABOX = "abox";
-	private static String TBOX = "tbox";
-	private static String PATH_ROOT = "/WEB-INF/filegraph/";
-	private static String URI_ROOT = "http://vitro.mannlib.cornell.edu/filegraph/";
+	private static final String ABOX = "abox";
+	private static final String TBOX = "tbox";
+	private static final String PATH_ROOT = "/WEB-INF/filegraph/";
+	public static final String FILEGRAPH_URI_ROOT = "http://vitro.mannlib.cornell.edu/filegraph/";
 	
 	private static final Log log = LogFactory.getLog(FileGraphSetup.class);
 		
@@ -45,10 +47,14 @@ public class FileGraphSetup implements ServletContextListener {
             return;
         }
 	    
+		boolean aboxChanged = false; // indicates whether any ABox file graph model has changed
+		boolean tboxChanged = false; // indicates whether any TBox file graph model has changed
+		OntModelSelector baseOms = null;
+		
 		try {
-			OntModelSelectorImpl baseOms = (OntModelSelectorImpl) sce.getServletContext().getAttribute("baseOntModelSelector");
+			baseOms = ModelContext.getBaseOntModelSelector(sce.getServletContext());
 			Store kbStore = (Store) sce.getServletContext().getAttribute("kbStore");
-			
+						
 			// ABox files
 			Set<String> pathSet = sce.getServletContext().getResourcePaths(PATH_ROOT + ABOX);
 			
@@ -56,7 +62,7 @@ public class FileGraphSetup implements ServletContextListener {
 			
 			if (pathSet != null) {
  			   OntModel aboxBaseModel = baseOms.getABoxModel();
-			   readGraphs(sce, pathSet, kbStore, ABOX, aboxBaseModel);		
+			   aboxChanged = readGraphs(sce, pathSet, kbStore, ABOX, aboxBaseModel);		
 			}
 			
 			// TBox files
@@ -66,7 +72,7 @@ public class FileGraphSetup implements ServletContextListener {
 			
 			if (pathSet != null) {
 			   OntModel tboxBaseModel = baseOms.getTBoxModel();
-			   readGraphs(sce, pathSet, kbStore, TBOX, tboxBaseModel);
+			   tboxChanged = readGraphs(sce, pathSet, kbStore, TBOX, tboxBaseModel);
 			}
 		} catch (ClassCastException cce) {
 			String errMsg = "Unable to cast servlet context attribute to the appropriate type " + cce.getLocalizedMessage();
@@ -77,20 +83,30 @@ public class FileGraphSetup implements ServletContextListener {
 			log.error(t);
 			t.printStackTrace();
 		}
+		
+		if (isUpdateRequired(sce.getServletContext()))  {
+        	log.info("mostSpecificType will be computed because a knowledge base migration was performed." );
+            SimpleReasonerSetup.setMSTComputeRequired(sce.getServletContext());
+	    } else if (aboxChanged || tboxChanged) {
+        	log.info("a full recompute of the Abox will be performed because" +
+			" the filegraph abox(s) and/or tbox(s) have changed or are being read for the first time." );
+	    	SimpleReasonerSetup.setRecomputeRequired(sce.getServletContext());
+	    }
 	}
 	
 	/*
 	 * Reads the graphs stored as files in sub-directories of 
-	 * FileGraphSetup.PATH_ROOT and for each graph:
 	 *   1. updates the SDB store to reflect the current contents of the graph.
 	 *   2. adds the graph as an in-memory submodel of the base in-memory graph 
 	 *      
 	 * Note: no connection needs to be maintained between the in-memory copy of the
 	 * graph and the DB copy.
 	 */
-	public void readGraphs(ServletContextEvent sce, Set<String> pathSet, Store kbStore, String type, OntModel baseModel) {
+	public boolean readGraphs(ServletContextEvent sce, Set<String> pathSet, Store kbStore, String type, OntModel baseModel) {
 			
 		int count = 0;
+		
+		boolean modelChanged = false;
 		
 		// For each file graph in the target directory update or add that graph to
 		// the Jena SDB, and attach the graph as a submodel of the base model
@@ -116,7 +132,7 @@ public class FileGraphSetup implements ServletContextListener {
 						 log.info("Attached file graph as " + type + " submodel " + p);
 					} 
 					
-					updateGraphInDB(kbStore, model, type, p);
+					modelChanged = modelChanged | updateGraphInDB(kbStore, model, type, p);
 					
 				} catch (Exception ioe) {
 					log.error("Unable to process file graph " + p, ioe);
@@ -137,7 +153,7 @@ public class FileGraphSetup implements ServletContextListener {
 		
 		System.out.println("Read " + count + " "  + type + " file graph" + ((count == 1) ? "" : "s") + " from " + PATH_ROOT + type);
 		
-		return;
+		return modelChanged;
 	}
 	
 	/*
@@ -150,19 +166,22 @@ public class FileGraphSetup implements ServletContextListener {
 	 * Otherwise, if a graph with the given name is in the DB and is isomorphic with
 	 * the graph that was read from the files system, then do nothing. 
 	 */
-	public void updateGraphInDB(Store kbStore, Model fileModel, String type, String path) {
+	public boolean updateGraphInDB(Store kbStore, Model fileModel, String type, String path) {
 			
 		String graphURI = pathToURI(path,type);
 		Model dbModel = SDBFactory.connectNamedModel(kbStore, graphURI);
+		boolean modelChanged = false;
 		
 		if (dbModel.isEmpty() ) {
 			dbModel.add(fileModel);
+			modelChanged = true;
 		} else if (!dbModel.isIsomorphicWith(fileModel)) {
 		    dbModel.removeAll();
 		    dbModel.add(fileModel);
+		    modelChanged = true;
 		}
 		
-		return;
+		return modelChanged;
 	}
 	
 	/*
@@ -177,7 +196,7 @@ public class FileGraphSetup implements ServletContextListener {
 	 */
 	public void cleanupDB(Store kbStore, Set<String> uriSet, String type) {
 		
-		Pattern graphURIPat = Pattern.compile("^" + URI_ROOT + type);   
+		Pattern graphURIPat = Pattern.compile("^" + FILEGRAPH_URI_ROOT + type);   
 		 
 	    Iterator<Node> iter = StoreUtils.storeGraphNames(kbStore);	
 	    
@@ -225,7 +244,7 @@ public class FileGraphSetup implements ServletContextListener {
 		
 	    if (path != null) {
 	    	File file = new File(path);
-			uri = URI_ROOT + type + "/" + file.getName(); 
+			uri = FILEGRAPH_URI_ROOT + type + "/" + file.getName(); 
 	    }
 		
 		return uri;
@@ -234,4 +253,9 @@ public class FileGraphSetup implements ServletContextListener {
 	public void contextDestroyed( ServletContextEvent sce ) {
 		// nothing to do
 	}
+	
+private static boolean isUpdateRequired(ServletContext ctx) {
+    return (ctx.getAttribute(UpdateKnowledgeBase.KBM_REQURIED_AT_STARTUP) != null);
+}
+
 }

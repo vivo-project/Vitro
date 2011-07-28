@@ -14,9 +14,6 @@ public class PropertyInstance implements PropertyInstanceIface, Comparable<Prope
     private String propertyURI = null;
     private String objectEntURI = null;
     private String subjectEntURI = null;
-    private String qualifier = null;
-    private Date sunrise = null;
-    private Date sunset = null;
 
     private String subjectName = null;
     private String objectName = null;
@@ -86,18 +83,6 @@ public class PropertyInstance implements PropertyInstanceIface, Comparable<Prope
     /* (non-Javadoc)
      * @see edu.cornell.mannlib.vitro.beans.PropertyInstanceIface#getQualifier()
      */
-    public String getQualifier(){return qualifier;}
-    /* (non-Javadoc)
-     * @see edu.cornell.mannlib.vitro.beans.PropertyInstanceIface#getSunrise()
-     */
-    public Date getSunrise(){return sunrise;}
-    /* (non-Javadoc)
-     * @see edu.cornell.mannlib.vitro.beans.PropertyInstanceIface#getSunset()
-     */
-    public Date getSunset(){return sunset;}
-    /* (non-Javadoc)
-     * @see edu.cornell.mannlib.vitro.beans.PropertyInstanceIface#getDomainSide()
-     */
     public boolean getSubjectSide(){return subjectSide;}
     /* (non-Javadoc)
      * @see edu.cornell.mannlib.vitro.beans.PropertyInstanceIface#getDomainQuickEditJsp()
@@ -156,18 +141,6 @@ public class PropertyInstance implements PropertyInstanceIface, Comparable<Prope
      * @see edu.cornell.mannlib.vitro.beans.PropertyInstanceIface#setRangePublic(java.lang.String)
      */
     public void setRangePublic(String in){rangePublic=in;}
-    /* (non-Javadoc)
-     * @see edu.cornell.mannlib.vitro.beans.PropertyInstanceIface#setQualifier(java.lang.String)
-     */
-    public void setQualifier(String in){qualifier=in;}
-    /* (non-Javadoc)
-     * @see edu.cornell.mannlib.vitro.beans.PropertyInstanceIface#setSunrise(java.util.Date)
-     */
-    public void setSunrise(Date in){sunrise=in;}
-    /* (non-Javadoc)
-     * @see edu.cornell.mannlib.vitro.beans.PropertyInstanceIface#setSunset(java.util.Date)
-     */
-    public void setSunset(Date in){sunset=in;}
     /* (non-Javadoc)
      * @see edu.cornell.mannlib.vitro.beans.PropertyInstanceIface#setDomainSide(boolean)
      */

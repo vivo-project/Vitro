@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -37,13 +39,15 @@ public class UploadedFileHelper {
 	private final IndividualDao individualDao;
 	private final DataPropertyStatementDao dataPropertyStatementDao;
 	private final ObjectPropertyStatementDao objectPropertyStatementDao;
+	private final ServletContext ctx;
 
-	public UploadedFileHelper(FileStorage fileStorage, WebappDaoFactory wadf) {
+	public UploadedFileHelper(FileStorage fileStorage, WebappDaoFactory wadf, ServletContext ctx) {
 		this.fileStorage = fileStorage;
 		this.wadf = wadf;
 		this.individualDao = wadf.getIndividualDao();
 		this.dataPropertyStatementDao = wadf.getDataPropertyStatementDao();
 		this.objectPropertyStatementDao = wadf.getObjectPropertyStatementDao();
+		this.ctx = ctx;
 	}
 
 	/**
@@ -170,7 +174,7 @@ public class UploadedFileHelper {
 		dataPropertyStatementDao
 				.insertNewDataPropertyStatement(new DataPropertyStatementImpl(
 						uri, VitroVocabulary.FS_ALIAS_URL, FileServingHelper
-								.getBytestreamAliasUrl(uri, filename)));
+								.getBytestreamAliasUrl(uri, filename, ctx)));
 
 		return individualDao.getIndividualByURI(uri);
 	}

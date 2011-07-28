@@ -2,18 +2,15 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -22,7 +19,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 
 /**
- * This allows a DBA to pretend that he's logged in with an external username.
+ * This allows J. Random User to pretend that he's passed external authentication.
+ * 
+ * This should not be included in web.xml in a production deployment!!!
  */
 public class FakeExternalAuthController extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory
@@ -91,8 +90,7 @@ public class FakeExternalAuthController extends FreemarkerHttpServlet {
 	}
 
 	private RedirectResponseValues makeRedirectResponse() {
-		return new RedirectResponseValues(
-				UrlBuilder.getUrl(URL_EXTERNAL_AUTH_RETURN));
+		return new RedirectResponseValues(URL_EXTERNAL_AUTH_RETURN);
 	}
 
 	/**
@@ -119,7 +117,7 @@ public class FakeExternalAuthController extends FreemarkerHttpServlet {
 		}
 
 		@Override
-		public String getExternalUsername(HttpServletRequest request) {
+		public String getExternalAuthId(HttpServletRequest request) {
 			log.debug("external username is '" + username + "'");
 			return username;
 		}

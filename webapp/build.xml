@@ -26,6 +26,8 @@
 
 	<property name="servletjars.dir" location="${build.dir}/servletjars" />
 
+	<property name="javac.deprecation" value="true" />
+
 	<!-- - - - - - - - - - - - - - - - - - 
           paths: for compiling and running                      
          - - - - - - - - - - - - - - - - - -->
@@ -61,6 +63,7 @@ all      - Runs "clean", then "deploy".
 clean    - Delete all artifacts so the next build will be from scratch.
 compile  - Compile the Java source files.
 test     - Compile and run the JUnit tests.
+war      - Create a WAR file to be deployed in a servlet container.
 deploy   - Deploy the application directly into the Tomcat webapps directory.
 	    </echo>
 	</target>
@@ -69,13 +72,6 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
           target: all              
          ================================= -->
 	<target name="all" depends="clean, deploy" description="--> Run 'clean', then 'deploy'" />
-
-	<!-- ================================= 
-          target: clean              
-         ================================= -->
-	<target name="clean" description="--> Delete all artifacts.">
-		<delete dir="${build.dir}" />
-	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
           target: properties                      
@@ -101,23 +97,36 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		      message="${deploy.properties.file} must contain a value for tomcat.home" />
 		<fail unless="webapp.name"
 		      message="${deploy.properties.file} must contain a value for webapp.name" />
-		<fail unless="upload.directory"
-		      message="${deploy.properties.file} must contain a value for upload.directory" />
-		<fail unless="LuceneSetup.indexDir"
-		      message="${deploy.properties.file} must contain a value for LuceneSetup.indexDir" />
+		<fail unless="vitro.home.directory"
+		      message="${deploy.properties.file} must contain a value for vitro.home.directory" />
 		<fail unless="Vitro.defaultNamespace"
 		      message="${deploy.properties.file} must contain a value for Vitro.defaultNamespace" />
-		<fail unless="Vitro.smtpHost"
-		      message="${deploy.properties.file} must contain a value for Vitro.smtpHost (may be empty)" />
 		<fail unless="VitroConnection.DataSource.url"
 		      message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.url" />
 		<fail unless="VitroConnection.DataSource.username"
 		      message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.username" />
 		<fail unless="VitroConnection.DataSource.password"
 		      message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.password" />
-		<fail unless="initialAdminUser"
-		      message="${deploy.properties.file} must contain a value for initialAdminUser" />
+		<fail unless="rootUser.emailAddress"
+		      message="${deploy.properties.file} must contain a value for rootUser.emailAddress" />
 
+		<fail message="The vitro.home.directory &quot;${vitro.home.directory}&quot; does not exist.">
+			<condition>
+				<not>
+					<available file="${vitro.home.directory}" />
+				</not>
+			</condition>
+		</fail>
+		
+		<property name="solr.home" location="${vitro.home.directory}/solr" />
+	</target>
+
+	<!-- ================================= 
+          target: clean              
+         ================================= -->
+	<target name="clean" depends="properties" description="--> Delete all artifacts.">
+		<delete dir="${build.dir}" />
+		<delete dir="${solr.home}" excludes="data/**/*" includeemptydirs="true" />
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
@@ -146,12 +155,12 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 			<fileset file="${webapp.dir}/config/dwr.xml" />
 		</copy>
 
-		<!-- copy the ontologies and the submodels into the war directory. -->
+		<!-- copy the ontologies and the filegraphs into the war directory. -->
 		<copy todir="${war-webinf.dir}">
 			<fileset dir="${webapp.dir}" includes="ontologies" />
 			<fileset dir="${webapp.dir}" includes="ontologies/**/*" />
-			<fileset dir="${webapp.dir}" includes="submodels" />
-			<fileset dir="${webapp.dir}" includes="submodels/**/*" />
+			<fileset dir="${webapp.dir}" includes="filegraph" />
+			<fileset dir="${webapp.dir}" includes="filegraph/**/*" />
 		</copy>
 
 		<!-- use the production Log4J properties, unless a debug version exists. -->
@@ -176,15 +185,6 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<copy todir="${war-webinf.dir}/tlds">
 			<fileset dir="${webapp.dir}/config/tlds" includes="**/*" excludes="*.LCK" />
 		</copy>
-
-		<!-- TODO Get rid of these webservices files -->
-		<copy todir="${war-webinf.dir}/lib">
-			<fileset dir="${webapp.dir}/../services/lib" includes="**/*" excludes="*.LCK" />
-		</copy>
-		<copy todir="${build.dir}/war">
-			<fileset dir="${webapp.dir}/../services/additions" includes="**/*" />
-		</copy>
-		<!-- TODO Get rid of these webservices files -->
 
 		<!-- copy any xml files from source tree to the war directory -->
 		<copy todir="${build.dir}/war/WEB-INF/classes">
@@ -227,9 +227,9 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<javac srcdir="${webapp.dir}/src"
 		       destdir="${war-classes.dir}"
 		       debug="true"
-		       deprecation="true"
+		       deprecation="${javac.deprecation}"
 		       encoding="UTF8"
-			   includeantruntime="false"
+		       includeantruntime="false"
 		       optimize="true"
 		       source="1.6">
 			<classpath refid="compile.classpath" />
@@ -243,9 +243,9 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<javac srcdir="${webapp.dir}/test"
 		       destdir="${test-classes.dir}"
 		       debug="true"
-		       deprecation="true"
+		       deprecation="${javac.deprecation}"
 		       encoding="UTF8"
-			   includeantruntime="false"
+		       includeantruntime="false"
 		       optimize="false"
 		       source="1.6">
 			<classpath refid="test.compile.classpath" />
@@ -263,7 +263,10 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	<!-- ================================= 
           target: revisionInfo              
          ================================= -->
-	<target name="revisionInfo" depends="test" unless="skipinfo" description="--> Store revision info in build">
+	<target name="revisionInfo"
+	        depends="test"
+	        unless="skipinfo"
+	        description="--> Store revision info in build">
 		<property name="revisionInfo.product.dir" location="${ant.file.vitroCore}/.." />
 		<property name="revisionInfo.build.file" location="${war-resources.dir}/revisionInfo.txt" />
 
@@ -278,9 +281,9 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<javac srcdir="${webapp.dir}/../utilities/buildutils/revisioninfo"
 		       destdir="${test-classes.dir}"
 		       debug="true"
-		       deprecation="true"
+		       deprecation="${javac.deprecation}"
 		       encoding="UTF8"
-			   includeantruntime="false"
+		       includeantruntime="false"
 		       optimize="false"
 		       source="1.6">
 		</javac>
@@ -295,11 +298,61 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		</java>
 	</target>
 
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: prepareSolr                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="prepareSolr" depends="properties">
+		<property name="solr.distrib.dir" location="${webapp.dir}/../solr" />
+		<property name="solr.example.dir" location="${solr.distrib.dir}/exampleSolr" />
+		<property name="solr.context.config.example"
+		          location="${solr.distrib.dir}/exampleSolrContext.xml" />
+		<property name="solr.war" location="${solr.distrib.dir}/apache-solr-3.1.0.war" />
+
+		<property name="solr.docbase" location="${solr.home}/solr.war" />
+		<property name="solr.context.name" value="${webapp.name}solr" />
+		<property name="solr.context.config" location="${solr.home}/${solr.context.name}.xml" />
+
+		<!-- Create and copy the example directory to the solr.home directory. -->
+		<mkdir dir="${solr.home}" />
+		<copy todir="${solr.home}">
+			<fileset dir="${solr.example.dir}" includes="**/*" />
+		</copy>
+
+		<!-- Add the war file. -->
+		<copy tofile="${solr.docbase}">
+			<fileset file="${solr.war}" />
+		</copy>
+		<war destfile="${solr.docbase}" update="true">
+			<classes dir="${webapp.dir}/config/solr/" />
+		</war>
+
+		<!-- if no mask is define, go with an unsecured installation. -->
+		<property name="vitro.local.solr.ipaddress.mask" value=".*" />
+		
+		<!-- Create the context configuration XML with expanded properties. -->
+		<copy tofile="${solr.context.config}" filtering="true">
+			<fileset file="${solr.context.config.example}" />
+			<filterchain>
+				<expandproperties />
+			</filterchain>
+		</copy>
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: deploySolr                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="deploySolr" depends="prepareSolr" unless="noSolrDeploy">
+		<unwar src="${solr.docbase}" dest="${tomcat.home}/webapps/${solr.context.name}" />
+		<copy todir="${tomcat.home}/conf/Catalina/localhost" overwrite="true" >
+			<fileset file="${solr.context.config}" />
+		</copy>
+	</target>
+
 	<!-- ================================= 
           target: deploy              
          ================================= -->
 	<target name="deploy"
-	        depends="revisionInfo"
+	        depends="revisionInfo, deploySolr"
 	        description="--> Build the app and install in Tomcat">
 		<property name="webapp.deploy.home" value="${tomcat.home}/webapps/${webapp.name}" />
 
@@ -308,6 +361,13 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<sync todir="${webapp.deploy.home}" includeemptydirs="true">
 			<fileset dir="${build.dir}/war" />
 		</sync>
+	</target>
+
+	<!-- ================================= 
+          target: war              
+         ================================= -->
+	<target name="war" depends="revisionInfo" description="--> Build the app and create a WAR file">
+		<jar basedir="${build.dir}/war" destfile="${build.dir}/${webapp.name}.war" />
 	</target>
 
 	<!-- ================================= 

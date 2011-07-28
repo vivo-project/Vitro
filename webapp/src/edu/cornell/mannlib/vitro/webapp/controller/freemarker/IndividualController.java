@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,12 +12,12 @@ import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.datatypes.TypeMapper;
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -26,39 +25,41 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeVerbosePropertyInformation;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RdfResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.jena.ExtendedLinkedDataUtils;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
-import edu.cornell.mannlib.vitro.webapp.web.functions.IndividualLocalNameMethod;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividualTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividual;
 import freemarker.ext.beans.BeansWrapper;
 
 /**
@@ -72,15 +73,22 @@ public class IndividualController extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(IndividualController.class);
+    private static final String RICH_EXPORT_ROOT = "/WEB-INF/rich-export/";
+    private static final String PERSON_CLASS_URI = "http://xmlns.com/foaf/0.1/Person";
+    private static final String INCLUDE_ALL = "all";
     
     private static final Map<String, String> namespaces = new HashMap<String, String>() {{
+        put("display", VitroVocabulary.DISPLAY);
         put("vitro", VitroVocabulary.vitroURI);
         put("vitroPublic", VitroVocabulary.VITRO_PUBLIC);
     }};
-    
+        
+	private static final Property extendedLinkedDataProperty = ResourceFactory.createProperty(namespaces.get("vitro") + "extendedLinkedData");
+	private static final Literal xsdTrue = ResourceFactory.createTypedLiteral("true", XSDDatatype.XSDboolean);
+	
     private static final String TEMPLATE_INDIVIDUAL_DEFAULT = "individual.ftl";
     private static final String TEMPLATE_HELP = "individual-help.ftl";
-    
+    private static Map<String,Float>qsMap;
     
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
@@ -93,7 +101,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        // Check to see if the request is for a non-information resource, redirect if it is.
 	        String redirectURL = checkForRedirect ( url, vreq );
 	        if( redirectURL != null ){
-	            return new RedirectResponseValues(redirectURL);
+	            return new RedirectResponseValues(redirectURL, HttpServletResponse.SC_SEE_OTHER);
 	        }            	                                         
 	
 	        Individual individual = null;
@@ -103,11 +111,11 @@ public class IndividualController extends FreemarkerHttpServlet {
 	            return doHelp();
 	        }
 	        
-	        if( individual == null || checkForHidden(vreq, individual) || checkForSunset(vreq, individual)){
+	        if( individual == null ){
 	        	return doNotFound(vreq);
 	        }
 
-            ContentType rdfFormat = checkForLinkedDataRequest(url, vreq);
+            ContentType rdfFormat = checkUrlForLinkedDataRequest(url, vreq);
             if( rdfFormat != null ){
                 return doRdf(vreq, individual, rdfFormat);
             }   
@@ -115,7 +123,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        // If this is an uploaded file, redirect to its "alias URL".
 	        String aliasUrl = getAliasUrlForBytestreamIndividual(vreq, individual);
 	        if (aliasUrl != null) {
-	        	return new RedirectResponseValues(UrlBuilder.getUrl(vreq.getContextPath() + aliasUrl));
+	        	return new RedirectResponseValues(aliasUrl);
 	        }
 
 	        Map<String, Object> body = new HashMap<String, Object>();
@@ -124,16 +132,19 @@ public class IndividualController extends FreemarkerHttpServlet {
     		body.put("relatedSubject", getRelatedSubject(vreq));
     		body.put("namespaces", namespaces);
     		body.put("temporalVisualizationEnabled", getTemporalVisualizationFlag());
+    		body.put("verbosePropertySwitch", getVerbosePropertyValues(vreq));
     		
-    		IndividualTemplateModel itm = getIndividualTemplateModel(vreq, individual);
+    		IndividualTemplateModel itm = getIndividualTemplateModel(individual, vreq);
     		/* We need to expose non-getters in displaying the individual's property list, 
     		 * since it requires calls to methods with parameters.
     		 * This is still safe, because we are only putting BaseTemplateModel objects
     		 * into the data model: no real data can be modified. 
     		 */
-	        body.put("individual", getNonDefaultBeansWrapper(BeansWrapper.EXPOSE_SAFE).wrap(itm));
+	        body.put("individual", wrap(itm, BeansWrapper.EXPOSE_SAFE));
 	        body.put("headContent", getRdfLinkTag(itm));	       
 	        
+	        //If special values required for individuals like menu, include values in template values
+	        this.includeSpecialEditingValues(vreq, body);
 	        String template = getIndividualTemplate(individual, vreq);
 	                
 	        return new TemplateResponseValues(template, body);
@@ -145,11 +156,68 @@ public class IndividualController extends FreemarkerHttpServlet {
     }
 
     private void cleanUpSession(VitroRequest vreq) {
-		// Session cleanup: any time we are at an entity page we shouldn't have an editing config or submission
-        HttpSession session = vreq.getSession();
-	    session.removeAttribute("editjson");
-	    EditConfiguration.clearAllConfigsInSession(session);
-	    EditSubmission.clearAllEditSubmissionsInSession(session);
+		// We should not remove edit configurations from the session because the user
+        // may resubmit the forms via the back button and the system is setup to handle this.         
+    }
+    
+    private Map<String, Object> getVerbosePropertyValues(VitroRequest vreq) {
+        
+        Map<String, Object> map = null;
+        
+        if (PolicyHelper.isAuthorizedForActions(vreq, new SeeVerbosePropertyInformation())) {
+            // Get current verbose property display value
+            String verbose = vreq.getParameter("verbose");
+            Boolean verboseValue;
+            // If the form was submitted, get that value
+            if (verbose != null) {
+                verboseValue = "true".equals(verbose);
+            // If form not submitted, get the session value
+            } else {
+                Boolean verbosePropertyDisplayValueInSession = (Boolean) vreq.getSession().getAttribute("verbosePropertyDisplay"); 
+                // True if session value is true, otherwise (session value is false or null) false
+                verboseValue = Boolean.TRUE.equals(verbosePropertyDisplayValueInSession);           
+            }
+            vreq.getSession().setAttribute("verbosePropertyDisplay", verboseValue);
+            
+            map = new HashMap<String, Object>();
+            map.put("currentValue", verboseValue);
+
+            /* Factors contributing to switching from a form to an anchor element:
+               - Can't use GET with a query string on the action unless there is no form data, since
+                 the form data is appended to the action with a "?", so there can't already be a query string
+                 on it.
+               - The browser (at least Firefox) does not submit a form that has no form data.
+               - Some browsers might strip the query string off the form action of a POST - though 
+                 probably they shouldn't, because the HTML spec allows a full URI as a form action.
+               - Given these three, the only reliable solution is to dynamically create hidden inputs
+                 for the query parameters. 
+               - Much simpler is to just create an anchor element. This has the added advantage that the
+                 browser doesn't ask to resend the form data when reloading the page.
+             */
+            String url = vreq.getRequestURI() + "?verbose=" + !verboseValue;
+            // Append request query string, except for current verbose value, to url
+            String queryString = vreq.getQueryString();
+            if (queryString != null) {
+                String[] params = queryString.split("&");
+                for (String param : params) {
+                    if (! param.startsWith("verbose=")) {
+                        url += "&" + param;
+                    }
+                }
+            }
+            map.put("url", url);            
+        } else {
+            vreq.getSession().setAttribute("verbosePropertyDisplay", false);
+        }
+        
+        return map;
+    }
+    
+    //Get special values for cases such as Menu Management editing
+    private void includeSpecialEditingValues(VitroRequest vreq, Map<String, Object> body) {
+    	if(vreq.getAttribute(VitroRequest.SPECIAL_WRITE_MODEL) != null) {
+    		body.put("reorderUrl", vreq.getContextPath() + DisplayVocabulary.REORDER_MENU_URL);
+    	}
     }
     
     private Map<String, Object> getRelatedSubject(VitroRequest vreq) {
@@ -168,7 +236,8 @@ public class IndividualController extends FreemarkerHttpServlet {
             if (relatedSubjectInd != null) {
                 map = new HashMap<String, Object>();
                 map.put("name", relatedSubjectInd.getName());
-                map.put("url", (new ListedIndividualTemplateModel(relatedSubjectInd, vreq)).getProfileUrl());
+                map.put("url", UrlBuilder.getIndividualProfileUrl(relatedSubjectInd, vreq));
+                map.put("url", (new ListedIndividual(relatedSubjectInd, vreq)).getProfileUrl());
                 String relatingPredicateUri = vreq.getParameter("relatingPredicateUri");
                 if (relatingPredicateUri != null) {
                     ObjectProperty relatingPredicateProp = opDao.getObjectPropertyByURI(relatingPredicateUri);
@@ -183,7 +252,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     
     private String getRdfLinkTag(IndividualTemplateModel itm) {
         String linkTag = null;
-        String linkedDataUrl = itm.getRdfUrl(false);
+        String linkedDataUrl = itm.getRdfUrl();
         if (linkedDataUrl != null) {
             linkTag = "<link rel=\"alternate\" type=\"application/rdf+xml\" href=\"" +
                           linkedDataUrl + "\" /> ";
@@ -191,12 +260,11 @@ public class IndividualController extends FreemarkerHttpServlet {
         return linkTag;
     }
     
-	private IndividualTemplateModel getIndividualTemplateModel(VitroRequest vreq, Individual individual) 
+	private IndividualTemplateModel getIndividualTemplateModel(Individual individual, VitroRequest vreq) 
 	    throws ServletException, IOException {
 		
     	IndividualDao iwDao = vreq.getWebappDaoFactory().getIndividualDao();
         
-        individual.setKeywords(iwDao.getKeywordsForIndividualByMode(individual.getURI(),"visible"));
         individual.sortForDisplay();
 
         return new IndividualTemplateModel(individual, vreq);
@@ -244,7 +312,8 @@ public class IndividualController extends FreemarkerHttpServlet {
             }
             // If still no custom template defined, and inferencing is asynchronous (under RDB), check
             // the superclasses of the vclass for a custom template specification. 
-            if (customTemplate == null && SimpleReasoner.isABoxReasoningAsynchronous(getServletContext())) { 
+            SimpleReasoner simpleReasoner = (SimpleReasoner) getServletContext().getAttribute(SimpleReasoner.class.getName());
+            if (customTemplate == null && simpleReasoner != null && simpleReasoner.isABoxReasoningAsynchronous()) { 
                 log.debug("Checking superclasses for custom template specification because ABox reasoning is asynchronous");
                 for (VClass directVClass : directClasses) {
                     VClassDao vcDao = vreq.getWebappDaoFactory().getVClassDao();
@@ -276,14 +345,10 @@ public class IndividualController extends FreemarkerHttpServlet {
 	private ResponseValues doRdf(VitroRequest vreq, Individual individual,
 			ContentType rdfFormat) throws IOException, ServletException {    	
 				
-		OntModel ontModel = null;
-		HttpSession session = vreq.getSession(false);
-		if( session != null )
-			ontModel = (OntModel)session.getAttribute("jenaOntModel");		
-		if( ontModel == null)
-			ontModel = (OntModel)getServletContext().getAttribute("jenaOntModel");
-			
-		Model newModel = getRDF(individual, ontModel, ModelFactory.createDefaultModel(), 0);		
+		OntModel ontModel = vreq.getJenaOntModel();		
+                
+        String[] includes = vreq.getParameterValues("include");
+		Model newModel = getRDF(individual,ontModel,ModelFactory.createDefaultModel(),0,includes);		
 		
 		return new RdfResponseValues(rdfFormat, newModel);
 	}
@@ -395,134 +460,138 @@ public class IndividualController extends FreemarkerHttpServlet {
             netIdStr = vreq.getParameter("netid");
         if ( netIdStr != null ){
     		SelfEditingConfiguration sec = SelfEditingConfiguration.getBean(vreq);
-    		uri = sec.getIndividualUriFromUsername(iwDao, netIdStr);
-            return iwDao.getIndividualByURI(uri);
+    		List<Individual> assocInds = sec.getAssociatedIndividuals(iwDao, netIdStr);
+    		if (!assocInds.isEmpty()) {
+    			return assocInds.get(0);
+    		}
         }
 
 		return null;		
     }
- 
 	
-	private static Pattern URI_PATTERN = Pattern.compile("^/individual/([^/]*)$");
-    //Redirect if the request is for http://hostname/individual/localname
-    // if accept is nothing or text/html redirect to ???
-    // if accept is some RDF thing redirect to the URL for RDF
+	/* 
+	 * Following recipe 3 from "Best Practice Recipes for Publishing RDF Vocabularies."
+	 * See http://www.w3.org/TR/swbp-vocab-pub/#recipe3.
+	 * The basic idea is that a URI like http://vivo.cornell.edu/individual/n1234
+	 * identifies a real world individual. HTTP cannot send that as the response
+	 * to a GET request because it can only send bytes and not things. The server 
+	 * sends a 303, to mean "you asked for something I cannot send you, but I can 
+	 * send you this other stream of bytes about that thing." 
+	 * In the case of a request like http://vivo.cornell.edu/individual/n1234/n1234.rdf
+	 * or http://vivo.cornell.edu/individual/n1234?format=rdfxml,
+	 * the request is for a set of bytes rather than an individual, so no 303 is needed.
+     */
+    private static Pattern URI_PATTERN = Pattern.compile("^/individual/([^/]*)$");
 	private String checkForRedirect(String url, VitroRequest vreq) {
-		Matcher m = URI_PATTERN.matcher(url);
-		if( m.matches() && m.groupCount() == 1 ){			
-			ContentType c = checkForLinkedDataRequest(url, vreq);			
-			if( c != null ){
-				String redirectUrl = "/individual/" + m.group(1) + "/" + m.group(1) ; 
-				if( RDFXML_MIMETYPE.equals( c.getMediaType())  ){
-					return redirectUrl + ".rdf";
-				}else if( N3_MIMETYPE.equals( c.getMediaType() )){
-					return redirectUrl + ".n3";
-				}else if( TTL_MIMETYPE.equals( c.getMediaType() )){
-					return redirectUrl + ".ttl";
-				}//else send them to html													
-			}
-			//else redirect to HTML representation
-			return UrlBuilder.getUrl("display/" + m.group(1));
-		}else{			
-			return null;
-		}
+	   
+	    String formatParam = (String) vreq.getParameter("format");
+	    if ( formatParam == null ) {
+	        Matcher m = URI_PATTERN.matcher(url);
+    		if ( m.matches() && m.groupCount() == 1 ) {	
+    			ContentType c = checkAcceptHeaderForLinkedDataRequest(url, vreq);			
+    			if ( c != null ) {
+    				String redirectUrl = "/individual/" + m.group(1) + "/" + m.group(1) ; 
+    				if ( RDFXML_MIMETYPE.equals( c.getMediaType() ) ) {
+    					return redirectUrl + ".rdf";
+    				} else if ( N3_MIMETYPE.equals( c.getMediaType() ) ) {
+    					return redirectUrl + ".n3";
+    				} else if ( TTL_MIMETYPE.equals( c.getMediaType() ) ) {
+    					return redirectUrl + ".ttl";
+    				}//else send them to html													
+    			}
+    			//else redirect to HTML representation
+    			return "display/" + m.group(1);
+    		} 
+	    }
+	    return null;
 	}
 
-	private static Pattern RDF_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.rdf$");
-    private static Pattern N3_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.n3$");
-    private static Pattern TTL_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.ttl$");
-    private static Pattern HTML_REQUEST = Pattern.compile("^/display/([^/]*)$");
-    
+    protected ContentType checkAcceptHeaderForLinkedDataRequest(String url, VitroRequest vreq) {
+        try {
+            /*
+             * Check the accept header. This request will trigger a 
+             * redirect with a 303 ("see also"), because the request is for 
+             * an individual but the server can only provide a set of bytes.
+             */
+            String acceptHeader = vreq.getHeader("accept");
+            if (acceptHeader != null) {             
+                String ctStr = ContentType.getBestContentType(
+                        ContentType.getTypesAndQ(acceptHeader), 
+                        getAcceptedContentTypes());
+                                
+                if (ctStr!=null && (
+                        RDFXML_MIMETYPE.equals(ctStr) || 
+                        N3_MIMETYPE.equals(ctStr) ||
+                        TTL_MIMETYPE.equals(ctStr) ))
+                    return new ContentType(ctStr);              
+            }            
+        } catch (Throwable th) {
+            log.error("Problem while checking accept header " , th);
+        }
+        return null;
+    }
+
     public static final Pattern RDFXML_FORMAT = Pattern.compile("rdfxml");
     public static final Pattern N3_FORMAT = Pattern.compile("n3");
     public static final Pattern TTL_FORMAT = Pattern.compile("ttl");
     
+    private static Pattern RDF_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.rdf$");
+    private static Pattern N3_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.n3$");
+    private static Pattern TTL_REQUEST = Pattern.compile("^/individual/([^/]*)/\\1.ttl$");
+    private static Pattern HTML_REQUEST = Pattern.compile("^/display/([^/]*)$");
+    
     /**  
      * @return null if this is not a linked data request, returns content type if it is a 
-     * linked data request.
+     * linked data request. 
+     * These are Vitro-specific ways of requesting rdf, unrelated to semantic web standards.
+     * They do not trigger a redirect with a 303, because the request is for a set of bytes
+     * rather than an individual.
      */
-	protected ContentType checkForLinkedDataRequest(String url, VitroRequest vreq ) {		
-		try {
-		    ContentType contentType = null;
-		    Matcher m;
-		    // Check for url param specifying format
-		    String formatParam = (String) vreq.getParameter("format");
-		    if (formatParam != null) {
-		        m = RDFXML_FORMAT.matcher(formatParam);
-		        if ( m.matches() ) {
-		            return new ContentType(RDFXML_MIMETYPE);
-		        }
-	            m = N3_FORMAT.matcher(formatParam);
-	            if( m.matches() ) {
-	                return new ContentType(N3_MIMETYPE);
-	            }
-	            m = TTL_FORMAT.matcher(formatParam);
-	            if( m.matches() ) {
-	                return new ContentType(TTL_MIMETYPE);
-	            } 		        
-		    }
-		    
-			//check the accept header
-		    String acceptHeader = vreq.getHeader("accept");
-			if (acceptHeader != null) {
-				List<ContentType> actualContentTypes = new ArrayList<ContentType>();				
-				actualContentTypes.add(new ContentType( XHTML_MIMETYPE ));
-				actualContentTypes.add(new ContentType( HTML_MIMETYPE ));				
-				
-				actualContentTypes.add(new ContentType( RDFXML_MIMETYPE ));
-				actualContentTypes.add(new ContentType( N3_MIMETYPE ));
-				actualContentTypes.add(new ContentType( TTL_MIMETYPE ));
-			
-				contentType = ContentType.getBestContentType(acceptHeader,actualContentTypes);
-				if (contentType!=null && (
-						RDFXML_MIMETYPE.equals(contentType.getMediaType()) || 
-						N3_MIMETYPE.equals(contentType.getMediaType()) ||
-						TTL_MIMETYPE.equals(contentType.getMediaType()) ))
-					return contentType;				
-			}
-			
-			/*
-			 * check for parts of URL that indicate request for RDF
-			   http://vivo.cornell.edu/individual/n23/n23.rdf
-			   http://vivo.cornell.edu/individual/n23/n23.n3
-			   http://vivo.cornell.edu/individual/n23/n23.ttl
-			 */
-	        m = RDF_REQUEST.matcher(url);
-	        if( m.matches() ) {
-	            return new ContentType(RDFXML_MIMETYPE);
+	protected ContentType checkUrlForLinkedDataRequest(String url, VitroRequest vreq ) {		
+
+	    Matcher m;
+	    
+	    /*
+	     * Check for url param specifying format.
+	     * Example: http://vivo.cornell.edu/individual/n23?format=rdfxml
+	     */
+	    String formatParam = (String) vreq.getParameter("format");
+	    if (formatParam != null) {
+	        m = RDFXML_FORMAT.matcher(formatParam);
+	        if ( m.matches() ) {
+	            return  ContentType.RDFXML;
 	        }
-	        m = N3_REQUEST.matcher(url);
-	        if( m.matches() ) {
-	            return new ContentType(N3_MIMETYPE);
-	        }
-	        m = TTL_REQUEST.matcher(url);
-	        if( m.matches() ) {
-	            return new ContentType(TTL_MIMETYPE);
-	        }    
-			
-			
-		} catch (Throwable th) {
-			log.error("problem while checking accept header " , th);
-		}
+            m = N3_FORMAT.matcher(formatParam);
+            if( m.matches() ) {
+                return  ContentType.N3;
+            }
+            m = TTL_FORMAT.matcher(formatParam);
+            if( m.matches() ) {
+                return  ContentType.TURTLE;
+            } 		        
+	    }
+
+		/*
+		 * Check for parts of URL that indicate request for RDF. Examples:
+		 * http://vivo.cornell.edu/individual/n23/n23.rdf
+		 * http://vivo.cornell.edu/individual/n23/n23.n3
+		 * http://vivo.cornell.edu/individual/n23/n23.ttl
+		 */
+        m = RDF_REQUEST.matcher(url);
+        if( m.matches() ) {
+            return ContentType.RDFXML;
+        }
+        m = N3_REQUEST.matcher(url);
+        if( m.matches() ) {
+            return ContentType.N3;
+        }
+        m = TTL_REQUEST.matcher(url);
+        if( m.matches() ) {
+            return ContentType.TURTLE;
+        }    
+						
 		return null;
 	}  
-	
-	private ContentType getContentTypeFromString(String string) {
-
-        return null;
-	}
-
-	@SuppressWarnings("unused")
-	private boolean checkForSunset(VitroRequest vreq, Individual entity) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @SuppressWarnings("unused")
-	private boolean checkForHidden(VitroRequest vreq, Individual entity){ 
-        // TODO Auto-generated method stub
-        return false;
-    }
     
 	/**
 	 * If this entity represents a File Bytestream, get its alias URL so we can
@@ -549,15 +618,16 @@ public class IndividualController extends FreemarkerHttpServlet {
 	}
  
 	private boolean getTemporalVisualizationFlag() {
-		String property = ConfigurationProperties.getProperty("visualization.temporal");
+		String property = ConfigurationProperties.getBean(getServletContext())
+				.getProperty("visualization.temporal");
 		return "enabled".equals(property);
 	}
 
-    private Model getRDF(Individual entity, OntModel contextModel, Model newModel, int recurseDepth ) {
+    private Model getRDF(Individual entity, OntModel contextModel, Model newModel, int recurseDepth, String[] includes) {
+    	
     	Resource subj = newModel.getResource(entity.getURI());
     	
     	List<DataPropertyStatement> dstates = entity.getDataPropertyStatements();
-    	//System.out.println("data: "+dstates.size());
     	TypeMapper typeMapper = TypeMapper.getInstance();
     	for (DataPropertyStatement ds: dstates) {
     		Property dp = newModel.getProperty(ds.getDatapropURI());
@@ -572,22 +642,68 @@ public class IndividualController extends FreemarkerHttpServlet {
     		newModel.add(newModel.createStatement(subj, dp, lit));
     	}
     	
-    	if( recurseDepth < 5 ){
+    	if (recurseDepth < 5) {
 	    	List<ObjectPropertyStatement> ostates = entity.getObjectPropertyStatements();
+	    	
 	    	for (ObjectPropertyStatement os: ostates) {
 	    		ObjectProperty objProp = os.getProperty();
-	    		Property op = newModel.getProperty(os.getPropertyURI());
+	    		Property prop = newModel.getProperty(os.getPropertyURI());
 	    		Resource obj = newModel.getResource(os.getObjectURI());
-	    		newModel.add(newModel.createStatement(subj, op, obj));
-	    		if( objProp.getStubObjectRelation() )
-	    			newModel.add(getRDF(os.getObject(), contextModel, newModel, recurseDepth + 1));
+	    		newModel.add(newModel.createStatement(subj, prop, obj));
+	    		if ( includeInLinkedData(obj, contextModel)) {
+	    			newModel.add(getRDF(os.getObject(), contextModel, newModel, recurseDepth + 1, includes));
+	    	    } else {
+	    	    	contextModel.enterCriticalSection(Lock.READ);
+	    			try {
+	    				newModel.add(contextModel.listStatements(obj, RDFS.label, (RDFNode)null));
+	    			} finally {
+	    				contextModel.leaveCriticalSection();
+	    			} 
+	    	    }
 	    	}
     	}
     	
     	newModel = getLabelAndTypes(entity, contextModel, newModel );
+    		
+    	// get all the statements not covered by the object property / datatype property code above
+    	// note implication that extendedLinkedData individuals will only be evaluated for the
+    	// recognized object properties.
+    	contextModel.enterCriticalSection(Lock.READ);
+		try {
+			StmtIterator iter = contextModel.listStatements(subj, (Property) null, (RDFNode) null);
+			while (iter.hasNext()) {
+				Statement stmt = iter.next();
+				if (!newModel.contains(stmt)) {
+				   newModel.add(stmt);
+				}
+			}  
+		} finally {
+			contextModel.leaveCriticalSection();
+		} 
+			
+		if (recurseDepth == 0 && includes != null && entity.isVClass(PERSON_CLASS_URI)) {
+			
+	        for (String include : includes) {
+	       
+	        	String rootDir = null;
+	        	if (INCLUDE_ALL.equals(include)) {
+	        		rootDir = RICH_EXPORT_ROOT;
+	        	} else {
+	        		rootDir = RICH_EXPORT_ROOT +  include + "/";
+	        	}
+	        	
+	        	long start = System.currentTimeMillis();
+				Model extendedModel = ExtendedLinkedDataUtils.createModelFromQueries(getServletContext(), rootDir, contextModel, entity.getURI());
+	        	long elapsedTimeMillis = System.currentTimeMillis()-start;
+	        	log.info("Time to create rich export model: msecs = " + elapsedTimeMillis);
+	        	
+				newModel.add(extendedModel);
+	        }
+		}
+		
     	return newModel;
     }
-
+    
     /* Get the properties that are difficult to get via a filtered WebappDaoFactory. */
     private Model getLabelAndTypes(Individual entity, Model ontModel, Model newModel){
     	for( VClass vclass : entity.getVClasses()){
@@ -620,7 +736,8 @@ public class IndividualController extends FreemarkerHttpServlet {
         return null;
     }
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response)
+    @Override
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException,IOException {
         doGet(request, response);
     }
@@ -630,79 +747,50 @@ public class IndividualController extends FreemarkerHttpServlet {
     }
     
     private ResponseValues doNotFound(VitroRequest vreq) throws IOException, ServletException {
-        Portal portal = vreq.getPortal();
-        ApplicationBean appBean = ApplicationBean.getAppBean(getServletContext());
-        int allPortalId = appBean.getAllPortalFlagNumeric();
-        
-        //If an Individual is not found, there is possibility that it
-        //was requested from a portal where it was not visible.
-        //In this case redirect to the all portal.    
-        try{      
-            Portal allPortal = 
-                vreq.getWebappDaoFactory().getPortalDao().getPortal(allPortalId);
-            // there must be a portal defined with the ID of the all portal
-            // for this to work
-            if( portal.getPortalId() !=  allPortalId && allPortal != null ) {            
-                                
-                //bdc34: 
-                // this is hard coded to get the all portal 
-                // I didn't find a way to get the id of the all portal
-                // it is likely that redirecting will not work in non VIVO clones
-                String portalPrefix = null;
-                String portalParam  = null;
-                if( allPortal != null && allPortal.getUrlprefix() != null )              
-                    portalPrefix = allPortal.getUrlprefix();
-                else
-                    portalParam = "home=" + allPortalId; 
-                                        
-                String queryStr = vreq.getQueryString();
-                if( queryStr == null && portalParam != null && !"".equals(portalParam)){
-                    queryStr = portalParam;
-                } else {                
-                    if( portalParam != null && !"".equals(portalParam))
-                        queryStr = queryStr + "&" + portalParam;
-                }   
-                if( queryStr != null && !queryStr.startsWith("?") )
-                    queryStr = "?" + queryStr;
-                           
-                StringBuilder url = new StringBuilder();
-                url.append( vreq.getContextPath() );                                
-                if( vreq.getContextPath() != null && !vreq.getContextPath().endsWith("/"))
-                    url.append('/');
-                
-                if( portalPrefix != null && !"".equals(portalPrefix)) 
-                    url.append( portalPrefix ).append('/');            
-                    
-                String servletPath = vreq.getServletPath();
-                String spath = "";
-                if( servletPath != null ){ 
-                    if( servletPath.startsWith("/") )
-                        spath = servletPath.substring(1);
-                    else
-                        spath = servletPath;
-                }
-                                
-                if( spath != null && !"".equals(spath))
-                    url.append( spath );
-                
-                if( vreq.getPathInfo() != null )
-                    url.append( vreq.getPathInfo() );
-                
-                if( queryStr != null && !"".equals(queryStr ))
-                    url.append( queryStr );
-                
-                return new RedirectResponseValues(url.toString());
-            }
-        }catch(Throwable th){
-            log.error("could not do a redirect", th);
-        }
 
         //set title before we do the highlighting so we don't get markup in it.
         Map<String, Object> body = new HashMap<String, Object>();
         body.put("title","Individual Not Found");
         body.put("errorMessage", "The individual was not found in the system.");
         
-        return new TemplateResponseValues(Template.TITLED_ERROR_MESSAGE.toString(), body);
+        return new TemplateResponseValues(Template.TITLED_ERROR_MESSAGE.toString(), body, HttpServletResponse.SC_NOT_FOUND);
     }
 
+    public static Map<String, Float> getAcceptedContentTypes() {
+        if( qsMap == null ){
+            HashMap<String,Float> map = new HashMap<String,Float>();
+            map.put(HTML_MIMETYPE , 0.5f);
+            map.put(XHTML_MIMETYPE, 0.5f);
+            map.put("application/xml", 0.5f);
+            map.put(RDFXML_MIMETYPE, 1.0f);
+            map.put(N3_MIMETYPE, 1.0f);
+            map.put(TTL_MIMETYPE, 1.0f);
+            qsMap = map;
+        }
+        return qsMap;
+    }
+    
+    public static boolean includeInLinkedData(Resource object, Model contextModel) {
+ 
+       	boolean retval = false;
+       	
+       	contextModel.enterCriticalSection(Lock.READ);
+       	
+       	try {
+	    	StmtIterator iter = contextModel.listStatements(object, RDF.type, (RDFNode)null);
+	    	    	
+	    	while (iter.hasNext()) {
+	    		Statement stmt = iter.next();
+	    		
+	    		if (stmt.getObject().isResource() && contextModel.contains(stmt.getObject().asResource(), extendedLinkedDataProperty, xsdTrue)) {
+	    			retval = true;
+	    		    break;
+	    		}	
+	    	}
+       	} finally {
+       		contextModel.leaveCriticalSection();
+       	}
+    	   	
+    	return retval;
+    }    
 }

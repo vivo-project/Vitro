@@ -14,39 +14,33 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
-import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 
 public class PropertyGroupsListingController extends BaseEditController {
 
+   @Override
    public void doGet(HttpServletRequest request, HttpServletResponse response) {
-
-        if(!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request, response);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-        
+     	if (!isAuthorizedToDisplayPage(request, response, new Actions(new EditOntology()))) {
+		    return;
+	    }
+	
         VitroRequest vrequest = new VitroRequest(request);
-        Portal portal = vrequest.getPortal();
 
         //need to figure out how to structure the results object to put the classes underneath
 
         PropertyGroupDao dao = vrequest.getFullWebappDaoFactory().getPropertyGroupDao();
 
-        List groups = dao.getPublicGroups(true);
+        List<PropertyGroup> groups = dao.getPublicGroups(true);
 
-        ArrayList results = new ArrayList();
+        ArrayList<String> results = new ArrayList<String>();
         results.add("XX");
         results.add("Group");
         results.add("Public description");
@@ -61,7 +55,7 @@ public class PropertyGroupsListingController extends BaseEditController {
                 results.add("XX");
                 if (pg.getName() != null) {
                     try {
-                        results.add("<a href=\"./editForm?uri="+URLEncoder.encode(pg.getURI(),"UTF-8")+"&amp;home="+portal.getPortalId()+"&amp;controller=PropertyGroup\">"+pg.getName()+"</a>");
+                        results.add("<a href=\"./editForm?uri="+URLEncoder.encode(pg.getURI(),"UTF-8")+"&amp;controller=PropertyGroup\">"+pg.getName()+"</a>");
                     } catch (Exception e) {
                         results.add(pg.getName());
                     }
@@ -125,12 +119,10 @@ public class PropertyGroupsListingController extends BaseEditController {
         request.setAttribute("columncount",new Integer(5));
         request.setAttribute("suppressquery","true");
         request.setAttribute("title","Property Groups");
-        request.setAttribute("portalBean",portal);
         request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
         request.setAttribute("horizontalJspAddButtonUrl", Controllers.RETRY_URL);
         request.setAttribute("horizontalJspAddButtonText", "Add new property group");
         request.setAttribute("horizontalJspAddButtonControllerParam", "PropertyGroup");
-        request.setAttribute("home", portal.getPortalId());
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         try {
             rd.forward(request,response);
@@ -140,12 +132,13 @@ public class PropertyGroupsListingController extends BaseEditController {
 
     }
    
-    private class PropertyGroupDisplayComparator implements Comparator {
-        public int compare (Object o1, Object o2) {
+    private class PropertyGroupDisplayComparator implements Comparator<PropertyGroup> {
+        @Override
+		public int compare (PropertyGroup o1, PropertyGroup o2) {
             try {
-                int diff = ((PropertyGroup)o1).getDisplayRank() - ((PropertyGroup)o2).getDisplayRank();
+                int diff = o1.getDisplayRank() - o2.getDisplayRank();
                 if (diff==0) {
-                    return ((PropertyGroup)o1).getName().compareToIgnoreCase(((PropertyGroup)o2).getName());
+                    return o1.getName().compareToIgnoreCase(o2.getName());
                 }
                 return diff;
             } catch (Exception e) {

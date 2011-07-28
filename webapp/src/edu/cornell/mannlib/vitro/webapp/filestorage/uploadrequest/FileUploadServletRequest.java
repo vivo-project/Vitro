@@ -15,6 +15,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
@@ -51,7 +52,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
  * </p>
  */
 @SuppressWarnings("deprecation")
-public abstract class FileUploadServletRequest implements HttpServletRequest {
+public abstract class FileUploadServletRequest extends HttpServletRequestWrapper  {
 	public static final String FILE_ITEM_MAP = "file_item_map";
 	public static final String FILE_UPLOAD_EXCEPTION = "file_upload_exception";
 
@@ -79,6 +80,7 @@ public abstract class FileUploadServletRequest implements HttpServletRequest {
 	private final HttpServletRequest delegate;
 
 	public FileUploadServletRequest(HttpServletRequest delegate) {
+	    super(delegate);
 		this.delegate = delegate;
 	}
 
@@ -116,260 +118,5 @@ public abstract class FileUploadServletRequest implements HttpServletRequest {
 	 * exception, return <code>null</code>.
 	 */
 	public abstract FileUploadException getFileUploadException();
-
-	// ----------------------------------------------------------------------
-	// Delegated methods.
-	// ----------------------------------------------------------------------
-
-	@Override
-	public String getAuthType() {
-		return delegate.getAuthType();
-	}
-
-	@Override
-	public String getContextPath() {
-		return delegate.getContextPath();
-	}
-
-	@Override
-	public Cookie[] getCookies() {
-		return delegate.getCookies();
-	}
-
-	@Override
-	public long getDateHeader(String name) {
-		return delegate.getDateHeader(name);
-	}
-
-	@Override
-	public String getHeader(String name) {
-		return delegate.getHeader(name);
-	}
-
-	@Override
-	public Enumeration<?> getHeaderNames() {
-		return delegate.getHeaderNames();
-	}
-
-	@Override
-	public Enumeration<?> getHeaders(String name) {
-		return delegate.getHeaders(name);
-	}
-
-	@Override
-	public int getIntHeader(String name) {
-		return delegate.getIntHeader(name);
-	}
-
-	@Override
-	public String getMethod() {
-		return delegate.getMethod();
-	}
-
-	@Override
-	public String getPathInfo() {
-		return delegate.getPathInfo();
-	}
-
-	@Override
-	public String getPathTranslated() {
-		return delegate.getPathTranslated();
-	}
-
-	@Override
-	public String getQueryString() {
-		return delegate.getQueryString();
-	}
-
-	@Override
-	public String getRemoteUser() {
-		return delegate.getRemoteUser();
-	}
-
-	@Override
-	public String getRequestURI() {
-		return delegate.getRequestURI();
-	}
-
-	@Override
-	public StringBuffer getRequestURL() {
-		return delegate.getRequestURL();
-	}
-
-	@Override
-	public String getRequestedSessionId() {
-		return delegate.getRequestedSessionId();
-	}
-
-	@Override
-	public String getServletPath() {
-		return delegate.getServletPath();
-	}
-
-	@Override
-	public HttpSession getSession() {
-		return delegate.getSession();
-	}
-
-	@Override
-	public HttpSession getSession(boolean create) {
-		return delegate.getSession(create);
-	}
-
-	@Override
-	public Principal getUserPrincipal() {
-		return delegate.getUserPrincipal();
-	}
-
-	@Override
-	public boolean isRequestedSessionIdFromCookie() {
-		return delegate.isRequestedSessionIdFromCookie();
-	}
-
-	@Override
-	public boolean isRequestedSessionIdFromURL() {
-		return delegate.isRequestedSessionIdFromURL();
-	}
-
-	@Override
-	public boolean isRequestedSessionIdFromUrl() {
-		return delegate.isRequestedSessionIdFromUrl();
-	}
-
-	@Override
-	public boolean isRequestedSessionIdValid() {
-		return delegate.isRequestedSessionIdValid();
-	}
-
-	@Override
-	public boolean isUserInRole(String role) {
-		return delegate.isUserInRole(role);
-	}
-
-	@Override
-	public Object getAttribute(String name) {
-		return delegate.getAttribute(name);
-	}
-
-	@Override
-	public Enumeration<?> getAttributeNames() {
-		return delegate.getAttributeNames();
-	}
-
-	@Override
-	public String getCharacterEncoding() {
-		return delegate.getCharacterEncoding();
-	}
-
-	@Override
-	public int getContentLength() {
-		return delegate.getContentLength();
-	}
-
-	@Override
-	public String getContentType() {
-		return delegate.getContentType();
-	}
-
-	@Override
-	public ServletInputStream getInputStream() throws IOException {
-		return delegate.getInputStream();
-	}
-
-	@Override
-	public String getLocalAddr() {
-		return delegate.getLocalAddr();
-	}
-
-	@Override
-	public String getLocalName() {
-		return delegate.getLocalName();
-	}
-
-	@Override
-	public int getLocalPort() {
-		return delegate.getLocalPort();
-	}
-
-	@Override
-	public Locale getLocale() {
-		return delegate.getLocale();
-	}
-
-	@Override
-	public Enumeration<?> getLocales() {
-		return delegate.getLocales();
-	}
-
-	@Override
-	public String getProtocol() {
-		return delegate.getProtocol();
-	}
-
-	@Override
-	public BufferedReader getReader() throws IOException {
-		return delegate.getReader();
-	}
-
-	@Override
-	public String getRealPath(String path) {
-		return delegate.getRealPath(path);
-	}
-
-	@Override
-	public String getRemoteAddr() {
-		return delegate.getRemoteAddr();
-	}
-
-	@Override
-	public String getRemoteHost() {
-		return delegate.getRemoteHost();
-	}
-
-	@Override
-	public int getRemotePort() {
-		return delegate.getRemotePort();
-	}
-
-	@Override
-	public RequestDispatcher getRequestDispatcher(String path) {
-		return delegate.getRequestDispatcher(path);
-	}
-
-	@Override
-	public String getScheme() {
-		return delegate.getScheme();
-	}
-
-	@Override
-	public String getServerName() {
-		return delegate.getServerName();
-	}
-
-	@Override
-	public int getServerPort() {
-		return delegate.getServerPort();
-	}
-
-	@Override
-	public boolean isSecure() {
-		return delegate.isSecure();
-	}
-
-	@Override
-	public void removeAttribute(String name) {
-		delegate.removeAttribute(name);
-	}
-
-	@Override
-	public void setAttribute(String name, Object o) {
-		delegate.setAttribute(name, o);
-	}
-
-	@Override
-	public void setCharacterEncoding(String env)
-			throws UnsupportedEncodingException {
-		delegate.setCharacterEncoding(env);
-	}
 
 }

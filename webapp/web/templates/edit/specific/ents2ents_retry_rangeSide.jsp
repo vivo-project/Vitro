@@ -20,19 +20,3 @@
 			</select>            <span class="warning"><form:error name="DomainId"/></span>
         </td>
     </tr>
-    <tr class="editformcell">
-        <td valign="top" colspan="2">
-            <b>Sunrise</b><br/>
-			<input name="Sunrise" value="<form:value name="Sunrise"/>" />
-        </td>
-        <td valign="top" colspan="1">
-            <b>Sunset</b><br/>
-			<input name="Sunset" value="<form:value name="Sunset"/>"/>
-        </td>
-    </tr>
-    <tr class="editformcell">
-        <td valign="top">
-            <b>Qualifier</b><br/>
-			<input name="Qualifier" value="<form:value name="Qualifier"/>"/>
-        </td>
-    </tr>    

@@ -2,8 +2,6 @@
 package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -11,7 +9,6 @@ import java.util.regex.Pattern;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -19,35 +16,23 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.ontology.OntResource;
+import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
-import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.dao.Classes2ClassesDao;
-import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 
 public class OntologyController extends VitroHttpServlet{
     private static final Log log = LogFactory.getLog(OntologyController.class.getName());
     
     private String default_jsp      = Controllers.BASIC_JSP;
-    private String default_body_jsp = Controllers.ENTITY_JSP;
     private ApplicationBean appBean;
     
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -146,38 +131,49 @@ public class OntologyController extends VitroHttpServlet{
 			ontModel =(OntModel)session.getAttribute("jenaOntModel");		
 		if( ontModel == null)
 			ontModel = (OntModel)getServletContext().getAttribute("jenaOntModel");
-			
+
+        boolean found = false;
+        Model newModel = ModelFactory.createDefaultModel();			
 		ontModel.enterCriticalSection(Lock.READ);
-		OntResource ontResource = ontModel.getOntResource(url);
-		if(ontResource == null)
-			ontResource = ontModel.getOntResource(url + "/");
-		Model newModel = ModelFactory.createDefaultModel();
-		if(ontResource != null){
-			Resource resource = (Resource)ontResource;
-			try{
-				String queryString = "Describe <" + resource.getURI() + ">"; 
-				newModel = QueryExecutionFactory.create(QueryFactory.create(queryString), ontModel).execDescribe();
-			}
-			finally{
-				ontModel.leaveCriticalSection();
-			}
-		}
-		else{
-			ontModel.leaveCriticalSection();
-			doNotFound(vreq,res);
-			return;
-		}
+        try{
+            OntResource ontResource = ontModel.getOntResource(url);
+            if(ontResource == null)
+                ontResource = ontModel.getOntResource(url + "/");
+            if(ontResource != null){
+                found = true;
+                Resource resource = (Resource)ontResource;
+                QueryExecution qexec = null;
+                try{
+                    String queryString = "Describe <" + resource.getURI() + ">"; 
+                    qexec = QueryExecutionFactory.create(QueryFactory.create(queryString), ontModel);
+                    newModel = qexec.execDescribe();
+                } finally{
+                    qexec.close();
+                }
+            } else {
+                found = false;
+            }
+        }finally{
+            ontModel.leaveCriticalSection();
+        }
+
+        if( ! found ){
+            //respond to HTTP outside of critical section
+            doNotFound(req,res);
+            return;
+        } else {		
+            res.setContentType(rdfFormat.getMediaType());
+            String format = ""; 
+            if ( RDFXML_MIMETYPE.equals(rdfFormat.getMediaType()))
+                format = "RDF/XML";
+            else if( N3_MIMETYPE.equals(rdfFormat.getMediaType()))
+                format = "N3";
+            else if ( TTL_MIMETYPE.equals(rdfFormat.getMediaType()))
+                format ="TTL";
 		
-		res.setContentType(rdfFormat.getMediaType());
-		String format = ""; 
-		if ( RDFXML_MIMETYPE.equals(rdfFormat.getMediaType()))
-			format = "RDF/XML";
-		else if( N3_MIMETYPE.equals(rdfFormat.getMediaType()))
-			format = "N3";
-		else if ( TTL_MIMETYPE.equals(rdfFormat.getMediaType()))
-			format ="TTL";
-		
-		newModel.write( res.getOutputStream(), format );		
+            newModel.write( res.getOutputStream(), format );		
+            return;
+        }
 	}
 	
 	private static Pattern URI_PATTERN = Pattern.compile("^/ontology/([^/]*)/([^/]*)$");
@@ -239,80 +235,15 @@ public class OntologyController extends VitroHttpServlet{
 	private void doNotFound(HttpServletRequest req, HttpServletResponse res)
     throws IOException, ServletException {
         VitroRequest vreq = new VitroRequest(req);
-        Portal portal = vreq.getPortal();
-        ApplicationBean appBean = ApplicationBean.getAppBean(getServletContext());
-        int allPortalId = appBean.getAllPortalFlagNumeric();
         
-        //If an Individual is not found, there is possibility that it
-        //was requested from a portal where it was not visible.
-        //In this case redirect to the all portal.    
-        try{      
-            Portal allPortal = 
-                vreq.getWebappDaoFactory().getPortalDao().getPortal(allPortalId);
-            // there must be a portal defined with the ID of the all portal
-            // for this to work
-            if( portal.getPortalId() !=  allPortalId && allPortal != null ) {            
-                                
-                //bdc34: 
-                // this is hard coded to get the all portal 
-                // I didn't find a way to get the id of the all portal
-                // it is likely that redirecting will not work in non VIVO clones
-                String portalPrefix = null;
-                String portalParam  = null;
-                if( allPortal != null && allPortal.getUrlprefix() != null )              
-                    portalPrefix = allPortal.getUrlprefix();
-                else
-                    portalParam = "home=" + allPortalId; 
-                                        
-                String queryStr = req.getQueryString();
-                if( queryStr == null && portalParam != null && !"".equals(portalParam)){
-                    queryStr = portalParam;
-                } else {                
-                    if( portalParam != null && !"".equals(portalParam))
-                        queryStr = queryStr + "&" + portalParam;
-                }   
-                if( queryStr != null && !queryStr.startsWith("?") )
-                    queryStr = "?" + queryStr;
-                           
-                StringBuilder url = new StringBuilder();
-                url.append( req.getContextPath() );                                
-                if( req.getContextPath() != null && !req.getContextPath().endsWith("/"))
-                    url.append('/');
-                
-                if( portalPrefix != null && !"".equals(portalPrefix)) 
-                    url.append( portalPrefix ).append('/');            
-                    
-                String servletPath = req.getServletPath();
-                String spath = "";
-                if( servletPath != null ){ 
-                    if( servletPath.startsWith("/") )
-                        spath = servletPath.substring(1);
-                    else
-                        spath = servletPath;
-                }
-                                
-                if( spath != null && !"".equals(spath))
-                    url.append( spath );
-                
-                if( req.getPathInfo() != null )
-                    url.append( req.getPathInfo() );
-                
-                if( queryStr != null && !"".equals(queryStr ))
-                    url.append( queryStr );
-                
-                res.sendRedirect(url.toString());
-                return;
-            }
-        }catch(Throwable th){
-            log.error("could not do a redirect", th);
-        }
+        ApplicationBean appBean = ApplicationBean.getAppBean(getServletContext());
 
         //set title before we do the highlighting so we don't get markup in it.
         req.setAttribute("title","not found");
         res.setStatus(HttpServletResponse.SC_NOT_FOUND);
 
         String css = "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\""
-            + portal.getThemeDir() + "css/entity.css\"/>"
+            + appBean.getThemeDir() + "css/entity.css\"/>"
             + "<script language='JavaScript' type='text/javascript' src='js/toggle.js'></script>";
         req.setAttribute("css",css);
 

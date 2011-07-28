@@ -2,12 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,6 +15,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
@@ -49,15 +48,14 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Keyword;
-import edu.cornell.mannlib.vitro.webapp.beans.KeywordIndividualRelation;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
-import edu.cornell.mannlib.vitro.webapp.dao.KeywordDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualCreationEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualDeletionEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualUpdateEvent;
+import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 
 public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
 
@@ -219,19 +217,10 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
            
         String entURI = null;
         
-    	Resource cls = null;
-        OntModel tboxModel = getOntModelSelector().getTBoxModel();
-        tboxModel.enterCriticalSection(Lock.READ);
-        try {
-            try {
-                cls = tboxModel.getOntClass(ent.getVClassURI());
-            } catch (Exception e) {}
-            if (cls==null) {
-                cls = OWL.Thing; // This assumes we want OWL-DL compatibility. Individuals cannot be untyped.
-            }
-        } finally {
-        	tboxModel.leaveCriticalSection();
-        }
+    	Resource cls = (ent.getVClassURI() != null) 
+            ? ontModel.getResource(ent.getVClassURI())
+            : OWL.Thing; // This assumes we want OWL-DL compatibility.
+                         // Individuals cannot be untyped.
         
         ontModel.enterCriticalSection(Lock.WRITE);
         try {
@@ -258,69 +247,13 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                         ind.addRDFType(ResourceFactory.createResource(vc.getURI()));
                     }
                 }
-                String flag1Set = ent.getFlag1Set();
-                if (flag1Set != null) {
-                    String[] flag1Value = flag1Set.split(",");
-                    for (int i=0; i<flag1Value.length; i++) {
-                        Resource flag1Type = getOntModel().getResource(VitroVocabulary.vitroURI+"Flag1Value"+flag1Value[i]+"Thing");
-                        if (flag1Type != null) {
-                            ind.addRDFType(flag1Type);
-                        }
-                    }
-                }
-                String flag2Set = ent.getFlag2Set();
-                if (flag2Set != null) {
-                    String[] flag2Value = flag2Set.split(",");
-                    for (int i=0; i<flag2Value.length; i++) {
-                        Resource flag2Type = getFlag2ValueMap().get(flag2Value[i]);
-                        if (flag2Type != null) {
-                            ind.addRDFType(flag2Type);
-                        }
-                    }
-                }
-                addPropertyStringValue(ind,MONIKER,ent.getMoniker(),ontModel);
-                addPropertyStringValue(ind,BLURB,ent.getBlurb(),ontModel);
-                addPropertyStringValue(ind,DESCRIPTION,ent.getDescription(),ontModel);
-                addPropertyDateTimeValue(ind,SUNRISE,ent.getSunrise(), ontModel);
-                addPropertyDateTimeValue(ind,SUNSET,ent.getSunset(), ontModel);
-                addPropertyDateTimeValue(ind,TIMEKEY,ent.getTimekey(), ontModel);
                 addPropertyDateTimeValue(ind,MODTIME,Calendar.getInstance().getTime(),ontModel);
                 if (ent.getMainImageUri() != null) {
                 	addPropertyResourceURIValue(ind, IND_MAIN_IMAGE, ent.getMainImageUri());
-                }
-                
-                if (ent.getAnchor()!= null && ent.getAnchor().length()>0 && LINK != null) {
-                    com.hp.hpl.jena.ontology.Individual primaryLink = ontModel.createIndividual(entURI+"_primaryLink", LINK);
-                    primaryLink.addProperty(RDF.type, LINK);
-                    if (log.isTraceEnabled()) {
-                    	log.trace("added RDF type Link to primary link in insertNewIndividual() for new individual "+ent.getName());
-                    }
-                    addPropertyStringValue(primaryLink, LINK_ANCHOR, ent.getAnchor(),ontModel);
-                    addPropertyStringValue(primaryLink, LINK_URL,ent.getUrl(),ontModel);
-                    ind.addProperty(PRIMARY_LINK,primaryLink);
-                }
+                }                
                 if( ent.getSearchBoost() != null ) {
                     addPropertyFloatValue(ind,SEARCH_BOOST_ANNOT, ent.getSearchBoost(), ontModel);
                 }
-                /* 2009-01-27 hold off on individual-level filtering for now
-                ind.removeAll(HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT);
-                if (HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT != null && ent.getHiddenFromDisplayBelowRoleLevel() != null) { // only need to add if present
-                    try {
-                        ind.addProperty(HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT, ResourceFactory.createResource(ent.getHiddenFromDisplayBelowRoleLevel().getURI()));
-                    } catch (Exception e) {
-                        log.error("error adding HiddenFromDisplayBelowRoleLevel annotation to individual "+ent.getURI());
-                    }
-                }
-
-                ind.removeAll(PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT);
-                if (PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT != null && ent.getProhibitedFromUpdateBelowRoleLevel() != null) { // only need to add if present
-                    try {
-                        ind.addProperty(PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT, ResourceFactory.createResource(ent.getProhibitedFromUpdateBelowRoleLevel().getURI()));
-                    } catch (Exception e) {
-                        log.error("error adding ProhibitedFromUpdateBelowRoleLevel annotation to individual "+ent.getURI());
-                    }
-                }
-                */
             } catch (Exception e) {
                 log.error("Exception inserting individual: ",e);
             }
@@ -341,40 +274,19 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
     }
 
     private void initInd(Individual ent) {
-        ent.getAnchor();
-        ent.getBlurb();
         ent.getClass();
         ent.getVClasses(false);
         ent.getDataPropertyList();
         ent.getDataPropertyStatements();
-        ent.getDescription();
         ent.getExternalIds();
-        ent.getFlag1Numeric();
-        ent.getFlag1Set();
-        ent.getFlag2Set();
         ent.getMainImageUri();
-        ent.getImageUrl();
-        ent.getThumbUrl();
-        ent.getKeywords();
-        ent.getKeywordString();
-        ent.getLinksList();
-        ent.getPrimaryLink();
         ent.getModTime();
-        ent.getMoniker();
         ent.getName();
         ent.getNamespace();
         ent.getObjectPropertyList();
-        ent.getStatus();
-        ent.getStatusId();
-        ent.getSunrise();
-        ent.getSunset();
-        ent.getTimekey();
-        ent.getUrl();
         ent.getVClassURI();
         ent.getVClass();
         ent.getVClassURI();
-        //ent.getHiddenFromDisplayBelowRoleLevel();
-        //ent.getProhibitedFromUpdateBelowRoleLevel();
     }
 
     public int updateIndividual(Individual ent, OntModel ontModel) {
@@ -409,22 +321,6 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                String flag1Set = ent.getFlag1Set();
-                if (flag1Set != null) {
-                    String[] flag1Value = flag1Set.split(",");
-                    for (int i=0; i<flag1Value.length; i++) {
-                        newTypeURIsSet.add(VitroVocabulary.vitroURI+"Flag1Value"+flag1Value[i]+"Thing");
-                    }
-                }
-                String flag2Set = ent.getFlag2Set();
-                if (flag2Set != null) {
-                    String[] flag2Value = flag2Set.split(",");
-                    for (int i=0; i<flag2Value.length; i++) {
-                        try {
-                            newTypeURIsSet.add(getFlag2ValueMap().get(flag2Value[i]).getURI());
-                        } catch (NullPointerException e) {}
-                    }
-                }
                 for (Iterator<String> oldIt = oldTypeURIsSet.iterator(); oldIt.hasNext();) {
                     String uri = oldIt.next();
                     if (!newTypeURIsSet.contains(uri)) {
@@ -439,83 +335,11 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                         ind.addRDFType(ResourceFactory.createResource(uri));
                     }
                 }
-                updatePropertyStringValue(ind,MONIKER,ent.getMoniker(),ontModel);
-                updatePropertyStringValue(ind,BLURB,ent.getBlurb(),ontModel);
-                updatePropertyStringValue(ind,DESCRIPTION,ent.getDescription(),ontModel);                
-                updatePropertyDateTimeValue(ind,SUNRISE,ent.getSunrise(), ontModel);
-                updatePropertyDateTimeValue(ind,SUNSET,ent.getSunset(), ontModel);
-                updatePropertyDateTimeValue(ind,TIMEKEY,ent.getTimekey(), ontModel);
                 updatePropertyDateTimeValue(ind,MODTIME,Calendar.getInstance().getTime(),ontModel);
                 updatePropertyResourceURIValue(ind, IND_MAIN_IMAGE, ent.getMainImageUri(), ontModel);
-                if (ent.getAnchor()!= null && ent.getAnchor().length()>0) {
-                    if (LINK != null && PRIMARY_LINK != null) {
-                        boolean updatedExisting = false;
-                        try {
-                            Resource primaryLink = (Resource) ind.getPropertyValue(PRIMARY_LINK);
-                            if (primaryLink != null) {
-                            	if (log.isTraceEnabled()) {
-                            		log.trace("Modifying the primary link to entity "+ent.getName());
-                            	}
-                                updatePropertyStringValue(primaryLink, LINK_ANCHOR, ent.getAnchor(), ontModel);
-                                updatePropertyStringValue(primaryLink, LINK_URL, ent.getUrl(), ontModel);
-                                updatedExisting = true;
-                            }
-                        } catch (Exception e) {}
-                        if (!updatedExisting) {
-                        	if (log.isTraceEnabled()) {
-                        		log.trace("Adding a primary link to entity "+ent.getName());
-                        	}
-                            ind.removeAll(PRIMARY_LINK);
-                            com.hp.hpl.jena.ontology.Individual primaryLink = LINK.createIndividual(ent.getURI()+"_primaryLink");
-                            primaryLink.addProperty(RDF.type, LINK);
-                            addPropertyStringValue(primaryLink, LINK_ANCHOR, ent.getAnchor(), ontModel);
-                            addPropertyStringValue(primaryLink, LINK_URL,ent.getUrl(), ontModel);
-                            ind.addProperty(PRIMARY_LINK,primaryLink);
-                        }
-                    }
-                } else {
-                    ind.removeAll(PRIMARY_LINK);
-                }
                 if( ent.getSearchBoost() != null ) {
                     updatePropertyFloatValue(ind, SEARCH_BOOST_ANNOT, ent.getSearchBoost(), ontModel);
                 }
-                /*
-                if (HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT != null) {
-                    try {
-                        ind.removeAll(HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT);
-                        if (ent.getHiddenFromDisplayBelowRoleLevel()!=null) {
-                            String badURIErrorStr = checkURI(ent.getHiddenFromDisplayBelowRoleLevel().getURI());
-                            if (badURIErrorStr == null) {
-                                ind.addProperty(HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT, ResourceFactory.createResource(ent.getHiddenFromDisplayBelowRoleLevel().getURI()));
-                            } else {
-                                log.error(badURIErrorStr);
-                            }
-                        }
-                    } catch (Exception e) {
-                        log.error("error linking individual "+ent.getURI()+" to HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL edit role");
-                    }
-                } else {
-                    log.error("vitro:hiddenFromDisplayBelowRoleLevelAnnot property not found in RBox");
-                }
-
-                if (PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT != null) {
-                    try {
-                        ind.removeAll(PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT);
-                        if (ent.getProhibitedFromUpdateBelowRoleLevel()!=null) {
-                            String badURIErrorStr = checkURI(ent.getProhibitedFromUpdateBelowRoleLevel().getURI());
-                            if (badURIErrorStr == null) {
-                                ind.addProperty(PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT, ResourceFactory.createResource(ent.getProhibitedFromUpdateBelowRoleLevel().getURI()));
-                            } else {
-                                log.error(badURIErrorStr);
-                            }
-                        }
-                    } catch (Exception e) {
-                        log.error("error linking individual "+ent.getURI()+" to PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL edit role");
-                    }
-                } else {
-                    log.error("vitro:prohibitedFromUpdateBelowRoleLevelAnnot property not found in RBox");
-                }
-                */
             return 0;
             } else {
                 return 1;
@@ -606,121 +430,20 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         entity.setVClass(getWebappDaoFactory().getVClassDao().getVClassByURI(entity.getVClassURI()));
     }
 
-    public List<String> monikers( String typeURI ) {
-        getOntModel().enterCriticalSection(Lock.READ);
-        try {
-            HashSet<String> monikers = new HashSet<String>();
-            OntClass cls = getOntModel().getOntClass(typeURI);
-            ResIterator inds = getOntModel().listSubjectsWithProperty(
-            		RDF.type, ResourceFactory.createResource(typeURI));
-            while (inds.hasNext()) {
-            	Resource ind = inds.nextResource();
-                if (MONIKER != null) {
-                Iterator<Statement> monikerIt = ind.listProperties(MONIKER);
-                    while (monikerIt.hasNext()) {
-                        Statement monikerStmt = monikerIt.next();
-                        monikers.add(((Literal)monikerStmt.getObject()).getString());
-                    }
-                }
-            }
-            List<String> monikerList = new ArrayList<String>();
-            if (monikers.size()>0) {
-                Iterator<String> monikerIt = monikers.iterator();
-                while (monikerIt.hasNext()) {
-                    monikerList.add(monikerIt.next());
-                }
-                Collections.sort(monikerList,new Comparator<String>() {
-                    public int compare( String first, String second ) {
-                        if (first==null) {
-                            return 1;
-                        }
-                        if (second==null) {
-                            return -1;
-                        }
-                        Collator collator = Collator.getInstance();
-                        return collator.compare(first,second);
-                    }
-                });
-                return monikerList;
-            }
-            else
-                return null;
-        } finally {
-            getOntModel().leaveCriticalSection();
-        }
-    }
-
-    public List<String> getKeywordsForIndividual(String entityURI) {
-        KeywordDao kDao = getWebappDaoFactory().getKeywordDao();
-        List<String> keywords = new LinkedList<String>();
-        List<KeywordIndividualRelation> kirs = getWebappDaoFactory().getKeys2EntsDao().getKeywordIndividualRelationsByIndividualURI(entityURI);
-        Iterator<KeywordIndividualRelation> kirsIt = kirs.iterator();
-        while (kirsIt.hasNext()) {
-            Keyword keyword = kDao.getKeywordById(kirsIt.next().getKeyId());
-            keywords.add(keyword.getTerm());
-        }
-        return keywords;
-    }
-
-    public List<String> getKeywordsForIndividualByMode(String entityURI, String modeStr) {
-        KeywordDao kDao = getWebappDaoFactory().getKeywordDao();
-        List<String> keywords = new LinkedList<String>();
-        List<KeywordIndividualRelation> kirs = getWebappDaoFactory().getKeys2EntsDao().getKeywordIndividualRelationsByIndividualURI(entityURI);
-        Iterator<KeywordIndividualRelation> kirsIt = kirs.iterator();
-        while (kirsIt.hasNext()) {
-            KeywordIndividualRelation kir = kirsIt.next();
-            if (kir.getMode().equalsIgnoreCase(modeStr)) {
-                Keyword keyword = kDao.getKeywordById(kir.getKeyId());
-                keywords.add(keyword.getTerm());
-            }
-        }
-        return keywords;
-    }
-
-    public List<Keyword> getKeywordObjectsForIndividual(String entityURI) {
-        KeywordDao kDao = getWebappDaoFactory().getKeywordDao();
-        List<Keyword> keywords = new LinkedList<Keyword>();
-        List<KeywordIndividualRelation> kirs = getWebappDaoFactory().getKeys2EntsDao().getKeywordIndividualRelationsByIndividualURI(entityURI);
-        Iterator<KeywordIndividualRelation> kirsIt = kirs.iterator();
-        while (kirsIt.hasNext()) {
-            Keyword keyword = kDao.getKeywordById(kirsIt.next().getKeyId());
-            keywords.add(keyword);
-        }
-        return keywords;
-    }
-
-	public String getIndividualURIFromNetId(String netIdStr, String netidMatchingPropertyUri) {
-		if (netidMatchingPropertyUri == null) {
-			return null;
-		}
-
-        Property prop = getOntModel().getProperty(netidMatchingPropertyUri);
-        Literal netid = getOntModel().createLiteral(netIdStr);
-        
-        ResIterator stmts = null;
-        try{
-            stmts = getOntModel().listResourcesWithProperty(prop, netid);
-            if (stmts.hasNext()) {
-                return stmts.nextResource().getURI();
-            } else {
-            	return null;
-            }
-        }   finally{
-            if( stmts != null ) stmts.close();
-        }
-    }
-
     /**
      * In Jena it can be difficult to get an object with a given dataproperty if
      * you do not care about the datatype or lang of the literal.  Use this
      * method if you would like to ignore the lang and datatype.  
+     * 
+     * Note: this method doesn't require that a property be declared in the 
+     * ontology as a data property -- only that it behaves as one.
      */
     public List<Individual> getIndividualsByDataProperty(String dataPropertyUri, String value){        
         Property prop = null;
         if( RDFS.label.getURI().equals( dataPropertyUri )){
             prop = RDFS.label;
         }else{
-            prop = getOntModel().getDatatypeProperty(dataPropertyUri);
+            prop = getOntModel().getProperty(dataPropertyUri);
         }
 
         if( prop == null ) {            
@@ -877,158 +600,14 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         return inds;
     }    
 
-    @Deprecated
-    public Individual getIndividualByExternalId(int externalIdType, String externalIdValue ) {
-        return null;
-    }
-
-    @Deprecated
-    public Individual getIndividualByExternalId(int externalIdType, String externalIdValue, String vClassURI) {
-        return null;
-    }
-
-    public String getNetId(String entityURI) {
-        return null;
-    }
-
-    public String getStatus(String entityURI) {
-        return null;
-    }
-
-    public Iterator<Individual> getAllOfThisTypeIterator() {
-        final List<com.hp.hpl.jena.ontology.Individual> list = 
-            new LinkedList<com.hp.hpl.jena.ontology.Individual>();
-        getOntModel().enterCriticalSection(Lock.READ);
-        try {
-            ClosableIterator<com.hp.hpl.jena.ontology.Individual> allIndIt = getOntModel().listIndividuals();
-            try {
-                while (allIndIt.hasNext()) {
-                    com.hp.hpl.jena.ontology.Individual ind = allIndIt.next();
-                    
-                    boolean userVisible = true;
-                    //Check for non-user visible types, maybe this should be an annotation?
-                    ClosableIterator<Resource> typeIt = ind.listRDFTypes(false);
-                    try {
-                        while (typeIt.hasNext()) {
-                            Resource typeRes = typeIt.next();
-                            String type = typeRes.getURI();
-                            // brute forcing this until we implement a better strategy
-                            if (VitroVocabulary.PORTAL.equals(type) || 
-                            	VitroVocabulary.TAB.equals(type) ||
-                            	VitroVocabulary.TAB_INDIVIDUALRELATION.equals(type) ||
-                            	VitroVocabulary.LINK.equals(type) ||
-                            	VitroVocabulary.KEYWORD.equals(type) ||
-                            	VitroVocabulary.KEYWORD_INDIVIDUALRELATION.equals(type) ||
-                            	VitroVocabulary.CLASSGROUP.equals(type) ||
-                            	VitroVocabulary.PROPERTYGROUP.equals(type) ||
-                            	VitroVocabulary.APPLICATION.equals(type)) {    	
-                                userVisible = false;
-                                break;
-                            }
-                            if( OWL.ObjectProperty.getURI().equals(type) ||
-                            	OWL.DatatypeProperty.getURI().equals(type) ||
-                            	OWL.AnnotationProperty.getURI().equals(type) ||
-                            	RDF.type.getURI().equals(type) ){
-                            	userVisible = false;
-                            	break;
-                        	} 
-                        }
-                    } finally {
-                        typeIt.close();
-                    }
-                    if (userVisible) {
-                        list.add(ind);
-                    }
-                    
-                }
-            } finally {
-                allIndIt.close();
-            }
-        } finally {
-            getOntModel().leaveCriticalSection();
-        }
-        if (list.size() >0){
-            return new Iterator<Individual>(){
-                Iterator<com.hp.hpl.jena.ontology.Individual> innerIt = list.iterator();
-                public boolean hasNext() { 
-                    return innerIt.hasNext();                    
-                }
-                public Individual next() {
-                    return new IndividualJena(innerIt.next(), (WebappDaoFactoryJena) getWebappDaoFactory());
-                }
-                public void remove() {
-                    //not used
-                }            
-            };
-        }
-        else
-            return null;
+    public Iterator<String> getAllOfThisTypeIterator() {
+        //this is implemented in IndivdiualSDB
+        throw new NotImplementedException();
     }  
 
-    public Iterator<Individual> getAllOfThisVClassIterator(String vClassURI) {
-        getOntModel().enterCriticalSection(Lock.READ);
-        try {
-            List<Individual> ents = new LinkedList<Individual>();
-            OntClass cls = getOntModel().getOntClass(vClassURI);
-            Iterator<? extends OntResource> indIt = cls.listInstances();
-            while (indIt.hasNext()) {
-            	OntResource ind = indIt.next();
-                ents.add(new IndividualJena(ind, (WebappDaoFactoryJena) getWebappDaoFactory()));
-            }
-            return ents.iterator();
-        } finally {
-            getOntModel().leaveCriticalSection();
-        }
-    }
-
-    public Iterator<Individual> getUpdatedSinceIterator(long updatedSince){
-        List<Individual> ents = new ArrayList<Individual>();
-        Date since = new DateTime(updatedSince).toDate();
-        String sinceStr = xsdDateTimeFormat.format(since);
-        getOntModel().enterCriticalSection(Lock.READ);
-        try {
-            Property modTimeProp = MODTIME;
-            if (modTimeProp == null)
-                modTimeProp = getOntModel().getProperty(VitroVocabulary.MODTIME);
-            if (modTimeProp == null)
-                return null; // throw an exception?
-            String queryStr = "PREFIX vitro: <"+ VitroVocabulary.vitroURI+"> " +
-                              "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>" +
-                              "SELECT ?ent " +
-                              "WHERE { " +
-                              "     ?ent vitro:modTime ?modTime ." +
-                              "     FILTER (xsd:dateTime(?modTime) >= \""+sinceStr+"\"^^xsd:dateTime) " +
-                              "}";
-            Query query = QueryFactory.create(queryStr);
-            QueryExecution qe = QueryExecutionFactory.create(query,getOntModel());
-            ResultSet results = qe.execSelect();
-            while (results.hasNext()) {
-                QuerySolution qs = (QuerySolution) results.next();
-                Resource res = (Resource) qs.get("?ent");
-                com.hp.hpl.jena.ontology.Individual ent = getOntModel().getIndividual(res.getURI());
-                if (ent != null) {
-                    boolean userVisible = false;
-                    ClosableIterator<Resource> typeIt = ent.listRDFTypes(true);
-                    try {
-                        while (typeIt.hasNext()) {
-                            Resource typeRes = typeIt.next();
-                            if (typeRes.getNameSpace() == null || (!NONUSER_NAMESPACES.contains(typeRes.getNameSpace()))) {
-                                userVisible = true;
-                                break;
-                            }
-                        }
-                    } finally {
-                        typeIt.close();
-                    }
-                    if (userVisible) {
-                        ents.add(new IndividualJena(ent, (WebappDaoFactoryJena) getWebappDaoFactory()));
-                    }
-                }
-            }
-        } finally {
-            getOntModel().leaveCriticalSection();
-        }
-        return ents.iterator();
+    public Iterator<String> getUpdatedSinceIterator(long updatedSince){
+        //this is implemented in IndivdiualSDB
+        throw new NotImplementedException();
     }
 
     public boolean isIndividualOfClass(String vclassURI, String indURI) {
@@ -1106,5 +685,20 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
 								
 		return uri;
 	}
+
+    @Override
+    // This method returns an EditLiteral rather than a Jena Literal, since IndividualDao
+    // should not reference Jena objects. (However, the problem isn't really solved 
+    // because EditLiteral currently references the Jena API.)
+    public EditLiteral getLabelEditLiteral(String individualUri) {
+        Literal literal = getLabelLiteral(individualUri);
+        if (literal == null) {
+            return null;
+        }
+        String value = literal.getLexicalForm();
+        String datatype = literal.getDatatypeURI();
+        String lang = literal.getLanguage();
+        return new EditLiteral(value, datatype, lang);       
+    }
 	
 }

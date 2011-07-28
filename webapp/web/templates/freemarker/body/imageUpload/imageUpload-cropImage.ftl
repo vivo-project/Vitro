@@ -2,14 +2,12 @@
 
 <#-- Crop the replacement main image for an Individual, to produce a thumbnail. -->
 
-${scripts.add("/js/jquery.js")}
-${scripts.add("/js/jquery_plugins/jcrop/jquery.Jcrop.js")}
-${scripts.add("/js/imageUpload/cropImage.js")}
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery.js"></script>',
+              '<script type="text/javascript" src="${urls.base}/js/jquery_plugins/jcrop/jquery.Jcrop.js"></script>',
+              '<script type="text/javascript" src="${urls.base}/js/imageUpload/cropImage.js"></script>')}
 
-
-${stylesheets.add("/css/uploadImages.css")}
-${stylesheets.add("/js/jquery_plugins/jcrop/jquery.Jcrop.css")}
-
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/uploadImages.css" />',
+                  '<link rel="stylesheet" href="${urls.base}/js/jquery_plugins/jcrop/jquery.Jcrop.css" />')}
 
 <#--Reduce original image to fit in the page layout  
 	If the width of the image is bigger or equal to 500 pixels, 

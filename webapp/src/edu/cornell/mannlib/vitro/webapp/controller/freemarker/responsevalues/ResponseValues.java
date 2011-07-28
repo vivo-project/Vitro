@@ -28,6 +28,8 @@ public interface ResponseValues {
     
     public ContentType getContentType();
     
+    public void setContentType(ContentType contentType);
+    
     public Model getModel();
 
 }

@@ -4,25 +4,35 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Portal" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
 <%@ page errorPage="/error.jsp" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"  %>
-<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 
 <%! 
 public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.editRequestDispatch.jsp");
 %>
 
-<vitro:confirmLoginStatus allowSelfEditing="true" />
+<%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousPages" %>
+<% request.setAttribute("requestedActions", new UseMiscellaneousPages()); %>
+<vitro:confirmAuthorization />
 
 <%
+	
+	//Check if special model, in which case forward
+	if(request.getParameter("switchToDisplayModel") != null) {
+		//forward to Edit Request Dispatch Controller
+		String queryString = request.getQueryString();
+		//Instead of edit request which is what we'll do later, here we'll forward to Menu Management Controller
+		//response.sendRedirect("editRequestDispatch?" + queryString);
+		response.sendRedirect(request.getContextPath() + "/editDisplayModel?" + queryString);
+	}
     /*
     Decide which form to forward to, set subjectUri, subjectUriJson, predicateUri, and predicateUriJson in request.
     Also get the Individual for the subjectUri and put it in the request scope.
@@ -147,7 +157,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
    //up an editing form.
    //Note that we do not want this behavior for the delete link (handled above).
    if ( (predicateUri != null) && (objectUri != null) && (wdf.getObjectPropertyDao().skipEditForm(predicateUri)) ) {
-       System.out.println("redirecting for predicate " + predicateUri);
+       log.debug("redirecting for predicate " + predicateUri);
        %><c:redirect url="/individual">
              <c:param name="uri" value="${param.objectUri}"/>
              <c:param name="relatedSubjectUri" value="${param.subjectUri}"/>
@@ -230,6 +240,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 
 <%!
 
+    //bdc34: This isn't used anywhere, don't migrate forward to java code in 1.3
     private static synchronized void setEditReferer(String editKey, String refererUrl, HttpSession session) {
 	     if (refererUrl != null) { 
 	    	 Object editRefererObj = session.getAttribute("editRefererMap");

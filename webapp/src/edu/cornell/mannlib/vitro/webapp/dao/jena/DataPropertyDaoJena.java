@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -52,59 +53,15 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
-import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
 public class DataPropertyDaoJena extends PropertyDaoJena implements
         DataPropertyDao {
     
     protected static final Log log = LogFactory.getLog(DataPropertyDaoJena.class.getName());
     
-    /* This may be the intent behind JenaBaseDao.NONUSER_NAMESPACES, but that
-     * value does not contain all of these namespaces.
-     */
-    protected static final List<String> EXCLUDED_NAMESPACES = Arrays.asList(
-            // Don't need to exclude these, because they are not owl:DatatypeProperty
-            //"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-            //"http://www.w3.org/2000/01/rdf-schema#",
-            "http://www.w3.org/2002/07/owl#",
-            "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#",
-            "http://vitro.mannlib.cornell.edu/ns/vitro/public#"
-        ); 
-
-    /*
-     * This is a hack to throw out properties in the vitro, rdf, rdfs, and owl namespaces.
-     * It will be implemented in a better way in v1.3 (Editing and Display Configuration).
-     */
-    protected static String propertyFilters = null;
-    static {
-        List<String> namespaceFilters = new ArrayList<String>();
-        for (String s : EXCLUDED_NAMESPACES) {
-            namespaceFilters.add("(afn:namespace(?property) != \"" + s + "\")");
-        }
-        propertyFilters = "FILTER (" + StringUtils.join(namespaceFilters, " && ") + ")\n";
-    } 
-    protected static final String DATA_PROPERTY_QUERY_STRING = 
-        prefixes + "\n" +
-        "SELECT DISTINCT ?property WHERE { \n" +
-        "   GRAPH ?g1 { ?subject ?property ?object } \n" + 
-        "   GRAPH ?g2 { ?property rdf:type owl:DatatypeProperty } \n" +
-        propertyFilters +
-        "}";
-    
-    protected static Query dataPropertyQuery;
-    static {
-        try {
-            dataPropertyQuery = QueryFactory.create(DATA_PROPERTY_QUERY_STRING);
-        } catch(Throwable th){
-            log.error("could not create SPARQL query for DATA_PROPERTY_QUERY_STRING " + th.getMessage());
-            log.error(DATA_PROPERTY_QUERY_STRING);
-        }             
-    }
-    
-    private class DataPropertyRanker implements Comparator {
-        public int compare (Object o1, Object o2) {
-            DataProperty dp1 = (DataProperty) o1;
-            DataProperty dp2 = (DataProperty) o2;
+    private class DataPropertyRanker implements Comparator<DataProperty> {
+        @Override
+		public int compare (DataProperty dp1, DataProperty dp2) {
             int diff = dp1.getDisplayTier() - dp2.getDisplayTier();
             if (diff==0)
                 return dp1.getPublicName().compareTo(dp2.getPublicName());
@@ -169,22 +126,23 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         removeABoxStatementsWithPredicate(URI);
     }
 
-    public void fillDataPropertiesForIndividual(Individual entity) {
+    @Override
+	public void fillDataPropertiesForIndividual(Individual entity) {
         if( entity == null ) return;
-        List dataprops = new ArrayList();
+        List<DataProperty> dataprops = new ArrayList<DataProperty>();
         dataprops.addAll( getDataPropertyStatements(entity.getDataPropertyStatements()) );
         entity.setDatatypePropertyList(dataprops);
     }
 
-    private List getDataPropertyStatements(List dataPropertyStmts) {
-        if( dataPropertyStmts == null || dataPropertyStmts.size() < 1) return new ArrayList();
-        HashMap hash = new HashMap();
-        String uris ="";
-        Iterator it = dataPropertyStmts.iterator();
-        while(it.hasNext()){
-            DataPropertyStatement dataPropertyStmt = (DataPropertyStatement)it.next();
+    private List<DataProperty> getDataPropertyStatements(List<DataPropertyStatement> dataPropertyStmts) {
+		if (dataPropertyStmts == null || dataPropertyStmts.isEmpty()) {
+			return new ArrayList<DataProperty>();
+		}
+
+		HashMap<String, DataProperty> hash = new HashMap<String, DataProperty>();
+        for (DataPropertyStatement dataPropertyStmt: dataPropertyStmts) {
             if (hash.containsKey(dataPropertyStmt.getDatapropURI())) {
-                DataProperty p = (DataProperty) hash.get(dataPropertyStmt.getDatapropURI());
+                DataProperty p = hash.get(dataPropertyStmt.getDatapropURI());
                 p.addDataPropertyStatement(dataPropertyStmt);
             } else {
             	OntModel ontModel = getOntModelSelector().getTBoxModel();
@@ -202,12 +160,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             }
         }
 
-        List dataprops = new ArrayList();
-        Iterator keyIt = hash.keySet().iterator();
-        while (keyIt.hasNext()) {
-            Object key = keyIt.next();
-            dataprops.add(hash.get(key));
-        }
+        List<DataProperty> dataprops = new ArrayList<DataProperty>(hash.values());
         Collections.sort(dataprops, new DataPropertyRanker());
         return dataprops;
     }
@@ -753,23 +706,80 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             return rootProperties;
     }
 
+    /*
+     * SPARQL-based methods for getting the individual's data properties.
+     * Ideally this implementation should replace the existing way of getting
+     * the data property list, but the consequences of this may be far-reaching,
+     * so we are implementing a new method now and will merge the old approach
+     * into the new one in a future release.
+     */
+    
+    /* This may be the intent behind JenaBaseDao.NONUSER_NAMESPACES, but that
+     * value does not contain all of these namespaces.
+     */
+    protected static final List<String> EXCLUDED_NAMESPACES = Arrays.asList(
+            // Don't need to exclude these, because they are not owl:DatatypeProperty
+            //"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+            //"http://www.w3.org/2000/01/rdf-schema#",
+            "http://www.w3.org/2002/07/owl#",
+            //"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#",
+            "http://vitro.mannlib.cornell.edu/ns/vitro/public#"
+        ); 
+
+    /*
+     * This is a hack to throw out properties in the vitro, rdf, rdfs, and owl namespaces.
+     * It will be implemented in a better way in v1.3 (Editing and Display Configuration).
+     */
+    protected static final String PROPERTY_FILTERS;
+    static {
+        List<String> namespaceFilters = new ArrayList<String>();
+        for (String namespace : EXCLUDED_NAMESPACES) {
+            namespaceFilters.add("( afn:namespace(?property) != \"" + namespace + "\" )");
+        }
+        PROPERTY_FILTERS = StringUtils.join(namespaceFilters, " && ");
+    } 
+    
+    protected static final String DATA_PROPERTY_QUERY_STRING = 
+        PREFIXES + "\n" +
+        "SELECT DISTINCT ?property WHERE { \n" +
+        "   ?subject ?property ?object . \n" + 
+        "   ?property a owl:DatatypeProperty . \n" +
+        "   FILTER ( \n" +
+        "       isLiteral(?object) && \n" +
+        "       ( afn:namespace(?property) != \"" + VitroVocabulary.PUBLIC + "\" ) && \n" +
+        "       ( afn:namespace(?property) != \"" + VitroVocabulary.OWL + "\" ) && \n" + 
+        // NIHVIVO-2790 vitro:moniker has been deprecated, but display existing values for editorial management (deletion is encouraged).
+        // This property will be hidden from public display by default.
+        "       ( ?property = <" + VitroVocabulary.MONIKER + "> || afn:namespace(?property) != \"" + VitroVocabulary.vitroURI + "\" ) \n" +           
+        "   ) \n" +
+        "}";
+    
     @Override
     public List<DataProperty> getDataPropertyList(Individual subject) {
         return getDataPropertyList(subject.getURI());
     }
     
     @Override
-    /*
-     * SPARQL-based method for getting the individual's data properties.
-     * Ideally this implementation should replace the existing way of getting
-     * the data property list, but the consequences of this may be far-reaching,
-     * so we are implementing a new method now and will merge the old approach
-     * into the new one in a future release.
-     */
     public List<DataProperty> getDataPropertyList(String subjectUri) {
-        log.debug("Data property query string:\n" + DATA_PROPERTY_QUERY_STRING);         
-        log.debug("Data property query:\n" + dataPropertyQuery);        
-        Iterator<QuerySolution> results = getPropertyQueryResults(subjectUri, dataPropertyQuery);
+
+        // Due to a Jena bug, prebinding on ?subject combined with the isLiteral()
+        // filter causes the query to fail. Insert the subjectUri manually instead.
+        // QuerySolutionMap initialBindings = new QuerySolutionMap();
+        // initialBindings.add("subject", ResourceFactory.createResource(subjectUri));
+        String queryString = QueryUtils.subUriForQueryVar(DATA_PROPERTY_QUERY_STRING, "subject", subjectUri);
+        log.debug(queryString);
+        
+        Query query = null;
+        try {
+            query = QueryFactory.create(queryString);
+        } catch(Throwable th){
+            log.error("could not create SPARQL query for query string " + th.getMessage());
+            log.error(queryString);
+            return null;
+        }                     
+        log.debug("Data property query string:\n" + query);         
+     
+        ResultSet results = getPropertyQueryResults(query);
         List<DataProperty> properties = new ArrayList<DataProperty>();
         while (results.hasNext()) {
             QuerySolution sol = results.next();

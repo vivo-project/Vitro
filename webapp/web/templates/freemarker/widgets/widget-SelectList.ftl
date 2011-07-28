@@ -4,8 +4,8 @@
 
 <#macro assets>
     <#--
-    ${stylesheets.add("/css/something.css")}
-    ${scripts.add("/js/somejavascript.js")}
+    ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/something.css" />')}
+    ${scripts.add('<script type="text/javascript" src="${urls.base}/js/somejavascript.js"></script>')}
     --> 
 </#macro>
 

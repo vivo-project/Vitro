@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
+import static edu.cornell.mannlib.vitro.webapp.beans.UserAccount.MAX_PASSWORD_LENGTH;
+import static edu.cornell.mannlib.vitro.webapp.beans.UserAccount.MIN_PASSWORD_LENGTH;
 import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.FORCED_PASSWORD_CHANGE;
 import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.LOGGED_IN;
 import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.LOGGING_IN;
@@ -10,8 +12,6 @@ import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -29,7 +28,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
-import edu.cornell.mannlib.vitro.webapp.beans.User;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -85,6 +84,7 @@ public class Authenticate extends VitroHttpServlet {
 	 * Find out where they are in the login process, process any input, record
 	 * the new state, and show the next page.
 	 */
+	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) {
 
 		VitroRequest vreq = new VitroRequest(request);
@@ -124,7 +124,7 @@ public class Authenticate extends VitroHttpServlet {
 			// Send them on their way.
 			switch (exitState) {
 			case NOWHERE:
-				new LoginRedirector(vreq, response).redirectCancellingUser();
+				showLoginCanceled(response, vreq);
 				break;
 			case LOGGING_IN:
 				showLoginScreen(vreq, response);
@@ -133,7 +133,7 @@ public class Authenticate extends VitroHttpServlet {
 				showLoginScreen(vreq, response);
 				break;
 			default: // LOGGED_IN:
-				new LoginRedirector(vreq, response).redirectLoggedInUser();
+				showLoginComplete(response, vreq);
 				break;
 			}
 		} catch (Exception e) {
@@ -313,8 +313,9 @@ public class Authenticate extends VitroHttpServlet {
 
 		bean.setUsername(username);
 
-		User user = getAuthenticator(request).getUserByUsername(username);
-		log.trace("User is " + (user == null ? "null" : user.getURI()));
+		UserAccount user = getAuthenticator(request).getAccountForInternalAuth(
+				username);
+		log.trace("User is " + (user == null ? "null" : user.getUri()));
 
 		if (user == null) {
 			bean.setMessage(Message.UNKNOWN_USERNAME, username);
@@ -326,16 +327,16 @@ public class Authenticate extends VitroHttpServlet {
 			return;
 		}
 
-		if (!getAuthenticator(request).isCurrentPassword(username, password)) {
+		if (!getAuthenticator(request).isCurrentPassword(user, password)) {
 			bean.setMessage(Message.INCORRECT_PASSWORD);
 			return;
 		}
 
 		// Username and password are correct. What next?
-		if (isFirstTimeLogin(user)) {
+		if (user.isPasswordChangeRequired()) {
 			transitionToForcedPasswordChange(request);
 		} else {
-			transitionToLoggedIn(request, username);
+			transitionToLoggedIn(request, user);
 		}
 	}
 
@@ -374,40 +375,32 @@ public class Authenticate extends VitroHttpServlet {
 			return;
 		}
 
-		if ((newPassword.length() < User.MIN_PASSWORD_LENGTH)
-				|| (newPassword.length() > User.MAX_PASSWORD_LENGTH)) {
-			bean.setMessage(Message.PASSWORD_LENGTH, User.MIN_PASSWORD_LENGTH,
-					User.MAX_PASSWORD_LENGTH);
+		if ((newPassword.length() < MIN_PASSWORD_LENGTH)
+				|| (newPassword.length() > MAX_PASSWORD_LENGTH)) {
+			bean.setMessage(Message.PASSWORD_LENGTH, MIN_PASSWORD_LENGTH,
+					MAX_PASSWORD_LENGTH);
 			return;
 		}
 
 		String username = bean.getUsername();
 
-		if (getAuthenticator(request).isCurrentPassword(username, newPassword)) {
+		UserAccount user = getAuthenticator(request).getAccountForInternalAuth(
+				username);
+		if (getAuthenticator(request).isCurrentPassword(user, newPassword)) {
 			bean.setMessage(Message.USING_OLD_PASSWORD);
 			return;
 		}
 
 		// New password is acceptable. Store it and go on.
-		transitionToLoggedIn(request, username, newPassword);
+		transitionToLoggedIn(request, user, newPassword);
 	}
 
 	/**
-	 * They are already logged in. There's nothing to do; no transition.
+	 * They are already logged in.
 	 */
 	@SuppressWarnings("unused")
 	private void processInputLoggedIn(HttpServletRequest request) {
-	}
-
-	/**
-	 * Has this user ever logged in before?
-	 */
-	private boolean isFirstTimeLogin(User user) {
-		if (user.getLoginCount() == 0) {
-			return true;
-		} else {
-			return false;
-		}
+		// Nothing to do. No transition.
 	}
 
 	/**
@@ -431,9 +424,9 @@ public class Authenticate extends VitroHttpServlet {
 	 * State change: all requirements are satisfied. Log them in.
 	 */
 	private void transitionToLoggedIn(HttpServletRequest request,
-			String username) {
-		log.debug("Completed login: " + username);
-		getAuthenticator(request).recordLoginAgainstUserAccount(username,
+			UserAccount user) {
+		log.debug("Completed login: " + user.getEmailAddress());
+		getAuthenticator(request).recordLoginAgainstUserAccount(user,
 				AuthenticationSource.INTERNAL);
 	}
 
@@ -442,10 +435,11 @@ public class Authenticate extends VitroHttpServlet {
 	 * log them in.
 	 */
 	private void transitionToLoggedIn(HttpServletRequest request,
-			String username, String newPassword) {
-		log.debug("Completed login: " + username + ", password changed.");
-		getAuthenticator(request).recordNewPassword(username, newPassword);
-		getAuthenticator(request).recordLoginAgainstUserAccount(username,
+			UserAccount user, String newPassword) {
+		log.debug("Completed login: " + user.getEmailAddress()
+				+ ", password changed.");
+		getAuthenticator(request).recordNewPassword(user, newPassword);
+		getAuthenticator(request).recordLoginAgainstUserAccount(user,
 				AuthenticationSource.INTERNAL);
 	}
 
@@ -477,12 +471,37 @@ public class Authenticate extends VitroHttpServlet {
 		log.debug("logging in.");
 
 		LoginInProcessFlag.set(vreq);
-		
+
 		String loginProcessPage = LoginProcessBean.getBean(vreq)
 				.getLoginPageUrl();
 		response.sendRedirect(loginProcessPage);
 		return;
 	}
+	
+	/**
+	 * Exit: user has completed the login. Redirect appropriately and clear the bean.
+	 */
+	private void showLoginComplete(HttpServletResponse response,
+			VitroRequest vreq) throws IOException {
+		getLoginRedirector(vreq).redirectLoggedInUser(response);
+		LoginProcessBean.removeBean(vreq);
+	}
+
+	/**
+	 * Exit: user has canceled. Redirect and clear the bean.
+	 */
+	private void showLoginCanceled(HttpServletResponse response,
+			VitroRequest vreq) throws IOException {
+		getLoginRedirector(vreq).redirectCancellingUser(response);
+		LoginProcessBean.removeBean(vreq);
+	}
+
+	private LoginRedirector getLoginRedirector(VitroRequest vreq) {
+		String afterLoginUrl = LoginProcessBean.getBean(vreq).getAfterLoginUrl();
+		return new LoginRedirector(vreq, afterLoginUrl);
+	}
+
+
 
 	/** Get a reference to the Authenticator. */
 	private Authenticator getAuthenticator(HttpServletRequest request) {
@@ -492,22 +511,6 @@ public class Authenticate extends VitroHttpServlet {
 	// ----------------------------------------------------------------------
 	// Public utility methods.
 	// ----------------------------------------------------------------------
-
-	/**
-	 * Encode this password for storage in the database. Apply an MD5 encoding,
-	 * and store the result as a string of hex digits.
-	 */
-	public static String applyMd5Encoding(String password) {
-		try {
-			MessageDigest md = MessageDigest.getInstance("MD5");
-			byte[] digest = md.digest(password.getBytes());
-			char[] hexChars = Hex.encodeHex(digest);
-			return new String(hexChars).toUpperCase();
-		} catch (NoSuchAlgorithmException e) {
-			// This can't happen with a normal Java runtime.
-			throw new RuntimeException(e);
-		}
-	}
 
 	/**
 	 * The servlet context should contain a map from User URIs to

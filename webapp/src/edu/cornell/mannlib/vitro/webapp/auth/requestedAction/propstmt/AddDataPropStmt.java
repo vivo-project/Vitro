@@ -2,12 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
+import com.hp.hpl.jena.rdf.model.Literal;
 
+/** Should we allow the user to add this DataPropertyStatement? */
 public class AddDataPropStmt extends AbstractDataPropertyAction {
-
     protected String data;
     protected String dataType;
     protected String lang;
@@ -19,6 +17,13 @@ public class AddDataPropStmt extends AbstractDataPropertyAction {
         this.lang = lang;
     }
 
+    public AddDataPropStmt(String subjectUri, String predicateUri, Literal literal) {
+    	super(subjectUri, predicateUri);
+    	this.data= literal.getValue().toString();
+    	this.dataType = literal.getDatatypeURI();
+    	this.lang = literal.getLanguage();
+    }
+    
     public String getData() {
         return data;
     }
@@ -29,10 +34,5 @@ public class AddDataPropStmt extends AbstractDataPropertyAction {
 
     public String getLang() {
         return lang;
-    }
-
-    @Override
-    public PolicyDecision accept(VisitingPolicyIface policy, IdentifierBundle ids ){
-        return policy.visit(ids, this );
     }
 }

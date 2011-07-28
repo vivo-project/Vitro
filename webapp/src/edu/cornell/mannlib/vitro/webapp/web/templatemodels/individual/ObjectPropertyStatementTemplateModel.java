@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -15,7 +16,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
-import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class ObjectPropertyStatementTemplateModel extends PropertyStatementTemplateModel {
@@ -24,33 +24,21 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     
     private static final String EDIT_PATH = "edit/editRequestDispatch.jsp";
 
-    private Map<String, String> data;
+    private final Map<String, String> data;
     
     // Used for editing
-    private String objectUri = null;
-    private String templateName = null;
+    private final String objectUri;
+    private final String templateName;
 
     ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, String objectKey, 
-            Map<String, String> data, EditingPolicyHelper policyHelper, String templateName) {
-        super(subjectUri, propertyUri, policyHelper);
+            Map<String, String> data, EditingPolicyHelper policyHelper, String templateName, VitroRequest vreq) {
+        super(subjectUri, propertyUri, policyHelper, vreq);
         
+        cleanMapValuesForDisplay( data );
         this.data = data;
-        this.objectUri = data.get(objectKey);
+        this.objectUri = data.get(objectKey);        
         this.templateName = templateName;
-        
         setEditAccess(policyHelper);
-    }
-
-    /** 
-     * This method handles the special case where we are creating a DataPropertyStatementTemplateModel 
-     * outside the GroupedPropertyList. Specifically, it allows vitro:primaryLink and vitro:additionalLink 
-     * to be treated like object property statements and thus have editing links. (In a future version, 
-     * these properties will be replaced by vivo core ontology properties.) It could potentially be used 
-     * for other properties outside the property list as well.
-     */
-    ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, 
-            VitroRequest vreq, EditingPolicyHelper policyHelper) {
-        super(subjectUri, propertyUri, policyHelper);       
     }
 
     private void setEditAccess(EditingPolicyHelper policyHelper) {
@@ -77,7 +65,7 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     /* Access methods for templates */
 
     public Object get(String key) {
-        return data.get(key);
+        return cleanTextForDisplay( data.get(key) );
     }
     
     public String getEditUrl() {
@@ -93,6 +81,13 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
             if (! isDeletable()) {
                 params.put("deleteProhibited", "prohibited");
             }
+            
+            //Check if special parameters being sent
+            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vreq);
+            if(specialParams.size() > 0) {
+            	params.putAll(specialParams);
+            }
+            
             editUrl = UrlBuilder.getUrl(EDIT_PATH, params);
         }
         
@@ -122,6 +117,12 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
                 }
             }
             params.put("templateName", templateName);
+            
+            //Check if special parameters being sent
+            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vreq);
+            if(specialParams.size() > 0) {
+            	params.putAll(specialParams);
+            }
             
             deleteUrl = UrlBuilder.getUrl(EDIT_PATH, params);
 

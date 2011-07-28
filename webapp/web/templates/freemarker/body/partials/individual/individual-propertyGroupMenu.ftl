@@ -8,17 +8,19 @@
     <#assign groups = propertyGroups.all>
     
     <#if groups?has_content>
-        <nav id="property-group-menu" role="navigation">
-            <ul role="list">
-                <#list groups as group>
-                    <#assign groupname = group.name(nameForOtherGroup)>
-                    <#if groupname?has_content>
-                        <#-- capitalize will capitalize each word in the name; cap_first only the first. We may need a custom
-                        function to capitalize all except function words. -->
-                        <li role="listitem"><a href="#${groupname}">${groupname?capitalize}</a></li>
-                    </#if>
-                </#list>
-            </ul>
-        </nav>
+        <#if (groups?size > 1) || (groups?first).getName(nameForOtherGroup)?has_content> 
+            <nav id="property-group-menu" role="navigation">
+                <ul role="list">
+                    <#list groups as group>
+                        <#assign groupname = group.getName(nameForOtherGroup)>
+                        <#if groupname?has_content>
+                            <#-- capitalize will capitalize each word in the name; cap_first only the first. We may need a custom
+                            function to capitalize all except function words. -->
+                            <li role="listitem"><a href="#${groupname}">${groupname?capitalize}</a></li>
+                        </#if>
+                    </#list>
+                </ul>
+            </nav>
+        </#if> 
     </#if>
 </#if>

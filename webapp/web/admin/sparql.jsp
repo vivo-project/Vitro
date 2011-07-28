@@ -4,6 +4,11 @@
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
 
+<%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" %>
+<% request.setAttribute("requestedActions", new UseAdvancedDataToolsPages()); %>
+<vitro:confirmAuthorization />
+
 <script type="text/javascript" src="../js/sparql/prototype.js">
 </script>
 <script type="text/javascript" src="../js/sparql/sparql.js">

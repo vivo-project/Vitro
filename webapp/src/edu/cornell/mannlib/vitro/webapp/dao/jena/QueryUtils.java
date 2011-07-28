@@ -2,21 +2,25 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.sparql.resultset.ResultSetMem;
+
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
 /** 
  * Utilities for executing queries and working with query results. 
@@ -27,7 +31,9 @@ public class QueryUtils {
     
     private static final Log log = LogFactory.getLog(QueryUtils.class);
     
-    protected static Map<String,Object> querySolutionToObjectValueMap( QuerySolution soln){
+    private QueryUtils() { }
+    
+    public static Map<String,Object> querySolutionToObjectValueMap( QuerySolution soln){
         Map<String,Object> map = new HashMap<String,Object>();
         Iterator<String> varNames = soln.varNames();
         while(varNames.hasNext()){
@@ -39,7 +45,7 @@ public class QueryUtils {
         return map;
     }
  
-    protected static Map<String,String> querySolutionToStringValueMap( QuerySolution soln ){
+    public static Map<String,String> querySolutionToStringValueMap( QuerySolution soln ){
         Map<String,String> map = new HashMap<String,String>();
         Iterator<String> varNames = soln.varNames();
         while(varNames.hasNext()){
@@ -51,7 +57,7 @@ public class QueryUtils {
         return map;
     }
     
-    protected static Object nodeToObject( RDFNode node ){
+    public static Object nodeToObject( RDFNode node ){
         if( node == null ){
             return "";
         }else if( node.isLiteral() ){
@@ -68,7 +74,7 @@ public class QueryUtils {
         }
     }
 
-    protected static String nodeToString( RDFNode node ){
+    public static String nodeToString( RDFNode node ){
         if( node == null ){
             return "";
         }else if( node.isLiteral() ){
@@ -84,4 +90,44 @@ public class QueryUtils {
             return "";
         }
     }
+    
+    /** Manually replace query variables with uris when prebinding causes the query to fail, probably
+     * due to a Jena bug.
+     */
+    public static String subUrisForQueryVars(String queryString, Map<String, String> varsToUris) {
+        
+        for (String var : varsToUris.keySet()) {
+           queryString = subUriForQueryVar(queryString, var, varsToUris.get(var));
+        }
+        return queryString;
+    }
+
+    /** Manually replace a query variable with a uri when prebinding causes the query to fail, probably
+     * due to a Jena bug.
+     */
+    public static String subUriForQueryVar(String queryString, String varName, String uri) {
+        return queryString.replaceAll("\\?" + varName + "\\b", "<" + uri + ">");
+    }
+    
+    public static ResultSet getQueryResults(String queryStr, VitroRequest vreq) {
+        
+        Dataset dataset = vreq.getDataset();
+        dataset.getLock().enterCriticalSection(Lock.READ);
+        QueryExecution qexec = null;
+        ResultSet results = null;
+        try {
+            qexec = QueryExecutionFactory.create(queryStr, dataset);                    
+            results = new ResultSetMem(qexec.execSelect());
+        } catch (Exception e) {
+            log.error(e, e);
+        } finally {
+            dataset.getLock().leaveCriticalSection();
+            if (qexec != null) {
+                qexec.close();
+            }
+        } 
+        
+        return results;
+    }
+
 }

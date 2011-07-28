@@ -7,7 +7,6 @@
 <%@ page errorPage="/error.jsp"%>
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Portal"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet" %>
 
 <% /* Prepare Freemarker components to allow .ftl templates to be included from jsp */
@@ -16,16 +15,13 @@
 
 <%
   VitroRequest vreq = new VitroRequest(request);  
-  Portal portal = vreq.getPortal();
   
-  String contextRoot = vreq.getContextPath();
+  String contextRoot = vreq.getContextPath();  
+  String themeDir = vreq.getAppBean().getThemeDir();
   
-  String themeDir = portal != null ? portal.getThemeDir() : Portal.DEFAULT_THEME_DIR_FROM_CONTEXT;
   themeDir = contextRoot + '/' + themeDir;
 %>
 
-
-<c:set var="portal" value="${requestScope.portalBean}"/>
 <c:set var="themeDir"><c:out value="${themeDir}" /></c:set>
 <c:set var="bodyJsp"><c:out value="${requestScope.bodyJsp}" default="/debug.jsp"/></c:set>
 <c:set var="title"><c:out value="${requestScope.title}" /></c:set>
@@ -35,7 +31,6 @@
     
         <script type="text/javascript" src="<c:url value="/js/extensions/String.js"/>"></script>
         <script type="text/javascript" src="<c:url value="/js/jquery_plugins/jquery.bgiframe.pack.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/js/jquery_plugins/thickbox/thickbox-compressed.js"/>"></script>
         <!-- <script type="text/javascript" src="<c:url value="/js/jquery_plugins/ui.datepicker.js"/>"></script> -->
     
     <%  String useAutoComplete = (useAutoComplete=request.getParameter("useAutoComplete")) != null && !(useAutoComplete.equals("")) ? useAutoComplete : "false";

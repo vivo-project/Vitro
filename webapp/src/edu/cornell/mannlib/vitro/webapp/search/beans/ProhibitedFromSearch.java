@@ -25,14 +25,14 @@ import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 
-public class ProhibitedFromSearch {
+public class ProhibitedFromSearch implements ClassProhibitedFromSearch{
 	List<String> prohibitedClasses;
 	String ProhibitedFromSearchURI;
 	
 	private static final String queryForProhibitedClasses = "SELECT ?prohibited WHERE{" +
 			"?searchConfig <" + DisplayVocabulary.EXCLUDE_CLASS + "> ?prohibited . }";
 		
-	private static final Log log = LogFactory.getLog(ProhibitedFromSearch.class.getName()); 
+	protected static final Log log = LogFactory.getLog(ProhibitedFromSearch.class.getName()); 
 		
 	public ProhibitedFromSearch(String URI, OntModel model){
 		this.ProhibitedFromSearchURI = URI;
@@ -41,9 +41,11 @@ public class ProhibitedFromSearch {
 		model.register(new ProhibitedFromSearchChangeListener( this ));
 	}
 	 
-	public synchronized boolean isClassProhibited(String classURI){
+	public synchronized boolean isClassProhibitedFromSearch(String classURI){
 		if( classURI != null ){
-			return prohibitedClasses.contains(classURI);
+			boolean p = prohibitedClasses.contains(classURI);
+			log.debug( classURI + " is " + (p?"prohibited":"not prohibited"));
+			return p;
 		}else{
 			return false;
 		}

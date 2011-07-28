@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -25,6 +28,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 
 /**
@@ -36,7 +40,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
  */
 public class KnowledgeBaseUpdater {
 
-	//private final Log log = LogFactory.getLog(OntologyUpdater.class);
+	private final Log log = LogFactory.getLog(KnowledgeBaseUpdater.class);
 	
 	private UpdateSettings settings;
 	private ChangeLogger logger;
@@ -48,62 +52,59 @@ public class KnowledgeBaseUpdater {
 		this.record = new SimpleChangeRecord(settings.getAddedDataFile(), settings.getRemovedDataFile());
 	}
 	
-	public boolean update() throws IOException {	
+	public void update() throws IOException {	
+					
+		if (this.logger == null) {
+			this.logger = new SimpleChangeLogger(settings.getLogFile(),	settings.getErrorLogFile());
+		}
+			
+		long startTime = System.currentTimeMillis();
+        System.out.println("Migrating the knowledge base");
+        log.info("Migrating the knowledge base");
+        logger.log("Started knowledge base migration");
 		
-		// Check to see if the update is necessary.
-		
-		boolean updateRequired = updateRequired();
-		if (updateRequired) {
-			
-			if (this.logger == null) {
-				this.logger = new SimpleChangeLogger(settings.getLogFile(),	settings.getErrorLogFile());
-			}
-			
-			
-			long startTime = System.currentTimeMillis();
-            System.out.println("Migrating the knowledge base");
-            logger.log("Started knowledge base migration");
-			
-			try {
-			     performUpdate();
-			} catch (Exception e) {
-				 logger.logError(e.getMessage());
-				 e.printStackTrace();
-			}
+		try {
+		     performUpdate();
+		} catch (Exception e) {
+			 logger.logError(e.getMessage());
+			 e.printStackTrace();
+		}
 
-			if (!logger.errorsWritten()) {
-				// add assertions to the knowledge base showing that the 
-				// update was successful, so we don't need to run it again.
-				assertSuccess();
-			}
-			
-			record.writeChanges();
-			logger.closeLogs();
-
-			long elapsedSecs = (System.currentTimeMillis() - startTime)/1000;		
-			System.out.println("Finished knowledge base migration in " + elapsedSecs + " second" + (elapsedSecs != 1 ? "s" : ""));
+		if (!logger.errorsWritten()) {
+			// add assertions to the knowledge base showing that the 
+			// update was successful, so we don't need to run it again.
+			assertSuccess();
 		}
 		
-		return updateRequired;
+		record.writeChanges();
+		logger.closeLogs();
+
+		long elapsedSecs = (System.currentTimeMillis() - startTime)/1000;		
+		System.out.println("Finished knowledge base migration in " + elapsedSecs + " second" + (elapsedSecs != 1 ? "s" : ""));
+		log.info("Finished knowledge base migration in " + elapsedSecs + " second" + (elapsedSecs != 1 ? "s" : ""));
 		
+		return;
 	}
+	
 	
 	private void performUpdate() throws IOException {
 		
-		performSparqlConstructAdditions(settings.getSparqlConstructAdditionsDir(), settings.getOntModelSelector().getABoxModel());
-		performSparqlConstructRetractions(settings.getSparqlConstructDeletionsDir(), settings.getOntModelSelector().getABoxModel());
+		log.info("\tperforming SPARQL construct additions (abox)");
+		performSparqlConstructAdditions(settings.getSparqlConstructAdditionsDir(), settings.getAssertionOntModelSelector().getABoxModel());
+		log.info("\tperforming SPARQL construct deletions (inferences)");
+		performSparqlConstructRetractions(settings.getSparqlConstructDeletionsDir(), settings.getInferenceOntModelSelector().getABoxModel());
 		
-		DateTimeMigration dtMigration = new DateTimeMigration(settings.getOntModelSelector().getABoxModel(), logger, record);
-        dtMigration.updateABox();
-        
 		List<AtomicOntologyChange> rawChanges = getAtomicOntologyChanges();
 		
 		AtomicOntologyChangeLists changes = new AtomicOntologyChangeLists(rawChanges,settings.getNewTBoxModel(),settings.getOldTBoxModel());
 		
         //process the TBox before the ABox
+		
+		log.info("\tupdating tbox annotations");
 	    updateTBoxAnnotations();
-
-    	updateABox(changes);		
+		
+		log.info("\tupdating the abox");
+    	updateABox(changes);
 	}
 	
 	private void performSparqlConstructAdditions(String sparqlConstructDir, OntModel aboxModel) throws IOException {
@@ -130,49 +131,27 @@ public class KnowledgeBaseUpdater {
 			
 			aboxModel.add(actualAdditions);
 			record.recordAdditions(actualAdditions);
-			/*
-			if (actualAdditions.size() > 0) {
-				logger.log("Constructed " + actualAdditions.size() + " new " +
-						   "statement" 
-						   + ((actualAdditions.size() > 1) ? "s" : "") + 
-						   " using SPARQL construct queries.");
-			}
-			*/
-
 		} finally {
 			aboxModel.leaveCriticalSection();
 		}
 		
 	}
 	
-	private void performSparqlConstructRetractions(String sparqlConstructDir, OntModel aboxModel) throws IOException {
+	private void performSparqlConstructRetractions(String sparqlConstructDir, OntModel model) throws IOException {
 		
-		Model retractions = performSparqlConstructs(sparqlConstructDir, aboxModel, false);
+		Model retractions = performSparqlConstructs(sparqlConstructDir, model, false);
 		
 		if (retractions == null) {
 			return;
 		}
 		
-		aboxModel.enterCriticalSection(Lock.WRITE);
+		model.enterCriticalSection(Lock.WRITE);
+		
 		try {
-			Model actualRetractions = ModelFactory.createDefaultModel();
-			StmtIterator stmtIt = retractions.listStatements();
-			while (stmtIt.hasNext()) {
-				Statement stmt = stmtIt.nextStatement();
-				if (aboxModel.contains(stmt)) {
-					actualRetractions.add(stmt);
-				}
-			}
-			aboxModel.remove(actualRetractions);
-			record.recordRetractions(actualRetractions);
-			/*
-			if (actualRetractions.size() > 0) {
-				logger.log("Removed " + actualRetractions.size() + " statement" + ((actualRetractions.size() > 1) ? "s" : "") +  " using SPARQL CONSTRUCT queries.");
-			}
-			*/
-
+			model.remove(retractions);
+			record.recordRetractions(retractions);
 		} finally {
-			aboxModel.leaveCriticalSection();
+			model.leaveCriticalSection();
 		}
 		
 	}
@@ -211,6 +190,7 @@ public class KnowledgeBaseUpdater {
 					fileContents.append(ln).append('\n');
 				}
 				try {
+					log.debug("\t\tprocessing SPARQL construct query from file " + sparqlFiles[i].getName());
 					Query q = QueryFactory.create(fileContents.toString(), Syntax.syntaxARQ);
 					aboxModel.enterCriticalSection(Lock.WRITE);
 					try {
@@ -221,11 +201,11 @@ public class KnowledgeBaseUpdater {
                         long num = numAfter - numBefore;
                         
                         if (num > 0) {
-						   logger.log((add ? "Added " : "Removed ") + num + 
+						   logger.log((add ? "Added " : "Removed ") + num + (add ? "" : " inferred") +
 								   " statement"  + ((num > 1) ? "s" : "") + 
 								   " using the SPARQL construct query from file " + sparqlFiles[i].getName());
                         }
-						
+                        qe.close();
 					} finally {
 						aboxModel.leaveCriticalSection();
 					}
@@ -257,7 +237,7 @@ public class KnowledgeBaseUpdater {
 
 		OntModel oldTBoxModel = settings.getOldTBoxModel();
 		OntModel newTBoxModel = settings.getNewTBoxModel();
-		OntModel ABoxModel = settings.getOntModelSelector().getABoxModel();
+		OntModel ABoxModel = settings.getAssertionOntModelSelector().getABoxModel();
 		ABoxUpdater aboxUpdater = new ABoxUpdater(
 				oldTBoxModel, newTBoxModel, ABoxModel, 
 				settings.getNewTBoxAnnotationsModel(), logger, record);
@@ -270,10 +250,10 @@ public class KnowledgeBaseUpdater {
 		
 		TBoxUpdater tboxUpdater = new TBoxUpdater(settings.getOldTBoxAnnotationsModel(),
 		                                          settings.getNewTBoxAnnotationsModel(),
-                                                  settings.getOntModelSelector().getABoxModel(), logger, record);
+                                                  settings.getAssertionOntModelSelector().getTBoxModel(), logger, record);
                                                   
         tboxUpdater.updateDefaultAnnotationValues();
-        tboxUpdater.updateAnnotationModel();
+        //tboxUpdater.updateAnnotationModel();
 	}
 	
 	/**
@@ -284,14 +264,14 @@ public class KnowledgeBaseUpdater {
 		
 		boolean required = false;
 		
-		String sparqlQueryStr = loadSparqlQuery(settings.getAskQueryFile());
+		String sparqlQueryStr = loadSparqlQuery(settings.getAskUpdatedQueryFile());
 		if (sparqlQueryStr == null) {
 			return required;
 		}
 				
-		Model m = settings.getOntModelSelector().getApplicationMetadataModel();
+		Model abox = settings.getAssertionOntModelSelector().getABoxModel();
 		Query query = QueryFactory.create(sparqlQueryStr);
-		QueryExecution isUpdated = QueryExecutionFactory.create(query, m);
+		QueryExecution isUpdated = QueryExecutionFactory.create(query, abox);
 		
 		// if the ASK query DOES have a solution (i.e. the assertions exist
 		// showing that the update has already been performed), then the update
@@ -301,12 +281,11 @@ public class KnowledgeBaseUpdater {
 			required = false;
 		} else {
 			required = true;
-			String sparqlQueryStr2 = loadSparqlQuery(settings.getAskEmptyQueryFile());
-			if (sparqlQueryStr2 != null) {
-				Query query2 = QueryFactory.create(sparqlQueryStr2);
-				QueryExecution isNotEmpty = QueryExecutionFactory.create(query2, m);
-				required = isNotEmpty.execAsk();
-			} 
+			if (JenaDataSourceSetupBase.isFirstStartup()) {
+				assertSuccess();  
+				log.info("The application is starting with an empty DB, an indication will be added to the DB that a knowledge base migration to the current version is not required.");
+			    required = false;	
+			}
 		}
 		
 		return required; 
@@ -335,19 +314,24 @@ public class KnowledgeBaseUpdater {
 	private void assertSuccess() throws FileNotFoundException, IOException {
 		try {
 			
-		    Model m = settings.getOntModelSelector().getApplicationMetadataModel();
+		    //Model m = settings.getAssertionOntModelSelector().getApplicationMetadataModel();
+		    Model m = settings.getAssertionOntModelSelector().getABoxModel();
 		    File successAssertionsFile = new File(settings.getSuccessAssertionsFile()); 
 		    InputStream inStream = new FileInputStream(successAssertionsFile);
 		    m.enterCriticalSection(Lock.WRITE);
 		    try {
 		    	m.read(inStream, null, settings.getSuccessRDFFormat());
-		    	logger.logWithDate("Finished knowledge base migration");
+		    	if (logger != null) {
+		    		logger.logWithDate("Finished knowledge base migration");
+		    	} 
 		    } finally {
 		    	m.leaveCriticalSection();
 		    }
 		} catch (Exception e) {
-			logger.logError(" unable to make RDF assertions about successful " +
+			if (logger != null) {
+			    logger.logError(" unable to make RDF assertions about successful " +
 					" update to new ontology version: " + e.getMessage());
+			}
 		}
 	}
 	

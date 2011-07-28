@@ -20,15 +20,13 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.sparql.resultset.ResultSetMem;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
@@ -53,12 +51,14 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         put("vitroPublic", VitroVocabulary.VITRO_PUBLIC);
     }};
     
-    protected static String prefixes = "";
+    protected static final String PREFIXES;
     static {
+        String prefixes = "";
         for (String key : NAMESPACES.keySet()) {
             prefixes += "PREFIX " + key + ": <" + NAMESPACES.get(key) + ">\n";
         }
-        log.debug("Query prefixes: " + prefixes);
+        PREFIXES = prefixes;
+        log.debug("Query prefixes: " + PREFIXES);
     }
     
     protected DatasetWrapperFactory dwf;
@@ -402,28 +402,25 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         return classSet;
     }
      
-    protected Iterator<QuerySolution> getPropertyQueryResults(String subjectUri, Query query) {        
+    protected ResultSet getPropertyQueryResults(Query query) {        
         log.debug("SPARQL query:\n" + query.toString());
-        // Bind the subject's uri to the ?subject query term
-        QuerySolutionMap subjectBinding = new QuerySolutionMap();
-        subjectBinding.add("subject", 
-                ResourceFactory.createResource(subjectUri));
-
+        
+        // RY Removing prebinding due to Jena bug: when isLiteral(?object) or 
+        // isURI(?object) is added to the query as a filter, the query fails with prebinding
+        // but succeeds when the subject uri is concatenated into the query string.
+        //QuerySolutionMap subjectBinding = new QuerySolutionMap();
+        //subjectBinding.add("subject", ResourceFactory.createResource(subjectUri));
+                
         // Run the SPARQL query to get the properties
         DatasetWrapper w = dwf.getDatasetWrapper();
         Dataset dataset = w.getDataset();
         dataset.getLock().enterCriticalSection(Lock.READ);
+        ResultSet rs = null;
         try {
             QueryExecution qexec = QueryExecutionFactory.create(
-                    query, dataset, subjectBinding);
+                    query, dataset); //, subjectBinding);
             try {
-                ResultSet rs = qexec.execSelect();
-                // consume iterator before wrapper w is closed in finally block
-                List<QuerySolution> results = new ArrayList<QuerySolution>();
-                while (rs.hasNext()) {
-                    results.add(rs.next());
-                }
-                return results.iterator();
+                rs = new ResultSetMem(qexec.execSelect());
             } finally {
                 qexec.close();
             }
@@ -431,6 +428,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
             dataset.getLock().leaveCriticalSection();
             w.close();
         }
+        return rs;
     }
     
 }

@@ -41,9 +41,12 @@ public abstract class Widget {
         Map<String, Object> map = new HashMap<String, Object>(); 
         
         try {
+            // Once we remove portals, we can define these as Configuration shared variables. Then the 
+            // templates will automatically get these and we don't have to add them to the data model.
             map.put("stylesheets", dataModel.get("stylesheets"));
             map.put("scripts", dataModel.get("scripts"));
             map.put("headScripts", dataModel.get("headScripts"));
+            map.put("urls", dataModel.get("urls"));
         } catch (TemplateModelException e) {
             log.error("Error getting asset values from data model.");
         }

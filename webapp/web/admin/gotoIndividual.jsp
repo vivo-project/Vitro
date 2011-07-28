@@ -4,9 +4,11 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
-<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 
-<vitro:confirmLoginStatus level="DBA" />
+<%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages" %>
+<% request.setAttribute("requestedActions", new UseMiscellaneousAdminPages()); %>
+<vitro:confirmAuthorization />
 
 <%
 if( request.getParameter("uri") != null ){

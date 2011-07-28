@@ -30,7 +30,7 @@ public class LinkTemplateModel extends BaseTemplateModel {
     }
 
     public String getUrl() {
-        return url;
+        return cleanTextForDisplay( url );
     }
 
     protected void setUrl(String path) {
@@ -46,7 +46,7 @@ public class LinkTemplateModel extends BaseTemplateModel {
     }
 
     public String getText() {
-        return text;
+        return cleanTextForDisplay(text);
     }
 
     protected void setText(String text) {

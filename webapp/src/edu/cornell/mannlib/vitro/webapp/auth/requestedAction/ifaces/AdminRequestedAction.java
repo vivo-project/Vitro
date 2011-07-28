@@ -2,8 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces;
 
-/** marker interface */
-
+/** Denotes an action that is administrative, like adding users, etc. */
 public interface AdminRequestedAction {
-
+	/** marker interface */
 }

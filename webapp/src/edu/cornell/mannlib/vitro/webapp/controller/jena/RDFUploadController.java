@@ -4,8 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.jena;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -31,13 +28,15 @@ import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 
@@ -51,7 +50,10 @@ public class RDFUploadController extends BaseEditController {
 	
 	public void doPost(HttpServletRequest rawRequest,
 			HttpServletResponse response) throws ServletException, IOException {
-	    
+        if (!isAuthorizedToDisplayPage(rawRequest, response, new Actions(new UseAdvancedDataToolsPages()))) {
+        	return;
+        }
+
 		FileUploadServletRequest req = FileUploadServletRequest.parseRequest(rawRequest,
 				maxFileSizeInBytes);
 		if (req.hasFileUploadException()) {
@@ -62,26 +64,13 @@ public class RDFUploadController extends BaseEditController {
 		Map<String, List<FileItem>> fileStreams = req.getFiles();
 	    
 		VitroRequest request = new VitroRequest(req);		
-		if (!checkLoginStatus(request,response) ){
-		    return;
-		}		
-		
 		LoginStatusBean loginBean = LoginStatusBean.getBean(request);
-		
-		try {
-			super.doGet(request,response);
-		} catch (Exception e) {
-		    forwardToFileUploadError(e.getLocalizedMessage(), req, response);
-			return;
-		}
 		
 		String modelName = req.getParameter("modelName");
 		if(modelName!=null){
 			loadRDF(req,request,response);
 			return;
-		}	
-		
-		Portal currentPortal = request.getPortal();		
+		}			
 	    			   
 		boolean remove = "remove".equals(request.getParameter("mode"));
 		String verb = remove?"Removed":"Added";
@@ -93,28 +82,6 @@ public class RDFUploadController extends BaseEditController {
 		// add directly to the ABox model without reading first into 
 		// a temporary in-memory model
 		boolean directRead = ("directAddABox".equals(request.getParameter("mode")));
-		
-		int[] portalArray = null;
-		String individualCheckIn = request.getParameter("checkIndividualsIntoPortal"); 
-		if (individualCheckIn != null) {
-		    if (individualCheckIn.equals("current")) {
-		        portalArray = new int[1];
-		        portalArray[0] = currentPortal.getPortalId();
-		    } else if (individualCheckIn.equals("all")) {
-		        try {
-		            Collection<Portal> portalCollection = request.getFullWebappDaoFactory().getPortalDao().getAllPortals();
-		            portalArray = new int[portalCollection.size()];
-		            int index = 0;
-		            for (Iterator<Portal> pit = portalCollection.iterator(); pit.hasNext(); ) { 
-		                Portal p = pit.next();
-		                portalArray[index] = p.getPortalId();
-		                index++;
-		            }
-		        } catch (Exception e) {
-		            e.printStackTrace();
-		        }
-		    }
-		}
           
 		String uploadDesc ="";		
 				
@@ -166,6 +133,12 @@ public class RDFUploadController extends BaseEditController {
 		        }
 		    }
 		}
+
+        if (!directRead) {
+           if (!uploadModel.getDocumentManager().getProcessImports()) {
+               uploadModel.loadImports();
+           }
+        }
 		
 		/* ********** Do the model changes *********** */
 		if( !directRead && uploadModel != null ){
@@ -180,12 +153,25 @@ public class RDFUploadController extends BaseEditController {
 		    OntModel tboxChangeModel=null;
 		    Model aboxChangeModel=null;
 		    if (tboxModel != null) {
-		    	tboxChangeModel = xutil.extractTBox(uploadModel);
-		        tboxstmtCount = operateOnModel(request.getFullWebappDaoFactory(), tboxModel,tboxChangeModel,remove,makeClassgroups,portalArray,loginBean.getUserURI());
+		    	boolean AGGRESSIVE = true;
+		    	tboxChangeModel = xutil.extractTBox(uploadModel, AGGRESSIVE);
+		    	// aggressively seek all statements that are part of the TBox  
+		        tboxstmtCount = operateOnModel(
+		        		request.getFullWebappDaoFactory(),
+		                tboxModel,tboxChangeModel,
+		                remove,
+		                makeClassgroups,
+		                loginBean.getUserURI());
 		    }
 		    if (aboxModel != null) {
 		    	aboxChangeModel = uploadModel.remove(tboxChangeModel);
-		        aboxstmtCount = operateOnModel(request.getFullWebappDaoFactory(), aboxModel,aboxChangeModel,remove,makeClassgroups,portalArray,loginBean.getUserURI());
+		        aboxstmtCount = operateOnModel(
+		        		request.getFullWebappDaoFactory(),
+		        		aboxModel,
+		        		aboxChangeModel,
+		        		remove,
+		        		makeClassgroups,
+		        		loginBean.getUserURI());
 		    }
 		    request.setAttribute("uploadDesc", uploadDesc + ". " + verb + " " + (tboxstmtCount + aboxstmtCount) + "  statements.");
 		} else {
@@ -194,9 +180,8 @@ public class RDFUploadController extends BaseEditController {
 	    
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("bodyJsp","/templates/edit/specific/upload_rdf_result.jsp");
-        request.setAttribute("portalBean",currentPortal);
         request.setAttribute("title","Ingest RDF Data");
-        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+currentPortal.getThemeDir()+"css/edit.css\"/>");
+        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+request.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
             rd.forward(request, response);
@@ -225,10 +210,9 @@ public class RDFUploadController extends BaseEditController {
 			request.setAttribute("title","Load RDF Data");
 			request.setAttribute("bodyJsp",LOAD_RDF_DATA_JSP);
 		}
-		Portal portal = request.getPortal();
+		
 		RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);      
-        request.setAttribute("portalBean",portal);
-        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
+        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+request.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
             rd.forward(request, response);
@@ -240,28 +224,40 @@ public class RDFUploadController extends BaseEditController {
 		
 	}
 	
-    private long operateOnModel(WebappDaoFactory webappDaoFactory, OntModel mainModel, Model changesModel, boolean remove, boolean makeClassgroups, int[] portal,  String userURI) {
+    private long operateOnModel(WebappDaoFactory webappDaoFactory, 
+    		                    OntModel mainModel, 
+    		                    Model changesModel, 
+    		                    boolean remove, 
+    		                    boolean makeClassgroups,  
+    		                    String userURI) {
         mainModel.enterCriticalSection(Lock.WRITE);
         try {
-            mainModel.getBaseModel().notifyEvent(new EditEvent(userURI,true));
+        	
+        	EditEvent startEvent = null, endEvent = null;
+        	
+        	if (remove) {
+        		startEvent = new BulkUpdateEvent(userURI, true);
+        		endEvent = new BulkUpdateEvent(userURI, false);
+        	} else {
+        		startEvent = new EditEvent(userURI, true);
+        		endEvent = new EditEvent(userURI, false);
+        	}
+         	
+            mainModel.getBaseModel().notifyEvent(startEvent);
             try {                
                 if (makeClassgroups) {
                     Model classgroupModel = 
-                        JenaModelUtils.makeClassGroupsFromRootClasses(webappDaoFactory, changesModel, changesModel);
+                        JenaModelUtils.makeClassGroupsFromRootClasses(
+                        		webappDaoFactory, changesModel, changesModel);
                     mainModel.add(classgroupModel);
-                }                
-                if (!remove && portal != null && portal.length>0) {
-                    for (int i=0; i<portal.length; i++) {
-                        JenaModelUtils.checkAllIndividualsInModelIntoPortal(changesModel, changesModel, portal[i]);
-                    }
-                }                 
+                }                            
                 if (remove) {
                     mainModel.remove(changesModel);
                 } else {
                     mainModel.add(changesModel);
                 } 
             } finally {
-                mainModel.getBaseModel().notifyEvent(new EditEvent(userURI,false));
+                mainModel.getBaseModel().notifyEvent(endEvent);
             }
         } finally {
             mainModel.leaveCriticalSection();

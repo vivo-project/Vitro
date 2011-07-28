@@ -1,4 +1,7 @@
 <Context override="true">
+
+  <!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+
     <!--
         Vitro will interpret this as either a file path or a resource path. So,
         if a simple resource path is used, such as "deploy.properties", Vitro 

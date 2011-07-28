@@ -10,9 +10,6 @@ public interface PropertyInstanceIface {
     public abstract String getPropertyURI();
     public abstract String getObjectEntURI();
     public abstract String getSubjectEntURI();
-    public abstract String getQualifier();
-    public abstract Date getSunrise();
-    public abstract Date getSunset();
 
 //  entities
     public abstract String getSubjectName();
@@ -55,12 +52,6 @@ public interface PropertyInstanceIface {
     public abstract void setDomainPublic(String in);
 
     public abstract void setRangePublic(String in);
-
-    public abstract void setQualifier(String in);
-
-    public abstract void setSunrise(Date in);
-
-    public abstract void setSunset(Date in);
 
     public abstract void setSubjectSide(boolean in);
 

@@ -6,6 +6,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -24,14 +29,15 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.util.ResourceUtils;
+import com.hp.hpl.jena.vocabulary.RDF;
 
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.SimpleOntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.UpdateSettings;
-import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
 
 /**
  * Invokes process to test whether the knowledge base needs any updating
@@ -41,29 +47,25 @@ import edu.cornell.mannlib.vitro.webapp.search.lucene.LuceneSetup;
  */
 public class UpdateKnowledgeBase implements ServletContextListener {
 	
+    public static final String KBM_REQURIED_AT_STARTUP = "KNOWLEDGE_BASE_MIGRATION_REQUIRED_AT_STARTUP";
 	private final static Log log = LogFactory.getLog(UpdateKnowledgeBase.class);
 	
 	private static final String DATA_DIR = "/WEB-INF/ontologies/update/";
 	private static final String LOG_DIR = "logs/";
 	private static final String CHANGED_DATA_DIR = "changedData/";
-	private static final String ASK_QUERY_FILE = DATA_DIR + "ask.sparql";
-	private static final String ASK_EMPTY_QUERY_FILE = DATA_DIR + "askEmpty.sparql";
-	private static final String ASK_EVER_QUERY_FILE = DATA_DIR + "askEver.sparql";
+	private static final String ASK_QUERY_FILE = DATA_DIR + "askUpdated.sparql";
 	private static final String SUCCESS_ASSERTIONS_FILE = DATA_DIR + "success.n3";
 	private static final String SUCCESS_RDF_FORMAT = "N3";
 	private static final String DIFF_FILE = DATA_DIR + "diff.tab.txt";
-	private static final String LOG_FILE = DATA_DIR + LOG_DIR + "knowledgeBaseUpdate.log";
-	private static final String ERROR_LOG_FILE = DATA_DIR + LOG_DIR + 	"knowledgeBaseUpdate.error.log";
 	private static final String REMOVED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + 	"removedData.n3";
 	private static final String ADDED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + "addedData.n3";
 	private static final String SPARQL_CONSTRUCT_ADDITIONS_DIR = DATA_DIR + "sparqlConstructs/additions/";
-	private static final String SPARQL_CONSTRUCT_ADDITIONS_PASS2_DIR = DATA_DIR + "sparqlConstructs/additions-pass2/";
 	private static final String SPARQL_CONSTRUCT_DELETIONS_DIR = DATA_DIR + "sparqlConstructs/deletions/";
-	private static final String MISC_REPLACEMENTS_FILE = DATA_DIR + "miscReplacements.rdf";
+	//private static final String MISC_REPLACEMENTS_FILE = DATA_DIR + "miscReplacements.rdf";
 	private static final String OLD_TBOX_MODEL_DIR = DATA_DIR + "oldVersion/";
-	private static final String NEW_TBOX_MODEL_DIR = "/WEB-INF/submodels/";
+	private static final String NEW_TBOX_MODEL_DIR = "/WEB-INF/filegraph/tbox/";
 	private static final String OLD_TBOX_ANNOTATIONS_DIR = DATA_DIR + "oldAnnotations/";
-	private static final String NEW_TBOX_ANNOTATIONS_DIR = "/WEB-INF/ontologies/user";
+	private static final String NEW_TBOX_ANNOTATIONS_DIR = "/WEB-INF/ontologies/user/tbox/";
 	
 	public void contextInitialized(ServletContextEvent sce) {
 				
@@ -74,67 +76,71 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		try {
 
 			ServletContext ctx = sce.getServletContext();
-
-			OntModelSelector oms = new SimpleOntModelSelector((OntModel) sce.getServletContext().getAttribute(JenaBaseDao.ASSERTIONS_ONT_MODEL_ATTRIBUTE_NAME));
 			
+			String logFileName =  DATA_DIR + LOG_DIR + timestampedFileName("knowledgeBaseUpdate", "log");
+			String errorLogFileName = DATA_DIR + LOG_DIR + 	timestampedFileName("knowledgeBaseUpdate.error", "log");
+						
 			UpdateSettings settings = new UpdateSettings();
-			settings.setAskQueryFile(getAskQueryPath(ctx));
-			settings.setAskEverQueryFile(getAskEverQueryPath(ctx));
-			settings.setAskEmptyQueryFile(getAskEmptyQueryPath(ctx));
+			settings.setAskUpdatedQueryFile(getAskUpdatedQueryPath(ctx));
 			settings.setDataDir(ctx.getRealPath(DATA_DIR));
 			settings.setSparqlConstructAdditionsDir(ctx.getRealPath(SPARQL_CONSTRUCT_ADDITIONS_DIR));
-			settings.setSparqlConstructAdditionsPass2Dir(ctx.getRealPath(SPARQL_CONSTRUCT_ADDITIONS_PASS2_DIR));
 			settings.setSparqlConstructDeletionsDir(ctx.getRealPath(SPARQL_CONSTRUCT_DELETIONS_DIR));
 			settings.setDiffFile(ctx.getRealPath(DIFF_FILE));
 			settings.setSuccessAssertionsFile(ctx.getRealPath(SUCCESS_ASSERTIONS_FILE));
 			settings.setSuccessRDFFormat(SUCCESS_RDF_FORMAT);
-			settings.setLogFile(ctx.getRealPath(LOG_FILE));
-			settings.setErrorLogFile(ctx.getRealPath(ERROR_LOG_FILE));
+			settings.setLogFile(ctx.getRealPath(logFileName));
+			settings.setErrorLogFile(ctx.getRealPath(errorLogFileName));
 			settings.setAddedDataFile(ctx.getRealPath(ADDED_DATA_FILE));
 			settings.setRemovedDataFile(ctx.getRealPath(REMOVED_DATA_FILE));
 			WebappDaoFactory wadf = (WebappDaoFactory) ctx.getAttribute("webappDaoFactory");
 			settings.setDefaultNamespace(wadf.getDefaultNamespace());
-				
-			settings.setOntModelSelector(oms);
-			OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_MODEL_DIR));
-			settings.setOldTBoxModel(oldTBoxModel);
-			OntModel newTBoxModel = loadModelFromDirectory(ctx.getRealPath(NEW_TBOX_MODEL_DIR));
-			settings.setNewTBoxModel(newTBoxModel);
-			OntModel oldTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_ANNOTATIONS_DIR));
-			settings.setOldTBoxAnnotationsModel(oldTBoxAnnotationsModel);
-			OntModel newTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(NEW_TBOX_ANNOTATIONS_DIR));
-			settings.setNewTBoxAnnotationsModel(newTBoxAnnotationsModel);
+			settings.setAssertionOntModelSelector(ModelContext.getBaseOntModelSelector(ctx));
+			settings.setInferenceOntModelSelector(ModelContext.getInferenceOntModelSelector(ctx));
 			
 			try {
+				OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_MODEL_DIR));
+				settings.setOldTBoxModel(oldTBoxModel);
+				OntModel newTBoxModel = loadModelFromDirectory(ctx.getRealPath(NEW_TBOX_MODEL_DIR));
+				settings.setNewTBoxModel(newTBoxModel);
+				OntModel oldTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_ANNOTATIONS_DIR));
+				settings.setOldTBoxAnnotationsModel(oldTBoxAnnotationsModel);
+				OntModel newTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(NEW_TBOX_ANNOTATIONS_DIR));
+				settings.setNewTBoxAnnotationsModel(newTBoxAnnotationsModel);
+			} catch (ModelDirectoryNotFoundException e) {
+				log.info("Knowledge base update directories not found.  " +
+						 "No update will be performed.");
+				return;
+			}
 				
-			  KnowledgeBaseUpdater ontologyUpdater = new KnowledgeBaseUpdater(settings);
+			try {		
+			   KnowledgeBaseUpdater ontologyUpdater = new KnowledgeBaseUpdater(settings);
 			  
-			  try {
+			   try {
 				  if (ontologyUpdater.updateRequired()) {
-					  ctx.setAttribute(LuceneSetup.INDEX_REBUILD_REQUESTED_AT_STARTUP, Boolean.TRUE);
-					  doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
-					  reloadDisplayModel(ctx);
+					  //ctx.setAttribute(IndexConstants.INDEX_REBUILD_REQUESTED_AT_STARTUP, Boolean.TRUE);
+					  ctx.setAttribute(KBM_REQURIED_AT_STARTUP, Boolean.TRUE);
+					  //doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
+					  //reloadDisplayModel(ctx);
+					  log.info("Migrating display model");
+					  doMigrateDisplayModel(ctx);
+					  log.info("Display model migrated");
+					  ontologyUpdater.update();
 				  }
-			  } catch (Throwable t){
-				  log.warn("Unable to perform miscellaneous application metadata replacements", t);
-			  }
-			  
-			  ontologyUpdater.update();
-				
-			} catch (IOException ioe) {
-				String errMsg = "IOException updating knowledge base " +
-					"for ontology changes: ";
-				// Tomcat doesn't always seem to print exceptions thrown from
-				// context listeners
-				System.out.println(errMsg);
-				ioe.printStackTrace();
-				throw new RuntimeException(errMsg, ioe);
-			}	
-		
+			   } catch (IOException ioe) {
+					String errMsg = "IOException updating knowledge base " +
+						"for ontology changes: ";
+					// Tomcat doesn't always seem to print exceptions thrown from
+					// context listeners
+					System.out.println(errMsg);
+					ioe.printStackTrace();
+					throw new RuntimeException(errMsg, ioe);
+			   }	
+			} catch (Throwable t){
+				  log.warn("warning", t);
+			}
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
-		
 	}	
 	
 	/**
@@ -178,7 +184,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		    	}
 		    }
 		} catch (FileNotFoundException fnfe) {
-			log.info("No miscellaneous application metadata replacements were performed.");
+			log.warn("Couldn't find miscellaneous application metadata replacement file: " + filename);
 		
 		} catch (Exception e) {
 			log.error("Error performing miscellaneous application metadata " +
@@ -206,12 +212,75 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	    }
 	}
 	
+	private void doMigrateDisplayModel(ServletContext ctx) {
+		Object o = ctx.getAttribute("displayOntModel");
+	    if (!(o instanceof OntModel)) {
+	    	return;
+	    }
+	    OntModel displayModel = (OntModel) o;
+	    migrateDisplayModel(displayModel);
+	}
+	
+	public static void migrateDisplayModel(Model displayModel) {
+	    Resource indexRes = displayModel.getResource(
+	    		DisplayVocabulary.DISPLAY_NS + "PrimaryLuceneIndex");
+	    ResourceUtils.renameResource(
+	    		indexRes, DisplayVocabulary.DISPLAY_NS + "SearchIndex");
+	    Iterator<Resource> pageIt = displayModel.listResourcesWithProperty(
+	    		RDF.type, displayModel.getResource(
+	    				DisplayVocabulary.PAGE_TYPE));
+	    while (pageIt.hasNext()) {
+	    	Resource pageRes = pageIt.next();
+	    	Resource classgroupType = displayModel.getResource(
+					DisplayVocabulary.CLASSGROUP_PAGE_TYPE);
+	    	Property forClassGroup = displayModel.getProperty(
+	    			DisplayVocabulary.FOR_CLASSGROUP);
+	    	if (pageRes.hasProperty(RDF.type, classgroupType)) {
+	    		displayModel.remove(pageRes, RDF.type, classgroupType);
+	    		StmtIterator fcgIt = pageRes.listProperties(forClassGroup);
+	    		List<Resource> classGroupResources = new ArrayList<Resource>();
+	    		while (fcgIt.hasNext()) {
+	    			Statement fcgStmt = fcgIt.nextStatement();
+	    			RDFNode classGroupNode = fcgStmt.getObject();
+	    			if (!classGroupNode.isURIResource()) {
+	    				continue;
+	    			}
+	    			classGroupResources.add((Resource) classGroupNode);
+	    		}
+ 	    		int classGroupIndex = 0;
+ 	    		Iterator<Resource> classGroupResIt = 
+ 	    		        classGroupResources.iterator();
+	    		while (classGroupResIt.hasNext()) {
+	    			classGroupIndex++;
+	    			Resource classGroupRes = classGroupResIt.next();
+	    			String URIsuffix = "DataGetter" + classGroupIndex;
+	    			String dataGetterURI = (!pageRes.isAnon()) 
+	    			        ? pageRes.getURI() + URIsuffix
+	    			        : DisplayVocabulary.DISPLAY_NS + 
+	    			                "page-" + pageRes.getId().toString() + "-"
+	    			                + URIsuffix;
+	    			Resource dataGetterRes = displayModel.createResource(
+	    					dataGetterURI);
+	    			pageRes.addProperty(
+	    					displayModel.getProperty(
+	    							DisplayVocabulary.HAS_DATA_GETTER), 
+	    							        dataGetterRes);
+	    			dataGetterRes.addProperty(forClassGroup, classGroupRes);
+	    			dataGetterRes.addProperty(RDF.type, classgroupType);
+	    			displayModel.removeAll(pageRes, RDF.type, classgroupType);
+	    			displayModel.removeAll(
+	    					pageRes, forClassGroup, (RDFNode) null);
+	    		}	    		
+	    	}
+	    }
+	}
+	
 	private OntModel loadModelFromDirectory(String directoryPath) {
 		
 		OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		File directory = new File(directoryPath);
 		if (!directory.isDirectory()) {
-			throw new RuntimeException(directoryPath + " must be a directory " +
+			throw new ModelDirectoryNotFoundException(directoryPath + " must be a directory " +
 					"containing RDF files.");
 		}
 		File[] rdfFiles = directory.listFiles();
@@ -230,7 +299,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 				}
 			} catch (FileNotFoundException fnfe) {
 				log.error(rdfFiles[i].getName() + " not found. Unable to load" +
-						" RDF from this location.");
+						" RDF from this location: " + directoryPath);
 			}
 		}
 		return om;
@@ -239,16 +308,20 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	public void contextDestroyed(ServletContextEvent arg0) {
 		// nothing to do	
 	}
-	public static String getAskQueryPath(ServletContext ctx) {
+	
+	public static String getAskUpdatedQueryPath(ServletContext ctx) {
 		return ctx.getRealPath(ASK_QUERY_FILE);
 	
-    }	
-	public static String getAskEverQueryPath(ServletContext ctx) {
-		return ctx.getRealPath(ASK_EVER_QUERY_FILE);
-	
     }
-	public static String getAskEmptyQueryPath(ServletContext ctx) {
-		return ctx.getRealPath(ASK_EMPTY_QUERY_FILE);
 	
-    }
+	private static String timestampedFileName(String prefix, String suffix) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-sss");
+		return prefix + "." + sdf.format(new Date()) + "." + suffix;
+	}
+	
+	private class ModelDirectoryNotFoundException extends RuntimeException {
+		public ModelDirectoryNotFoundException(String msg) {
+			super(msg);
+		}
+	}
 }

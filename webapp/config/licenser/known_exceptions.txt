@@ -28,15 +28,11 @@ webapp/src/edu/cornell/mannlib/vitro/webapp/web/ContentType.java
 webapp/src/org/json/*
 
 # See /doc/3rd-party-licenses.txt for LICENSE file
-webapp/src/edu/cornell/mannlib/vitro/webapp/utils/JSONtoFmModel.java
+webapp/src/edu/cornell/mannlib/vitro/webapp/utils/JsonToFmModel.java
 
 # See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/js/tiny_mce/*
 webapp/web/js/tiny_mce/**/*
-
-# See /doc/3rd-party-licenses.txt for LICENSE file
-webapp/web/admin/axis/SOAPMonitorApplet.java
-services/additions/admin/axis/SOAPMonitorApplet.java
 
 # See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/js/jquery.js
@@ -164,3 +160,10 @@ webapp/web/js/raphael/*
 
 # See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/js/sparql/prototype.js
+
+# Apache Solr search platform. See /doc/3rd-party-licenses.txt for LICENSE file
+solr/**/*
+solr/*
+
+# OWASP AntiSamy Project.  See /doc/3rd-party-licenses.txt for LICENSE file
+webapp/src/edu/cornell/mannlib/vitro/webapp/web/antisamy-vitro-1.4.4.xml

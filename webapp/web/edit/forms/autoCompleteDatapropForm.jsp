@@ -5,7 +5,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataProperty" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration" %>
 <%@ taglib prefix="v" uri="http://vitro.mannlib.cornell.edu/vitro/tags" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%>
 
@@ -119,10 +119,10 @@
         Model model =  (Model)application.getAttribute("jenaOntModel");
         editConfig.prepareForDataPropUpdate(model,dps);
         formTitle   = "Change text for: <em>"+prop.getPublicName()+"</em>";
-        submitLabel = "save change";
+        submitLabel = "Save change";
     } else {
         formTitle   = "Add new entry for: <em>"+prop.getPublicName()+"</em>";
-        submitLabel = "save entry";
+        submitLabel = "Save entry";
     }
 %>
 

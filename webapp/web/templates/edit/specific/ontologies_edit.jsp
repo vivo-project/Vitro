@@ -18,28 +18,23 @@
 <tr valign="bottom" align="center">
 	<td>
 		<form action="listOntologies" method="get">
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="submit" class="form-button" value="All Ontologies"/>
 		</form>
 		<form action="showClassHierarchy" method="get">
-                        <input type="hidden" name="home" value="${portalBean.portalId}" />
                         <input type="submit" class="form-button" value="Hierarchy of Classes Defined in This Namespace" />
                         <input type="hidden" name="ontologyUri" value="${Ontology.URI}" />
                 </form>
 		<form action="listPropertyWebapps" method="get">
-                        <input type="hidden" name="home" value="${portalBean.portalId}" />
                         <input type="submit" class="form-button" value="Object Properties Defined in This Namespace" />
                         <input type="hidden" name="ontologyUri" value="${Ontology.URI}" />
                 </form>
 		<form action="listDatatypeProperties" method="get">
-                        <input type="hidden" name="home" value="${portalBean.portalId}" />
                         <input type="submit" class="form-button" value="Datatype Properties Defined in This Namespace" />
                         <input type="hidden" name="ontologyUri" value="${Ontology.URI}" />
                 </form>
 	</td>
 	<td valign="bottom" align="center">
 		<form action="editForm" method="get">
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="submit" class="form-button" value="Edit ${Ontology.name}"/>
 			<input name="uri" type = "hidden" value="${Ontology.URI}" />
 			<input type="hidden" name="controller" value="Ontology"/>
@@ -47,13 +42,11 @@
 	</td>
 	<td valign="bottom">
 		<form action="editForm" method="get">
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="submit" class="form-button" value="Add New Ontology"/>
 			<input type="hidden" name="controller" value="Ontology"/>
 		</form>
         <form action="editForm" method="get">
                 <input type="submit" class="form-button" value="Change URI"/>
-                <input type="hidden" name="home" value="${portalBean.portalId}" />
                 <input type="hidden" name="oldURI" value="${realURI}"/>
                 <input type="hidden" name="mode" value="renameResource"/>
                 <input type="hidden" name="controller" value="Refactor"/>

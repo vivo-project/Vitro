@@ -22,13 +22,9 @@ public class Controllers {
     public static final String ABOUT = "/about";
     public static final String CONTACT_URL = "/comments";
     public static final String TERMS_OF_USE_URL = "/termsOfUse";
-    public static final String SEARCH_URL = "/search";
-    
+    public static final String SEARCH_URL = "/search";    
     public static final String ENTITY = "/entity";
-    public static final String ENTITY_PROP_LIST = "/entityPropList";
-    public static final String ENTITY_LIST = "/entitylist";
 
-    public static final String BROWSE_CONTROLLER = "browsecontroller";
     public static final String RETRY_URL = "editForm";
     public static final String TAB_ENTITIES = "/TabEntitiesController";  
 
@@ -43,41 +39,22 @@ public class Controllers {
     
     public static final String TAB = "/index.jsp";
 
-    
     public static final String BASIC_JSP = "/templates/page/basicPage.jsp";
     public static final String DEBUG_JSP = "/templates/page/debug.jsp";
     public static final Object BODY_MSG = "/templates/page/bodyMsg.jsp";
     
-    public static final String ENTITY_JSP = "/templates/entity/entityBasic.jsp";
-    public static final String ENTITY_PROP_LIST_JSP = "templates/entity/entityPropsList.jsp";
-    public static final String ENTITY_DATAPROP_LIST_JSP = "templates/entity/entityDatapropsList.jsp";
-    public static final String ENTITY_MERGED_PROP_LIST_GROUPED_JSP = "templates/entity/entityMergedPropsList.jsp";
     public static final String DASHBOARD_PROP_LIST_JSP = "edit/dashboardPropsList.jsp";
-    public static final String ENTITY_MERGED_PROP_LIST_UNGROUPED_JSP = "templates/entity/entityMergedPropsListUngrouped.jsp";
-    
-    public static final String ENTITY_KEYWORDS_LIST_JSP = "templates/entity/entityKeywordsList.jsp";
 
     public static final String ENTITY_EDITABLE_JSP = "templates/entity/entityEditable.jsp";
     public static final String ENTITY_EDITABLE_PROP_LIST_JSP = "templates/entity/entityEditablePropsList.jsp";
 
-    public static final String ENTITY_LIST_JSP = "templates/entity/entityList.jsp";
     public static final String ENTITY_LIST_FOR_TABS_JSP = "templates/entity/entityListForTabs.jsp";
-    public static final String TAB_ENTITIES_LIST_GALLERY_JSP = "templates/entity/entityListForGalleryTab.jsp";
     public static final String ENTITY_NOT_FOUND_JSP = "templates/error/entityNotFound.jsp";
 
     public static final String TAB_BASIC_JSP = "/templates/tabs/tabBasic.jsp";
     public static final String TAB_PRIMARY_JSP = "/templates/tabs/tabprimary.jsp";
 
     public static final String ALPHA_INDEX_JSP = "/templates/alpha/alphaIndex.jsp";
-
-    public static final String SEARCH_BASIC_JSP = "/templates/search/searchBasic.jsp";
-    public static final String SEARCH_PAGED_JSP = "/templates/search/searchPaged.jsp";
-    public static final String SEARCH_FAILED_JSP = "/templates/search/searchFailed.jsp";
-    public static final String SEARCH_GROUP_JSP = "/templates/search/searchGroup.jsp";
-    public static final Object SEARCH_FORM_JSP = "/templates/search/searchForm.jsp";
-    public static final Object SEARCH_BAD_QUERY_JSP = "/templates/search/searchBadQuery.jsp";
-    
-    public static final String BROWSE_GROUP_JSP = "/templates/browse/browseGroup.jsp";
 
     public static final String HORIZONTAL_JSP = "/templates/edit/fetch/horizontal.jsp";
     public static final String VERTICAL_JSP = "/templates/edit/fetch/vertical.jsp";
@@ -88,9 +65,6 @@ public class Controllers {
     public static final String VCLASS_RETRY_URL = "vclass_retry";
 
     public static final String TOGGLE_SCRIPT_ELEMENT = "<script language='JavaScript' type='text/javascript' src='js/toggle.js'></script>";
-
-    public static final Object SEARCH_ERROR_JSP = "/templates/parts/search_error.jsp";
-
     
     //public static final String TAB_ENTITIES_LIST_JSP = "templates/tab/tabEntities.jsp";
 

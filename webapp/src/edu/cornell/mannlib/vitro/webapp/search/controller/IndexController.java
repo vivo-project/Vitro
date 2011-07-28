@@ -8,13 +8,14 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeSiteAdminPage;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 
 /**
@@ -24,24 +25,25 @@ import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
  *
  * That IndexBuilder will be associated with a object that implements the IndexerIface.
  *
- * An example of the IndexerIface is LuceneIndexer.
- * An example of the IndexBuilder and LuceneIndexer getting setup is in LuceneSetup.
+ * An example of the IndexerIface is SolrIndexer.
+ * An example of the IndexBuilder and SolrIndexer setup is in SolrSetup.
  *
  * @author bdc34
  */
 public class IndexController extends FreemarkerHttpServlet {
 	
 	private static final Log log = LogFactory.getLog(IndexController.class);
+
+    public static final Actions REQUIRED_ACTIONS = new Actions(new UseMiscellaneousAdminPages());
+    
+	@Override
+	protected Actions requiredActions(VitroRequest vreq) {
+		return new Actions(new UseMiscellaneousAdminPages());
+	}
 	
     @Override
     protected String getTitle(String siteName, VitroRequest vreq) {
         return "Full Search Index Rebuild";
-    }
-    
-    @Override
-    protected int requiredLoginLevel() {
-        // User must be logged in to view this page.
-        return LoginStatusBean.DBA;
     }
     
     @Override
@@ -56,13 +58,13 @@ public class IndexController extends FreemarkerHttpServlet {
                 builder.doIndexRebuild();
             }
             
-        } catch (IndexingException e) {
+        } catch (Exception e) {
         	log.error("Error rebuilding search index",e);
         	body.put("errorMessage", "There was an error while rebuilding the search index. " + e.getMessage());
         	return new ExceptionResponseValues(Template.ERROR_MESSAGE.toString(), body, e);            
         }
         
-        body.put("message","Rebuilding of index started."); 
+        body.put("message","Rebuild of search index started. A message will be written to the vivo log when indexing is complete."); 
         return new TemplateResponseValues(Template.MESSAGE.toString(), body);
     }
 }

@@ -24,7 +24,6 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.AtomicOntologyChange.AtomicChangeType;
 
 /**  
@@ -145,8 +144,6 @@ public class ABoxUpdater {
 		   // the autolinking annotation should be rewritten using the 
 		   // new class name.
 		   
-		   Property autoLinkedToTab = ResourceFactory.createProperty(VitroVocabulary.TAB_AUTOLINKEDTOTAB);
-		   
 		   StmtIterator iter = aboxModel.listStatements(oldClass, (Property) null, (RDFNode) null);
 
 		   int renameCount = 0;
@@ -160,12 +157,6 @@ public class ABoxUpdater {
 				   // This happens in cases where a class hasn't really
 				   // been removed, but we just want to map any ABox
 				   // data using it to use a different class instead.
-			   }
-			   if (autoLinkedToTab.equals(oldStatement.getPredicate())) {
-				   renameCount++;
-				   Statement newStatement = ResourceFactory.createStatement(newClass, oldStatement.getPredicate(), oldStatement.getObject());
-				   additions.add(newStatement);
-				   retractions.add(oldStatement);
 			   } else {
 				   removeCount++;
 				   retractions.add(oldStatement);
@@ -353,75 +344,26 @@ public class ABoxUpdater {
 
 	    Model retractions = ModelFactory.createDefaultModel();
 		
-		// Remove statements where the deleted class is the subject  (e.g. statements with vitro annotation properties as the predicate)
-		aboxModel.enterCriticalSection(Lock.WRITE);
-	    try {
-	       int count = 0;
-		   StmtIterator iter = aboxModel.listStatements(deletedClass, (Property) null, (RDFNode) null);
-		   
-		   while (iter.hasNext()) {
-			   Statement oldStatement = iter.next();
-			   count++;
-			   retractions.add(oldStatement);
-			   //logChange(oldStatement, false);
-		   }
-		   
-		   if (count > 0) {
-			   logger.log("Removed " + count + " subject reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class");
-		   }
-		} finally {
-			aboxModel.leaveCriticalSection();
-		}
-
 		// Remove instances of the deleted class
 		aboxModel.enterCriticalSection(Lock.WRITE);
 	    try {
-	    	int count = 0;
-	    	StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, deletedClass);
+	       int count = 0;
+	       StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, deletedClass);
 
-    		while (iter.hasNext()) {
+    	   while (iter.hasNext()) {
 			   count++;
 			   Statement typeStmt = iter.next();
 			   retractions.add(typeStmt);
-
-			   StmtIterator iter2 = aboxModel.listStatements(typeStmt.getSubject(), (Property) null, (RDFNode) null);
-			   while (iter2.hasNext()) {
-				   retractions.add(iter2.next());
-			   }   
-		   }
+		   }   
 		   
 		   //log summary of changes
 		   if (count > 0) {
-			   logger.log("Removed " + count + " instance" + ((count > 1) ? "s" : "") + " of the "  + deletedClass.getURI() + " class");
+			   logger.log("Removed " + count + " " + deletedClass.getURI() + " type assertion" + ((count > 1) ? "s" : ""));
 		   }
 		   
 		   aboxModel.remove(retractions);
 		   record.recordRetractions(retractions);		
 		   
-		} finally {
-			aboxModel.leaveCriticalSection();
-		}
-
-	    // Remove other object references to the deleted class - what would these be? nothing, I think.
-		aboxModel.enterCriticalSection(Lock.WRITE);
-	    try {
-	       int count = 0;
-	       StmtIterator iter = aboxModel.listStatements((Resource) null, (Property) null, deletedClass);
-   
-		   while (iter.hasNext()) {
-			   count++;
-			   Statement oldStatement = iter.next();
-			   retractions.add(oldStatement);
-			   //logChange(oldStatement, false);
-		   }
-		   
-		   //log summary of changes
-		   if (count > 0) {
-			   logger.log("Removed " + count + " object reference" + ((count > 1) ? "s" : "") + " to the "  + deletedClass.getURI() + " class");
-		   }
-
-		   aboxModel.remove(retractions);
-		   record.recordRetractions(retractions);		   
 		} finally {
 			aboxModel.leaveCriticalSection();
 		}
@@ -433,14 +375,18 @@ public class ABoxUpdater {
 		while(propItr.hasNext()){
 			AtomicOntologyChange propChangeObj = propItr.next();
 			switch (propChangeObj.getAtomicChangeType()){
-			case ADD: addProperty(propChangeObj);
-			break;
-			case DELETE: deleteProperty(propChangeObj);
-			break;
-			case RENAME: renameProperty(propChangeObj);
-			break;
-			default: logger.logError("unexpected change type indicator: " + propChangeObj.getAtomicChangeType());
-			break;
+			  case ADD: 
+			   addProperty(propChangeObj);
+			   break;
+			case DELETE: 
+			   deleteProperty(propChangeObj);
+			   break;
+			case RENAME: 
+			   renameProperty(propChangeObj);
+			   break;
+			default: 
+			   logger.logError("unexpected change type indicator: " + propChangeObj.getAtomicChangeType());
+			   break;
 		    }		
 		}
 	}

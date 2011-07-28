@@ -10,6 +10,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Keyword;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
 
 public interface IndividualDao extends ObjectSourceIface {
@@ -87,53 +88,24 @@ public interface IndividualDao extends ObjectSourceIface {
     /**
      * Returns an Iterator over all Individuals in the model that are user-viewable.
      */
-    public abstract Iterator<Individual> getAllOfThisTypeIterator();
-
-    /**
-     * Returns an Iterator over all Individuals in the model that are user-viewable and of the specified VClass URI.
-     * @param vClassURI
-     * @return
-     */
-    public abstract Iterator<Individual> getAllOfThisVClassIterator(String vClassURI);
+    public abstract Iterator<String> getAllOfThisTypeIterator();
 
     /**
      * Returns an Iterator over all Individuals in the model that are user-viewable and have been updated since the specified time.
      */
-    public abstract Iterator<Individual> getUpdatedSinceIterator(long updatedSince);
-
-        int getCountOfIndividualsInVClass(String vclassURI );
+    public abstract Iterator<String> getUpdatedSinceIterator(long updatedSince);
 
     public boolean isIndividualOfClass(String vclassURI, String indURI);
     
     /**
      * Returns a list of individuals with the given value for the given dataProperty.  If
      * there are no Indiviuals that fit the criteria then an empty list is returned.
-     * 
-     * @param dataPropertyUri
-     * @param value
-     * @return
      */
     public List<Individual> getIndividualsByDataProperty(String dataPropertyUri, String value);
 
     public List<Individual> getIndividualsByDataProperty(String dataPropertyUri, String value, String datatypeUri, String lang);
     
 	void fillVClassForIndividual(Individual individual);
-
-	List<String> monikers(String vclassURI);
-
-	List<String> getKeywordsForIndividual(String individualURI);
-
-	List<String> getKeywordsForIndividualByMode(String individualURI,
-			String modeStr);
-
-	List<Keyword> getKeywordObjectsForIndividual(String individualURI);
-
-	/** In most cases, it's best to let ExternalAuthHelper call this for you. */
-	String getIndividualURIFromNetId(String netIdStr, String netidMatchingPropertyUri);
-
-	String getNetId(String entityURI);
-
-	String getStatus(String entityURI);
 
 	/**
 	 * Standard way to get a new URI that is not yet used.
@@ -143,12 +115,6 @@ public interface IndividualDao extends ObjectSourceIface {
 	 */
 	String getUnusedURI(Individual individual) throws InsertException;
 	
-    @Deprecated
-    public abstract Individual getIndividualByExternalId(int externalIdType,
-                                                         String externalIdValue);
-
-    @Deprecated
-    Individual getIndividualByExternalId(int externalIdType,
-                                         String externalIdValue,
-                                         String vClassURI);
+	EditLiteral getLabelEditLiteral(String individualUri);
+	
 }

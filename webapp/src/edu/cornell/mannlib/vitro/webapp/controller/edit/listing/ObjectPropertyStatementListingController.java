@@ -13,11 +13,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vedit.beans.ButtonForm;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
@@ -28,18 +28,12 @@ public class ObjectPropertyStatementListingController extends
 		BaseEditController {
 	
    public void doGet(HttpServletRequest request, HttpServletResponse response) {
+       if (!isAuthorizedToDisplayPage(request, response, new Actions(new EditOntology()))) {
+       	return;
+       }
+
         VitroRequest vrequest = new VitroRequest(request);
-        Portal portal = vrequest.getPortal();
 
-        if(!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request, response);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-        
         boolean assertedStatementsOnly = false;
      
         String assertParam = request.getParameter("assertedStmts");
@@ -126,19 +120,19 @@ public class ObjectPropertyStatementListingController extends
         	Individual subj = iDao.getIndividualByURI(ops.getSubjectURI());
         	Individual obj = iDao.getIndividualByURI(ops.getObjectURI());
         	results.add("XX");
-        	results.add(ListingControllerWebUtils.formatIndividualLink(subj,portal));
+        	results.add(ListingControllerWebUtils.formatIndividualLink(subj));
         	if (showVClasses) {
 				try {
-					results.add(ListingControllerWebUtils.formatVClassLinks(subj.getVClasses(true),portal));
+					results.add(ListingControllerWebUtils.formatVClassLinks(subj.getVClasses(true)));
 				} catch (Exception e) {
 					results.add("?");
 				}
 			}
         	results.add(op.getDomainPublic());
-        	results.add(ListingControllerWebUtils.formatIndividualLink(obj,portal));
+        	results.add(ListingControllerWebUtils.formatIndividualLink(obj));
             if (showVClasses) {
 				try {
-					results.add(ListingControllerWebUtils.formatVClassLinks(obj.getVClasses(true),portal));
+					results.add(ListingControllerWebUtils.formatVClassLinks(obj.getVClasses(true)));
 				} catch (Exception e) {
 					results.add("?");
 				}
@@ -163,19 +157,15 @@ public class ObjectPropertyStatementListingController extends
         }
         request.setAttribute("suppressquery","true");
         request.setAttribute("title","Object Property Statements");
-        request.setAttribute("portalBean",portal);
         request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
-        request.setAttribute("home", portal.getPortalId());
         // new way of adding more than one button
         List <ButtonForm> buttons = new ArrayList<ButtonForm>();
         HashMap<String,String> newPropParams=new HashMap<String,String>();
         newPropParams.put("controller", "Property");
-        newPropParams.put("home", String.valueOf(portal.getPortalId()));
         ButtonForm newPropButton = new ButtonForm(Controllers.RETRY_URL,"buttonForm","Add new object property",newPropParams);
         buttons.add(newPropButton);
         HashMap<String,String> rootPropParams=new HashMap<String,String>();
         rootPropParams.put("iffRoot", "true");
-        rootPropParams.put("home", String.valueOf(portal.getPortalId()));
         ButtonForm rootPropButton = new ButtonForm("showObjectPropertyHierarchy","buttonForm","root properties",rootPropParams);
         buttons.add(rootPropButton);
         request.setAttribute("topButtons", buttons);

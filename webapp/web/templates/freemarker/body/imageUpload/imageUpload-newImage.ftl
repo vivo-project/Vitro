@@ -2,10 +2,10 @@
 
 <#-- Upload a replacement main image for an Individual. -->
 
-${scripts.add("/js/jquery.js")}
-${scripts.add("/js/imageUpload/imageUploadUtils.js")}
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery.js"></script>',
+              '<script type="text/javascript" src="${urls.base}/js/imageUpload/imageUploadUtils.js"></script>')}
 
-${stylesheets.add("/css/uploadImages.css")}
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/uploadImages.css" />')}
 
 <section id="photoUploadContainer" role="region">
     <h2>Photo Upload</h2>
@@ -26,6 +26,8 @@ ${stylesheets.add("/css/uploadImages.css")}
         <label>Upload a photo <span> (JPEG, GIF or PNG)</span></label>
         
         <input id="datafile" type="file" name="datafile" size="30" />
+         <p class="note">Maximum file size: ${maxFileSize} megabytes<br />
+        Minimum image dimensions: ${thumbnailWidth} x ${thumbnailHeight} pixels</p>
         <input class="submit" type="submit" value="Upload photo"/>
         
         <span class="or"> or <a class="cancel"  href="${cancelUrl}">Cancel</a></span>

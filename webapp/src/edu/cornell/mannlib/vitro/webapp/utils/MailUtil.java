@@ -4,31 +4,30 @@ package edu.cornell.mannlib.vitro.webapp.utils;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 
 public class MailUtil {
 	private static final Log log = LogFactory.getLog(MailUtil.class);
+	private final HttpServletRequest req;
 	
-	 	private String smtpHost = null;
-        public MailUtil(){
-        	smtpHost = getSmtpHostFromProperties();
-        }
+		public MailUtil(HttpServletRequest req) {
+			this.req = req;
+		}
         
         public void sendMessage(String messageText, String subject, String from, String to, List<String> deliverToArray) throws IOException{
-        	Properties props = System.getProperties();
-            props.put("mail.smtp.host", smtpHost);
-            Session s = Session.getDefaultInstance(props,null);
+        	
+            Session s = FreemarkerEmailFactory.getEmailSession(req);
             
             try{
             	
@@ -67,20 +66,4 @@ public class MailUtil {
             }
         }
         
-        public boolean isSmtpHostConfigured() {
-            if( smtpHost==null || smtpHost.equals("")) {
-                return false;
-            }
-            return true;
-        }
-
-    	private String getSmtpHostFromProperties() {
-    		String host = ConfigurationProperties.getProperty("Vitro.smtpHost");
-    		if (host != null && !host.equals("")) {
-    			log.debug("Found Vitro.smtpHost value of " + host);
-    		} else {
-    			log.error("No Vitro.smtpHost specified");
-    		}
-    		return (host != null && host.length() > 0) ? host : null;
-    	}
 }

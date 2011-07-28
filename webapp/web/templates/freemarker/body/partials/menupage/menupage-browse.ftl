@@ -2,6 +2,8 @@
 
 <#-- Template for browsing individuals in class groups for menupages -->
 
+<#import "lib-string.ftl" as str>
+
 <section id="browse-by" role="region">
     <nav role="navigation">
         <ul id="browse-classes">
@@ -11,14 +13,15 @@
                 to degrade gracefully in absence of JavaScript. Something
                 similar to what Brian had setup with widget-browse.ftl
                 ------------------------------------------------------------->
-                <#assign vClassCamel = vClass.name?capitalize?replace(" ", "")?uncap_first />
+                <#assign vClassCamel = str.camelCase(vClass.name) />
                 <#-- Only display vClasses with individuals -->
                 <#if (vClass.entityCount > 0)>
                     <li id="${vClassCamel}"><a href="#${vClassCamel}" title="Browse all individuals in this class" data-uri="${vClass.URI}">${vClass.name} <span class="count-classes">(${vClass.entityCount})</span></a></li>
                 </#if>
             </#list>
         </ul>
-        <nav role="navigation">
+        <nav id="alpha-browse-container" role="navigation">
+            <h3 class="selected-class"></h3>
             <#assign alphabet = ["A", "B", "C", "D", "E", "F", "G" "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"] />
             <ul id="alpha-browse-individuals">
                 <li><a href="#" class="selected" data-alpha="all">All</a></li>

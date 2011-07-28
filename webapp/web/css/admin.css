@@ -3,7 +3,6 @@
 /* Admin Dashboard */
 
 #adminDashboard {
-    margin-top: 1em;
     display: inline-block;
     width: 100%;
 }
@@ -12,8 +11,7 @@
     clear: right;
     display: inline-block;
     width: 45%;
-    margin-top: 2em;
-    margin-bottom: 1em;
+    margin: 1em 0;
     padding: 0 1em;
 }
 #adminDashboard .pageBodyGroup h4 {

@@ -23,7 +23,8 @@ import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.util.FormUtils;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -102,15 +103,9 @@ public class RefactorRetryController extends BaseEditController {
 	}
 	
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
-		
-	    if(!checkLoginStatus(request,response))
-	        return;
-	
-	    try {
-	        super.doGet(request,response);
-	    } catch (Exception e) {
-	        log.error(this.getClass().getName()+" encountered exception calling super.doGet()");
-	    }
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new EditOntology()))) {
+        	return;
+        }
 	
 	    //create an EditProcessObject for this and put it in the session
 	    EditProcessObject epo = super.createEpo(request);

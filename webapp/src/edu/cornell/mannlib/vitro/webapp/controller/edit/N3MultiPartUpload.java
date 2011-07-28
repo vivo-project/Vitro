@@ -33,16 +33,15 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Generator;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.Field;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Generator;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditSubmission;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 import edu.cornell.mannlib.vitro.webapp.utils.MailUtil;
 
@@ -86,28 +85,27 @@ public class N3MultiPartUpload extends VitroHttpServlet {
      */
     @Override
     public void init() throws ServletException {
-        super.init();
-        
-            fileUriPrefix = ConfigurationProperties.getProperty("n3.defaultUriPrefix",
-                    DEFAULT_FILE_URI_PREFIX);
-            baseDirectoryForFiles = ConfigurationProperties.getProperty("n3.baseDirectoryForFiles",
-                    DEFAULT_BASE_DIR);
+		ConfigurationProperties configProperties = ConfigurationProperties
+				.getBean(getServletContext());
 
-            String postUploadProcess = ConfigurationProperties.getProperty("n3.postUploadProcess");
-            System.out.println("Attempting to load postUploadProcess "
-                    + postUploadProcess);
-            postUpload = getPostUpload(postUploadProcess);
+		fileUriPrefix = configProperties.getProperty("n3.defaultUriPrefix",
+				DEFAULT_FILE_URI_PREFIX);
+		baseDirectoryForFiles = configProperties.getProperty(
+				"n3.baseDirectoryForFiles", DEFAULT_BASE_DIR);
 
-            String maxSize = ConfigurationProperties.getProperty("n3.maxSize", Long
-                    .toString(DEFAULT_MAX_SIZE));
-            //DEBUG ADDED
-            System.out.println("Max size is " + maxSize);
-            try {
-                maxFileSize = Integer.parseInt(maxSize);
-            } catch (NumberFormatException nfe) {
-                log.error(nfe);
-                maxFileSize = DEFAULT_MAX_SIZE;
-            }
+		String postUploadProcess = configProperties.getProperty("n3.postUploadProcess");
+		System.out.println("Attempting to load postUploadProcess "
+				+ postUploadProcess);
+		postUpload = getPostUpload(postUploadProcess);
+
+		String maxSize = configProperties.getProperty("n3.maxSize",	Long.toString(DEFAULT_MAX_SIZE));
+		log.debug("Max size is " + maxSize);
+		try {
+			maxFileSize = Integer.parseInt(maxSize);
+		} catch (NumberFormatException nfe) {
+			log.error(nfe);
+			maxFileSize = DEFAULT_MAX_SIZE;
+		}
     }
 
     @Override
@@ -277,8 +275,7 @@ public class N3MultiPartUpload extends VitroHttpServlet {
                 }
                 if (postUploadSuccess) {
                     /* **** Save the models for all the files **** */
-                    String editorUri = EditN3Utils.getEditorUri(request,
-                            session, application);
+                    String editorUri = EditN3Utils.getEditorUri(request);
                     Lock lock = null;
                     try {
                         lock = jenaOntModel.getLock();
@@ -509,15 +506,17 @@ public class N3MultiPartUpload extends VitroHttpServlet {
     }
     
     public void sendUserEmail(HttpServletRequest request, HttpSession session, String uploadFileName) {
-        LoginStatusBean loginBean = LoginStatusBean.getBean(request);
-        String userURI = loginBean.getUserURI();
+    	UserAccount userAccount = LoginStatusBean.getCurrentUser(request);
+    	if (userAccount == null) {
+    		return;
+    	}
+    	
         try{
-	        System.out.println("User URI is " + userURI);
-	        UserDao uDao = (new VitroRequest(request)).getFullWebappDaoFactory().getUserDao();
-	        String email = uDao.getUserEmailAddress(userURI);
+	        System.out.println("User URI is " + userAccount.getUri());
+	        String email = userAccount.getEmailAddress();
 	        String deliveryFrom = "hjk54@cornell.edu";//TO DO: replace with email address to be used
 	        //Now send message
-	        MailUtil mu = new MailUtil();
+	        MailUtil mu = new MailUtil(request);
 	        List<String> deliverToArray = new ArrayList<String>();
 	        deliverToArray.add(email);
 	        

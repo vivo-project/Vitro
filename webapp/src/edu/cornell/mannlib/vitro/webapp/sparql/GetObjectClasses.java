@@ -14,6 +14,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousPages;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
@@ -48,15 +50,11 @@ public class GetObjectClasses extends BaseEditController {
 	 */
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		try {
-			super.doGet(request, response);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		if( !checkLoginStatus(request, response) )
+		if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseMiscellaneousPages()))) {
         	return;
-		VitroRequest vreq = new VitroRequest(request);
+		}
 
+		VitroRequest vreq = new VitroRequest(request);
 
 		String predicate = vreq.getParameter("predicate");
 		if (predicate == null || predicate.trim().equals("")) {

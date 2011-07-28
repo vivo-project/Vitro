@@ -2,7 +2,7 @@
 
 <#-- Template for the Revision Information page. -->
 
-${stylesheets.add("/css/revision.css")} 
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/revision.css" />')}
 
 <section role="region">
     <h2>Revision Information</h2>

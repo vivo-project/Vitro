@@ -7,7 +7,6 @@ import java.io.StringReader;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,69 +20,30 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.shared.Lock;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;
 
-public class PrimitiveRdfEdit extends FreemarkerHttpServlet{
+public class PrimitiveRdfEdit extends VitroAjaxController {
 
     private static final long serialVersionUID = 1L;
 
-    @Override
-    protected String getTitle(String siteName, VitroRequest vreq) {
-        return "RDF edit";
-    }
-
-    @Override
-    protected int requiredLoginLevel() {
-        return LoginStatusBean.EDITOR;
-    }
+	/**
+	 * No need to restrict authorization here. doRequest() will return an error
+	 * if the user is not authorized.
+	 */
+	@Override
+	protected Actions requiredActions(VitroRequest vreq) {
+		return Actions.AUTHORIZED;
+	}
     
     @Override
-    protected ResponseValues processRequest(VitroRequest vreq) {
-        return new TemplateResponseValues("primitiveRdfEdit.ftl");
-    }
-    
-    @Override
-    public void doPost(HttpServletRequest request,
+    protected void doRequest(VitroRequest vreq,
             HttpServletResponse response) throws ServletException, IOException {
-        
-        VitroRequest vreq = new VitroRequest(request);
-        if( !LoginStatusBean.getBean(request).isLoggedIn()){
-            doError(response,"You must be logged in to use this servlet.",HttpStatus.SC_UNAUTHORIZED);
-            return;
-        }
-        
-//        PolicyIface policy = RequestPolicyList.getPolicies( request );
-//        
-//        if( policy == null || ( policy instanceof PolicyList && ((PolicyList)policy).size() == 0 )){
-//            policy = ServletPolicyList.getPolicies( getServletContext() );
-//            if( policy == null || ( policy instanceof PolicyList && ((PolicyList)policy).size() == 0 )){            
-//                log.debug("No policy found in request at " + RequestPolicyList.POLICY_LIST);
-//                doError(response, "no policy found.",500);
-//                return;                
-//            }
-//        }              
-//        
-//        IdentifierBundle ids = (IdentifierBundle)ServletIdentifierBundleFactory
-//            .getIdBundleForRequest(request,request.getSession(false),getServletContext());
-//        
-//        if( ids == null ){
-//            log.error("No IdentifierBundle objects for request");
-//            doError(response,"no identifiers found",500);
-//            return;
-//        }
-        
-        processRequest(vreq, response);
-
-    }
-    
-    protected void processRequest(VitroRequest vreq, HttpServletResponse response) {
         
         //Test error case
         /*
@@ -121,78 +81,62 @@ public class PrimitiveRdfEdit extends FreemarkerHttpServlet{
             return;
         }
 
-
-        //check permissions     
-        //TODO: (bdc34)This is not yet implemented, must check the IDs against the policies for permissons before doing an edit!
-        // rjy7 put policy check in separate method so subclasses can inherit
-        boolean hasPermission = true;
-        
-        if( !hasPermission ){
-            //if not okay, send error message
-            doError(response,"Insufficent permissions.",HttpStatus.SC_UNAUTHORIZED);
-            return;
-        }
-
-        ServletContext sc = getServletContext();
-        String editorUri = EditN3Utils.getEditorUri(vreq, vreq.getSession(false), sc);           
+        String editorUri = EditN3Utils.getEditorUri(vreq);           
         try {
-            processChanges( additions, retractions, getWriteModel(vreq),getQueryModel(vreq), editorUri);
+			Model a = mergeModels(additions);
+			Model r = mergeModels(retractions);
+
+			Model toBeAdded = a.difference(r);
+			Model toBeRetracted = r.difference(a);
+
+			Model depResRetractions = DependentResourceDeleteJena
+					.getDependentResourceDeleteForChange(toBeAdded,
+							toBeRetracted, getWriteModel(vreq));
+			toBeRetracted.add(depResRetractions);
+        	
+        	if (!isAuthorized(vreq, toBeAdded, toBeRetracted)) {
+        		doError(response, "Not authorized for these RDF edits", HttpStatus.SC_UNAUTHORIZED);
+        		return;
+        	}
+        	
+        	processChanges(editorUri, getWriteModel(vreq), toBeAdded, toBeRetracted);
         } catch (Exception e) {
             doError(response,e.getMessage(),HttpStatus.SC_INTERNAL_SERVER_ERROR);
         }           
         
     }
-    
-    protected void processChanges(Set<Model> additions, Set<Model> retractions, OntModel writeModel, OntModel queryModel, String editorURI ) throws Exception{
-        Model a = com.hp.hpl.jena.rdf.model.ModelFactory.createDefaultModel();
-        for(Model m : additions)
-            a.add(m);
-        
-        Model r = com.hp.hpl.jena.rdf.model.ModelFactory.createDefaultModel();
-        for(Model m : retractions)
-            r.add(m);
-        
-        processChanges(a,r,writeModel,queryModel,editorURI);
-               
-    }
-    
-    protected void processChanges(Model additions, Model retractions, OntModel writeModel, OntModel queryModel, String editorURI ) throws Exception{        
-        /*
-         * Do a diff on the additions and retractions and then only add the delta to the jenaOntModel.
-         */            
-        Model assertionsAdded = additions.difference( retractions );    
-        Model assertionsRetracted = retractions.difference( additions );
-            
-        Model depResRetractions = 
-            DependentResourceDeleteJena
-              .getDependentResourceDeleteForChange(assertionsAdded, assertionsRetracted, queryModel);
-        assertionsRetracted.add( depResRetractions );                     
-         
-        Lock lock = null;
-        try{
-            lock =  writeModel.getLock();
-            lock.enterCriticalSection(Lock.WRITE);
-            writeModel.getBaseModel().notifyEvent(new EditEvent(editorURI,true));   
-            writeModel.add( assertionsAdded );
-            writeModel.remove( assertionsRetracted );
-        }catch(Throwable t){
-            throw new Exception("Error while modifying model \n" + t.getMessage());     
-        }finally{
-            writeModel.getBaseModel().notifyEvent(new EditEvent(editorURI,false));
-            lock.leaveCriticalSection();
-        }        
-    }
-    
 
+	private boolean isAuthorized(VitroRequest vreq, Model toBeAdded, Model toBeRetracted) {
+		return PolicyHelper.isAuthorizedToAdd(vreq, toBeAdded)
+				&& PolicyHelper.isAuthorizedToDrop(vreq, toBeRetracted);
+	}
+
+	/** Package access to allow for unit testing. */
+	void processChanges(String editorUri, OntModel writeModel,
+			Model toBeAdded, Model toBeRetracted) throws Exception {
+		Lock lock = writeModel.getLock();
+		try {
+			lock.enterCriticalSection(Lock.WRITE);
+			writeModel.getBaseModel().notifyEvent(new EditEvent(editorUri, true));
+			writeModel.add(toBeAdded);
+			writeModel.remove(toBeRetracted);
+		} catch (Throwable t) {
+			throw new Exception("Error while modifying model \n" + t.getMessage());
+		} finally {
+			writeModel.getBaseModel().notifyEvent(new EditEvent(editorUri, false));
+			lock.leaveCriticalSection();
+		}
+	}
 
     /**
      * Convert the values from a parameters into RDF models.
+     * 
+     * Package access to allow for unit testing.
+     * 
      * @param parameters - the result of request.getParameters(String)
      * @param format - a valid format string for Jena's Model.read()
-     * @return 
-     * @throws Exception
      */
-    protected Set<Model> parseRdfParam(String[] parameters, String format) throws Exception{
+    Set<Model> parseRdfParam(String[] parameters, String format) throws Exception{
         Set<Model> models = new HashSet<Model>();               
         for( String param : parameters){
             try{
@@ -207,34 +151,23 @@ public class PrimitiveRdfEdit extends FreemarkerHttpServlet{
         }
         return models;
     }
-    
-    protected void doError(HttpServletResponse response, String errorMsg, int httpstatus){
-        response.setStatus(httpstatus);
-        try {
-            response.getWriter().write(errorMsg);
-        } catch (IOException e) {
-            log.debug("IO exception during output",e );
-        }
-    }
-    
-    protected OntModel getWriteModel(HttpServletRequest request){
+
+    private OntModel getWriteModel(HttpServletRequest request){
         HttpSession session = request.getSession(false);
         if( session == null || session.getAttribute("jenaOntModel") == null )
             return (OntModel)getServletContext().getAttribute("jenaOntModel");
         else
             return (OntModel)session.getAttribute("jenaOntModel");
     }
-    
-    protected OntModel getQueryModel(HttpServletRequest request){
-        return getWriteModel(request);
-    }
-    
+
+	/** Package access to allow for unit testing. */
+	Model mergeModels(Set<Model> additions) {
+		Model a = com.hp.hpl.jena.rdf.model.ModelFactory.createDefaultModel();
+		for (Model m : additions) {
+			a.add(m);
+		}
+		return a;
+	}
+
     Log log = LogFactory.getLog(PrimitiveRdfEdit.class.getName());
-
-
-    static public boolean checkLoginStatus(HttpServletRequest request){
-    	return LoginStatusBean.getBean(request).isLoggedIn();
-    }
-
-
 }

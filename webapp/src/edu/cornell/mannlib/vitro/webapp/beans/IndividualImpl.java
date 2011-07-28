@@ -2,16 +2,24 @@
 
 package edu.cornell.mannlib.vitro.webapp.beans;
 
+import java.lang.reflect.Method;
+import java.sql.Timestamp;
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
-
-import java.lang.reflect.Method;
-import java.sql.Timestamp;
-import java.text.Collator;
-import java.util.*;
 
 /**
  * Represents a single entity record.
@@ -31,9 +39,6 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     protected VClass vClass = null;
     protected List<VClass> directVClasses = null;
     protected List<VClass> allVClasses = null;
-    protected Date sunrise = null;
-    protected Date sunset = null;
-    protected Date timekey = null;
     protected Timestamp modTime = null;
     protected List <ObjectProperty>propertyList = null;
     protected List<ObjectProperty> populatedObjectPropertyList = null;
@@ -46,20 +51,10 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     protected List <ObjectPropertyStatement>rangeEnts2Ents = null;
     protected List <DataPropertyStatement>externalIds = null;
 
-    protected String moniker = null;
-    protected String url = null;
-    protected String description = null;
-    protected String anchor = null;
-    protected String blurb = null;
     protected String mainImageUri = NOT_INITIALIZED;
     protected ImageInfo imageInfo = null;
-    protected int statusId = 0;
-    protected String status = null;
-    protected List <Link>linksList = null;
-    protected Link primaryLink = null;
-    protected List<String> keywords=null;
-    protected List<Keyword> keywordObjects=null;
     protected Float searchBoost;
+    protected String searchSnippet;
     
     /** indicates if sortForDisplay has been called  */
     protected boolean sorted = false;
@@ -86,22 +81,9 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
 
     public String getRdfsLabel(){ return rdfsLabel; }
     public void setRdfsLabel(String s){ rdfsLabel = s; }    	
-    
-//     private String modTime = null;
-//     public String getModtime(){return modTime;}
-//     public void setModtime(String in){modTime=in;}
 
     public String getVClassURI(){return vClassURI;}
     public void setVClassURI(String in){vClassURI=in;}
-
-    public Date getSunrise(){return sunrise;}
-    public void setSunrise(Date in){sunrise=in;}
-
-    public Date getSunset(){return sunset;}
-    public void setSunset(Date in){sunset=in;}
-
-    public Date getTimekey(){return timekey;}
-    public void setTimekey(Date in){timekey=in;}
 
     /**
      * Returns the last time this object was changed in the model.
@@ -271,26 +253,6 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     public void setExternalIds(List<DataPropertyStatement> externalIds){
         this.externalIds = externalIds;
     }
-
-
-    public String getMoniker(){return moniker;}
-    public void setMoniker(String in){moniker=in;}
-
-    public String getDescription(){return description;}
-    public void setDescription(String in){description=in;}
-
-    public String getAnchor(){return anchor;}
-    public void setAnchor(String in){anchor=in;}
-
-    public String getBlurb(){return blurb;}
-    public void setBlurb(String in){blurb=in;}
-    
-    public int getStatusId(){return statusId;}
-    public void setStatusId(int in){statusId=in;}
-
-    public String getStatus()         {return status;}
-    public void   setStatus(String s) {status=s;     }
-
     
 	@Override
 	public String getMainImageUri() {
@@ -313,108 +275,11 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
 		return "thumbUrl";
 	}
 
-	public String getUrl() {
-        return url;
-    }
-    public void setUrl(String url) {
-        this.url = url;
-    }
-    public List<Link> getLinksList() {
-        return linksList;
-    }
-    public void setLinksList(List <Link>linksList) {
-        this.linksList = linksList;
-    }
-    
-    public Link getPrimaryLink() {
-        return primaryLink;
-    }
-    
-    public void setPrimaryLink(Link link) {
-        primaryLink = link;
-    }
-    
-    
-    /* look at PortalFlag.numeric2numerics if you want to know which
-     * bits are set in a numeric flag.
-     *
-     * NOTICE:
-     * Values set Entity.getFlagXNumeric() will NOT be saved to the model.
-     *
-     * Also, changes to an entity flag state using Entity.setFlagXNumeric()
-     * are not reflected in Entity.getFlagXSet() and vice versa.
-     */
-    protected String flag1Set = null;
-    public String getFlag1Set(){return flag1Set;}
-    public void setFlag1Set(String in){flag1Set=in;}
-
-    protected int flag1Numeric = -1;
-    public int getFlag1Numeric(){return flag1Numeric;}
-    public void setFlag1Numeric(int i){flag1Numeric=i;}
-
-    /* Consider the flagBitMask as a mask to & with flags.
-   if flagBitMask bit zero is set then return true if
-   the individual is in portal 2,
-   if flagBitMask bit 1 is set then return true if
-   the individua is in portal 4
-   etc.
-    */
-    public boolean doesFlag1Match(int flagBitMask) {
-        return (flagBitMask & getFlag1Numeric()) != 0;
-    }
-
-    protected String flag2Set = null;
-    public String getFlag2Set(){return flag2Set;}
-    public void setFlag2Set(String in){flag2Set=in;}
-
-    protected int flag2Numeric = -1;
-    public int getFlag2Numeric(){return flag2Numeric;}
-    public void setFlag2Numeric(int i){flag2Numeric=i;}
-
-    protected String flag3Set = null;
-    public String getFlag3Set(){return flag3Set;}
-    public void setFlag3Set(String in){flag3Set=in;}
-
-    protected int flag3Numeric = -1;
-    public int getFlag3Numeric(){return flag3Numeric;}
-    public void setFlag3Numeric(int i){flag3Numeric=i;}
-
-    public List<String> getKeywords() {     return keywords;    }
-    public void setKeywords(List<String> keywords) {this.keywords = keywords;}
-    public String getKeywordString(){
-        String rv = "";
-        List keywords=getKeywords();
-        if (getKeywords()!=null){
-            Iterator<String> it1 = getKeywords().iterator();
-            TreeSet<String> keywordSet = new TreeSet<String>(new Comparator<String>() {
-                public int compare( String first, String second ) {
-                    if (first==null) {
-                        return 1;
-                    }
-                    if (second==null) {
-                        return -1;
-                    }
-                    Collator collator = Collator.getInstance();
-                    return collator.compare(first,second);
-                }
-            });
-            while( it1.hasNext() ){
-                keywordSet.add(it1.next());
-            }
-            Iterator<String> it2 = keywordSet.iterator();
-            while (it2.hasNext()) {
-                rv+= it2.next();
-                if( it2.hasNext())
-                    rv+=", ";
-            }
-        }
-        return rv;
-    }
-    public List<Keyword> getKeywordObjects() { return keywordObjects; }
-    public void setKeywordObjects(List<Keyword> keywords) {this.keywordObjects = keywords;}
-
     public Float getSearchBoost() { return searchBoost;  }    
     public void setSearchBoost(Float boost) { searchBoost = boost; }
+    
+    public String getSearchSnippet() { return searchSnippet; }
+    public void setSearchSnippet(String snippet) { searchSnippet = snippet; }
     
     /**
      * Sorts the ents2ents records into the proper order for display.
@@ -446,7 +311,6 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     public static final String [] INCLUDED_IN_JSON = {
          "URI",
          "name",
-         "moniker",
          "vClassId"
     };
 
@@ -466,8 +330,6 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
 
        if( "name".equalsIgnoreCase(fieldName) )
            return getName();
-       if( "timekey".equalsIgnoreCase(fieldName) )
-           return getTimekey();
 
        //not one of the more common ones, try reflection
 

@@ -2,6 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.filters;
 
+import static edu.cornell.mannlib.vitro.webapp.controller.VitroRequest.SPECIAL_WRITE_MODEL;
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.CONTEXT_DISPLAY_TBOX;
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.SWITCH_TO_DISPLAY_MODEL;
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.USE_DISPLAY_MODEL_PARAM;
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.USE_MODEL_PARAM;
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.USE_TBOX_MODEL_PARAM;
+
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,36 +22,34 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.query.DataSource;
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.DatasetFactory;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.SelfEditing;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.AccessSpecialDataModels;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
-import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.FilterFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.HiddenFromDisplayBelowRoleLevelFilter;
-import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
+import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.HideFromDisplayByPolicyFilter;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
-import edu.cornell.mannlib.vitro.webapp.flags.AuthFlag;
-import edu.cornell.mannlib.vitro.webapp.flags.FlagException;
-import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
-import edu.cornell.mannlib.vitro.webapp.flags.RequestToAuthFlag;
-import edu.cornell.mannlib.vitro.webapp.flags.SunsetFlag;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 /**
@@ -58,21 +63,15 @@ import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
  *
  */
 public class VitroRequestPrep implements Filter {
-    ServletContext _context;
-    ApplicationBean _appbean;    
-    
-    static FilterFactory filterFactory = null;
-    
-    /**
-     * The filter will be applied to all incoming urls,
-     this is a list of URI patterns to skip.  These are
-     matched against the requestURI sans query paramerts,
-     * ex
-     * "/vitro/index.jsp"
-     * "/vitro/themes/enhanced/css/edit.css"
-     *
-    */
-    Pattern[] skipPatterns = {
+	private static final Log log = LogFactory.getLog(VitroRequestPrep.class.getName());
+
+	/**
+	 * The filter will be applied to all incoming requests, but should skip any
+	 * request whose URI matches any of these patterns. These are matched
+	 * against the requestURI without query parameters, e.g. "/vitro/index.jsp"
+	 * "/vitro/themes/enhanced/css/edit.css"
+	 */
+    private static final Pattern[] skipPatterns = {
             Pattern.compile(".*\\.(gif|GIF|jpg|jpeg)$"),
             Pattern.compile(".*\\.css$"),
             Pattern.compile(".*\\.js$"),
@@ -80,128 +79,90 @@ public class VitroRequestPrep implements Filter {
             Pattern.compile("/.*/images/.*")
     };
 
-    private static final Log log = LogFactory.getLog(VitroRequestPrep.class.getName());
-
-    public void doFilter(ServletRequest  request,
-                          ServletResponse response,
-                          FilterChain     chain)
-    throws IOException, ServletException {
+    private ServletContext _context;
+    private ApplicationBean _appbean;    
+    
+    @Override
+	public void init(FilterConfig filterConfig) throws ServletException {
+        _context = filterConfig.getServletContext();
+        
+        Object o =  _context.getAttribute("applicationBean");
+        if (o instanceof ApplicationBean) {
+            _appbean = (ApplicationBean) o; 
+        } else {
+            _appbean = new ApplicationBean();
+        }
+        log.debug("VitroRequestPrep: AppBean theme " + _appbean.getThemeDir());
+    }    
+    
+    @Override
+	public void doFilter(ServletRequest request, ServletResponse response,
+			FilterChain chain) throws IOException, ServletException {
+    	// If this isn't an HttpServletRequest, we might as well fail now.
+    	HttpServletRequest req = (HttpServletRequest) request;
+    	HttpServletResponse resp = (HttpServletResponse) response;
+    	logRequestUriForDebugging(req);
 
         //don't waste time running this filter again.
-        if( request.getAttribute("VitroRequestPrep.setup") != null ){
+        if( req.getAttribute("VitroRequestPrep.setup") != null ){
             log.debug("VitroRequestPrep has already been executed at least once, not re-executing.");
-            Integer a =(Integer) request.getAttribute("VitroRequestPrep.setup");
-            request.setAttribute("VitroRequestPrep.setup", new Integer( a + 1 ) );
-            chain.doFilter(request, response);
+            Integer a =(Integer) req.getAttribute("VitroRequestPrep.setup");
+            req.setAttribute("VitroRequestPrep.setup", new Integer( a + 1 ) );
+            chain.doFilter(req, response);
             return;
         }
 
+        // don't run this filter for image files, CSS files, etc.
         for( Pattern skipPattern : skipPatterns){
-            Matcher match =skipPattern.matcher( ((HttpServletRequest)request).getRequestURI() );
+            Matcher match =skipPattern.matcher( req.getRequestURI() );
             if( match.matches()  ){
                 log.debug("request matched a skipPattern, skipping VitroRequestPrep"); 
-                chain.doFilter(request, response);
+                chain.doFilter(req, response);
                 return;
             }
         }
+
+        // If we're not authorized for this request, skip the chain and redirect.
+        if (!authorizedForSpecialModel(req)) {
+        	VitroHttpServlet.redirectUnauthorizedRequest(req, resp);
+        	return;
+        }
         
-        VitroRequest vreq = new VitroRequest((HttpServletRequest)request);
-
-		if (log.isDebugEnabled()) {
-			try {
-				String logRequestStr = vreq.getRequestURI();
-				if ( (vreq.getQueryString() != null) && (vreq.getQueryString().length()>0) ) {
-					logRequestStr += "?" + vreq.getQueryString();
-				}
-				log.debug("RequestURI: "+logRequestStr);
-			} catch (Exception e) {
-				// Just in case something goes horribly wrong
-				// Don't want logging to kill the request
-			}
-		}
-
+        VitroRequest vreq = new VitroRequest(req);
+        
         //-- setup appBean --//
         vreq.setAppBean(_appbean);
-
-        //-- setup Authorization flag --/
-        AuthFlag authFlag = RequestToAuthFlag.makeAuthFlag((HttpServletRequest)request);
-        vreq.setAuthFlag(authFlag);
         
-        //-- setup sunserFlag --//
-        SunsetFlag sunsetFlag = new SunsetFlag();
-        if( _appbean != null )
-            sunsetFlag.filterBySunsetDate = _appbean.isOnlyCurrent();
-        vreq.setSunsetFlag(sunsetFlag);
-
         //-- setup DAO factory --//
         WebappDaoFactory wdf = getWebappDaoFactory(vreq);
         //TODO: get accept-language from request and set as preferred languages
         
-        //-- setup portal and portalFlag --//
-        Portal portal = null;
-        PortalFlag portalFlag = null;
-        PortalDao portalDao = wdf.getPortalDao();
-        try{
-            if( request instanceof HttpServletRequest){
-                portal = getCurrentPortalBean((HttpServletRequest)request, true, portalDao);
-                if ( (portal == null) && (response instanceof HttpServletResponse) ) {
-                	((HttpServletResponse)response).sendError(404);
-                	return;
-                }
-                vreq.setPortal(portal);
-                portalFlag = new PortalFlag((HttpServletRequest)request,_appbean, portal, wdf);
-                vreq.setPortalFlag(portalFlag);
-            }
-        }catch(FlagException ex){
-            System.out.println("could not make portal flag" + ex);
+        // if there is a WebappDaoFactory in the session, use it
+    	Object o = req.getSession().getAttribute("webappDaoFactory");
+    	if (o instanceof WebappDaoFactory) {
+    		wdf = (WebappDaoFactory) o;
+    		log.debug("Found a WebappDaoFactory in the session and using it for this request");
+    	}
+    	
+    	//replace the WebappDaoFactory with a different version if menu management parameter is found
+    	wdf = checkForSpecialWDF(vreq, wdf);
+    	
+    	//get any filters from the ContextFitlerFactory
+        VitroFilters filters = getFiltersFromContextFilterFactory(req, wdf);
+        if( filters != null ){
+            log.debug("Wrapping WebappDaoFactory in filters from ContextFitlerFactory");
+            wdf = new WebappDaoFactoryFiltering(wdf, filters);
         }
-                       
-        WebappDaoFactory sessionDaoFactory = null;
-        if (request instanceof HttpServletRequest) {
-        	Object o = ((HttpServletRequest)request).getSession().getAttribute("webappDaoFactory");
-        	if ( (o != null) && (o instanceof WebappDaoFactory) ) {
-        		sessionDaoFactory = (WebappDaoFactory) o;
-        	}
-        }
-        
-        RoleLevel role = RoleLevel.getRoleFromAuth(authFlag);
-        role = role!=null ? role : RoleLevel.PUBLIC;
-        log.debug("setting role to "+role.getShorthand());
-        
-        if (sessionDaoFactory != null) {
-        	log.debug("Found a WebappDaoFactory in the session and using it for this request");
-        	wdf = sessionDaoFactory;
-        } else if (portal.getWebappDaoFactory() != null) {
-            log.debug("Found a WebappDaoFactory in the portal and using it for this request");
-        	wdf = portal.getWebappDaoFactory();  // BJL 2008-03-05 : I'm trying this out for portals that filter by having their own submodel        	
-        } else {        	
-	        VitroFilters filters = null;
-			        
-	        filters = getFiltersFromContextFilterFactory((HttpServletRequest)request, wdf);
-	        
-	        if( wdf.getApplicationDao().isFlag1Active() && (portalFlag != null) ){
-	            VitroFilters portalFilter = 
-	                VitroFilterUtils.getFilterFromPortalFlag(portalFlag);
-	            if( filters != null ) 	                
-	                filters = filters.and(portalFilter);
-	            else
-	                filters = portalFilter;	            
-	        }
-	        
-	        if( filters != null ){
-	            log.debug("Wrapping WebappDaoFactory in portal filters");
-	            wdf = new WebappDaoFactoryFiltering(wdf, filters);
-	        }
-        }                          
-
-        /* display filtering happens now at any level, all the time; editing pages get their WebappDaoFactories differently */
-        WebappDaoFactory roleFilteredFact = 
-            new WebappDaoFactoryFiltering(wdf, new HiddenFromDisplayBelowRoleLevelFilter( role, wdf ));
-        wdf = roleFilteredFact;        
-        if( log.isDebugEnabled() ) log.debug("setting role-based WebappDaoFactory filter for role " + role.toString());             
-
-        vreq.setWebappDaoFactory(wdf);
-        
+                               
+		/*
+		 * display filtering happens now at any level, all the time; editing
+		 * pages get their WebappDaoFactories differently
+		 */
+		HideFromDisplayByPolicyFilter filter = new HideFromDisplayByPolicyFilter(
+				RequestIdentifiers.getIdBundleForRequest(req),
+				ServletPolicyList.getPolicies(_context));
+		vreq.setWebappDaoFactory(new WebappDaoFactoryFiltering(wdf, filter));
+		
         // support for Dataset interface if using Jena in-memory model
         if (vreq.getDataset() == null) {
         	Dataset dataset = WebappDaoFactoryJena.makeInMemoryDataset(
@@ -209,31 +170,23 @@ public class VitroRequestPrep implements Filter {
         	vreq.setDataset(dataset);
         }
         
-        request.setAttribute("VitroRequestPrep.setup", new Integer(1));
-        chain.doFilter(request, response);
+        vreq.setUnfilteredWebappDaoFactory(new WebappDaoFactorySDB(
+                ModelContext.getUnionOntModelSelector(
+                        vreq.getSession().getServletContext()),
+                        vreq.getDataset()));
+        
+        req.setAttribute("VitroRequestPrep.setup", new Integer(1));
+        chain.doFilter(req, response);
     }
 
-    private WebappDaoFactory getWebappDaoFactory(VitroRequest vreq){
+	private WebappDaoFactory getWebappDaoFactory(VitroRequest vreq){
     	WebappDaoFactory webappDaoFactory = vreq.getWebappDaoFactory();
         return (webappDaoFactory != null) ? webappDaoFactory :
         	(WebappDaoFactory) _context.getAttribute("webappDaoFactory");
     }
 
-    public void init(FilterConfig filterConfig) throws ServletException {
-        _context = filterConfig.getServletContext();
-        ApplicationBean a = null;
-        try {
-            a = (ApplicationBean) _context.getAttribute("applicationBean");
-        } catch (Exception e) {}
-        if ( a != null ) {
-            _appbean = (ApplicationBean) a; 
-        } else {
-            _appbean = new ApplicationBean();
-        }
-    }    
-    
-    public VitroFilters getFiltersFromContextFilterFactory( HttpServletRequest request, WebappDaoFactory wdf){
-        FilterFactory ff = getFilterFactory();
+    private VitroFilters getFiltersFromContextFilterFactory( HttpServletRequest request, WebappDaoFactory wdf){
+        FilterFactory ff = (FilterFactory)_context.getAttribute("FilterFactory");
         if( ff == null ){ 
             return null;
         } else {
@@ -241,210 +194,160 @@ public class VitroRequestPrep implements Filter {
         }
     }
     
-    public FilterFactory getFilterFactory(){
-        return(FilterFactory)_context.getAttribute("FilterFactory");        
-    }
-    public static void setFilterFactory(ServletContext sc, FilterFactory ff){
-        sc.setAttribute("FilterFactory", ff);
-    }
-    
-    /* ********** Static Utility Methods **************** */
-    /**
-     *  This method attempts to get a useful Portal object given the state of the request and session.
-     *  If one is found stick the id in the current session and stick the Portal object in the
-     *  current session.
-     *
-     * @param request
-     * @param forcePortalParameter - if true, ignore any portal info in the session
-     * and try to use the HTTP parameter for the portalID
-     * bdc34: I don't know where forcePortalParameter is being used, it might be legacy code.
-     * jc55:  The ability to force a change in the portal was implemented for the CALS Research
-     *        portals, where curators wanted the ability for people to pick a portal to search
-     *        in and then be "forced" into that portal when results were displayed.
-     *        It may also be used to initially get people into the portal from a /lifesci or /socsci parameter
-     * It is safe to pass false if you are not sure what to pass here.
-     * @return
-     */
-    private static Portal getCurrentPortalBean(HttpServletRequest request, boolean forcePortalParameter, PortalDao portalDao) {
-        if(log.isDebugEnabled())
-            log.debug("entering getCurrentPortalBean, forcePortalParameter:" + forcePortalParameter);
+	private boolean authorizedForSpecialModel(HttpServletRequest req) {
+		if (isParameterPresent(req, SWITCH_TO_DISPLAY_MODEL)) {
+			return PolicyHelper.isAuthorizedForActions(req, new ManageMenus());
+		} else if (anyOtherSpecialProperties(req)){
+			return PolicyHelper.isAuthorizedForActions(req, new AccessSpecialDataModels());
+		} else {
+			return true;
+		}
+	}
 
-        if( request == null ){
-            log.error("getCurrentPortalBean() needs a usable VitroRequest to access the PortalDao");
-            return null;
-        }
-        Portal portal = null;
-        HttpSession currentSession = request.getSession(true);
-        if( forcePortalParameter ){
-            int forcedPortalId = getCurrentPortalId(request,true);
-            portal = portalDao.getPortal(forcedPortalId);
-        }else{
-            /* Look for a portal Object in the session */
-            if( currentSession != null )
-                portal = getPortalFromSession(currentSession);
-        }
-        if( portal == null ){
-            int portalIdFromRequest = getCurrentPortalId(request,false);
-            portal = portalDao.getPortal(portalIdFromRequest);
-        }
-        if( portal != null )
-            putPortalIntoSession(currentSession,portal);
-
-        return portal;
-    }
-
-    /**
-     * returns null if no portal found.
-     * @param session
-     * @return
-     */
-    private static Portal getPortalFromSession(HttpSession session){
-        if( session == null )
-            return null;
-        Object currentPortal = session.getAttribute("currentPortal");
-        if( currentPortal != null && currentPortal instanceof Portal){
-            if(log.isDebugEnabled())
-                log.debug("Found Portal in session: " +((Portal)currentPortal).getPortalId());
-            return (Portal)currentPortal;
-        }else
-            return null;
-    }
-
-    /**
-     * returns -1 if no portal id was found in session.
-     * @param currentSession
-     * @return
-     */
-    private static int getPortalIdFromSession(HttpSession currentSession){
-        int portalId = -1;
-        Object currentPortalObj=currentSession.getAttribute("currentPortalId");
-        if (currentPortalObj != null && currentPortalObj instanceof Integer) {
-            int portalIdFromSession=((Integer)currentPortalObj).intValue();
-            if(log.isDebugEnabled())
-                log.debug("Found portal id in session: " + portalIdFromSession);
-            if ( portalIdFromSession > 0 ){
-                portalId = portalIdFromSession;
-            }
-        }
-        return portalId;
-    }
-
-    private static void putPortalIntoSession(HttpSession session, Portal portal){
-        session.setAttribute("currentPortalId",new Integer(portal.getPortalId()));
-        session.setAttribute("currentPortal",portal);
-    }
-
-    /**
-     * Gets the id of the portal indicated by the request or session object.
-     * Changing 10/11/07 so private; all
-     * @param request
-     * @param forcePortalParameter
-     * @return
-     */
-    private static int getCurrentPortalId(HttpServletRequest req, boolean forcePortalParameter) {
-        if(log.isDebugEnabled())
-            log.debug("entering getCurrentPortalId, forcePortalParameter:" + forcePortalParameter);
-
-        VitroRequest request = new VitroRequest(req);
-        
-        int portalId = Portal.DEFAULT_PORTAL_ID;
-        int portalIdFromSession=-1;
-        HttpSession currentSession = request.getSession(true);
-
-        /* Look for a portal id in the session */
-        boolean noPortalFoundInSession = true;
-        portalIdFromSession = getPortalIdFromSession(currentSession);
-        if ( portalIdFromSession > 0 ){
-            portalId = portalIdFromSession;
-            noPortalFoundInSession = false;
-        } else {
-            portalId = Portal.DEFAULT_PORTAL_ID;
-            noPortalFoundInSession = true;
-        }
-
-
-        if (forcePortalParameter || noPortalFoundInSession ) {
-            /* if forcePortalParameter is true, ignore the portal id from the session */
-            String idStr ="undefined";
-            if( request.getAttribute("home") != null)
-                idStr = (String)request.getAttribute("home");
-            else if( request.getParameter("home") != null)
-                idStr = (String)request.getParameter("home");
-            else if( request.getAttribute("home") != null)
-                idStr = (String)request.getAttribute("home");
-            else
-                idStr = "undefined";
-
-            try {
-                int portalIdForced=Integer.parseInt(idStr);
-                if (portalIdFromSession>=0 && portalIdFromSession!=portalIdForced) { // invalidate saved search preferences
-                    currentSession.removeAttribute("flag1pref");
-                    currentSession.removeAttribute("flag2pref");
-                    currentSession.removeAttribute("flag3pref");
-                }
-                portalId = portalIdForced;
-                if(log.isDebugEnabled())
-                    log.debug("forcePortalParameter so using portal id " + portalId + " from parameter 'home'");
-            } catch (NumberFormatException ex) {
-                /* if we can't format the parameter, try portalid from session, if no session portal id then a default portal id */
-                if ( portalIdFromSession > 0 ) {
-                    portalId = portalIdFromSession;
-                    if(log.isDebugEnabled())
-                        log.debug("tried to forcePortalParameter but could not parse '"
-                                + idStr +"' using id of " + portalId + " from session.");
-                } else {
-                    portalId = Portal.DEFAULT_PORTAL_ID;
-                    if(log.isDebugEnabled())
-                        log.debug("tried to forcePortalParameter but could not parse '"
-                                + idStr +"' using default portal id of " + Portal.DEFAULT_PORTAL_ID +
-                                " This happens when no incoming home parameter and current session is null");
-                }
-            } /* end of catch (NumberFormatException ex) */
-        }/* end of if(forcePortalParameter) */
-
-        return portalId;
-    }
-
-    /**
-     * This should wipe out all portal state and force the portal to be the indicated one.
-     * @param hRequest
-     * @param hResponse
-     * @param id
-     * This is only used in PortalPickerFilter
-     */
-    public static void forceToPortal(HttpServletRequest request, Integer portalId){
-        HttpSession currentSession = request.getSession(true);
-        currentSession.setAttribute("currentPortalId", portalId);
-        currentSession.setAttribute("currentPortal", null);
-        (new VitroRequest(request)).setPortalId( portalId.toString() );
+    @Override
+	public void destroy() {
+    	// Nothing to do.
     }
 
 	/**
-	 * Check to see whether any of the current identifiers is a SelfEditing
-	 * identifier.
+	 * Check if special model is requested - this is for enabling the use of a different
+	 * model for menu management. Also enables the use of a completely different
+	 * model and tbox if uris are passed.
 	 */
-	public static boolean isSelfEditing(HttpServletRequest request) {
-		HttpSession session = request.getSession(false);
-		if (session == null) {
-			return false;
-		}
+    private WebappDaoFactory checkForSpecialWDF(VitroRequest vreq, WebappDaoFactory inputWadf) {
+        //TODO: Does the dataset in the vreq get set when using a special WDF? Does it need to?
+        //TODO: Does the unfiltered WDF get set when using a special WDF? Does it need to?
+        
+    	// If this isn't a Jena WADF, then there's nothing to be done.
+    	if (!(inputWadf instanceof WebappDaoFactoryJena)) {
+    		log.warn("Can't set special models: " +
+    				"WebappDaoFactory is not a WebappDaoFactoryJena");
+        	removeSpecialWriteModel(vreq);
+    		return inputWadf;
+    	}
 
-		ServletContext sc = session.getServletContext();
-		IdentifierBundle idBundle = ServletIdentifierBundleFactory.getIdBundleForRequest(request, session, sc);
-		if (idBundle == null) {
-			return false;
+    	WebappDaoFactoryJena wadf = (WebappDaoFactoryJena) inputWadf;
+    	
+    	// If they asked for the display model, give it to them.
+		if (isParameterPresent(vreq, SWITCH_TO_DISPLAY_MODEL)) {
+			OntModel mainOntModel = (OntModel)_context.getAttribute("displayOntModel");
+			OntModel tboxOntModel = (OntModel) _context.getAttribute(CONTEXT_DISPLAY_TBOX);
+	   		setSpecialWriteModel(vreq, mainOntModel);
+			return createNewWebappDaoFactory(wadf, mainOntModel, tboxOntModel, null);
+		}
+    	
+		// If they asked for other models by URI, set them.
+		if (anyOtherSpecialProperties(vreq)) {
+			BasicDataSource bds = JenaDataSourceSetupBase.getApplicationDataSource(_context);
+			String dbType = ConfigurationProperties.getBean(_context)
+					.getProperty("VitroConnection.DataSource.dbtype", "MySQL");
+
+	    	OntModel mainOntModel = createSpecialModel(vreq, USE_MODEL_PARAM, bds, dbType);
+	    	OntModel tboxOntModel = createSpecialModel(vreq, USE_TBOX_MODEL_PARAM, bds, dbType);
+	    	OntModel displayOntModel = createSpecialModel(vreq, USE_DISPLAY_MODEL_PARAM, bds, dbType);
+	   		setSpecialWriteModel(vreq, mainOntModel);
+	    	return createNewWebappDaoFactory(wadf, mainOntModel, tboxOntModel, displayOntModel);
 		}
 		
-		SelfEditing selfId = SelfEditingIdentifierFactory.getSelfEditingIdentifier(idBundle);
-		if (selfId == null) {
-			return false;
-		}
-		
-		return true;
-	}
+		// Otherwise, there's nothing special about this request.
+    	removeSpecialWriteModel(vreq);
+		return wadf;
 
-    public void destroy() {       
     }
 
+	private boolean anyOtherSpecialProperties(HttpServletRequest req) {
+		return isParameterPresent(req, USE_MODEL_PARAM)
+				|| isParameterPresent(req, USE_TBOX_MODEL_PARAM)
+				|| isParameterPresent(req, USE_DISPLAY_MODEL_PARAM);
+	}
 
+	/**
+	 * If the request asks for a special model by URI, create it from the
+	 * Database.
+	 * 
+	 * @return the model they asked for, or null if they didn't ask for one.
+	 * @throws IllegalStateException
+	 *             if it's not found.
+	 */
+	private OntModel createSpecialModel(VitroRequest vreq, String key,
+			BasicDataSource bds, String dbType) {
+		if (!isParameterPresent(vreq, key)) {
+			return null;
+		}
+		
+		String modelUri = vreq.getParameter(key);
+		Model model = JenaDataSourceSetupBase.makeDBModel(bds, modelUri,
+				OntModelSpec.OWL_MEM,
+				JenaDataSourceSetupBase.TripleStoreType.RDB, dbType, _context);
+		if (model != null) {
+			return ModelFactory
+					.createOntologyModel(OntModelSpec.OWL_MEM, model);
+		} else {
+			throw new IllegalStateException("Main Model Uri " + modelUri
+					+ " did not retrieve model");
+		}
+	}
+
+	private void removeSpecialWriteModel(VitroRequest vreq) {
+		if (vreq.getAttribute(SPECIAL_WRITE_MODEL) != null) {
+			vreq.removeAttribute(SPECIAL_WRITE_MODEL);
+		}
+	}
+	
+	private void setSpecialWriteModel(VitroRequest vreq, OntModel mainOntModel) {
+		if (mainOntModel != null) {
+			vreq.setAttribute(SPECIAL_WRITE_MODEL, mainOntModel);
+		}
+	}
+
+	/**
+	 * The goal here is to return a new WDF that is set to
+	 * have the mainOntModel as its ABox, the tboxOntModel as it
+	 * TBox and displayOntModel as it display model.
+	 * 
+	 * Right now this is achieved by creating a copy of 
+	 * the WADF, and setting the special models onto it.
+	 *  
+	 * If a model is null, it will have no effect.
+	 */
+	private WebappDaoFactory createNewWebappDaoFactory(
+			WebappDaoFactoryJena inputWadf, OntModel mainOntModel,
+			OntModel tboxOntModel, OntModel displayOntModel) {
+	    
+		WebappDaoFactoryJena wadfj = new WebappDaoFactoryJena(inputWadf);
+		wadfj.setSpecialDataModel(mainOntModel, tboxOntModel, displayOntModel);
+		return wadfj;
+	}
+
+	private boolean isParameterPresent(HttpServletRequest req, String key) {
+		return getNonEmptyParameter(req, key) != null;
+	}
+
+	/**
+	 * Return a non-empty parameter from the request, or a null.
+	 */
+	private String getNonEmptyParameter(HttpServletRequest req, String key) {
+		String value = req.getParameter(key);
+		if ((value == null) || value.isEmpty()) {
+			return null;
+		} else {
+			return value;
+		}
+	}
+	
+	private void logRequestUriForDebugging(HttpServletRequest req) {
+		if (log.isDebugEnabled()) {
+			try {
+				String uriString = req.getRequestURI();
+				String queryString = req.getQueryString();
+				if ((queryString != null) && (queryString.length() > 0)) {
+					uriString += "?" + queryString;
+				}
+				log.debug("RequestURI: " + uriString);
+			} catch (Exception e) {
+				// Don't want to kill the request if the logging fails.
+			}
+		}
+	}
+	
 }

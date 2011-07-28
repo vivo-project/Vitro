@@ -14,6 +14,11 @@ public class RdfResponseValues extends BaseResponseValues {
         this.model = model;
     }
 
+    public RdfResponseValues(ContentType contentType, Model model, int statusCode) {
+        super(contentType, statusCode);
+        this.model = model;
+    }
+    
     @Override
     public Model getModel() {
        return model;

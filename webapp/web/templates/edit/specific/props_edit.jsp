@@ -28,27 +28,22 @@
 <tr valign="bottom" align="center">
     <td>
         <form action="showObjectPropertyHierarchy" method="get">
-	        <input type="hidden" name="home" value="${portalBean.portalId}" />
 	        <input type="hidden" name="iffRoot" value="true" />
             <input type="submit" class="form-button" value="Root Properties"/>
         </form>
         <form action="listPropertyWebapps" method="get">
-	        <input type="hidden" name="home" value="${portalBean.portalId}" />
             <input type="submit" class="form-button" value="See All Properties"/>
         </form>
         <form action="showObjectPropertyHierarchy" method="get">
-	    	<input type="hidden" name="home" value="${portalBean.portalId}" />
 	    	<input type="hidden" name="propertyUri" value="${property.URI}"/>
             <input type="submit" class="form-button" value="Show Hierarchy below This Property"/>
         </form>      
         <form action="listVClassWebapps" method="get">
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="hidden" name="showPropertyRestrictions" value="true"/>
 			<input type="hidden" name="propertyURI" value="${property.URI}"/>
 			<input type="submit" class="form-button" value="Show Classes With a Restriction on This Property"/>
 		</form>
         <form action="listObjectPropertyStatements" method="get">
-        	<input type="hidden" name="home" value="${portalBean.portalId}" />
         	<input type="hidden" name="propertyURI" value="${property.URI}"/>
         	<input type="hidden" name="assertedStmts" value="true"/>
         	<input type="hidden" name="showVClasses" value="true"/>
@@ -59,7 +54,6 @@
     </td>
     <td valign="bottom" align="center">
         <form action="editForm" method="get">
-            <input name="home" type="hidden" value="${portalBean.portalId}" />
             <input name="uri" type = "hidden" value="${property.URI}" />
             <input type="submit" class="form-button" value="Edit Property Record"/>
 	    <input type="hidden" name="controller" value="Property"/>
@@ -67,26 +61,22 @@
     </td>
     <td valign="bottom">
         <form action="editForm" method="get">
-            <input name="home" type="hidden" value="${portalBean.portalId}" />
             <input type="hidden" name="parentId" value="${property.URI}" />
 	    <input type="hidden" name="controller" value="Property"/>
             <input type="submit" class="form-button" value="Add New Child Property"/>
         </form>
         <form action="editForm" method="get">
-            <input name="home" type="hidden" value="${portalBean.portalId}" />
             <input type="submit" class="form-button" value="Add New Property"/>
 	    <input type="hidden" name="controller" value="Property"/>
         </form>
             <form action="editForm" method="get">
             <input type="submit" class="form-button" value="Change URI"/>
-            <input type="hidden" name="home" value="${portalBean.portalId}" />
             <input type="hidden" name="oldURI" value="${property.URI}"/>
             <input type="hidden" name="mode" value="renameResource"/>
             <input type="hidden" name="controller" value="Refactor"/>
         </form>
         <form action="editForm" method="get">
             <input type="submit" class="form-button" value="Move Statements to Different Property"/>
-            <input type="hidden" name="home" value="${portalBean.portalId}" />
             <input type="hidden" name="propertyURI" value="${property.URI}"/>
             <input type="hidden" name="mode" value="movePropertyStatements"/>
             <input type="hidden" name="propertyType" value="ObjectProperty"/>
@@ -95,7 +85,6 @@
         <c:if test="${!empty property.URIInverse}">
 	        <form action="propertyEdit" method="get">
 	            <input type="submit" class="form-button" value="Go to Inverse Property"/>
-	            <input type="hidden" name="home" value="${portalBean.portalId}" />
 	            <input type="hidden" name="uri" value="${property.URIInverse}"/>
 	        </form>
 		</c:if>
@@ -111,7 +100,6 @@
 			<ul style="list-style-type:none;">
 			<c:forEach var="superproperty" items="${superproperties}">
 			<c:url var="superpropertyURL" value="propertyEdit">
-				<c:param name="home" value="${portalBean.portalId}"/>
 				<c:param name="uri" value="${superproperty.URI}"/>
 			</c:url>
 				<li><input type="checkbox" name="SuperpropertyURI" value="${superproperty.URI}" class="form-item"/>
@@ -120,7 +108,6 @@
 			</c:forEach>
 			</ul>
 			<input type="hidden" name="SubpropertyURI" value="${property.URI}"/>
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="hidden" name="operation" value="remove"/>
 		    <input type="hidden" name="_epoKey" value="${epoKey}"/>	
 			<input type="submit" class="form-button" value="Remove Checked Superproperty Links"/>
@@ -129,7 +116,6 @@
 	</td>
 	<td>
 		<form action="editForm" method="get">
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="hidden" name="SubpropertyURI" value="${property.URI}"/>
             <input type="hidden" name="opMode" value="superproperty"/>
 			<input type="hidden" name="controller" value="Properties2Properties"/>
@@ -146,7 +132,6 @@
 			<ul style="list-style-type:none;">
 			<c:forEach var="subproperty" items="${subproperties}">
 				<c:url var="subpropertyURL" value="propertyEdit">
-					<c:param name="home" value="${portalBean.portalId}"/>
 					<c:param name="uri" value="${subproperty.URI}"/>
 				</c:url>
 				<li><input type="checkbox" name="SubpropertyURI" value="${subproperty.URI}" class="form-item"/>
@@ -156,7 +141,6 @@
 			</ul>
 			<input type="hidden" name="SuperpropertyURI" value="${property.URI}"/>
 			<input type="submit" class="form-button" value="Remove Checked Subproperty Links"/>
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
             <input type="hidden" name="_epoKey" value="${epoKey}"/>
 			<input type="hidden" name="operation" value="remove"/>
 		</form>
@@ -165,14 +149,12 @@
 	<td valign="bottom">
 		<form action="editForm" method="get">
 			<input type="hidden" name="controller" value="Properties2Properties"/>
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="hidden" name="SuperpropertyURI" value="${property.URI}"/>
             <input type="hidden" name="opMode" value="subproperty"/>
 			<input type="submit" class="form-button" value="New Link to Subproperty"/>
 		</form>
 		<form action="editForm" method="get">
 			<input type="hidden" name="controller" value="Property"/> 
-			<input type="hidden" name="home" value="${portalBean.portalId}" />
 			<input type="hidden" name="parentId" value="${property.URI}" />
 			<input type="submit" class="form-button" value="Add New Subproperty of This Property"/>
 		</form>
@@ -187,7 +169,6 @@
             <ul style="list-style-type:none;">
             <c:forEach var="eqproperty" items="${equivalentProperties}">
                 <c:url var="eqpropertyURL" value="datapropEdit">
-                    <c:param name="home" value="${portalBean.portalId}"/>
                     <c:param name="uri" value="${eqproperty.URI}"/>
                 </c:url>
                 <li><input type="checkbox" name="SubpropertyURI" value="${eqproperty.URI}" class="form-item"/>
@@ -197,7 +178,6 @@
             </ul>
             <input type="hidden" name="SuperpropertyURI" value="${property.URI}"/>
             <input type="submit" class="form-button" value="Remove Checked Equivalent Property Links"/>
-            <input type="hidden" name="home" value="${portalBean.portalId}" />
             <input type="hidden" name="_epoKey" value="${epoKey}"/>
             <input type="hidden" name="operation" value="remove"/>
             <input type="hidden" name="opMode" value="equivalentProperty"/>
@@ -207,7 +187,6 @@
     <td valign="bottom">
         <form action="editForm" method="get">
             <input type="hidden" name="controller" value="Properties2Properties"/>
-            <input type="hidden" name="home" value="${portalBean.portalId}" />
             <input type="hidden" name="SuperpropertyURI" value="${property.URI}"/>
             <input type="hidden" name="opMode" value="equivalentProperty"/>
             <input type="hidden" name="propertyType" value="object"/>

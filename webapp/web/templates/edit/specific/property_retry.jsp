@@ -135,7 +135,7 @@
 <tr class="editformcell">
     <td valign="bottom" colspan="2">
         <em>Optional: <strong>sort related individuals</strong> by<br />
-	    (name,timekey,sunrise,or sunset; default is name)</em><br/>
+	    (default is sort by name)</em><br/>
         <input name="DomainEntitySortField" value="<form:value name="DomainEntitySortField"/>" />
         <font size="2" color="red"><form:error name="DomainEntitySortField"/></font><br />
     </td>
@@ -254,7 +254,7 @@
     <tr class="editformcell">
         <td valign="bottom" colspan="2">
             <em>Optional: <strong>sort related object individuals of inverse property</strong> by<br />
-	    (name,timekey,sunrise,or sunset; default is name)</em><br/>
+	    (default is sort by name)</em><br/>
             <input name="RangeEntitySortField" value="<form:value name="RangeEntitySortField"/>" />
                 <font size="2" color="red"><form:error name="RangeEntitySortField"/></font>
         </td>

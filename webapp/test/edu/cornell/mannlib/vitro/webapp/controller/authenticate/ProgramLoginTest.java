@@ -2,21 +2,20 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
+import static edu.cornell.mannlib.vitro.webapp.controller.authenticate.ProgramLogin.ProgramLoginCore.PARAM_EMAIL_ADDRESS;
 import static edu.cornell.mannlib.vitro.webapp.controller.authenticate.ProgramLogin.ProgramLoginCore.PARAM_NEW_PASSWORD;
 import static edu.cornell.mannlib.vitro.webapp.controller.authenticate.ProgramLogin.ProgramLoginCore.PARAM_PASSWORD;
-import static edu.cornell.mannlib.vitro.webapp.controller.authenticate.ProgramLogin.ProgramLoginCore.PARAM_USERNAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Date;
+import java.util.Collections;
 
 import javax.servlet.ServletException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.Level;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,8 +27,8 @@ import stubs.javax.servlet.http.HttpServletResponseStub;
 import stubs.javax.servlet.http.HttpSessionStub;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
-import edu.cornell.mannlib.vitro.webapp.beans.User;
-import edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 
 /**
  * Test the basic features of ProgramTest.
@@ -40,13 +39,13 @@ public class ProgramLoginTest extends AbstractTestClass {
 	private static final String NEW_USER_URI = "new_user_uri";
 	private static final String NEW_USER_NAME = "new_user";
 	private static final String NEW_USER_PASSWORD = "new_user_pw";
-	private static final User NEW_USER = createUser(NEW_USER_URI,
+	private static final UserAccount NEW_USER = createUserAccount(NEW_USER_URI,
 			NEW_USER_NAME, NEW_USER_PASSWORD, 0);
 
 	private static final String OLD_USER_URI = "old_user_uri";
 	private static final String OLD_USER_NAME = "old_user";
 	private static final String OLD_USER_PASSWORD = "old_user_pw";
-	private static final User OLD_USER = createUser(OLD_USER_URI,
+	private static final UserAccount OLD_USER = createUserAccount(OLD_USER_URI,
 			OLD_USER_NAME, OLD_USER_PASSWORD, 10);
 
 	private AuthenticatorStub authenticator;
@@ -59,7 +58,8 @@ public class ProgramLoginTest extends AbstractTestClass {
 
 	@Before
 	public void setLogging() {
-//		setLoggerLevel(this.getClass(), Level.DEBUG);
+		// setLoggerLevel(this.getClass(), Level.DEBUG);
+		// setLoggerLevel(ProgramLogin.class, Level.DEBUG);
 	}
 
 	@Before
@@ -87,17 +87,16 @@ public class ProgramLoginTest extends AbstractTestClass {
 		response = new HttpServletResponseStub();
 	}
 
-	private static User createUser(String uri, String name, String password,
-			int loginCount) {
-		User user = new User();
-		user.setUsername(name);
-		user.setURI(uri);
-		user.setRoleURI(String.valueOf(50));
-		user.setMd5password(Authenticate.applyMd5Encoding(password));
+	private static UserAccount createUserAccount(String uri, String name,
+			String password, int loginCount) {
+		UserAccount user = new UserAccount();
+		user.setEmailAddress(name);
+		user.setUri(uri);
+		user.setPermissionSetUris(Collections
+				.singleton(PermissionSetsLoader.URI_DBA));
+		user.setMd5Password(Authenticator.applyMd5Encoding(password));
 		user.setLoginCount(loginCount);
-		if (loginCount > 0) {
-			user.setFirstTime(new Date(0));
-		}
+		user.setPasswordChangeRequired(loginCount == 0);
 		return user;
 	}
 
@@ -172,10 +171,10 @@ public class ProgramLoginTest extends AbstractTestClass {
 	// Helper methods
 	// ----------------------------------------------------------------------
 
-	private void executeRequest(String username, String password,
+	private void executeRequest(String email, String password,
 			String newPassword) {
-		if (username != null) {
-			request.addParameter(PARAM_USERNAME, username);
+		if (email != null) {
+			request.addParameter(PARAM_EMAIL_ADDRESS, email);
 		}
 		if (password != null) {
 			request.addParameter(PARAM_PASSWORD, password);

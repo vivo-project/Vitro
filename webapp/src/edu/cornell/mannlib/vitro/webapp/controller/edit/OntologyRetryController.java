@@ -21,9 +21,9 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
 import edu.cornell.mannlib.vedit.util.FormUtils;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.NamespaceDao;
@@ -34,16 +34,11 @@ public class OntologyRetryController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(OntologyRetryController.class.getName());
 
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
+        if (!isAuthorizedToDisplayPage(req, response, new Actions(new EditOntology()))) {
+        	return;
+        }
 
     	VitroRequest request = new VitroRequest(req);
-        if (!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error("OntologyRetryController encountered exception calling super.doGet()");
-        }
 
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
@@ -86,16 +81,10 @@ public class OntologyRetryController extends BaseEditController {
 
         //set up any listeners
 
-        //set portal flag to current portal
-        Portal currPortal = (Portal) request.getAttribute("portalBean");
-        int currPortalId = 1;
-        if (currPortal != null) {
-            currPortalId = currPortal.getPortalId();
-        }
         //make a postinsert pageforwarder that will send us to a new ontology's edit screen
-        epo.setPostInsertPageForwarder(new OntologyInsertPageForwarder(currPortalId));
+        epo.setPostInsertPageForwarder(new OntologyInsertPageForwarder());
         //make a postdelete pageforwarder that will send us to the list of ontologies
-        epo.setPostDeletePageForwarder(new UrlForwarder("listOntologies?home="+currPortalId));
+        epo.setPostDeletePageForwarder(new UrlForwarder("listOntologies"));
 
         //set the getMethod so we can retrieve a new bean after we've inserted it
         try {
@@ -153,14 +142,8 @@ public class OntologyRetryController extends BaseEditController {
 
     class OntologyInsertPageForwarder implements PageForwarder {
 
-        private int portalId = 1;
-
-        public OntologyInsertPageForwarder(int currPortalId) {
-            portalId = currPortalId;
-        }
-
         public void doForward(HttpServletRequest request, HttpServletResponse response, EditProcessObject epo){
-            String newOntologyUrl = "ontologyEdit?home="+portalId+"&uri=";
+            String newOntologyUrl = "ontologyEdit?uri=";
             Ontology ont = (Ontology) epo.getNewBean();
             try {
                 newOntologyUrl += URLEncoder.encode(ont.getURI(),"UTF-8");

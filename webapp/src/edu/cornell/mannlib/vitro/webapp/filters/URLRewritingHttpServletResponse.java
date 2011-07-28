@@ -2,31 +2,27 @@
 
 package edu.cornell.mannlib.vitro.webapp.filters;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
 
-public class URLRewritingHttpServletResponse implements HttpServletResponse {
+public class URLRewritingHttpServletResponse extends HttpServletResponseWrapper/*implements HttpServletResponse */{
 
 	private final static Log log = LogFactory.getLog(URLRewritingHttpServletResponse.class);
 	
@@ -37,37 +33,18 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 	private Pattern slashPattern = Pattern.compile("/");
 	
 	public URLRewritingHttpServletResponse(HttpServletResponse response, HttpServletRequest request, ServletContext context) {
+	    super(response);
 		this._response = response;
 		this._context = context;
 		this.wadf = (WebappDaoFactory) context.getAttribute("webappDaoFactory");
 		this.contextPathDepth = slashPattern.split(request.getContextPath()).length-1;
 	}
-
-	/**
-	 * For use in testing only.
-	 */
-	protected URLRewritingHttpServletResponse(){ }
+		
+	/** for testing. */
+	protected URLRewritingHttpServletResponse(HttpServletResponse res){
+	    super(res);
+	}
 	
-	public void addCookie(Cookie arg0) {
-		_response.addCookie(arg0);
-	}
-
-	public void addDateHeader(String arg0, long arg1) {
-		_response.addDateHeader(arg0, arg1);
-	}
-
-	public void addHeader(String arg0, String arg1) {
-		_response.addHeader(arg0, arg1);
-	}
-
-	public void addIntHeader(String arg0, int arg1) {
-		_response.addIntHeader(arg0, arg1);
-	}
-
-	public boolean containsHeader(String arg0) {
-		return _response.containsHeader(arg0);
-	}
-
 	/**
 	 * @deprecated
 	 */
@@ -93,8 +70,6 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
         if( log.isDebugEnabled() ){
             log.debug("START");
             log.debug("charEncoding: "  + this.getCharacterEncoding() );
-            log.debug("PortalPickerFilter.getPortalPickerFilter(this._context)," + PortalPickerFilter.getPortalPickerFilter(this._context));
-            log.debug("wadf.getPortalDao().isSinglePortal(), " + wadf.getPortalDao().isSinglePortal());
             log.debug("contextPathDepth," + contextPathDepth);
             log.debug("nsMap," + nsMap);
             log.debug("wadf.getDefaultNamespace(), " + wadf.getDefaultNamespace());
@@ -105,8 +80,7 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 	    String encodedUrl = encodeForVitro(
 	            inUrl,
 	            this.getCharacterEncoding(),
-	            PortalPickerFilter.getPortalPickerFilter(this._context),
-	            wadf.getPortalDao().isSinglePortal(),
+	            /*wadf.getPortalDao().isSinglePortal()*/ true,
 	            contextPathDepth,
 	            nsMap,
 	            wadf.getDefaultNamespace(),
@@ -125,8 +99,7 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 	 */
 	protected String encodeForVitro(
 	        String inUrl, 
-	        String characterEncoding , 
-	        PortalPickerFilter portalPickerFilter,
+	        String characterEncoding, 
 	        Boolean isSInglePortal,
 	        int contextPathDepth,
 	        NamespaceMapper nsMap,
@@ -134,7 +107,7 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 	        List<String> externalNamespaces) {
 		try {
 			if( log.isDebugEnabled() ){
-			    log.debug("Incomming URL '" + inUrl + "'");
+			    log.debug("Incoming URL '" + inUrl + "'");
 			}
 			VitroURL url = new VitroURL(inUrl,characterEncoding);
 			if (url.host != null) {
@@ -146,43 +119,6 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
 			        log.debug("Encoded as  '"+rv+"'");
 			    }
 				return rv;
-			}
-			
-			// rewrite home parameters as portal prefixes or remove
-			// if there is only one portal
-			if ( url.pathBeginsWithSlash && 
-					(PortalPickerFilter.isPortalPickingActive || isSInglePortal) ) {
-				
-				if ( (portalPickerFilter != null) && (url.queryParams != null) ) {
-					Iterator<String[]> qpIt = url.queryParams.iterator();
-					int qpIndex = -1;
-					int indexToRemove = -1;
-					while (qpIt.hasNext()) {
-						String[] keyAndValue = qpIt.next();
-						qpIndex++;			
-						if ( ("home".equals(keyAndValue[0])) && (keyAndValue.length>1) && (keyAndValue[1] != null) ) {
-							try {
-								int portalId = Integer.decode(keyAndValue[1].trim());
-								if ((Portal.DEFAULT_PORTAL_ID == portalId)) {
-									indexToRemove = qpIndex;
-								} else {
-									String prefix = portalPickerFilter.getPortalId2PrefixMap().get(portalId);
-									if ( (prefix != null) && (!prefix.equals(url.pathParts.get(contextPathDepth))) ) {		
-										url.pathParts.add(contextPathDepth,prefix);									
-										url.pathBeginsWithSlash = true;
-										indexToRemove = qpIndex;
-									}
-								}
-							} catch (NumberFormatException nfe) {
-								log.info("Invalid portal id string: "+keyAndValue[1], nfe);
-							}
-						}
-					}
-					if (indexToRemove > -1) {
-						url.queryParams.remove(indexToRemove);
-					}
-		
-				}
 			}
 			
 			// rewrite "entity" as "individual"
@@ -263,102 +199,7 @@ public class URLRewritingHttpServletResponse implements HttpServletResponse {
             log.error("Encoded as  '"+rv+"'");
 			return rv;
 		}
-	}
-
-	public void flushBuffer() throws IOException {
-		_response.flushBuffer();
-	}
-
-	public int getBufferSize() {
-		return _response.getBufferSize();
-	}
-
-	public String getCharacterEncoding() {
-		return _response.getCharacterEncoding();
-	}
-
-	public String getContentType() {
-		return _response.getContentType();
-	}
-
-	public Locale getLocale() {
-		return _response.getLocale();
-	}
-
-	public ServletOutputStream getOutputStream() throws IOException {
-		return _response.getOutputStream();
-	}
-
-	public PrintWriter getWriter() throws IOException {
-		return _response.getWriter();
-	}
-
-	public boolean isCommitted() {
-		return _response.isCommitted();
-	}
-
-	public void reset() {
-		_response.reset();
-	}
-
-	public void resetBuffer() {
-		_response.resetBuffer();
-	}
-
-	public void sendError(int arg0, String arg1) throws IOException {
-		_response.sendError(arg0, arg1);
-	}
-
-	public void sendError(int arg0) throws IOException {
-		_response.sendError(arg0);
-	}
-
-	public void sendRedirect(String arg0) throws IOException {
-		_response.sendRedirect(arg0);
-	}
-
-	public void setBufferSize(int arg0) {
-		_response.setBufferSize(arg0);
-	}
-
-	public void setCharacterEncoding(String arg0) {
-		_response.setCharacterEncoding(arg0);
-	}
-
-	public void setContentLength(int arg0) {
-		_response.setContentLength(arg0);
-	}
-
-	public void setContentType(String arg0) {
-		_response.setContentType(arg0);
-	}
-
-	public void setDateHeader(String arg0, long arg1) {
-		_response.setDateHeader(arg0, arg1);
-	}
-
-	public void setHeader(String arg0, String arg1) {
-		_response.setHeader(arg0, arg1);
-	}
-
-	public void setIntHeader(String arg0, int arg1) {
-		_response.setIntHeader(arg0, arg1);
-	}
-
-	public void setLocale(Locale arg0) {
-		_response.setLocale(arg0);
-	}
-
-	/**
-	 * @deprecated
-	 */
-	public void setStatus(int arg0, String arg1) {
-		_response.setStatus(arg0, arg1);
-	}
-
-	public void setStatus(int arg0) {
-		_response.setStatus(arg0);
-	}		
+	}	
 	
 	private boolean isExternallyLinkedNamespace(String namespace,List<String> externallyLinkedNamespaces) {	    
 	    return externallyLinkedNamespaces.contains(namespace);

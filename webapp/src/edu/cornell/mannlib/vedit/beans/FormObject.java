@@ -3,59 +3,60 @@
 package edu.cornell.mannlib.vedit.beans;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import edu.cornell.mannlib.vedit.beans.Option;
+import java.util.Map;
 
 public class FormObject implements Serializable {
 
-    private HashMap values = new HashMap();
-    private HashMap optionLists = new HashMap();
-    private HashMap checkboxLists = new HashMap();
-    private HashMap errorMap = new HashMap();
-    private List dynamicFields = null;
+    private HashMap<String, String> values = new HashMap<String, String>();
+    private HashMap<String, List<Option>> optionLists = new HashMap<String, List<Option>>();
+    private HashMap<String, List<Checkbox>> checkboxLists = new HashMap<String, List<Checkbox>>();
+    private Map<String, String> errorMap = new HashMap<String, String>();
+    private List<DynamicField> dynamicFields = new ArrayList<DynamicField>();
 
-    public HashMap getValues(){
+    public HashMap<String, String> getValues(){
         return values;
     }
 
-    public void setValues(HashMap values){
+    public void setValues(HashMap<String, String> values){
         this.values = values;
     }
 
     public String valueByName(String name){
-        return (String) values.get(name);
+        return values.get(name);
     }
 
-    public HashMap getOptionLists() {
+    public HashMap<String, List<Option>> getOptionLists() {
         return optionLists;
     }
 
-    public void setOptionLists(HashMap optionLists) {
+    public void setOptionLists(HashMap<String, List<Option>> optionLists) {
         this.optionLists = optionLists;
     }
 
-    public List optionListByName(String key){
-        return (List) optionLists.get(key);
+    public List<Option> optionListByName(String key){
+        return optionLists.get(key);
     }
 
-    public HashMap getCheckboxLists(){
+    public HashMap<String, List<Checkbox>> getCheckboxLists(){
         return checkboxLists;
     }
 
-    public HashMap getErrorMap(){
+    public Map<String, String> getErrorMap(){
         return errorMap;
     }
 
-    public void setErrorMap(HashMap errorMap){
+    public void setErrorMap(Map<String, String> errorMap){
         this.errorMap = errorMap;
     }
 
-    public List getDynamicFields() {
+    public List<DynamicField> getDynamicFields() {
         return dynamicFields;
     }
 
-    public void setDynamicFields(List dynamicFields){
+    public void setDynamicFields(List<DynamicField> dynamicFields){
         this.dynamicFields = dynamicFields;
     }
 

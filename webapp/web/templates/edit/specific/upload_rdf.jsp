@@ -2,6 +2,10 @@
 
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
 
+<%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" %>
+<% request.setAttribute("requestedActions", new UseAdvancedDataToolsPages()); %>
+<vitro:confirmAuthorization />
 
 <div class="staticPageBackground">
 
@@ -32,17 +36,6 @@
             <option value="TTL">Turtle</option>
     </select>
     <p><input type="checkbox" name="makeClassgroups" value="true"/> create classgroups automatically</p>
-            
-    <c:if test="${requestScope.singlePortal == true}">
-      <input type="hidden" name="checkIndividualsIntoPortal" value="current"/>
-    </c:if>
-    
-    <c:if test="${requestScope.singlePortal == false }">
-      <p>
-      <input type="radio" name="checkIndividualsIntoPortal" value="current"/> make individuals visible in current portal
-      <input type="radio" name="checkIndividualsIntoPortal" value="all"/> make individuals visible in all portals
-      </p>
-    </c:if>
 
     <p><input id="submit" type="submit" name="submit" value="submit"/></p>     
 </form>

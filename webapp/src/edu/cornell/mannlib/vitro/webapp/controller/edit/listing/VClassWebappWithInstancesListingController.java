@@ -14,9 +14,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -28,19 +29,11 @@ public class VClassWebappWithInstancesListingController extends BaseEditControll
     private int NUM_COLS = 6;
     
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
-        
-        VitroRequest vrequest = new VitroRequest(request);
-        Portal portal = vrequest.getPortal();
-
-        if(!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request, response);
-        } catch (Throwable t) {
-            t.printStackTrace();
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new EditOntology()))) {
+        	return;
         }
 
+        VitroRequest vrequest = new VitroRequest(request);
 
         String uriStr = request.getParameter("uri");
 
@@ -113,7 +106,6 @@ public class VClassWebappWithInstancesListingController extends BaseEditControll
         request.setAttribute("columncount",new Integer(NUM_COLS));
         request.setAttribute("suppressquery","true");
         request.setAttribute("title","Class Groups");
-        request.setAttribute("portalBean",portal);
         request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         try {

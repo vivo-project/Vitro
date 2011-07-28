@@ -34,7 +34,8 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
@@ -101,8 +102,10 @@ public class JenaXMLFileUpload  extends BaseEditController  {
             throw new ServletException("Must POST a multipart encoded request");
         }
 
-		if (!checkLoginStatus(request,resp)) 
-			return;		        
+        if (!isAuthorizedToDisplayPage(request, resp, new Actions(new UseAdvancedDataToolsPages()))) {
+        	return;
+        }
+
         VitroRequest vreq = new VitroRequest(request);        
         ModelMaker modelMaker = getVitroJenaModelMaker(vreq);
         String targetModel = request.getParameter("targetModel");               
@@ -136,10 +139,8 @@ public class JenaXMLFileUpload  extends BaseEditController  {
 		
 		request.setAttribute("fileItems",request.getFiles());				
 
-        Portal portal = vreq.getPortal();
 		RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);      
-        request.setAttribute("portalBean",portal);
-        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
+        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
             rd.forward(request, resp);
@@ -153,8 +154,10 @@ public class JenaXMLFileUpload  extends BaseEditController  {
 		
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {		
-		if (!checkLoginStatus(request,response)) 
-			return;
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseAdvancedDataToolsPages()))) {
+        	return;
+        }
+
 		VitroRequest vreq = new VitroRequest(request);
 		
 		//make a form for uploading a file
@@ -163,10 +166,8 @@ public class JenaXMLFileUpload  extends BaseEditController  {
 		
 		request.setAttribute("models", null);				
 
-        Portal portal = vreq.getPortal();
 		RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);      
-        request.setAttribute("portalBean",portal);
-        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
+        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
             rd.forward(request, response);

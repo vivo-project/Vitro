@@ -51,53 +51,10 @@ public class JenaModelUtils {
 		nonIndividualTypeURIs.add(OWL.Restriction.getURI());
 		nonIndividualTypeURIs.add(OWL.ObjectProperty.getURI());
 		nonIndividualTypeURIs.add(OWL.DatatypeProperty.getURI());
+		nonIndividualTypeURIs.add(OWL.AnnotationProperty.getURI());
 		nonIndividualTypeURIs.add(OWL.Ontology.getURI());
 		nonIndividualTypeURIs.add(RDFS.Class.getURI());
 		nonIndividualTypeURIs.add(RDF.Property.getURI());
-	}
-	
-	// We used to use Jena's listIndividuals() but, at least in certain cases,
-	// this missed some individuals, possibly due to the absence of a TBox
-	public synchronized static void checkAllIndividualsInModelIntoPortal(Model baseModel, Model vitroInternalsSubmodel, int portalId) {
-		OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM,baseModel);
-		OntModel tempModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);
-		Resource portalClassResource = ResourceFactory.createResource(VitroVocabulary.vitroURI+"Flag1Value"+portalId+"Thing");
-		ontModel.enterCriticalSection(Lock.READ);
-		int indCount = 0;
-		try {
-			Iterator<Resource> typedResIt = ontModel.listSubjectsWithProperty(RDF.type);
-			while (typedResIt.hasNext()) {
-				Resource typedRes = typedResIt.next();
-				boolean isIndividual = true;
-				StmtIterator typeIt = ontModel.listStatements(typedRes, RDF.type, (RDFNode) null);
-				try {
-					while (typeIt.hasNext()) {
-						Statement stmt = typeIt.nextStatement();
-						if (stmt.getObject().isResource()) {
-							Resource ind = stmt.getSubject();
-							Resource objRes = (Resource) stmt.getObject();
-							if (!objRes.isAnon() && nonIndividualTypeURIs.contains(objRes.getURI())) {
-								isIndividual = false;
-								break;
-							}
-						}
-					}
-				} finally {
-					typeIt.close();
-				}
-				if (isIndividual) {
-					tempModel.add(typedRes, RDF.type, portalClassResource);
-				}
-			}
-		} finally {
-			ontModel.leaveCriticalSection();
-		}
-		vitroInternalsSubmodel.enterCriticalSection(Lock.WRITE);
-		try {
-			vitroInternalsSubmodel.add(tempModel);
-		} finally {
-			vitroInternalsSubmodel.leaveCriticalSection();
-		}
 	}
 	
 	public synchronized static void makeClassGroupsFromRootClasses(WebappDaoFactory wadf, Model ontModel) {
@@ -145,18 +102,30 @@ public class JenaModelUtils {
 	    return modelForClassgroups;
 	}
 	
-private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
-	
-	public OntModel extractTBox( Model inputModel) {
-	return extractTBox(inputModel, null);	
+	private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
+	private final boolean NORMAL = false;
+	private final boolean AGGRESSIVE = true;
+
+
+	public OntModel extractTBox( Model inputModel ) {
+	    return extractTBox(inputModel, null);	
 	}
+	
+	public OntModel extractTBox( Model inputModel, boolean MODE ) {
+	    Dataset dataset = DatasetFactory.create(inputModel);
+        return extractTBox(dataset, null, null, MODE);   
+    }
 	
 	public OntModel extractTBox( Model inputModel, String namespace ) {
 	    Dataset dataset = DatasetFactory.create(inputModel);
-        return extractTBox( dataset, namespace, null );
+        return extractTBox( dataset, namespace, null, NORMAL );
 	}
 	
-	public OntModel extractTBox( Dataset dataset, String namespace, String graphURI ) {
+	public OntModel extractTBox( Dataset dataset, String namespace, String graphURI) {
+	    return extractTBox( dataset, namespace, graphURI, NORMAL);
+	}
+	
+	public OntModel extractTBox( Dataset dataset, String namespace, String graphURI, boolean mode ) {
 		OntModel tboxModel = ModelFactory.createOntologyModel(DEFAULT_ONT_MODEL_SPEC);
 		
 		List<String> queryStrList = new LinkedList<String>();
@@ -164,8 +133,10 @@ private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
 		// Use SPARQL DESCRIBE queries to extract the RDF for named ontology entities
 		
 		queryStrList.add( makeDescribeQueryStr( OWL.Class.getURI(), namespace, graphURI ) );
+		queryStrList.add( makeDescribeQueryStr( OWL.Restriction.getURI(), namespace, graphURI ) );
 		queryStrList.add( makeDescribeQueryStr( OWL.ObjectProperty.getURI(), namespace, graphURI ) );
 		queryStrList.add( makeDescribeQueryStr( OWL.DatatypeProperty.getURI(), namespace, graphURI ) );
+		queryStrList.add( makeDescribeQueryStr( OWL.AnnotationProperty.getURI(), namespace, graphURI ) );
 		// if we're using to a hash namespace, the URI of the Ontology resource will be
 		// that namespace minus the final hash mark.
 		if ( namespace != null && namespace.endsWith("#") ) {
@@ -186,8 +157,57 @@ private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
 			}
 		}
 		
+		// Perform possibly-redundant extraction to try ensure we don't miss 
+		// individual axioms floating around.  We still might miss things;
+		// this approach isn't perfect.
+		if (mode = AGGRESSIVE) {
+			tboxModel.add(construct(dataset, namespace, graphURI, RDFS.subClassOf));
+			tboxModel.add(construct(dataset, namespace, graphURI, RDFS.subPropertyOf));
+			tboxModel.add(construct(dataset, namespace, graphURI, OWL.equivalentClass));
+			tboxModel.add(construct(dataset, namespace, graphURI, OWL.unionOf));
+			tboxModel.add(construct(dataset, namespace, graphURI, OWL.intersectionOf));
+			tboxModel.add(construct(dataset, namespace, graphURI, OWL.complementOf));
+			tboxModel.add(construct(dataset, namespace, graphURI, OWL.onProperty));
+			tboxModel.add(construct(dataset, namespace, graphURI, OWL.allValuesFrom));
+			tboxModel.add(construct(dataset, namespace, graphURI, OWL.someValuesFrom));
+			tboxModel.add(construct(dataset, namespace, graphURI, OWL.hasValue));
+			tboxModel.add(construct(dataset, namespace, graphURI, OWL.minCardinality));
+			tboxModel.add(construct(dataset, namespace, graphURI, OWL.maxCardinality));
+			tboxModel.add(construct(dataset, namespace, graphURI, OWL.cardinality));
+			tboxModel.add(construct(dataset, namespace, graphURI, OWL.disjointWith));	
+		}
 		return tboxModel;
-		
+	}
+	
+	private Model construct(Dataset dataset, 
+	                        String namespace, 
+	                        String graphURI, 
+	                        Resource property) {
+	    dataset.getLock().enterCriticalSection(Lock.READ);
+	    try {
+	        StringBuffer buff = new StringBuffer();
+	        buff.append("PREFIX afn: <http://jena.hpl.hp.com/ARQ/function#> \n")
+	        .append("CONSTRUCT { \n")
+	        .append("  ?res <" + property.getURI() + "> ?o } WHERE { \n");
+	        if (graphURI != null) {
+	            buff.append("    GRAPH " + graphURI + " { \n");
+	        }
+	        buff.append("      ?res <" + property.getURI() + "> ?o \n");
+	        buff.append(getNamespaceFilter(namespace));
+	        if (graphURI != null) {
+	            buff.append("    } \n");
+	        }
+	        buff.append("}");
+	        Query constructProp = QueryFactory.create(buff.toString());
+	        QueryExecution qe = QueryExecutionFactory.create(constructProp, dataset);
+	        try {
+	            return qe.execConstruct();
+	        } finally {
+	            qe.close();
+	        }
+	    } finally {
+	        dataset.getLock().leaveCriticalSection();
+	    }
 	}
 	
 	private String makeDescribeQueryStr( String typeURI, String namespace ) {
@@ -208,31 +228,10 @@ private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
 			.append("    ?res rdf:type <").append(typeURI).append("> . \n");
 			
 			describeQueryStrBuff
-			.append("    FILTER (!isBlank(?res)) \n");
-		
-		if (namespace == null) {
-			// exclude resources in the Vitro internal namespace or in the 
-			// OWL namespace, but allow all others
-			describeQueryStrBuff
-			//.append("    FILTER (afn:namespace(?res) != \"")
-			//.append("http://vitro.mannlib.cornell.edu/ns/vitro/0.7#")
-			//.append("\") \n")
-			.append("    FILTER (afn:namespace(?res) != \"")
-			.append("http://www.w3.org/2002/07/owl#")
-			.append("\") \n")
-			//.append("    FILTER (?res != <")
-			//.append("http://vitro.mannlib.cornell.edu/ns/vitro/0.7")
-			//.append(">) \n")
-			.append("    FILTER (?res != <")
-			.append("http://www.w3.org/2002/07/owl")
-			.append(">) \n");
-		} else {
-			// limit resources to those in the supplied namespace
-			describeQueryStrBuff
-			.append("    FILTER (afn:namespace(?res) = \"")
-			.append(namespace)
-			.append("\") \n");	
-		}
+			.append("    FILTER (!isBlank(?res)) \n")
+	
+			.append(getNamespaceFilter(namespace));
+	
 		if (graphURI != null) {
 			describeQueryStrBuff
 			.append("} \n");
@@ -242,6 +241,28 @@ private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
 		
 		return describeQueryStrBuff.toString();
 		
+	}
+	
+	private String getNamespaceFilter(String namespace) {
+	    StringBuffer buff = new StringBuffer();
+	    if (namespace == null) {
+            // exclude resources in the Vitro internal namespace or in the 
+            // OWL namespace, but allow all others
+            buff
+            .append("    FILTER (afn:namespace(?res) != \"")
+            .append("http://www.w3.org/2002/07/owl#")
+            .append("\") \n")
+            .append("    FILTER (?res != <")
+            .append("http://www.w3.org/2002/07/owl")
+            .append(">) \n");
+        } else {
+            // limit resources to those in the supplied namespace
+            buff
+            .append("    FILTER (afn:namespace(?res) = \"")
+            .append(namespace)
+            .append("\") \n");  
+        }
+	    return buff.toString();
 	}
 	
 	public Model extractABox(Model inputModel){
@@ -261,8 +282,7 @@ private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
 		//OntModel ontModel = ( inputModel instanceof OntModel ) 
 		//? (OntModel)inputModel
 		//: ModelFactory.createOntologyModel( DEFAULT_ONT_MODEL_SPEC, inputModel );
-		OntModel ontModel = extractTBox(unionDataset, null, graphURI);
-		
+		OntModel ontModel = extractTBox(unionDataset, null, graphURI);	
 	
 		try {
 			ontModel.enterCriticalSection(Lock.READ);
@@ -308,25 +328,6 @@ private final OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
 		}
 		
 		return aboxModel;
-		
-	}
-	
-	public Model extractUserAccountsData(Model inputModel) {
-		
-		Model userAccountsModel = ModelFactory.createDefaultModel();
-		
-		String queryStr = makeDescribeQueryStr( VitroVocabulary.USER, null );
-		
-		Query usersSparqlQuery = QueryFactory.create(queryStr);
-		QueryExecution qe = QueryExecutionFactory.create(usersSparqlQuery,inputModel);
-		try {
-			inputModel.enterCriticalSection(Lock.READ);
-			qe.execDescribe(userAccountsModel);
-		} finally {
-			inputModel.leaveCriticalSection();
-		}
-		
-		return userAccountsModel;
 		
 	}
 	

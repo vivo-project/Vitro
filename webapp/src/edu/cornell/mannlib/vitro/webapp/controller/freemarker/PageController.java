@@ -23,7 +23,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.BrowseDataGetter;
 import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetter;
 import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.ClassGroupPageData;
-
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.IndividualsForClassesDataGetter;
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.InternalClassesDataGetter;
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.DataGetterUtils;
 /**
  * Controller for getting data for pages defined in the display model. 
  * 
@@ -51,22 +53,26 @@ public class PageController extends FreemarkerHttpServlet{
             Map<String,Object>page;
             try {
                 pageUri = getPageUri( vreq , url );
-                page = getMapForPage( vreq, pageUri );
+                page = DataGetterUtils.getMapForPage( vreq, pageUri );
                 mapForTemplate.put( "page", page);
                 if( page.containsKey("title") ){
                     mapForTemplate.put("title", page.get("title"));
                 }
+
             } catch (Throwable th) {
                 return doNotFound(vreq);                
             }
             
             try{
-                mapForTemplate.putAll( getAdditionalDataForPage( vreq, pageUri, page) );
+                mapForTemplate.putAll( DataGetterUtils.getDataForPage(pageUri, vreq, getServletContext()) );
             } catch( Throwable th){
                 log.error(th,th);
                 return doError(vreq);
             }
-            
+            //set default in case doesn't exist for data getter
+            if(!mapForTemplate.containsKey("dataServiceUrlIndividualsByVClass")) {             
+            	mapForTemplate.put("dataServiceUrlIndividualsByVClass", UrlBuilder.getUrl("/dataservice?getSolrIndividualsByVClass=1&vclassId="));
+            }
             ResponseValues rv = new TemplateResponseValues(getTemplate( mapForTemplate ), mapForTemplate);            
             return rv;
         } catch (Throwable e) {
@@ -86,43 +92,6 @@ public class PageController extends FreemarkerHttpServlet{
             return DEFAULT_BODY_TEMPLATE;        
     }
 
-    protected Map<String,Object> getAdditionalDataForPage(VitroRequest vreq, String pageUri, Map<String,Object>page ) {
-        /* figure out if the page needs additional data added */
-        Map<String,Object> data = new HashMap<String,Object>();
-        List<String> types = (List<String>)page.get("types");
-        if( types != null ){
-            for( String type : types){
-                Map<String,Object> moreData = null;
-                try{
-                    moreData = getAdditionalData(vreq,pageUri,page,type);
-                    if( moreData != null)
-                        data.putAll(moreData);
-                }catch(Throwable th){
-                    log.error(th,th);
-                }                    
-            }            
-        }        
-        return data;
-    }
-
-    protected Map<String,Object> getAdditionalData(
-            VitroRequest vreq, String pageUri, Map<String, Object> page, String type) {        
-        if(type == null || type.isEmpty())
-            return Collections.emptyMap();
-            
-        PageDataGetter getter = getPageDataGetterMap(getServletContext()).get(type);
-        
-        if( getter != null ){
-            try{
-                return getter.getData(getServletContext(), vreq, pageUri, page, type);
-            }catch(Throwable th){
-                log.error(th,th);
-                return Collections.emptyMap();
-            }
-        } else {
-            return Collections.emptyMap();
-        }
-    }
 
     private ResponseValues doError(VitroRequest vreq) {
         Map<String, Object> body = new HashMap<String, Object>();
@@ -138,10 +107,6 @@ public class PageController extends FreemarkerHttpServlet{
         return new TemplateResponseValues(Template.TITLED_ERROR_MESSAGE.toString(), body, HttpServletResponse.SC_NOT_FOUND);
     }
 
-    private Map<String,Object> getMapForPage(VitroRequest vreq, String pageUri) {
-        //do a query to the display model for attributes of this page.        
-        return vreq.getWebappDaoFactory().getPageDao().getPage(pageUri);
-    }
 
     /**
      * Gets the page URI from the request.  The page must be defined in the display model.  
@@ -176,6 +141,13 @@ public class PageController extends FreemarkerHttpServlet{
             getPageDataGetterMap(context).put(cgpd.getType(), cgpd);      
             BrowseDataGetter bdg = new BrowseDataGetter();
             getPageDataGetterMap(context).put(bdg.getType(), bdg);
+            IndividualsForClassesDataGetter cidg =  new IndividualsForClassesDataGetter();
+            getPageDataGetterMap(context).put(cidg.getType(), cidg);
+            InternalClassesDataGetter internalCdg =  new InternalClassesDataGetter();
+            getPageDataGetterMap(context).put(internalCdg.getType(), internalCdg);
+            
         }
     }
+    
+    
 }

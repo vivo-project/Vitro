@@ -13,6 +13,11 @@
 <%@ page import="java.util.Set" %>
 <%@ page import="java.util.Map.Entry" %>
 
+<%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" %>
+<% request.setAttribute("requestedActions", new UseAdvancedDataToolsPages()); %>
+<vitro:confirmAuthorization />
+
 <%
 
     ModelMaker maker = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");

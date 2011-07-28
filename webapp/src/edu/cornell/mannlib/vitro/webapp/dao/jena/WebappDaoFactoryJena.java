@@ -33,6 +33,7 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.Classes2ClassesDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
@@ -41,8 +42,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayModelDao;
 import edu.cornell.mannlib.vitro.webapp.dao.FlagDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.dao.KeywordDao;
-import edu.cornell.mannlib.vitro.webapp.dao.KeywordIndividualRelationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.LinksDao;
 import edu.cornell.mannlib.vitro.webapp.dao.LinktypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.MenuDao;
@@ -51,13 +50,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
-import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
-import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
-import edu.cornell.mannlib.vitro.webapp.dao.TabIndividualRelationDao;
-import edu.cornell.mannlib.vitro.webapp.dao.TabVClassRelationDao;
-import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
+import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -69,17 +64,10 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
 
     protected IndividualDao entityWebappDao;
     protected FlagDao flagDao;
-    protected KeywordIndividualRelationDao keys2EntsDao;
-    protected KeywordDao keywordDao;
     protected LinksDao linksDao;
     protected LinktypeDao linktypeDao;
     protected ApplicationDaoJena applicationDao;
-    protected PortalDao portalDao;
-    protected TabDao tabDao;
-    protected TabIndividualRelationDao tabs2EntsDao;
-
-    protected TabVClassRelationDao tabs2TypesDao;
-    protected UserDao userDao;
+    protected UserAccountsDao userAccountsDao;
     protected VClassGroupDao vClassGroupDao;
     protected PropertyGroupDao propertyGroupDao;
 
@@ -450,41 +438,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         else
             return entityWebappDao = new IndividualDaoJena(this);
     }
-
-    public FlagDao getFlagDao() {
-        if (flagDao != null)
-            return flagDao;
-        else
-            return flagDao = new FlagDaoJena(this);
-    }
-
-    public KeywordIndividualRelationDao getKeys2EntsDao() {
-        if (keys2EntsDao != null)
-            return keys2EntsDao;
-        else
-            return keys2EntsDao = new KeywordIndividualRelationDaoJena(this);
-    }
-
-    public KeywordDao getKeywordDao() {
-        if (keywordDao != null)
-            return keywordDao;
-        else
-            return keywordDao = new KeywordDaoJena(this);
-    }
-
-    public LinksDao getLinksDao() {
-        if (linksDao != null)
-            return linksDao;
-        else
-            return linksDao = new LinksDaoJena(this);
-    }
-
-    public LinktypeDao getLinktypeDao() {
-        if (linktypeDao != null)
-            return linktypeDao;
-        else
-            return linktypeDao = new LinktypeDaoJena(this);
-    }
     
     public ApplicationDao getApplicationDao() {
     	if (applicationDao != null) {
@@ -492,35 +445,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     	} else {
     		return applicationDao = new ApplicationDaoJena(this);
     	}
-    }
-
-    public PortalDao getPortalDao() {
-        if (portalDao != null)
-            return portalDao;
-        else
-            return portalDao = new PortalDaoJena(this);
-    }
-
-    public TabDao getTabDao() {
-        if (tabDao != null)
-            return tabDao;
-        else
-            return tabDao = new TabDaoJena(this);
-    }
-
-    public TabIndividualRelationDao getTabs2EntsDao() {
-        if (tabs2EntsDao != null)
-            return tabs2EntsDao;
-        else
-            return tabs2EntsDao = new TabIndividualRelationDaoJena(this);
-    }
-
-
-    public TabVClassRelationDao getTabs2TypesDao() {
-        if (tabs2TypesDao != null)
-            return tabs2TypesDao;
-        else
-            return tabs2TypesDao = new TabVClassRelationDaoJena(this);
     }
 
     public VClassGroupDao getVClassGroupDao() {
@@ -537,13 +461,13 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
             return propertyGroupDao = new PropertyGroupDaoJena(this);
     }
 
-    public UserDao getUserDao() {
-        if (userDao != null)
-            return userDao;
-        else
-            return userDao = new UserDaoJena(this);
+    public UserAccountsDao getUserAccountsDao() {
+    	if (userAccountsDao != null)
+    		return userAccountsDao;
+    	else
+    		return userAccountsDao = new UserAccountsDaoJena(this);
     }
-
+    
     Classes2ClassesDao classes2ClassesDao = null;
     public Classes2ClassesDao getClasses2ClassesDao() {
         if(classes2ClassesDao == null )
@@ -664,6 +588,114 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         if (applicationDao != null) {
             applicationDao.close();
         }   
+    }
+    
+    //Method for creating a copy - does not pass the same object
+    public WebappDaoFactoryJena (WebappDaoFactoryJena base) {
+    	//Not sure if selector somehow has greater longevity so making a copy instead of reference
+    	
+    	if(base.ontModelSelector instanceof OntModelSelectorImpl) {
+    		OntModelSelectorImpl selector = new OntModelSelectorImpl();
+    		selector.setABoxModel(base.ontModelSelector.getABoxModel());
+    		selector.setApplicationMetadataModel(base.ontModelSelector.getApplicationMetadataModel());
+    		selector.setDisplayModel(base.ontModelSelector.getDisplayModel());
+    		selector.setFullModel(base.ontModelSelector.getFullModel());
+    		selector.setTBoxModel(base.ontModelSelector.getTBoxModel());
+    		selector.setUserAccountsModel(base.ontModelSelector.getUserAccountsModel());
+    		this.ontModelSelector = selector;
+    	} else if(base.ontModelSelector instanceof SimpleOntModelSelector) {
+    		SimpleOntModelSelector selector = new SimpleOntModelSelector();
+    		selector.setABoxModel(base.ontModelSelector.getABoxModel());
+    		selector.setApplicationMetadataModel(base.ontModelSelector.getApplicationMetadataModel());
+    		selector.setDisplayModel(base.ontModelSelector.getDisplayModel());
+    		selector.setFullModel(base.ontModelSelector.getFullModel());
+    		selector.setTBoxModel(base.ontModelSelector.getTBoxModel());
+    		selector.setUserAccountsModel(base.ontModelSelector.getUserAccountsModel());
+    		this.ontModelSelector = selector;
+    	} else {
+    		//Not sure what this is but will set to equivalence here
+    		this.ontModelSelector =base.ontModelSelector;
+    	}
+    	
+        this.defaultNamespace = base.defaultNamespace;
+        this.nonuserNamespaces = base.nonuserNamespaces;
+        this.preferredLanguages = base.preferredLanguages;
+        this.userURI = base.userURI;
+        this.flag2ValueMap = new HashMap<String,OntClass>();
+        this.flag2ValueMap.putAll(base.flag2ValueMap);
+        this.flag2ClassLabelMap = new HashMap<Resource, String>();
+        this.flag2ClassLabelMap.putAll(base.flag2ClassLabelMap);
+        this.dwf = base.dwf;
+    }
+    
+    /**
+     * Method for using special model for webapp dao factory, such as display model.  
+     * The goal here is to modify this WebappDaoFactory so that it is using the
+     * specialModel, specialTboxModel and the specialDisplayModel for individual 
+     * editing. 
+     * 
+     * DAOs related to the application configuration, user accounts, and namespaces
+     * should remain unchanged.
+     */    
+    public void setSpecialDataModel(OntModel specialModel, OntModel specialTboxModel, OntModel specialDisplayModel) {
+        if( specialModel == null )
+            throw new IllegalStateException( "specialModel must not be null");
+        
+    	//Can we get the "original" models here from somewhere?
+    	OntModelSelector originalSelector = this.getOntModelSelector();
+    	
+    	//Set up model selector for this special WDF
+    	//The selector is used by the object property DAO, therefore should be set up even though we 
+    	//use the new webapp dao factory object to generate portions to overwrite the regular webapp dao factory
+    	
+    	//The WDF expects the full model in the OntModelSelect that has 
+    	//both the ABox and TBox.  This is used to run SPARQL queries against.    	
+    	OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+        unionModel.addSubModel(specialModel);
+        
+    	OntModelSelectorImpl specialSelector = new OntModelSelectorImpl();
+    	specialSelector.setFullModel(unionModel);
+    	specialSelector.setApplicationMetadataModel(specialModel);    	
+    	
+    	if(specialDisplayModel != null) {
+    		specialSelector.setDisplayModel(specialDisplayModel);
+    	    unionModel.addSubModel(specialDisplayModel);
+    	} else {
+    		OntModel selectorDisplayModel = originalSelector.getDisplayModel();
+    		if(selectorDisplayModel != null) {
+    			specialSelector.setDisplayModel(originalSelector.getDisplayModel());
+    		}
+    	}
+    	if(specialTboxModel != null) {
+    	    unionModel.addSubModel(specialTboxModel);
+    		specialSelector.setTBoxModel(specialTboxModel);
+    	} else {
+    		OntModel selectorTboxModel = originalSelector.getTBoxModel();
+    		if(selectorTboxModel != null) {
+    			specialSelector.setTBoxModel(originalSelector.getTBoxModel());
+    		}
+    	}    	    
+    	
+    	specialSelector.setABoxModel(specialModel);
+    	specialSelector.setUserAccountsModel(specialModel);
+    	//although we're only use part of the new wadf and copy over below, the object property dao
+    	//utilizes methods that will employ the display model returned from the simple ontmodel selector
+    	//so if the object property dao is to be copied over we need to ensure we have the correct display model
+    	//and tbox model
+    	WebappDaoFactoryJena specialWadfj = new WebappDaoFactoryJena(specialSelector);
+    	entityWebappDao = specialWadfj.getIndividualDao();
+    	vClassGroupDao = specialWadfj.getVClassGroupDao();
+    	//To allow for testing, add a property group, this will allow
+    	//the unassigned group method section to be executed and main Image to be assigned to that group
+    	//otherwise the dummy group does not allow for the unassigned group to be executed
+    	propertyGroupDao = specialWadfj.getPropertyGroupDao();
+    	objectPropertyDao = specialWadfj.getObjectPropertyDao();
+    	objectPropertyStatementDao = specialWadfj.getObjectPropertyStatementDao();
+    	dataPropertyDao = specialWadfj.getDataPropertyDao();
+    	dataPropertyStatementDao = specialWadfj.getDataPropertyStatementDao();
+    	//Why can't we set the selector to be the same?
+    	ontModelSelector = specialSelector;
+    	
     }
    
 }

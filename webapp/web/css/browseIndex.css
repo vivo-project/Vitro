@@ -44,4 +44,12 @@
 }
 .individualList li a { 
     font-weight: normal; 
+    margin-right: .4em;
+}
+.individualList .display-title {
+    font-size: .825em;
+    color: #5e6363;
+    border-left: 1px solid #A6B1B0;
+    padding-left: .7em;
+    padding-right: .3em;
 }

@@ -58,12 +58,175 @@
     font-size: .9em;
     line-height: 30px;
 }
-#flash-message{
+#flash-message {
     background-color: #7285a0;
     padding: .5em;  
     margin-bottom: 10px;
 }
+.contentNote {
+    float: right;
+    padding: .6em;
+    background: #ffc;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+}
+.contentNote h4,
+.contentNote p {
+    margin: 0;
+    padding: 0;
+}
+.contentNote p {
+    font-size: .8em;
+}
+
+/* <------ SITE ADMIN*/
+ul.ingestMenu {
+    margin-bottom: 1.2em;
+}
+
 /* <------ INDEX PAGE*/
 .siteMap h2 {
     padding-bottom: 0;
+}
+.class-group {
+    margin-right:25px;
+}
+#isotope-container {
+    overflow:visible;
+}
+#isotope-container li {
+    width:290px;
+}
+/* <------ SEARCH RESULTS PAGE*/
+.searchTOC {    
+    margin-bottom: 1.5em; 
+    float:right;
+    margin-right:35px;
+    margin-left:45px;
+    width:182px;
+    text-align:center;
+/*    border: 1px solid #dde4e3;*/
+    padding-top:4px;
+    color: #fff;
+    background: #5e6363; 
+}
+.searchTOC h4 {    
+    color: #fff;
+    padding: .2em 0 .2em 0;
+}
+.searchTOC ul {
+    width: 180px;
+    border: 1px solid #dde4e3;
+    background: #f1f2ee;
+    padding: 0;
+    margin-top: 4px;
+    text-align: left;
+}
+.searchTOC ul li {
+    display: block;
+    border-bottom: 1px solid #dde4e3;
+    font-size: 14px;
+    padding-top: .5em;
+    padding-bottom: .5em;
+}
+.searchTOC ul li:hover {
+    background-color:#f7f9f9;
+}
+.searchTOC ul li:last-child {
+    border-bottom: none
+}
+.searchTOC ul a {
+    display: block;
+    padding-left: 25px;
+}
+
+/* ------------------------------------------------->  */
+/* DROP DOWN USER MENU  ---------------------------->  */
+/* ------------------------------------------------->  */
+
+/* LEVEL ONE */
+ul.dropdown { 
+    position: relative; 
+}
+ul.dropdown li {  
+    float: left; 
+    zoom: 1; 
+    padding: 0 !important;
+}
+ul.dropdown li a { 
+    display: block; 
+    font-size: 1.4em;
+}
+ul.dropdown li#user-menu { 
+    background: url(../images/arrowDownOverAccount.gif) right 9px no-repeat;
+    min-width:110px;
+    position: relative;
+}
+ul.dropdown li#user-menu a { 
+    margin-right: 28px;
+    margin-left:10px;
+}
+ul.dropdown li#user-menu.hover,
+ul.dropdown li#user-menu:hover { 
+    color: #000 !important; 
+    position: relative; 
+    background: #fff url(../images/arrowDownAccount.gif) right 9px no-repeat;
+    border-bottom: 1px solid #cdcfcf;
+}
+ul.dropdown li.hover a,
+ul.dropdown li:hover a { 
+    color: #000 !important; 
+    margin-left:10px;
+}
+/* LEVEL TWO */
+ul.dropdown ul.sub_menu {  
+    background-color: #fff;
+    font-size: 1.4em;
+    visibility: hidden; 
+    position: absolute; 
+    top: 100%; 
+    right: 0; 
+    z-index: 999;
+    color: #000;
+}
+ul.dropdown ul.sub_menu li { 
+    float: none; 
+    clear: both;
+    padding-left: 14px !important;
+    width: 96px;
+    border-right: none !important;
+    border-bottom: 1px solid #cdcfcf;
+    background: #fff url(../images/arrowMenuAccount.gif) 7px 8px no-repeat;
+}
+ul.dropdown ul.sub_menu li:last-child { 
+    width: 96px;
+}
+/* IE 6 & 7 Needs Inline Block */
+/* ADD IN IE6.css and IE7.css*/
+ul.dropdown ul.sub_menu li a { 
+    width: 90%; 
+    display: inline-block; 
+    color: #000 !important;
+    background-color: #fff;
+    padding: 0;
+    padding-left: 0px;
+    height: 24px;
+}
+ul.dropdown ul.sub_menu li.inactive { 
+    color: #aab0ae !important;
+    font-size: 1em !important;
+    padding-left: 22px !important; 
+    width: 88px; 
+}
+ul.dropdown ul.sub_menu li a:hover,
+ul.dropdown ul.sub_menu li a.hover { 
+    color: #999 !important;
+}
+/*  LEVEL THREE */
+ul.dropdown ul ul { 
+    left: 100%; top: 0; 
+}
+ul.dropdown li:hover > ul { 
+    visibility: visible; 
 }

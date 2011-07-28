@@ -8,11 +8,10 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import freemarker.template.Configuration;
 
 public class AboutController extends FreemarkerHttpServlet {
 	
@@ -22,11 +21,11 @@ public class AboutController extends FreemarkerHttpServlet {
     
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
-        Portal portal = vreq.getPortal();
+        ApplicationBean application = vreq.getAppBean();
         
         Map<String, Object> body = new HashMap<String, Object>();
-        body.put("aboutText", portal.getAboutText());
-        body.put("acknowledgeText", portal.getAcknowledgeText());
+        body.put("aboutText", application.getAboutText());
+        body.put("acknowledgeText", application.getAcknowledgeText());
         
         return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
     }

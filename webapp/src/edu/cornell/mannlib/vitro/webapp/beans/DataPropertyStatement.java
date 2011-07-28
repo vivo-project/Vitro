@@ -36,17 +36,5 @@ public interface DataPropertyStatement {
 
     public void setLanguage(String language);
 
-    public Date getSunrise();
-
-    public void setSunrise(Date sunrise);
-
-    public Date getSunset();
-
-    public void setSunset(Date sunset);
-    /*
-    public String getQualifier();
-
-    public void setQualifier(String qualifier);
-    */
     public String getString();
 }

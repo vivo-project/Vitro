@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,17 +14,19 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOwnAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
-import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ForwardResponseValues;
@@ -31,15 +34,10 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Rdf
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
-import edu.cornell.mannlib.vitro.webapp.web.BreadCrumbsUtil;
-import edu.cornell.mannlib.vitro.webapp.web.PortalWebUtil;
-import edu.cornell.mannlib.vitro.webapp.web.functions.IndividualLocalNameMethod;
+import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.Tags;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Scripts;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.files.Stylesheets;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.TabMenu;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -74,7 +72,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         }
     }
     
-    public void doGet( HttpServletRequest request, HttpServletResponse response )
+    @Override
+	public void doGet( HttpServletRequest request, HttpServletResponse response )
         throws IOException, ServletException {
         
         super.doGet(request,response);   
@@ -85,24 +84,24 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 	        Configuration config = getConfig(vreq);
 	        vreq.setAttribute("freemarkerConfig", config);
 	        
-	        ResponseValues responseValues;
-	        
-	        // This method does a redirect if the required login level is not met, so just return.
-	        if (requiredLoginLevelNotFound(request, response)) {
-	            return; 
-	        } else {
-	            responseValues = processRequest(vreq);
-	        }
+			// This method does a redirect if the required authorizations are not met, so just return. 
+			if (!isAuthorizedToDisplayPage(request, response, requiredActions(vreq))) {
+				return;
+			}
 
-	        doResponse(vreq, response, responseValues);	        
-       
+			ResponseValues responseValues = processRequest(vreq);
+	        doResponse(vreq, response, responseValues);	 
+	        
+    	} catch (TemplateProcessingException e) {
+    	    log.error(e.getMessage(), e);
         } catch (Throwable e) {
             log.error("FreeMarkerHttpServlet could not forward to view.", e);
         }
     }
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+    @Override
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
         doGet(request, response);
     }
    
@@ -112,22 +111,18 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return loader.getConfig(vreq);
     }
 
-    private boolean requiredLoginLevelNotFound(HttpServletRequest request, HttpServletResponse response) {
-        int requiredLoginLevel = requiredLoginLevel();
-        // checkLoginStatus() does a redirect if the user is not logged in.
-        if (requiredLoginLevel > LoginStatusBean.ANYBODY && !checkLoginStatus(request, response, requiredLoginLevel)) {
-            return true;
-        }
-        return false;
-    }
-    
-    protected int requiredLoginLevel() {
-        // By default, user does not need to be logged in to view pages.
-        // Subclasses that require login to process their page will override to return the required login level.
-        // NB This method can't be static, because then the superclass method gets called rather than
-        // the subclass method. For the same reason, it can't refer to a static or instance field
-        // REQUIRES_LOGIN_LEVEL which is overridden in the subclass.
-        return LoginStatusBean.ANYBODY;
+    /**
+     * By default, a page requires authorization for no actions.
+     * Subclasses that require authorization to process their page will override 
+	 *    to return the actions that require authorization.
+	 * In some cases, the choice of actions will depend on the contents of the request.
+	 *
+     * NB This method can't be static, because then the superclass method gets called rather than
+     * the subclass method. For the same reason, it can't refer to a static or instance field
+     * REQUIRED_ACTIONS which is overridden in the subclass.
+     */
+    protected Actions requiredActions(VitroRequest vreq) {
+        return Actions.AUTHORIZED;
     }
     
     // Subclasses will override
@@ -135,7 +130,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return null;
     }
        
-    protected void doResponse(VitroRequest vreq, HttpServletResponse response, ResponseValues values) {
+    protected void doResponse(VitroRequest vreq, HttpServletResponse response, 
+            ResponseValues values) throws TemplateProcessingException {
         try {
             
             int statusCode = values.getStatusCode();
@@ -159,10 +155,10 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         } catch (IOException e) {
             log.error("IOException in doResponse()", e);
         }
-     
     }
 
-    protected void doTemplate(VitroRequest vreq, HttpServletResponse response, ResponseValues values) {
+    protected void doTemplate(VitroRequest vreq, HttpServletResponse response, 
+            ResponseValues values) throws TemplateProcessingException {
      
         Configuration config = getConfig(vreq);
         
@@ -189,14 +185,22 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         templateDataModel.put("body", bodyString);
         
         // Tell the template and any directives it uses that we're processing a page template.
-        templateDataModel.put("templateType", PAGE_TEMPLATE_TYPE);        
-        writePage(templateDataModel, config, vreq, response);       
+        templateDataModel.put("templateType", PAGE_TEMPLATE_TYPE);  
+        
+        writePage(templateDataModel, config, vreq, response, values.getStatusCode());       
     }
     
     protected void doRedirect(HttpServletRequest request, HttpServletResponse response, ResponseValues values) 
         throws ServletException, IOException { 
         String redirectUrl = values.getRedirectUrl();
+        setResponseStatus(response, values.getStatusCode());
         response.sendRedirect(redirectUrl);        
+    }
+    
+    private void setResponseStatus(HttpServletResponse response, int statusCode) {
+        if (statusCode > 0) {
+            response.setStatus(statusCode);
+        }
     }
     
     protected void doForward(HttpServletRequest request, HttpServletResponse response, ResponseValues values) 
@@ -229,42 +233,47 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         values.getModel().write( response.getOutputStream(), format );      
     }
 
-    protected void doException(VitroRequest vreq, HttpServletResponse response, ResponseValues values) {
+    protected void doException(VitroRequest vreq, HttpServletResponse response, 
+            ResponseValues values) throws TemplateProcessingException {
         // Log the error, and display an error message on the page.        
         log.error(values.getException(), values.getException());      
         TemplateResponseValues trv = TemplateResponseValues.getTemplateResponseValuesFromException((ExceptionResponseValues)values);
         doTemplate(vreq, response, trv);
     }
 
-    public String getThemeDir(Portal portal) {
-        return portal.getThemeDir().replaceAll("/$", "");
+    public String getThemeDir(ApplicationBean appBean) {
+        return appBean.getThemeDir().replaceAll("/$", "");
     }
 
     // Define the URLs that are accessible to the templates. Note that we do not create menus here,
     // because we want the templates to be free to define the link text and where the links are displayed.
-    private final Map<String, String> getUrls(String themeDir, UrlBuilder urlBuilder, VitroRequest vreq) {
+    private final Map<String, String> getUrls(String themeDir, VitroRequest vreq) {
         Map<String, String> urls = new HashMap<String, String>();
         
-        urls.put("home", urlBuilder.getHomeUrl());
+        urls.put("home", UrlBuilder.getHomeUrl());
         
         // Templates use this to construct urls.
         urls.put("base", UrlBuilder.contextPath);
 
-        urls.put("about", urlBuilder.getPortalUrl(Route.ABOUT));
-        if (ContactMailServlet.getSmtpHostFromProperties() != null) {
-            urls.put("contact", urlBuilder.getPortalUrl(Route.CONTACT));
+        urls.put("about", UrlBuilder.getUrl(Route.ABOUT));
+        if (FreemarkerEmailFactory.isConfigured(vreq)) {
+            urls.put("contact", UrlBuilder.getUrl(Route.CONTACT));
         }
-        urls.put("search", urlBuilder.getPortalUrl(Route.SEARCH));  
-        urls.put("termsOfUse", urlBuilder.getPortalUrl(Route.TERMS_OF_USE));  
-        urls.put("login", urlBuilder.getLoginUrl());          
-        urls.put("logout", urlBuilder.getLogoutUrl());       
-        urls.put("siteAdmin", urlBuilder.getPortalUrl(Route.SITE_ADMIN));  
-        urls.put("siteIcons", urlBuilder.getPortalUrl(themeDir + "/site_icons")); // deprecated
-        urls.put("themeImages", urlBuilder.getPortalUrl(themeDir + "/images"));
+        urls.put("search", UrlBuilder.getUrl(Route.SEARCH));  
+        urls.put("termsOfUse", UrlBuilder.getUrl(Route.TERMS_OF_USE));  
+        urls.put("login", UrlBuilder.getLoginUrl());          
+        urls.put("logout", UrlBuilder.getLogoutUrl());       
+        urls.put("siteAdmin", UrlBuilder.getUrl(Route.SITE_ADMIN));  
+        urls.put("themeImages", UrlBuilder.getUrl(themeDir + "/images"));
         urls.put("images", UrlBuilder.getUrl("/images"));
         urls.put("theme", UrlBuilder.getUrl(themeDir));
         urls.put("index", UrlBuilder.getUrl("/browse"));   
         urls.put("currentPage", getCurrentPageUrl(vreq));
+        urls.put("referringPage", getReferringPageUrl(vreq));
+        
+		if (PolicyHelper.isAuthorizedForActions(vreq, new EditOwnAccount())) {
+			urls.put("myAccount", UrlBuilder.getUrl("/accounts/myAccount"));
+		}
         
         return urls;
     }
@@ -278,44 +287,36 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         path = normalizeServletName(path);        
         return UrlBuilder.getUrl(path);
     }
+    
+    private String getReferringPageUrl(HttpServletRequest request) {
+		String referrer = request.getHeader("referer");
+		return (referrer == null) ? UrlBuilder.getHomeUrl() : referrer;
+    }
 
-    protected BeansWrapper getNonDefaultBeansWrapper(int exposureLevel) {
+    protected TemplateModel wrap(Object obj, int exposureLevel) throws TemplateModelException {
+        BeansWrapper wrapper = getBeansWrapper(exposureLevel);
+        return wrapper.wrap(obj);
+    }
+    
+    protected BeansWrapper getBeansWrapper(int exposureLevel) {
         BeansWrapper wrapper = new DefaultObjectWrapper();
-        // Too bad exposure levels are ints instead of enum values; what happens if 
-        // we send an int that's not a defined exposure level?
         wrapper.setExposureLevel(exposureLevel);
         return wrapper;
     }
-    
-    private TemplateModel getStylesheetList(String themeDir) {
-        
+
+    private TemplateModel getTagList() {        
         // For script and stylesheet lists, use an object wrapper that exposes write methods, 
         // instead of the configuration's object wrapper, which doesn't. The templates can
         // add stylesheets and scripts to the lists by calling their add() methods.
-        BeansWrapper wrapper = getNonDefaultBeansWrapper(BeansWrapper.EXPOSE_SAFE);
         try {
-            // Here themeDir SHOULD NOT have the context path already added to it.
-            return wrapper.wrap(new Stylesheets(themeDir));       
+            return wrap(new Tags(), BeansWrapper.EXPOSE_SAFE);
         } catch (TemplateModelException e) {
-            log.error("Error creating stylesheet TemplateModel");
+            log.error("Error creating Tags template model");
             return null;
         }
     }
     
-    private TemplateModel getScriptList(String themeDir) {
-        
-        // For script and stylesheet lists, use an object wrapper that exposes write methods, 
-        // instead of the configuration's object wrapper, which doesn't. The templates can
-        // add stylesheets and scripts to the lists by calling their add() methods.
-        BeansWrapper wrapper = getNonDefaultBeansWrapper(BeansWrapper.EXPOSE_SAFE);
-        try {
-            return wrapper.wrap(new Scripts(themeDir));       
-        } catch (TemplateModelException e) {
-            log.error("Error creating script TemplateModel");
-            return null;
-        }        
-    }
-    
+
     /**
      *  Add any Java directives the templates should have access to.
      *  This is public and static so that these may be used by other classes during
@@ -323,19 +324,25 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
      */    
     public static Map<String, Object> getDirectives() {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("describe", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.DescribeDirective());
-        map.put("dump", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.DumpDirective());
-        map.put("dumpAll", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.DumpAllDirective());  
-        map.put("help", new edu.cornell.mannlib.vitro.webapp.web.directives.dump.HelpDirective()); 
-        //map.put("url", new edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective()); 
+        map.putAll(getDirectivesForAllEnvironments());
+        map.put("url", new edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective()); 
         map.put("widget", new edu.cornell.mannlib.vitro.webapp.web.directives.WidgetDirective());
+        
+        return map;
+    }
+    
+    public static Map<String, Object> getDirectivesForAllEnvironments() {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("dump", new freemarker.ext.dump.DumpDirective());
+        map.put("dumpAll", new freemarker.ext.dump.DumpAllDirective());  
+        map.put("help", new freemarker.ext.dump.HelpDirective());    
         return map;
     }
     
     public static Map<String, Object> getMethods() {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("profileUrl", new edu.cornell.mannlib.vitro.webapp.web.functions.IndividualProfileUrlMethod());
-        map.put("localName", new edu.cornell.mannlib.vitro.webapp.web.functions.IndividualLocalNameMethod());
+        map.put("profileUrl", new edu.cornell.mannlib.vitro.webapp.web.methods.IndividualProfileUrlMethod());
+        map.put("localName", new edu.cornell.mannlib.vitro.webapp.web.methods.IndividualLocalNameMethod());
         return map;
     }
     
@@ -347,53 +354,37 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
         Map<String, Object> map = new HashMap<String, Object>();
 
-        Portal portal = vreq.getPortal();
-        // Ideally, templates wouldn't need portal id. Currently used as a hidden input value
-        // in the site search box, so needed for now.
-        map.put("portalId", portal.getPortalId());
-        
-        String siteName = portal.getAppName();
+        ApplicationBean appBean = vreq.getAppBean();
+        String siteName = appBean.getApplicationName();
         map.put("siteName", siteName);
         
         // This may be overridden by the body data model received from the subcontroller.
         map.put("title", getTitle(siteName, vreq));
 
-        String themeDir = getThemeDir(portal);
-        UrlBuilder urlBuilder = new UrlBuilder(portal);
+        String themeDir = getThemeDir(appBean);
         
-        map.put("urls", getUrls(themeDir, urlBuilder, vreq)); 
+        map.put("urls", getUrls(themeDir, vreq)); 
 
         map.put("themeDir", themeDir);
         map.put("currentTheme", themeDir.substring(themeDir.lastIndexOf('/')+1));
-        map.put("stylesheets", getStylesheetList(themeDir));
-        map.put("scripts", getScriptList(themeDir));
-        map.put("headScripts", getScriptList(themeDir));
+        map.put("stylesheets", getTagList());
+        map.put("scripts", getTagList());
+        map.put("headScripts", getTagList());
         
         map.putAll(getDirectives());
         map.putAll(getMethods());
         
-        map.put("tabMenu", getTabMenu(vreq));
         map.put("menu", getDisplayModelMenu(vreq));
-        
-        ApplicationBean appBean = vreq.getAppBean();
-        PortalWebUtil.populateSearchOptions(portal, appBean, vreq.getWebappDaoFactory().getPortalDao());
-        PortalWebUtil.populateNavigationChoices(portal, vreq, appBean, vreq.getWebappDaoFactory().getPortalDao()); 
         
         map.put("user", new User(vreq));
         
-        map.put("version", getRevisionInfo(urlBuilder));
+        map.put("version", getRevisionInfo());
         
-        map.put("copyright", getCopyrightInfo(portal));    
-        map.put("siteTagline", portal.getShortHand());
-        map.put("breadcrumbs", BreadCrumbsUtil.getBreadCrumbsDiv(vreq));
+        map.put("copyright", getCopyrightInfo(appBean));    
+        map.put("siteTagline", appBean.getShortHand());
 
         // This value is used only in stylesheets.ftl and already contains the context path.
         map.put("stylesheetPath", UrlBuilder.getUrl(themeDir + "/css"));  
-
-        String bannerImage = portal.getBannerImage();  
-        if ( ! StringUtils.isEmpty(bannerImage)) {
-            map.put("bannerImage", UrlBuilder.getUrl(themeDir + "site_icons/" + bannerImage));
-        }
 
         String flashMessage = DisplayMessage.getMessageAndClear(vreq);
         if (! flashMessage.isEmpty()) {
@@ -402,6 +393,9 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 
         // Let the page template know which page it's processing.
         map.put("currentServlet", normalizeServletName(vreq.getServletPath().replaceFirst("/", "")));
+
+        // In template: ${now?date}, ${now?datetime}, ${now?time}
+        map.put("now", new Date());
         
         return map;        
     }  
@@ -412,21 +406,16 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         // since we don't get here on other tabs.
         return (name.length() == 0 || name.equals("index.jsp")) ? "home" : name;
     }
-
-    private TabMenu getTabMenu(VitroRequest vreq) {
-        int portalId = vreq.getPortal().getPortalId();
-        return new TabMenu(vreq, portalId);
-    }
     
     protected MainMenu getDisplayModelMenu(VitroRequest vreq){
         String url = vreq.getRequestURI().substring(vreq.getContextPath().length());
         return vreq.getWebappDaoFactory().getMenuDao().getMainMenu(url);
     }
     
-    private final Map<String, Object> getCopyrightInfo(Portal portal) {
+    private final Map<String, Object> getCopyrightInfo(ApplicationBean appBean) {
 
         Map<String, Object> copyright = null;
-        String copyrightText = portal.getCopyrightAnchor();
+        String copyrightText = appBean.getCopyrightAnchor();
         if ( ! StringUtils.isEmpty(copyrightText) ) {
             copyright =  new HashMap<String, Object>();
             copyright.put("text", copyrightText);
@@ -434,16 +423,16 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             //String thisYear = ((Integer)Calendar.getInstance().get(Calendar.YEAR)).toString(); // use ${copyrightYear} in template
             //SimpleDate thisYear = new SimpleDate(Calendar.getInstance().getTime(), TemplateDateModel.DATE); // use ${copyrightYear?string("yyyy")} in template
             copyright.put("year", thisYear);
-            copyright.put("url", portal.getCopyrightURL());
+            copyright.put("url", appBean.getCopyrightURL());
         } 
         return copyright;
     }
     
-    private final Map<String, Object> getRevisionInfo(UrlBuilder urlBuilder) {
+    private final Map<String, Object> getRevisionInfo() {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("label", RevisionInfoBean.getBean(getServletContext())
                 .getReleaseLabel());
-        map.put("moreInfoUrl", urlBuilder.getPortalUrl("/revisionInfo"));
+        map.put("moreInfoUrl", UrlBuilder.getUrl("/revisionInfo"));
         return map;
     }
 
@@ -453,37 +442,46 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     }
 
     protected StringWriter processTemplate(String templateName, Map<String, Object> map, Configuration config, 
-            HttpServletRequest request) {    
+            HttpServletRequest request) throws TemplateProcessingException {    
         TemplateProcessingHelper helper = new TemplateProcessingHelper(config, request, getServletContext());
         return helper.processTemplate(templateName, map);
     }
     
-    protected StringWriter processTemplate(ResponseValues values, Configuration config, HttpServletRequest request) {
+    protected StringWriter processTemplate(ResponseValues values, Configuration config, 
+            HttpServletRequest request) throws TemplateProcessingException {
         return processTemplate(values.getTemplateName(), values.getMap(), config, request);
     }
     
     // In fact, we can put StringWriter objects directly into the data model, so perhaps we should eliminate the processTemplateToString() methods.
     protected String processTemplateToString(String templateName, Map<String, Object> map, Configuration config, 
-            HttpServletRequest request) {
+            HttpServletRequest request) throws TemplateProcessingException {
         return processTemplate(templateName, map, config, request).toString();
     }
   
-    protected String processTemplateToString(ResponseValues values, Configuration config, HttpServletRequest request) {
+    protected String processTemplateToString(ResponseValues values, Configuration config, 
+            HttpServletRequest request) throws TemplateProcessingException {
         return processTemplate(values, config, request).toString();
     }
     
-    protected void writePage(Map<String, Object> root, Configuration config, HttpServletRequest request, HttpServletResponse response) {   
-        writeTemplate(getPageTemplateName(), root, config, request, response);                   
+    protected void writePage(Map<String, Object> root, Configuration config, 
+            HttpServletRequest request, HttpServletResponse response, int statusCode) throws TemplateProcessingException {   
+        writeTemplate(getPageTemplateName(), root, config, request, response, statusCode);                   
     }
     
     protected void writeTemplate(String templateName, Map<String, Object> map, Configuration config, 
-            HttpServletRequest request, HttpServletResponse response) {       
-        StringWriter sw = processTemplate(templateName, map, config, request);          
-        write(sw, response);
+            HttpServletRequest request, HttpServletResponse response) throws TemplateProcessingException { 
+        writeTemplate(templateName, map, config, request, response, 0);
+    }
+
+    protected void writeTemplate(String templateName, Map<String, Object> map, Configuration config, 
+            HttpServletRequest request, HttpServletResponse response, int statusCode) throws TemplateProcessingException {       
+        StringWriter sw = processTemplate(templateName, map, config, request);     
+        write(sw, response, statusCode);
     }
     
-    protected void write(StringWriter sw, HttpServletResponse response) {        
+    protected void write(StringWriter sw, HttpServletResponse response, int statusCode) {        
         try {
+            setResponseStatus(response, statusCode);
             PrintWriter out = response.getWriter();
             out.print(sw);     
         } catch (IOException e) {

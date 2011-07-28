@@ -13,19 +13,23 @@
     <#-- Refinement links -->
     <#if classGroupLinks?has_content>
         <div class="searchTOC">
-            <span class="jumpText">Show only results of this <b>type</b>:</span>           
+            <h4>Display only</h4>           
+            <ul>           
             <#list classGroupLinks as link>
-                <a href="${link.url}">${link.text}</a>
+                <li><a href="${link.url}">${link.text}</a></li>
             </#list>
+            </ul>           
         </div>
     </#if>
 
     <#if classLinks?has_content>
         <div class="searchTOC">
-            <span class="jumpText">Show only results of this <b>subtype</b>:</span>           
+            <h4>Limit ${classGroupName} to</h4>
+            <ul>           
             <#list classLinks as link>
-                <a href="${link.url}">${link.text}</a>
+                <li><a href="${link.url}">${link.text}</a></li>
             </#list>
+            </ul>
         </div>
     </#if>
 
@@ -56,4 +60,4 @@
 
 </div> <!-- end contentsBrowseGroup -->
 
-${stylesheets.add("/css/search.css")}
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/search.css" />')}

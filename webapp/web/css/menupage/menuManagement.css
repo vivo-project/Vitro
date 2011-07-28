@@ -1,0 +1,57 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+/**Added by Huda for demonstration so feel free to edit/remove**/
+
+/*note for mb: hide should be changed to hidden. We have a hidden class at the vitro layer vitro.css*/
+.hide {
+    display:none;
+}
+#add-menu-item p,
+#edit-menu-item p {
+    margin-top: 15px;
+}
+#add-menu-item input[name="prettyUrl"],
+#edit-menu-item input[name="prettyUrl"] {
+    margin-bottom: 0;
+}
+#add-menu-item p.note,
+#edit-menu-item p.note {
+    margin-top: 5px;
+}
+#existingContentType {
+    margin-top: 15px;
+}
+#selectContentType label {
+    margin-top: 15px;
+}
+#selectedContentTypeValue {
+    padding: 0.2em 0.4em;
+    background: #f4f4f4;
+    margin-right: .4em;
+}
+ul#selectedClasses {
+    list-style-type: none;
+}
+#add-menu-item input.submit,
+#edit-menu-item input.submit {
+    margin-top: 20px;
+}
+#internal-class {
+    padding: 0.8em 1em;
+    background: #f4f4f4;
+    margin-right: .4em;
+    width: 65%;
+}
+#internal-class label {
+    color: #7F8993;
+}
+#internal-class p.note {
+    color: #595B5B;
+    padding-left: 25px;
+}
+ul#selectedClasses li {
+    margin-left: .4em;
+}
+#error-alert{
+    height: auto !important;
+}

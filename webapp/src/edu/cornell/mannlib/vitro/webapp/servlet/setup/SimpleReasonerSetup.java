@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
-import java.sql.Connection;
-
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -13,23 +11,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mindswap.pellet.PelletOptions;
 
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.sdb.SDBFactory;
-import com.hp.hpl.jena.sdb.Store;
-import com.hp.hpl.jena.sdb.StoreDesc;
-import com.hp.hpl.jena.sdb.sql.SDBConnection;
-import com.hp.hpl.jena.sdb.store.DatabaseType;
-import com.hp.hpl.jena.sdb.store.LayoutType;
 import com.hp.hpl.jena.vocabulary.OWL;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.RDBGraphGenerator;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.RegeneratingGraph;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.SDBGraphGenerator;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.ReasonerConfiguration;
@@ -45,6 +32,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	static final String JENA_INF_MODEL_REBUILD = "http://vitro.mannlib.cornell.edu/default/vitro-kb-inf-rebuild";
 	static final String JENA_INF_MODEL_SCRATCHPAD = "http://vitro.mannlib.cornell.edu/default/vitro-kb-inf-scratchpad";
 
+	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 	    
 	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
@@ -54,9 +42,9 @@ public class SimpleReasonerSetup implements ServletContextListener {
 		try {	
 		    // set up Pellet reasoning for the TBox	
 			
-			OntModelSelector assertionsOms = (OntModelSelector) sce.getServletContext().getAttribute("baseOntModelSelector");
-			OntModelSelector inferencesOms = (OntModelSelector) sce.getServletContext().getAttribute("inferenceOntModelSelector");
-			OntModelSelector unionOms = (OntModelSelector) sce.getServletContext().getAttribute("unionOntModelSelector");
+			OntModelSelector assertionsOms = ModelContext.getBaseOntModelSelector(sce.getServletContext());
+			OntModelSelector inferencesOms = ModelContext.getInferenceOntModelSelector(sce.getServletContext());
+			OntModelSelector unionOms = ModelContext.getUnionOntModelSelector(sce.getServletContext());
 
 			WebappDaoFactoryJena wadf = (WebappDaoFactoryJena) sce.getServletContext().getAttribute("webappDaoFactory");
 			
@@ -88,7 +76,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	        ServletContext ctx = sce.getServletContext();
 	        BasicDataSource bds = JenaDataSourceSetupBase
 	                                .getApplicationDataSource(ctx);
-	        String dbType = ConfigurationProperties.getProperty( // database type
+	        String dbType = ConfigurationProperties.getBean(ctx).getProperty( // database type
                     "VitroConnection.DataSource.dbtype","MySQL");
 	        
 	        	        
@@ -97,21 +85,21 @@ public class SimpleReasonerSetup implements ServletContextListener {
                     JENA_INF_MODEL_REBUILD, 
                     JenaDataSourceSetupBase.DB_ONT_MODEL_SPEC, 
                     TripleStoreType.SDB, 
-                    dbType);            
+                    dbType, ctx);            
             Model scratchModel = JenaDataSourceSetupBase.makeDBModel(
                     bds, 
                     JENA_INF_MODEL_SCRATCHPAD, 
                     JenaDataSourceSetupBase.DB_ONT_MODEL_SPEC, 
                     TripleStoreType.SDB, 
-                    dbType); 
+                    dbType, ctx); 
 	        
 	        
 	        // the simple reasoner will register itself as a listener to the ABox assertions
 	        SimpleReasoner simpleReasoner = new SimpleReasoner(unionOms.getTBoxModel(), assertionsOms.getABoxModel(), inferencesOms.getABoxModel(), rebuildModel, scratchModel);
+	        sce.getServletContext().setAttribute(SimpleReasoner.class.getName(),simpleReasoner);
 	        
-	        if (isRecomputeRequired(sce.getServletContext())) {
-	            
-	            log.info("ABox inference recompute required");
+	        if (isRecomputeRequired(sce.getServletContext())) {   
+	            log.info("ABox inference recompute required.");
 	            
 	            int sleeps = 0;
 	            while (sleeps < 1000 && pelletListener.isReasoning()) {
@@ -122,13 +110,29 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	                sleeps++;
 	            }
 	            
-	            simpleReasoner.recompute();
+	            if (JenaDataSourceSetupBase.isFirstStartup()) {
+	            	simpleReasoner.recompute();
+	            } else {
+	            	log.info("starting ABox inference recompute in a separate thread.");
+        		    new Thread(new ABoxRecomputer(simpleReasoner),"ABoxRecomputer").start();
+	            }
+        		
+	        } else if ( isMSTComputeRequired(sce.getServletContext()) ) {
+	            log.info("mostSpecificType computation required. It will be done in a separate thread.");
 	            
+	            int sleeps = 0;
+	            while (sleeps < 1000 && pelletListener.isReasoning()) {
+	                if ((sleeps % 30) == 0) {
+	                    log.info("Waiting for initial TBox reasoning to complete");
+	                }
+	                Thread.sleep(100);   
+	                sleeps++;
+	            }
+	            
+	            new Thread(new MostSpecificTypeRecomputer(simpleReasoner),"MostSpecificTypeComputer").start();
 	        }
 
 	        assertionsOms.getTBoxModel().register(new SimpleReasonerTBoxListener(simpleReasoner));
-	        
-	        sce.getServletContext().setAttribute("simpleReasoner",simpleReasoner);
 	        
 	        log.info("Simple reasoner connected for the ABox");
 	        
@@ -137,8 +141,25 @@ public class SimpleReasonerSetup implements ServletContextListener {
 		}		
 	}
 	
-	public void contextDestroyed(ServletContextEvent arg0) {
-		// nothing to do
+	@Override
+	public void contextDestroyed(ServletContextEvent sce) {
+		log.info("received contextDestroyed notification");
+        SimpleReasoner simpleReasoner = getSimpleReasonerFromServletContext(sce.getServletContext());
+	    
+	    if (simpleReasoner != null) {
+	    	log.info("sending stop request to SimpleReasoner");
+	    	simpleReasoner.setStopRequested();
+	    } 
+	}
+	
+	public static SimpleReasoner getSimpleReasonerFromServletContext(ServletContext ctx) {
+	    Object simpleReasoner = ctx.getAttribute(SimpleReasoner.class.getName());
+	    
+	    if (simpleReasoner instanceof SimpleReasoner) {
+	        return (SimpleReasoner) simpleReasoner;
+	    } else {
+	        return null;
+	    }
 	}
 	
 	private static final String RECOMPUTE_REQUIRED_ATTR = 
@@ -152,4 +173,40 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	    return (ctx.getAttribute(RECOMPUTE_REQUIRED_ATTR) != null);
 	}
   
+	private static final String MSTCOMPUTE_REQUIRED_ATTR = 
+        SimpleReasonerSetup.class.getName() + ".MSTComputeRequired";
+
+	public static void setMSTComputeRequired(ServletContext ctx) {
+	    ctx.setAttribute(MSTCOMPUTE_REQUIRED_ATTR, true);
+	}
+	
+	private static boolean isMSTComputeRequired(ServletContext ctx) {
+	    return (ctx.getAttribute(MSTCOMPUTE_REQUIRED_ATTR) != null);
+	}
+	
+    private class ABoxRecomputer implements Runnable {
+        
+        private SimpleReasoner simpleReasoner;
+        
+        public ABoxRecomputer(SimpleReasoner simpleReasoner) {
+            this.simpleReasoner = simpleReasoner;
+        }
+        
+        public void run() {
+            simpleReasoner.recompute();
+        }
+    }
+    
+    private class MostSpecificTypeRecomputer implements Runnable {
+        
+        private SimpleReasoner simpleReasoner;
+        
+        public MostSpecificTypeRecomputer(SimpleReasoner simpleReasoner) {
+            this.simpleReasoner = simpleReasoner;
+        }
+        
+        public void run() {
+        	simpleReasoner.computeMostSpecificType();      		
+        }
+    }
 }

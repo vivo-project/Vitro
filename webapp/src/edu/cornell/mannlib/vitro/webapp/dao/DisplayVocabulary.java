@@ -16,30 +16,57 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 public class DisplayVocabulary {
     /** <p>The ontology model that holds the vocabulary terms</p> */
     private static OntModel m_model = ModelFactory.createOntologyModel( OntModelSpec.OWL_MEM, null );
+
+    /*Uris for Models for Display*/
     
+    public static final String DISPLAY_TBOX_MODEL_URI = "http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadataTBOX";
+    public static final String DISPLAY_DISPLAY_MODEL_URI = "http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadata-displayModel";
     /* Namespace for display vocabulary */
     public static final String DISPLAY_NS = "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#";
     private static final String NS = DISPLAY_NS;
     
     /* Individuals */
-    public static final String PRIMARY_LUCENE_INDEX_URI = NS + "PrimaryLuceneIndex";
+    public static final String DEFAULT_MENU = NS + "DefaultMenu";
+    public static final String SEARCH_INDEX_URI = NS + "SearchIndex";
+    
+    //bk392 for extracting properties beyond context nodes.
+    public static final String CONTEXT_NODES_URI = NS + "QueryForContextNodes";
     
     /* Page types */
+    //Corresponding to statements in menu management that define class of data getter to be used
     public static final String PAGE_TYPE = NS + "Page";
     public static final String HOME_PAGE_TYPE = NS + "HomePage";
     public static final String CLASSGROUP_PAGE_TYPE = NS + "ClassGroupPage";
+    public static final String CLASSINDIVIDUALS_PAGE_TYPE = NS + "IndividualsForClassesPage";
+    public static final String CLASSINDIVIDUALS_INTERNAL_TYPE = NS + "InternalClassesPage";
 
     /* Object Properties */
     public static final String FOR_CLASSGROUP = NS + "forClassGroup";
-    
+    public static final String CLASS_INTERSECTION = NS + "intersectsWithClass";
+    public static final String HAS_CLASS_INTERSECTION = NS + "hasClassIntersection";
+    public static final String ITEM_TO_PAGE = NS + "toPage";
+    public static final String HAS_ELEMENT = NS + "hasElement";
+
+    /**Data Getter object properties **/
+    public static final String HAS_DATA_GETTER = NS + "hasDataGetter";
+    public static final String GETINDIVIDUALS_FOR_CLASS = NS + "getIndividualsForClass";
+    public static final String 	RESTRICT_RESULTS_BY = NS + "restrictResultsByClass";
+    //specific case for internal class, value is true or false
+    public static final String 	RESTRICT_RESULTS_BY_INTERNAL = NS + "restrictResultsByInternalClass";
+
+
     /* Data Properties */
     public static final DatatypeProperty URL_MAPPING = m_model.createDatatypeProperty(NS + "urlMapping");
     public static final String TITLE = NS + "title";
-    public static final DatatypeProperty REQUIRES_BODY_TEMPLATE = m_model.createDatatypeProperty(NS + "requiresBodyTemplate"); 
-    
+    public static final DatatypeProperty REQUIRES_BODY_TEMPLATE = m_model.createDatatypeProperty(NS + "requiresBodyTemplate");
+    //bk392 for extracting properties beyond context nodes.
+    public static final DatatypeProperty QUERY_FOR_EDUCATIONAL_TRAINING = m_model.createDatatypeProperty(NS + "queryForEducationalTraining");
+    public static final DatatypeProperty LINK_TEXT = m_model.createDatatypeProperty(NS + "linkText");
+
     /* URIs for storing menu.n3 */
     public static final String MENU_TEXT_RES = NS + "MenuText";    
     public static final String HAS_TEXT_REPRESENTATION = NS + "hasMenuText";
+    
     
     
     /** <p>The namespace of the vocabulary as a string</p>
@@ -79,7 +106,24 @@ public class DisplayVocabulary {
     /** <p>Class of pages.</p> */
     public static final OntClass PAGE = m_model.createClass( NS + "Page" );
     
+    
+    //Parameters to switch to menu editing - or to switch models
+    public static final String SWITCH_TO_DISPLAY_MODEL = "switchToDisplayModel";
+    public static final String USE_MODEL_PARAM = "useThisModel";
+    public static final String USE_TBOX_MODEL_PARAM = "useThisTboxModel";
+    public static final String USE_DISPLAY_MODEL_PARAM = "useThisDisplayModel";
+    
+    //Attribute values used to store display tbox/display display model in servlet context
+    public static final String CONTEXT_DISPLAY_TBOX = "displayOntModelTBOX";
+    public static final String CONTEXT_DISPLAY_DISPLAY = "displayOntModelDisplayModel";
+    
+    //URL for menu management
+    public static final String PROCESS_MENU_MANAGEMENT_URL = "/processEditDisplayModel";
+    public static final String REORDER_MENU_URL = PROCESS_MENU_MANAGEMENT_URL + "?cmd=Reorder&" + SWITCH_TO_DISPLAY_MODEL + "=true";
+
     /* URIs for some individuals in the dispaly ontology */
+
+	public static final String HOME_MENU_ITEM = DISPLAY_NS + "HomeMenuItem";
         
     
     //public static final Individual EVENTS = m_model.createIndividual( NS + "Events", PAGE );

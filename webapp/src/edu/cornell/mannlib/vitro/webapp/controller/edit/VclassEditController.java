@@ -20,7 +20,8 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -36,17 +37,11 @@ public class VclassEditController extends BaseEditController {
 	private static final int NUM_COLS = 12;
 
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
-    	
-    	VitroRequest request = new VitroRequest(req);
-
-        if (!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error("VclassEditController caught exception calling doGet()");
+        if (!isAuthorizedToDisplayPage(req, response, new Actions(new EditOntology()))) {
+        	return;
         }
+
+    	VitroRequest request = new VitroRequest(req);
 
         EditProcessObject epo = super.createEpo(request, FORCE_NEW);
         request.setAttribute("epoKey", epo.getKey());
@@ -216,15 +211,13 @@ public class VclassEditController extends BaseEditController {
 
         boolean instantiable = (vcl.getURI().equals(OWL.Nothing.getURI())) ? false : true;
         
-        Portal portal = (new VitroRequest(request)).getPortal();
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("epoKey",epo.getKey());
         request.setAttribute("vclassWebapp", vcl);
         request.setAttribute("instantiable", instantiable);
         request.setAttribute("bodyJsp","/templates/edit/specific/classes_edit.jsp");
-        request.setAttribute("portalBean",portal);
         request.setAttribute("title","Class Control Panel");
-        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
+        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+request.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
             rd.forward(request, response);

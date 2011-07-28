@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
@@ -26,18 +27,13 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.util.iterator.ClosableIterator;
-import com.hp.hpl.jena.vocabulary.OWL;
-import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -53,7 +49,6 @@ public class IndividualDaoSDB extends IndividualDaoJena {
 
 	private DatasetWrapperFactory dwf;
     private SDBDatasetMode datasetMode;
-	private WebappDaoFactoryJena wadf;
 	
     public IndividualDaoSDB(DatasetWrapperFactory dwf, 
                             SDBDatasetMode datasetMode, 
@@ -69,14 +64,18 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     
     protected Individual makeIndividual(String individualURI) {
         try {
-            return new IndividualSDB(individualURI, this.dwf, datasetMode, getWebappDaoFactory());
+            return new IndividualSDB(individualURI, 
+            	                     this.dwf,
+            	                     datasetMode, 
+            	                     getWebappDaoFactory());
         } catch (IndividualNotFoundException e) {
             // If the individual does not exist, return null.
             return null;
         }
     }
 
-    private static final Log log = LogFactory.getLog(IndividualDaoSDB.class.getName());
+    private static final Log log = LogFactory.getLog(
+    		IndividualDaoSDB.class.getName());
 
     @Override
     protected OntModel getOntModel() {
@@ -86,7 +85,9 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     private static final boolean SKIP_INITIALIZATION = true;
     
     @Override
-    public List getIndividualsByVClassURI(String vclassURI, int offset, int quantity ) {
+    public List getIndividualsByVClassURI(String vclassURI, 
+    		                              int offset, 
+    		                              int quantity ) {
 
     	if (vclassURI==null) {
             return null;
@@ -105,66 +106,42 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         		ents.addAll(getIndividualsByVClass(vc));
         	}
         } else {
-    	    DatasetWrapper w = getDatasetWrapper();
-    	    Dataset dataset = w.getDataset();
-        	dataset.getLock().enterCriticalSection(Lock.READ);
-        	try {
-        	    String[] graphVars = {"?g", "?h", "?i"};
-        		String query = 
-    	    		"SELECT DISTINCT ?ind ?label ?moniker " +
-    	    		"WHERE " +
-    	    		 "{ \n" +
-    	    		 	"{ \n" +
-                        "    ?ind a <" + theClass.getURI() + "> . \n" +
-    	    		 	"    ?ind  <" + RDFS.label.getURI() + "> ?label \n" +
-    	    		 	"} \n" +
-    	    		 	"UNION { \n" +
-                        "    ?ind a <" + theClass.getURI() + "> . \n" +
-    	    		 	"    ?ind  <" + VitroVocabulary.MONIKER + "> ?moniker \n" +
-    	    		 	"} \n" +
-    	    		 "} ORDER BY ?ind ?label";
-        		ResultSet rs =QueryExecutionFactory.create(
-        		        QueryFactory.create(query), dataset)
-        		        .execSelect();
-        		String uri = null;
-        		String label = null;
-        		String moniker = null;
-        		while (rs.hasNext()) {
-        		    QuerySolution sol = rs.nextSolution();
-        		    Resource currRes = sol.getResource("ind");
-        		    if (currRes.isAnon()) {
-        		        continue;
-        		    }
-        		    if (uri != null && !uri.equals(currRes.getURI())) {
-        		        Individual ent = makeIndividual(uri, label, moniker);
-        		        if (ent != null) {
-        		            ents.add(ent);
-        		        }
-        	            uri = currRes.getURI();
-        	            label = null;
-        	            moniker = null;
-        		    } else if (uri == null) {
-        		        uri = currRes.getURI();
-        		    }
-                    Literal labelLit = sol.getLiteral("label");
-                    if (labelLit != null) {
-                        label = labelLit.getLexicalForm();
-                    }
-                    Literal monikerLit = sol.getLiteral("moniker");
-                    if (monikerLit != null) {
-                        moniker = monikerLit.getLexicalForm();
-                    }
-                    if (!rs.hasNext()) {
-                        Individual ent = makeIndividual(uri, label, moniker);
-                        if (ent != null) {
-                            ents.add(ent);
-                        }
-                    }
-        		}
-        	} finally {
-        		dataset.getLock().leaveCriticalSection();
-        		w.close();
-        	} 
+        	
+        	List<Individual> individualList;
+        	
+        	// Check if there is a graph filter.
+        	// If so, we will use it in a slightly strange way.  Unfortunately,
+        	// performance is quite bad if we add several graph variables in 
+        	// order to account for the fact that an individual's type 
+        	// declaration may be in a different graph from its label.
+        	// Thus, we will run two queries: one with a single
+        	// graph variable to get the list of URIs, and a second against
+        	// the union graph to get individuals with their labels.
+        	// We will then toss out any individual in the second
+        	// list that is not also in the first list.
+        	// Annoying, yes, but better than the alternative.
+        	// Note that both queries need to sort identically or 
+        	// the results may be very strange.
+        	String[] graphVars = {"?g"};
+        	String filterStr = WebappDaoFactorySDB.getFilterBlock(
+        			graphVars, datasetMode);
+        	if (!StringUtils.isEmpty(filterStr)) {
+        		List<Individual> graphFilteredIndividualList = 
+        			    getGraphFilteredIndividualList(theClass, filterStr);
+        		List<Individual> unfilteredIndividualList = getIndividualList(
+        				theClass);
+        		Iterator<Individual> unfilteredIt  = unfilteredIndividualList
+        													.iterator(); 
+        		for (Individual filt : graphFilteredIndividualList) {
+        			Individual unfilt = unfilteredIt.next();
+        			while (!unfilt.getURI().equals(filt.getURI())) {
+        				unfilt = unfilteredIt.next();
+        			}
+        			ents.add(unfilt);
+        		}	
+        	} else {
+        		ents = getIndividualList(theClass);
+        	}
         }
         
         java.util.Collections.sort(ents);
@@ -180,13 +157,101 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         return ents;
 
     }
+        
+    private List<Individual> getIndividualList(Resource theClass) {
+    	List<Individual> ents = new ArrayList<Individual>();
+   	    DatasetWrapper w = getDatasetWrapper();
+	    Dataset dataset = w.getDataset();
+    	dataset.getLock().enterCriticalSection(Lock.READ);
+    	try {
+    	    
+    		String query = 
+	    		"SELECT DISTINCT ?ind ?label " +
+	    		"WHERE " +
+	    		 "{ \n" +
+                    "{   ?ind a <" + theClass.getURI() + "> } \n" +
+	    		 	"UNION { \n" +
+                    "    ?ind a <" + theClass.getURI() + "> . \n" +
+	    		 	"    ?ind  <" + RDFS.label.getURI() + "> ?label \n" +
+	    		 	"} \n" +
+	    		 "} ORDER BY ?ind ?label";
+    		ResultSet rs =QueryExecutionFactory.create(
+    		        QueryFactory.create(query), dataset)
+    		        .execSelect();
+    		String uri = null;
+    		String label = null;
+    		while (rs.hasNext()) {
+    		    QuerySolution sol = rs.nextSolution();
+    		    Resource currRes = sol.getResource("ind");
+    		    if (currRes.isAnon()) {
+    		        continue;
+    		    }
+    		    if (uri != null && !uri.equals(currRes.getURI())) {
+    		        Individual ent = makeIndividual(uri, label);
+    		        if (ent != null) {
+    		            ents.add(ent);
+    		        }
+    	            uri = currRes.getURI();
+    	            label = null;
+    		    } else if (uri == null) {
+    		        uri = currRes.getURI();
+    		    }
+                Literal labelLit = sol.getLiteral("label");
+                if (labelLit != null) {
+                    label = labelLit.getLexicalForm();
+                }
+                if (!rs.hasNext()) {
+                    Individual ent = makeIndividual(uri, label);
+                    if (ent != null) {
+                        ents.add(ent);
+                    }
+                }
+    		}
+    	} finally {
+    		dataset.getLock().leaveCriticalSection();
+    		w.close();
+    	} 
+        return ents;
+    }
     
-    private Individual makeIndividual(String uri, String label, String moniker) {
+    private List<Individual> getGraphFilteredIndividualList(Resource theClass, 
+    		                                                String filterStr) {
+		List<Individual> filteredIndividualList = new ArrayList<Individual>();
+		DatasetWrapper w = getDatasetWrapper();
+   	    Dataset dataset = w.getDataset();
+       	dataset.getLock().enterCriticalSection(Lock.READ);
+       	try {
+    		String query = 
+    			"SELECT DISTINCT ?ind " +
+    			"WHERE " +
+    			"{ GRAPH ?g { \n" +
+                	"{   ?ind a <" + theClass.getURI() + "> } \n" +
+                "  } \n" + filterStr +
+                "} ORDER BY ?ind";
+    		ResultSet rs =QueryExecutionFactory.create(
+    		        QueryFactory.create(query), dataset)
+    		        .execSelect();
+    		while (rs.hasNext()) {
+    		    QuerySolution sol = rs.nextSolution();
+    		    Resource currRes = sol.getResource("ind");
+    		    if (currRes.isAnon()) {
+    		        continue;
+    		    }
+    		    filteredIndividualList.add(
+    		    		makeIndividual(currRes.getURI(), null));
+    		}
+       	} finally {
+    		dataset.getLock().leaveCriticalSection();
+    		w.close();
+		}
+       	return filteredIndividualList;
+    }
+    
+    private Individual makeIndividual(String uri, String label) {
         Individual ent = new IndividualSDB(uri, 
                 this.dwf, datasetMode, getWebappDaoFactory(), 
                 SKIP_INITIALIZATION);
         ent.setName(label);
-        ent.setMoniker(moniker);
         return ent;
     }
 	
@@ -200,7 +265,8 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     }  
     
     /**
-     * fills in the Individual objects needed for any ObjectPropertyStatements attached to the specified individual.
+     * fills in the Individual objects needed for any ObjectPropertyStatements 
+     * attached to the specified individual.
      * @param entity
      */
     private void fillIndividualsForObjectPropertyStatements(Individual entity){
@@ -208,7 +274,8 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         try {
             Iterator e2eIt = entity.getObjectPropertyStatements().iterator();
             while (e2eIt.hasNext()) {
-                ObjectPropertyStatement e2e = (ObjectPropertyStatement) e2eIt.next();
+                ObjectPropertyStatement e2e = 
+                		(ObjectPropertyStatement) e2eIt.next();
                 e2e.setSubject(makeIndividual(e2e.getSubjectURI()));
                 e2e.setObject(makeIndividual(e2e.getObjectURI()));       
             }
@@ -221,14 +288,18 @@ public class IndividualDaoSDB extends IndividualDaoJena {
      * In Jena it can be difficult to get an object with a given dataproperty if
      * you do not care about the datatype or lang of the literal.  Use this
      * method if you would like to ignore the lang and datatype.  
+     * 
+     * Note: this method doesn't require that a property be declared in the 
+     * ontology as a data property -- only that it behaves as one.
      */
     @Override
-    public List<Individual> getIndividualsByDataProperty(String dataPropertyUri, String value){        
+    public List<Individual> getIndividualsByDataProperty(String dataPropertyUri, 
+    	                                                 String value){        
         Property prop = null;
         if( RDFS.label.getURI().equals( dataPropertyUri )){
             prop = RDFS.label;
         }else{
-            prop = getOntModel().getDatatypeProperty(dataPropertyUri);
+            prop = getOntModel().getProperty(dataPropertyUri);
         }
 
         if( prop == null ) {            
@@ -249,7 +320,8 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         //warning: this assumes that any language tags will be EN
         Literal litv3 = getOntModel().createLiteral(value,"EN");        
         
-        HashMap<String,Individual> individualsMap = new HashMap<String, Individual>();
+        HashMap<String,Individual> individualsMap = 
+        		new HashMap<String, Individual>();
                 
         getOntModel().enterCriticalSection(Lock.READ);
         int count = 0;
@@ -336,14 +408,16 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     }
     
     @Override
-    public Iterator getAllOfThisTypeIterator() {
+    public Iterator<String> getAllOfThisTypeIterator() {
         final List<String> list = 
             new LinkedList<String>();
         
         // get all labeled resources from any non-tbox and non-metadata graphs.
         String query = "SELECT DISTINCT ?ind WHERE { \n" +
-                       "  GRAPH ?g { ?ind <" + RDFS.label.getURI() + "> ?label } \n" +
-                       "  FILTER (?g != <" + JenaDataSourceSetupBase.JENA_APPLICATION_METADATA_MODEL + "> " +
+                       "  GRAPH ?g { ?ind <" + RDFS.label.getURI() +
+                                          "> ?label } \n" +
+                       "  FILTER (?g != <" + JenaDataSourceSetupBase
+                               .JENA_APPLICATION_METADATA_MODEL + "> " +
                        "          && !regex(str(?g),\"tbox\")) \n " +
                        "}";
               
@@ -365,15 +439,22 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         	dataset.getLock().leaveCriticalSection();
         	w.close();
         }
-        
-        if (list.size() >0){
-            log.info("Number of individuals from source: " + list.size());
-            return new Iterator(){
-                Iterator<String> innerIt = list.iterator();
+
+        return list.iterator();
+
+    }  
+
+    private Iterator<Individual> getIndividualIterator(
+    									final List<String> individualURIs) {
+        if (individualURIs.size() >0){
+            log.info("Number of individuals from source: " 
+            		+ individualURIs.size());
+            return new Iterator<Individual>(){
+                Iterator<String> innerIt = individualURIs.iterator();
                 public boolean hasNext() { 
                     return innerIt.hasNext();                    
                 }
-                public Object next() {
+                public Individual next() {
                     String indURI = innerIt.next();
                     Individual ind = makeIndividual(indURI);
                     if (ind != null) {
@@ -389,81 +470,42 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         }
         else
             return null;
-    }  
+    }       
 
     @Override
-    public Iterator getAllOfThisVClassIterator(String vClassURI) {
-        getOntModel().enterCriticalSection(Lock.READ);
-        try {
-            List ents = new LinkedList();
-            OntClass cls = getOntModel().getOntClass(vClassURI);
-            Iterator indIt = cls.listInstances();
-            while (indIt.hasNext()) {
-                com.hp.hpl.jena.ontology.Individual ind = (com.hp.hpl.jena.ontology.Individual) indIt.next();
-                Individual ent = makeIndividual(ind.getURI());
-                if (ent != null) {
-                    ents.add(ent);
-                }
-            }
-            return ents.iterator();
-        } finally {
-            getOntModel().leaveCriticalSection();
-        }
-    }
-
-    @Override
-    public Iterator getUpdatedSinceIterator(long updatedSince){
-        List ents = new ArrayList();
+    public Iterator<String> getUpdatedSinceIterator(long updatedSince){
+        List<String> individualURIs = new ArrayList<String>();
         Date since = new DateTime(updatedSince).toDate();
         String sinceStr = xsdDateTimeFormat.format(since);
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            Property modTimeProp = MODTIME;
-            if (modTimeProp == null)
-                modTimeProp = getOntModel().getProperty(VitroVocabulary.MODTIME);
-            if (modTimeProp == null)
-                return null; // throw an exception?
             String queryStr = "PREFIX vitro: <"+ VitroVocabulary.vitroURI+"> " +
-                              "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>" +
+                              "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>"+
                               "SELECT ?ent " +
                               "WHERE { " +
                               "     ?ent vitro:modTime ?modTime ." +
-                              "     FILTER (xsd:dateTime(?modTime) >= \""+sinceStr+"\"^^xsd:dateTime) " +
+                              "     FILTER (xsd:dateTime(?modTime) >= \""
+                              		+ sinceStr + "\"^^xsd:dateTime) " +
                               "}";
             Query query = QueryFactory.create(queryStr);
-            QueryExecution qe = QueryExecutionFactory.create(query,getOntModel());
-            ResultSet results = qe.execSelect();
-            while (results.hasNext()) {
-                QuerySolution qs = (QuerySolution) results.next();
-                Resource res = (Resource) qs.get("?ent");
-                com.hp.hpl.jena.ontology.Individual ent = getOntModel().getIndividual(res.getURI());
-                if (ent != null) {
-                    boolean userVisible = false;
-                    ClosableIterator typeIt = ent.listRDFTypes(true);
-                    try {
-                        while (typeIt.hasNext()) {
-                            Resource typeRes = (Resource) typeIt.next();
-                            if (typeRes.getNameSpace() == null || (!NONUSER_NAMESPACES.contains(typeRes.getNameSpace()))) {
-                                userVisible = true;
-                                break;
-                            }
-                        }
-                    } finally {
-                        typeIt.close();
-                    }
-                    if (userVisible) {
-                        Individual ind = makeIndividual(ent.getURI());
-                        if (ind != null) {
-                            ents.add(ind);
-                        }
-                    }
-                }
+            QueryExecution qe = QueryExecutionFactory.create(
+            		query,getOntModel());
+            try {
+	            ResultSet results = qe.execSelect();
+	            while (results.hasNext()) {
+	                QuerySolution qs = (QuerySolution) results.next();
+	                Resource res = (Resource) qs.get("?ent");
+	                if (res.getURI() != null) {
+	                	individualURIs.add(res.getURI());
+	                }
+	            }
+            } finally {
+            	qe.close();
             }
         } finally {
             getOntModel().leaveCriticalSection();
         }
-        return ents.iterator();
+        return individualURIs.iterator();
     }
-
     
 }

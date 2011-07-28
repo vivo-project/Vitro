@@ -2,11 +2,8 @@
 
 
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.ServletIdentifierBundleFactory"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory.SelfEditing"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.SelfEditingIdentifierFactory"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.identifier.RoleIdentifier"%>
-<%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty"%>
@@ -21,6 +18,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils" %>
 <%@ page import="com.hp.hpl.jena.rdf.model.Model" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfigurationLoader"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper"%>
@@ -37,9 +35,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 <%@ taglib prefix="v" uri="http://vitro.mannlib.cornell.edu/vitro/tags" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jstl/functions" %>
-<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 
-<vitro:confirmLoginStatus allowSelfEditing="true" />
+<%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousPages" %>
+<% request.setAttribute("requestedActions", new UseMiscellaneousPages()); %>
+<vitro:confirmAuthorization />
 
 <%! 
 public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.forms.propDelete.jsp");
@@ -75,7 +75,7 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
     //do the delete
     if( request.getParameter("y") != null ) {
         
-        String editorUri = EditN3Utils.getEditorUri(request,session,application);        
+        String editorUri = EditN3Utils.getEditorUri(request);        
          wdf = wdf.getUserAwareDaoFactory(editorUri);
         
         if (prop.getStubObjectRelation()) {
@@ -118,6 +118,13 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
     if (! statement.isEmpty()) {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("statement", statement);
+ 
+        /* Some propStatements (propStatement-educationalTraining.ftl) make reference to the individual,  
+         * but instead of adding it to the data model we'll test in the template for non-existence. If
+         * this becomes more common, add it here instead.
+         */
+        //map.put("individual", new IndividualTemplateModel(subject, vreq));
+
         map.putAll(FreemarkerHttpServlet.getDirectives());
         map.putAll(FreemarkerHttpServlet.getMethods());
         ServletContext context = getServletContext();

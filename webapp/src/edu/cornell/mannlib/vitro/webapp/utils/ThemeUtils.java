@@ -34,7 +34,7 @@ public class ThemeUtils {
         }
         
         // File.list() does not guarantee a specific order, so sort alphabetically
-        if (doSort == true) {
+        if (doSort) {
         	Collections.sort(themeNames);
         }
         

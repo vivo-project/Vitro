@@ -3,10 +3,10 @@
 package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -16,7 +16,6 @@ import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,53 +23,29 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
+import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 
 public class MailUsersServlet extends VitroHttpServlet {
 	private static final Log log = LogFactory.getLog(MailUsersServlet.class);
 	
     public static HttpServletRequest request;
     public static HttpServletRequest response;
-    private static String smtpHost = null;
-   // private static final Log log = LogFactory.getLog(ContactMailServlet.class.getName());
 
-    public void init(ServletConfig servletConfig) throws javax.servlet.ServletException {
-        super.init(servletConfig);
-        smtpHost = getSmtpHostFromProperties();
-    }
-    
-    public static boolean isSmtpHostConfigured() {
-        if( smtpHost==null || smtpHost.equals("")) {
-            return false;
-        }
-        return true;
-    }
-
-	private String getSmtpHostFromProperties() {
-		String host = ConfigurationProperties.getProperty("Vitro.smtpHost");
-		if (host != null && !host.equals("")) {
-			log.debug("Found Vitro.smtpHost value of " + host);
-		} else {
-			log.warn("No Vitro.smtpHost specified");
-		}
-		return (host != null && host.length() > 0) ? host : null;
-	}
-    
-    public void doGet( HttpServletRequest request, HttpServletResponse response )
+    @Override
+	public void doGet( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException {
         VitroRequest vreq = new VitroRequest(request);
-        Portal portal = vreq.getPortal();
 
         String   confirmpage    = "/confirmUserMail.jsp";
         String   errpage        = "/contact_err.jsp";
         String status = null; // holds the error status
         
-        if (smtpHost==null || smtpHost.equals("")){
-            status = "This application has not yet been configured to send mail " +
-            		"-- smtp host has not been identified in the Configuration Properties file.";
-            response.sendRedirect( "test?bodyJsp=" + errpage + "&ERR=" + status + "&home=" + portal.getPortalId() );
+        if (!FreemarkerEmailFactory.isConfigured(vreq)) {
+			status = "This application has not yet been configured to send mail. "
+					+ "Email properties must be specified in the configuration properties file.";
+            response.sendRedirect( "test?bodyJsp=" + errpage + "&ERR=" + status );
             return;
         }
 
@@ -101,10 +76,8 @@ public class MailUsersServlet extends VitroHttpServlet {
         int recipientCount = 0;
         String deliveryfrom = null;
         
-        UserDao uDao = vreq.getFullWebappDaoFactory().getUserDao();
-        
         // get Individuals that the User mayEditAs
-        deliverToArray = uDao.getUserAccountEmails();
+        deliverToArray = getEmailsForAllUserAccounts(vreq);
         
         //Removed all form type stuff b/c recipients pre-configured
         recipientCount=(deliverToArray == null) ? 0 : deliverToArray.size();
@@ -175,10 +148,8 @@ public class MailUsersServlet extends VitroHttpServlet {
         outFile.flush();
         // outFile.close();
 		*/
-        // Set the smtp host
-        Properties props = System.getProperties();
-        props.put("mail.smtp.host", smtpHost);
-        Session s = Session.getDefaultInstance(props,null); // was Session.getInstance(props,null);
+
+        Session s = FreemarkerEmailFactory.getEmailSession(vreq);
         //s.setDebug(true);
         try {
             // Construct the message
@@ -230,15 +201,28 @@ public class MailUsersServlet extends VitroHttpServlet {
         // Redirect to the appropriate confirmation page
         if (status == null && !probablySpam) {
             // message was sent successfully
-            response.sendRedirect( "test?bodyJsp=" + confirmpage + "&home=" + portal.getPortalId() );
+            response.sendRedirect( "test?bodyJsp=" + confirmpage );
         } else {
             // exception occurred
-            response.sendRedirect( "test?bodyJsp=" + errpage + "&ERR=" + status + "&home=" + portal.getPortalId() );
+            response.sendRedirect( "test?bodyJsp=" + errpage + "&ERR=" + status );
         }
 
     }
+    
+	private List<String> getEmailsForAllUserAccounts(VitroRequest vreq) {
+		UserAccountsDao uaDao = vreq.getFullWebappDaoFactory()
+				.getUserAccountsDao();
+		
+		List<String> emails = new ArrayList<String>();
+		for (UserAccount user : uaDao.getAllUserAccounts()) {
+			emails.add(user.getEmailAddress());
+		}
 
-    public void doPost( HttpServletRequest request, HttpServletResponse response )
+		return emails;
+	}
+
+    @Override
+	public void doPost( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException
     {
         doGet( request, response );

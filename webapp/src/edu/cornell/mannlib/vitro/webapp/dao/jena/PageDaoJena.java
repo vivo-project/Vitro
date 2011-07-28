@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,10 +36,17 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
     
     static protected Query pageQuery;
     static protected Query pageTypeQuery;
+    static protected Query pageDataGettersQuery;
     static protected Query pageMappingsQuery;
     static protected Query homePageUriQuery;
     static protected Query classGroupPageQuery;
-    
+    static protected Query classIntersectionPageQuery;
+    static protected Query individualsForClassesQuery;
+    static protected Query individualsForClassesRestrictedQuery;
+    static protected Query institutionalInternalClassQuery;
+    static protected Query individualsForClassesInternalQuery;
+
+
     static final String prefixes = 
         "PREFIX rdf:   <" + VitroVocabulary.RDF +"> \n" +
         "PREFIX rdfs:  <" + VitroVocabulary.RDFS +"> \n" + 
@@ -61,6 +69,13 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         "    ?pageUri rdf:type ?type .\n"+                              
         "} \n" ;
     
+    //Get data getters
+    static final protected String pageDataGettersQueryString = 
+        prefixes + "\n" +
+        "SELECT ?dataGetter WHERE {\n" +
+        "    ?pageUri display:hasDataGetter ?dg .\n"+    
+        " 	 ?dg rdf:type ?dataGetter . \n" +
+        "} \n" ;
     static final protected String pageMappingsQueryString = 
         prefixes + "\n" +
         "SELECT ?pageUri ?urlMapping WHERE {\n" +
@@ -74,10 +89,56 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         "    ?pageUri rdf:type <" + DisplayVocabulary.HOME_PAGE_TYPE + "> .\n"+                
         "} \n" ;
 
+    /*
     static final protected String classGroupPageQueryString = 
         prefixes + "\n" +
         "SELECT ?classGroup WHERE { ?pageUri <" + DisplayVocabulary.FOR_CLASSGROUP + "> ?classGroup . }";
+    */
+    //Updated class group page query string
+    static final protected String classGroupPageQueryString = 
+    	prefixes + "\n" + 
+    	 "SELECT ?classGroup WHERE {\n" +
+         "    ?pageUri display:hasDataGetter ?dg .\n"+    
+         " 	 ?dg rdf:type <" + DisplayVocabulary.CLASSGROUP_PAGE_TYPE + ">. \n" + 
+         " ?dg <" + DisplayVocabulary.FOR_CLASSGROUP + "> ?classGroup . \n" +
+         "} \n" ;
+   
+    //Query to get what classes are to be employed on the page 
+    static final protected String individualsForClassesDataGetterQueryString = 
+    	prefixes + "\n" + 
+    	 "SELECT ?dg ?class ?restrictClass WHERE {\n" +
+         "    ?pageUri display:hasDataGetter ?dg .\n"+    
+         " 	 ?dg rdf:type <" + DisplayVocabulary.CLASSINDIVIDUALS_PAGE_TYPE + ">. \n" + 
+         " ?dg <" + DisplayVocabulary.GETINDIVIDUALS_FOR_CLASS + "> ?class . \n" +
+         "    OPTIONAL {?dg <"+ DisplayVocabulary.RESTRICT_RESULTS_BY + "> ?restrictClass } .\n" +    
+         "} \n" ;
+        
+    //Given a data getter, check if results are to be restricted by class
+    static final protected String individualsForClassesRestrictedQueryString =     
+    	prefixes + "\n" +    
+    	 "SELECT ?restrictClass WHERE {\n" +
+         "    ?dg <"+ DisplayVocabulary.RESTRICT_RESULTS_BY + "> ?restrictClass .\n" +    
+         "} \n" ;
+   
+    //Is this data getter using internal class
+    static final protected String institutionalInternalClassQueryString  =     
+    	prefixes + "\n" +    
+   	 "SELECT ?restrictByInternalClass WHERE {\n" +
+        "    ?dg <"+ DisplayVocabulary.RESTRICT_RESULTS_BY_INTERNAL + "> ?restrictsByInternalClass .\n" +    
+        "} \n" ;
     
+    //Query to get classes employed on internal class page
+    //and restriction classes if they exist
+    static final protected String individualsForClassesInternalQueryString = 
+    	prefixes + "\n" + 
+    	 "SELECT ?dg ?class ?isInternal WHERE {\n" +
+         "    ?pageUri display:hasDataGetter ?dg .\n"+    
+         " 	 ?dg rdf:type <" + DisplayVocabulary.CLASSINDIVIDUALS_INTERNAL_TYPE + ">. \n" + 
+         " ?dg <" + DisplayVocabulary.GETINDIVIDUALS_FOR_CLASS + "> ?class . \n" +
+         " OPTIONAL {  ?dg <"+ DisplayVocabulary.RESTRICT_RESULTS_BY_INTERNAL + "> ?isInternal } .\n" +    
+         "} \n" ;
+    
+	
     static{
         try{    
             pageQuery=QueryFactory.create(pageQueryString);
@@ -90,6 +151,12 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         }catch(Throwable th){
             log.error("could not create SPARQL query for pageTypeQuery " + th.getMessage());
             log.error(pageTypeQueryString);
+        }
+        try{
+            pageDataGettersQuery = QueryFactory.create(pageDataGettersQueryString);
+        }catch(Throwable th){
+            log.error("could not create SPARQL query for pageTypeQuery " + th.getMessage());
+            log.error(pageDataGettersQueryString);
         }
         try{    
             pageMappingsQuery=QueryFactory.create(pageMappingsQueryString);
@@ -108,7 +175,37 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         }catch(Throwable th){
             log.error("could not create SPARQL query for classGroupPageQuery " + th.getMessage());
             log.error(classGroupPageQueryString);
+        } 
+        try{    
+            individualsForClassesQuery=QueryFactory.create(individualsForClassesDataGetterQueryString);
+        }catch(Throwable th){
+            log.error("could not create SPARQL query for individualsForClassesQuery " + th.getMessage());
+            log.error(individualsForClassesDataGetterQueryString);
         }  
+        
+        try{    
+            individualsForClassesRestrictedQuery=QueryFactory.create(individualsForClassesRestrictedQueryString);
+        }catch(Throwable th){
+            log.error("could not create SPARQL query for individualsForClassesRestrictedQuery " + th.getMessage());
+            log.error(individualsForClassesDataGetterQueryString);
+        }  
+        //Check if data getter uses internal class
+        try{    
+            institutionalInternalClassQuery=QueryFactory.create(institutionalInternalClassQueryString);
+        }catch(Throwable th){
+            log.error("could not create SPARQL query for institutionalInternalClassQuery " + th.getMessage());
+            log.error(institutionalInternalClassQueryString);
+        } 
+        //Check which classes set for page and whether or not page should only have internal classes
+        try{    
+            individualsForClassesInternalQuery = QueryFactory.create(individualsForClassesInternalQueryString);
+        }catch(Throwable th){
+            log.error("could not create SPARQL query for individualsForClassesInternalQuery " + th.getMessage());
+            log.error(individualsForClassesInternalQueryString);
+        } 
+        
+        
+        
     }        
     
     public PageDaoJena(WebappDaoFactoryJena wadf) {
@@ -118,13 +215,21 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
     @Override
     public Map<String, String> getPageMappings() {
         Model displayModel = getOntModelSelector().getDisplayModel();
-        QueryExecution qexec = QueryExecutionFactory.create( pageQuery, displayModel );
-        
         Map<String,String> rv = new HashMap<String,String>();
-        ResultSet resultSet = qexec.execSelect();
-        while(resultSet.hasNext()){
-            QuerySolution soln = resultSet.next();
-            rv.put(nodeToString(soln.get("urlMapping")) , nodeToString( soln.get("pageUri") ));
+        displayModel.enterCriticalSection(false);
+        try{
+        QueryExecution qexec = QueryExecutionFactory.create( pageQuery, displayModel );        
+            try{            
+                ResultSet resultSet = qexec.execSelect();
+                while(resultSet.hasNext()){
+                    QuerySolution soln = resultSet.next();
+                    rv.put(nodeToString(soln.get("urlMapping")) , nodeToString( soln.get("pageUri") ));
+                }
+            }finally{
+                qexec.close();
+            }
+        }finally{
+            displayModel.leaveCriticalSection();
         }
         return rv; 
     }
@@ -143,8 +248,11 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
       displayModel.enterCriticalSection(false);
       try{
           QueryExecution qexec = QueryExecutionFactory.create(pageQuery,displayModel,initialBindings );
-          list = executeQueryToCollection( qexec );
-          qexec.close();
+          try{
+              list = executeQueryToCollection( qexec );
+          }finally{
+              qexec.close();
+          }
       }finally{
           displayModel.leaveCriticalSection();
       }
@@ -163,24 +271,28 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
       Map<String,Object> pageData = list.get(0);
       
       //now get the rdf:types for the page
-      List<String> types = new ArrayList<String>();
+      //Changing to get the data getters for the page (already know that it's a page type)
+      List<String> dataGetters = new ArrayList<String>();
       displayModel.enterCriticalSection(false);
       try{
-          QueryExecution qexec = QueryExecutionFactory.create(pageTypeQuery, displayModel, initialBindings);
-          ResultSet rs = qexec.execSelect();
-          while(rs.hasNext()){
-              QuerySolution soln = rs.next();
-              types.add( nodeToString( soln.get("type" ) ));
+          QueryExecution qexec = QueryExecutionFactory.create(pageDataGettersQuery, displayModel, initialBindings);
+          try{
+              ResultSet rs = qexec.execSelect();
+              while(rs.hasNext()){
+                  QuerySolution soln = rs.next();
+                  dataGetters.add( nodeToString( soln.get("dataGetter" ) ));
+              }
+          }finally{
+              qexec.close();
           }
-          qexec.close();
       }finally{
           displayModel.leaveCriticalSection();
       }
       
       if( list == null )
-          log.error("could not get types for page " + pageUri);
+          log.error("could not get data getters for page " + pageUri);
       else
-          pageData.put("types", types);
+          pageData.put("dataGetters", dataGetters);
       
       return pageData;
     }
@@ -188,23 +300,31 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
     @Override
     public String getHomePageUri(){
         Model displayModel = getOntModelSelector().getDisplayModel();
-        QueryExecution qexec = QueryExecutionFactory.create( homePageUriQuery, displayModel );
-        
         List<String> rv = new ArrayList<String>();
-        ResultSet resultSet = qexec.execSelect();        
-        while(resultSet.hasNext()){
-            QuerySolution soln = resultSet.next();
-            rv.add( nodeToString(soln.get("pageUri")) );        
-        }
-        if( rv.size() == 0 ){
-            log.error("No display:HomePage defined in display model.");
-            return null;
-        }
-        if( rv.size() > 1 ){
-            log.error("More than one display:HomePage defined in display model.");
-            for( String hp : rv ){
-                log.error("home page: " + hp);
+        displayModel.enterCriticalSection(false);
+        try{
+            QueryExecution qexec = QueryExecutionFactory.create( homePageUriQuery, displayModel );
+            try{                
+                ResultSet resultSet = qexec.execSelect();        
+                while(resultSet.hasNext()){
+                    QuerySolution soln = resultSet.next();
+                    rv.add( nodeToString(soln.get("pageUri")) );        
+                }
+                if( rv.size() == 0 ){
+                    log.error("No display:HomePage defined in display model.");
+                    return null;
+                }
+                if( rv.size() > 1 ){
+                    log.error("More than one display:HomePage defined in display model.");
+                    for( String hp : rv ){
+                        log.error("home page: " + hp);
+                    }
+                }
+            }finally{
+                qexec.close();            
             }
+        }finally{
+            displayModel.leaveCriticalSection();
         }
         return rv.get(0);
     }
@@ -222,30 +342,132 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         initialBindings.add("pageUri", ResourceFactory.createResource(pageUri));
         
         Model displayModel = getOntModelSelector().getDisplayModel();
-        QueryExecution qexec = QueryExecutionFactory.create( classGroupPageQuery, displayModel , initialBindings);
-        
-        List<String> classGroupsForPage = new ArrayList<String>();
-        ResultSet resultSet = qexec.execSelect();        
-        while(resultSet.hasNext()){
-            QuerySolution soln = resultSet.next();
-            classGroupsForPage.add( nodeToString(soln.get("classGroup")) );        
+        displayModel.enterCriticalSection(false);
+        try{                    
+            QueryExecution qexec = QueryExecutionFactory.create( classGroupPageQuery, displayModel , initialBindings);
+            try{
+                List<String> classGroupsForPage = new ArrayList<String>();
+                ResultSet resultSet = qexec.execSelect();        
+                while(resultSet.hasNext()){
+                    QuerySolution soln = resultSet.next();
+                    classGroupsForPage.add( nodeToString(soln.get("classGroup")) );        
+                }
+                if( classGroupsForPage.size() == 0 ){
+                    log.debug("No classgroup info defined in display model for "+ pageUri);
+                    return null;
+                }
+                if( classGroupsForPage.size() > 1 ){
+                    log.error("More than one display:forClassGroup defined in display model for page " + pageUri);            
+                }        
+                return classGroupsForPage.get(0);
+            }finally{
+                qexec.close();
+            }            
+        }finally{
+            displayModel.leaveCriticalSection();
         }
-        if( classGroupsForPage.size() == 0 ){
-            log.debug("No classgroup info defined in display model for "+ pageUri);
-            return null;
-        }
-        if( classGroupsForPage.size() > 1 ){
-            log.error("More than one display:forClassGroup defined in display model for page " + pageUri);            
-        }        
-        return classGroupsForPage.get(0);
     }
     
     
-    /* ****************************************************************************** */
+    /*
+     * Get the classes for which to get individuals returned. This should return a list of class uris. 
+     * Return a list of classes to be returned along with any restrictions to be applied.
+     * Assumption: The page has a single data getter for classes and restrictions - all classes and restrictions
+     * for any data getters for the page will be lumped together. For multiple data getters, will need to return
+     * data for each one separately in the same map structure as below.
+     *      * Get restriction class to be applied as filter to individuals for page.
+     * Although to be used specifically for internal class filtering and will usually be one class returned,
+     * allowing for multiple classes to be returned.
+     */
+    public Map<String, List<String>> getClassesAndRestrictionsForPage(String pageUri) {
+   	 	Map<String, List<String>> classesAndRestrictions = new HashMap<String, List<String>>();
+    	QuerySolutionMap initialBindings = new QuerySolutionMap();
+        initialBindings.add("pageUri", ResourceFactory.createResource(pageUri));
+        List<String> classes = new ArrayList<String>();
+        
+        Model displayModel = getOntModelSelector().getDisplayModel();
+        displayModel.enterCriticalSection(false);
+        try{
+            QueryExecution qexec = QueryExecutionFactory.create( individualsForClassesQuery, displayModel , initialBindings);
+            try{
+                HashMap<String, String> restrictClassesPresentMap = new HashMap<String, String>();
+                List<String>  restrictClasses = new ArrayList<String>();
+               
+                ResultSet resultSet = qexec.execSelect();        
+                while(resultSet.hasNext()){
+                    QuerySolution soln = resultSet.next();
+                    String dg = nodeToString(soln.get("dg"));
+                    classes.add(nodeToString(soln.get("class")));
+                    String restrictClass = nodeToString(soln.get("restrictClass"));
+                    if(!restrictClass.isEmpty() && !restrictClassesPresentMap.containsKey(restrictClass)) {
+                    	restrictClasses.add(restrictClass);
+                    	restrictClassesPresentMap.put(restrictClass, "true");
+                    }
+                }
+                
+                if( classes.size() == 0 ){
+                    log.debug("No classes  defined in display model for "+ pageUri);
+                    return null;
+                }
+                classesAndRestrictions.put("classes", classes);  
+                classesAndRestrictions.put("restrictClasses", restrictClasses);
+                return classesAndRestrictions;
+            }finally{
+                qexec.close();
+            }
+        }finally{
+            displayModel.leaveCriticalSection();
+        }
+    }
+    
+    //Get classes for page along with whether or not internal class
+    public Map<String, Object> getClassesAndCheckInternal(String pageUri) {
+   	 	Map<String, Object> classesAndRestrictions = new HashMap<String, Object>();
+    	QuerySolutionMap initialBindings = new QuerySolutionMap();
+        initialBindings.add("pageUri", ResourceFactory.createResource(pageUri));
+        List<String> classes = new ArrayList<String>();
+        
+        Model displayModel = getOntModelSelector().getDisplayModel();
+        displayModel.enterCriticalSection(false);
+        try{
+            QueryExecution qexec = QueryExecutionFactory.create( individualsForClassesInternalQuery, displayModel , initialBindings);
+            try{
+                ResultSet resultSet = qexec.execSelect();        
+                while(resultSet.hasNext()){
+                    QuerySolution soln = resultSet.next();
+                    String dg = nodeToString(soln.get("dg"));
+                    classes.add(nodeToString(soln.get("class")));
+                    //node to string will convert null to empty string
+                    String isInternal = nodeToString(soln.get("isInternal"));
+                    if(!isInternal.isEmpty()) {
+                    	log.debug("Internal value is "+ isInternal);
+                    	//Retrieve and add internal class
+                    	classesAndRestrictions.put("isInternal", isInternal);
+                    }
+                }
+                
+                if( classes.size() == 0 ){
+                    log.debug("No classes  defined in display model for "+ pageUri);
+                    return null;
+                }
+                classesAndRestrictions.put("classes", classes);  
+                return classesAndRestrictions;
+            }finally{
+                qexec.close();
+            }
+        }finally{
+            displayModel.leaveCriticalSection();
+        }
+    }
+    
+   
+    
+    /* *************************** Utility methods ********************************* */
     
     /**
      * Converts a sparql query that returns a multiple rows to a list of maps.
      * The maps will have column names as keys to the values.
+     * This method will not close qexec.
      */
     protected List<Map<String, Object>> executeQueryToCollection(
             QueryExecution qexec) {

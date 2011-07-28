@@ -2,48 +2,50 @@
 
 package edu.cornell.mannlib.vedit.beans;
 
-import java.util.List;
-import java.util.LinkedList;
+import java.io.Serializable;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-import java.util.Stack;
+
 import javax.servlet.http.HttpSession;
 
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
-import edu.cornell.mannlib.vedit.beans.BeanDependency;
-import edu.cornell.mannlib.vedit.beans.FormObject;
-import java.lang.reflect.Method;
-import java.io.Serializable;
+import edu.cornell.mannlib.vedit.listener.ChangeListener;
+import edu.cornell.mannlib.vedit.listener.EditPreProcessor;
+import edu.cornell.mannlib.vedit.validator.Validator;
 
 public class EditProcessObject implements Serializable {
 
     private String key = null;
 
-    private Class beanClass = null;
-    private Class implementationClass = null;
+    private Class<?> beanClass = null;
+    private Class<?> implementationClass = null;
     private boolean useRecycledBean = false;
 
     private Object beanMask = null;
-    private List simpleMask = new LinkedList();
+    private List<Object[] /* Object[2] */> simpleMask = new LinkedList<Object[]>();
 
-    private HashMap validatorMap = new HashMap();
-    private HashMap errMsgMap = new HashMap();
+    private Map<String, List<Validator>> validatorMap = new HashMap<String, List<Validator>>();
+    private Map<String, String> errMsgMap = new HashMap<String, String>();
 
-    private HashMap defaultValueMap = new HashMap();
+    private Map<String, String> defaultValueMap = new HashMap<String, String>();
 
-    private List preProcessorList = new LinkedList();
-    private List changeListenerList = new LinkedList();
+    private List<EditPreProcessor> preProcessorList = new LinkedList<EditPreProcessor>();
+    private List<ChangeListener> changeListenerList = new LinkedList<ChangeListener>();
 
     private Object originalBean = null;
     private Object newBean = null;
 
     private String idFieldName = null;
-    private Class idFieldClass = null;
+    private Class<?> idFieldClass = null;
 
     private FormObject formObject = null;
 
     private Object dataAccessObject = null;
-    private HashMap additionalDaoMap = new HashMap();
+    private HashMap<String, Object /* DAO */> additionalDaoMap = new HashMap<String, Object>();
 
     private Method insertMethod = null;
     private Method updateMethod = null;
@@ -58,15 +60,11 @@ public class EditProcessObject implements Serializable {
 
     private String action = null;
 
-    private Map requestParameterMap = null;
+    private Map<String, String[]> requestParameterMap = null;
 
-    private HashMap badValueMap = new HashMap();
+    private Map<String, String> badValueMap = new HashMap<String, String>();
     
-    private HashMap<String,Object> attributeMap = new HashMap<String,Object>();
-
-    /***** experimental ******/
-    private Stack epoStack = new Stack();
-    private HashMap beanDependencies = new HashMap();
+    private Map<String,Object> attributeMap = new HashMap<String, Object>();
 
     private Method getMethod = null;
     //assumed to take an integer primary key argument, at least for now
@@ -79,19 +77,19 @@ public class EditProcessObject implements Serializable {
         this.key = key;
     }
 
-    public Class getBeanClass(){
+    public Class<?> getBeanClass(){
         return beanClass;
     }
 
-    public void setBeanClass(Class beanClass){
+    public void setBeanClass(Class<?> beanClass){
         this.beanClass = beanClass;
     }
 
-    public Class getImplementationClass(){
+    public Class<?> getImplementationClass(){
         return implementationClass;
     }
 
-    public void setImplementationClass(Class implementationClass){
+    public void setImplementationClass(Class<?> implementationClass){
         this.implementationClass = implementationClass;
     }
 
@@ -103,28 +101,28 @@ public class EditProcessObject implements Serializable {
         this.beanMask = beanMask;
     }
 
-    public List getSimpleMask(){
+    public List<Object[]> getSimpleMask(){
         return simpleMask;
     }
 
-    public void setSimpleMask(List simpleMask){
+    public void setSimpleMask(List<Object[]> simpleMask){
         this.simpleMask = simpleMask;
     }
 
-    public List getChangeListenerList() {
+    public List<ChangeListener> getChangeListenerList() {
         return changeListenerList;
     }
 
-    public void setChangeListenerList(List changeListenerList) {
-        this.changeListenerList = changeListenerList;
+    public void setChangeListenerList(List<? extends ChangeListener> changeListenerList) {
+        this.changeListenerList = new ArrayList<ChangeListener>(changeListenerList);
     }
 
-    public List getPreProcessorList() {
+    public List<EditPreProcessor> getPreProcessorList() {
         return preProcessorList;
     }
 
-    public void setPreProcessorList(List preProcessorList) {
-        this.preProcessorList = preProcessorList;
+    public void setPreProcessorList(List<? extends EditPreProcessor> preProcessorList) {
+        this.preProcessorList = new ArrayList<EditPreProcessor>(preProcessorList);
     }
 
     public Object getOriginalBean(){
@@ -151,11 +149,11 @@ public class EditProcessObject implements Serializable {
         this.idFieldName = ifn;
     }
 
-    public Class getIdFieldClass() {
+    public Class<?> getIdFieldClass() {
         return idFieldClass;
     }
 
-    public void setIdFieldClass(Class cls) {
+    public void setIdFieldClass(Class<?> cls) {
         this.idFieldClass = cls;
     }
 
@@ -199,11 +197,11 @@ public class EditProcessObject implements Serializable {
         this.action = action;
     }
 
-    public Map getRequestParameterMap() {
+    public Map<String, String[]> getRequestParameterMap() {
         return requestParameterMap;
     }
 
-    public void setRequestParameterMap (Map rpmap) {
+    public void setRequestParameterMap (Map<String, String[]> rpmap) {
         requestParameterMap = rpmap;
     }
 
@@ -239,10 +237,10 @@ public class EditProcessObject implements Serializable {
         dataAccessObject = dao;
     }
 
-    public HashMap getAdditionalDaoMap() {
+    public HashMap<String, Object> getAdditionalDaoMap() {
         return additionalDaoMap;
     }
-    public void setAdditionalDaoMap(HashMap adm) {
+    public void setAdditionalDaoMap(HashMap<String, Object> adm) {
         additionalDaoMap = adm;
     }
 
@@ -278,39 +276,39 @@ public class EditProcessObject implements Serializable {
         this.getMethod = getMethod;
     }
 
-    public HashMap getDefaultValueMap() {
+    public Map<String, String> getDefaultValueMap() {
         return defaultValueMap;
     }
 
-    public void setDefaultValueMap(HashMap dvh) {
+    public void setDefaultValueMap(Map<String, String> dvh) {
         this.defaultValueMap = dvh;
     }
 
-    public HashMap getValidatorMap(){
+    public Map<String, List<Validator>> getValidatorMap(){
         return validatorMap;
     }
 
-    public void setValidatorMap(HashMap validatorMap){
+    public void setValidatorMap(Map<String, List<Validator>> validatorMap){
         this.validatorMap = validatorMap;
     }
 
-    public HashMap getErrMsgMap() {
+    public Map<String, String> getErrMsgMap() {
         return errMsgMap;
     }
 
-    public void setErrMsgMap(HashMap emh){
+    public void setErrMsgMap(Map<String, String> emh){
         errMsgMap = emh;
     }
 
-    public HashMap getBadValueMap() {
+    public Map<String, String> getBadValueMap() {
         return badValueMap;
     }
 
-    public void setBadValueMap(HashMap bvh){
+    public void setBadValueMap(Map<String, String> bvh){
         badValueMap = bvh;
     }
 
-    public Map getAttributeMap() {
+    public Map<String, Object> getAttributeMap() {
     	return this.attributeMap;
     }
     
@@ -322,29 +320,4 @@ public class EditProcessObject implements Serializable {
     	this.attributeMap.put(key, value);
     }
     
-    public Stack getEpoStack(){
-        return epoStack;
-    }
-
-    public HashMap /*to BeanDependency*/ getBeanDependencies(){
-        return beanDependencies;
-    }
-
-    public void setBeanDependencies(HashMap beanDependencies){
-        this.beanDependencies = beanDependencies;
-    }
-
-    public BeanDependency getBeanDependency(String name){
-        return (BeanDependency) beanDependencies.get(name);
-    }
-
-    public Object getDependentBean(String name){
-        return ((BeanDependency)beanDependencies.get(name)).getBean();
-    }
-
-    /******* probably will need to change this *******/
-    public void setEpoStack(Stack epoStack){
-        this.epoStack = epoStack;
-    }
-
 }

@@ -1,9 +1,9 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditSubmission" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditSubmission" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.utils.StringUtils" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@page import="org.apache.commons.logging.Log"%>
 <%@page import="org.apache.commons.logging.LogFactory"%>
 <%@page import="com.hp.hpl.jena.rdf.model.ResourceFactory"%>
@@ -59,7 +59,7 @@
             urlPatternToCancelTo = request.getParameter("url");
         }
         // If a different cancel return path has been designated, use it. Otherwise, use the regular return path.
-        if (cancel != null && cancel.equals("true") && !StringUtils.isEmpty(urlPatternToCancelTo)) {
+        if ("true".equals(cancel) && !StringUtils.isEmpty(urlPatternToCancelTo)) {
             urlPattern = urlPatternToCancelTo;
         }
         else if (!StringUtils.isEmpty(urlPatternToReturnTo)) {

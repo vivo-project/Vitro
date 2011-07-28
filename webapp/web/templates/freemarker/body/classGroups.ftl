@@ -6,21 +6,39 @@
 
 <#if (!noData)>
     <section class="siteMap" role="region">
-        <#list classGroups as classGroup>
-            <#-- Only render classgroups that have at least one class with individuals -->
-            <#if (classGroup.individualCount > 0)>              
-                <h2>${classGroup.displayName}</h2>
-                <ul role="list">
-                    <#list classGroup.classes as class> 
-                        <#-- Only render classes with individuals -->
-                        <#if (class.individualCount > 0)>
-                            <li role="listitem"><a href="${class.url}">${class.name}</a> (${class.individualCount})</li>
-                        </#if>
-                    </#list>
-                </ul>
-            </#if>
-        </#list>
+        <div id="isotope-container">
+            <#list classGroups as classGroup>
+                <#-- Only render classgroups that have at least one populated class -->
+                <#if (classGroup.individualCount > 0)> 
+                	<div class="class-group">             
+                        <h2>${classGroup.displayName}</h2>
+                        <ul role="list">
+                            <#list classGroup.classes as class> 
+                                <#-- Only render populated classes -->
+                                <#if (class.individualCount > 0)>
+                                    <li role="listitem"><a href="${class.url}">${class.name}</a> (${class.individualCount})</li>
+                                </#if>
+                            </#list>
+                        </ul>
+                    </div> <!-- end class-group -->
+                </#if>
+            </#list>
+          </div> <!-- end isotope-container -->
     </section>
+
+    ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/jquery_plugins/isotope/jquery.isotope.min.js"></script>')}
+    <script>
+        var initHeight = $("#isotope-container").height();
+        initHeight = (initHeight/2.5)+200 ;
+        $("#isotope-container").css("height",initHeight + "px");
+    </script>
+    <script>
+        $('#isotope-container').isotope({
+          // options
+          itemSelector : '.class-group',
+          layoutMode : 'fitColumns'
+        });
+    </script>    
 <#else>
     ${noDataNotification}
 </#if>

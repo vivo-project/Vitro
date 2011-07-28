@@ -5,8 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 import java.io.IOException;
 import java.util.HashMap;
 
-import javax.management.RuntimeErrorException;
-import javax.naming.OperationNotSupportedException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -15,13 +13,10 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.beans.Classes2Classes;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.Classes2ClassesDao;
-import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 
 public class Properties2PropertiesOperationController extends
 		BaseEditController {
@@ -32,20 +27,14 @@ public class Properties2PropertiesOperationController extends
 	private static final boolean REMOVE = true;
 	
     public void doPost(HttpServletRequest req, HttpServletResponse response) {
+        if (!isAuthorizedToDisplayPage(req, response, new Actions(new EditOntology()))) {
+        	return;
+        }
     	
     	String defaultLandingPage = getDefaultLandingPage(req);
     	
     	try {
-    		
 			VitroRequest request = new VitroRequest(req);
-		    if(!checkLoginStatus(request,response))
-		        return;
-		
-		    try {
-		        super.doGet(request,response);
-		    } catch (Exception e) {
-		        log.error(this.getClass().getName()+" encountered exception calling super.doGet()");
-		    }
 		    
 		    HashMap epoHash = null;
 		    EditProcessObject epo = null;

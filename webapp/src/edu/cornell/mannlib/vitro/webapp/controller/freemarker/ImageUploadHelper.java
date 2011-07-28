@@ -20,6 +20,7 @@ import java.util.Map;
 import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.util.ImagingListener;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.FileItem;
@@ -100,10 +101,11 @@ public class ImageUploadHelper {
 	private final FileStorage fileStorage;
 	private final UploadedFileHelper uploadedFileHelper;
 
-	ImageUploadHelper(FileStorage fileStorage, WebappDaoFactory webAppDaoFactory) {
+	ImageUploadHelper(FileStorage fileStorage,
+			WebappDaoFactory webAppDaoFactory, ServletContext ctx) {
 		this.fileStorage = fileStorage;
 		this.uploadedFileHelper = new UploadedFileHelper(fileStorage,
-				webAppDaoFactory);
+				webAppDaoFactory, ctx);
 	}
 
 	/**

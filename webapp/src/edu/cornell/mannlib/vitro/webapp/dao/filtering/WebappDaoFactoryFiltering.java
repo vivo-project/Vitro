@@ -12,25 +12,16 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayModelDao;
-import edu.cornell.mannlib.vitro.webapp.dao.FlagDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.dao.KeywordDao;
-import edu.cornell.mannlib.vitro.webapp.dao.KeywordIndividualRelationDao;
-import edu.cornell.mannlib.vitro.webapp.dao.LinksDao;
-import edu.cornell.mannlib.vitro.webapp.dao.LinktypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.MenuDao;
 import edu.cornell.mannlib.vitro.webapp.dao.NamespaceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
-import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
-import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
-import edu.cornell.mannlib.vitro.webapp.dao.TabIndividualRelationDao;
-import edu.cornell.mannlib.vitro.webapp.dao.TabVClassRelationDao;
-import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
+import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -72,8 +63,7 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
     transient private ObjectPropertyStatementDao filteringObjectPropertyStatementDao=null;
     transient private VClassDao                filteringVClassDao=null;
 
-    transient private TabDao filteringTabDao=null;
-    transient private UserDao filteringUserDao=null;
+    transient private UserAccountsDao filteringUserAccountsDao=null;
     transient private VClassGroupDao filteringVClassGroupDao=null;
     transient private PropertyGroupDao filteringPropertyGroupDao=null;
     transient private PropertyInstanceDao filteringPropertyInstanceDao=null;
@@ -131,20 +121,13 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
         return filteringIndividualDao;
     }
 
-    public TabDao getTabDao() {
-        if( filteringTabDao == null)
-            filteringTabDao =
-                new TabDaoFiltering(innerWebappDaoFactory.getTabDao(),innerWebappDaoFactory.getPortalDao(),innerWebappDaoFactory.getApplicationDao(),filters);
-        return filteringTabDao;
+    public UserAccountsDao getUserAccountsDao() {
+    	if( filteringUserAccountsDao == null)
+    		filteringUserAccountsDao =
+    			new UserAccountsDaoFiltering(innerWebappDaoFactory.getUserAccountsDao(),filters);                                     
+    	return filteringUserAccountsDao;
     }
-
-    public UserDao getUserDao() {
-        if( filteringUserDao == null)
-            filteringUserDao =
-                new UserDaoFiltering(innerWebappDaoFactory.getUserDao(),filters);                                     
-        return filteringUserDao;
-    }
-
+    
     public VClassGroupDao getVClassGroupDao() {
         if( filteringVClassGroupDao == null)
             filteringVClassGroupDao =
@@ -181,40 +164,8 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
         return innerWebappDaoFactory.getUserURI();
     }
 
-    public TabIndividualRelationDao getTabs2EntsDao() {
-        return innerWebappDaoFactory.getTabs2EntsDao();
-    }
-
-    public TabVClassRelationDao getTabs2TypesDao() {
-        return innerWebappDaoFactory.getTabs2TypesDao();
-    }
-
-    public FlagDao getFlagDao() {
-        return innerWebappDaoFactory.getFlagDao();
-    }
-
-    public KeywordIndividualRelationDao getKeys2EntsDao() {
-        return innerWebappDaoFactory.getKeys2EntsDao();
-    }
-
-    public KeywordDao getKeywordDao() {
-        return innerWebappDaoFactory.getKeywordDao();
-    }
-
-    public LinksDao getLinksDao() {
-        return innerWebappDaoFactory.getLinksDao();
-    }
-
-    public LinktypeDao getLinktypeDao() {
-        return innerWebappDaoFactory.getLinktypeDao();
-    }
-
     public ApplicationDao getApplicationDao() {
     	return innerWebappDaoFactory.getApplicationDao();
-    }
-    
-    public PortalDao getPortalDao() {
-        return innerWebappDaoFactory.getPortalDao();
     }
 
 ///////////////////////////////////////////////////////////////////

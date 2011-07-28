@@ -4,10 +4,11 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.hp.hpl.jena.datatypes.TypeMapper;
-import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.query.Dataset;
@@ -16,12 +17,10 @@ import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -42,23 +41,6 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
 {
 
     private DatasetWrapperFactory dwf;
-    
-    protected static final String DATA_PROPERTY_VALUE_QUERY_STRING = 
-        "SELECT ?value WHERE { \n" +
-        "   GRAPH ?g {\n" + 
-        "       ?subject ?property ?value . \n" +        
-        "   }\n" +
-        "}";
-    
-    static protected Query dataPropertyValueQuery;
-    static {
-        try {
-            dataPropertyValueQuery = QueryFactory.create(DATA_PROPERTY_VALUE_QUERY_STRING);
-        } catch(Throwable th){
-            log.error("could not create SPARQL query for DATA_PROPERTY_VALUE_QUERY_STRING " + th.getMessage());
-            log.error(DATA_PROPERTY_VALUE_QUERY_STRING);
-        }             
-    }
     
     public DataPropertyStatementDaoJena(DatasetWrapperFactory dwf, 
                                         WebappDaoFactoryJena wadf) {
@@ -190,14 +172,27 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
     public Collection<DataPropertyStatement> getDataPropertyStatementsForIndividualByDataPropertyURI(Individual entity,
             String datapropURI) {
     	Collection<DataPropertyStatement> edList = new ArrayList<DataPropertyStatement>();
-    	if (entity.getURI() == null) {
+    	if (entity.getURI() == null || datapropURI == null) {
 			return edList;
 		}
+    	// do something nicer if we're not dealing with a blank node
+    	Resource res = ResourceFactory.createResource(entity.getURI());
+    	if (!VitroVocabulary.PSEUDO_BNODE_NS.equals(entity.getNamespace())) {
+    		for (Literal lit : this.getDataPropertyValuesForIndividualByProperty(res.getURI(), datapropURI)) {
+    			DataPropertyStatement ed = new DataPropertyStatementImpl();
+    			fillDataPropertyStatementWithJenaLiteral(ed, lit);
+                ed.setIndividualURI(entity.getURI());
+                ed.setIndividual(entity);
+                ed.setDatapropURI(datapropURI);
+                edList.add(ed);
+    		}
+    		return edList;
+    	}
+        // do something annoying if we are dealing with a blank node
     	try {	
 	    	getOntModel().enterCriticalSection(Lock.READ);
-	        OntResource ontRes = (VitroVocabulary.PSEUDO_BNODE_NS.equals(entity.getNamespace())) 
-	        		? (OntResource) getOntModel().createResource(new AnonId(entity.getLocalName())).as(OntResource.class)
-	        		: getOntModel().getOntResource(entity.getURI());
+	        OntResource ontRes = (OntResource) getOntModel().createResource(
+	        		new AnonId(entity.getLocalName())).as(OntResource.class);
 	        if (ontRes == null) {
 	        	return edList;
 	        }
@@ -314,6 +309,23 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
      * SPARQL-based methods for getting the individual's values for a single data property.
      */
     
+    protected static final String DATA_PROPERTY_VALUE_QUERY_STRING = 
+        "SELECT ?value WHERE { \n" +
+        "    ?subject ?property ?value . \n" +
+        // ignore statements with uri values
+        " FILTER ( isLiteral(?value) ) " +
+        "} ORDER BY ?value";
+    
+    protected static Query dataPropertyValueQuery;
+    static {
+        try {
+            dataPropertyValueQuery = QueryFactory.create(DATA_PROPERTY_VALUE_QUERY_STRING);
+        } catch(Throwable th) {
+            log.error("could not create SPARQL query for DATA_PROPERTY_VALUE_QUERY_STRING " + th.getMessage());
+            log.error(DATA_PROPERTY_VALUE_QUERY_STRING);
+        }             
+    }
+    
     @Override
     public List<Literal> getDataPropertyValuesForIndividualByProperty(Individual subject, DataProperty property) {
         return getDataPropertyValuesForIndividualByProperty(subject.getURI(), property.getURI());
@@ -323,33 +335,39 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
     public List<Literal> getDataPropertyValuesForIndividualByProperty(String subjectUri, String propertyUri) {    
         log.debug("Data property value query string:\n" + DATA_PROPERTY_VALUE_QUERY_STRING);         
         log.debug("Data property value:\n" + dataPropertyValueQuery); 
-        
-        QuerySolutionMap initialBindings = new QuerySolutionMap();
-        initialBindings.add("subject", ResourceFactory.createResource(subjectUri));
-        initialBindings.add("property", ResourceFactory.createResource(propertyUri));
+
+        // Due to a Jena bug, prebinding on ?subject combined with the isLiteral()
+        // filter causes the query to fail. Insert the subjectUri manually instead.
+        // QuerySolutionMap initialBindings = new QuerySolutionMap();
+        // initialBindings.add("subject", ResourceFactory.createResource(subjectUri));
+        // initialBindings.add("property", ResourceFactory.createResource(propertyUri));
+        Map<String, String> bindings = new HashMap<String, String>();
+        bindings.put("subject", subjectUri);
+        bindings.put("property", propertyUri);
+        String queryString = QueryUtils.subUrisForQueryVars(DATA_PROPERTY_VALUE_QUERY_STRING, bindings);
 
         // Run the SPARQL query to get the properties
         List<Literal> values = new ArrayList<Literal>();                
         DatasetWrapper w = dwf.getDatasetWrapper();
         Dataset dataset = w.getDataset();
         dataset.getLock().enterCriticalSection(Lock.READ);
+        QueryExecution qexec = null;
         try {
-            QueryExecution qexec = QueryExecutionFactory.create(
-                    dataPropertyValueQuery, dataset, initialBindings);
+            qexec = QueryExecutionFactory.create(
+                    queryString, dataset);
             ResultSet results = qexec.execSelect(); 
     
             while (results.hasNext()) {
-                QuerySolution soln = results.next();
-                RDFNode node = soln.get("value");
-                if (! node.isLiteral()) {
-                    continue;
-                }                
-                Literal value = soln.getLiteral("value");
+                QuerySolution sol = results.next();
+                Literal value = sol.getLiteral("value");
                 values.add(value);
             }
         } finally {
             dataset.getLock().leaveCriticalSection();
             w.close();
+            if (qexec != null) {
+                qexec.close();
+            }
         }
         return values;         
     }

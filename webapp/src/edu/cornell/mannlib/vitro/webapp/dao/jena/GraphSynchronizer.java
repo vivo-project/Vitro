@@ -13,8 +13,6 @@ import com.hp.hpl.jena.graph.GraphEvents;
 import com.hp.hpl.jena.graph.GraphListener;
 import com.hp.hpl.jena.graph.Triple;
 
-import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
-
 public class GraphSynchronizer implements GraphListener {
 
 	private static final Log log = LogFactory.getLog(GraphSynchronizer.class.getName());

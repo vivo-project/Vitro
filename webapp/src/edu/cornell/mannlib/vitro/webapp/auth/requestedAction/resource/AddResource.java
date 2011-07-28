@@ -2,20 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.resource;
 
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-
-public class AddResource extends AbstractResourceAction implements
-		RequestedAction {
+/** Should we allow the user to add a Resource to the model? */
+public class AddResource extends AbstractResourceAction {
 
 	public AddResource(String typeUri, String subjectUri) {
 		super(typeUri, subjectUri);
-	}
-
-	public PolicyDecision accept(VisitingPolicyIface policy,
-			IdentifierBundle ids) {
-		return policy.visit(ids, this);
 	}
 }

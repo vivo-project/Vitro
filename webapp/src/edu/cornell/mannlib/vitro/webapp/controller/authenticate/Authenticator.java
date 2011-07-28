@@ -2,12 +2,18 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.codec.binary.Hex;
+
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
-import edu.cornell.mannlib.vitro.webapp.beans.User;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 
 /**
  * The tool that a login process will use to interface with the user records in
@@ -45,61 +51,60 @@ public abstract class Authenticator {
 	// ----------------------------------------------------------------------
 
 	/** Maximum inactive interval for a ordinary logged-in session, in seconds. */
-	public static final int LOGGED_IN_TIMEOUT_INTERVAL = 300;
+	public static final int LOGGED_IN_TIMEOUT_INTERVAL = 60 * 60;
 
 	/** Maximum inactive interval for a editor (or better) session, in seconds. */
-	public static final int PRIVILEGED_TIMEOUT_INTERVAL = 32000;
+	public static final int PRIVILEGED_TIMEOUT_INTERVAL = 60 * 60 * 8;
 
 	/**
-	 * Does a user by this name exist?
+	 * Get the UserAccount for this external ID, or null if there is none.
 	 */
-	public abstract boolean isExistingUser(String username);
+	public abstract UserAccount getAccountForExternalAuth(String externalAuthId);
 
 	/**
-	 * Does a user by this name have this password?
+	 * Get the UserAccount for this email address, or null if there is none.
 	 */
-	public abstract boolean isCurrentPassword(String username,
+	public abstract UserAccount getAccountForInternalAuth(String emailAddress);
+
+	/**
+	 * Internal: does this UserAccount have this password? False if the
+	 * userAccount is null.
+	 */
+	public abstract boolean isCurrentPassword(UserAccount userAccount,
 			String clearTextPassword);
 
 	/**
-	 * Get the user with this name, or null if no such user exists.
+	 * Internal: record a new password for the user. Takes no action if the
+	 * userAccount is null.
 	 */
-	public abstract User getUserByUsername(String username);
+	public abstract void recordNewPassword(UserAccount userAccount,
+			String newClearTextPassword);
+
+	/**
+	 * Is a change in name or email required when the user logs in?
+	 */
+	public abstract boolean accountRequiresEditing(UserAccount userAccount);
 
 	/**
 	 * Get the URIs of all individuals associated with this user, whether by a
 	 * self-editing property like cornellEmailNetid, or by mayEditAs.
 	 */
-	public abstract List<String> getAssociatedIndividualUris(String username);
-
-	/**
-	 * Record a new password for the user.
-	 */
-	public abstract void recordNewPassword(String username,
-			String newClearTextPassword);
+	public abstract List<String> getAssociatedIndividualUris(
+			UserAccount userAccount);
 
 	/**
 	 * <pre>
 	 * Record that the user has logged in, with all of the housekeeping that 
 	 * goes with it:
-	 * - updating the user record
-	 * - setting login status and timeout limit in the session
+	 * - update the user record
+	 * - set login status and timeout limit in the session
+	 * - refresh the Identifiers on the request
 	 * - record the user in the session map
 	 * - notify other users of the model
 	 * </pre>
 	 */
-	public abstract void recordLoginAgainstUserAccount(String username,
+	public abstract void recordLoginAgainstUserAccount(UserAccount userAccount,
 			AuthenticationSource authSource);
-
-	/**
-	 * <pre>
-	 * Record that the user has logged in but with only external authentication 
-	 * info, so no internal user account.
-	 * - this involves everything except updating the user record.
-	 * </pre>
-	 */
-	public abstract void recordLoginWithoutUserAccount(String username,
-			String individualUri, AuthenticationSource authSource);
 
 	/**
 	 * <pre>
@@ -110,4 +115,51 @@ public abstract class Authenticator {
 	 */
 	public abstract void recordUserIsLoggedOut();
 
+	// ----------------------------------------------------------------------
+	// Public utility methods.
+	// ----------------------------------------------------------------------
+
+	/**
+	 * Apply MD5 to this string, and encode as a string of hex digits. Just
+	 * right for storing passwords in the database, or hashing the password
+	 * link.
+	 */
+	public static String applyMd5Encoding(String raw) {
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			byte[] digest = md.digest(raw.getBytes());
+			char[] hexChars = Hex.encodeHex(digest);
+			return new String(hexChars).toUpperCase();
+		} catch (NoSuchAlgorithmException e) {
+			// This can't happen with a normal Java runtime.
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Check whether the form of the emailAddress is syntactically correct. Does
+	 * not allow multiple addresses. Does not allow local addresses (without a
+	 * hostname).
+	 * 
+	 * Does not confirm that the host actually exists, or has a mailbox by that
+	 * name.
+	 */
+	public static boolean isValidEmailAddress(String emailAddress) {
+		try {
+			// InternetAddress constructor will throw an exception if the
+			// address does not have valid format (if "strict" is true).
+			@SuppressWarnings("unused")
+			InternetAddress a = new InternetAddress(emailAddress, true);
+
+			// InternetAddress permits a localname without hostname.
+			// Guard against that.
+			if (emailAddress.indexOf('@') == -1) {
+				return false;
+			}
+
+			return true;
+		} catch (AddressException e) {
+			return false;
+		}
+	}
 }

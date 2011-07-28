@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,15 +21,14 @@ import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.Datatype;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
-import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 
 public class RestrictionRetryController extends BaseEditController {
@@ -40,17 +38,12 @@ public class RestrictionRetryController extends BaseEditController {
 	private static final boolean OBJECT = false;
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse response) {
-		
+        if (!isAuthorizedToDisplayPage(req, response, new Actions(new EditOntology()))) {
+        	return;
+        }
+
 		VitroRequest request = new VitroRequest(req);
-		if (!checkLoginStatus(request,response))
-		    return;
-		
-		try {
-		    super.doGet(request,response);
-		} catch (Exception e) {
-		    log.error("PropertyRetryController encountered exception calling super.doGet()");
-		}
-		
+
 		try {
 			
 			EditProcessObject epo = createEpo(request);
@@ -65,13 +58,12 @@ public class RestrictionRetryController extends BaseEditController {
 			// default to object property restriction
 			boolean propertyType = ("data".equals(request.getParameter("propertyType"))) ? DATA : OBJECT ;
 			
-			List<Property> pList = (propertyType == OBJECT) 
+			List<? extends Property> pList = (propertyType == OBJECT) 
 				? request.getFullWebappDaoFactory().getObjectPropertyDao().getAllObjectProperties()
 			    : request.getFullWebappDaoFactory().getDataPropertyDao().getAllDataProperties();
 			List<Option> onPropertyList = new LinkedList<Option>(); 
 			Collections.sort(pList, new PropSorter());
-			for (Iterator<Property> i = pList.iterator(); i.hasNext(); ) {
-				Property p = i.next(); 
+			for (Property p: pList) {
 				onPropertyList.add( new Option(p.getURI(),p.getLocalNameWithPrefix()) );
 			}
 					
@@ -126,8 +118,7 @@ public class RestrictionRetryController extends BaseEditController {
 	private List<Option> getValueClassOptionList(VitroRequest request) {
 		List<Option> valueClassOptionList = new LinkedList<Option>();
 		VClassDao vcDao = request.getFullWebappDaoFactory().getVClassDao();
-		for (Iterator i = vcDao.getAllVclasses().iterator(); i.hasNext(); ) {
-			VClass vc = (VClass) i.next();
+		for (VClass vc: vcDao.getAllVclasses()) {
 			valueClassOptionList.add(new Option(vc.getURI(), vc.getLocalNameWithPrefix()));
 		}
 		return valueClassOptionList;
@@ -136,8 +127,7 @@ public class RestrictionRetryController extends BaseEditController {
 	private List<Option> getValueDatatypeOptionList(VitroRequest request) {
 		List<Option> valueDatatypeOptionList = new LinkedList<Option>();
 		DatatypeDao dtDao = request.getFullWebappDaoFactory().getDatatypeDao();
-		for (Iterator i = dtDao.getAllDatatypes().iterator(); i.hasNext(); ) {
-			Datatype dt = (Datatype) i.next();
+		for (Datatype dt: dtDao.getAllDatatypes()) {
 			valueDatatypeOptionList.add(new Option(dt.getUri(), dt.getName()));
 		}
 		valueDatatypeOptionList.add(new Option(RDFS.Literal.getURI(), "rdfs:Literal"));

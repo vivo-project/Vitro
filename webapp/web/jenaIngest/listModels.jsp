@@ -5,6 +5,11 @@
 <%@ page import="java.net.URLEncoder" %>
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
 
+<%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" %>
+<% request.setAttribute("requestedActions", new UseAdvancedDataToolsPages()); %>
+<vitro:confirmAuthorization />
+
 <script type="text/javascript">
 function init(){
 	var infoLine = document.information.info.value;
@@ -98,7 +103,7 @@ function init(){
                 <input type="hidden" name="action" value="attachModel"/>
                 <input type="hidden" name="modelName" value="<%=modelName%>"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
-                <input type="submit" name="submit" value="attach to webapp"/>
+                <input type="submit" name="submit" value="attach to TBox (ontology)"/>
             </form>
             </td>
             <td>
@@ -106,7 +111,7 @@ function init(){
                 <input type="hidden" name="action" value="detachModel"/>
                 <input type="hidden" name="modelName" value="<%=modelName%>"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
-                <input type="submit" name="submit" value="detach from webapp"/>
+                <input type="submit" name="submit" value="detach from TBox (ontology)"/>
             </form>
             </td>
             <td>

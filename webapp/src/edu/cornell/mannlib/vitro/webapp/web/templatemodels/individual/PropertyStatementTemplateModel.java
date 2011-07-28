@@ -3,33 +3,38 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 public abstract class PropertyStatementTemplateModel extends BaseTemplateModel {
 
     private static final Log log = LogFactory.getLog(PropertyStatementTemplateModel.class); 
-
+    
     private static enum EditAccess {
         EDIT, DELETE;
     }
     
+    protected final VitroRequest vreq;
     // Used for editing
-    protected String subjectUri = null;
-    protected String propertyUri = null;
-    private List<EditAccess> editAccessList = null;
+    protected final String subjectUri;
+    protected final String propertyUri;
+    private final List<EditAccess> editAccessList;
+ 
     
-    PropertyStatementTemplateModel(String subjectUri, String propertyUri, EditingPolicyHelper policyHelper) {
-        
-        if (policyHelper != null) { // we're editing
-            this.subjectUri = subjectUri;
-            this.propertyUri = propertyUri;  
-            editAccessList = new ArrayList<EditAccess>(); 
-        }
+    PropertyStatementTemplateModel(String subjectUri, String propertyUri, EditingPolicyHelper policyHelper, VitroRequest vreq) {
+        this.vreq = vreq;
+        // Instantiate the list even if not editing, so calls to getEditUrl() and getDeleteUrl() from 
+        // dump methods don't generate an error when they call isEditable() and isDeletable().
+        editAccessList = new ArrayList<EditAccess>();         
+        this.subjectUri = subjectUri;
+        this.propertyUri = propertyUri;              
+       
     }
     
     protected void markEditable() {
@@ -47,4 +52,5 @@ public abstract class PropertyStatementTemplateModel extends BaseTemplateModel {
     protected boolean isDeletable() {
         return editAccessList.contains(EditAccess.DELETE);
     }
+    
 }

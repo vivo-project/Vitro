@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.ontology.update;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.hp.hpl.jena.ontology.OntModel;
@@ -125,12 +124,6 @@ public class TBoxUpdater {
 				 // namespace
 				 continue;
 			 }
-			 
-			 if (VitroVocabulary.TAB_AUTOLINKEDTOTAB.equals(predicate.getURI())) {
-				 continue;
-				 // the tab autolinks are not like the other annotations
-				 // and should never be updated automatically
-			 }
 			 			 
 			 NodeIterator newObjects = newTboxAnnotationsModel.listObjectsOfProperty(subject, predicate);
 			 
@@ -140,10 +133,12 @@ public class TBoxUpdater {
 				 List<RDFNode> siteObjects = siteModel.listObjectsOfProperty(subject, predicate).toList();
 				
 				 if (siteObjects.size() > 1) {
+					 /*
 					 logger.log("WARNING: found " + siteObjects.size() +
-							 " statements with subject = " + subject.getURI() + 
+					 		 " statements with subject = " + subject.getURI() + 
 							 " and property = " + predicate.getURI() +
 							 " in the site database (maximum of one is expected)");
+					 */
 				 }
 				 
 				 if (siteObjects.size() > 0) {
@@ -211,10 +206,12 @@ public class TBoxUpdater {
 				 } 
 
 				 if (i > 1) {
+					 /*
 					 logger.log("WARNING: found " + i +
 							 " statements with subject = " + subject.getURI() + 
 							 " and property = " + predicate.getURI() +
 							 " in the site annotations model (maximum of one is expected) "); 
+					 */
 					 continue; 
 				 }
 				 	 
@@ -326,9 +323,6 @@ public void updateAnnotationModel() throws IOException {
 	   // for each ClassGroup in the old vitro annotations model: if it is not in 
 	   // the new vitro annotations model and the site has no classes asserted to 
 	   // be in that class group then delete it.
-	   // TODO: the site will have classes asserted to be in it if we have switched
-	   // the default assignment in the new version but haven't migration yet. How
-	   // to handle this?
 	   
 	   removeObsoleteAnnotations();
 	   

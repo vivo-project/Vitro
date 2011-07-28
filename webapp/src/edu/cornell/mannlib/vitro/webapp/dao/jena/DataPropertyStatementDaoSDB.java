@@ -57,22 +57,23 @@ public class DataPropertyStatementDaoSDB extends DataPropertyStatementDaoJena
         }
         else
         {
-            String[] graphVars = { "?g" };
         	String query = 
 	        	"CONSTRUCT { \n" +
 			       "   <" + entity.getURI() + "> ?p ?o . \n" +
-			       "} WHERE { GRAPH ?g { \n" +
+			       "} WHERE { \n" +
 			       "   <" + entity.getURI() + "> ?p ?o . \n" +
 			       "   FILTER(isLiteral(?o)) \n" +
-			       WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
-	            "} }" ;
+	            "}" ;
         	Model results = null;
         	DatasetWrapper w = dwf.getDatasetWrapper();
             Dataset dataset = w.getDataset();
             dataset.getLock().enterCriticalSection(Lock.READ);
+            QueryExecution qexec = null;
             try { 
-        	    results = QueryExecutionFactory.create(QueryFactory.create(query), dataset).execConstruct();
+                qexec = QueryExecutionFactory.create(QueryFactory.create(query), dataset);                
+        	    results = qexec.execConstruct();
             } finally {
+                if(qexec!=null) qexec.close();
                 dataset.getLock().leaveCriticalSection();
                 w.close();
             }
@@ -88,6 +89,7 @@ public class DataPropertyStatementDaoSDB extends DataPropertyStatementDaoJena
                     boolean addToList = /*allowAnyNameSpace ? st.getObject().canAs(Literal.class) :*/ st.getObject().isLiteral() && 
                           (
                               (RDF.value.equals(st.getPredicate()) || VitroVocabulary.value.equals(st.getPredicate().getURI())) 
+                              || this.MONIKER.equals(st.getPredicate())
                               || !(NONUSER_NAMESPACES.contains(st.getPredicate().getNameSpace()))
                           );
                     if( addToList )

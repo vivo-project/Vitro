@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -22,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
@@ -29,9 +31,12 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropStmt;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
+import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import freemarker.cache.TemplateLoader;
@@ -86,21 +91,18 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     private String objectKey;    
     
     // Used for editing
-    private boolean addAccess = false;
-
+    private boolean addAccess; // defaults to false
+    
     ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, 
             EditingPolicyHelper policyHelper)
         throws InvalidConfigurationException {
         
-        super(op, subject, policyHelper);
-        
-        log.debug("Creating template model for object property " + op.getURI());
-        
+        super(op, subject, policyHelper, vreq); 
         setName(op.getDomainPublic());
-
+        
         // Get the config for this object property
         try {
-            config = new PropertyListConfig(op, vreq);
+            config = new PropertyListConfig(op, policyHelper);
         } catch (InvalidConfigurationException e) {
             throw e;
         } catch (Exception e) {
@@ -109,15 +111,39 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         
         objectKey = getQueryObjectVariableName();
         
-        // Determine whether a new statement can be added
+        setAddAccess(policyHelper, op);
+    }
+
+    // Determine whether a new statement can be added
+    @Override
+    protected void setAddAccess(EditingPolicyHelper policyHelper, Property property) {
         if (policyHelper != null) {
             RequestedAction action = new AddObjectPropStmt(subjectUri, propertyUri, RequestActionConstants.SOME_URI);
             if (policyHelper.isAuthorizedAction(action)) {
                 addAccess = true;
             }
-        }
+        }        
     }
     
+    protected List<Map<String, String>> getStatementData() {
+        ObjectPropertyStatementDao opDao = vreq.getWebappDaoFactory().getObjectPropertyStatementDao();
+        return opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, objectKey, getSelectQuery(), getConstructQueries());
+    }
+    
+    protected abstract boolean isEmpty();
+    
+    @Override 
+    protected int getPropertyDisplayTier(Property p) {
+        // For some reason ObjectProperty.getDomainDisplayTier() returns a String
+        // rather than an int. That should probably be fixed.
+        return Integer.parseInt(((ObjectProperty)p).getDomainDisplayTier());
+    }
+
+    @Override 
+    protected Route getPropertyEditRoute() {
+        return Route.OBJECT_PROPERTY_EDIT;
+    }
+
     protected ConfigError checkQuery(String queryString) {
         if (StringUtils.isBlank(queryString)) {
             return ConfigError.NO_SELECT_QUERY;
@@ -125,11 +151,11 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         return null;
     }
       
-    protected String getSelectQuery() {
+    private String getSelectQuery() {
         return config.selectQuery;
     }
     
-    protected Set<String> getConstructQueries() {
+    private Set<String> getConstructQueries() {
         return config.constructQueries;
     }
     
@@ -192,7 +218,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     }
     
     /** Apply post-processing to query results to prepare for template */
-    protected void postprocess(List<Map<String, String>> data, WebappDaoFactory wdf) {
+    protected void postprocess(List<Map<String, String>> data) {
         
         if (log.isDebugEnabled()) {
             log.debug("Data for property " + getUri() + " before postprocessing");
@@ -309,10 +335,11 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private static final String DEFAULT_CONFIG_FILE_NAME = "listViewConfig-default.xml";
         
         private static final String NODE_NAME_QUERY_CONSTRUCT = "query-construct";
-        private static final String NODE_NAME_QUERY_BASE = "query-base";
-        private static final String NODE_NAME_QUERY_COLLATED = "query-collated";
+        private static final String NODE_NAME_QUERY_SELECT = "query-select";
         private static final String NODE_NAME_TEMPLATE = "template";
         private static final String NODE_NAME_POSTPROCESSOR = "postprocessor";
+        private static final String NODE_NAME_COLLATED = "collated";
+        private static final String NODE_NAME_CRITICAL_DATA_REQUIRED = "critical-data-required";
 
         /* NB The default post-processor is not the same as the post-processor for the default view. The latter
          * actually defines its own post-processor, whereas the default post-processor is used for custom views
@@ -327,7 +354,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private String templateName;
         private ObjectPropertyDataPostProcessor postprocessor = null;
 
-        PropertyListConfig(ObjectProperty op, VitroRequest vreq) 
+        PropertyListConfig(ObjectProperty op, EditingPolicyHelper policyHelper) 
             throws InvalidConfigurationException {
 
             // Get the custom config filename
@@ -347,7 +374,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                     configFilePath = getConfigFilePath(DEFAULT_CONFIG_FILE_NAME);
                     // Should we test for the existence of the default, and throw an error if it doesn't exist?
                 }                   
-                setValuesFromConfigFile(configFilePath, op, vreq.getWebappDaoFactory());           
+                setValuesFromConfigFile(configFilePath, op, vreq.getWebappDaoFactory(), policyHelper);           
 
             } catch (Exception e) {
                 log.error("Error processing config file " + configFilePath + " for object property " + op.getURI(), e);
@@ -355,7 +382,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             }
             
             if ( ! isDefaultConfig(configFileName) ) {
-                ConfigError configError = checkConfiguration(vreq);
+                ConfigError configError = checkConfiguration();
                 if ( configError != null ) { // the configuration contains an error
                     // If this is a collated property, throw an error: this results in creating an 
                     // UncollatedPropertyTemplateModel instead.
@@ -367,7 +394,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                             " in " + configFilePath + ":\n" +                            
                             configError + " Using default config instead.");
                     configFilePath = getConfigFilePath(DEFAULT_CONFIG_FILE_NAME);
-                    setValuesFromConfigFile(configFilePath, op, vreq.getWebappDaoFactory());                    
+                    setValuesFromConfigFile(configFilePath, op, vreq.getWebappDaoFactory(), policyHelper);                    
                 }
             }
             
@@ -378,7 +405,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             return configFileName.equals(DEFAULT_CONFIG_FILE_NAME);
         }
         
-        private ConfigError checkConfiguration(VitroRequest vreq) {
+        private ConfigError checkConfiguration() {
 
             ConfigError error = ObjectPropertyTemplateModel.this.checkQuery(selectQuery);
             if (error != null) {
@@ -406,7 +433,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             return null;
         }
         
-        private void setValuesFromConfigFile(String configFilePath, ObjectProperty op, WebappDaoFactory wdf) {
+        private void setValuesFromConfigFile(String configFilePath, ObjectProperty op, WebappDaoFactory wdf, 
+                EditingPolicyHelper policyHelper) {
             
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db;
@@ -415,17 +443,13 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                 db = dbf.newDocumentBuilder();
                 Document doc = db.parse(configFilePath);
                 String propertyUri = op.getURI();
+                
                 // Required values
-                String queryNodeName = 
-                    // Don't test op.getCollateBySubclass(), since if creating a CollatedObjectPropertyTemplateModel failed,
-                    // we now want to create an UncollatedObjectPropertyTemplateModel
-                    (ObjectPropertyTemplateModel.this instanceof CollatedObjectPropertyTemplateModel) ?
-                        NODE_NAME_QUERY_COLLATED : NODE_NAME_QUERY_BASE;
-                        
-                log.debug("Using query element " + queryNodeName + " for object property " + propertyUri);
-                selectQuery = getConfigValue(doc, queryNodeName, propertyUri);
+                selectQuery = getSelectQuery(doc, propertyUri, policyHelper);
+                
                 templateName = getConfigValue(doc, NODE_NAME_TEMPLATE, propertyUri); 
                 
+                // Optional values
                 constructQueries = getConfigValues(doc, NODE_NAME_QUERY_CONSTRUCT, propertyUri);
                 
                 String postprocessorName = getConfigValue(doc, NODE_NAME_POSTPROCESSOR, propertyUri);
@@ -446,8 +470,44 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                 
             } catch (Exception e) {
                 log.error("Error processing config file " + configFilePath, e);
-                // What should we do here?
             }            
+        }
+        
+        private String getSelectQuery(Document doc, String propertyUri, EditingPolicyHelper policyHelper) {
+            Node selectQueryNode = doc.getElementsByTagName(NODE_NAME_QUERY_SELECT).item(0);
+            String value = null;
+            if (selectQueryNode != null) {
+                boolean collated = ObjectPropertyTemplateModel.this instanceof CollatedObjectPropertyTemplateModel;
+                /* If not editing the page (policyHelper == null), hide statements with missing linked individual or other
+                 * critical information missing (e.g., anchor and url on a link); otherwise, show these statements.
+                 * We might want to refine this based on whether the user can edit the statement in question, but that
+                 * would require a completely different approach: include the statement in the query results, and then during the 
+                 * postprocessing phase, check the editing policy, and  remove the statement if it's not editable. We would not
+                 * preprocess the query, as here.
+                 */
+                boolean criticalDataRequired = policyHelper == null;
+                NodeList children = selectQueryNode.getChildNodes();
+                int childCount = children.getLength();
+                value = "";
+                for (int i = 0; i < childCount; i++) {
+                    Node node = children.item(i);    
+                    if (node.getNodeName().equals(NODE_NAME_COLLATED)) {
+                        if (collated) {
+                            value += node.getChildNodes().item(0).getNodeValue();
+                        } // else ignore this node                    
+                    } else if (node.getNodeName().equals(NODE_NAME_CRITICAL_DATA_REQUIRED)) {
+                        if (criticalDataRequired) {
+                            value += node.getChildNodes().item(0).getNodeValue();
+                        } // else ignore this node
+                    } else {
+                        value += node.getNodeValue();
+                    }     
+                }
+                log.debug("Found config parameter " + NODE_NAME_QUERY_SELECT + " for object property " + propertyUri +  " with value " + value);
+            } else {
+                log.error("No value found for config parameter " + NODE_NAME_QUERY_SELECT + " for object property " + propertyUri);
+            }
+            return value;
         }
         
         private void getPostProcessor(String name, WebappDaoFactory wdf) throws Exception {
@@ -457,11 +517,10 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         }
  
         private String getConfigValue(Document doc, String nodeName, String propertyUri) {
-            NodeList nodes = doc.getElementsByTagName(nodeName);
-            Element element = (Element) nodes.item(0); 
+            Node node = doc.getElementsByTagName(nodeName).item(0);
             String value = null;
-            if (element != null) {
-                value = element.getChildNodes().item(0).getNodeValue();   
+            if (node != null) {
+                value = node.getChildNodes().item(0).getNodeValue();   
                 log.debug("Found config parameter " + nodeName + " for object property " + propertyUri +  " with value " + value);
             } else {
                 log.debug("No value found for config parameter " + nodeName + " for object property " + propertyUri);
@@ -476,8 +535,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             if (nodeCount > 0) {
                 values = new HashSet<String>(nodeCount);
                 for (int i = 0; i < nodeCount; i++) {
-                    Element element = (Element) nodes.item(i);
-                    String value = element.getChildNodes().item(0).getNodeValue();
+                    Node node = nodes.item(i);
+                    String value = node.getChildNodes().item(0).getNodeValue();
                     values.add(value);  
                     log.debug("Found config parameter " + nodeName + " for object property " + propertyUri +  " with value " + value);
                 }
@@ -506,7 +565,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     public String getType() {
         return TYPE;
     }
-    
+
     public String getTemplate() {
         return config.templateName;
     }
@@ -522,7 +581,14 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             } 
             ParamMap params = new ParamMap(
                     "subjectUri", subjectUri,
-                    "predicateUri", propertyUri);                              
+                    "predicateUri", propertyUri);  
+            
+            //Check if special parameters being sent
+            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vreq);
+            if(specialParams.size() > 0) {
+            	params.putAll(specialParams);
+            }
+             
             addUrl = UrlBuilder.getUrl(EDIT_PATH, params);  
 
         }

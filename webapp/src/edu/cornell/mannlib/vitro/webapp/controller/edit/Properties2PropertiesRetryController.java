@@ -2,9 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
-import java.text.CollationKey;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,8 +9,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.TreeMap;
 import java.util.ListIterator;
 
 import javax.servlet.RequestDispatcher;
@@ -23,37 +18,28 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.text.Collator;
-
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.util.FormUtils;
-import edu.cornell.mannlib.vitro.webapp.beans.Classes2Classes;
-import edu.cornell.mannlib.vitro.webapp.beans.Property;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.Classes2ClassesDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 
 public class Properties2PropertiesRetryController extends BaseEditController {
 
 	private static final Log log = LogFactory.getLog(Properties2PropertiesRetryController.class.getName());
 
     public void doGet (HttpServletRequest req, HttpServletResponse response) {
-    	VitroRequest request = new VitroRequest(req);
-        if(!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error(this.getClass().getName()+" encountered exception calling super.doGet()");
+        if (!isAuthorizedToDisplayPage(req, response, new Actions(new EditOntology()))) {
+        	return;
         }
 
+    	VitroRequest request = new VitroRequest(req);
         
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);

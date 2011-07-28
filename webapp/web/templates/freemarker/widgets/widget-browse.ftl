@@ -5,8 +5,8 @@
 <#macro assets>
   <#-- 
    Are there stylesheets or scripts needed? 
-   ${stylesheets.add("/css/browse.css")} 
-   ${scripts.add("/js/browse.js")}
+   ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browse.css" />')}
+   ${scripts.add('<script type="text/javascript" src="${urls.base}/js/browse.js"></script>'}
    -->        
 </#macro>
 

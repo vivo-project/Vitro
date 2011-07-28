@@ -44,10 +44,6 @@ public class ObjectPropertyStatementFiltering implements ObjectPropertyStatement
         return innerStmt.toString();
     }
 
-    public String getDescription() {
-        return innerStmt.getDescription();
-    }
-
     public String getObjectURI() {
         return innerStmt.getObjectURI();
     }
@@ -56,28 +52,12 @@ public class ObjectPropertyStatementFiltering implements ObjectPropertyStatement
         return innerStmt.getPropertyURI();
     }
 
-    public String getQualifier() {
-        return innerStmt.getQualifier();
-    }
-
     public String getSubjectURI() {
         return innerStmt.getSubjectURI();
     }
 
-    public Date getSunrise() {
-        return innerStmt.getSunrise();
-    }
-
-    public Date getSunset() {
-        return innerStmt.getSunset();
-    }
-
     public boolean isSubjectOriented() {
         return innerStmt.isSubjectOriented();
-    }
-
-    public void setDescription(String description) {
-        innerStmt.setDescription(description);
     }
 
     public void setObject(Individual object) {
@@ -96,10 +76,6 @@ public class ObjectPropertyStatementFiltering implements ObjectPropertyStatement
         innerStmt.setPropertyURI(URI);
     }
 
-    public void setQualifier(String qualifier) {
-        innerStmt.setQualifier(qualifier);
-    }
-
     public void setSubject(Individual subject) {
         innerStmt.setSubject(subject);
     }
@@ -110,14 +86,6 @@ public class ObjectPropertyStatementFiltering implements ObjectPropertyStatement
 
     public void setSubjectURI(String subjectURI) {
         innerStmt.setSubjectURI(subjectURI);
-    }
-
-    public void setSunrise(Date date) {
-        innerStmt.setSunrise(date);
-    }
-
-    public void setSunset(Date date) {
-        innerStmt.setSunset(date);
     }
 
 }

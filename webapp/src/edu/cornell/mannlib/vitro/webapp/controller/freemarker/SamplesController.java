@@ -3,8 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,11 +10,9 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration;
 
 /**
  * Freemarker controller and template samples.
@@ -31,7 +27,6 @@ public class SamplesController extends FreemarkerHttpServlet {
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
-        Portal portal = vreq.getPortal();
         
         Map<String, Object> body = new HashMap<String, Object>();
         // Test of #list directive in template on undefined, null, and empty values.
@@ -39,11 +34,6 @@ public class SamplesController extends FreemarkerHttpServlet {
         List<String> apples = new ArrayList<String>();  // no error
         // List<String> apples = null; // error
         body.put("apples", apples); // without this: error        
-        
-        Calendar cal = Calendar.getInstance();
-        Date now = cal.getTime();
-        body.put("now", now);
-        // In template: ${now?date}, ${now?datetime}, ${now?time}
         
         // You can add to a collection AFTER putting it in the template data model.
         // The data model contains a reference to the collection, not a copy.
@@ -81,8 +71,6 @@ public class SamplesController extends FreemarkerHttpServlet {
         
         body.put("trueStatement", true);
         body.put("falseStatement", false);
-        
-        body.put("pojo", new EditConfiguration());
         
         getBerries(body);
         

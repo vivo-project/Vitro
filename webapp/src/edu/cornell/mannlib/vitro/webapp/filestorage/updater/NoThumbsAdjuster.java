@@ -2,15 +2,24 @@
 
 package edu.cornell.mannlib.vitro.webapp.filestorage.updater;
 
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.THUMBNAIL_HEIGHT;
+import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.THUMBNAIL_WIDTH;
 
-import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import javax.media.jai.JAI;
+import javax.media.jai.RenderedOp;
 
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.sun.media.jai.codec.MemoryCacheSeekableStream;
+
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.CropRectangle;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadThumbnailer;
 
 /**
  * Adjust any individual that has a main image but no thumbnail.
@@ -56,10 +65,15 @@ public class NoThumbsAdjuster extends FsuScanner {
 		File mainFile = imageDirectoryWithBackup.getExistingFile(mainFilename);
 		File thumbFile = imageDirectoryWithBackup.getNewfile(thumbFilename);
 		thumbFile = checkNameConflicts(thumbFile);
+
 		try {
-			generateThumbnailImage(mainFile, thumbFile,
-					FileStorageUpdater.THUMBNAIL_WIDTH,
-					FileStorageUpdater.THUMBNAIL_HEIGHT);
+			CropRectangle crop = getImageSize(mainFile);
+			if (imageIsSmallEnoughAlready(crop)) {
+				copyMainImageToThumbnail(mainFile, thumbFile);
+			} else {
+				cropScaleAndStore(crop, mainFile, thumbFile);
+			}
+
 			ResourceWrapper.addProperty(resource, thumbProperty, thumbFilename);
 		} catch (IOException e) {
 			updateLog.error(resource, "failed to create thumbnail file '"
@@ -67,30 +81,93 @@ public class NoThumbsAdjuster extends FsuScanner {
 		}
 	}
 
-	/**
-	 * Read in the main image, and scale it to a thumbnail that maintains the
-	 * aspect ratio, but doesn't exceed either of these dimensions.
-	 */
-	private void generateThumbnailImage(File mainFile, File thumbFile,
-			int maxWidth, int maxHeight) throws IOException {
-		BufferedImage bsrc = ImageIO.read(mainFile);
-
-		double scale = Math.min(((double) maxWidth) / bsrc.getWidth(),
-				((double) maxHeight) / bsrc.getHeight());
-		AffineTransform at = AffineTransform.getScaleInstance(scale, scale);
-		int newWidth = (int) (scale * bsrc.getWidth());
-		int newHeight = (int) (scale * bsrc.getHeight());
-		updateLog.log("Scaling '" + mainFile + "' by a factor of " + scale
-				+ ", from " + bsrc.getWidth() + "x" + bsrc.getHeight() + " to "
-				+ newWidth + "x" + newHeight);
-
-		BufferedImage bdest = new BufferedImage(newWidth, newHeight,
-				BufferedImage.TYPE_INT_RGB);
-		Graphics2D g = bdest.createGraphics();
-
-		g.drawRenderedImage(bsrc, at);
-
-		ImageIO.write(bdest, "JPG", thumbFile);
+	private CropRectangle getImageSize(File file) throws IOException {
+		InputStream imageSource = null;
+		try {
+			imageSource = new FileInputStream(file);
+			MemoryCacheSeekableStream stream = new MemoryCacheSeekableStream(
+					imageSource);
+			RenderedOp image = JAI.create("stream", stream);
+			return new CropRectangle(0, 0, image.getHeight(), image.getWidth());
+		} finally {
+			if (imageSource != null) {
+				try {
+					imageSource.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
+	private boolean imageIsSmallEnoughAlready(CropRectangle crop) {
+		return (crop.height <= THUMBNAIL_HEIGHT)
+				&& (crop.width <= THUMBNAIL_WIDTH);
+	}
+
+	private void copyMainImageToThumbnail(File mainFile, File thumbFile)
+			throws IOException {
+		InputStream imageSource = null;
+		try {
+			imageSource = new FileInputStream(mainFile);
+			storeImage(imageSource, thumbFile);
+		} finally {
+			if (imageSource != null) {
+				try {
+					imageSource.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	private void cropScaleAndStore(CropRectangle crop, File mainFile,
+			File thumbFile) throws IOException {
+		InputStream mainImageStream = null;
+		InputStream imageSource = null;
+		try {
+			mainImageStream = new FileInputStream(mainFile);
+			ImageUploadThumbnailer iut = new ImageUploadThumbnailer(
+					THUMBNAIL_HEIGHT, THUMBNAIL_WIDTH);
+			imageSource = iut.cropAndScale(mainImageStream, crop);
+			storeImage(imageSource, thumbFile);
+		} finally {
+			if (mainImageStream != null) {
+				try {
+					mainImageStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (imageSource != null) {
+				try {
+					imageSource.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	private void storeImage(InputStream source, File file) throws IOException {
+		OutputStream sink = null;
+		try {
+			sink = new FileOutputStream(file);
+			
+			byte[] buffer = new byte[8192];
+			int howMany;
+			while (-1 != (howMany = source.read(buffer))) {
+				sink.write(buffer, 0, howMany);
+			}
+		} finally {
+			if (sink != null) {
+				try {
+					sink.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 }

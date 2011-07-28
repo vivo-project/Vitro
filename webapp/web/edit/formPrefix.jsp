@@ -7,7 +7,6 @@
 <%@ page errorPage="/error.jsp"%>
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Portal"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet" %>
 
 <% 
@@ -16,20 +15,16 @@ FreemarkerHttpServlet.getFreemarkerComponentsForJsp(request);
 
 <%
   VitroRequest vreq = new VitroRequest(request);  
-  Portal portal = vreq.getPortal();
   
   String contextRoot = vreq.getContextPath();
+  String themeDir = vreq.getAppBean().getThemeDir();
   
-  String themeDir = portal != null ? portal.getThemeDir() : Portal.DEFAULT_THEME_DIR_FROM_CONTEXT;
   themeDir = contextRoot + '/' + themeDir;
 %>
 
-
-<c:set var="portal" value="${requestScope.portalBean}"/>
 <c:set var="themeDir"><c:out value="${themeDir}" /></c:set>
 <c:set var="bodyJsp"><c:out value="${requestScope.bodyJsp}" default="/debug.jsp"/></c:set>
 <c:set var="title"><c:out value="${requestScope.title}" /></c:set>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -42,8 +37,6 @@ FreemarkerHttpServlet.getFreemarkerComponentsForJsp(request);
     <c:forEach var="cssFile" items="${customCss}">
         <link rel="stylesheet" type="text/css" href="<c:url value="${cssFile}"/>" media="screen"/>
     </c:forEach>
-    
-    <link rel="stylesheet" type="text/css" href="<c:url value="/js/jquery_plugins/thickbox/thickbox.css"/>" />
     
     ${ftl_head}
     

@@ -7,7 +7,6 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Ontology"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.OntologyDao"%>
 
-
 <div class="staticPageBackground">
 
 <h2>Export to RDF</h2>

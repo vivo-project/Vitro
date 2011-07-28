@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
+import java.io.IOException;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -9,21 +11,18 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
-import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vedit.util.FormUtils;
+import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
+import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vedit.util.FormUtils;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
+import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
-import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.Iterator;
-import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 
 
 public class ClassgroupRetryController extends BaseEditController {
@@ -31,16 +30,11 @@ public class ClassgroupRetryController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(ClassgroupRetryController.class.getName());
 
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
+        if (!isAuthorizedToDisplayPage(req, response, new Actions(new UseMiscellaneousAdminPages()))) {
+        	return;
+        }
 
     	VitroRequest request = new VitroRequest(req);
-        if (!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error("ClassgroupRetryController encountered exception calling super.doGet()");
-        }
 
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
@@ -83,16 +77,10 @@ public class ClassgroupRetryController extends BaseEditController {
             vclassGroupForEditing = (VClassGroup) epo.getNewBean();
         }
 
-        //set portal flag to current portal
-        Portal currPortal = (Portal) request.getAttribute("portalBean");
-        int currPortalId = 1;
-        if (currPortal != null) {
-            currPortalId = currPortal.getPortalId();
-        }
         //make a postinsert pageforwarder that will send us to a new class's fetch screen
-        epo.setPostInsertPageForwarder(new VclassGroupInsertPageForwarder(currPortalId));
+        epo.setPostInsertPageForwarder(new VclassGroupInsertPageForwarder());
         //make a postdelete pageforwarder that will send us to the list of classes
-        epo.setPostDeletePageForwarder(new UrlForwarder("listGroups?home="+currPortalId));
+        epo.setPostDeletePageForwarder(new UrlForwarder("listGroups"));
 
         //set the getMethod so we can retrieve a new bean after we've inserted it
         try {
@@ -134,14 +122,9 @@ public class ClassgroupRetryController extends BaseEditController {
     }
 
     class VclassGroupInsertPageForwarder implements PageForwarder {
-        private int portalId = 1;
-
-        public VclassGroupInsertPageForwarder(int currPortalId) {
-            portalId = currPortalId;
-        }
 
         public void doForward(HttpServletRequest request, HttpServletResponse response, EditProcessObject epo){
-            String newVclassGroupUrl = "listGroups?home="+portalId;
+            String newVclassGroupUrl = "listGroups";
             try {
                 response.sendRedirect(newVclassGroupUrl);
             } catch (IOException ioe) {

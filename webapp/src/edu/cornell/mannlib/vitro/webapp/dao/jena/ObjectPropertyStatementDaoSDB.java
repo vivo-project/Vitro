@@ -7,9 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -33,6 +37,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetM
 public class ObjectPropertyStatementDaoSDB extends
 		ObjectPropertyStatementDaoJena implements ObjectPropertyStatementDao {
 
+    private static final Log log = LogFactory.getLog(ObjectPropertyStatementDaoSDB.class);
+    
 	private DatasetWrapperFactory dwf;
 	private SDBDatasetMode datasetMode;
 	
@@ -69,9 +75,12 @@ public class ObjectPropertyStatementDaoSDB extends
         	DatasetWrapper w = dwf.getDatasetWrapper();
         	Dataset dataset = w.getDataset();
         	dataset.getLock().enterCriticalSection(Lock.READ);
+        	QueryExecution qexec = null;
         	try {
-        		m = QueryExecutionFactory.create(QueryFactory.create(query), dataset).execConstruct();
+        		qexec = QueryExecutionFactory.create(QueryFactory.create(query), dataset);
+        		m = qexec.execConstruct();
         	} finally {
+        	    if(qexec != null) qexec.close();
         		dataset.getLock().leaveCriticalSection();
         		w.close();
         	}
@@ -116,17 +125,12 @@ public class ObjectPropertyStatementDaoSDB extends
 
 	                            if (objPropertyStmt.getObjectURI() != null) {
 	                                //this might throw IndividualNotFoundException
-	                            	try {
-                                         Individual objInd = new IndividualSDB(
-                                             objPropertyStmt.getObjectURI(), 
-                                             this.dwf, 
-                                             datasetMode,
-                                             getWebappDaoFactory());
-                                         objPropertyStmt.setObject(objInd);	
-	                            	} catch (IndividualNotFoundException infe) {
-	                            		 log.warn("Individual Not Found for uri: " + objPropertyStmt.getObjectURI());
-	                            		 continue;
-	                            	}                 
+                                    Individual objInd = new IndividualSDB(
+                                        objPropertyStmt.getObjectURI(), 
+                                        this.dwf, 
+                                        datasetMode,
+                                        getWebappDaoFactory());
+                                    objPropertyStmt.setObject(objInd);	                                
 	                            }
 	                            
 	                            //only add statement to list if it has its values filled out
@@ -136,6 +140,9 @@ public class ObjectPropertyStatementDaoSDB extends
 	                                objPropertyStmtList.add(objPropertyStmt);                           
 	                            } 
 	                            
+	                        } catch (IndividualNotFoundException t) {
+	                            log.debug(t,t);
+	                            continue;
 	                        } catch (Throwable t){
 	                            log.error(t,t);
                                 continue;

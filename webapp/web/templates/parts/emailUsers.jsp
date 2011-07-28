@@ -13,7 +13,6 @@
 <hr/>
 
 		<form name = "contact_form" action="mailusers" method="post">
-		<input type="hidden" name="home" value="${portalId}"/>
 		<input type="hidden" name="RequiredFields" value="comments"/>
 		<input type="hidden" name="RequiredFieldsNames" value="Comments"/>
 		<input type="hidden" name="EmailFields" value="webuseremail"/>

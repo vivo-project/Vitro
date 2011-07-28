@@ -3,29 +3,24 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import junit.framework.Assert;
+
+import org.junit.Ignore;
+import org.junit.Test;
+
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
-import edu.cornell.mannlib.vitro.webapp.beans.Link;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
-import edu.cornell.mannlib.vitro.webapp.beans.Tab;
-import edu.cornell.mannlib.vitro.webapp.beans.User;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.PortalDao;
-import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
-import edu.cornell.mannlib.vitro.webapp.dao.TabDao;
-import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
+import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 /**
@@ -36,40 +31,38 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 public class OntModelSegementationTest {
 
 	private WebappDaoFactoryJena wadf;
-	
 	@org.junit.Before
 	public void setUpWebappDaoFactoryJena() {
 		wadf = new WebappDaoFactoryJena(new SimpleOntModelSelector());
 	}
 	
-	@org.junit.Test
+	@Test
 	public void testUserAccountModel() {
 		
-		UserDao udao = wadf.getUserDao();
+		UserAccountsDao uadao = wadf.getUserAccountsDao();
 		OntModelSelector oms = wadf.getOntModelSelector();
-		
-		User user = new User();
+
+		UserAccount user = new UserAccount();
 		user.setFirstName("Chuck");
 		user.setLastName("Roast");
-		user.setUsername("chuckroast");
+		user.setExternalAuthId("chuckroast");
 		
-		String userURI = udao.insertUser(user);
-		user.setURI(userURI);
+		uadao.insertUserAccount(user);
 		Assert.assertTrue(oms.getUserAccountsModel().size() > 0);
 		Assert.assertTrue(oms.getFullModel().size() == 0);
 		Assert.assertTrue(oms.getABoxModel().size() == 0);
 		Assert.assertTrue(oms.getTBoxModel().size() == 0);
 		Assert.assertTrue(oms.getApplicationMetadataModel().size() == 0);
 		
-		user.setUsername("todd");
-		udao.updateUser(user);
+		user.setEmailAddress("todd@somewhere");
+		uadao.updateUserAccount(user);
 		Assert.assertTrue(oms.getUserAccountsModel().size() > 0);
 		Assert.assertTrue(oms.getFullModel().size() == 0);
 		Assert.assertTrue(oms.getABoxModel().size() == 0);
 		Assert.assertTrue(oms.getTBoxModel().size() == 0);
 		Assert.assertTrue(oms.getApplicationMetadataModel().size() == 0);
 		
-		udao.deleteUser(user);
+		uadao.deleteUserAccount(user.getUri());
 		Assert.assertTrue(oms.getUserAccountsModel().size() == 0);
 		Assert.assertTrue(oms.getFullModel().size() == 0);
 		Assert.assertTrue(oms.getABoxModel().size() == 0);
@@ -78,7 +71,8 @@ public class OntModelSegementationTest {
 		
 	}
 	
-	@org.junit.Test
+	/*
+	@Test
 	public void testApplicationMetadataModel() throws InsertException {
 		
 		PortalDao pdao = wadf.getPortalDao();
@@ -87,7 +81,7 @@ public class OntModelSegementationTest {
 		PropertyGroupDao pgdao = wadf.getPropertyGroupDao();
 		OntModelSelector oms = wadf.getOntModelSelector();
 	
-		this.assertAllModelsEmpty(oms);
+		this.assertAllModelsExceptAppMetadataAreEmpty(oms);
 		
 		//insert a portal
 		Portal portal = new Portal();
@@ -134,16 +128,16 @@ public class OntModelSegementationTest {
 		pgdao.updatePropertyGroup(pgroup);
 		this.assertMetadataModelNonemptyAndAllOtherModelsAreEmpty(oms);
 		
-		pdao.deletePortal(portal);
 		tdao.deleteTab(tab);
 		vcgdao.deleteVClassGroup(group);
 		pgdao.deletePropertyGroup(pgroup);
 		
-		this.assertAllModelsEmpty(oms);
+		this.assertAllModelsExceptAppMetadataAreEmpty(oms);
 		
 	}
+	*/
 	
-	@org.junit.Test
+	@Test
 	public void testTBoxModel() throws InsertException {
 		
 		OntModelSelector oms = wadf.getOntModelSelector();
@@ -194,11 +188,11 @@ public class OntModelSegementationTest {
 		dpDao.deleteDataProperty(dp);
 		oDao.deleteOntology(o);
 		
-		this.assertAllModelsEmpty(oms);
+		this.assertAllModelsExceptAppMetadataAreEmpty(oms);
 			
 	}
 	
-	@org.junit.Test
+	@Test
 	public void testAboxModel() throws InsertException {
 		
 		OntModelSelector oms = wadf.getOntModelSelector();
@@ -213,18 +207,19 @@ public class OntModelSegementationTest {
 		this.assertABoxModelNonemptyAndAllOtherModelsAreEmpty(oms);
 		
 		iDao.deleteIndividual(ind);
-		this.assertAllModelsEmpty(oms);
+		this.assertAllModelsExceptAppMetadataAreEmpty(oms);
 		
 	}
 
-	private void assertAllModelsEmpty(OntModelSelector oms) {
-		Assert.assertTrue(oms.getApplicationMetadataModel().size() == 0);
+	private void assertAllModelsExceptAppMetadataAreEmpty(OntModelSelector oms) {
+		//Assert.assertTrue(oms.getApplicationMetadataModel().size() == 0);
 		Assert.assertTrue(oms.getFullModel().size() == 0);
 		Assert.assertTrue(oms.getABoxModel().size() == 0);
 		Assert.assertTrue(oms.getTBoxModel().size() == 0);
 		Assert.assertTrue(oms.getUserAccountsModel().size() == 0);
 	}
 	
+	/*
 	private void assertMetadataModelNonemptyAndAllOtherModelsAreEmpty(OntModelSelector oms) {
 		Assert.assertTrue(oms.getApplicationMetadataModel().size() > 0);
 		Assert.assertTrue(oms.getFullModel().size() == oms.getApplicationMetadataModel().size());
@@ -232,6 +227,7 @@ public class OntModelSegementationTest {
 		Assert.assertTrue(oms.getTBoxModel().size() == 0);
 		Assert.assertTrue(oms.getUserAccountsModel().size() == 0);
 	}
+	*/
 	
 	private void assertTBoxModelNonemptyAndAllOtherModelsAreEmpty(OntModelSelector oms) {
 		Assert.assertTrue(oms.getTBoxModel().size() > 0);
@@ -249,20 +245,21 @@ public class OntModelSegementationTest {
 		Assert.assertTrue(oms.getUserAccountsModel().size() == 0);
 	}
 	
-	@org.junit.Test
+	@Ignore
+	@Test
 	public void testConcurrency() throws InsertException {
-//		(new Thread(new ClassLister(wadf))).start();
-//		(new Thread(new ClassLister(wadf))).start();
-//		VClass v = null;
-//		for (int i = 0; i < 50; i++) {
-//			v = new VClass();
-//			v.setURI("http://example.org/vclass" + i);
-//			wadf.getVClassDao().insertNewVClass(v);
-//		}
-//		for (int i = 0; i < 500; i++) {
-//			v.setName("blah " + i);
-//			wadf.getVClassDao().updateVClass(v);
-//		}
+		(new Thread(new ClassLister(wadf))).start();
+		(new Thread(new ClassLister(wadf))).start();
+		VClass v = null;
+		for (int i = 0; i < 50; i++) {
+			v = new VClass();
+			v.setURI("http://example.org/vclass" + i);
+			wadf.getVClassDao().insertNewVClass(v);
+		}
+		for (int i = 0; i < 500; i++) {
+			v.setName("blah " + i);
+			wadf.getVClassDao().updateVClass(v);
+		}
 		
 	}
 	

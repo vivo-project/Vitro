@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -15,26 +14,27 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginFormBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.RoleBasedPolicy.AuthRole;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.IsRootUser;
+import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
-import edu.cornell.mannlib.vitro.webapp.beans.User;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.dao.UserDao;
+import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LogoutEvent;
+import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 
 /**
  * The "standard" implementation of Authenticator.
  */
 public class BasicAuthenticator extends Authenticator {
-	/** User roles are recorded in the model like "role:/50", etc. */
-	private static final String ROLE_NAMESPACE = "role:/";
-
 	private static final Log log = LogFactory.getLog(BasicAuthenticator.class);
 
 	private final HttpServletRequest request;
@@ -44,125 +44,119 @@ public class BasicAuthenticator extends Authenticator {
 	}
 
 	@Override
-	public boolean isExistingUser(String username) {
-		return getUserByUsername(username) != null;
-	}
-
-	@Override
-	public User getUserByUsername(String username) {
-		UserDao userDao = getUserDao();
-		if (userDao == null) {
+	public UserAccount getAccountForInternalAuth(String emailAddress) {
+		UserAccountsDao userAccountsDao = getUserAccountsDao();
+		if (userAccountsDao == null) {
 			return null;
 		}
-		return userDao.getUserByUsername(username);
+		return userAccountsDao.getUserAccountByEmail(emailAddress);
 	}
 
 	@Override
-	public boolean isCurrentPassword(String username, String clearTextPassword) {
-		User user = getUserDao().getUserByUsername(username);
-		if (user == null) {
-			log.trace("Checking password '" + clearTextPassword
-					+ "' for user '" + username + "', but user doesn't exist.");
+	public UserAccount getAccountForExternalAuth(String externalAuthId) {
+		UserAccountsDao userAccountsDao = getUserAccountsDao();
+		if (userAccountsDao == null) {
+			return null;
+		}
+		return userAccountsDao.getUserAccountByExternalAuthId(externalAuthId);
+	}
+
+	@Override
+	public boolean isCurrentPassword(UserAccount userAccount,
+			String clearTextPassword) {
+		if (userAccount == null) {
 			return false;
 		}
-
-		String md5NewPassword = Authenticate
-				.applyMd5Encoding(clearTextPassword);
-		return md5NewPassword.equals(user.getMd5password());
+		if (clearTextPassword == null) {
+			return false;
+		}
+		String encodedPassword = applyMd5Encoding(clearTextPassword);
+		return encodedPassword.equals(userAccount.getMd5Password());
 	}
 
 	@Override
-	public void recordNewPassword(String username, String newClearTextPassword) {
-		User user = getUserByUsername(username);
-		if (user == null) {
-			log.error("Trying to change password on non-existent user: "
-					+ username);
+	public void recordNewPassword(UserAccount userAccount,
+			String newClearTextPassword) {
+		if (userAccount == null) {
+			log.error("Trying to change password on null user.");
 			return;
 		}
-		user.setOldPassword(user.getMd5password());
-		user.setMd5password(Authenticate.applyMd5Encoding(newClearTextPassword));
-		getUserDao().updateUser(user);
+		userAccount.setMd5Password(applyMd5Encoding(newClearTextPassword));
+		userAccount.setPasswordChangeRequired(false);
+		userAccount.setPasswordLinkExpires(0L);
+		getUserAccountsDao().updateUserAccount(userAccount);
 	}
 
 	@Override
-	public void recordLoginAgainstUserAccount(String username,
+	public boolean accountRequiresEditing(UserAccount userAccount) {
+		if (userAccount == null) {
+			log.error("Trying to check for valid fields on a null user.");
+			return false;
+		}
+		if (userAccount.getFirstName().isEmpty()) {
+			return true;
+		}
+		if (userAccount.getLastName().isEmpty()) {
+			return true;
+		}
+		if (userAccount.getEmailAddress().isEmpty()) {
+			return true;
+		}
+		if (!isValidEmailAddress(userAccount.getEmailAddress())) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public List<String> getAssociatedIndividualUris(UserAccount userAccount) {
+		List<String> uris = new ArrayList<String>();
+		if (userAccount == null) {
+			return uris;
+		}
+		uris.addAll(getUrisAssociatedBySelfEditorConfig(userAccount));
+		return uris;
+	}
+
+	@Override
+	public void recordLoginAgainstUserAccount(UserAccount userAccount,
 			AuthenticationSource authSource) {
-		User user = getUserByUsername(username);
-		if (user == null) {
-			log.error("Trying to record the login of a non-existent user: "
-					+ username);
+		if (userAccount == null) {
+			log.error("Trying to record the login of a null user. ");
 			return;
 		}
 
-		recordLoginOnUserRecord(user);
+		recordLoginOnUserRecord(userAccount);
 
-		String userUri = user.getURI();
-		String roleUri = user.getRoleURI();
-		int securityLevel = parseUserSecurityLevel(user);
-		recordLoginWithOrWithoutUserAccount(username, userUri, roleUri,
-				securityLevel, authSource);
-	}
-
-	@Override
-	public void recordLoginWithoutUserAccount(String username,
-			String individualUri, AuthenticationSource authSource) {
-		String roleUri = AuthRole.USER.roleUri();
-		int securityLevel = LoginStatusBean.NON_EDITOR;
-		recordLoginWithOrWithoutUserAccount(username, individualUri, roleUri,
-				securityLevel, authSource);
-	}
-
-	/** This much is in common on login, whether or not you have a user account. */
-	private void recordLoginWithOrWithoutUserAccount(String username,
-			String userUri, String roleUri, int securityLevel,
-			AuthenticationSource authSource) {
 		HttpSession session = request.getSession();
-		createLoginFormBean(username, userUri, roleUri, session);
-		createLoginStatusBean(username, userUri, securityLevel, authSource,
-				session);
-		setSessionTimeoutLimit(session);
-		recordInUserSessionMap(userUri, session);
-		notifyOtherUsers(userUri, session);
+		createLoginStatusBean(userAccount.getUri(), authSource, session);
+		RequestIdentifiers.resetIdentifiers(request);
+		setSessionTimeoutLimit(userAccount, session);
+		recordInUserSessionMap(userAccount.getUri(), session);
+		notifyOtherUsers(userAccount.getUri(), session);
+		
+		if (IsRootUser.isRootUser(RequestIdentifiers
+				.getIdBundleForRequest(request))) {
+			IndexBuilder.checkIndexOnRootLogin(request);
+		}
 	}
 
 	/**
 	 * Update the user record to record the login.
 	 */
-	private void recordLoginOnUserRecord(User user) {
-		user.setLoginCount(user.getLoginCount() + 1);
-		if (user.getFirstTime() == null) { // first login
-			user.setFirstTime(new Date());
-		}
-		getUserDao().updateUser(user);
+	private void recordLoginOnUserRecord(UserAccount userAccount) {
+		userAccount.setLoginCount(userAccount.getLoginCount() + 1);
+		userAccount.setLastLoginTime(new Date().getTime());
+		userAccount.setStatus(Status.ACTIVE);
+		getUserAccountsDao().updateUserAccount(userAccount);
 	}
 
 	/**
 	 * Put the login bean into the session.
-	 * 
-	 * TODO The LoginFormBean is being phased out.
 	 */
-	private void createLoginFormBean(String username, String userUri,
-			String roleUri, HttpSession session) {
-		LoginFormBean lfb = new LoginFormBean();
-		lfb.setUserURI(userUri);
-		lfb.setLoginStatus("authenticated");
-		lfb.setSessionId(session.getId());
-		lfb.setLoginRole(roleUri);
-		lfb.setLoginRemoteAddr(request.getRemoteAddr());
-		lfb.setLoginName(username);
-		session.setAttribute("loginHandler", lfb);
-	}
-
-	/**
-	 * Put the login bean into the session.
-	 * 
-	 * TODO this should eventually replace the LoginFormBean.
-	 */
-	private void createLoginStatusBean(String username, String userUri,
-			int securityLevel, AuthenticationSource authSource,
-			HttpSession session) {
-		LoginStatusBean lsb = new LoginStatusBean(userUri, username,
-				securityLevel, authSource);
+	private void createLoginStatusBean(String userUri,
+			AuthenticationSource authSource, HttpSession session) {
+		LoginStatusBean lsb = new LoginStatusBean(userUri, authSource);
 		LoginStatusBean.setBean(session, lsb);
 		log.debug("Adding status bean: " + lsb);
 	}
@@ -170,9 +164,13 @@ public class BasicAuthenticator extends Authenticator {
 	/**
 	 * Editors and other privileged users get a longer timeout interval.
 	 */
-	private void setSessionTimeoutLimit(HttpSession session) {
-		if (LoginStatusBean.getBean(session).isLoggedInAtLeast(
-				LoginStatusBean.EDITOR)) {
+	private void setSessionTimeoutLimit(UserAccount userAccount,
+			HttpSession session) {
+		RoleLevel role = RoleLevel.getRoleFromLoginStatus(request);
+		if (role == RoleLevel.EDITOR || role == RoleLevel.CURATOR
+				|| role == RoleLevel.DB_ADMIN) {
+			session.setMaxInactiveInterval(PRIVILEGED_TIMEOUT_INTERVAL);
+		} else if (userAccount.isRootUser()) {
 			session.setMaxInactiveInterval(PRIVILEGED_TIMEOUT_INTERVAL);
 		} else {
 			session.setMaxInactiveInterval(LOGGED_IN_TIMEOUT_INTERVAL);
@@ -199,54 +197,23 @@ public class BasicAuthenticator extends Authenticator {
 				session.getServletContext(), session);
 	}
 
-	@Override
-	public List<String> getAssociatedIndividualUris(String username) {
+	private List<String> getUrisAssociatedBySelfEditorConfig(UserAccount user) {
 		List<String> uris = new ArrayList<String>();
-		uris.addAll(getUrisAssociatedBySelfEditorConfig(username));
-		uris.addAll(getUrisAssociatedByMayEditAs(username));
-		return uris;
-	}
-
-	private List<String> getUrisAssociatedBySelfEditorConfig(String username) {
-		if (username == null) {
-			return Collections.emptyList();
+		if (user == null) {
+			return uris;
 		}
 
 		IndividualDao iDao = getIndividualDao();
 		if (iDao == null) {
-			return Collections.emptyList();
-		}
-		
-		String selfEditorUri = SelfEditingConfiguration.getBean(request)
-				.getIndividualUriFromUsername(iDao, username);
-		if (selfEditorUri == null) {
-			return Collections.emptyList();
-		} else {
-			return Collections.singletonList(selfEditorUri);
-		}
-	}
-
-	private List<String> getUrisAssociatedByMayEditAs(String username) {
-		if (username == null) {
-			return Collections.emptyList();
+			return uris;
 		}
 
-		UserDao userDao = getUserDao();
-		if (userDao == null) {
-			return Collections.emptyList();
+		List<Individual> associatedIndividuals = SelfEditingConfiguration
+				.getBean(request).getAssociatedIndividuals(iDao, user);
+		for (Individual ind : associatedIndividuals) {
+			uris.add(ind.getURI());
 		}
-
-		User user = userDao.getUserByUsername(username);
-		if (user == null) {
-			return Collections.emptyList();
-		}
-
-		String userUri = user.getURI();
-		if (userUri == null) {
-			return Collections.emptyList();
-		}
-
-		return userDao.getIndividualsUserMayEditAs(userUri);
+		return uris;
 	}
 
 	@Override
@@ -257,42 +224,30 @@ public class BasicAuthenticator extends Authenticator {
 	}
 
 	private void notifyOtherUsersOfLogout(HttpSession session) {
-		LoginStatusBean loginBean = LoginStatusBean.getBean(session);
-		if (!loginBean.isLoggedIn()) {
+		String userUri = LoginStatusBean.getBean(session).getUserURI();
+		if ((userUri == null) || userUri.isEmpty()) {
 			return;
 		}
 
-		UserDao userDao = getUserDao();
-		if (userDao == null) {
-			return;
-		}
-
-		String username = loginBean.getUsername();
-		User user = userDao.getUserByUsername(username);
-		if (user == null) {
-			log.error("Unable to retrieve user " + username + " from model");
-			return;
-		}
-
-		Authenticate.sendLoginNotifyEvent(new LogoutEvent(user.getURI()),
+		Authenticate.sendLoginNotifyEvent(new LogoutEvent(userUri),
 				session.getServletContext(), session);
 	}
 
 	/**
-	 * Get a reference to the UserDao, or null.
+	 * Get a reference to the UserAccountsDao, or null.
 	 */
-	private UserDao getUserDao() {
+	private UserAccountsDao getUserAccountsDao() {
 		WebappDaoFactory wadf = getWebappDaoFactory();
 		if (wadf == null) {
 			return null;
 		}
 
-		UserDao userDao = wadf.getUserDao();
-		if (userDao == null) {
-			log.error("getUserDao: no UserDao");
+		UserAccountsDao userAccountsDao = wadf.getUserAccountsDao();
+		if (userAccountsDao == null) {
+			log.error("getUserAccountsDao: no UserAccountsDao");
 		}
 
-		return userDao;
+		return userAccountsDao;
 	}
 
 	/**
@@ -303,15 +258,15 @@ public class BasicAuthenticator extends Authenticator {
 		if (wadf == null) {
 			return null;
 		}
-		
+
 		IndividualDao individualDao = wadf.getIndividualDao();
 		if (individualDao == null) {
 			log.error("getIndividualDao: no IndividualDao");
 		}
-		
+
 		return individualDao;
 	}
-	
+
 	/**
 	 * Get a reference to the WebappDaoFactory, or null.
 	 */
@@ -330,25 +285,6 @@ public class BasicAuthenticator extends Authenticator {
 		}
 
 		return wadf;
-	}
-
-	/**
-	 * Parse the role URI from User. Don't crash if it is not valid.
-	 */
-	private int parseUserSecurityLevel(User user) {
-		String roleURI = user.getRoleURI();
-		try {
-			if (roleURI.startsWith(ROLE_NAMESPACE)) {
-				String roleLevel = roleURI.substring(ROLE_NAMESPACE.length());
-				return Integer.parseInt(roleLevel);
-			} else {
-				return Integer.parseInt(roleURI);
-			}
-		} catch (NumberFormatException e) {
-			log.warn("Invalid RoleURI '" + roleURI + "' for user '"
-					+ user.getURI() + "'");
-			return 1;
-		}
 	}
 
 }

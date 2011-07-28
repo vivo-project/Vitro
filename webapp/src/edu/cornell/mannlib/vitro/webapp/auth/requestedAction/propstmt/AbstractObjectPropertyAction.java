@@ -2,17 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.VisitingPolicyIface;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 
 /**
  * A base class for requested actions that involve manipulating an object
  * property.
  */
-public abstract class AbstractObjectPropertyAction implements RequestedAction {
+public abstract class AbstractObjectPropertyAction extends RequestedAction {
 	public final String uriOfSubject;
 	public final String uriOfPredicate;
 	public final String uriOfObject;
@@ -35,16 +31,6 @@ public abstract class AbstractObjectPropertyAction implements RequestedAction {
 	public String getUriOfObject() {
 		return uriOfObject;
 	}
-
-	@Override
-	public String getURI() {
-		return RequestActionConstants.actionNamespace
-				+ this.getClass().getName();
-	}
-
-	@Override
-	public abstract PolicyDecision accept(VisitingPolicyIface policy,
-			IdentifierBundle whoToAuth);
 
 	@Override
 	public String toString() {

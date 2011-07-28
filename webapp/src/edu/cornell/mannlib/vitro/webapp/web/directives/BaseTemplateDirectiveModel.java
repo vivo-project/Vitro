@@ -14,32 +14,15 @@ import freemarker.core.Environment;
 import freemarker.template.Template;
 import freemarker.template.TemplateDirectiveModel;
 import freemarker.template.TemplateException;
+import freemarker.template.TemplateHashModel;
+import freemarker.template.TemplateModelException;
+import freemarker.template.utility.DeepUnwrap;
 
 public abstract class BaseTemplateDirectiveModel implements TemplateDirectiveModel {
 
     private static final Log log = LogFactory.getLog(BaseTemplateDirectiveModel.class);
     
-    public String help(Environment environment) {
-        Map<String, Object> map = new HashMap<String, Object>();
-        
-        String name = getDirectiveName();
-        map.put("name", name);
-        
-        return mergeToHelpTemplate(map, environment);
-    }
-    
-    protected String getDirectiveName() {
-        String className = this.getClass().getName();
-        String[] nameParts = className.split("\\.");
-        String directiveName = nameParts[nameParts.length-1];
-        directiveName = directiveName.replaceAll("Directive$", "");
-        directiveName = directiveName.substring(0, 1).toLowerCase() + directiveName.substring(1);
-        return directiveName;               
-    }
-    
-    protected String mergeToHelpTemplate(Map<String, Object> map, Environment env) {
-        return processTemplateToString("help-directive.ftl", map, env);        
-    }
+    public abstract Map<String, Object> help(String name);
     
     public static String processTemplateToString(String templateName, Map<String, Object> map, Environment env) {
         Template template = getTemplate(templateName, env);

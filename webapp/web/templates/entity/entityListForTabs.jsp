@@ -8,7 +8,6 @@
 
          request.attributes:
          a List of Entity objects with the name "entities"
-         portal id as "portal"
 
          request.parameters:
          None yet.
@@ -24,13 +23,11 @@
 %>
 <c:set var="searchViewPrefix" value="/templates/search/"/>
 <c:set var='entities' value='${requestScope.entities}' /><%/* just moving this into page scope for easy use */ %>
-<c:set var='portal' value='${requestScope.portal}' />
 <c:set var='IMG_WIDTH' value='75'/>
 <jsp:include page="/templates/alpha/alphaIndex.jsp"/>
 <ul class='tabEntities entityListForTab'>
     <c:forEach items='${entities}' var='ent'>
 	<c:url var="entHref" value="/entity">
-		<c:param name="home" value="${sessionScope.currentPortalId}"/>
 		<c:param name="uri" value="${ent.URI}"/>
 	</c:url>
         <li>
@@ -77,14 +74,11 @@
             <c:choose>
             <c:when test='${not empty ent.thumbUrl }'>
             	<c:url var="imageHref" value="entity">
-    						<c:param name="home" value="${sessionScope.currentPortalId}"/>
     						<c:param name="uri" value="${ent.URI}"/>
     					</c:url>
                   <div class="tab-image"><a class="image" href="<c:out value="${imageHref}"/>"><img width="${IMG_WIDTH}" src="${pageContext.request.contextPath}${ent.thumbUrl}" title="${ent.name}" alt="" /></a></div>
-                  <c:if test="${not empty ent.blurb}"><div class='blurb'>${ent.blurb}</div></c:if>
             </c:when>
             <c:otherwise>
-                <c:if test="${not empty ent.blurb}"><div class='blurb'>${ent.blurb}</div></c:if>
             </c:otherwise>
             </c:choose>
         </li>

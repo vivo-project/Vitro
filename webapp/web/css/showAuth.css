@@ -1,0 +1,22 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+/* Styles for Freemarker template showAuth */
+
+#show-auth * h3 {
+    padding: 20px 0 12px 0;
+}
+#show-auth * caption {
+    padding: 20px 0 12px 0;
+    margin: 0;
+    text-align: left;
+}
+#show-auth * th {
+    padding: 4px 10px 4px 10px;
+    border: 1px solid black;
+    text-align: right;
+}
+#show-auth * td {
+    padding: 4px 10px 4px 10px;
+    text-align: left;
+    border: 1px solid black;
+}

@@ -10,11 +10,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.ontology.ConversionException;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
@@ -26,7 +26,6 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -49,69 +48,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
-import edu.cornell.mannlib.vitro.webapp.utils.StringUtils;
 
 public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectPropertyDao {
     private static final Log log = LogFactory.getLog(ObjectPropertyDaoJena.class.getName());
-    
-    protected static final List<String> EXCLUDED_NAMESPACES = Arrays.asList(
-            // Don't need to exclude these, because they are not owl:ObjectProperty
-            //"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-            //"http://www.w3.org/2000/01/rdf-schema#",
-            "http://www.w3.org/2002/07/owl#"            
-        ); 
-    /*
-     * This is a hack to throw out properties in the vitro, rdf, rdfs, and owl namespaces.
-     * It will be implemented in a better way in v1.3 (Editing and Display Configuration).
-     */
-    protected static String propertyFilters = "";
-    static {
-        List<String> namespaceFilters = new ArrayList<String>();
-        for (String s : EXCLUDED_NAMESPACES) {
-            namespaceFilters.add("(afn:namespace(?property) != \"" + s + "\")");
-        }
-        // A hack to include the vitro:primaryLink and vitro:additionalLink properties in the list
-        namespaceFilters.add("( ?property = vitro:primaryLink ||" +
-                               "?property = vitro:additionalLink ||" +
-                               "afn:namespace(?property) != \"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#\" )");
-        propertyFilters = "FILTER (" + StringUtils.join(namespaceFilters, " && ") + ")\n";
-    }
-    
-    protected static final String OBJECT_PROPERTY_QUERY_STRING = 
-        prefixes + "\n" +
-        "SELECT DISTINCT ?property WHERE { \n" +
-        "   GRAPH ?g1 { ?subject ?property ?object } \n" + 
-        "   GRAPH ?g2 { ?property rdf:type owl:ObjectProperty } \n" +
-        propertyFilters +
-        "}";
-
-    protected static Query objectPropertyQuery;
-    static {
-        try {
-            objectPropertyQuery = QueryFactory.create(OBJECT_PROPERTY_QUERY_STRING);
-        } catch(Throwable th){
-            log.error("could not create SPARQL query for OBJECT_PROPERTY_QUERY_STRING " + th.getMessage());
-            log.error(OBJECT_PROPERTY_QUERY_STRING);
-        }           
-    }
-    
-    protected static final String LIST_VIEW_CONFIG_FILE_QUERY_STRING =
-        "PREFIX display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>" +
-        "SELECT ?property ?filename WHERE { \n" +
-        "    ?property display:listViewConfigFile ?filename . \n" +
-        "}";
-    
-    protected static Query listViewConfigFileQuery;
-    static {
-        try {
-            listViewConfigFileQuery = QueryFactory.create(LIST_VIEW_CONFIG_FILE_QUERY_STRING);
-        } catch(Throwable th){
-            log.error("could not create SPARQL query for LIST_VIEW_CONFIG_FILE_QUERY_STRING " + th.getMessage());
-            log.error(LIST_VIEW_CONFIG_FILE_QUERY_STRING);
-        }           
-    }
-    
-    Map<ObjectProperty, String> customListViewConfigFileMap = null;
     
     public ObjectPropertyDaoJena(DatasetWrapperFactory dwf, 
                                  WebappDaoFactoryJena wadf) {
@@ -870,23 +809,69 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     	return false;
     }
 
+    /*
+     * SPARQL-based methods for getting the individual's object properties.
+     * Ideally this implementation should replace the existing way of getting
+     * the object property list, but the consequences of this may be far-reaching,
+     * so we are implementing a new method now and will merge the old approach
+     * into the new one in a future release.
+     */
+    
+    protected static final List<String> EXCLUDED_NAMESPACES = Arrays.asList(
+            "http://www.w3.org/2002/07/owl#"            
+        ); 
+    /*
+     * This is a hack to throw out properties in the vitro, rdf, rdfs, and owl namespaces.
+     * It will be implemented in a better way in v1.3 (Editing and Display Configuration).
+     */
+    protected static final String PROPERTY_FILTERS;
+    static {
+        List<String> namespaceFilters = new ArrayList<String>();
+        for (String namespace : EXCLUDED_NAMESPACES) {
+            namespaceFilters.add("( afn:namespace(?property) != \"" + namespace + "\" )");
+        }
+        // A hack to include the vitro:primaryLink and vitro:additionalLink properties in the list
+        namespaceFilters.add("( ?property = vitro:primaryLink ||" +
+                               "?property = vitro:additionalLink ||" +
+                               "afn:namespace(?property) != \"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#\" )");
+        PROPERTY_FILTERS = StringUtils.join(namespaceFilters, " && ");
+    }
+    
+    protected static final String OBJECT_PROPERTY_QUERY_STRING = 
+        PREFIXES + "\n" +
+        "SELECT DISTINCT ?property WHERE { \n" +
+        "   ?subject ?property ?object . \n" + 
+        "   ?property a owl:ObjectProperty . \n" +
+        "   FILTER ( \n" +
+        "       isURI(?object) && \n" +
+                PROPERTY_FILTERS + "\n" +
+        "   ) \n" +
+        "}";    
+    
     @Override
     public List<ObjectProperty> getObjectPropertyList(Individual subject) {
         return getObjectPropertyList(subject.getURI());
     }
     
     @Override
-    /*
-     * SPARQL-based method for getting the individual's object properties.
-     * Ideally this implementation should replace the existing way of getting
-     * the object property list, but the consequences of this may be far-reaching,
-     * so we are implementing a new method now and will merge the old approach
-     * into the new one in a future release.
-     */
     public List<ObjectProperty> getObjectPropertyList(String subjectUri) {
-        log.debug("Object property query string:\n" + OBJECT_PROPERTY_QUERY_STRING);
-        log.debug("Object property query:\n" + objectPropertyQuery);
-        Iterator<QuerySolution> results = getPropertyQueryResults(subjectUri, objectPropertyQuery);
+
+        // Due to a Jena bug, prebinding on ?subject combined with the isURI()
+        // filter causes the query to fail. Using string concatenation to insert the
+        // subject uri instead.
+        String queryString = QueryUtils.subUriForQueryVar(OBJECT_PROPERTY_QUERY_STRING, "subject", subjectUri); 
+
+        Query query = null;
+        try {
+            query = QueryFactory.create(queryString);
+        } catch(Throwable th){
+            log.error("could not create SPARQL query for query string " + th.getMessage());
+            log.error(queryString);
+            return null;
+        } 
+        log.debug("Object property query:\n" + query);
+        
+        ResultSet results = getPropertyQueryResults(query);
         List<ObjectProperty> properties = new ArrayList<ObjectProperty>();
         while (results.hasNext()) {
             QuerySolution soln = results.next();
@@ -900,6 +885,24 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         }
         return properties; 
     }
+
+    protected static final String LIST_VIEW_CONFIG_FILE_QUERY_STRING =
+        "PREFIX display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>" +
+        "SELECT ?property ?filename WHERE { \n" +
+        "    ?property display:listViewConfigFile ?filename . \n" +
+        "}";
+    
+    protected static Query listViewConfigFileQuery = null;
+    static {
+        try {
+            listViewConfigFileQuery = QueryFactory.create(LIST_VIEW_CONFIG_FILE_QUERY_STRING);
+        } catch(Throwable th){
+            log.error("could not create SPARQL query for LIST_VIEW_CONFIG_FILE_QUERY_STRING " + th.getMessage());
+            log.error(LIST_VIEW_CONFIG_FILE_QUERY_STRING);
+        }           
+    }
+    
+    Map<ObjectProperty, String> customListViewConfigFileMap = null;
     
     @Override
     public String getCustomListViewConfigFileName(ObjectProperty op) {
@@ -913,7 +916,8 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 ObjectProperty prop = getObjectPropertyByURI(soln.getResource("property").getURI());
                 String filename = soln.getLiteral("filename").getLexicalForm();
                 customListViewConfigFileMap.put(prop, filename);                
-            }           
+            }       
+            qexec.close();
         }        
         return customListViewConfigFileMap.get(op);
     }

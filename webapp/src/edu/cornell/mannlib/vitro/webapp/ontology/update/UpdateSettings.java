@@ -12,9 +12,7 @@ public class UpdateSettings {
 	private String sparqlConstructAdditionsDir;
 	private String sparqlConstructAdditionsPass2Dir;
 	private String sparqlConstructDeletionsDir;
-	private String askQueryFile;
-	private String askEmptyQueryFile;
-	private String askEverQueryFile;
+	private String askUpdatedQueryFile;
 	private String successAssertionsFile;
 	private String successRDFFormat = "N3";
 	private String diffFile;
@@ -23,7 +21,8 @@ public class UpdateSettings {
 	private String addedDataFile;
 	private String removedDataFile;
 	private String defaultNamespace;
-	private OntModelSelector ontModelSelector;
+	private OntModelSelector assertionOntModelSelector;
+	private OntModelSelector inferenceOntModelSelector;
 	private OntModel oldTBoxModel;
 	private OntModel newTBoxModel;
 	private OntModel oldTBoxAnnotationsModel;
@@ -53,23 +52,11 @@ public class UpdateSettings {
 	public void setSparqlConstructDeletionsDir(String sparqlConstructDeletionsDir) {
 		this.sparqlConstructDeletionsDir = sparqlConstructDeletionsDir;
 	}
-	public String getAskQueryFile() {
-		return askQueryFile;
+	public String getAskUpdatedQueryFile() {
+		return askUpdatedQueryFile;
 	}
-	public void setAskQueryFile(String askQueryFile) {
-		this.askQueryFile = askQueryFile;
-	}
-	public String getAskEverQueryFile() {
-		return askEverQueryFile;
-	}
-	public void setAskEverQueryFile(String askEverQueryFile) {
-		this.askEverQueryFile = askEverQueryFile;
-	}
-	public String getAskEmptyQueryFile() {
-		return askEmptyQueryFile;
-	}
-	public void setAskEmptyQueryFile(String askEmptyQueryFile) {
-		this.askEmptyQueryFile = askEmptyQueryFile;
+	public void setAskUpdatedQueryFile(String askQueryFile) {
+		this.askUpdatedQueryFile = askQueryFile;
 	}
 	public String getSuccessAssertionsFile() {
 		return successAssertionsFile;
@@ -89,8 +76,11 @@ public class UpdateSettings {
 	public void setDiffFile(String diffFile) {
 		this.diffFile = diffFile;
 	}
-	public OntModelSelector getOntModelSelector() {
-		return ontModelSelector;
+	public OntModelSelector getAssertionOntModelSelector() {
+		return assertionOntModelSelector;
+	}
+	public OntModelSelector getInferenceOntModelSelector() {
+		return inferenceOntModelSelector;
 	}
 	public String getLogFile() {
 		return logFile;
@@ -122,8 +112,11 @@ public class UpdateSettings {
 	public void setDefaultNamespace(String defaultNamespace) {
 		this.defaultNamespace = defaultNamespace;
 	}
-	public void setOntModelSelector(OntModelSelector ontModelSelector) {
-		this.ontModelSelector = ontModelSelector;
+	public void setAssertionOntModelSelector(OntModelSelector ontModelSelector) {
+		this.assertionOntModelSelector = ontModelSelector;
+	}
+	public void setInferenceOntModelSelector(OntModelSelector ontModelSelector) {
+		this.inferenceOntModelSelector = ontModelSelector;
 	}
 	public OntModel getOldTBoxModel() {
 		return oldTBoxModel;
@@ -149,5 +142,4 @@ public class UpdateSettings {
 	public void setNewTBoxAnnotationsModel(OntModel newTBoxAnnotationsModel) {
 		this.newTBoxAnnotationsModel = newTBoxAnnotationsModel;
 	}
-	
 }

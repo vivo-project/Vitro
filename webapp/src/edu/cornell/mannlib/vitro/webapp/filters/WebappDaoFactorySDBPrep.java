@@ -21,7 +21,9 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.sdb.SDBFactory;
 import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
@@ -57,13 +59,12 @@ public class WebappDaoFactorySDBPrep implements Filter {
             Pattern.compile("/.*/images/.*")
     };
 	
+	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain filterChain) throws IOException, ServletException {
 		
-		if ( (!(JenaDataSourceSetupBase.isSDBActive())) || 
-		        (request.getAttribute(
-		                "WebappDaoFactorySDBPrep.setup") != null) ) {
-			// don't run multiple times or if SDB is not active
+		if ( request.getAttribute("WebappDaoFactorySDBPrep.setup") != null ) {
+			// don't run multiple times
 		    filterChain.doFilter(request, response);
 			return;
 		}
@@ -107,6 +108,9 @@ public class WebappDaoFactorySDBPrep implements Filter {
 				vreq.setWebappDaoFactory(wadf);
 				vreq.setFullWebappDaoFactory(wadf);
 				vreq.setDataset(dataset);
+				vreq.setJenaOntModel(ModelFactory.createOntologyModel(
+						OntModelSpec.OWL_MEM, dataset.getNamedModel(
+								WebappDaoFactorySDB.UNION_GRAPH)));
 			}
 		} catch (Throwable t) {
 			log.error("Unable to filter request to set up SDB connection", t);
@@ -134,6 +138,7 @@ public class WebappDaoFactorySDBPrep implements Filter {
 		
 	}
 
+	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
 		try {
 			_ctx = filterConfig.getServletContext();
@@ -142,6 +147,7 @@ public class WebappDaoFactorySDBPrep implements Filter {
 		}		
 	}
 	
+	@Override
 	public void destroy() {
 		// no destroy actions
 	}

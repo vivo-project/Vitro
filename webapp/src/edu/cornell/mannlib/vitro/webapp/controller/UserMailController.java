@@ -10,8 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
-import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
+import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 
 /**
  *  Controller for comments ("contact us") page
@@ -19,44 +18,31 @@ import edu.cornell.mannlib.vitro.webapp.controller.ContactMailServlet;
  */
 public class UserMailController extends VitroHttpServlet{
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response)
+    @Override
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         doGet(request, response);
     }
 
-    public void doGet( HttpServletRequest request, HttpServletResponse response )
+    @Override
+	public void doGet( HttpServletRequest request, HttpServletResponse response )
     throws IOException, ServletException {
         super.doGet(request,response);
         VitroRequest vreq = new VitroRequest(request);
         try {
         //this try block passes any errors to error.jsp
-            if (!ContactMailServlet.isSmtpHostConfigured()) {
+            if (!FreemarkerEmailFactory.isConfigured(request)) {
                 request.setAttribute("title", "Mail All Users Form");
                 request.setAttribute("bodyJsp", "/contact_err.jsp");// <<< this is where the body gets set
-                request.setAttribute("ERR","This application has not yet been configured to send mail -- " +
-                		"smtp host has not been specified in the configuration properties file.");
+				request.setAttribute("ERR",
+						"This application has not yet been configured to send mail. "
+								+ "Email properties must be specified in the configuration properties file.");
                 RequestDispatcher errd = request.getRequestDispatcher(Controllers.BASIC_JSP);
                 errd.forward(request, response);
             }
             ApplicationBean appBean=vreq.getAppBean();
-            Portal portalBean=vreq.getPortal();
 
-            if ( (appBean.getMaxSharedPortalId()-appBean.getMinSharedPortalId()) > 1
-                    && ( (portalBean.getPortalId()    >= appBean.getMinSharedPortalId()
-                          && portalBean.getPortalId() <= appBean.getMaxSharedPortalId() )
-                          || portalBean.getPortalId() == appBean.getSharedPortalFlagNumeric() )
-                ) {
-                request.setAttribute("portalType","CALSResearch");
-            } else
-                if (portalBean.getAppName().equalsIgnoreCase("CALS Impact")){
-                request.setAttribute("portalType", "CALSImpact");
-            } else if (portalBean.getAppName().equalsIgnoreCase("VIVO")) {
-                request.setAttribute("portalType", "VIVO");
-            } else {
-                request.setAttribute("portalType", "clone");
-            }
-
-            request.setAttribute("siteName",portalBean.getAppName());
+            request.setAttribute("siteName", appBean.getApplicationName());
             request.setAttribute("scripts","/js/commentsForm.js");
 
             if (request.getHeader("Referer") == null)
@@ -64,12 +50,8 @@ public class UserMailController extends VitroHttpServlet{
             else
                 request.getSession().setAttribute("commentsFormReferer",request.getHeader("Referer"));
 
-
-            request.setAttribute("portalId",Integer.valueOf(portalBean.getPortalId()));
-
-            request.setAttribute("title", portalBean.getAppName()+" Mail Users Form");
+            request.setAttribute("title", appBean.getApplicationName()+" Mail Users Form");
             request.setAttribute("bodyJsp", "/templates/parts/emailUsers.jsp");// <<< this is where the body gets set
-            request.setAttribute("portalBean",portalBean);
 
             RequestDispatcher rd =
                 request.getRequestDispatcher(Controllers.BASIC_JSP);

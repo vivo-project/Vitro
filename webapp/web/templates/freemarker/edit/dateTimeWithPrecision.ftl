@@ -72,13 +72,13 @@ precisionConstants.second -- URI for precision
     
         <#if precLevel gte 1>
             <#-- Only text input field in the mix. We should have some validation to ensure it's a valid year (4 digits, integer, etc) -->
-            <label for="${fieldName}.year">Year<#if reqLevel gte 1> <span class="requiredHint">*</span></#if></label>
-            <input class="text-field" name="${fieldName}.year" id="${fieldName}.year" type="text" value="${year!}" size="4" maxlength="4" <#if reqLevel gte 1>required </#if>/>
+            <label for="${fieldName}-year">Year<#if reqLevel gte 1> <span class="requiredHint">*</span></#if></label>
+            <input class="text-field" name="${fieldName}-year" id="${fieldName}-year" type="text" value="${year!}" size="4" maxlength="4" <#if reqLevel gte 1>required </#if>/>
         </#if>
 
         <#if precLevel gte 2>
-            <label for="${fieldName}.month">Month<#if reqLevel gte 2> <span class="requiredHint">*</span></#if></label>
-            <select name="${fieldName}.month" id="${fieldName}.month" <#if reqLevel gte 2>required </#if>>
+            <label for="${fieldName}-month">Month<#if reqLevel gte 2> <span class="requiredHint">*</span></#if></label>
+            <select name="${fieldName}-month" id="${fieldName}-month" <#if reqLevel gte 2>required </#if>>
                 <option value=""<#if !month??> selected="selected"</#if>>month</option>
                 <#assign numMonths = 12 />
                 <#list 1..numMonths as currentMonth>
@@ -88,8 +88,8 @@ precisionConstants.second -- URI for precision
         </#if>
 
         <#if precLevel gte 3>
-            <label for="${fieldName}.day">Day<#if reqLevel gte 3> <span class="requiredHint">*</span></#if></label>
-            <select name="${fieldName}.day" id="${fieldName}.day" <#if reqLevel gte 3>required </#if>>
+            <label for="${fieldName}-day">Day<#if reqLevel gte 3> <span class="requiredHint">*</span></#if></label>
+            <select name="${fieldName}-day" id="${fieldName}-day" <#if reqLevel gte 3>required </#if>>
                 <option value=""<#if !day??> selected="selected"</#if>>day</option>
                 <#assign numDays = 31 />
                 <#list 1..numDays as currentDay>
@@ -100,8 +100,8 @@ precisionConstants.second -- URI for precision
 
         <#if precLevel gte 4>
             <#-- We'll need to make this more flexible to support 24 hour display down the road. For now assuming 12h with am/pm -->
-            <label for="${fieldName}.hour">Hour<#if reqLevel gte 4> <span class="requiredHint">*</span></#if></label>
-            <select name="${fieldName}.hour" id="${fieldName}.hour" <#if reqLevel gte 3>required </#if>>
+            <label for="${fieldName}-hour">Hour<#if reqLevel gte 4> <span class="requiredHint">*</span></#if></label>
+            <select name="${fieldName}-hour" id="${fieldName}-hour" <#if reqLevel gte 3>required </#if>>
                 <option value=""<#if !hour??> selected="selected"</#if>>hour</option>
                 <#assign numHours = 23 />
                 <#list 0..numHours as currentHour>
@@ -123,8 +123,8 @@ precisionConstants.second -- URI for precision
         </#if>
 
         <#if precLevel gte 5>
-            <label for="${fieldName}.minute">Minutes<#if reqLevel gte 5> <span class="requiredHint">*</span></#if></label>
-            <select name="${fieldName}.minute" id="${fieldName}.minute" <#if reqLevel gte 5>required </#if>>
+            <label for="${fieldName}-minute">Minutes<#if reqLevel gte 5> <span class="requiredHint">*</span></#if></label>
+            <select name="${fieldName}-minute" id="${fieldName}-minute" <#if reqLevel gte 5>required </#if>>
                 <option value=""<#if !minute??> selected="selected"</#if>>minutes</option>
                 <#assign numMinutes = 59 />
                 <#list 1..numMinutes as currentMinute>
@@ -134,8 +134,8 @@ precisionConstants.second -- URI for precision
         </#if>
 
         <#if precLevel gte 6>
-            <label for="${fieldName}.second">Seconds<#if reqLevel gte 6> <span class="requiredHint">*</span></#if></label>
-            <select name="${fieldName}.second" id="${fieldName}.second" <#if reqLevel gte 6>required </#if>>
+            <label for="${fieldName}-second">Seconds<#if reqLevel gte 6> <span class="requiredHint">*</span></#if></label>
+            <select name="${fieldName}-second" id="${fieldName}-second" <#if reqLevel gte 6>required </#if>>
                 <option value=""<#if !second??> selected="selected"</#if>>seconds</option>
                 <#assign numMinutes = 59 />
                 <#list 1..numMinutes as currentSecond>

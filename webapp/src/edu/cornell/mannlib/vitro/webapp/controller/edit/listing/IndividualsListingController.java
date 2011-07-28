@@ -14,8 +14,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vedit.beans.ButtonForm;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -28,17 +29,11 @@ public class IndividualsListingController extends BaseEditController {
     //private static final int MAX_INDIVIDUALS = 50;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
-        VitroRequest vrequest = new VitroRequest(request);
-        Portal portal = vrequest.getPortal();
-
-        if(!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request, response);
-        } catch (Throwable t) {
-            t.printStackTrace();
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new EditOntology()))) {
+        	return;
         }
+
+        VitroRequest vrequest = new VitroRequest(request);
 
         //need to figure out how to structure the results object to put the classes underneath
 
@@ -66,7 +61,6 @@ public class IndividualsListingController extends BaseEditController {
         results.add("XX");
         results.add("Individual");
         results.add("class");
-        results.add("moniker");
 
         if (inds != null && inds.size()>0) {
             Iterator indsIt = inds.iterator();
@@ -78,7 +72,7 @@ public class IndividualsListingController extends BaseEditController {
                 if (ind.getName() != null) {
                     try {
                         String individualName = (ind.getName()==null || ind.getName().length()==0) ? ind.getURI() : ind.getName();
-                        results.add("<a href=\"./entityEdit?uri="+URLEncoder.encode(ind.getURI(),"UTF-8")+"&amp;home="+portal.getPortalId()+"\">"+individualName+"</a>");
+                        results.add("<a href=\"./entityEdit?uri="+URLEncoder.encode(ind.getURI(),"UTF-8")+"\">"+individualName+"</a>");
                     } catch (Exception e) {
                         results.add(ind.getName());
                     }
@@ -90,16 +84,13 @@ public class IndividualsListingController extends BaseEditController {
                 if (vc != null) {
                     try {
                         String vclassName = (vc.getName()==null || vc.getName().length()==0) ? vc.getURI() : vc.getName();
-                        results.add("<a href=\"./vclassEdit?uri="+URLEncoder.encode(vc.getURI(),"UTF-8")+"&amp;home="+portal.getPortalId()+"\">"+vclassName+"</a>");
+                        results.add("<a href=\"./vclassEdit?uri="+URLEncoder.encode(vc.getURI(),"UTF-8")+"\">"+vclassName+"</a>");
                     } catch (Exception e) {
                         results.add(vc.getName());
                     }
                 } else {
                     results.add(vclassURI);
                 }
-
-                String monikerStr = (ind.getMoniker() != null) ? ind.getMoniker() : "unspecified";
-                results.add(monikerStr);
 
             }
         } else {
@@ -109,20 +100,14 @@ public class IndividualsListingController extends BaseEditController {
 
         request.setAttribute("results",results);
 
-        request.setAttribute("columncount",new Integer(4));
+        request.setAttribute("columncount",new Integer(3));
         request.setAttribute("suppressquery","true");
         request.setAttribute("title", "Individuals in Class "+ ( (vc != null) ? vc.getName() : vclassURI ) );
-        request.setAttribute("portalBean",portal);
         request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
-//        request.setAttribute("horizontalJspAddButtonUrl", Controllers.RETRY_URL);
-//        request.setAttribute("horizontalJspAddButtonText", "Add new individual");
-//        request.setAttribute("horizontalJspAddButtonControllerParam", "Individual");
-        request.setAttribute("home", portal.getPortalId());
-        
+
         // new individual button
         List <ButtonForm> buttons = new ArrayList<ButtonForm>();
         HashMap<String,String> newIndividualParams=new HashMap<String,String>();
-        newIndividualParams.put("home", String.valueOf(portal.getPortalId()));
         newIndividualParams.put("VClassURI",vclassURI);    
         newIndividualParams.put("controller","Entity");
         ButtonForm newIndividualButton = new ButtonForm(Controllers.RETRY_URL,"buttonForm","Add instance",newIndividualParams);

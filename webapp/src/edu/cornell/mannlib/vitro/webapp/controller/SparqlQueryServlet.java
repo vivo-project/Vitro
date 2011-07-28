@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -45,10 +46,10 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.sparql.resultset.ResultSetFormat;
 import com.hp.hpl.jena.vocabulary.XSD;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 
 
@@ -104,10 +105,10 @@ public class SparqlQueryServlet extends BaseEditController {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException
     {    	    	   	
-        if( !checkLoginStatus(request, response, LoginStatusBean.DBA) ) {
-        	return;
-        }
-        
+    	if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseAdvancedDataToolsPages()))) {
+    		return;
+    	}
+
         VitroRequest vreq = new VitroRequest(request);
 
         Model model = vreq.getJenaOntModel(); 
@@ -150,19 +151,13 @@ public class SparqlQueryServlet extends BaseEditController {
 		}
 		
 		String queryParam = vreq.getParameter("query");
-		boolean graphPresent = false;
-		StringTokenizer tokenizer = new StringTokenizer(queryParam, " ");
-	    while(tokenizer.hasMoreTokens()){
-	    	if("graph".equalsIgnoreCase(tokenizer.nextToken())){
-	    		graphPresent = true;
-	    		break;
+		String[] tokens = queryParam.split("\\s");
+	    for(int i = 0; i < tokens.length; i++){
+	    	if("graph".equalsIgnoreCase(tokens[i])){
+	    		return vreq.getDataset();
 	    	}
 	    }
-		Dataset dataset = vreq.getDataset();
-		if (dataset != null && graphPresent) {
-			return dataset;
-		}
-
+		
 		DataSource dataSource = DatasetFactory.create();
 		dataSource.setDefaultModel(vreq.getJenaOntModel());
 		return dataSource;
@@ -245,6 +240,12 @@ public class SparqlQueryServlet extends BaseEditController {
                     resultModel = qe.execConstruct();
                 }else if ( query.isDescribeType() ){
                     resultModel = qe.execDescribe();
+                }else if(query.isAskType()){
+                	//Irrespective of the ResultFormatParam, this always prints a boolean to the default OutputStream.
+                	String result = (qe.execAsk() == true) ? "true" : "false";
+                	PrintWriter p = response.getWriter();
+                	p.write(result);
+                    return;
                 }
                 response.setContentType(rdfFormatSymbols.get(rdfResultFormatParam));
                 OutputStream out = response.getOutputStream();
@@ -325,7 +326,6 @@ public class SparqlQueryServlet extends BaseEditController {
     
     private void doHelp(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
             VitroRequest vreq = new VitroRequest(req);
-            Portal portal = vreq.getPortal();
             
             OntologyDao daoObj = vreq.getFullWebappDaoFactory().getOntologyDao();
             List<Ontology> ontologiesObj = daoObj.getAllOntologies();
@@ -344,7 +344,6 @@ public class SparqlQueryServlet extends BaseEditController {
             
             req.setAttribute("prefixList", prefixList);
             
-            req.setAttribute("portalBean",portal);
             // nac26: 2009-09-25 - this was causing problems in safari on localhost installations because the href did not include the context.  The edit.css is not being used here anyway (or anywhere else for that matter)
             // req.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
             req.setAttribute("title","SPARQL Query");

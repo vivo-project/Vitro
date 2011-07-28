@@ -13,14 +13,12 @@ public class VitroQueryWrapper {
     private VitroQuery query = null;
     private int requestCount = 0;
     private long searchTime = 0;
-    private VitroHighlighter highlighter;
 
 
-    public VitroQueryWrapper(VitroQuery q, VitroHighlighter hi, int reqCount, long d){
+    public VitroQueryWrapper(VitroQuery q, int reqCount, long d){
         this.setSearchTime(d);
         this.setQuery(q);
         this.setRequestCount(reqCount);
-        this.highlighter = hi;
     }
 
     public long getSearchTime() {
@@ -41,7 +39,5 @@ public class VitroQueryWrapper {
     public void setRequestCount(int requestCount) {
         this.requestCount = requestCount;
     }
-
-    public VitroHighlighter getHighlighter(){ return highlighter; }
 
 }

@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -15,10 +16,13 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropStmt;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class DataPropertyTemplateModel extends PropertyTemplateModel {
 
@@ -27,13 +31,14 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     private static final String TYPE = "data";
     private static final String EDIT_PATH = "edit/editDatapropStmtRequestDispatch.jsp";  
     
-    private List<DataPropertyStatementTemplateModel> statements;
-
+    private final List<DataPropertyStatementTemplateModel> statements;
+    
     DataPropertyTemplateModel(DataProperty dp, Individual subject, VitroRequest vreq, 
             EditingPolicyHelper policyHelper, List<DataProperty> populatedDataPropertyList) {
         
-        super(dp, subject, policyHelper);
+        super(dp, subject, policyHelper, vreq);
         setName(dp.getPublicName());
+
         statements = new ArrayList<DataPropertyStatementTemplateModel>();
         
         // If the property is populated, get the data property statements via a sparql query
@@ -42,14 +47,27 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
             DataPropertyStatementDao dpDao = vreq.getWebappDaoFactory().getDataPropertyStatementDao();
             List<Literal> values = dpDao.getDataPropertyValuesForIndividualByProperty(subject, dp);            
             for (Literal value : values) {
-                statements.add(new DataPropertyStatementTemplateModel(subjectUri, propertyUri, value, policyHelper));
+                statements.add(new DataPropertyStatementTemplateModel(subjectUri, propertyUri, value, policyHelper, vreq));
             }
         } else {
             log.debug("Data property " + getUri() + " is unpopulated.");
         }
         
-        // Determine whether a new statement can be added
+        setAddAccess(policyHelper, dp);
+        
+    }
+
+    // Determine whether a new statement can be added
+    @Override
+    protected void setAddAccess(EditingPolicyHelper policyHelper, Property property) {
         if (policyHelper != null) {
+            
+            DataProperty dp = (DataProperty) property;
+            
+            // NIHVIVO-2790 vitro:moniker now included in the display, but don't allow new statements
+            if (dp.getURI().equals(VitroVocabulary.MONIKER)) {
+                return;
+            }
             // If the display limit has already been reached, we can't add a new statement
             int displayLimit = dp.getDisplayLimit();
             // Display limit of -1 (default value for new property) means no display limit
@@ -59,12 +77,17 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
                     addAccess = true;
                 }
             }
-        }
+        }        
     }
     
-    @Override
-    protected boolean isEmpty() {
-        return statements.isEmpty();
+    @Override 
+    protected int getPropertyDisplayTier(Property p) {
+        return ((DataProperty)p).getDisplayTier();
+    }
+
+    @Override 
+    protected Route getPropertyEditRoute() {
+        return Route.DATA_PROPERTY_EDIT;
     }
     
     /* Access methods for templates */
@@ -80,6 +103,12 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
             ParamMap params = new ParamMap(
                     "subjectUri", subjectUri,
                     "predicateUri", propertyUri);
+            
+            //Check if special parameters being sent            
+            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vreq);
+            if(specialParams.size() > 0) {
+            	params.putAll(specialParams);
+            }
             addUrl = UrlBuilder.getUrl(EDIT_PATH, params);       
         }
         return addUrl;

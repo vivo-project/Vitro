@@ -1,65 +1,54 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<!-- Default list view config file for uncollated object properties 
+<!-- Default list view config file for object properties 
     
      See guidelines in vitro/doc/list_view_configuration_guidelines.txt -->
 
 <list-view-config>
-    <query-base>    
-        PREFIX vitro: &lt;http://vitro.mannlib.cornell.edu/ns/vitro/0.7#&gt;
-        PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;  
-          
-        SELECT ?object ?name ?moniker WHERE {
-            ?subject ?property ?object 
-            OPTIONAL { ?object rdfs:label ?name }
-            OPTIONAL { ?object vitro:moniker ?moniker }
-        } ORDER BY ?name ?object  
-    </query-base>
-
-    <query-collated>    
-        PREFIX vitro: &lt;http://vitro.mannlib.cornell.edu/ns/vitro/0.7#&gt;
-        PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;  
+    <query-select>    
         PREFIX afn:  &lt;http://jena.hpl.hp.com/ARQ/function#&gt;
-          
-        SELECT ?subclass ?object ?name ?moniker {
+        PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;  
+        PREFIX vitro: &lt;http://vitro.mannlib.cornell.edu/ns/vitro/0.7#&gt;
+        
+        SELECT <collated> ?subclass </collated>
+               ?object 
+               ?label 
+               ?localName WHERE {
+               
             ?subject ?property ?object
+                LET (?localName := afn:localname(?object)) 
+                
+            OPTIONAL { ?object rdfs:label ?label } 
+            
+            <collated> 
             OPTIONAL { ?object a ?subclass } 
-            OPTIONAL { ?object rdfs:label ?name }
-            OPTIONAL { ?object vitro:moniker ?moniker }           
-            FILTER ( afn:namespace(?subclass) != "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" )                     
-        } ORDER BY ?subclass ?name ?object  
-    </query-collated>
+            FILTER ( afn:namespace(?subclass) != "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" )   
+            </collated>       
+        
+        } ORDER BY <collated> ?subclass </collated> ?label ?label ?localName  
+    </query-select>
 
     <query-construct>
-        PREFIX vitro: &lt;http://vitro.mannlib.cornell.edu/ns/vitro/0.7#&gt;
         PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;  
+        PREFIX vitro: &lt;http://vitro.mannlib.cornell.edu/ns/vitro/0.7#&gt;
 
         CONSTRUCT {
             ?subject ?property ?object .
             ?object a ?subclass .
-            ?object rdfs:label ?name .
-            ?object vitro:moniker ?moniker
+            ?object rdfs:label ?label .
         } WHERE {
             { 
                 ?subject ?property ?object 
-            }
-            UNION {
+            } UNION {            
                 ?subject ?property ?object .
                 ?object a ?subclass . 
-            } 
-            UNION {
+            } UNION {         
                 ?subject ?property ?object .
-                ?object rdfs:label ?name .
-            } 
-            UNION {
-                ?subject ?property ?object .
-                ?object vitro:moniker ?moniker .
-            }
+                ?object rdfs:label ?label .
+            }             
         }
     </query-construct>
-     
-    <postprocessor>edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DefaultListViewDataPostProcessor</postprocessor>
     
     <template>propStatement-default.ftl</template>
 </list-view-config>

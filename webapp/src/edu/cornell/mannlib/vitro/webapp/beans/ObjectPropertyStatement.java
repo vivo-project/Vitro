@@ -7,10 +7,6 @@ public interface ObjectPropertyStatement {
 
     public String toString();
 
-    public String getDescription();
-
-    public void setDescription(String description);
-
     public boolean isSubjectOriented();
 
     public void setSubjectOriented(boolean subjectOriented);
@@ -18,10 +14,6 @@ public interface ObjectPropertyStatement {
     public String getSubjectURI();
 
     public void setSubjectURI(String subjectURI);
-
-    public String getQualifier();
-
-    public void setQualifier(String qualifier);
 
     public String getObjectURI();
 
@@ -42,14 +34,6 @@ public interface ObjectPropertyStatement {
     public String getPropertyURI();
 
     public void setPropertyURI(String URI);
-
-    public void setSunrise(Date date);
-
-    public Date getSunrise();
-
-    public void setSunset(Date date);
-
-    public Date getSunset();
 
     public PropertyInstance toPropertyInstance();
 

@@ -19,15 +19,15 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 
 public class DatapropEditController extends BaseEditController {
@@ -35,19 +35,13 @@ public class DatapropEditController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(DatapropEditController.class.getName());
 
     public void doPost (HttpServletRequest request, HttpServletResponse response) {
-    	
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new EditOntology()))) {
+        	return;
+        }
+
     	VitroRequest vreq = new VitroRequest(request);
     	
         final int NUM_COLS=15;
-
-        if (!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error("DatapropEditController caught exception calling doGet()");
-        }
 
         String datapropURI = request.getParameter("uri");
 
@@ -72,8 +66,6 @@ public class DatapropEditController extends BaseEditController {
         results.add("custom entry form");
         results.add("URI");
 
-        
-        Portal portal = (new VitroRequest(request)).getPortal();
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
 
         results.add(dp.getLocalNameWithPrefix());
@@ -94,7 +86,7 @@ public class DatapropEditController extends BaseEditController {
         // TODO - need unionOf/intersectionOf-style domains for domain class
         String domainStr="";
         try {
-            domainStr = (dp.getDomainClassURI() == null) ? "" : "<a href=\"vclassEdit?uri="+URLEncoder.encode(dp.getDomainClassURI(),"UTF-8")+"&amp;home="+portal.getPortalId()+"\">"+dp.getDomainClassURI()+"</a>";
+            domainStr = (dp.getDomainClassURI() == null) ? "" : "<a href=\"vclassEdit?uri="+URLEncoder.encode(dp.getDomainClassURI(),"UTF-8")+"\">"+dp.getDomainClassURI()+"</a>";
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -179,12 +171,13 @@ public class DatapropEditController extends BaseEditController {
         }
         request.setAttribute("equivalentProperties", eqProperties);
         
+        ApplicationBean appBean = vreq.getAppBean();
+        
         request.setAttribute("epoKey",epo.getKey());
         request.setAttribute("datatypeProperty", dp);
         request.setAttribute("bodyJsp","/templates/edit/specific/dataprops_edit.jsp");
-        request.setAttribute("portalBean",portal);
         request.setAttribute("title","Data Property Control Panel");
-        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
+        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+appBean.getThemeDir()+"css/edit.css\"/>");
 
         try {
             rd.forward(request, response);

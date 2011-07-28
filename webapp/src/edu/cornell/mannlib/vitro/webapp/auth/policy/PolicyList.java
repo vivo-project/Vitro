@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,10 +22,8 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
  *  and return the first AUTHORIZED or UNAUTHROIZED decision.  INCONCLUSIVE
  *  or null decisions will be ignored and the next policy on the list will
  *  be queried. 
- *  
  *   
  * @author bdc34
- *
  */
 public class PolicyList extends ArrayList<PolicyIface> implements PolicyIface{
     private static final Log log = LogFactory.getLog(PolicyList.class.getName());
@@ -33,7 +32,12 @@ public class PolicyList extends ArrayList<PolicyIface> implements PolicyIface{
         super();
     }
 
-    public PolicyDecision isAuthorized(IdentifierBundle whoToAuth, RequestedAction whatToAuth) {
+	public PolicyList(Collection<PolicyIface> policies) {
+		super(policies);
+	}
+
+	@Override
+	public PolicyDecision isAuthorized(IdentifierBundle whoToAuth, RequestedAction whatToAuth) {
         PolicyDecision pd = null;
         for(PolicyIface policy : this){ 
             try{
@@ -43,12 +47,11 @@ public class PolicyList extends ArrayList<PolicyIface> implements PolicyIface{
                         break;
                     if( pd.getAuthorized() == Authorization.UNAUTHORIZED )
                         break;
-//                    if( pd.getAuthorized() == Authorization.INCONCLUSIVE )
-//                        continue;
+					// if( pd.getAuthorized() == Authorization.INCONCLUSIVE )
+					// continue;
                 } else{
                     log.debug("policy " + policy.toString() + " returned a null PolicyDecision");
                 }
-
             }catch(Throwable th){
                 log.error("ignoring exception in policy " + policy.toString(), th );
             }

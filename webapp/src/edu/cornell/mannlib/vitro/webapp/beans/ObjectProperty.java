@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,8 +17,6 @@ import org.joda.time.DateTime;
 import org.openrdf.model.impl.URIImpl;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-
-import edu.cornell.mannlib.vitro.webapp.controller.EntityController;
 
 /**
  * a class representing an object property

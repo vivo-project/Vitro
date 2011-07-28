@@ -8,7 +8,9 @@ public class VitroVocabulary {
 	
     public static final String vitroURI = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#";
     
+    public static final String VITRO_AUTH = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#";
     public static final String VITRO_PUBLIC = "http://vitro.mannlib.cornell.edu/ns/vitro/public#";
+    public static final String VITRO_PUBLIC_ONTOLOGY = "http://vitro.mannlib.cornell.edu/ns/vitro/public";
     
     
     /** BJL23 2008-02-25:
@@ -40,8 +42,7 @@ public class VitroVocabulary {
     public static final String DISPLAY = DisplayVocabulary.DISPLAY_NS;
 
     // properties found on the beans
-
-    public static final String DESCRIPTION = vitroURI+"description";
+    
     public static final String DESCRIPTION_ANNOT = vitroURI + "descriptionAnnot";
     public static final String PUBLIC_DESCRIPTION_ANNOT = vitroURI + "publicDescriptionAnnot";
     public static final String SHORTDEF = vitroURI+"shortDef";
@@ -55,6 +56,8 @@ public class VitroVocabulary {
     //public static final String PROHIBITED_FROM_CREATE_BELOW_ROLE_LEVEL_ANNOT = vitroURI+"prohibitedFromCreateBelowRoleLevelAnnot";
     public static final String PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT = vitroURI+"prohibitedFromUpdateBelowRoleLevelAnnot";
     //public static final String PROHIBITED_FROM_DELETE_BELOW_ROLE_LEVEL_ANNOT = vitroURI+"prohibitedFromDeleteBelowRoleLevelAnnot";
+    
+    public static final String MOST_SPECIFIC_TYPE = vitroURI + "mostSpecificType";
 
     // roles
     public static final String PUBLIC = "http://vitro.mannlib.cornell.edu/ns/vitro/role#public";
@@ -65,32 +68,21 @@ public class VitroVocabulary {
     public static final String NOBODY = "http://vitro.mannlib.cornell.edu/ns/vitro/role#nobody";
     
     public static final String SEARCH_BOOST_ANNOT = vitroURI + "searchBoostAnnot";
-    
-    public static final String SUNRISE = vitroURI+"sunrise";
-    public static final String SUNSET = vitroURI+"sunset";
 
     public static final String DEPENDENT_RESORUCE = "http://vivoweb.org/ontology/core#DependentResource";
     
     //////////////////////////////////////////
 
-
-    public static final String CURATOR_NOTE = vitroURI+"curatorNote";
-
     public static final String MONIKER = vitroURI+"moniker";
-
-    public static final String BLURB = vitroURI+"blurb";
 
     public static final String CLASSGROUP = vitroURI+"ClassGroup";
     public static final String IN_CLASSGROUP = vitroURI+"inClassGroup";
 
     public static final String MODTIME = vitroURI+"modTime";
-    public static final String TIMEKEY = vitroURI+"timekey";
 
     public static final String DISPLAY_RANK = vitroURI+"displayRank";
     public static final String DISPLAY_RANK_ANNOT = vitroURI+"displayRankAnnot";
     public static final String DISPLAY_LIMIT = vitroURI+"displayLimitAnnot";
-
-    public static final String CITATION = vitroURI+"citation";
     
     // ================== property related =================================
 
@@ -99,8 +91,6 @@ public class VitroVocabulary {
     public static final String PROPERTY_OBJECTINDIVIDUALSORTPROPERTY = vitroURI+"objectIndividualSortProperty";
     public static final String PROPERTY_FULLPROPERTYNAMEANNOT = vitroURI+"fullPropertyNameAnnot";
     public static final String PROPERTY_CUSTOMSEARCHVIEWANNOT = vitroURI+"customSearchViewAnnot";
-    //public static final String PROPERTY_SELFEDITPROHIBITEDANNOT = vitroURI+"selfEditProhibitedAnnot";
-    //public static final String PROPERTY_CURATOREDITPROHIBITEDANNOT = vitroURI+"curatorEditProhibitedAnnot";
     public static final String PROPERTY_CUSTOMENTRYFORMANNOT = vitroURI+"customEntryFormAnnot";
     public static final String PROPERTY_CUSTOMDISPLAYVIEWANNOT = vitroURI+"customDisplayViewAnnot";
     public static final String PROPERTY_CUSTOMSHORTVIEWANNOT = vitroURI+"customShortViewAnnot";
@@ -113,20 +103,7 @@ public class VitroVocabulary {
     public static final String SKIP_EDIT_FORM = vitroURI + "skipEditForm";
     public static final String PROPERTY_STUBOBJECTPROPERTYANNOT = vitroURI + "stubObjectPropertyAnnot";
 	public static final String PROPERTY_COLLATEBYSUBCLASSANNOT = vitroURI + "collateBySubclassAnnot";
-	
-    // ================== keyword related ==================================
-
-    public static final String KEYWORD = vitroURI+"Keyword";
-    public static final String KEYWORD_STEM = vitroURI+"keywordStem";
-    public static final String KEYWORD_TYPE = vitroURI+"keywordType";
-    public static final String KEYWORD_SOURCE = vitroURI+"keywordSource";
-    public static final String KEYWORD_ORIGIN = vitroURI+"keywordOrigin";
-    public static final String KEYWORD_COMMENTS = vitroURI+"keywordComment";
-    public static final String KEYWORD_INDIVIDUALRELATION = vitroURI+"KeywordRelation";
-    public static final String KEYWORD_INDIVIDUALRELATION_INVOLVESKEYWORD = vitroURI+"involvesKeyword";
-    public static final String KEYWORD_INDIVIDUALRELATION_INVOLVESINDIVIDUAL = vitroURI+"involvesIndividual";
-    public static final String KEYWORD_INDIVIDUALRELATION_MODE = vitroURI+"keywordMode";
-
+    public static final String IS_INTERNAL_CLASSANNOT = vitroURI + "isMenuPageIntersectionClass";
     // ================== link related =====================================
 
     public static final String LINK = vitroURI+"Link";
@@ -140,24 +117,14 @@ public class VitroVocabulary {
     // ================== Vitro Application vocabulary =====================
 
     public static final String APPLICATION = vitroURI + "Application";
-    public static final String APPLICATION_FLAG1NAME = vitroURI+"flag1Name";
-    public static final String APPLICATION_FLAG2NAME = vitroURI+"flag2Name";
-    public static final String APPLICATION_FLAG3NAME = vitroURI+"flag3Name";
-    public static final String APPLICATION_MINSHAREDPORTALID = vitroURI+"minSharedPortalId";
-    public static final String APPLICATION_MAXSHAREDPORTALID = vitroURI+"maxSharedPortalId";
     public static final String APPLICATION_KEYWORDHEADING = vitroURI+"keywordHeading";
     public static final String APPLICATION_ROOTLOGOTYPEIMAGE = vitroURI+"rootLogotypeImage";
-    public static final String APPLICATION_ONLYCURRENT = vitroURI+"onlyCurrent";
-    public static final String APPLICATION_MAXPORTALID = vitroURI+"maxPortalId";
-
+    
     // ================== Vitro Portal vocabulary ===========================
 
     public static final String PORTAL = vitroURI+"Portal";
-    public static final String PORTAL_ROOTTAB = vitroURI+"rootTab";
     public static final String PORTAL_THEMEDIR = vitroURI+"themeDir";
     public static final String PORTAL_BANNERIMAGE = vitroURI+"bannerImage";
-    public static final String PORTAL_FLAG2VALUES = vitroURI+"flag2Values";
-    public static final String PORTAL_FLAG1VALUES = vitroURI+"flag1Values";
     public static final String PORTAL_CONTACTMAIL = vitroURI+"contactMail";
     public static final String PORTAL_CORRECTIONMAIL = vitroURI+"correctionMail";
     public static final String PORTAL_SHORTHAND = vitroURI+"shortHand";
@@ -165,9 +132,6 @@ public class VitroVocabulary {
     public static final String PORTAL_ACKNOWLEGETEXT = vitroURI+"acknowledgeText";
     public static final String PORTAL_BANNERWIDTH = vitroURI+"bannerWidth";
     public static final String PORTAL_BANNERHEIGHT = vitroURI+"bannerHeight";
-    public static final String PORTAL_FLAG3VALUES = vitroURI+"flag3Values";
-    public static final String PORTAL_FLAG2NUMERIC = vitroURI+"flag2Numeric";
-    public static final String PORTAL_FLAG3NUMERIC = vitroURI+"flag3Numeric";
     public static final String PORTAL_COPYRIGHTURL = vitroURI+"copyrightURL";
     public static final String PORTAL_COPYRIGHTANCHOR = vitroURI+"copyrightAnchor";
     public static final String PORTAL_ROOTBREADCRUMBURL = vitroURI+"rootBreadCrumbURL";
@@ -177,62 +141,35 @@ public class VitroVocabulary {
     public static final String PORTAL_LOGOTYPEWIDTH = vitroURI+"logotypeWidth";
     public static final String PORTAL_IMAGETHUMBWIDTH = vitroURI+"imageThumbWidth";
     // reusing displayRank property above
-    public static final String PORTAL_FLAG1SEARCHFILTERING = vitroURI+"flag1SearchFiltering";
-    public static final String PORTAL_FLAG2SEARCHFILTERING = vitroURI+"flag2SearchFiltering";
-    public static final String PORTAL_FLAG3SEARCHFILTERING = vitroURI+"flag3SearchFiltering";
     public static final String PORTAL_URLPREFIX = vitroURI + "urlPrefix";
-    public static final String PORTAL_FLAG1FILTERING = vitroURI+"flag1Filtering";
-
-    // ================ Vitro Tab vocabulary ================================
-
-    public static final String TAB = vitroURI+"Tab";
-    public static final String TAB_AUTOLINKABLETAB = vitroURI+"AutoLinkableTab";
-    public static final String TAB_MANUALLYLINKABLETAB = vitroURI+"ManuallyLinkableTab";
-    public static final String TAB_MIXEDTAB = vitroURI+"MixedTab";
-    public static final String TAB_PRIMARYTAB = vitroURI+"PrimaryTab";
-    public static final String TAB_SUBCOLLECTIONCATEGORY = vitroURI+"SubcollectionCategory";
-    public static final String TAB_SECONDARYTAB = vitroURI+"SecondaryTab";
-    public static final String TAB_PRIMARYTABCONTENT = vitroURI+"PrimaryTabContent";
-    public static final String TAB_SUBCOLLECTION = vitroURI+"Subcollection";
-    public static final String TAB_SUBTABOF = vitroURI+"subTabOf";
-    public static final String TAB_COLLECTION = vitroURI+"Collection";
-
-    public static final String TAB_INDIVIDUALRELATION= vitroURI+"TabIndividualRelation";
-    public static final String TAB_INDIVIDUALRELATION_INVOLVESINDIVIDUAL= vitroURI+"involvesIndividual";
-    public static final String TAB_INDIVIDUALRELATION_INVOLVESTAB = vitroURI+"involvesTab";
-
-
-    public static final String TAB_AUTOLINKEDTOTAB = vitroURI + "autoLinkedToTab"; // annotation on class
-    public static final String TAB_TABTYPE = vitroURI+"tabType";
-    public static final String TAB_STATUSID = vitroURI+"statusId";
-    public static final String TAB_DAYLIMIT = vitroURI+"dayLimit";
-    public static final String TAB_BODY = vitroURI+"tabBody";
-    public static final String TAB_GALLERYROWS = vitroURI+"galleryRows";
-    public static final String TAB_GALLERYCOLS = vitroURI+"galleryCols";
-    public static final String TAB_MORETAG = vitroURI+"moreTag";
-    public static final String TAB_IMAGEWIDTH = vitroURI+"imageWidth";
-    public static final String TAB_PORTAL = vitroURI+"inPortal";
-    public static final String TAB_ENTITYSORTFIELD = vitroURI+"individualSortField";
-    public static final String TAB_ENTITYSORTDIRECTION = vitroURI+"individualSortDirection";
-    public static final String TAB_ENTITYLINKMETHOD = vitroURI+"individualLinkMethod";
-    public static final String TAB_RSSURL = vitroURI+"rssUrl";
-    public static final String TAB_FLAG2SET = vitroURI+"flag2Set";
-    public static final String TAB_FLAG3SET = vitroURI+"flag3Set";
-    public static final String TAB_FLAG2MODE = vitroURI+"flag2Mode";
-    public static final String TAB_FLAG3MODE = vitroURI+"flag3Mode";
 
     // =============== Vitro User vocabulary =================================
 
-    public static final String USER = vitroURI+"User";
-    public static final String USER_USERNAME = vitroURI+"username";
-    public static final String USER_MD5PASSWORD = vitroURI+"md5password";
-    public static final String USER_OLDPASSWORD = vitroURI+"oldpassword";
-    public static final String USER_FIRSTTIME = vitroURI+"firstTime";
-    public static final String USER_LOGINCOUNT = vitroURI+"loginCount";
-    public static final String USER_ROLE = vitroURI+"roleURI";
-    public static final String USER_LASTNAME = vitroURI+"lastName";
-    public static final String USER_FIRSTNAME = vitroURI+"firstName";
+    // TODO JB This should go away when the new method of associating UserAccounts with Individuals is in place.
     public static final String MAY_EDIT_AS = vitroURI+"mayEditAs";
+
+    // =============== Vitro UserAccount and PermissionSet vocabulary ===========
+    
+    public static final String USERACCOUNT = VITRO_AUTH + "UserAccount";
+    public static final String USERACCOUNT_ROOT_USER = VITRO_AUTH + "RootUserAccount";
+    public static final String USERACCOUNT_EMAIL_ADDRESS = VITRO_AUTH + "emailAddress";
+    public static final String USERACCOUNT_FIRST_NAME = VITRO_AUTH + "firstName";
+    public static final String USERACCOUNT_LAST_NAME = VITRO_AUTH + "lastName";
+    public static final String USERACCOUNT_MD5_PASSWORD = VITRO_AUTH + "md5password";
+    public static final String USERACCOUNT_OLD_PASSWORD = VITRO_AUTH + "oldpassword";
+    public static final String USERACCOUNT_LOGIN_COUNT = VITRO_AUTH + "loginCount";
+    public static final String USERACCOUNT_LAST_LOGIN_TIME = VITRO_AUTH + "lastLoginTime";
+    public static final String USERACCOUNT_STATUS = VITRO_AUTH + "status";
+    public static final String USERACCOUNT_PASSWORD_LINK_EXPIRES = VITRO_AUTH + "passwordLinkExpires";
+    public static final String USERACCOUNT_PASSWORD_CHANGE_REQUIRED = VITRO_AUTH + "passwordChangeRequired";
+    public static final String USERACCOUNT_EXTERNAL_AUTH_ID = VITRO_AUTH + "externalAuthId";
+    public static final String USERACCOUNT_EXTERNAL_AUTH_ONLY = VITRO_AUTH + "externalAuthOnly";
+    public static final String USERACCOUNT_HAS_PERMISSION_SET = VITRO_AUTH + "hasPermissionSet";
+
+    public static final String PERMISSIONSET = VITRO_AUTH + "PermissionSet";
+    public static final String PERMISSIONSET_HAS_PERMISSION = VITRO_AUTH + "hasPermission";
+
+    public static final String PERMISSION = VITRO_AUTH + "Permission";
 
     // =============== model auditing vocabulary =============================
 
@@ -248,6 +185,7 @@ public class VitroVocabulary {
     public static final String EDIT_EVENT_AGENT = vitroURI+"editEventAgent";
     public static final String EDIT_EVENT_DATETIME = vitroURI+"editEventDateTime";
 
+    public static final String BULK_UPDATE_EVENT = vitroURI+"BulkUpdateEvent";
     public static final String INDIVIDUAL_EDIT_EVENT = vitroURI+"IndividualEditEvent";
     public static final String INDIVIDUAL_CREATION_EVENT = vitroURI+"IndividualCreationEvent";
     public static final String INDIVIDUAL_UPDATE_EVENT = vitroURI+"IndividualUpdateEvent";

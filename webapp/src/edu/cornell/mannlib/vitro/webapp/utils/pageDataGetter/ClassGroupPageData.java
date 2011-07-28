@@ -10,10 +10,12 @@ import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
@@ -26,13 +28,13 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateMo
 public class ClassGroupPageData implements PageDataGetter{
     private static final Log log = LogFactory.getLog(ClassGroupPageData.class);
     
-    public Map<String,Object> getData(ServletContext context, VitroRequest vreq, String pageUri, Map<String, Object> page, String type ){
+    public Map<String,Object> getData(ServletContext context, VitroRequest vreq, String pageUri, Map<String, Object> page ){
         HashMap<String, Object> data = new HashMap<String,Object>();
         String classGroupUri = vreq.getWebappDaoFactory().getPageDao().getClassGroupPage(pageUri);
         data.put("classGroupUri", classGroupUri);
 
         VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
-        List<VClassGroup> vcgList = vcgc.getGroups(vreq.getPortalId());
+        List<VClassGroup> vcgList = vcgc.getGroups();
         VClassGroup group = null;
         for( VClassGroup vcg : vcgList){
             if( vcg.getURI() != null && vcg.getURI().equals(classGroupUri)){
@@ -63,15 +65,25 @@ public class ClassGroupPageData implements PageDataGetter{
             }
             
         }
-                    
-        data.put("vClassGroup", group);  //may put null            
+        log.debug("Retrieved class group " + group.getURI() + " and returning to template");  
+        //if debug enabled, print out the number of entities within each class in the class gorup
+        if(log.isDebugEnabled()){
+        	List<VClass> groupClasses = group.getVitroClassList();
+        	for(VClass v: groupClasses) {
+        		log.debug("Class " + v.getName() + " - " + v.getURI() + " has " + v.getEntityCount() + " entities");
+        	}
+        }
+        data.put("vClassGroup", group);  //may put null     
+        //Also add data service url
+        //Hardcoding for now, need a more dynamic way of doing this
+        data.put("dataServiceUrlIndividualsByVClass", this.getDataServiceUrl());
         return data;
     }        
     
     public static VClassGroupTemplateModel getClassGroup(String classGroupUri, ServletContext context, VitroRequest vreq){
         
         VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
-        List<VClassGroup> vcgList = vcgc.getGroups(vreq.getPortalId());
+        List<VClassGroup> vcgList = vcgc.getGroups();
         VClassGroup group = null;
         for( VClassGroup vcg : vcgList){
             if( vcg.getURI() != null && vcg.getURI().equals(classGroupUri)){
@@ -112,6 +124,20 @@ public class ClassGroupPageData implements PageDataGetter{
         return DisplayVocabulary.CLASSGROUP_PAGE_TYPE;
     } 
     
+  //Get data servuice
+    public String getDataServiceUrl() {
+    	return UrlBuilder.getUrl("/dataservice?getSolrIndividualsByVClass=1&vclassId=");
+    }
+    
+    
+    /**
+     * For processing of JSONObject
+     */
+    //Currently empty, TODO: Review requirements
+    public JSONObject convertToJSON(Map<String, Object> dataMap, VitroRequest vreq) {
+    	JSONObject rObj = null;
+    	return rObj;
+    }
     protected static void setAllClassCountsToZero(VClassGroup vcg){
         for(VClass vc : vcg){
             vc.setEntityCount(0);

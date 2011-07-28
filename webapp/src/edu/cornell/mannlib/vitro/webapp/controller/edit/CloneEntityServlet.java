@@ -8,11 +8,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,6 +18,8 @@ import org.joda.time.DateTime;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndividuals;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -37,45 +37,35 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  * */
 public class CloneEntityServlet extends BaseEditController {
     private static final String NO_PROPERTY_RESTRICTION = null;
-    private static final int DEFAULT_PORTAL_ID=1;
     private static final int MIN_EDIT_ROLE=4;
     private static final Log log = LogFactory.getLog(CloneEntityServlet.class.getName());
 
     public void doPost(HttpServletRequest req, HttpServletResponse response) {
-    	VitroRequest request = new VitroRequest(req);
-        HttpSession session = req.getSession();
-        ServletContext context = getServletContext();
-        try {
-            String portalIdStr = (portalIdStr = request.getParameter("home")) == null ? String
-                    .valueOf(DEFAULT_PORTAL_ID)
-                    : portalIdStr;
+        if (!isAuthorizedToDisplayPage(req, response, new Actions(new EditIndividuals()))) {
+        	return;
+        }
 
-            if (!checkLoginStatus(request,response)) {
-//                getServletConfig().getServletContext().getRequestDispatcher(
-//                "/index.jsp?home=" + portalIdStr).forward(request,
-//                 response);
-                 return;
-            }
+    	VitroRequest request = new VitroRequest(req);
+        try {
 
             //attempt to clone a tab but if we don't find the parameter 'tabId' the clone a entity
             try{
                 int id = doCloneTab(request, response);
                 if( id >= 0){
-                    response.sendRedirect("tabEdit?home=" + portalIdStr
-                        + "&id=" + id);
+                    response.sendRedirect("tabEdit?id=" + id);
                     return;
                 }
             }catch(Exception ex){
                 log.error("Could not clone tab: " + ex);
                 getServletConfig().getServletContext().getRequestDispatcher(
-                    "/index.jsp?home=" + portalIdStr).forward(request,
+                    "/index.jsp").forward(request,
                     response);
                 return;
             }
 
         String individualURI=request.getParameter("uri");
         if (individualURI == null || individualURI.equals("")){
-            getServletConfig().getServletContext().getRequestDispatcher("/index.jsp?home="+portalIdStr).forward( request, response );
+            getServletConfig().getServletContext().getRequestDispatcher("/index.jsp").forward( request, response );
             return;
         }
         
@@ -99,20 +89,7 @@ public class CloneEntityServlet extends BaseEditController {
             }
         } else {
             ind.setName("CLONE OF "+ind.getName());
-        }
-        
-        String timeKeyStr = request.getParameter("timekey");
-        if (timeKeyStr!=null && !timeKeyStr.equals("")) {
-            Date timekey = parseStringToDate(timeKeyStr);
-            if (timekey!=null) {
-                ind.setTimekey(timekey);
-            }
-        }
-        // specify other values that do NOT want to be carried over from the existing Individual
-        ind.setSunrise(new DateTime().toDate());
-        // cannot set these values to null because they will still be copies
-        ind.setBlurb("");
-        ind.setDescription("");        
+        }      
  
         String cloneURI=individualDao.insertNewIndividual(ind);
         if (cloneURI == null){ log.error("Error inserting cloned individual"); return; }
@@ -125,10 +102,8 @@ public class CloneEntityServlet extends BaseEditController {
             propertyInstanceDao.insertProp(currPI);
         }
 
-        // addIndividualToLuceneIndex( context, cloneURI );
-
         String encodedCloneURI = URLEncoder.encode(cloneURI, "UTF-8");
-        response.sendRedirect("entityEdit?home="+portalIdStr+"&uri="+encodedCloneURI);
+        response.sendRedirect("entityEdit?uri="+encodedCloneURI);
         //response.sendRedirect("entity?home="+portalIdStr+"&id="+newEntityId);
 
     } catch (Exception ex) {

@@ -2,70 +2,92 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.Collection;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
-import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndividual;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.RevisionInfoController;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.SiteAdminController;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.search.controller.IndexController;
 
 public class User extends BaseTemplateModel {
-   
-    private static final Log log = LogFactory.getLog(User.class);
-    
-    private enum Access {
-        SITE_ADMIN(SiteAdminController.staticRequiredLoginLevel()),
-        REVISION_INFO(RevisionInfoController.staticRequiredLoginLevel()),
-        FILTER_SECURITY(LoginStatusBean.EDITOR);
-        
-        private final int requiredLoginLevel;
-        
-        Access(int requiredLoginLevel) {
-            this.requiredLoginLevel = requiredLoginLevel;
-        }
-        
-        int requiredLoginLevel() {
-            return this.requiredLoginLevel;
-        }
-    }
-    
-    private LoginStatusBean loginBean = null;
-    private VitroRequest vreq = null;
+    private final VitroRequest vreq;
+    private final UserAccount currentUser;
+    private final String profileUrl;
     
     public User(VitroRequest vreq) {
         this.vreq = vreq;
-        loginBean = LoginStatusBean.getBean(vreq);
+        this.currentUser = LoginStatusBean.getCurrentUser(vreq);
+        this.profileUrl = figureAssociatedProfileUrl();
     }
     
-    public boolean isLoggedIn() {
-        return loginBean.isLoggedIn();
+	private String figureAssociatedProfileUrl() {
+        IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(vreq);
+		Collection<String> uris = HasAssociatedIndividual.getIndividualUris(ids);
+        if (uris.isEmpty()) {
+        	return "";
+        }
+        
+        String uri = uris.iterator().next();
+        String url = UrlBuilder.getIndividualProfileUrl(uri, vreq);
+        if (url == null) {
+        	return "";
+        }
+        
+        return url;
+	}
+
+	public boolean isLoggedIn() {
+        return currentUser != null;
+    }
+    
+    public String getEmailAddress() {
+		return (currentUser == null) ? "" : currentUser.getEmailAddress();
     }
     
     public String getLoginName() {
-        return loginBean.getUsername();
+    	if (currentUser == null) {
+    		return "";
+    	} 
+
+    	if (currentUser.getFirstName().isEmpty()) {
+    		return currentUser.getEmailAddress();
+    	}
+    	
+    	return currentUser.getFirstName();
+    }
+    
+    public String getFirstName() {
+        return currentUser == null ? "" : currentUser.getFirstName();
+    }
+    
+    public String getLastName() {
+        return currentUser == null ? "" : currentUser.getLastName();
     }
     
     public boolean getHasSiteAdminAccess() {
-        return loginBean.isLoggedInAtLeast(Access.SITE_ADMIN.requiredLoginLevel());
+    	return PolicyHelper.isAuthorizedForActions(vreq, SiteAdminController.REQUIRED_ACTIONS);
     }
     
     public boolean getHasRevisionInfoAccess() {
-        return loginBean.isLoggedInAtLeast(Access.REVISION_INFO.requiredLoginLevel());
+    	return PolicyHelper.isAuthorizedForActions(vreq, RevisionInfoController.REQUIRED_ACTIONS);
     }
     
-    public boolean getShowFlag1SearchField() {
-        boolean showFlag1SearchField = false;
-        if (loginBean.isLoggedInAtLeast(Access.FILTER_SECURITY.requiredLoginLevel)) {
-            ApplicationBean appBean = vreq.getAppBean();            
-            if (appBean.isFlag1Active()) {
-                showFlag1SearchField = true;
-            }
-        }
-        return showFlag1SearchField;
+    public boolean isAuthorizedToRebuildSearchIndex() {
+        return PolicyHelper.isAuthorizedForActions(vreq, IndexController.REQUIRED_ACTIONS);
+    }
+    
+    public boolean getHasProfile() {
+    	return !profileUrl.isEmpty();
+    }
+    
+    public String getProfileUrl() {
+    	return profileUrl;
     }
 }

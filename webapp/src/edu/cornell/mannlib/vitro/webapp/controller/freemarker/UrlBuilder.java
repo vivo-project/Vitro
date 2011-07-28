@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openrdf.model.URI;
@@ -17,33 +16,33 @@ import org.openrdf.model.impl.URIImpl;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.filters.PortalPickerFilter;
 
 public class UrlBuilder {
 
     private static final Log log = LogFactory.getLog(UrlBuilder.class.getName());
 
     protected static String contextPath = null;   
-    private static boolean addPortalParam = PortalPickerFilter.isPortalPickingActive();
-    
-    private Portal portal;
         
     public enum Route {
         ABOUT("/about"),
         AUTHENTICATE("/authenticate"),
         BROWSE("/browse"),
         CONTACT("/contact"),
+        DATA_PROPERTY_EDIT("/datapropEdit"),
         INDIVIDUAL("/individual"),
         INDIVIDUAL_EDIT("/entityEdit"),
         INDIVIDUAL_LIST("/individuallist"),
         LOGIN("/login"), 
         LOGOUT("/logout"),
+        OBJECT_PROPERTY_EDIT("/propertyEdit"),
         SEARCH("/search"),
         SITE_ADMIN("/siteAdmin"),
         TERMS_OF_USE("/termsOfUse"),
         VISUALIZATION("/visualization"),
+        VISUALIZATION_SHORT("/vis"),
         VISUALIZATION_AJAX("/visualizationAjax"),
         VISUALIZATION_DATA("/visualizationData");
 
@@ -72,7 +71,7 @@ public class UrlBuilder {
     
     public enum Css {
         CUSTOM_FORM("/edit/forms/css/customForm.css"),
-        JQUERY_UI("/js/jquery-ui/css/smoothness/jquery-ui-1.8.4.custom.css");        
+        JQUERY_UI("/js/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css");        
 
         private final String path;
         
@@ -92,7 +91,7 @@ public class UrlBuilder {
     public enum JavaScript {
         CUSTOM_FORM_UTILS("/js/customFormUtils.js"),
         JQUERY("/js/jquery.js"),
-        JQUERY_UI("/js/jquery-ui/js/jquery-ui-1.8.4.custom.min.js"),
+        JQUERY_UI("/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"),
         UTILS("/js/utils.js");
         
         private final String path;
@@ -110,63 +109,23 @@ public class UrlBuilder {
         }
     }
     
-    public UrlBuilder(Portal portal) {
-        this.portal = portal;
-    }
-    
-    public int getPortalId() {
-        return portal.getPortalId();
-    }
-    
-    public String getHomeUrl() {
-        String rootBreadCrumbUrl = portal.getRootBreadCrumbURL();
-        String path = StringUtils.isEmpty(rootBreadCrumbUrl) ? "" : rootBreadCrumbUrl;
-        return getUrl(path);
+    private UrlBuilder() { }
+  
+    public static String getHomeUrl() {
+    	return getUrl("");
     }
     
     // Used by templates to build urls.
-    public String getBaseUrl() {
+    public static String getBaseUrl() {
         return contextPath;
     }
     
-	public String getLoginUrl() {
-		return getPortalUrl(Route.AUTHENTICATE, "return", "true");
+	public static String getLoginUrl() {
+		return getUrl(Route.AUTHENTICATE, "return", "true");
 	}
     
-    public String getLogoutUrl() {
-        return getPortalUrl(Route.LOGOUT);
-    }
-    
-    public ParamMap getPortalParam() {
-        return new ParamMap("home", "" + portal.getPortalId());    
-    }
-
-    public String getPortalUrl(String path) {
-        return addPortalParam ? getUrl(path, getPortalParam()) : getUrl(path);
-    }
-    
-    public String getPortalUrl(String path, ParamMap params) {
-        if (addPortalParam) {
-            params.putAll(getPortalParam());
-        }
-        return getUrl(path, params);
-    }
-
-    public String getPortalUrl(String path, String...params) {
-        ParamMap urlParams = new ParamMap(params);
-        return getPortalUrl(path, urlParams);
-    }
-    
-    public String getPortalUrl(Route route) {
-        return getPortalUrl(route.path());
-    }
-    
-    public String getPortalUrl(Route route, ParamMap params) {
-        return getPortalUrl(route.path(), params);
-    }
-
-    public String getPortalUrl(Route route, String...params) {
-        return getPortalUrl(route.path(), params);
+    public static String getLogoutUrl() {
+        return getUrl(Route.LOGOUT);
     }
     
     public static class ParamMap extends HashMap<String, String> { 
@@ -201,9 +160,13 @@ public class UrlBuilder {
             put(key, String.valueOf(value));
         }
         
+        public void put(ParamMap params) {
+            for (String key: params.keySet()) {
+                put(key, params.get(key));
+            }
+        }
+        
     }
-    
-    /********** Static utility methods **********/
     
     public static String getUrl(String path) {
     	
@@ -265,21 +228,25 @@ public class UrlBuilder {
         return addParams(url, new ParamMap(params));
     }
     
+    public static String addParams(String url, List<String> params) {
+        return addParams(url, new ParamMap(params));
+    }
+    
     public static String getPath(Route route, ParamMap params) {
         return getPath(route.path(), params);
     }
     
-    public static String getIndividualProfileUrl(String individualUri, WebappDaoFactory wadf) {
+    public static String getIndividualProfileUrl(Individual individual, VitroRequest vreq) {
+        return getIndividualProfileUrl(individual, individual.getURI(),vreq);
+    }
+
+    public static String getIndividualProfileUrl(String individualUri, VitroRequest vreq) {
         Individual individual = new IndividualImpl(individualUri);
-        return getIndividualProfileUrl(individual, individualUri, wadf);
-    }
+        return getIndividualProfileUrl(individual, individualUri, vreq);
+    }    
     
-    public static String getIndividualProfileUrl(Individual individual, WebappDaoFactory wadf) {
-        String individualUri = individual.getURI();
-        return getIndividualProfileUrl(individual, individualUri, wadf);        
-    }
-    
-    private static String getIndividualProfileUrl(Individual individual, String individualUri, WebappDaoFactory wadf) {
+    private static String getIndividualProfileUrl(Individual individual, String individualUri, VitroRequest vreq) {
+        WebappDaoFactory wadf = vreq.getWebappDaoFactory();
         String profileUrl = null;
         try {
             URI uri = new URIImpl(individualUri); // throws exception if individualUri is invalid
@@ -302,8 +269,32 @@ public class UrlBuilder {
         } catch (Exception e) {
             log.warn(e);
             return null;
+        }        
+
+    	if (profileUrl != null) {
+    		HashMap<String, String> specialParams = getSpecialParams(vreq);
+    		if(specialParams.size() != 0) {
+    			profileUrl = addParams(profileUrl, new ParamMap(specialParams));
+    		}
+    	}
+    	
+    	return profileUrl;
+    }
+
+    public static boolean isUriInDefaultNamespace(String individualUri, VitroRequest vreq) {
+        return isUriInDefaultNamespace(individualUri, vreq.getWebappDaoFactory());
+    }
+    
+    public static boolean isUriInDefaultNamespace(String individualUri, WebappDaoFactory wadf) {       
+        try {
+            URI uri = new URIImpl(individualUri); // throws exception if individualUri is invalid
+            String namespace = uri.getNamespace();
+            String defaultNamespace = wadf.getDefaultNamespace();  
+            return defaultNamespace.equals(namespace);
+        } catch (Exception e) {
+            log.warn(e);
+            return false;
         }
-        return profileUrl;        
     }
     
     public static String urlEncode(String str) {
@@ -326,6 +317,34 @@ public class UrlBuilder {
             log.error("Error decoding url " + str + " with encoding " + encoding + ": Unsupported encoding.");
         }
         return decodedUrl;
+    }
+    
+    //To be used in different property templates so placing method for reuse here
+    //Check if special params included, specifically for menu management and other models
+    public static HashMap<String,String> getSpecialParams(VitroRequest vreq) {
+    	
+    	HashMap<String,String> specialParams = new HashMap<String, String>();
+    	if(vreq != null) {
+    		//this parameter is sufficient to switch to menu model
+    		String useMenuModelParam = vreq.getParameter(DisplayVocabulary.SWITCH_TO_DISPLAY_MODEL);
+    		//the parameters below allow for using a different model
+	    	String useMainModelUri = vreq.getParameter(DisplayVocabulary.USE_MODEL_PARAM);
+	    	String useTboxModelUri = vreq.getParameter(DisplayVocabulary.USE_TBOX_MODEL_PARAM);
+	    	String useDisplayModelUri = vreq.getParameter(DisplayVocabulary.USE_DISPLAY_MODEL_PARAM);
+	    	if(useMenuModelParam != null && !useMenuModelParam.isEmpty()) {
+	    		specialParams.put(DisplayVocabulary.SWITCH_TO_DISPLAY_MODEL, useMenuModelParam);
+	    	}
+	    	else if(useMainModelUri != null && !useMainModelUri.isEmpty()) {
+	    		specialParams.put(DisplayVocabulary.USE_MODEL_PARAM, useMainModelUri);
+	    		if(useTboxModelUri != null && !useTboxModelUri.isEmpty()){ 
+	    			specialParams.put(DisplayVocabulary.USE_TBOX_MODEL_PARAM, useTboxModelUri);
+	    		}
+	    		if(useDisplayModelUri != null && !useDisplayModelUri.isEmpty()) {
+	    			specialParams.put(DisplayVocabulary.USE_DISPLAY_MODEL_PARAM, useDisplayModelUri);
+	    		}
+	    	}
+    	}
+    	return specialParams;
     }
 
 }

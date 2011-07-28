@@ -6,26 +6,34 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.RdfLiteralHash" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Portal" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
-<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 
 <%
     //org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.editDatapropStmtRequestDispatch.jsp");
     final Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.edit.editDatapropStmtRequestDispatch.jsp");
 %>
 
-<vitro:confirmLoginStatus allowSelfEditing="true" />
+<%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousPages" %>
+<% request.setAttribute("requestedActions", new UseMiscellaneousPages()); %>
+<vitro:confirmAuthorization />
 
 <%
+	//Check if special model, in which case forward
+	if(request.getParameter("switchToDisplayModel") != null) {
+		//forward to Edit Request Dispatch Controller
+		String queryString = request.getQueryString();
+		response.sendRedirect(request.getContextPath() + "/editRequestDispatch?" + queryString);
+	}
+
     // Decide which form to forward to, set subjectUri, subjectUriJson, predicateUri, predicateUriJson in request
     // Also get the Individual for the subjectUri and put it in the request scope
     // If a datapropKey is sent it as an http parameter, then set datapropKey and datapropKeyJson in request, and
@@ -40,7 +48,6 @@
       ************************************** */
 
     final String DEFAULT_DATA_FORM = "defaultDatapropForm.jsp";
-    final String DEFAULT_VITRO_NS_FORM = "defaultVitroNsDataPropForm.jsp";
     final String DEFAULT_ERROR_FORM = "error.jsp";
     
     VitroRequest vreq = new VitroRequest(request);
@@ -58,14 +65,6 @@
     String formParam    = vreq.getParameter("editForm");
     String command      = vreq.getParameter("cmd");
     
-    String vitroNsProp = (String) vreq.getParameter("vitroNsProp");
-    
-    boolean isVitroNsProp = false;
-    // On new Freemarker individual page, the editing link for rdfs:label doesn't get this url param attached
-    if ( "true".equals(vitroNsProp) || predicateUri.equals(VitroVocabulary.LABEL) ) {
-        isVitroNsProp = true;
-    }
-
     if( subjectUri == null || subjectUri.trim().length() == 0 ) {
         log.error("required subjectUri parameter missing");
         throw new Error("subjectUri was empty, it is required by editDatapropStmtRequestDispatch");
@@ -90,10 +89,12 @@
     }
     vreq.setAttribute("subject", subject);
 
-    DataProperty dataproperty = wdf.getDataPropertyDao().getDataPropertyByURI( predicateUri );
+    WebappDaoFactory unfilteredWdf = vreq.getUnfilteredWebappDaoFactory();
+    DataProperty dataproperty = unfilteredWdf.getDataPropertyDao().getDataPropertyByURI( predicateUri );
     if( dataproperty == null) {
-        // No dataproperty will be returned for a vitro ns prop, but we shouldn't throw an error.
-        if (!isVitroNsProp) {
+        // No dataproperty will be returned for rdfs:label, but we shouldn't throw an error.
+        // This is controlled by the Jena layer, so we can't change the behavior.
+        if (! predicateUri.equals(VitroVocabulary.LABEL)) {
             log.error("Could not find data property '"+predicateUri+"' in model");
             throw new Error("editDatapropStmtRequest.jsp: Could not find DataProperty in model: " + predicateUri);
         }
@@ -120,7 +121,7 @@
     DataPropertyStatement dps = null;
     if( dataHash != 0) {
         Model model = (Model)application.getAttribute("jenaOntModel");
-        dps = RdfLiteralHash.getPropertyStmtByHash(subject, predicateUri, dataHash, model, isVitroNsProp);
+        dps = RdfLiteralHash.getPropertyStmtByHash(subject, predicateUri, dataHash, model);
                               
         if (dps==null) {
             log.error("No match to existing data property \""+predicateUri+"\" statement for subject \""+subjectUri+"\" via key "+datapropKeyStr);
@@ -160,8 +161,8 @@
     if (formParam != null) {
         form = formParam;
     }   
-    else if (isVitroNsProp) {  // dataproperty is null here
-        form = DEFAULT_VITRO_NS_FORM; 
+    else if (predicateUri.equals(VitroVocabulary.LABEL)) {  // dataproperty is null here
+        form = "rdfsLabelForm.jsp"; 
     }
     else {
         form = dataproperty.getCustomEntryForm();

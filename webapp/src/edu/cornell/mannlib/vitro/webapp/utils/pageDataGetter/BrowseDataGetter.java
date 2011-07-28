@@ -19,24 +19,25 @@ import org.json.JSONObject;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.controller.JSONServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.JsonServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
-import edu.cornell.mannlib.vitro.webapp.utils.JSONtoFmModel;
+import edu.cornell.mannlib.vitro.webapp.utils.JsonToFmModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassTemplateModel;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ListedIndividualTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividual;
 
 public class BrowseDataGetter implements PageDataGetter {
     final static Log log = LogFactory.getLog(BrowseDataGetter.class);
     
     @Override
     public Map<String, Object> getData(ServletContext context,
-            VitroRequest vreq, String pageUri, Map<String, Object> page,
-            String type) {
+            VitroRequest vreq, String pageUri, Map<String, Object> page) {
         try{            
             Map params = vreq.getParameterMap();
+            
             Mode mode = getMode( vreq, params );
             switch( mode ){          
                 case VCLASS_ALPHA:
@@ -61,7 +62,10 @@ public class BrowseDataGetter implements PageDataGetter {
         return DisplayVocabulary.HOME_PAGE_TYPE;
     }
     
-
+  //Get data servuice
+    public String getDataServiceUrl() {
+    	return UrlBuilder.getUrl("/dataservice?getSolrIndividualsByVClass=1&vclassId=");
+    }
     private Map<String, Object> doClassAlphaDisplay( Map params, VitroRequest request, ServletContext context) throws Exception {
         Map<String,Object> body = new HashMap<String,Object>();
         body.putAll(getCommonValues(context, request));
@@ -77,12 +81,12 @@ public class BrowseDataGetter implements PageDataGetter {
         VClass vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(classUri);
         map.put("class", new VClassTemplateModel(vclass));
         
-        JSONObject vclassRes = JSONServlet.getLuceneIndividualsByVClass(vclass.getURI(), request, context);        
-        map.put("totalCount", JSONtoFmModel.convertJSONObjectToMap( (String) vclassRes.get("totalCount") ));
-        map.put("alpha", JSONtoFmModel.convertJSONObjectToMap( (String) vclassRes.get("alpha") ));
-        map.put("individuals", JSONtoFmModel.convertJSONArrayToList( (JSONArray) vclassRes.get("individuals") ));
-        map.put("pages", JSONtoFmModel.convertJSONArrayToList( (JSONArray) vclassRes.get("pages") ));
-        map.put("letters", JSONtoFmModel.convertJSONArrayToList( (JSONArray) vclassRes.get("letters") ));
+        JSONObject vclassRes = JsonServlet.getSolrIndividualsByVClass(vclass.getURI(), request, context);        
+        map.put("totalCount", JsonToFmModel.convertJSONObjectToMap( (String) vclassRes.get("totalCount") ));
+        map.put("alpha", JsonToFmModel.convertJSONObjectToMap( (String) vclassRes.get("alpha") ));
+        map.put("individuals", JsonToFmModel.convertJSONArrayToList( (JSONArray) vclassRes.get("individuals") ));
+        map.put("pages", JsonToFmModel.convertJSONArrayToList( (JSONArray) vclassRes.get("pages") ));
+        map.put("letters", JsonToFmModel.convertJSONArrayToList( (JSONArray) vclassRes.get("letters") ));
         
         return map;
     }
@@ -91,7 +95,7 @@ public class BrowseDataGetter implements PageDataGetter {
         Map<String,Object> values = new HashMap<String,Object>();              
                 
         VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
-        List<VClassGroup> cgList = vcgc.getGroups(vreq.getPortalId());        
+        List<VClassGroup> cgList = vcgc.getGroups();        
         LinkedList<VClassGroupTemplateModel> cgtmList = new LinkedList<VClassGroupTemplateModel>();
         for( VClassGroup classGroup : cgList){
             cgtmList.add( new VClassGroupTemplateModel( classGroup ));
@@ -141,9 +145,9 @@ public class BrowseDataGetter implements PageDataGetter {
         List<Individual> inds = vreq.getWebappDaoFactory().getIndividualDao()
             .getIndividualsByVClass(vclass);
         
-        List<ListedIndividualTemplateModel> tInds = new ArrayList<ListedIndividualTemplateModel>(inds.size());
+        List<ListedIndividual> tInds = new ArrayList<ListedIndividual>(inds.size());
         for( Individual ind : inds){
-            tInds.add(new ListedIndividualTemplateModel(ind, vreq));
+            tInds.add(new ListedIndividual(ind, vreq));
         }
         map.put("individualsInClass", tInds);
 
@@ -165,7 +169,7 @@ public class BrowseDataGetter implements PageDataGetter {
         VitroRequest vreq = new VitroRequest(request);        
         
         VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
-        VClassGroup vcg = vcgc.getGroup(vreq.getPortalId(), vcgUri);        
+        VClassGroup vcg = vcgc.getGroup(vcgUri);        
         
         ArrayList<VClassTemplateModel> classes = new ArrayList<VClassTemplateModel>(vcg.size());
         for( VClass vc : vcg){
@@ -174,7 +178,6 @@ public class BrowseDataGetter implements PageDataGetter {
         map.put("classes", classes);
         
         map.put("classGroup", new VClassGroupTemplateModel(vcg));
-        map.put("classGroupUri", vcg.getURI());
         
         return map;
     }
@@ -216,5 +219,14 @@ public class BrowseDataGetter implements PageDataGetter {
         else
             return null;
     }
+    
+    /**
+     * For processig of JSONObject
+     */
+    public JSONObject convertToJSON(Map<String, Object> dataMap, VitroRequest vreq) {
+    	JSONObject rObj = null;
+    	return rObj;
+    }
+
 
 }

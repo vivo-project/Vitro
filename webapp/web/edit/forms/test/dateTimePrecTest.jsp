@@ -13,7 +13,7 @@ This is a test file for the DateTimeWithPrecision EditElement.
 <%@ page import="java.util.HashMap"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory"%>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
@@ -40,21 +40,21 @@ This is a test file for the DateTimeWithPrecision EditElement.
 <v:jsonset var="sparqlForDxPrecision"  >
  PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
  PREFIX core: <http://vivoweb.org/ontology/core#>     
- SELECT ?dtX.precision WHERE {
+ SELECT ?dtX-precision WHERE {
     ?subject ?predicate ?object .
     ?object <core:hasDateTimeValue> ?dtX. 
     ?dtX <rdf:type>  <core:DateTimeValue> .           
-    ?dtX <core:dateTimePrecision> ?dtX.precision .            
+    ?dtX <core:dateTimePrecision> ?dtX-precision .            
 </v:jsonset>
 
 <v:jsonset var="sparqlForDxValue"  >
  PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>    
  PREFIX core: <http://vivoweb.org/ontology/core#>     
- SELECT ?dtX.value WHERE {
+ SELECT ?dtX-value WHERE {
     ?subject ?predicate ?object .
     ?object <core:hasDateTimeValue> ?dtX. 
     ?dtX <rdf:type>  <core:DateTimeValue> .    
-    ?dtX <core:dateTime> ?dtX.value .                   
+    ?dtX <core:dateTime> ?dtX-value .                   
 </v:jsonset>
 
 <v:jsonset var="n3ForEdit"  >
@@ -68,8 +68,8 @@ This is a test file for the DateTimeWithPrecision EditElement.
     ?object <core:hasDateTimeValue> ?dtX. 
     ?dtX <rdf:type>  <core:DateTimeValue> .
     
-    ?dtX <core:dateTime> ?dtX.value .    
-    ?dtX <core:dateTimePrecision> ?dtX.precision .            
+    ?dtX <core:dateTime> ?dtX-value .    
+    ?dtX <core:dateTimePrecision> ?dtX-precision .            
 </v:jsonset>
 
 <c:set var="editjson" scope="request">
@@ -92,8 +92,8 @@ This is a test file for the DateTimeWithPrecision EditElement.
     "filesOnForm"               : [ ],
     "sparqlForLiterals"         : { },
     "sparqlForUris"             : { },
-    "sparqlForExistingLiterals" : { "dtX.value": "${sparqlForDxValue}" },
-    "sparqlForExistingUris"     : { "dtX.precision": "${sparqlForDxPrecision}" },
+    "sparqlForExistingLiterals" : { "dtX-value": "${sparqlForDxValue}" },
+    "sparqlForExistingUris"     : { "dtX-precision": "${sparqlForDxPrecision}" },
     "fields" : {
         "dtX" : {
             "newResource"       : "true",

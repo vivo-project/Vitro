@@ -2,7 +2,7 @@
 
 <#-- Template for the main Site Administration page -->
 
-${stylesheets.add("/css/admin.css")}
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/admin.css" />')}
 
 <div class="tab">
     <h2>Site Administration</h2>
@@ -13,5 +13,5 @@ ${stylesheets.add("/css/admin.css")}
     <#include "siteAdmin-siteConfiguration.ftl">
     <#include "siteAdmin-ontologyEditor.ftl">
     <#include "siteAdmin-advancedDataTools.ftl">
-    <#include "siteAdmin-customReports.ftl">
+    <#include "siteAdmin-indexCacheRebuild.ftl">
 </div>

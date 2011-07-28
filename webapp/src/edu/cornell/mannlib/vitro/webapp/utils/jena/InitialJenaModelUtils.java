@@ -2,9 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.jena;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Set;
 
 import javax.servlet.ServletContext;
 
@@ -15,7 +17,11 @@ import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.rdf.model.AnonId;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -26,9 +32,9 @@ import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 
 public class InitialJenaModelUtils {
 
@@ -68,49 +74,21 @@ public class InitialJenaModelUtils {
 			ResourceUtils.renameResource(portalResource, defaultNamespace + "portal1");
 		}
 		
-		//rename tabs
-		List<AnonId> tabIds = new ArrayList<AnonId>();
-		Iterator<Resource> tabResIt = initialModel.listSubjectsWithProperty(RDF.type, initialModel.getResource(VitroVocabulary.TAB));
-		while (tabResIt.hasNext()) {
-			Resource tabRes = tabResIt.next();
-			if (tabRes.isAnon()) {
-				tabIds.add(tabRes.getId());
-			}
-		}
-		int tabIdInt = 0;
-		for (AnonId tabId : tabIds) {
-			tabIdInt++;
-			ResourceUtils.renameResource(initialModel.createResource(tabId), defaultNamespace + "tab" + tabIdInt);
-		}
-		
 		return initialModel;
 		
 	}
 	
-	public static Model basicPortalAndRootTab(String defaultNamespace) {
+	public static Model basicInterfaceData(String defaultNamespace) {
 		OntModel essentialInterfaceData = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
         Resource portalClass = essentialInterfaceData.getResource(VitroVocabulary.PORTAL);
         Property themeDirProperty = essentialInterfaceData.getProperty(VitroVocabulary.PORTAL_THEMEDIR);
-        Property flag1FilteringProperty = essentialInterfaceData.getProperty(VitroVocabulary.PORTAL_FLAG1FILTERING);
-        Resource tabClass = essentialInterfaceData.getResource(VitroVocabulary.TAB);
-        Resource primaryTabClass = essentialInterfaceData.getResource(VitroVocabulary.TAB_PRIMARYTAB);
-        Property rootTabProperty = essentialInterfaceData.getProperty(VitroVocabulary.PORTAL_ROOTTAB);
-        Property tabInPortalProperty = essentialInterfaceData.getProperty(VitroVocabulary.TAB_PORTAL);
-
         Individual portal1 = essentialInterfaceData.createIndividual(defaultNamespace+"portal1",portalClass);
-        String defaultThemeStr = Portal.DEFAULT_THEME_DIR_FROM_CONTEXT;
+        String defaultThemeStr = ApplicationBean.DEFAULT_THEME_DIR_FROM_CONTEXT;
         if (defaultThemeStr == null) {
         	throw new RuntimeException("No default theme has been set; unable to create default portal.");      	
         }
         portal1.setPropertyValue(themeDirProperty,ResourceFactory.createPlainLiteral(defaultThemeStr));
-		portal1.setPropertyValue(flag1FilteringProperty, essentialInterfaceData.createTypedLiteral(true));
-		portal1.setLabel("New Vitro Portal", null);
-		Individual rootTab = essentialInterfaceData.createIndividual(defaultNamespace+"tab1",tabClass);
-		rootTab.setLabel("Home", null);
-		rootTab.addProperty(RDF.type, primaryTabClass);
-		rootTab.addProperty(tabInPortalProperty, portal1);
-		portal1.addProperty(rootTabProperty, rootTab);
-		
+		portal1.setLabel("Vitro", null);	
 		return essentialInterfaceData;		
 	}
 	
@@ -127,6 +105,5 @@ public class InitialJenaModelUtils {
 				m.getProperty(VitroVocabulary.IN_CLASSGROUP), thingsClassGroup);
 		return m;
 	}
-	
-	
+				
 }

@@ -23,8 +23,9 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vedit.beans.ButtonForm;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -45,22 +46,15 @@ public class ClassHierarchyListingController extends BaseEditController {
 
     private VClassDao vcDao = null;
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response) {
+    @Override
+	public void doGet(HttpServletRequest request, HttpServletResponse response) {
+    	if (!isAuthorizedToDisplayPage(request, response, new Actions(new EditOntology()))) {
+    		return;
+    	}
+    	
         VitroRequest vrequest = new VitroRequest(request);
-        Portal portal = vrequest.getPortal();
 
         try {
-
-        if (!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request, response);
-        } catch (Exception e) {
-            log.error("Exception calling super.doGet() from "+this.getClass().getName()+":");
-            e.printStackTrace();
-        }
-
         boolean inferred = (vrequest.getParameter("inferred") != null);
         
         if (vrequest.getAssertionsWebappDaoFactory() != null && !inferred) {
@@ -69,7 +63,7 @@ public class ClassHierarchyListingController extends BaseEditController {
         	vcDao = vrequest.getFullWebappDaoFactory().getVClassDao();
         }
 
-        ArrayList results = new ArrayList();
+        ArrayList<String> results = new ArrayList<String>();
         results.add("XX");            // column 1
         results.add("class");         // column 2
         results.add("shortdef");      // column 3
@@ -83,7 +77,7 @@ public class ClassHierarchyListingController extends BaseEditController {
         String ontologyUri = request.getParameter("ontologyUri");
         String startClassUri = request.getParameter("vclassUri");
 
-        List roots = null;
+        List<VClass> roots = null;
 
         if (ontologyUri != null) {
             roots = vcDao.getOntologyRootClasses(ontologyUri);
@@ -144,13 +138,10 @@ public class ClassHierarchyListingController extends BaseEditController {
         request.setAttribute("columncount",NUM_COLS);
         request.setAttribute("suppressquery","true");
         request.setAttribute("title", (inferred) ? "Inferred Class Hierarchy" : "Class Hierarchy");
-        request.setAttribute("portalBean", portal);
         request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
-        request.setAttribute("home", portal.getPortalId());
         // new way of adding more than one button
         List <ButtonForm> buttons = new ArrayList<ButtonForm>();
         HashMap<String,String> newClassParams=new HashMap<String,String>();
-        newClassParams.put("home", String.valueOf(portal.getPortalId()));
         String temp;
         if ( (temp=vrequest.getParameter("ontologyUri")) != null) {
         	newClassParams.put("ontologyUri",temp);
@@ -158,7 +149,6 @@ public class ClassHierarchyListingController extends BaseEditController {
         ButtonForm newClassButton = new ButtonForm(Controllers.VCLASS_RETRY_URL,"buttonForm","Add new class",newClassParams);
         buttons.add(newClassButton);
         HashMap<String,String> allClassParams=new HashMap<String,String>();
-        allClassParams.put("home", String.valueOf(portal.getPortalId()));
         if ( (temp=vrequest.getParameter("ontologyUri")) != null) {
         	allClassParams.put("ontologyUri",temp);
         }
@@ -166,7 +156,6 @@ public class ClassHierarchyListingController extends BaseEditController {
         buttons.add(allClassButton);
         if (!inferred) {
             HashMap<String,String> inferParams=new HashMap<String,String>();
-            inferParams.put("home", String.valueOf(portal.getPortalId()));
             if ( (temp=vrequest.getParameter("ontologyUri")) != null) {
             	inferParams.put("ontologyUri",temp);
             }
@@ -175,7 +164,6 @@ public class ClassHierarchyListingController extends BaseEditController {
             buttons.add(inferButton);
         } else {
         	HashMap<String,String> inferParams=new HashMap<String,String>();
-            inferParams.put("home", String.valueOf(portal.getPortalId()));
             if ( (temp=vrequest.getParameter("ontologyUri")) != null) {
             	inferParams.put("ontologyUri",temp);
             }

@@ -16,20 +16,18 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.auth.AuthorizationHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ForwardResponseValues;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -38,7 +36,6 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
-import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
 
 /**
  * Handle adding, replacing or deleting the main image on an Individual.
@@ -50,12 +47,6 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 
 	private static final String ATTRIBUTE_REFERRING_PAGE = "ImageUploadController.referringPage";
 
-	private static final String DEFAULT_NAMESPACE = ConfigurationProperties
-			.getProperty("Vitro.defaultNamespace");
-
-	public static final String DUMMY_THUMBNAIL_PERSON_URL = "/images/placeholders/person.thumbnail.jpg"; 
-    public static final String DUMMY_THUMBNAIL_NON_PERSON_URL = "/images/placeholders/non.person.thumbnail.jpg"; 
-    
 	/** Limit file size to 6 megabytes. */
 	public static final int MAXIMUM_FILE_SIZE = 6 * 1024 * 1024;
 
@@ -71,6 +62,12 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 
 	/** The form field of the uploaded file; use as a key to the FileItem map. */
 	public static final String PARAMETER_UPLOADED_FILE = "datafile";
+
+	/**
+	 * The image to use as a placeholder when the individual has no image.
+	 * Determined by the template.
+	 */
+	public static final String PARAMETER_PLACEHOLDER_URL = "placeholder";
 
 	/** Here is the main image file. Hold on to it. */
 	public static final String ACTION_UPLOAD = "upload";
@@ -94,6 +91,9 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	public static final String BODY_DELETE_URL = "deleteUrl";
 	public static final String BODY_FORM_ACTION = "formAction";
 	public static final String BODY_ERROR_MESSAGE = "errorMessage";
+	public static final String BODY_MAX_FILE_SIZE = "maxFileSize";
+	public static final String BODY_THUMBNAIL_WIDTH = "thumbnailWidth";
+	public static final String BODY_THUMBNAIL_HEIGHT = "thumbnailHeight";
 
 	public static final String TEMPLATE_NEW = "imageUpload-newImage.ftl";
 	public static final String TEMPLATE_REPLACE = "imageUpload-replaceImage.ftl";
@@ -131,6 +131,34 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	}
 
 	/**
+	 * The required action depends on what we are trying to do.
+	 */
+	@Override
+	protected Actions requiredActions(VitroRequest vreq) {
+		try {
+			String action = vreq.getParameter(PARAMETER_ACTION);
+			Individual entity = validateEntityUri(vreq);
+			String imageUri = entity.getMainImageUri();
+
+			RequestedAction ra;
+			if (ACTION_DELETE.equals(action) || ACTION_DELETE_EDIT.equals(action)) {
+				ra = new DropObjectPropStmt(entity.getURI(),
+						VitroVocabulary.IND_MAIN_IMAGE, imageUri);
+			} else if (imageUri != null) {
+				ra = new EditObjPropStmt(entity.getURI(),
+						VitroVocabulary.IND_MAIN_IMAGE, imageUri);
+			} else {
+				ra = new AddObjectPropStmt(entity.getURI(),
+						VitroVocabulary.IND_MAIN_IMAGE,
+						RequestActionConstants.SOME_URI);
+			}
+			return new Actions(ra);
+		} catch (UserMistakeException e) {
+			return Actions.UNAUTHORIZED;
+		}
+	}
+	
+	/**
 	 * <p>
 	 * Parse the multi-part request, process the request, and produce the
 	 * output.
@@ -156,20 +184,12 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	protected ResponseValues processRequest(VitroRequest vreq) {
 		try {
 			// Parse the multi-part request.
-			FileUploadServletRequest request = FileUploadServletRequest
-					.parseRequest(vreq, MAXIMUM_FILE_SIZE);
+			FileUploadServletRequest.parseRequest(vreq, MAXIMUM_FILE_SIZE);
 			if (log.isTraceEnabled()) {
 				dumpRequestDetails(vreq);
 			}
 
-			// If they aren't authorized to do this, send them to login.
-			if (!checkAuthorized(vreq)) {
-				String loginPage = request.getContextPath() + Controllers.LOGIN;
-				return new RedirectResponseValues(loginPage);
-			}
-
 			return buildTheResponse(vreq);
-
 		} catch (Exception e) {
 			// log.error("Could not produce response page", e);
 			return new ExceptionResponseValues(e);
@@ -240,7 +260,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private ResponseValues doUploadImage(VitroRequest vreq, Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
-				vreq.getFullWebappDaoFactory());
+				vreq.getFullWebappDaoFactory(), getServletContext());
 
 		try {
 			// Did they provide a file to upload? If not, show an error.
@@ -283,7 +303,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	private ResponseValues doCreateThumbnail(VitroRequest vreq,
 			Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
-				vreq.getFullWebappDaoFactory());
+				vreq.getFullWebappDaoFactory(), getServletContext());
 
 		try {
 			CropRectangle crop = validateCropCoordinates(vreq);
@@ -305,7 +325,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private ResponseValues doDeleteImage(VitroRequest vreq, Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
-				vreq.getFullWebappDaoFactory());
+				vreq.getFullWebappDaoFactory(), getServletContext());
 
 		helper.removeExistingImage(entity);
 
@@ -318,7 +338,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private ResponseValues doDeleteThenEdit(VitroRequest vreq, Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
-				vreq.getFullWebappDaoFactory());
+				vreq.getFullWebappDaoFactory(), getServletContext());
 
 		helper.removeExistingImage(entity);
 
@@ -384,23 +404,23 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private TemplateResponseValues showAddImagePage(VitroRequest vreq,
 			Individual entity) {
+
+		String placeholderUrl = vreq.getParameter(PARAMETER_PLACEHOLDER_URL);
+
 		String formAction = (entity == null) ? "" : formAction(entity.getURI(),
-				ACTION_UPLOAD);
+				ACTION_UPLOAD, placeholderUrl);
 		String cancelUrl = (entity == null) ? "" : exitPageUrl(vreq,
 				entity.getURI());
 
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_NEW);
-		
-		// rjy7 We should not be referencing particular ontology values here, and ideally
-		// the template would add the placeholder url to the edit link, since it already
-		// knows which placeholder it's using. However, this requires a significantly more
-		// complex implementation, so keeping it simple for now.
-		String dummyThumbnailUrl = entity.isVClass("http://xmlns.com/foaf/0.1/Person") ?
-		        DUMMY_THUMBNAIL_PERSON_URL : DUMMY_THUMBNAIL_NON_PERSON_URL;
-		rv.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(dummyThumbnailUrl));
+
+		rv.put(BODY_THUMBNAIL_URL, placeholderUrl);
 		rv.put(BODY_FORM_ACTION, formAction);
 		rv.put(BODY_CANCEL_URL, cancelUrl);
 		rv.put(BODY_TITLE, "Upload image" + forName(entity));
+		rv.put(BODY_MAX_FILE_SIZE, MAXIMUM_FILE_SIZE / (1024 * 1024));
+		rv.put(BODY_THUMBNAIL_HEIGHT, THUMBNAIL_HEIGHT);
+		rv.put(BODY_THUMBNAIL_WIDTH, THUMBNAIL_WIDTH);
 		return rv;
 	}
 
@@ -417,13 +437,17 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private TemplateResponseValues showReplaceImagePage(VitroRequest vreq,
 			Individual entity, ImageInfo imageInfo) {
+		String placeholderUrl = vreq.getParameter(PARAMETER_PLACEHOLDER_URL);
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_REPLACE);
 		rv.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(imageInfo.getThumbnail()
 				.getBytestreamAliasUrl()));
-		rv.put(BODY_DELETE_URL, formAction(entity.getURI(), ACTION_DELETE_EDIT));
-		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_UPLOAD));
+		rv.put(BODY_DELETE_URL, formAction(entity.getURI(), ACTION_DELETE_EDIT, placeholderUrl));
+		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_UPLOAD, placeholderUrl));
 		rv.put(BODY_CANCEL_URL, exitPageUrl(vreq, entity.getURI()));
 		rv.put(BODY_TITLE, "Replace image" + forName(entity));
+		rv.put(BODY_MAX_FILE_SIZE, MAXIMUM_FILE_SIZE / (1024 * 1024));
+		rv.put(BODY_THUMBNAIL_HEIGHT, THUMBNAIL_HEIGHT);
+		rv.put(BODY_THUMBNAIL_WIDTH, THUMBNAIL_WIDTH);
 		return rv;
 	}
 
@@ -444,11 +468,12 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private TemplateResponseValues showCropImagePage(VitroRequest vreq,
 			Individual entity, String imageUrl, Dimensions dimensions) {
+		String placeholderUrl = vreq.getParameter(PARAMETER_PLACEHOLDER_URL);
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_CROP);
 		rv.put(BODY_MAIN_IMAGE_URL, UrlBuilder.getUrl(imageUrl));
 		rv.put(BODY_MAIN_IMAGE_HEIGHT, dimensions.height);
 		rv.put(BODY_MAIN_IMAGE_WIDTH, dimensions.width);
-		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_SAVE));
+		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_SAVE, placeholderUrl));
 		rv.put(BODY_CANCEL_URL, exitPageUrl(vreq, entity.getURI()));
 		rv.put(BODY_TITLE, "Crop Photo" + forName(entity));
 		return rv;
@@ -465,7 +490,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	/**
 	 * When we complete the process, by success or by cancellation, go to the
 	 * initial referring page. If there wasn't one, go to the individual display
-	 * page,
+	 * page.
 	 */
 	private String exitPageUrl(VitroRequest vreq, String entityUri) {
 		String referrer = (String) vreq.getSession().getAttribute(
@@ -474,12 +499,13 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 			return referrer;
 		}
 
-		if (DEFAULT_NAMESPACE == null) {
+		String defaultNamespace = getDefaultNamespace();
+		if (defaultNamespace == null) {
 			return "";
-		} else if (!entityUri.startsWith(DEFAULT_NAMESPACE)) {
+		} else if (!entityUri.startsWith(defaultNamespace)) {
 			return "";
 		} else {
-			String tail = entityUri.substring(DEFAULT_NAMESPACE.length());
+			String tail = entityUri.substring(defaultNamespace.length());
 			if (!tail.startsWith("/")) {
 				tail = "/" + tail;
 			}
@@ -492,9 +518,11 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 * back to this controller, along with the desired action and the Entity
 	 * URI.
 	 */
-	private String formAction(String entityUri, String action) {
-		UrlBuilder.ParamMap params = new UrlBuilder.ParamMap(
-				PARAMETER_ENTITY_URI, entityUri, PARAMETER_ACTION, action);
+	private String formAction(String entityUri, String action,
+			String placeholderUrl) {
+		ParamMap params = new ParamMap(
+				PARAMETER_ENTITY_URI, entityUri, PARAMETER_ACTION, action,
+				PARAMETER_PLACEHOLDER_URL, placeholderUrl);
 		return UrlBuilder.getPath(URL_HERE, params);
 	}
 
@@ -523,13 +551,13 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	/**
 	 * Holds the coordinates that we use to crop the main image.
 	 */
-	static class CropRectangle {
-		final int x;
-		final int y;
-		final int height;
-		final int width;
+	public static class CropRectangle {
+		public final int x;
+		public final int y;
+		public final int height;
+		public final int width;
 
-		CropRectangle(int x, int y, int height, int width) {
+		public CropRectangle(int x, int y, int height, int width) {
 			this.x = x;
 			this.y = y;
 			this.height = height;
@@ -593,49 +621,8 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 		}
 	}
 
-	/**
-	 * If they are logged in as an Editor or better, they can do whatever they
-	 * want.
-	 * 
-	 * Otherwise, they will need to be self-editing, and will need to have
-	 * authorization for this specific operation they are requesting.
-	 */
-	private boolean checkAuthorized(VitroRequest vreq)
-			throws UserMistakeException {
-		if (LoginStatusBean.getBean(vreq).isLoggedInAtLeast(
-				LoginStatusBean.EDITOR)) {
-			log.debug("Authorized because logged in as Editor");
-			return true;
-		}
-
-		if (!VitroRequestPrep.isSelfEditing(vreq)) {
-			log.debug("Not Authorized because not self-editing");
-			return false;
-		}
-
-		String action = vreq.getParameter(PARAMETER_ACTION);
-		Individual entity = validateEntityUri(vreq);
-		String imageUri = entity.getMainImageUri();
-
-		// What are we trying to do? Check if authorized.
-		RequestedAction ra;
-		if (ACTION_DELETE.equals(action) || ACTION_DELETE_EDIT.equals(action)) {
-			ra = new DropObjectPropStmt(entity.getURI(),
-					VitroVocabulary.IND_MAIN_IMAGE, imageUri);
-		} else if (imageUri != null) {
-			ra = new EditObjPropStmt(entity.getURI(),
-					VitroVocabulary.IND_MAIN_IMAGE, imageUri);
-		} else {
-			ra = new AddDataPropStmt(entity.getURI(),
-					VitroVocabulary.IND_MAIN_IMAGE,
-					RequestActionConstants.SOME_LITERAL, null, null);
-		}
-
-		AuthorizationHelper helper = new AuthorizationHelper(vreq);
-		boolean authorized = helper.isAuthorizedForRequestedAction(ra);
-		log.debug((authorized ? "" : "Not ") + "Authorized for '" + action
-				+ "' as self-editor;  requested action = " + ra);
-		return authorized;
+	private String getDefaultNamespace() {
+		return ConfigurationProperties.getBean(getServletContext())
+				.getProperty("Vitro.defaultNamespace");
 	}
-
 }

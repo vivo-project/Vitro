@@ -22,16 +22,16 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.ButtonForm;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
-import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 
 public class ObjectPropertyHierarchyListingController extends BaseEditController {
 
@@ -44,26 +44,20 @@ public class ObjectPropertyHierarchyListingController extends BaseEditController
     private VClassDao vcDao = null;
     private PropertyGroupDao pgDao = null;
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response) {
+    @Override
+	public void doGet(HttpServletRequest request, HttpServletResponse response) {
+    	if (!isAuthorizedToDisplayPage(request, response, new Actions(new EditOntology()))) {
+    		return;
+    	}
+    	
         VitroRequest vrequest = new VitroRequest(request);
-        Portal portal = vrequest.getPortal();
         try {
-
-        if (!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request, response);
-        } catch (Exception e) {
-            log.error("Exception calling super.doGet() from "+this.getClass().getName()+":");
-            e.printStackTrace();
-        }
 
         opDao = vrequest.getAssertionsWebappDaoFactory().getObjectPropertyDao();
         vcDao = vrequest.getAssertionsWebappDaoFactory().getVClassDao();
         pgDao = vrequest.getAssertionsWebappDaoFactory().getPropertyGroupDao();
 
-        ArrayList results = new ArrayList();
+        ArrayList<String> results = new ArrayList<String>();
         results.add("XX");            // column 1
         results.add("property");      // column 2
         results.add("domain vclass"); // column 3
@@ -77,7 +71,7 @@ public class ObjectPropertyHierarchyListingController extends BaseEditController
         String ontologyUri = request.getParameter("ontologyUri");
         String startPropertyUri = request.getParameter("propertyUri");
 
-        List roots = null;
+        List<ObjectProperty> roots = null;
 
         if (startPropertyUri != null) {
         	roots = new LinkedList<ObjectProperty>();
@@ -90,7 +84,7 @@ public class ObjectPropertyHierarchyListingController extends BaseEditController
         }
 
         if (roots!=null) {
-            Iterator rootIt = roots.iterator();
+            Iterator<ObjectProperty> rootIt = roots.iterator();
             if (!rootIt.hasNext()) {
                 ObjectProperty op = new ObjectProperty();
                 op.setURI(ontologyUri+"fake");
@@ -99,7 +93,7 @@ public class ObjectPropertyHierarchyListingController extends BaseEditController
                 results.addAll(addObjectPropertyDataToResultsList(op,0,ontologyUri));
             } else {
                 while (rootIt.hasNext()) {
-                    ObjectProperty root = (ObjectProperty) rootIt.next();
+                    ObjectProperty root = rootIt.next();
                     if ( (ontologyUri==null) || ( (ontologyUri!=null) && (root.getNamespace()!=null) && (ontologyUri.equals(root.getNamespace())) ) ) {
                     	ArrayList childResults = new ArrayList();
                     	addChildren(root, childResults, 0, ontologyUri);
@@ -113,19 +107,15 @@ public class ObjectPropertyHierarchyListingController extends BaseEditController
         request.setAttribute("columncount",NUM_COLS);
         request.setAttribute("suppressquery","true");
         request.setAttribute("title", "Object Property Hierarchy");
-        request.setAttribute("portalBean", portal);
         request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
-        request.setAttribute("home", portal.getPortalId());
         
         // new way of adding more than one button
         List <ButtonForm> buttons = new ArrayList<ButtonForm>();
         HashMap<String,String> newPropParams=new HashMap<String,String>();
         newPropParams.put("controller", "Property");
-        newPropParams.put("home", String.valueOf(portal.getPortalId()));
         ButtonForm newPropButton = new ButtonForm(Controllers.RETRY_URL,"buttonForm","Add new object property",newPropParams);
         buttons.add(newPropButton);
         HashMap<String,String> allPropParams=new HashMap<String,String>();
-        allPropParams.put("home", String.valueOf(portal.getPortalId()));
         String temp;
         if ( (temp=vrequest.getParameter("ontologyUri")) != null) {
         	allPropParams.put("ontologyUri",temp);

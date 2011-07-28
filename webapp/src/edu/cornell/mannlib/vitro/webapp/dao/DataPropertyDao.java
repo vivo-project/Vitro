@@ -10,9 +10,9 @@ import java.util.Collection;
 
 public interface DataPropertyDao extends PropertyDao {
 
-    public abstract List /*of DataProperty */ getAllDataProperties();
+    public abstract List<DataProperty> getAllDataProperties();
 
-    public abstract List /*of DataProperty */ getAllExternalIdDataProperties();
+    public abstract List<DataProperty> getAllExternalIdDataProperties();
 
     void fillDataPropertiesForIndividual(Individual individual);
 

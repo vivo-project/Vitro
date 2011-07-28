@@ -2,12 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.beans;
 
-import javax.servlet.http.HttpServletRequest;
-
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.flags.PortalFlag;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
 
 public interface VitroQueryFactory {
-    public VitroQuery getQuery(VitroRequest req, PortalFlag portalState)throws SearchException;
+    public VitroQuery getQuery(VitroRequest req) throws SearchException;
 }

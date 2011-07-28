@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -23,8 +24,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LogoutRedirector;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 
 public class VitroHttpServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -39,10 +44,30 @@ public class VitroHttpServlet extends HttpServlet {
 	public final static String HTML_MIMETYPE = "text/html";
 
 	public final static String RDFXML_MIMETYPE = "application/rdf+xml";
-	public final static String N3_MIMETYPE = "text/n3"; // unofficial and
-														// unregistered
-	public final static String TTL_MIMETYPE = "text/turtle"; // unofficial and
-																// unregistered
+	public final static String N3_MIMETYPE = "text/n3"; // unofficial and unregistered
+	public final static String TTL_MIMETYPE = "text/turtle"; // unofficial and unregistered
+
+	@Override
+	public final void service(ServletRequest req, ServletResponse resp)
+			throws ServletException, IOException {
+		if ((req instanceof HttpServletRequest)
+				&& (resp instanceof HttpServletResponse)) {
+			HttpServletRequest hreq = (HttpServletRequest) req;
+			HttpServletResponse hresp = (HttpServletResponse) resp;
+
+			if (log.isTraceEnabled()) {
+				dumpRequestHeaders(hreq);
+			}
+
+			// check to see if VitroRequestPrep filter was run
+			if (hreq.getAttribute("appBean") == null
+					|| hreq.getAttribute("webappDaoFactory") == null) {
+				log.warn("request scope was not prepared by VitroRequestPrep");
+			}
+		}
+
+		super.service(req, resp);
+	}
 
 	/**
 	 * Show this to the user if they are logged in, but still not authorized to
@@ -54,22 +79,12 @@ public class VitroHttpServlet extends HttpServlet {
 			+ "please contact us and we'll be happy to help.";
 
 	/**
-	 * Setup the auth flag, portal flag and portal bean objects. Put them in the
-	 * request attributes.
+	 * doGet does nothing.
 	 */
 	@Override
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		setup(request);
-	}
-
-	protected final void setup(HttpServletRequest request) {
-
-		// check to see if VitroRequestPrep filter was run
-		if (request.getAttribute("appBean") == null
-				|| request.getAttribute("webappDaoFactory") == null) {
-			log.warn("request scope was not prepared by VitroRequestPrep");
-		}
+		// nothing to do
 	}
 
 	/**
@@ -81,53 +96,58 @@ public class VitroHttpServlet extends HttpServlet {
 		doGet(request, response);
 	}
 
+	/**
+	 * Don't display a page that the user isn't authorized to see.
+	 * 
+	 * @param actions
+	 *            the RequestedActions that must be authorized.
+	 */
+	protected boolean isAuthorizedToDisplayPage(HttpServletRequest request,
+			HttpServletResponse response, RequestedAction... actions) {
+		return isAuthorizedToDisplayPage(request, response,
+				new Actions(Arrays.asList(actions)));
+	}
+
+	/**
+	 * Don't display a page that the user isn't authorized to see.
+	 * 
+	 * @param actions
+	 *            the combination of RequestedActions that must be authorized.
+	 */
+	protected boolean isAuthorizedToDisplayPage(HttpServletRequest request,
+			HttpServletResponse response, Actions actions) {
+		// Record restricted pages so we won't return to them on logout
+		if (!actions.isEmpty()) {
+			LogoutRedirector.recordRestrictedPageUri(request);
+		}
+
+		if (PolicyHelper.isAuthorizedForActions(request, actions)) {
+			log.debug("Servlet '" + this.getClass().getSimpleName()
+					+ "' is authorized for actions: " + actions);
+			return true;
+		}
+
+		log.debug("Servlet '" + this.getClass().getSimpleName()
+				+ "' is not authorized for actions: " + actions);
+		redirectUnauthorizedRequest(request, response);
+		return false;
+	}
+
 	// ----------------------------------------------------------------------
 	// static utility methods for all Vitro servlets
 	// ----------------------------------------------------------------------
 
-	/**
-	 * If not logged in, redirect them to the login page.
-	 */
-	public static boolean checkLoginStatus(HttpServletRequest request,
+	public static void redirectUnauthorizedRequest(HttpServletRequest request,
 			HttpServletResponse response) {
-		LogoutRedirector.recordRestrictedPageUri(request);
 		if (LoginStatusBean.getBean(request).isLoggedIn()) {
-			log.trace("Logged in. No minimum level.");
-			return true;
-		} else {
-			log.trace("Not logged in. No minimum level.");
-			redirectToLoginPage(request, response);
-			return false;
-		}
-	}
-
-	/**
-	 * If not logged in at the required level, redirect them to the appropriate
-	 * page.
-	 */
-	public static boolean checkLoginStatus(HttpServletRequest request,
-			HttpServletResponse response, int minimumLevel) {
-		LogoutRedirector.recordRestrictedPageUri(request);
-		LoginStatusBean statusBean = LoginStatusBean.getBean(request);
-		if (statusBean.isLoggedInAtLeast(minimumLevel)) {
-			log.trace("Security level " + statusBean.getSecurityLevel()
-					+ " is sufficient for minimum of " + minimumLevel);
-			return true;
-		} else if (statusBean.isLoggedIn()) {
-			log.trace("Security level " + statusBean.getSecurityLevel()
-					+ " is insufficient for minimum of " + minimumLevel);
 			redirectToInsufficientAuthorizationPage(request, response);
-			return false;
 		} else {
-			log.trace("Not logged in; not sufficient for minimum of "
-					+ minimumLevel);
 			redirectToLoginPage(request, response);
-			return false;
 		}
 	}
-
+	
 	/**
-	 * Logged in, but with insufficent authorization. Send them to the home page
+	 * Logged in, but with insufficient authorization. Send them to the home page
 	 * with a message. They won't be coming back.
 	 */
 	public static void redirectToInsufficientAuthorizationPage(
@@ -163,7 +183,8 @@ public class VitroHttpServlet extends HttpServlet {
 		if ((queryString == null) || queryString.isEmpty()) {
 			return request.getRequestURI();
 		} else {
-			return request.getRequestURI() + "?" + queryString;
+			return request.getRequestURI() + "?"
+					+ UrlBuilder.urlEncode(queryString);
 		}
 	}
 
@@ -180,27 +201,22 @@ public class VitroHttpServlet extends HttpServlet {
 	}
 
 	/**
-	 * If logging is set to the TRACE level, dump the HTTP headers on the
-	 * request.
+	 * If logging on the subclass is set to the TRACE level, dump the HTTP
+	 * headers on the request.
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public void service(ServletRequest req, ServletResponse resp)
-			throws ServletException, IOException {
-		if (log.isTraceEnabled()) {
-			HttpServletRequest request = (HttpServletRequest) req;
-			Enumeration<String> names = request.getHeaderNames();
-			log.trace("----------------------request:"
-					+ request.getRequestURL());
-			while (names.hasMoreElements()) {
-				String name = names.nextElement();
-				if (!BORING_HEADERS.contains(name)) {
-					log.trace(name + "=" + request.getHeader(name));
-				}
+	private void dumpRequestHeaders(HttpServletRequest req) {
+		@SuppressWarnings("unchecked")
+		Enumeration<String> names = req.getHeaderNames();
+
+		Log subclassLog = LogFactory.getLog(this.getClass());
+		subclassLog.trace("----------------------request:"
+				+ req.getRequestURL());
+		while (names.hasMoreElements()) {
+			String name = names.nextElement();
+			if (!BORING_HEADERS.contains(name)) {
+				subclassLog.trace(name + "=" + req.getHeader(name));
 			}
 		}
-
-		super.service(req, resp);
 	}
 
 	/** Don't dump the contents of these headers, even if log.trace is enabled. */
@@ -209,4 +225,19 @@ public class VitroHttpServlet extends HttpServlet {
 					"accept-language", "accept-encoding", "accept-charset",
 					"keep-alive", "connection" }));
 
+	/**
+	 * A child class may call this if logging is set to debug level.
+	 */
+	protected void dumpRequestParameters(HttpServletRequest req) {
+		Log subclassLog = LogFactory.getLog(this.getClass());
+		
+		@SuppressWarnings("unchecked")
+		Map<String, String[]> map = req.getParameterMap();
+		
+		for (String key : map.keySet()) {
+			String[] values = map.get(key);
+			subclassLog.debug("Parameter '" + key + "' = "
+					+ Arrays.deepToString(values));
+		}
+	}
 }

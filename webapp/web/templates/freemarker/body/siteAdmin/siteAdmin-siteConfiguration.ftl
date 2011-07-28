@@ -2,29 +2,27 @@
 
 <#-- Template for Site Administration site configuration panel -->
 
-<#if siteConfig??>
-    <div class="pageBodyGroup">
-        
+<#if siteConfig?has_content>
+    <section class="pageBodyGroup">
         <h3>Site Configuration</h3>
         
         <ul>
-            <#if siteConfig.urls.portals??>
-                <li><a href="${siteConfig.urls.siteInfo}">Current portal information</a></li>
-                <li><a href="${siteConfig.urls.portals}">List all portals</a></li>
-            <#else>
-                <li><a href="${siteConfig.urls.siteInfo}">Site information</a></li>
+            <#if siteConfig.siteInfo?has_content>
+                <li><a href="${siteConfig.siteInfo}">Site information</a></li>
             </#if>
             
-            <#if siteConfig.urls.menuN3Editor??>
-                <li><a href="${siteConfig.urls.menuN3Editor}">Menu management</a></li>  
+            <#if siteConfig.menuManagement?has_content>
+                <li><a href="${siteConfig.menuManagement}">Menu management</a></li>
             </#if>
             
-            <li><a href="${siteConfig.urls.tabs}">Tab management</a></li>
-            
-            <#if siteConfig.urls.users??>
-                <li><a href="${siteConfig.urls.users}">User accounts</a></li>  
+            <#if siteConfig.internalClass?has_content>
+                <li><a href="${siteConfig.internalClass}">Institutional internal class</a></li>
+
             </#if>
             
+            <#if siteConfig.userAccounts?has_content>
+                <li><a href="${siteConfig.userAccounts}">User accounts</a></li>
+            </#if>           
         </ul>
-    </div>
+    </section>
 </#if>

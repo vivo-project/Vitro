@@ -19,7 +19,7 @@ public class MainMenu extends Menu {
     
     protected VitroRequest vreq;
     
-    public MainMenu(){ }
+    public MainMenu() { }
     
     public MainMenu(VitroRequest vreq) {
         this.vreq = vreq;

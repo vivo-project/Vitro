@@ -7,10 +7,21 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+
+import org.json.JSONObject;
 
 public interface PageDataGetter{
-    Map<String,Object> getData(ServletContext contect, VitroRequest vreq, String pageUri, Map<String, Object> page, String type );
+    Map<String,Object> getData(ServletContext contect, VitroRequest vreq, String pageUri, Map<String, Object> page );
     
     /** Gets the type that this class applies to */
+    //This has been changed to return the class name for data getter used in menu management
     String getType();
+    
+    //get data service url based on data getter requirements
+  //Get data servuice
+    String getDataServiceUrl();
+    
+    /**Convert data to JSONObject based on what's required for the data processing**/
+   JSONObject convertToJSON(Map<String, Object> map, VitroRequest vreq);
 }

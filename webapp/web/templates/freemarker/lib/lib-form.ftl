@@ -5,9 +5,9 @@
 <#-- 
     Macro: optionGroups
     
-    Output a sequence of option groups with options.
+    Output: a sequence of option groups with options.
     
-    Input is a map of option groups to lists of Option objects.
+    Input: a map of option groups to lists of Option objects.
     
     Usage: <@optionGroups groups=myOptionGroups />
 -->
@@ -24,9 +24,9 @@
 <#-- 
     Macro: options
     
-    Output a sequence of options.
+    Output: a sequence of options.
     
-    Input is a list of Option objects.
+    Input: a list of Option objects.
     
     Usage: <@options opts=myOptions />
 -->
@@ -37,3 +37,20 @@
 </#macro>
 
 <#---------------------------------------------------------------------------->
+
+<#-- 
+    Macro: hiddenInputs
+    
+    Output hidden inputs from a map of names to values.
+    
+    Input: a map of strings (names) to strings (values). May be null.
+    
+    Usage: <@hiddenInputs inputs />
+-->
+<#macro hiddenInputs inputs="">
+    <#if inputs?has_content>
+        <#list inputs?keys as name>
+            <input type="hidden" name="${name}" value="${inputs[name]}" />
+        </#list>
+    </#if>
+</#macro>

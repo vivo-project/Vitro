@@ -5,8 +5,10 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -31,8 +33,6 @@ import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.rdf.model.Literal;
@@ -119,10 +119,10 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     protected String getPropertyStringValue(OntResource res, Property dataprop) {
         if (dataprop != null) {
             try {
-                ClosableIterator stateIt = res.getModel().listStatements(res,dataprop,(Literal)null);
+                ClosableIterator<Statement> stateIt = res.getModel().listStatements(res,dataprop,(Literal)null);
                 try {
                     if (stateIt.hasNext())
-                        return ((Literal)((Statement)stateIt.next()).getObject()).getString();
+                        return ((Literal)stateIt.next().getObject()).getString();
                     else
                         return null;
                 } finally {
@@ -260,6 +260,16 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         }
     }
 
+	/**
+	 * convenience method
+	 */
+	protected void addPropertyLongValue(Resource res, Property dataprop,
+			long value, Model model) {
+		if (dataprop != null) {
+			model.add(res, dataprop, Long.toString(value), XSDDatatype.XSDlong);
+		}
+	}
+	
     /**
      * convenience method for use with functional datatype properties
      */
@@ -318,6 +328,48 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 
     	updatePropertyIntValue(res,dataprop,value,model);
         
+    }
+
+	/**
+	 * convenience method for use with functional datatype properties
+	 */
+	protected void updatePropertyLongValue(Resource res, Property dataprop,
+			Long value, Model model) {
+		
+		if (dataprop != null) {
+			Long existingValue = null;
+			Statement stmt = res.getProperty(dataprop);
+			if (stmt != null) {
+				RDFNode object = stmt.getObject();
+				if (object != null && object.isLiteral()) {
+					existingValue = ((Literal) object).getLong();
+				}
+			}
+			
+			if (existingValue == null) {
+				model.add(res, dataprop, value.toString(),
+						XSDDatatype.XSDlong);
+			} else if (existingValue.longValue() != value) {
+				model.removeAll(res, dataprop, null);
+				model.add(res, dataprop, value.toString(),
+						XSDDatatype.XSDlong);
+			}
+		}
+	}
+	
+    /**
+     * convenience method
+     */
+    protected long getPropertyLongValue(OntResource res, Property dataprop) {
+        if (dataprop != null) {
+            try {
+                return ((Literal)res.getPropertyValue(dataprop)).getLong();
+            } catch (Exception e) {
+                return -1L;
+            }
+        } else {
+            return -1L;
+        }
     }
 
     /**
@@ -441,9 +493,6 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 
     /**
      * convenience method
-     * @param ind
-     * @param dataprop
-     * @param value
      */
     protected synchronized void addPropertyDateTimeValue(Resource res, Property dataprop, Date value, Model model) {
         if (dataprop != null && value != null) {
@@ -479,6 +528,28 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         }
     }
 
+    /**
+     * convenience method for use with functional object properties
+     */
+    protected Collection<String> getPropertyResourceURIValues(Resource res, ObjectProperty prop) {
+    	List<String> list = new ArrayList<String>();
+    	if (prop != null) {
+    		try {
+    			ClosableIterator<Statement> stateIt = res.getModel().listStatements(res,prop,(Literal)null);
+    			try {
+    				while(stateIt.hasNext()) {
+    					list.add(stateIt.next().getObject().asResource().getURI());
+    				}
+    			} finally {
+    				stateIt.close();
+    			}
+    		} catch (Exception e) {
+    			log.debug("can't get object property URI values: ", e);
+    		}
+    	}
+    	return list;
+    }
+    
     /**
      * convenience method for use with functional object properties
      */
@@ -590,6 +661,59 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         }
     }
     
+	/**
+	 * convenience method to update the value(s) of a one-to-many object
+	 * property
+	 * 
+	 * NOTE: this should be run from within a CriticalSection(WRITE)
+	 */
+	protected void updatePropertyResourceURIValues(Resource res, Property prop,
+			Collection<String> uris, Model model) {
+		log.debug("updatePropertyResourceURIValues(), resource="
+				+ (res == null ? "null" : res.getURI()) + ", property="
+				+ (prop == null ? "null" : prop.getURI()) + ", uris=" + uris);
+
+		if ((res == null) || (prop == null)) {
+			return;
+		}
+
+		// figure existing URIs
+		Set<String> existingUris = new HashSet<String>();
+		StmtIterator stmts = model.listStatements(res, prop, (RDFNode) null);
+		while (stmts.hasNext()) {
+			Statement stmt = stmts.next();
+			RDFNode o = stmt.getObject();
+			if (o instanceof Resource) {
+				existingUris.add(((Resource) o).getURI());
+			}
+		}
+
+		// figure which to add and which to remove
+		Set<String> addingUris = new HashSet<String>(uris);
+		addingUris.removeAll(existingUris);
+		Set<String> removingUris = new HashSet<String>(existingUris);
+		removingUris.removeAll(uris);
+
+		// for each to remove, remove it.
+		for (String removeUri : removingUris) {
+			Resource o = model.getResource(removeUri);
+			model.remove(res, prop, o);
+		}
+
+		// for each to add, add it, unless it is null, empty, or invalid.
+		for (String addUri : addingUris) {
+			if ((addUri != null) && (!addUri.isEmpty())) {
+				String badUriErrorStr = checkURI(addUri);
+				if (badUriErrorStr == null) {
+					Resource o = model.getResource(addUri);
+					model.add(res, prop, o);
+				} else {
+					log.warn(badUriErrorStr);
+				}
+			}
+		}
+	}
+
     /**
      * convenience method for updating the RDFS label
      */
@@ -607,7 +731,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     	}
     }
     
-    private String getLabel(String lang, List<RDFNode>labelList) {
+    private Literal getLabel(String lang, List<RDFNode>labelList) {
     	Iterator<RDFNode> labelIt = labelList.iterator();
     	while (labelIt.hasNext()) {
     		RDFNode label = labelIt.next();
@@ -615,10 +739,10 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     			Literal labelLit = ((Literal)label);
     			String labelLanguage = labelLit.getLanguage();
     			if ( (labelLanguage==null) && (lang==null) ) {
-    				return labelLit.getLexicalForm();
+    				return labelLit;
     			}
     			if ( (lang != null) && (lang.equals(labelLanguage)) ) {
-    				return labelLit.getLexicalForm();
+    				return labelLit;
     			}
     		}
     	}
@@ -644,26 +768,39 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         return label;
     }
     
+    protected String getLabel(OntResource r){
+        String label = null;
+        Literal labelLiteral = getLabelLiteral(r);
+        if (labelLiteral != null) {
+            label = labelLiteral.getLexicalForm();
+        }
+        return label;
+    }
+    
+    protected Literal getLabelLiteral(String individualUri) {
+        OntResource resource = webappDaoFactory.getOntModel().createOntResource(individualUri);
+        return getLabelLiteral(resource);
+    }
+
     /**
      * works through list of PREFERRED_LANGUAGES to find an appropriate 
      * label, or NULL if not found.  
      */
-    protected String getLabel(OntResource r){
-        String label = null;
+    protected Literal getLabelLiteral(OntResource r) {
+        Literal labelLiteral = null;
         r.getOntModel().enterCriticalSection(Lock.READ);
         try {            
             // try rdfs:label with preferred languages
-            label = tryPropertyForPreferredLanguages( r, RDFS.label, ALSO_TRY_NO_LANG );
-            
+            labelLiteral = tryPropertyForPreferredLanguages( r, RDFS.label, ALSO_TRY_NO_LANG );
             // try vitro:label with preferred languages
             // Commenting out for NIHVIVO-1962
            /* if ( label == null ) {
-                label = tryPropertyForPreferredLanguages( r, r.getModel().getProperty(VitroVocabulary.label), ALSO_TRY_NO_LANG );
-            }   */                           
+                labelLiteral = tryPropertyForPreferredLanguages( r, r.getModel().getProperty(VitroVocabulary.label), ALSO_TRY_NO_LANG );
+            }   */          
         } finally {
             r.getOntModel().leaveCriticalSection();
         }
-        return label;
+        return labelLiteral;        
     }
     
     /**
@@ -687,9 +824,24 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         return label;
     }
     
-    private String tryPropertyForPreferredLanguages( OntResource r, Property p, boolean alsoTryNoLang ) {
-    	String label = null;
-	    List<RDFNode> labels = (List<RDFNode>) r.listPropertyValues(p).toList();
+    private Literal tryPropertyForPreferredLanguages( OntResource r, Property p, boolean alsoTryNoLang ) {
+    	Literal label = null;
+	    List<RDFNode> labels = r.listPropertyValues(p).toList();
+
+	    // Sort by lexical value to guarantee consistent results
+	    Collections.sort(labels, new Comparator<RDFNode>() {
+	        public int compare(RDFNode left, RDFNode right) {
+	            if (left == null) {
+	                return (right == null) ? 0 : -1;
+	            }
+	            if ( left.isLiteral() && right.isLiteral()) {
+	                return ((Literal) left).getLexicalForm().compareTo(((Literal) right).getLexicalForm());
+	            } 
+	            // Can't sort meaningfully if both are not literals
+	            return 0;	            
+	        }
+	    });
+	    
 	    for (int i=0; i<PREFERRED_LANGUAGES.length; i++) {
 	    	String lang = PREFERRED_LANGUAGES[i];
 	    	label = getLabel(lang,labels);

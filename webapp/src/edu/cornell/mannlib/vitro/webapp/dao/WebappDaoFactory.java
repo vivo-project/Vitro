@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -111,21 +110,8 @@ public interface WebappDaoFactory {
     /* ======================== DAOs for other objects ======================== */
 
     public ApplicationDao getApplicationDao();
-    public PortalDao getPortalDao();
 
-    public TabDao getTabDao();
-    public TabIndividualRelationDao getTabs2EntsDao();
-    public TabVClassRelationDao getTabs2TypesDao();
-
-    public KeywordIndividualRelationDao getKeys2EntsDao();
-    public KeywordDao getKeywordDao();
-
-    public LinksDao getLinksDao();
-    public LinktypeDao getLinktypeDao();
-
-    public FlagDao getFlagDao();
-
-    public UserDao getUserDao();
+    public UserAccountsDao getUserAccountsDao();
 
     public VClassGroupDao getVClassGroupDao();
 

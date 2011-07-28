@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
+import javax.servlet.ServletContext;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -112,10 +114,10 @@ public class FileStorageUpdater implements FSUController {
 
 	public FileStorageUpdater(WebappDaoFactory wadf, Model model,
 			FileStorage fileStorage, File uploadDirectory,
-			File webappImageDirectory) {
+			File webappImageDirectory, ServletContext ctx) {
 		this.model = model;
 		this.fileStorage = fileStorage;
-		this.uploadedFileHelper = new UploadedFileHelper(fileStorage, wadf);
+		this.uploadedFileHelper = new UploadedFileHelper(fileStorage, wadf, ctx);
 		this.upgradeDirectory = new File(uploadDirectory, "upgrade");
 
 		this.imageDirectoryWithBackup = new ImageDirectoryWithBackup(new File(

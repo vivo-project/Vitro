@@ -4,7 +4,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ page import="javax.servlet.ServletException" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest"%>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Portal"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean"%>
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
@@ -12,10 +11,9 @@
   public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.templates.page.headContent.jsp");
 %>
 <%
-  VitroRequest vreq = new VitroRequest(request);  
-  Portal portal = vreq.getPortal();
-  
-  String themeDir = portal != null ? portal.getThemeDir() : Portal.DEFAULT_THEME_DIR_FROM_CONTEXT;
+  VitroRequest vreq = new VitroRequest(request); 
+
+  String themeDir = vreq.getAppBean().getThemeDir();
   themeDir = vreq.getContextPath() + '/' + themeDir;   
 %>
 

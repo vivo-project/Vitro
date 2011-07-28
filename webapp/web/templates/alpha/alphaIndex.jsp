@@ -2,7 +2,6 @@
 
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Portal" %>
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %><%/* this odd thing points to something in web.xml */ %>
 <%@ page errorPage="/error.jsp"%>
 <%  /***********************************************
@@ -18,23 +17,9 @@
         put something like this in for debuggin: < % =  MiscWebUtils.getReqInfo(request) % >
          bdc34 2006-02-06
         **********************************************/
-        
-        /***************************************************
-        nac26 2008-05-09 following brian's lead from menu.jsp to get the portalId so it can be added to the alpha index links */
-        final Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.web.alphaIndex.jsp");
-
-        Portal portal = (Portal)request.getAttribute("portalBean");
-        int portalId = -1;
-        if (portal==null) {
-            log.error("Attribute 'portalBean' missing or null; portalId defaulted to 1");
-            portalId=1;
-        } else {
-            portalId=portal.getPortalId();
-        }
-        /**************************************************/
+       
 %>
 
-<c:set var="portalId" value="<%=portalId%>" />
 <c:if test="${ requestScope.showAlpha == 1 }">
 <div class='alphaIndex'>
     <c:forEach items='${requestScope.letters}' var='letter'>

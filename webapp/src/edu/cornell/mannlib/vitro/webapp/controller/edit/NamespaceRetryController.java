@@ -16,9 +16,9 @@ import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.util.FormUtils;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.JenaNetidPolicy.ContextSetup;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Namespace;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.NamespaceDao;
@@ -28,17 +28,11 @@ public class NamespaceRetryController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(NamespaceRetryController.class.getName());
 
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
-    	
-    	VitroRequest request = new VitroRequest(req);
-        if (!checkLoginStatus(request,response))
-            return;
-
-        try {
-            super.doGet(request,response);
-        } catch (Exception e) {
-            log.error("NamespaceRetryController encountered exception calling super.doGet()");
-            e.printStackTrace();
+        if (!isAuthorizedToDisplayPage(req, response, new Actions(new UseMiscellaneousAdminPages()))) {
+        	return;
         }
+
+    	VitroRequest request = new VitroRequest(req);
 
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
@@ -85,14 +79,8 @@ public class NamespaceRetryController extends BaseEditController {
 
         //set up any listeners
 
-        //set portal flag to current portal
-        Portal currPortal = (Portal) request.getAttribute("portalBean");
-        int currPortalId = 1;
-        if (currPortal != null) {
-            currPortalId = currPortal.getPortalId();
-        }
         //make a postinsert pageforwarder that will send us to a new class's fetch screen
-        epo.setPostInsertPageForwarder(new NamespaceInsertPageForwarder(currPortalId));
+        epo.setPostInsertPageForwarder(new NamespaceInsertPageForwarder());
         //make a postdelete pageforwarder that will send us to the list of classes
 
         //set the getMethod so we can retrieve a new bean after we've inserted it
@@ -139,14 +127,8 @@ public class NamespaceRetryController extends BaseEditController {
 
     class NamespaceInsertPageForwarder implements PageForwarder {
 
-        private int portalId = 1;
-
-        public NamespaceInsertPageForwarder(int currPortalId) {
-            portalId = currPortalId;
-        }
-
         public void doForward(HttpServletRequest request, HttpServletResponse response, EditProcessObject epo){
-            String newNamespaceUrl = "fetch?home="+portalId+"&queryspec=private_namespacev&postGenLimit=-1&linkwhere=namespaces.id=";
+            String newNamespaceUrl = "fetch?queryspec=private_namespacev&postGenLimit=-1&linkwhere=namespaces.id=";
             Namespace ns = (Namespace) epo.getNewBean();
             newNamespaceUrl += ns.getId();
             try {

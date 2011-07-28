@@ -27,6 +27,15 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
+/*
+public class GroupedPropertyList extends ArrayList<PropertyGroupTemplateModel> {
+If this class extends a List type, Freemarker does not let the templates call methods
+on it. Since the class must then contain a list rather than be a list, the template
+syntax is less idiomatic: e.g., groups.all rather than simply groups. An alternative
+is to make the get methods (getProperty and getPropertyAndRemoveFromList) methods
+of the IndividualTemplateModel. Then this class doesn't need methods, and can extend
+a List type.
+*/
 public class GroupedPropertyList extends BaseTemplateModel {
 
     private static final long serialVersionUID = 1L;
@@ -34,21 +43,19 @@ public class GroupedPropertyList extends BaseTemplateModel {
     private static final int MAX_GROUP_DISPLAY_RANK = 99;
     
     @SuppressWarnings("serial")
-    private static final List<String> VITRO_PROPS_TO_ADD_TO_LIST = new ArrayList<String>() {{
-        add(VitroVocabulary.PRIMARY_LINK);
-        add(VitroVocabulary.ADDITIONAL_LINK);
+    protected static final List<String> VITRO_PROPS_TO_ADD_TO_LIST = new ArrayList<String>() {{
         add(VitroVocabulary.IND_MAIN_IMAGE);
     }}; 
     
-    private Individual subject;
-    private VitroRequest vreq;
-    private WebappDaoFactory wdf;
+    private final Individual subject;
+    private final VitroRequest vreq;
+    private final WebappDaoFactory wdf;
 
     private List<PropertyGroupTemplateModel> groups;
     
     GroupedPropertyList(Individual subject, VitroRequest vreq, EditingPolicyHelper policyHelper) {
-        this.subject = subject;
         this.vreq = vreq;
+        this.subject = subject;
         this.wdf = vreq.getWebappDaoFactory();
         
         boolean editing = policyHelper != null;
@@ -64,7 +71,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
            
         // If editing this page, merge in object properties applicable to the individual that are currently
         // unpopulated, so the properties are displayed to allow statements to be added to these properties.
-        // RY In future, we should limit this to properties that the user CAN add properties to.
+        // RY In future, we should limit this to properties that the user has permission to add properties to.
         if (editing) {
             mergeAllPossibleObjectProperties(populatedObjectPropertyList, propertyList);
         }
@@ -92,14 +99,18 @@ public class GroupedPropertyList extends BaseTemplateModel {
         for (PropertyGroup propertyGroup: propertyGroupList) {
             groups.add(new PropertyGroupTemplateModel(vreq, propertyGroup, subject, 
                     policyHelper, populatedDataPropertyList, populatedObjectPropertyList));
-        }   
+        }  
         
         if (!editing) {
             pruneEmptyProperties();
-        }        
+        }
     
     }
-
+    
+    // It's possible that an object property retrieved in the call to getPopulatedObjectPropertyList()
+    // is now empty of statements, because if not editing, some statements without a linked individual
+    // are not retrieved by the query. (See <linked-individual-required> elements in queries.)
+    // Remove these properties, and also remove any groups with no remaining properties. 
     private void pruneEmptyProperties() {
         Iterator<PropertyGroupTemplateModel> iGroups = groups.iterator();
         while (iGroups.hasNext()) {
@@ -108,11 +119,13 @@ public class GroupedPropertyList extends BaseTemplateModel {
             while (iProperties.hasNext()) {
                 PropertyTemplateModel property = iProperties.next();
                 if (property instanceof ObjectPropertyTemplateModel) {
+                    // It's not necessary to do comparable pruning of the subclass list
+                    // of a CollatedObjectPropertyTemplateModel, because the collated subclass
+                    // list is compiled on the basis of existing statements. There will not
+                    // be any empty subclasses.
                     if ( ( (ObjectPropertyTemplateModel) property).isEmpty() ) {                        
                         iProperties.remove();
                     }
-                } else if ( ( (DataPropertyTemplateModel) property).isEmpty() ) {                                            
-                    iProperties.remove();
                 }
             } 
             if (pgtm.isEmpty()) {
@@ -120,7 +133,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
             }
         }        
     }
-    
+
     @SuppressWarnings("unchecked")
     protected void sort(List<Property> propertyList) {            
         try {
@@ -241,7 +254,6 @@ public class GroupedPropertyList extends BaseTemplateModel {
             log.warn("groupList has no groups on entering addPropertiesToGroups(); will create a new group");
             PropertyGroup dummyGroup = pgDao.createDummyPropertyGroup(null, 1);
             dummyGroup.getPropertyList().addAll(propertyList);
-            sortGroupPropertyList(dummyGroup.getName(), propertyList);
             groupList.add(dummyGroup);
             return groupList;            
         } 
@@ -290,48 +302,46 @@ public class GroupedPropertyList extends BaseTemplateModel {
     private void populateGroupListWithProperties(List<PropertyGroup> groupList, 
             PropertyGroup groupForUnassignedProperties, List<Property> propertyList) {
         
-        // Assign the properties to the groups
+        // Clear out the property lists on the groups
         for (PropertyGroup pg : groupList) {
-             if (pg.getPropertyList().size()>0) {
-                 pg.getPropertyList().clear();
-             }
-             for (Property p : propertyList) {
-                 if (p.getURI() == null) {
-                     log.error("Property p has null URI in populateGroupsListWithProperties()");
-                 // If the property is not assigned to any group, add it to the group for unassigned properties
-                 } else if (p.getGroupURI()==null) {
-                     if (groupForUnassignedProperties!=null) { 
-                         // RY How could it happen that it's already in the group? Maybe we can remove this test.
-                         if (!alreadyOnPropertyList(groupForUnassignedProperties.getPropertyList(),p)) {                          
-                             groupForUnassignedProperties.getPropertyList().add(p);
-                             if (log.isDebugEnabled()) {
-                                 log.debug("adding property " + getLabel(p) + " to group for unassigned properties");
-                             }                             
-                         }
-                     } 
-                 // Otherwise, if the property is assigned to this group, add it to the group if it's not already there
-                 } else if (p.getGroupURI().equals(pg.getURI())) {
-                     // RY How could it happen that it's already in the group? Maybe we can remove this case.
-                     if (!alreadyOnPropertyList(pg.getPropertyList(),p)) {
-                         pg.getPropertyList().add(p);
-                     }
-                 }
-             }
-             sortGroupPropertyList(pg.getName(), pg.getPropertyList());
+            if (pg.getPropertyList().size()>0) {
+                pg.getPropertyList().clear();
+            }                        
         }
-    }
-    
-    private void sortGroupPropertyList(String groupName, List<Property> propertyList) {
-        if (propertyList.size()>1) {
-            try {
-                Collections.sort(propertyList,new Property.DisplayComparatorIgnoringPropertyGroup());
-            } catch (Exception ex) {
-                log.error("Exception sorting property group "+ groupName + " property list: "+ex.getMessage());
-            }
-        }       
+        
+        // Assign the properties to the groups
+        for (Property p : propertyList) {
+            if (p.getURI() == null) {
+                log.error("Property p has null URI in populateGroupListWithProperties()");
+            // If the property is not assigned to any group, add it to the group for unassigned properties
+            } else {
+                String groupUriForProperty = p.getGroupURI();                
+                boolean assignedToGroup = false;
+  
+                if (groupUriForProperty != null) {
+                    for (PropertyGroup pg : groupList) {
+                         String groupUri = pg.getURI();
+                         if (groupUriForProperty.equals(groupUri)) {
+                             pg.getPropertyList().add(p);
+                             assignedToGroup = true;
+                             break;
+                         }
+                    }
+                }
+                
+                // Either the property is not assigned to a group, or it is assigned to a group
+                // not in the list (i.e., a non-existent group).
+                if (! assignedToGroup) {
+                    if (groupForUnassignedProperties!=null) {                          
+                        groupForUnassignedProperties.getPropertyList().add(p);
+                        log.debug("adding property " + getLabel(p) + " to group for unassigned properties");                            
+                    }                        
+                }
+             } 
+         }
     }
 
-    private class PropertyRanker implements Comparator {
+    private class PropertyRanker implements Comparator<Property> {
     
         WebappDaoFactory wdf;
         PropertyGroupDao pgDao;
@@ -341,48 +351,14 @@ public class GroupedPropertyList extends BaseTemplateModel {
             this.pgDao = wdf.getPropertyGroupDao();
         }
         
-        public int compare (Object o1, Object o2) {
-            Property p1 = (Property) o1;
-            Property p2 = (Property) o2;
+        public int compare(Property p1, Property p2) {
             
-            // sort first by property group rank; if the same, then sort by property rank
-            final int MAX_GROUP_RANK=99;
-            
-            int p1GroupRank=MAX_GROUP_RANK;
-            try {
-                if (p1.getGroupURI()!=null) {
-                    PropertyGroup pg1 = pgDao.getGroupByURI(p1.getGroupURI());
-                    if (pg1!=null) {
-                        p1GroupRank=pg1.getDisplayRank();
-                    }
-                }
-            } catch (Exception ex) {
-                log.error("Cannot retrieve p1GroupRank for group "+p1.getLabel());
-            }
-            
-            int p2GroupRank=MAX_GROUP_RANK;
-            try {
-                if (p2.getGroupURI()!=null) {
-                    PropertyGroup pg2 = pgDao.getGroupByURI(p2.getGroupURI());
-                    if (pg2!=null) {
-                        p2GroupRank=pg2.getDisplayRank();
-                    }
-                }
-            } catch (Exception ex) {
-                log.error("Cannot retrieve p2GroupRank for group "+p2.getLabel());
-            }
-            
-            // int diff = pgDao.getGroupByURI(p1.getGroupURI()).getDisplayRank() - pgDao.getGroupByURI(p2.getGroupURI()).getDisplayRank();
-            int diff=p1GroupRank - p2GroupRank;
+            int diff = determineDisplayRank(p1) - determineDisplayRank(p2);
             if (diff==0) {
-                diff = determineDisplayRank(p1) - determineDisplayRank(p2);
-                if (diff==0) {
-                    return getLabel(p1).compareTo(getLabel(p2));
-                } else {
-                    return diff;
-                }
+                return getLabel(p1).compareTo(getLabel(p2));
+            } else {
+                return diff;
             }
-            return diff;
         }
         
         private int determineDisplayRank(Property p) {
@@ -391,7 +367,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
                 return dp.getDisplayTier();
             } else if (p instanceof ObjectProperty) {
                 ObjectProperty op = (ObjectProperty)p;
-                String tierStr = op.getDomainDisplayTier(); // no longer used: p.isSubjectSide() ? op.getDomainDisplayTier() : op.getRangeDisplayTier();
+                String tierStr = op.getDomainDisplayTier(); 
                 try {
                     return Integer.parseInt(tierStr);
                 } catch (NumberFormatException ex) {
@@ -433,15 +409,24 @@ public class GroupedPropertyList extends BaseTemplateModel {
         return null;
     }
     
+    @Deprecated
     public PropertyTemplateModel getPropertyAndRemoveFromList(String propertyUri) {
+        return pullProperty(propertyUri);
+    }
 
+    public PropertyTemplateModel pullProperty(String propertyUri) {
+        
         for (PropertyGroupTemplateModel pgtm : groups) {
             List<PropertyTemplateModel> properties = pgtm.getProperties();
             for (PropertyTemplateModel ptm : properties) {
                 if (propertyUri.equals(ptm.getUri())) { 
-                    // Remove the property from the group
+                    // Remove the property from the group.
+                    // NB Works with a for-each loop instead of an iterator, since
+                    // iteration doesn't continue after the remove.
                     properties.remove(ptm);
-                    // If this is the only property in the group, remove the group as well
+                    // If this is the only property in the group, remove the group as well.
+                    // NB Works with a for-each loop instead of an iterator, since
+                    // iteration doesn't continue after the remove.
                     if (properties.size() == 0) {
                         groups.remove(pgtm);   
                     }
@@ -451,6 +436,5 @@ public class GroupedPropertyList extends BaseTemplateModel {
         }        
         return null;
     }
-
 }
 

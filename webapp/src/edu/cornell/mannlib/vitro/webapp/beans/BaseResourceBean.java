@@ -2,13 +2,19 @@
 
 package edu.cornell.mannlib.vitro.webapp.beans;
 
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openrdf.model.impl.URIImpl;
+
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.flags.AuthFlag;
 
 public class BaseResourceBean implements ResourceBean {
 	
@@ -29,10 +35,10 @@ public class BaseResourceBean implements ResourceBean {
     
     public enum RoleLevel { PUBLIC("http://vitro.mannlib.cornell.edu/ns/vitro/role#public","public","public"),
                             SELF("http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor","self-authenticated","self"),
-                            EDITOR("http://vitro.mannlib.cornell.edu/ns/vitro/role#editor","editor,curator,dbAdmin","editor"),
-                            CURATOR("http://vitro.mannlib.cornell.edu/ns/vitro/role#curator","curator,dbAdmin","curator"),
-                            DB_ADMIN("http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin","dbAdmin only","DBA"),
-                            NOBODY("http://vitro.mannlib.cornell.edu/ns/vitro/role#nobody","nobody","nobody");
+                            EDITOR("http://vitro.mannlib.cornell.edu/ns/vitro/role#editor","editor, curator, site administrator","editor"),
+                            CURATOR("http://vitro.mannlib.cornell.edu/ns/vitro/role#curator","curator, site administrator","curator"),
+                            DB_ADMIN("http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin","site administrator","siteAdmin"),
+                            NOBODY("http://vitro.mannlib.cornell.edu/ns/vitro/role#nobody","root user","root");
     
         private final String uri;
         private final String label;
@@ -67,21 +73,26 @@ public class BaseResourceBean implements ResourceBean {
             return RoleLevel.values()[0];            
         }
         
-        public static RoleLevel getRoleFromAuth(AuthFlag ar){
-            int level = ar.getUserSecurityLevel();
-            if( level == LoginStatusBean.ANYBODY)    // 0
-                return PUBLIC;
-            if( level == LoginStatusBean.NON_EDITOR) // 1
-                return PUBLIC; // no correspondence with self-editing, which does not authorize through the LoginStatusBean
-            if( level == LoginStatusBean.EDITOR )    // 4
-                return EDITOR;
-            if( level == LoginStatusBean.CURATOR )   // 5
-                return CURATOR;
-            if( level == LoginStatusBean.DBA )       // 50
-                return DB_ADMIN;
-            else
-                return null;
-        }
+		public static RoleLevel getRoleFromLoginStatus(HttpServletRequest req) {
+			UserAccount u = LoginStatusBean.getCurrentUser(req);
+			if (u == null) {
+				return PUBLIC;
+			}
+			
+			Set<String> roles = u.getPermissionSetUris();
+			if (roles.contains(PermissionSetsLoader.URI_DBA)) {
+				return  DB_ADMIN;
+			} else if (roles.contains(PermissionSetsLoader.URI_CURATOR)) {
+				return CURATOR;
+			} else if (roles.contains(PermissionSetsLoader.URI_EDITOR)) {
+				return EDITOR;
+			} else if (roles.contains(PermissionSetsLoader.URI_SELF_EDITOR)) {
+				return SELF;
+			} else {
+				// Logged in but with no recognized role? Make them SELF
+				return SELF;
+			}
+		}
     }
 
     public boolean isAnonymous() {        
@@ -105,20 +116,15 @@ public class BaseResourceBean implements ResourceBean {
             this.localName = null;
         } else {
             this.URI = URI;
-            try {
-                URIImpl uri = new URIImpl(URI);
-                this.namespace = uri.getNamespace();
-                this.localName = uri.getLocalName();
-            } catch (Exception e) {
-                log.error("Exception processing URI "+URI);
-                e.printStackTrace();
-            }
+            Resource uri = ResourceFactory.createResource(URI);
+            this.namespace = uri.getNameSpace();
+            this.localName = uri.getLocalName();
         }
     }
     
     public String getNamespace() {
         if( namespace == null && this.URI != null)
-            buildLocalAndNS( this.URI);        
+            buildLocalAndNS(this.URI);        
         return namespace;
     }
     public void setNamespace(String namespace) {
@@ -133,6 +139,7 @@ public class BaseResourceBean implements ResourceBean {
             buildLocalAndNS(this.URI);        
         return localName;
     }
+    
     public void setLocalName(String localName) {
         this.localName = localName;
         if (namespace != null && localName != null) {

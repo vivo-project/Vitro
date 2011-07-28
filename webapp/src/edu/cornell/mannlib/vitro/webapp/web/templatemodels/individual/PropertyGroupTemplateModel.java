@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -21,12 +22,13 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
 
     private static final Log log = LogFactory.getLog(PropertyGroupTemplateModel.class); 
     
-    private String name;
-    private List<PropertyTemplateModel> properties;
+    private final String name;
+    private final List<PropertyTemplateModel> properties;
       
     PropertyGroupTemplateModel(VitroRequest vreq, PropertyGroup group, 
             Individual subject, EditingPolicyHelper policyHelper, 
             List<DataProperty> populatedDataPropertyList, List<ObjectProperty> populatedObjectPropertyList) {
+
         this.name = group.getName();
         
         List<Property> propertyList = group.getPropertyList();
@@ -49,10 +51,15 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
         properties.remove(ptm);
     }
     
-    /* Freemarker doesn't consider this a getter, because it takes a parameter, so to call it as group.name
-     * in the templates the method name must be simply "name" and not "getName."
-     */
-    public String name(String otherGroupName) {
+    
+    /* Accessor methods for templates */
+    // Add this so it's included in dumps for debugging. The templates will want to display
+    // name using getName(String)
+    public String getName() {
+        return name;
+    }
+    
+    public String getName(String otherGroupName) {
         String displayName = name;
         if (displayName == null) {
             displayName = "";
@@ -65,5 +72,6 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
     public List<PropertyTemplateModel> getProperties() {
         return properties;
     }
+    
 
 }

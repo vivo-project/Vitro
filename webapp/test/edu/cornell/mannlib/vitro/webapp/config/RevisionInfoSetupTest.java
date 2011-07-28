@@ -82,7 +82,7 @@ public class RevisionInfoSetupTest extends AbstractTestClass {
 	@Test
 	public void resourceFileHasInvalidLevelLine() {
 		setLoggerLevel(RevisionInfoSetup.class, Level.OFF);
-		testThisExpectedFailure("invalid level line", "2010-10-13 23:55:00\n"
+		testThisExpectedFailure("invalid level line", "2010-02-13 23:55:00\n"
 				+ "name ~ release ~revision");
 	}
 
@@ -90,8 +90,8 @@ public class RevisionInfoSetupTest extends AbstractTestClass {
 	public void simpleSingleLevel() {
 		testThisResourceFile(
 				"simple single level",
-				"2010-10-13 23:55:00\n" + "name ~ release ~ revision",
-				bean(date("2010-10-13 23:55:00"),
+				"2010-02-13 23:55:00\n" + "name ~ release ~ revision",
+				bean(date("2010-02-13 23:55:00"),
 						level("name", "release", "revision")));
 	}
 
@@ -108,9 +108,9 @@ public class RevisionInfoSetupTest extends AbstractTestClass {
 	public void ignoreWhiteSpaceInLevelInfo() {
 		testThisResourceFile(
 				"white space in level info",
-				"2010-10-13 23:55:00\n"
+				"2010-02-13 23:55:00\n"
 						+ "   name   ~ release   ~   revision  ",
-				bean(date("2010-10-13 23:55:00"),
+				bean(date("2010-02-13 23:55:00"),
 						level("name", "release", "revision")));
 	}
 
@@ -118,9 +118,9 @@ public class RevisionInfoSetupTest extends AbstractTestClass {
 	public void ignoreBlankLinesAndComments() {
 		testThisResourceFile(
 				"ignore empty lines",
-				"2010-10-13 23:55:00\n" + "\n" + "     \n" + "   #   \n"
+				"2010-02-13 23:55:00\n" + "\n" + "     \n" + "   #   \n"
 						+ "name ~ release ~ revision",
-				bean(date("2010-10-13 23:55:00"),
+				bean(date("2010-02-13 23:55:00"),
 						level("name", "release", "revision")));
 	}
 
@@ -128,17 +128,17 @@ public class RevisionInfoSetupTest extends AbstractTestClass {
 	public void parseMultipleLevels() {
 		testThisResourceFile(
 				"multiple levels",
-				"2010-10-13 23:55:00\n" + "name ~ release ~ revision\n"
+				"2010-02-13 23:55:00\n" + "name ~ release ~ revision\n"
 						+ "name2 ~ release2 ~ revision2\n",
-				bean(date("2010-10-13 23:55:00"),
+				bean(date("2010-02-13 23:55:00"),
 						level("name", "release", "revision"),
 						level("name2", "release2", "revision2")));
 	}
 
 	@Test
 	public void parseNoLevels() {
-		testThisResourceFile("no levels", "2010-10-13 23:55:00\n",
-				bean(date("2010-10-13 23:55:00")));
+		testThisResourceFile("no levels", "2010-02-13 23:55:00\n",
+				bean(date("2010-02-13 23:55:00")));
 	}
 
 	// ----------------------------------------------------------------------

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+
+<!-- Custom list view config file for display:hasElement property (used for menu system)
+
+     See guidelines in vitro/doc/list_view_configuration_guidelines.txt -->
+
+<list-view-config>
+    <query-select>
+        PREFIX display: &lt;http://vitro.mannlib.cornell.edu/ontologies/display/1.1#&gt;
+        PREFIX afn:  &lt;http://jena.hpl.hp.com/ARQ/function#&gt;
+        
+        SELECT ?menuItem
+               (afn:localname(?menuItem) AS ?menuItemName)
+               ?linkText
+               ?menuPosition WHERE {
+            ?subject ?property ?menuItem
+            OPTIONAL { ?menuItem display:linkText ?linkText }
+            OPTIONAL { ?menuItem display:menuPosition ?menuPosition }
+        } ORDER BY ?menuPosition
+    </query-select>
+
+    <query-construct>
+        CONSTRUCT {
+            ?subject ?property ?menuItem .
+            ?menuItem ?menuItemProp ?menuItemObj
+        } WHERE {
+            { ?subject ?property ?menuItem }
+            UNION {
+                ?subject ?property ?menuItem .
+                ?menuItem ?menuItemProp ?menuItemObj
+            } 
+        }
+    </query-construct>
+    
+    <template>propStatement-hasElement.ftl</template>
+</list-view-config>

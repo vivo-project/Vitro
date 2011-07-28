@@ -13,8 +13,8 @@ import javax.servlet.ServletContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.beans.Portal;
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
@@ -54,13 +54,24 @@ public class FreemarkerConfigurationLoader {
         }
     }
     
-    public Configuration getConfig(VitroRequest vreq) {       
-        String themeDir = getThemeDir(vreq.getPortal());
+    public Configuration getConfig(VitroRequest vreq) { 
+        String themeDir = getThemeDir(vreq.getAppBean());
         return getConfigForTheme(themeDir);
     }
 
-    protected String getThemeDir(Portal portal) {
-        return portal.getThemeDir().replaceAll("/$", "");
+    protected String getThemeDir(ApplicationBean appBean) {
+        String themeDir = null;
+    	if (appBean == null) {
+    		log.error("Cannot get themeDir from null application bean");
+    		return null;
+    	} else {
+    	    themeDir = appBean.getThemeDir();
+    	    if (themeDir == null) {
+    	        log.error("themeDir is null");
+    	        return null;
+    	    }
+    	} 
+        return themeDir.replaceAll("/$", "");
     }
 
     
@@ -89,7 +100,7 @@ public class FreemarkerConfigurationLoader {
         
         Configuration config = new Configuration();
         
-        String buildEnv = ConfigurationProperties.getProperty("Environment.build");
+        String buildEnv = ConfigurationProperties.getBean(context).getProperty("Environment.build");
         log.debug("Current build environment: " + buildEnv);
         if ("development".equals(buildEnv)) { // Set Environment.build = development in deploy.properties
             log.debug("Disabling Freemarker template caching in development build.");
@@ -101,12 +112,12 @@ public class FreemarkerConfigurationLoader {
         }
 
         // Specify how templates will see the data model. 
-        // The default wrapper exposes set methods unless exposure level is set.
-        // By default we want to block exposure of set methods. 
+        // The Freemarker default wrapper exposes set methods and get methods that take
+        // arguments. We block exposure to these methods by default. 
         BeansWrapper wrapper = new DefaultObjectWrapper();
         wrapper.setExposureLevel(BeansWrapper.EXPOSE_PROPERTIES_ONLY);
         config.setObjectWrapper(wrapper);
-
+        
         // Set some formatting defaults. These can be overridden at the template
         // or environment (template-processing) level, or for an individual
         // token by using built-ins.

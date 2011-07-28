@@ -19,7 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.BasicValidation;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.BasicValidation;
 
 public class IndividualDataPropertyStatementProcessor implements ChangeListener {
 	
@@ -34,7 +34,7 @@ public class IndividualDataPropertyStatementProcessor implements ChangeListener 
     }
 
     public void doDeleted(Object oldObj, EditProcessObject epo) {
-        // sunset all data property statements associated with entity
+        // do nothing
     }
 
     private void processDataprops (EditProcessObject epo) {

@@ -15,14 +15,18 @@
     </#if>
 </#list>
 
-<#-- For v1.3: The controller should pass in the dataservice url. -->
 <script type="text/javascript">
     var menupageData = {
         baseUrl: '${urls.base}',
-        dataServiceUrl: '${urls.base}/dataservice?getLuceneIndividualsByVClass=1&vclassId=',
+        <#if internalClass?has_content>
+            dataServiceUrl: '${dataServiceUrlIndividualsByVClass}${internalClass}&vclassId=',
+        <#else>
+            dataServiceUrl: '${dataServiceUrlIndividualsByVClass}',
+        </#if>
         defaultBrowseVClassUri: '${firstNonEmptyVClass}'
     };
 </script>
 
 <#-- Script to enable browsing individuals within a class -->
-${scripts.add("/js/jquery_plugins/jquery.scrollTo-min.js", "/js/menupage/browseByVClass.js")}
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery_plugins/jquery.scrollTo-min.js"></script>',
+              '<script type="text/javascript" src="${urls.base}/js/menupage/browseByVClass.js"></script>')}

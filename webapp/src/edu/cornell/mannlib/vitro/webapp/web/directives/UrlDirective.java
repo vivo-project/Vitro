@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import freemarker.core.Environment;
-import freemarker.template.Configuration;
+import freemarker.template.SimpleScalar;
 import freemarker.template.TemplateDirectiveBody;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
@@ -44,11 +45,18 @@ public class UrlDirective extends BaseTemplateDirectiveModel {
                 "The url directive doesn't allow nested content.");
         } 
         
-        String path = params.get("path").toString();
-        if (path == null) {
+        Object o = params.get("path");
+        if (o == null) {
             throw new TemplateModelException(
                 "The url directive requires a value for parameter 'path'.");
         }
+        
+        if (! ( o instanceof SimpleScalar)) {
+            throw new TemplateModelException(
+                "The url directive requires a string value for parameter 'path'.");
+        }
+        
+        String path = o.toString();
         
         if (!path.startsWith("/")) {
             throw new TemplateModelException(
@@ -60,26 +68,23 @@ public class UrlDirective extends BaseTemplateDirectiveModel {
         out.write(url);
     }
 
-    public String help(Environment env) {
-        Map<String, Object> map = new HashMap<String, Object>();
+    @Override
+    public Map<String, Object> help(String name) {
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
+
+        map.put("effect", "Generate a full url from a path by prepending the servlet context path. Use for generating src attribute of image tags, href attribute of anchor tags, etc.");
         
-        String name = getDirectiveName();
-        map.put("name", name);
-        
-        map.put("effect", "Generate a full url from a path. Use for generating src attribute of image tags.");
-        
-        map.put("comments", "The path should be an absolute path, starting with '/'.");
+        map.put("comments", "The path should be an absolute path, starting with \"/\".");
         
         Map<String, String> params = new HashMap<String, String>();
         params.put("path", "path");
-        map.put("params", params);
+        map.put("parameters", params);
         
         List<String> examples = new ArrayList<String>();
-        examples.add("<@" + name + " path=\"/images/placeholders/person.thumbnail.jpg\" />");
+        examples.add("&lt;img src=\"<@url path=\"/images/placeholders/person.thumbnail.jpg\" />\" /&gt;" );
         map.put("examples", examples);
         
-        return mergeToHelpTemplate(map, env);
+        return map;
     }
-
     
 }

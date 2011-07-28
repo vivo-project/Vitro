@@ -1,7 +1,7 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
 <#-- Default individual profile page template -->
-
+<#--@dumpAll /-->
 <section id="individual-intro" class="vcard" role="region">
     <#-- Image -->
     <#assign individualImage>
@@ -10,7 +10,7 @@
                   namespaces=namespaces 
                   editable=editable 
                   showPlaceholder="with_add_link" 
-                  placeholder="${urls.images}/placeholders/non.person.thumbnail.jpg" />
+                  placeholder="${urls.images}/placeholders/thumbnail.jpg" />
     </#assign>
     
     <#if ( individualImage?contains('<img class="individual-photo"') )>
@@ -20,9 +20,7 @@
     <div id="photo-wrapper">${individualImage}</div>
     
     <section id="individual-info" ${infoClass!} role="region">
-        <#if individual.showAdminPanel>
-               <#include "individual-adminPanel.ftl">
-        </#if>
+        <#include "individual-adminPanel.ftl">
         
         <header>
             <#if relatedSubject??>
@@ -33,17 +31,15 @@
                     <#-- Label -->
                     <@p.label individual editable />
                         
-                    <#-- Moniker -->
-                    <#if individual.moniker?has_content>
-                        <span class="preferred-title">${individual.moniker}</span>                  
-                    </#if>
+                    <#--  Most-specific types -->
+                    <@p.mostSpecificTypes individual />
                 </h1>
             </#if>
         </header>
         
         <nav role="navigation">
-            <ul id ="individual-tools" role="list">                          
-                <li role="listitem"><img title="${individual.uri}" class="middle" src="${urls.images}/individual/uriIcon.gif" alt="uri icon" /></li>
+            <ul id ="individual-tools" role="list">
+                <li role="listitem"><img id="uriIcon" title="${individual.uri}" class="middle" src="${urls.images}/individual/uriIcon.gif" alt="uri icon"/></li>
                 
                 <#assign rdfUrl = individual.rdfUrl>
                 <#if rdfUrl??>
@@ -52,9 +48,6 @@
             </ul>
         </nav>
                 
-        <#-- Links -->
-        <@p.vitroLinks propertyGroups namespaces editable  />
-
     <#if individualProductExtension??>
         ${individualProductExtension}
     <#else>
@@ -70,14 +63,9 @@
 <#-- Ontology properties -->
 <#include "individual-properties.ftl">
 
-${stylesheets.add("/css/individual/individual.css")}
-                           
-<#-- RY Figure out which of these scripts really need to go into the head, and which are needed at all (e.g., tinyMCE??) -->
-${headScripts.add("/js/jquery_plugins/getURLParam.js",                  
-                  "/js/jquery_plugins/colorAnimations.js",
-                  "/js/jquery_plugins/jquery.form.js",
-                  "/js/tiny_mce/tiny_mce.js", 
-                  "/js/controls.js",
-                  "/js/toggle.js")}
-                  
-${scripts.add("/js/imageUpload/imageUploadUtils.js")}
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/individual/individual.css" />')}
+
+${headScripts.add('<script type="text/javascript" src="${urls.base}/js/jquery_plugins/qtip/jquery.qtip-1.0.0-rc3.min.js"></script>',
+                  '<script type="text/javascript" src="${urls.base}/js/tiny_mce/tiny_mce.js"></script>')}
+
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/imageUpload/imageUploadUtils.js"></script>')}

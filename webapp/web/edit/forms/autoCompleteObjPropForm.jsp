@@ -6,7 +6,7 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.VClass" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditConfiguration" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration" %>
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
@@ -111,10 +111,10 @@
         if ( prop.getOfferCreateNewOption() ) {
             log.debug("property set to offer \"create new\" option; custom form: ["+prop.getCustomEntryForm()+"]");
             formTitle   = "Select an existing "+rangeClass.getName()+" for "+subject.getName();
-            submitLabel = "select existing";
+            submitLabel = "Select existing";
         } else {
             formTitle   = "Add an entry to: <em>"+prop.getDomainPublic()+"</em>";
-            submitLabel = "save entry";
+            submitLabel = "Save entry";
         }
     }
 %>
@@ -174,7 +174,7 @@ $(document).ready(function() {
     <v:input type="submit" id="submit" value="<%=submitLabel%>" cancel="true"/>
     <c:if test="${predicate.offerCreateNewOption == true}">
         <p>If you don't find the appropriate entry on the selection list,
-        <button type="button" onclick="javascript:document.location.href='${createNewUrl}'">add a new item to this list</button>
+        <button type="button" onclick="javascript:document.location.href='${createNewUrl}'">Add a new item to this list</button>
         </p>
     </c:if>
 </form>

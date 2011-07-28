@@ -7,14 +7,14 @@
 
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataProperty" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.EditN3Utils"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory"%>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.RdfLiteralHash" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.StandardModelSelector"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.StandardModelSelector"%>
 <%@ page import="com.hp.hpl.jena.shared.Lock"%>
 <%@ page import="com.hp.hpl.jena.ontology.OntModel"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent"%>
@@ -22,9 +22,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jstl/functions" %>
 <%@ taglib prefix="v" uri="http://vitro.mannlib.cornell.edu/vitro/tags" %>
-<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 
-<vitro:confirmLoginStatus allowSelfEditing="true" />
+<%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousPages" %>
+<% request.setAttribute("requestedActions", new UseMiscellaneousPages()); %>
+<vitro:confirmAuthorization />
 
 <%
     org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger("edu.cornell.mannlib.vitro.jsp.edit.forms.datapropStmtDelete");
@@ -43,7 +45,7 @@
 
     VitroRequest vreq = new VitroRequest(request);
     WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-    String editorUri = EditN3Utils.getEditorUri(request,session,application);        
+    String editorUri = EditN3Utils.getEditorUri(vreq);        
     wdf = wdf.getUserAwareDaoFactory(editorUri);
     
     DataProperty prop = wdf.getDataPropertyDao().getDataPropertyByURI(predicateUri);
@@ -59,9 +61,8 @@
     Model model = (Model)application.getAttribute("jenaOntModel");
     
     String vitroNsProp  = vreq.getParameter("vitroNsProp");
-    boolean isVitroNsProp = vitroNsProp != null && vitroNsProp.equals("true") ? true : false;
     
-    DataPropertyStatement dps = RdfLiteralHash.getPropertyStmtByHash(subject, predicateUri, dataHash, model, isVitroNsProp);
+    DataPropertyStatement dps = RdfLiteralHash.getPropertyStmtByHash(subject, predicateUri, dataHash, model);
     
     if( log.isDebugEnabled() ){
         log.debug("attempting to delete dataPropertyStatement: subjectURI <" + dps.getIndividualURI() +">");
@@ -84,21 +85,8 @@
         
       	//do the delete
         if( request.getParameter("y") != null ) {
-        	if( isVitroNsProp ){
-        			OntModel writeModel = (new StandardModelSelector()).getModel(request, application);        			
-        			writeModel.enterCriticalSection(Lock.WRITE);
-        			try{
-        			    writeModel.getBaseModel().notifyEvent(new EditEvent(editorUri,true));
-        				writeModel.remove(
-        						writeModel.getResource(subjectUri), 
-        						writeModel.getProperty(predicateUri),
-        						writeModel.createTypedLiteral(dps.getData(), dps.getDatatypeURI()));
-        			}finally{
-        				writeModel.leaveCriticalSection();
-        			}        			        			
-        	}else{
-            	wdf.getDataPropertyStatementDao().deleteDataPropertyStatement(dps);
-        	}        	                
+
+            wdf.getDataPropertyStatementDao().deleteDataPropertyStatement(dps);      	                
             %>
 
 			<%-- grab the predicate URI and trim it down to get the Local Name so we can send the user back to the appropriate property --%>

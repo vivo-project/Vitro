@@ -6,6 +6,7 @@ var browseByVClass = {
         this.mergeFromTemplate();
         this.initObjects();
         this.bindEventListeners();
+        this.defaultVClass();
     },
     
     // Add variables from menupage template
@@ -29,20 +30,20 @@ var browseByVClass = {
     bindEventListeners: function() {
         // Listeners for vClass switching
         this.vgraphVClassLinks.click(function() {
-            uri = $(this).attr('data-uri');
+            var uri = $(this).attr('data-uri');
             browseByVClass.getIndividuals(uri);
         });
         
         this.browseVClassLinks.click(function() {
-            uri = $(this).attr('data-uri');
+            var uri = $(this).attr('data-uri');
             browseByVClass.getIndividuals(uri);
             return false;
         });
         
         // Listener for alpha switching
         this.alphaIndexLinks.click(function() {
-            uri = $('#browse-classes li a.selected').attr('data-uri');
-            alpha = $(this).attr('data-alpha');
+            var uri = $('#browse-classes li a.selected').attr('data-uri');
+            var alpha = $(this).attr('data-alpha');
             browseByVClass.getIndividuals(uri, alpha);
             return false;
         });
@@ -54,9 +55,9 @@ var browseByVClass = {
     // Listener for page switching -- separate from the rest because it needs to be callable
     paginationListener: function() {
         $('.pagination li a').click(function() {
-            uri = $('#browse-classes li a.selected').attr('data-uri');
-            alpha = $('#alpha-browse-individuals li a.selected').attr('data-alpha');
-            page = $(this).attr('data-page');
+            var uri = $('#browse-classes li a.selected').attr('data-uri');
+            var alpha = $('#alpha-browse-individuals li a.selected').attr('data-alpha');
+            var page = $(this).attr('data-page');
             browseByVClass.getIndividuals(uri, alpha, page);
             return false;
         });
@@ -71,7 +72,7 @@ var browseByVClass = {
     
     // Where all the magic happens -- gonna fetch me some individuals
     getIndividuals: function(vclassUri, alpha, page, scroll) {
-        url = this.dataServiceUrl + encodeURIComponent(vclassUri);
+        var url = this.dataServiceUrl + encodeURIComponent(vclassUri);
         if ( alpha && alpha != "all") {
             url += '&alpha=' + alpha;
         }
@@ -87,44 +88,52 @@ var browseByVClass = {
         // Scroll to #menupage-intro page unless told otherwise
         if ( scroll != false ) {
             // only scroll back up if we're past the top of the #browse-by section
-            scrollPosition = browseByVClass.getPageScroll();
-            browseByOffset = $('#browse-by').offset();
+            var scrollPosition = browseByVClass.getPageScroll();
+            var browseByOffset = $('#browse-by').offset();
             if ( scrollPosition[1] > browseByOffset.top) {
                 $.scrollTo('#menupage-intro', 500);
             }
         }
         
         $.getJSON(url, function(results) {
-            individualList = "";
+            var individualList = "";
             
             // Catch exceptions when empty individuals result set is returned
             // This is very likely to happen now since we don't have individual counts for each letter and always allow the result set to be filtered by any letter
             if ( results.individuals.length == 0 ) {
                 browseByVClass.emptyResultSet(results.vclass, alpha)
             } else {
+                var vclassName = results.vclass.name;
                 $.each(results.individuals, function(i, item) {
-                    label = results.individuals[i].label;
-                    moniker = results.individuals[i].moniker;
-                    vclassName = results.individuals[i].vclassName;
-                    uri = results.individuals[i].URI;
-                    profileUrl = results.individuals[i].profileUrl;
-                    if ( results.individuals[i].thumbUrl ) {
-                        image = browseByVClass.baseUrl + results.individuals[i].thumbUrl;
+                    var individual, 
+                        label, 
+                        mostSpecificTypes, 
+                        uri, 
+                        profileUrl, 
+                        image, 
+                        listItem;
+                        
+                    individual = results.individuals[i];
+                    label = individual.label;
+                    mostSpecificTypes = individual.mostSpecificTypes;
+                    moreInfo = browseByVClass.getMoreInfo(mostSpecificTypes, vclassName);
+                    uri = individual.URI;
+                    profileUrl = individual.profileUrl;
+                    if ( individual.thumbUrl ) {
+                        image = browseByVClass.baseUrl + individual.thumbUrl;
                     }
                     // Build the content of each list item, piecing together each component
                     listItem = '<li class="individual" role="listitem" role="navigation">';
-                    if ( typeof results.individuals[i].thumbUrl !== "undefined" ) {
+                    if ( typeof individual.thumbUrl !== "undefined" ) {
                         listItem += '<img src="'+ image +'" width="90" alt="'+ label +'" /><h1 class="thumb">';
                     } else {
                         listItem += '<h1>';
                     }
                     listItem += '<a href="'+ profileUrl +'" title="View the profile page for '+ label +'">'+ label +'</a></h1>';
-                    // Include the moniker only if it's not empty and not equal to the VClass name
-                    if ( moniker != vclassName && moniker != "" ) {
-                        listItem += '<span class="title">'+ moniker +'</span>';
+                    if ( moreInfo != '' ) {
+                        listItem += '<span class="title">'+ moreInfo +'</span>';
                     }
                     listItem += '</li>';
-                    // browseByVClass.individualsInVClass.append(listItem);
                     individualList += listItem;
                 })
                 
@@ -136,18 +145,43 @@ var browseByVClass = {
                 
                 // Check to see if we're dealing with pagination
                 if ( results.pages.length ) {
-                    pages = results.pages;
+                    var pages = results.pages;
                     browseByVClass.pagination(pages, page);
                 }
-                
-                selectedClassHeading = '<h3 class="selected-class">'+ results.vclass.name +'</h3>';
-                browseByVClass.individualsContainer.prepend(selectedClassHeading);
-                
-                // Set selected class, alpha and page
-                browseByVClass.selectedVClass(results.vclass.URI);
-                browseByVClass.selectedAlpha(alpha);
             }
+            
+            // Set selected class, alpha and page
+            // Do this whether or not there are any results
+            $('h3.selected-class').text(results.vclass.name);
+            browseByVClass.selectedVClass(results.vclass.URI);
+            browseByVClass.selectedAlpha(alpha);
         });
+    },
+    
+    // Handle mostSpecificType as array
+    // * remove requested class for redundancy
+    // * allow override by another property (passed as argument)
+    getMoreInfo: function(mostSpecificTypes, requestedClass, override) {
+        var requestedClassIndex = $.inArray(requestedClass, mostSpecificTypes);
+        if ( requestedClassIndex > -1 ) {
+            mostSpecificTypes.splice(requestedClassIndex, 1);
+        }
+        var mostSpecificTypeCount = mostSpecificTypes.length;
+        
+        if ( typeof override !== "undefined" ) {
+            return override;
+        } else {
+            if ( mostSpecificTypeCount > 1 ) {
+                var assembledList = '<ul class="mostSpecificTypes">';
+                $.each(mostSpecificTypes, function(i, item) {
+                    assembledList += '<li>'+ item +'</li>';
+                })
+                assembledList += '</ul>';
+                return assembledList;
+            } else {
+                return mostSpecificTypes;
+            }
+        }
     },
     
     // getPageScroll() by quirksmode.org
@@ -168,12 +202,12 @@ var browseByVClass = {
     
     // Print out the pagination nav if called
     pagination: function(pages, page) {
-        pagination = '<div class="pagination menupage">';
+        var pagination = '<div class="pagination menupage">';
         pagination += '<h3>page</h3>';
         pagination += '<ul>';
         $.each(pages, function(i, item) {
-            anchorOpen = '<a class="round" href="#" title="View page '+ pages[i].text +' of the results" data-page="'+ pages[i].index +'">';
-            anchorClose = '</a>';
+            var anchorOpen = '<a class="round" href="#" title="View page '+ pages[i].text +' of the results" data-page="'+ pages[i].index +'">';
+            var anchorClose = '</a>';
             
             pagination += '<li class="round';
             // Test for active page
@@ -216,11 +250,12 @@ var browseByVClass = {
         
         // Add active class for requested alpha
         $('#alpha-browse-individuals li a[data-alpha="'+ alpha +'"]').addClass('selected');
+        
+        return alpha;
     },
     
-    // Wipe the currently displayed class heading, individuals, no-content message, and existing pagination
+    // Wipe the currently displayed individuals, no-content message, and existing pagination
     wipeSlate: function() {
-        $('h3.selected-class').remove();
         browseByVClass.individualsInVClass.empty();
         $('p.no-individuals').remove();
         $('.pagination').remove();
@@ -228,19 +263,22 @@ var browseByVClass = {
     
     // When no individuals are returned for the AJAX request, print a reasonable message for the user
     emptyResultSet: function(vclass, alpha) {
+        var nothingToSeeHere;
+        
         this.wipeSlate();
-        this.selectedAlpha(alpha);
+        var alpha = this.selectedAlpha(alpha);
         
         if ( alpha != "all" ) {
             nothingToSeeHere = '<p class="no-individuals">There are no '+ vclass.name +' individuals whose name starts with <em>'+ alpha.toUpperCase() +'</em>.</p> <p class="no-individuals">Please try another letter or browse all.</p>';
         } else {
             nothingToSeeHere = '<p class="no-individuals">There are no '+ vclass.name +' individuals in the system.</p> <p class="no-individuals">Please select another class from the list.</p>';
         }
-        browseByVClass.individualsContainer.prepend(nothingToSeeHere);
+
+        browseByVClass.individualsContainer.prepend(nothingToSeeHere);   
     }
+    
 };
 
 $(document).ready(function() {
     browseByVClass.onLoad();
-    browseByVClass.defaultVClass();
 });

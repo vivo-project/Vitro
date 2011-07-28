@@ -3,6 +3,7 @@
 <#-- FreeMarker samples -->
 
 <#import "lib-datetime.ftl" as dt>
+<#import "lib-string.ftl" as str>
 
 <h2>${title}</h2>
 
@@ -10,10 +11,12 @@
 
 <h3>Dates</h3>
 <ul>
-    <li>Current date & time: ${now?datetime}</li>
-    <li>Current date: ${now?date}</li>
-    <li>Current time: ${now?time}</li>
+    <li>Current date & time: ${.now?datetime}</li>
+    <li>Current date: ${.now?date}</li>
+    <li>Current time: ${.now?time}</li>
 </ul>
+<h3>Dates</h3>
+
 
 <h3>Formatted datetime</h3>
 <p><p>${dt.xsdDateTimeToYear(xsddatetime)}</p>
@@ -113,26 +116,28 @@ ${r"${two}"}: ${two}<br />
 ${r"${numbers[1]}"}: ${numbers[1]}<br />
 ${r"${numbers2[1]}"}: ${numbers2[1]}<br />
 
+<h3>Uncamelcasing</h3>
+<#assign s1 = "FreemarkerTest">
+${s1} => ${str.unCamelCase(s1)}<br />
+<#assign s2 = "Freemarker">
+${s2} => ${str.unCamelCase(s2)}<br />
 
 <@dump var="now" />
 <@dump var="urls" />
 <@dump var="fruit" />
 <@dump var="trueStatement" />
 <@dump var="zoo1" />
-<@dump var="pojo" />
 
-${stylesheets.addFromTheme("/css/sstest.css", "/css/sstest2.css")}
-${scripts.addFromTheme("/js/jstest.js")}
-${scripts.add("/js/script1.js", "/js/script2.js", "/js/script3.js")}
-
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/script1.js"></script>',
+              '<script type="text/javascript" src="${urls.base}/js/script2.js"></script>',
+              '<script type="text/javascript" src="${urls.base}/js/script3.js"></script>')}
 
 <@dumpAll />
 
-<@help directive="dump" />
+<@help for="dump" />
 
-<@describe var="stylesheets" />
+<@help for="profileUrl" />
 
-<@describe var="scripts" />
 
-<@describe var="headScripts" />
+
 
