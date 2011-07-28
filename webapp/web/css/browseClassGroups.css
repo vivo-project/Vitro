@@ -34,25 +34,29 @@ ul#browse-classgroups {
     margin-top: 10px;
     padding-top: 10px;
 }
+
 ul#browse-classgroups li {
     display: block;
     border-bottom: 1px solid #dde4e3;
     font-size: 18px;
     width: 200px;
-    height: 35px;
-    line-height: 35px;
+    line-height: 1.5em;
 }
+
 ul#browse-classgroups li:last-child {
     border-bottom: none
 }
+
 ul#browse-classgroups a {
     display: block;
     padding-left: 15px;
     width: 200px;
-    height: 35px;
     color: #5e6363;
     text-decoration: none;
+    padding-top: 8px;
+    padding-bottom: 8px;
 }
+
 ul#browse-classgroups .count-classes {
     font-size: 14px
 }
