@@ -251,3 +251,7 @@ span.controls {
     margin-top: -30px;
     padding-right: 5px;
 }
+/* Co-author and co-investigator visualizations */
+#ego_profile {
+    min-height: 100px;
+}
