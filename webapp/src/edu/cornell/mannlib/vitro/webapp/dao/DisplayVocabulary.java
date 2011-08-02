@@ -27,6 +27,7 @@ public class DisplayVocabulary {
     
     /* Individuals */
     public static final String DEFAULT_MENU = NS + "DefaultMenu";
+    public static final String HOME_PAGE_URI = NS + "Home";
     public static final String SEARCH_INDEX_URI = NS + "SearchIndex";
     
     //bk392 for extracting properties beyond context nodes.
@@ -36,16 +37,19 @@ public class DisplayVocabulary {
     //Corresponding to statements in menu management that define class of data getter to be used
     public static final String PAGE_TYPE = NS + "Page";
     public static final String HOME_PAGE_TYPE = NS + "HomePage";
+   
+    
     public static final String CLASSGROUP_PAGE_TYPE = NS + "ClassGroupPage";
     public static final String CLASSINDIVIDUALS_PAGE_TYPE = NS + "IndividualsForClassesPage";
     public static final String CLASSINDIVIDUALS_INTERNAL_TYPE = NS + "InternalClassesPage";
-
+   
     /* Object Properties */
     public static final String FOR_CLASSGROUP = NS + "forClassGroup";
     public static final String CLASS_INTERSECTION = NS + "intersectsWithClass";
     public static final String HAS_CLASS_INTERSECTION = NS + "hasClassIntersection";
     public static final String ITEM_TO_PAGE = NS + "toPage";
     public static final String HAS_ELEMENT = NS + "hasElement";
+    public static final String USES_DATAGETTER_CLASS = NS + "usesDataGetterClass";
 
     /**Data Getter object properties **/
     public static final String HAS_DATA_GETTER = NS + "hasDataGetter";

@@ -2,14 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import java.util.Collections;
+
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -20,11 +16,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.BrowseDataGetter;
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetter;
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.ClassGroupPageData;
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.IndividualsForClassesDataGetter;
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.InternalClassesDataGetter;
 import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.DataGetterUtils;
 /**
  * Controller for getting data for pages defined in the display model. 
@@ -121,33 +112,11 @@ public class PageController extends FreemarkerHttpServlet{
         else
             throw new Exception("no page found for " + vreq.getRequestURI() );
     }
-
-    public static Map<String,PageDataGetter> getPageDataGetterMap(ServletContext sc){
-        setupDataGetters(sc);
-        return (Map<String,PageDataGetter>)sc.getAttribute(DATA_GETTER_MAP);
-    }        
+      
     
     public static void putPageUri(HttpServletRequest req, String pageUri){
         req.setAttribute("pageURI", pageUri);
     }  
-
-    public static void setupDataGetters(ServletContext context ){
-        if( context != null && context.getAttribute(DATA_GETTER_MAP) == null ){
-            context.setAttribute(DATA_GETTER_MAP, new HashMap<String,PageDataGetter>());
-            
-            /* register all page data getters with the PageController servlet.  
-             * There should be a better way of doing this. */                        
-            ClassGroupPageData cgpd = new ClassGroupPageData();
-            getPageDataGetterMap(context).put(cgpd.getType(), cgpd);      
-            BrowseDataGetter bdg = new BrowseDataGetter();
-            getPageDataGetterMap(context).put(bdg.getType(), bdg);
-            IndividualsForClassesDataGetter cidg =  new IndividualsForClassesDataGetter();
-            getPageDataGetterMap(context).put(cidg.getType(), cidg);
-            InternalClassesDataGetter internalCdg =  new InternalClassesDataGetter();
-            getPageDataGetterMap(context).put(internalCdg.getType(), internalCdg);
-            
-        }
-    }
     
     
 }

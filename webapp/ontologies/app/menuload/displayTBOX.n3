@@ -99,7 +99,8 @@ owl:versionInfo
 <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#hasMenuText>
       a       owl:DatatypeProperty .  
       
-      
+  <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#usesDataGetterClass>
+      a       owl:DatatypeProperty .      
       
       
 ######### Object Properties#########
@@ -171,3 +172,5 @@ owl:topObjectProperty
       
 <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#restrictResultsByClass>
       a       owl:ObjectProperty .    
+      
+        

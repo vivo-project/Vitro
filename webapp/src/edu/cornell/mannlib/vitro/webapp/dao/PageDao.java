@@ -23,8 +23,10 @@ public interface PageDao {
    
     String getClassGroupPage(String pageUri);
         
-    Map<String, List<String>> getClassesAndRestrictionsForPage(String pageUri);
+    Map<String, Object> getClassesAndRestrictionsForPage(String pageUri);
 
     Map<String, Object> getClassesAndCheckInternal(String pageUri);
+    
+    List<String> getDataGetterClass(String pageUri);
 
 }

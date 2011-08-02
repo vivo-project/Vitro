@@ -29,6 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListCont
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 
 public class DataGetterUtils {
     protected static final String DATA_GETTER_MAP = "pageTypeToDataGetterMap";
@@ -37,26 +38,18 @@ public class DataGetterUtils {
     public static Map<String,Object> getDataForPage(String pageUri, VitroRequest vreq, ServletContext context) {
         //Based on page type get the appropriate data getter
         Map<String, Object> page = getMapForPage(vreq, pageUri);
-        //Get data getters map
-        Map<String, PageDataGetter> dataGetterMap = getPageDataGetterMap(context);
-        //Get types associated with page
         Map<String,Object> data = new HashMap<String,Object>();
-        List<String> dataGetters = (List<String>)page.get("dataGetters");
-        log.debug("Retrieved data getters for Page " + pageUri + " = " + dataGetters.toString());
-        if( dataGetters != null ){
-            for( String dataGetter : dataGetters){
+        List<PageDataGetter> dataGetters = getDataGetterObjects(vreq, pageUri);
+        for(PageDataGetter getter: dataGetters) {
+            try{
                 Map<String,Object> moreData = null;
-                PageDataGetter getter = dataGetterMap.get(dataGetter);
-                log.debug("Retrieved data getter for " + dataGetter);
-                try{
-                    moreData = getAdditionalData(pageUri, dataGetter, page, vreq, getter, context);
-                    if( moreData != null)
-                        data.putAll(moreData);
-                }catch(Throwable th){
-                    log.error(th,th);
-                }                    
-            }            
-        }        
+                moreData = getAdditionalData(pageUri, getter.getType(), page, vreq, getter, context);
+                if( moreData != null)
+                    data.putAll(moreData);
+            }catch(Throwable th){
+                log.error(th,th);
+            } 
+        }
         return data;
     }
 
@@ -68,33 +61,29 @@ public class DataGetterUtils {
     public static JSONObject covertDataToJSONForPage(String pageUri, Map<String, Object> data, VitroRequest vreq, ServletContext context) {
         //Based on page type get the appropriate data getter
         Map<String, Object> page = getMapForPage(vreq, pageUri);
-        //Get data getters map
-        Map<String, PageDataGetter> dataGetterMap = getPageDataGetterMap(context);
         //Get types associated with page
         JSONObject rObj = null;
         List<String> types = (List<String>)page.get("types");
-        if( types != null ){
-            for( String type : types){
-                JSONObject typeObj = null;
-                PageDataGetter getter = dataGetterMap.get(type);
-                try{
-                    typeObj = getter.convertToJSON(data, vreq);
-                    if( typeObj != null) {
-                        //Copy over everything from this type Obj to 
-                        //TODO: Review how to handle duplicate keys, etc.
-                        if(rObj != null) {
-                            //For now, just nests as separate entry
-                            rObj.put(type, typeObj);
-                        } else {
-                            rObj = typeObj;
-                        }
-                    }
-                        
-                }catch(Throwable th){
-                    log.error(th,th);
-                }                    
-            }            
-        }        
+        List<PageDataGetter> dataGetters = getDataGetterObjects(vreq, pageUri);
+        for(PageDataGetter getter: dataGetters) {
+        	 JSONObject typeObj = null;
+             try{
+                 typeObj = getter.convertToJSON(data, vreq);
+                 if( typeObj != null) {
+                     //Copy over everything from this type Obj to 
+                     //TODO: Review how to handle duplicate keys, etc.
+                     if(rObj != null) {
+                         //For now, just nests as separate entry
+                         rObj.put(getter.getType(), typeObj);
+                     } else {
+                         rObj = typeObj;
+                     }
+                 }      
+        	
+            } catch(Throwable th){
+                log.error(th,th);
+            }
+        }     
         return rObj;
     }
     /*
@@ -105,38 +94,7 @@ public class DataGetterUtils {
         return vreq.getWebappDaoFactory().getPageDao().getPage(pageUri);
     }
     
-    public static void setupDataGetters(ServletContext context){
-        if( context != null && context.getAttribute(DATA_GETTER_MAP) == null ){
-            context.setAttribute(DATA_GETTER_MAP, new HashMap<String,PageDataGetter>());
-                
-            /* register all page data getters with the PageController servlet.  
-             * There should be a better way of doing this. */                        
-            ClassGroupPageData cgpd = new ClassGroupPageData();
-            getPageDataGetterMap(context).put(cgpd.getType(), cgpd);      
-            BrowseDataGetter bdg = new BrowseDataGetter();
-            getPageDataGetterMap(context).put(bdg.getType(), bdg);
-            //TODO: Check if can include by type here
-            IndividualsForClassesDataGetter cidg =  new IndividualsForClassesDataGetter();
-            getPageDataGetterMap(context).put(cidg.getType(), cidg);
-            InternalClassesDataGetter internalCdg =  new InternalClassesDataGetter();
-            getPageDataGetterMap(context).put(internalCdg.getType(), internalCdg);
-                
-        }
-    }
-    
-    public static Map<String,PageDataGetter> getPageDataGetterMap(ServletContext sc){
-        setupDataGetters(sc);
-        return (Map<String,PageDataGetter>)sc.getAttribute(DATA_GETTER_MAP);
-    }
-    /*
-    //Based on page Uri, do conversions
-    public static PageDataGetter getDataGetterForType(String type, ServletContext sc) {
-        Map<String, PageDataGetter> map = getPageDataGetterMap(sc);
-        PageDataGetter pdg = (PageDataGetter) map.get(type);
-        return pdg;
-    }*/
-    
-    protected static Map<String,Object> getAdditionalData(
+    public static Map<String,Object> getAdditionalData(
             String pageUri, String dataGetterName, Map<String, Object> page, VitroRequest vreq, PageDataGetter getter, ServletContext context) {        
         if(dataGetterName == null || dataGetterName.isEmpty())
             return Collections.emptyMap();
@@ -153,6 +111,42 @@ public class DataGetterUtils {
         } else {
             return Collections.emptyMap();
         }
+    }
+    
+    /***
+     * For the page, get the actual Data Getters to be employed
+     */
+    public static List<PageDataGetter> getDataGetterObjects(VitroRequest vreq, String pageUri) {
+    	List<PageDataGetter> dataGetterObjects = new ArrayList<PageDataGetter>();
+    	try {
+	    	List<String> dataGetterClassNames = vreq.getWebappDaoFactory().getPageDao().getDataGetterClass(pageUri);
+			
+	    	
+	    	for(String dgClassName: dataGetterClassNames) {
+	    		String className = getClassNameFromUri(dgClassName);
+	    		PageDataGetter pg = (PageDataGetter) Class.forName(className).newInstance();
+	    		if(pg != null) {
+	    			dataGetterObjects.add(pg);
+	    		} else {
+	    			log.error("Data getter does not exist for " + className);
+	    		}
+	    	} 
+	    }
+    	catch(Exception ex) {
+    		log.error("Error occurred in retrieving data getter class names for "+ pageUri, ex);
+    	}
+    	return dataGetterObjects;
+    }
+    
+    //Class uris returned include "java:" and to instantiate object need to remove java: portion
+    public static String getClassNameFromUri(String dataGetterClassUri) {
+    	if(dataGetterClassUri.contains("java:")) {
+    		String[] splitArray = dataGetterClassUri.split("java:");
+    		if(splitArray.length > 1) {
+    			return splitArray[1];
+    		}
+    	}
+    	return dataGetterClassUri;
     }
     
     /**
@@ -305,6 +299,44 @@ public class DataGetterUtils {
         return map;        
     }
     
+	
+    //Get All VClass Groups information
+    //Used within menu management and processing
+    //TODO: Check if more appropriate location possible
+    public static List<HashMap<String, String>> getClassGroups(ServletContext context) {
+    	//Wanted this to be 
+    	VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+        List<VClassGroup> vcgList = vcgc.getGroups();
+        //For now encoding as hashmap with label and URI as trying to retrieve class group
+        //results in errors for some reason
+        List<HashMap<String, String>> classGroups = new ArrayList<HashMap<String, String>>();
+        for(VClassGroup vcg: vcgList) {
+        	HashMap<String, String> hs = new HashMap<String, String>();
+        	hs.put("publicName", vcg.getPublicName());
+        	hs.put("URI", vcg.getURI());
+        	classGroups.add(hs);
+        }
+        return classGroups;
+    }
     
+    //Return data getter type to be employed in display model
+    public static String generateDataGetterTypeURI(String dataGetterClassName) {
+    	return "java:" + dataGetterClassName;
+    }
+    
+   //TODO: Check whether this needs to be put here or elsewhere, as this is data getter specific
+    //with respect to class groups
+  //Need to use VClassGroupCache to retrieve class group information - this is the information returned from "for class group"
+	public static void getClassGroupForDataGetter(ServletContext context, Map<String, Object> pageData, Map<String, Object> templateData) {
+    	//Get the class group from VClassGroup, this is the same as the class group for the class group page data getter
+		//and the associated class group (not custom) for individuals datagetter
+		String classGroupUri = (String) pageData.get("classGroupUri");
+		VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+    	VClassGroup group = vcgc.getGroup(classGroupUri);
+
+		templateData.put("classGroup", group);
+		templateData.put("associatedPage", group.getPublicName());
+		templateData.put("associatedPageURI", group.getURI());
+    }
     
 }

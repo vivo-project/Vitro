@@ -17,6 +17,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
@@ -24,6 +30,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
 
@@ -34,35 +43,64 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateMo
  */
 public class IndividualsForClassesDataGetter implements PageDataGetter{
     private static final Log log = LogFactory.getLog(IndividualsForClassesDataGetter.class);
-    protected static String restrictClassesTemplateName = "restricted";
+    protected static String restrictClassesTemplateName = null;
     public Map<String,Object> getData(ServletContext context, VitroRequest vreq, String pageUri, Map<String, Object> page ){
-        HashMap<String, Object> data = new HashMap<String,Object>();
+        this.setTemplateName();
+    	HashMap<String, Object> data = new HashMap<String,Object>();
         //This is the old technique of getting class intersections
-        Map<String, List<String>> classIntersectionsMap = vreq.getWebappDaoFactory().getPageDao().getClassesAndRestrictionsForPage(pageUri);
+        PageDao pageDao = vreq.getWebappDaoFactory().getPageDao();
+        Map<String, Object> classIntersectionsMap = getClassIntersectionsMap(pageDao, pageUri);
         
         try{
-        	List<String> classes = classIntersectionsMap.get("classes");
-        	List<String> restrictClasses = classIntersectionsMap.get("restrictClasses");
+        	List<String> classes = retrieveClasses(context, classIntersectionsMap);
+        	List<String> restrictClasses = retrieveRestrictClasses(context, classIntersectionsMap);
         	log.debug("Retrieving classes for " + classes.toString() + " and restricting by " + restrictClasses.toString());
         	processClassesAndRestrictions(vreq, context, data, classes, restrictClasses);
         	 //Also add data service url
             //Hardcoding for now, need a more dynamic way of doing this
             data.put("dataServiceUrlIndividualsByVClass", this.getDataServiceUrl());
+            //this is the class group associated with the data getter utilized for display on menu editing, not the custom one created
+            data.put("classGroupUri", pageDao.getClassGroupPage(pageUri));
         } catch(Exception ex) {
         	log.error("An error occurred retrieving Vclass Intersection individuals", ex);
         }
              
         return data;
     }        
+   
+    protected void setTemplateName() {
+    	this.restrictClassesTemplateName = "restricted";
+    }
+    
+    protected Map<String, Object> getClassIntersectionsMap(PageDao pageDao, 
+			String pageUri) {
+		// TODO Auto-generated method stub
+    	return pageDao.getClassesAndRestrictionsForPage(pageUri);
+	}
+    
+    protected List<String> retrieveClasses(
+			ServletContext context, Map<String, Object> classIntersectionsMap) {
+    	List<String> restrictClasses = (List<String>) classIntersectionsMap.get("classes");
+		return restrictClasses;
+	}    
+    
+    protected List<String> retrieveRestrictClasses(
+			ServletContext context, Map<String, Object> classIntersectionsMap) {
+    	List<String> restrictClasses = (List<String>) classIntersectionsMap.get("restrictClasses");
+		return restrictClasses;
+	}        
     
     protected void processClassesAndRestrictions(VitroRequest vreq, ServletContext context, 
     		HashMap<String, Object> data, List<String> classes, List<String> restrictClasses ) {
     	processClassesForDisplay(context, data, classes);
     	processRestrictionClasses(vreq, context, data, restrictClasses);
     	processIntersections(vreq, context, data);
+    	
     }
     
-    //At this point, data specifices whether or not intersections included
+
+
+	//At this point, data specifices whether or not intersections included
     private void processIntersections(VitroRequest vreq,
 			ServletContext context, HashMap<String, Object> data) {
     	VClassGroup classesGroup = (VClassGroup) data.get("vClassGroup");
@@ -122,7 +160,6 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
   
     	VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
     	for(String classUri: classes) {
-    		//VClass vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(classUri);
     		//Retrieve vclass from cache to get the count
     		VClass vclass = vcgc.getCachedVClass(classUri);
     		if(vclass != null) {
@@ -152,10 +189,15 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
 	    	List<VClass> restrictVClasses = new ArrayList<VClass>();
 	    	
 	    	List<String> urlEncodedRestrictClasses = new ArrayList<String>();
+	    	VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+
 	    	if(restrictClasses.size() > 0) {
 	    		//classes for restriction are not displayed so don't need to include their class individual counts
 	    		for(String restrictClassUri: restrictClasses) {
-	    			VClass vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(restrictClassUri);
+	    			//Also uses cache to remain consistent with process classes and also allow
+	    			//vclasses to be returned even if switched to display model, although
+	    			//uris used within display model editing and not vclass objects
+	    			VClass vclass = vcgc.getCachedVClass(restrictClassUri);
 	        		if(vclass != null) {
 	        			log.debug("Found restrict class and adding to list " + restrictClassUri);
 	        			restrictVClasses.add(vclass);
@@ -226,7 +268,7 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
     }
     
     public String getType(){
-        return DisplayVocabulary.CLASSINDIVIDUALS_PAGE_TYPE;
+        return DataGetterUtils.generateDataGetterTypeURI(IndividualsForClassesDataGetter.class.getName());
     } 
     
     //Get data servuice

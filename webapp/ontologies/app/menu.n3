@@ -26,4 +26,10 @@ display:Home
     a display:HomePage ;
     a display:Page ;
     display:title "Home" ;
-    display:urlMapping "/" .
+    display:urlMapping "/" ;
+    display:hasDataGetter display:homeDataGetter .
+    
+########## Data Getter ############
+    
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#homeDataGetter>
+      a <java:edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.BrowseDataGetter> .    
