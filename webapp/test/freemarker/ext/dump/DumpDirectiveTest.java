@@ -28,12 +28,14 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
+import freemarker.core.CollectionAndSequence;
 import freemarker.core.Environment;
 import freemarker.ext.beans.BeansWrapper;
+import freemarker.ext.beans.CollectionModel;
 import freemarker.ext.dump.BaseDumpDirective.DateType;
 import freemarker.ext.dump.BaseDumpDirective.Key;
-import freemarker.ext.dump.BaseDumpDirective.Value;
 import freemarker.ext.dump.BaseDumpDirective.Type;
+import freemarker.ext.dump.BaseDumpDirective.Value;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleCollection;
 import freemarker.template.Template;
@@ -445,14 +447,14 @@ public class DumpDirectiveTest {
         
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
         expectedDumpValue.put(Key.TYPE.toString(), Type.SEQUENCE);
-        List<Map<String, Object>> myArrayexpectedDumpValue = new ArrayList<Map<String, Object>>(myArray.length);
+        List<Map<String, Object>> myArrayExpectedDumpValue = new ArrayList<Map<String, Object>>(myArray.length);
         for ( String str : myArray) {
             Map<String, Object> itemDump = new HashMap<String, Object>();
             itemDump.put(Key.TYPE.toString(), Type.STRING);
             itemDump.put(Key.VALUE.toString(), str);
-            myArrayexpectedDumpValue.add(itemDump);
+            myArrayExpectedDumpValue.add(itemDump);
         }
-        expectedDumpValue.put(Key.VALUE.toString(), myArrayexpectedDumpValue);
+        expectedDumpValue.put(Key.VALUE.toString(), myArrayExpectedDumpValue);
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
         expectedDump.put(varName, expectedDumpValue);
@@ -488,36 +490,36 @@ public class DumpDirectiveTest {
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
         expectedDumpValue.put(Key.TYPE.toString(), Type.SEQUENCE);
         
-        List<Map<String, Object>> mixedListexpectedDumpValue = new ArrayList<Map<String, Object>>(mixedList.size());
+        List<Map<String, Object>> mixedListExpectedDumpValue = new ArrayList<Map<String, Object>>(mixedList.size());
         
-        Map<String, Object> myStringexpectedDumpValue = new HashMap<String, Object>();        
-        myStringexpectedDumpValue.put(Key.TYPE.toString(), Type.STRING);
-        myStringexpectedDumpValue.put(Key.VALUE.toString(), myString);
-        mixedListexpectedDumpValue.add(myStringexpectedDumpValue);
+        Map<String, Object> myStringExpectedDumpValue = new HashMap<String, Object>();        
+        myStringExpectedDumpValue.put(Key.TYPE.toString(), Type.STRING);
+        myStringExpectedDumpValue.put(Key.VALUE.toString(), myString);
+        mixedListExpectedDumpValue.add(myStringExpectedDumpValue);
  
-        Map<String, Object> myIntexpectedDumpValue = new HashMap<String, Object>();  
-        myIntexpectedDumpValue.put(Key.TYPE.toString(), Type.NUMBER);
-        myIntexpectedDumpValue.put(Key.VALUE.toString(), myInt);
-        mixedListexpectedDumpValue.add(myIntexpectedDumpValue);
+        Map<String, Object> myIntExpectedDumpValue = new HashMap<String, Object>();  
+        myIntExpectedDumpValue.put(Key.TYPE.toString(), Type.NUMBER);
+        myIntExpectedDumpValue.put(Key.VALUE.toString(), myInt);
+        mixedListExpectedDumpValue.add(myIntExpectedDumpValue);
         
-        Map<String, Object> myBoolexpectedDumpValue = new HashMap<String, Object>();  
-        myBoolexpectedDumpValue.put(Key.TYPE.toString(), Type.BOOLEAN);
-        myBoolexpectedDumpValue.put(Key.VALUE.toString(), myBool);
-        mixedListexpectedDumpValue.add(myBoolexpectedDumpValue);
+        Map<String, Object> myBoolExpectedDumpValue = new HashMap<String, Object>();  
+        myBoolExpectedDumpValue.put(Key.TYPE.toString(), Type.BOOLEAN);
+        myBoolExpectedDumpValue.put(Key.VALUE.toString(), myBool);
+        mixedListExpectedDumpValue.add(myBoolExpectedDumpValue);
         
-        Map<String, Object> myListexpectedDumpValue = new HashMap<String, Object>();
-        myListexpectedDumpValue.put(Key.TYPE.toString(), Type.SEQUENCE); 
-        List<Map<String, Object>> myListItemsexpectedDumpValue = new ArrayList<Map<String, Object>>(myList.size());
+        Map<String, Object> myListExpectedDumpValue = new HashMap<String, Object>();
+        myListExpectedDumpValue.put(Key.TYPE.toString(), Type.SEQUENCE); 
+        List<Map<String, Object>> myListItemsExpectedDumpValue = new ArrayList<Map<String, Object>>(myList.size());
         for ( String animal : myList ) {
             Map<String, Object> itemDump = new HashMap<String, Object>();
             itemDump.put(Key.TYPE.toString(), Type.STRING);
             itemDump.put(Key.VALUE.toString(), animal);
-            myListItemsexpectedDumpValue.add(itemDump);            
+            myListItemsExpectedDumpValue.add(itemDump);            
         }        
-        myListexpectedDumpValue.put(Key.VALUE.toString(), myListItemsexpectedDumpValue);
-        mixedListexpectedDumpValue.add(myListexpectedDumpValue);
+        myListExpectedDumpValue.put(Key.VALUE.toString(), myListItemsExpectedDumpValue);
+        mixedListExpectedDumpValue.add(myListExpectedDumpValue);
         
-        expectedDumpValue.put(Key.VALUE.toString(), mixedListexpectedDumpValue);
+        expectedDumpValue.put(Key.VALUE.toString(), mixedListExpectedDumpValue);
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
         expectedDump.put(varName, expectedDumpValue);
@@ -541,14 +543,14 @@ public class DumpDirectiveTest {
         
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
         expectedDumpValue.put(Key.TYPE.toString(), Type.SEQUENCE);        
-        List<Map<String, Object>> myIntSetexpectedDumpValue = new ArrayList<Map<String, Object>>(myIntSet.size());
+        List<Map<String, Object>> myIntSetExpectedDumpValue = new ArrayList<Map<String, Object>>(myIntSet.size());
         for ( int i : myIntSet ) {
             Map<String, Object> itemDump = new HashMap<String, Object>();
             itemDump.put(Key.TYPE.toString(), Type.NUMBER);
             itemDump.put(Key.VALUE.toString(), i);
-            myIntSetexpectedDumpValue.add(itemDump);
+            myIntSetExpectedDumpValue.add(itemDump);
         }
-        expectedDumpValue.put(Key.VALUE.toString(), myIntSetexpectedDumpValue);
+        expectedDumpValue.put(Key.VALUE.toString(), myIntSetExpectedDumpValue);
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
         expectedDump.put(varName, expectedDumpValue);
@@ -557,7 +559,7 @@ public class DumpDirectiveTest {
     }
     
     @Test
-    public void dumpNumberCollection() {
+    public void dumpSimpleCollection() {
 
         String varName = "oddNums";
         Map<String, Object> dataModel = new HashMap<String, Object>();
@@ -573,20 +575,85 @@ public class DumpDirectiveTest {
         
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
         expectedDumpValue.put(Key.TYPE.toString(), Type.COLLECTION);       
-        List<Map<String, Object>> myCollectionexpectedDumpValue = new ArrayList<Map<String, Object>>(odds.size());
+        List<Map<String, Object>> myCollectionExpectedDumpValue = new ArrayList<Map<String, Object>>(odds.size());
         for ( int i : odds ) {
             Map<String, Object> itemDump = new HashMap<String, Object>();
             itemDump.put(Key.TYPE.toString(), Type.NUMBER);
             itemDump.put(Key.VALUE.toString(), i);
-            myCollectionexpectedDumpValue.add(itemDump);
+            myCollectionExpectedDumpValue.add(itemDump);
         }
-        expectedDumpValue.put(Key.VALUE.toString(), myCollectionexpectedDumpValue);
+        expectedDumpValue.put(Key.VALUE.toString(), myCollectionExpectedDumpValue);
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
         expectedDump.put(varName, expectedDumpValue);
         
         test(varName, dataModel, expectedDump); 
     }    
+
+    @Test
+    public void dumpCollectionModel() {
+
+        String varName = "oddNums";
+        Map<String, Object> dataModel = new HashMap<String, Object>();
+        
+        Set<Integer> odds = new HashSet<Integer>();
+        for (int i=0; i <= 10; i++) {
+            if (i % 2 == 1) {
+                odds.add(i);
+            }
+        }
+        TemplateCollectionModel myCollection = new CollectionModel(odds, new BeansWrapper());
+        dataModel.put(varName, myCollection);
+        
+        Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
+        expectedDumpValue.put(Key.TYPE.toString(), Type.COLLECTION);       
+        List<Map<String, Object>> myCollectionExpectedDumpValue = new ArrayList<Map<String, Object>>(odds.size());
+        for ( int i : odds ) {
+            Map<String, Object> itemDump = new HashMap<String, Object>();
+            itemDump.put(Key.TYPE.toString(), Type.NUMBER);
+            itemDump.put(Key.VALUE.toString(), i);
+            myCollectionExpectedDumpValue.add(itemDump);
+        }
+        expectedDumpValue.put(Key.VALUE.toString(), myCollectionExpectedDumpValue);
+
+        Map<String, Object> expectedDump = new HashMap<String, Object>();
+        expectedDump.put(varName, expectedDumpValue);
+        
+        test(varName, dataModel, expectedDump); 
+    }  
+ 
+    @Test
+    public void dumpCollectionAndSequenceModel() {
+
+        String varName = "oddNums";
+        Map<String, Object> dataModel = new HashMap<String, Object>();
+        
+        Set<Integer> odds = new HashSet<Integer>();
+        for (int i=0; i <= 10; i++) {
+            if (i % 2 == 1) {
+                odds.add(i);
+            }
+        }
+        TemplateCollectionModel coll = new CollectionModel(odds, new BeansWrapper());
+        TemplateCollectionModel myCollection = new CollectionAndSequence(coll);
+        dataModel.put(varName, myCollection);
+        
+        Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
+        expectedDumpValue.put(Key.TYPE.toString(), Type.SEQUENCE);       
+        List<Map<String, Object>> myCollectionExpectedDumpValue = new ArrayList<Map<String, Object>>(odds.size());
+        for ( int i : odds ) {
+            Map<String, Object> itemDump = new HashMap<String, Object>();
+            itemDump.put(Key.TYPE.toString(), Type.NUMBER);
+            itemDump.put(Key.VALUE.toString(), i);
+            myCollectionExpectedDumpValue.add(itemDump);
+        }
+        expectedDumpValue.put(Key.VALUE.toString(), myCollectionExpectedDumpValue);
+
+        Map<String, Object> expectedDump = new HashMap<String, Object>();
+        expectedDump.put(varName, expectedDumpValue);
+        
+        test(varName, dataModel, expectedDump); 
+    }  
     
     @Test
     public void dumpHash() {

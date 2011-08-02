@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import freemarker.core.Environment;
+import freemarker.ext.beans.CollectionModel;
 import freemarker.ext.beans.StringModel;
 import freemarker.template.Template;
 import freemarker.template.TemplateBooleanModel;
@@ -169,7 +170,11 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         if (model != null) {
             
             if ( model instanceof TemplateSequenceModel ) {
-                map.putAll( getTemplateModelDump( ( TemplateSequenceModel)model ) );
+                if (model instanceof CollectionModel && ! ((CollectionModel)model).getSupportsIndexedAccess()) {
+                    map.putAll( getTemplateModelDump( ( TemplateCollectionModel)model ) );                   
+                } else {
+                    map.putAll( getTemplateModelDump( ( TemplateSequenceModel)model ) );
+                }
                 
             } else if ( model instanceof TemplateNumberModel ) {
                 map.putAll( getTemplateModelDump( (TemplateNumberModel)model ) );
