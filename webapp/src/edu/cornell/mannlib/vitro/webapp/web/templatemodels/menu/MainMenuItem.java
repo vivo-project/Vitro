@@ -21,6 +21,8 @@ public class MainMenuItem extends MenuItem {
         this.active = active;
     }
      
+    /* Template properties */
+    
     public boolean isActive() {
         return active;
     }

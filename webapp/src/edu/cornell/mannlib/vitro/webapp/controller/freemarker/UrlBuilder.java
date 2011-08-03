@@ -272,7 +272,7 @@ public class UrlBuilder {
         }        
 
     	if (profileUrl != null) {
-    		HashMap<String, String> specialParams = getSpecialParams(vreq);
+    		HashMap<String, String> specialParams = getModelParams(vreq);
     		if(specialParams.size() != 0) {
     			profileUrl = addParams(profileUrl, new ParamMap(specialParams));
     		}
@@ -321,7 +321,7 @@ public class UrlBuilder {
     
     //To be used in different property templates so placing method for reuse here
     //Check if special params included, specifically for menu management and other models
-    public static HashMap<String,String> getSpecialParams(VitroRequest vreq) {
+    public static HashMap<String,String> getModelParams(VitroRequest vreq) {
     	
     	HashMap<String,String> specialParams = new HashMap<String, String>();
     	if(vreq != null) {

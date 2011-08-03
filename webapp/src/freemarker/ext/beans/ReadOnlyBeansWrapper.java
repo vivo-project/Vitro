@@ -33,7 +33,19 @@ public class ReadOnlyBeansWrapper extends BeansWrapper {
             decision.setExposeMethodAs(null);
         } else if ( method.getReturnType().getName().equals("void") ) {
             decision.setExposeMethodAs(null);
-        }        
+        }
     }
+    
+// For exposing a method as a property (when it's not named getX or isX). Note that this is not
+// just a syntactic change in the template from X() to X, but also makes the value get precomputed.
+//    private void exposeAsProperty(Method method, MethodAppearanceDecision decision)  {
+//        try {
+//            PropertyDescriptor pd = new PropertyDescriptor(method.getName(), method, null);
+//            decision.setExposeAsProperty(pd);
+//            decision.setMethodShadowsProperty(false);
+//        } catch (IntrospectionException e) {
+//            log.error(e, e);
+//        }
+//    }
     
 }

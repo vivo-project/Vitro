@@ -96,7 +96,10 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
     }
     
     
-    /* Access methods for templates */
+    /* Template properties */
+    
+    
+    /* Template methods */
     
     public String getValue() {
         return value;
@@ -113,11 +116,8 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
                 params.put("deleteProhibited", "prohibited");
             }
             
-            //Check if special parameters being sent
-            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vreq);
-            if(specialParams.size() > 0) {
-            	params.putAll(specialParams);
-            }
+            params.putAll(UrlBuilder.getModelParams(vreq));
+            
             editUrl = UrlBuilder.getUrl(EDIT_PATH, params);    
         }
         return editUrl;
@@ -132,11 +132,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
                     "datapropKey", dataPropHash,
                     "cmd", "delete");
             
-            //Check if special parameters being sent
-            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vreq);
-            if(specialParams.size() > 0) {
-            	params.putAll(specialParams);
-            }
+            params.putAll(UrlBuilder.getModelParams(vreq));
             
             deleteUrl = UrlBuilder.getUrl(EDIT_PATH, params);
         }

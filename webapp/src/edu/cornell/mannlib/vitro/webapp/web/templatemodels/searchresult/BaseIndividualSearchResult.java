@@ -43,7 +43,7 @@ public abstract class BaseIndividualSearchResult extends BaseTemplateModel {
         return models;
     }
     
-    /* Access methods for templates */
+    /* Template properties */
 
     public String getProfileUrl() {
         return UrlBuilder.getIndividualProfileUrl(individual, vreq);

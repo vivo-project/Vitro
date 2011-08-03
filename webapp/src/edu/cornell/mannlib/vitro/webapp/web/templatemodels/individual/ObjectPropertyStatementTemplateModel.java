@@ -82,11 +82,7 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
                 params.put("deleteProhibited", "prohibited");
             }
             
-            //Check if special parameters being sent
-            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vreq);
-            if(specialParams.size() > 0) {
-            	params.putAll(specialParams);
-            }
+            params.putAll(UrlBuilder.getModelParams(vreq));
             
             editUrl = UrlBuilder.getUrl(EDIT_PATH, params);
         }
@@ -105,6 +101,7 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
                     "predicateUri", propertyUri,
                     "objectUri", objectUri,
                     "cmd", "delete");
+            
             for ( String key : data.keySet() ) {
                 String value = data.get(key);
                 // Remove an entry with a null value instead of letting it get passed
@@ -116,13 +113,10 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
                     params.put("statement_" + key, data.get(key));
                 }
             }
+            
             params.put("templateName", templateName);
             
-            //Check if special parameters being sent
-            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vreq);
-            if(specialParams.size() > 0) {
-            	params.putAll(specialParams);
-            }
+            params.putAll(UrlBuilder.getModelParams(vreq));
             
             deleteUrl = UrlBuilder.getUrl(EDIT_PATH, params);
 

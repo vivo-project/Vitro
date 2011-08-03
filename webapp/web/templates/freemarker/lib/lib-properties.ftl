@@ -40,7 +40,6 @@
     </#list> 
 </#macro>
 
-
 <#macro objectProperty property editable template=property.template>
     <#if property.collatedBySubclass> <#-- collated -->
         <@collatedObjectPropertyList property editable template />
@@ -51,7 +50,6 @@
         <@objectPropertyList property editable property.statements template />
     </#if>
 </#macro>
-
 
 <#macro collatedObjectPropertyList property editable template=property.template >
     <#assign subclasses = property.subclasses>

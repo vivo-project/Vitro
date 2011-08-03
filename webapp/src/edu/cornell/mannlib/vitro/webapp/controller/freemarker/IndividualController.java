@@ -140,7 +140,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     		 * This is still safe, because we are only putting BaseTemplateModel objects
     		 * into the data model: no real data can be modified. 
     		 */
-	        //body.put("individual", wrap(itm, BeansWrapper.EXPOSE_SAFE));
+	        // body.put("individual", wrap(itm, BeansWrapper.EXPOSE_SAFE));
     		body.put("individual", wrap(itm, new ReadOnlyBeansWrapper()));
     		
 	        body.put("headContent", getRdfLinkTag(itm));	       

@@ -321,7 +321,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), object.getClass().getName());
         
-        // Compile the sets of properties and methods available to template
+        // Compile the collections of properties and methods available to the template
         SortedMap<String, Object> properties = new TreeMap<String, Object>();
         List<String> methods = new ArrayList<String>();
         
@@ -379,6 +379,8 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                 }
                 // Else look for the entire methodName in the key set. Include those 
                 // starting with "get" or "is" that were not found above.
+                // NB This does not properly account for methods exposed as properties
+                // using BeansWrapper.finetuneMethodAppearance(). 
                 if (keySet.contains(methodName)) {               
                     String methodDisplayName = getMethodDisplayName(method);
                     methods.add(methodDisplayName);

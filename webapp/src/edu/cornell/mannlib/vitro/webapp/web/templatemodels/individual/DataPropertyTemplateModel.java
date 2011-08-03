@@ -104,11 +104,8 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
                     "subjectUri", subjectUri,
                     "predicateUri", propertyUri);
             
-            //Check if special parameters being sent            
-            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vreq);
-            if(specialParams.size() > 0) {
-            	params.putAll(specialParams);
-            }
+            params.putAll(UrlBuilder.getModelParams(vreq));
+            
             addUrl = UrlBuilder.getUrl(EDIT_PATH, params);       
         }
         return addUrl;

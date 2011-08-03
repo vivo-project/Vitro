@@ -29,10 +29,6 @@ public class LinkTemplateModel extends BaseTemplateModel {
         setUrl(path, params);
     }
 
-    public String getUrl() {
-        return cleanTextForDisplay( url );
-    }
-
     protected void setUrl(String path) {
         url = UrlBuilder.getUrl(path);
     }
@@ -45,12 +41,17 @@ public class LinkTemplateModel extends BaseTemplateModel {
         url = UrlBuilder.getUrl(path, params);
     }
 
-    public String getText() {
-        return cleanTextForDisplay(text);
-    }
-
     protected void setText(String text) {
         this.text = StringEscapeUtils.escapeHtml(text);
     }
+    
+    /* Template properties */
+    
+    public String getUrl() {
+        return cleanTextForDisplay( url );
+    }    
 
+    public String getText() {
+        return cleanTextForDisplay(text);
+    }
 }

@@ -15,6 +15,8 @@ public class Tags extends BaseTemplateModel {
     public Tags(LinkedHashSet<String> tags) {
         this.tags = tags;
     }
+    
+    /* Template methods */
 
     public void add(String... tags) {
         for (String tag : tags) {

@@ -284,7 +284,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
 //    }
     
     
-    /* Access methods for templates */
+    /* Template properties */
     
     public List<SubclassTemplateModel> getSubclasses() {
         return subclasses;

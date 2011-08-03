@@ -58,7 +58,7 @@ public abstract class BaseTemplateModel {
         AntiScript.cleanMapValues(map, getServletContext());
     }
     
-    public static ServletContext getServletContext() {
+    protected static ServletContext getServletContext() {
         return servletContext;
     }
 
@@ -66,5 +66,6 @@ public abstract class BaseTemplateModel {
         servletContext = context;
     }
  
+    /* Template properties */
     
 }

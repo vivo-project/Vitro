@@ -426,11 +426,14 @@ public class GroupedPropertyList extends BaseTemplateModel {
         return label;
     }
 
-    /* Access methods for templates */
+    /* Template properties */
 
     public List<PropertyGroupTemplateModel> getAll() {
         return groups;
     }
+    
+    
+    /* Template methods */
 
     public PropertyTemplateModel getProperty(String propertyUri) {
 
