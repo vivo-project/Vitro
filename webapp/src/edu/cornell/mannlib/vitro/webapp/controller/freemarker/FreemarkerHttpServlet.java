@@ -78,9 +78,11 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
         super.doGet(request,response);   
         
+        VitroRequest vreq = new VitroRequest(request);
+        ResponseValues responseValues = null;
+        
     	try {
-	        VitroRequest vreq = new VitroRequest(request);
-	        
+    	    
 	        Configuration config = getConfig(vreq);
 	        vreq.setAttribute("freemarkerConfig", config);
 	        
@@ -89,13 +91,26 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 				return;
 			}
 
-			ResponseValues responseValues = processRequest(vreq);
+			responseValues = processRequest(vreq);
 	        doResponse(vreq, response, responseValues);	 
 	        
-    	} catch (TemplateProcessingException e) {
-    	    log.error(e.getMessage(), e);
-        } catch (Throwable e) {
-            log.error("FreeMarkerHttpServlet could not forward to view.", e);
+    	} catch (Throwable e) {
+    	    if (e instanceof IOException || e instanceof ServletException) {
+    	        try {
+                    throw e;
+                } catch (Throwable e1) {
+                    handleException(vreq, response, e);
+                }
+    	    }
+    	    handleException(vreq, response, e);
+    	}
+    }
+    
+    protected void handleException(VitroRequest vreq, HttpServletResponse response, Throwable t) throws ServletException {
+        try {
+            doResponse(vreq, response, new ExceptionResponseValues(t)); 
+        } catch (TemplateProcessingException e) {
+            throw new ServletException();
         }
     }
 
