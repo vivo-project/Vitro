@@ -25,7 +25,9 @@ public class SourceInstitution implements DocumentModifier {
 	public void modifyDocument(Individual individual, SolrInputDocument doc,
 			StringBuffer addUri) throws SkipIndividualException {
 		
-		doc.addField(fieldForSiteURL, siteURL);
+		doc.addField(VitroSearchTermNames.SITE_URL, siteURL);
+		doc.addField(VitroSearchTermNames.SITE_NAME, siteURL);
+		
 		doc.addField(fieldForSiteName, siteName);
 	}
 

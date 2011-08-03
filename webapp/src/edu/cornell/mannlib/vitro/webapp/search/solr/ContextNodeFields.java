@@ -33,18 +33,18 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 
 public class ContextNodeFields implements DocumentModifier{
-    private Model model;
+    protected Model model;
     
-    private boolean shutdown = false;
-    private static ExecutorService threadPool = null;
-    private static final int THREAD_POOL_SIZE = 10;	 
+    protected boolean shutdown = false;
+    protected static ExecutorService threadPool = null;
+    protected static final int THREAD_POOL_SIZE = 10;	 
     
-	private static final List<String> singleValuedQueriesForAgent = new ArrayList<String>();
-	private static final List<String> singleValuedQueriesForInformationResource = new ArrayList<String>();
-	private static final List<String> multiValuedQueriesForAgent = new ArrayList<String>();	
-	private static final String multiValuedQueryForInformationResource;	
+    protected static final List<String> singleValuedQueriesForAgent = new ArrayList<String>();
+    protected static final List<String> singleValuedQueriesForInformationResource = new ArrayList<String>();
+    protected static final List<String> multiValuedQueriesForAgent = new ArrayList<String>();	
+    protected static final String multiValuedQueryForInformationResource;	
 	
-	private Log log = LogFactory.getLog(ContextNodeFields.class);	          
+    protected Log log = LogFactory.getLog(ContextNodeFields.class);	          
    
     public ContextNodeFields(Model model){    
         this.model = model;           
@@ -52,17 +52,24 @@ public class ContextNodeFields implements DocumentModifier{
 		
     @Override
     public void modifyDocument(Individual individual, SolrInputDocument doc, StringBuffer addUri) {    	
-        log.debug("retrieving context node values..");    	    		
+        log.debug("retrieving context node values..");    	    		        
         
 		StringBuffer objectProperties = singleThreadExecute( individual, multiValuedQueriesForAgent);
 		
 		SolrInputField field = doc.getField(VitroSearchTermNames.ALLTEXT);
-		
-    	field.addValue(objectProperties + " " + runQuery(individual, multiValuedQueryForInformationResource), field.getBoost());
+		if( field == null ){
+		    doc.addField(VitroSearchTermNames.ALLTEXT, 
+		            objectProperties + " " + 
+		            runQuery(individual, multiValuedQueryForInformationResource));		    
+		}else{
+		    field.addValue(objectProperties + " " + 
+		            runQuery(individual, multiValuedQueryForInformationResource), 
+		            field.getBoost());
+		}		    	
         log.debug("context node values are retrieved");    		    
     }
 
-    private StringBuffer singleThreadExecute(Individual individual,  List<String> queries ){        
+    protected StringBuffer singleThreadExecute(Individual individual,  List<String> queries ){        
         StringBuffer propertyValues = new StringBuffer(" ");        
         for(String query : queries ){
             propertyValues.append(runQuery(individual, query));            
@@ -110,7 +117,7 @@ public class ContextNodeFields implements DocumentModifier{
     }           
 
     
-    private static final String prefix = "prefix owl: <http://www.w3.org/2002/07/owl#> "
+    protected static final String prefix = "prefix owl: <http://www.w3.org/2002/07/owl#> "
         + " prefix vitroDisplay: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>  "
         + " prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  "
         + " prefix core: <http://vivoweb.org/ontology/core#>  "
