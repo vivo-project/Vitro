@@ -1171,6 +1171,10 @@ ul#alpha-browse-individuals {
 ul#individual-tools {
     color: #8AA149;
 }
+ul#individual-tools li{
+    float: left;
+    padding-right: .5em;
+}
 #individual-intro ul.individual-urls li a {
     color: #47B6D0;
 }

@@ -43,6 +43,9 @@
     padding-left: 10px;
     margin-left: 10px;
 }
+#individual-info.withThumb {
+    width: 78%;
+}
 #individual-info h3 {
     padding-bottom: 5px;
     margin-top: 5px;
