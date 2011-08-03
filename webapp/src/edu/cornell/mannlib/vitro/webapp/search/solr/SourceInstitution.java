@@ -10,11 +10,15 @@ import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 public class SourceInstitution implements DocumentModifier {
 	
 	private String siteURL;
+	private String siteName;
+	
 	static VitroSearchTermNames term = new VitroSearchTermNames();
 	private String fieldForSiteURL = term.SITE_URL;
+	private String fieldForSiteName = term.SITE_NAME;
 	
-	public SourceInstitution(String siteURL){
+	public SourceInstitution(String siteURL, String siteName){
 		this.siteURL = siteURL;
+		this.siteName = siteName;
 	}
 	
 	@Override
@@ -22,6 +26,7 @@ public class SourceInstitution implements DocumentModifier {
 			StringBuffer addUri) throws SkipIndividualException {
 		
 		doc.addField(fieldForSiteURL, siteURL);
+		doc.addField(fieldForSiteName, siteName);
 	}
 
 	@Override
