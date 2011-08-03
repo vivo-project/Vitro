@@ -210,6 +210,12 @@ ul#alpha-browse-individuals a {
     padding-left: 8px;
     width: 10px;
 }
+nav#alpha-browse-container {
+    width: 619px;
+    float: left;
+    padding-left: 10px;
+    margin-left: 1px;
+}
 /* BROWSE INDIVIDUALS------>  */
 #individuals-in-class {
     float: right;
