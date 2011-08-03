@@ -584,6 +584,9 @@
 <!-- field for source institution's name -->
 <field name="SITE_URL" type="string" indexed="true" stored="true"/>
 
+<!--  field for preferred title -->
+<field name="PREFERRED_TITLE" type="string" indexed="true" stored="true"/>
+
 <!-- Copy nameLowercase to sortable field. -->
 <copyField source="nameLowercase" dest="nameLowercaseSingleValued" />
    

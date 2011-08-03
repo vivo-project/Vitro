@@ -73,4 +73,6 @@ public class VitroSearchTermNames {
 	
 	/** source institution url */
 	public static final String SITE_URL = "SITE_URL";
+	/** preferred title */
+	public static final String PREFERRED_TITLE = "PREFERRED_TITLE";
 }
