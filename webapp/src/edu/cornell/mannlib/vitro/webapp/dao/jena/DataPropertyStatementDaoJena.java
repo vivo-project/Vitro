@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -362,6 +363,12 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
                 Literal value = sol.getLiteral("value");
                 values.add(value);
             }
+            return values;  
+            
+        } catch (Exception e) {
+            log.error("Error getting data property values for individual " + subjectUri + " and property " + propertyUri);
+            return Collections.emptyList();
+            
         } finally {
             dataset.getLock().leaveCriticalSection();
             w.close();
@@ -369,6 +376,6 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
                 qexec.close();
             }
         }
-        return values;         
+               
     }
 }

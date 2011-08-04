@@ -321,7 +321,11 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
                     list.add(QueryUtils.querySolutionToStringValueMap(soln));
                 }
             }
+            return list;
             
+        } catch (Exception e) {
+            log.error("Error getting object property values for subject " + subjectUri + " and property " + propertyUri);
+            return Collections.emptyList();
         } finally {
             dataset.getLock().leaveCriticalSection();
             w.close();
@@ -329,7 +333,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
                 qexec.close();
             }
         }
-        return list;
+       
     }
  
     private Model constructModelForSelectQueries(String subjectUri,
@@ -366,17 +370,17 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             DatasetWrapper w = dwf.getDatasetWrapper();
             Dataset dataset = w.getDataset();
             dataset.getLock().enterCriticalSection(Lock.READ);
-            try {           
-                
-                QueryExecution qe = QueryExecutionFactory.create(
+            QueryExecution qe = null;
+            try {                           
+                qe = QueryExecutionFactory.create(
                         query, dataset, initialBindings);
-                try {
-                    qe.execConstruct(constructedModel);
-                } finally {
+                qe.execConstruct(constructedModel);
+            } catch (Exception e) {
+                log.error("Error getting constructed model for subject " + subjectUri + " and property " + propertyUri);
+            } finally {
+                if (qe != null) {
                     qe.close();
                 }
-                      
-            } finally {
                 dataset.getLock().leaveCriticalSection();
                 w.close();
             }
@@ -444,6 +448,11 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
                     types.put(type, label);
                 }
             }
+            return types;
+            
+        } catch (Exception e) {
+            log.error("Error getting most specific types for subject " + subjectUri);
+            return Collections.emptyMap();
             
         } finally {
             dataset.getLock().leaveCriticalSection();
@@ -452,7 +461,6 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             }
             w.close();
         }
-        
-        return types;        
+           
     }
 }

@@ -913,9 +913,14 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             ResultSet results = qexec.execSelect();           
             while (results.hasNext()) {
                 QuerySolution soln = results.next();
-                ObjectProperty prop = getObjectPropertyByURI(soln.getResource("property").getURI());
-                String filename = soln.getLiteral("filename").getLexicalForm();
-                customListViewConfigFileMap.put(prop, filename);                
+                String propertyUri = soln.getResource("property").getURI();
+                ObjectProperty prop = getObjectPropertyByURI(propertyUri);
+                if (prop == null) {
+                    log.warn("Can't find property for uri " + propertyUri);
+                } else {
+                    String filename = soln.getLiteral("filename").getLexicalForm();
+                    customListViewConfigFileMap.put(prop, filename);     
+                }
             }       
             qexec.close();
         }        
