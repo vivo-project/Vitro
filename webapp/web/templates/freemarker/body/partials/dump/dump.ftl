@@ -36,10 +36,6 @@ div.dump {
 .dump ul li.item .value { 
     margin-left: 1.5em;
 }
-
-.dump ul.methods li {
-    margin-bottom: .25em;
-}
 </style>
 
 <div class="dump">
@@ -78,7 +74,7 @@ div.dump {
     </#if>   
 
     <#local value = map.value!>    
-    <#if value??>
+    <#if value?has_content>
         <div class="values">
             <#if type?contains(".")><@doObjectValue value />
             <#elseif value?is_sequence><@doSequenceValue value type />
@@ -104,8 +100,17 @@ div.dump {
     <#if obj.methods?has_content>
         <p><strong>Methods:</strong</p>
         <ul class="methods">
-            <#list obj.methods as method>
-                <@liItem>${method}</@liItem>
+            <#list obj.methods?keys as method>
+                <#local value = obj.methods[method]>
+                <@liItem>
+                    <#if ! value?has_content> <#-- no return value -->
+                        ${method} 
+                    <#elseif value?is_string> <#-- value is return type -->
+                        ${method} => ${value}
+                    <#else> <#-- no-arg method: value is result of method invocation -->
+                        ${method} => <@divValue><@doTypeAndValue value /></@divValue>
+                    </#if>
+                </@liItem>
             </#list>
         </ul>
     </#if>

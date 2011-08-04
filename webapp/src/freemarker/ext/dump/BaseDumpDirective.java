@@ -5,9 +5,9 @@ package freemarker.ext.dump;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,8 +23,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import freemarker.core.Environment;
+import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.CollectionModel;
+import freemarker.ext.beans.SimpleMethodModel;
 import freemarker.ext.beans.StringModel;
+import freemarker.ext.beans.WrapperExtractor;
 import freemarker.template.Template;
 import freemarker.template.TemplateBooleanModel;
 import freemarker.template.TemplateCollectionModel;
@@ -53,6 +56,8 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     
     private static final String TEMPLATE_DEFAULT = "dump.ftl";  // change to dump.ftl when old dump is removed  
     private static final Pattern PROPERTY_NAME_PATTERN = Pattern.compile("^(get|is)\\w");
+    
+    private BeansWrapper wrapper;
     
     enum Key {
         CLASS("class"),
@@ -323,7 +328,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         
         // Compile the collections of properties and methods available to the template
         SortedMap<String, Object> properties = new TreeMap<String, Object>();
-        List<String> methods = new ArrayList<String>();
+        SortedMap<String, Object> methods = new TreeMap<String, Object>();
         
         // keys() gets only values visible to template based on the BeansWrapper used.
         // Note: if the BeansWrapper exposure level > BeansWrapper.EXPOSE_PROPERTIES_ONLY,
@@ -380,20 +385,40 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                 // Else look for the entire methodName in the key set. Include those 
                 // starting with "get" or "is" that were not found above.
                 // NB This does not properly account for methods exposed as properties
-                // using BeansWrapper.finetuneMethodAppearance(). 
+                // using BeansWrapper.finetuneMethodAppearance(), and perhaps other
+                // changes to method exposure through that method. 
                 if (keySet.contains(methodName)) {               
-                    String methodDisplayName = getMethodDisplayName(method);
-                    methods.add(methodDisplayName);
+                    String methodDisplayName = getMethodDisplayName(method);                   
+                    if ( methodDisplayName.endsWith(")") ) {
+                        String returnTypeName = getTypeName(method.getReturnType());
+                        Map<String, String> methodValue = new HashMap<String, String>();
+                        if ( ! returnTypeName.equals("void") ) {
+                            methodValue.put(Key.TYPE.toString(), returnTypeName);
+                        }
+                        methods.put(methodDisplayName, methodValue);                       
+                    } else {
+                        SimpleMethodModel methodModel = (SimpleMethodModel)model.get(methodName);
+                        Member member = WrapperExtractor.getMember(methodModel);
+                        try {
+                            if (member instanceof Method) {
+                                Method m = (Method) member;
+                                Object result = m.invoke(object);
+                                // But we need to use the same wrapper that wrapped it
+                                TemplateModel wrappedResult = new BeansWrapper().wrap(result);
+                                methods.put(methodDisplayName, getDump(wrappedResult));
+                            }
+                        } catch (Exception e) {
+                            log.error(e, e);    
+                        }
+                    }                    
                 }
             }           
         }
         
         Map<String, Object> objectValue = new HashMap<String, Object>(2);
         objectValue.put(Key.PROPERTIES.toString(), properties);
-        
-        Collections.sort(methods);
         objectValue.put(Key.METHODS.toString(), methods);
-        
+    
         map.put(Key.VALUE.toString(), objectValue);
         return map;
     }
@@ -404,17 +429,16 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         if (paramTypes.length > 0) {
             List<String> paramTypeList = new ArrayList<String>(paramTypes.length);
             for (Class<?> cls : paramTypes) {
-                String name = cls.getName();
-                String[] nameParts = name.split("\\.");
-                String typeName = nameParts[nameParts.length-1];
-                typeName = typeName.replaceAll(";", "s");
-                paramTypeList.add(typeName);
+                paramTypeList.add(getTypeName(cls));
             }
             methodName += "(" + StringUtils.join(paramTypeList, ", ") + ")";
-        }
-        
+        }     
         return methodName;               
     }    
+    
+    private String getTypeName(Class<?> cls) {
+        return cls.getSimpleName().replace("[]", "s");
+    }
 
     // Return the method name as it is represented in TemplateHashModelEx.keys()
     private String getPropertyName(String methodName) {
@@ -464,7 +488,6 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                     log.error("Method help() of " + modelClass + " of class " + cls.getName() + " has incorrect return type.");
                     return null;
                 } catch (Exception e) {
-                    // 
                     log.error("Error invoking method help() on " + modelClass + " of class " + cls.getName());
                     return null;
                 } 
@@ -478,6 +501,14 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         }
         return null;
     }
+    
+//    private Map<String, Object> getSimpleMethodModelDump(Object object, SimpleMethodModel model) throws TemplateModelException {
+//        Map<String, Object> map = new HashMap<String, Object>();
+//        Method method = (Method)DeepUnwrap.permissiveUnwrap(model);
+//        TemplateModel value = model.get(method.getName());
+//        map.put(Key.VALUE.toString(), getDump(value));
+//        return map;          
+//    }
     
     private Map<String, Object> getTemplateModelDump(TemplateModel model) throws TemplateModelException {
         // One of the more specific cases should have applied. Track whether this actually occurs.

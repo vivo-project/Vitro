@@ -2,7 +2,8 @@
 
 package freemarker.ext.beans;
 
-import freemarker.template.TemplateModel;
+import java.lang.reflect.Member;
+
 
 /**
  * Class to extract information about the wrapper used to wrap an object in 
@@ -16,5 +17,9 @@ public class WrapperExtractor {
     
     public static int getWrapperExposureLevel(BeanModel model) {
         return model.wrapper.getExposureLevel();
+    }
+    
+    public static Member getMember(SimpleMethodModel model) {
+        return model.getMember();
     }
 }

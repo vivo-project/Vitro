@@ -1122,6 +1122,10 @@ public class DumpDirectiveTest {
         public List<String> getFavoriteColors() {
             return favoriteColors;
         }
+        
+        public String familyName() {
+            return lastName;
+        }
     }
     
     private Employee getEmployee() {
@@ -1210,21 +1214,36 @@ public class DumpDirectiveTest {
         expectedDump.put(Key.PROPERTIES.toString(), propertiesExpectedDump);
         
         // Methods       
-        expectedDump.put(Key.METHODS.toString(), getEmployeeMethodsExpectedDump(exposureLevel)); 
+        expectedDump.put(Key.METHODS.toString(), getEmployeeMethodsExpectedDump(exposureLevel, "Doe")); 
         
         return expectedDump;
     }
     
-    private List<String> getEmployeeMethodsExpectedDump(int exposureLevel) {
+    private SortedMap<String, Object> getEmployeeMethodsExpectedDump(int exposureLevel, String familyName) {
         
-        List<String> expectedDump = new ArrayList<String>();
+        SortedMap<String, Object> expectedDump = new TreeMap<String, Object>();
+        
         if (exposureLevel <= BeansWrapper.EXPOSE_SAFE) {
-            expectedDump.add("getEmployeeCount");
-            expectedDump.add("getName(String)");
-            expectedDump.add("setFavoriteColors(Strings)");
-            expectedDump.add("setNickname(String)");
+
+            Map<String, Object> nameExpectedDump = new HashMap<String, Object>();
+            nameExpectedDump.put(Key.TYPE.toString(), "String");
+            expectedDump.put("getName(String)", nameExpectedDump);
+            
+            expectedDump.put("setFavoriteColors(Strings)", Collections.emptyMap());
+            
+            expectedDump.put("setNickname(String)", Collections.emptyMap());
+            
+            Map<String, Object> familyNameExpectedDump = new HashMap<String, Object>();
+            familyNameExpectedDump.put(Key.TYPE.toString(), Type.STRING);
+            familyNameExpectedDump.put(Key.VALUE.toString(), familyName);
+            expectedDump.put("familyName", familyNameExpectedDump);
+
+            Map<String, Object> employeeCountExpectedDump = new HashMap<String, Object>();
+            employeeCountExpectedDump.put(Key.TYPE.toString(), Type.NUMBER);
+            employeeCountExpectedDump.put(Key.VALUE.toString(), Employee.getEmployeeCount());
+            expectedDump.put("getEmployeeCount", employeeCountExpectedDump);
         }   
-        Collections.sort(expectedDump);
+
         return expectedDump;
     }
     
@@ -1291,7 +1310,7 @@ public class DumpDirectiveTest {
         expectedDump.put(Key.PROPERTIES.toString(), propertiesExpectedDump);
         
         // Methods
-        expectedDump.put(Key.METHODS.toString(), getEmployeeMethodsExpectedDump(exposureLevel)); 
+        expectedDump.put(Key.METHODS.toString(), getEmployeeMethodsExpectedDump(exposureLevel, "Smith")); 
         
         return expectedDump;
     }
