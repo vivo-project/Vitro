@@ -84,12 +84,12 @@ public class GrefineMqlreadServlet extends VitroHttpServlet {
 			
 			// run SPARQL query to get the results
 			JSONArray resultAllJsonArr = new JSONArray();
-	        DataPropertyStatementDao dpsDao = vreq.getWebappDaoFactory().getDataPropertyStatementDao();
+	        DataPropertyStatementDao dpsDao = vreq.getUnfilteredWebappDaoFactory().getDataPropertyStatementDao();
 	        for (String subjectUri: subjectUriList) {
 	        	JSONObject subjectPropertyResultJson = new JSONObject();
 	        	subjectPropertyResultJson.put("id", subjectUri);
 	        	for (Map.Entry<String, JSONArray> entry : propertyUriMap.entrySet()) {
-	        		int limit = 10; // default
+	        		int limit = 200; // default
 	        		String propertyUri = entry.getKey();
 	        		JSONArray propertyUriOptions = entry.getValue();
 	        		for (int i=0; i<propertyUriOptions.length(); i++) {
