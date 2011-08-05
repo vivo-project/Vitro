@@ -23,11 +23,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import freemarker.core.Environment;
+import freemarker.ext.beans.BeanModel;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.CollectionModel;
 import freemarker.ext.beans.SimpleMethodModel;
 import freemarker.ext.beans.StringModel;
-import freemarker.ext.beans.WrapperExtractor;
+import freemarker.ext.beans.WrapperUtils;
 import freemarker.template.Template;
 import freemarker.template.TemplateBooleanModel;
 import freemarker.template.TemplateCollectionModel;
@@ -176,9 +177,9 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
             
             if ( model instanceof TemplateSequenceModel ) {
                 if (model instanceof CollectionModel && ! ((CollectionModel)model).getSupportsIndexedAccess()) {
-                    map.putAll( getTemplateModelDump( ( TemplateCollectionModel)model ) );                   
+                    map.putAll( getTemplateModelDump( (TemplateCollectionModel)model ) );                   
                 } else {
-                    map.putAll( getTemplateModelDump( ( TemplateSequenceModel)model ) );
+                    map.putAll( getTemplateModelDump( (TemplateSequenceModel)model ) );
                 }
                 
             } else if ( model instanceof TemplateNumberModel ) {
@@ -191,7 +192,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                 map.putAll( getTemplateModelDump( (TemplateDateModel)model ) );
 
             } else if ( model instanceof TemplateCollectionModel ) {
-                map.putAll( getTemplateModelDump( ( TemplateCollectionModel)model ) );
+                map.putAll( getTemplateModelDump( (TemplateCollectionModel)model ) );
                 
             } else if ( model instanceof StringModel ) {
                 // A StringModel can wrap either a String or a plain Java object.
@@ -201,17 +202,17 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                 if (unwrappedModel instanceof String) {
                     map.putAll( getTemplateModelDump( (TemplateScalarModel)model ) );
                 } else {
-                    map.putAll( getTemplateModelDump( ( TemplateHashModelEx)model ) );
+                    map.putAll( getTemplateModelDump( (TemplateHashModelEx)model ) );
                 }
              
             } else if ( model instanceof TemplateScalarModel ) {
                     map.putAll( getTemplateModelDump( (TemplateScalarModel)model ) );
 
             } else if ( model instanceof TemplateHashModelEx ) {
-                map.putAll( getTemplateModelDump( ( TemplateHashModelEx)model ) );
+                map.putAll( getTemplateModelDump( (TemplateHashModelEx)model ) );
                 
             } else if  (model instanceof TemplateHashModel ) {
-                map.putAll( getTemplateModelDump( ( TemplateHashModel)model ) );
+                map.putAll( getTemplateModelDump( (TemplateHashModel)model ) );
 
             // Nodes and transforms not included here     
                 
@@ -388,28 +389,30 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                 // using BeansWrapper.finetuneMethodAppearance(), and perhaps other
                 // changes to method exposure through that method. 
                 if (keySet.contains(methodName)) {               
-                    String methodDisplayName = getMethodDisplayName(method);                   
-                    if ( methodDisplayName.endsWith(")") ) {
-                        String returnTypeName = getTypeName(method.getReturnType());
-                        Map<String, String> methodValue = new HashMap<String, String>();
-                        if ( ! returnTypeName.equals("void") ) {
-                            methodValue.put(Key.TYPE.toString(), returnTypeName);
-                        }
-                        methods.put(methodDisplayName, methodValue);                       
-                    } else {
+                    String methodDisplayName = getMethodDisplayName(method);  
+                    // If no arguments, invoke the method to get the result
+                    if ( methodDisplayName.endsWith("()") ) {                     
                         SimpleMethodModel methodModel = (SimpleMethodModel)model.get(methodName);
-                        Member member = WrapperExtractor.getMember(methodModel);
+                        Member member = WrapperUtils.getMember(methodModel);
                         try {
                             if (member instanceof Method) {
                                 Method m = (Method) member;
                                 Object result = m.invoke(object);
-                                // But we need to use the same wrapper that wrapped it
-                                TemplateModel wrappedResult = new BeansWrapper().wrap(result);
+                                BeansWrapper wrapper = getWrapper(model);
+                                TemplateModel wrappedResult = wrapper.wrap(result);
                                 methods.put(methodDisplayName, getDump(wrappedResult));
                             }
                         } catch (Exception e) {
                             log.error(e, e);    
                         }
+                    // Else display method name, parameter types, and return type
+                    } else {
+                        String returnTypeName = getTypeName(method.getReturnType());
+                        Map<String, String> methodValue = new HashMap<String, String>();
+                        if ( ! returnTypeName.equals("void") ) {
+                            methodValue.put(Key.TYPE.toString(), returnTypeName);
+                        }
+                        methods.put(methodDisplayName, methodValue);                           
                     }                    
                 }
             }           
@@ -423,16 +426,25 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         return map;
     }
     
+    private BeansWrapper getWrapper(TemplateHashModelEx model) {
+        
+        if (model instanceof BeanModel) {
+            return WrapperUtils.getWrapper((BeanModel)model);
+        } else {
+            return new BeansWrapper();
+        }
+    }
+    
     private String getMethodDisplayName(Method method) {
         String methodName = method.getName();
         Class<?>[] paramTypes = method.getParameterTypes();
-        if (paramTypes.length > 0) {
-            List<String> paramTypeList = new ArrayList<String>(paramTypes.length);
+        List<String> paramTypeList = new ArrayList<String>(paramTypes.length);
+        if (paramTypes.length > 0) {           
             for (Class<?> cls : paramTypes) {
                 paramTypeList.add(getTypeName(cls));
-            }
-            methodName += "(" + StringUtils.join(paramTypeList, ", ") + ")";
-        }     
+            }            
+        } 
+        methodName += "(" + StringUtils.join(paramTypeList, ", ") + ")";
         return methodName;               
     }    
     

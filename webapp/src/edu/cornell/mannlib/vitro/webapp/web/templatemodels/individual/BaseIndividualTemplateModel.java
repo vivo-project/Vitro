@@ -181,12 +181,5 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         }
         return id;
     }
-    
-    public String ageInUnits(String units) {
-        return "5 " + units;
-    }
-    
-    public int age() {
-        return 10;
-    }
+
 }

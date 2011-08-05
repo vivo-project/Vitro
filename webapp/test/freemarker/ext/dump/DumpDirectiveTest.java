@@ -1236,12 +1236,12 @@ public class DumpDirectiveTest {
             Map<String, Object> familyNameExpectedDump = new HashMap<String, Object>();
             familyNameExpectedDump.put(Key.TYPE.toString(), Type.STRING);
             familyNameExpectedDump.put(Key.VALUE.toString(), familyName);
-            expectedDump.put("familyName", familyNameExpectedDump);
+            expectedDump.put("familyName()", familyNameExpectedDump);
 
             Map<String, Object> employeeCountExpectedDump = new HashMap<String, Object>();
             employeeCountExpectedDump.put(Key.TYPE.toString(), Type.NUMBER);
             employeeCountExpectedDump.put(Key.VALUE.toString(), Employee.getEmployeeCount());
-            expectedDump.put("getEmployeeCount", employeeCountExpectedDump);
+            expectedDump.put("getEmployeeCount()", employeeCountExpectedDump);
         }   
 
         return expectedDump;

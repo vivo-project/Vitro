@@ -4,12 +4,12 @@ package freemarker.ext.beans;
 
 import java.lang.reflect.Member;
 
-
 /**
- * Class to extract information about the wrapper used to wrap an object in 
- * the template model.
+ * Class to expose protected information about template models and their data
+ * and wrappers to dump methods. Used as workaround to some problems and gaps
+ * in the Freemarker template model API.
  */
-public class WrapperExtractor {
+public class WrapperUtils {
     
     public static BeansWrapper getWrapper(BeanModel model) {
         return model.wrapper;
