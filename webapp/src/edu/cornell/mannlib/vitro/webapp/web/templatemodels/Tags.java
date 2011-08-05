@@ -4,6 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels;
 
 import java.util.LinkedHashSet;
 
+import org.apache.commons.lang.StringUtils;
+
 public class Tags extends BaseTemplateModel {
     
     protected final LinkedHashSet<String> tags;
@@ -15,6 +17,7 @@ public class Tags extends BaseTemplateModel {
     public Tags(LinkedHashSet<String> tags) {
         this.tags = tags;
     }
+
     
     /* Template methods */
 
@@ -27,14 +30,8 @@ public class Tags extends BaseTemplateModel {
     public void add(String tag) {
         tags.add(tag);
     }
-    
-    public String getList() {
-        String tagList = "";
-        
-        for (String tag : tags) {
-            tagList += tag;
-        }
-        return tagList;
+ 
+    public String list() {
+        return StringUtils.join(tags, "");
     }
-    
 }

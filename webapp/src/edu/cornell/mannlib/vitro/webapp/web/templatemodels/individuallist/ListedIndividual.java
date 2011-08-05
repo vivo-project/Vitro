@@ -15,7 +15,5 @@ public class ListedIndividual extends BaseListedIndividual {
     public ListedIndividual(Individual individual, VitroRequest vreq) {
         super(individual, vreq);
     }
-    
-    /* Access methods for templates */
 
 }

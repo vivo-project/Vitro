@@ -108,7 +108,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     
     protected void handleException(VitroRequest vreq, HttpServletResponse response, Throwable t) throws ServletException {
         try {
-            doResponse(vreq, response, new ExceptionResponseValues(t)); 
+            doResponse(vreq, response, new ExceptionResponseValues(t, HttpServletResponse.SC_INTERNAL_SERVER_ERROR)); 
         } catch (TemplateProcessingException e) {
             throw new ServletException();
         }

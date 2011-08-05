@@ -81,8 +81,8 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     }
 
     enum Value {
-        NULL("[null]"),
-        UNDEFINED("[undefined]");
+        NULL("<null>"),
+        UNDEFINED("<undefined>");
     
         private final String value;
         

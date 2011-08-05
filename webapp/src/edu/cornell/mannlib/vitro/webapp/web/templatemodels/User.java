@@ -43,8 +43,6 @@ public class User extends BaseTemplateModel {
         return url;
 	}
 	
-	/* Template methods */
-	
 	/* Template properties */
 
 	public boolean isLoggedIn() {

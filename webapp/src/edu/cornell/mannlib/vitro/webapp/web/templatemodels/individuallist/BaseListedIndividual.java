@@ -35,7 +35,7 @@ public abstract class BaseListedIndividual extends BaseTemplateModel {
         return models;
     }
     
-    /* Access methods for templates */
+    /* Template properties */
     
     public String getProfileUrl() {
         return cleanURIForDisplay( UrlBuilder.getIndividualProfileUrl(individual, vreq) );
