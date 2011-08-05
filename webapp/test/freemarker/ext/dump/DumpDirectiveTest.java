@@ -1119,6 +1119,10 @@ public class DumpDirectiveTest {
             return supervisor;
         }
         
+        public Employee boss() {
+            return supervisor;
+        }
+        
         public List<String> getFavoriteColors() {
             return favoriteColors;
         }
@@ -1151,6 +1155,10 @@ public class DumpDirectiveTest {
     private Map<String, Object> getJohnDoeExpectedDump(int exposureLevel) {
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
+
+        Map<String, Object> supervisorExpectedDump = new HashMap<String, Object>();
+        supervisorExpectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
+        supervisorExpectedDump.put(Key.VALUE.toString(), getJaneSmithExpectedDump(exposureLevel)); 
         
         // Properties
         SortedMap<String, Object> propertiesExpectedDump = new TreeMap<String, Object>();
@@ -1189,11 +1197,7 @@ public class DumpDirectiveTest {
             marriedExpectedDump.put(Key.TYPE.toString(), Type.BOOLEAN);
             marriedExpectedDump.put(Key.VALUE.toString(), true);
             propertiesExpectedDump.put("married", marriedExpectedDump);
-    
-            Map<String, Object> supervisorExpectedDump = new HashMap<String, Object>();
-            supervisorExpectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
-
-            supervisorExpectedDump.put(Key.VALUE.toString(), getJaneSmithExpectedDump(exposureLevel));               
+                 
             propertiesExpectedDump.put("supervisor", supervisorExpectedDump);    
             
             Map<String, Object> favoriteColorsExpectedDump = new HashMap<String, Object>(); 
@@ -1214,7 +1218,11 @@ public class DumpDirectiveTest {
         expectedDump.put(Key.PROPERTIES.toString(), propertiesExpectedDump);
         
         // Methods       
-        expectedDump.put(Key.METHODS.toString(), getEmployeeMethodsExpectedDump(exposureLevel, "Doe")); 
+        SortedMap<String, Object> methodDump = getEmployeeMethodsExpectedDump(exposureLevel, "Doe");
+        if ( ! methodDump.isEmpty()) {
+            methodDump.put("boss()", supervisorExpectedDump);
+        }
+        expectedDump.put(Key.METHODS.toString(), methodDump);
         
         return expectedDump;
     }
@@ -1250,6 +1258,9 @@ public class DumpDirectiveTest {
     private Map<String, Object> getJaneSmithExpectedDump(int exposureLevel) {
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
+
+        Map<String, Object> supervisorExpectedDump = new HashMap<String, Object>();
+        supervisorExpectedDump.put(Key.VALUE.toString(), Value.NULL);
         
         SortedMap<String, Object> propertiesExpectedDump = new TreeMap<String, Object>();
         
@@ -1289,8 +1300,6 @@ public class DumpDirectiveTest {
             marriedExpectedDump.put(Key.VALUE.toString(), true);
             propertiesExpectedDump.put("married", marriedExpectedDump);      
         
-            Map<String, Object> supervisorExpectedDump = new HashMap<String, Object>();
-            supervisorExpectedDump.put(Key.VALUE.toString(), Value.NULL);
             propertiesExpectedDump.put("supervisor", supervisorExpectedDump);             
     
             Map<String, Object> favoriteColorsExpectedDump = new HashMap<String, Object>(); 
@@ -1310,7 +1319,11 @@ public class DumpDirectiveTest {
         expectedDump.put(Key.PROPERTIES.toString(), propertiesExpectedDump);
         
         // Methods
-        expectedDump.put(Key.METHODS.toString(), getEmployeeMethodsExpectedDump(exposureLevel, "Smith")); 
+        SortedMap<String, Object> methodDump = getEmployeeMethodsExpectedDump(exposureLevel, "Smith");
+        if ( ! methodDump.isEmpty()) {
+            methodDump.put("boss()", supervisorExpectedDump);
+        }
+        expectedDump.put(Key.METHODS.toString(), methodDump);
         
         return expectedDump;
     }

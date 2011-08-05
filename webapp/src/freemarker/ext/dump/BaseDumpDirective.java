@@ -5,7 +5,6 @@ package freemarker.ext.dump;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +27,8 @@ import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.CollectionModel;
 import freemarker.ext.beans.SimpleMethodModel;
 import freemarker.ext.beans.StringModel;
-import freemarker.ext.beans.WrapperUtils;
+import freemarker.ext.beans.WrapperExtractor;
+import freemarker.template.ObjectWrapper;
 import freemarker.template.Template;
 import freemarker.template.TemplateBooleanModel;
 import freemarker.template.TemplateCollectionModel;
@@ -58,7 +58,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     private static final String TEMPLATE_DEFAULT = "dump.ftl";  // change to dump.ftl when old dump is removed  
     private static final Pattern PROPERTY_NAME_PATTERN = Pattern.compile("^(get|is)\\w");
     
-    private BeansWrapper wrapper;
+    private ObjectWrapper defaultWrapper;
     
     enum Key {
         CLASS("class"),
@@ -139,6 +139,11 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     protected Map<String, Object> getTemplateVariableDump(String varName, Environment env) 
     throws TemplateModelException {
 
+        defaultWrapper = env.getObjectWrapper();
+        if (defaultWrapper == null) {
+            defaultWrapper = env.getConfiguration().getObjectWrapper();
+        }
+        
         TemplateHashModel dataModel = env.getDataModel();       
         TemplateModel model = dataModel.get(varName);
         return getTemplateVariableDump(varName, model);
@@ -393,15 +398,11 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                     // If no arguments, invoke the method to get the result
                     if ( methodDisplayName.endsWith("()") ) {                     
                         SimpleMethodModel methodModel = (SimpleMethodModel)model.get(methodName);
-                        Member member = WrapperUtils.getMember(methodModel);
                         try {
-                            if (member instanceof Method) {
-                                Method m = (Method) member;
-                                Object result = m.invoke(object);
-                                BeansWrapper wrapper = getWrapper(model);
-                                TemplateModel wrappedResult = wrapper.wrap(result);
-                                methods.put(methodDisplayName, getDump(wrappedResult));
-                            }
+                            Object result = methodModel.exec(null);
+                            ObjectWrapper wrapper = getWrapper(model);
+                            TemplateModel wrappedResult = wrapper.wrap(result);
+                            methods.put(methodDisplayName, getDump(wrappedResult));
                         } catch (Exception e) {
                             log.error(e, e);    
                         }
@@ -426,10 +427,14 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         return map;
     }
     
-    private BeansWrapper getWrapper(TemplateHashModelEx model) {
-        
+    private ObjectWrapper getWrapper(TemplateHashModelEx model) {
+        // Attempt to find the wrapper that this template model object was wrapped with.
         if (model instanceof BeanModel) {
-            return WrapperUtils.getWrapper((BeanModel)model);
+            return WrapperExtractor.getWrapper((BeanModel)model);
+        // Otherwise return the wrapper defined for the Environment or Configuration, 
+        // if there is one. Why can't we get the wrapper for any type of TemplateModel??
+        } else if (defaultWrapper != null) {
+            return defaultWrapper;
         } else {
             return new BeansWrapper();
         }
