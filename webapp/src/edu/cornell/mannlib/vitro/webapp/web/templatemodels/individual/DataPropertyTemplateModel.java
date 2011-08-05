@@ -51,15 +51,15 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
             }
         } else {
             log.debug("Data property " + getUri() + " is unpopulated.");
-        }
+        }        
         
-        setAddAccess(policyHelper, dp);
-        
+        setAddUrl(policyHelper, dp);
     }
 
     // Determine whether a new statement can be added
     @Override
-    protected void setAddAccess(EditingPolicyHelper policyHelper, Property property) {
+    protected void setAddUrl(EditingPolicyHelper policyHelper, Property property) {
+        this.addUrl = "";
         if (policyHelper != null) {
             
             DataProperty dp = (DataProperty) property;
@@ -68,16 +68,25 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
             if (dp.getURI().equals(VitroVocabulary.MONIKER)) {
                 return;
             }
-            // If the display limit has already been reached, we can't add a new statement
+            // If the display limit has already been reached, we can't add a new statement.
+            // NB This appears to be a misuse of a value called "display limit". Note that it's 
+            // not used to limit display, either, so should be renamed.
             int displayLimit = dp.getDisplayLimit();
             // Display limit of -1 (default value for new property) means no display limit
             if ( (displayLimit < 0) || (displayLimit > statements.size()) ) {
                 RequestedAction action = new AddDataPropStmt(subjectUri, propertyUri,RequestActionConstants.SOME_LITERAL, null, null);
                 if (policyHelper.isAuthorizedAction(action)) {
-                    addAccess = true;
+
+                    ParamMap params = new ParamMap(
+                            "subjectUri", subjectUri,
+                            "predicateUri", propertyUri);
+                    
+                    params.putAll(UrlBuilder.getModelParams(vreq));
+                    
+                    addUrl = UrlBuilder.getUrl(EDIT_PATH, params);       
                 }
             }
-        }        
+        } 
     }
     
     @Override 
@@ -90,37 +99,25 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
         return Route.DATA_PROPERTY_EDIT;
     }
     
-    /* Access methods for templates */
+    /* Template properties */
     
     public String getType() {
         return TYPE;
     }
 
-    @Override
-    public String getAddUrl() {
-        String addUrl = "";
-        if (addAccess) {
-            ParamMap params = new ParamMap(
-                    "subjectUri", subjectUri,
-                    "predicateUri", propertyUri);
-            
-            params.putAll(UrlBuilder.getModelParams(vreq));
-            
-            addUrl = UrlBuilder.getUrl(EDIT_PATH, params);       
-        }
-        return addUrl;
-    }
-    
     public List<DataPropertyStatementTemplateModel> getStatements() {
         return statements;
     }
     
-    public DataPropertyStatementTemplateModel getFirst() {
+    
+    /* Template methods */
+    
+    public DataPropertyStatementTemplateModel first() {
         return ( (statements == null || statements.isEmpty()) ) ? null : statements.get(0);
     }
     
-    public String getFirstValue() {
-        DataPropertyStatementTemplateModel first = getFirst();
+    public String firstValue() {
+        DataPropertyStatementTemplateModel first = first();
         return first == null ? null : first.getValue();
     }
     

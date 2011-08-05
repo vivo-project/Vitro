@@ -111,18 +111,31 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         
         objectKey = getQueryObjectVariableName();
         
-        setAddAccess(policyHelper, op);
+        setAddUrl(policyHelper, op);
+
     }
 
     // Determine whether a new statement can be added
     @Override
-    protected void setAddAccess(EditingPolicyHelper policyHelper, Property property) {
+    protected void setAddUrl(EditingPolicyHelper policyHelper, Property property) {
+        addUrl = "";
         if (policyHelper != null) {
             RequestedAction action = new AddObjectPropStmt(subjectUri, propertyUri, RequestActionConstants.SOME_URI);
             if (policyHelper.isAuthorizedAction(action)) {
-                addAccess = true;
-            }
-        }        
+                
+                if (propertyUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
+                    addUrl = getImageUploadUrl(subjectUri, "add");
+                } else {
+                    ParamMap params = new ParamMap(
+                            "subjectUri", subjectUri,
+                            "predicateUri", propertyUri);  
+                    
+                    params.putAll(UrlBuilder.getModelParams(vreq));
+    
+                    addUrl = UrlBuilder.getUrl(EDIT_PATH, params);  
+                }
+            }                
+        }    
     }
     
     protected List<Map<String, String>> getStatementData() {
@@ -167,7 +180,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         return config.isDefaultConfig;
     }
     
-    public static String getImageUploadUrl(String subjectUri, String action) {
+    protected static String getImageUploadUrl(String subjectUri, String action) {
         ParamMap params = new ParamMap(
                 "entityUri", subjectUri,
                 "action", action);                              
@@ -560,7 +573,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         }
     }
     
-    /* Access methods for templates */
+    /* Template properties */
     
     public String getType() {
         return TYPE;
@@ -571,24 +584,5 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     }
     
     public abstract boolean isCollatedBySubclass();
-
-    @Override
-    public String getAddUrl() {
-        String addUrl = "";
-        if (addAccess) {
-            if (propertyUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
-                return getImageUploadUrl(subjectUri, "add");
-            } 
-            ParamMap params = new ParamMap(
-                    "subjectUri", subjectUri,
-                    "predicateUri", propertyUri);  
-            
-            params.putAll(UrlBuilder.getModelParams(vreq));
-
-            addUrl = UrlBuilder.getUrl(EDIT_PATH, params);  
-
-        }
-        return addUrl;
-    }
 
 }

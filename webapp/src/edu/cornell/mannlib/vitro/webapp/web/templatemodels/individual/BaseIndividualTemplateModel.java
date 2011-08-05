@@ -104,10 +104,6 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         return isUriInDefaultNamespace ? profileUrl + "/" + getLocalName() + ".rdf" 
                                        : UrlBuilder.addParams(profileUrl, "format", "rdfxml");
     }
-    
-    public String getEditUrl() {
-        return UrlBuilder.getUrl(Route.INDIVIDUAL_EDIT, "uri", getUri());
-    }
 
     public GroupedPropertyList getPropertyList() {
         if (propertyList == null) {
@@ -166,39 +162,62 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
     public String getLocalName() {
         return individual.getLocalName();
     }   
+   
+// For testing dump
+//    // Properties
+//    public String getANullString() {
+//        return null;
+//    }    
+//    public String getAnEmptyString() {
+//        return "";
+//    }    
+//    public String[] getANullArray() {
+//        return null;
+//    }    
+//    public String[] getAnEmptyArray() {
+//        String[] a = {};
+//        return a;
+//    }    
+//    public List<String> getANullList() {
+//        return null;
+//    }    
+//    public List<String> getAnEmptyList() {
+//        return Collections.emptyList();
+//    }    
+//    public Map<String, String> getANullMap() {
+//        return null;
+//    }    
+//    public Map<String, String> getAnEmptyMap() {
+//        return Collections.emptyMap();
+//    }    
+//    
+//    // Methods
+//    public String nullString() {
+//        return null;
+//    }    
+//    public String emptyString() {
+//        return "";
+//    }    
+//    public String[] nullArray() {
+//        return null;
+//    }    
+//    public String[] emptyArray() {
+//        String[] a = {};
+//        return a;
+//    }    
+//    public List<String> nullList() {
+//        return null;
+//    }    
+//    public List<String> emptyList() {
+//        return Collections.emptyList();
+//    }   
+//    public Map<String, String> nullMap() {
+//        return null;
+//    }    
+//    public Map<String, String> emptyMap() {
+//        return Collections.emptyMap();
+//    }
     
-    public String nullString() {
-        return null;
-    }
-    
-    public String emptyString() {
-        return "";
-    }
-    
-    public String[] nullArray() {
-        return null;
-    }
-    
-    public String[] emptyArray() {
-        String[] a = {};
-        return a;
-    }
-    
-    public List<String> nullList() {
-        return null;
-    }
-    
-    public List<String> emptyList() {
-        return Collections.emptyList();
-    }
-    
-    public Map<String, String> nullMap() {
-        return null;
-    }
-    
-    public Map<String, String> emptyMap() {
-        return Collections.emptyMap();
-    }
     
     /* Template methods */
  
@@ -216,5 +235,9 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         }
         return id;
     }
-
+    
+    public String controlPanelUrl() {
+        return UrlBuilder.getUrl(Route.INDIVIDUAL_EDIT, "uri", getUri());
+    }
+    
 }

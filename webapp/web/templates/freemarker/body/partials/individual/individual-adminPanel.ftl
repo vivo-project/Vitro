@@ -6,10 +6,10 @@
 
 <#if individual.showAdminPanel>
     <section id="admin">
-        <h3>Admin Panel</h3><a class="edit-individual" href="${individual.editUrl}">Edit this individual</a>
+        <h3>Admin Panel</h3><a class="edit-individual" href="${individual.controlPanelUrl()}">Edit this individual</a>
         
         <section id = "verbose-mode">
-        <#if verbosePropertySwitch??>
+        <#if verbosePropertySwitch?has_content>
             <#assign anchorId = "verbosePropertySwitch">
             <#assign currentValue = verbosePropertySwitch.currentValue?string("on", "off")>
             <#assign newValue = verbosePropertySwitch.currentValue?string("off", "on")>

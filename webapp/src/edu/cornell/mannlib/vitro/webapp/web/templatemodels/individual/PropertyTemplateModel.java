@@ -32,7 +32,8 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     private final String localName;
 
     protected Map<String, Object> verboseDisplay;
-    protected boolean addAccess; // defaults to false
+    protected String addUrl;
+    
     private String name;
 
     PropertyTemplateModel(Property property, Individual subject, EditingPolicyHelper policyHelper, VitroRequest vreq) {
@@ -42,6 +43,7 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         localName = property.getLocalName();        
         log.debug("Local name for property " + propertyUri + ": " + localName);
         setVerboseDisplayValues(property);
+        
         // Do in subclass constructor. The label has not been set on the property, and the
         // means of getting the label differs between object and data properties.
         // this.name = property.getLabel();
@@ -90,11 +92,10 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         this.name = name;
     }
     
-    // Determine whether a new statement can be added
-    protected abstract void setAddAccess(EditingPolicyHelper policyHelper, Property property);
+    protected abstract void setAddUrl(EditingPolicyHelper policyHelper, Property property);
     
     
-    /* Access methods for templates */
+    /* Template properties */
     
     public abstract String getType();
     
@@ -110,7 +111,9 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         return propertyUri;
     }
     
-    public abstract String getAddUrl();
+    public String getAddUrl() {
+        return addUrl;
+    }
     
     public Map<String, Object> getVerboseDisplay() {
         return verboseDisplay;
