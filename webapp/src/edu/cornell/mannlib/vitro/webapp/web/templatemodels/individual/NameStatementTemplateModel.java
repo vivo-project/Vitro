@@ -40,7 +40,7 @@ public class NameStatementTemplateModel extends
         
         if (literal != null) {
             value = cleanTextForDisplay( literal.getLexicalForm() );
-            setEditAccess(literal, policyHelper);
+            setEditUrls(literal, policyHelper, propertyUri);
         } else {
             // If the individual has no rdfs:label, use the local name. It will not be editable. (This replicates previous behavior;
             // perhaps we would want to allow a label to be added. But such individuals do not usually have their profiles viewed or
@@ -48,26 +48,6 @@ public class NameStatementTemplateModel extends
             URI uri = new URIImpl(subjectUri);
             value = uri.getLocalName();       
         }
-    }
-
-    protected void setEditAccess(EditLiteral value, EditingPolicyHelper policyHelper) {
-        
-        if (policyHelper != null) { // we're editing         
-            DataPropertyStatement dps = new DataPropertyStatementImpl(subjectUri, propertyUri, value.getLexicalForm());
-            // Language and datatype are needed to get the correct hash value
-            dps.setLanguage(value.getLanguage());
-            dps.setDatatypeURI(value.getDatatypeURI());
-            this.dataPropHash = String.valueOf(RdfLiteralHash.makeRdfLiteralHash(dps));
-            
-            // Determine whether the statement can be edited
-            RequestedAction action = new EditDataPropStmt(dps);
-            if (policyHelper.isAuthorizedAction(action)) {
-                markEditable();
-            }      
-            
-            // The label cannot be deleted, so we don't need to check
-            // the policy for the delete action.
-        }        
     }
     
 }

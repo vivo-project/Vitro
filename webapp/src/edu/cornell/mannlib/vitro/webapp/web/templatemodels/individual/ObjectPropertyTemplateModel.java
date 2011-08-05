@@ -90,9 +90,6 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     private PropertyListConfig config;
     private String objectKey;    
     
-    // Used for editing
-    private boolean addAccess; // defaults to false
-    
     ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, 
             EditingPolicyHelper policyHelper)
         throws InvalidConfigurationException {
@@ -112,30 +109,32 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         objectKey = getQueryObjectVariableName();
         
         setAddUrl(policyHelper, op);
-
     }
 
-    // Determine whether a new statement can be added
     @Override
     protected void setAddUrl(EditingPolicyHelper policyHelper, Property property) {
-        addUrl = "";
-        if (policyHelper != null) {
-            RequestedAction action = new AddObjectPropStmt(subjectUri, propertyUri, RequestActionConstants.SOME_URI);
-            if (policyHelper.isAuthorizedAction(action)) {
-                
-                if (propertyUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
-                    addUrl = getImageUploadUrl(subjectUri, "add");
-                } else {
-                    ParamMap params = new ParamMap(
-                            "subjectUri", subjectUri,
-                            "predicateUri", propertyUri);  
-                    
-                    params.putAll(UrlBuilder.getModelParams(vreq));
-    
-                    addUrl = UrlBuilder.getUrl(EDIT_PATH, params);  
-                }
-            }                
-        }    
+
+        if (policyHelper == null) {
+            return;
+        }
+        
+        // Determine whether a new statement can be added
+        RequestedAction action = new AddObjectPropStmt(subjectUri, propertyUri, RequestActionConstants.SOME_URI);
+        if ( ! policyHelper.isAuthorizedAction(action) ) {
+            return;
+        }
+        
+        if (propertyUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
+            addUrl = getImageUploadUrl(subjectUri, "add");
+        } else {
+            ParamMap params = new ParamMap(
+                    "subjectUri", subjectUri,
+                    "predicateUri", propertyUri);  
+            
+            params.putAll(UrlBuilder.getModelParams(vreq));
+
+            addUrl = UrlBuilder.getUrl(EDIT_PATH, params);  
+        }
     }
     
     protected List<Map<String, String>> getStatementData() {

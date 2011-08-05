@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -38,64 +39,33 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
         this.data = data;
         this.objectUri = data.get(objectKey);        
         this.templateName = templateName;
-        setEditAccess(policyHelper);
+        setEditUrls(policyHelper);
     }
 
-    private void setEditAccess(EditingPolicyHelper policyHelper) {
+    protected void setEditUrls(EditingPolicyHelper policyHelper) {
         // If the policyHelper is non-null, we are in edit mode, so create the list of editing permissions.
         // We do this now rather than in getEditUrl() and getDeleteUrl(), because getEditUrl() also needs to know
         // whether a delete is allowed.
         if (policyHelper != null) {
-            ObjectPropertyStatement objectPropertyStatement = new ObjectPropertyStatementImpl(subjectUri, propertyUri, objectUri);
+            ObjectPropertyStatement ops = new ObjectPropertyStatementImpl(subjectUri, propertyUri, objectUri);
             
-            // Determine whether the statement can be edited
-            RequestedAction action =  new EditObjPropStmt(objectPropertyStatement);
-            if (policyHelper.isAuthorizedAction(action)) {
-                markEditable();
-            }
-            
-            // Determine whether the statement can be deleted
-            action = new DropObjectPropStmt(subjectUri, propertyUri, objectUri);
-            if (policyHelper.isAuthorizedAction(action)) {    
-                markDeletable();
-            }
+            // Do delete url first, since used in building edit url
+            setDeleteUrl(policyHelper, ops);
+            setEditUrl(policyHelper, ops);
         }        
     }
     
-    /* Access methods for templates */
-
-    public Object get(String key) {
-        return cleanTextForDisplay( data.get(key) );
-    }
-    
-    public String getEditUrl() {
-        String editUrl = "";
-        if (isEditable()) {
-            if (propertyUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
-                return ObjectPropertyTemplateModel.getImageUploadUrl(subjectUri, "edit");
-            } 
-            ParamMap params = new ParamMap(
-                    "subjectUri", subjectUri,
-                    "predicateUri", propertyUri,
-                    "objectUri", objectUri);
-            if (! isDeletable()) {
-                params.put("deleteProhibited", "prohibited");
-            }
-            
-            params.putAll(UrlBuilder.getModelParams(vreq));
-            
-            editUrl = UrlBuilder.getUrl(EDIT_PATH, params);
+    protected void setDeleteUrl(EditingPolicyHelper policyHelper, ObjectPropertyStatement ops) {
+        
+        // Determine whether the statement can be deleted
+        RequestedAction action = new DropObjectPropStmt(subjectUri, propertyUri, objectUri);
+        if (policyHelper.isAuthorizedAction(action)) {    
+            return;
         }
         
-        return editUrl;
-    }
-    
-    public String getDeleteUrl() {
-        String deleteUrl = "";
-        if (isDeletable()) {
-            if (propertyUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
-                return ObjectPropertyTemplateModel.getImageUploadUrl(subjectUri, "delete");
-            } 
+        if (propertyUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
+            deleteUrl = ObjectPropertyTemplateModel.getImageUploadUrl(subjectUri, "delete");
+        } else {
             ParamMap params = new ParamMap(
                     "subjectUri", subjectUri,
                     "predicateUri", propertyUri,
@@ -119,8 +89,40 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
             params.putAll(UrlBuilder.getModelParams(vreq));
             
             deleteUrl = UrlBuilder.getUrl(EDIT_PATH, params);
-
-        }
-        return deleteUrl;
+        }    
     }
+    
+    protected void setEditUrl(EditingPolicyHelper policyHelper, ObjectPropertyStatement ops) {
+        
+        // Determine whether the statement can be edited
+        RequestedAction action =  new EditObjPropStmt(ops);
+        if ( ! policyHelper.isAuthorizedAction(action)) {
+            return;
+        }
+        
+        if (propertyUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
+            editUrl = ObjectPropertyTemplateModel.getImageUploadUrl(subjectUri, "edit");
+        } else {
+            ParamMap params = new ParamMap(
+                    "subjectUri", subjectUri,
+                    "predicateUri", propertyUri,
+                    "objectUri", objectUri);
+            
+            if ( deleteUrl.isEmpty() ) {
+                params.put("deleteProhibited", "prohibited");
+            }
+            
+            params.putAll(UrlBuilder.getModelParams(vreq));
+            
+            editUrl = UrlBuilder.getUrl(EDIT_PATH, params);
+        }       
+    }
+    
+    
+    /* Template methods */
+
+    public Object get(String key) {
+        return cleanTextForDisplay( data.get(key) );
+    }
+  
 }
