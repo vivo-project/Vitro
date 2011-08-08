@@ -25,6 +25,7 @@ import freemarker.core.Environment;
 import freemarker.ext.beans.BeanModel;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.beans.CollectionModel;
+import freemarker.ext.beans.MapModel;
 import freemarker.ext.beans.SimpleMethodModel;
 import freemarker.ext.beans.StringModel;
 import freemarker.ext.beans.WrapperExtractor;
@@ -175,6 +176,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     }
 
     private Map<String, Object> getDump(TemplateModel model) throws TemplateModelException {
+        
         Map<String, Object> map = new HashMap<String, Object>();
         
         // Don't return null if model == null. We still want to send the map to the template.
@@ -308,7 +310,8 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         if ( unwrappedModel instanceof Map ) {
             return getMapDump(model);
         }
-        // Java objects are wrapped as TemplateHashModelEx-s.
+        
+         // Java objects are wrapped as TemplateHashModelEx-s.
         return getObjectDump(model, unwrappedModel);
     }
     
@@ -320,13 +323,18 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         TemplateModelIterator iModel = keys.iterator();
         while (iModel.hasNext()) {
             String key = iModel.next().toString();
+            // Workaround this oddity: model.object does not contain
+            // values for "empty" and "keys", but model.keys() does. 
+            if ("class".equals(key) || "empty".equals(key)) {
+                continue;
+            }
             TemplateModel value = model.get(key);
-            items.put(key, getDump(value));
-        }        
+            items.put(key, getDump(value)); 
+        }   
         map.put(Key.VALUE.toString(), items);  
         return map;
     }
-
+    
     private Map<String, Object> getObjectDump(TemplateHashModelEx model, Object object) throws TemplateModelException {
         
         Map<String, Object> map = new HashMap<String, Object>();
@@ -388,11 +396,9 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                         continue;
                     }
                 }
-                // Else look for the entire methodName in the key set. Include those 
-                // starting with "get" or "is" that were not found above.
-                // NB This does not properly account for methods exposed as properties
-                // using BeansWrapper.finetuneMethodAppearance(), and perhaps other
-                // changes to method exposure through that method. 
+                
+                // Else look for the entire methodName in the key set, to include
+                // those that are exposed as methods rather than properties. 
                 if (keySet.contains(methodName)) {               
                     String methodDisplayName = getMethodDisplayName(method);  
                     // If no arguments, invoke the method to get the result
