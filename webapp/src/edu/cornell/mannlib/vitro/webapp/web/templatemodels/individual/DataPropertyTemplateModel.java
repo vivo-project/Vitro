@@ -81,7 +81,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
           
         // Determine whether a new statement can be added
         RequestedAction action = new AddDataPropStmt(subjectUri, propertyUri, RequestActionConstants.SOME_LITERAL, null, null);
-        if ( ! policyHelper.isAuthorizedAction(action)) {
+        if ( ! policyHelper.isAuthorizedAction(action) ) {
             return;
         }
         

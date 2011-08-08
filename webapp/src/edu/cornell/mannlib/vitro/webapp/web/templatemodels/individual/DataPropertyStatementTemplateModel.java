@@ -82,7 +82,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
 
         // Determine whether the statement can be deleted
         RequestedAction action = new DropDataPropStmt(dps);
-        if ( ! policyHelper.isAuthorizedAction(action)) {
+        if ( ! policyHelper.isAuthorizedAction(action) ) {
             return;
         }
         
@@ -107,7 +107,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
         
         // Determine whether the statement can be edited
         RequestedAction action = new EditDataPropStmt(dps);
-        if ( ! policyHelper.isAuthorizedAction(action)) {
+        if ( ! policyHelper.isAuthorizedAction(action) ) {
             return;
         }
         

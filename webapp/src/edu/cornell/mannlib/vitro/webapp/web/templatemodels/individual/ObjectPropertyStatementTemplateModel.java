@@ -59,7 +59,7 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
         
         // Determine whether the statement can be deleted
         RequestedAction action = new DropObjectPropStmt(subjectUri, propertyUri, objectUri);
-        if (policyHelper.isAuthorizedAction(action)) {    
+        if ( ! policyHelper.isAuthorizedAction(action) ) {    
             return;
         }
         
@@ -96,7 +96,7 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
         
         // Determine whether the statement can be edited
         RequestedAction action =  new EditObjPropStmt(ops);
-        if ( ! policyHelper.isAuthorizedAction(action)) {
+        if ( ! policyHelper.isAuthorizedAction(action) ) {
             return;
         }
         
