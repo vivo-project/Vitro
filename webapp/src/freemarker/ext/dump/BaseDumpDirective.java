@@ -323,13 +323,21 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         TemplateModelIterator iModel = keys.iterator();
         while (iModel.hasNext()) {
             String key = iModel.next().toString();
-            // Workaround this oddity: model.object does not contain
+            // Work around this oddity: model.object does not contain
             // values for "empty" and "keys", but model.keys() does. 
             if ("class".equals(key) || "empty".equals(key)) {
                 continue;
             }
             TemplateModel value = model.get(key);
-            items.put(key, getDump(value)); 
+            // A map with exposed methods includes methods inherited from Map and Object like
+            // size(), getClass(), etc. Punt on these for now by suppressing in the dump,
+            // though this is not the optimal solution. If they are exposed to the templates,
+            // the dump should also expose them. I'm guessing that in most cases these
+            // methods are not relevant to template authors.
+            if (! (value instanceof TemplateMethodModel)) {
+                items.put(key, getDump(value)); 
+            } 
+            
         }   
         map.put(Key.VALUE.toString(), items);  
         return map;

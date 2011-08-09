@@ -654,11 +654,6 @@ public class DumpDirectiveTest {
         
         test(varName, dataModel, expectedDump); 
     }  
-    
-    @Test
-    public void dumpHash() {
-        
-    }
 
     @Test
     public void dumpStringToStringMap() {
@@ -1039,6 +1034,7 @@ public class DumpDirectiveTest {
         private int id;
         private String middleName;
         private List<String> favoriteColors;
+        // private Map<String, String> degrees;
         private Employee supervisor;
         private float salary;
         
@@ -1071,6 +1067,10 @@ public class DumpDirectiveTest {
                 favoriteColors.add(color);
             }
         }
+        
+//        void setDegrees(Map<String, String> degrees) {
+//            this.degrees = degrees;
+//        }
 
         float getSalary() {
             return salary;
@@ -1127,6 +1127,10 @@ public class DumpDirectiveTest {
             return favoriteColors;
         }
         
+//        public Map<String, String> getDegrees() {
+//            return degrees;
+//        }
+        
         public String familyName() {
             return lastName;
         }
@@ -1141,6 +1145,11 @@ public class DumpDirectiveTest {
         jdoe.setFavoriteColors("blue", "green");
         jdoe.setSalary(65000);
 
+//        Map<String, String> degrees = new HashMap<String, String>();
+//        degrees.put("BA", "Mathematics");
+//        degrees.put("MS", "Computer Science");
+//        jdoe.setDegrees(degrees);
+        
         c.clear();
         c.set(1975, Calendar.OCTOBER, 25);
         c = DateUtils.truncate(c, Calendar.DATE);
@@ -1158,7 +1167,7 @@ public class DumpDirectiveTest {
 
         Map<String, Object> supervisorExpectedDump = new HashMap<String, Object>();
         supervisorExpectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
-        supervisorExpectedDump.put(Key.VALUE.toString(), getJaneSmithExpectedDump(exposureLevel)); 
+        supervisorExpectedDump.put(Key.VALUE.toString(), getJaneSmithExpectedDump(exposureLevel));
         
         // Properties
         SortedMap<String, Object> propertiesExpectedDump = new TreeMap<String, Object>();
@@ -1198,6 +1207,7 @@ public class DumpDirectiveTest {
             marriedExpectedDump.put(Key.VALUE.toString(), true);
             propertiesExpectedDump.put("married", marriedExpectedDump);
                  
+
             propertiesExpectedDump.put("supervisor", supervisorExpectedDump);    
             
             Map<String, Object> favoriteColorsExpectedDump = new HashMap<String, Object>(); 
@@ -1213,6 +1223,22 @@ public class DumpDirectiveTest {
             favoriteColorListExpectedDump.add(color2ExpectedDump);
             favoriteColorsExpectedDump.put(Key.VALUE.toString(), favoriteColorListExpectedDump);        
             propertiesExpectedDump.put("favoriteColors", favoriteColorsExpectedDump);
+
+// This test fails, don't know why
+//            Map<String, Object> degreesExpectedDump = new HashMap<String, Object>();
+//            degreesExpectedDump.put(Key.TYPE.toString(), Type.HASH);
+//            Map<String, Map<String, Object>> degreeMapExpectedDump = new HashMap<String, Map<String, Object>>();
+//            Map<String, Object> degree1ExpectedDump = new HashMap<String, Object>();
+//            degree1ExpectedDump.put(Key.TYPE.toString(), Type.STRING);
+//            degree1ExpectedDump.put(Key.VALUE.toString(), "Mathematics");
+//            degreeMapExpectedDump.put("BA", degree1ExpectedDump);
+//            Map<String, Object> degree2ExpectedDump = new HashMap<String, Object>();
+//            degree2ExpectedDump.put(Key.TYPE.toString(), Type.STRING);
+//            degree2ExpectedDump.put(Key.VALUE.toString(), "Computer Science");
+//            degreeMapExpectedDump.put("MS", degree2ExpectedDump);
+//            degreesExpectedDump.put(Key.VALUE.toString(), degreeMapExpectedDump);
+//            propertiesExpectedDump.put("degrees", degreesExpectedDump);
+            
         }        
         
         expectedDump.put(Key.PROPERTIES.toString(), propertiesExpectedDump);
@@ -1315,6 +1341,10 @@ public class DumpDirectiveTest {
             favoriteColorListExpectedDump.add(color2ExpectedDump);
             favoriteColorsExpectedDump.put(Key.VALUE.toString(), favoriteColorListExpectedDump);        
             propertiesExpectedDump.put("favoriteColors", favoriteColorsExpectedDump);
+            
+//            Map<String, Object> degreesExpectedDump = new HashMap<String, Object>();
+//            degreesExpectedDump.put(Key.VALUE.toString(), Value.NULL);
+//            propertiesExpectedDump.put("degrees", degreesExpectedDump);            
         }
         expectedDump.put(Key.PROPERTIES.toString(), propertiesExpectedDump);
         
