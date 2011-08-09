@@ -144,7 +144,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         Map<String, Object> value = new HashMap<String, Object>();
         
         if (model == null) {
-            value.put(Key.VALUE.toString(), Value.UNDEFINED);
+            value.put(Key.VALUE.toString(), Value.UNDEFINED.toString());
 
         // TemplateMethodModel and TemplateDirectiveModel objects can only be
         // included in the data model at the top level.
@@ -215,7 +215,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                 map.putAll( getTemplateModelDump( (TemplateModel)model ) );
             }
         } else {
-            map.put(Key.VALUE.toString(), Value.NULL);
+            map.put(Key.VALUE.toString(), Value.NULL.toString());
         }
         
         return map;
