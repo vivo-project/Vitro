@@ -81,7 +81,7 @@ public class DumpDirectiveTest {
         Map<String, Object> dataModel = new HashMap<String, Object>();
         
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
-        expectedDumpValue.put(Key.VALUE.toString(), Value.UNDEFINED);
+        expectedDumpValue.put(Key.VALUE.toString(), Value.UNDEFINED.toString());
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
         expectedDump.put(varName, expectedDumpValue);
@@ -1199,7 +1199,7 @@ public class DumpDirectiveTest {
             propertiesExpectedDump.put("nickname", nicknameExpectedDump);
     
             Map<String, Object> middleNameExpectedDump = new HashMap<String, Object>();
-            middleNameExpectedDump.put(Key.VALUE.toString(), Value.NULL);
+            middleNameExpectedDump.put(Key.VALUE.toString(), Value.NULL.toString());
             propertiesExpectedDump.put("middleName", middleNameExpectedDump);
             
             Map<String, Object> marriedExpectedDump = new HashMap<String, Object>();
@@ -1286,7 +1286,7 @@ public class DumpDirectiveTest {
         Map<String, Object> expectedDump = new HashMap<String, Object>();
 
         Map<String, Object> supervisorExpectedDump = new HashMap<String, Object>();
-        supervisorExpectedDump.put(Key.VALUE.toString(), Value.NULL);
+        supervisorExpectedDump.put(Key.VALUE.toString(), Value.NULL.toString());
         
         SortedMap<String, Object> propertiesExpectedDump = new TreeMap<String, Object>();
         
@@ -1318,7 +1318,7 @@ public class DumpDirectiveTest {
             propertiesExpectedDump.put("nickname", nicknameExpectedDump);
         
             Map<String, Object> middleNameExpectedDump = new HashMap<String, Object>();
-            middleNameExpectedDump.put(Key.VALUE.toString(), Value.NULL);
+            middleNameExpectedDump.put(Key.VALUE.toString(), Value.NULL.toString());
             propertiesExpectedDump.put("middleName", middleNameExpectedDump);
               
             Map<String, Object> marriedExpectedDump = new HashMap<String, Object>();
@@ -1343,7 +1343,7 @@ public class DumpDirectiveTest {
             propertiesExpectedDump.put("favoriteColors", favoriteColorsExpectedDump);
             
 //            Map<String, Object> degreesExpectedDump = new HashMap<String, Object>();
-//            degreesExpectedDump.put(Key.VALUE.toString(), Value.NULL);
+//            degreesExpectedDump.put(Key.VALUE.toString(), Value.NULL.toString());
 //            propertiesExpectedDump.put("degrees", degreesExpectedDump);            
         }
         expectedDump.put(Key.PROPERTIES.toString(), propertiesExpectedDump);
