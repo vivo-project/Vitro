@@ -63,7 +63,7 @@ div.dump {
     </#if>
 </#macro>
 
-<#macro doTypeAndValue map>
+<#macro doTypeAndValue map isMethod=false>
     <#local type = map.type!>
     <#if type?has_content>
         <p><strong>Type:</strong> ${type}</p>
@@ -75,8 +75,9 @@ div.dump {
 
     <#local value = map.value!>   
     <#-- Not value?has_content: we want to print [empty] for empty strings.
-         See doScalarValue macro. --> 
-    <#if value??> 
+         See doScalarValue macro. For methods, we don't show a list of values
+         unless there is a value. --> 
+    <#if value?? && (value?has_content || ! isMethod)> 
         <div class="values">
             <#if type?contains(".")><@doObjectValue value />
             <#elseif value?is_sequence><@doSequenceValue value type />
@@ -84,7 +85,7 @@ div.dump {
             <#else><@doScalarValue value />
             </#if>
        </div>
-   </#if>                    
+    </#if>                         
 </#macro>
 
 <#macro doObjectValue obj>
@@ -110,7 +111,8 @@ div.dump {
                     <#elseif value?is_string> <#-- value is return type -->
                         ${method} => ${value}
                     <#else> <#-- no-arg method: value is result of method invocation -->
-                        ${method} => <@divValue><@doTypeAndValue value /></@divValue>
+                        <#local isMethod = true>
+                        ${method} => <@divValue><@doTypeAndValue value isMethod /></@divValue>
                     </#if>
                 </@liItem>
             </#list>

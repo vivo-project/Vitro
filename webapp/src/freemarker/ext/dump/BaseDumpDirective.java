@@ -422,7 +422,7 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                         }
                     // Else display method name, parameter types, and return type
                     } else {
-                        String returnTypeName = getTypeName(method.getReturnType());
+                        String returnTypeName = getReturnTypeName(method);
                         Map<String, String> methodValue = new HashMap<String, String>();
                         if ( ! returnTypeName.equals("void") ) {
                             methodValue.put(Key.TYPE.toString(), returnTypeName);
@@ -460,14 +460,26 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
         List<String> paramTypeList = new ArrayList<String>(paramTypes.length);
         if (paramTypes.length > 0) {           
             for (Class<?> cls : paramTypes) {
-                paramTypeList.add(getTypeName(cls));
+                paramTypeList.add(getSimpleTypeName(cls));
             }            
         } 
         methodName += "(" + StringUtils.join(paramTypeList, ", ") + ")";
         return methodName;               
     }    
     
-    private String getTypeName(Class<?> cls) {
+    private String getReturnTypeName(Method method) {
+        Class<?> cls = method.getReturnType();
+        Package pkg = cls.getPackage();
+        if (pkg != null) {  // void return type has null package
+            String packageName = pkg.getName();
+            if (packageName.startsWith("java")) {
+                return getSimpleTypeName(cls);
+            }
+        } 
+        return cls.getName();
+    }
+    
+    private String getSimpleTypeName(Class<?> cls) {
         return cls.getSimpleName().replace("[]", "s");
     }
 
