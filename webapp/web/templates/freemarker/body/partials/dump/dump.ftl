@@ -73,8 +73,10 @@ div.dump {
         </#if>
     </#if>   
 
-    <#local value = map.value!>    
-    <#if value?has_content>
+    <#local value = map.value!>   
+    <#-- Not value?has_content: we want to print [empty] for empty strings.
+         See doScalarValue macro. --> 
+    <#if value??> 
         <div class="values">
             <#if type?contains(".")><@doObjectValue value />
             <#elseif value?is_sequence><@doSequenceValue value type />
