@@ -5,8 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,16 +12,15 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOwnAccount;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
-import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
@@ -35,7 +32,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Red
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.Tags;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
 import freemarker.ext.beans.BeansWrapper;
@@ -57,6 +53,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         STANDARD_ERROR("error-standard.ftl"),
         ERROR_MESSAGE("error-message.ftl"),
         TITLED_ERROR_MESSAGE("error-titled.ftl"),
+        ERROR_DISPLAY("error-display.ftl"),
         MESSAGE("message.ftl"),
         TITLED_MESSAGE("message-titled.ftl"),
         PAGE_DEFAULT("page.ftl"),
@@ -93,8 +90,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             vreq.setAttribute("freemarkerConfig", config);            
             config.resetRequestSpecificSharedVariables();
             
-			responseValues = processRequest(vreq);
-			
+			responseValues = processRequest(vreq);			
 	        doResponse(vreq, response, responseValues);	 
 	        
     	} catch (Throwable e) {
@@ -112,7 +108,22 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     
     protected void handleException(VitroRequest vreq, HttpServletResponse response, Throwable t) throws ServletException {
         try {
-            doResponse(vreq, response, new ExceptionResponseValues(t, HttpServletResponse.SC_INTERNAL_SERVER_ERROR)); 
+            int statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+            ExceptionResponseValues rv;
+            String templateName = Template.ERROR_DISPLAY.toString();
+            if (PolicyHelper.isAuthorizedForActions(vreq, new UseMiscellaneousAdminPages())) {
+                Map<String, Object> map = new HashMap<String, Object>();
+                Map<String, String> errorData = new HashMap<String, String>();               
+                errorData.put("errorMessage", t.getMessage());
+                StringWriter sw = new StringWriter();
+                t.printStackTrace(new PrintWriter(sw));
+                errorData.put("stackTrace", sw.toString());  
+                map.put("errorData", errorData);
+                rv = new ExceptionResponseValues(templateName, map, t, statusCode);
+            } else {
+                rv = new ExceptionResponseValues(templateName, t, statusCode);
+            }            
+            doResponse(vreq, response, rv);
         } catch (TemplateProcessingException e) {
             throw new ServletException();
         }
@@ -206,7 +217,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         // Tell the template and any directives it uses that we're processing a page template.
         templateDataModel.put("templateType", PAGE_TEMPLATE_TYPE);  
         
-        writePage(templateDataModel, config, vreq, response, values.getStatusCode());       
+        writePage(templateDataModel, config, vreq, response, values.getStatusCode(), values);       
     }
     
     protected void doRedirect(HttpServletRequest request, HttpServletResponse response, ResponseValues values) 
@@ -256,8 +267,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             ResponseValues values) throws TemplateProcessingException {
         // Log the error, and display an error message on the page.        
         log.error(values.getException(), values.getException());      
-        TemplateResponseValues trv = TemplateResponseValues.getTemplateResponseValuesFromException((ExceptionResponseValues)values);
-        doTemplate(vreq, response, trv);
+        doTemplate(vreq, response, values);
     }
 
     public String getThemeDir(ApplicationBean appBean) {
@@ -408,9 +418,15 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return processTemplate(values, config, request).toString();
     }
     
-    protected void writePage(Map<String, Object> root, Configuration config, 
-            HttpServletRequest request, HttpServletResponse response, int statusCode) throws TemplateProcessingException {   
-        writeTemplate(getPageTemplateName(), root, config, request, response, statusCode);                   
+    protected void writePage(Map<String, Object> root, Configuration config, HttpServletRequest request,
+            HttpServletResponse response, int statusCode, ResponseValues rv) throws TemplateProcessingException {
+        
+        // For an error page, use the standard page template rather than a special one, in case that is the source
+        // of the error. (The standard page template could also be the source of the error, but that is
+        // less likely.
+        String pageTemplateName = 
+            rv instanceof ExceptionResponseValues ? Template.PAGE_DEFAULT.toString() : getPageTemplateName();
+        writeTemplate(pageTemplateName, root, config, request, response, statusCode);                   
     }
     
     protected void writeTemplate(String templateName, Map<String, Object> map, Configuration config, 
