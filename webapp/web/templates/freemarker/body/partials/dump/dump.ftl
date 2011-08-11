@@ -2,41 +2,7 @@
 
 <#-- Template for dump directives -->
 
-<#-- Styles here are temporary; use stylesheets.add() once that's working (see below) -->
-<style>
-div.dump {
-    margin-top: 1em;
-    border-top: 2px solid #ccc; 
-    padding-top: .75em;
-}
-
-.dump ul li.variable {
-    margin-bottom: .5em;
-    border-bottom: 1px solid #ccc; 
-    padding-top: .75em;
-    padding-bottom: .75em;
-}
-
-.dump ul ul {
-    margin-left: 1.5em;
-}
-
-.dump ul li {
-    list-style: none;
-}
-
-.dump ul li p {
-    margin-bottom: .25em;  
-}
-
-.dump ul li.item {
-    margin-bottom: 1.25em;
-}
-
-.dump ul li.item .value { 
-    margin-left: 1.5em;
-}
-</style>
+ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/dump.css" />')}
 
 <div class="dump">
     <h3>${title}</h3>
@@ -205,7 +171,3 @@ div.dump {
     <li class="item"><#nested></li>
 </#macro>
 
-
-<#-- This will work after we move stylesheets to Configuration sharedVariables 
-${stylesheets.add('<link rel="stylesheet" href="/css/fmdump.css">')}
--->
