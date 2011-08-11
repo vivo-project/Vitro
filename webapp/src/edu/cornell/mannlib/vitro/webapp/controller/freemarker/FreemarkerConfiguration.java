@@ -22,7 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.Tags;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.Tags.TagsBeansWrapper;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.Tags.TagsWrapper;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
@@ -187,7 +187,7 @@ public class FreemarkerConfiguration extends Configuration {
      */
     private TemplateModel wrapTagList(Tags tags) {        
         try {
-            BeansWrapper wrapper = new TagsBeansWrapper();
+            BeansWrapper wrapper = new TagsWrapper();
             return wrapper.wrap(tags); // this is a StringModel
         } catch (TemplateModelException e) {
             log.error("Error creating Tags template model");

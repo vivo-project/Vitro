@@ -282,7 +282,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             if (FreemarkerEmailFactory.isConfigured(vreq)) {
                 urls.put("contact", UrlBuilder.getUrl(Route.CONTACT));
             } else {
-                urls.remove("contact");
+                urls.remove("contact"); // clear value from a previous request
             }      
             
             urls.put("currentPage", getCurrentPageUrl(vreq));
@@ -291,7 +291,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             if (PolicyHelper.isAuthorizedForActions(vreq, new EditOwnAccount())) {
                 urls.put("myAccount", UrlBuilder.getUrl("/accounts/myAccount"));
             } else {
-                urls.remove("myAccount");
+                urls.remove("myAccount"); // clear value from a previous request
             }
             
             config.setSharedVariable("urls", urls);

@@ -31,9 +31,9 @@ public class Tags extends BaseTemplateModel {
         tags.clear();
     }
 
-    static public class TagsBeansWrapper extends BeansWrapper {
+    static public class TagsWrapper extends BeansWrapper {
         
-        public TagsBeansWrapper() {
+        public TagsWrapper() {
             // Start by exposing all safe methods.
             setExposureLevel(EXPOSE_SAFE);
         }
