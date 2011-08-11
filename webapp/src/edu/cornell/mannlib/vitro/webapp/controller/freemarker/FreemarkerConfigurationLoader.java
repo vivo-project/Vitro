@@ -42,7 +42,7 @@ public class FreemarkerConfigurationLoader {
         }
     }
     
-    public VitroFreemarkerConfiguration getConfig(VitroRequest vreq) { 
+    public FreemarkerConfiguration getConfig(VitroRequest vreq) { 
         String themeDir = getThemeDir(vreq.getAppBean());
         return getConfigForTheme(themeDir, vreq);
     }
@@ -63,15 +63,15 @@ public class FreemarkerConfigurationLoader {
     }
 
     
-    protected VitroFreemarkerConfiguration getConfigForTheme(String themeDir, VitroRequest vreq) {
+    protected FreemarkerConfiguration getConfigForTheme(String themeDir, VitroRequest vreq) {
         
         /* The Configuration is theme-specific because:
          * 1. The template loader is theme-specific, since it specifies a theme directory to load templates from.
          * 2. Shared variables like stylesheets are theme-specific.
          */ 
         @SuppressWarnings("unchecked")
-        Map<String, VitroFreemarkerConfiguration> themeToConfigMap = 
-            (Map<String, VitroFreemarkerConfiguration>) context.getAttribute("themeToConfigMap");
+        Map<String, FreemarkerConfiguration> themeToConfigMap = 
+            (Map<String, FreemarkerConfiguration>) context.getAttribute("themeToConfigMap");
         
         if( themeToConfigMap == null ) {
             log.error("The templating system is not configured correctly. Make sure that you have the FreemarkerSetup context listener in your web.xml.");
@@ -81,7 +81,7 @@ public class FreemarkerConfigurationLoader {
         } else if (themeToConfigMap.containsKey(themeDir)) {
             return themeToConfigMap.get(themeDir);
         } else {
-            VitroFreemarkerConfiguration config = new VitroFreemarkerConfiguration(themeDir, vreq, context); 
+            FreemarkerConfiguration config = new FreemarkerConfiguration(themeDir, vreq, context); 
             themeToConfigMap.put(themeDir, config);
             return config;
         }

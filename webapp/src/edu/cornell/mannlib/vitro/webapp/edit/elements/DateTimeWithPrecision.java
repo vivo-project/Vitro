@@ -17,7 +17,7 @@ import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.VitroFreemarkerConfiguration;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
@@ -109,8 +109,7 @@ public class DateTimeWithPrecision extends BaseEditElement {
     @Override
     public String draw(String fieldName, EditConfiguration editConfig,
             EditSubmission editSub, Configuration fmConfig) {                        
-        Map map = getMapForTemplate( editConfig, editSub);
-        //map.putAll( VitroFreemarkerConfiguration.getDirectives());        
+        Map map = getMapForTemplate( editConfig, editSub);    
         return merge( fmConfig, TEMPLATE_NAME, map);
     }    
     

@@ -34,7 +34,7 @@ public class FreemarkerComponentGenerator extends FreemarkerHttpServlet {
    
         // Mimic what FreemarkerHttpServlet does for a new request
         VitroRequest vreq = new VitroRequest(request);       
-        VitroFreemarkerConfiguration config = getConfig(vreq);
+        FreemarkerConfiguration config = getConfig(vreq);
         vreq.setAttribute("freemarkerConfig", config);
         config.resetRequestSpecificSharedVariables();        
         Map<String, Object> map = getPageTemplateValues(vreq);

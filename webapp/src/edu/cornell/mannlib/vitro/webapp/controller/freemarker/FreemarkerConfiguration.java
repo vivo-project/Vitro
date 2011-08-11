@@ -34,9 +34,9 @@ import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 
-public class VitroFreemarkerConfiguration extends Configuration {
+public class FreemarkerConfiguration extends Configuration {
 
-    private static final Log log = LogFactory.getLog(VitroFreemarkerConfiguration.class);
+    private static final Log log = LogFactory.getLog(FreemarkerConfiguration.class);
 
     private final String themeDir;
     private final ServletContext context;
@@ -46,7 +46,7 @@ public class VitroFreemarkerConfiguration extends Configuration {
     private final Tags scripts;
     private final Tags headScripts;
     
-    VitroFreemarkerConfiguration(String themeDir, VitroRequest vreq, ServletContext context) {
+    FreemarkerConfiguration(String themeDir, VitroRequest vreq, ServletContext context) {
         
         this.themeDir = themeDir;
         this.context = context;
@@ -103,8 +103,12 @@ public class VitroFreemarkerConfiguration extends Configuration {
     /** Some template variables are shared so that they are accessible to
      * all templates, but they are request-specific and so need to be
      * reset at the beginning of a new request.
+     * 
+     * This is public for now because it's accessed by propDelete.jsp. 
+     * Once the property deletion is integrated into Freemarker and generated
+     * with a Freemarker page, the visibility can be reduced to package.
      */
-    void resetRequestSpecificSharedVariables() {      
+    public void resetRequestSpecificSharedVariables() {      
         stylesheets.reset();
         scripts.reset();
         headScripts.reset();

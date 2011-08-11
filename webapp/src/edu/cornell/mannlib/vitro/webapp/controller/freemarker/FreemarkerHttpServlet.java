@@ -89,7 +89,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
                 return;
             }
             
-            VitroFreemarkerConfiguration config = getConfig(vreq);
+            FreemarkerConfiguration config = getConfig(vreq);
             vreq.setAttribute("freemarkerConfig", config);            
             config.resetRequestSpecificSharedVariables();
             
@@ -124,7 +124,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         doGet(request, response);
     }
    
-    protected VitroFreemarkerConfiguration getConfig(VitroRequest vreq) {               
+    protected FreemarkerConfiguration getConfig(VitroRequest vreq) {               
         FreemarkerConfigurationLoader loader = 
             FreemarkerConfigurationLoader.getFreemarkerConfigurationLoader(getServletContext());
         return loader.getConfig(vreq);
@@ -270,7 +270,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
      */
     private void setRequestUrls(VitroRequest vreq) {
         
-        VitroFreemarkerConfiguration config = (VitroFreemarkerConfiguration)vreq.getAttribute("freemarkerConfig");
+        FreemarkerConfiguration config = (FreemarkerConfiguration)vreq.getAttribute("freemarkerConfig");
         TemplateModel urlModel = config.getSharedVariable("urls");
         
         try {
