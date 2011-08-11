@@ -28,6 +28,7 @@ public class ReadOnlyBeansWrapper extends BeansWrapper {
         setExposureLevel(EXPOSE_SAFE);
     }
     
+    @SuppressWarnings("rawtypes")
     @Override
     protected void finetuneMethodAppearance(Class cls, Method method, MethodAppearanceDecision decision) {
         

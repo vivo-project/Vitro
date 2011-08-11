@@ -2,28 +2,22 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.elements;
 
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.format.ISODateTimeFormat;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.VitroFreemarkerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
@@ -116,7 +110,7 @@ public class DateTimeWithPrecision extends BaseEditElement {
     public String draw(String fieldName, EditConfiguration editConfig,
             EditSubmission editSub, Configuration fmConfig) {                        
         Map map = getMapForTemplate( editConfig, editSub);
-        map.putAll( FreemarkerHttpServlet.getDirectives());        
+        //map.putAll( VitroFreemarkerConfiguration.getDirectives());        
         return merge( fmConfig, TEMPLATE_NAME, map);
     }    
     

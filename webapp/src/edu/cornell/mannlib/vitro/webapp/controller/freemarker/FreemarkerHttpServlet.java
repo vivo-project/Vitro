@@ -43,6 +43,7 @@ import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
+import freemarker.template.utility.DeepUnwrap;
 
 public class FreemarkerHttpServlet extends VitroHttpServlet {
 
@@ -82,16 +83,18 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         ResponseValues responseValues = null;
         
     	try {
-    	    
-	        Configuration config = getConfig(vreq);
-	        vreq.setAttribute("freemarkerConfig", config);
-	        
-			// This method does a redirect if the required authorizations are not met, so just return. 
-			if (!isAuthorizedToDisplayPage(request, response, requiredActions(vreq))) {
-				return;
-			}
 
+            // This method does a redirect if the required authorizations are not met, so just return. 
+            if (!isAuthorizedToDisplayPage(request, response, requiredActions(vreq))) {
+                return;
+            }
+            
+            VitroFreemarkerConfiguration config = getConfig(vreq);
+            vreq.setAttribute("freemarkerConfig", config);            
+            config.resetRequestSpecificSharedVariables();
+            
 			responseValues = processRequest(vreq);
+			
 	        doResponse(vreq, response, responseValues);	 
 	        
     	} catch (Throwable e) {
@@ -105,6 +108,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     	    handleException(vreq, response, e);
     	}
     }
+    
     
     protected void handleException(VitroRequest vreq, HttpServletResponse response, Throwable t) throws ServletException {
         try {
@@ -120,7 +124,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         doGet(request, response);
     }
    
-    protected Configuration getConfig(VitroRequest vreq) {               
+    protected VitroFreemarkerConfiguration getConfig(VitroRequest vreq) {               
         FreemarkerConfigurationLoader loader = 
             FreemarkerConfigurationLoader.getFreemarkerConfigurationLoader(getServletContext());
         return loader.getConfig(vreq);
@@ -260,37 +264,42 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return appBean.getThemeDir().replaceAll("/$", "");
     }
 
-    // Define the URLs that are accessible to the templates. Note that we do not create menus here,
-    // because we want the templates to be free to define the link text and where the links are displayed.
-    private final Map<String, String> getUrls(String themeDir, VitroRequest vreq) {
-        Map<String, String> urls = new HashMap<String, String>();
+    /** 
+     * Define the request-specific URLs that are accessible to the templates. 
+     * @param VitroRequest vreq
+     */
+    private void setRequestUrls(VitroRequest vreq) {
         
-        urls.put("home", UrlBuilder.getHomeUrl());
+        VitroFreemarkerConfiguration config = (VitroFreemarkerConfiguration)vreq.getAttribute("freemarkerConfig");
+        TemplateModel urlModel = config.getSharedVariable("urls");
         
-        // Templates use this to construct urls.
-        urls.put("base", UrlBuilder.contextPath);
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> urls = (Map<String, Object>) DeepUnwrap.permissiveUnwrap(urlModel);
+            
+            // This is request-specific because email can be configured
+            // and de-configured in the application interface. 
+            if (FreemarkerEmailFactory.isConfigured(vreq)) {
+                urls.put("contact", UrlBuilder.getUrl(Route.CONTACT));
+            } else {
+                urls.remove("contact");
+            }      
+            
+            urls.put("currentPage", getCurrentPageUrl(vreq));
+            urls.put("referringPage", getReferringPageUrl(vreq));
+            
+            if (PolicyHelper.isAuthorizedForActions(vreq, new EditOwnAccount())) {
+                urls.put("myAccount", UrlBuilder.getUrl("/accounts/myAccount"));
+            } else {
+                urls.remove("myAccount");
+            }
+            
+            config.setSharedVariable("urls", urls);
 
-        urls.put("about", UrlBuilder.getUrl(Route.ABOUT));
-        if (FreemarkerEmailFactory.isConfigured(vreq)) {
-            urls.put("contact", UrlBuilder.getUrl(Route.CONTACT));
+        } catch (TemplateModelException e) {
+            log.error(e, e);
         }
-        urls.put("search", UrlBuilder.getUrl(Route.SEARCH));  
-        urls.put("termsOfUse", UrlBuilder.getUrl(Route.TERMS_OF_USE));  
-        urls.put("login", UrlBuilder.getLoginUrl());          
-        urls.put("logout", UrlBuilder.getLogoutUrl());       
-        urls.put("siteAdmin", UrlBuilder.getUrl(Route.SITE_ADMIN));  
-        urls.put("themeImages", UrlBuilder.getUrl(themeDir + "/images"));
-        urls.put("images", UrlBuilder.getUrl("/images"));
-        urls.put("theme", UrlBuilder.getUrl(themeDir));
-        urls.put("index", UrlBuilder.getUrl("/browse"));   
-        urls.put("currentPage", getCurrentPageUrl(vreq));
-        urls.put("referringPage", getReferringPageUrl(vreq));
-        
-		if (PolicyHelper.isAuthorizedForActions(vreq, new EditOwnAccount())) {
-			urls.put("myAccount", UrlBuilder.getUrl("/accounts/myAccount"));
-		}
-        
-        return urls;
+
     }
     
     private String getCurrentPageUrl(HttpServletRequest request) {
@@ -323,87 +332,28 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return wrapper;
     }
 
-    private TemplateModel getTagList() {        
-        // For script and stylesheet lists, use an object wrapper that exposes write methods, 
-        // instead of the configuration's object wrapper, which doesn't. The templates can
-        // add stylesheets and scripts to the lists by calling their add() methods.
-        try {
-            return wrap(new Tags(), BeansWrapper.EXPOSE_SAFE);
-        } catch (TemplateModelException e) {
-            log.error("Error creating Tags template model");
-            return null;
-        }
-    }
-    
-
-    /**
-     *  Add any Java directives the templates should have access to.
-     *  This is public and static so that these may be used by other classes during
-     *  the transition from JSP to Freemarker.
-     */    
-    public static Map<String, Object> getDirectives() {
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.putAll(getDirectivesForAllEnvironments());
-        map.put("url", new edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective()); 
-        map.put("widget", new edu.cornell.mannlib.vitro.webapp.web.directives.WidgetDirective());
-        
-        return map;
-    }
-    
-    public static Map<String, Object> getDirectivesForAllEnvironments() {
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("dump", new freemarker.ext.dump.DumpDirective());
-        map.put("dumpAll", new freemarker.ext.dump.DumpAllDirective());  
-        map.put("help", new freemarker.ext.dump.HelpDirective());    
-        return map;
-    }
-    
-    public static Map<String, Object> getMethods() {
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("profileUrl", new edu.cornell.mannlib.vitro.webapp.web.methods.IndividualProfileUrlMethod());
-        map.put("localName", new edu.cornell.mannlib.vitro.webapp.web.methods.IndividualLocalNameMethod());
-        return map;
-    }
-    
-    // Add variables that are needed to generate the page template (they will also be accessible
-    // to the body template).
+    /** Add variables that are needed to generate the page template (they will also be accessible
+     *  to the body template). These are specific to the request, so are not defined as
+     *  shared variables in the Configuration. (Though we could reset them like other 
+     *  shared variables. These variables are not needed outside the page and body templates,
+     *  however. If they are needed elsewhere, add to shared variables.
+     *  @param VitroRequest vreq
+     *  @return Map<String, Object>
+     */
     // RY This is protected instead of private so FreeMarkerComponentGenerator can access.
-    // Once we don't need that (i.e., jsps have been eliminated) we can make it private.
+    // Once we don't need that (i.e., jsps have been eliminated) it can be made private.
     protected Map<String, Object> getPageTemplateValues(VitroRequest vreq) {
         
         Map<String, Object> map = new HashMap<String, Object>();
-
-        ApplicationBean appBean = vreq.getAppBean();
-        String siteName = appBean.getApplicationName();
-        map.put("siteName", siteName);
         
         // This may be overridden by the body data model received from the subcontroller.
-        map.put("title", getTitle(siteName, vreq));
+        map.put("title", getTitle(vreq.getAppBean().getApplicationName(), vreq));
+        
+        setRequestUrls(vreq);
 
-        String themeDir = getThemeDir(appBean);
-        
-        map.put("urls", getUrls(themeDir, vreq)); 
-
-        map.put("themeDir", themeDir);
-        map.put("currentTheme", themeDir.substring(themeDir.lastIndexOf('/')+1));
-        map.put("stylesheets", getTagList());
-        map.put("scripts", getTagList());
-        map.put("headScripts", getTagList());
-        
-        map.putAll(getDirectives());
-        map.putAll(getMethods());
-        
         map.put("menu", getDisplayModelMenu(vreq));
         
         map.put("user", new User(vreq));
-        
-        map.put("version", getRevisionInfo());
-        
-        map.put("copyright", getCopyrightInfo(appBean));    
-        map.put("siteTagline", appBean.getShortHand());
-
-        // This value is used only in stylesheets.ftl and already contains the context path.
-        map.put("stylesheetPath", UrlBuilder.getUrl(themeDir + "/css"));  
 
         String flashMessage = DisplayMessage.getMessageAndClear(vreq);
         if (! flashMessage.isEmpty()) {
@@ -412,9 +362,9 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 
         // Let the page template know which page it's processing.
         map.put("currentServlet", normalizeServletName(vreq.getServletPath().replaceFirst("/", "")));
-
-        // In template: ${now?date}, ${now?datetime}, ${now?time}
-        map.put("now", new Date());
+        
+        map.put("url", new edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective()); 
+        map.put("widget", new edu.cornell.mannlib.vitro.webapp.web.directives.WidgetDirective());
         
         return map;        
     }  
@@ -431,30 +381,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return vreq.getWebappDaoFactory().getMenuDao().getMainMenu(url);
     }
     
-    private final Map<String, Object> getCopyrightInfo(ApplicationBean appBean) {
-
-        Map<String, Object> copyright = null;
-        String copyrightText = appBean.getCopyrightAnchor();
-        if ( ! StringUtils.isEmpty(copyrightText) ) {
-            copyright =  new HashMap<String, Object>();
-            copyright.put("text", copyrightText);
-            int thisYear = Calendar.getInstance().get(Calendar.YEAR);  // use ${copyrightYear?c} in template
-            //String thisYear = ((Integer)Calendar.getInstance().get(Calendar.YEAR)).toString(); // use ${copyrightYear} in template
-            //SimpleDate thisYear = new SimpleDate(Calendar.getInstance().getTime(), TemplateDateModel.DATE); // use ${copyrightYear?string("yyyy")} in template
-            copyright.put("year", thisYear);
-            copyright.put("url", appBean.getCopyrightURL());
-        } 
-        return copyright;
-    }
-    
-    private final Map<String, Object> getRevisionInfo() {
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("label", RevisionInfoBean.getBean(getServletContext())
-                .getReleaseLabel());
-        map.put("moreInfoUrl", UrlBuilder.getUrl("/revisionInfo"));
-        return map;
-    }
-
     // Subclasses may override. This serves as a default.
     protected String getTitle(String siteName, VitroRequest vreq) {        
         return siteName;

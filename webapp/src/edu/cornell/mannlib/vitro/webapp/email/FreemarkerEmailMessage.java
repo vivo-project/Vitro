@@ -155,7 +155,7 @@ public class FreemarkerEmailMessage {
 	}
 
 	public void processTemplate() {
-		bodyMap.putAll(FreemarkerHttpServlet.getDirectivesForAllEnvironments());
+		//bodyMap.putAll(FreemarkerHttpServlet.getDirectivesForAllEnvironments());
 		bodyMap.put("email", new EmailDirective(this));
 
 		try {

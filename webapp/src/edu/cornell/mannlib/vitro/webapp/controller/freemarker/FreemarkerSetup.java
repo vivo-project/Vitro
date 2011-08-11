@@ -26,7 +26,7 @@ public class FreemarkerSetup implements ServletContextListener {
         }
 	    
 		ServletContext sc = event.getServletContext();	
-		sc.setAttribute("themeToConfigMap", new HashMap<String, Configuration>());
+		sc.setAttribute("themeToConfigMap", new HashMap<String, VitroFreemarkerConfiguration>());
         BaseTemplateModel.setServletContext(sc);
         FreemarkerComponentGenerator.setServletContext(sc);
 		UrlBuilder.contextPath = sc.getContextPath();
