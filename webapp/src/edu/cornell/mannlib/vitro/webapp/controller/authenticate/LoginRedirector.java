@@ -147,14 +147,6 @@ public class LoginRedirector {
 		}
 	}
 
-	public void redirectUnrecognizedExternalUser(HttpServletResponse response,
-			String username) throws IOException {
-		log.debug("Redirecting unrecognized external user: " + username);
-		DisplayMessage.setMessage(request,
-				"VIVO cannot find a profile for your account.");
-		response.sendRedirect(getApplicationHomePageUrl());
-	}
-
 	private boolean isMerelySelfEditor() {
 		IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(request);
 		if (IsRootUser.isRootUser(ids)) {
