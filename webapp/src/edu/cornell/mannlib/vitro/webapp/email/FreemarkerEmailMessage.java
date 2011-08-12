@@ -167,7 +167,7 @@ public class FreemarkerEmailMessage {
 		}
 	}
 
-	public void send() {
+	public boolean send() {
 		try {
 			MimeMessage msg = new MimeMessage(session);
 			msg.setReplyTo(new Address[] { replyToAddress });
@@ -204,9 +204,10 @@ public class FreemarkerEmailMessage {
 			msg.setSentDate(new Date());
 
 			Transport.send(msg);
-
+			return true;
 		} catch (MessagingException e) {
 			log.error("Failed to send message.", e);
+			return false;
 		}
 	}
 

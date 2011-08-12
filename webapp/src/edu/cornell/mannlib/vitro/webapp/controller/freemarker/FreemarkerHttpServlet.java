@@ -2,9 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
+import static javax.mail.Message.RecipientType.TO;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOwnAcc
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
@@ -32,6 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Red
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
+import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailMessage;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
 import freemarker.ext.beans.BeansWrapper;
@@ -50,14 +55,22 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     public static final String BODY_TEMPLATE_TYPE = "body";
 
     protected enum Template {
-        STANDARD_ERROR("error-standard.ftl"),
-        ERROR_MESSAGE("error-message.ftl"),
-        TITLED_ERROR_MESSAGE("error-titled.ftl"),
-        ERROR_DISPLAY("error-display.ftl"),
-        MESSAGE("message.ftl"),
-        TITLED_MESSAGE("message-titled.ftl"),
+        
+        SETUP("setup.ftl"),
+        
         PAGE_DEFAULT("page.ftl"),
-        SETUP("setup.ftl");
+        
+        // error templates
+        ERROR_DISPLAY("error-display.ftl"),
+        ERROR_EMAIL("error-email.ftl"),
+        ERROR_MESSAGE("error-message.ftl"),
+        STANDARD_ERROR("error-standard.ftl"),
+        TITLED_ERROR_MESSAGE("error-titled.ftl"),
+
+        // message templates
+        MESSAGE("message.ftl"),
+        TITLED_MESSAGE("message-titled.ftl");
+
         
         private final String filename;
         
@@ -105,25 +118,61 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     	}
     }
     
-    
+    /** In case of a processing error, display an error page. To an authorized user, the page displays
+     * details of the error. Otherwise, these details are sent to the site administrator.
+     */
     protected void handleException(VitroRequest vreq, HttpServletResponse response, Throwable t) throws ServletException {
         try {
-            int statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-            ExceptionResponseValues rv;
+            Map<String, Object> templateMap = new HashMap<String, Object>();
             String templateName = Template.ERROR_DISPLAY.toString();
-            if (PolicyHelper.isAuthorizedForActions(vreq, new UseMiscellaneousAdminPages())) {
-                Map<String, Object> map = new HashMap<String, Object>();
-                Map<String, String> errorData = new HashMap<String, String>();               
-                errorData.put("errorMessage", t.getMessage());
-                StringWriter sw = new StringWriter();
-                t.printStackTrace(new PrintWriter(sw));
-                errorData.put("stackTrace", sw.toString());  
-                map.put("errorData", errorData);
-                rv = new ExceptionResponseValues(templateName, map, t, statusCode);
+            int statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+            
+            // adminErrorData will be viewable only by an admin, either on the
+            // page or in an email.
+            Map<String, Object> adminErrorData = new HashMap<String, Object>();            
+
+            StringBuffer requestedUrl = vreq.getRequestURL();
+            String queryString = vreq.getQueryString();   
+            if (queryString != null) {
+                requestedUrl.append(queryString);
+            }
+            adminErrorData.put("requestedUrl", requestedUrl);
+            
+            String errorMessage = t.getMessage();
+            adminErrorData.put("errorMessage", errorMessage);
+
+            StringWriter sw = new StringWriter();
+            t.printStackTrace(new PrintWriter(sw));
+            String stackTrace = sw.toString();
+            adminErrorData.put("stackTrace", stackTrace);
+            
+            adminErrorData.put("datetime", new Date());
+
+            templateMap.put("errorOnHomePage", this instanceof HomePageController);
+            
+            boolean sentEmail = false;
+            
+            // If the user is authorized, display the error data on the page
+            if (PolicyHelper.isAuthorizedForActions(vreq, new UseMiscellaneousAdminPages())) {                              
+                templateMap.put("adminErrorData", adminErrorData);   
+                
+            // Else send the data to the site administrator
             } else {
-                rv = new ExceptionResponseValues(templateName, t, statusCode);
-            }            
+                FreemarkerEmailMessage email = FreemarkerEmailFactory.createNewMessage(vreq);
+                String recipient = ConfigurationProperties.getBean(getServletContext())
+                    .getProperty("email.replyTo");
+                email.addRecipient(TO, recipient);          
+                email.setTemplate(Template.ERROR_EMAIL.toString());
+                email.setBodyMap(adminErrorData);
+                email.processTemplate();
+                sentEmail = email.send();                   
+            }
+            
+            templateMap.put("sentEmail", sentEmail);
+            
+            ExceptionResponseValues rv = new ExceptionResponseValues(templateName, templateMap, t, statusCode);
             doResponse(vreq, response, rv);
+            
         } catch (TemplateProcessingException e) {
             throw new ServletException();
         }
