@@ -1,0 +1,347 @@
+# An example of the RDF for a person from 1.2.1 vivo.cornell.edu
+# The person's URI is <http://vivo.cornell.edu/individual/individual8803>
+
+<http://vivo.cornell.edu/individual/AI-24401569793-2>
+      a       <http://www.w3.org/2002/07/owl#Thing> , <http://vivoweb.org/ontology/core#Relationship> , <http://vivoweb.org/ontology/core#Authorship> ;
+      <http://vivoweb.org/ontology/activity-insight#authorNameAsListed>
+              "Allen, P E" ;
+      <http://vivoweb.org/ontology/core#authorRank>
+              "2"^^<http://www.w3.org/2001/XMLSchema#int> ;
+      <http://vivoweb.org/ontology/core#linkedAuthor>
+              <http://vivo.cornell.edu/individual/individual8803> ;
+      <http://vivoweb.org/ontology/core#linkedInformationResource>
+              <http://vivo.cornell.edu/individual/AI-24401569793> .
+
+<http://vivo.cornell.edu/individual/grant46750>
+      a       <http://www.w3.org/2002/07/owl#Thing> , <http://vivoweb.org/ontology/cu-vivo-osp#Grant> , <http://vivoweb.org/ontology/core#Agreement> , <http://vivoweb.org/ontology/core#Grant> ;
+      <http://www.w3.org/2000/01/rdf-schema#label>
+              "THE SCIENCE KNOWLEDGE AND EDUCATION NETWORK BUILDING A USER BASE AROUND SCIENTIFIC PUBLICATIONS: EDITING ONLINE CONTENT AND ANNOTATING SCIENTIFIC MATERIALS" ;
+      <http://vivoweb.org/ontology/core#administeredBy>
+              <http://vivo.cornell.edu/individual/individual5548> ;
+      <http://vivoweb.org/ontology/core#dateTimeInterval>
+              <http://vivo.cornell.edu/individual/grant46750-DTI> ;
+      <http://vivoweb.org/ontology/core#grantAwardedBy>
+              <http://vivo.cornell.edu/individual/individual9254> ;
+      <http://vivoweb.org/ontology/core#localAwardId>
+              "46750" ;
+      <http://vivoweb.org/ontology/core#relatedRole>
+              <http://vivo.cornell.edu/individual/inGrant46750For2191> , <http://vivo.cornell.edu/individual/inGrant46750For8286> , <http://vivo.cornell.edu/individual/inGrant46750For8287> , <http://vivo.cornell.edu/individual/inGrant46750For5144> ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#dateHarvested>
+              "2011-06-27-04:00" ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#harvestedBy>
+              "OSPWH-Harvester" ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#sponsorLevelOne>
+              "NSF" ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#sponsorLevelThree>
+              "" ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#sponsorLevelTwo>
+              "NSF EHR" .
+
+<http://vivo.cornell.edu/individual/AI-20912635905-3>
+      a       <http://www.w3.org/2002/07/owl#Thing> , <http://vivoweb.org/ontology/core#Relationship> , <http://vivoweb.org/ontology/core#Authorship> ;
+      <http://vivoweb.org/ontology/activity-insight#authorNameAsListed>
+              "Allen, P E" ;
+      <http://vivoweb.org/ontology/core#authorRank>
+              "3"^^<http://www.w3.org/2001/XMLSchema#int> ;
+      <http://vivoweb.org/ontology/core#linkedAuthor>
+              <http://vivo.cornell.edu/individual/individual8803> ;
+      <http://vivoweb.org/ontology/core#linkedInformationResource>
+              <http://vivo.cornell.edu/individual/AI-20912635905> .
+
+<http://vivo.cornell.edu/individual/AI-24401569793>
+      a       <http://purl.org/ontology/bibo/Document> , <http://vivo.library.cornell.edu/ns/0.1#PublishedThing> , <http://www.w3.org/2002/07/owl#Thing> , <http://purl.org/ontology/bibo/AcademicArticle> , <http://www.aktors.org/ontology/portal#Article-In-A-Composite-Publication> , <http://vivoweb.org/ontology/core#InformationResource> , <http://purl.org/ontology/bibo/Article> ;
+      <http://www.w3.org/2000/01/rdf-schema#label>
+              "The seasonal decline in avian clutch size: Strategy or physiological constraints? " ;
+      <http://purl.org/ontology/bibo/pageEnd>
+              "932"^^<http://www.w3.org/2001/XMLSchema#int> ;
+      <http://purl.org/ontology/bibo/pageStart>
+              "922"^^<http://www.w3.org/2001/XMLSchema#int> ;
+      <http://purl.org/ontology/bibo/volume>
+              "77" ;
+      <http://vivoweb.org/ontology/core#dateTimeValue>
+              <http://vivo.cornell.edu/individual/n3863423> ;
+      <http://vivoweb.org/ontology/core#hasPublicationVenue>
+              <http://vivo.cornell.edu/individual/AI-ICJR-0203DF692BF00000683> ;
+      <http://vivoweb.org/ontology/core#informationResourceInAuthorship>
+              <http://vivo.cornell.edu/individual/AI-24401569793-2> , <http://vivo.cornell.edu/individual/AI-24401569793-1> .
+
+<http://vivo.cornell.edu/individual/AI-24442931201-3>
+      a       <http://www.w3.org/2002/07/owl#Thing> , <http://vivoweb.org/ontology/core#Relationship> , <http://vivoweb.org/ontology/core#Authorship> ;
+      <http://vivoweb.org/ontology/activity-insight#authorNameAsListed>
+              "Allen, P E" ;
+      <http://vivoweb.org/ontology/core#authorRank>
+              "3"^^<http://www.w3.org/2001/XMLSchema#int> ;
+      <http://vivoweb.org/ontology/core#linkedAuthor>
+              <http://vivo.cornell.edu/individual/individual8803> ;
+      <http://vivoweb.org/ontology/core#linkedInformationResource>
+              <http://vivo.cornell.edu/individual/AI-24442931201> .
+
+<http://vivo.cornell.edu/individual/grant62212>
+      a       <http://www.w3.org/2002/07/owl#Thing> , <http://vivoweb.org/ontology/cu-vivo-osp#Grant> , <http://vivoweb.org/ontology/core#Agreement> , <http://vivoweb.org/ontology/core#Grant> ;
+      <http://www.w3.org/2000/01/rdf-schema#label>
+              "DIGITAL RESOURCE DISCOVERY AND DYNAMIC LEARNING COMMUNITIES FOR A CHANGING BIOLOGY" ;
+      <http://vivoweb.org/ontology/core#administeredBy>
+              <http://vivo.cornell.edu/individual/individual5548> ;
+      <http://vivoweb.org/ontology/core#dateTimeInterval>
+              <http://vivo.cornell.edu/individual/grant62212-DTI> ;
+      <http://vivoweb.org/ontology/core#grantAwardedBy>
+              <http://vivo.cornell.edu/individual/individual9254> ;
+      <http://vivoweb.org/ontology/core#grantSubcontractedThrough>
+              <http://vivo.cornell.edu/individual/OSP-0203E52003A001C384B> ;
+      <http://vivoweb.org/ontology/core#localAwardId>
+              "62212" ;
+      <http://vivoweb.org/ontology/core#relatedRole>
+              <http://vivo.cornell.edu/individual/inGrant62212For8287> ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#dateHarvested>
+              "2011-06-27-04:00" ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#harvestedBy>
+              "OSPWH-Harvester" ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#sponsorLevelOne>
+              "ECOLOGICAL SOCIETY OF AMERICA" ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#sponsorLevelThree>
+              "" ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#sponsorLevelTwo>
+              "" .
+
+<http://vivo.cornell.edu/individual/n54945>
+      a       <http://vitro.mannlib.cornell.edu/ns/vitro/public#FileByteStream> , <http://www.w3.org/2002/07/owl#Thing> ;
+      <http://vitro.mannlib.cornell.edu/ns/vitro/public#directDownloadUrl>
+              "/file/n54945/_main_image_allen_paul_thumb.gif" .
+
+<http://vivo.cornell.edu/individual/grant53811>
+      a       <http://www.w3.org/2002/07/owl#Thing> , <http://vivoweb.org/ontology/cu-vivo-osp#Grant> , <http://vivoweb.org/ontology/core#Agreement> , <http://vivoweb.org/ontology/core#Grant> ;
+      <http://www.w3.org/2000/01/rdf-schema#label>
+              "THE BIODIVERSITY ANALYSIS PIPELINE" ;
+      <http://vivoweb.org/ontology/core#administeredBy>
+              <http://vivo.cornell.edu/individual/KFSID-01Y7> ;
+      <http://vivoweb.org/ontology/core#dateTimeInterval>
+              <http://vivo.cornell.edu/individual/grant53811-DTI> ;
+      <http://vivoweb.org/ontology/core#grantAwardedBy>
+              <http://vivo.cornell.edu/individual/individual9254> ;
+      <http://vivoweb.org/ontology/core#localAwardId>
+              "53811" ;
+      <http://vivoweb.org/ontology/core#relatedRole>
+              <http://vivo.cornell.edu/individual/inGrant53811For8287> , <http://vivo.cornell.edu/individual/inGrant53811For5144> , <http://vivo.cornell.edu/individual/inGrant53811For2191> ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#dateHarvested>
+              "2011-06-27-04:00" ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#harvestedBy>
+              "OSPWH-Harvester" ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#sponsorLevelOne>
+              "NSF" ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#sponsorLevelThree>
+              "" ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#sponsorLevelTwo>
+              "NSF EHR" .
+
+<http://vivo.cornell.edu/individual/inGrant46750For8287>
+      a       <http://www.w3.org/2002/07/owl#Thing> , <http://vivoweb.org/ontology/core#InvestigatorRole> , <http://vivoweb.org/ontology/core#Role> , <http://vivoweb.org/ontology/core#CoPrincipalInvestigatorRole> , <http://vivoweb.org/ontology/core#ResearcherRole> ;
+      <http://vivoweb.org/ontology/core#co-PrincipalInvestigatorRoleOf>
+              <http://vivo.cornell.edu/individual/individual8803> ;
+      <http://vivoweb.org/ontology/core#roleIn>
+              <http://vivo.cornell.edu/individual/grant46750> ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#dateHarvested>
+              "2011-06-27-04:00" ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#harvestedBy>
+              "OSPWH-Harvester" .
+
+<http://vivo.cornell.edu/individual/AI-20912846849>
+      a       <http://purl.org/ontology/bibo/Document> , <http://vivo.library.cornell.edu/ns/0.1#PublishedThing> , <http://purl.org/ontology/bibo/AcademicArticle> , <http://www.w3.org/2002/07/owl#Thing> , <http://www.aktors.org/ontology/portal#Article-In-A-Composite-Publication> , <http://vivoweb.org/ontology/core#InformationResource> , <http://purl.org/ontology/bibo/Article> ;
+      <http://www.w3.org/2000/01/rdf-schema#label>
+              "Breeding dispersal and philopatry in the tree swallow" ;
+      <http://purl.org/ontology/bibo/pageEnd>
+              "776"^^<http://www.w3.org/2001/XMLSchema#int> ;
+      <http://purl.org/ontology/bibo/pageStart>
+              "768"^^<http://www.w3.org/2001/XMLSchema#int> ;
+      <http://purl.org/ontology/bibo/volume>
+              "106" ;
+      <http://vivoweb.org/ontology/core#dateTimeValue>
+              <http://vivo.cornell.edu/individual/n3525546> ;
+      <http://vivoweb.org/ontology/core#hasPublicationVenue>
+              <http://vivo.cornell.edu/individual/AI-ICJR-0203DF692BF00000589> ;
+      <http://vivoweb.org/ontology/core#informationResourceInAuthorship>
+              <http://vivo.cornell.edu/individual/AI-20912846849-3> , <http://vivo.cornell.edu/individual/AI-20912846849-8> , <http://vivo.cornell.edu/individual/AI-20912846849-2> , <http://vivo.cornell.edu/individual/AI-20912846849-1> , <http://vivo.cornell.edu/individual/AI-20912846849-5> , <http://vivo.cornell.edu/individual/AI-20912846849-4> , <http://vivo.cornell.edu/individual/AI-20912846849-6> , <http://vivo.cornell.edu/individual/AI-20912846849-9> , <http://vivo.cornell.edu/individual/AI-20912846849-7> .
+
+<http://vivo.cornell.edu/individual/AI-20912846849-3>
+      a       <http://www.w3.org/2002/07/owl#Thing> , <http://vivoweb.org/ontology/core#Relationship> , <http://vivoweb.org/ontology/core#Authorship> ;
+      <http://vivoweb.org/ontology/activity-insight#authorNameAsListed>
+              "Allen, P E" ;
+      <http://vivoweb.org/ontology/core#authorRank>
+              "3"^^<http://www.w3.org/2001/XMLSchema#int> ;
+      <http://vivoweb.org/ontology/core#linkedAuthor>
+              <http://vivo.cornell.edu/individual/individual8803> ;
+      <http://vivoweb.org/ontology/core#linkedInformationResource>
+              <http://vivo.cornell.edu/individual/AI-20912846849> .
+
+<http://vivo.cornell.edu/individual/AI-24401616897>
+      a       <http://purl.org/ontology/bibo/Document> , <http://vivo.library.cornell.edu/ns/0.1#PublishedThing> , <http://purl.org/ontology/bibo/AcademicArticle> , <http://www.w3.org/2002/07/owl#Thing> , <http://www.aktors.org/ontology/portal#Article-In-A-Composite-Publication> , <http://vivoweb.org/ontology/core#InformationResource> , <http://purl.org/ontology/bibo/Article> ;
+      <http://www.w3.org/2000/01/rdf-schema#label>
+              "Effects of handicapping on female condition and reproduction in Tree Swallows (Tachycineta bicolor)" ;
+      <http://purl.org/ontology/bibo/pageEnd>
+              "747"^^<http://www.w3.org/2001/XMLSchema#int> ;
+      <http://purl.org/ontology/bibo/pageStart>
+              "737"^^<http://www.w3.org/2001/XMLSchema#int> ;
+      <http://purl.org/ontology/bibo/volume>
+              "112" ;
+      <http://vivoweb.org/ontology/core#dateTimeValue>
+              <http://vivo.cornell.edu/individual/n2277781> ;
+      <http://vivoweb.org/ontology/core#hasPublicationVenue>
+              <http://vivo.cornell.edu/individual/AI-ICJR-0203DF692BF000016CB> ;
+      <http://vivoweb.org/ontology/core#informationResourceInAuthorship>
+              <http://vivo.cornell.edu/individual/AI-24401616897-2> , <http://vivo.cornell.edu/individual/AI-24401616897-1> .
+
+<http://vivo.cornell.edu/individual/individual8803-position1>
+      a       <http://www.w3.org/2002/07/owl#Thing> , <http://vivoweb.org/ontology/core#DependentResource> , <http://vivoweb.org/ontology/core#Position> , <http://vivoweb.org/ontology/core#NonAcademicPosition> ;
+      <http://www.w3.org/2000/01/rdf-schema#label>
+              "Info Tech Area Manager II" ;
+      <http://vivoweb.org/ontology/core#hrJobTitle>
+              "Info Tech Area Mgr II" ;
+      <http://vivoweb.org/ontology/core#positionForPerson>
+              <http://vivo.cornell.edu/individual/individual8803> ;
+      <http://vivoweb.org/ontology/core#positionInOrganization>
+              <http://vivo.cornell.edu/individual/individual5548> .
+
+<http://vivo.cornell.edu/individual/grant56145>
+      a       <http://vivoweb.org/ontology/cu-vivo-osp#Contract> , <http://www.w3.org/2002/07/owl#Thing> , <http://vivoweb.org/ontology/core#Agreement> , <http://vivoweb.org/ontology/core#Contract> ;
+      <http://www.w3.org/2000/01/rdf-schema#label>
+              "INTEROP: CREATION OF A VIRTUAL DATA CENTER FOR THE BIODIVERSITY, ECOLOGICAL AND ENVIRONMENTAL SCIENCES" ;
+      <http://vivoweb.org/ontology/core#administeredBy>
+              <http://vivo.cornell.edu/individual/individual5548> ;
+      <http://vivoweb.org/ontology/core#dateTimeInterval>
+              <http://vivo.cornell.edu/individual/grant56145-DTI> ;
+      <http://vivoweb.org/ontology/core#grantAwardedBy>
+              <http://vivo.cornell.edu/individual/OSP-0203E52003A001BD106> ;
+      <http://vivoweb.org/ontology/core#grantSubcontractedThrough>
+              <http://vivo.cornell.edu/individual/individual7066> ;
+      <http://vivoweb.org/ontology/core#localAwardId>
+              "56145" ;
+      <http://vivoweb.org/ontology/core#relatedRole>
+              <http://vivo.cornell.edu/individual/inGrant56145For5144> , <http://vivo.cornell.edu/individual/inGrant56145For8287> ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#dateHarvested>
+              "2011-06-27-04:00" ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#harvestedBy>
+              "OSPWH-Harvester" ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#sponsorLevelOne>
+              "U OF NEW MEXICO" ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#sponsorLevelThree>
+              "" ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#sponsorLevelTwo>
+              "" .
+
+<http://vivo.cornell.edu/individual/individual8803>
+      a       <http://vivo.library.cornell.edu/ns/0.1#CornellEmployee> , <http://xmlns.com/foaf/0.1/Person> , <http://vivo.cornell.edu/ns/mannadditions/0.1#CornellNonAcademicStaff> , <http://www.w3.org/2002/07/owl#Thing> , <http://xmlns.com/foaf/0.1/Agent> , <http://vivo.library.cornell.edu/ns/0.1#CornellAffiliatedPerson> , <http://vivoweb.org/ontology/core#NonAcademic> ;
+      <http://www.w3.org/2000/01/rdf-schema#label>
+              "Allen, Paul Edward" ;
+      <http://vitro.mannlib.cornell.edu/ns/vitro/public#mainImage>
+              <http://vivo.cornell.edu/individual/n3809> ;
+      <http://vivoweb.org/ontology/core#authorInAuthorship>
+              <http://vivo.cornell.edu/individual/AI-24401569793-2> , <http://vivo.cornell.edu/individual/AI-20912846849-3> , <http://vivo.cornell.edu/individual/AI-20912635905-3> , <http://vivo.cornell.edu/individual/AI-24442931201-3> , <http://vivo.cornell.edu/individual/AI-24401616897-2> ;
+      <http://vivoweb.org/ontology/core#hasCo-PrincipalInvestigatorRole>
+              <http://vivo.cornell.edu/individual/inGrant53811For8287> , <http://vivo.cornell.edu/individual/inGrant46750For8287> ;
+      <http://vivoweb.org/ontology/core#hasPrincipalInvestigatorRole>
+              <http://vivo.cornell.edu/individual/inGrant56145For8287> , <http://vivo.cornell.edu/individual/inGrant62212For8287> ;
+      <http://vivoweb.org/ontology/core#overview>
+              """<p>Paul's background in computer science and ecology (M.S. Computer Science, Carnegie Mellon U., 1991; M.S. Organismal Biology and Ecology, U. Montana, 1998) serve him well as software architect and head of software development for the Cornell Lab of Ornithology (CLO) Information Technologies (IT) department. Since joining the CLO staff in 1997 and the IT department in 1999, Paul has focused on building software systems to collect bird monitoring information from citizen scientists. Most recently Paul has helped bring the \"Birds of North America\" into the digital age and will be building a new framework to create communities focused on scientific references such as the \"Birds of North America.\"</p>
+
+<p>While work on birds has taken Paul from Panama and the Bahamas to Alaska, the most important thing to him is using his skills for conservation.</p>"""^^<http://www.w3.org/2001/XMLSchema#string> ;
+      <http://vivoweb.org/ontology/core#personInPosition>
+              <http://vivo.cornell.edu/individual/individual8803-position1> ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#invId>
+              "8287" .
+
+<http://vivo.cornell.edu/individual/inGrant53811For8287>
+      a       <http://www.w3.org/2002/07/owl#Thing> , <http://vivoweb.org/ontology/core#InvestigatorRole> , <http://vivoweb.org/ontology/core#Role> , <http://vivoweb.org/ontology/core#CoPrincipalInvestigatorRole> , <http://vivoweb.org/ontology/core#ResearcherRole> ;
+      <http://vivoweb.org/ontology/core#co-PrincipalInvestigatorRoleOf>
+              <http://vivo.cornell.edu/individual/individual8803> ;
+      <http://vivoweb.org/ontology/core#roleIn>
+              <http://vivo.cornell.edu/individual/grant53811> ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#dateHarvested>
+              "2011-06-27-04:00" ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#harvestedBy>
+              "OSPWH-Harvester" .
+
+<http://vivo.cornell.edu/individual/AI-24401616897-2>
+      a       <http://www.w3.org/2002/07/owl#Thing> , <http://vivoweb.org/ontology/core#Relationship> , <http://vivoweb.org/ontology/core#Authorship> ;
+      <http://vivoweb.org/ontology/activity-insight#authorNameAsListed>
+              "Allen, P E" ;
+      <http://vivoweb.org/ontology/core#authorRank>
+              "2"^^<http://www.w3.org/2001/XMLSchema#int> ;
+      <http://vivoweb.org/ontology/core#linkedAuthor>
+              <http://vivo.cornell.edu/individual/individual8803> ;
+      <http://vivoweb.org/ontology/core#linkedInformationResource>
+              <http://vivo.cornell.edu/individual/AI-24401616897> .
+
+<http://vivo.cornell.edu/individual/n3809>
+      a       <http://vitro.mannlib.cornell.edu/ns/vitro/public#File> , <http://www.w3.org/2002/07/owl#Thing> ;
+      <http://vitro.mannlib.cornell.edu/ns/vitro/public#downloadLocation>
+              <http://vivo.cornell.edu/individual/n54945> ;
+      <http://vitro.mannlib.cornell.edu/ns/vitro/public#filename>
+              "_main_image_allen_paul_thumb.gif"^^<http://www.w3.org/2001/XMLSchema#string> ;
+      <http://vitro.mannlib.cornell.edu/ns/vitro/public#mimeType>
+              "image/gif"^^<http://www.w3.org/2001/XMLSchema#string> ;
+      <http://vitro.mannlib.cornell.edu/ns/vitro/public#thumbnailImage>
+              <http://vivo.cornell.edu/individual/n17632> .
+
+<http://vivo.cornell.edu/individual/AI-20912635905>
+      a       <http://purl.org/ontology/bibo/Document> , <http://vivo.library.cornell.edu/ns/0.1#PublishedThing> , <http://purl.org/ontology/bibo/AcademicArticle> , <http://www.w3.org/2002/07/owl#Thing> , <http://www.aktors.org/ontology/portal#Article-In-A-Composite-Publication> , <http://vivoweb.org/ontology/core#InformationResource> , <http://purl.org/ontology/bibo/Article> ;
+      <http://www.w3.org/2000/01/rdf-schema#label>
+              "The natal dispersal of tree swallows in a continuous mainland environment" ;
+      <http://purl.org/ontology/bibo/pageEnd>
+              "1090"^^<http://www.w3.org/2001/XMLSchema#int> ;
+      <http://purl.org/ontology/bibo/pageStart>
+              "1080"^^<http://www.w3.org/2001/XMLSchema#int> ;
+      <http://purl.org/ontology/bibo/volume>
+              "74" ;
+      <http://vivoweb.org/ontology/core#dateTimeValue>
+              <http://vivo.cornell.edu/individual/n6320125> ;
+      <http://vivoweb.org/ontology/core#hasPublicationVenue>
+              <http://vivo.cornell.edu/individual/AI-ICJR-0203DF692BF00000CDF> ;
+      <http://vivoweb.org/ontology/core#informationResourceInAuthorship>
+              <http://vivo.cornell.edu/individual/AI-20912635905-2> , <http://vivo.cornell.edu/individual/AI-20912635905-3> , <http://vivo.cornell.edu/individual/AI-20912635905-4> , <http://vivo.cornell.edu/individual/AI-20912635905-1> , <http://vivo.cornell.edu/individual/AI-20912635905-7> , <http://vivo.cornell.edu/individual/AI-20912635905-6> , <http://vivo.cornell.edu/individual/AI-20912635905-5> .
+
+<http://vivo.cornell.edu/individual/n17632>
+      a       <http://vitro.mannlib.cornell.edu/ns/vitro/public#File> , <http://www.w3.org/2002/07/owl#Thing> ;
+      <http://vitro.mannlib.cornell.edu/ns/vitro/public#downloadLocation>
+              <http://vivo.cornell.edu/individual/n13658> ;
+      <http://vitro.mannlib.cornell.edu/ns/vitro/public#filename>
+              "allen_paul_thumb.gif"^^<http://www.w3.org/2001/XMLSchema#string> ;
+      <http://vitro.mannlib.cornell.edu/ns/vitro/public#mimeType>
+              "image/gif"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<http://vivo.cornell.edu/individual/inGrant56145For8287>
+      a       <http://www.w3.org/2002/07/owl#Thing> , <http://vivoweb.org/ontology/core#InvestigatorRole> , <http://vivoweb.org/ontology/core#Role> , <http://vivoweb.org/ontology/core#PrincipalInvestigatorRole> , <http://vivoweb.org/ontology/core#ResearcherRole> ;
+      <http://vivoweb.org/ontology/core#principalInvestigatorRoleOf>
+              <http://vivo.cornell.edu/individual/individual8803> ;
+      <http://vivoweb.org/ontology/core#roleIn>
+              <http://vivo.cornell.edu/individual/grant56145> ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#dateHarvested>
+              "2011-06-27-04:00" ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#harvestedBy>
+              "OSPWH-Harvester" .
+
+<http://vivo.cornell.edu/individual/inGrant62212For8287>
+      a       <http://www.w3.org/2002/07/owl#Thing> , <http://vivoweb.org/ontology/core#InvestigatorRole> , <http://vivoweb.org/ontology/core#Role> , <http://vivoweb.org/ontology/core#PrincipalInvestigatorRole> , <http://vivoweb.org/ontology/core#ResearcherRole> ;
+      <http://vivoweb.org/ontology/core#principalInvestigatorRoleOf>
+              <http://vivo.cornell.edu/individual/individual8803> ;
+      <http://vivoweb.org/ontology/core#roleIn>
+              <http://vivo.cornell.edu/individual/grant62212> ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#dateHarvested>
+              "2011-06-27-04:00" ;
+      <http://vivoweb.org/ontology/cu-vivo-osp#harvestedBy>
+              "OSPWH-Harvester" .
+
+<http://vivo.cornell.edu/individual/AI-24442931201>
+      a       <http://purl.org/ontology/bibo/Document> , <http://vivo.library.cornell.edu/ns/0.1#PublishedThing> , <http://purl.org/ontology/bibo/AcademicArticle> , <http://www.w3.org/2002/07/owl#Thing> , <http://www.aktors.org/ontology/portal#Article-In-A-Composite-Publication> , <http://vivoweb.org/ontology/core#InformationResource> , <http://purl.org/ontology/bibo/Article> ;
+      <http://www.w3.org/2000/01/rdf-schema#label>
+              "Geographic differences in seasonal clutch size variation in multi-brooded bird species" ;
+      <http://purl.org/ontology/bibo/pageEnd>
+              "651"^^<http://www.w3.org/2001/XMLSchema#int> ;
+      <http://purl.org/ontology/bibo/pageStart>
+              "646"^^<http://www.w3.org/2001/XMLSchema#int> ;
+      <http://purl.org/ontology/bibo/volume>
+              "144" ;
+      <http://vivoweb.org/ontology/core#dateTimeValue>
+              <http://vivo.cornell.edu/individual/n4290936> ;
+      <http://vivoweb.org/ontology/core#hasPublicationVenue>
+              <http://vivo.cornell.edu/individual/AI-ICJR-0203DF692BF0000094B> ;
+      <http://vivoweb.org/ontology/core#informationResourceInAuthorship>
+              <http://vivo.cornell.edu/individual/AI-24442931201-3> , <http://vivo.cornell.edu/individual/AI-24442931201-2> , <http://vivo.cornell.edu/individual/AI-24442931201-1> .

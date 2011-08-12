@@ -46,7 +46,6 @@ public class ThumbnailImageURL implements DocumentModifier {
     
     private Model model;
     private Log log = LogFactory.getLog(ThumbnailImageURL.class);
-    private boolean shutdown = false;
     
 	static VitroSearchTermNames term = new VitroSearchTermNames();
 	String fieldForThumbnailURL = term.THUMBNAIL_URL;
@@ -65,7 +64,7 @@ public class ThumbnailImageURL implements DocumentModifier {
 	
 	}
 
-	private String runQueryForThumbnailLocation(Individual individual) {
+	protected String runQueryForThumbnailLocation(Individual individual) {
 		
 		StringBuffer result = new StringBuffer();
 		QuerySolutionMap initialBinding = new QuerySolutionMap();
@@ -91,9 +90,8 @@ public class ThumbnailImageURL implements DocumentModifier {
                         }                        
                     }
                 }
-            }catch(Throwable t){
-                if( ! shutdown )
-                    log.error(t,t);
+            }catch(Throwable t){                
+                log.error(t,t);
             } finally{
                 qExec.close();
             } 
@@ -105,8 +103,7 @@ public class ThumbnailImageURL implements DocumentModifier {
 	}
 
 	@Override
-	public void shutdown() {
-		shutdown = true;
+	public void shutdown() {		
 	}
 
 }
