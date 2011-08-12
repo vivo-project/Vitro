@@ -60,7 +60,18 @@ public class FreemarkerConfigurationLoader {
     }
 
     protected String getThemeDir(Portal portal) {
-        return portal.getThemeDir().replaceAll("/$", "");
+        if (portal == null) {
+            log.error("Cannot get themeDir from null portal");
+            return null;            
+        }
+        
+        String themeDir = portal.getThemeDir();
+        if (themeDir == null) {
+            log.error("themeDir is null");
+            return null;
+        }
+        
+        return themeDir.replaceAll("/$", "");
     }
 
     
