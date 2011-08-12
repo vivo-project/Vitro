@@ -77,6 +77,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     private static final String PERSON_CLASS_URI = "http://xmlns.com/foaf/0.1/Person";
     private static final String INCLUDE_ALL = "all";
     
+    @SuppressWarnings("serial")
     private static final Map<String, String> namespaces = new HashMap<String, String>() {{
         put("display", VitroVocabulary.DISPLAY);
         put("vitro", VitroVocabulary.vitroURI);
@@ -270,11 +271,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     
 	private IndividualTemplateModel getIndividualTemplateModel(Individual individual, VitroRequest vreq) 
 	    throws ServletException, IOException {
-		
-    	IndividualDao iwDao = vreq.getWebappDaoFactory().getIndividualDao();
-        
         individual.sortForDisplay();
-
         return new IndividualTemplateModel(individual, vreq);
 	}
 	
@@ -654,7 +651,6 @@ public class IndividualController extends FreemarkerHttpServlet {
 	    	List<ObjectPropertyStatement> ostates = entity.getObjectPropertyStatements();
 	    	
 	    	for (ObjectPropertyStatement os: ostates) {
-	    		ObjectProperty objProp = os.getProperty();
 	    		Property prop = newModel.getProperty(os.getPropertyURI());
 	    		Resource obj = newModel.getResource(os.getObjectURI());
 	    		newModel.add(newModel.createStatement(subj, prop, obj));
