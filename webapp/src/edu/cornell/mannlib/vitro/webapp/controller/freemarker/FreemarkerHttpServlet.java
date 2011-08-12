@@ -146,6 +146,18 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             String stackTrace = sw.toString();
             adminErrorData.put("stackTrace", stackTrace);
             
+            sw = new StringWriter();
+            Throwable c = t.getCause();
+            String cause;
+            if (c != null) {
+                c.printStackTrace(new PrintWriter(sw));
+                cause = sw.toString();
+               
+            } else {
+                cause = "";
+            }
+            adminErrorData.put("cause", cause);
+            
             adminErrorData.put("datetime", new Date());
 
             templateMap.put("errorOnHomePage", this instanceof HomePageController);
@@ -174,6 +186,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             doResponse(vreq, response, rv);
             
         } catch (TemplateProcessingException e) {
+            // We'll get here if the error was in one of the page templates; then attempting
+            // to display the error page also generates an error.
             throw new ServletException();
         }
     }

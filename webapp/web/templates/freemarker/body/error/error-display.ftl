@@ -14,12 +14,16 @@
         <p><strong>Error message:</strong> ${adminErrorData.errorMessage}</p>
     </#if>
     <#if adminErrorData.stackTrace?has_content>
-        <div>
-            <p><strong>Stack trace</strong> (full trace available in the vivo log):</p>
-            ${adminErrorData.stackTrace}
-        </div>
-    </#if>    
+        <p>
+            <strong>Stack trace</strong> (full trace available in the vivo log): ${adminErrorData.stackTrace}
+        </p>
+                   
+        <#if adminErrorData.cause?has_content>
+            <p><strong>Caused by:</strong> ${adminErrorData.cause}</p>            
+        </#if>
+    </#if>  
+
 <#elseif ! errorOnHomePage> <#-- view for other users -->
-    <p>Return to the <a href="${urls.home}">home page</a>.</p> 
+    <p>Return to the <a href="${urls.home}">home page</a></p> 
 </#if>
 

@@ -48,20 +48,19 @@ public class FreemarkerConfigurationLoader {
     }
 
     protected String getThemeDir(ApplicationBean appBean) {
-        String themeDir = null;
     	if (appBean == null) {
     		log.error("Cannot get themeDir from null application bean");
     		return null;
-    	} else {
-    	    themeDir = appBean.getThemeDir();
-    	    if (themeDir == null) {
-    	        log.error("themeDir is null");
-    	        return null;
-    	    }
-    	} 
+    	}
+    	
+    	String themeDir = appBean.getThemeDir();
+	    if (themeDir == null) {
+	        log.error("themeDir is null");
+	        return null;
+	    }
+
         return themeDir.replaceAll("/$", "");
     }
-
     
     protected FreemarkerConfiguration getConfigForTheme(String themeDir, VitroRequest vreq) {
         

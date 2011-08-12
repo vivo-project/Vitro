@@ -17,18 +17,20 @@
         </p>
         
         <p>
-            <strong>Requested url:</strong> ${requestedUrl}.
+            <strong>Requested url:</strong> ${requestedUrl}
         </p>
         
         <p>
-            <strong>Error message:</strong> ${errorMessage}.
+            <strong>Error message:</strong> ${errorMessage}
         </p>
         
         <p>
-            <strong>Stack trace</strong> (full trace available in the vivo log):
+            <strong>Stack trace</strong> (full trace available in the vivo log): ${stackTrace}
         </p>
         
-        <div>${stackTrace}</div>
+        <#if cause?has_content>
+            <p><strong>Caused by:</strong> ${cause}</p>
+        </#if>
         
     </body>
 </html>
@@ -37,13 +39,15 @@
 <#assign text>
 An error occurred on your VIVO site at ${datetime}.
 
-Requested url: ${requestedUrl}.
+Requested url: ${requestedUrl}
 
-Error message: ${errorMessage}.
+Error message: ${errorMessage}
 
-Stack trace (full trace available in the vivo log):
+Stack trace (full trace available in the vivo log): ${stackTrace}
 
-${stackTrace}        
+<#if cause?has_content>
+Caused by: ${cause}
+</#if>       
 </#assign>
 
 <@email subject=subject html=html text=text />
