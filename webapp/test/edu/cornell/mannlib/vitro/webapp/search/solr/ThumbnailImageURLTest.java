@@ -22,7 +22,6 @@ import com.hp.hpl.jena.rdf.model.impl.RDFDefaultErrorHandler;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.MenuDaoJenaTest;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 
 /**
@@ -44,7 +43,7 @@ public class ThumbnailImageURLTest extends AbstractTestClass{
         setLoggerLevel(RDFDefaultErrorHandler.class, Level.OFF);
 
         Model model = ModelFactory.createDefaultModel();        
-        InputStream in = MenuDaoJenaTest.class.getResourceAsStream("resources/menuForTest.n3");
+        InputStream in = ThumbnailImageURLTest.class.getResourceAsStream("testPerson.n3");
         model.read(in,"","N3");        
         testModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM,model);
     }
@@ -70,7 +69,7 @@ public class ThumbnailImageURLTest extends AbstractTestClass{
         Assert.assertNotNull( thumbnailField.getValues() );
         Assert.assertEquals(1, thumbnailField.getValueCount());
         
-        Assert.assertEquals("http://vivo.cornell.edu/individual/n13658", thumbnailField.getFirstValue());
+        Assert.assertEquals("http://vivo.cornell.edu/individual/n54945", thumbnailField.getFirstValue());
     }
 
 }

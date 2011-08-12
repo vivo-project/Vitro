@@ -39,10 +39,10 @@ public class ThumbnailImageURL implements DocumentModifier {
     
     private static final String query = prefix + 
     
-    " SELECT (str(?thumbnailLocationURL) as ?ThumbnailLocationURL) WHERE { " +
+    " SELECT (str(?downloadLocation) as ?DownloadLocation) WHERE { " +
     " ?uri <http://vitro.mannlib.cornell.edu/ns/vitro/public#mainImage> ?a . " +
-    " ?a <http://vitro.mannlib.cornell.edu/ns/vitro/public#downloadLocation> ?b . " +
-    " ?b <http://vitro.mannlib.cornell.edu/ns/vitro/public#directDownloadUrl> ?thumbnailLocationURL . } ";
+    " ?a <http://vitro.mannlib.cornell.edu/ns/vitro/public#downloadLocation> ?downloadLocation . } " ;
+    //" ?b <http://vitro.mannlib.cornell.edu/ns/vitro/public#directDownloadUrl> ?thumbnailLocationURL . } ";
     
     private Model model;
     private Log log = LogFactory.getLog(ThumbnailImageURL.class);
@@ -84,7 +84,7 @@ public class ThumbnailImageURL implements DocumentModifier {
                         String name = iter.next();
                         RDFNode node = soln.get( name );
                         if( node != null ){
-                            result.append(" " + node.toString());
+                            result.append("" + node.toString());
                         }else{
                             log.info(name + " is null");
                         }                        
