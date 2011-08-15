@@ -217,7 +217,11 @@ public class FreemarkerEmailMessage {
 		bodyPart.setContent(textBody, type);
 		content.addBodyPart(bodyPart);
 	}
-
+	   
+    public String getReplyToAddress() {
+        return replyToAddress.getAddress();
+    }
+    
 	private <T> T nonNull(T value, T defaultValue) {
 		return (value == null) ? defaultValue : value;
 	}

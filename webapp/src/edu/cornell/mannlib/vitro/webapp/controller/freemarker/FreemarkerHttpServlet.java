@@ -15,6 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -169,15 +170,13 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
                 templateMap.put("adminErrorData", adminErrorData);   
                 
             // Else send the data to the site administrator
-            } else {
+            } else if (FreemarkerEmailFactory.isConfigured(vreq)) {
                 FreemarkerEmailMessage email = FreemarkerEmailFactory.createNewMessage(vreq);
-                String recipient = ConfigurationProperties.getBean(getServletContext())
-                    .getProperty("email.replyTo");
-                email.addRecipient(TO, recipient);          
+                email.addRecipient(TO, email.getReplyToAddress());          
                 email.setTemplate(Template.ERROR_EMAIL.toString());
                 email.setBodyMap(adminErrorData);
                 email.processTemplate();
-                sentEmail = email.send();                   
+                sentEmail = email.send();      
             }
             
             templateMap.put("sentEmail", sentEmail);
