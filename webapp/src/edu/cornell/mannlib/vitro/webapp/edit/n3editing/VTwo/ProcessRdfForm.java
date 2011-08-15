@@ -211,6 +211,7 @@ public class ProcessRdfForm {
                     Model model = ModelFactory.createDefaultModel();
                     StringReader reader = new StringReader(n3);
                     model.read(reader, "", "N3");
+                    requiredFieldAssertions.add(model);
                 }catch(Throwable t){
                     String errMsg = "error processing N3 assertion string from field " + fieldName + "\n" +
                     t.getMessage() + '\n' + "n3: \n" + n3;

@@ -624,6 +624,11 @@ public class EditConfigurationVTwo {
     public void setDatapropKey(String datapropKey) {
         this.datapropKey = datapropKey;
     }
+    
+    //to allow for external setting
+    public void setDatapropValue(String datapropValue) {
+    	this.datapropValue = datapropValue;
+    }
 
     public String getSubjectUri() {
         return subjectUri;

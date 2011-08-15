@@ -97,7 +97,7 @@ public class MenuEditingFormGenerator implements EditConfigurationGenerator {
     	this.setSparqlQueries(editConfiguration);
     	
     	//Set up fields
-    	this.setUpFields(editConfiguration, vreq);
+    	this.setFields(editConfiguration, vreq);
 
     	//set submission url
     	editConfiguration.setSubmitToUrl("/edit/process");
@@ -362,7 +362,7 @@ public class MenuEditingFormGenerator implements EditConfigurationGenerator {
     //Just get the properties?
     
     //Fields
-    private void setUpFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
+    private void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
     	Map<String, FieldVTwo> fields = new HashMap<String, FieldVTwo>();
     	
     	

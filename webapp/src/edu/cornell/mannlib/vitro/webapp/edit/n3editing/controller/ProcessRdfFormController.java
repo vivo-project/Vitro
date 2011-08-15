@@ -195,7 +195,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
             ParamMap paramMap = new ParamMap();
             paramMap.put("uri", resourceToRedirectTo);
             paramMap.put("extra","true"); //for ie6            
-            return new RedirectResponseValues( UrlBuilder.getUrl(urlPattern,paramMap) + predicateAnchor );
+            return new RedirectResponseValues( UrlBuilder.getPath(urlPattern,paramMap) + predicateAnchor );
         } else if ( !urlPattern.endsWith("individual") && !urlPattern.endsWith("entity") ){
             return new RedirectResponseValues( urlPattern );
         }

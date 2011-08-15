@@ -4,24 +4,32 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.controller;
 
 import java.util.HashMap;
 import java.util.Map;
-
+import java.net.URLEncoder;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
+import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.EditConfigurationGenerator;
 import edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit.EditConfigurationTemplateModel;
-
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
 /**
  * This servlet is intended to handle all requests to create a form for use
  * by the N3 editing system.  It will examine the request parameters, determine
@@ -38,193 +46,54 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     
     final String DEFAULT_OBJ_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultObjectPropertyFormGenerator";
     final String DEFAULT_DATA_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDataPropertyFormGenerator";
-
+    //TODO: Create this generator
+    final String RDFS_LABEL_FORM = "";
     final String DEFAULT_ERROR_FORM = "error.jsp";
     final String DEFAULT_ADD_INDIVIDUAL = "defaultAddMissingIndividualForm.jsp";
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
-        Map mapTest = vreq.getParameterMap();
-        java.util.Iterator testIterator = mapTest.keySet().iterator();
-        while(testIterator.hasNext()) {
-        	String paramKey = (String) testIterator.next();
-        	System.out.println("Param key is " + paramKey + " and test iterator is value is " +  mapTest.get(paramKey).toString());
-        }
+      
     	try{
         WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+         //check some error conditions and if they exist return response values
+         //with error message
+         if(isErrorCondition(vreq)){
+        	 return doHelp(vreq, getErrorMessage(vreq));
+         }
         
-        //get edit key.  
-        //The edit key links submissions to EditConfiguration objects in the session.
-        HttpSession session = vreq.getSession();        
-        String editKey = 
-            (EditConfigurationVTwo.getEditKey(vreq) == null) 
-                ? EditConfigurationVTwo.newEditKey(session)
-                : EditConfigurationVTwo.getEditKey(vreq);
-        vreq.setAttribute("editKey", editKey);
+         //if delete, originally forwarded but here would have to do something else
+     //    processDelete(vreq);
         
-        //set title to Edit to maintain functionality from 1.1.1 and avoid updates to Selenium tests
-        vreq.setAttribute("title","Edit");       
-
-         String subjectUri = vreq.getParameter("subjectUri");
-         String predicateUri = vreq.getParameter("predicateUri");
-         String formParam = vreq.getParameter("editform");
-         String command = vreq.getParameter("cmd");         
-         
-         //check some error conditions
-         if (formParam == null || "".equals(formParam)) {
-             if ((predicateUri == null || predicateUri.trim().length() == 0)) {
-                 return doHelp(vreq, "No form was specified, both predicateUri and"
-                                 + " editform are empty. One of these is required"
-                                 + " by editRequestDispatch to choose a form.");
-             }
-             
-             if (subjectUri == null || subjectUri.trim().length() == 0){
-                 return doHelp(vreq, "subjectUri was empty. If no editForm is specified," +
-                 		" it is required by EditRequestDispatch.");                 
-             }
-         }                  
-         
-         vreq.setAttribute("subjectUri", subjectUri);
-         vreq.setAttribute("subjectUriJson", MiscWebUtils.escape(subjectUri));
-         if (predicateUri != null) {
-             vreq.setAttribute("predicateUri", predicateUri);
-             vreq.setAttribute("predicateUriJson", MiscWebUtils.escape(predicateUri));
-         } 
-         
-         if (formParam != null && formParam.length() > 0) {
-             vreq.setAttribute("editForm", formParam);
-         } else {
-             formParam = null;
-         }
-                         
-         //bdc34: typeOfNew is used by some forms like defaultAddMissingindividuaForm
-         //it should be moved out of this code and into the configuration for those forms
-         String typeOfNew = vreq.getParameter("typeOfNew");
-         if( typeOfNew != null )
-             vreq.setAttribute("typeOfNew", typeOfNew);             
-         
-         vreq.setAttribute("urlPatternToReturnTo", vreq
-                 .getParameter("urlPattern") == null ? "/entity" : vreq
-                 .getParameter("urlPattern"));
-         log.debug("setting urlPatternToReturnTo as "
-                 + vreq.getAttribute("urlPatternToReturnTo"));
-
-         /* since we have the URIs lets put the individuals in the request */         
-         if( subjectUri != null ){
-             Individual subject = wdf.getIndividualDao().getIndividualByURI(subjectUri);
-             if( subject != null )
-                 vreq.setAttribute("subject", subject);             
-         }
-
-         String objectUri = vreq.getParameter("objectUri");
-         if (objectUri != null) {
-             vreq.setAttribute("objectUri", objectUri);
-             vreq.setAttribute("objectUriJson", MiscWebUtils.escape(objectUri));            
-         }
-         
-         boolean isEditOfExistingStmt = false;
-         if (objectUri != null) {
-             Individual object = wdf.getIndividualDao().getIndividualByURI(objectUri);
-             if (object != null) {
-                 vreq.setAttribute("object", object);
-                 isEditOfExistingStmt = true;
-             }
-         }
-
-        // Keep track of what form we are using so it can be returned to after a failed validation 
-        // I'd like to get this from the request but sometimes that doesn't work well, internal forwards etc.
-         //TODO: this needs to be the same as the mapping in web.xml 
-         vreq.setAttribute("formUrl", "/edit/editRequestDispatch?" + vreq.getQueryString());
-
-         if ("delete".equals(command)) {
-             //TODO: delete command is used with the defualt delete form
-             //maybe it doesn't need to be in here?
-        	 HashMap<String,Object> map = new HashMap<String,Object>();
-        	 map.put("errorMessage", "delete command is not yet implemented");
-        	 return new TemplateResponseValues("error-message.ftl", map);
-         }
-
-         //Certain predicates may be annotated to change the behavior of the edit
-         //link.  Check for this annotation and, if present, simply redirect 
-         //to the normal individual display for the object URI instead of bringing
-         //up an editing form.
-         //Note that we do not want this behavior for the delete link (handled above).
-         // This might be done in the custom form jsp for publicaitons already.
-         // so maybe this logic shouldn't be here?
-         if ( isEditOfExistingStmt && (wdf.getObjectPropertyDao().skipEditForm(predicateUri)) ) {
-             log.debug("redirecting to object for predicate " + predicateUri);
-             //TODO: implement this feature
-//             %><c:redirect url="/individual">
-//                   <c:param name="uri" value="${param.objectUri}"/>
-//                   <c:param name="relatedSubjectUri" value="${param.subjectUri}"/>
-//                   <c:param name="relatingPredicateUri" value="${param.predicateUri}"/>
-//               </c:redirect>
-//             <%
-             
-             HashMap<String,Object> map = new HashMap<String,Object>();
-        	 map.put("errorMessage", "skip edit form for object properties is not yet implemented");
-        	 return new TemplateResponseValues("error-message.ftl", map);
-         } 
-
-         //use default object property form if nothing else works
-         String editConfGeneratorName = DEFAULT_OBJ_FORM;
-          
-         // *** handle the case where the form is specified as a request parameter ***
-         if( predicateUri == null && ( formParam != null && !formParam.isEmpty()) ){
-             //form parameter must be a fully qualified java class name of a EditConfigurationVTwoGenerator implementation.
-             editConfGeneratorName = formParam;              
-         }
-         
-         // *** handle the case where the form is decided by the predicate parameter ***
-
-         //check to see if we have a predicate and if it has a custom form
-         //if it has a custom form associated with it then use that form, 
-         //otherwise use the default object property form
-
-         String customForm = null;
-         ObjectProperty objectProp = wdf.getObjectPropertyDao().getObjectPropertyByURI(predicateUri);
-         if( objectProp != null ){
-             vreq.setAttribute("predicate", objectProp);
-             //custom entry form use to be a jsp but it should now be a fully qualified java class name of a 
-             //EditConfigurationVTwoGenerator implementation.
-             customForm = objectProp.getCustomEntryForm();
-             if (customForm != null && customForm.length() > 0) {                            
-                 //if there is a custom form on the predicate, use that
-                 editConfGeneratorName = objectProp.getCustomEntryForm();
-             }
-         }
-
-         // The default object proepty form offers the option to create a new item
-         // instead of selecting from existing individuals in the system.
-         // This is where the request to create a new indivdiual is handled.
-         //
-         // Forward to create new is part of the default object property form
-         // it should be handled in that form's EditConfigurationVTwo, not here.
-         // The code that sets up the EditConfigurationVTwo should decide on 
-         // different configurations and templates to use based on isForwardToCreateNew. 
-         //TODO: make sure that forward to create new works on the default object property form
-         if( isFowardToCreateNew(vreq, objectProp, command)){
-             return handleForwardToCreateNew(vreq, command, objectProp, isEditOfExistingStmt);
-         }
-                     
-         vreq.setAttribute("form", editConfGeneratorName);
-         
-         /****  make new or get an existing edit configuration ***/         
+         //in case form needs to be redirected b/c of special individuals
+     //    processSkipEditForm(vreq);
      
-         EditConfigurationVTwo editConfig = makeEditConfigurationVTwo( editConfGeneratorName, vreq, session);
-         editConfig.setEditKey(editKey);
-         EditConfigurationVTwo.putConfigInSession(editConfig, session);
+        //Get the edit generator name
+         String editConfGeneratorName = processEditConfGeneratorName(vreq);
+
+         //if need to forward to create new object, handle that
+         //why is this not done earlier? why aren't forwards handled in the same place?
+      //   processForwardToCreateNew(vreq);
+        
+         //session attribute 
+         setSessionRequestFromEntity(vreq);
+         //Test
+         boolean isObjectProp = EditConfigurationUtils.isObjectProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq);
+         boolean isDataProp = EditConfigurationUtils.isDataProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq);
+         /****  make new or get an existing edit configuration ***/         
+         EditConfigurationVTwo editConfig = setupEditConfiguration(editConfGeneratorName, vreq);
          
          //what template?
          String template = editConfig.getTemplate();
-         String formTitle = (String)vreq.getAttribute("formTitle");
+        
          
          //what goes in the map for templates?
          Map<String,Object> templateData = new HashMap<String,Object>();
-         templateData.put("editConfiguration", new EditConfigurationTemplateModel( editConfig, vreq));
-         //templateData.put("formTitle", formTitle);
-         //templateData.put("pageData", retrieveEditData(vreq));
-         //retrieveEditData(vreq, templateData);
-         
+         EditConfigurationTemplateModel etm = new EditConfigurationTemplateModel( editConfig, vreq);
+         templateData.put("editConfiguration", etm);
+         //Corresponding to original note for consistency with selenium tests and 1.1.1
+         templateData.put("title", "Edit");
+         templateData.put("submitUrl", getSubmissionUrl(vreq));
+         templateData.put("editKey", editConfig.getEditKey());
          return new TemplateResponseValues(template, templateData);
          }catch(Throwable th){
         	
@@ -235,6 +104,240 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
         
          }
     }
+    
+
+
+	private EditConfigurationVTwo setupEditConfiguration(String editConfGeneratorName,
+			VitroRequest vreq) {
+		//Still based on request attribute, if edit key exists on request, then use otherwise generate new edit key
+		String editKey = EditConfigurationUtils.getEditKey(vreq);	
+    	HttpSession session = vreq.getSession();
+    	EditConfigurationVTwo editConfig = makeEditConfigurationVTwo( editConfGeneratorName, vreq, session);
+        //Set edit key for edit configuration here
+    	editConfig.setEditKey(editKey);
+    	//put edit configuration in session
+    	
+        EditConfigurationVTwo.putConfigInSession(editConfig, session);
+		return editConfig;
+	}
+
+	private void setSessionRequestFromEntity(VitroRequest vreq) {
+		HttpSession session = vreq.getSession();
+		String subjectUri = vreq.getParameter("subjectUri");
+		if(session.getAttribute("requestedFromEntity") == null) {
+			session.setAttribute("requestedFromEntity", subjectUri);
+		}
+		
+	}
+
+	//Additional forwards.. should they be processed here to see which form should be forwarded to
+	//e.g. default add individual form etc. and additional scenarios
+	//TODO: Check if additional scenarios should be checked here
+	private String processEditConfGeneratorName(VitroRequest vreq) {
+		 WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+    	//use default object property form if nothing else works
+        String editConfGeneratorName = DEFAULT_OBJ_FORM;
+        String predicateUri =  EditConfigurationUtils.getPredicateUri(vreq);
+        String formParam = getFormParam(vreq);
+        // *** handle the case where the form is specified as a request parameter ***
+        if( predicateUri == null && ( formParam != null && !formParam.isEmpty()) ){
+            //form parameter must be a fully qualified java class name of a EditConfigurationVTwoGenerator implementation.
+            editConfGeneratorName = formParam;              
+        } else if(isVitroLabel(predicateUri)) { //in case of data property
+        	editConfGeneratorName = RDFS_LABEL_FORM;
+        } else{
+        	String customForm = getCustomForm(predicateUri, wdf);
+        	if(customForm != null && !customForm.isEmpty()) {
+        		editConfGeneratorName = customForm;
+        	}
+        }
+        return editConfGeneratorName;
+	}
+	
+	
+	
+
+	private String getCustomForm(String predicateUri, WebappDaoFactory wdf) {
+		Property prop = getPropertyByUri(predicateUri, wdf);
+		return prop.getCustomEntryForm();
+	}
+
+	private Property getPropertyByUri(String predicateUri, WebappDaoFactory wdf) {
+		Property p = null;
+		p = wdf.getObjectPropertyDao().getObjectPropertyByURI(predicateUri);
+		if(p == null) {
+			p = wdf.getDataPropertyDao().getDataPropertyByURI(predicateUri);
+		}
+		return p;
+	}
+
+
+	private boolean isVitroLabel(String predicateUri) {
+		return predicateUri.equals(VitroVocabulary.LABEL);
+	}
+
+
+
+	//TODO: Implement below correctly or integrate
+    private ResponseValues processSkipEditForm(VitroRequest vreq) {
+    	 //Certain predicates may be annotated to change the behavior of the edit
+        //link.  Check for this annotation and, if present, simply redirect 
+        //to the normal individual display for the object URI instead of bringing
+        //up an editing form.
+        //Note that we do not want this behavior for the delete link (handled above).
+        // This might be done in the custom form jsp for publicaitons already.
+        // so maybe this logic shouldn't be here?
+        WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+        String predicateUri = vreq.getParameter("predicateUri");
+        boolean isEditOfExistingStmt = isEditOfExistingStmt(vreq);
+        
+        if ( isEditOfExistingStmt && (wdf.getObjectPropertyDao().skipEditForm(predicateUri)) ) {
+            log.debug("redirecting to object for predicate " + predicateUri);
+            String redirectPage = vreq.getContextPath() + "/individual";
+            redirectPage += "uri=" + URLEncoder.encode(vreq.getParameter("objectUri")) + 
+            	"&relatedSubjectUri=" + URLEncoder.encode(vreq.getParameter("subjectUri")) + 
+            	"&relatingPredicateUri=" + URLEncoder.encode(vreq.getParameter("predicateUri"));
+            return new RedirectResponseValues(redirectPage, HttpServletResponse.SC_SEE_OTHER);
+        } 
+        return null;
+		
+	}
+
+	//Check error conditions
+    //TODO: Do we need both methods or jsut one?
+    private boolean isErrorCondition(VitroRequest vreq) {
+    	 String subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
+         String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
+         String formParam = getFormParam(vreq);
+         
+    	if (formParam == null || "".equals(formParam)) {
+            if ((predicateUri == null || predicateUri.trim().length() == 0)) {
+            	return true;
+            }
+            if (subjectUri == null || subjectUri.trim().length() == 0){
+            	return true;
+                        
+            }
+        }
+    	
+    	//Check predicate - if not vitro label and neither data prop nor object prop return error
+    	WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+    	if(!EditConfigurationUtils.isObjectProperty(predicateUri, vreq) 
+    			&& !isVitroLabel(predicateUri)
+    			&& !EditConfigurationUtils.isDataProperty(predicateUri, vreq))
+    	{
+    		return true;
+    	}
+    	return false;
+    }
+    
+    private String getErrorMessage(VitroRequest vreq) {
+    	String errorMessage = null;
+    	 String subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
+         String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
+         String formParam = getFormParam(vreq);
+         if (formParam == null || "".equals(formParam)) {
+             if ((predicateUri == null || predicateUri.trim().length() == 0)) {
+            	 errorMessage = "No form was specified, both predicateUri and"
+                     + " editform are empty. One of these is required"
+                     + " by editRequestDispatch to choose a form.";
+             }
+             if (subjectUri == null || subjectUri.trim().length() == 0){
+                 return "subjectUri was empty. If no editForm is specified," +
+                 		" it is required by EditRequestDispatch.";                
+             }
+         }
+         return errorMessage;
+    }
+    
+   
+    //Based on subject, predicate, object and command, set the appropriate attributes
+    //TODO: Check if setting attributes the way to go or alternative
+    //Leaving these in for now but shouldn't depending on vreq attributes at all
+    //Generators should process them
+    //leaving here for reference, delete later
+    private void processStoreParameters(VitroRequest vreq) {
+         
+         //TODO: Check if json version required any longer
+         //subject
+    	/*
+         processSubject(vreq);
+         processPredicate(vreq);
+         processObject(vreq); 
+         processFormParam(vreq);
+         processTypeOfNew(vreq);
+         processUrlPatternReturn(vreq);
+         saveCurrentUrl(vreq);
+        
+         //if data propety
+         if(isDataProperty(vreq.getParameter("predicateUri"), vreq)) {
+        	 processDataProperty(vreq);
+         }*/
+    }
+    
+    private void processDataProperty(VitroRequest vreq) {
+    	String datapropKeyStr = vreq.getParameter("datapropKey");
+    	String predicateUri = vreq.getParameter("predicateUri");
+    	String subjectUri = vreq.getParameter("subjectUri");
+    	WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+    	HttpSession session = vreq.getSession();
+    	Individual subject = wdf.getIndividualDao().getIndividualByURI(subjectUri);
+   	    int dataHash = 0;
+   	    if( datapropKeyStr != null ){
+   	        try {
+   	            dataHash = Integer.parseInt(datapropKeyStr);
+   	            vreq.setAttribute("datahash", dataHash);
+   	            log.debug("Found a datapropKey in parameters and parsed it to int: " + dataHash);
+   	         } catch (NumberFormatException ex) {
+   	            //return doHelp(vreq, "Cannot decode incoming datapropKey value "+datapropKeyStr+" as an integer hash in EditDataPropStmtRequestDispatchController");
+   	        }
+   	    }
+   	    
+   	    DataPropertyStatement dps = null;
+   	    if( dataHash != 0) {
+   	        Model model = (Model)session.getServletContext().getAttribute("jenaOntModel");
+   	        dps = RdfLiteralHash.getPropertyStmtByHash(subject, predicateUri, dataHash, model);
+   	                              
+   	        if (dps==null) {
+   	            log.error("No match to existing data property \""+predicateUri+"\" statement for subject \""+subjectUri+"\" via key "+datapropKeyStr);
+   	            //TODO: Needs to forward to dataPropMissingStatement.jsp
+   	            //return null;
+   	        }                     
+   	        vreq.setAttribute("dataprop", dps );
+   	    }
+	}
+    
+	//should return null
+	private String getFormParam(VitroRequest vreq) {
+		String formParam = (String) vreq.getAttribute("editForm");
+		return formParam;
+	}
+    
+    private boolean isEditOfExistingStmt(VitroRequest vreq) {
+        String objectUri = vreq.getParameter("objectUri");
+
+    	WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+    	if(objectUri != null) {
+        	Individual object = wdf.getIndividualDao().getIndividualByURI(objectUri);
+        	return (object != null);
+    	}
+    	return false;
+    }
+    
+    //Check whether command is delete and either process or save
+    //Original code involved doing a jsp forward
+    //TODO: Check how to integrate deletion
+    private boolean isDeleteForm(VitroRequest vreq) {
+    	String command = vreq.getParameter("cmd");
+        if ("delete".equals(command)) {
+       	 	return true;
+        }
+        return false;
+
+    }
+    
+    
+    //
     
     private EditConfigurationVTwo makeEditConfigurationVTwo(
             String editConfGeneratorName, VitroRequest vreq, HttpSession session) {
@@ -263,63 +366,6 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
         
     }
 
-    /*
-         Forward to create new is part of the default object property form
-         it should be handled in that form's EditConfigurationVTwo, not here.
-         The code that sets up the EditConfigurationVTwo should decide on 
-         different configurations and templates to use based on isForwardToCreateNew.
-     */
-    boolean isFowardToCreateNew(VitroRequest vreq, ObjectProperty objectProp, String command){       
-        //Offer create new and select from existing are ignored if there is a custom form
-        if( objectProp != null && objectProp.getCustomEntryForm() != null && !objectProp.getCustomEntryForm().isEmpty()){        
-            return false;
-        } else {
-     
-            boolean isForwardToCreateNew = 
-                ( objectProp != null && objectProp.getOfferCreateNewOption() && objectProp.getSelectFromExisting() == false)
-                || ( objectProp != null && objectProp.getOfferCreateNewOption() && "create".equals(command));
-
-            return isForwardToCreateNew;
-        }
-    }
-    
-    ResponseValues handleForwardToCreateNew(VitroRequest vreq, String command, ObjectProperty objectProp, boolean isEditOfExistingStmt){                          
-        vreq.setAttribute("isForwardToCreateNew", new Boolean(true));
-        
-        //If a objectProperty is both provideSelect and offerCreateNewOption
-        // and a user goes to a defaultObjectProperty.jsp form then the user is
-        // offered the option to create a new Individual and replace the 
-        // object in the existing objectPropertyStatement with this new individual. 
-        boolean isReplaceWithNew =
-            isEditOfExistingStmt && "create".equals(command) 
-            && objectProp != null && objectProp.getOfferCreateNewOption() == true;                
-
-        // If an objectProperty is selectFromExisitng==false and offerCreateNewOption == true
-        // the we want to forward to the create new form but edit the existing object
-        // of the objPropStmt.
-        boolean isForwardToCreateButEdit = 
-            isEditOfExistingStmt && objectProp != null 
-            && objectProp.getOfferCreateNewOption() == true 
-            && objectProp.getSelectFromExisting() == false
-            && ! "create".equals(command);
-
-        //bdc34: maybe when doing a create new, the custom form should be on the class, not the property?
-        String form;
-        if( isReplaceWithNew ){
-            vreq.setAttribute("isReplaceWithNew", new Boolean(true));
-            form = DEFAULT_ADD_INDIVIDUAL;
-        }else  if( isForwardToCreateButEdit ){
-            vreq.setAttribute("isForwardToCreateButEdit", new Boolean(true));
-            form = DEFAULT_ADD_INDIVIDUAL;
-        }else {
-            form = DEFAULT_ADD_INDIVIDUAL;
-        }
-        
-        //forward to form?
-        HashMap<String,Object> map = new HashMap<String,Object>();
-   	 map.put("errorMessage", "forweard to create new is not yet implemented");
-   	 return new TemplateResponseValues("error-message.ftl", map);
-    }        
     
     private ResponseValues doHelp(VitroRequest vreq, String message){
         //output some sort of help message for the developers.
@@ -329,6 +375,10 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
    	 return new TemplateResponseValues("error-message.ftl", map);    }
     
     
+    //Get submission url
+    private String getSubmissionUrl(VitroRequest vreq) {
+    	return vreq.getContextPath() + "/edit/process";
+    }
     
     
 }

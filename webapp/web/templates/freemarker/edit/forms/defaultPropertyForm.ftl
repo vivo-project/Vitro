@@ -1,21 +1,32 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<h2>${formTitle}</h2>
+<h2>${editConfiguration.formTitle}</h2>
 
-<#assign form ="/edit/processRdfForm2.jsp">
+<#assign predicateProperty = "${editConfiguration.predicateProperty}" />
 
-<#assign formUrl ="${form?url}">
-
-<#if ${predicate.selectFromExisting} == true>
-	<#if ${rangeOptionsExist}  == true >
-		<form class="editForm" action = "${formUrl}">
-			<#if predicate.publicDescription??>
-				<p>${predicate.publicDescription}</p>
-				<input type="text" id="objectVar" size="80" />
+<#if editConfiguration.propertySelectFromExisting = true>
+	<#if editConfiguration.rangeOptionsExist  = true >
+		<#assign rangeOptionKeys = editConfiguration.rangeOptions?keys />
+		<form class="editForm" action = "${submitUrl}">
+			<input type="hidden" name="editKey" id="editKey" value="${editKey}" />
+			<#if editConfiguration.propertyPublicDescription?has_content>
+				<p>${editConfiguration.propertyPublicDescription}</p>
+				
+				<select type="text" id="objectVar" name="objectVar">
+					<#list rangeOptionKeys as key>
+					 <option value="${key}"
+					 <#if editConfiguration.objectUri?has_content && editConfiguration.objectUri = key>
+					 	selected
+					 </#if>
+					 >${editConfiguration.rangeOptions[key]}</option>
+					</#list>
+				</select>
 				<div style="margin-top: 0.2em">
-					<input type="submit" id="submit" value="${submitLabel}" cancel="true"/>
+					<input type="submit" id="submit" value="${editConfiguration.submitLabel}" cancel="true"/>
 				</div>
 			</#if>	
 		</form>
+	<#else>
+		<p> There are no entries in the system from which to select.  </p>	
 	</#if>
 </#if>
