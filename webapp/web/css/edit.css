@@ -348,6 +348,10 @@ div.sparqlform .parenthetical {
     margin-top: 0;
     margin-bottom: .25em;
 }
+/* custom list view for mailingAddress */
+div.adr {
+    display: inline-block;
+}
 /* Temporary hack to remove stuff from forms in vivoweb only */
 .hideFromVivoWeb {
     display: none;
