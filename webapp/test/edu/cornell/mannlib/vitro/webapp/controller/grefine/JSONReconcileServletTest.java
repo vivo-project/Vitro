@@ -94,7 +94,7 @@ public class JSONReconcileServletTest extends AbstractTestClass {
 			} else {
 				modStr = inputStr;
 			}
-		    Pattern regex = Pattern.compile(modStr);
+		    Pattern regex = Pattern.compile(modStr, Pattern.CASE_INSENSITIVE);
 		    Matcher regexMatcher = regex.matcher(resultStr);
 		    Assert.assertTrue(message, regexMatcher.find());
 		} catch (PatternSyntaxException e) {

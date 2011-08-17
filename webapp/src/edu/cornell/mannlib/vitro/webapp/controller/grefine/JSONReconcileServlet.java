@@ -241,7 +241,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 				
 				// continue with properties list
 				String searchType = null;
-				int limit = 3; // default
+				int limit = 10; // default
 				String typeStrict = "should"; // default
 				ArrayList<String[]> propertiesList = new ArrayList<String[]>();
 
@@ -382,15 +382,19 @@ public class JSONReconcileServlet extends VitroHttpServlet {
             return null;
         }
                    
-        SolrQuery query = new SolrQuery();
+        /// original
+        ///SolrQuery query = new SolrQuery();
         
+        /// test
+        SolrQuery query = new SolrQuery(queryStr.toLowerCase());
+
         // original code:
         // query.setStart(0).setRows(DEFAULT_MAX_HIT_COUNT);  
         // Google Refine specific:
         query.setStart(0).setRows(limit);
         
         // TODO: works better without using tokenizeNameQuery(), need to investigate a bit more
-        query.setQuery(queryStr);
+        /// comment out original: query.setQuery(queryStr);
         
         // Filter by type
         // e.g. http://xmlns.com/foaf/0.1/Person
