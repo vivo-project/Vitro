@@ -92,7 +92,7 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
     
     protected void processClassesAndRestrictions(VitroRequest vreq, ServletContext context, 
     		HashMap<String, Object> data, List<String> classes, List<String> restrictClasses ) {
-    	processClassesForDisplay(context, data, classes);
+    	processClassesForDisplay(vreq, context, data, classes);
     	processRestrictionClasses(vreq, context, data, restrictClasses);
     	processIntersections(vreq, context, data);
     	
@@ -152,7 +152,7 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
 
 	}
 
-	private void processClassesForDisplay(ServletContext context, HashMap<String, Object> data, List<String> classes) {
+	private void processClassesForDisplay(VitroRequest vreq, ServletContext context, HashMap<String, Object> data, List<String> classes) {
     	VClassGroup classesGroup = new VClassGroup();
     	classesGroup.setURI("displayClasses");
     	log.debug("Processing classes that will be displayed");
@@ -162,6 +162,10 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
     	for(String classUri: classes) {
     		//Retrieve vclass from cache to get the count
     		VClass vclass = vcgc.getCachedVClass(classUri);
+    		//if not found in cache, possibly due to not being in any class group
+			if(vclass == null) {
+				vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(classUri);
+			}
     		if(vclass != null) {
     			log.debug("VClass does exist for " + classUri + " and entity count is " + vclass.getEntityCount());
     			vClasses.add(vclass);
@@ -198,6 +202,10 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
 	    			//vclasses to be returned even if switched to display model, although
 	    			//uris used within display model editing and not vclass objects
 	    			VClass vclass = vcgc.getCachedVClass(restrictClassUri);
+	    			//if not found in cache, possibly due to not being in any class group
+	    			if(vclass == null) {
+	    				vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(restrictClassUri);
+	    			}
 	        		if(vclass != null) {
 	        			log.debug("Found restrict class and adding to list " + restrictClassUri);
 	        			restrictVClasses.add(vclass);
