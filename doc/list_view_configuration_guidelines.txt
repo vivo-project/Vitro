@@ -51,18 +51,22 @@ the same type of inefficiency. Instead, use multiple construct queries to constr
 model that includes all the necessary data.
 
 - In the absence of any construct queries, the select query is run against the
-entire dataset. 
+entire dataset. If your select query does not involve a lot of OPTIONAL clauses, you do not
+need to include construct queries.
 
 - The construct queries must be designed to collect all the data that the
 select query will request. They can be flexibly constructed to contain more data than
-is currently selected, to allow for possible future expansion of the SELECT. For example, one
-of the construct queries for core:hasRole includes
+is currently selected, to allow for possible future expansion of the SELECT and to
+simplify the WHERE clause. For example, one of the construct queries for core:hasRole 
+includes:
 
+CONSTRUCT { 
     ?role ?roleProperty ?roleValue . 
-    
-WHERE
-
+    ...
+} WHERE {
     ?role ?roleProperty ?roleValue . 
+    ...
+}
     
 That is, it includes all the properties of the role, rather than just those currently
 selected by the select query.

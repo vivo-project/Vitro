@@ -43,5 +43,9 @@ public abstract class PropertyStatementTemplateModel extends BaseTemplateModel {
     public String getDeleteUrl() {
         return deleteUrl;
     }
+    
+    public boolean isEditable() {
+        return ! editUrl.isEmpty();
+    }
 
 }
