@@ -4,7 +4,7 @@
 
     <tr class="editformcell" id="entityNameTr">
         <td valign="bottom" id="entityNameTd" colspan="2">
-			<b>Individual Name</b><br/>
+			<b>Individual Name *</b><br/>
             <input style="width:80%;" type="text" name="Name" value="<form:value name="Name"/>" />
             <p class="error"><form:error name="Name"/></p>
         </td>
