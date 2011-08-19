@@ -45,7 +45,8 @@ public abstract class PropertyStatementTemplateModel extends BaseTemplateModel {
         editAccessList.add(EditAccess.DELETE);
     }
     
-    protected boolean isEditable() {
+    /* propStatement-mailingAddress.ftl uses editable property, so making public */
+    public boolean isEditable() {
         return editAccessList.contains(EditAccess.EDIT);
     }
     
