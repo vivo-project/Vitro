@@ -103,6 +103,33 @@ public abstract class AbstractRelationshipPolicy implements PolicyIface {
 		}
 	}
 
+	protected List<String> getLiteralStringValuesOfProperty(String resourceUri,
+			String propertyUri) {
+		List<String> list = new ArrayList<String>();
+
+		Selector selector = createSelector(resourceUri, propertyUri, null);
+
+		StmtIterator stmts = null;
+		model.enterCriticalSection(Lock.READ);
+		try {
+			stmts = model.listStatements(selector);
+			while (stmts.hasNext()) {
+				RDFNode o = stmts.next().getObject();
+				if (o.isLiteral()) {
+					list.add(o.asLiteral().getString());
+				}
+			}
+			log.debug("Literal values of property '" + propertyUri + "' on resource '"
+					+ resourceUri + "': " + list);
+			return list;
+		} finally {
+			if (stmts != null) {
+				stmts.close();
+			}
+			model.leaveCriticalSection();
+		}
+	}
+
 	protected List<String> getObjectsOfLinkedProperty(String resourceUri,
 			String linkUri, String propertyUri) {
 		List<String> list = new ArrayList<String>();
