@@ -470,4 +470,16 @@ public class GroupedPropertyList extends BaseTemplateModel {
         }
         return null;
     }
+    
+    public PropertyGroupTemplateModel pullPropertyGroup(String groupName) {
+        Iterator<PropertyGroupTemplateModel> groupIt = groups.iterator();
+        while (groupIt.hasNext()) {
+            PropertyGroupTemplateModel group = groupIt.next();
+            if (groupName.equals(group.getName())) {
+                groups.remove(group);
+                return group;
+            }
+        }
+        return null;
+    }
 }
