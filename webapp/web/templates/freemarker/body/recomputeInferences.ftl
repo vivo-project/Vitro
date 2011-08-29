@@ -1,11 +1,11 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#if link??>
-    <form method="post" action="RecomputeInferences">
+<#if formAction?has_content>
+    <form method="post" action="${formAction}">
         <input type="submit" value="Recompute Inferences" name="submit"/>
-        <input type="hidden" value="Recompute" name="signal">
     </form>
 </#if>
-<#if message??>
+
+<#if message?has_content>
     <p>${message}</p>
 </#if>

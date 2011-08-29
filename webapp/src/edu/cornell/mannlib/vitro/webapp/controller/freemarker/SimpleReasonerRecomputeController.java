@@ -33,31 +33,27 @@ public class SimpleReasonerRecomputeController extends FreemarkerHttpServlet {
         String messageStr = "";
         try {
         	
-        	Object simpleReasoner = vreq.getSession().getServletContext().getAttribute(SimpleReasoner.class.getName());
+        	Object sr = getServletContext().getAttribute(SimpleReasoner.class.getName());
         	
-            if (!(simpleReasoner instanceof SimpleReasoner)) {
+            if (!(sr instanceof SimpleReasoner)) {
                 messageStr = "No SimpleReasoner has been set up.";
-            } else if ( ((SimpleReasoner)simpleReasoner).isABoxReasoningAsynchronous() ) {
-                messageStr = "SimpleReasoner is currently in asynchronous mode so a recompute cannot be started. Please try again later.";
+                
             } else {
-            	String signal = (String) vreq.getParameter("signal");
-            	    	 
-                if (((SimpleReasoner)simpleReasoner).isRecomputing()) {
-                    messageStr = 
-                         "The SimpleReasoner is currently in the process of " +
-                         "recomputing inferences.";
-                } else{
-                	String restart = (String)getServletContext().getAttribute("restart");
-                	if(restart == null || restart.equals("showButton") || signal == null){
-                		body.put("link", "show");
-                    	messageStr = null;
-                    	getServletContext().setAttribute("restart", "yes");
-                	}
-                	else if(signal!=null && signal.equals("Recompute")){
-                		new Thread(new Recomputer(((SimpleReasoner)simpleReasoner))).start();
-                        messageStr = "Recomputation of inferences started";
-                        getServletContext().setAttribute("restart", "showButton");
-                	}	
+                SimpleReasoner simpleReasoner = (SimpleReasoner) sr;
+                if (simpleReasoner.isABoxReasoningAsynchronous()) {
+                    messageStr = "SimpleReasoner is currently in asynchronous mode so a recompute cannot be started. Please try again later.";
+                } else if (simpleReasoner.isRecomputing()) {
+                        messageStr = 
+                            "The SimpleReasoner is currently in the process of " +
+                            "recomputing inferences.";
+                } else {
+                    String submit = (String)vreq.getParameter("submit");
+                    if (submit != null) {
+                        new Thread(new Recomputer((simpleReasoner))).start();
+                        messageStr = "Recompute of inferences started. See vivo log for further details.";                       
+                    } else {
+                        body.put("formAction", UrlBuilder.getUrl("/RecomputeInferences"));
+                    } 
                 }
             }
             
@@ -71,7 +67,6 @@ public class SimpleReasonerRecomputeController extends FreemarkerHttpServlet {
         }
         
         body.put("message", messageStr); 
-        body.put("redirecturl",vreq.getContextPath()+"/RecomputeInferences");
         return new TemplateResponseValues(RECOMPUTE_INFERENCES_FTL, body);
     }
     
