@@ -14,12 +14,12 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 
 /*
  * Servlet that only specifies a template, without putting any data
- * into the template model.
+ * into the template model. Page content is fully specified in the template.
  */
-public class EmptyController extends FreemarkerHttpServlet {
+public class StaticPageController extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private static final Log log = LogFactory.getLog(EmptyController.class);
+    private static final Log log = LogFactory.getLog(StaticPageController.class);
     
     @SuppressWarnings("serial")
     private static final Map<String, String> urlsToTemplates = new HashMap<String, String>(){
