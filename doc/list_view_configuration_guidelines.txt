@@ -17,7 +17,8 @@ Example of registering a new association in a file named newListViews.n3:
     "listViewConfig-authorInAuthorship.xml" .
 
 Place this file in /vivo/productMods/WEB-INF/ontologies/app/loadedAtStartup, 
-redeploy and restart tomcat to put the new custom list view in effect.     
+redeploy and restart tomcat to put the new custom list view in effect.    
+ 
 
 -----------------
 REQUIRED ELEMENTS
@@ -26,6 +27,7 @@ REQUIRED ELEMENTS
 - list-view-config: root element
 - query-select: sparql query used to retrieve data
 - template: the name of the template used to display a single property statement
+
 
 -----------------
 OPTIONAL ELEMENTS
@@ -37,14 +39,15 @@ OPTIONAL ELEMENTS
                  sending it to the template. If no postprocessor is specified, the default
                  postprocessor will be invoked.
                  
+                 
 -----------------
 CONSTRUCT QUERIES
 -----------------                
 
 - Because SPARQL queries with multiple OPTIONAL clauses are converted to highly inefficient
 SQL by the Jena API, one or more construct queries should be included to improve query
-performance. They are used to construct a model that the select query is
-run against. 
+performance. They are used to construct a model significantly smaller than the entire 
+dataset that the select query can be run against with reasonable performance. 
 
 - The construct queries themselves should not contain multiple OPTIONAL clauses, to prevent
 the same type of inefficiency. Instead, use multiple construct queries to construct a 
