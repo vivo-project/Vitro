@@ -28,10 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.web.directives.EmailDirective;
-import freemarker.core.Environment;
-import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
@@ -39,12 +37,10 @@ import freemarker.template.TemplateException;
  * A framework that makes it simpler to send email messages with a body built
  * from a Freemarker template.
  * 
- * The template must contain the @email directive, which may provide the subject
+ * The template must call the @email directive, which may provide the subject
  * line, the HTML content, and the plain text content. If these values are not
  * provided by the directive, they default to empty strings, or to values that
  * were set by the controller.
- * 
- * The directive also calls the send() method here.
  * 
  * @see EmailDirective
  */
@@ -52,11 +48,11 @@ public class FreemarkerEmailMessage {
 	private static final Log log = LogFactory
 			.getLog(FreemarkerEmailMessage.class);
 
-	private static final String ATTRIBUTE_NAME = "freemarkerConfig";
+	private static final String CONFIG_ATTRIBUTE = "freemarkerConfig";
 
 	private final HttpServletRequest req;
 	private final Session session;
-	private final Configuration config;
+	private final FreemarkerConfiguration config;
 
 	private final List<Recipient> recipients = new ArrayList<Recipient>();
 	private final InternetAddress replyToAddress;
@@ -77,15 +73,15 @@ public class FreemarkerEmailMessage {
 		this.session = session;
 		this.replyToAddress = replyToAddress;
 
-		Object o = req.getAttribute(ATTRIBUTE_NAME);
-		if (!(o instanceof Configuration)) {
+		Object o = req.getAttribute(CONFIG_ATTRIBUTE);
+		if (!(o instanceof FreemarkerConfiguration)) {
 			String oClass = (o == null) ? "null" : o.getClass().getName();
 
 			throw new IllegalStateException(
 					"Request does not contain a Configuration at '"
-							+ ATTRIBUTE_NAME + "': " + oClass);
+							+ CONFIG_ATTRIBUTE + "': " + oClass);
 		}
-		this.config = (Configuration) o;
+		this.config = (FreemarkerConfiguration) o;
 	}
 
 	public void addRecipient(RecipientType type, String emailAddress) {
