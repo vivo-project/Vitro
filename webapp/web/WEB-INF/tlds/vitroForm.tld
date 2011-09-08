@@ -1,0 +1,222 @@
+
+<!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd" version="2.0">
+
+    <description></description>
+     <display-name>SPARQL JSP taglib</display-name>
+     <tlib-version>1.0</tlib-version>
+
+    <short-name>Vitro DAO access Form Library</short-name>
+<!--
+		This library has tags for extracting information from
+        the vitro dao and formating it into commonly used html
+        structures.
+
+        It is unrelated to the vedit form.tld
+-->
+
+	<tag>
+		<name>optionsForProperty</name>
+        <display-name>Options For Property</display-name>
+        <description>
+            Create the option elements for a specified subject and predicate.
+        </description>
+        <tag-class>edu.cornell.mannlib.vitro.webapp.web.jsptags.OptionsForPropertyTag</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<name>subjectUri</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+        <attribute>
+			<name>predicateUri</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+        <attribute>
+			<name>selectedUri</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+    </tag>
+
+
+    <tag>
+		<name>optionsForVClass</name>
+        <display-name>Options For VClass</display-name>
+        <description>
+            Create the option elements for a specified vitro class.
+        </description>
+        <tag-class>edu.cornell.mannlib.vitro.webapp.web.jsptags.OptionsForClassTag</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<name>classUri</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+        <attribute>
+			<name>selectedUri</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+    </tag>
+
+
+    <tag>
+		<name>option</name>
+        <display-name>Options for Form Field</display-name>
+        <description>
+            Create the option elements for a specified field using information in the
+            editConfiguration to build the list and the editSubmission to mark one
+            of the options as selected.
+        </description>
+        <tag-class>edu.cornell.mannlib.vitro.webapp.web.jsptags.Options</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<name>name</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+    </tag>
+
+    <tag>
+        <name>jsonset</name>
+        <tag-class>edu.cornell.mannlib.vitro.webapp.web.jsptags.JsonSet</tag-class>
+        <body-content>scriptless</body-content>
+        <attribute>
+            <name>var</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+
+    <tag>
+        <name>value</name>
+        <display-name>value for a Form Field</display-name>
+        <description>
+            If there is a value in a edit submission object that matches the name,
+            Then output that value. otherwise, output nothing
+        </description>
+        <tag-class>edu.cornell.mannlib.vitro.webapp.web.jsptags.Value</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<name>name</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+    </tag>
+
+
+    <tag>
+        <name>errorMessage</name>
+        <display-name>errorMessage value for a Form Field</display-name>
+        <description>
+            If there is a value in a edit submission.validation object that matches the name,
+            Then output that value. otherwise, output nothing
+        </description>
+        <tag-class>edu.cornell.mannlib.vitro.webapp.web.jsptags.ErrorMessage</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<name>name</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+    </tag>
+    
+    <tag>
+		<name>input</name>
+        <display-name>Input Element Formatting</display-name>
+        <description>
+            Format a form input element of a specified element type
+        </description>
+        <tag-class>edu.cornell.mannlib.vitro.webapp.web.jsptags.InputElementFormattingTag</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<name>type</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+        <attribute>
+			<name>id</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+        </attribute>
+    	<attribute>
+    		<name>name</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
+        <attribute>
+			<name>label</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+        </attribute>
+    	<attribute>
+    		<name>labelClass</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>    	
+        <attribute>
+			<name>cssClass</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+        </attribute>
+		<attribute>
+			<name>value</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+        <attribute>
+			<name>error</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+        <attribute>
+			<name>size</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+        <attribute>
+			<name>rows</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+        <attribute>
+			<name>cols</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>multiple</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+        <attribute>
+			<name>listMarkup</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+        <attribute>
+			<name>cancel</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+        </attribute>
+    	<attribute>
+    		<name>cancelLabel</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
+    	<attribute>
+    		<name>cancelUrl</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
+    	<attribute>
+    		<name>disabled</name>
+    		<required>false</required>
+    		<rtexprvalue>true</rtexprvalue>
+    	</attribute>
+    </tag>
+    
+</taglib>

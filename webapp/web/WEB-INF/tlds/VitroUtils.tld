@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+
+<taglib
+    xmlns="http://java.sun.com/xml/ns/j2ee" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd" 
+    version="2.0">
+
+     <display-name>Vitro Utilities taglib</display-name>
+     <tlib-version>1.0</tlib-version>
+
+    <short-name>Library of JSP utility tags for Vitro</short-name>
+<!--
+		This library has an assortment of tags for tasks that are common to many Vitro pages.
+-->
+
+	<tag>
+		<name>confirmAuthorization</name>
+        <display-name>Confirm that the user is authorized for the actions that this page requires.</display-name>
+        <description>
+        	Confirm that the user is authorized to perform all of the RequestedActions that
+        	this page requires. If any of the actions is not authorized, the user will be 
+        	redirected to the appropriate page.
+        	
+        	The actions must be found in the "requestedActions" attribute of the request. 
+        	The attribute may be a RequestedAction or an array of RequestedActions. 
+        	
+        	If the user is not authorized because he is not logged in, he will be directed
+        	to the login page, with the current request stored as a post-login destination.
+        	
+        	If the user is logged in but without sufficient authorization, he will be
+        	directed to the home page, which will display an "insufficient authorization" 
+        	message.
+        </description>
+        <tag-class>edu.cornell.mannlib.vitro.webapp.web.jsptags.ConfirmAuthorization</tag-class>
+		<body-content>empty</body-content>
+	</tag>
+
+</taglib>

@@ -1,0 +1,35 @@
+# $This file is distributed under the terms of the license in /doc/license.txt$ 
+
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+### This file defines the default menu for vitro. ###
+
+#### Default Menu ####
+
+display:DefaultMenu
+    a  display:MainMenu ;
+    display:hasElement display:HomeMenuItem .
+
+#### Menu Items for Default Menu ####
+
+display:HomeMenuItem
+    a display:NavigationElement ;
+    display:menuPosition 1;
+    display:linkText "Home";
+    display:toPage display:Home .
+
+########## Pages ############
+
+display:Home
+    a display:HomePage ;
+    a display:Page ;
+    display:title "Home" ;
+    display:urlMapping "/" ;
+    display:hasDataGetter display:homeDataGetter .
+    
+########## Data Getter ############
+    
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#homeDataGetter>
+      a <java:edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.BrowseDataGetter> .    
