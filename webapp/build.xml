@@ -117,7 +117,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 				</not>
 			</condition>
 		</fail>
-		
+
 		<property name="solr.home" location="${vitro.home.directory}/solr" />
 	</target>
 
@@ -138,7 +138,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<mkdir dir="${war-resources.dir}" />
 		<mkdir dir="${test-classes.dir}" />
 
-		<!-- copy the themes into the war directory. -->
+		<!-- copy all sorts of web stuff (with or without themes) into the war directory. -->
 		<copy todir="${war.dir}">
 			<fileset dir="${webapp.dir}/web">
 				<!--
@@ -149,18 +149,14 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 			</fileset>
 		</copy>
 
-		<!-- copy the config files into the war directory. -->
 		<copy todir="${war-webinf.dir}">
-			<fileset file="${webapp.dir}/config/web.xml" />
-			<fileset file="${webapp.dir}/config/dwr.xml" />
-		</copy>
-
-		<!-- copy the ontologies and the filegraphs into the war directory. -->
-		<copy todir="${war-webinf.dir}">
-			<fileset dir="${webapp.dir}" includes="ontologies" />
-			<fileset dir="${webapp.dir}" includes="ontologies/**/*" />
-			<fileset dir="${webapp.dir}" includes="filegraph" />
-			<fileset dir="${webapp.dir}" includes="filegraph/**/*" />
+			<fileset dir="${webapp.dir}">
+				<!-- copy the JARs into the war directory -->
+				<include name="lib/*" />
+				<!-- these are already in Tomcat: we mustn't conflict. -->
+				<exclude name="lib/jsp-api.jar" />
+				<exclude name="lib/servlet-api.jar" />
+			</fileset>
 		</copy>
 
 		<!-- use the production Log4J properties, unless a debug version exists. -->
@@ -176,28 +172,12 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 			</filterchain>
 		</copy>
 
-		<!-- copy the deploy.properties into the war directory -->
 		<copy todir="${war-classes.dir}">
+			<!-- copy the deploy.properties into the war directory -->
 			<fileset file="${deploy.properties.file}" />
-		</copy>
 
-		<!-- copy the custom tag libraries into the war directory -->
-		<copy todir="${war-webinf.dir}/tlds">
-			<fileset dir="${webapp.dir}/config/tlds" includes="**/*" excludes="*.LCK" />
-		</copy>
-
-		<!-- copy any xml files from source tree to the war directory -->
-		<copy todir="${build.dir}/war/WEB-INF/classes">
+			<!-- copy any xml files from source tree to the war directory -->
 			<fileset dir="${webapp.dir}/src" includes="**/*.xml" />
-		</copy>
-
-		<!-- copy the JARs into the war directory -->
-		<copy todir="${war-lib.dir}">
-			<fileset dir="${webapp.dir}/lib">
-				<!-- these are already in Tomcat: we mustn't conflict. -->
-				<exclude name="jsp-api.jar" />
-				<exclude name="servlet-api.jar" />
-			</fileset>
 		</copy>
 
 		<!-- copy the servlet JARs into their own directory, to compile against. -->
@@ -328,7 +308,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 
 		<!-- if no mask is define, go with an unsecured installation. -->
 		<property name="vitro.local.solr.ipaddress.mask" value=".*" />
-		
+
 		<!-- Create the context configuration XML with expanded properties. -->
 		<copy tofile="${solr.context.config}" filtering="true">
 			<fileset file="${solr.context.config.example}" />
@@ -343,7 +323,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
          - - - - - - - - - - - - - - - - - -->
 	<target name="deploySolr" depends="prepareSolr" unless="noSolrDeploy">
 		<unwar src="${solr.docbase}" dest="${tomcat.home}/webapps/${solr.context.name}" />
-		<copy todir="${tomcat.home}/conf/Catalina/localhost" overwrite="true" >
+		<copy todir="${tomcat.home}/conf/Catalina/localhost" overwrite="true">
 			<fileset file="${solr.context.config}" />
 		</copy>
 	</target>
