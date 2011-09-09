@@ -13,18 +13,22 @@
 	<!-- - - - - - - - - - - - - - - - - - 
           properties                      
          - - - - - - - - - - - - - - - - - -->
+	<property name="corebase.dir" location="." />
+
+	<!-- 
+		If calling from a Product build script, these properties already point to 
+		the product-related locations, so setting them here has no effect. 
+	-->
+	<property name="appbase.dir" location="${corebase.dir}" />
 	<property name="build.dir" location=".build" />
-	<property name="webapp.dir" location="." />
+	<property name="deploy.properties.file" location="config/deploy.properties" />
 
 	<property name="war.dir" location="${build.dir}/war" />
 	<property name="war-webinf.dir" location="${war.dir}/WEB-INF" />
 	<property name="war-classes.dir" location="${war-webinf.dir}/classes" />
 	<property name="war-resources.dir" location="${war-webinf.dir}/resources" />
-	<property name="war-lib.dir" location="${war-webinf.dir}/lib" />
 
 	<property name="test-classes.dir" location="${build.dir}/testclasses" />
-
-	<property name="servletjars.dir" location="${build.dir}/servletjars" />
 
 	<property name="javac.deprecation" value="true" />
 
@@ -32,10 +36,7 @@
           paths: for compiling and running                      
          - - - - - - - - - - - - - - - - - -->
 	<path id="compile.classpath">
-		<fileset dir="${war-lib.dir}">
-			<include name="**/*.jar" />
-		</fileset>
-		<fileset dir="${servletjars.dir}">
+		<fileset dir="${appbase.dir}/lib">
 			<include name="**/*.jar" />
 		</fileset>
 	</path>
@@ -46,9 +47,7 @@
 	</path>
 
 	<path id="test.run.classpath">
-		<!-- This holds data files and a special log4j.properties -->
-		<pathelement location="${webapp.dir}/test" />
-
+		<pathelement location="${appbase.dir}/test" />
 		<pathelement location="${test-classes.dir}" />
 		<path refid="test.compile.classpath" />
 	</path>
@@ -77,12 +76,6 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
           target: properties                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="properties">
-		<!--
-			If calling from a Product build script, then this property
-			already points to the deploy.properties file of the Product. 
-		-->
-		<property name="deploy.properties.file" location="config/deploy.properties" />
-
 		<fail message="You must create a &quot;${deploy.properties.file}&quot; file.">
 			<condition>
 				<not>
@@ -118,7 +111,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 			</condition>
 		</fail>
 
-		<property name="solr.home" location="${vitro.home.directory}/solr" />
+		<property name="solr.home.dir" location="${vitro.home.directory}/solr" />
 	</target>
 
 	<!-- ================================= 
@@ -126,7 +119,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
          ================================= -->
 	<target name="clean" depends="properties" description="--> Delete all artifacts.">
 		<delete dir="${build.dir}" />
-		<delete dir="${solr.home}" excludes="data/**/*" includeemptydirs="true" />
+		<delete dir="${solr.home.dir}" excludes="data/**/*" includeemptydirs="true" />
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
@@ -140,7 +133,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 
 		<!-- copy all sorts of web stuff (with or without themes) into the war directory. -->
 		<copy todir="${war.dir}">
-			<fileset dir="${webapp.dir}/web">
+			<fileset dir="${appbase.dir}/web">
 				<!--
 					If a product doesn't want the core themes, it can
 					set this property and they will be skipped. 
@@ -150,7 +143,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		</copy>
 
 		<copy todir="${war-webinf.dir}">
-			<fileset dir="${webapp.dir}">
+			<fileset dir="${appbase.dir}">
 				<!-- copy the JARs into the war directory -->
 				<include name="lib/*" />
 				<!-- these are already in Tomcat: we mustn't conflict. -->
@@ -160,10 +153,10 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		</copy>
 
 		<!-- use the production Log4J properties, unless a debug version exists. -->
-		<available file="${webapp.dir}/config/debug.log4j.properties"
+		<available file="${appbase.dir}/config/debug.log4j.properties"
 		           property="debug.log4j.exists" />
 		<copy tofile="${war-classes.dir}/log4j.properties" filtering="true" overwrite="true">
-			<fileset dir="${webapp.dir}/config">
+			<fileset dir="${appbase.dir}/config">
 				<include name="default.log4j.properties" unless="debug.log4j.exists" />
 				<include name="debug.log4j.properties" if="debug.log4j.exists" />
 			</fileset>
@@ -177,19 +170,11 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 			<fileset file="${deploy.properties.file}" />
 
 			<!-- copy any xml files from source tree to the war directory -->
-			<fileset dir="${webapp.dir}/src" includes="**/*.xml" />
-		</copy>
-
-		<!-- copy the servlet JARs into their own directory, to compile against. -->
-		<copy todir="${servletjars.dir}">
-			<fileset dir="${webapp.dir}/lib">
-				<include name="jsp-api.jar" />
-				<include name="servlet-api.jar" />
-			</fileset>
+			<fileset dir="${appbase.dir}/src" includes="**/*.xml" />
 		</copy>
 
 		<!-- copy the context file into the war directory -->
-		<copy file="${webapp.dir}/context.xml" tofile="${war.dir}/META-INF/context.xml" />
+		<copy file="${appbase.dir}/context.xml" tofile="${war.dir}/META-INF/context.xml" />
 	</target>
 
 	<!-- ================================= 
@@ -197,14 +182,14 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
          ================================= -->
 	<target name="compile" depends="prepare" description="--> Compile Java sources">
 		<!-- deletes all files that depend on changed .java files -->
-		<depend srcdir="${webapp.dir}/src"
+		<depend srcdir="${appbase.dir}/src"
 		        destdir="${war-classes.dir}"
 		        closure="false"
 		        cache="${build.dir}/.depcache">
 			<classpath refid="compile.classpath" />
 		</depend>
 
-		<javac srcdir="${webapp.dir}/src"
+		<javac srcdir="${appbase.dir}/src"
 		       destdir="${war-classes.dir}"
 		       debug="true"
 		       deprecation="${javac.deprecation}"
@@ -220,7 +205,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
           target: test              
          ================================= -->
 	<target name="test" depends="compile" unless="skiptests" description="--> Run JUnit tests">
-		<javac srcdir="${webapp.dir}/test"
+		<javac srcdir="${appbase.dir}/test"
 		       destdir="${test-classes.dir}"
 		       debug="true"
 		       deprecation="${javac.deprecation}"
@@ -235,7 +220,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		      fork="yes"
 		      failonerror="true">
 			<classpath refid="test.run.classpath" />
-			<arg file="${webapp.dir}/test" />
+			<arg file="${appbase.dir}/test" />
 			<arg value="${testlevel}" />
 		</java>
 	</target>
@@ -258,7 +243,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<echo file="${revisionInfo.build.file}">${revisionInfo.timestamp}
 </echo>
 
-		<javac srcdir="${webapp.dir}/../utilities/buildutils/revisioninfo"
+		<javac srcdir="${appbase.dir}/../utilities/buildutils/revisioninfo"
 		       destdir="${test-classes.dir}"
 		       debug="true"
 		       deprecation="${javac.deprecation}"
@@ -282,19 +267,19 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
           target: prepareSolr                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="prepareSolr" depends="properties">
-		<property name="solr.distrib.dir" location="${webapp.dir}/../solr" />
+		<property name="solr.distrib.dir" location="${appbase.dir}/../solr" />
 		<property name="solr.example.dir" location="${solr.distrib.dir}/exampleSolr" />
 		<property name="solr.context.config.example"
 		          location="${solr.distrib.dir}/exampleSolrContext.xml" />
 		<property name="solr.war" location="${solr.distrib.dir}/apache-solr-3.1.0.war" />
 
-		<property name="solr.docbase" location="${solr.home}/solr.war" />
+		<property name="solr.docbase" location="${solr.home.dir}/solr.war" />
 		<property name="solr.context.name" value="${webapp.name}solr" />
-		<property name="solr.context.config" location="${solr.home}/${solr.context.name}.xml" />
+		<property name="solr.context.config" location="${solr.home.dir}/${solr.context.name}.xml" />
 
-		<!-- Create and copy the example directory to the solr.home directory. -->
-		<mkdir dir="${solr.home}" />
-		<copy todir="${solr.home}">
+		<!-- Create and copy the example directory to the solr.home.dir directory. -->
+		<mkdir dir="${solr.home.dir}" />
+		<copy todir="${solr.home.dir}">
 			<fileset dir="${solr.example.dir}" includes="**/*" />
 		</copy>
 
@@ -303,7 +288,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 			<fileset file="${solr.war}" />
 		</copy>
 		<war destfile="${solr.docbase}" update="true">
-			<classes dir="${webapp.dir}/config/solr/" />
+			<classes dir="${appbase.dir}/config/solr/" />
 		</war>
 
 		<!-- if no mask is define, go with an unsecured installation. -->
@@ -360,12 +345,12 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
          ================================= -->
 	<target name="licenser" description="--> Check source files for licensing tags">
 		<property name="licenser.properties.file"
-		          location="${webapp.dir}/config/licenser/licenser.properties" />
+		          location="${appbase.dir}/config/licenser/licenser.properties" />
 		<property name="licenser.label" value="Vitro core" />
 
 		<echo message="Checking license tags on ${licenser.label}" />
 
-		<exec executable="ruby" dir="${webapp.dir}/../utilities/licenser" failonerror="true">
+		<exec executable="ruby" dir="${appbase.dir}/../utilities/licenser" failonerror="true">
 			<arg value="licenser.rb" />
 			<arg value="${licenser.properties.file}" />
 			<redirector outputproperty="licenser.test.output" alwayslog="true" />
