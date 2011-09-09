@@ -42,14 +42,18 @@
 	<typedef name="dirDifference"
 	         classname="edu.cornell.mannlib.vitro.utilities.anttasks.DirDifferenceResourceCollection"
 	         classpathref="anttasks.classpath" />
+	<typedef name="optionalDir"
+	         classname="edu.cornell.mannlib.vitro.utilities.anttasks.OptionalDirResourceCollection"
+	         classpathref="anttasks.classpath" />
 
 	<!-- - - - - - - - - - - - - - - - - - 
           target: product-prepare                      
          - - - - - - - - - - - - - - - - - -->
-	<target name="product-prepare" depends="product-prepare-lib">
+	<target name="product-prepare">
 		<mkdir dir="${appbase.dir}" />
 		<mkdir dir="${appbase.dir}/web" />
 		<mkdir dir="${appbase.dir}/src" />
+		<mkdir dir="${appbase.dir}/test" />
 
 		<copy todir="${appbase.dir}/web">
 			<dirDifference primary="${inner.basedir}/web" blocking="${product.modifications.dir}" />
@@ -68,22 +72,38 @@
 			               blockingOptional="true" />
 		</copy>
 		<copy todir="${appbase.dir}/src">
-			<fileset dir="./src" />
+			<optionalDir primary="./src" />
+		</copy>
+
+		<copy todir="${appbase.dir}/lib">
+			<dirDifference primary="${inner.basedir}/lib"
+			               blocking="./lib"
+			               blockingOptional="true" />
+		</copy>
+		<copy todir="${appbase.dir}/lib">
+			<optionalDir primary="./lib" />
+		</copy>
+
+		<copy todir="${appbase.dir}/test">
+			<dirDifference primary="${inner.basedir}/test"
+			               blocking="./test"
+			               blockingOptional="true" />
+		</copy>
+		<copy todir="${appbase.dir}/test">
+			<optionalDir primary="./test" />
+		</copy>
+
+		<copy todir="${appbase.dir}/test">
+			<dirDifference primary="${inner.basedir}/test"
+			               blocking="./test"
+			               blockingOptional="true" />
+		</copy>
+		<copy todir="${appbase.dir}/test">
+			<optionalDir primary="./test" />
 		</copy>
 
 		<copy tofile="${appbase.dir}/context.xml" file="${inner.basedir}/context.xml" />
 	</target>
-	<!-- - - - - - - - - - - - - - - - - - 
-          target: product-prepare-lib                      
-         - - - - - - - - - - - - - - - - - -->
-	<target name="product-prepare-lib">
-		<mkdir dir="${appbase.dir}/lib" />
-
-		<available property="product.lib.exist" file="./lib" />
-		<mergedirs suffix="lib" flag="${product.lib.exist}" />
-		<copydir suffix="lib" flag="${product.lib.exist}" />
-	</target>
-
 	<!-- ================================= 
           target: describe              
          ================================= -->
@@ -161,36 +181,6 @@
 	        description="--> Build the app and create a WAR file">
 		<innercall target="war" />
 	</target>
-
-	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-          MACROS
-    	 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-
-	<!--
-    			Call a target in the inner script.
-    		-->
-	<macrodef name="mergedirs">
-		<attribute name="suffix" />
-		<attribute name="flag" />
-		<sequential>
-			<copy todir="${appbase.dir}/web">
-				<dirDifference primary="${inner.basedir}/web" blocking="${product.modifications.dir}" />
-			</copy>
-			<copy todir="${appbase.dir}/web">
-				<fileset dir="${product.modifications.dir}" />
-			</copy>
-			<ant dir="${inner.basedir}" inheritall="false">
-				<!-- pass the properties that are needed. -->
-				<propertyset>
-					<propertyref name="build.dir" />
-					<propertyref name="skip.core.themes" />
-					<propertyref name="deploy.properties.file" />
-				</propertyset>
-				<additionalProperties />
-				<target name="@{target}" />
-			</ant>
-		</sequential>
-	</macrodef>
 
 	<!-- 
 	===========================================================================

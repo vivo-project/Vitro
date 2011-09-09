@@ -13,7 +13,7 @@
 	<!-- - - - - - - - - - - - - - - - - - 
           properties                      
          - - - - - - - - - - - - - - - - - -->
-	<property name="corebase.dir" location="." />
+	<dirname property="corebase.dir" file="${ant.file.vitroCore}" />
 
 	<!-- 
 		If calling from a Product build script, these properties already point to 
@@ -232,7 +232,8 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	        depends="test"
 	        unless="skipinfo"
 	        description="--> Store revision info in build">
-		<property name="revisionInfo.product.dir" location="${ant.file.vitroCore}/.." />
+
+		<property name="revisionInfo.product.dir" location="${corebase.dir}/.." />
 		<property name="revisionInfo.build.file" location="${war-resources.dir}/revisionInfo.txt" />
 
 		<delete file="${revisionInfo.build.file}" />
@@ -243,7 +244,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<echo file="${revisionInfo.build.file}">${revisionInfo.timestamp}
 </echo>
 
-		<javac srcdir="${appbase.dir}/../utilities/buildutils/revisioninfo"
+		<javac srcdir="${corebase.dir}/../utilities/buildutils/revisioninfo"
 		       destdir="${test-classes.dir}"
 		       debug="true"
 		       deprecation="${javac.deprecation}"
@@ -267,7 +268,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
           target: prepareSolr                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="prepareSolr" depends="properties">
-		<property name="solr.distrib.dir" location="${appbase.dir}/../solr" />
+		<property name="solr.distrib.dir" location="${corebase.dir}/../solr" />
 		<property name="solr.example.dir" location="${solr.distrib.dir}/exampleSolr" />
 		<property name="solr.context.config.example"
 		          location="${solr.distrib.dir}/exampleSolrContext.xml" />

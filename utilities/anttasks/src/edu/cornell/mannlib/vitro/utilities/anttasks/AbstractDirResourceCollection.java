@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.utilities.anttasks;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
