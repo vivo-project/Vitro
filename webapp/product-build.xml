@@ -40,10 +40,7 @@
           custom Ant types                      
          - - - - - - - - - - - - - - - - - -->
 	<typedef name="dirDifference"
-	         classname="edu.cornell.mannlib.vitro.utilities.anttasks.DirDifferenceResourceCollection"
-	         classpathref="anttasks.classpath" />
-	<typedef name="optionalDir"
-	         classname="edu.cornell.mannlib.vitro.utilities.anttasks.OptionalDirResourceCollection"
+	         classname="edu.cornell.mannlib.vitro.utilities.anttasks.DirDifferenceFileSet"
 	         classpathref="anttasks.classpath" />
 
 	<!-- - - - - - - - - - - - - - - - - - 
@@ -55,55 +52,56 @@
 		<mkdir dir="${appbase.dir}/src" />
 		<mkdir dir="${appbase.dir}/test" />
 
-		<copy todir="${appbase.dir}/web">
-			<dirDifference primary="${inner.basedir}/web" blocking="${product.modifications.dir}" />
+		<copy todir="${appbase.dir}/web" includeemptydirs="true">
+			<dirDifference dir="${inner.basedir}/web">
+				<path>
+					<pathelement location="${product.modifications.dir}" />
+				</path>
+			</dirDifference>
 		</copy>
-		<copy todir="${appbase.dir}/web">
+		<copy todir="${appbase.dir}/web" includeemptydirs="true">
 			<fileset dir="${product.modifications.dir}" />
 		</copy>
 
-		<copy todir="${appbase.dir}/config">
+		<copy todir="${appbase.dir}/config" includeemptydirs="true">
 			<fileset dir="${inner.basedir}/config" />
 		</copy>
 
-		<copy todir="${appbase.dir}/src">
-			<dirDifference primary="${inner.basedir}/src"
-			               blocking="./src"
-			               blockingOptional="true" />
+		<copy todir="${appbase.dir}/src" includeemptydirs="true">
+			<dirDifference dir="${inner.basedir}/src">
+				<path>
+					<pathelement location="./src" />
+				</path>
+			</dirDifference>
 		</copy>
-		<copy todir="${appbase.dir}/src">
-			<optionalDir primary="./src" />
-		</copy>
-
-		<copy todir="${appbase.dir}/lib">
-			<dirDifference primary="${inner.basedir}/lib"
-			               blocking="./lib"
-			               blockingOptional="true" />
-		</copy>
-		<copy todir="${appbase.dir}/lib">
-			<optionalDir primary="./lib" />
+		<copy todir="${appbase.dir}/src" includeemptydirs="true">
+			<fileset dir="./src" erroronmissingdir="false" />
 		</copy>
 
-		<copy todir="${appbase.dir}/test">
-			<dirDifference primary="${inner.basedir}/test"
-			               blocking="./test"
-			               blockingOptional="true" />
+		<copy todir="${appbase.dir}/lib" includeemptydirs="true">
+			<dirDifference dir="${inner.basedir}/lib">
+				<path>
+					<pathelement location="./lib" />
+				</path>
+			</dirDifference>
 		</copy>
-		<copy todir="${appbase.dir}/test">
-			<optionalDir primary="./test" />
-		</copy>
-
-		<copy todir="${appbase.dir}/test">
-			<dirDifference primary="${inner.basedir}/test"
-			               blocking="./test"
-			               blockingOptional="true" />
-		</copy>
-		<copy todir="${appbase.dir}/test">
-			<optionalDir primary="./test" />
+		<copy todir="${appbase.dir}/lib" includeemptydirs="true">
+			<fileset dir="./lib" erroronmissingdir="false" />
 		</copy>
 
-		<copy todir="${appbase.dir}/themes">
-			<optionalDir primary="./themes" />
+		<copy todir="${appbase.dir}/test" includeemptydirs="true">
+			<dirDifference dir="${inner.basedir}/test">
+				<path>
+					<pathelement location="./test" />
+				</path>
+			</dirDifference>
+		</copy>
+		<copy todir="${appbase.dir}/test" includeemptydirs="true">
+			<fileset dir="./test" />
+		</copy>
+
+		<copy todir="${appbase.dir}/themes" includeemptydirs="true">
+			<fileset dir="./themes" erroronmissingdir="false" />
 		</copy>
 
 		<copy tofile="${appbase.dir}/context.xml" file="${inner.basedir}/context.xml" />
