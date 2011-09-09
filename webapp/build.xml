@@ -140,6 +140,9 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 				-->
 				<exclude name="themes/**/*" if="skip.core.themes" />
 			</fileset>
+			<fileset dir="${appbase.dir}">
+				<include name="themes/**/*" />
+			</fileset>
 		</copy>
 
 		<copy todir="${war-webinf.dir}">
@@ -175,6 +178,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 
 		<!-- copy the context file into the war directory -->
 		<copy file="${appbase.dir}/context.xml" tofile="${war.dir}/META-INF/context.xml" />
+		
 	</target>
 
 	<!-- ================================= 

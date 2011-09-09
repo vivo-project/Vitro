@@ -102,6 +102,10 @@
 			<optionalDir primary="./test" />
 		</copy>
 
+		<copy todir="${appbase.dir}/themes">
+			<optionalDir primary="./themes" />
+		</copy>
+
 		<copy tofile="${appbase.dir}/context.xml" file="${inner.basedir}/context.xml" />
 	</target>
 	<!-- ================================= 
