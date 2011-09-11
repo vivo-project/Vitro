@@ -3,13 +3,13 @@
 package edu.cornell.mannlib.vitro.utilities.anttasks;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.FileSet;
+import org.apache.tools.ant.types.PatternSet;
 import org.apache.tools.ant.types.Resource;
 import org.apache.tools.ant.types.ResourceCollection;
 import org.apache.tools.ant.types.resources.FileResource;
@@ -18,20 +18,26 @@ import org.apache.tools.ant.types.resources.FileResource;
  * A base class for our custom-made FileSet extensions.
  */
 public abstract class AbstractWrappedFileSet implements ResourceCollection {
+	private Project p;
+	
+	/** The list of FileResources that we will yield to the task. */
 	protected List<FileResource> files;
 	
-	private Project p;
-	private File dir;
-	
-	private FileSet fileSet;
+	/** The internal FileSet */
+	private FileSet fileSet = new FileSet();
 	
 	public void setProject(Project p) {
 		this.p = p;
+		fileSet.setProject(p);
 	}
 	
 	public void setDir(File dir) {
-		this.dir = dir;
+		fileSet.setDir(dir);
 	}
+	
+    public PatternSet.NameEntry createInclude() {
+    	return fileSet.createInclude();
+    }
 
 	@Override
 	public Object clone() {
@@ -58,14 +64,11 @@ public abstract class AbstractWrappedFileSet implements ResourceCollection {
 
 	protected abstract void fillFileList();
 	
+	protected Project getProject() {
+		return p;
+	}
+	
 	protected FileSet getInternalFileSet() {
-		if (fileSet != null) {
-			return fileSet;
-		}
-		
-		fileSet = new FileSet();
-		fileSet.setProject(p);
-		fileSet.setDir(dir);
 		return fileSet;
 	}
 

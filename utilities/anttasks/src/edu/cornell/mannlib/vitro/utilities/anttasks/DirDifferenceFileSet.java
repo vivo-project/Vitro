@@ -16,10 +16,12 @@ import org.apache.tools.ant.types.resources.FileResource;
 public class DirDifferenceFileSet extends AbstractWrappedFileSet {
 	private Path blockingPath;
 
-	@SuppressWarnings("hiding")
-	public void addConfiguredPath(Path blockingPath) {
-		this.blockingPath = blockingPath;
-	}
+    public Path createBlockingPath() {
+        if (blockingPath == null) {
+        	blockingPath = new Path(getProject());
+        }
+        return blockingPath.createPath();
+    }
 
 	@Override
 	protected void fillFileList() {

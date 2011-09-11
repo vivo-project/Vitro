@@ -54,9 +54,9 @@
 
 		<copy todir="${appbase.dir}/web" includeemptydirs="true">
 			<dirDifference dir="${inner.basedir}/web">
-				<path>
+				<blockingPath>
 					<pathelement location="${product.modifications.dir}" />
-				</path>
+				</blockingPath>
 			</dirDifference>
 		</copy>
 		<copy todir="${appbase.dir}/web" includeemptydirs="true">
@@ -67,37 +67,23 @@
 			<fileset dir="${inner.basedir}/config" />
 		</copy>
 
-		<copy todir="${appbase.dir}/src" includeemptydirs="true">
-			<dirDifference dir="${inner.basedir}/src">
-				<path>
-					<pathelement location="./src" />
-				</path>
+		<!-- -->
+		<copy todir="${appbase.dir}" includeemptydirs="true">
+			<dirDifference dir="${inner.basedir}">
+				<include name="src/**/*" />
+				<include name="lib/**/*" />
+				<include name="test/**/*" />
+				<blockingPath>
+					<pathelement location="." />
+				</blockingPath>
 			</dirDifference>
 		</copy>
-		<copy todir="${appbase.dir}/src" includeemptydirs="true">
-			<fileset dir="./src" erroronmissingdir="false" />
-		</copy>
-
-		<copy todir="${appbase.dir}/lib" includeemptydirs="true">
-			<dirDifference dir="${inner.basedir}/lib">
-				<path>
-					<pathelement location="./lib" />
-				</path>
-			</dirDifference>
-		</copy>
-		<copy todir="${appbase.dir}/lib" includeemptydirs="true">
-			<fileset dir="./lib" erroronmissingdir="false" />
-		</copy>
-
-		<copy todir="${appbase.dir}/test" includeemptydirs="true">
-			<dirDifference dir="${inner.basedir}/test">
-				<path>
-					<pathelement location="./test" />
-				</path>
-			</dirDifference>
-		</copy>
-		<copy todir="${appbase.dir}/test" includeemptydirs="true">
-			<fileset dir="./test" />
+		<copy todir="${appbase.dir}" includeemptydirs="true">
+			<fileset dir="." erroronmissingdir="false">
+				<include name="src/**/*" />
+				<include name="lib/**/*" />
+				<include name="test/**/*" />
+			</fileset>
 		</copy>
 
 		<copy todir="${appbase.dir}/themes" includeemptydirs="true">
