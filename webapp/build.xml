@@ -173,7 +173,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 
 		<!-- copy the context file into the war directory -->
 		<copy file="${appbase.dir}/context.xml" tofile="${war.dir}/META-INF/context.xml" />
-		
+
 	</target>
 
 	<!-- ================================= 
@@ -232,9 +232,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	        unless="skipinfo"
 	        description="--> Store revision info in build">
 
-		<property name="revisionInfo.product.dir" location="${corebase.dir}/.." />
 		<property name="revisionInfo.build.file" location="${war-resources.dir}/revisionInfo.txt" />
-
 		<delete file="${revisionInfo.build.file}" />
 
 		<tstamp>
@@ -243,24 +241,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<echo file="${revisionInfo.build.file}">${revisionInfo.timestamp}
 </echo>
 
-		<javac srcdir="${corebase.dir}/../utilities/buildutils/revisioninfo"
-		       destdir="${test-classes.dir}"
-		       debug="true"
-		       deprecation="${javac.deprecation}"
-		       encoding="UTF8"
-		       includeantruntime="false"
-		       optimize="false"
-		       source="1.6">
-		</javac>
-
-		<java classname="edu.cornell.mannlib.vitro.utilities.revisioninfo.RevisionInfoBuilder"
-		      fork="no"
-		      failonerror="true">
-			<classpath refid="test.run.classpath" />
-			<arg value="${ant.project.name}" />
-			<arg file="${revisionInfo.product.dir}" />
-			<arg file="${revisionInfo.build.file}" />
-		</java>
+		<addRevisionInfoLine productName="vitroCore" productCheckoutDir="${corebase.dir}/.." />
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
@@ -345,16 +326,58 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
          ================================= -->
 	<target name="licenser" description="--> Check source files for licensing tags">
 		<property name="licenser.properties.file"
-		          location="${appbase.dir}/config/licenser/licenser.properties" />
-		<property name="licenser.label" value="Vitro core" />
-
-		<echo message="Checking license tags on ${licenser.label}" />
-
-		<exec executable="ruby" dir="${appbase.dir}/../utilities/licenser" failonerror="true">
-			<arg value="licenser.rb" />
-			<arg value="${licenser.properties.file}" />
-			<redirector outputproperty="licenser.test.output" alwayslog="true" />
-		</exec>
+		          location="${corebase.dir}/config/licenser/licenser.properties" />
+		<runLicenserScript productname="Vitro core" propertiesfile="${licenser.properties.file}" />
 	</target>
+
+	
+	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	     MACROS
+         - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+	<!--
+		Run the licenser script.
+	-->
+	<macrodef name="runLicenserScript">
+		<attribute name="productName" />
+		<attribute name="propertiesFile" />
+		<sequential>
+			<echo message="Checking license tags on @{productName}" />
+
+			<exec executable="ruby" dir="${corebase.dir}/../utilities/licenser" failonerror="true">
+				<arg value="licenser.rb" />
+				<arg value="@{propertiesFile}" />
+				<redirector outputproperty="licenser.test.output" alwayslog="true" />
+			</exec>
+		</sequential>
+	</macrodef>
+
+	<!--
+		Add a line to the revisionInfo file.
+	-->
+	<macrodef name="addRevisionInfoLine">
+		<attribute name="productName" />
+		<attribute name="productCheckoutDir" />
+		<sequential>
+			<javac srcdir="${corebase.dir}/../utilities/buildutils/revisioninfo"
+			       destdir="${test-classes.dir}"
+			       debug="true"
+			       deprecation="${javac.deprecation}"
+			       encoding="UTF8"
+			       includeantruntime="false"
+			       optimize="false"
+			       source="1.6">
+			</javac>
+
+			<java classname="edu.cornell.mannlib.vitro.utilities.revisioninfo.RevisionInfoBuilder"
+			      fork="no"
+			      failonerror="true">
+				<classpath refid="test.run.classpath" />
+				<arg value="@{productName}" />
+				<arg file="@{productCheckoutDir}" />
+				<arg file="${revisionInfo.build.file}" />
+			</java>
+		</sequential>
+	</macrodef>
 
 </project>

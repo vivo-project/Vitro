@@ -44,6 +44,11 @@
 	         classpathref="anttasks.classpath" />
 
 	<!-- - - - - - - - - - - - - - - - - - 
+          target: prepare                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="prepare" depends="product-prepare,vitroCore.prepare" />
+
+	<!-- - - - - - - - - - - - - - - - - - 
           target: product-prepare                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="product-prepare">
@@ -70,7 +75,7 @@
 				<include name="src/**/*" />
 				<include name="lib/**/*" />
 				<include name="test/**/*" />
-				<include name="themes/**/*" unless="skip.core.themes"/>
+				<include name="themes/**/*" unless="skip.core.themes" />
 				<include name="context.xml" />
 				<blockingPath>
 					<pathelement location="." />
@@ -87,82 +92,34 @@
 			</fileset>
 		</copy>
 	</target>
-	<!-- ================================= 
-          target: describe              
-         ================================= -->
-	<target name="describe" description="--> Describe the targets (this is the default).">
-		<innercall target="describe" />
-	</target>
 
-	<!-- ================================= 
-          target: all              
-         ================================= -->
-	<target name="all" depends="clean, deploy" description="--> Run 'clean', then 'deploy'" />
-
-	<!-- ================================= 
-          target: clean              
-         ================================= -->
-	<target name="clean" description="--> Delete all artifacts.">
-		<innercall target="clean" />
-	</target>
-
-	<!-- ================================= 
-          target: deploy              
-         ================================= -->
-	<target name="deploy"
-	        depends="product-prepare"
-	        description="--> Build the app and install in Tomcat">
-		<innercall target="deploy" />
-	</target>
-
-	<!-- ================================= 
-          target: compile              
-         ================================= -->
-	<target name="compile" depends="product-prepare" description="--> Compile Java sources.">
-		<innercall target="compile" />
-	</target>
-
-	<!-- ================================= 
-          target: test              
-         ================================= -->
-	<target name="test" depends="product-prepare" description="--> Run JUnit tests">
-		<innercall target="test" />
-	</target>
+	<import file="${vivoProduct.basedir}/build.xml" />
 
 	<!-- ================================= 
 	      target: revisionInfo              
 	     ================================= -->
 	<target name="revisionInfo"
-	        depends="product-prepare"
+	        depends="vitroCore.revisionInfo"
 	        description="--> Store revision info in build">
-		<innercall target="revisionInfo" />
-		<antcall target="productRevisionInfo" />
-	</target>
-
-	<!-- - - - - - - - - - - - - - - - - - 
-	      target: productRevisionInfo                      
-	     - - - - - - - - - - - - - - - - - -->
-	<target name="productRevisionInfo" unless="skipinfo">
-		<property name="revisionInfo.product.dir" location="${ant.file}/.." />
-		<property name="revisionInfo.build.file" location="${war-resources.dir}/revisionInfo.txt" />
-
-		<java classname="edu.cornell.mannlib.vitro.utilities.revisioninfo.RevisionInfoBuilder"
-		      fork="no"
-		      failonerror="true">
-			<classpath refid="test.run.classpath" />
-			<arg value="${ant.project.name}" />
-			<arg file="${revisionInfo.product.dir}" />
-			<arg file="${revisionInfo.build.file}" />
-		</java>
+		<addRevisionInfoLine productName="${ant.project.name}" productCheckoutDir="${basedir}" />
 	</target>
 
 	<!-- ================================= 
-          target: war              
+          target: licenser             
+          
+          In regular use, checks that all appropriate source files have license tags.
+          At release time, applies license text to source files.
+          
+          NOTE: don't override licenser.properties.file from the command line.
+          Instead, override licenser.core.properties.file and licenser.product.properties.file
          ================================= -->
-	<target name="war"
-	        depends="product-prepare"
-	        description="--> Build the app and create a WAR file">
-		<innercall target="war" />
+	<target name="licenser" description="--> Check source files for licensing tags">
+		<property name="licenser.product.properties.file"
+		          location="./config/licenser/licenser.properties" />
+		<property name="licenser.core.properties.file"
+		          location="${corebase.dir}/config/licenser/licenser.properties" />
+		<runLicenserScript productname="${ant.project.name}" propertiesfile="${licenser.product.properties.file}" />
+		<runLicenserScript productname="Vitro core" propertiesfile="${licenser.core.properties.file}" />
 	</target>
 
 	<!-- 
@@ -183,55 +140,4 @@
 		     destfile="${build.dir}/${webapp.name}.jar" />
 	</target>
 
-	<!-- ================================= 
-          target: licenser             
-          
-          In regular use, checks that all appropriate source files have license tags.
-          At release time, applies license text to source files.
-          
-          NOTE: don't override licenser.properties.file from the command line.
-          Instead, override licenser.core.properties.file and licenser.product.properties.file
-         ================================= -->
-	<target name="licenser" description="--> Check source files for licensing tags">
-		<!-- Once for the product... -->
-		<innercall target="licenser">
-			<property name="licenser.properties.file" value="${licenser.product.properties.file}" />
-			<property name="licenser.label" value="${ant.project.name}" />
-		</innercall>
-
-		<!-- ...and once for the core. -->
-		<condition property="licenser.properties.file" value="${licenser.core.properties.file}">
-			<isset property="licenser.core.properties.file" />
-		</condition>
-		<innercall target="licenser">
-			<propertyset>
-				<propertyref name="licenser.properties.file" />
-			</propertyset>
-		</innercall>
-	</target>
-
-	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	     MACROS
-         - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-
-	<!--
-		Call a target in the inner script.
-	-->
-	<macrodef name="innercall">
-		<attribute name="target" />
-		<element name="additionalProperties" implicit="yes" optional="true" />
-		<sequential>
-			<ant dir="${inner.basedir}" inheritall="false">
-				<!-- pass the properties that are needed. -->
-				<propertyset>
-					<propertyref name="build.dir" />
-					<propertyref name="appbase.dir" />
-					<propertyref name="skip.core.themes" />
-					<propertyref name="deploy.properties.file" />
-				</propertyset>
-				<additionalProperties />
-				<target name="@{target}" />
-			</ant>
-		</sequential>
-	</macrodef>
 </project>
