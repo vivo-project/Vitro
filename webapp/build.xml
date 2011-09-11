@@ -131,14 +131,9 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<mkdir dir="${war-resources.dir}" />
 		<mkdir dir="${test-classes.dir}" />
 
-		<!-- copy all sorts of web stuff (with or without themes) into the war directory. -->
+		<!-- copy all sorts of web stuff into the war directory. -->
 		<copy todir="${war.dir}">
 			<fileset dir="${appbase.dir}/web">
-				<!--
-					If a product doesn't want the core themes, it can
-					set this property and they will be skipped. 
-				-->
-				<exclude name="themes/**/*" if="skip.core.themes" />
 			</fileset>
 			<fileset dir="${appbase.dir}">
 				<include name="themes/**/*" />

@@ -49,8 +49,6 @@
 	<target name="product-prepare">
 		<mkdir dir="${appbase.dir}" />
 		<mkdir dir="${appbase.dir}/web" />
-		<mkdir dir="${appbase.dir}/src" />
-		<mkdir dir="${appbase.dir}/test" />
 
 		<copy todir="${appbase.dir}/web" includeemptydirs="true">
 			<dirDifference dir="${inner.basedir}/web">
@@ -67,12 +65,13 @@
 			<fileset dir="${inner.basedir}/config" />
 		</copy>
 
-		<!-- -->
 		<copy todir="${appbase.dir}" includeemptydirs="true">
 			<dirDifference dir="${inner.basedir}">
 				<include name="src/**/*" />
 				<include name="lib/**/*" />
 				<include name="test/**/*" />
+				<include name="themes/**/*" unless="skip.core.themes"/>
+				<include name="context.xml" />
 				<blockingPath>
 					<pathelement location="." />
 				</blockingPath>
@@ -83,14 +82,10 @@
 				<include name="src/**/*" />
 				<include name="lib/**/*" />
 				<include name="test/**/*" />
+				<include name="themes/**/*" />
+				<include name="context.xml" />
 			</fileset>
 		</copy>
-
-		<copy todir="${appbase.dir}/themes" includeemptydirs="true">
-			<fileset dir="./themes" erroronmissingdir="false" />
-		</copy>
-
-		<copy tofile="${appbase.dir}/context.xml" file="${inner.basedir}/context.xml" />
 	</target>
 	<!-- ================================= 
           target: describe              
@@ -179,49 +174,6 @@
 	===========================================================================
 	===========================================================================
 	-->
-
-	<!-- Is there a "src" directory in the product? -->
-	<property name="product.source.dir" location="./src" />
-	<available property="product.sources.exist" file="${product.source.dir}" />
-
-	<!-- Is there a "test" directory in the product? -->
-	<property name="product.test.dir" location="./test" />
-	<available property="product.tests.exist" file="${product.test.dir}" />
-
-	<!-- Is there a "themes" directory in the product? -->
-	<property name="product.themes.dir" location="./themes" />
-	<available property="product.themes.exist" file="${product.themes.dir}" />
-
-	<!-- Is there a modifications directory in the product? -->
-	<property name="product.modifications.dir" location="./modifications" />
-	<available property="product.modifications.exist" file="${product.modifications.dir}" />
-
-	<!-- - - - - - - - - - - - - - - - - - 
-          target: productPrepare                      
-         - - - - - - - - - - - - - - - - - -->
-	<target name="productPrepare">
-		<antcall target="prepareThemes" />
-		<antcall target="prepareModifications" />
-	</target>
-
-	<!-- - - - - - - - - - - - - - - - - - 
-          target: prepareThemes                      
-         - - - - - - - - - - - - - - - - - -->
-	<target name="prepareThemes" if="product.themes.exist">
-		<copy todir="${build.dir}/war/themes" overwrite="true">
-			<fileset dir="${product.themes.dir}" />
-		</copy>
-	</target>
-
-	<!-- - - - - - - - - - - - - - - - - - 
-          target: prepareModifications                      
-         - - - - - - - - - - - - - - - - - -->
-	<target name="prepareModifications" if="product.modifications.exist">
-		<copy todir="${build.dir}/war" overwrite="true">
-			<fileset dir="${product.modifications.dir}" />
-		</copy>
-	</target>
-
 
 	<!-- ================================= 
           target: jar              
