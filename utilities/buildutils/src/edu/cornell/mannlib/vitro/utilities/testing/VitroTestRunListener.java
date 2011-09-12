@@ -1,13 +1,14 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.testing;
+package edu.cornell.mannlib.vitro.utilities.testing;
 
-import static edu.cornell.mannlib.vitro.testing.VitroTestRunner.ReportLevel.BRIEF;
-import static edu.cornell.mannlib.vitro.testing.VitroTestRunner.ReportLevel.FULL;
-import static edu.cornell.mannlib.vitro.testing.VitroTestRunner.ReportLevel.MORE;
+import static edu.cornell.mannlib.vitro.utilities.testing.VitroTestRunner.ReportLevel.BRIEF;
+import static edu.cornell.mannlib.vitro.utilities.testing.VitroTestRunner.ReportLevel.FULL;
+import static edu.cornell.mannlib.vitro.utilities.testing.VitroTestRunner.ReportLevel.MORE;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -18,9 +19,7 @@ import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
 
-import com.ibm.icu.text.SimpleDateFormat;
-
-import edu.cornell.mannlib.vitro.testing.VitroTestRunner.ReportLevel;
+import edu.cornell.mannlib.vitro.utilities.testing.VitroTestRunner.ReportLevel;
 
 /**
  * Listen to events as they come from the JUnit test runner. The events from the

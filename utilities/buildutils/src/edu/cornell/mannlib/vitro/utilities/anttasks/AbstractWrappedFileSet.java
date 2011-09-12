@@ -43,6 +43,11 @@ public abstract class AbstractWrappedFileSet implements ResourceCollection {
     	return fileSet.createExclude();
     }
     
+    public PatternSet createPatternSet() {
+    	return fileSet.createPatternSet();
+    }
+    	 
+    
 	@Override
 	public Object clone() {
 		throw new BuildException(this.getClass().getSimpleName()

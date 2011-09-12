@@ -34,16 +34,9 @@
 	</path>
 
 	<!-- - - - - - - - - - - - - - - - - - 
-          custom Ant types                      
-         - - - - - - - - - - - - - - - - - -->
-	<typedef name="dirDifference"
-	         classname="edu.cornell.mannlib.vitro.utilities.anttasks.DirDifferenceFileSet"
-	         classpathref="anttasks.classpath" />
-
-	<!-- - - - - - - - - - - - - - - - - - 
           target: prepare                      
          - - - - - - - - - - - - - - - - - -->
-	<target name="prepare" depends="product-prepare,vitroCore.prepare" />
+	<target name="prepare" depends="compileUtilities,product-prepare,vitroCore.prepare" />
 
 	<!-- - - - - - - - - - - - - - - - - - 
           target: product-prepare                      
@@ -61,25 +54,26 @@
 			<fileset dir="${product.modifications.dir}" />
 		</copy>
 
+		<patternset id="appbase.patterns">
+			<include name="src/**/*" />
+			<include name="lib/**/*" />
+			<include name="test/**/*" />
+			<include name="themes/**/*" />
+			<include name="config/*.properties" />
+			<include name="config/solr/*" />
+			<include name="context.xml" />
+		</patternset>
+
 		<copy todir="${appbase.dir}" includeemptydirs="true">
 			<dirDifference dir="${corebase.dir}">
-				<include name="src/**/*" />
-				<include name="lib/**/*" />
-				<include name="test/**/*" />
-				<include name="themes/**/*" unless="skip.core.themes" />
-				<include name="config/*.properties" />
-				<include name="config/solr/*" />
-				<include name="context.xml" />
+				<patternset refid="appbase.patterns" />
+				<exclude name="themes/**/*" if="skip.core.themes" />
 				<blockingPath>
 					<pathelement location="." />
 				</blockingPath>
 			</dirDifference>
 			<fileset dir=".">
-				<include name="src/**/*" />
-				<include name="lib/**/*" />
-				<include name="test/**/*" />
-				<include name="themes/**/*" />
-				<include name="context.xml" />
+				<patternset refid="appbase.patterns" />
 			</fileset>
 		</copy>
 	</target>
@@ -100,16 +94,16 @@
           
           In regular use, checks that all appropriate source files have license tags.
           At release time, applies license text to source files.
-          
-          NOTE: don't override licenser.properties.file from the command line.
-          Instead, override licenser.core.properties.file and licenser.product.properties.file
+          The files are handled as properties so they can be overridden from the command line, if desired.
          ================================= -->
 	<target name="licenser" description="--> Check source files for licensing tags">
 		<property name="licenser.product.properties.file"
 		          location="./config/licenser/licenser.properties" />
 		<property name="licenser.core.properties.file"
 		          location="${corebase.dir}/config/licenser/licenser.properties" />
-		<runLicenserScript productname="${ant.project.name}" propertiesfile="${licenser.product.properties.file}" />
-		<runLicenserScript productname="Vitro core" propertiesfile="${licenser.core.properties.file}" />
+		<runLicenserScript productname="${ant.project.name}"
+		                   propertiesfile="${licenser.product.properties.file}" />
+		<runLicenserScript productname="Vitro core"
+		                   propertiesfile="${licenser.core.properties.file}" />
 	</target>
 </project>

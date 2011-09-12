@@ -15,21 +15,24 @@
          - - - - - - - - - - - - - - - - - -->
 	<dirname property="corebase.dir" file="${ant.file.vitroCore}" />
 
-	<!-- 
-		If calling from a Product build script, these properties already point to 
-		the product-related locations, so setting them here has no effect. 
-	-->
+	<!-- A product script will override appbase.dir, but not corebase.dir -->
 	<property name="appbase.dir" location="${corebase.dir}" />
+
 	<property name="build.dir" location=".build" />
 	<property name="deploy.properties.file" location="config/deploy.properties" />
 
-	<property name="war.dir" location="${build.dir}/war" />
-	<property name="war-webinf.dir" location="${war.dir}/WEB-INF" />
-	<property name="war-classes.dir" location="${war-webinf.dir}/classes" />
-	<property name="war-resources.dir" location="${war-webinf.dir}/resources" />
-	<property name="revisionInfo.build.file" location="${war-resources.dir}/revisionInfo.txt" />
+	<property name="utilities.base.dir" location="${corebase.dir}/../utilities/buildutils" />
+	<property name="utilities.source.dir" location="${utilities.base.dir}/src" />
+	<property name="utilities.lib.dir" location="${utilities.base.dir}/lib" />
 
-	<property name="test-classes.dir" location="${build.dir}/testclasses" />
+	<property name="war.dir" location="${build.dir}/war" />
+	<property name="war.webinf.dir" location="${war.dir}/WEB-INF" />
+	<property name="war.classes.dir" location="${war.webinf.dir}/classes" />
+	<property name="war.resources.dir" location="${war.webinf.dir}/resources" />
+	<property name="revisionInfo.build.file" location="${war.resources.dir}/revisionInfo.txt" />
+
+	<property name="test.classes.dir" location="${build.dir}/testClasses" />
+	<property name="utility.classes.dir" location="${build.dir}/utilityClasses" />
 
 	<property name="javac.deprecation" value="true" />
 
@@ -37,22 +40,29 @@
           paths: for compiling and running                      
          - - - - - - - - - - - - - - - - - -->
 	<path id="compile.classpath">
-		<fileset dir="${appbase.dir}/lib">
-			<include name="**/*.jar" />
-		</fileset>
+		<fileset dir="${appbase.dir}/lib" includes="*.jar" />
+	</path>
+
+	<path id="utility.compile.classpath">
+		<fileset dir="${utilities.lib.dir}" includes="*.jar" />
+	</path>
+
+	<path id="utility.run.classpath">
+		<pathelement location="${utility.classes.dir}" />
+		<path refid="utility.compile.classpath" />
 	</path>
 
 	<path id="test.compile.classpath">
-		<pathelement location="${war-classes.dir}" />
+		<pathelement location="${war.classes.dir}" />
 		<path refid="compile.classpath" />
 	</path>
 
 	<path id="test.run.classpath">
 		<pathelement location="${appbase.dir}/test" />
-		<pathelement location="${test-classes.dir}" />
+		<pathelement location="${test.classes.dir}" />
 		<path refid="test.compile.classpath" />
+		<path refid="utility.run.classpath" />
 	</path>
-
 
 	<!-- ================================= 
           target: describe              
@@ -124,24 +134,42 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
+          target: compileUtilities                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="compileUtilities">
+		<mkdir dir="${utility.classes.dir}" />
+		<javac srcdir="${utilities.source.dir}"
+		       destdir="${utility.classes.dir}"
+		       debug="true"
+		       deprecation="${javac.deprecation}"
+		       encoding="UTF8"
+		       includeantruntime="false"
+		       optimize="false"
+		       source="1.6">
+			<classpath refid="utility.compile.classpath" />
+		</javac>
+
+		<typedef name="dirDifference"
+		         classname="edu.cornell.mannlib.vitro.utilities.anttasks.DirDifferenceFileSet"
+		         classpathref="utility.run.classpath" />
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
           target: prepare                      
          - - - - - - - - - - - - - - - - - -->
-	<target name="prepare" depends="properties">
+	<target name="prepare" depends="properties, compileUtilities">
 		<mkdir dir="${build.dir}" />
-		<mkdir dir="${war-classes.dir}" />
-		<mkdir dir="${war-resources.dir}" />
-		<mkdir dir="${test-classes.dir}" />
+		<mkdir dir="${war.classes.dir}" />
+		<mkdir dir="${war.resources.dir}" />
+		<mkdir dir="${test.classes.dir}" />
 
 		<!-- copy all sorts of web stuff into the war directory. -->
 		<copy todir="${war.dir}">
-			<fileset dir="${appbase.dir}/web">
-			</fileset>
-			<fileset dir="${appbase.dir}">
-				<include name="themes/**/*" />
-			</fileset>
+			<fileset dir="${appbase.dir}/web" />
+			<fileset dir="${appbase.dir}" includes="themes/**/*" />
 		</copy>
 
-		<copy todir="${war-webinf.dir}">
+		<copy todir="${war.webinf.dir}">
 			<fileset dir="${appbase.dir}">
 				<!-- copy the JARs into the war directory -->
 				<include name="lib/*" />
@@ -154,7 +182,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<!-- use the production Log4J properties, unless a debug version exists. -->
 		<available file="${appbase.dir}/config/debug.log4j.properties"
 		           property="debug.log4j.exists" />
-		<copy tofile="${war-classes.dir}/log4j.properties" filtering="true" overwrite="true">
+		<copy tofile="${war.classes.dir}/log4j.properties" filtering="true" overwrite="true">
 			<fileset dir="${appbase.dir}/config">
 				<include name="default.log4j.properties" unless="debug.log4j.exists" />
 				<include name="debug.log4j.properties" if="debug.log4j.exists" />
@@ -164,7 +192,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 			</filterchain>
 		</copy>
 
-		<copy todir="${war-classes.dir}">
+		<copy todir="${war.classes.dir}">
 			<!-- copy the deploy.properties into the war directory -->
 			<fileset file="${deploy.properties.file}" />
 
@@ -183,14 +211,14 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	<target name="compile" depends="prepare" description="--> Compile Java sources">
 		<!-- deletes all files that depend on changed .java files -->
 		<depend srcdir="${appbase.dir}/src"
-		        destdir="${war-classes.dir}"
+		        destdir="${war.classes.dir}"
 		        closure="false"
 		        cache="${build.dir}/.depcache">
 			<classpath refid="compile.classpath" />
 		</depend>
 
 		<javac srcdir="${appbase.dir}/src"
-		       destdir="${war-classes.dir}"
+		       destdir="${war.classes.dir}"
 		       debug="true"
 		       deprecation="${javac.deprecation}"
 		       encoding="UTF8"
@@ -206,7 +234,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
          ================================= -->
 	<target name="test" depends="compile" unless="skiptests" description="--> Run JUnit tests">
 		<javac srcdir="${appbase.dir}/test"
-		       destdir="${test-classes.dir}"
+		       destdir="${test.classes.dir}"
 		       debug="true"
 		       deprecation="${javac.deprecation}"
 		       encoding="UTF8"
@@ -216,7 +244,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 			<classpath refid="test.compile.classpath" />
 		</javac>
 
-		<java classname="edu.cornell.mannlib.vitro.testing.VitroTestRunner"
+		<java classname="edu.cornell.mannlib.vitro.utilities.testing.VitroTestRunner"
 		      fork="yes"
 		      failonerror="true">
 			<classpath refid="test.run.classpath" />
@@ -229,8 +257,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
           target: jar              
          ================================= -->
 	<target name="jar" depends="test" description="--> Compile the Java, and build a JAR file">
-		<jar basedir="${war-classes.dir}"
-		     destfile="${build.dir}/${ant.project.name}.jar" />
+		<jar basedir="${war.classes.dir}" destfile="${build.dir}/${ant.project.name}.jar" />
 	</target>
 
 	<!-- ================================= 
@@ -364,20 +391,10 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<attribute name="productName" />
 		<attribute name="productCheckoutDir" />
 		<sequential>
-			<javac srcdir="${corebase.dir}/../utilities/buildutils/revisioninfo"
-			       destdir="${test-classes.dir}"
-			       debug="true"
-			       deprecation="${javac.deprecation}"
-			       encoding="UTF8"
-			       includeantruntime="false"
-			       optimize="false"
-			       source="1.6">
-			</javac>
-
 			<java classname="edu.cornell.mannlib.vitro.utilities.revisioninfo.RevisionInfoBuilder"
 			      fork="no"
 			      failonerror="true">
-				<classpath refid="test.run.classpath" />
+				<classpath refid="utility.run.classpath" />
 				<arg value="@{productName}" />
 				<arg file="@{productCheckoutDir}" />
 				<arg file="${revisionInfo.build.file}" />
