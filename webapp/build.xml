@@ -27,6 +27,7 @@
 	<property name="war-webinf.dir" location="${war.dir}/WEB-INF" />
 	<property name="war-classes.dir" location="${war-webinf.dir}/classes" />
 	<property name="war-resources.dir" location="${war-webinf.dir}/resources" />
+	<property name="revisionInfo.build.file" location="${war-resources.dir}/revisionInfo.txt" />
 
 	<property name="test-classes.dir" location="${build.dir}/testclasses" />
 
@@ -225,16 +226,20 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	</target>
 
 	<!-- ================================= 
+          target: jar              
+         ================================= -->
+	<target name="jar" depends="test" description="--> Compile the Java, and build a JAR file">
+		<jar basedir="${war-classes.dir}"
+		     destfile="${build.dir}/${ant.project.name}.jar" />
+	</target>
+
+	<!-- ================================= 
           target: revisionInfo              
          ================================= -->
 	<target name="revisionInfo"
 	        depends="test"
 	        unless="skipinfo"
 	        description="--> Store revision info in build">
-
-		<property name="revisionInfo.build.file" location="${war-resources.dir}/revisionInfo.txt" />
-		<delete file="${revisionInfo.build.file}" />
-
 		<tstamp>
 			<format property="revisionInfo.timestamp" pattern="yyyy-MM-dd HH:mm:ss" />
 		</tstamp>
@@ -330,7 +335,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<runLicenserScript productname="Vitro core" propertiesfile="${licenser.properties.file}" />
 	</target>
 
-	
+
 	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	     MACROS
          - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->

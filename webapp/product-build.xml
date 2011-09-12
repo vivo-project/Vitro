@@ -21,9 +21,6 @@
         It should be invoked from the build script of a Vivo product.
     </fail>
 
-	<fail unless="inner.basedir"
-	      message="The build script for the product must define a value for inner.basedir" />
-
 	<!-- 
 		The build directory goes in the product directory. 
 		Everything else hangs from the build directory. 
@@ -56,34 +53,28 @@
 		<mkdir dir="${appbase.dir}/web" />
 
 		<copy todir="${appbase.dir}/web" includeemptydirs="true">
-			<dirDifference dir="${inner.basedir}/web">
+			<dirDifference dir="${corebase.dir}/web">
 				<blockingPath>
 					<pathelement location="${product.modifications.dir}" />
 				</blockingPath>
 			</dirDifference>
-		</copy>
-		<copy todir="${appbase.dir}/web" includeemptydirs="true">
 			<fileset dir="${product.modifications.dir}" />
 		</copy>
 
-		<copy todir="${appbase.dir}/config" includeemptydirs="true">
-			<fileset dir="${inner.basedir}/config" />
-		</copy>
-
 		<copy todir="${appbase.dir}" includeemptydirs="true">
-			<dirDifference dir="${inner.basedir}">
+			<dirDifference dir="${corebase.dir}">
 				<include name="src/**/*" />
 				<include name="lib/**/*" />
 				<include name="test/**/*" />
 				<include name="themes/**/*" unless="skip.core.themes" />
+				<include name="config/*.properties" />
+				<include name="config/solr/*" />
 				<include name="context.xml" />
 				<blockingPath>
 					<pathelement location="." />
 				</blockingPath>
 			</dirDifference>
-		</copy>
-		<copy todir="${appbase.dir}" includeemptydirs="true">
-			<fileset dir="." erroronmissingdir="false">
+			<fileset dir=".">
 				<include name="src/**/*" />
 				<include name="lib/**/*" />
 				<include name="test/**/*" />
@@ -121,23 +112,4 @@
 		<runLicenserScript productname="${ant.project.name}" propertiesfile="${licenser.product.properties.file}" />
 		<runLicenserScript productname="Vitro core" propertiesfile="${licenser.core.properties.file}" />
 	</target>
-
-	<!-- 
-	===========================================================================
-	===========================================================================
-	===========================================================================
-	NOT YET USING ANYTHING BELOW HERE
-	===========================================================================
-	===========================================================================
-	===========================================================================
-	-->
-
-	<!-- ================================= 
-          target: jar              
-         ================================= -->
-	<target name="jar" depends="revisionInfo" description="--> Build the app and create a JAR file">
-		<jar basedir="${build.dir}/war/WEB-INF/classes"
-		     destfile="${build.dir}/${webapp.name}.jar" />
-	</target>
-
 </project>
