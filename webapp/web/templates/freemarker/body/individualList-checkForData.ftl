@@ -1,9 +1,9 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#if (individuals?size == 0)>
-    <#assign noData = true />
-<#else>
+<#if individuals?has_content>
     <#assign noData = false />
+<#else>
+    <#assign noData = true />
 </#if>
 
 <#assign noDataNotification>    
