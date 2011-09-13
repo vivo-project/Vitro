@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts.user;
 
-import static edu.cornell.mannlib.vitro.webapp.controller.accounts.user.UserAccountsUserController.BOGUS_STANDARD_MESSAGE;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +9,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsPage;
@@ -49,6 +48,8 @@ public abstract class UserAccountsPasswordBasePage extends UserAccountsPage {
 
 	/** The result of validating a "submit" request. */
 	private String errorCode = "";
+
+	private boolean loggedIn;
 
 	protected UserAccountsPasswordBasePage(VitroRequest vreq) {
 		super(vreq);
@@ -112,6 +113,19 @@ public abstract class UserAccountsPasswordBasePage extends UserAccountsPage {
 			bogusMessage = passwordChangeNotPendingMessage();
 			return;
 		}
+
+		UserAccount currentUser = LoginStatusBean.getCurrentUser(vreq);
+		if (currentUser != null) {
+			loggedIn = true;
+			String currentUserEmail = currentUser.getEmailAddress();
+			if (!userEmail.equals(currentUserEmail)) {
+				log.info("Password request for '" + userEmail
+						+ "' when already logged in as '" + currentUserEmail
+						+ "'");
+				bogusMessage = alreadyLoggedInMessage(currentUserEmail);
+				return;
+			}
+		}
 	}
 
 	public boolean isBogus() {
@@ -153,6 +167,16 @@ public abstract class UserAccountsPasswordBasePage extends UserAccountsPage {
 
 		return new TemplateResponseValues(templateName(), body);
 	}
+
+	public String getSuccessMessage() {
+		if (loggedIn) {
+			return "Your password has been saved.";
+		} else {
+			return "Your password has been saved. Please log in.";
+		}
+	}
+
+	protected abstract String alreadyLoggedInMessage(String currentUserEmail);
 
 	protected abstract String passwordChangeNotPendingMessage();
 

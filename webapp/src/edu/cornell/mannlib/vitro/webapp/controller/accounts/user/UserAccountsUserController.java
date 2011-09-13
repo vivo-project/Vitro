@@ -80,8 +80,7 @@ public class UserAccountsUserController extends FreemarkerHttpServlet {
 			return showHomePage(vreq, page.getBogusMessage());
 		} else if (page.isSubmit() && page.isValid()) {
 			page.createPassword();
-			return showHomePage(vreq,
-					"Your password has been saved. Please log in.");
+			return showHomePage(vreq, page.getSuccessMessage());
 		} else {
 			return page.showPage();
 		}
@@ -95,8 +94,7 @@ public class UserAccountsUserController extends FreemarkerHttpServlet {
 			return showHomePage(vreq, page.getBogusMessage());
 		} else if (page.isSubmit() && page.isValid()) {
 			page.resetPassword();
-			return showHomePage(vreq,
-					"Your password has been saved. Please log in.");
+			return showHomePage(vreq, page.getSuccessMessage());
 		} else {
 			return page.showPage();
 		}
