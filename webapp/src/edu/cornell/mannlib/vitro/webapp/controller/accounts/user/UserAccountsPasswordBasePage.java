@@ -24,6 +24,8 @@ public abstract class UserAccountsPasswordBasePage extends UserAccountsPage {
 	private static final Log log = LogFactory
 			.getLog(UserAccountsPasswordBasePage.class);
 
+	public static final String BOGUS_MESSAGE_NO_SUCH_ACCOUNT = "The account you are trying to set a password on is no longer available. Please contact your system administrator if you think this is an error.";
+
 	private static final String PARAMETER_SUBMIT = "submit";
 	private static final String PARAMETER_USER = "user";
 	private static final String PARAMETER_KEY = "key";
@@ -76,7 +78,7 @@ public abstract class UserAccountsPasswordBasePage extends UserAccountsPage {
 		if (userAccount == null) {
 			log.warn("Password request for '" + userEmail
 					+ "' is bogus: no such user");
-			bogusMessage = BOGUS_STANDARD_MESSAGE;
+			bogusMessage = BOGUS_MESSAGE_NO_SUCH_ACCOUNT;
 			return;
 		}
 
@@ -98,7 +100,7 @@ public abstract class UserAccountsPasswordBasePage extends UserAccountsPage {
 		if (expirationDate.before(new Date())) {
 			log.info("Password request for '" + userEmail
 					+ "' is bogus: expiration date has passed.");
-			bogusMessage = BOGUS_STANDARD_MESSAGE;
+			bogusMessage = passwordChangeNotPendingMessage();
 			return;
 		}
 
@@ -107,7 +109,7 @@ public abstract class UserAccountsPasswordBasePage extends UserAccountsPage {
 			log.warn("Password request for '" + userEmail + "' is bogus: key ("
 					+ key + ") doesn't match expected key (" + expectedKey
 					+ ")");
-			bogusMessage = BOGUS_STANDARD_MESSAGE;
+			bogusMessage = passwordChangeNotPendingMessage();
 			return;
 		}
 	}

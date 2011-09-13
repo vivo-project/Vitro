@@ -25,7 +25,7 @@ public class UserAccountsUserController extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory
 			.getLog(UserAccountsUserController.class);
 
-	public static final String BOGUS_STANDARD_MESSAGE = "The account you are trying to set a password on is no longer available. Please contact your system administrator if you think this is an error.";
+	public static final String BOGUS_STANDARD_MESSAGE = "Request failed. Please contact your system administrator.";
 
 	private static final String ACTION_CREATE_PASSWORD = "/createPassword";
 	private static final String ACTION_RESET_PASSWORD = "/resetPassword";
