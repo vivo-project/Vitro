@@ -18,6 +18,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -148,7 +149,9 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             int startIndex = getStartIndex(vreq);            
             int hitsPerPage = getHitsPerPage( vreq );           
 
-            String qtxt = vreq.getParameter(VitroQuery.QUERY_PARAMETER_NAME);            
+            String qtxt = vreq.getParameter(VitroQuery.QUERY_PARAMETER_NAME);  
+            //Clean text to prevent cross-scripting errors
+            qtxt = StringEscapeUtils.escapeHtml(qtxt);
             log.debug("Query text is \""+ qtxt + "\""); 
 
             String badQueryMsg = badQueryText( qtxt );
