@@ -21,6 +21,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
@@ -200,6 +201,8 @@ public class FreemarkerPagedSearchController extends FreemarkerHttpServlet imple
             log.debug("maxHitSize is " + maxHitSize);
 
             String qtxt = vreq.getParameter(VitroQuery.QUERY_PARAMETER_NAME);
+            //Clean text to prevent cross-scripting errors
+            qtxt = StringEscapeUtils.escapeHtml(qtxt);
             Analyzer analyzer = getAnalyzer(getServletContext());
             
             Query query = null;
