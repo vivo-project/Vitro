@@ -273,3 +273,6 @@ a.disable-delete {
 #passwordContainer {
     margin-top: 20px;
 }
+.disabledSubmit {
+    cursor: default ! important;
+}

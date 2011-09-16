@@ -58,7 +58,7 @@
     </#if>
 
 <section id="my-account" role="region">
-    <form method="POST" action="${formUrls.myAccount}" class="customForm" role="my account">
+    <form id="main-form" method="POST" action="${formUrls.myAccount}" class="customForm" role="my account">
         <label for="email-address">Email address<span class="requiredHint"> *</span></label>
         <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
 
@@ -80,7 +80,7 @@
             <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
         </#if>
 
-        <p><input type="submit" name="submitMyAccount" value="Save changes" class="submit" /> or <a class="cancel" href="${urls.referringPage}">Cancel</a></p>
+        <p><input type="submit" id="submitMyAccount" name="submitMyAccount" value="Save changes" class="submit" disabled /> or <a class="cancel" href="${urls.referringPage}">Cancel</a></p>
 
         <p class="requiredHint">* required fields</p>
     </form>
@@ -88,3 +88,7 @@
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/account.css" />')}
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/customForm.css" />')}
+
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery.js"></script>',
+              '<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"></script>',
+              '<script type="text/javascript" src="${urls.base}/js/account/accountListenerSetup.js"></script>')}
