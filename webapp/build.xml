@@ -155,6 +155,10 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 			<fileset file="${webapp.dir}/config/dwr.xml" />
 		</copy>
 
+		<copy todir="${war-resources.dir}">
+			<fileset file="${webapp.dir}/config/startup_listeners.txt" />
+		</copy>
+
 		<!-- copy the ontologies and the filegraphs into the war directory. -->
 		<copy todir="${war-webinf.dir}">
 			<fileset dir="${webapp.dir}" includes="ontologies" />
