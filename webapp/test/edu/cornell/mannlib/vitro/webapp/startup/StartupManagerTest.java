@@ -120,6 +120,7 @@ public class StartupManagerTest extends AbstractTestClass {
 
 	@Test
 	public void listenerThrowsException() {
+		setLoggerLevel(StartupManager.class, Level.OFF);
 		assertStartupFails(InitThrowsException.class);
 	}
 
@@ -138,16 +139,16 @@ public class StartupManagerTest extends AbstractTestClass {
 		// Did they initialize in the correct order?
 		List<StatusItem> items = ss.getStatusItems();
 		assertEquals("how many", 2, items.size());
-		assertEquals("init order 1", listener1Name, items.get(0).sourceName);
-		assertEquals("init order 2", listener2Name, items.get(1).sourceName);
+		assertEquals("init order 1", listener1Name, items.get(0).getSourceName());
+		assertEquals("init order 2", listener2Name, items.get(1).getSourceName());
 
 		sm.contextDestroyed(sce);
 
 		// Did they destroy in reverse order?
 		items = ss.getStatusItems();
 		assertEquals("how many", 4, items.size());
-		assertEquals("destroy order 1", listener2Name, items.get(2).sourceName);
-		assertEquals("destroy order 2", listener1Name, items.get(3).sourceName);
+		assertEquals("destroy order 1", listener2Name, items.get(2).getSourceName());
+		assertEquals("destroy order 2", listener1Name, items.get(3).getSourceName());
 	}
 
 	@Test
@@ -159,11 +160,12 @@ public class StartupManagerTest extends AbstractTestClass {
 
 	@Test
 	public void dontExecuteAfterFailure() {
+		setLoggerLevel(StartupManager.class, Level.OFF);
 		assertStartupFails(InitThrowsException.class, SucceedsWithInfo.class);
 
 		for (StatusItem item : ss.getStatusItems()) {
-			if (item.sourceName.equals(SucceedsWithInfo.class.getName())
-					&& (item.level == StatusItem.Level.NOT_EXECUTED)) {
+			if (item.getSourceName().equals(SucceedsWithInfo.class.getName())
+					&& (item.getLevel() == StatusItem.Level.NOT_EXECUTED)) {
 				return;
 			}
 		}
@@ -315,8 +317,8 @@ public class StartupManagerTest extends AbstractTestClass {
 		List<StatusItem> items = ss.getStatusItems();
 		log.debug("-------------- " + items.size() + " items");
 		for (StatusItem item : items) {
-			log.debug(String.format("%8s %s \n  %s \n  %s", item.level,
-					item.sourceName, item.message, item.cause));
+			log.debug(String.format("%8s %s \n  %s \n  %s", item.getLevel(),
+					item.getSourceName(), item.getMessage(), item.getCause()));
 		}
 	}
 }
