@@ -18,7 +18,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * TODO
+ * Instantiate and run the ServletContextListeners for Vitro, while accumulating
+ * messages in StartupStatus.
+ * 
+ * The startup listeners are stored in a file with one full-qualified class name
+ * per line. Blank lines and comment lines (starting with '#') are ignored.
+ * 
+ * No exception in the listeners should prevent the successful completion.
+ * However, an uncaught exception or a fatal error status will cause the
+ * StartupStatusDisplayFilter to disply the problem instead of showing the home
+ * page (or any other requested page).
  */
 public class StartupManager implements ServletContextListener {
 	private static final Log log = LogFactory.getLog(StartupManager.class);
@@ -175,8 +184,11 @@ public class StartupManager implements ServletContextListener {
 		try {
 			log.debug("Initializing '" + listener.getClass().getName() + "'");
 			listener.contextInitialized(sce);
+			ss.listenerExecuted(listener);
 		} catch (Exception e) {
 			ss.fatal(listener, "Threw unexpected exception", e);
+			log.error("Listener threw fatal exception: '"
+					+ listener.getClass().getName() + "'", e);
 		}
 	}
 
