@@ -1,0 +1,28 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+/* Styles for Freemarker template startupStatus-display and startupStatus-displayRaw */
+
+table.item {
+    border: thin solid black;
+    font-family: monospace;
+    width: 100%;
+}
+table.item tr.top {
+    font-size: larger;
+}
+table.item td {
+    border: thin solid black;
+}
+.error td {
+    background: #FFDDDD;
+    font-weight: bolder;
+}
+.warning td {
+    background: #FFFFDD;
+}
+.info td {
+    background: #DDFFDD;
+}
+.not_executed td {
+    color: #444444;
+}
