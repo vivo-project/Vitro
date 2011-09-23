@@ -25,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.RefreshVis
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeIndividualEditingPanel;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeRevisionInfo;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeSiteAdminPage;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeVerbosePropertyInformation;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
@@ -70,6 +71,15 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		} else if (whatToAuth instanceof AccessSpecialDataModels) {
 			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
 			
+		} else if (whatToAuth instanceof RebuildVClassGroupCache) {
+            result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
+
+		} else if (whatToAuth instanceof RefreshVisualizationCacheAction) {
+			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
+		
+		} else if (whatToAuth instanceof SeeStartupStatus) {
+			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
+			
 		} else if (whatToAuth instanceof EditOntology) {
 			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
 
@@ -112,10 +122,6 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		} else if (whatToAuth instanceof EditOwnAccount) {
 			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
 
-		} else if (whatToAuth instanceof RebuildVClassGroupCache) {
-            result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
-		} else if (whatToAuth instanceof RefreshVisualizationCacheAction) {
-			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
 		} else {
 			result = defaultDecision("Unrecognized action");
 		}
