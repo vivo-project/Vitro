@@ -17,11 +17,14 @@
             
             <#if siteConfig.internalClass?has_content>
                 <li><a href="${siteConfig.internalClass}">Institutional internal class</a></li>
-
             </#if>
             
             <#if siteConfig.userAccounts?has_content>
                 <li><a href="${siteConfig.userAccounts}">User accounts</a></li>
+            </#if>           
+            
+            <#if siteConfig.startupStatus?has_content>
+                <li><a href="${siteConfig.startupStatus}">Startup Status</a></li>
             </#if>           
         </ul>
     </section>
