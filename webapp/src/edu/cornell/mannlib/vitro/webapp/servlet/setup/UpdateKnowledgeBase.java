@@ -68,13 +68,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private static final String NEW_TBOX_ANNOTATIONS_DIR = "/WEB-INF/ontologies/user/tbox/";
 	
 	public void contextInitialized(ServletContextEvent sce) {
-				
-	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
-            return;
-        }
-	    
 		try {
-
 			ServletContext ctx = sce.getServletContext();
 			
 			String logFileName =  DATA_DIR + LOG_DIR + timestampedFileName("knowledgeBaseUpdate", "log");

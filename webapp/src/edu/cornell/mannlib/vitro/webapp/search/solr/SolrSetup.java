@@ -38,7 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForObjectP
 import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForTypeStatements;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.SearchReindexingListener;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
+import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 public class SolrSetup implements javax.servlet.ServletContextListener{   
     private static final Log log = LogFactory.getLog(SolrSetup.class.getName());
@@ -47,12 +47,10 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
     
     @Override
     public void contextInitialized(ServletContextEvent sce) {        
-        if (AbortStartup.isStartupAborted(sce.getServletContext())) {
-            return;
-        }
-                              
+    	ServletContext context = sce.getServletContext();
+		StartupStatus ss = StartupStatus.getBean(context);
+		
         try {        
-            ServletContext context = sce.getServletContext();
             
             /* setup the http connection with the solr server */
             String solrServerUrl = ConfigurationProperties.getBean(sce).getProperty("vitro.local.solr.url");
@@ -122,8 +120,10 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             ModelContext.registerListenerForChanges(ctx, srl);
             
             log.info("Setup of Solr index completed.");   
+            ss.info(this, "Setup of Solr index completed.");   
         } catch (Throwable e) {
             log.error("could not setup local solr server",e);
+            ss.fatal(this, "could not setup local solr server",e);
         }
        
     }

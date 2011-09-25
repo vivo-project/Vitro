@@ -22,11 +22,6 @@ public class PelletReasonerSetup implements ServletContextListener {
 	
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		
-	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
-            return;
-        }
-
 	    if (true) {
             (new SimpleReasonerSetup()).contextInitialized(sce);
             return;

@@ -20,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 import edu.cornell.mannlib.vitro.webapp.filestorage.updater.FileStorageAliasAdder;
 import edu.cornell.mannlib.vitro.webapp.filestorage.updater.FileStorageUpdater;
+import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
  * Check that the conditions are met for updating uploaded files. If everything
@@ -48,14 +49,9 @@ public class UpdateUploadedFiles implements ServletContextListener {
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-
-		if (AbortStartup.isStartupAborted(sce.getServletContext())) {
-			return;
-		}
-
+		ServletContext ctx = sce.getServletContext();
+		
 		try {
-			ServletContext ctx = sce.getServletContext();
-
 			WebappDaoFactory wadf = (WebappDaoFactory) ctx
 					.getAttribute("assertionsWebappDaoFactory");
 			if (wadf == null) {
@@ -142,6 +138,7 @@ public class UpdateUploadedFiles implements ServletContextListener {
 			fsaa.update();
 		} catch (Exception e) {
 			log.fatal("Unknown problem", e);
+			StartupStatus.getBean(ctx).fatal(this, "Unknown problem", e);
 		}
 	}
 }

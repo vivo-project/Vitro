@@ -34,11 +34,6 @@ public class SimpleReasonerSetup implements ServletContextListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-	    
-	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
-            return;
-        }
-	    
 		try {	
 		    // set up Pellet reasoning for the TBox	
 			

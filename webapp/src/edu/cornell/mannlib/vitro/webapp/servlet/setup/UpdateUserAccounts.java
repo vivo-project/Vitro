@@ -37,6 +37,7 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
  * Convert any existing User resources (up to rel 1.2) in the UserAccounts Model
@@ -60,18 +61,16 @@ public class UpdateUserAccounts implements ServletContextListener {
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		ServletContext ctx = sce.getServletContext();
-		if (AbortStartup.isStartupAborted(ctx)) {
-			return;
-		}
-
+		StartupStatus ss = StartupStatus.getBean(ctx);
+		
 		try {
 			Updater updater = new Updater(ctx);
 			if (updater.isThereAnythingToDo()) {
 				updater.update();
 			}
 		} catch (Exception e) {
-			AbortStartup.abortStartup(ctx);
 			log.fatal("Failed to update user accounts information", e);
+			ss.fatal(this, "Failed to update user accounts information", e);
 		}
 	}
 

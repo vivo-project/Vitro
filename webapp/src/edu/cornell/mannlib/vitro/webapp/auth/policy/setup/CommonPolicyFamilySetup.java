@@ -17,7 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.EditRestrictedDataByRoleLeve
 import edu.cornell.mannlib.vitro.webapp.auth.policy.SelfEditingPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.UseRestrictedPagesByRoleLevelPolicy;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
+import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
  * Set up the common policy family, with Identifier factory.
@@ -29,10 +29,7 @@ public class CommonPolicyFamilySetup implements ServletContextListener {
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		ServletContext ctx = sce.getServletContext();
-
-		if (AbortStartup.isStartupAborted(ctx)) {
-			return;
-		}
+		StartupStatus ss = StartupStatus.getBean(ctx);
 
 		try {
 			ServletPolicyList.addPolicy(ctx,
@@ -54,8 +51,8 @@ public class CommonPolicyFamilySetup implements ServletContextListener {
 		} catch (Exception e) {
 			log.error("could not run " + this.getClass().getSimpleName() + ": "
 					+ e);
-			AbortStartup.abortStartup(ctx);
-			throw new RuntimeException(e);
+			ss.fatal(this, "could not run " + this.getClass().getSimpleName() + ": "
+					+ e);
 		}
 	}
 

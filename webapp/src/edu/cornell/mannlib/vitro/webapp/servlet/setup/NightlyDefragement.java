@@ -61,11 +61,6 @@ public class NightlyDefragement implements ServletContextListener, Runnable {
     
     @Override
     public void contextInitialized(ServletContextEvent arg0) {
-        
-        if (AbortStartup.isStartupAborted(arg0.getServletContext())) {
-            return;
-        }
-        
         lastRun = new DateTime().minusHours( 400 );
         if( nightlyDefragement != null ){
             log.warn("NightlyDefragement listener has already been setup. Check your web.xml for duplicate listeners.");            

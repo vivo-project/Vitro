@@ -18,7 +18,7 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
+import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
  * Reads the configuration properties from a file and stores them in the servlet
@@ -79,18 +79,20 @@ public class ConfigurationPropertiesSetup implements ServletContextListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		if (AbortStartup.isStartupAborted(sce.getServletContext())) {
-			return;
-		}
-
 		ServletContext ctx = sce.getServletContext();
+		StartupStatus ss = StartupStatus.getBean(ctx);
 
 		try {
 			InputStream stream = null;
 			try {
 				stream = locatePropertiesFile();
-				ConfigurationProperties.setBean(ctx,
-						new ConfigurationPropertiesImpl(stream));
+				
+				ConfigurationPropertiesImpl bean = new ConfigurationPropertiesImpl(
+						stream);
+				ConfigurationProperties.setBean(ctx, bean);
+				
+				ss.info(this, "Loaded " + bean.getPropertyMap().size()
+						+ " properties.");
 			} finally {
 				if (stream != null) {
 					try {
@@ -102,8 +104,7 @@ public class ConfigurationPropertiesSetup implements ServletContextListener {
 			}
 		} catch (Exception e) {
 			log.error(e, e);
-			AbortStartup.abortStartup(ctx);
-			throw new RuntimeException(e);
+			ss.fatal(this, e.getMessage(), e);
 		}
 	}
 

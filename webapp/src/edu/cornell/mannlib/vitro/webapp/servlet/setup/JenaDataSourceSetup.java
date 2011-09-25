@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -52,7 +51,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
-import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
+import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.InitialJenaModelUtils;
 
 public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements javax.servlet.ServletContextListener {
@@ -61,12 +60,8 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
     
     @Override
 	public void contextInitialized(ServletContextEvent sce) {
-    	
     	ServletContext ctx = sce.getServletContext();
-        
-		if (AbortStartup.isStartupAborted(ctx)) {
-            return;
-        }
+    	StartupStatus ss = StartupStatus.getBean(ctx);
         
         try {
         	long startTime = System.currentTimeMillis();
@@ -75,18 +70,11 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         			" seconds to set up SDB store");
         } catch (SQLException sqle) {   
             // SQL exceptions are fatal and should halt startup
-            AbortStartup.abortStartup(ctx);
             log.error("Error using SQL database; startup aborted.", sqle);
-            // print to catalina.out for good measure
-            System.out.println("Error using SQL database; startup aborted.");
-            sqle.printStackTrace();
-            throw new Error(this.getClass().getName() + "failed");
+            ss.fatal(this, "Error using SQL database; startup aborted.", sqle);
         } catch (Throwable t) {
             log.error("Throwable in " + this.getClass().getName(), t);
-            // printing the error because Tomcat doesn't print context listener
-            // errors the same way it prints other errors at startup
-            t.printStackTrace();
-            throw new Error(this.getClass().getName() + "failed");
+            ss.fatal(this, "Throwable in " + this.getClass().getName(), t);
         }
         
     } 

@@ -16,7 +16,6 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -34,7 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
+import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 public class VClassGroupCache {
     private static final Log log = LogFactory.getLog(VClassGroupCache.class);
@@ -69,7 +68,7 @@ public class VClassGroupCache {
         this.context = context;
         this._groupList = null;
 
-        if (AbortStartup.isStartupAborted(context)) {
+        if (StartupStatus.getBean(context).isStartupAborted()) {
             _cacheRebuildThread = null;
             return;
         }

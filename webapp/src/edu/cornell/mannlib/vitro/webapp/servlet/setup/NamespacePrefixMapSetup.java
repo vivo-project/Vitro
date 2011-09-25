@@ -13,11 +13,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 public class NamespacePrefixMapSetup implements ServletContextListener {
 	
 	public void contextInitialized(ServletContextEvent sce) {
-	    
-	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
-            return;
-        }
-	    
 		HashMap<String,String> prefixToNamespace = new HashMap<String,String>();
 		HashMap<String,String> namespaceToPrefix = new HashMap<String,String>();
 		Model model = (Model) sce.getServletContext().getAttribute("jenaOntModel");

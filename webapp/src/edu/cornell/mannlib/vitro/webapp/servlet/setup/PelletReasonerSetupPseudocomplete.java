@@ -20,11 +20,6 @@ public class PelletReasonerSetupPseudocomplete implements ServletContextListener
 	private static final Log log = LogFactory.getLog(PelletReasonerSetupComplete.class.getName());
 	
 	public void contextInitialized(ServletContextEvent sce) {
-		
-	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
-            return;
-        }
-	    
 		try {	
 			
     		OntModel memoryModel = (OntModel) sce.getServletContext().getAttribute("jenaOntModel");

@@ -27,7 +27,7 @@ import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
+import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
  * Assists the role-based policies in determining whether a property or resource
@@ -342,10 +342,7 @@ public class PropertyRestrictionPolicyHelper {
 		@Override
 		public void contextInitialized(ServletContextEvent sce) {
 			ServletContext ctx = sce.getServletContext();
-
-			if (AbortStartup.isStartupAborted(ctx)) {
-				return;
-			}
+			StartupStatus ss = StartupStatus.getBean(ctx);
 
 			try {
 				OntModel model = (OntModel) ctx.getAttribute("jenaOntModel");
@@ -360,8 +357,8 @@ public class PropertyRestrictionPolicyHelper {
 			} catch (Exception e) {
 				log.error("could not run PropertyRestrictionPolicyHelper$Setup: "
 						+ e);
-				AbortStartup.abortStartup(ctx);
-				throw new RuntimeException(e);
+				ss.fatal(this, "could not run PropertyRestrictionPolicyHelper$Setup: "
+						+ e);
 			}
 		}
 

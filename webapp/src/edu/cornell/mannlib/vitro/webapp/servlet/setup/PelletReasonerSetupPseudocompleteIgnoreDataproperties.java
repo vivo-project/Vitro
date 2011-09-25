@@ -21,13 +21,7 @@ public class PelletReasonerSetupPseudocompleteIgnoreDataproperties implements
 	private static final Log log = LogFactory.getLog(PelletReasonerSetupPseudocompleteIgnoreDataproperties.class.getName());
 	
 	public void contextInitialized(ServletContextEvent sce) {
-	
-	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
-            return;
-        }
-	    
 		try {
-		
 			OntModel memoryModel = (OntModel) sce.getServletContext().getAttribute("jenaOntModel");
 			OntModel baseModel = (OntModel) sce.getServletContext().getAttribute("baseOntModel");
 			OntModel inferenceModel = (OntModel) sce.getServletContext().getAttribute("inferenceOntModel");
@@ -57,7 +51,6 @@ public class PelletReasonerSetupPseudocompleteIgnoreDataproperties implements
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
-		
 	}
 	
 	public void contextDestroyed(ServletContextEvent arg0) {

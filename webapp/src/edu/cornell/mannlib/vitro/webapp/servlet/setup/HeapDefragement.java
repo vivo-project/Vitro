@@ -25,11 +25,6 @@ public class HeapDefragement implements ServletContextListener {
     
     @Override
     public void contextInitialized(ServletContextEvent arg0) {
-        
-        if (AbortStartup.isStartupAborted(arg0.getServletContext())) {
-            return;
-        }
-        
         try{
             log.info("Calling System.gc() to defragement the heap.");
             long start = System.currentTimeMillis();

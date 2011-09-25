@@ -11,20 +11,13 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
-import freemarker.template.Configuration;
 
 public class FreemarkerSetup implements ServletContextListener {
     
     private static final Log log = LogFactory.getLog(FreemarkerSetup.class);
 
 	public void contextInitialized(ServletContextEvent event) {	
-
-        if (AbortStartup.isStartupAborted(event.getServletContext())) {
-            return;
-        }
-	    
 		ServletContext sc = event.getServletContext();	
 		sc.setAttribute("themeToConfigMap", new HashMap<String, FreemarkerConfiguration>());
         BaseTemplateModel.setServletContext(sc);

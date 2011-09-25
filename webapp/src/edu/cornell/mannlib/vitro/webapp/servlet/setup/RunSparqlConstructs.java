@@ -41,13 +41,7 @@ public class RunSparqlConstructs implements ServletContextListener {
 	private static Random random = new Random(System.currentTimeMillis());
 	
 	public void contextInitialized(ServletContextEvent sce) {
-		
-	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
-            return;
-        }
-	    
 		try {
-		
 			WebappDaoFactory wadf = (WebappDaoFactory) sce.getServletContext().getAttribute("webappDaoFactory");
 			String namespace = (wadf != null && wadf.getDefaultNamespace() != null) 
 				? wadf.getDefaultNamespace() : DEFAULT_DEFAULT_NAMESPACE;

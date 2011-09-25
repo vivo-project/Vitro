@@ -14,12 +14,8 @@ import edu.cornell.mannlib.vitro.webapp.utils.ThemeUtils;
 public class DefaultThemeSetup implements ServletContextListener {
 	
 	// Set default theme based on themes present on the file system
+	@Override
 	public void contextInitialized(ServletContextEvent event) {
-
-	    if (AbortStartup.isStartupAborted(event.getServletContext())) {
-            return;
-        }
-	    
     	// Find the themes directory in the file system
 		ServletContext sc = event.getServletContext();		
     	boolean doSort = true;
@@ -36,9 +32,9 @@ public class DefaultThemeSetup implements ServletContextListener {
         String defaultThemeDir = "themes/" + defaultTheme + "/";
         // Define as a static variable of Portal so getThemeDir() method of portal can access it.
         ApplicationBean.DEFAULT_THEME_DIR_FROM_CONTEXT = defaultThemeDir;
-        
 	}
 
+	@Override
 	public void contextDestroyed(ServletContextEvent event) {
 		// nothing to do here
 	}

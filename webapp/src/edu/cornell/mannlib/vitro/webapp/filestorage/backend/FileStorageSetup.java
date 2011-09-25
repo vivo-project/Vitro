@@ -15,6 +15,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
  * Initializes the file storage system, and stores a reference in the servlet
@@ -50,15 +51,18 @@ public class FileStorageSetup implements ServletContextListener {
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
+		ServletContext ctx = sce.getServletContext();
+		StartupStatus ss = StartupStatus.getBean(ctx);
+
 		try {
 			File baseDirectory = figureBaseDir(sce);
 			Collection<String> fileNamespace = confirmDefaultNamespace(sce);
 			FileStorage fs = new FileStorageImpl(baseDirectory, fileNamespace);
 
-			ServletContext sc = sce.getServletContext();
-			sc.setAttribute(ATTRIBUTE_NAME, fs);
+			ctx.setAttribute(ATTRIBUTE_NAME, fs);
 		} catch (Exception e) {
 			log.fatal("Failed to initialize the file system.", e);
+			ss.fatal(this, "Failed to initialize the file system.", e);
 		}
 	}
 

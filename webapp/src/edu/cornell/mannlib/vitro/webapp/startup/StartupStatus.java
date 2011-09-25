@@ -11,11 +11,16 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextListener;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Accumulates a list of messages from the StartupManager, and from the context
  * listeners that the run during startup.
  */
 public class StartupStatus {
+	private static final Log log = LogFactory.getLog(StartupStatus.class);
+
 	private static final String ATTRIBUTE_NAME = "STARTUP_STATUS";
 
 	// ----------------------------------------------------------------------
@@ -143,20 +148,67 @@ public class StartupStatus {
 		private final String message;
 		private final String cause;
 
+		private boolean unexpectedArguments;
+
 		public StatusItem(Level level, ServletContextListener source,
 				String message, Throwable cause) {
-			this.level = level;
-			this.sourceName = source.getClass().getName();
-			this.shortSourceName = source.getClass().getSimpleName();
+			this.level = figureLevel(level);
+			this.sourceName = figureSourceName(source);
+			this.shortSourceName = figureShortSourceName(source);
 			this.message = message;
+			this.cause = figureCauseString(cause);
 
-			if (cause == null) {
-				this.cause = "";
+			if (unexpectedArguments) {
+				log.error("Unexpected arguments to "
+						+ StatusItem.class.getName() + ": level=" + level
+						+ ", source=" + source + ", message=" + message
+						+ ", cause=" + cause);
+			}
+		}
+
+		/** Level should never be null: we have a problem. */
+		private Level figureLevel(Level newLevel) {
+			if (newLevel == null) {
+				unexpectedArguments = true;
+				return Level.FATAL;
+			} else {
+				return newLevel;
+			}
+		}
+
+		private String figureSourceName(ServletContextListener source) {
+			if (source == null) {
+				unexpectedArguments = true;
+				return "UNKNOWN SOURCE";
+			} else {
+				return source.getClass().getName();
+			}
+		}
+
+		/**
+		 * Don't just use getSimpleName(): on an inner class we'd like to see
+		 * the parent also.
+		 */
+		private String figureShortSourceName(ServletContextListener source) {
+			if (source == null) {
+				unexpectedArguments = true;
+				return "UNKNOWN_SOURCE";
+			} else {
+				String sourceClassName = source.getClass().getName();
+				int lastPeriodHere = sourceClassName.lastIndexOf('.');
+				return sourceClassName.substring(lastPeriodHere + 1);
+			}
+		}
+
+		/** Cause may be null - that's not unexpected. */
+		private String figureCauseString(Throwable newCause) {
+			if (newCause == null) {
+				return "";
 			} else {
 				StringWriter sw = new StringWriter();
 				PrintWriter pw = new PrintWriter(sw);
-				cause.printStackTrace(pw);
-				this.cause = sw.toString();
+				newCause.printStackTrace(pw);
+				return sw.toString();
 			}
 		}
 

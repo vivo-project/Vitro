@@ -21,7 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
+import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
  * If the user has an IsRootUser identifier, they can do anything!
@@ -64,10 +64,7 @@ public class RootUserPolicy implements PolicyIface {
 		@Override
 		public void contextInitialized(ServletContextEvent sce) {
 			ServletContext ctx = sce.getServletContext();
-
-			if (AbortStartup.isStartupAborted(ctx)) {
-				return;
-			}
+			StartupStatus ss = StartupStatus.getBean(ctx);
 
 			try {
 				UserAccountsDao uaDao = getUserAccountsDao(ctx);
@@ -82,8 +79,8 @@ public class RootUserPolicy implements PolicyIface {
 			} catch (Exception e) {
 				log.error("could not run " + this.getClass().getSimpleName()
 						+ ": " + e);
-				AbortStartup.abortStartup(ctx);
-				throw new RuntimeException(e);
+				ss.fatal(this, "could not run " + this.getClass().getSimpleName()
+						+ ": " + e);
 			}
 		}
 

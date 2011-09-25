@@ -31,10 +31,6 @@ public class AttachSubmodels implements ServletContextListener {
 	public void contextInitialized( ServletContextEvent sce ) {
 	    
 	    ServletContext ctx = sce.getServletContext();
-		if (AbortStartup.isStartupAborted(ctx)) {
-            return;
-        }
-		
 	    
         if (true) {
             (new FileGraphSetup()).contextInitialized(sce);
