@@ -24,6 +24,7 @@ import com.ibm.icu.text.SimpleDateFormat;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean.LevelRevisionInfo;
+import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
  * Test for RevisionInfoSetup
@@ -54,6 +55,11 @@ public class RevisionInfoSetupTest extends AbstractTestClass {
 		setLoggerLevel(RevisionInfoBean.class, Level.WARN);
 	}
 
+	@Before
+	public void suppressMessagesFromStartupStatus() {
+		setLoggerLevel(StartupStatus.class, Level.OFF);
+	}
+	
 	@Test
 	public void noResourceFile() {
 		setLoggerLevel(RevisionInfoSetup.class, Level.OFF);
