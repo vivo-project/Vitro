@@ -80,7 +80,9 @@
     	<#if status.errorItems?has_content>
     	    <h2>Fatal error</h2>
     	    <p>VIVO detected a fatal error during startup.</p>
-    	    <p><a href=".">Continue</a></p>
+    	    <#if showLink>
+                <p><a href=".">Continue</a></p>
+    	    </#if>
     	    <#list status.errorItems as item>
               <@statusItem item=item />
     	    </#list>
@@ -89,7 +91,9 @@
     	<#if status.warningItems?has_content>
     	    <h2>Warning</h2>
     	    <p>VIVO issued warnings during startup.</p>
-    	    <p><a href=".">Continue</a></p>
+    	    <#if showLink>
+                <p><a href=".">Continue</a></p>
+    	    </#if>
     	    <#list status.warningItems as item>
               <@statusItem item=item />
     	    </#list>

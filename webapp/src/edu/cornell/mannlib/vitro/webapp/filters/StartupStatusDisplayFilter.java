@@ -2,8 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.filters;
 
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import freemarker.cache.WebappTemplateLoader;
@@ -33,11 +35,13 @@ public class StartupStatusDisplayFilter implements Filter {
 	private static final String TEMPLATE_PATH = "/templates/freemarker/body/admin/startupStatus-displayRaw.ftl";
 
 	private ServletContext ctx;
+	private StartupStatus ss;
 	private boolean statusAlreadyDisplayed;
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
 		ctx = filterConfig.getServletContext();
+		ss = StartupStatus.getBean(ctx);
 		statusAlreadyDisplayed = false;
 	}
 
@@ -49,31 +53,39 @@ public class StartupStatusDisplayFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp,
 			FilterChain chain) throws IOException, ServletException {
-		StartupStatus ss = StartupStatus.getBean(ctx);
-		if (ss.allClear() || statusAlreadyDisplayed) {
+		if (ss.allClear() || (!isFatal() && statusAlreadyDisplayed)) {
 			chain.doFilter(req, resp);
 			return;
 		}
 
-		displayStartupStatus(req, resp);
+		displayStartupStatus(resp);
 		statusAlreadyDisplayed = true;
 	}
 
-	private void displayStartupStatus(ServletRequest req, ServletResponse resp)
-			throws IOException, ServletException {
-		Configuration cfg = new Configuration();
-		cfg.setTemplateLoader(new WebappTemplateLoader(ctx));
-		Template tpl = cfg.getTemplate(TEMPLATE_PATH);
-
-		Map<String, Object> bodyMap = new HashMap<String, Object>();
-		bodyMap.put("status", StartupStatus.getBean(ctx));
+	private void displayStartupStatus(ServletResponse resp) throws IOException,
+			ServletException {
+		HttpServletResponse hResp = (HttpServletResponse) resp;
 
 		try {
-			PrintWriter out = resp.getWriter();
-			tpl.process(bodyMap, out);
-			out.flush();
+			Map<String, Object> bodyMap = new HashMap<String, Object>();
+			bodyMap.put("status", StartupStatus.getBean(ctx));
+			bodyMap.put("showLink", !isFatal());
+
+			hResp.setStatus(SC_INTERNAL_SERVER_ERROR);
+			Template tpl = loadFreemarkerTemplate();
+			tpl.process(bodyMap, hResp.getWriter());
 		} catch (TemplateException e) {
 			throw new ServletException("Problem with Freemarker Template", e);
 		}
+	}
+
+	private Template loadFreemarkerTemplate() throws IOException {
+		Configuration cfg = new Configuration();
+		cfg.setTemplateLoader(new WebappTemplateLoader(ctx));
+		return cfg.getTemplate(TEMPLATE_PATH);
+	}
+
+	private boolean isFatal() {
+		return !ss.getErrorItems().isEmpty();
 	}
 }
