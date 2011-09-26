@@ -49,7 +49,7 @@ public class RootUserPolicy implements PolicyIface {
 					"not root user");
 		}
 	}
-	
+
 	@Override
 	public String toString() {
 		return "RootUserPolicy - " + hashCode();
@@ -60,19 +60,26 @@ public class RootUserPolicy implements PolicyIface {
 	// ----------------------------------------------------------------------
 
 	public static class Setup implements ServletContextListener {
+		private ServletContext ctx;
+		private StartupStatus ss;
+		private String configRootEmail;
+		private UserAccountsDao uaDao;
 
 		@Override
 		public void contextInitialized(ServletContextEvent sce) {
-			ServletContext ctx = sce.getServletContext();
-			StartupStatus ss = StartupStatus.getBean(ctx);
+			ctx = sce.getServletContext();
+			ss = StartupStatus.getBean(ctx);
 
 			try {
-				UserAccountsDao uaDao = getUserAccountsDao(ctx);
+				uaDao = getUserAccountsDao();
+				configRootEmail = getRootEmailFromConfig();
 
-				checkForWrongRootUser(ctx, uaDao);
+				checkForWrongRootUser();
 
-				if (!rootUserExists(uaDao)) {
-					createRootUser(ctx, uaDao);
+				if (rootUserExists()) {
+					ss.info(this, "root user is " + configRootEmail);
+				} else {
+					createRootUser();
 				}
 
 				ServletPolicyList.addPolicy(ctx, new RootUserPolicy());
@@ -81,7 +88,7 @@ public class RootUserPolicy implements PolicyIface {
 			}
 		}
 
-		private UserAccountsDao getUserAccountsDao(ServletContext ctx) {
+		private UserAccountsDao getUserAccountsDao() {
 			WebappDaoFactory wadf = (WebappDaoFactory) ctx
 					.getAttribute("webappDaoFactory");
 			if (wadf == null) {
@@ -91,28 +98,43 @@ public class RootUserPolicy implements PolicyIface {
 			return wadf.getUserAccountsDao();
 		}
 
-		private void checkForWrongRootUser(ServletContext ctx,
-				UserAccountsDao uaDao) {
-			UserAccount root = getRootUser(uaDao);
+		private String getRootEmailFromConfig() {
+			String email = ConfigurationProperties.getBean(ctx).getProperty(
+					PROPERTY_ROOT_USER_EMAIL);
+			if (email == null) {
+				throw new IllegalStateException(
+						"deploy.properties must contain a value for '"
+								+ PROPERTY_ROOT_USER_EMAIL + "'");
+			} else {
+				return email;
+			}
+		}
+
+		private void checkForWrongRootUser() {
+			UserAccount root = getRootUser();
 			if (root == null) {
 				return;
 			}
-			String actualRootEmail = root.getEmailAddress();
 
-			String configRootEmail = ConfigurationProperties.getBean(ctx)
-					.getProperty(PROPERTY_ROOT_USER_EMAIL);
+			String actualRootEmail = root.getEmailAddress();
 			if (actualRootEmail.equals(configRootEmail)) {
 				return;
 			}
 
-			log.warn("Root user '" + actualRootEmail + "' already exists.");
+			ss.warning(
+					this,
+					"The deploy.properties file specifies a root user of '"
+							+ configRootEmail
+							+ "', but the system already contains a root user named '"
+							+ actualRootEmail + "'. The user '"
+							+ configRootEmail + "' will not be created.");
 		}
 
-		private boolean rootUserExists(UserAccountsDao uaDao) {
-			return (getRootUser(uaDao) != null);
+		private boolean rootUserExists() {
+			return (getRootUser() != null);
 		}
 
-		private UserAccount getRootUser(UserAccountsDao uaDao) {
+		private UserAccount getRootUser() {
 			for (UserAccount ua : uaDao.getAllUserAccounts()) {
 				if (ua.isRootUser()) {
 					return ua;
@@ -125,7 +147,7 @@ public class RootUserPolicy implements PolicyIface {
 		 * TODO The first and last name should be left blank, so the user will
 		 * be forced to edit them. However, that's not in place yet.
 		 */
-		private void createRootUser(ServletContext ctx, UserAccountsDao uaDao) {
+		private void createRootUser() {
 			String emailAddress = ConfigurationProperties.getBean(ctx)
 					.getProperty(PROPERTY_ROOT_USER_EMAIL);
 			if (emailAddress == null) {
@@ -159,7 +181,8 @@ public class RootUserPolicy implements PolicyIface {
 
 			uaDao.insertUserAccount(ua);
 
-			log.info("Created root user as '" + emailAddress + "'");
+			StartupStatus.getBean(ctx).info(this,
+					"Created root user as '" + emailAddress + "'");
 		}
 
 		@Override
