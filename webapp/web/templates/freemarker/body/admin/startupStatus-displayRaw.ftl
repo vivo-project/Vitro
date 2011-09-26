@@ -6,6 +6,9 @@
     
     "raw" because this template works outside of the usual framework, in 
     case the Freemarker context didn't initialize properly.
+    
+    This file can't even include a reference to an external CSS file, in case
+    the servlet routing filters are broken.
 -->
 
 <#macro statusItem item>
@@ -44,7 +47,33 @@
 <html>
     <head>
         <title>Startup Status</title>
-        <link rel="stylesheet" type="text/css" href="./css/startupStatus.css"> 
+        
+        <style TYPE="text/css">
+            table.item {
+                border: thin solid black;
+                font-family: monospace;
+                width: 100%;
+            }
+            table.item tr.top {
+                font-size: larger;
+            }
+            table.item td {
+                border: thin solid black;
+            }
+            .error td {
+                background: #FFDDDD;
+                font-weight: bolder;
+            }
+            .warning td {
+                background: #FFFFDD;
+            }
+            .info td {
+                background: #DDFFDD;
+            }
+            .not_executed td {
+                color: #444444;
+            }
+        </style> 
     </head>
 
     <body>
