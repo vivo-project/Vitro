@@ -42,7 +42,7 @@ public class StartupStatus {
 	}
 
 	// ----------------------------------------------------------------------
-	// methods to set status
+	// methods to set status - note that these write to the log also.
 	// ----------------------------------------------------------------------
 
 	private List<StatusItem> itemList = new ArrayList<StatusItem>();
@@ -94,7 +94,30 @@ public class StartupStatus {
 
 	private void addItem(StatusItem.Level level, ServletContextListener source,
 			String message, Throwable cause) {
-		itemList.add(new StatusItem(level, source, message, cause));
+		StatusItem item = new StatusItem(level, source, message, cause);
+		itemList.add(item);
+
+		String logMessage = "From " + item.getShortSourceName() + ": "
+				+ item.getMessage();
+		if (item.getLevel() == StatusItem.Level.FATAL) {
+			if (cause == null) {
+				log.fatal(logMessage);
+			} else {
+				log.fatal(logMessage, cause);
+			}
+		} else if (item.getLevel() == StatusItem.Level.WARNING) {
+			if (cause == null) {
+				log.warn(logMessage);
+			} else {
+				log.warn(logMessage, cause);
+			}
+		} else {
+			if (cause == null) {
+				log.info(logMessage);
+			} else {
+				log.info(logMessage, cause);
+			}
+		}
 	}
 
 	// ----------------------------------------------------------------------

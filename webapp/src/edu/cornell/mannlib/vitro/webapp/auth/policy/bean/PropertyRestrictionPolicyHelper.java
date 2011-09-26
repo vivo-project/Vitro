@@ -355,10 +355,7 @@ public class PropertyRestrictionPolicyHelper {
 						.createBean(model);
 				PropertyRestrictionPolicyHelper.setBean(ctx, bean);
 			} catch (Exception e) {
-				log.error("could not run PropertyRestrictionPolicyHelper$Setup: "
-						+ e);
-				ss.fatal(this, "could not run PropertyRestrictionPolicyHelper$Setup: "
-						+ e);
+				ss.fatal(this, "could not set up PropertyRestrictionPolicyHelper", e);
 			}
 		}
 

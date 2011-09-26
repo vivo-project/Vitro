@@ -6,9 +6,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.CommonIdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.DisplayRestrictedDataByRoleLevelPolicy;
@@ -23,8 +20,6 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
  * Set up the common policy family, with Identifier factory.
  */
 public class CommonPolicyFamilySetup implements ServletContextListener {
-	private static final Log log = LogFactory
-			.getLog(CommonPolicyFamilySetup.class);
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
@@ -49,10 +44,7 @@ public class CommonPolicyFamilySetup implements ServletContextListener {
 
 			ActiveIdentifierBundleFactories.addFactory(sce, factory);
 		} catch (Exception e) {
-			log.error("could not run " + this.getClass().getSimpleName() + ": "
-					+ e);
-			ss.fatal(this, "could not run " + this.getClass().getSimpleName() + ": "
-					+ e);
+			ss.fatal(this, "could not run CommonPolicyFamilySetup", e);
 		}
 	}
 

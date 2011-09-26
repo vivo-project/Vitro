@@ -72,8 +72,8 @@ public class RevisionInfoSetup implements ServletContextListener {
 			List<String> lines = readRevisionInfo(context);
 			bean = parseRevisionInformation(lines);
 		} catch (Exception e) {
-			log.error(e, e);
-			StartupStatus.getBean(context).warning(this, e.getMessage(), e);
+			StartupStatus.getBean(context).warning(this,
+					"Failed to load the revision info", e);
 			bean = DUMMY_BEAN;
 		}
 

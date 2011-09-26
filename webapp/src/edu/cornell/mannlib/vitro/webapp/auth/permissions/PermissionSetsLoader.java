@@ -53,7 +53,6 @@ public class PermissionSetsLoader implements ServletContextListener {
 			wrapper.createPermissionSet(URI_CURATOR, "Curator");
 			wrapper.createPermissionSet(URI_DBA, "Site Admin");
 		} catch (Exception e) {
-			log.error("could not run PermissionSetsLoader" + e);
 			ss.fatal(this, "could not run PermissionSetsLoader" + e);
 		}
 	}

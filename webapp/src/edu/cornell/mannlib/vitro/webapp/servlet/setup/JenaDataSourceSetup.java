@@ -311,13 +311,6 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         if( portalURIs.size() > 0 ){
             for( String portalUri : portalURIs){
                 if( portalUri != null && ! portalUri.startsWith(defaultNamespaceFromDeployProperites)){
-                    log.error("Namespace mismatch between db and deploy.properties.");
-                    log.error("Vivo will not start up correctly because the default namespace specified in deploy.properties does not match the namespace of " +
-                            "a portal in the database. Namespace from deploy.properties: \"" + defaultNamespaceFromDeployProperites + 
-                            "\" Namespace from an existing portal: \"" + portalUri + "\" To get the application to start with this " +
-                            "database change the default namespace in deploy.properties " + portalUri.substring(0, portalUri.lastIndexOf("/")+1) + 
-                            "  Another possibility is that deploy.properties does not specify the intended database.");
-
                     StartupStatus ss = StartupStatus.getBean(ctx);
                     ss.warning(this, "Namespace mismatch between db and deploy.properties.");
                     ss.warning(this, "Vivo will not start up correctly because the default namespace specified in deploy.properties does not match the namespace of " +

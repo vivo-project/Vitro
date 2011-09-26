@@ -66,7 +66,8 @@ public class StartupManager implements ServletContextListener {
 				}
 			}
 		} catch (Exception e) {
-			recordFatal("Startup threw an unexpected exception.", e);
+			ss.fatal(this, "Startup threw an unexpected exception.", e);
+			log.error("Startup threw an unexpected exception.", e);
 		}
 	}
 
@@ -110,10 +111,10 @@ public class StartupManager implements ServletContextListener {
 				}
 			}
 		} catch (NullPointerException e) {
-			recordFatal("Unable to locate the list of startup listeners: "
+			ss.fatal(this, "Unable to locate the list of startup listeners: "
 					+ FILE_OF_STARTUP_LISTENERS);
 		} catch (IOException e) {
-			recordFatal(
+			ss.fatal(this,
 					"Failed while processing the list of startup listeners:  "
 							+ FILE_OF_STARTUP_LISTENERS, e);
 		} finally {
@@ -147,29 +148,17 @@ public class StartupManager implements ServletContextListener {
 			Class<?> c = Class.forName(className);
 			Object o = c.newInstance();
 			return (ServletContextListener) o;
-		} catch (ClassNotFoundException e) {
-			recordFatal("Failed to instantiate listener: '" + className + "'",
-					e);
-			return null;
-		} catch (InstantiationException e) {
-			recordFatal("Failed to instantiate listener: '" + className + "'",
-					e);
-			return null;
-		} catch (IllegalAccessException e) {
-			recordFatal("Failed to instantiate listener: '" + className + "'",
-					e);
-			return null;
 		} catch (ClassCastException e) {
-			recordFatal("Instance of '" + className
+			ss.fatal(this, "Instance of '" + className
 					+ "' is not a ServletContextListener", e);
 			return null;
 		} catch (Exception e) {
-			recordFatal("Failed to instantiate listener: '" + className + "'",
-					e);
+			ss.fatal(this, "Failed to instantiate listener: '" + className
+					+ "'", e);
 			return null;
 		} catch (ExceptionInInitializerError e) {
-			recordFatal("Failed to instantiate listener: '" + className + "'",
-					e);
+			ss.fatal(this, "Failed to instantiate listener: '" + className
+					+ "'", e);
 			return null;
 		}
 	}
@@ -187,8 +176,6 @@ public class StartupManager implements ServletContextListener {
 			ss.listenerExecuted(listener);
 		} catch (Exception e) {
 			ss.fatal(listener, "Threw unexpected exception", e);
-			log.error("Listener threw fatal exception: '"
-					+ listener.getClass().getName() + "'", e);
 		}
 	}
 
@@ -201,21 +188,12 @@ public class StartupManager implements ServletContextListener {
 				ServletContextListener iListener = initializeList.get(i);
 				ServletContextListener jListener = initializeList.get(j);
 				if (iListener.getClass().equals(jListener.getClass())) {
-					recordFatal("File contains duplicate listener classes: '"
-							+ iListener.getClass().getName() + "'");
+					ss.fatal(this,
+							("File contains duplicate listener classes: '"
+									+ iListener.getClass().getName() + "'"));
 				}
 			}
 		}
-	}
-
-	private void recordFatal(String message) {
-		ss.fatal(this, message);
-		log.error(message);
-	}
-
-	private void recordFatal(String message, Throwable cause) {
-		ss.fatal(this, message, cause);
-		log.error(message, cause);
 	}
 
 	/**

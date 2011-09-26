@@ -122,7 +122,6 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             log.info("Setup of Solr index completed.");   
             ss.info(this, "Setup of Solr index completed.");   
         } catch (Throwable e) {
-            log.error("could not setup local solr server",e);
             ss.fatal(this, "could not setup local solr server",e);
         }
        

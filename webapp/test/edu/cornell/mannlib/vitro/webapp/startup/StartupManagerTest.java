@@ -43,8 +43,9 @@ public class StartupManagerTest extends AbstractTestClass {
 		sm = new StartupManager();
 		ss = StartupStatus.getBean(ctx);
 
-//		setLoggerLevel(this.getClass(), Level.DEBUG);
-//		setLoggerLevel(StartupManager.class, Level.DEBUG);
+		// setLoggerLevel(this.getClass(), Level.DEBUG);
+		setLoggerLevel(StartupStatus.class, Level.OFF);
+		setLoggerLevel(StartupManager.class, Level.OFF);
 	}
 
 	@After
@@ -56,7 +57,6 @@ public class StartupManagerTest extends AbstractTestClass {
 
 	@Test
 	public void noSuchFile() {
-		setLoggerLevel(StartupManager.class, Level.OFF);
 		assertStartupFails((String) null);
 	}
 
@@ -78,49 +78,41 @@ public class StartupManagerTest extends AbstractTestClass {
 
 	@Test
 	public void classDoesNotExist() {
-		setLoggerLevel(StartupManager.class, Level.OFF);
 		assertStartupFails("no.such.class\n");
 	}
 
 	@Test
 	public void classThrowsExceptionWhenLoading() {
-		setLoggerLevel(StartupManager.class, Level.OFF);
 		assertStartupFails(ThrowsExceptionWhenLoading.class);
 	}
 
 	@Test
 	public void classIsPrivate() {
-		setLoggerLevel(StartupManager.class, Level.OFF);
 		assertStartupFails(PrivateClass.class);
 	}
 
 	@Test
 	public void noDefaultConstructor() {
-		setLoggerLevel(StartupManager.class, Level.OFF);
 		assertStartupFails(NoDefaultConstructor.class);
 	}
 
 	@Test
 	public void constructorIsPrivate() {
-		setLoggerLevel(StartupManager.class, Level.OFF);
 		assertStartupFails(PrivateConstructor.class);
 	}
 
 	@Test
 	public void constructorThrowsException() {
-		setLoggerLevel(StartupManager.class, Level.OFF);
 		assertStartupFails(ConstructorThrowsException.class);
 	}
 
 	@Test
 	public void notAServletContextListener() {
-		setLoggerLevel(StartupManager.class, Level.OFF);
 		assertStartupFails(NotAListener.class);
 	}
 
 	@Test
 	public void listenerThrowsException() {
-		setLoggerLevel(StartupManager.class, Level.OFF);
 		assertStartupFails(InitThrowsException.class);
 	}
 
@@ -139,28 +131,30 @@ public class StartupManagerTest extends AbstractTestClass {
 		// Did they initialize in the correct order?
 		List<StatusItem> items = ss.getStatusItems();
 		assertEquals("how many", 2, items.size());
-		assertEquals("init order 1", listener1Name, items.get(0).getSourceName());
-		assertEquals("init order 2", listener2Name, items.get(1).getSourceName());
+		assertEquals("init order 1", listener1Name, items.get(0)
+				.getSourceName());
+		assertEquals("init order 2", listener2Name, items.get(1)
+				.getSourceName());
 
 		sm.contextDestroyed(sce);
 
 		// Did they destroy in reverse order?
 		items = ss.getStatusItems();
 		assertEquals("how many", 4, items.size());
-		assertEquals("destroy order 1", listener2Name, items.get(2).getSourceName());
-		assertEquals("destroy order 2", listener1Name, items.get(3).getSourceName());
+		assertEquals("destroy order 1", listener2Name, items.get(2)
+				.getSourceName());
+		assertEquals("destroy order 2", listener1Name, items.get(3)
+				.getSourceName());
 	}
 
 	@Test
 	public void duplicateListeners() {
-		setLoggerLevel(StartupManager.class, Level.OFF);
 		assertStartupFails(SucceedsWithInfo.class, SucceedsWithWarning.class,
 				SucceedsWithInfo.class);
 	}
 
 	@Test
 	public void dontExecuteAfterFailure() {
-		setLoggerLevel(StartupManager.class, Level.OFF);
 		assertStartupFails(InitThrowsException.class, SucceedsWithInfo.class);
 
 		for (StatusItem item : ss.getStatusItems()) {
@@ -321,4 +315,5 @@ public class StartupManagerTest extends AbstractTestClass {
 					item.getSourceName(), item.getMessage(), item.getCause()));
 		}
 	}
+
 }

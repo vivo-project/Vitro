@@ -168,7 +168,6 @@ public class FreemarkerEmailFactory {
 							+ "the system will not send mail to users.");
 				}
 			} catch (Exception e) {
-				log.error(e, e);
 				ss.warning(this,
 						"Failed to initialize FreemarkerEmailFactory. "
 								+ "The system will not be able to send email "
