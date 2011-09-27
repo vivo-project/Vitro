@@ -68,14 +68,24 @@ public class StartupStatusDisplayFilter implements Filter {
 
 		try {
 			Map<String, Object> bodyMap = new HashMap<String, Object>();
-			bodyMap.put("status", StartupStatus.getBean(ctx));
+			bodyMap.put("status", ss);
 			bodyMap.put("showLink", !isFatal());
+			bodyMap.put("contextPath", getContextPath());
 
 			hResp.setStatus(SC_INTERNAL_SERVER_ERROR);
 			Template tpl = loadFreemarkerTemplate();
 			tpl.process(bodyMap, hResp.getWriter());
 		} catch (TemplateException e) {
 			throw new ServletException("Problem with Freemarker Template", e);
+		}
+	}
+
+	private String getContextPath() {
+		String cp = ctx.getContextPath();
+		if ((cp == null) || cp.isEmpty()) {
+			return "The application";
+		} else {
+			return cp;
 		}
 	}
 

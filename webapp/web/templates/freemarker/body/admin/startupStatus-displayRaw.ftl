@@ -79,7 +79,7 @@
     <body>
     	<#if status.errorItems?has_content>
     	    <h2>Fatal error</h2>
-    	    <p>VIVO detected a fatal error during startup.</p>
+    	    <p>${contextPath} detected a fatal error during startup.</p>
     	    <#if showLink>
                 <p><a href=".">Continue</a></p>
     	    </#if>
@@ -90,7 +90,7 @@
     
     	<#if status.warningItems?has_content>
     	    <h2>Warning</h2>
-    	    <p>VIVO issued warnings during startup.</p>
+    	    <p>${contextPath} found problems during startup.</p>
     	    <#if showLink>
                 <p><a href=".">Continue</a></p>
     	    </#if>
