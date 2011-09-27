@@ -33,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.search.controller.IndexController;
+import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 public class BaseSiteAdminController extends FreemarkerHttpServlet {
 	
@@ -58,7 +59,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
         Map<String, Object> body = new HashMap<String, Object>();        
 
         body.put("dataInput", getDataInputData(vreq));
-        body.put("siteConfig", getSiteConfigUrls(vreq));        
+        body.put("siteConfig", getSiteConfigData(vreq));        
         body.put("indexCacheRebuild", getIndexCacheRebuildUrls(vreq));     
         body.put("ontologyEditor", getOntologyEditorData(vreq));
         body.put("dataTools", getDataToolsUrls(vreq));
@@ -120,29 +121,30 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
         return map;
     }
     
-    protected Map<String, String> getSiteConfigUrls(VitroRequest vreq) {
+    protected Map<String, Object> getSiteConfigData(VitroRequest vreq) {
 
-        Map<String, String> urls = new HashMap<String, String>();
+        Map<String, Object> data = new HashMap<String, Object>();
         
         if (PolicyHelper.isAuthorizedForActions(vreq, new ManageUserAccounts())) {
-        	urls.put("userAccounts", UrlBuilder.getUrl("/accountsAdmin"));
+        	data.put("userAccounts", UrlBuilder.getUrl("/accountsAdmin"));
         }
  
         if (PolicyHelper.isAuthorizedForActions(vreq, new EditSiteInformation())) {
-            urls.put("siteInfo", UrlBuilder.getUrl("/editForm", "controller", "ApplicationBean"));
+            data.put("siteInfo", UrlBuilder.getUrl("/editForm", "controller", "ApplicationBean"));
         }
         
         if (PolicyHelper.isAuthorizedForActions(vreq, new ManageMenus())) {
-            urls.put("menuManagement", UrlBuilder.getUrl("/individual",
+            data.put("menuManagement", UrlBuilder.getUrl("/individual",
                     "uri", "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#DefaultMenu",
                     "switchToDisplayModel", "true"));
         }
         
         if (PolicyHelper.isAuthorizedForActions(vreq, new SeeStartupStatus())) {
-        	urls.put("startupStatus", UrlBuilder.getUrl("/startupStatus"));
+        	data.put("startupStatus", UrlBuilder.getUrl("/startupStatus"));
+        	data.put("startupStatusAlert", !StartupStatus.getBean(getServletContext()).allClear());
         }
         
-        return urls;
+        return data;
     }
     
     protected Map<String, Object> getOntologyEditorData(VitroRequest vreq) {
