@@ -1381,15 +1381,11 @@ a {
 .middle {
     vertical-align: middle;
 }
-
 /* EDITING DISPLAY------>  */
 .edit-individual {
     border-left: 1px dotted #47b6d0;
 }
-.disabledSubmit {
-    color: #ede ! important;
-    background-color: #47b6d0 ! important;
-}
+
 /* ------------------------------------------------->  */
 /* SITE ADMIN DASHBOARD ---------------------------->  */
 /* ------------------------------------------------->  */
