@@ -44,9 +44,6 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/startupStatus.c
 <#if status.errorItems?has_content>
     <h2>Fatal error</h2>
     <p>VIVO detected a fatal error during startup.</p>
-    <p>
-        <a href=".">Continue</a>
-    </p>
     <#list status.errorItems as item>
       <@statusItem item=item />
     </#list>
@@ -55,9 +52,6 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/startupStatus.c
 <#if status.warningItems?has_content>
     <h2>Warning</h2>
     <p>VIVO issued warnings during startup.</p>
-    <p>
-        <a href=".">Continue</a>
-    </p>
     <#list status.warningItems as item>
       <@statusItem item=item />
     </#list>
