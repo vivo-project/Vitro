@@ -231,6 +231,21 @@ a.edit-mainImage img.edit-individual {
 .middle {
     vertical-align: middle;
 }
+a.more-less {
+    margin-left: 1.5em;
+    padding: .3em .8em;
+    font-size: .8em;
+    text-decoration: none;
+    color: #666;
+    background: #eee;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+a:hover.more-less {
+    color: #fff;
+    background: #888;
+}
 /* VERBOSE DISPLAY------>  */
 section.verbosePropertyListing {
     display: inline-block;
