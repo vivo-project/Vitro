@@ -27,7 +27,7 @@
                 <li>
                     <a href="${siteConfig.startupStatus}">Startup Status</a>
                     <#if siteConfig.startupStatusAlert>
-                        <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon" />
+                        <img id="alertIcon" src="${urls.images}/iconAlert.png" width="20" height="20" alert="Error alert icon" />
                     </#if>
                 </li>
             </#if>           

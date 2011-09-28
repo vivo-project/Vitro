@@ -36,3 +36,6 @@
 #adminDashboard .add-action-button {
     margin-top: .75em;
 }
+#alertIcon {
+    vertical-align:middle
+}
