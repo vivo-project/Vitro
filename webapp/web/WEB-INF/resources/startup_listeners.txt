@@ -33,14 +33,9 @@ edu.cornell.mannlib.vitro.webapp.servlet.setup.UpdateUploadedFiles
 # Update to the new UserAccounts model (1.3). Needs to run after JenaDataSourceSetup.
 edu.cornell.mannlib.vitro.webapp.servlet.setup.UpdateUserAccounts
 
-# Attaching submodels permits extra RDF files to be made visible without storing the data in the DB.
-edu.cornell.mannlib.vitro.webapp.servlet.setup.AttachSubmodels
+edu.cornell.mannlib.vitro.webapp.servlet.setup.FileGraphSetup
 
-# Pellet setup enables reasoning.  Inferences are cached in a separate DB graph.
-# Changing the class name sets the kinds of inferences that are materialized.
-# See documentation for details.
-# If used, must be run after JenaDataSourceSetup
-edu.cornell.mannlib.vitro.webapp.servlet.setup.PelletReasonerSetup
+edu.cornell.mannlib.vitro.webapp.servlet.setup.SimpleReasonerSetup
 
 edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader
 
