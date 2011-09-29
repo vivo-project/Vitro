@@ -27,6 +27,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaOutputUtils;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 
 public class OntologyController extends VitroHttpServlet{
@@ -161,7 +162,8 @@ public class OntologyController extends VitroHttpServlet{
             //respond to HTTP outside of critical section
             doNotFound(req,res);
             return;
-        } else {		
+        } else {	
+        	JenaOutputUtils.setNameSpacePrefixes(newModel,vreq.getWebappDaoFactory());
             res.setContentType(rdfFormat.getMediaType());
             String format = ""; 
             if ( RDFXML_MIMETYPE.equals(rdfFormat.getMediaType()))

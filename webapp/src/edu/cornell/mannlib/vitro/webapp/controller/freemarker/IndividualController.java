@@ -57,6 +57,7 @@ import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.ExtendedLinkedDataUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaOutputUtils;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 import edu.cornell.mannlib.vitro.webapp.web.beanswrappers.ReadOnlyBeansWrapper;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
@@ -354,7 +355,7 @@ public class IndividualController extends FreemarkerHttpServlet {
                 
         String[] includes = vreq.getParameterValues("include");
 		Model newModel = getRDF(individual,ontModel,ModelFactory.createDefaultModel(),0,includes);		
-		
+		JenaOutputUtils.setNameSpacePrefixes(newModel, vreq.getWebappDaoFactory());
 		return new RdfResponseValues(rdfFormat, newModel);
 	}
 

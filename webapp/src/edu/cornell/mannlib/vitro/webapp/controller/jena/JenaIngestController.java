@@ -78,6 +78,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetup;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestWorkflowProcessor;
+import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaOutputUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.WorkflowOntology;
 
 public class JenaIngestController extends BaseEditController {
@@ -324,6 +325,7 @@ public class JenaIngestController extends BaseEditController {
 			                               String modelType) {
 		String modelNameStr = vreq.getParameter("modelName");
 		Model model = getModel(modelNameStr,vreq);
+		JenaOutputUtils.setNameSpacePrefixes(model,vreq.getWebappDaoFactory());
 		model.enterCriticalSection(Lock.READ);
 		try {
 			OutputStream out = response.getOutputStream();
