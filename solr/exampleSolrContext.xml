@@ -9,7 +9,7 @@
    <Environment
         type="java.lang.String" 
         name="solr/home"  
-        value="${solr.home}" override="true"/>
+        value="${solr.home.dir}" override="true"/>
 
    <!-- Disable persist sessions on shut down.-->
    <Manager pathname="" />
