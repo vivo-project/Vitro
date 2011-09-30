@@ -2,21 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.beans;
 
-/**
- * @version 2 2005-09-14
- * @author Brian Caruso, Jon Corson-Rikert
- *
- * UPDATES:
- * 2006-03-13   jcr   minor changes having to do with browse functionality; removing old commented out code and comments
- * 2005-10-19   jcr   added variables and methods to retrieve MAX PORTAL ID from database and use that and minSharedPortalId/maxSharedPortalId
- *                    to get rid of need for ALL CALS RESEARCH
- * 2005-09-14   bdc34 modified to initialize itself from database and store static instance in class
- * 2005-07-05   JCR   added onlyCurrent and onlyPublic to get rid of constants stuck here and there in the code
- * 2005-06-14   JCR   added boolean initialized value to help detect when settings come from current site database
- *
- */
-
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 
@@ -25,12 +14,8 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * This object is intended to represent the single row of data in the table application.
- *
- * @author jc55
- *
  */
 public class ApplicationBean {
-    
 	private static final Log log = LogFactory.getLog(ApplicationBean.class);
 	
     public final static int      CALS_SEARCHBOX_SIZE         = 25;
@@ -43,7 +28,7 @@ public class ApplicationBean {
     private final static String  DEFAULT_ROOT_LOGOTYPE_TITLE  = "";
     
     // Value gets set in default theme setup context listener at application startup
-    public static String DEFAULT_THEME_DIR_FROM_CONTEXT  = null;
+    public static ThemeInfo themeInfo  = new ThemeInfo(null, "no_default_theme", new ArrayList<String>());
 
     // Default initializations, which may be overwritten in the AppBeanMapper
     // but are otherwise not changed there
@@ -135,17 +120,9 @@ public class ApplicationBean {
         copyrightAnchor = string_val;
     }
     
-    public void setThemeDir(String string_val) {
-        if( string_val == null || string_val.length() == 0
-            || "default".equalsIgnoreCase(string_val)
-            || "portal".equalsIgnoreCase(string_val)
-            || "null".equalsIgnoreCase(string_val)
-            || "&nbsp;".equalsIgnoreCase(string_val) )
-            themeDir = DEFAULT_THEME_DIR_FROM_CONTEXT;
-        else
-            themeDir = string_val;
-    }
-
+	public void setThemeDir(String string_val) {
+		themeDir = string_val;
+	}
 
     /*************************** GET functions ****************************/
 
@@ -217,38 +194,72 @@ public class ApplicationBean {
      * @return
      */
     public String getThemeDir(){
-        return (themeDir != null && themeDir.length()>0) 
-        		? themeDir 
-        	    : DEFAULT_THEME_DIR_FROM_CONTEXT;
+    	if (themeInfo.isValidThemeDir(themeDir)) {
+    		return themeDir;
+    	} else {
+    		return themeInfo.getDefaultThemeDir();
+    	}
     }
 
     /**********************************************************************/
-    
-    public  boolean themeDirExists(){
-        String themeDir = this.getThemeDir();
-        if( themeDir == null || themeDir.length() < 1 ){
-            log.error("Application has no themeDir/stylesheet set in the db." );
-            return false;
-        }
 
-        File dir = new File(themeDir);
-        if( !dir.exists() ){
-            log.error("Application: the themeDir/stylesheet "
-                    + dir.getAbsolutePath()+ " does not exist.");
-            return false;
-        }
-        if( !dir.isDirectory() ){
-            log.error("Application: themeDir/stylesheet "
-                    + dir.getAbsolutePath() + " is not a directory.");
-            return false;
-        }
-        if( !dir.canRead() ){
-            log.error("Application: themeDir/stylesheet "
-                    + dir.getAbsolutePath() + " is not readable.");
-            return false;
-        }
-        return true;
-    }
-    
+	/**
+	 * Hold the names of the available themes, the name of the default theme,
+	 * and the base directory that contains the theme directories.
+	 * 
+	 * The theme names are stored as simple strings, like "wilma".
+	 * 
+	 * To be backwards compatible, we need to be able to test a string like
+	 * "themes/wilma/ to see whether it is available, or to return the default
+	 * directory in that form.
+	 */
+	public static class ThemeInfo {
+		private final File themesBaseDir;
+		private final String defaultThemeName;
+		private final List<String> themeNames;
+
+		public ThemeInfo(File themesBaseDir, String defaultThemeName,
+				List<String> themeNames) {
+			this.themesBaseDir = themesBaseDir;
+			this.defaultThemeName = defaultThemeName;
+			this.themeNames = Collections
+					.unmodifiableList(new ArrayList<String>(themeNames));
+		}
+
+		public static String themeNameFromDir(String themeDir) {
+			if (themeDir == null) {
+				return themeDir;
+			}
+			if (!themeDir.startsWith("themes/") || !themeDir.endsWith("/")) {
+				return themeDir;
+			}
+			return themeDir.substring(7, themeDir.length() - 1);
+		}
+
+		public boolean isValidThemeDir(String themeDir) {
+			if (themeDir == null) {
+				return false;
+			}
+			return themeNames.contains(themeNameFromDir(themeDir));
+		}
+
+		public String getDefaultThemeDir() {
+			return "themes/" + defaultThemeName + "/";
+		}
+
+		public File getThemesBaseDir() {
+			return themesBaseDir;
+		}
+
+		public String getDefaultThemeName() {
+			return defaultThemeName;
+		}
+
+		public List<String> getThemeNames() {
+			return themeNames;
+		}
+
+	}
+	
 }
 
