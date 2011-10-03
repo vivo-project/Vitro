@@ -58,12 +58,6 @@ public class VitroHttpServlet extends HttpServlet {
 			if (log.isTraceEnabled()) {
 				dumpRequestHeaders(hreq);
 			}
-
-			// check to see if VitroRequestPrep filter was run
-			if (hreq.getAttribute("appBean") == null
-					|| hreq.getAttribute("webappDaoFactory") == null) {
-				log.warn("request scope was not prepared by VitroRequestPrep");
-			}
 		}
 
 		super.service(req, resp);
