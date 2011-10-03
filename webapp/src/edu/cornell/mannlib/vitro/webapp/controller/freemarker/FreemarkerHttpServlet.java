@@ -15,7 +15,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -25,7 +24,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOwnAcc
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
@@ -198,9 +196,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     }
    
     protected FreemarkerConfiguration getConfig(VitroRequest vreq) {               
-        FreemarkerConfigurationLoader loader = 
-            FreemarkerConfigurationLoader.getFreemarkerConfigurationLoader(getServletContext());
-        return loader.getConfig(vreq);
+        return FreemarkerConfigurationLoader.getConfig(vreq, getServletContext());
     }
 
     /**

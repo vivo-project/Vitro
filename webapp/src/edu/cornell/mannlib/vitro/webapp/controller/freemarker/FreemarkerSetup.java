@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import java.util.HashMap;
-
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -17,18 +15,17 @@ public class FreemarkerSetup implements ServletContextListener {
     
     private static final Log log = LogFactory.getLog(FreemarkerSetup.class);
 
+	@Override
 	public void contextInitialized(ServletContextEvent event) {	
 		ServletContext sc = event.getServletContext();	
-		sc.setAttribute("themeToConfigMap", new HashMap<String, FreemarkerConfiguration>());
         BaseTemplateModel.setServletContext(sc);
         FreemarkerComponentGenerator.setServletContext(sc);
 		UrlBuilder.contextPath = sc.getContextPath();
 		
-		FreemarkerConfigurationLoader loader = new FreemarkerConfigurationLoader(sc);
-		
 		log.info("Freemarker templating system initialized.");
 	}
 
+	@Override
 	public void contextDestroyed(ServletContextEvent event) {
 		// nothing to do here
 	}
