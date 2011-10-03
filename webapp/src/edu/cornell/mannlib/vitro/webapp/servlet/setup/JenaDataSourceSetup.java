@@ -197,7 +197,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
             applicationMetadataModel.getBaseModel().register(new ModelSynchronizer(applicationMetadataModelDB));
             
             if (isFirstStartup()) {
-            	applicationMetadataModel.add(InitialJenaModelUtils.loadInitialModel(ctx, defaultNamespace));
+            	applicationMetadataModel.add(InitialJenaModelUtils.loadInitialModel(ctx, getDefaultNamespace(ctx)));
             	
             } else if (applicationMetadataModelDB.size() == 0) {
                 repairAppMetadataModel(applicationMetadataModel, aboxAssertions, aboxInferences);
@@ -211,7 +211,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
             log.error("Unable to load application metadata model cache from DB", e);
         }
         
-        checkForNamespaceMismatch( baseOms.getApplicationMetadataModel(), defaultNamespace, ctx );
+        checkForNamespaceMismatch( baseOms.getApplicationMetadataModel(), ctx );
         
         if (isFirstStartup()) {
         	loadDataFromFilesystem(baseOms, ctx);
@@ -236,7 +236,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
                 baseOms,
                 bds,
                 storeDesc, 
-                defaultNamespace, 
+                getDefaultNamespace(ctx), 
                 null, 
                 null, 
                 WebappDaoFactorySDB.SDBDatasetMode.ASSERTIONS_ONLY);
@@ -250,7 +250,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
                 inferenceOms, 
                 bds, 
                 storeDesc, 
-                defaultNamespace, 
+                getDefaultNamespace(ctx), 
                 null, 
                 null, 
                 WebappDaoFactorySDB.SDBDatasetMode.INFERENCES_ONLY);
@@ -264,7 +264,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         //        ModelFactory.createUnion(unionABoxModel, unionTBoxModel));
         unionOms.setFullModel(masterUnion);
         ctx.setAttribute("jenaOntModel", masterUnion);  
-        WebappDaoFactory wadf = new WebappDaoFactorySDB(unionOms, bds, storeDesc, defaultNamespace, null, null);
+        WebappDaoFactory wadf = new WebappDaoFactorySDB(unionOms, bds, storeDesc, getDefaultNamespace(ctx), null, null);
         ctx.setAttribute("webappDaoFactory",wadf);
 
         ModelContext.setUnionOntModelSelector(unionOms, ctx);          // assertions and inferences
@@ -277,7 +277,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         //ctx.setAttribute("NamespaceMapper", namespaceMapper);
         //unionOms.getFullModel().getBaseModel().register(namespaceMapper);
         
-        ctx.setAttribute("defaultNamespace", defaultNamespace);
+        ctx.setAttribute("defaultNamespace", getDefaultNamespace(ctx));
         
         log.info("SDB store ready for use");
         
@@ -290,38 +290,46 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         
         log.info("Model makers set up");
     }
-    
-    private void checkForNamespaceMismatch(OntModel model, String defaultNamespace, ServletContext ctx) {
-		String defaultNamespaceFromDeployProperites = ConfigurationProperties
-				.getBean(ctx).getProperty("Vitro.defaultNamespace");
-        if( defaultNamespaceFromDeployProperites == null ){            
-            log.error("Could not get namespace from deploy.properties.");
-        }               
-        
-        List<String> portalURIs = new ArrayList<String>();
-        try {
-            model.enterCriticalSection(Lock.READ);
-            Iterator<Individual> portalIt = model.listIndividuals(PORTAL);
-            while (portalIt.hasNext()) {
-                portalURIs.add( portalIt.next().getURI() );                
-            }
-        } finally {
-            model.leaveCriticalSection();
-        }
-        if( portalURIs.size() > 0 ){
-            for( String portalUri : portalURIs){
-                if( portalUri != null && ! portalUri.startsWith(defaultNamespaceFromDeployProperites)){
-                    StartupStatus ss = StartupStatus.getBean(ctx);
-                    ss.warning(this, "Namespace mismatch between db and deploy.properties.");
-                    ss.warning(this, "Vivo will not start up correctly because the default namespace specified in deploy.properties does not match the namespace of " +
-                    		"a portal in the database. Namespace from deploy.properties: \"" + defaultNamespaceFromDeployProperites + 
-                    		"\" Namespace from an existing portal: \"" + portalUri + "\" To get the application to start with this " +
-                    		"database change the default namespace in deploy.properties " + portalUri.substring(0, portalUri.lastIndexOf("/")+1) + 
-                    "  Another possibility is that deploy.properties does not specify the intended database.");
-                }
-            }
-        }
-    }
+
+	/**
+	 * If we find a "portal1" portal (and we should), its URI should use the
+	 * default namespace.
+	 */
+	private void checkForNamespaceMismatch(OntModel model, ServletContext ctx) {
+		String expectedNamespace = getDefaultNamespace(ctx);
+
+		List<String> portalURIs = new ArrayList<String>();
+		try {
+			model.enterCriticalSection(Lock.READ);
+			Iterator<Individual> portalIt = model.listIndividuals(PORTAL);
+			while (portalIt.hasNext()) {
+				portalURIs.add(portalIt.next().getURI());
+			}
+		} finally {
+			model.leaveCriticalSection();
+		}
+
+		for (String portalUri : portalURIs) {
+			if (portalUri == null) {
+				continue;
+			}
+
+			int splitHere = portalUri.lastIndexOf("/") + 1;
+			String actualNamespace = portalUri.substring(0, splitHere);
+			String portalName = portalUri.substring(splitHere);
+
+			if ("portal1".equals(portalName)
+					&& (!expectedNamespace.equals(actualNamespace))) {
+				StartupStatus ss = StartupStatus.getBean(ctx);
+				ss.fatal(this, "Default namespace mis-match. "
+						+ "The default namespace specified in deploy.properties ('" + expectedNamespace + "') "
+						+ "does not match the namespace used in the database ('" + actualNamespace + "'). "
+						+ "Perhaps the 'Vitro.defaultNamespace' property in deploy.properties is incorrect, "
+						+ "or perhaps the 'VitroConnection.DataSource.url' property in deploy.properties "
+						+ "specifies the wrong database.");
+			}
+		}
+	}
 
 
     /* ====================================================================== */

@@ -34,8 +34,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 
 public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
-    
-    private static final Log log = LogFactory.getLog(
+	private static final String VITRO_DEFAULT_NAMESPACE = "Vitro.defaultNamespace";
+
+	private static final Log log = LogFactory.getLog(
             JenaDataSourceSetupBase.class);
 
     protected final static int DEFAULT_MAXWAIT = 10000, // ms
@@ -126,11 +127,6 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     static final String JENA_DISPLAY_DISPLAY_MODEL = 
         DisplayVocabulary.DISPLAY_DISPLAY_MODEL_URI;
 
-    static final String DEFAULT_DEFAULT_NAMESPACE = 
-            "http://vitro.mannlib.cornell.edu/ns/default#";
-   
-    static String defaultNamespace = DEFAULT_DEFAULT_NAMESPACE; // FIXME
-   
     // use OWL models with no reasoning
     static final OntModelSpec DB_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
     static final OntModelSpec MEM_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM; 
@@ -166,10 +162,6 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         BasicDataSource ds = makeBasicDataSource(
                 getDbDriverClassName(ctx), jdbcUrl, username, password, ctx);
 
-        String dns = ConfigurationProperties.getBean(ctx).getProperty(
-                "Vitro.defaultNamespace");
-        defaultNamespace = (dns != null && dns.length() > 0) ? dns : null;
-       
        jenaDbOntModelSpec = (jenaDbOntModelSpec != null) 
                ? jenaDbOntModelSpec 
                : DB_ONT_MODEL_SPEC;
@@ -456,6 +448,17 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
                                                  ServletContext ctx){
     	ctx.setAttribute(sdbModelMaker, vsmm);
     }
+    
+	protected String getDefaultNamespace(ServletContext ctx) {
+		String dns = ConfigurationProperties.getBean(ctx).getProperty(
+				VITRO_DEFAULT_NAMESPACE);
+		if ((dns != null) && (!dns.isEmpty())) {
+			return dns;
+		} else {
+			throw new IllegalStateException("deploy.properties does not "
+					+ "contain a value for '" + VITRO_DEFAULT_NAMESPACE + "'");
+		}
+	}
     
     protected VitroJenaModelMaker getVitroJenaModelMaker(){
     	return vjmm;
