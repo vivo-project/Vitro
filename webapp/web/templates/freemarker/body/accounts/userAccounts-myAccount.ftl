@@ -62,7 +62,7 @@
         <label for="email-address">Email address<span class="requiredHint"> *</span></label>
         <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
 
-        <p class="note">Note: if email changes, a confirmation email will be sent to the new email address entered above.</p>
+        <p class="note">Note: if email changes, a confirmation email will<br />be sent to the new email address entered above.</p>
         
         <label for="first-name">First name<span class="requiredHint"> *</span></label> 
         <input type="text" name="firstName" value="${firstName}" id="first-name" role="input" />
@@ -74,7 +74,7 @@
             <label for="new-password">New password</label>
             <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
 
-            <p class="note">Minimum of ${minimumLength} characters in length. Leaving this blank means that the password will not be changed.</p>
+            <p class="note">Minimum of ${minimumLength} characters in length.<br />If left blank, the password will not be changed.</p>
 
             <label for="confirm-password">Confirm new password</label> 
             <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
