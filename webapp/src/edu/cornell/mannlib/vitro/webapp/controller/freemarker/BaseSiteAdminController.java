@@ -76,11 +76,12 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
             urls.put("recomputeInferences", UrlBuilder.getUrl("/RecomputeInferences"));     
         
             urls.put("rebuildClassGroupCache", UrlBuilder.getUrl("/browse?clearcache=1"));
-        
-            if (PolicyHelper.isAuthorizedForActions(vreq, IndexController.REQUIRED_ACTIONS)) {
-                urls.put("rebuildSearchIndex", UrlBuilder.getUrl("/SearchIndex"));            
-            }
         }
+        
+		if (PolicyHelper.isAuthorizedForActions(vreq, IndexController.REQUIRED_ACTIONS)) {
+			urls.put("rebuildSearchIndex", UrlBuilder.getUrl("/SearchIndex"));
+		}
+		
         return urls;
     }
 

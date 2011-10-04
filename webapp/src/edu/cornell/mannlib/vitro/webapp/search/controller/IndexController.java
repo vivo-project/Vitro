@@ -9,8 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeSiteAdminPage;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageSearchIndex;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
@@ -34,11 +33,11 @@ public class IndexController extends FreemarkerHttpServlet {
 	
 	private static final Log log = LogFactory.getLog(IndexController.class);
 
-    public static final Actions REQUIRED_ACTIONS = new Actions(new UseMiscellaneousAdminPages());
+    public static final Actions REQUIRED_ACTIONS = new Actions(new ManageSearchIndex());
     
 	@Override
 	protected Actions requiredActions(VitroRequest vreq) {
-		return new Actions(new UseMiscellaneousAdminPages());
+		return REQUIRED_ACTIONS;
 	}
 	
     @Override

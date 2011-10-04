@@ -19,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOwnAcc
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditSiteInformation;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManagePortals;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageSearchIndex;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageTabs;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.RefreshVisualizationCacheAction;
@@ -65,6 +66,9 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		} else if (whatToAuth instanceof ManageMenus) {
 			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
 
+		} else if (whatToAuth instanceof ManageSearchIndex) {
+			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
+			
 		} else if (whatToAuth instanceof UseMiscellaneousAdminPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
 
