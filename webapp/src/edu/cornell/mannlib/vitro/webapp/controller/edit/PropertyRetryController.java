@@ -143,7 +143,7 @@ public class PropertyRetryController extends BaseEditController {
         HashMap<String, List<Option>> optionMap = new HashMap<String, List<Option>>();
         try {
             List<Option> namespaceIdList = FormUtils.makeOptionListFromBeans(ontDao.getAllOntologies(),"URI","Name", ((propertyForEditing.getNamespace()==null) ? "" : propertyForEditing.getNamespace()), null, (propertyForEditing.getNamespace()!=null));
-	        namespaceIdList.add(new Option(request.getFullWebappDaoFactory().getDefaultNamespace(),"default"));
+	        namespaceIdList.add(0, new Option(request.getFullWebappDaoFactory().getDefaultNamespace(),"default"));
             optionMap.put("Namespace", namespaceIdList);
             List<Option> namespaceIdInverseList = FormUtils.makeOptionListFromBeans(ontDao.getAllOntologies(),"URI","Name",  ((propertyForEditing.getNamespaceInverse()==null) ? "" : propertyForEditing.getNamespaceInverse()), null, (propertyForEditing.getNamespaceInverse()!=null));
 	        namespaceIdInverseList.add(new Option(request.getFullWebappDaoFactory().getDefaultNamespace(),"default"));
@@ -161,9 +161,23 @@ public class PropertyRetryController extends BaseEditController {
             objectIndividualSortPropertyList.add(0,new Option("","- select data property -"));
             optionMap.put("ObjectIndividualSortPropertyURI",objectIndividualSortPropertyList);       
             List<Option> domainOptionList = FormUtils.makeVClassOptionList(request.getFullWebappDaoFactory(), propertyForEditing.getDomainVClassURI());
+            if (propertyForEditing.getDomainVClass() != null 
+            		&& propertyForEditing.getDomainVClass().isAnonymous()) {
+            	domainOptionList.add(0, new Option(
+            			propertyForEditing.getDomainVClass().getURI(), 
+            			propertyForEditing.getDomainVClass().getName(), 
+            			true));
+            }
             domainOptionList.add(0, new Option("","(none specified)"));
             optionMap.put("DomainVClassURI", domainOptionList);
             List<Option> rangeOptionList = FormUtils.makeVClassOptionList(request.getFullWebappDaoFactory(), propertyForEditing.getRangeVClassURI());
+            if (propertyForEditing.getRangeVClass() != null 
+            		&& propertyForEditing.getRangeVClass().isAnonymous()) {
+            	rangeOptionList.add(0, new Option(
+            			propertyForEditing.getRangeVClass().getURI(), 
+            			propertyForEditing.getRangeVClass().getName(), 
+            			true));
+            }
             rangeOptionList.add(0, new Option("","(none specified)"));
             optionMap.put("RangeVClassURI", rangeOptionList);
         } catch (Exception e) {
@@ -204,7 +218,7 @@ public class PropertyRetryController extends BaseEditController {
 
         epo.setFormObject(foo);
 
-        String html = FormUtils.htmlFormFromBean(propertyForEditing,action,foo,epo.getBadValueMap());
+        FormUtils.populateFormFromBean(propertyForEditing,action,foo,epo.getBadValueMap());
 
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");

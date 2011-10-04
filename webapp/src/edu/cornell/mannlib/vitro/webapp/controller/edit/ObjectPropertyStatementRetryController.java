@@ -143,10 +143,9 @@ public class ObjectPropertyStatementRetryController extends BaseEditController {
         foo.setOptionLists(optionMap);
         epo.setFormObject(foo);
 
-        String html = FormUtils.htmlFormFromBean(objectForEditing,action,foo);
+        FormUtils.populateFormFromBean(objectForEditing,action,foo);
 
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        request.setAttribute("formHtml",html);
         request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
         request.setAttribute("formJsp","/templates/edit/specific/ents2ents_retry_domainSide.jsp");
         request.setAttribute("scripts","/templates/edit/formBasic.js");

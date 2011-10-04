@@ -55,15 +55,25 @@ public class PropertyGroupsListingController extends BaseEditController {
                 results.add("XX");
                 if (pg.getName() != null) {
                     try {
-                        results.add("<a href=\"./editForm?uri="+URLEncoder.encode(pg.getURI(),"UTF-8")+"&amp;controller=PropertyGroup\">"+pg.getName()+"</a>");
+                        results.add("<a href=\"./editForm?uri=" + 
+                        		URLEncoder.encode(pg.getURI(),"UTF-8") + 
+                        		"&amp;controller=PropertyGroup\">" + 
+                        		pg.getName() + "</a>");
                     } catch (Exception e) {
                         results.add(pg.getName());
                     }
                 } else {
                     results.add("");
                 }
-                results.add(pg.getPublicDescription()==null ? "unspecified" : pg.getPublicDescription());
-                results.add(Integer.valueOf(pg.getDisplayRank()).toString());
+                results.add(
+                		(pg.getPublicDescription() == null) 
+                		        ? "unspecified" 
+                		        : pg.getPublicDescription());
+                Integer t;
+                results.add(
+                		((t = Integer.valueOf(pg.getDisplayRank())) != -1) 
+                		        ? t.toString() 
+                		        : "");
                 results.add("XX");
                 List<Property> classList = pg.getPropertyList();
                 if (classList != null && classList.size()>0) {
@@ -79,33 +89,55 @@ public class PropertyGroupsListingController extends BaseEditController {
                         Property p = propIt.next();
                         if (p instanceof ObjectProperty) {
                         	ObjectProperty op = (ObjectProperty) p;
-	                        if (op.getLocalNameWithPrefix() != null && op.getURI() != null) {
+	                        if (op.getLocalNameWithPrefix() != null 
+	                        		&& op.getURI() != null) {
 	                            try {
-	                                results.add("<a href=\"propertyEdit?uri="+URLEncoder.encode(op.getURI(),"UTF-8")+"\">"+op.getLocalNameWithPrefix()+"</a>");
+	                                results.add("<a href=\"propertyEdit?uri=" + 
+	                                		URLEncoder.encode(
+	                                				op.getURI(), "UTF-8") + 
+	                                				"\">" + 
+	                                				op.getLocalNameWithPrefix()
+	                                				+ "</a>");
 	                            } catch (Exception e) {
 	                                results.add(op.getLocalNameWithPrefix());
 	                            }
 	                        } else {
 	                            results.add("");
 	                        }
-	                        String exampleStr = (op.getExample() == null) ? "" : op.getExample();
+	                        String exampleStr = 
+	                        	    (op.getExample() == null) 
+	                                        ? "" 
+	                                        : op.getExample();
 	                        results.add(exampleStr);
-	                        String descriptionStr = (op.getDescription() == null) ? "" : op.getDescription();
+	                        String descriptionStr = 
+	                        	    (op.getDescription() == null) 
+	                        	            ? "" 
+	                        	            : op.getDescription();
 	                        results.add(descriptionStr);
                         } else {
                           	DataProperty dp = (DataProperty) p;
 	                        if (dp.getName() != null && dp.getURI() != null) {
 	                            try {
-	                                results.add("<a href=\"datapropEdit?uri="+URLEncoder.encode(dp.getURI(),"UTF-8")+"\">"+dp.getName()+"</a>");
+	                                results.add("<a href=\"datapropEdit?uri=" + 
+	                                		URLEncoder.encode(
+	                                				dp.getURI(),"UTF-8") + 
+	                                				"\">" + dp.getName() + 
+	                                				"</a>");
 	                            } catch (Exception e) {
 	                                results.add(dp.getName());
 	                            }
 	                        } else {
 	                            results.add("");
 	                        }
-	                        String exampleStr = (dp.getExample() == null) ? "" : dp.getExample();
+	                        String exampleStr = 
+	                        	    (dp.getExample() == null) 
+	                        	            ? "" 
+	                        	            : dp.getExample();
 	                        results.add(exampleStr);
-	                        String descriptionStr = (dp.getDescription() == null) ? "" : dp.getDescription();
+	                        String descriptionStr = 
+	                        	    (dp.getDescription() == null) 
+	                        	            ? "" 
+	                        	            : dp.getDescription();
 	                        results.add(descriptionStr);
                         }
                         if (propIt.hasNext())

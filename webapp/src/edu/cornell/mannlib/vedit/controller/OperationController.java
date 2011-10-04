@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,6 +22,7 @@ import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.listener.ChangeListener;
 import edu.cornell.mannlib.vedit.listener.EditPreProcessor;
 import edu.cornell.mannlib.vedit.util.FormUtils;
+import edu.cornell.mannlib.vedit.util.FormUtils.NegativeIntegerException;
 import edu.cornell.mannlib.vedit.util.OperationUtils;
 import edu.cornell.mannlib.vedit.validator.ValidationObject;
 import edu.cornell.mannlib.vedit.validator.Validator;
@@ -201,17 +201,6 @@ public class OperationController extends BaseEditController {
         }
     }
     
-    private void applySimpleMask(EditProcessObject epo, Object newObj) {
-        // apply the simple mask
-        //if (epo.getSimpleMask() != null) {
-        //  Iterator smaskIt = epo.getSimpleMask().iterator();
-        //  while (smaskIt.hasNext()){
-        //      Object[] simpleMaskPair = (Object[]) smaskIt.next();
-        //      FormUtils.beanSet(newObj,(String)simpleMaskPair[0],simpleMaskPair[1].toString());
-        //  }
-        //}
-    }
-    
     private Object getNewObj(EditProcessObject epo) {
     	Object newObj = null;
     	if (epo.getOriginalBean() != null) { // we're updating or deleting an existing bean
@@ -292,10 +281,14 @@ public class OperationController extends BaseEditController {
                         epo.getBadValueMap().remove(currParam);
                     } catch (NumberFormatException e) {
                         if (currValue.length()>0) {
-                            valid=false;
+                            valid = false;
                             epo.getErrMsgMap().put(currParam,"Please enter an integer");
                             epo.getBadValueMap().put(currParam,currValue);
                         }
+                    } catch (NegativeIntegerException nie) {
+                        valid = false;
+                        epo.getErrMsgMap().put(currParam,"Please enter a positive integer");
+                        epo.getBadValueMap().put(currParam,currValue);                    	
                     } catch (IllegalArgumentException f) {
                         valid=false;
                         log.error("doPost() reports IllegalArgumentException for "+currParam);

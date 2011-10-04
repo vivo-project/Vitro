@@ -973,8 +973,8 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                     updatePropertyStringValue(ontCls,SHORTDEF,cls.getShortDef(),ontModel);
                     updatePropertyStringValue(ontCls,EXAMPLE_ANNOT,cls.getExample(),ontModel);
                     updatePropertyStringValue(ontCls,DESCRIPTION_ANNOT,cls.getDescription(),ontModel);
-                    updatePropertyIntValue(ontCls,DISPLAY_LIMIT,cls.getDisplayLimit(),ontModel);
-                    updatePropertyIntValue(ontCls,DISPLAY_RANK_ANNOT,cls.getDisplayRank(),ontModel);
+                    updatePropertyNonNegativeIntValue(ontCls,DISPLAY_LIMIT,cls.getDisplayLimit(),ontModel);
+                    updatePropertyNonNegativeIntValue(ontCls,DISPLAY_RANK_ANNOT,cls.getDisplayRank(),ontModel);
                     updatePropertyFloatValue(ontCls, SEARCH_BOOST_ANNOT, cls.getSearchBoost(), ontModel);
                     
                     if (cls.getHiddenFromDisplayBelowRoleLevel() != null) {

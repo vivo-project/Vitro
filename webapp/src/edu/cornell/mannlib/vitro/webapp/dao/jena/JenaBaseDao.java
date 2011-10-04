@@ -254,6 +254,21 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     /**
      * convenience method
      */
+    protected Integer getPropertyNonNegativeIntegerValue(OntResource res, Property dataprop) {
+        if (dataprop != null) {
+            try {
+                return ((Literal)res.getPropertyValue(dataprop)).getInt();
+            } catch (Exception e) {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * convenience method
+     */
     protected void addPropertyIntValue(Resource res, Property dataprop, int value, Model model) {
         if (dataprop != null) {
             model.add(res, dataprop, Integer.toString(value), XSDDatatype.XSDint);
@@ -322,13 +337,27 @@ public class JenaBaseDao extends JenaBaseDaoCon {
      * convenience method for use with functional datatype properties
      */
     protected void updatePropertyNonNegativeIntValue(Resource res, Property dataprop, int value, Model model) {
-
-    	if (value < 0)
-       	  return;
-
-    	updatePropertyIntValue(res,dataprop,value,model);
-        
+    	if (value < 0) {
+    		// TODO fixme: the backend editor depends on this weird behavior.
+    		if (model != null && res != null && dataprop != null) {
+    			model.removeAll(res, dataprop, (RDFNode) null);
+    		}
+    	} else {
+    		updatePropertyIntValue(res,dataprop,value,model);
+    	}
     }
+    
+    /**
+     * convenience method for use with functional datatype properties
+     */
+    protected void updatePropertyNonNegativeIntegerValue(Resource res, Property dataprop, Integer value, Model model) {
+        if (value != null) {
+        	updatePropertyIntValue(res,dataprop,value,model);
+    	} else {
+    		model.removeAll(res, dataprop, (RDFNode) null);
+    	}
+    }
+
 
 	/**
 	 * convenience method for use with functional datatype properties

@@ -71,19 +71,11 @@ public class Property extends BaseResourceBean {
         
         private int determineDisplayRank(Property p) {
             if (p instanceof DataProperty) {
-                DataProperty dp = (DataProperty)p;
+                DataProperty dp = (DataProperty) p;
                 return dp.getDisplayTier();
             } else if (p instanceof ObjectProperty) {
-                ObjectProperty op = (ObjectProperty)p;
-                String tierStr = p.isSubjectSide() ? op.getDomainDisplayTier() : op.getRangeDisplayTier();
-                try {
-                    return Integer.parseInt(tierStr);
-                } catch (NumberFormatException ex) {
-                    log.error("Cannot decode object property display tier value "+tierStr+" as an integer");
-                }
-            } else if (p instanceof KeywordProperty) {
-                KeywordProperty kp = (KeywordProperty)p;
-                return kp.getDisplayRank();
+                ObjectProperty op = (ObjectProperty) p;
+                return op.getDomainDisplayTier();
             } else {
                 log.error("Property is of unknown class in PropertyRanker()");  
             }

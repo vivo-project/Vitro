@@ -9,12 +9,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.jga.algorithms.Filter;
-import net.sf.jga.algorithms.Summarize;
 import net.sf.jga.algorithms.Transform;
 import net.sf.jga.fn.UnaryFunctor;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.Keyword;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;

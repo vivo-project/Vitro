@@ -29,6 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionList
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.RoleLevelOptionsSetup;
@@ -130,15 +131,25 @@ public class DatapropRetryController extends BaseEditController {
         foo.setErrorMap(epo.getErrMsgMap()); // retain error messages from previous time through the form
         
         epo.setFormObject(foo);
-        String html = FormUtils.htmlFormFromBean(objectForEditing,action,foo);
+        FormUtils.populateFormFromBean(objectForEditing,action,foo);
         //for now, this is also making the value hash - need to separate this out
         
         HashMap optionMap = new HashMap();
         List namespaceList = FormUtils.makeOptionListFromBeans(ontDao.getAllOntologies(),"URI","Name", ((objectForEditing.getNamespace()==null) ? "" : objectForEditing.getNamespace()), null, (objectForEditing.getNamespace()!=null));
-	    namespaceList.add(new Option(vreq.getFullWebappDaoFactory().getDefaultNamespace(),"default"));
+	    namespaceList.add(0, new Option(vreq.getFullWebappDaoFactory().getDefaultNamespace(),"default"));
         optionMap.put("Namespace", namespaceList);
         
         List<Option> domainOptionList = FormUtils.makeVClassOptionList(vreq.getFullWebappDaoFactory(), objectForEditing.getDomainClassURI());
+        if (objectForEditing.getDomainClassURI() != null) {
+        	VClass domain = vreq.getWebappDaoFactory().getVClassDao()
+        	        .getVClassByURI(objectForEditing.getDomainClassURI());
+        	if (domain.isAnonymous()) {
+        		domainOptionList.add(0, new Option(
+        			    domain.getURI(), 
+        			    domain.getName(), 
+        			    true));
+        	}
+        }
         domainOptionList.add(0, new Option("","(none specified)"));
         optionMap.put("DomainClassURI", domainOptionList);
         
@@ -166,7 +177,6 @@ public class DatapropRetryController extends BaseEditController {
         foo.setErrorMap(epo.getErrMsgMap());
 
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        request.setAttribute("formHtml",html);
         request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
         request.setAttribute("colspan","4");
         request.setAttribute("scripts","/templates/edit/formBasic.js");

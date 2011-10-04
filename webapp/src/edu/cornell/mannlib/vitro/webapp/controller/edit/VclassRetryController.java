@@ -144,7 +144,7 @@ public class VclassRetryController extends BaseEditController {
             List namespaceIdList = (action.equals("insert"))
                     ? FormUtils.makeOptionListFromBeans(oDao.getAllOntologies(),"URI","Name", ((vclassForEditing.getNamespace()==null) ? "" : vclassForEditing.getNamespace()), null, false)
                     : FormUtils.makeOptionListFromBeans(oDao.getAllOntologies(),"URI","Name", ((vclassForEditing.getNamespace()==null) ? "" : vclassForEditing.getNamespace()), null, true);
-	        namespaceIdList.add(new Option(request.getFullWebappDaoFactory().getDefaultNamespace(),"default"));
+	        namespaceIdList.add(0, new Option(request.getFullWebappDaoFactory().getDefaultNamespace(),"default"));
             optionMap.put("Namespace", namespaceIdList);
         } catch (Exception e) {
             log.error(this.getClass().getName() + "unable to create Namespace option list");
@@ -161,10 +161,9 @@ public class VclassRetryController extends BaseEditController {
 
         request.setAttribute("formValue",foo.getValues());
 
-        String html = FormUtils.htmlFormFromBean(vclassForEditing,action,foo,epo.getBadValueMap());
+        FormUtils.populateFormFromBean(vclassForEditing,action,foo,epo.getBadValueMap());
 
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        request.setAttribute("formHtml",html);
         request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
         request.setAttribute("formJsp","/templates/edit/specific/vclass_retry.jsp");
         request.setAttribute("colspan","4");

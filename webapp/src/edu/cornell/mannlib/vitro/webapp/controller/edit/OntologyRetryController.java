@@ -113,10 +113,9 @@ public class OntologyRetryController extends BaseEditController {
 
         epo.setFormObject(foo);
 
-        String html = FormUtils.htmlFormFromBean(ontologyForEditing,action,foo,epo.getBadValueMap());
+        FormUtils.populateFormFromBean(ontologyForEditing,action,foo,epo.getBadValueMap());
 
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        request.setAttribute("formHtml",html);
         request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
         request.setAttribute("formJsp","/templates/edit/specific/ontology_retry.jsp");
         request.setAttribute("scripts","/templates/edit/formBasic.js");

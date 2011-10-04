@@ -31,13 +31,11 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     private String domainVClassURI = null;
     private VClass domainVClass = null;
     private String domainEntityURI = null;
-    private String domainSidePhasedOut = null;
     private String domainPublic = null;
 
     private String rangeVClassURI = null;
     private VClass rangeVClass = null;
     private String rangeEntityURI = null;
-    private String rangeSidePhasedOut = null;
     private String rangePublic = null;
 
     private boolean transitive = false;
@@ -56,17 +54,15 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
 
     private String domainEntitySortField = null;
     private String domainEntitySortDirection = null;
-    private String domainDisplayTier = "-1";
-    private int domainDisplayLimit = 5;
-    private String domainQuickEditJsp = null;
+    private Integer domainDisplayTier = null;
+    private Integer domainDisplayLimit = 5;
 
     private String objectIndividualSortPropertyURI = null;
     
     private String rangeEntitySortField = null;
     private String rangeEntitySortDirection = null;
-    private String rangeDisplayTier = "-1";
-    private int rangeDisplayLimit = 5;
-    private String rangeQuickEditJsp = null;
+    private Integer rangeDisplayTier = null;
+    private Integer rangeDisplayLimit = 5;
     
     private boolean selectFromExisting = true;
     private boolean offerCreateNewOption = false;
@@ -105,13 +101,6 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     public void setDomainPublic(String domainPublic) {
         this.domainPublic = domainPublic;
     }
-
-    public String getDomainSidePhasedOut() {
-        return domainSidePhasedOut;
-    }
-    public void setDomainSidePhasedOut(String domainSidePhasedOut) {
-        this.domainSidePhasedOut = domainSidePhasedOut;
-    }
     public VClass getDomainVClass() {
         return domainVClass;
     }
@@ -142,13 +131,6 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     }
     public void setRangePublic(String rangePublic) {
         this.rangePublic = rangePublic;
-    }
-
-    public String getRangeSidePhasedOut() {
-        return rangeSidePhasedOut;
-    }
-    public void setRangeSidePhasedOut(String rangeSide) {
-        this.rangeSidePhasedOut = rangeSide;
     }
     public VClass getRangeVClass() {
         return rangeVClass;
@@ -271,19 +253,36 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
         getObjectPropertyStatements().add(objPropertyStmt);
     }
 
+    /**
+     *  @return int for compatibility reasons.  Null values convert to -1.
+     */
     public int getDomainDisplayLimit() {
-        return domainDisplayLimit;
+        return (domainDisplayLimit == null) ? -1 : domainDisplayLimit;
     }
-    public void setDomainDisplayLimit(int domainDisplayLimit) {
+    /**
+     * @return display limit, or null for an unset value
+     */
+    public Integer getDomainDisplayLimitInteger() {
+    	return domainDisplayLimit;
+    }
+    public void setDomainDisplayLimit(Integer domainDisplayLimit) {
         this.domainDisplayLimit = domainDisplayLimit;
     }
-    public String getDomainDisplayTier() {
+    /**
+     *  @return int for compatibility reasons.  Null values convert to -1.
+     */
+    public int getDomainDisplayTier() {
+        return (domainDisplayTier != null) ? domainDisplayTier : -1;
+    }
+    /**
+     * @return display tier, or null for an unset value
+     */    
+    public Integer getDomainDisplayTierInteger() {
         return domainDisplayTier;
     }
-    public void setDomainDisplayTier(String domainDisplayTier) {
+    public void setDomainDisplayTier(Integer domainDisplayTier) {
         this.domainDisplayTier = domainDisplayTier;
     }
-
     public String getDomainEntitySortDirection() {
         return domainEntitySortDirection;
     }
@@ -296,34 +295,42 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     public void setDomainEntitySortField(String domainEntitySortField) {
         this.domainEntitySortField = domainEntitySortField;
     }
-
-    public String getDomainQuickEditJsp() {
-        return domainQuickEditJsp;
-    }
-    public void setDomainQuickEditJsp(String domainQuickEditJsp) {
-        this.domainQuickEditJsp = domainQuickEditJsp;
-    }
-
     public String getObjectIndividualSortPropertyURI() {
     	return this.objectIndividualSortPropertyURI;
     }
     public void setObjectIndividualSortPropertyURI(String objectIndividualSortPropertyURI) {
     	this.objectIndividualSortPropertyURI = objectIndividualSortPropertyURI;
     }
-
+    /**
+     * @return int for compatibility reasons.  Null values convert to -1.
+     */
     public int getRangeDisplayLimit() {
-        return rangeDisplayLimit;
+        return (rangeDisplayLimit == null) ? -1 : rangeDisplayLimit;
+    }
+    /**
+     * @return display limit, or null for an unset value
+     */
+    public Integer getRangeDisplayLimitInteger() {
+    	return rangeDisplayLimit;
     }
     public void setRangeDisplayLimit(int rangeDisplayLimit) {
         this.rangeDisplayLimit = rangeDisplayLimit;
     }
-    public String getRangeDisplayTier() {
-        return rangeDisplayTier;
+    /**
+     * @return int for compatibility reason.  Null values convert to -1.
+     */
+    public int getRangeDisplayTier() {
+        return (rangeDisplayTier == null) ? -1 : rangeDisplayTier;
     }
-    public void setRangeDisplayTier(String rangeDisplayTier) {
+    /**
+     * @return display tier, or null for an unset value
+     */
+    public Integer getRangeDisplayTierInteger() {
+    	return rangeDisplayTier;
+    }
+    public void setRangeDisplayTier(Integer rangeDisplayTier) {
         this.rangeDisplayTier = rangeDisplayTier;
     }
-
     public String getRangeEntitySortDirection() {
         return rangeEntitySortDirection;
     }
@@ -336,14 +343,6 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     public void setRangeEntitySortField(String rangeEntitySortField) {
         this.rangeEntitySortField = rangeEntitySortField;
     }
-
-    public String getRangeQuickEditJsp() {
-        return rangeQuickEditJsp;
-    }
-    public void setRangeQuickEditJsp(String rangeQuickEditJsp) {
-        this.rangeQuickEditJsp = rangeQuickEditJsp;
-    }
-
     public boolean getSelectFromExisting() {
         return selectFromExisting;
     }
@@ -366,60 +365,14 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     
     public void setStubObjectRelation(boolean b) {
         this.stubObjectRelation = b;
-    }
+    }    
     
     /**
-     * swaps the domain and range.
-     *
-     */
-    public final void reflect(){
-        int tempI = getDomainDisplayLimit();
-        setDomainDisplayLimit( getRangeDisplayLimit() );
-        setRangeDisplayLimit( tempI);
-
-        String tmpS =getDomainDisplayTier();
-        setDomainDisplayTier( getRangeDisplayTier() );
-        setRangeDisplayTier(tmpS);
-
-        tmpS=getDomainEntityURI();
-        setDomainEntityURI(getRangeEntityURI());
-        setRangeEntityURI(tmpS);
-
-        tmpS=getDomainEntitySortDirection();
-        setDomainEntitySortDirection(getRangeEntitySortDirection());
-        setRangeEntitySortDirection(tmpS);
-
-        tmpS=getDomainEntitySortField();
-        setDomainEntitySortField(getRangeEntitySortField());
-        setRangeEntitySortField(tmpS);
-
-        tmpS=getDomainPublic();
-        setDomainPublic(getRangePublic());
-        setRangePublic(tmpS);
-
-        tmpS=getDomainQuickEditJsp();
-        setDomainQuickEditJsp(getRangeQuickEditJsp());
-        setRangeQuickEditJsp(tmpS);
-
-        tmpS=getDomainSidePhasedOut();
-        setDomainSidePhasedOut(getRangeSidePhasedOut());
-        setRangeSidePhasedOut(tmpS);
-
-        VClass tmpC=getDomainVClass();
-        setDomainVClass(getRangeVClass());
-        setRangeVClass(tmpC);
-
-        tmpS = getDomainVClassURI();
-        setDomainVClassURI(getRangeVClassURI());
-        setRangeVClassURI(tmpS);
-    }
-    
-    /**
-     * Sorts alphabetically by non-public name
+     * Sorts alphabetically by public name
      */
     public int compareTo (ObjectProperty op) {
         Collator collator = Collator.getInstance();
-        return collator.compare(this.getDomainSidePhasedOut(),(op).getDomainSidePhasedOut());
+        return collator.compare(this.getDomainPublic(), (op).getDomainPublic());
     }
 
     /**
@@ -430,11 +383,11 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
         public int compare(Object o1, Object o2) {
             if( !(o1 instanceof ObjectProperty ) && !(o2 instanceof ObjectProperty))
                 return 0;
-            String tier1 = ((ObjectProperty ) o1).getDomainDisplayTier();
-            String tier2 = ((ObjectProperty ) o2).getDomainDisplayTier();
-            tier1 = tier1 == null ? "0":tier1;
-            tier2 = tier2 == null ? "0":tier2;
-            return Integer.parseInt( tier1 ) - Integer.parseInt( tier2 );
+            Integer tier1 = ((ObjectProperty ) o1).getDomainDisplayTier();
+            Integer tier2 = ((ObjectProperty ) o2).getDomainDisplayTier();
+            tier1 = (tier1 == null) ? 0 : tier1;
+            tier2 = (tier2 == null) ? 0 : tier2;
+            return tier1 - tier2;
         }
     }
 
@@ -670,8 +623,6 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
         "domainVClass: " + getDomainVClass() + "\n\t" +
         "domainClassId: " + getDomainVClassURI() + "\n\t" +
         "domainPublic: " + getDomainPublic() + "\n\t" +
-        "domainQuickEditJsp: " + getDomainQuickEditJsp() + "\n\t" +
-        "domainSidePhasedOut: " + getDomainSidePhasedOut() + "\n\t" +
         "parentId: " + getParentURI() + "\n\t" +
         "rangeDisplayLimit: " + getRangeDisplayLimit() + "\n\t" +
         "rangeDisplayTier: " + getRangeDisplayTier() + "\n\t" +
@@ -681,8 +632,6 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
         "rangeVClass: " + getRangeVClass() + "\n\t" +
         "rangeClassId: " + getRangeVClassURI() + "\n\t" +
         "rangePublic: " + getRangePublic() + "\n\t" +
-        "rangeQuickEditJsp: " + getRangeQuickEditJsp() + "\n\t" +
-        "rangeSidePhasedOut: " + getRangeSidePhasedOut() + "\n\t" +
         "customEntryForm" + getCustomEntryForm() + "\n\t" +
         "selectFromExisting" + getSelectFromExisting() + "\n\t" +
         "offerCreateNewOption" + getOfferCreateNewOption() + "\n\t" +

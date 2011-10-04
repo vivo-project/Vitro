@@ -83,7 +83,7 @@ public class ApplicationBeanRetryController extends BaseEditController {
         foo.setOptionLists(optionMap);
 
         epo.setFormObject(foo);
-        FormUtils.htmlFormFromBean(applicationForEditing, epo.getAction(), foo);
+        FormUtils.populateFormFromBean(applicationForEditing, epo.getAction(), foo);
    
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");

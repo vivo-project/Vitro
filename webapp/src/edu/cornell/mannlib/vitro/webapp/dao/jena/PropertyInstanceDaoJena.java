@@ -14,13 +14,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.hp.hpl.jena.ontology.AllValuesFromRestriction;
 import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.ontology.Restriction;
-import com.hp.hpl.jena.ontology.SomeValuesFromRestriction;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -92,11 +90,6 @@ public class PropertyInstanceDaoJena extends JenaBaseDao implements
         } finally {
             ontModel.leaveCriticalSection();
         }
-    }
-
-    public Iterator getAllOfThisTypeIterator() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     public Collection<PropertyInstance> getAllPossiblePropInstForIndividual(String individualURI) {

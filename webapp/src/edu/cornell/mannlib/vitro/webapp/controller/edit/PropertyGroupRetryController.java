@@ -94,10 +94,9 @@ public class PropertyGroupRetryController extends BaseEditController {
         foo.setErrorMap(epo.getErrMsgMap());
         epo.setFormObject(foo);
 
-        String html = FormUtils.htmlFormFromBean(propertyGroupForEditing,action,foo,epo.getBadValueMap());
+        FormUtils.populateFormFromBean(propertyGroupForEditing,action,foo,epo.getBadValueMap());
 
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        request.setAttribute("formHtml",html);
         request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
         request.setAttribute("formJsp","/templates/edit/specific/propertyGroup_retry.jsp");
         request.setAttribute("scripts","/templates/edit/formBasic.js");

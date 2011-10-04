@@ -275,8 +275,7 @@ public class EntityRetryController extends BaseEditController {
         // DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         DateFormat minutesOnlyDateFormat = new SimpleDateFormat ("yyyy-MM-dd HH:mm");
         DateFormat dateOnlyFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-        String html = FormUtils.htmlFormFromBean(individualForEditing,action,epo,foo,epo.getBadValueMap());
+        FormUtils.populateFormFromBean(individualForEditing,action,epo,foo,epo.getBadValueMap());
 
         List cList = new ArrayList();
         cList.add(new IndividualDataPropertyStatementProcessor());
@@ -289,7 +288,6 @@ public class EntityRetryController extends BaseEditController {
         ApplicationBean appBean = vreq.getAppBean();
         
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        request.setAttribute("formHtml",html);
         request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
         request.setAttribute("formJsp","/templates/edit/specific/entity_retry.jsp");
         request.setAttribute("epoKey",epo.getKey());

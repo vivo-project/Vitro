@@ -364,12 +364,7 @@ public class DashboardPropertyListController extends VitroHttpServlet {
                 return dp.getDisplayTier();
             } else if (p instanceof ObjectProperty) {
                 ObjectProperty op = (ObjectProperty)p;
-                String tierStr = p.isSubjectSide() ? op.getDomainDisplayTier() : op.getRangeDisplayTier();
-                try {
-                    return Integer.parseInt(tierStr);
-                } catch (NumberFormatException ex) {
-                    log.error("Cannot decode object property display tier value "+tierStr+" as an integer");
-                }
+                return op.getDomainDisplayTier();
             } else {
                 log.error("Property is of unknown class in PropertyRanker()");  
             }

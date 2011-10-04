@@ -114,12 +114,6 @@ public class FilteringPropertyInstanceDao implements PropertyInstanceDao {
             return null;
     }
 
-    
-    /* ************* unfiltered methods that might need to be filtered ****** */
-    public Iterator getAllOfThisTypeIterator() {
-        return innerPropertyInstanceDao.getAllOfThisTypeIterator();
-    }
-    
     /* **************** unfiltered methods ***************** */    
     public void deleteObjectPropertyStatement(String subjectURI,
             String propertyURI, String objectURI) {

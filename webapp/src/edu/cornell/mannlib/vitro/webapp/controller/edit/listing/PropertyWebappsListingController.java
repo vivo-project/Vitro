@@ -182,7 +182,11 @@ public class PropertyWebappsListingController extends BaseEditController {
                     } else {
                         results.add("unspecified");
                     }
-                    results.add(prop.getDomainDisplayTier()); //("d"+prop.getDomainDisplayTier()+",r"+prop.getRangeDisplayTier()); // column 7
+                    if (prop.getDomainDisplayTierInteger() != null) {
+                    	results.add(Integer.toString(prop.getDomainDisplayTierInteger(), BASE_10)); // column 7
+                    } else {
+                    	results.add(""); // column 7
+                    }
                     results.add(prop.getHiddenFromDisplayBelowRoleLevel()  == null ? "(unspecified)" : prop.getHiddenFromDisplayBelowRoleLevel().getShorthand()); // column 8
                     results.add(prop.getProhibitedFromUpdateBelowRoleLevel() == null ? "(unspecified)" : prop.getProhibitedFromUpdateBelowRoleLevel().getShorthand()); // column 9
                 }
