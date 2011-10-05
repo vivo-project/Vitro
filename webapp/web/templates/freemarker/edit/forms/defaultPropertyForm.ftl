@@ -2,8 +2,6 @@
 
 <h2>${editConfiguration.formTitle}</h2>
 
-<#assign predicateProperty = "${editConfiguration.predicateProperty}" />
-
 <#if editConfiguration.propertySelectFromExisting = true>
 	<#if editConfiguration.rangeOptionsExist  = true >
 		<#assign rangeOptionKeys = editConfiguration.rangeOptions?keys />
@@ -30,3 +28,18 @@
 		<p> There are no entries in the system from which to select.  </p>	
 	</#if>
 </#if>
+
+<#if editConfiguration.propertyOfferCreateNewOption = true>
+<#include "defaultOfferCreateNewOptionForm.ftl">
+
+</#if>
+
+<#if editConfiguration.propertySelectFromExisting = false && editConfiguration.propertyOfferCreateNewOption = false>
+<p>This property is currently configured to prohibit editing. </p>
+</#if>
+
+
+<#if editConfiguration.includeDeletionForm = true>
+<#include "defaultDeletePropertyForm.ftl">
+</#if>
+

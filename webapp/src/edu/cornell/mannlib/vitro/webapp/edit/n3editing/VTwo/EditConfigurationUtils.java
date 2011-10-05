@@ -47,41 +47,59 @@ public class EditConfigurationUtils {
     public static Individual getSubjectIndividual(VitroRequest vreq) {
     	Individual subject = null;
     	String subjectUri = getSubjectUri(vreq);
-	    WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-
-    	 if( subjectUri != null ){
-	        subject = wdf.getIndividualDao().getIndividualByURI(subjectUri);
-	         if( subject != null )
-	             vreq.setAttribute("subject", subject);    
-	 	    }
+    	subject = getIndividual(vreq, subjectUri);
+    	
+    	 if( subject!= null ){
+	         vreq.setAttribute("subject", subject);    
+	 	 }
     	return subject;
+    }
+    
+    public static Individual getIndividual(VitroRequest vreq, String uri) {
+    	Individual individual = null; 
+    	WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+
+    	 if( uri != null ){
+	        individual = wdf.getIndividualDao().getIndividualByURI(uri);
+    	 }
+    	return individual;
     }
     
     public static Individual getObjectIndividual(VitroRequest vreq) {
     	String objectUri = getObjectUri(vreq);
-    	Individual object = null;
-        WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-
-    	 if( objectUri != null ){
-	        object = wdf.getIndividualDao().getIndividualByURI(objectUri);
-	         if( object != null )
-	             vreq.setAttribute("subject", object);    
-	 	    }
+    	Individual object = getIndividual(vreq, objectUri);
+        if( object != null ) {
+             vreq.setAttribute("subject", object);    
+ 	    }
     	return object;
     }
    
     
     public static ObjectProperty getObjectProperty(VitroRequest vreq) {
-    	WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+    	//gets the predicate uri from the request
     	String predicateUri = getPredicateUri(vreq);
+    	return getObjectPropertyForPredicate(vreq, predicateUri);
+    }
+    
+    public static DataProperty getDataProperty(VitroRequest vreq) {
+    	String predicateUri = getPredicateUri(vreq);
+    	return getDataPropertyForPredicate(vreq, predicateUri);
+    }
+    
+    public static ObjectProperty getObjectPropertyForPredicate(VitroRequest vreq, String predicateUri) {
+    	WebappDaoFactory wdf = vreq.getWebappDaoFactory();
     	ObjectProperty objectProp = wdf.getObjectPropertyDao().getObjectPropertyByURI(predicateUri);
     	return objectProp;
     }
     
-    public static DataProperty getDataProperty(VitroRequest vreq) {
+    public static DataProperty getDataPropertyForPredicate(VitroRequest vreq, String predicateUri) {
     	WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-    	String predicateUri = getPredicateUri(vreq);
-    	DataProperty dataProp = wdf.getDataPropertyDao().getDataPropertyByURI(predicateUri);
+    	//TODO: Check reason for employing unfiltered webapp dao factory and note if using a different version
+    	//would change the results
+    	//For some reason, note that edit data prop statement request dispatch utilizes unfiltered webapp dao facotry
+    	//DataProperty dataProp = wdf.getDataPropertyDao().getDataPropertyByURI(predicateUri);
+    	 WebappDaoFactory unfilteredWdf = vreq.getUnfilteredWebappDaoFactory();
+    	 DataProperty dataProp = unfilteredWdf.getDataPropertyDao().getDataPropertyByURI( predicateUri );
       	return dataProp;
     }
     

@@ -151,9 +151,10 @@ public class EditN3GeneratorVTwo {
             String tmp = n3;
             for( String key : varsToVals.keySet()){
                 tmp = subInMultiLiterals( key, varsToVals.get(key),tmp);                
-            }            
+            }
+            outv.add(tmp);
         }
-       return n3targets;
+       return outv;
     }
     
     protected static String subInMultiLiterals(String var, List<Literal>values, String n3){        

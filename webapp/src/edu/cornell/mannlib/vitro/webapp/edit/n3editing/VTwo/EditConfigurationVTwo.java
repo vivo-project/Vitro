@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Set;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
@@ -159,7 +159,98 @@ public class EditConfigurationVTwo {
         wdfSelectorForOptons = StandardWDFSelector.selector;
     }
 
+    //Make copy of edit configuration object
+    public EditConfigurationVTwo copy() {
+    	EditConfigurationVTwo editConfig = new EditConfigurationVTwo();
+    	//Copy n3generator - make copy of n3generator or get something else?
+    	editConfig.setN3Generator(new EditN3GeneratorVTwo(this));
+    	//For remaining ensure we make copies of all the objects and we don't use refererences
+    	//Set form url
+    	editConfig.setFormUrl(this.getFormUrl());
+    	//Set edit key
+    	editConfig.setEditKey(this.getEditKey());
+    	//subject, predicate
+    	editConfig.setUrlPatternToReturnTo(this.getUrlPatternToReturnTo());
+    	editConfig.setVarNameForSubject(this.getVarNameForSubject());
+    	editConfig.setSubjectUri(this.getSubjectUri());
+    	editConfig.setEntityToReturnTo(this.getEntityToReturnTo());
+    	editConfig.setVarNameForPredicate(this.getVarNameForPredicate());
+    	editConfig.setPredicateUri(this.getPredicateUri());
+    	//object or data parameters based on whether object or data property
+    	if(this.getObject() != null) {
+    		editConfig.setObject(this.getObject());
+    	}
+    	editConfig.setVarNameForObject(this.getVarNameForObject());
+    	editConfig.setObjectResource(this.isObjectResource());
+    	editConfig.setDatapropKey(this.getDatapropKey());
+    	//original set datapropValue, which in this case would be empty string but no way here
+    	editConfig.setDatapropValue(this.datapropValue);
+    	editConfig.setUrlPatternToReturnTo(this.getUrlPatternToReturnTo());
+   
+    	//n3 required
+    	editConfig.setN3Required(this.copy(this.getN3Required()));
+    	//n3 optional
+    	editConfig.setN3Optional(this.copy(this.getN3Optional()));
+    	//uris on form
+    	editConfig.setUrisOnform(this.copy(this.getUrisOnform()));
+    	//literals on form
+    	editConfig.setLiteralsOnForm(this.copy(this.getLiteralsOnForm()));
+    	//files on form
+    	editConfig.setFilesOnForm(this.copy(this.getFilesOnForm()));
+    	//new resources
+    	Map<String, String> copyNewResources = new HashMap<String, String>();
+    	editConfig.setNewResources(this.copy(this.getNewResources(), copyNewResources));
+    	//uris in scope
+    	editConfig.setUrisInScope(this.copy(this.getUrisInScope()));
+    	//TODO: ensure this is not a shallow copy of literals but makes entirely new literal objects
+    	editConfig.setLiteralsInScope(this.getLiteralsInScope());
+    	//editConfig.setLiteralsInScope(this.copy(this.getLiteralsInScope()));
+    	//sparql for additional uris in scope
+    	editConfig.setSparqlForAdditionalUrisInScope(
+    			this.copy(this.getSparqlForAdditionalUrisInScope(), 
+    					(Map) new HashMap<String, String>()));
+    	//sparql for additional literals in scope
+    	editConfig.setSparqlForAdditionalLiteralsInScope(
+    			this.copy(this.getSparqlForAdditionalLiteralsInScope(), 
+    					(Map) new HashMap<String, String>()));
+    	//sparql for existing literals
+    	editConfig.setSparqlForExistingLiterals(
+    			this.copy(this.getSparqlForExistingLiterals(), 
+    					(Map) new HashMap<String, String>()));
+    	//sparql for existing uris
+    	editConfig.setSparqlForExistingUris(
+    			this.copy(this.getSparqlForExistingUris(), 
+    					(Map) new HashMap<String, String>()));
+    	//TODO: Ensure this is true copy of field and not just shallow copy with same references
+    	Map<String, FieldVTwo> fields = this.getFields();
+    	editConfig.setFields(fields);
+    	
+    	return editConfig;
+    }
+    
+    //make copy of list of strings
+    public List<String> copy(List<String> list) {
+    	List<String> copyList = new ArrayList<String>();
+    	for(String l: list) {
+    		copyList.add(l);
+    	}
+    	return copyList;
+   }
+    
+    public Map<String, List<String>> copy(Map<String, List<String>> source) {
+    	HashMap<String, List<String>> map = new HashMap<String, List<String>>();
+    	Set<String> keys = map.keySet();
+    	for(String key: keys) {
+    		List<String> vals = map.get(key);
+    		map.put(key, this.copy(vals));
+    	}
+     	return map;
+    }
+    	
 
+    
+    
+    
     /**
      * Add symbols for things like currentTime and editingUser to 
      * editConfig.urisInScope and editConfig.literalsInScope.
@@ -823,7 +914,11 @@ public class EditConfigurationVTwo {
         this.submitToUrl = submitToUrl;
     }
     
-    public boolean isUpdate(){
+    public boolean isObjectPropertyUpdate(){
         return this.getObject() != null && this.getObject().trim().length() > 0;  
+    }
+    
+    public boolean isDataPropertyUpdate() {
+    	return this.getDatapropKey() != null && this.getDatapropKey().length() > 0;
     }
 }

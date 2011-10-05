@@ -2,9 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.controller;
 
+import static edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils.getPredicateUri;
+
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
-import java.net.URLEncoder;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -12,24 +15,22 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.rdf.model.Model;
+
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
-import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.EditConfigurationGenerator;
-import edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit.EditConfigurationTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit.EditConfigurationTemplateModel;
 /**
  * This servlet is intended to handle all requests to create a form for use
  * by the N3 editing system.  It will examine the request parameters, determine
@@ -60,25 +61,19 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          if(isErrorCondition(vreq)){
         	 return doHelp(vreq, getErrorMessage(vreq));
          }
-        
-         //if delete, originally forwarded but here would have to do something else
-     //    processDelete(vreq);
-        
+         //TODO: Check if skip edit form needs to go here or elsewhere
          //in case form needs to be redirected b/c of special individuals
      //    processSkipEditForm(vreq);
      
         //Get the edit generator name
          String editConfGeneratorName = processEditConfGeneratorName(vreq);
 
-         //if need to forward to create new object, handle that
-         //why is this not done earlier? why aren't forwards handled in the same place?
-      //   processForwardToCreateNew(vreq);
+        //forward to create new handled in default object property form generator
         
          //session attribute 
          setSessionRequestFromEntity(vreq);
          //Test
-         boolean isObjectProp = EditConfigurationUtils.isObjectProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq);
-         boolean isDataProp = EditConfigurationUtils.isDataProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq);
+ 
          /****  make new or get an existing edit configuration ***/         
          EditConfigurationVTwo editConfig = setupEditConfiguration(editConfGeneratorName, vreq);
          
@@ -109,12 +104,10 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 
 	private EditConfigurationVTwo setupEditConfiguration(String editConfGeneratorName,
 			VitroRequest vreq) {
-		//Still based on request attribute, if edit key exists on request, then use otherwise generate new edit key
-		String editKey = EditConfigurationUtils.getEditKey(vreq);	
+
     	HttpSession session = vreq.getSession();
     	EditConfigurationVTwo editConfig = makeEditConfigurationVTwo( editConfGeneratorName, vreq, session);
-        //Set edit key for edit configuration here
-    	editConfig.setEditKey(editKey);
+        //edit key should now always be set in the generator class
     	//put edit configuration in session
     	
         EditConfigurationVTwo.putConfigInSession(editConfig, session);
@@ -137,7 +130,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 		 WebappDaoFactory wdf = vreq.getWebappDaoFactory();
     	//use default object property form if nothing else works
         String editConfGeneratorName = DEFAULT_OBJ_FORM;
-        String predicateUri =  EditConfigurationUtils.getPredicateUri(vreq);
+        String predicateUri =  getPredicateUri(vreq);
         String formParam = getFormParam(vreq);
         // *** handle the case where the form is specified as a request parameter ***
         if( predicateUri == null && ( formParam != null && !formParam.isEmpty()) ){
@@ -249,63 +242,6 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          }
          return errorMessage;
     }
-    
-   
-    //Based on subject, predicate, object and command, set the appropriate attributes
-    //TODO: Check if setting attributes the way to go or alternative
-    //Leaving these in for now but shouldn't depending on vreq attributes at all
-    //Generators should process them
-    //leaving here for reference, delete later
-    private void processStoreParameters(VitroRequest vreq) {
-         
-         //TODO: Check if json version required any longer
-         //subject
-    	/*
-         processSubject(vreq);
-         processPredicate(vreq);
-         processObject(vreq); 
-         processFormParam(vreq);
-         processTypeOfNew(vreq);
-         processUrlPatternReturn(vreq);
-         saveCurrentUrl(vreq);
-        
-         //if data propety
-         if(isDataProperty(vreq.getParameter("predicateUri"), vreq)) {
-        	 processDataProperty(vreq);
-         }*/
-    }
-    
-    private void processDataProperty(VitroRequest vreq) {
-    	String datapropKeyStr = vreq.getParameter("datapropKey");
-    	String predicateUri = vreq.getParameter("predicateUri");
-    	String subjectUri = vreq.getParameter("subjectUri");
-    	WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-    	HttpSession session = vreq.getSession();
-    	Individual subject = wdf.getIndividualDao().getIndividualByURI(subjectUri);
-   	    int dataHash = 0;
-   	    if( datapropKeyStr != null ){
-   	        try {
-   	            dataHash = Integer.parseInt(datapropKeyStr);
-   	            vreq.setAttribute("datahash", dataHash);
-   	            log.debug("Found a datapropKey in parameters and parsed it to int: " + dataHash);
-   	         } catch (NumberFormatException ex) {
-   	            //return doHelp(vreq, "Cannot decode incoming datapropKey value "+datapropKeyStr+" as an integer hash in EditDataPropStmtRequestDispatchController");
-   	        }
-   	    }
-   	    
-   	    DataPropertyStatement dps = null;
-   	    if( dataHash != 0) {
-   	        Model model = (Model)session.getServletContext().getAttribute("jenaOntModel");
-   	        dps = RdfLiteralHash.getPropertyStmtByHash(subject, predicateUri, dataHash, model);
-   	                              
-   	        if (dps==null) {
-   	            log.error("No match to existing data property \""+predicateUri+"\" statement for subject \""+subjectUri+"\" via key "+datapropKeyStr);
-   	            //TODO: Needs to forward to dataPropMissingStatement.jsp
-   	            //return null;
-   	        }                     
-   	        vreq.setAttribute("dataprop", dps );
-   	    }
-	}
     
 	//should return null
 	private String getFormParam(VitroRequest vreq) {

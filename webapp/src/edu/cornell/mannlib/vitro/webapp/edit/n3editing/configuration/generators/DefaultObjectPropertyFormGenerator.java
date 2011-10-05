@@ -18,7 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUti
 
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
-
+import com.hp.hpl.jena.ontology.OntModel;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -36,6 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditN3GeneratorVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.SelectListGeneratorVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils;
+import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 /**
  * Generates the edit configuration for a default property form.
@@ -63,7 +64,18 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     @Override
     public EditConfigurationVTwo getEditConfiguration(VitroRequest vreq,
             HttpSession session) {
+    	
+    	//Check if create new and return specific edit configuration from that generator.
+    	if(DefaultAddMissingIndividualFormGenerator.isCreateNewIndividual(vreq, session)) {
+    		DefaultAddMissingIndividualFormGenerator generator = new DefaultAddMissingIndividualFormGenerator();
+    		return generator.getEditConfiguration(vreq, session);
+    	}
+    	//TODO: Add a generator for delete: based on command being delete - propDelete.jsp
         //Generate a edit conf for the default object property form and return it.	
+    	return getDefaultObjectEditConfiguration(vreq, session);
+    }
+    
+    private EditConfigurationVTwo getDefaultObjectEditConfiguration(VitroRequest vreq, HttpSession session) {
     	EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();
     	//Set n3 generator
     	editConfiguration.setN3Generator(new EditN3GeneratorVTwo(editConfiguration));
@@ -100,19 +112,30 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 
     	prepareForUpdate(vreq, session, editConfiguration);
     	
+    	//After the main processing is done, check if select from existing process
+    	processProhibitedFromSearch(vreq, session, editConfiguration);
+    	
     	//Form title and submit label now moved to edit configuration template
     	//TODO: check if edit configuration template correct place to set those or whether
     	//additional methods here should be used and reference instead, e.g. edit configuration template could call
     	//default obj property form.populateTemplate or some such method
     	//Select from existing also set within template itself
     	setTemplate(editConfiguration, vreq);
+    	//Set edit key
+    	setEditKey(editConfiguration, vreq);
     	return editConfiguration;
+    }
+    
+    private void setEditKey(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
+    	String editKey = EditConfigurationUtils.getEditKey(vreq);	
+    	editConfiguration.setEditKey(editKey);
     }
     
 	private void setTemplate(EditConfigurationVTwo editConfiguration,
 			VitroRequest vreq) {
 		String template = objectPropertyTemplate;
-    	if(EditConfigurationUtils.isDataProperty(editConfiguration.getPredicateUri(), vreq)){
+		
+		if(EditConfigurationUtils.isDataProperty(editConfiguration.getPredicateUri(), vreq)){
     		template = dataPropertyTemplate;
     	} 
     	editConfiguration.setTemplate(template);
@@ -135,7 +158,6 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	editConfiguration.setEntityToReturnTo(subjectUri);
     	editConfiguration.setVarNameForPredicate("predicate");
     	editConfiguration.setPredicateUri(predicateUri);
-    	
     	
     	
     	//this needs to be set for the editing to be triggered properly, otherwise the 'prepare' method
@@ -189,7 +211,6 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	editConfiguration.setObjectResource(false);
     	//set data prop value, data prop key str, 
     	editConfiguration.setDatapropKey((datapropKeyStr==null)?"":datapropKeyStr);
-    	DataProperty prop = EditConfigurationUtils.getDataProperty(vreq);
     	editConfiguration.setVarNameForObject(dataLiteral);
     	//original set datapropValue, which in this case would be empty string but no way here
     	editConfiguration.setDatapropValue("");
@@ -218,14 +239,17 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	List<String> n3Inverse = new ArrayList<String>();
     	//Note that for proper substitution, spaces expected between variables, i.e. string
     	//of n3 format
-    	n3Inverse.add("?objectVar ?inverseProp ?subject .");
+    	//Set only if object property form
+    	if(this.isObjectPropForm) {
+    		n3Inverse.add("?objectVar ?inverseProp ?subject .");
+    	}
     	return n3Inverse;
     	
     }
     
     //Set queries
     private String retrieveQueryForInverse () {
-    	String queryForInverse = "PREFIX owl:  <http://www.w3.org/2002/07/owl#>"
+    	String queryForInverse =  "PREFIX owl:  <http://www.w3.org/2002/07/owl#>"
 			+ " SELECT ?inverse_property "
 			+ "    WHERE { ?inverse_property owl:inverseOf ?predicate } ";
     	return queryForInverse;
@@ -253,13 +277,15 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     
     private void setUrisAndLiteralsOnForm(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
     	List<String> urisOnForm = new ArrayList<String>();
-    	urisOnForm.add("objectVar");
-    	editConfiguration.setUrisOnform(urisOnForm);
     	List<String> literalsOnForm = new ArrayList<String>();
     	if(EditConfigurationUtils.isDataProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq)) {
     		//if data property set to data literal
     		literalsOnForm.add(dataLiteral);
+    	} else {
+    		//uris on form should be empty if data property
+    		urisOnForm.add("objectVar");
     	}
+    	editConfiguration.setUrisOnform(urisOnForm);
     	editConfiguration.setLiteralsOnForm(literalsOnForm);
     }
     
@@ -313,6 +339,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	field.setNewResource(false);
     	//queryForExisting is not being used anywhere in Field
     	String rangeDatatypeUri = getRangeDatatypeUri(editConfiguration, vreq);
+    	String rangeLang = getRangeLang(editConfiguration, vreq);
     	
     	List<String> validators = new ArrayList<String>();
     	validators.add("datatype:" + rangeDatatypeUri);
@@ -325,8 +352,10 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	field.setPredicateUri(null);
     	field.setObjectClassUri(null);
     	field.setRangeDatatypeUri(rangeDatatypeUri);
-    	
-    	field.setRangeLang(getRangeLang(editConfiguration, vreq));
+    	//have either range datatype uri or range lang
+    	if(rangeDatatypeUri == null) {
+    		field.setRangeLang(rangeLang);
+    	}
     	field.setLiteralOptions(getLiteralOptions(editConfiguration, vreq));
     	
     	//set assertions
@@ -368,6 +397,8 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 	           log.debug("language attribute of ["+rangeLang+"] on data property statement in DefaultDataPropertyFormGenerator");
 	       }
 	   }
+	   if( rangeLang != null && rangeLang.trim().length() == 0)
+           rangeLang = null;
 	    return rangeLang;
 	}
 
@@ -393,7 +424,9 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 	    } else {
 	        log.debug("No incoming dataproperty statement attribute for property "+prop.getPublicName()+"; adding a new statement");                
 	    }      
-
+	    if( rangeDatatypeUri != null && rangeDatatypeUri.trim().length() == 0)
+            rangeDatatypeUri = null;
+	    
 	    return rangeDatatypeUri;
 	}
 
@@ -461,91 +494,35 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	String typeOfNew = vreq.getParameter("typeOfNew");
     	return (typeOfNew != null && !typeOfNew.isEmpty());
     }
-    //orignal code for process to forward new is below
-    /*
-	private ResponseValues processForwardToCreateNew(VitroRequest vreq) {
-		String command = vreq.getParameter("cmd");
-		ObjectProperty objectProp = (ObjectProperty) vreq.getAttribute("predicate");
-	
-		// TODO Auto-generated method stub
-    	 // The default object proepty form offers the option to create a new item
-        // instead of selecting from existing individuals in the system.
-        // This is where the request to create a new indivdiual is handled.
-        //
-        // Forward to create new is part of the default object property form
-        // it should be handled in that form's EditConfigurationVTwo, not here.
-        // The code that sets up the EditConfigurationVTwo should decide on 
-        // different configurations and templates to use based on isForwardToCreateNew. 
-        //TODO: make sure that forward to create new works on the default object property form
-    	
-    	
-        if( isFowardToCreateNew(vreq, objectProp, command)){
-            return handleForwardToCreateNew(vreq, command, objectProp, isEditOfExistingStmt(vreq));
-        }
-        //what should this return otherwise and should this in fact redirect
-        return null;
-		
-	}*/
     
-    /*
-    Forward to create new is part of the default object property form
-    it should be handled in that form's EditConfigurationVTwo, not here.
-    The code that sets up the EditConfigurationVTwo should decide on 
-    different configurations and templates to use based on isForwardToCreateNew.
-*//*
-boolean isFowardToCreateNew(VitroRequest vreq, ObjectProperty objectProp, String command){       
-   //Offer create new and select from existing are ignored if there is a custom form
-   if( objectProp != null && objectProp.getCustomEntryForm() != null && !objectProp.getCustomEntryForm().isEmpty()){        
-       return false;
-   } else {
-
-       boolean isForwardToCreateNew = 
-           ( objectProp != null && objectProp.getOfferCreateNewOption() && objectProp.getSelectFromExisting() == false)
-           || ( objectProp != null && objectProp.getOfferCreateNewOption() && "create".equals(command));
-
-       return isForwardToCreateNew;
-   }
-}
-
-ResponseValues handleForwardToCreateNew(VitroRequest vreq, String command, ObjectProperty objectProp, boolean isEditOfExistingStmt){                          
-   vreq.setAttribute("isForwardToCreateNew", new Boolean(true));
-   
-   //If a objectProperty is both provideSelect and offerCreateNewOption
-   // and a user goes to a defaultObjectProperty.jsp form then the user is
-   // offered the option to create a new Individual and replace the 
-   // object in the existing objectPropertyStatement with this new individual. 
-   boolean isReplaceWithNew =
-       isEditOfExistingStmt && "create".equals(command) 
-       && objectProp != null && objectProp.getOfferCreateNewOption() == true;                
-
-   // If an objectProperty is selectFromExisitng==false and offerCreateNewOption == true
-   // the we want to forward to the create new form but edit the existing object
-   // of the objPropStmt.
-   boolean isForwardToCreateButEdit = 
-       isEditOfExistingStmt && objectProp != null 
-       && objectProp.getOfferCreateNewOption() == true 
-       && objectProp.getSelectFromExisting() == false
-       && ! "create".equals(command);
-
-   //bdc34: maybe when doing a create new, the custom form should be on the class, not the property?
-   String form;
-   if( isReplaceWithNew ){
-       vreq.setAttribute("isReplaceWithNew", new Boolean(true));
-       form = DEFAULT_ADD_INDIVIDUAL;
-   }else  if( isForwardToCreateButEdit ){
-       vreq.setAttribute("isForwardToCreateButEdit", new Boolean(true));
-       form = DEFAULT_ADD_INDIVIDUAL;
-   }else {
-       form = DEFAULT_ADD_INDIVIDUAL;
-   }
-   
-   //forward to form?
-   //There should be no error message here
-   //TODO: Return redirect response values or find out to process this here
-   HashMap<String,Object> map = new HashMap<String,Object>();
-	 map.put("errorMessage", "forweard to create new is not yet implemented");
-	 return new TemplateResponseValues("error-message.ftl", map);
-}        
-*/
+    private boolean isSelectFromExisting(VitroRequest vreq) {
+    	String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
+    	if(EditConfigurationUtils.isDataProperty(predicateUri, vreq)) {
+    		return false;
+    	}
+    	ObjectProperty objProp = EditConfigurationUtils.getObjectPropertyForPredicate(vreq, EditConfigurationUtils.getPredicateUri(vreq));
+    	return objProp.getSelectFromExisting();
+    }
+    
+    //Additional processing, eg. select from existing
+    //This is really process prohibited from search
+    private void processProhibitedFromSearch(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfig) {
+    	if(isSelectFromExisting(vreq)) {
+    		// set ProhibitedFromSearch object so picklist doesn't show
+            // individuals from classes that should be hidden from list views
+    		//TODO: Check how model is retrieved
+            OntModel displayOntModel = 
+               (OntModel) session.getServletContext()
+                    .getAttribute("displayOntModel");
+            if (displayOntModel != null) {
+                ProhibitedFromSearch pfs = new ProhibitedFromSearch(
+                    DisplayVocabulary.SEARCH_INDEX_URI, displayOntModel);
+                if( editConfig != null )
+                    editConfig.setProhibitedFromSearch(pfs);
+            }
+    	}
+    }
+    
+    
 
 }

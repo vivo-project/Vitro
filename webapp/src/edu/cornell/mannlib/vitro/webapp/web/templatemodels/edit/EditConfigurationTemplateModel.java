@@ -7,13 +7,18 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.SelectListGeneratorVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultObjectPropertyFormGenerator;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.text.Collator;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
@@ -43,12 +48,17 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
         this.retrieveEditData();
     }
     
+    //Seeing if returning edit config object might work
+    public EditConfigurationVTwo getEditConfigObject() {
+    	return editConfig;
+    }
+    
     public String getEditKey(){
         return editConfig.getEditKey();
     }
     
     public boolean isUpdate(){
-        return editConfig.isUpdate();
+        return editConfig.isObjectPropertyUpdate();
     }
     
     public String getSubmitToUrl(){
@@ -75,10 +85,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	
     	
     }
-    //TODO: remove
-    private void setRangeDatatype() {
-
-	}
+   
 
 	private boolean isRangeOptionsExist() {
     	boolean rangeOptionsExist = (pageData.get("rangeOptionsExist") != null && (Boolean) pageData.get("rangeOptionsExist")  == true);
@@ -86,7 +93,8 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     }
     
 	private void setFormTitle() {
-		if(editConfig.isObjectResource()) {
+		//if(editConfig.isObjectResource()) {
+		if(EditConfigurationUtils.isObjectProperty(editConfig.getPredicateUri(), vreq)) {
 			setObjectFormTitle();
 		} else {
 			setDataFormTitle();
@@ -107,6 +115,8 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 	}
 
 	//Process and set data
+    //Both form title and submit label would depend on whether this is data property
+    //or object property
     private void setObjectFormTitle() {
     	String formTitle = null;
     	Individual objectIndividual = EditConfigurationUtils.getObjectIndividual(vreq);
@@ -147,20 +157,29 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	pageData.put("formTitle", formTitle);
     }
     
+    
     private void setSubmitLabel() {
     	String submitLabel = null;
-    	Individual objectIndividual = EditConfigurationUtils.getObjectIndividual(vreq);
-    	ObjectProperty prop = EditConfigurationUtils.getObjectProperty(vreq);
-    	
-    	if(objectIndividual != null) {
-    		submitLabel = "save change";
-    	}  else {
-            if ( prop.getOfferCreateNewOption() ) {
-                submitLabel = "select existing";
-            } else {
-                submitLabel = "save entry";
-            }
-        }
+		if(EditConfigurationUtils.isObjectProperty(editConfig.getPredicateUri(), vreq)) {
+	    	Individual objectIndividual = EditConfigurationUtils.getObjectIndividual(vreq);
+	    	ObjectProperty prop = EditConfigurationUtils.getObjectProperty(vreq);
+	    	
+	    	if(objectIndividual != null) {
+	    		submitLabel = "Save change";
+	    	}  else {
+	            if ( prop.getOfferCreateNewOption() ) {
+	                submitLabel = "Select existing";
+	            } else {
+	                submitLabel = "Save entry";
+	            }
+	        }
+		} else {
+			if(editConfig.isDataPropertyUpdate()) {
+				submitLabel = "Save change";
+			} else {
+				submitLabel = "Save entry";
+			}
+		}
     	pageData.put("submitLabel", submitLabel);
     }
     
@@ -169,19 +188,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	if( prop.getSelectFromExisting() ){
     		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
 
-        	// set ProhibitedFromSearch object so picklist doesn't show
-            // individuals from classes that should be hidden from list views
-        	//uncomment out when we know what to do here
-           /*
-        	OntModel displayOntModel = 
-                (OntModel) session.getServletContext()
-                    .getAttribute("displayOntModel");
-            if (displayOntModel != null) {
-                ProhibitedFromSearch pfs = new ProhibitedFromSearch(
-                    DisplayVocabulary.PRIMARY_SEARCH_INDEX_URI, displayOntModel);
-                if( editConfiguration != null )
-                    editConfiguration.setProhibitedFromSearch(pfs);
-            }*/
+        	
         	Map<String,String> rangeOptions = SelectListGeneratorVTwo.getOptions(editConfig, "objectVar" , wdf);    	
         	if( rangeOptions != null && rangeOptions.size() > 0 ) {
         		pageData.put("rangeOptionsExist", true);
@@ -223,10 +230,13 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     }
     
     public List<String> getLiteralStringValue(String key) {
-    	List<Literal> ls = editConfig.getLiteralsInScope().get(key);
     	List<String> literalValues = new ArrayList<String>();
-    	for(Literal l: ls) {
-    		literalValues.add(l.getString());
+    	Map<String, List<Literal>> literalsInScope = editConfig.getLiteralsInScope();
+    	if(literalsInScope.containsKey(key)) {
+	    	List<Literal> ls = literalsInScope.get(key);
+	    	for(Literal l: ls) {
+	    		literalValues.add(l.getString());
+	    	}
     	}
     	return literalValues;
     }
@@ -262,21 +272,26 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	String predicateUri = getPredicateUri();
     	//If predicate uri corresponds to object property, return that
     	if(EditConfigurationUtils.isObjectProperty(predicateUri, vreq)){
-    		return this.vreq.getWebappDaoFactory().getObjectPropertyDao().getObjectPropertyByURI(predicateUri);
+    		return EditConfigurationUtils.getObjectPropertyForPredicate(this.vreq, predicateUri);
     	}
 		//otherwise return Data property
-    	return this.vreq.getWebappDaoFactory().getDataPropertyDao().getDataPropertyByURI(predicateUri);
+    	return EditConfigurationUtils.getDataPropertyForPredicate(this.vreq, predicateUri);
     }
     
     public ObjectProperty getObjectPredicateProperty() {
-    	return this.vreq.getWebappDaoFactory().getObjectPropertyDao().getObjectPropertyByURI(getPredicateUri());
+    	//explore usuing EditConfigurationUtils.getObjectProperty(this.vreq)
+    	//return this.vreq.getWebappDaoFactory().getObjectPropertyDao().getObjectPropertyByURI(getPredicateUri());
+    	return EditConfigurationUtils.getObjectPropertyForPredicate(this.vreq, getPredicateUri());
     }
     
     public DataProperty getDataPredicateProperty() {
-    	return this.vreq.getWebappDaoFactory().getDataPropertyDao().getDataPropertyByURI(getPredicateUri());
-
+    	return EditConfigurationUtils.getDataPropertyForPredicate(this.vreq, getPredicateUri());
     }
     
+    public String getDataPredicatePublicDescription() {
+    	DataProperty dp = getDataPredicateProperty();
+    	return dp.getPublicDescription();
+    }
     public String getPredicateUri() {
     	return editConfig.getPredicateUri();
     }
@@ -285,23 +300,128 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	return editConfig.getSubjectUri();
     }
     
+    public String getSubjectName() {
+    	
+    	Individual subject = EditConfigurationUtils.getIndividual(vreq, getSubjectUri());
+    	return subject.getName();
+    }
+    
     public String getObjectUri() {
     	return editConfig.getObject();
     }
+    
     
     //data literal
     public String getDataLiteral() {
     	return getDataPredicateProperty().getLocalName() + "Edited";
     }
     
+    //Get data property key
+    
     //public description only appears visible for object property
     public String getPropertyPublicDescription() {
     	return getObjectPredicateProperty().getPublicDescription();
     }
     
+    //properties queried on the main object property
     public boolean getPropertySelectFromExisting() {
     	return getObjectPredicateProperty().getSelectFromExisting();
     }
+    
+    //used for form title for object properties
+    //TODO: update because assumes domain public
+    public String getPropertyPublicDomainTitle() {
+    	ObjectProperty prop = EditConfigurationUtils.getObjectProperty(vreq);
+    	return  prop.getDomainPublic();
+    }
+    
+    //used for form title for data properties
+    //TODO: Update b/c assumes data property
+    public String getPropertyPublicName() {
+    	DataProperty  prop = EditConfigurationUtils.getDataProperty(vreq);
+		return prop.getPublicName();
+    }
+    
+    public boolean getPropertyOfferCreateNewOption() {
+    	return getObjectPredicateProperty().getOfferCreateNewOption();
+    }
+    
+    //TODO:Check where this logic should actually go, copied from input element formatting tag
+    public Map<String, String> getOfferTypesCreateNew() {
+		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+    	ObjectProperty op = 
+    		wdf.getObjectPropertyDao().getObjectPropertyByURI(editConfig.getPredicateUri());
+
+    	Individual sub = 
+    		wdf.getIndividualDao().getIndividualByURI(editConfig.getSubjectUri());
+    	
+    	List<VClass> vclasses = null;
+    	vclasses = wdf.getVClassDao().getVClassesForProperty(sub.getVClassURI(), op.getURI());    	
+    	if( vclasses == null )
+    		vclasses = wdf.getVClassDao().getAllVclasses();
+    	
+    	HashMap<String,String> types = new HashMap<String, String>();
+    	for( VClass vclass : vclasses ){
+    		
+    		String name = null;
+    		if( vclass.getPickListName() != null && vclass.getPickListName().length() > 0){
+    			name = vclass.getPickListName();
+    		}else if( vclass.getName() != null && vclass.getName().length() > 0){
+    			name = vclass.getName();
+    		}else if (vclass.getLocalNameWithPrefix() != null && vclass.getLocalNameWithPrefix().length() > 0){
+    			name = vclass.getLocalNameWithPrefix();
+    		}
+    		if( name != null && name.length() > 0)
+    			types.put(vclass.getURI(),name);
+    	}
+    	
+    	//Unlike input element formatting tag, including sorting logic here
+    	return  getSortedMap(types);
+    }
+    
+    public Map<String,String> getSortedMap(Map<String,String> hmap){
+        // first make temporary list of String arrays holding both the key and its corresponding value, so that the list can be sorted with a decent comparator
+        List<String[]> objectsToSort = new ArrayList<String[]>(hmap.size());
+        for (String key:hmap.keySet()) {
+            String[] x = new String[2];
+            x[0] = key;
+            x[1] = hmap.get(key);
+            objectsToSort.add(x);
+        }
+        Collections.sort(objectsToSort, new MapComparator());
+
+        HashMap<String,String> map = new LinkedHashMap<String,String>(objectsToSort.size());
+        for (String[] pair:objectsToSort) {
+            map.put(pair[0],pair[1]);
+        }
+        return map;
+    }
+    
+    private class MapComparator implements Comparator<String[]> {
+        public int compare (String[] s1, String[] s2) {
+            Collator collator = Collator.getInstance();
+            if (s2 == null) {
+                return 1;
+            } else if (s1 == null) {
+                return -1;
+            } else {
+            	if ("".equals(s1[0])) {
+            		return -1;
+            	} else if ("".equals(s2[0])) {
+            		return 1;
+            	}
+                if (s2[1]==null) {
+                    return 1;
+                } else if (s1[1] == null){
+                    return -1;
+                } else {
+                    return collator.compare(s1[1],s2[1]);
+                }
+            }
+        }
+    }
+    
+    
     
     //booleans for checking whether predicate is data or object
     public boolean isDataProperty() {
@@ -321,7 +441,34 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     }
     
     public String getCurrentUrl() {
-    	return "/edit/editRequestDispatch?" + vreq.getQueryString();
+    	return getMainEditUrl() + "?" + vreq.getQueryString();
     }
+    
+    public String getMainEditUrl() {
+    	return "/edit/editRequestDispatch";
+    }
+    
+    //TODO: Check if this logic is correct and delete prohibited does not expect a specific value
+    public boolean isDeleteProhibited() {
+    	String deleteProhibited = vreq.getParameter("deleteProhibited");
+    	return (deleteProhibited != null && !deleteProhibited.isEmpty());
+    }
+    
+    public String getDatapropKey() {
+    	return editConfig.getDatapropKey();
+    }
+    
+    //Check whether deletion form should be included for default object property
+    public boolean getIncludeDeletionForm() {
+    	if(isDeleteProhibited()) 
+    		return false;
+    	if(isObjectProperty()) {
+    		return (getObjectUri() != null && !getObjectUri().isEmpty());
+    	}
+    	else {
+    		String datapropKey = editConfig.getDatapropKey();
+    		return (datapropKey != null && !datapropKey.isEmpty());
+    	}
+     }
     
 }
