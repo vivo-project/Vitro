@@ -60,7 +60,6 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
     }*/
 
     @Override
-    //
     protected ResponseValues processRequest(VitroRequest vreq) {
     	//if error conditions then return here
     	String errorMessage = handleErrors(vreq);
