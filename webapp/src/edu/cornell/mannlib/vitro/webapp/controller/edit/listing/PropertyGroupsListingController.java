@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.controller.edit.listing;
 
 import java.net.URLEncoder;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -12,6 +13,10 @@ import java.util.List;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
@@ -26,120 +31,87 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 
 public class PropertyGroupsListingController extends BaseEditController {
 
-   @Override
-   public void doGet(HttpServletRequest request, HttpServletResponse response) {
-     	if (!isAuthorizedToDisplayPage(request, response, new Actions(new EditOntology()))) {
-		    return;
-	    }
-	
-        VitroRequest vrequest = new VitroRequest(request);
+    private static final long serialVersionUID = 1L;
+    private static final Log log = LogFactory.getLog(PropertyGroupsListingController.class);
+    private static final boolean WITH_PROPERTIES = true;
 
-        //need to figure out how to structure the results object to put the classes underneath
+    @Override
+	public void doGet(HttpServletRequest request, HttpServletResponse response) {
+    	if (!isAuthorizedToDisplayPage(request, response, new Actions(new EditOntology()))) {
+    		return;
+    	}
+    	
+        VitroRequest vreq = new VitroRequest(request);
 
-        PropertyGroupDao dao = vrequest.getFullWebappDaoFactory().getPropertyGroupDao();
+        PropertyGroupDao dao = vreq.getFullWebappDaoFactory().getPropertyGroupDao();
 
-        List<PropertyGroup> groups = dao.getPublicGroups(true);
+        List<PropertyGroup> groups = dao.getPublicGroups(WITH_PROPERTIES);
+        
+        Comparator<Property> comparator = new PropertySorter();
 
-        ArrayList<String> results = new ArrayList<String>();
+        List<String> results = new ArrayList<String>();
         results.add("XX");
-        results.add("Group");
-        results.add("Public description");
+        results.add("group");
         results.add("display rank");
+        results.add("");
         results.add("XX");
 
         if (groups != null) {
-            Collections.sort(groups, new PropertyGroupDisplayComparator());
-            Iterator<PropertyGroup> groupsIt = groups.iterator();
-            while (groupsIt.hasNext()) {
-                PropertyGroup pg = groupsIt.next();
+        	for(PropertyGroup pg: groups) {
                 results.add("XX");
-                if (pg.getName() != null) {
-                    try {
-                        results.add("<a href=\"./editForm?uri=" + 
-                        		URLEncoder.encode(pg.getURI(),"UTF-8") + 
-                        		"&amp;controller=PropertyGroup\">" + 
-                        		pg.getName() + "</a>");
-                    } catch (Exception e) {
-                        results.add(pg.getName());
-                    }
-                } else {
-                    results.add("");
+                String publicName = pg.getName();
+                if ( StringUtils.isBlank(publicName) ) {
+                    publicName = "(unnamed group)";
+                }           
+                try {
+                    results.add("<a href=\"./editForm?uri="+URLEncoder.encode(pg.getURI(),"UTF-8")+"&amp;controller=PropertyGroup\">"+publicName+"</a>");
+                } catch (Exception e) {
+                    results.add(publicName);
                 }
-                results.add(
-                		(pg.getPublicDescription() == null) 
-                		        ? "unspecified" 
-                		        : pg.getPublicDescription());
                 Integer t;
-                results.add(
-                		((t = Integer.valueOf(pg.getDisplayRank())) != -1) 
-                		        ? t.toString() 
-                		        : "");
+                results.add(((t = Integer.valueOf(pg.getDisplayRank())) != -1) ? t.toString() : "");
+                results.add("");
                 results.add("XX");
-                List<Property> classList = pg.getPropertyList();
-                if (classList != null && classList.size()>0) {
+                List<Property> propertyList = pg.getPropertyList();
+                if (propertyList != null && propertyList.size() > 0) {
+                	Collections.sort(propertyList, comparator);
                     results.add("+");
                     results.add("XX");
-                    results.add("Property");
-                    results.add("example");
-                    results.add("description");
+                    results.add("property");
+                    results.add("");
+                    results.add("");
                     results.add("@@entities");
-                    Iterator<Property> propIt = classList.iterator();
+                    Iterator<Property> propIt = propertyList.iterator();
                     while (propIt.hasNext()) {
-                    	results.add("XX");
-                        Property p = propIt.next();
-                        if (p instanceof ObjectProperty) {
-                        	ObjectProperty op = (ObjectProperty) p;
-	                        if (op.getLocalNameWithPrefix() != null 
-	                        		&& op.getURI() != null) {
-	                            try {
-	                                results.add("<a href=\"propertyEdit?uri=" + 
-	                                		URLEncoder.encode(
-	                                				op.getURI(), "UTF-8") + 
-	                                				"\">" + 
-	                                				op.getLocalNameWithPrefix()
-	                                				+ "</a>");
-	                            } catch (Exception e) {
-	                                results.add(op.getLocalNameWithPrefix());
-	                            }
-	                        } else {
-	                            results.add("");
-	                        }
-	                        String exampleStr = 
-	                        	    (op.getExample() == null) 
-	                                        ? "" 
-	                                        : op.getExample();
-	                        results.add(exampleStr);
-	                        String descriptionStr = 
-	                        	    (op.getDescription() == null) 
-	                        	            ? "" 
-	                        	            : op.getDescription();
-	                        results.add(descriptionStr);
-                        } else {
-                          	DataProperty dp = (DataProperty) p;
-	                        if (dp.getName() != null && dp.getURI() != null) {
-	                            try {
-	                                results.add("<a href=\"datapropEdit?uri=" + 
-	                                		URLEncoder.encode(
-	                                				dp.getURI(),"UTF-8") + 
-	                                				"\">" + dp.getName() + 
-	                                				"</a>");
-	                            } catch (Exception e) {
-	                                results.add(dp.getName());
-	                            }
-	                        } else {
-	                            results.add("");
-	                        }
-	                        String exampleStr = 
-	                        	    (dp.getExample() == null) 
-	                        	            ? "" 
-	                        	            : dp.getExample();
-	                        results.add(exampleStr);
-	                        String descriptionStr = 
-	                        	    (dp.getDescription() == null) 
-	                        	            ? "" 
-	                        	            : dp.getDescription();
-	                        results.add(descriptionStr);
+                        Property prop = propIt.next();
+                        results.add("XX");
+                        String controllerStr = "propertyEdit";
+                        String nameStr = 
+                        	   (prop.getLabel() == null) 
+                        	           ? "" 
+                        	           : prop.getLabel();
+                        if (prop instanceof ObjectProperty) {
+                        	nameStr = ((ObjectProperty) prop).getDomainPublic();
+                        } else if (prop instanceof DataProperty) {
+                        	controllerStr = "datapropEdit";
+                        	nameStr = ((DataProperty) prop).getName();
                         }
+                        if (prop.getURI() != null) {
+                            try {
+                                results.add("<a href=\"" + controllerStr + 
+                                		"?uri="+URLEncoder.encode(
+                                				prop.getURI(),"UTF-8") + 
+                                				"\">" + nameStr +"</a>");
+                            } catch (Exception e) {
+                                results.add(nameStr);
+                            }
+                        } else {
+                            results.add(nameStr);
+                        }
+                        String exampleStr = "";
+                        results.add(exampleStr);
+                        String descriptionStr = "";
+                        results.add(descriptionStr);
                         if (propIt.hasNext())
                             results.add("@@entities");
                     }
@@ -163,20 +135,33 @@ public class PropertyGroupsListingController extends BaseEditController {
         }
 
     }
-   
-    private class PropertyGroupDisplayComparator implements Comparator<PropertyGroup> {
-        @Override
-		public int compare (PropertyGroup o1, PropertyGroup o2) {
-            try {
-                int diff = o1.getDisplayRank() - o2.getDisplayRank();
-                if (diff==0) {
-                    return o1.getName().compareToIgnoreCase(o2.getName());
-                }
-                return diff;
-            } catch (Exception e) {
-                return 1;
-            }
-        }
+    
+    private class PropertySorter implements Comparator<Property> {
+    	
+    	private Collator coll = Collator.getInstance();
+    	
+    	public int compare(Property p1, Property p2) {
+    		String name1 = getName(p1);
+    		String name2 = getName(p2);
+    		if (name1 == null && name2 != null) {
+    			return 1;
+    		} else if (name2 == null && name1 != null) {
+    			return -1;
+    		} else if (name1 == null && name2 == null) {
+    			return 0;
+    		}
+    		return coll.compare(name1, name2);
+    	}
+    	
+    	private String getName(Property prop) {
+    		if (prop instanceof ObjectProperty) {
+    			return ((ObjectProperty) prop).getDomainPublic();
+    		} else if (prop instanceof DataProperty) {
+    			return ((DataProperty) prop).getName();
+    		} else {
+    			return prop.getLabel();
+    		}
+    	}
     }
-
+    
 }
