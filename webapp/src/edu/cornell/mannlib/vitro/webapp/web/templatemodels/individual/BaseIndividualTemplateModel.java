@@ -106,7 +106,7 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
     }
 
     public GroupedPropertyList getPropertyList() {
-        if (!(propertyList instanceof GroupedPropertyList)) {
+        if (propertyList == null) {
             propertyList = new GroupedPropertyList(individual, vreq, policyHelper);
         }
         return propertyList;
