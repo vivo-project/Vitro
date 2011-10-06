@@ -337,7 +337,9 @@ public class GroupedPropertyList extends BaseTemplateModel {
 
         // Clear out the property lists on the groups
         for (PropertyGroup pg : groupList) {
-            if (pg.getPropertyList().size() > 0) {
+        	if (pg.getPropertyList() == null) {
+        		pg.setPropertyList(new ArrayList<Property>());
+        	} else if (pg.getPropertyList().size() > 0) {
                 pg.getPropertyList().clear();
             }
         }
