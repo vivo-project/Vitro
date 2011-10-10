@@ -63,7 +63,7 @@
         <font color="red"><form:error name="CopyrightURL"/></font>
     </td>
 </tr>
-
+<!--
 <tr class="editformcell">
     <td valign="bottom" colspan="4">
         <b>About message</b> <i>used for main content area on About page (HTML is allowed)</i><br />
@@ -78,7 +78,7 @@
         <font color="red"><form:error name="AcknowledgeText"/></font>
     </td>
 </tr>
-
+-->
 <tr class="editformcell hideFromVivoWeb">   
     <td valign="bottom" colspan="1">
         <b>Banner image</b><br />
