@@ -59,17 +59,6 @@ public class IndexBuilder extends Thread {
     protected List<StatementToURIsToUpdate> stmtToURIsToIndexFunctions;    
     
     /**
-     * updatedUris will only be accessed from the IndexBuilder thread
-     * so it doesn't need to be synchronized.
-     */
-    private List<String> updatedUris = null;
-    /**
-     * deletedUris will only be accessed from the IndexBuilder thread
-     * so it doesn't need to be synchronized.
-     */
-    private List<String> deletedUris = null;    
-    
-    /**
      * Indicates that a full index re-build has been requested.
      */
     private boolean reindexRequested = false;
@@ -101,8 +90,8 @@ public class IndexBuilder extends Thread {
         super("IndexBuilder");
         
         this.indexer = indexer;
-        this.wdf = wdf;            
                 
+        this.wdf = wdf;            
         if( stmtToURIsToIndexFunctions != null )
             this.stmtToURIsToIndexFunctions = stmtToURIsToIndexFunctions;
         else
@@ -248,32 +237,29 @@ public class IndexBuilder extends Thread {
     }
     
 	/**
-	 * Sets updatedUris and deletedUris lists from the changedStmtQueue.
-	 * updatedUris and deletedUris will only be accessed from the IndexBuilder thread
-	 * so they don't need to be synchronized.
+	 * Take the URIs that we got from the changedStmtQueue, and create the lists
+	 * of updated URIs and deleted URIs.
 	 */
-	private void makeAddAndDeleteLists( Collection<String> uris){	    				
-	    IndividualDao indDao = wdf.getIndividualDao();
-	    
-		/* clear updateInds and deletedUris.  This is the only method that should set these. */
-		this.updatedUris = new LinkedList<String>();
-		this.deletedUris = new LinkedList<String>();
-						
-    	for( String uri: uris){
-    		if( uri != null ){
-    			try{
-    			    Individual ind = indDao.getIndividualByURI(uri);    			    
-	    			if( ind != null)
-	    				this.updatedUris.add(uri);
-	    			else{
-	    				log.debug("found delete in changed uris");
-	    				this.deletedUris.add(uri);
-	    			}
-    			} catch(QueryParseException ex){
-    				log.error("could not get Individual "+ uri,ex);
-    			}
-    		}
-    	}    		    	            	
+	private UriLists makeAddAndDeleteLists(Collection<String> uris) {
+		IndividualDao indDao = wdf.getIndividualDao();
+
+		UriLists uriLists = new UriLists();
+		for (String uri : uris) {
+			if (uri != null) {
+				try {
+					Individual ind = indDao.getIndividualByURI(uri);
+					if (ind != null) {
+						uriLists.updatedUris.add(uri);
+					} else {
+						log.debug("found delete in changed uris");
+						uriLists.deletedUris.add(uri);
+					}
+				} catch (QueryParseException ex) {
+					log.error("could not get Individual " + uri, ex);
+				}
+			}
+		}
+		return uriLists;
 	}	
 
 	/**
@@ -298,13 +284,10 @@ public class IndexBuilder extends Thread {
     protected void updatedIndex() {
         log.debug("Starting updateIndex()");       
                      
-        makeAddAndDeleteLists( statementsToUris(getAndEmptyChangedStatements()) );
+        UriLists uriLists = makeAddAndDeleteLists( statementsToUris(getAndEmptyChangedStatements()) );
         
-        this.numberOfThreads = Math.max( MAX_UPDATE_THREADS, updatedUris.size() / 20); 
-        doBuild( updatedUris.iterator(), deletedUris );
-        
-        this.updatedUris = null;
-        this.deletedUris = null;
+        this.numberOfThreads = Math.max( MAX_UPDATE_THREADS, uriLists.updatedUris.size() / 20); 
+        doBuild( uriLists.updatedUris.iterator(), uriLists.deletedUris );
         
         log.debug("Ending updateIndex()");
     }
@@ -453,6 +436,11 @@ public class IndexBuilder extends Thread {
         synchronized( changedStmtQueue ){
             return reindexRequested || ! changedStmtQueue.isEmpty() ;
         }
-    }        
+    }
+    
+    private static class UriLists {
+        private final List<String> updatedUris = new ArrayList<String>();
+        private final List<String> deletedUris = new ArrayList<String>();
+    }
 }
 
