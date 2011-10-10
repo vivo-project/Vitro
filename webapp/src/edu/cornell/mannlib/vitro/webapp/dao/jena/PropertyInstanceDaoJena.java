@@ -19,6 +19,13 @@ import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.ontology.Restriction;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -246,11 +253,17 @@ public class PropertyInstanceDaoJena extends JenaBaseDao implements
     		        		}
 		        	    }
 		        		
+		        	    List<Resource> propertyList = new ArrayList<Resource>();
 		        		// find properties with class in domain
 		        		ResIterator pit = ontModel.listSubjectsWithProperty(
 		        		        RDFS.domain, ontClass);
 		        		while (pit.hasNext()) {
 		        		    Resource prop = pit.nextResource();
+		        		    propertyList.add(prop);
+		        		}
+		        		propertyList.addAll(
+		        				getPropertiesWithUnionDomainIncluding(VClassURI));
+		        		for (Resource prop : propertyList) {
 		        		    if (prop.getNameSpace() != null 
 		        		            && !NONUSER_NAMESPACES.contains(
 		        		                    prop.getNameSpace()) ) {
@@ -326,6 +339,38 @@ public class PropertyInstanceDaoJena extends JenaBaseDao implements
         Collections.sort(propInsts, new PropInstSorter());
         return propInsts;
         
+    }
+
+    /**
+     * requires SPARQL 1.1 (or ARQ) property path support
+     * @param vclassURI
+     * @return list of property resources with union domains that include the vclass
+     */
+    private List<Resource> getPropertiesWithUnionDomainIncluding(String vclassURI) {
+        List<Resource> propertyResList = new ArrayList<Resource>();
+    	String queryStr = 
+    		      "PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n" +
+                  "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n" +
+                  "PREFIX owl:   <http://www.w3.org/2002/07/owl#> \n\n " +
+                  "SELECT ?p WHERE { \n" +
+                  "    ?f rdf:first <" + vclassURI + "> . \n" +
+                  "    ?u rdf:rest* ?f . \n" +
+                  "    ?d owl:unionOf ?u . \n" +
+                  "    ?p rdfs:domain ?d . \n" +
+                  "}";
+    	Query q = QueryFactory.create(queryStr, Syntax.syntaxSPARQL_11);
+    	QueryExecution qe = QueryExecutionFactory.create(
+    			q, getOntModelSelector().getTBoxModel());
+    	try {
+    	    ResultSet rs = qe.execSelect();
+    	    while (rs.hasNext()) {
+    	    	QuerySolution qs = rs.nextSolution();
+    	    	propertyResList.add(qs.getResource("p"));
+    	    }
+    	} finally {
+    		qe.close();
+    	}
+    	return propertyResList;
     }
     
     private String getURIStr(Resource res) {
