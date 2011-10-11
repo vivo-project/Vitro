@@ -655,7 +655,15 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         
     	OntModelSelectorImpl specialSelector = new OntModelSelectorImpl();
     	specialSelector.setFullModel(unionModel);
-    	specialSelector.setApplicationMetadataModel(specialModel);    	
+    	//Keeping original application metadata model and adding special model
+    	//adding both allows us to prevent errors in ApplicationDao which may depend on 
+    	//a specific individual from the regular application metadata model to pick theme
+    	//Adding the new model would take care of special situations where the switch model may
+    	//contain important information
+    	OntModel newApplicationModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+    	newApplicationModel.add(specialModel);
+    	newApplicationModel.add(originalSelector.getApplicationMetadataModel());
+    	specialSelector.setApplicationMetadataModel(newApplicationModel);    	
     	
     	if(specialDisplayModel != null) {
     		specialSelector.setDisplayModel(specialDisplayModel);

@@ -866,14 +866,21 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         if (customListViewConfigFileMap == null) {
             customListViewConfigFileMap = new HashMap<ObjectProperty, String>();
             OntModel displayModel = getOntModelSelector().getDisplayModel();
+            //Get all property to list view config file mappings in the system
             QueryExecution qexec = QueryExecutionFactory.create(listViewConfigFileQuery, displayModel); 
-            ResultSet results = qexec.execSelect();           
+            ResultSet results = qexec.execSelect();  
+            //Iterate through mappings looking for the current property and setting up a hashmap for subsequent retrieval
             while (results.hasNext()) {
                 QuerySolution soln = results.next();
                 String propertyUri = soln.getResource("property").getURI();
                 ObjectProperty prop = getObjectPropertyByURI(propertyUri);
                 if (prop == null) {
-                    log.warn("Can't find property for uri " + propertyUri);
+                	//This is a warning only if this property is the one for which we're searching
+                	if(op.getURI().equals(propertyUri)){
+                		log.warn("Can't find property for uri " + propertyUri);
+                	} else {
+                		log.debug("Can't find property for uri " + propertyUri);
+                	}
                 } else {
                     String filename = soln.getLiteral("filename").getLexicalForm();
                     customListViewConfigFileMap.put(prop, filename);     
