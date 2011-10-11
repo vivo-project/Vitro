@@ -78,7 +78,7 @@ public class IndexBuilder extends VitroBackgroundThread {
     	if (o instanceof IndexBuilder) {
     		return (IndexBuilder) o;
     	} else {
-    		log.error("IndexBuilder has not bee initialized.");
+    		log.error("IndexBuilder has not been initialized.");
     		return null;
     	}
     }
