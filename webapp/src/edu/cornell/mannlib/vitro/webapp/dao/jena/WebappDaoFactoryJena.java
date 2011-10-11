@@ -536,7 +536,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     private PropertyInstanceDao propertyInstanceDao = null;
     public PropertyInstanceDao getPropertyInstanceDao() {
         if( propertyInstanceDao == null )
-            propertyInstanceDao = new PropertyInstanceDaoJena(this);
+            propertyInstanceDao = new PropertyInstanceDaoJena(dwf, this);
         return propertyInstanceDao;
     }
 

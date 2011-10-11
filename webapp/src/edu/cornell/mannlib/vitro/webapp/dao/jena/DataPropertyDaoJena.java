@@ -45,6 +45,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
+import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
@@ -310,107 +311,37 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     }
 
     public List<DataProperty> getDatapropsForClass(String vclassURI) {
-        // TODO make this more efficient once we figure out our reasoner strategy
-        List<DataProperty> datapropsForClass = new ArrayList();
-        OntModel ontModel = getOntModelSelector().getTBoxModel();
-        try {
-        	VClassDao vcDao = getWebappDaoFactory().getVClassDao();
-	        HashSet<String> superclassURIs = new HashSet<String>(vcDao.getAllSuperClassURIs(vclassURI));
-	        superclassURIs.add(vclassURI);
-	        for (String equivURI : vcDao.getEquivalentClassURIs(vclassURI)) {
-	        	superclassURIs.add(equivURI);
-	        	superclassURIs.addAll(vcDao.getAllSuperClassURIs(equivURI));
-	        }
-	        Iterator superclassURIsIt = superclassURIs.iterator();
-	        ontModel.enterCriticalSection(Lock.READ);
-	        try {
-	            Iterator dataprops = ontModel.listDatatypeProperties();
-	            while (dataprops.hasNext()) {
-	                Object nextObj = dataprops.next();
-	                try {
-	                    com.hp.hpl.jena.ontology.OntProperty jDataprop = (com.hp.hpl.jena.ontology.OntProperty) nextObj;
-	                    Resource domainRes = jDataprop.getDomain();
-	                    if (domainRes != null && !NONUSER_NAMESPACES.contains(jDataprop.getNameSpace()) && superclassURIs.contains(domainRes.getURI())) {
-	                        datapropsForClass.add(datapropFromOntProperty(jDataprop));
-	                    }
-	                    // also check restrictions
-	                    for (Iterator restStmtIt = ontModel.listStatements(null,OWL.onProperty,jDataprop); restStmtIt.hasNext();) {
-		            		Statement restStmt = (Statement) restStmtIt.next();
-		            		Resource restRes = restStmt.getSubject();	            		
-		            		for (Iterator axStmtIt = ontModel.listStatements(null,null,restRes); axStmtIt.hasNext();) {
-		            			Statement axStmt = (Statement) axStmtIt.next();
-		            			OntResource subjOntRes = null;
-	            				if (axStmt.getSubject().canAs(OntResource.class)) {
-	            					subjOntRes = (OntResource) axStmt.getSubject().as(OntResource.class);
-	            				}
-		            			if (
-		            				( (subjOntRes!=null) && (superclassURIs.contains(getClassURIStr(subjOntRes))) ) &&
-		            				(axStmt.getPredicate().equals(RDFS.subClassOf) || (axStmt.getPredicate().equals(OWL.equivalentClass)))	
-		            				) {
-				            		if (restRes.canAs(AllValuesFromRestriction.class) || restRes.canAs(SomeValuesFromRestriction.class)) {
-				            			datapropsForClass.add(datapropFromOntProperty(jDataprop));
-				            		} 
-		            			}
-		            		}
-            			}
-	                } catch (ClassCastException e) {
-	                    e.printStackTrace();
-	                }
-	            }
-	        } finally {
-	            ontModel.leaveCriticalSection();
-	        }
-        } catch (ProfileException pe) {
-        	// TODO language profile doesn't support data properties.
-        	// With RDFS, we might like to return properties with rdfs:range containing a datatype
-        }
-        Collections.sort(datapropsForClass, new DataPropertyRanker());
-        return datapropsForClass;
+        return filterAndConvertToDataProperties(getAllPropInstByVClass(vclassURI));
     }
     
     public Collection<DataProperty> getAllPossibleDatapropsForIndividual(String individualURI) {
-        Individual ind = getWebappDaoFactory().getIndividualDao().getIndividualByURI(individualURI);
-        Collection<DataProperty> dpColl = new ArrayList<DataProperty>();
-        List<String> vclassURIs = getVClassURIs(ind);
-        
-        try {
-	        for (VClass currClass : ind.getVClasses( DIRECT )) {            
-                List<DataProperty> currList = getDatapropsForClass(currClass.getURI());
-                for (Iterator<DataProperty> dpIter = currList.iterator(); dpIter.hasNext();) {
-                    DataProperty dp = (DataProperty) dpIter.next();
-                    boolean addIt = true;
-                    // some inefficient de-duping
-                    for (Iterator<DataProperty> existingIter = dpColl.iterator(); existingIter.hasNext(); ) {
-                        DataProperty existingDp = (DataProperty) existingIter.next();
-                        try {
-                            if (existingDp.getURI().equals(dp.getURI()) && 
-                                    existingDp.getDomainClassURI().equals(dp.getDomainClassURI()) &&
-                                    existingDp.getRangeDatatypeURI().equals(dp.getRangeDatatypeURI())) {
-                                addIt = false;
-                            }
-                        } catch (Exception e) { }
-                    }
-                    if (addIt) {
-                        dpColl.add(dp);
-                    }
-                }
-                // 2010-01-25 addition by BJL
-                // now change range datatype based on individual
-                // TODO: rethink all these methods to reduce inefficiency
-                for (DataProperty dp : dpColl) {
-                	dp.setRangeDatatypeURI(getRequiredDatatypeURI(ind, dp, vclassURIs));
-                }
-        	}
-        } catch (ProfileException pe) {
-        	// TODO language profile doesn't support data properties.
-        	// With RDFS, we might like to return properties with rdfs:range containing a datatype
-        }
-        /*
-        for (DataProperty dp : dpColl) {
-            dp.setDomainClassURI(ind.getVClassURI()); // TODO: improve.  This is so the DWR property editing passes the individual's VClass to get the right restrictions
-        }
-        Collections.sort(dpColl, new PropInstSorter()); */
-        return dpColl;
+    	return filterAndConvertToDataProperties(getAllPossiblePropInstForIndividual(individualURI));
+    }
+    
+    private List<DataProperty> filterAndConvertToDataProperties(
+    		                                List<PropertyInstance> propInsts) {
+    	List<DataProperty> dataprops = new ArrayList<DataProperty>();
+    	for (PropertyInstance propInst : propInsts) {
+       		OntModel tboxModel = getOntModel();
+    		tboxModel.enterCriticalSection(Lock.READ);
+    		boolean add = false;
+    		try { 
+    			add = (propInst.getPropertyURI() != null 
+    					&& tboxModel.contains(
+    							tboxModel.getResource(
+    									propInst.getPropertyURI()), 
+    									RDF.type, 
+    									OWL.DatatypeProperty));
+	    	} finally {
+	    		tboxModel.leaveCriticalSection();
+	    	}
+	    	if (add) {
+	    		DataProperty dataprop = getDataPropertyByURI(propInst.getPropertyURI());
+	    		dataprop.setRangeDatatypeURI(propInst.getRangeClassURI());
+	    		dataprops.add(dataprop);
+	    	}	    	
+    	}
+        return dataprops;
     }
 
     protected boolean reasoningAvailable() {
