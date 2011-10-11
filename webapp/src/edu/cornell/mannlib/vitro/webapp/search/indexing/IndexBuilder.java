@@ -25,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndexerIface;
 import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
+import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
 
 /**
@@ -37,7 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
  * listener can use an IndexBuilder to keep the full text index in sncy with 
  * updates to a model. It calls IndexBuilder.addToChangedUris().  
  */
-public class IndexBuilder extends Thread {
+public class IndexBuilder extends VitroBackgroundThread {
     private WebappDaoFactory wdf;    
 	private final IndexerIface indexer;           
 
@@ -71,6 +72,16 @@ public class IndexBuilder extends Thread {
     public static final int MAX_THREADS = Math.max( MAX_UPDATE_THREADS, MAX_REINDEX_THREADS);
     
     private static final Log log = LogFactory.getLog(IndexBuilder.class);
+    
+    public static IndexBuilder getBuilder(ServletContext ctx) {
+    	Object o = ctx.getAttribute(IndexBuilder.class.getName());
+    	if (o instanceof IndexBuilder) {
+    		return (IndexBuilder) o;
+    	} else {
+    		log.error("IndexBuilder has not bee initialized.");
+    		return null;
+    	}
+    }
 
     public IndexBuilder(IndexerIface indexer,
                         WebappDaoFactory wdf,
@@ -127,10 +138,6 @@ public class IndexBuilder extends Thread {
         this.notifyAll();    	    	   
     }
        
-    public boolean isIndexing(){
-        return indexer.isIndexing();
-    }    	
-		
 	/**
 	 * This is called when the system shuts down.
 	 */
@@ -145,12 +152,16 @@ public class IndexBuilder extends Thread {
         while(! stopRequested ){                        
             try{
                 if( reindexRequested ){
+                	setWorkLevel(WorkLevel.WORKING);
                     log.debug("full re-index requested");
                     indexRebuild();
+                    setWorkLevel(WorkLevel.IDLE);
                 }else if( !changedStmtQueue.isEmpty() ){                       
+                	setWorkLevel(WorkLevel.WORKING);
                     Thread.sleep(WAIT_AFTER_NEW_WORK_INTERVAL); //wait a bit to let a bit more work to come into the queue
                     log.debug("work found for IndexBuilder, starting update");
                     updatedIndex();
+                    setWorkLevel(WorkLevel.IDLE);
                 } else {
                     log.debug("there is no indexing working to do, waiting for work");              
                     synchronized (this) { this.wait(MAX_IDLE_INTERVAL); }                         

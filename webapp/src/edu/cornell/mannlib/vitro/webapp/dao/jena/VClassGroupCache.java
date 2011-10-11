@@ -34,6 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
+import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
 public class VClassGroupCache {
     private static final Log log = LogFactory.getLog(VClassGroupCache.class);
@@ -230,7 +231,7 @@ public class VClassGroupCache {
     
     /* ******************** RebuildGroupCacheThread **************** */
     
-    protected class RebuildGroupCacheThread extends Thread {
+    protected class RebuildGroupCacheThread extends VitroBackgroundThread {
         private final VClassGroupCache cache;
         private long queueChangeMillis = 0L;
         private long timeToBuildLastCache = 100L; //in msec 
@@ -256,8 +257,10 @@ public class VClassGroupCache {
                     log.debug("rebuildGroupCacheThread.run() -- starting rebuildCache()");                    
                     long start = System.currentTimeMillis();
                     
+                    setWorkLevel(WorkLevel.WORKING);
                     rebuildRequested = false;
                     rebuildCache( cache );
+                    setWorkLevel(WorkLevel.IDLE);
                     
                     timeToBuildLastCache = System.currentTimeMillis() - start;
                     log.debug("rebuildGroupCacheThread.run() -- rebuilt cache in " 
