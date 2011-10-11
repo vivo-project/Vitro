@@ -237,7 +237,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	//asserted types string buffer is empty in the original jsp
     	//TODO: Review original comments in jsp to see what could go here
     	//n3Optional.add(getN3AssertedTypes(vreq));
-    	n3Optional.add(getFlagURI(vreq));
+    	n3Optional.add("?" + objectVarName + " rdf:type " + getFlagURI(vreq));
     	return n3Optional;
     	
     }
@@ -386,8 +386,10 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	//if object property
     	if(EditConfigurationUtils.isObjectProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq)){
 	    	Individual objectIndividual = EditConfigurationUtils.getObjectIndividual(vreq);
-	    	if(isForwardToCreateButEdit(vreq) || 
-	    			objectIndividual != null) {
+	    	if(!isReplaceWithNew(vreq) && 
+	    			(isForwardToCreateButEdit(vreq) || 
+	    			objectIndividual != null)
+	    		) {
 	    		editConfiguration.prepareForObjPropUpdate(model);
 	    	}  else {
 	    		//new object to be created

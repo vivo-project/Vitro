@@ -65,7 +65,6 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 	//bdc34: this is likely to become a servlet instead of a jsp.
 	// You can get a reference to the servlet from the context.
 	// this will need to be converted from a jsp to something else
-	public static final String POST_EDIT_CLEANUP_JSP = "postEditCleanUp.jsp";	   	    
 	
 	@Override 
 	protected ResponseValues processRequest(VitroRequest vreq) {			
@@ -111,7 +110,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		String entityToReturnTo = ProcessRdfForm.processEntityToReturnTo(configuration, submission, vreq);
         //For data property processing, need to update edit configuration for back button 
 		ProcessRdfForm.updateEditConfigurationForBackButton(configuration, submission, vreq, writeModel);
-        return doPostEdit(vreq, entityToReturnTo);		
+        return PostEditCleanupController.doPostEdit(vreq, entityToReturnTo);		
 	}
 
 	//In case of back button confusion
@@ -208,49 +207,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		}
 		return null; //no errors		
 	}
-	
-	//TODO: Is this the equivalent of post Edit Cleanup
-	//Also do we wish to continue setting attributes on the request?
 
-    private RedirectResponseValues doPostEdit(VitroRequest vreq, String resourceToRedirectTo ) {
-        String urlPattern = null;
-        String predicateAnchor = "";
-        HttpSession session = vreq.getSession(false);
-        if( session != null ) {
-            EditConfigurationVTwo editConfig = EditConfigurationVTwo.getConfigFromSession(session,vreq);
-            //In order to support back button resubmissions, don't remove the editConfig from session.
-            //EditConfiguration.clearEditConfigurationInSession(session, editConfig);            
-
-            MultiValueEditSubmission editSub = EditSubmissionUtils.getEditSubmissionFromSession(session,editConfig);        
-            EditSubmissionUtils.clearEditSubmissionInSession(session, editSub);
-            
-            //Get prop local name if it exists
-            String predicateLocalName = Utilities.getPredicateLocalName(editConfig);
-          
-            //Get url pattern
-            urlPattern = Utilities.getPostEditUrlPattern(vreq, editConfig);
-            predicateAnchor = Utilities.getPredicateAnchorPostEdit(urlPattern, predicateLocalName);
-            if(predicateAnchor != null && !predicateAnchor.isEmpty()) {
-                vreq.setAttribute("predicateAnchor", predicateAnchor);
-
-            }
-            
-        }
-        
-        //Redirect appropriately
-        if( resourceToRedirectTo != null ){
-            ParamMap paramMap = new ParamMap();
-            paramMap.put("uri", resourceToRedirectTo);
-            paramMap.put("extra","true"); //for ie6            
-            return new RedirectResponseValues( UrlBuilder.getPath(urlPattern,paramMap) + predicateAnchor );
-        } else if ( !urlPattern.endsWith("individual") && !urlPattern.endsWith("entity") ){
-            return new RedirectResponseValues( urlPattern );
-        }
-            
-    
-        return new RedirectResponseValues( UrlBuilder.getUrl(Route.LOGIN) );
-        
-    }    
 	
 	//Move to EditN3Utils but keep make new uris here
 	public static class Utilities {

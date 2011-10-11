@@ -49,8 +49,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     final String DEFAULT_DATA_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDataPropertyFormGenerator";
     //TODO: Create this generator
     final String RDFS_LABEL_FORM = "";
-    final String DEFAULT_ERROR_FORM = "error.jsp";
-    final String DEFAULT_ADD_INDIVIDUAL = "defaultAddMissingIndividualForm.jsp";
+    final String DEFAULT_DELETE_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDeleteGenerator";
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
       
@@ -61,9 +60,11 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          if(isErrorCondition(vreq)){
         	 return doHelp(vreq, getErrorMessage(vreq));
          }
-         //TODO: Check if skip edit form needs to go here or elsewhere
-         //in case form needs to be redirected b/c of special individuals
-     //    processSkipEditForm(vreq);
+        
+         //if edit form needs to be skipped to object instead
+         if(isSkipEditForm(vreq)) {
+        	 return processSkipEditForm(vreq);
+         }
      
         //Get the edit generator name
          String editConfGeneratorName = processEditConfGeneratorName(vreq);
@@ -132,8 +133,12 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
         String editConfGeneratorName = DEFAULT_OBJ_FORM;
         String predicateUri =  getPredicateUri(vreq);
         String formParam = getFormParam(vreq);
+        //Handle deletion before any of the other cases
+        if(isDeleteForm(vreq)) {
+        	editConfGeneratorName = DEFAULT_DELETE_FORM;
+        }
         // *** handle the case where the form is specified as a request parameter ***
-        if( predicateUri == null && ( formParam != null && !formParam.isEmpty()) ){
+        else if( predicateUri == null && ( formParam != null && !formParam.isEmpty()) ){
             //form parameter must be a fully qualified java class name of a EditConfigurationVTwoGenerator implementation.
             editConfGeneratorName = formParam;              
         } else if(isVitroLabel(predicateUri)) { //in case of data property
@@ -170,10 +175,9 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 	}
 
 
-
-	//TODO: Implement below correctly or integrate
-    private ResponseValues processSkipEditForm(VitroRequest vreq) {
-    	 //Certain predicates may be annotated to change the behavior of the edit
+	//if skip edit form
+	private boolean isSkipEditForm(VitroRequest vreq) {
+		 //Certain predicates may be annotated to change the behavior of the edit
         //link.  Check for this annotation and, if present, simply redirect 
         //to the normal individual display for the object URI instead of bringing
         //up an editing form.
@@ -183,16 +187,19 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
         WebappDaoFactory wdf = vreq.getWebappDaoFactory();
         String predicateUri = vreq.getParameter("predicateUri");
         boolean isEditOfExistingStmt = isEditOfExistingStmt(vreq);
-        
-        if ( isEditOfExistingStmt && (wdf.getObjectPropertyDao().skipEditForm(predicateUri)) ) {
-            log.debug("redirecting to object for predicate " + predicateUri);
-            String redirectPage = vreq.getContextPath() + "/individual";
-            redirectPage += "uri=" + URLEncoder.encode(vreq.getParameter("objectUri")) + 
-            	"&relatedSubjectUri=" + URLEncoder.encode(vreq.getParameter("subjectUri")) + 
-            	"&relatingPredicateUri=" + URLEncoder.encode(vreq.getParameter("predicateUri"));
-            return new RedirectResponseValues(redirectPage, HttpServletResponse.SC_SEE_OTHER);
-        } 
-        return null;
+        return (isEditOfExistingStmt && (wdf.getObjectPropertyDao().skipEditForm(predicateUri)));
+	}
+
+	//TODO: Implement below correctly or integrate
+    private ResponseValues processSkipEditForm(VitroRequest vreq) {
+        String redirectPage = vreq.getContextPath() + "/individual";
+        String objectUri = EditConfigurationUtils.getObjectUri(vreq);
+        String subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
+        String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
+        redirectPage += "uri=" + URLEncoder.encode(objectUri) + 
+        	"&relatedSubjectUri=" + URLEncoder.encode(subjectUri) + 
+        	"&relatingPredicateUri=" + URLEncoder.encode(predicateUri);
+        return new RedirectResponseValues(redirectPage, HttpServletResponse.SC_SEE_OTHER);
 		
 	}
 

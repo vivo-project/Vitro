@@ -130,9 +130,7 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
         //map.putAll(FreemarkerHttpServlet.getDirectives());
         //map.putAll(FreemarkerHttpServlet.getMethods());
         ServletContext context = getServletContext();
-        FreemarkerConfigurationLoader loader = 
-            FreemarkerConfigurationLoader.getFreemarkerConfigurationLoader(context);
-        FreemarkerConfiguration fmConfig = loader.getConfig(vreq);
+        FreemarkerConfiguration fmConfig = FreemarkerConfigurationLoader.getConfig(vreq, context);
         fmConfig.resetRequestSpecificSharedVariables();
         TemplateProcessingHelper helper = new TemplateProcessingHelper(fmConfig, vreq, context);
         statementDisplay =  helper.processTemplateToString(templateName, map);       

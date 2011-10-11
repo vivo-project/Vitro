@@ -118,7 +118,7 @@ public class EditConfigurationVTwo {
 
 	EditN3GeneratorVTwo n3generator;   
 
-    private List<ModelChangePreprocessor> modelChangePreprocessors = Collections.emptyList();
+    private List<ModelChangePreprocessor> modelChangePreprocessors;
     
     private List<EditSubmissionVTwoPreprocessor> editSubmissionPreprocessors  = Collections.emptyList();
     
@@ -157,6 +157,7 @@ public class EditConfigurationVTwo {
         queryModelSelector = StandardModelSelector.selector;   
         resourceModelSelector = StandardModelSelector.selector;
         wdfSelectorForOptons = StandardWDFSelector.selector;
+        modelChangePreprocessors = new LinkedList<ModelChangePreprocessor>();
     }
 
     //Make copy of edit configuration object

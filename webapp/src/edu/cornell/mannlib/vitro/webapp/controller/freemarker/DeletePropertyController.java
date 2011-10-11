@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
-
+import java.net.URLEncoder;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
@@ -37,6 +37,7 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
  
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
@@ -75,9 +76,7 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
     	} else {
     		processDataProperty(vreq);
     	}
-    	//Get subject, predicate uri ,
-    	//Redirect 
-    	//return new TemplateResponseValues(editConfig.getTemplate(), map);
+   
     	String redirectUrl = getRedirectUrl(vreq);
     	return new RedirectResponseValues(redirectUrl, HttpServletResponse.SC_SEE_OTHER);
     }
@@ -89,8 +88,8 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
     	String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
     	int hashIndex = predicateUri.lastIndexOf("#");
     	String localName = predicateUri.substring(hashIndex + 1);
-    	String redirectUrl = "/entity?uri=" + subjectUri;
-		return null;
+    	String redirectUrl =  "/entity?uri=" + URLEncoder.encode(subjectUri);
+		return redirectUrl + "#" + URLEncoder.encode(localName);
 	}
 
 
@@ -113,7 +112,8 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
     			return "In delete property controller, could not find object property " + predicateUri;
     		}
     	} else {
-    		DataProperty prop = EditConfigurationUtils.getDataProperty(vreq);
+    		DataProperty prop = getDataProperty(vreq);
+    		
     		if(prop == null) {
     			return "In delete property controller, could not find data property " + predicateUri;
     		}
@@ -122,6 +122,18 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
     	return null;
 		
 	}
+
+	private DataProperty getDataProperty(VitroRequest vreq) {
+		//This is the standard mechanism but note that datapropStmtDelete uses wdf with user aware
+
+		//DataProperty prop = EditConfigurationUtils.getDataProperty(vreq);
+		String editorUri = EditN3Utils.getEditorUri(vreq);
+		WebappDaoFactory wdf = vreq.getWebappDaoFactory().getUserAwareDaoFactory(editorUri);
+		DataProperty prop = wdf.getDataPropertyDao().getDataPropertyByURI(
+				EditConfigurationUtils.getPredicateUri(vreq));
+		return prop;
+	}
+
 
 	private TemplateResponseValues doErrorMessage(String errorMessage) {
 		HashMap<String,Object> map = new HashMap<String,Object>();
@@ -137,31 +149,49 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
     }
     
     private void deleteDataPropertyStatement(VitroRequest vreq) {
-    	Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
-    	//TODO: if null, need to throw or show error
-    	int dataHash = getDataHash(vreq);
+    	String subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
 		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
+
+    	int dataHash = EditConfigurationUtils.getDataHash(vreq);
 		DataPropertyStatement dps = EditConfigurationUtils.getDataPropertyStatement(vreq, vreq.getSession(), dataHash, predicateUri);
 		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+		
+		
+		
 		if(dps != null) {
+			logDataPropertyDeletionMessages(dps);
+			processDataPropertyStatement(dps, subjectUri, predicateUri);
 			wdf.getDataPropertyStatementDao().deleteDataPropertyStatement(dps);
 		}
 	}
 
 
-	private int getDataHash(VitroRequest vreq) {
-		int dataHash = 0;
-		String datapropKey = EditConfigurationUtils.getDataPropKey(vreq);
-		if (datapropKey!=null && datapropKey.trim().length()>0) {
-	        try {
-	            dataHash = Integer.parseInt(datapropKey);
-	        } catch (NumberFormatException ex) {
-	            log.error("Cannot decode incoming dataprop key str " + datapropKey + "as integer hash");
-	        	//throw new JspException("Cannot decode incoming datapropKey String value "+datapropKeyStr+" as an integer hash in datapropStmtDelete.jsp");
-	        }
+	private void processDataPropertyStatement(
+			DataPropertyStatement dps, String subjectUri, String predicateUri) {
+		 //if no individual Uri set to subject uri
+		if( dps.getIndividualURI() == null || dps.getIndividualURI().trim().length() == 0){
+	        log.debug("adding missing subjectURI to DataPropertyStatement" );
+	        dps.setIndividualURI( subjectUri );
 	    }
-		return dataHash;
+		//if no predicate, set predicate uri
+	    if( dps.getDatapropURI() == null || dps.getDatapropURI().trim().length() == 0){
+	        log.debug("adding missing datapropUri to DataPropertyStatement");
+	        dps.setDatapropURI( predicateUri );
+	    }
 	}
+
+
+	private void logDataPropertyDeletionMessages(DataPropertyStatement dps) {
+		log.debug("attempting to delete dataPropertyStatement: subjectURI <" + dps.getIndividualURI() +">");
+        log.debug( "predicateURI <" + dps.getDatapropURI() + ">");
+        log.debug( "literal \"" + dps.getData() + "\"" );
+        log.debug( "lang @" + (dps.getLanguage() == null ? "null" : dps.getLanguage()));
+        log.debug( "datatype ^^" + (dps.getDatatypeURI() == null ? "null" : dps.getDatatypeURI() ));       
+		
+	}
+
+
+	
 
 
 	//process object property

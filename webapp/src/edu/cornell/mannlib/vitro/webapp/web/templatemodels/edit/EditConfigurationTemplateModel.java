@@ -346,6 +346,37 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	return getObjectPredicateProperty().getOfferCreateNewOption();
     }
     
+    public String getPropertyName() {
+    	if(isObjectProperty()) {
+    		return getPropertyPublicDomainTitle().toLowerCase();
+    	}
+    	if(isDataProperty()) {
+    		return getPropertyPublicName();
+    	}
+    	return null;
+    }
+    
+    //TODO: Implement statement display
+    public Map<String, String> getStatementDisplay() {
+    	Map<String, String> statementDisplay = new HashMap<String, String>();
+    	if(isDataProperty()) {
+    		statementDisplay.put("dataValue", getDataLiteralValuesAsString());
+    	} else {
+    		//Expecting statement parameters to be passed in
+    		Map params = vreq.getParameterMap();
+    		for (Object key : params.keySet()) {
+    	        String keyString = (String) key; //key.toString()
+    	        if (keyString.startsWith("statement_")) {
+    	            keyString = keyString.replaceFirst("statement_", "");
+    	            String value = ( (String[]) params.get(key))[0];
+    	            statementDisplay.put(keyString, value);
+    	        }
+    	    }
+    		
+    	}
+    	return statementDisplay;
+    }
+    
     //TODO:Check where this logic should actually go, copied from input element formatting tag
     public Map<String, String> getOfferTypesCreateNew() {
 		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
@@ -444,8 +475,19 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	return getMainEditUrl() + "?" + vreq.getQueryString();
     }
     
+    //this url is for canceling
+    public String getCancelUrl() {
+    	String editKey = editConfig.getEditKey();
+    	return vreq.getContextPath() + "/postEditCleanupController?editKey=" + editKey + "&cancel=true";
+    }
+    
     public String getMainEditUrl() {
-    	return "/edit/editRequestDispatch";
+    	return vreq.getContextPath() + "/editRequestDispatch";
+    }
+    
+    //Get confirm deletion url
+    public String getDeleteProcessingUrl() {
+    	return vreq.getContextPath() + "/deletePropertyController";
     }
     
     //TODO: Check if this logic is correct and delete prohibited does not expect a specific value
@@ -470,5 +512,13 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     		return (datapropKey != null && !datapropKey.isEmpty());
     	}
      }
+    
+    public String getVitroNsProperty() {
+    	String vitroNsProp =  vreq.getParameter("vitroNsProp");
+    	if(vitroNsProp == null) {
+    		vitroNsProp = "";
+    	}
+    	return vitroNsProp;
+    }
     
 }

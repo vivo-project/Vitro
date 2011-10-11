@@ -8,12 +8,16 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit.EditConfigurationTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
@@ -21,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 
 public class EditConfigurationUtils {
+	private static Log log = LogFactory.getLog(EditConfigurationUtils.class);
 
     protected static final String MULTI_VALUED_EDIT_SUBMISSION = "MultiValueEditSubmission";
     
@@ -157,6 +162,21 @@ public class EditConfigurationUtils {
    	        
    	    }
    	    return dps;
+    }
+    
+    //TODO: Include get object property statement
+    public static int getDataHash(VitroRequest vreq) {
+    	int dataHash = 0;
+		String datapropKey = EditConfigurationUtils.getDataPropKey(vreq);
+		if (datapropKey!=null && datapropKey.trim().length()>0) {
+	        try {
+	            dataHash = Integer.parseInt(datapropKey);
+	        } catch (NumberFormatException ex) {
+	            log.error("Cannot decode incoming dataprop key str " + datapropKey + "as integer hash");
+	        	//throw new JspException("Cannot decode incoming datapropKey String value "+datapropKeyStr+" as an integer hash in datapropStmtDelete.jsp");
+	        }
+	    }
+		return dataHash;
     }
 
 }

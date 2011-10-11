@@ -14,9 +14,13 @@
 	id="${editConfiguration.dataLiteral}" name="${editConfiguration.dataLiteral}"
 	value="${literalValues}"/>
 
+
 	<div style="margin-top: 0.2em">
-		<input type="submit" id="submit" value="${editConfiguration.submitLabel}" cancel="true"/>
+		<input type="submit" id="submit" value="${editConfiguration.submitLabel}"/>
+		<span class="or"> or </span>
+		<a title="Cancel" href="${editConfiguration.cancelUrl}">Cancel</a>
 	</div>
+	
 </form>
 
 
