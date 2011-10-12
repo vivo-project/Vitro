@@ -97,22 +97,14 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 
 		<property file="${deploy.properties.file}" />
 
-		<fail unless="tomcat.home"
-		      message="${deploy.properties.file} must contain a value for tomcat.home" />
-		<fail unless="webapp.name"
-		      message="${deploy.properties.file} must contain a value for webapp.name" />
-		<fail unless="vitro.home.directory"
-		      message="${deploy.properties.file} must contain a value for vitro.home.directory" />
-		<fail unless="Vitro.defaultNamespace"
-		      message="${deploy.properties.file} must contain a value for Vitro.defaultNamespace" />
-		<fail unless="VitroConnection.DataSource.url"
-		      message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.url" />
-		<fail unless="VitroConnection.DataSource.username"
-		      message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.username" />
-		<fail unless="VitroConnection.DataSource.password"
-		      message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.password" />
-		<fail unless="rootUser.emailAddress"
-		      message="${deploy.properties.file} must contain a value for rootUser.emailAddress" />
+		<fail unless="tomcat.home" message="${deploy.properties.file} must contain a value for tomcat.home" />
+		<fail unless="webapp.name" message="${deploy.properties.file} must contain a value for webapp.name" />
+		<fail unless="vitro.home.directory" message="${deploy.properties.file} must contain a value for vitro.home.directory" />
+		<fail unless="Vitro.defaultNamespace" message="${deploy.properties.file} must contain a value for Vitro.defaultNamespace" />
+		<fail unless="VitroConnection.DataSource.url" message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.url" />
+		<fail unless="VitroConnection.DataSource.username" message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.username" />
+		<fail unless="VitroConnection.DataSource.password" message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.password" />
+		<fail unless="rootUser.emailAddress" message="${deploy.properties.file} must contain a value for rootUser.emailAddress" />
 
 		<fail message="The vitro.home.directory &quot;${vitro.home.directory}&quot; does not exist.">
 			<condition>
@@ -138,20 +130,11 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
          - - - - - - - - - - - - - - - - - -->
 	<target name="compileUtilities">
 		<mkdir dir="${utility.classes.dir}" />
-		<javac srcdir="${utilities.source.dir}"
-		       destdir="${utility.classes.dir}"
-		       debug="true"
-		       deprecation="${javac.deprecation}"
-		       encoding="UTF8"
-		       includeantruntime="false"
-		       optimize="false"
-		       source="1.6">
+		<javac srcdir="${utilities.source.dir}" destdir="${utility.classes.dir}" debug="true" deprecation="${javac.deprecation}" encoding="UTF8" includeantruntime="false" optimize="false" source="1.6">
 			<classpath refid="utility.compile.classpath" />
 		</javac>
 
-		<typedef name="dirDifference"
-		         classname="edu.cornell.mannlib.vitro.utilities.anttasks.DirDifferenceFileSet"
-		         classpathref="utility.run.classpath" />
+		<typedef name="dirDifference" classname="edu.cornell.mannlib.vitro.utilities.anttasks.DirDifferenceFileSet" classpathref="utility.run.classpath" />
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
@@ -180,8 +163,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		</copy>
 
 		<!-- use the production Log4J properties, unless a debug version exists. -->
-		<available file="${appbase.dir}/config/debug.log4j.properties"
-		           property="debug.log4j.exists" />
+		<available file="${appbase.dir}/config/debug.log4j.properties" property="debug.log4j.exists" />
 		<copy tofile="${war.classes.dir}/log4j.properties" filtering="true" overwrite="true">
 			<fileset dir="${appbase.dir}/config">
 				<include name="default.log4j.properties" unless="debug.log4j.exists" />
@@ -210,21 +192,11 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
          ================================= -->
 	<target name="compile" depends="prepare" description="--> Compile Java sources">
 		<!-- deletes all files that depend on changed .java files -->
-		<depend srcdir="${appbase.dir}/src"
-		        destdir="${war.classes.dir}"
-		        closure="false"
-		        cache="${build.dir}/.depcache">
+		<depend srcdir="${appbase.dir}/src" destdir="${war.classes.dir}" closure="false" cache="${build.dir}/.depcache">
 			<classpath refid="compile.classpath" />
 		</depend>
 
-		<javac srcdir="${appbase.dir}/src"
-		       destdir="${war.classes.dir}"
-		       debug="true"
-		       deprecation="${javac.deprecation}"
-		       encoding="UTF8"
-		       includeantruntime="false"
-		       optimize="true"
-		       source="1.6">
+		<javac srcdir="${appbase.dir}/src" destdir="${war.classes.dir}" debug="true" deprecation="${javac.deprecation}" encoding="UTF8" includeantruntime="false" optimize="true" source="1.6">
 			<classpath refid="compile.classpath" />
 		</javac>
 	</target>
@@ -233,20 +205,11 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
           target: test              
          ================================= -->
 	<target name="test" depends="compile" unless="skiptests" description="--> Run JUnit tests">
-		<javac srcdir="${appbase.dir}/test"
-		       destdir="${test.classes.dir}"
-		       debug="true"
-		       deprecation="${javac.deprecation}"
-		       encoding="UTF8"
-		       includeantruntime="false"
-		       optimize="false"
-		       source="1.6">
+		<javac srcdir="${appbase.dir}/test" destdir="${test.classes.dir}" debug="true" deprecation="${javac.deprecation}" encoding="UTF8" includeantruntime="false" optimize="false" source="1.6">
 			<classpath refid="test.compile.classpath" />
 		</javac>
 
-		<java classname="edu.cornell.mannlib.vitro.utilities.testing.VitroTestRunner"
-		      fork="yes"
-		      failonerror="true">
+		<java classname="edu.cornell.mannlib.vitro.utilities.testing.VitroTestRunner" fork="yes" failonerror="true">
 			<classpath refid="test.run.classpath" />
 			<arg file="${appbase.dir}/test" />
 			<arg value="${testlevel}" />
@@ -263,10 +226,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	<!-- ================================= 
           target: revisionInfo              
          ================================= -->
-	<target name="revisionInfo"
-	        depends="test"
-	        unless="skipinfo"
-	        description="--> Store revision info in build">
+	<target name="revisionInfo" depends="test" unless="skipinfo" description="--> Store revision info in build">
 		<tstamp>
 			<format property="revisionInfo.timestamp" pattern="yyyy-MM-dd HH:mm:ss" />
 		</tstamp>
@@ -282,8 +242,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	<target name="prepareSolr" depends="properties">
 		<property name="solr.distrib.dir" location="${corebase.dir}/../solr" />
 		<property name="solr.example.dir" location="${solr.distrib.dir}/exampleSolr" />
-		<property name="solr.context.config.example"
-		          location="${solr.distrib.dir}/exampleSolrContext.xml" />
+		<property name="solr.context.config.example" location="${solr.distrib.dir}/exampleSolrContext.xml" />
 		<property name="solr.war" location="${solr.distrib.dir}/apache-solr-3.1.0.war" />
 
 		<property name="solr.docbase" location="${solr.home.dir}/solr.war" />
@@ -329,9 +288,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	<!-- ================================= 
           target: deploy              
          ================================= -->
-	<target name="deploy"
-	        depends="revisionInfo, deploySolr"
-	        description="--> Build the app and install in Tomcat">
+	<target name="deploy" depends="revisionInfo, deploySolr" description="--> Build the app and install in Tomcat">
 		<property name="webapp.deploy.home" value="${tomcat.home}/webapps/${webapp.name}" />
 
 		<mkdir dir="${webapp.deploy.home}" />
@@ -357,9 +314,19 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
           At release time, applies license text to source files.
          ================================= -->
 	<target name="licenser" description="--> Check source files for licensing tags">
-		<property name="licenser.properties.file"
-		          location="${corebase.dir}/config/licenser/licenser.properties" />
+		<property name="licenser.properties.file" location="${corebase.dir}/config/licenser/licenser.properties" />
 		<runLicenserScript productname="Vitro core" propertiesfile="${licenser.properties.file}" />
+	</target>
+
+	<!-- ================================= 
+          target: jarlist              
+         ================================= -->
+	<target name="jarlist" depends="jar" description="Figure out what JARs are not needed">
+		<java classname="edu.cornell.mannlib.vitro.utilities.jarlist.JarLister" fork="no" failonerror="true">
+			<classpath refid="utility.run.classpath" />
+			<arg value="${build.dir}/${ant.project.name}.jar" />
+			<arg value="${appbase.dir}/lib" />
+		</java>
 	</target>
 
 
@@ -391,9 +358,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<attribute name="productName" />
 		<attribute name="productCheckoutDir" />
 		<sequential>
-			<java classname="edu.cornell.mannlib.vitro.utilities.revisioninfo.RevisionInfoBuilder"
-			      fork="no"
-			      failonerror="true">
+			<java classname="edu.cornell.mannlib.vitro.utilities.revisioninfo.RevisionInfoBuilder" fork="no" failonerror="true">
 				<classpath refid="utility.run.classpath" />
 				<arg value="@{productName}" />
 				<arg file="@{productCheckoutDir}" />
