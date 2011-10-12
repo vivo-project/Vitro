@@ -481,7 +481,6 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
                   "  FILTER(?p != owl:bottomDataProperty \n" +
                   "      && ?p != owl:bottomObjectProperty) \n" +
                   "}";
-    	log.info(queryStr);
     	Query q = QueryFactory.create(queryStr, Syntax.syntaxSPARQL_11);
     	QueryExecution qe = QueryExecutionFactory.create(
     			q, getOntModelSelector().getTBoxModel());
