@@ -16,7 +16,7 @@ import com.hp.hpl.jena.query.Dataset;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
-//HttpServletRequest
+
 public class VitroRequest extends HttpServletRequestWrapper {
 
     private static final String FROM_ENCODING = "ISO-8859-1";
@@ -39,12 +39,6 @@ public class VitroRequest extends HttpServletRequestWrapper {
 
     public VitroRequest(HttpServletRequest _req) {
         super(_req);
-        if( _req == null )
-            throw new IllegalArgumentException("Non-null HttpServletRequest needed" +
-                    "to construct a VitroRequest");
-        //if( _req.getAttribute("VitroRequestPrep.setup") ==null )
-          //  throw new IllegalArgumentException("Cannot construct a VitroRequest if the HttpServletRequest " +
-            //      "has not been setup correctly by the VitroRequestPrep filter");
         this._req = _req;
     }
 
@@ -124,8 +118,8 @@ public class VitroRequest extends HttpServletRequestWrapper {
     //Method that retrieves write model, returns special model in case of write model
     public OntModel getWriteModel() {
     	//if special write model doesn't exist use get ont model 
-    	if(this.getAttribute(this.SPECIAL_WRITE_MODEL) != null) {
-    		return (OntModel)this.getAttribute(this.SPECIAL_WRITE_MODEL);
+    	if(this.getAttribute(SPECIAL_WRITE_MODEL) != null) {
+    		return (OntModel)this.getAttribute(SPECIAL_WRITE_MODEL);
     	} else {
     		return getJenaOntModel();
     	}
@@ -172,8 +166,9 @@ public class VitroRequest extends HttpServletRequestWrapper {
     /* These methods are overridden so that we might convert URL-encoded request parameters to UTF-8
      * Call static method setConvertParameterEncoding(false) to disable conversion.
      */
-    //@Override
-    public Map getParameterMap() {
+    @SuppressWarnings("unchecked")
+	@Override
+    public Map<String, String[]> getParameterMap() {
         if ((_req.getAttribute("convertParameterEncoding") != null && !((Boolean)_req.getAttribute("convertParameterEncoding"))) || _req.getParameterMap() == null || this.getMethod().equals("POST") || !convertParameterEncoding) {
             return _req.getParameterMap();
         } else {
@@ -184,13 +179,13 @@ public class VitroRequest extends HttpServletRequestWrapper {
         }
     }
     
-    //@Override
+    @Override
     public String getParameter(String name) {        
         if ((_req.getAttribute("convertParameterEncoding") != null && !((Boolean)_req.getAttribute("convertParameterEncoding"))) || _req.getParameter(name) == null || this.getMethod().equals("POST") || !convertParameterEncoding)
             return _req.getParameter(name);
         else {
-            Map pmap = getParameterMap();
-            String[] values = (String[])pmap.get(name);
+            Map<String, String[]> pmap = getParameterMap();
+            String[] values = pmap.get(name);
             if( values == null )
                 return null;
             else if( values.length == 0 )
@@ -200,27 +195,27 @@ public class VitroRequest extends HttpServletRequestWrapper {
         }
     }
 
-    //@Override
+    @Override
     public String[] getParameterValues(String name) {
         if ((_req.getAttribute("convertParameterEncoding") != null && !((Boolean)_req.getAttribute("convertParameterEncoding"))) || this.getMethod().equals("POST") || !convertParameterEncoding)
             return _req.getParameterValues(name);
         else {
-            Map pmap = getParameterMap();
+            Map<String, String[]> pmap = getParameterMap();
             if( pmap != null )
-                return (String[])pmap.get(name);
+                return pmap.get(name);
             else
                 return null;
         }
     }
     
-    public static HashMap<String,String[]> convertParameterMap( Map map ){
+    public static HashMap<String,String[]> convertParameterMap( Map<String, String[]> map ){
         if( map == null ) return null;
         
         HashMap<String,String[]> rMap = new HashMap<String,String[]>();
-        Iterator keyIt = map.keySet().iterator();
+        Iterator<String> keyIt = map.keySet().iterator();
         while (keyIt.hasNext()) {        
-            String key =(String) keyIt.next();                
-            rMap.put(key, convertValues( (String[])map.get(key) ));        
+            String key = keyIt.next();                
+            rMap.put(key, convertValues( map.get(key) ));        
         }
         return rMap;
     }
@@ -243,214 +238,5 @@ public class VitroRequest extends HttpServletRequestWrapper {
             return null;
         }
     }
-
-    /* *********** delegated methods *********** */
-//    public Object getAttribute(String name) {
-//        return _req.getAttribute(name);
-//    }
-//
-//    public Enumeration getAttributeNames() {
-//        return _req.getAttributeNames();
-//    }
-//
-//    public String getAuthType() {
-//        return _req.getAuthType();
-//    }
-//
-//    public String getCharacterEncoding() {
-//        return _req.getCharacterEncoding();
-//    }
-//
-//    public int getContentLength() {
-//        return _req.getContentLength();
-//    }
-//
-//    public String getContentType() {
-//        return _req.getContentType();
-//    }
-//
-//    public String getContextPath() {
-//        return _req.getContextPath();
-//    }
-//
-//    public Cookie[] getCookies() {
-//        return _req.getCookies();
-//    }
-//
-//    public long getDateHeader(String name) {
-//        return _req.getDateHeader(name);
-//    }
-//
-//    public String getHeader(String name) {
-//        return _req.getHeader(name);
-//    }
-//
-//    public Enumeration getHeaderNames() {
-//        return _req.getHeaderNames();
-//    }
-//
-//    public Enumeration getHeaders(String name) {
-//        return _req.getHeaders(name);
-//    }
-//
-//    public ServletInputStream getInputStream() throws IOException {
-//        return _req.getInputStream();
-//    }
-//
-//    public int getIntHeader(String name) {
-//        return _req.getIntHeader(name);
-//    }
-//
-//    public String getLocalAddr() {
-//        return _req.getLocalAddr();
-//    }
-//
-//    public Locale getLocale() {
-//        return _req.getLocale();
-//    }
-//
-//    public Enumeration getLocales() {
-//        return _req.getLocales();
-//    }
-//
-//    public String getLocalName() {
-//        return _req.getLocalName();
-//    }
-//
-//    public int getLocalPort() {
-//        return _req.getLocalPort();
-//    }
-//
-//    public String getMethod() {
-//        return _req.getMethod();
-//    }
-//
-//    public Enumeration getParameterNames() {
-//        return _req.getParameterNames();
-//    }
-//
-//    public String getPathInfo() {
-//        return _req.getPathInfo();
-//    }
-//
-//    public String getPathTranslated() {
-//        return _req.getPathTranslated();
-//    }
-//
-//    public String getProtocol() {
-//        return _req.getProtocol();
-//    }
-//
-//    public String getQueryString() {
-//        return _req.getQueryString();
-//    }
-//
-//    public BufferedReader getReader() throws IOException {
-//        return _req.getReader();
-//    }
-//
-//    @Deprecated
-//    public String getRealPath(String path) {
-//        return _req.getRealPath(path);
-//    }
-//
-//    public String getRemoteAddr() {
-//        return _req.getRemoteAddr();
-//    }
-//
-//    public String getRemoteHost() {
-//        return _req.getRemoteHost();
-//    }
-//
-//    public int getRemotePort() {
-//        return _req.getRemotePort();
-//    }
-//
-//    public String getRemoteUser() {
-//        return _req.getRemoteUser();
-//    }
-//
-//    public RequestDispatcher getRequestDispatcher(String path) {
-//        return _req.getRequestDispatcher(path);
-//    }
-//
-//    public String getRequestedSessionId() {
-//        return _req.getRequestedSessionId();
-//    }
-//
-//    public String getRequestURI() {
-//        return _req.getRequestURI();
-//    }
-//
-//    public StringBuffer getRequestURL() {
-//        return _req.getRequestURL();
-//    }
-//
-//    public String getScheme() {
-//        return _req.getScheme();
-//    }
-//
-//    public String getServerName() {
-//        return _req.getServerName();
-//    }
-//
-//    public int getServerPort() {
-//        return _req.getServerPort();
-//    }
-//
-//    public String getServletPath() {
-//        return _req.getServletPath();
-//    }
-//
-//    public HttpSession getSession() {
-//        return _req.getSession();
-//    }
-//
-//    public HttpSession getSession(boolean create) {
-//        return _req.getSession(create);
-//    }
-//
-//    public Principal getUserPrincipal() {
-//        return _req.getUserPrincipal();
-//    }
-//
-//    public boolean isRequestedSessionIdFromCookie() {
-//        return _req.isRequestedSessionIdFromCookie();
-//    }
-//
-//    @Deprecated
-//    public boolean isRequestedSessionIdFromUrl() {
-//        return _req.isRequestedSessionIdFromUrl();
-//    }
-//
-//    public boolean isRequestedSessionIdFromURL() {
-//        return _req.isRequestedSessionIdFromURL();
-//    }
-//
-//    public boolean isRequestedSessionIdValid() {
-//        return _req.isRequestedSessionIdValid();
-//    }
-//
-//    public boolean isSecure() {
-//        return _req.isSecure();
-//    }
-//
-//    public boolean isUserInRole(String role) {
-//        return _req.isUserInRole(role);
-//    }
-//
-//    public void removeAttribute(String name) {
-//        _req.removeAttribute(name);
-//    }
-//
-//    public void setAttribute(String name, Object o) {
-//        _req.setAttribute(name, o);
-//    }
-//
-//    public void setCharacterEncoding(String env)
-//            throws UnsupportedEncodingException {
-//        _req.setCharacterEncoding(env);
-//    }
-
 
 }
