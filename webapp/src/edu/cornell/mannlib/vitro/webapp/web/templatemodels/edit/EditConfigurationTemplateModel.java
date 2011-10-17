@@ -360,7 +360,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     public Map<String, String> getStatementDisplay() {
     	Map<String, String> statementDisplay = new HashMap<String, String>();
     	if(isDataProperty()) {
-    		statementDisplay.put("dataValue", getDataLiteralValuesAsString());
+    		statementDisplay.put("dataValue", getDataLiteralValuesFromParameter());
     	} else {
     		//Expecting statement parameters to be passed in
     		Map params = vreq.getParameterMap();
@@ -377,7 +377,23 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	return statementDisplay;
     }
     
-    //TODO:Check where this logic should actually go, copied from input element formatting tag
+    //Retrieves data propkey from parameter and gets appropriate data value
+    private String getDataLiteralValuesFromParameter() {
+    	String dataValue = null;
+		//Get data hash
+		int dataHash = EditConfigurationUtils.getDataHash(vreq);
+		DataPropertyStatement dps = EditConfigurationUtils.getDataPropertyStatement(vreq, 
+				vreq.getSession(), 
+				dataHash, 
+				EditConfigurationUtils.getPredicateUri(vreq));
+		if(dps != null) {
+			dataValue = dps.getData().trim();
+		}
+		return dataValue;
+		
+	}
+
+	//TODO:Check where this logic should actually go, copied from input element formatting tag
     public Map<String, String> getOfferTypesCreateNew() {
 		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
     	ObjectProperty op = 
@@ -472,17 +488,17 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     }
     
     public String getCurrentUrl() {
-    	return getMainEditUrl() + "?" + vreq.getQueryString();
+    	return EditConfigurationUtils.getEditUrl(vreq) + "?" + vreq.getQueryString();
+    }
+    
+    public String getMainEditUrl() {
+    	return EditConfigurationUtils.getEditUrl(vreq);
     }
     
     //this url is for canceling
     public String getCancelUrl() {
     	String editKey = editConfig.getEditKey();
-    	return vreq.getContextPath() + "/postEditCleanupController?editKey=" + editKey + "&cancel=true";
-    }
-    
-    public String getMainEditUrl() {
-    	return vreq.getContextPath() + "/editRequestDispatch";
+    	return EditConfigurationUtils.getCancelUrlBase(vreq) + "?editKey=" + editKey + "&cancel=true";
     }
     
     //Get confirm deletion url

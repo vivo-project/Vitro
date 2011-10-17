@@ -90,6 +90,8 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          templateData.put("title", "Edit");
          templateData.put("submitUrl", getSubmissionUrl(vreq));
          templateData.put("editKey", editConfig.getEditKey());
+         //This may change based on the particular generator? Check if true
+         templateData.put("bodyClasses", "formsEdit");
          return new TemplateResponseValues(template, templateData);
          }catch(Throwable th){
         	

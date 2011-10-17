@@ -109,7 +109,15 @@ public class EditConfigurationUtils {
     }
     
     public static String getFormUrl(VitroRequest vreq) {
-    	return vreq.getContextPath() + "/edit/editRequestDispatch?" + vreq.getQueryString();
+    	return getEditUrl(vreq) + "?" + vreq.getQueryString();
+    }
+    
+    public static String getEditUrl(VitroRequest vreq) {
+    	return vreq.getContextPath() + "/editRequestDispatch";
+    }
+    
+    public static String getCancelUrlBase(VitroRequest vreq) {
+    	 return vreq.getContextPath() + "/postEditCleanupController";
     }
     
     

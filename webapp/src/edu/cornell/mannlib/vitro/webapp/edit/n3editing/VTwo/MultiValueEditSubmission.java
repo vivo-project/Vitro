@@ -69,32 +69,18 @@ public class MultiValueEditSubmission {
             String[] valuesArray = queryParameters.get( var );
             //String uri = null;
             List<String> values = (valuesArray != null) ? Arrays.asList(valuesArray) : null;
-            //Iterate through the values and check to see if they should be added or removed from form
-            urisFromForm.put(var, values);
-            for(String uri : values) {
-	            if( uri != null && uri.length() == 0 && editConfig.getNewResources().containsKey(var) ){
-	                log.debug("A new resource URI will be made for var " + var + " since it was blank on the form.");
-	                urisFromForm.remove(var);
-	            }
-            }
-            /*
             if( values != null && values.size() > 0){
-                if(  values.size() == 1 ) {
-                    uri = values.get(0);                        
-                } else if( values.size() > 1 ){
-                	//TODO: Change this and above so array/list sent as uri and not single value
-                    uri = values.get(0);
-                    log.error("Cannot yet handle multiple URIs for a single field, using first URI on list");
-                } 
-                urisFromForm.put(var,uri);
-            } else {
+	            //Iterate through the values and check to see if they should be added or removed from form
+	            urisFromForm.put(var, values);
+	            for(String uri : values) {
+		            if( uri != null && uri.length() == 0 && editConfig.getNewResources().containsKey(var) ){
+		                log.debug("A new resource URI will be made for var " + var + " since it was blank on the form.");
+		                urisFromForm.remove(var);
+		            }
+	            }
+            }  else {
                 log.debug("No value found for query parameter " + var);              
             }
-            //check to see if a URI field from the form was blank but was intended to create a new URI
-            if( uri != null && uri.length() == 0 && editConfig.getNewResources().containsKey(var) ){
-                log.debug("A new resource URI will be made for var " + var + " since it was blank on the form.");
-                urisFromForm.remove(var);
-            }*/
         }
         
         this.literalsFromForm =new HashMap<String,List<Literal>>();        
@@ -122,25 +108,6 @@ public class MultiValueEditSubmission {
                         }
                 	}
                 	literalsFromForm.put(var, literalsArray);
-                	/*
-                    String value = valueList.get(0);
-                    
-                    // remove any characters that are not valid in XML 1.0
-                    // from user input so they don't cause problems
-                    // with model serialization
-                    value = EditN3Utils.stripInvalidXMLChars(value);
-                    
-                    if (!StringUtils.isEmpty(value)) {
-                        literalsFromForm.put(var, createLiteral(
-                                                    value, 
-                                                    field.getRangeDatatypeUri(), 
-                                                    field.getRangeLang()));
-                    }
-                    
-                    if(valueList != null && valueList.size() > 1 )
-                        log.debug("For field " + var +", cannot yet handle multiple " +
-                                "Literals for a single field, using first Literal on list");
-                    */
                     
                 }else{
                     log.debug("could not find value for parameter " + var  );

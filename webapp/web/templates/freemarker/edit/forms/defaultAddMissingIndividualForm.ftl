@@ -5,9 +5,12 @@
 </#assign>
 <#if editConfiguration.objectUri?has_content>
 	<#assign formTitle>Edit ${formTitle} </#assign>
+	<#assign submitLabel>Save changes</#assign>
 <#else>
  	<#assign formTitle>Create ${formTitle} </#assign>
+ 	<#assign submitLabel>Create "${editConfiguration.propertyPublicDomainTitle}" entry</#assign>
 </#if>
+
 
 <h2>${formTitle}</h2>
 
@@ -17,7 +20,7 @@
 	<br/>
 	
 	<div style="margin-top: 0.2em">
-		<input type="submit" id="submit" value="${editConfiguration.submitLabel}"
+		<input type="submit" id="submit" value="${submitLabel}"
 		<span class="or"> or </span>
 		<a title="Cancel" href="${editConfiguration.cancelUrl}">Cancel</a>
 	</div>     

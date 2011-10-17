@@ -97,6 +97,7 @@ public class ProcessRdfForm {
     //
     @SuppressWarnings("static-access")
     public static AdditionsAndRetractions createNewStatement(EditConfigurationVTwo editConfiguration , MultiValueEditSubmission submission, VitroRequest vreq){
+    	varToNewResource = null;
     	//Get all assertions
     	List<Model> assertions = populateAssertions(editConfiguration, submission, vreq);
     	//Retractions should be empty anyway but the method should take care of that
@@ -106,6 +107,7 @@ public class ProcessRdfForm {
     }
     
     public static AdditionsAndRetractions editExistingStatement(EditConfigurationVTwo editConfiguration, MultiValueEditSubmission submission, VitroRequest vreq) {
+    	varToNewResource = null;
     	List<Model> fieldAssertions = populateAssertions(editConfiguration, submission, vreq);
     	List<Model> fieldRetractions = populateRetractions(editConfiguration, submission, vreq);
         return getMinimalChanges(new AdditionsAndRetractions(fieldAssertions, fieldRetractions));

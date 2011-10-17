@@ -126,7 +126,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     private Map<String, String> generateNewResources(VitroRequest vreq) {
 		HashMap<String, String> newResources = new HashMap<String, String>();
 		//TODO: Get default namespace
-		String defaultNamespace = "";
+		String defaultNamespace = vreq.getWebappDaoFactory().getDefaultNamespace();
 		newResources.put(objectVarName, defaultNamespace + "individual");
 		return newResources;
 	}
@@ -211,10 +211,9 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     //Handles both object and data property    
     private List<String> generateN3Required(VitroRequest vreq) {
     	List<String> n3ForEdit = new ArrayList<String>();
-    	n3ForEdit.addAll(getN3Prefixes());
-    	n3ForEdit.add(getN3ForName());
+    	n3ForEdit.add(getN3PrefixesAsString() + "\n" + getN3ForName());
     	n3ForEdit.add("?subject ?predicate ?" + objectVarName + " .");
-    	n3ForEdit.add("?" + objectVarName + " rdf:type " + getRangeClassUri(vreq) + " . ");
+    	n3ForEdit.add(getN3PrefixesAsString() + "\n" + "?" + objectVarName + " rdf:type <" + getRangeClassUri(vreq) + "> . ");
     	return n3ForEdit;
     }
     
@@ -225,19 +224,23 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	return prefixStrings;
     }
     
+    private String getN3PrefixesAsString() {
+    	String prefixes = StringUtils.join(getN3Prefixes(), "\n");
+    	return prefixes;
+    }
+    
     private String getN3ForName() {
-    	return "?" + objectVarName + " rdfs:label ?name";
+    	return "?" + objectVarName + " rdfs:label ?name .";
     }
     
     private List<String> generateN3Optional(VitroRequest vreq) {
     	//flag uri and asserted types need to be added here
     	List<String> n3Optional = new ArrayList<String>();
-    	n3Optional.addAll(getN3Prefixes());
     	n3Optional.add("?" + objectVarName + " ?inverseProp ?subject .");
     	//asserted types string buffer is empty in the original jsp
     	//TODO: Review original comments in jsp to see what could go here
     	//n3Optional.add(getN3AssertedTypes(vreq));
-    	n3Optional.add("?" + objectVarName + " rdf:type " + getFlagURI(vreq));
+    	n3Optional.add(getN3PrefixesAsString() + "\n" + "?" + objectVarName + " rdf:type <" + getFlagURI(vreq) + "> . ");
     	return n3Optional;
     	
     }
@@ -260,6 +263,11 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     
     private void setUrisAndLiteralsInScope(EditConfigurationVTwo editConfiguration) {
     	HashMap<String, List<String>> urisInScope = new HashMap<String, List<String>>();
+    	//Add subject uri and predicate turo to uris in scope
+    	urisInScope.put(editConfiguration.getVarNameForSubject(), 
+    			Arrays.asList(new String[]{editConfiguration.getSubjectUri()}));
+    	urisInScope.put(editConfiguration.getVarNameForPredicate(), 
+    			Arrays.asList(new String[]{editConfiguration.getPredicateUri()}));
     	editConfiguration.setUrisInScope(urisInScope);    	
     	editConfiguration.setLiteralsInScope(new HashMap<String, List<Literal>>());
     }

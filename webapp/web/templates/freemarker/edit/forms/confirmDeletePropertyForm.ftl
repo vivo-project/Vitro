@@ -29,10 +29,14 @@
     </#if>
     
    
+   	<#if editConfiguration.objectProperty = true>
     <p class="submit">
+    </#if>
     		<input type="submit" id="delete" value="Delete"/>
-			<span class="or"> or </span>
-			<a title="Cancel" href="${editConfiguration.cancelUrl}">Cancel</a>
-    </p>
-	
+			 or 
+			<a class="cancel" title="Cancel" href="${editConfiguration.cancelUrl}">Cancel</a>
+    <#if editConfiguration.objectProperty = true>
+   	</p>
+    </#if>
+    	
 </form>

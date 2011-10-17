@@ -114,7 +114,7 @@ public class PostEditCleanupController extends FreemarkerHttpServlet{
         } else if ( !urlPattern.endsWith("individual") && !urlPattern.endsWith("entity") ){
             return new RedirectResponseValues( urlPattern );
         }
-        return new RedirectResponseValues( UrlBuilder.getUrl(Route.LOGIN) );
+        return new RedirectResponseValues( Route.LOGIN );
     }    
 	
 }

@@ -67,9 +67,83 @@ public class DefaultDeleteGenerator implements EditConfigurationGenerator {
     public EditConfigurationVTwo getEditConfiguration(VitroRequest vreq,
             HttpSession session) {
     	EditConfigurationVTwo editConfiguration = EditConfigurationVTwo.getConfigFromSession(session, vreq);
+    	//Two paths for deletion: (i) from front page and (ii) from edit page of individual
+    	//If (ii), edit configuration already exists but if (i) no edit configuration exists or is required for deletion
+    	//so stub will be created that contains a minimal set of information
     	//Set template to be confirm delete
+    	if(editConfiguration == null) {
+    		editConfiguration = setupEditConfiguration(vreq, session);
+    	}
     	editConfiguration.setTemplate(template);
     	return editConfiguration;
     }
+
+	private EditConfigurationVTwo  setupEditConfiguration(VitroRequest vreq, HttpSession session) {
+		EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();
+		initProcessParameters(vreq, session, editConfiguration);
+		//set edit key for this as well
+		editConfiguration.setEditKey(editConfiguration.newEditKey(session));
+		return editConfiguration;
+		
+	}
+	
+	//Do need to know whether data or object property and how to handle that
+    private void initProcessParameters(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {
+    	subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
+    	predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
+    	editConfiguration.setSubjectUri(subjectUri);
+    	editConfiguration.setPredicateUri(predicateUri);
+    	editConfiguration.setEntityToReturnTo(subjectUri);
+    	editConfiguration.setUrlPatternToReturnTo("/individual");
+
+    	if(EditConfigurationUtils.isObjectProperty(predicateUri, vreq)) {
+    		//not concerned about remainder, can move into default obj prop form if required
+    		this.initObjectParameters(vreq);
+    		this.processObjectPropForm(vreq, editConfiguration);
+    	} else {
+    		this.initDataParameters(vreq, session);
+    	   this.processDataPropForm(vreq, editConfiguration);
+    	}
+    }
+    
+    private void initDataParameters(VitroRequest vreq, HttpSession session) {
+    	datapropKeyStr = EditConfigurationUtils.getDataPropKey(vreq);
+	    if( datapropKeyStr != null ){
+	        try {
+	            dataHash = Integer.parseInt(datapropKeyStr);
+	            log.debug("Found a datapropKey in parameters and parsed it to int: " + dataHash);
+	         } catch (NumberFormatException ex) {
+	            //return doHelp(vreq, "Cannot decode incoming datapropKey value "+datapropKeyStr+" as an integer hash in EditDataPropStmtRequestDispatchController");
+	        }
+	    }
+	    dps = EditConfigurationUtils.getDataPropertyStatement(vreq, session, dataHash, predicateUri);
+	}
+
+
+    
+	private void initObjectParameters(VitroRequest vreq) {
+		//in case of object property
+    	objectUri = EditConfigurationUtils.getObjectUri(vreq);
+	}
+
+	private void processObjectPropForm(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
+    	editConfiguration.setObject(objectUri);
+    	//this needs to be set for the editing to be triggered properly, otherwise the 'prepare' method
+    	//pretends this is a data property editing statement and throws an error
+    	//TODO: Check if null in case no object uri exists but this is still an object property
+    	if(objectUri != null) {
+    		editConfiguration.setObjectResource(true);
+    	}
+    }
+    
+    private void processDataPropForm(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
+    	editConfiguration.setObjectResource(false);
+    	//set data prop value, data prop key str, 
+    	editConfiguration.setDatapropKey((datapropKeyStr==null)?"":datapropKeyStr);
+    	//original set datapropValue, which in this case would be empty string but no way here
+    	editConfiguration.setDatapropValue("");
+    }
+    
+
 
 }
