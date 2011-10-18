@@ -32,7 +32,7 @@
             </tr>
             <#if item.cause??>
                 <tr>
-                    <td colspan="2">${item.cause}</td>
+                    <td colspan="2"><pre>${item.cause}</pre></td>
                 </tr>
             </#if>
         </table>
