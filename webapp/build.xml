@@ -34,6 +34,8 @@
 	<property name="test.classes.dir" location="${build.dir}/testClasses" />
 	<property name="utility.classes.dir" location="${build.dir}/utilityClasses" />
 
+	<property name="solr.build.dir" location="${build.dir}/solr" />
+
 	<property name="javac.deprecation" value="true" />
 
 	<!-- - - - - - - - - - - - - - - - - - 
@@ -239,50 +241,65 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	<!-- - - - - - - - - - - - - - - - - - 
           target: prepareSolr                      
          - - - - - - - - - - - - - - - - - -->
-	<target name="prepareSolr" depends="properties">
+	<target name="prepareSolr" depends="properties" unless="skipsolr">
+		<mkdir dir="${solr.home.dir}" />
+		<mkdir dir="${solr.build.dir}" />
+
 		<property name="solr.distrib.dir" location="${corebase.dir}/../solr" />
 		<property name="solr.example.dir" location="${solr.distrib.dir}/exampleSolr" />
 		<property name="solr.context.config.example" location="${solr.distrib.dir}/exampleSolrContext.xml" />
-		<property name="solr.war" location="${solr.distrib.dir}/apache-solr-3.1.0.war" />
+		<property name="solr.distrib.war" location="${solr.distrib.dir}/apache-solr-3.1.0.war" />
 
-		<property name="solr.docbase" location="${solr.home.dir}/solr.war" />
+		<property name="solr.context.file" location="${solr.build.dir}/context.xml" />
+		<property name="solr.context.temp.file" location="${solr.build.dir}/context.temp.xml" />
+		<property name="solr.build.war" location="${solr.build.dir}/solr.war" />
+
 		<property name="solr.context.name" value="${webapp.name}solr" />
-		<property name="solr.context.config" location="${solr.home.dir}/${solr.context.name}.xml" />
+		<property name="solr.deployed.war" value="${tomcat.home}/webapps/${solr.context.name}.war" />
+
+		<!-- if no mask is defined, leave Solr unsecured. -->
+		<property name="vitro.local.solr.ipaddress.mask" value=".*" />
 
 		<!-- Create and copy the example directory to the solr.home.dir directory. -->
-		<mkdir dir="${solr.home.dir}" />
 		<copy todir="${solr.home.dir}">
 			<fileset dir="${solr.example.dir}" includes="**/*" />
 		</copy>
 
-		<!-- Add the war file. -->
-		<copy tofile="${solr.docbase}">
-			<fileset file="${solr.war}" />
-		</copy>
-		<war destfile="${solr.docbase}" update="true">
-			<classes dir="${appbase.dir}/config/solr/" />
-		</war>
-
-		<!-- if no mask is define, go with an unsecured installation. -->
-		<property name="vitro.local.solr.ipaddress.mask" value=".*" />
-
-		<!-- Create the context configuration XML with expanded properties. -->
-		<copy tofile="${solr.context.config}" filtering="true">
+		<!-- Create the context configuration XML with expanded properties. Store it in a temp file for now. -->
+		<copy tofile="${solr.context.temp.file}" filtering="true" overwrite="true">
 			<fileset file="${solr.context.config.example}" />
 			<filterchain>
 				<expandproperties />
 			</filterchain>
 		</copy>
+
+		<!-- If the WAR is up to date and the context file hasn't changed, we can skip the deploy. -->
+		<condition property="skipsolr">
+			<and>
+				<uptodate targetfile="${solr.build.war}">
+					<srcfiles file="${solr.distrib.war}" />
+					<srcfiles dir="${appbase.dir}/config/solr/" />
+				</uptodate>
+				<filesmatch file1="${solr.context.temp.file}" file2="${solr.context.file}" />
+			</and>
+		</condition>
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
           target: deploySolr                      
          - - - - - - - - - - - - - - - - - -->
-	<target name="deploySolr" depends="prepareSolr" unless="noSolrDeploy">
-		<unwar src="${solr.docbase}" dest="${tomcat.home}/webapps/${solr.context.name}" />
-		<copy todir="${tomcat.home}/conf/Catalina/localhost" overwrite="true">
-			<fileset file="${solr.context.config}" />
-		</copy>
+	<target name="deploySolr" depends="prepareSolr" unless="skipsolr">
+		<!-- save the new context file, so we can compare against it next time. -->
+		<copy file="${solr.context.temp.file}" tofile="${solr.context.file}" />
+
+		<war destfile="${solr.build.war}" needxmlfile="false">
+			<zipfileset src="${solr.distrib.war}" />
+			<classes dir="${appbase.dir}/config/solr" />
+			<metainf file="${solr.context.file}" />
+		</war>
+
+		<!-- deploy the new WAR -->
+		<unwar src="${solr.build.war}" dest="${tomcat.home}/webapps/${solr.context.name}" />
 	</target>
 
 	<!-- ================================= 
