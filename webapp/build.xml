@@ -246,7 +246,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<mkdir dir="${solr.build.dir}" />
 
 		<property name="solr.distrib.dir" location="${corebase.dir}/../solr" />
-		<property name="solr.example.dir" location="${solr.distrib.dir}/exampleSolr" />
+		<property name="solr.home.template.dir" location="${solr.distrib.dir}/homeDirectoryTemplate" />
 		<property name="solr.context.template.file" location="${solr.distrib.dir}/template.context.xml" />
 		<property name="solr.distrib.war" location="${solr.distrib.dir}/apache-solr-3.1.0.war" />
 
@@ -262,7 +262,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 
 		<!-- Create and copy the example directory to the solr.home.dir directory. -->
 		<copy todir="${solr.home.dir}">
-			<fileset dir="${solr.example.dir}" includes="**/*" />
+			<fileset dir="${solr.home.template.dir}" includes="**/*" />
 		</copy>
 
 		<!-- Create the context configuration XML with expanded properties. Store it in a temp file for now. -->
