@@ -14,7 +14,7 @@ http://www.w3.org/TR/html401/struct/global.html
     <directives>
         <directive name="omitXmlDeclaration" value="true"/>
         <directive name="omitDoctypeDeclaration" value="true"/>
-        <directive name="maxInputSize" value="20000"/>
+        <directive name="maxInputSize" value="150000"/>
         <directive name="useXHTML" value="true"/>
 
         <directive name="formatOutput" value="true"/>
