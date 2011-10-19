@@ -343,6 +343,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 			<classpath refid="utility.run.classpath" />
 			<arg value="${build.dir}/${ant.project.name}.jar" />
 			<arg value="${appbase.dir}/lib" />
+			<arg value="${appbase.dir}/config/jarlist/known_dependencies.txt" />
 		</java>
 	</target>
 

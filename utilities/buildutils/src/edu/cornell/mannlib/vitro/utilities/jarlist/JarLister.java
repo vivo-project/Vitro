@@ -2,12 +2,17 @@
 
 package edu.cornell.mannlib.vitro.utilities.jarlist;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -65,24 +70,42 @@ public class JarLister {
 	 *     <classpath refid="utility.run.classpath" />
 	 *     <arg value="${build.dir}/${ant.project.name}.jar" />
 	 *     <arg value="${appbase.dir}/lib" />
+	 *     <arg value="${appbase.dir}/config/jarlist/known_dependencies.txt" />
 	 *   </java>
 	 * </target>
 	 * 
 	 * </pre>
 	 */
 
-	private static final String[] KNOWN_DEPENDENCIES = {
-			"mysql-connector-java-5.1.16-bin.jar", "commons-logging-1.1.1.jar" };
-
 	private final String topJar;
 	private final String libDirectory;
+	private final List<String> knownDependencies;
 
 	private final Map<String, Set<String>> dependencyMap = new HashMap<String, Set<String>>();
 	private final Set<String> dependencySet = new TreeSet<String>();
 
-	public JarLister(String[] args) {
+	public JarLister(String[] args) throws IOException {
 		topJar = args[0];
 		libDirectory = args[1];
+		knownDependencies = Collections
+				.unmodifiableList(readKnownDependencies(args[2]));
+	}
+
+	private List<String> readKnownDependencies(String knownDependenciesFilename)
+			throws IOException {
+		List<String> list = new ArrayList<String>();
+
+		BufferedReader r = new BufferedReader(new FileReader(
+				knownDependenciesFilename));
+
+		String line;
+		while (null != (line = r.readLine())) {
+			line = line.trim();
+			if (!(line.startsWith("#") || line.isEmpty())) {
+				list.add(line);
+			}
+		}
+		return list;
 	}
 
 	public void runDepFind() throws IOException {
@@ -113,7 +136,7 @@ public class JarLister {
 		String topJarName = new File(topJar).getName();
 		addDependenciesFor(topJarName);
 
-		for (String known : KNOWN_DEPENDENCIES) {
+		for (String known : knownDependencies) {
 			dependencySet.add(known);
 			addDependenciesFor(known);
 		}
@@ -136,7 +159,7 @@ public class JarLister {
 		w.println("--------------------");
 		w.println("Known required JARs");
 		w.println("--------------------");
-		for (String d : KNOWN_DEPENDENCIES) {
+		for (String d : knownDependencies) {
 			w.println("    " + d);
 		}
 		w.println();
