@@ -22,3 +22,6 @@ commons-logging-1.1.1.jar
 #    processDatapropRdfForm.jsp
 #    processRdfForm2.jsp
 xstream-1.2.2.jar
+
+# Used in error.jsp, which should probably go away.
+cos.jar
