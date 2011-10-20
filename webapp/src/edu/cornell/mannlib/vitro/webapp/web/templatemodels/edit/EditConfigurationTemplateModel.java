@@ -102,15 +102,17 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 	}
 	
     private void setDataFormTitle() {
-		String formTitle = null;
+		String formTitle = "";
 		String datapropKeyStr = editConfig.getDatapropKey();
 		DataProperty  prop = EditConfigurationUtils.getDataProperty(vreq);
-		if( datapropKeyStr != null && datapropKeyStr.trim().length() > 0  ) {
-	        formTitle   = "Change text for: <em>"+prop.getPublicName()+"</em>";
-	        
-	    } else {
-	        formTitle   ="Add new entry for: <em>"+prop.getPublicName()+"</em>";
-	    }
+		if(prop != null) {
+			if( datapropKeyStr != null && datapropKeyStr.trim().length() > 0  ) {
+		        formTitle   = "Change text for: <em>"+prop.getPublicName()+"</em>";
+		        
+		    } else {
+		        formTitle   ="Add new entry for: <em>"+prop.getPublicName()+"</em>";
+		    }
+		}
 		pageData.put("formTitle", formTitle);
 	}
 
@@ -241,6 +243,17 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	return literalValues;
     }
     
+    //Check if possible to send in particular parameter
+    public String dataLiteralValueFor(String dataLiteralName) {
+    	List<String> literalValues = getLiteralStringValue(dataLiteralName);
+    	return StringUtils.join(literalValues, ",");
+    }
+    
+    public String testMethod(String testValue) {
+    	return testValue + "test";
+    }
+    
+    
     public String getDataLiteralValuesAsString() {
     	List<String> values = getDataLiteralValues();
     	return StringUtils.join(values, ",");
@@ -312,8 +325,16 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     
     
     //data literal
+    //Thus would depend on the literals on the form
+    //Here we are assuming there is only one data literal but there may be more than one
+    //TODO: Support multiple data literals AND/or leaving the data literal to the 
     public String getDataLiteral() {
-    	return getDataPredicateProperty().getLocalName() + "Edited";
+    	List<String> literalsOnForm = editConfig.getLiteralsOnForm();
+    	String dataLiteralName = null;
+    	if(literalsOnForm.size() == 1) {
+    		dataLiteralName = literalsOnForm.get(0);
+    	}
+    	return dataLiteralName;
     }
     
     //Get data property key
@@ -514,6 +535,15 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     
     public String getDatapropKey() {
     	return editConfig.getDatapropKey();
+    }
+    
+    public DataPropertyStatement getDataPropertyStatement() {
+    	int dataHash = EditConfigurationUtils.getDataHash(vreq);
+    	String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
+    	return EditConfigurationUtils.getDataPropertyStatement(vreq, 
+    			vreq.getSession(), 
+    			dataHash, 
+    			predicateUri);
     }
     
     //Check whether deletion form should be included for default object property

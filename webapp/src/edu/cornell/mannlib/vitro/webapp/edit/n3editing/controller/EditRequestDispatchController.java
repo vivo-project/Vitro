@@ -48,7 +48,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     final String DEFAULT_OBJ_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultObjectPropertyFormGenerator";
     final String DEFAULT_DATA_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDataPropertyFormGenerator";
     //TODO: Create this generator
-    final String RDFS_LABEL_FORM = "";
+    final String RDFS_LABEL_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.RDFSLabelGenerator";
     final String DEFAULT_DELETE_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDeleteGenerator";
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
@@ -89,6 +89,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          //Corresponding to original note for consistency with selenium tests and 1.1.1
          templateData.put("title", "Edit");
          templateData.put("submitUrl", getSubmissionUrl(vreq));
+         templateData.put("cancelUrl", etm.getCancelUrl());
          templateData.put("editKey", editConfig.getEditKey());
          //This may change based on the particular generator? Check if true
          templateData.put("bodyClasses", "formsEdit");
