@@ -54,10 +54,11 @@
 <#macro collatedObjectPropertyList property editable template=property.template >
     <#assign subclasses = property.subclasses>
     <#list subclasses as subclass>
-        <#local subclassName = subclass.name!>
+        <#assign subclassName = subclass.name!>
         <#if subclassName?has_content>
             <li class="subclass" role="listitem">
-                <h3>${subclassName?lower_case}</h3>
+                <#if property.name == "related role"><h3>${subclassName?lower_case?replace(" role", "")}</h3>
+                <#else><h3>${subclassName?lower_case}</h3></#if>
                 <ul class="subclass-property-list">
                     <@objectPropertyList property editable subclass.statements template />
                 </ul>
