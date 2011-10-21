@@ -108,6 +108,8 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 			u.setPermissionSetUris(getPropertyResourceURIValues(r,
 					USERACCOUNT_HAS_PERMISSION_SET));
 			u.setRootUser(isResourceOfType(r, USERACCOUNT_ROOT_USER));
+			u.setProxiedIndividualUris(getPropertyResourceURIValues(r,
+					USERACCOUNT_PROXY_EDITOR_FOR));
 			return u;
 		} finally {
 			getOntModel().leaveCriticalSection();
@@ -212,6 +214,10 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 				model.add(res, RDF.type, USERACCOUNT_ROOT_USER);
 			}
 
+			updatePropertyResourceURIValues(res,
+					USERACCOUNT_PROXY_EDITOR_FOR,
+					userAccount.getProxiedIndividualUris(), model);
+
 			userAccount.setUri(userUri);
 			return userUri;
 		} catch (InsertException e) {
@@ -276,6 +282,10 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 			} else {
 				model.remove(res, RDF.type, USERACCOUNT_ROOT_USER);
 			}
+
+			updatePropertyResourceURIValues(res,
+					USERACCOUNT_PROXY_EDITOR_FOR,
+					userAccount.getProxiedIndividualUris(), model);
 
 		} finally {
 			model.leaveCriticalSection();

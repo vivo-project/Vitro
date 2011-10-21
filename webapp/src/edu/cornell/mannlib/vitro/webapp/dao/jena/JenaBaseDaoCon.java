@@ -139,6 +139,7 @@ public class JenaBaseDaoCon {
     protected  DatatypeProperty   USERACCOUNT_EXTERNAL_AUTH_ID = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_EXTERNAL_AUTH_ID);
     protected  DatatypeProperty   USERACCOUNT_EXTERNAL_AUTH_ONLY = _constModel.createDatatypeProperty(VitroVocabulary.USERACCOUNT_EXTERNAL_AUTH_ONLY);
     protected  ObjectProperty     USERACCOUNT_HAS_PERMISSION_SET = _constModel.createObjectProperty(VitroVocabulary.USERACCOUNT_HAS_PERMISSION_SET);
+    protected  ObjectProperty     USERACCOUNT_PROXY_EDITOR_FOR = _constModel.createObjectProperty(VitroVocabulary.USERACCOUNT_PROXY_EDITOR_FOR);
 
     protected  OntClass           PERMISSIONSET = _constModel.createClass(VitroVocabulary.PERMISSIONSET);
     protected  ObjectProperty     PERMISSIONSET_HAS_PERMISSION = _constModel.createObjectProperty(VitroVocabulary.PERMISSIONSET_HAS_PERMISSION);

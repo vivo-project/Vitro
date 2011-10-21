@@ -65,6 +65,9 @@ public class UserAccount {
 	private Set<String> permissionSetUris = Collections.emptySet();
 
 	private boolean rootUser = false;
+	
+	/** This may be empty, but should never be null. */
+	private Set<String> proxiedIndividualUris = Collections.emptySet();
 
 	public String getUri() {
 		return uri;
@@ -200,6 +203,17 @@ public class UserAccount {
 
 	public void setRootUser(boolean rootUser) {
 		this.rootUser = rootUser;
+	}
+
+	public Set<String> getProxiedIndividualUris() {
+		return new HashSet<String>(proxiedIndividualUris);
+	}
+
+	public void setProxiedIndividualUris(Collection<String> proxiedIndividualUris) {
+		if (proxiedIndividualUris == null) {
+			throw new NullPointerException("proxiedIndividualUris may not be null.");
+		}
+		this.proxiedIndividualUris = new HashSet<String>(proxiedIndividualUris);
 	}
 
 	private <T> T nonNull(T value, T defaultValue) {
