@@ -18,7 +18,9 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntolo
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOwnAccount;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditSiteInformation;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageOwnProxies;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManagePortals;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageProxies;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageSearchIndex;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageTabs;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
@@ -84,6 +86,9 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		} else if (whatToAuth instanceof SeeStartupStatus) {
 			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
 			
+		} else if (whatToAuth instanceof ManageProxies) {
+			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
+			
 		} else if (whatToAuth instanceof EditOntology) {
 			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
 
@@ -126,6 +131,9 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		} else if (whatToAuth instanceof EditOwnAccount) {
 			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
 
+		} else if (whatToAuth instanceof ManageOwnProxies) {
+			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
+			
 		} else {
 			result = defaultDecision("Unrecognized action");
 		}
