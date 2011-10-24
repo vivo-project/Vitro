@@ -30,6 +30,11 @@ public class RegeneratingGraph implements Graph, Regenerable {
 		regenerate();
 	}
 	
+	public RegeneratingGraph(Graph initGraph, GraphGenerator graphGenerator) {
+		this.g = initGraph;
+		this.generator = graphGenerator;
+	}
+	
 	public void regenerate() {
 		this.g = generator.generateGraph();
 	}

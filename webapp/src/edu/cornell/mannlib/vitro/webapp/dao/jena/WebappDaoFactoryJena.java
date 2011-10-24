@@ -147,7 +147,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
             initPreferredLanguages();
         }
         this.userURI = userURI;
-        makeFlag2ConvenienceMaps();
         Model languageUniversalsModel = ModelFactory.createDefaultModel();
         if (INCLUDE_TOP_CONCEPT) {
         	Resource top = getTopConcept();
@@ -282,29 +281,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         preferredLanguages[0] = "en-US";
         preferredLanguages[1] = "en";
         preferredLanguages[2] = "EN";
-    }
-
-    private void makeFlag2ConvenienceMaps() {
-        HashMap<String,OntClass> flag2ValueHashMap = new HashMap<String,OntClass>();
-        HashMap<Resource,String> flag2ClassLabelHashMap = new HashMap<Resource,String>();
-        for (Iterator classIt = ontModelSelector.getTBoxModel().listClasses(); classIt.hasNext(); ) {
-            OntClass ontClass = (OntClass) classIt.next();
-            String ontClassName = ontClass.getLocalName();
-            if(ontClassName != null && ontClass.getNameSpace().equals(VitroVocabulary.vitroURI) && ontClassName.indexOf("Flag2Value")==0) {
-                String ontClassLabel = ontClass.getLabel(null);
-                if (ontClassLabel != null) {
-                    flag2ValueHashMap.put(ontClassLabel, ontClass);
-                    flag2ClassLabelHashMap.put(ontClass, ontClassLabel);
-                }
-            }
-        }
-        this.flag2ValueMap = flag2ValueHashMap;
-        this.flag2ClassLabelMap = flag2ClassLabelHashMap;
-    }
-
-    private Map<Resource,String> makeFlag2ClassLabelMap() {
-        HashMap<Resource,String> flag2ClassLabelMap = new HashMap<Resource,String>();
-        return flag2ClassLabelMap;
     }
 
     /* ******************************************** */

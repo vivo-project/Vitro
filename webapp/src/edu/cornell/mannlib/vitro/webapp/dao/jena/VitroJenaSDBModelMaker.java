@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.apache.commons.dbcp.BasicDataSource;
 
+import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.GraphMaker;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.query.Dataset;
@@ -24,6 +25,7 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.rdf.model.ModelReader;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -169,11 +171,11 @@ public class VitroJenaSDBModelMaker implements ModelMaker {
 		getStore().close();
 	}
 
-	public Model createModel(String arg0) {
-		Model model = SDBFactory.connectNamedModel(getStore(), arg0);
+	public Model createModel(String modelName) {
+		Model model = getModel(modelName);
 		Model metadataModel = getMetadataModel();
 		try {
-		    metadataModel.add(sdbResource,metadataModel.getProperty(HAS_NAMED_MODEL_URI),arg0);
+		    metadataModel.add(sdbResource,metadataModel.getProperty(HAS_NAMED_MODEL_URI), modelName);
 		} finally {
 		    metadataModel.close();
 		}
@@ -403,8 +405,12 @@ public class VitroJenaSDBModelMaker implements ModelMaker {
 		return (this.hasModel(arg0)) ? SDBFactory.connectNamedModel(getStore(),arg0) : null;
 	}
 
-	public Model getModel(String arg0) {
-		return SDBFactory.connectNamedModel(getStore(), arg0);
+	public Model getModel(String modelName) {
+		SDBGraphGenerator graphGen = new SDBGraphGenerator(
+				bds, storeDesc, modelName);
+		Graph g = new RegeneratingGraph(
+				SDBFactory.connectNamedGraph(getStore(), modelName), graphGen);
+		return ModelFactory.createModelForGraph(g);
 	}
 
 	public Model getModel(String arg0, ModelReader arg1) {
