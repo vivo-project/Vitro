@@ -21,6 +21,11 @@ public class JenaOutputUtils {
 		
 	public static void setNameSpacePrefixes(Model model, WebappDaoFactory wadf) {
 		
+		if (model == null) {
+			log.warn("input model is null");
+			return;
+		}
+		
 		Map<String,String> prefixes = new HashMap<String,String>();
 		List<Ontology> ontologies = wadf.getOntologyDao().getAllOntologies();
 		Iterator<Ontology> iter = ontologies.iterator();
