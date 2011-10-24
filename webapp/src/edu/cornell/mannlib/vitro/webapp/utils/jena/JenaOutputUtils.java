@@ -39,7 +39,7 @@ public class JenaOutputUtils {
             
             prefix = ontology.getPrefix();
             if (prefix == null || prefix.isEmpty()) {
-            	log.info("no prefix found for namespace: " + namespace);
+            	log.debug("no prefix found for namespace: " + namespace);
             	continue;
             }
             
