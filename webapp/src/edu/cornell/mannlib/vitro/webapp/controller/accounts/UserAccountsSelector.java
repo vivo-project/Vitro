@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.controller.accounts;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -13,10 +12,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.Syntax;
@@ -26,6 +21,8 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.Field;
+import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner;
+import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner.QueryParser;
 
 /**
  * Pull some UserAccounts from the model, based on a set of criteria.
@@ -71,8 +68,6 @@ public class UserAccountsSelector {
 			+ "WHERE {\n" //
 			+ "    <%uri%> auth:hasPermissionSet ?ps \n" //
 			+ "} \n";
-
-	private static final Syntax SYNTAX = Syntax.syntaxARQ;
 
 	/**
 	 * If the user enters any of these characters in a search term, escape it
@@ -123,8 +118,8 @@ public class UserAccountsSelector {
 				.replace("%offset%", offset());
 		log.debug("main query: " + qString);
 
-		List<UserAccount> accounts = executeQuery(qString,
-				new MainQueryParser());
+		List<UserAccount> accounts = new SparqlQueryRunner<List<UserAccount>>(
+				model, new MainQueryParser()).executeQuery(qString);
 		log.debug("query returns: " + accounts);
 		return accounts;
 	}
@@ -138,7 +133,8 @@ public class UserAccountsSelector {
 				.replace("%filterClauses%", filterClauses());
 		log.debug("count query: " + qString);
 
-		int count = executeQuery(qString, new CountQueryParser());
+		int count = new SparqlQueryRunner<Integer>(model,
+				new CountQueryParser()).executeQuery(qString);
 		log.debug("result count: " + count);
 		return count;
 	}
@@ -150,8 +146,8 @@ public class UserAccountsSelector {
 					PREFIX_LINES).replace("%uri%", uri);
 			log.debug("permissions query: " + qString);
 
-			Collection<String> permissions = executeQuery(qString,
-					new PermissionsQueryParser());
+			Set<String> permissions = new SparqlQueryRunner<Set<String>>(model,
+					new PermissionsQueryParser()).executeQuery(qString);
 			log.debug("permissions for '" + uri + "': " + permissions);
 			account.setPermissionSetUris(permissions);
 		}
@@ -245,67 +241,15 @@ public class UserAccountsSelector {
 		return String.valueOf(offset);
 	}
 
-	private <T> T executeQuery(String queryStr, QueryParser<T> parser) {
-		QueryExecution qe = null;
-		try {
-			Query query = QueryFactory.create(queryStr, SYNTAX);
-			qe = QueryExecutionFactory.create(query, model);
-			return parser.parseResults(queryStr, qe.execSelect());
-		} catch (Exception e) {
-			log.error("Failed to execute the query: " + queryStr, e);
-			return parser.defaultValue();
-		} finally {
-			if (qe != null) {
-				qe.close();
-			}
-		}
-	}
-
-	private static abstract class QueryParser<T> {
-		abstract T parseResults(String queryStr, ResultSet results);
-
-		abstract T defaultValue();
-
-		protected String ifLiteralPresent(QuerySolution solution,
-				String variableName, String defaultValue) {
-			Literal literal = solution.getLiteral(variableName);
-			if (literal == null) {
-				return defaultValue;
-			} else {
-				return literal.getString();
-			}
-		}
-
-		protected long ifLongPresent(QuerySolution solution,
-				String variableName, long defaultValue) {
-			Literal literal = solution.getLiteral(variableName);
-			if (literal == null) {
-				return defaultValue;
-			} else {
-				return literal.getLong();
-			}
-		}
-
-		protected int ifIntPresent(QuerySolution solution, String variableName,
-				int defaultValue) {
-			Literal literal = solution.getLiteral(variableName);
-			if (literal == null) {
-				return defaultValue;
-			} else {
-				return literal.getInt();
-			}
-		}
-
-	}
-
 	private static class MainQueryParser extends QueryParser<List<UserAccount>> {
 		@Override
-		public List<UserAccount> defaultValue() {
+		protected List<UserAccount> defaultValue() {
 			return Collections.emptyList();
 		}
 
 		@Override
-		public List<UserAccount> parseResults(String queryStr, ResultSet results) {
+		protected List<UserAccount> parseResults(String queryStr,
+				ResultSet results) {
 			List<UserAccount> accounts = new ArrayList<UserAccount>();
 			while (results.hasNext()) {
 				try {
@@ -359,12 +303,12 @@ public class UserAccountsSelector {
 
 	private static class CountQueryParser extends QueryParser<Integer> {
 		@Override
-		public Integer defaultValue() {
+		protected Integer defaultValue() {
 			return 0;
 		}
 
 		@Override
-		public Integer parseResults(String queryStr, ResultSet results) {
+		protected Integer parseResults(String queryStr, ResultSet results) {
 			int count = 0;
 
 			if (!results.hasNext()) {
@@ -384,12 +328,12 @@ public class UserAccountsSelector {
 	private static class PermissionsQueryParser extends
 			QueryParser<Set<String>> {
 		@Override
-		Set<String> defaultValue() {
+		protected Set<String> defaultValue() {
 			return Collections.emptySet();
 		}
 
 		@Override
-		Set<String> parseResults(String queryStr, ResultSet results) {
+		protected Set<String> parseResults(String queryStr, ResultSet results) {
 			Set<String> permissions = new HashSet<String>();
 
 			while (results.hasNext()) {
