@@ -57,7 +57,7 @@
         <#local subclassName = subclass.name!>
         <#if subclassName?has_content>
             <li class="subclass" role="listitem">
-                <h3>${subclassName?lower_case}</h
+                <h3>${subclassName?lower_case}</h3>
                 <ul class="subclass-property-list">
                     <@objectPropertyList property editable subclass.statements template />
                 </ul>
