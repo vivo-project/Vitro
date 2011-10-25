@@ -23,6 +23,8 @@ import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.ontology.UnionClass;
 import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
@@ -285,6 +287,13 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
             com.hp.hpl.jena.ontology.Individual ind = ontModel.getIndividual(ent.getURI());
             if (ind != null) {
                 if (ent.getName() != null && ( (ind.getLabel(getDefaultLanguage())==null) || (ind.getLabel(getDefaultLanguage())!=null && ent.getName()!=null && !ent.getName().equals(ind.getLabel(getDefaultLanguage())) ) ) ) {
+                	
+                	// removal of existing values done this odd way to trigger
+                	// the change listeners
+                	Model temp = ModelFactory.createDefaultModel();
+                	temp.add(ontModel.listStatements(ind, RDFS.label, (RDFNode) null));
+                	ontModel.remove(temp);
+
                     ind.setLabel(ent.getName(), getDefaultLanguage());
                 }
                 Set<String> oldTypeURIsSet = new HashSet<String>();
@@ -295,7 +304,9 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                     }
                 }
                 Set<String> newTypeURIsSet = new HashSet<String>();
-                newTypeURIsSet.add(ent.getVClassURI());
+                if (ent.getVClassURI() != null) {
+                	newTypeURIsSet.add(ent.getVClassURI());
+                }
                 boolean conservativeTypeDeletion = false;
                 try {
                     List<VClass> vcl = ent.getVClasses(false);

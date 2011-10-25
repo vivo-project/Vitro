@@ -70,6 +70,8 @@ public class SimpleReasoner extends StatementListener {
 	private CumulativeDeltaModeler aBoxDeltaModeler2 = null;
 	private boolean batchMode1 = false, batchMode2 = false;
 	private boolean stopRequested = false;
+	
+	private List<ReasonerPlugin> pluginList = new ArrayList<ReasonerPlugin>();
 
 	/**
 	 * @param tboxModel - input.  This model contains both asserted and inferred TBox axioms
@@ -114,6 +116,14 @@ public class SimpleReasoner extends StatementListener {
 		stopRequested = false;
 	}
 	
+	public void setPluginList(List<ReasonerPlugin> pluginList) {
+		this.pluginList = pluginList;
+	}
+	
+	public List<ReasonerPlugin> getPluginList() {
+		return this.pluginList;
+	}
+	
 	/*
 	 * Performs selected incremental ABox reasoning based
 	 * on the addition of a new statement (aka assertion) 
@@ -127,11 +137,19 @@ public class SimpleReasoner extends StatementListener {
 			    addedABoxTypeAssertion(stmt, inferenceModel, new HashSet<String>());
 			    setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
 			} 
-	       /* uncomment this to enable subproperty/equivalent property inferencing. sjm222 5/13/2011	
-			else {
-			    addedABoxAssertion(stmt,inferenceModel);
+	        // uncomment this to enable subproperty/equivalent property inferencing. sjm222 5/13/2011	
+			// addedABoxAssertion(stmt,inferenceModel);
+			
+			for (ReasonerPlugin plugin : getPluginList()) {
+				try {
+					if (plugin.isInterestedInAddedStatement(stmt)) {
+						plugin.addedABoxStatement(
+								stmt, aboxModel, inferenceModel, tboxModel);
+					}
+				} catch (Throwable t) {
+					log.error(t, t);
+				}
 			}
-	       */
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
 			log.error("Exception while computing inferences: " + e.getMessage());
@@ -141,30 +159,46 @@ public class SimpleReasoner extends StatementListener {
 	/*
 	 * Performs selected incremental ABox reasoning based
 	 * on the retraction of a statement (aka assertion)
-	 * from the ABox.
+	 * from the ABox. 
 	 */
 	@Override
 	public void removedStatement(Statement stmt) {
 	
 		try {
-			if (stmt.getPredicate().equals(RDF.type)) {
-				if (batchMode1) {
-					 aBoxDeltaModeler1.removedStatement(stmt);
-				} else if (batchMode2) {
-					 aBoxDeltaModeler2.removedStatement(stmt);
-				} else {
-			         removedABoxTypeAssertion(stmt, inferenceModel);
-			         setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
+			
+			// The delta modeler could optionally record only statements relevant
+			// to reasoning by checking the .isInterestedInRemovedStatement()
+			// methods on the plugins in addition to recording rdf:type 
+			// statements.  If property reasoning were uncommented, however,
+			// almost all statements would be relevant.
+			
+			if (batchMode1) {
+				 aBoxDeltaModeler1.removedStatement(stmt);
+			} else if (batchMode2) {
+				 aBoxDeltaModeler2.removedStatement(stmt);
+			} else {
+				if (stmt.getPredicate().equals(RDF.type)) {
+					removedABoxTypeAssertion(stmt, inferenceModel);
+					setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
+				}
+				
+				// uncomment this to enable subproperty/equivalent property inferencing. sjm222 5/13/2011
+				// removedABoxAssertion(stmt, inferenceModel);
+				
+				for (ReasonerPlugin plugin : getPluginList()) {
+					try {
+						if (plugin.isInterestedInRemovedStatement(stmt)) {
+							plugin.removedABoxStatement(
+									stmt, aboxModel, inferenceModel, tboxModel);
+						}
+					} catch (Throwable t) {
+						log.error(t, t);
+					}
 				}
 			}
-			/* uncomment this to enable subproperty/equivalent property inferencing. sjm222 5/13/2011
-			else {
-				removedABoxAssertion(stmt, inferenceModel);
-			}
-			*/
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
-			log.error("Exception while retracting inferences: " + e.getMessage());
+			log.error("Exception while retracting inferences: ", e);
 		}
 	}
 	
@@ -1013,17 +1047,24 @@ public class SimpleReasoner extends StatementListener {
 				try {
 					addedABoxTypeAssertion(individual, inferenceRebuildModel, unknownTypes);
 					setMostSpecificTypes(individual, inferenceRebuildModel, unknownTypes);
+					StmtIterator sit = aboxModel.listStatements(individual, null, (RDFNode) null);
+					while (sit.hasNext()) {
+						Statement s = sit.nextStatement();
+						for (ReasonerPlugin plugin : getPluginList()) {
+							plugin.addedABoxStatement(s, aboxModel, inferenceRebuildModel, tboxModel);
+						}
+					}
 				} catch (NullPointerException npe) {
                 	log.error("a NullPointerException was received while recomputing the ABox inferences. Halting inference computation.");
                     return;
 				} catch (JenaException je) {
 					 if (je.getMessage().equals("Statement models must no be null")) {
-						 log.error("Exception while recomputing ABox inference model: " + je.getMessage() + ". Halting inference computation.");
+						 log.error("Exception while recomputing ABox inference model. Halting inference computation.", je);
 		                 return; 
 					 } 
-					 log.error("Exception while recomputing ABox inference model: " + je.getMessage());
+					 log.error("Exception while recomputing ABox inference model: ", je);
 				} catch (Exception e) {
-					 log.error("Exception while recomputing ABox inference model: " + e.getMessage());
+					 log.error("Exception while recomputing ABox inference model: ", e);
 				}
 				
 				numStmts++;
@@ -1391,6 +1432,16 @@ public class SimpleReasoner extends StatementListener {
     					
     					try {
     				        removedABoxTypeAssertion(stmt, inferenceModel);
+    				        for (ReasonerPlugin plugin : getPluginList()) {
+    				        	try {
+	    				        	if (plugin.isInterestedInRemovedStatement(stmt)) {
+	    				        		plugin.removedABoxStatement(
+	    				        				stmt, aboxModel, inferenceModel, tboxModel);
+	    				        	}
+	    				        } catch (Throwable t) {
+	    				        	log.error(t, t);
+	    				        }
+    				        }
     				        setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
     				        //TODO update this part when subproperty inferencing is added.
     					} catch (NullPointerException npe) {

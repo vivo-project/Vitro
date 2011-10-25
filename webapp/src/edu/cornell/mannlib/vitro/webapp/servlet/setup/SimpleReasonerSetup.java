@@ -2,6 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -20,13 +27,17 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.ReasonerConfiguration;
+import edu.cornell.mannlib.vitro.webapp.reasoner.ReasonerPlugin;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.reasoner.support.SimpleReasonerTBoxListener;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase.TripleStoreType;
+import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 public class SimpleReasonerSetup implements ServletContextListener {
 
 	private static final Log log = LogFactory.getLog(SimpleReasonerSetup.class.getName());
+	
+	public static final String FILE_OF_PLUGINS = "/WEB-INF/resources/reasoner_plugins.txt";
 	
 	// Models used during a full recompute of the ABox
 	static final String JENA_INF_MODEL_REBUILD = "http://vitro.mannlib.cornell.edu/default/vitro-kb-inf-rebuild";
@@ -92,6 +103,21 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	        // the simple reasoner will register itself as a listener to the ABox assertions
 	        SimpleReasoner simpleReasoner = new SimpleReasoner(unionOms.getTBoxModel(), assertionsOms.getABoxModel(), inferencesOms.getABoxModel(), rebuildModel, scratchModel);
 	        sce.getServletContext().setAttribute(SimpleReasoner.class.getName(),simpleReasoner);
+	        
+	        StartupStatus ss = StartupStatus.getBean(ctx);
+	        List<ReasonerPlugin> pluginList = new ArrayList<ReasonerPlugin>();
+	        List<String> pluginClassnameList = this.readFileOfListeners(ctx);
+	        for (String classname : pluginClassnameList) {
+	        	try {
+	        		ReasonerPlugin plugin = (ReasonerPlugin) Class.forName(
+	        				classname).getConstructors()[0].newInstance();
+	        		pluginList.add(plugin);
+	        	} catch(Throwable t) {      		
+	        		ss.info(this, "Could not instantiate reasoner plugin " + classname);
+	        	}
+	        }
+	        simpleReasoner.setPluginList(pluginList);
+	        
 	        
 	        if (isRecomputeRequired(sce.getServletContext())) {   
 	            log.info("ABox inference recompute required.");
@@ -204,4 +230,55 @@ public class SimpleReasonerSetup implements ServletContextListener {
         	simpleReasoner.computeMostSpecificType();      		
         }
     }
+    
+	/**
+	 * Read the names of the plugin classes classes.
+	 * 
+	 * If there is a problem, set a fatal error, and return an empty list.
+	 */
+	private List<String> readFileOfListeners(ServletContext ctx) {
+		List<String> list = new ArrayList<String>();
+
+		StartupStatus ss = StartupStatus.getBean(ctx);
+		
+		InputStream is = null;
+		BufferedReader br = null;
+		try {
+			is = ctx.getResourceAsStream(FILE_OF_PLUGINS);
+			br = new BufferedReader(new InputStreamReader(is));
+
+			String line;
+			while (null != (line = br.readLine())) {
+				String trimmed = line.trim();
+				if (!trimmed.isEmpty() && !trimmed.startsWith("#")) {
+					list.add(trimmed);
+				}
+			}
+		} catch (NullPointerException e) {
+			// ignore the lack of file
+		} catch (IOException e) {
+			ss.fatal(this,
+					"Failed while processing the list of startup listeners:  "
+							+ FILE_OF_PLUGINS, e);
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					log.error(e);
+				}
+			}
+			if (is != null) {
+				try {
+					is.close();
+				} catch (IOException e) {
+					log.error(e);
+				}
+			}
+		}
+		
+		log.debug("Classnames of reasoner plugins = " + list);
+		return list;
+		
+	}
 }
