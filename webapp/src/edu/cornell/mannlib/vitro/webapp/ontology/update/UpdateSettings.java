@@ -23,6 +23,7 @@ public class UpdateSettings {
 	private String defaultNamespace;
 	private OntModelSelector assertionOntModelSelector;
 	private OntModelSelector inferenceOntModelSelector;
+	private OntModelSelector unionOntModelSelector;
 	private OntModel oldTBoxModel;
 	private OntModel newTBoxModel;
 	private OntModel oldTBoxAnnotationsModel;
@@ -82,6 +83,9 @@ public class UpdateSettings {
 	public OntModelSelector getInferenceOntModelSelector() {
 		return inferenceOntModelSelector;
 	}
+	public OntModelSelector getUnionOntModelSelector() {
+		return unionOntModelSelector;
+	}
 	public String getLogFile() {
 		return logFile;
 	}
@@ -117,6 +121,9 @@ public class UpdateSettings {
 	}
 	public void setInferenceOntModelSelector(OntModelSelector ontModelSelector) {
 		this.inferenceOntModelSelector = ontModelSelector;
+	}
+	public void setUnionOntModelSelector(OntModelSelector ontModelSelector) {
+		this.unionOntModelSelector = ontModelSelector;
 	}
 	public OntModel getOldTBoxModel() {
 		return oldTBoxModel;

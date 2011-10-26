@@ -95,7 +95,7 @@ public class ABoxUpdater {
 			      break;
 			   case DELETE:
 				  if ("Delete".equals(change.getNotes())) {
-				     deleteClass(change);
+				     deleteIndividualsOfType(change);
 				  } else {
 					 renameClassToParent(change);
 				  }
@@ -325,13 +325,13 @@ public class ABoxUpdater {
 	
 	/**
 	 * 
-	 * Remove all instances of and references to a class in the abox of the knowledge base.
+	 * Remove all instances of the given class from the abox of the knowledge base.
 	 * 
 	 * @param   change - an AtomicOntologyChange object representing a class
 	 *                   delete operation.
 	 *                    
 	 */
-	public void deleteClass(AtomicOntologyChange change) throws IOException {
+	public void deleteIndividualsOfType(AtomicOntologyChange change) throws IOException {
 
 		//logger.log("Processing a class deletion of class " + change.getSourceURI());
 		
@@ -348,17 +348,32 @@ public class ABoxUpdater {
 		aboxModel.enterCriticalSection(Lock.WRITE);
 	    try {
 	       int count = 0;
+	       int refCount = 0;
 	       StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, deletedClass);
 
     	   while (iter.hasNext()) {
 			   count++;
 			   Statement typeStmt = iter.next();
-			   retractions.add(typeStmt);
+			   
+			   StmtIterator iter2 = aboxModel.listStatements(typeStmt.getSubject(), (Property) null, (RDFNode) null);
+			   
+			   while (iter2.hasNext()) {
+				  Statement subjstmt = iter2.next();
+			      retractions.add(subjstmt);
+			   }
+			   
+			   StmtIterator iter3 = aboxModel.listStatements((Resource) null, (Property) null, typeStmt.getSubject());
+			   
+			   while (iter3.hasNext()) {
+				  Statement objstmt = iter3.next();
+			      retractions.add(objstmt);
+			      refCount++;
+			   }
 		   }   
 		   
 		   //log summary of changes
 		   if (count > 0) {
-			   logger.log("Removed " + count + " " + deletedClass.getURI() + " type assertion" + ((count > 1) ? "s" : ""));
+			   logger.log("Removed " + count + " individual " + ((count > 1) ? "s" : "" + " of type " + deletedClass.getURI()) + " (refs = " + refCount + ")");
 		   }
 		   
 		   aboxModel.remove(retractions);

@@ -90,6 +90,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setDefaultNamespace(wadf.getDefaultNamespace());
 			settings.setAssertionOntModelSelector(ModelContext.getBaseOntModelSelector(ctx));
 			settings.setInferenceOntModelSelector(ModelContext.getInferenceOntModelSelector(ctx));
+			settings.setUnionOntModelSelector(ModelContext.getUnionOntModelSelector(ctx));
 			
 			try {
 				OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_MODEL_DIR));
