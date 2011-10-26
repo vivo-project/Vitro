@@ -373,7 +373,7 @@ public class ABoxUpdater {
 		   
 		   //log summary of changes
 		   if (count > 0) {
-			   logger.log("Removed " + count + " individual " + ((count > 1) ? "s" : "" + " of type " + deletedClass.getURI()) + " (refs = " + refCount + ")");
+			   logger.log("Removed " + count + " individual" + ((count > 1) ? "s" : "" + " of type " + deletedClass.getURI()) + " (refs = " + refCount + ")");
 		   }
 		   
 		   aboxModel.remove(retractions);
