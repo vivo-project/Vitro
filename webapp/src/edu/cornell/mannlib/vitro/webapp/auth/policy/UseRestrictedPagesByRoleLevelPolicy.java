@@ -12,6 +12,8 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.RebuildVClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.querymodel.QueryFullModel;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.querymodel.QueryUserAccountsModel;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.AccessSpecialDataModels;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndividuals;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
@@ -133,6 +135,12 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 
 		} else if (whatToAuth instanceof ManageOwnProxies) {
 			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
+			
+		} else if (whatToAuth instanceof QueryUserAccountsModel) {
+			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
+			
+		} else if (whatToAuth instanceof QueryFullModel) {
+			result = isAuthorized(whatToAuth, RoleLevel.PUBLIC, userRole);
 			
 		} else {
 			result = defaultDecision("Unrecognized action");

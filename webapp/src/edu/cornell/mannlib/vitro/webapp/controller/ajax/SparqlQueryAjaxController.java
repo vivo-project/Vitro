@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
@@ -26,8 +27,10 @@ import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.querymodel.QueryFullModel;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.querymodel.QueryUserAccountsModel;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 
 /**
  * Handle an AJAX request for a SPARQL query. On entry, the "query" parameter
@@ -39,46 +42,96 @@ public class SparqlQueryAjaxController extends VitroAjaxController {
 	private static final Log log = LogFactory
 			.getLog(SparqlQueryAjaxController.class);
 
-	private static final String PARAMETER_QUERY = "query";
-	private static final String RESPONSE_MIME_TYPE = "application/javascript";
+	public static final String PARAMETER_QUERY = "query";
+	public static final String RESPONSE_MIME_TYPE = "application/javascript";
 
-    @Override
-    protected Actions requiredActions(VitroRequest vreq) {
-    	return new Actions(new UseBasicAjaxControllers());
-    }
-    
+	public static final String PARAMETER_MODEL = "model";
+	public static final String OPTION_MODEL_FULL = "full";
+	public static final String OPTION_MODEL_USER_ACCOUNTS = "userAccounts";
+
+	@Override
+	protected Actions requiredActions(VitroRequest vreq) {
+		String modelParam = getModelParam(vreq);
+		if (OPTION_MODEL_USER_ACCOUNTS.equals(modelParam)) {
+			return new Actions(new QueryUserAccountsModel());
+		} else {
+			return new Actions(new QueryFullModel());
+		}
+	}
+
 	@Override
 	protected void doRequest(VitroRequest vreq, HttpServletResponse response)
 			throws ServletException, IOException {
-
-		Model model = vreq.getJenaOntModel();
-		if (model == null) {
-			log.error("JenaOntModel not found.");
-			response.sendError(SC_INTERNAL_SERVER_ERROR,
-					"JenaOntModel not found");
+		try {
+			String modelParam = getModelParam(vreq);
+			Model model = locateModel(modelParam);
+			String queryParam = locateQueryParam(vreq);
+			Query query = createQuery(queryParam);
+			executeQuery(response, query, model);
 			return;
+		} catch (AjaxControllerException e) {
+			log.error(e.getMessage());
+			response.sendError(e.getStatusCode());
+		}
+	}
+
+	private String getModelParam(HttpServletRequest req) {
+		String modelParam = req.getParameter(PARAMETER_MODEL);
+		log.debug("modelParam was: " + modelParam);
+		if ((modelParam != null) && (!modelParam.isEmpty())) {
+			return modelParam;
+		} else {
+			return OPTION_MODEL_FULL;
 		}
 
+	}
+
+	private Model locateModel(String modelParam) throws AjaxControllerException {
+		Object o = getServletContext().getAttribute("baseOntModelSelector");
+		if (!(o instanceof OntModelSelector)) {
+			throw new AjaxControllerException(SC_INTERNAL_SERVER_ERROR,
+					"OntModelSelector not found");
+		}
+		OntModelSelector oms = (OntModelSelector) o;
+
+		Model model = null;
+		if (OPTION_MODEL_USER_ACCOUNTS.equals(modelParam)) {
+			model = oms.getUserAccountsModel();
+		} else {
+			model = oms.getFullModel();
+		}
+		if (model == null) {
+			throw new AjaxControllerException(SC_INTERNAL_SERVER_ERROR,
+					"Model '' not found.");
+		}
+
+		return model;
+	}
+
+	private String locateQueryParam(VitroRequest vreq)
+			throws AjaxControllerException {
 		String queryParam = vreq.getParameter(PARAMETER_QUERY);
-		log.debug("queryParam was : " + queryParam);
-		if ((queryParam == null) || queryParam.isEmpty()) {
-			response.sendError(SC_NOT_FOUND, "'" + PARAMETER_QUERY
-					+ "' parameter is required");
+		log.debug("queryParam was: " + queryParam);
+		if ((queryParam != null) && (!queryParam.isEmpty())) {
+			return queryParam;
+		} else {
+			throw new AjaxControllerException(SC_NOT_FOUND, "'"
+					+ PARAMETER_QUERY + "' parameter is required");
 		}
+	}
 
+	private Query createQuery(String queryParam) throws AjaxControllerException {
 		Query query = QueryFactory.create(queryParam, Syntax.syntaxARQ);
 		if (!query.isSelectType()) {
-			log.debug("Not a 'select' query.");
-			response.sendError(SC_NOT_FOUND,
+			throw new AjaxControllerException(SC_NOT_FOUND,
 					"Only 'select' queries are allowed.");
 		}
-
-		executeQuery(response, query, DatasetFactory.create(model));
-		return;
+		return query;
 	}
 
 	private void executeQuery(HttpServletResponse response, Query query,
-			Dataset dataset) throws IOException {
+			Model model) throws IOException {
+		Dataset dataset = DatasetFactory.create(model);
 		QueryExecution qe = QueryExecutionFactory.create(query, dataset);
 		try {
 			ResultSet results = qe.execSelect();
@@ -90,4 +143,16 @@ public class SparqlQueryAjaxController extends VitroAjaxController {
 		}
 	}
 
+	private static class AjaxControllerException extends Exception {
+		private final int statusCode;
+
+		AjaxControllerException(int statusCode, String message) {
+			super(message);
+			this.statusCode = statusCode;
+		}
+
+		public int getStatusCode() {
+			return statusCode;
+		}
+	}
 }
