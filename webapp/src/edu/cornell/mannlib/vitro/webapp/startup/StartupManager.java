@@ -65,6 +65,7 @@ public class StartupManager implements ServletContextListener {
 					initialize(listener, sce);
 				}
 			}
+			log.info("Called 'contextInitialized' on all listeners.");
 		} catch (Exception e) {
 			ss.fatal(this, "Startup threw an unexpected exception.", e);
 			log.error("Startup threw an unexpected exception.", e);
@@ -215,6 +216,7 @@ public class StartupManager implements ServletContextListener {
 						+ listener.getClass().getName() + "'", e);
 			}
 		}
+		log.info("Called 'contextDestroyed' on all listeners.");
 	}
 
 }
