@@ -43,6 +43,7 @@ public class SparqlQueryRunner<T> {
 	 * afterward. If an exception occurs, return the parser's default value.
 	 */
 	public T executeQuery(String queryStr) {
+		log.debug("query is: '" + queryStr + "'");
 		QueryExecution qe = null;
 		try {
 			Query query = QueryFactory.create(queryStr, SYNTAX);
