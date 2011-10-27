@@ -7,10 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -29,10 +26,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.util.ResourceUtils;
-import com.hp.hpl.jena.vocabulary.RDF;
 
-import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
@@ -116,9 +110,9 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 					  ctx.setAttribute(KBM_REQURIED_AT_STARTUP, Boolean.TRUE);
 					  //doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
 					  //reloadDisplayModel(ctx);
-					  log.info("Migrating display model");
-					  doMigrateDisplayModel(ctx);
-					  log.info("Display model migrated");
+					  log.info("Display model has not been migrated");
+					  //doMigrateDisplayModel(ctx);
+					  //log.info("Display model migrated");
 					  ontologyUpdater.update();
 				  }
 			   } catch (IOException ioe) {
@@ -217,6 +211,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	}
 	
 	public static void migrateDisplayModel(Model displayModel) {
+		/*
 	    Resource indexRes = displayModel.getResource(
 	    		DisplayVocabulary.DISPLAY_NS + "PrimaryLuceneIndex");
 	    ResourceUtils.renameResource(
@@ -268,6 +263,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	    		}	    		
 	    	}
 	    }
+	    */
 	}
 	
 	private OntModel loadModelFromDirectory(String directoryPath) {
