@@ -44,8 +44,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/proxy.c
                         %label% | %classLabel%
                         </div>
                         <div>
-                            <a href="." templatePart="remove">remove</a>
-                            <a href="." templatePart="restore">restore</a>
+                            <a href="." templatePart="remove" restoreText="restore">remove</a>
                             <input type="hidden" name="proxyUri" templatePart="uriField" value="%uri%" >
                             </div>
                     </td>

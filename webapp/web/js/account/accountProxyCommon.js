@@ -15,9 +15,8 @@
  *                   profile associated with that individual.
  * ----------------------------------------------------------------------------
  * The template must inlude
- * 1) a link with attribute templatePart="remove"
- * 2) a link with attribute templatePart="restore"
- * 3) a hidden field with attribute templatePart="uriField" and value="%uri%" see below
+ * 1) a link with attribute templatePart="remove" and restoreText="[something]"
+ * 2) a hidden field with attribute templatePart="uriField" and value="%uri%" see below
  * 
  * The template may include tokens to be replaced, from the following:
  *    %uri% -- the URI of the individual being displayed 
@@ -45,45 +44,31 @@ function proxyInfoElement(template, uri, label, classLabel, imageUrl, existing) 
 	this.element = function() {
 		var element = $("<div name='proxyInfoElement'>" + content + "</div>");
 		var removeLink = $("[templatePart='remove']", element).first();
-		var restoreLink = $("[templatePart='restore']", element).first();
+		var removeText = removeLink.text();
+		var restoreText = removeLink.attr('restoreText');
 		var proxyUriField = $("[templatePart='uriField']", element);
 
-		var setClass = function(r) {
-			if (r) {
-				element.removeClass('new existing').addClass('removed')
-			} else if (existed) {
-				element.removeClass('new removed').addClass('existing')
-			} else {
-				element.removeClass('removed existing').addClass('new')
-			}
-		}
-
-		var setRemoved = function(r) {
-			removed = r;
-			if (r) {
-				removeLink.hide();
-				restoreLink.show();
+		var showRemoved = function() {
+			if (removed) {
+				removeLink.text(restoreText);
 				proxyUriField.attr('disabled', 'disabled');
-				setClass(r);
+				element.addClass('removed');
 			} else {
-				removeLink.show();
-				restoreLink.hide();
+				removeLink.text(removeText);
 				proxyUriField.attr('disabled', '');
-				setClass(r);
+				element.removeClass('removed');
 			}
 		}
 
 		removeLink.click(function(event) {
-			setRemoved(true);
+			removed = !removed;
+			showRemoved();
 			return false;
 		});
 
-		restoreLink.click(function(event) {
-			setRemoved(false);
-			return false;
-		});
-
-		setRemoved(removed);
+		element.removeClass('new existing removed');
+		element.addClass(existed ? 'existing' : 'new')
+		showRemoved()
 
 		return element;
 	}

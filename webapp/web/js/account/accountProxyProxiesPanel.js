@@ -126,7 +126,10 @@ function proxyAutocomplete(parent) {
     this.select = function(event, ui) {
         parent.proxyData.unshift(new proxyInfoElement(parent.templateHtml, ui.item.uri, ui.item.label, "", "", false));
         parent.displayProxyData();
+        event.preventDefault();
+        event.target.value = '';
 	}
+    
 }
 
 $(document).ready(function() {
