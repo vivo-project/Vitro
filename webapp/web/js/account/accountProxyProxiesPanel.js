@@ -1,7 +1,12 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 function proxyProxiesPanel(p)  {
-	var query = "PREFIX fn: <http://www.w3.org/2005/xpath-functions#> \n"
+	var sparqlQueryUrl = '../ajax/sparqlQuery';
+	var matchingProperty = "http://vivoweb.org/ontology/core#scopusId"
+	var urlContext = 'http://localhost:8080/vivo'
+		
+	var query = ""
+	    + "PREFIX fn: <http://www.w3.org/2005/xpath-functions#> \n"
 		+ "PREFIX auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> \n"
 		+ "\n"
 		+ "SELECT DISTINCT ?uri ?label ?externalAuthId \n"
@@ -16,6 +21,30 @@ function proxyProxiesPanel(p)  {
 		+ "ORDER BY ASC(?lastName) ASC(?firstName) \n"
 		+ "LIMIT 25 \n";
 	
+	var moreInfoQuery = ""
+		+ "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"
+		+ "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n"
+		+ "PREFIX p.1: <http://vitro.mannlib.cornell.edu/ns/vitro/public#> \n"
+		+ " \n"
+		+ "SELECT ?uri ?classLabel ?imageUrl \n"
+		+ "WHERE \n"
+		+ "{ \n"
+		+ "    ?uri <%matchingProperty%> '%externalAuthId%'. \n"
+		+ " \n"
+		+ "    OPTIONAL { \n" 
+		+ "       ?uri vitro:mostSpecificType ?type. \n"
+		+ "       ?type rdfs:label ?classLabel  \n"
+		+ "       }  \n"
+		+ " \n"
+		+ "   OPTIONAL { \n" 
+		+ "       ?uri p.1:mainImage ?imageUri. \n"
+		+ "       ?imageUri p.1:thumbnailImage ?thumbUri. \n"
+		+ "       ?thumbUri p.1:downloadLocation ?thumbstreamUri. \n"
+		+ "       ?thumbstreamUri p.1:directDownloadUrl ?imageUrl. \n"
+		+ "       }  \n"
+		+ "} \n"
+		+ "LIMIT 1 \n";
+
 	var self = this;
 	
 	this.disableFormInUnsupportedBrowsers = function() {
@@ -63,6 +92,29 @@ function proxyProxiesPanel(p)  {
 	if (this.disableFormInUnsupportedBrowsers()) {
 		return;
 	}
+	
+	this.getAdditionalInfo = function(info, externalAuthId) {
+        $.ajax({
+            url: sparqlQueryUrl,
+            dataType: 'json',
+            data: {
+            	query: moreInfoQuery.replace("%matchingProperty%", matchingProperty).replace("%externalAuthId%", externalAuthId)
+            },
+            complete: function(xhr, status) {
+                var results = $.parseJSON(xhr.responseText);
+                var parsed = sparqlUtils.parseSparqlResults(results);
+                if (parsed.length > 0) {
+	                if ("classLabel" in parsed[0]) {
+	                    info.classLabel = parsed[0].classLabel;
+	                }
+	                if ("imageUrl" in parsed[0]) {
+	                	info.imageUrl = urlContext + parsed[0].imageUrl;
+	                }
+	                self.displayProxyData();
+	            }
+            }
+        });
+	}
 
 	this.panel = p;
 	this.proxyDataDiv = $("div[name='proxyData']", this.panel).first();
@@ -76,8 +128,10 @@ function proxyProxiesPanel(p)  {
 		return self.proxyData;	
 	}
 	
-	this.addProxyInfo = function(uri, label, junk1, junk2) {
-        self.proxyData.unshift(new proxyInfoElement(self.templateHtml, uri, label, "", "", false));
+	this.addProxyInfo = function(selection) {
+		var info = new proxyInfoElement(self.templateHtml, selection.uri, selection.label, "", "", false)
+        self.proxyData.unshift(info);
+        self.getAdditionalInfo(info, selection.externalAuthId)
         self.displayProxyData();
 	}
 	
@@ -85,7 +139,7 @@ function proxyProxiesPanel(p)  {
 		var parms = {
 		    query: query, 
 		    model: "userAccounts",
-		    url: '../ajax/sparqlQuery'
+		    url: sparqlQueryUrl
 		    };
 	    this.addAutoCompleteField.autocomplete(new proxyAutocomplete(parms, this.getProxyInfos, this.addProxyInfo));
 	}

@@ -29,19 +29,23 @@
 
 function proxyInfoElement(template, uri, label, classLabel, imageUrl, existing) {
 	this.uri = uri;
+	this.label = label;
+	this.classLabel = classLabel;
+	this.imageUrl = imageUrl;
 	
 	var existed = existing;
 	var removed = false;
-
-	var content = template.replace(/%uri%/g, uri).replace(/%label%/g, label)
-			.replace(/%classLabel%/g, classLabel).replace(/%imageUrl%/g,
-					imageUrl);
 
 	this.toString = function() {
 		return "proxyInfoElement: " + content;
 	}
 
 	this.element = function() {
+		var content = template.replace(/%uri%/g, this.uri)
+				              .replace(/%label%/g, this.label)
+				              .replace(/%classLabel%/g, this.classLabel)
+				              .replace(/%imageUrl%/g, this.imageUrl);
+
 		var element = $("<div name='proxyInfoElement'>" + content + "</div>");
 		var removeLink = $("[templatePart='remove']", element).first();
 		var removeText = removeLink.text();
@@ -87,8 +91,8 @@ function proxyInfoElement(template, uri, label, classLabel, imageUrl, existing) 
  *   	    that are already present in the list and so should be filtered out of 
  *          the autocomplete response.
  *   addProxyInfo -- a function that we can call when an item is selected.
- *          It will take the uri, label, classLabel, and imageUrl, build a
- *          proxyInfoElement, and add it to the panel.
+ *          It will take the selection info, build a proxyInfoElement, and add 
+ *          it to the panel.
  * ----------------------------------------------------------------------------
  * Before executing the AJAX request, the query from the parms map will be modified, 
  * replacing "%term%" with the current search term.
@@ -142,7 +146,7 @@ function proxyAutocomplete(parms, getProxyInfos, addProxyInfo) {
     }
     
     this.select = function(event, ui) {
-    	addProxyInfo(ui.item.uri, ui.item.label, ui.item.classLabel, ui.item.imageUrl);
+    	addProxyInfo(ui.item);
         event.preventDefault();
         event.target.value = '';
 	}
