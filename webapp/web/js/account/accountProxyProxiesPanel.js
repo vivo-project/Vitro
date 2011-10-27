@@ -1,6 +1,21 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 function proxyProxiesPanel(p)  {
+	var query = "PREFIX fn: <http://www.w3.org/2005/xpath-functions#> \n"
+		+ "PREFIX auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> \n"
+		+ "\n"
+		+ "SELECT DISTINCT ?uri ?label ?externalAuthId \n"
+		+ "WHERE { \n"
+		+ "    ?uri a auth:UserAccount ; \n"
+		+ "            auth:firstName ?firstName ; \n"
+		+ "            auth:lastName ?lastName . \n"
+		+ "    LET ( ?label := fn:concat(?lastName, ', ', ?firstName) )"
+		+ "    OPTIONAL { ?uri auth:externalAuthId ?externalAuthId } \n"
+		+ "    FILTER (REGEX(?label, '^%term%', 'i')) \n"
+		+ "} \n"
+		+ "ORDER BY ASC(?lastName) ASC(?firstName) \n"
+		+ "LIMIT 25 \n";
+	
 	var self = this;
 	
 	this.disableFormInUnsupportedBrowsers = function() {
@@ -45,10 +60,6 @@ function proxyProxiesPanel(p)  {
 		}
 	}
 	
-	this.setupAutoCompleteFields = function() {
-	    this.addAutoCompleteField.autocomplete(new proxyAutocomplete(this));
-	}
-	
 	if (this.disableFormInUnsupportedBrowsers()) {
 		return;
 	}
@@ -60,76 +71,26 @@ function proxyProxiesPanel(p)  {
 	this.parseProxyTemplate();
 	this.parseProxyData();
 	this.displayProxyData();
-	this.setupAutoCompleteFields();
-}
+	
+	this.getProxyInfos = function() {
+		return self.proxyData;	
+	}
+	
+	this.addProxyInfo = function(uri, label, junk1, junk2) {
+        self.proxyData.unshift(new proxyInfoElement(self.templateHtml, uri, label, "", "", false));
+        self.displayProxyData();
+	}
+	
+	this.setupAutoCompleteFields = function() {
+		var parms = {
+		    query: query, 
+		    model: "userAccounts",
+		    url: '../ajax/sparqlQuery'
+		    };
+	    this.addAutoCompleteField.autocomplete(new proxyAutocomplete(parms, this.getProxyInfos, this.addProxyInfo));
+	}
 
-function proxyAutocomplete(parent) {
-	var cache = [];
-	
-	var query = "PREFIX fn: <http://www.w3.org/2005/xpath-functions#> \n"
-		+ "PREFIX auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> \n"
-		+ "\n"
-		+ "SELECT DISTINCT ?uri ?label ?externalAuthId \n"
-		+ "WHERE { \n"
-		+ "    ?uri a auth:UserAccount ; \n"
-		+ "            auth:firstName ?firstName ; \n"
-		+ "            auth:lastName ?lastName . \n"
-		+ "    LET ( ?label := fn:concat(?lastName, ', ', ?firstName) )"
-		+ "    OPTIONAL { ?uri auth:externalAuthId ?externalAuthId } \n"
-		+ "    FILTER (REGEX(?label, '^%term%', 'i')) \n"
-		+ "} \n"
-		+ "ORDER BY ASC(?lastName) ASC(?firstName) \n"
-		+ "LIMIT 25 \n";
-	
-	var filterResults = function(parsed, data) {
-		var filtered = [];
-		for (var p = 0; p < parsed.length; p++) {
-			var dupe = false;
-			for (var d = 0; d < data.length; d++) {
-				if (data[d].uri == parsed[p].uri) {
-					dupe = true;
-					break;
-				}
-			}
-			if (!dupe) {
-				filtered.push(parsed[p]);
-			}
-		}
-		return filtered;
-	}
-	
-    this.minLength = 3,
-    
-    this.source = function(request, response) {
-        if (request.term in cache) {
-        	var filtered = filterResults(cache[request.term], parent.proxyData);
-            response(filtered);
-            return;
-        }
-        $.ajax({
-            url: '../ajax/sparqlQuery',
-            dataType: 'json',
-            data: {
-                query: query.replace("%term%", request.term),
-                model: "userAccounts"
-            }, 
-            complete: function(xhr, status) {
-                var results = $.parseJSON(xhr.responseText);
-                var parsed = sparqlUtils.parseSparqlResults(results); 
-                cache[request.term] = parsed; 
-                var filtered = filterResults(parsed, parent.proxyData);
-                response(filtered);
-            }
-        });
-    }
-    
-    this.select = function(event, ui) {
-        parent.proxyData.unshift(new proxyInfoElement(parent.templateHtml, ui.item.uri, ui.item.label, "", "", false));
-        parent.displayProxyData();
-        event.preventDefault();
-        event.target.value = '';
-	}
-    
+	this.setupAutoCompleteFields();
 }
 
 $(document).ready(function() {
