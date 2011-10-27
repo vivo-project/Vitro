@@ -1,0 +1,15 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+/* ------------------------------------------------->  */
+/* BOGUS STUFF FOR PROXIES ------------------------------------>  */
+/* ------------------------------------------------->  */
+
+.new {
+    background-color: #DDFFDD;
+}
+.existing {
+    background-color: #DDDDDD;
+}
+.removed {
+    background-color: #FFDDDD;
+}

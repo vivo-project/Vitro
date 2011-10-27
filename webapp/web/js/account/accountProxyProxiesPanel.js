@@ -1,0 +1,187 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+function proxyProxiesPanel(p)  {
+	var self = this;
+	
+	this.disableFormInUnsupportedBrowsers = function() {
+		var disableWrapper = $('#ie67DisableWrapper');
+
+		// Check for unsupported browsers only if the element exists on the page
+		if (disableWrapper.length) {
+			if (vitro.browserUtils.isIELessThan8()) {
+				disableWrapper.show();
+				$('.noIE67').hide();
+				return true;
+			}
+		}
+		return false;
+	};
+	
+	this.parseProxyTemplate = function() {
+		var templateDiv = $("div[name='template']", this.proxyDataDiv)
+		this.templateHtml = templateDiv.html();
+		templateDiv.remove();
+	};
+	
+	this.parseProxyData = function() {
+		var datas = $("div[name='data']", this.proxyDataDiv)
+		
+		this.proxyData = []
+		for (i = 0; i < datas.length; i++) {
+			var data = datas[i];
+			var uri = $("p[name='uri']", data).text();
+			var label = $("p[name='label']", data).text();
+			var classLabel = $("p[name='classLabel']", data).text();
+			var imageUrl = $("p[name='imageUrl']", data).text();
+			this.proxyData.push(new proxyProxy(this.templateHtml, uri, label, classLabel, imageUrl, true));
+		}
+	}
+
+	this.displayProxyData = function() {
+		$("div[name='proxyActual']", this.proxyDataDiv).remove();
+		
+		for (i = 0; i < this.proxyData.length; i++) {
+			this.proxyData[i].element().appendTo(this.proxyDataDiv);
+		}
+	}
+	
+	this.setupAutoCompleteFields = function() {
+	    this.addAutoCompleteField.autocomplete(new proxyAutocomplete(this));
+	}
+	
+	if (this.disableFormInUnsupportedBrowsers()) {
+		return;
+	}
+
+	this.panel = p;
+	this.proxyDataDiv = $("div[name='proxyData']", this.panel).first();
+	this.addAutoCompleteField = $("input[name='proxySelectorAC']", this.panel).first();
+	
+	this.parseProxyTemplate();
+	this.parseProxyData();
+	this.displayProxyData();
+	this.setupAutoCompleteFields();
+}
+
+function proxyProxy(template, uri, label, classLabel, imageUrl, existing) {
+	var existed = existing;
+	
+	var content = template.replace(/%uri%/g, uri)
+                          .replace(/%label%/g, label)
+                          .replace(/%classLabel%/g, classLabel)
+                          .replace(/%imageUrl%/g, imageUrl);
+
+	this.toString = function() {
+		return "ProxyProxy: " + content;
+	}
+	
+	this.element = function() {
+		var element = $("<div name='proxyActual'>" + content + "</div>");
+		var removeLink = $("[name='removeProxy']", element).first();
+		var restoreLink = $("[name='restoreProxy']", element).first();
+		var proxyUriField = $("[name='proxyUri']", element);
+		
+		var setClass = function(r) {
+			if (r) {
+				element.removeClass('new existing').addClass('removed')
+			} else if (existed) {
+				element.removeClass('new removed').addClass('existing')
+			} else {
+				element.removeClass('removed existing').addClass('new')
+			}
+		}
+		
+		var setRemoved = function(r) {
+			if (r) {
+				removeLink.hide();
+				restoreLink.show();
+				proxyUriField.attr('disabled', 'disabled');
+				setClass(r);
+			} else {
+				removeLink.show();
+				restoreLink.hide();
+				proxyUriField.attr('disabled', '');
+				setClass(r);
+			}
+		}
+		
+		removeLink.click(function(event) {
+			setRemoved(true);
+			return false;
+			});
+		
+		restoreLink.click(function(event) {
+			setRemoved(false);
+			return false;
+			});
+		
+		setRemoved(false);
+		
+		return element;
+	}
+}
+
+function proxyAutocomplete(parent) {
+	var cache = [];
+	
+	var query = "PREFIX fn: <http://www.w3.org/2005/xpath-functions#> \n"
+		+ "PREFIX auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> \n"
+		+ "\n"
+		+ "SELECT DISTINCT ?uri ?label ?externalAuthId \n"
+		+ "WHERE { \n"
+		+ "    ?uri a auth:UserAccount ; \n"
+		+ "            auth:firstName ?firstName ; \n"
+		+ "            auth:lastName ?lastName . \n"
+		+ "    LET ( ?label := fn:concat(?lastName, ', ', ?firstName) )"
+		+ "    OPTIONAL { ?uri auth:externalAuthId ?externalAuthId } \n"
+		+ "    FILTER (REGEX(?label, '^%term%', 'i')) \n"
+		+ "} \n"
+		+ "ORDER BY ASC(?lastName) ASC(?firstName) \n"
+		+ "LIMIT 25 \n";
+	
+    this.minLength = 3,
+    
+    this.source = function(request, response) {
+        if (request.term in cache) {
+            response(cache[request.term]);
+            return;
+        }
+        $.ajax({
+            url: '../ajax/sparqlQuery',
+            dataType: 'json',
+            data: {
+                query: query.replace("%term%", request.term),
+                model: "userAccounts"
+            }, 
+            complete: function(xhr, status) {
+                var results = $.parseJSON(xhr.responseText);
+                var parsed = sparqlUtils.parseSparqlResults(results); 
+                cache[request.term] = parsed; 
+                response(parsed);
+            }
+        });
+    }
+    
+    this.select = function(event, ui) {
+        parent.proxyData.unshift(new proxyProxy(parent.templateHtml, ui.item.uri, ui.item.label, "", "", false));
+        parent.displayProxyData();
+	}
+        
+; 
+}
+
+function dump(msg, obj) {
+    var out = '';
+    for (var i in obj) {
+        out += i + ": " + obj[i] + "\n";
+    }
+    console.log(msg, out);
+}
+
+
+$(document).ready(function() {
+	$("div[name='proxyProxiesPanel']").each(function(i) {
+		var ppp = new proxyProxiesPanel(this);
+		this["ppp"]=ppp;
+	});
+});
