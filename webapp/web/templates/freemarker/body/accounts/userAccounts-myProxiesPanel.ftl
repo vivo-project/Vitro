@@ -26,9 +26,12 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/proxy.c
         </#list>
 
 		<#-- 
-		    Each proxy will be shown using the HTML inside this div.  
-		    One of the links "removeProxy" and "restoreProxy" will show at a time.
-		    The hidden input field named "proxyUri" is required.
+		    Each proxy will be shown using the HTML inside this div.
+		    It must contain at least:
+		      1) a link with templatePart="remove"
+		      2) a link with templatePart="restore"
+		      3) a hidden input field with templatePart="uriField"  
+		    One of the links "remove" and "restore" will show at a time.
 		-->
         <div name="template" style="display: none">
             <table>
@@ -37,11 +40,14 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/proxy.c
                         <img width="90" alt="%label%" src="%imageUrl%">
                     </td>
                     <td>
+                        <div>
                         %label% | %classLabel%
-                        <br>
-                        <a href="." name="removeProxy">remove</a>
-                        <a href="." name="restoreProxy">restore</a>
-                        <input type="hidden" name="proxyUri" value="%uri%" >
+                        </div>
+                        <div>
+                            <a href="." templatePart="remove">remove</a>
+                            <a href="." templatePart="restore">restore</a>
+                            <input type="hidden" name="proxyUri" templatePart="uriField" value="%uri%" >
+                            </div>
                     </td>
                 </tr>
             </table>
@@ -51,4 +57,5 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/proxy.c
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/sparqlUtils.js"></script>',   
+              '<script type="text/javascript" src="${urls.base}/js/account/accountProxyCommon.js"></script>',   
               '<script type="text/javascript" src="${urls.base}/js/account/accountProxyProxiesPanel.js"></script>')}   

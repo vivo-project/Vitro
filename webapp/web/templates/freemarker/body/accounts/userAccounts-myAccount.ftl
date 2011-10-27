@@ -59,6 +59,8 @@
 
 <section id="my-account" role="region">
     <form id="main-form" method="POST" action="${formUrls.myAccount}" class="customForm" role="my account">
+        <#include "userAccounts-myProxiesPanel.ftl">
+
         <label for="email-address">Email address<span class="requiredHint"> *</span></label>
         <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
 

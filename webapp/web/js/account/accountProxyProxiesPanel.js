@@ -33,12 +33,12 @@ function proxyProxiesPanel(p)  {
 			var label = $("p[name='label']", data).text();
 			var classLabel = $("p[name='classLabel']", data).text();
 			var imageUrl = $("p[name='imageUrl']", data).text();
-			this.proxyData.push(new proxyProxy(this.templateHtml, uri, label, classLabel, imageUrl, true));
+			this.proxyData.push(new proxyInfoElement(this.templateHtml, uri, label, classLabel, imageUrl, true));
 		}
 	}
 
 	this.displayProxyData = function() {
-		$("div[name='proxyActual']", this.proxyDataDiv).remove();
+		$("div[name='proxyInfoElement']", this.proxyDataDiv).remove();
 		
 		for (i = 0; i < this.proxyData.length; i++) {
 			this.proxyData[i].element().appendTo(this.proxyDataDiv);
@@ -63,64 +63,6 @@ function proxyProxiesPanel(p)  {
 	this.setupAutoCompleteFields();
 }
 
-function proxyProxy(template, uri, label, classLabel, imageUrl, existing) {
-	var existed = existing;
-	
-	var content = template.replace(/%uri%/g, uri)
-                          .replace(/%label%/g, label)
-                          .replace(/%classLabel%/g, classLabel)
-                          .replace(/%imageUrl%/g, imageUrl);
-
-	this.toString = function() {
-		return "ProxyProxy: " + content;
-	}
-	
-	this.element = function() {
-		var element = $("<div name='proxyActual'>" + content + "</div>");
-		var removeLink = $("[name='removeProxy']", element).first();
-		var restoreLink = $("[name='restoreProxy']", element).first();
-		var proxyUriField = $("[name='proxyUri']", element);
-		
-		var setClass = function(r) {
-			if (r) {
-				element.removeClass('new existing').addClass('removed')
-			} else if (existed) {
-				element.removeClass('new removed').addClass('existing')
-			} else {
-				element.removeClass('removed existing').addClass('new')
-			}
-		}
-		
-		var setRemoved = function(r) {
-			if (r) {
-				removeLink.hide();
-				restoreLink.show();
-				proxyUriField.attr('disabled', 'disabled');
-				setClass(r);
-			} else {
-				removeLink.show();
-				restoreLink.hide();
-				proxyUriField.attr('disabled', '');
-				setClass(r);
-			}
-		}
-		
-		removeLink.click(function(event) {
-			setRemoved(true);
-			return false;
-			});
-		
-		restoreLink.click(function(event) {
-			setRemoved(false);
-			return false;
-			});
-		
-		setRemoved(false);
-		
-		return element;
-	}
-}
-
 function proxyAutocomplete(parent) {
 	var cache = [];
 	
@@ -139,11 +81,29 @@ function proxyAutocomplete(parent) {
 		+ "ORDER BY ASC(?lastName) ASC(?firstName) \n"
 		+ "LIMIT 25 \n";
 	
+	var filterResults = function(parsed, data) {
+		var filtered = [];
+		for (var p = 0; p < parsed.length; p++) {
+			var dupe = false;
+			for (var d = 0; d < data.length; d++) {
+				if (data[d].uri == parsed[p].uri) {
+					dupe = true;
+					break;
+				}
+			}
+			if (!dupe) {
+				filtered.push(parsed[p]);
+			}
+		}
+		return filtered;
+	}
+	
     this.minLength = 3,
     
     this.source = function(request, response) {
         if (request.term in cache) {
-            response(cache[request.term]);
+        	var filtered = filterResults(cache[request.term], parent.proxyData);
+            response(filtered);
             return;
         }
         $.ajax({
@@ -157,27 +117,17 @@ function proxyAutocomplete(parent) {
                 var results = $.parseJSON(xhr.responseText);
                 var parsed = sparqlUtils.parseSparqlResults(results); 
                 cache[request.term] = parsed; 
-                response(parsed);
+                var filtered = filterResults(parsed, parent.proxyData);
+                response(filtered);
             }
         });
     }
     
     this.select = function(event, ui) {
-        parent.proxyData.unshift(new proxyProxy(parent.templateHtml, ui.item.uri, ui.item.label, "", "", false));
+        parent.proxyData.unshift(new proxyInfoElement(parent.templateHtml, ui.item.uri, ui.item.label, "", "", false));
         parent.displayProxyData();
 	}
-        
-; 
 }
-
-function dump(msg, obj) {
-    var out = '';
-    for (var i in obj) {
-        out += i + ": " + obj[i] + "\n";
-    }
-    console.log(msg, out);
-}
-
 
 $(document).ready(function() {
 	$("div[name='proxyProxiesPanel']").each(function(i) {
