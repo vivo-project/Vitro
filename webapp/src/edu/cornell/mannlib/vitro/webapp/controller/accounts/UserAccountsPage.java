@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.controller.accounts;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,6 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
+import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -57,6 +59,7 @@ public abstract class UserAccountsPage {
 	protected final VClassDao vclassDao;
 	protected final IndividualDao indDao;
 	protected final DataPropertyStatementDao dpsDao;
+	protected final ObjectPropertyStatementDao opsDao;
 
 	protected UserAccountsPage(VitroRequest vreq) {
 		this.vreq = vreq;
@@ -72,6 +75,7 @@ public abstract class UserAccountsPage {
 		vclassDao = wdf.getVClassDao();
 		indDao = wdf.getIndividualDao();
 		dpsDao = wdf.getDataPropertyStatementDao();
+		opsDao = wdf.getObjectPropertyStatementDao();
 	}
 
 	protected boolean isEmailEnabled() {
@@ -81,6 +85,15 @@ public abstract class UserAccountsPage {
 	protected String getStringParameter(String key, String defaultValue) {
 		String value = vreq.getParameter(key);
 		return (value == null) ? defaultValue : value;
+	}
+
+	protected List<String> getStringParameters(String key) {
+		String[] values = vreq.getParameterValues(key);
+		if (values == null) {
+			return Collections.emptyList();
+		} else {
+			return new ArrayList<String>(Arrays.asList(values));
+		}
 	}
 
 	protected int getIntegerParameter(String key, int defaultValue) {
