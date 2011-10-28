@@ -119,6 +119,7 @@ function proxyProxiesPanel(p)  {
 	this.panel = p;
 	this.proxyDataDiv = $("div[name='proxyData']", this.panel).first();
 	this.addAutoCompleteField = $("input[name='proxySelectorAC']", this.panel).first();
+	this.searchStatusField = $("span[name='proxySelectorSearchStatus']", this.panel).first();
 	
 	this.parseProxyTemplate();
 	this.parseProxyData();
@@ -135,16 +136,36 @@ function proxyProxiesPanel(p)  {
         self.displayProxyData();
 	}
 	
+	
 	this.setupAutoCompleteFields = function() {
 		var parms = {
 		    query: query, 
 		    model: "userAccounts",
 		    url: sparqlQueryUrl
 		    };
-	    this.addAutoCompleteField.autocomplete(new proxyAutocomplete(parms, this.getProxyInfos, this.addProxyInfo));
+		var reportSearchStatus = new searchStatusField(this.searchStatusField, 3).setText;
+	    this.addAutoCompleteField.autocomplete(new proxyAutocomplete(parms, this.getProxyInfos, this.addProxyInfo, reportSearchStatus));
 	}
 
 	this.setupAutoCompleteFields();
+}
+
+function searchStatusField(element, minLength) {
+	var emptyText = element.text();
+	var moreCharsText = element.attr('moreCharsText');
+	var noMatchText = element.attr('noMatchText');
+
+	this.setText = function(searchTermLength, numberOfResults) {
+		if (numberOfResults > 0) {
+			element.text = '';
+		} else if (searchTermLength == 0) {
+			element.text(emptyText);
+		} else if (searchTermLength < minLength) {
+			element.text(moreCharsText);
+		} else {
+			element.text(noMatchText);
+		}
+	}
 }
 
 $(document).ready(function() {

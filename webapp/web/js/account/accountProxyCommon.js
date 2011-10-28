@@ -97,6 +97,9 @@ function proxyInfoElement(template, uri, label, classLabel, imageUrl, existing) 
  *   addProxyInfo -- a function that we can call when an item is selected.
  *          It will take the selection info, build a proxyInfoElement, and add 
  *          it to the panel.
+ *   reportSearchStatus -- a function that we can call when a search is done. It
+ *          will accept the length of the search term and the number of results, 
+ *          and will display it in some way.
  * ----------------------------------------------------------------------------
  * Before executing the AJAX request, the query from the parms map will be modified, 
  * replacing "%term%" with the current search term.
@@ -108,7 +111,7 @@ function proxyInfoElement(template, uri, label, classLabel, imageUrl, existing) 
  *   -- calling addProxyInfo() and clearing the field when a value is selected.
  * ----------------------------------------------------------------------------
  */
-function proxyAutocomplete(parms, getProxyInfos, addProxyInfo) {
+function proxyAutocomplete(parms, getProxyInfos, addProxyInfo, reportSearchStatus) {
 	var cache = [];
 	
 	var filterResults = function(parsed) {
@@ -123,13 +126,21 @@ function proxyAutocomplete(parms, getProxyInfos, addProxyInfo) {
 		});
 		return filtered;
 	}
-	
-    this.minLength = 3,
+
+	var sendResponse = function(request, response, results) {
+        reportSearchStatus(request.term.length, results.length);
+		response(results);
+	}
+
+    this.minLength = 0,
     
     this.source = function(request, response) {
+    	if (request.term.length < 3) {
+    		sendResponse(request, response, []);
+    		return;
+    	} 
         if (request.term in cache) {
-        	var filtered = filterResults(cache[request.term]);
-            response(filtered);
+        	sendResponse(request, response, filterResults(cache[request.term]));
             return;
         }
         $.ajax({
@@ -143,8 +154,7 @@ function proxyAutocomplete(parms, getProxyInfos, addProxyInfo) {
                 var results = $.parseJSON(xhr.responseText);
                 var parsed = sparqlUtils.parseSparqlResults(results); 
                 cache[request.term] = parsed; 
-                var filtered = filterResults(parsed);
-                response(filtered);
+                sendResponse(request, response, filterResults(parsed));
             }
         });
     }

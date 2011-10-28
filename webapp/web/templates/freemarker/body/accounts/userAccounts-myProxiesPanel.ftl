@@ -11,6 +11,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/proxy.c
     <br><br>
     <p>Add proxy:</p>
     <p><input type="text" name="proxySelectorAC" class="acSelector" size="35"></p>
+    <p><span name='proxySelectorSearchStatus' moreCharsText='type more characters' noMatchText='no match'>type here</span></p>
     <br><br>
     <p>Selected proxies:</p>
 
