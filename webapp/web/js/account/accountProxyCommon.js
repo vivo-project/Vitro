@@ -25,8 +25,12 @@
  *    %imageUrl% -- the URL that will fetch the image of the individual, 
  *                  or a placeholder image.
  * ----------------------------------------------------------------------------
+ * This relies on magic names for the styles:
+ *   existingProxyItem -- for an item that was present when the page was loaded
+ *   newProxyItem      -- for an item that was added since the page was loaded
+ *   removedProxyItem  -- added to an item when the "remove" link is cheked.
+ * ----------------------------------------------------------------------------
  */
-
 function proxyInfoElement(template, uri, label, classLabel, imageUrl, existing) {
 	this.uri = uri;
 	this.label = label;
@@ -56,11 +60,11 @@ function proxyInfoElement(template, uri, label, classLabel, imageUrl, existing) 
 			if (removed) {
 				removeLink.text(restoreText);
 				proxyUriField.attr('disabled', 'disabled');
-				element.addClass('removed');
+				element.addClass('removedProxyItem');
 			} else {
 				removeLink.text(removeText);
 				proxyUriField.attr('disabled', '');
-				element.removeClass('removed');
+				element.removeClass('removedProxyItem');
 			}
 		}
 
@@ -70,8 +74,8 @@ function proxyInfoElement(template, uri, label, classLabel, imageUrl, existing) 
 			return false;
 		});
 
-		element.removeClass('new existing removed');
-		element.addClass(existed ? 'existing' : 'new')
+		element.removeClass('newProxyItem existingProxyItem removedProxyItem');
+		element.addClass(existed ? 'existingProxyItem' : 'newProxyItem')
 		showRemoved()
 
 		return element;

@@ -4,12 +4,12 @@
 /* BOGUS STUFF FOR PROXIES ------------------------------------>  */
 /* ------------------------------------------------->  */
 
-.new {
+.newProxyItem {
     background-color: #DDFFDD;
 }
-.existing {
+.existingProxyItem {
     background-color: #DDDDDD;
 }
-.removed {
+.removedProxyItem {
     background-color: #FFDDDD;
 }
