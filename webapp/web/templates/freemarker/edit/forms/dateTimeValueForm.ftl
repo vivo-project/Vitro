@@ -23,7 +23,7 @@
 <form class="customForm" action ="${submitUrl}" class="customForm">
     <fieldset class="dateTime" role="group"> 
         <label for="dateTimeField-year">Year</label>
-        <input class="text-field" name="dateTimeField-year" id="dateTimeField-year" type="text" value="1996" size="4" maxlength="4" role="input"/>
+        <input class="text-field" name="dateTimeField-year" id="dateTimeField-year" type="text" value="" size="4" maxlength="4" role="input"/>
 
         <label for="dateTimeField-month">Month</label>
         <select name="dateTimeField-month" id="dateTimeField-month" role="select">
