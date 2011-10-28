@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.identifier.common;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndividual.Mechanism.EXPLICIT_PROXY;
+import static edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndividual.Mechanism.SELF;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,6 +55,7 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 		bundle.addAll(createRootUserIdentifiers(req));
 		bundle.addAll(createRoleLevelIdentifiers(req));
 		bundle.addAll(createBlacklistOrAssociatedIndividualIdentifiers(req));
+		bundle.addAll(createExplicitProxyEditingIdentifiers(req));
 
 		return bundle;
 	}
@@ -104,7 +108,7 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 			if (id != null) {
 				ids.add(id);
 			} else {
-				ids.add(new HasAssociatedIndividual(ind.getURI()));
+				ids.add(new HasAssociatedIndividual(ind.getURI(), SELF));
 			}
 		}
 
@@ -112,10 +116,7 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 	}
 
 	/**
-	 * Get all Individuals associated with the current user.
-	 * 
-	 * TODO Currently only uses the matching property. Should also use
-	 * "mayEditAs" type of association.
+	 * Get all Individuals associated with the current user as SELF.
 	 */
 	private Collection<Individual> getAssociatedIndividuals(
 			HttpServletRequest req) {
@@ -140,6 +141,23 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 		individuals.addAll(sec.getAssociatedIndividuals(indDao, user));
 
 		return individuals;
+	}
+
+	/**
+	 * Get all Individuals associated with the current user by explicit proxy relationship.
+	 */
+	private Collection<? extends Identifier> createExplicitProxyEditingIdentifiers(
+			HttpServletRequest req) {
+		Collection<Identifier> ids = new ArrayList<Identifier>();
+
+		UserAccount user = LoginStatusBean.getCurrentUser(req);
+		if (user != null) {
+			for(String proxiedUri: user.getProxiedIndividualUris()) {
+				ids.add(new HasAssociatedIndividual(proxiedUri, EXPLICIT_PROXY));
+			}
+		}
+
+		return ids;
 	}
 
 	@Override
