@@ -48,6 +48,12 @@ public class UserAccountsDaoFiltering extends BaseFiltering implements
 	}
 	
 	@Override
+	public Collection<UserAccount> getUserAccountsWhoProxyForPage(
+			String profilePageUri) {
+		return innerDao.getUserAccountsWhoProxyForPage(profilePageUri);
+	}
+
+	@Override
 	public String insertUserAccount(UserAccount userAccount) {
 		return innerDao.insertUserAccount(userAccount);
 	}

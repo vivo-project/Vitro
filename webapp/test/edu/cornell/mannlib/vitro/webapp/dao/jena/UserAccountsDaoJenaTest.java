@@ -232,6 +232,48 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		assertEqualAccounts(user1, updated);
 	}
 
+	@Test
+	public void getProxyEditorsFirst() {
+		String profileOne = NS_MINE + "userNewProxyOne";
+		String profileTwo = NS_MINE + "userNewProxyTwo";
+		userNew.setProxiedIndividualUris(collection(profileOne, profileTwo));
+
+		String userUri = dao.insertUserAccount(userNew);
+		UserAccount user = dao.getUserAccountByUri(userUri);
+
+		assertExpectedAccountUris("proxy for profile one",
+				Collections.singleton(user),
+				dao.getUserAccountsWhoProxyForPage(profileOne));
+	}
+
+	@Test
+	public void getProxyEditorsSecond() {
+		String profileOne = NS_MINE + "userNewProxyOne";
+		String profileTwo = NS_MINE + "userNewProxyTwo";
+		userNew.setProxiedIndividualUris(collection(profileOne, profileTwo));
+
+		String userUri = dao.insertUserAccount(userNew);
+		UserAccount user = dao.getUserAccountByUri(userUri);
+
+		assertExpectedAccountUris("proxy for profile two",
+				Collections.singleton(user),
+				dao.getUserAccountsWhoProxyForPage(profileTwo));
+	}
+
+	@Test
+	public void getProxyEditorsBogus() {
+		String profileOne = NS_MINE + "userNewProxyOne";
+		String profileTwo = NS_MINE + "userNewProxyTwo";
+		String bogusProfile = NS_MINE + "bogus";
+		userNew.setProxiedIndividualUris(collection(profileOne, profileTwo));
+
+		dao.insertUserAccount(userNew);
+
+		assertExpectedAccountUris("proxy for bogus profile",
+				Collections.<UserAccount> emptySet(),
+				dao.getUserAccountsWhoProxyForPage(bogusProfile));
+	}
+
 	// ----------------------------------------------------------------------
 	// Tests for PermissionSet methods
 	// ----------------------------------------------------------------------
@@ -388,6 +430,22 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		}
 
 		assertEquals("all permission sets", expectedMaps, actualMaps);
+	}
+
+	private void assertExpectedAccountUris(String label,
+			Set<UserAccount> expectedUserAccounts,
+			Collection<UserAccount> actualUserAccounts) {
+		Set<String> expectedUris = new HashSet<String>();
+		for (UserAccount ua : expectedUserAccounts) {
+			expectedUris.add(ua.getUri());
+		}
+
+		Set<String> actualUris = new HashSet<String>();
+		for (UserAccount ua : actualUserAccounts) {
+			actualUris.add(ua.getUri());
+		}
+
+		assertEqualSets(label, expectedUris, actualUris);
 	}
 
 	@SuppressWarnings("unused")

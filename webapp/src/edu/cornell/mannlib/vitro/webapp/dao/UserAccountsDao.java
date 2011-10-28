@@ -39,6 +39,11 @@ public interface UserAccountsDao {
 	 * @return null if the ID is null, or if there is no such UserAccount
 	 */
 	UserAccount getUserAccountByExternalAuthId(String externalAuthId);
+	
+	/**
+	 * Get any UserAccounts who act as proxy editors for this profile page.
+	 */
+	Collection<UserAccount> getUserAccountsWhoProxyForPage(String profilePageUri);
 
 	/**
 	 * Create a new UserAccount in the model.

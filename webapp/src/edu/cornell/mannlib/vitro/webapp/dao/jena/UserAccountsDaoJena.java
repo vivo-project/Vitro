@@ -12,6 +12,8 @@ import java.util.Random;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
+import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -24,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 /**
  * Implement UserAccountsDao for Jena models.
@@ -165,6 +168,41 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 	}
 
 	@Override
+	public Collection<UserAccount> getUserAccountsWhoProxyForPage(
+			String profilePageUri) {
+		List<String> userUris = new ArrayList<String>();
+
+		Resource s = null;
+		Property p = getOntModel().getProperty(
+				VitroVocabulary.USERACCOUNT_PROXY_EDITOR_FOR);
+		Resource o = getOntModel().createResource(profilePageUri);
+
+		getOntModel().enterCriticalSection(Lock.READ);
+		try {
+			StmtIterator stmts = getOntModel().listStatements(s, p, o);
+			while (stmts.hasNext()) {
+				Resource subject = stmts.next().getSubject();
+				if (subject != null) {
+					userUris.add(subject.getURI());
+				}
+			}
+			stmts.close();
+		} finally {
+			getOntModel().leaveCriticalSection();
+		}
+
+		List<UserAccount> userAccounts = new ArrayList<UserAccount>();
+		for (String userUri : userUris) {
+			UserAccount ua = getUserAccountByUri(userUri);
+			if (ua != null) {
+				userAccounts.add(ua);
+			}
+		}
+
+		return userAccounts;
+	}
+
+	@Override
 	public String insertUserAccount(UserAccount userAccount) {
 		if (userAccount == null) {
 			throw new NullPointerException("userAccount may not be null.");
@@ -214,8 +252,7 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 				model.add(res, RDF.type, USERACCOUNT_ROOT_USER);
 			}
 
-			updatePropertyResourceURIValues(res,
-					USERACCOUNT_PROXY_EDITOR_FOR,
+			updatePropertyResourceURIValues(res, USERACCOUNT_PROXY_EDITOR_FOR,
 					userAccount.getProxiedIndividualUris(), model);
 
 			userAccount.setUri(userUri);
@@ -283,8 +320,7 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 				model.remove(res, RDF.type, USERACCOUNT_ROOT_USER);
 			}
 
-			updatePropertyResourceURIValues(res,
-					USERACCOUNT_PROXY_EDITOR_FOR,
+			updatePropertyResourceURIValues(res, USERACCOUNT_PROXY_EDITOR_FOR,
 					userAccount.getProxiedIndividualUris(), model);
 
 		} finally {
