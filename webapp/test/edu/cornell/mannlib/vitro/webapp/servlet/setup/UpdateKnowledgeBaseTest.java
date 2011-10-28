@@ -13,7 +13,7 @@ import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 
 public class UpdateKnowledgeBaseTest extends AbstractTestClass {
 
-	@org.junit.Test
+	//@org.junit.Test
 	public void testMigrateDisplayModel() {
 		
 		String version12DisplayModel = "\n" + 
