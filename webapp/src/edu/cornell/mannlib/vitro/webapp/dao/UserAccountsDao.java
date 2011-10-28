@@ -85,6 +85,12 @@ public interface UserAccountsDao {
 	void deleteUserAccount(String userAccountUri);
 
 	/**
+	 * Set so that these UserAccounts, and only these, are authorized as proxies on this
+	 * profile page.
+	 */
+	void setProxyAccountsOnProfile(String profilePageUri, Collection<String> userAccountUris);
+	
+	/**
 	 * Get the PermissionSet for this URI.
 	 * 
 	 * @return null if the URI is null, or if there is no such PermissionSet.

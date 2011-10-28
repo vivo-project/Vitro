@@ -165,7 +165,12 @@ public class UserAccountsMyAccountPage extends UserAccountsPage {
 		userAccount.setEmailAddress(emailAddress);
 		userAccount.setFirstName(firstName);
 		userAccount.setLastName(lastName);
-		userAccount.setProxiedIndividualUris(proxyUris);
+
+		Individual profilePage = getProfilePage(userAccount);
+		if (profilePage != null) {
+			userAccountsDao.setProxyAccountsOnProfile(profilePage.getURI(),
+					proxyUris);
+		}
 
 		strategy.setAdditionalProperties(userAccount);
 
@@ -199,10 +204,15 @@ public class UserAccountsMyAccountPage extends UserAccountsPage {
 
 		Individual profilePage = getProfilePage(userAccount);
 		if (profilePage == null) {
+			log.debug("no profile page");
 			proxyUsers = Collections.emptyList();
 		} else {
 			String uri = profilePage.getURI();
+			log.debug("profile page at " + uri);
 			proxyUsers = userAccountsDao.getUserAccountsWhoProxyForPage(uri);
+			if (log.isDebugEnabled()) {
+				log.debug(getUrisFromUserAccounts(proxyUsers));
+			}
 		}
 
 		return buildProxyListFromUserAccounts(proxyUsers);
@@ -266,6 +276,15 @@ public class UserAccountsMyAccountPage extends UserAccountsPage {
 		} else {
 			return types.values().iterator().next();
 		}
+	}
+
+	private List<String> getUrisFromUserAccounts(
+			Collection<UserAccount> proxyUsers) {
+		List<String> list = new ArrayList<String>();
+		for (UserAccount u : proxyUsers) {
+			list.add(u.getUri());
+		}
+		return list;
 	}
 
 	public static class ProxyInfo {

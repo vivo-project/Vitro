@@ -346,6 +346,52 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 	}
 
 	@Override
+	public void setProxyAccountsOnProfile(String profilePageUri,
+			Collection<String> userAccountUris) {
+		Property p = getOntModel().getProperty(
+				VitroVocabulary.USERACCOUNT_PROXY_EDITOR_FOR);
+		Resource o = getOntModel().createResource(profilePageUri);
+
+		// figure out what needs to be added and what needs to be removed.
+		List<String> removeThese = new ArrayList<String>();
+		List<String> addThese = new ArrayList<String>(userAccountUris);
+		getOntModel().enterCriticalSection(Lock.READ);
+		try {
+			Resource s = null;
+			StmtIterator stmts = getOntModel().listStatements(s, p, o);
+			while (stmts.hasNext()) {
+				Resource subject = stmts.next().getSubject();
+				if (subject != null) {
+					String uri = subject.getURI();
+					if (addThese.contains(uri)) {
+						addThese.remove(uri);
+					} else {
+						removeThese.add(uri);
+					}
+				}
+			}
+			stmts.close();
+		} finally {
+			getOntModel().leaveCriticalSection();
+		}
+
+		// now do it.
+		getOntModel().enterCriticalSection(Lock.WRITE);
+		try {
+			for (String uri : removeThese) {
+				Resource s = getOntModel().createResource(uri);
+				getOntModel().remove(s, p, o);
+			}
+			for (String uri: addThese) {
+				Resource s = getOntModel().createResource(uri);
+				getOntModel().add(s, p, o);
+			}
+		} finally {
+			getOntModel().leaveCriticalSection();
+		}
+	}
+
+	@Override
 	public PermissionSet getPermissionSetByUri(String uri) {
 		if (uri == null) {
 			return null;

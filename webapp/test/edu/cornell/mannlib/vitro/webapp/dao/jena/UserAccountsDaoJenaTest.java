@@ -58,12 +58,19 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 	private static final String URI_ROLE2 = NS_MINE + "role2";
 	private static final String URI_ROLE3 = NS_MINE + "role3";
 
+	private static final String URI_PROFILE1 = NS_MINE + "profile1";
+	private static final String URI_PROFILE2 = NS_MINE + "profile2";
+
 	private OntModel ontModel;
 	private WebappDaoFactoryJena wadf;
 	private UserAccountsDaoJena dao;
 
 	private UserAccount user1;
 	private UserAccount userNew;
+
+	private UserAccount userA;
+	private UserAccount userB;
+	private UserAccount userC;
 
 	@Before
 	public void setup() throws IOException {
@@ -89,6 +96,16 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		userNew = userAccount("", "email@here", "Joe", "Blow", "XXXX", "YYYY",
 				0L, false, 1, 0L, Status.ACTIVE, "jblow", false, EMPTY, false,
 				EMPTY);
+
+		userA = userAccount("", "aahern@here", "Alf", "Ahern", "XXXX", "YYYY",
+				0L, false, 1, 0L, Status.ACTIVE, "aahern", false, EMPTY, false,
+				collection(URI_PROFILE1));
+		userB = userAccount("", "email@here", "Betty", "Boop", "XXXX", "YYYY",
+				0L, false, 1, 0L, Status.ACTIVE, "bboop", false, EMPTY, false,
+				collection(URI_PROFILE1, URI_PROFILE2));
+		userC = userAccount("", "ccallas@here", "Charlie", "Callas", "XXXX",
+				"YYYY", 0L, false, 1, 0L, Status.ACTIVE, "ccallas", false,
+				EMPTY, false, collection(URI_PROFILE2));
 	}
 
 	// ----------------------------------------------------------------------
@@ -232,6 +249,10 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		assertEqualAccounts(user1, updated);
 	}
 
+	// ----------------------------------------------------------------------
+	// Tests for proxy-related methods
+	// ----------------------------------------------------------------------
+
 	@Test
 	public void getProxyEditorsFirst() {
 		String profileOne = NS_MINE + "userNewProxyOne";
@@ -272,6 +293,22 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		assertExpectedAccountUris("proxy for bogus profile",
 				Collections.<UserAccount> emptySet(),
 				dao.getUserAccountsWhoProxyForPage(bogusProfile));
+	}
+
+	@Test
+	public void setProxyEditorsOnProfile() {
+		String uriA = dao.insertUserAccount(userA);
+		String uriB = dao.insertUserAccount(userB);
+		String uriC = dao.insertUserAccount(userC);
+
+		dao.setProxyAccountsOnProfile(URI_PROFILE1, collection(uriB, uriC));
+
+		assertExpectedProxies("userA", collection(),
+				dao.getUserAccountByUri(uriA).getProxiedIndividualUris());
+		assertExpectedProxies("userB", collection(URI_PROFILE1, URI_PROFILE2),
+				dao.getUserAccountByUri(uriB).getProxiedIndividualUris());
+		assertExpectedProxies("userC", collection(URI_PROFILE1, URI_PROFILE2),
+				dao.getUserAccountByUri(uriC).getProxiedIndividualUris());
 	}
 
 	// ----------------------------------------------------------------------
@@ -446,6 +483,12 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		}
 
 		assertEqualSets(label, expectedUris, actualUris);
+	}
+
+	private void assertExpectedProxies(String label,
+			Collection<String> expected, Set<String> actual) {
+		Set<String> expectedSet = new HashSet<String>(expected);
+		assertEqualSets(label, expectedSet, actual);
 	}
 
 	@SuppressWarnings("unused")
