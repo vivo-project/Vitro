@@ -14,7 +14,7 @@ import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 public class UpdateKnowledgeBaseTest extends AbstractTestClass {
 
 	//@org.junit.Test
-	public void testMigrateDisplayModel() {
+	public void testMigrateDisplayModel12() {
 		
 		String version12DisplayModel = "\n" + 
 		       " <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#PrimaryLuceneIndex> " +
@@ -50,6 +50,12 @@ public class UpdateKnowledgeBaseTest extends AbstractTestClass {
 		UpdateKnowledgeBase.migrateDisplayModel(preMigrate);
 		Assert.assertTrue(preMigrate.isIsomorphicWith(postMigrate));
 		
+	}
+	
+	@org.junit.Test
+	public void testMigrateDisplayModel13() {
+		
+      return;		
 	}
 	
 }
