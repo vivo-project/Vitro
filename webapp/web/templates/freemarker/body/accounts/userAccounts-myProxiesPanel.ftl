@@ -4,7 +4,6 @@
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/autocomplete.css" />',
                    '<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css" />')}
-${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/proxy.css" />')}
 
 <div name="proxyProxiesPanel" style="border: solid; padding: 5px; float: right;">
     Proxy self editors
@@ -29,10 +28,8 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/proxy.c
 		<#-- 
 		    Each proxy will be shown using the HTML inside this div.
 		    It must contain at least:
-		      1) a link with templatePart="remove"
-		      2) a link with templatePart="restore"
-		      3) a hidden input field with templatePart="uriField"  
-		    One of the links "remove" and "restore" will show at a time.
+		      -- a link with templatePart="remove"
+		      -- a hidden input field with templatePart="uriField"  
 		-->
         <div name="template" style="display: none">
             <table>
@@ -45,8 +42,8 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/proxy.c
                         %label% | %classLabel%
                         </div>
                         <div>
-                            <a href="." templatePart="remove" restoreText="restore">remove</a>
-                            <input type="hidden" name="proxyUri" templatePart="uriField" value="%uri%" >
+                            <a href="." templatePart="remove">remove</a>
+                            <input type="hidden" name="proxyUri" value="%uri%" >
                             </div>
                     </td>
                 </tr>

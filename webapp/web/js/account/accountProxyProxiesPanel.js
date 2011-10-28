@@ -47,6 +47,10 @@ function proxyProxiesPanel(p)  {
 
 	var self = this;
 	
+	var removeProxyInfo = function(info) {
+		self.removeProxyInfo(info)
+	}
+	
 	this.disableFormInUnsupportedBrowsers = function() {
 		var disableWrapper = $('#ie67DisableWrapper');
 
@@ -67,6 +71,14 @@ function proxyProxiesPanel(p)  {
 		templateDiv.remove();
 	};
 	
+	this.removeProxyInfo = function(info) {
+		var idx = self.proxyData.indexOf(info);
+		if (idx != -1) {
+			self.proxyData.splice(idx, 1);
+		}
+		self.displayProxyData();
+	}
+	
 	this.parseProxyData = function() {
 		var datas = $("div[name='data']", this.proxyDataDiv)
 		
@@ -77,7 +89,7 @@ function proxyProxiesPanel(p)  {
 			var label = $("p[name='label']", data).text();
 			var classLabel = $("p[name='classLabel']", data).text();
 			var imageUrl = $("p[name='imageUrl']", data).text();
-			this.proxyData.push(new proxyInfoElement(this.templateHtml, uri, label, classLabel, imageUrl, true));
+			this.proxyData.push(new proxyInfoElement(this.templateHtml, uri, label, classLabel, imageUrl, removeProxyInfo));
 		}
 	}
 
@@ -130,7 +142,7 @@ function proxyProxiesPanel(p)  {
 	}
 	
 	this.addProxyInfo = function(selection) {
-		var info = new proxyInfoElement(self.templateHtml, selection.uri, selection.label, "", "", false)
+		var info = new proxyInfoElement(self.templateHtml, selection.uri, selection.label, "", "", removeProxyInfo)
         self.proxyData.unshift(info);
         self.getAdditionalInfo(info, selection.externalAuthId)
         self.displayProxyData();

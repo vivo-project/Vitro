@@ -13,10 +13,14 @@
  *    a profile -- Individual to be edited.
  *    a proxy   -- User Account to do the editing, optionally with info from a 
  *                   profile associated with that individual.
+ * 
+ * You provide:
+ *   template -- the HTML text that determines how the element should look.
+ *   uri, label, classLabel, imageUrl -- as described below
+ *   remove -- a function that we can call when the user clicks on the remove 
+ *             link or button. We will pass a reference to this struct.
  * ----------------------------------------------------------------------------
- * The template must inlude
- * 1) a link with attribute templatePart="remove" and restoreText="[something]"
- * 2) a hidden field with attribute templatePart="uriField" and value="%uri%" see below
+ * The template must inlude a link or button with attribute templatePart="remove"
  * 
  * The template may include tokens to be replaced, from the following:
  *    %uri% -- the URI of the individual being displayed 
@@ -31,15 +35,14 @@
  *   removedProxyItem  -- added to an item when the "remove" link is cheked.
  * ----------------------------------------------------------------------------
  */
-function proxyInfoElement(template, uri, label, classLabel, imageUrl, existing) {
+function proxyInfoElement(template, uri, label, classLabel, imageUrl, removeInfo) {
+	var self = this;
+	
 	this.uri = uri;
 	this.label = label;
 	this.classLabel = classLabel;
 	this.imageUrl = imageUrl;
 	
-	var existed = existing;
-	var removed = false;
-
 	this.toString = function() {
 		return "proxyInfoElement: " + content;
 	}
@@ -51,32 +54,12 @@ function proxyInfoElement(template, uri, label, classLabel, imageUrl, existing) 
 				              .replace(/%imageUrl%/g, this.imageUrl);
 
 		var element = $("<div name='proxyInfoElement'>" + content + "</div>");
+
 		var removeLink = $("[templatePart='remove']", element).first();
-		var removeText = removeLink.text();
-		var restoreText = removeLink.attr('restoreText');
-		var proxyUriField = $("[templatePart='uriField']", element);
-
-		var showRemoved = function() {
-			if (removed) {
-				removeLink.text(restoreText);
-				proxyUriField.attr('disabled', 'disabled');
-				element.addClass('removedProxyItem');
-			} else {
-				removeLink.text(removeText);
-				proxyUriField.attr('disabled', '');
-				element.removeClass('removedProxyItem');
-			}
-		}
-
 		removeLink.click(function(event) {
-			removed = !removed;
-			showRemoved();
+			removeInfo(self);
 			return false;
 		});
-
-		element.removeClass('newProxyItem existingProxyItem removedProxyItem');
-		element.addClass(existed ? 'existingProxyItem' : 'newProxyItem')
-		showRemoved()
 
 		return element;
 	}
