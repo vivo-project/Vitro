@@ -64,7 +64,7 @@ public class SparqlQueryAjaxController extends VitroAjaxController {
 			throws ServletException, IOException {
 		try {
 			String modelParam = getModelParam(vreq);
-			Model model = locateModel(modelParam);
+			Model model = locateModel(vreq, modelParam);
 			String queryParam = locateQueryParam(vreq);
 			Query query = createQuery(queryParam);
 			executeQuery(response, query, model);
@@ -86,7 +86,8 @@ public class SparqlQueryAjaxController extends VitroAjaxController {
 
 	}
 
-	private Model locateModel(String modelParam) throws AjaxControllerException {
+	private Model locateModel(VitroRequest vreq, String modelParam)
+			throws AjaxControllerException {
 		Object o = getServletContext().getAttribute("baseOntModelSelector");
 		if (!(o instanceof OntModelSelector)) {
 			throw new AjaxControllerException(SC_INTERNAL_SERVER_ERROR,
@@ -98,7 +99,9 @@ public class SparqlQueryAjaxController extends VitroAjaxController {
 		if (OPTION_MODEL_USER_ACCOUNTS.equals(modelParam)) {
 			model = oms.getUserAccountsModel();
 		} else {
-			model = oms.getFullModel();
+			// TODO What is the appropriate way to do this?
+			// model = oms.getFullModel();
+			model = vreq.getJenaOntModel();
 		}
 		if (model == null) {
 			throw new AjaxControllerException(SC_INTERNAL_SERVER_ERROR,
