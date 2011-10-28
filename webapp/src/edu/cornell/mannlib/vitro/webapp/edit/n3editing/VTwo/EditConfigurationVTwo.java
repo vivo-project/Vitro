@@ -114,16 +114,18 @@ public class EditConfigurationVTwo {
     String formUrl;
     String editKey;
 
-    List<N3Validator> validators = Collections.emptyList();
+    List<N3ValidatorVTwo> validators;
 
 	EditN3GeneratorVTwo n3generator;   
 
     private List<ModelChangePreprocessor> modelChangePreprocessors;
     
-    private List<EditSubmissionVTwoPreprocessor> editSubmissionPreprocessors  = Collections.emptyList();
+    private List<EditSubmissionVTwoPreprocessor> editSubmissionPreprocessors;
     
     private ProhibitedFromSearch prohibitedFromSearch;
 
+    private HashMap<String, Object> formSpecificData;
+    
     /** Name of freemarker template to generate form. */
     String template;
     
@@ -879,13 +881,13 @@ public class EditConfigurationVTwo {
             this.resourceModelSelector = resourceModelSelector;
     }
         
-    public List<N3Validator> getValidators() {
+    public List<N3ValidatorVTwo> getValidators() {
 		return validators;
 	}
 
-    public void addValidator( N3Validator validator){
+    public void addValidator( N3ValidatorVTwo validator){
     	if( this.validators == null )
-    		this.validators = new ArrayList<N3Validator>();
+    		this.validators = new ArrayList<N3ValidatorVTwo>();
     	this.validators.add(validator);    		
     }    
 
@@ -922,4 +924,15 @@ public class EditConfigurationVTwo {
     public boolean isDataPropertyUpdate() {
     	return this.getDatapropKey() != null && this.getDatapropKey().length() > 0;
     }
+    
+    //This is for specific data for a form that will be set by the generator
+    
+	public  void setFormSpecificData(HashMap<String, Object> formSpecificData) {
+		this.formSpecificData = formSpecificData;
+	}
+
+	public HashMap<String, Object> getFormSpecificData() {
+		// TODO Auto-generated method stub
+		return this.formSpecificData;
+	}
 }

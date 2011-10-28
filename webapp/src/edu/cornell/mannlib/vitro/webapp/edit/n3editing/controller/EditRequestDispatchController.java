@@ -141,7 +141,10 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
         	editConfGeneratorName = DEFAULT_DELETE_FORM;
         }
         // *** handle the case where the form is specified as a request parameter ***
-        else if( predicateUri == null && ( formParam != null && !formParam.isEmpty()) ){
+        //TODO: Substitute the original line in again which checks for null predicate, currently overriding
+        //in order to test
+        //else if( predicateUri == null && ( formParam != null && !formParam.isEmpty()) ){
+        else if(  formParam != null && !formParam.isEmpty() ){
             //form parameter must be a fully qualified java class name of a EditConfigurationVTwoGenerator implementation.
             editConfGeneratorName = formParam;              
         } else if(isVitroLabel(predicateUri)) { //in case of data property
@@ -212,7 +215,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     	 String subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
          String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
          String formParam = getFormParam(vreq);
-         
+         //if no form parameter, then predicate uri and subject uri must both be populated
     	if (formParam == null || "".equals(formParam)) {
             if ((predicateUri == null || predicateUri.trim().length() == 0)) {
             	return true;
@@ -225,7 +228,11 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     	
     	//Check predicate - if not vitro label and neither data prop nor object prop return error
     	WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-    	if(!EditConfigurationUtils.isObjectProperty(predicateUri, vreq) 
+    	//TODO: Check if any error conditions are not met here
+    	//At this point, if there is a form paramter, we don't require a predicate uri
+    	if(formParam == null 
+    			&& predicateUri != null 
+    			&& !EditConfigurationUtils.isObjectProperty(predicateUri, vreq) 
     			&& !isVitroLabel(predicateUri)
     			&& !EditConfigurationUtils.isDataProperty(predicateUri, vreq))
     	{
@@ -255,7 +262,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     
 	//should return null
 	private String getFormParam(VitroRequest vreq) {
-		String formParam = (String) vreq.getAttribute("editForm");
+		String formParam = (String) vreq.getParameter("editForm");
 		return formParam;
 	}
     

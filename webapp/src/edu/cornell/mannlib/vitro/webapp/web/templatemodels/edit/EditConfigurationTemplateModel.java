@@ -7,9 +7,13 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.SelectListGeneratorVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditElementVTwo;
+
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultObjectPropertyFormGenerator;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils.EditMode;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 import java.io.UnsupportedEncodingException;
@@ -22,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -64,28 +69,56 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     public String getSubmitToUrl(){
         return  getUrl( editConfig.getSubmitToUrl() );
     }
-    //TODO: Check whether to include additoinal data here or elsewhere
-  //For now, using attributes off of vitro request to add to template
-    //TODO: find better mechanism
-    //Calculate data here
+   
+    /*
+     * Used to calculate/retrieve/extract additional form-specific data
+     * Such as options for a drop-down etc. 
+     */
+    
     private void retrieveEditData() {
     	//Get vitro request attributes for
     	setFormTitle();
     	setSubmitLabel();
-    	//this should only be called if this is an object property form
-    	//how would we do this?
-    	if(EditConfigurationUtils.isObjectProperty(editConfig.getPredicateUri(), vreq)) {
-    		setRangeOptions();
-    	}
-    	//range data type probably not set here but for edit configuration's field
-    	/*
-    	if(EditConfigurationUtils.isDataProperty(editConfig.getPredicateUri(), vreq)) {
-    		setRangeDatatype();
-    	}*/
     	
-    	
+    	//Get the form specific data
+    	HashMap<String, Object> formSpecificData = editConfig.getFormSpecificData();
+    	pageData.putAll(formSpecificData);
+    	populateDropdowns();
+    	//populate html with edit element where appropriate
+    	populateGeneratedHtml();
     }
    
+
+    //Based on certain pre-set fields/variables, look for what
+    //drop-downs need to be populated
+	private void populateDropdowns() {
+		if(EditConfigurationUtils.isObjectProperty(editConfig.getPredicateUri(), vreq)) {
+    		setRangeOptions();
+    	}
+    	if(pageData.containsKey("objectSelect")) {
+    		List<String> fieldNames = (List<String>)pageData.get("objectSelect");
+    		for(String field:fieldNames) {
+    			WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+            	Map<String,String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, field , wdf);    	
+    			pageData.put(field, optionsMap);    		
+    		}
+    	}
+		
+	}
+
+	//TODO: Check if this should return a list instead
+	//Also check if better manipulated/handled within the freemarker form itself
+	private String getSelectedValue(String field) {
+		String selectedValue = null;
+		Map<String, List<String>> urisInScope = editConfig.getUrisInScope();
+		if(urisInScope.containsKey(field)) {
+			List<String> values = urisInScope.get(field);
+			//Unsure how to deal with multi-select drop-downs
+			//TODO: Handle multiple select dropdowns
+			selectedValue = StringUtils.join(values, ",");
+		}
+		return selectedValue;
+	}
 
 	private boolean isRangeOptionsExist() {
     	boolean rangeOptionsExist = (pageData.get("rangeOptionsExist") != null && (Boolean) pageData.get("rangeOptionsExist")  == true);
@@ -189,9 +222,10 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	ObjectProperty prop = EditConfigurationUtils.getObjectProperty(vreq);
     	if( prop.getSelectFromExisting() ){
     		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-
-        	
-        	Map<String,String> rangeOptions = SelectListGeneratorVTwo.getOptions(editConfig, "objectVar" , wdf);    	
+    		//TODO: Change this to varname for object from object property?
+    		String fieldName = editConfig.getVarNameForObject();
+        	//TODO: Check if this still works?
+        	Map<String,String> rangeOptions = SelectListGeneratorVTwo.getOptions(editConfig, fieldName , wdf);    	
         	if( rangeOptions != null && rangeOptions.size() > 0 ) {
         		pageData.put("rangeOptionsExist", true);
         	    pageData.put("rangeOptions", rangeOptions);
@@ -243,6 +277,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	return literalValues;
     }
     
+
     //Check if possible to send in particular parameter
     public String dataLiteralValueFor(String dataLiteralName) {
     	List<String> literalValues = getLiteralStringValue(dataLiteralName);
@@ -567,4 +602,40 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	return vitroNsProp;
     }
     
+    //Additional data to be returned
+    public HashMap<String, Object> getPageData() {
+    	return pageData;
+    }
+    
+    //Literals in scope and uris in scope are the values
+    //that currently exist for any of the fields/values
+    
+  //Get literals in scope returned as string values
+    public Map<String, List<String>> getExistingLiteralValues() {
+    	return EditConfigurationUtils.getExistingLiteralValues(vreq, editConfig);
+    }
+    
+    public Map<String, List<String>> getExistingUriValues() {
+    	return editConfig.getUrisInScope();
+    }
+    
+    //Get editElements with html
+    public void populateGeneratedHtml() {
+    	Map<String, String> generatedHtml = new HashMap<String, String>();
+    	Map<String, FieldVTwo> fieldMap = editConfig.getFields();
+    	//Check if any of the fields have edit elements and should be generated
+    	Set<String> keySet = fieldMap.keySet();
+    	for(String key: keySet) {
+    		FieldVTwo field = fieldMap.get(key);
+    		EditElementVTwo editElement = field.getEditElement();
+    		String fieldName = field.getName();
+    		if(editElement != null) {
+    			generatedHtml.put(fieldName, EditConfigurationUtils.generateHTMLForElement(vreq, fieldName, editConfig));
+    		}
+    	}
+    	
+    	//Put in pageData
+    	pageData.put("htmlForElements", generatedHtml);
+    }
+   
 }

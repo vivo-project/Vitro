@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,18 +12,23 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit.EditConfigurationTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfigurationLoader;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import freemarker.template.Configuration;
 
 public class EditConfigurationUtils {
 	private static Log log = LogFactory.getLog(EditConfigurationUtils.class);
@@ -186,5 +192,49 @@ public class EditConfigurationUtils {
 	    }
 		return dataHash;
     }
+    
+    //Copied from the original input element formatting tag
+    //Allows the retrieval of the string values for the literals
+    //Useful for cases with date/time and other mechanisms
+    public static Map<String, List<String>> getExistingLiteralValues(VitroRequest vreq, EditConfigurationVTwo editConfig) {
+    	Map<String, List<String>> literalsInScopeStringValues = new HashMap<String, List<String>>();
+    	Map<String, List<Literal>> literalsInScope = editConfig.getLiteralsInScope();
+    	
+    	for(String key: literalsInScope.keySet() ) {
+    		List<String> stringValues = processLiteral(editConfig, key);
+    		literalsInScopeStringValues.put(key, stringValues);
+    	}
+    	return literalsInScopeStringValues;
+    }
+    
+    //Copied from input element formatting tag
+    private static List<String> processLiteral(EditConfigurationVTwo editConfig, String fieldName) {
+    	Map<String, List<Literal>> literalsInScope = editConfig.getLiteralsInScope();
+    	List<String> stringValues = new ArrayList<String>();
+		List<Literal> literalValues = literalsInScope.get(fieldName);
+    	for(Literal l: literalValues) {
+    		//Could do additional processing here if required, for example if date etc. if need be
+    		stringValues.add(l.getValue().toString());
+    	}
+		return stringValues;
+	}
+
+	public static Map<String, List<String>> getExistingUriValues(EditConfigurationVTwo editConfig) {
+    	return editConfig.getUrisInScope();
+    }
+	
+	//Generate HTML for a specific field name given 
+	public static String generateHTMLForElement(VitroRequest vreq, String fieldName, EditConfigurationVTwo editConfig) {
+		String html = "";
+        Configuration fmConfig = FreemarkerConfigurationLoader.getConfig(vreq, vreq.getSession().getServletContext());
+
+        FieldVTwo field = editConfig == null ? null : editConfig.getField(fieldName);
+        MultiValueEditSubmission editSub =  new MultiValueEditSubmission(vreq.getParameterMap(), editConfig);  
+        if( field != null && field.getEditElement() != null ){
+    	  html = field.getEditElement().draw(fieldName, editConfig, editSub, fmConfig);
+        }
+		return html;
+	}
+   
 
 }

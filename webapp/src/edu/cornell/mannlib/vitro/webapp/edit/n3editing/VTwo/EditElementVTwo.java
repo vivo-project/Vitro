@@ -39,6 +39,11 @@ public interface EditElementVTwo {
      */
     public String draw(String fieldName, EditConfigurationVTwo editConfig, MultiValueEditSubmission editSub, Configuration fmConfig);
     
+    /**
+     * This method gets the map with the data that can then be passed to the template
+     */
+    public Map getMapForTemplate(EditConfigurationVTwo editConfig, MultiValueEditSubmission editSub);            
+    
     /* in the future, we may need to get existing values */
     /*
     public Map<String,Literal> getExistingLiterals(???)
