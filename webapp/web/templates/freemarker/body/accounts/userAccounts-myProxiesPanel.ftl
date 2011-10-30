@@ -56,7 +56,8 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/auto
 var proxyMechanism = {
 	baseUrl: '${urls.base}',
 	sparqlQueryUrl: '${formUrls.sparqlQueryAjax}',
-	matchingProperty: '${matchingProperty}'
+	matchingProperty: '${matchingProperty}',
+	myAccountUri: '${myAccountUri}'
 };
 </script>
 

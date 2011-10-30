@@ -147,6 +147,7 @@ public class UserAccountsMyAccountPage extends UserAccountsPage {
 			body.put("proxies", buildOriginalProxyList());
 		}
 		body.put("formUrls", buildUrlsMap());
+		body.put("myAccountUri", userAccount.getUri());
 
 		// Could I do this without exposing this mechanism? But how to search
 		// for an associated profile in AJAX?

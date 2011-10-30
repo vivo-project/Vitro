@@ -43,6 +43,8 @@ function proxyProxiesPanel(p)  {
 
 	var self = this;
 	
+	var excludedUris = [proxyMechanism.myAccountUri];
+	
 	var removeProxyInfo = function(info) {
 		self.removeProxyInfo(info)
 	}
@@ -153,7 +155,7 @@ function proxyProxiesPanel(p)  {
 		    url: proxyMechanism.sparqlQueryUrl
 		    };
 		var reportSearchStatus = new searchStatusField(this.searchStatusField, 3).setText;
-	    this.addAutoCompleteField.autocomplete(new proxyAutocomplete(parms, this.getProxyInfos, this.addProxyInfo, reportSearchStatus));
+	    this.addAutoCompleteField.autocomplete(new proxyAutocomplete(parms, excludedUris, this.getProxyInfos, this.addProxyInfo, reportSearchStatus));
 	}
 
 	this.setupAutoCompleteFields();

@@ -74,6 +74,7 @@ function proxyInfoElement(template, uri, label, classLabel, imageUrl, removeInfo
  * You provide:
  *   parms -- a map containing the URL of the AJAX controller, the query, and 
  *          the model selector.
+ *   excludedUris -- these URIs are always filtered out of the results.
  *   getProxyInfos -- a function that will return an array of proxyInfoElements
  *   	    that are already present in the list and so should be filtered out of 
  *          the autocomplete response.
@@ -94,7 +95,7 @@ function proxyInfoElement(template, uri, label, classLabel, imageUrl, removeInfo
  *   -- calling addProxyInfo() and clearing the field when a value is selected.
  * ----------------------------------------------------------------------------
  */
-function proxyAutocomplete(parms, getProxyInfos, addProxyInfo, reportSearchStatus) {
+function proxyAutocomplete(parms, excludedUris, getProxyInfos, addProxyInfo, reportSearchStatus) {
 	var cache = [];
 	
 	var filterResults = function(parsed) {
@@ -103,7 +104,8 @@ function proxyAutocomplete(parms, getProxyInfos, addProxyInfo, reportSearchStatu
 			return p.uri;
 			});
 		$.each(parsed, function(i, p) {
-			if (-1 == $.inArray(p.uri, existingUris)) {
+			if ((-1 == $.inArray(p.uri, existingUris))
+					&& (-1 == $.inArray(p.uri, excludedUris))) {
 				filtered.push(p);
 			}
 		});
