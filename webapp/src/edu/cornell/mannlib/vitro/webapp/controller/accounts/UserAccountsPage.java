@@ -181,6 +181,7 @@ public abstract class UserAccountsPage {
 		map.put("firstTimeExternal",
 				UrlBuilder.getUrl("/accounts/firstTimeExternal"));
 		map.put("accountsAjax", UrlBuilder.getUrl("/accountsAjax"));
+		map.put("sparqlQueryAjax", UrlBuilder.getUrl("/ajax/sparqlQuery"));
 
 		return map;
 	}

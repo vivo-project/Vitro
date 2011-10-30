@@ -1,10 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 function proxyProxiesPanel(p)  {
-	var sparqlQueryUrl = '../ajax/sparqlQuery';
-	var matchingProperty = "http://vivoweb.org/ontology/core#scopusId"
-	var urlContext = 'http://localhost:8080/vivo'
-		
 	var query = ""
 	    + "PREFIX fn: <http://www.w3.org/2005/xpath-functions#> \n"
 		+ "PREFIX auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> \n"
@@ -107,10 +103,11 @@ function proxyProxiesPanel(p)  {
 	
 	this.getAdditionalInfo = function(info, externalAuthId) {
         $.ajax({
-            url: sparqlQueryUrl,
+            url: proxyMechanism.sparqlQueryUrl,
             dataType: 'json',
             data: {
-            	query: moreInfoQuery.replace("%matchingProperty%", matchingProperty).replace("%externalAuthId%", externalAuthId)
+            	query: moreInfoQuery.replace("%matchingProperty%", proxyMechanism.matchingProperty)
+            	                    .replace("%externalAuthId%", externalAuthId)
             },
             complete: function(xhr, status) {
                 var results = $.parseJSON(xhr.responseText);
@@ -120,7 +117,7 @@ function proxyProxiesPanel(p)  {
 	                    info.classLabel = parsed[0].classLabel;
 	                }
 	                if ("imageUrl" in parsed[0]) {
-	                	info.imageUrl = urlContext + parsed[0].imageUrl;
+	                	info.imageUrl = proxyMechanism.baseUrl + parsed[0].imageUrl;
 	                }
 	                self.displayProxyData();
 	            }
@@ -153,7 +150,7 @@ function proxyProxiesPanel(p)  {
 		var parms = {
 		    query: query, 
 		    model: "userAccounts",
-		    url: sparqlQueryUrl
+		    url: proxyMechanism.sparqlQueryUrl
 		    };
 		var reportSearchStatus = new searchStatusField(this.searchStatusField, 3).setText;
 	    this.addAutoCompleteField.autocomplete(new proxyAutocomplete(parms, this.getProxyInfos, this.addProxyInfo, reportSearchStatus));

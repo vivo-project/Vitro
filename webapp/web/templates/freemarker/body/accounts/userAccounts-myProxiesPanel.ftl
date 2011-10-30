@@ -52,6 +52,14 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/auto
     </div>
 </div>
 
+<script type="text/javascript">
+var proxyMechanism = {
+	baseUrl: '${urls.base}',
+	sparqlQueryUrl: '${formUrls.sparqlQueryAjax}',
+	matchingProperty: '${matchingProperty}'
+};
+</script>
+
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/sparqlUtils.js"></script>',   
               '<script type="text/javascript" src="${urls.base}/js/account/accountProxyCommon.js"></script>',   

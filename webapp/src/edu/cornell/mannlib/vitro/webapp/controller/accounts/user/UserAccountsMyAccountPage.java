@@ -13,6 +13,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageOwnProxies;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
@@ -146,6 +148,11 @@ public class UserAccountsMyAccountPage extends UserAccountsPage {
 		}
 		body.put("formUrls", buildUrlsMap());
 
+		// Could I do this without exposing this mechanism? But how to search
+		// for an associated profile in AJAX?
+		body.put("matchingProperty", SelfEditingConfiguration.getBean(vreq)
+				.getMatchingPropertyUri());
+
 		if (userAccount.isExternalAuthOnly()) {
 			body.put("externalAuthOnly", Boolean.TRUE);
 		}
@@ -154,6 +161,9 @@ public class UserAccountsMyAccountPage extends UserAccountsPage {
 		}
 		if (!confirmationCode.isEmpty()) {
 			body.put(confirmationCode, Boolean.TRUE);
+		}
+		if (isProxyPanelAuthorized()) {
+			body.put("showProxyPanel", Boolean.TRUE);
 		}
 
 		strategy.addMoreBodyValues(body);
@@ -178,6 +188,12 @@ public class UserAccountsMyAccountPage extends UserAccountsPage {
 
 		strategy.notifyUser();
 		confirmationCode = strategy.getConfirmationCode();
+	}
+
+	boolean isProxyPanelAuthorized() {
+		return PolicyHelper
+				.isAuthorizedForActions(vreq, new ManageOwnProxies())
+				&& (getProfilePage(userAccount) != null);
 	}
 
 	boolean isExternalAuthOnly() {
