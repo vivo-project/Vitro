@@ -73,7 +73,8 @@ public class PostEditCleanupController extends FreemarkerHttpServlet{
         if(configuration == null)
             throw new Error("No edit configuration found.");        
 
-        //get the EditSubmission
+        //The submission for getting the entity to return to is not retrieved from the session but needs
+        //to be created - as it is in processRdfForm3.jsp
         MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq.getParameterMap(), configuration);  
         String entityToReturnTo = ProcessRdfForm.processEntityToReturnTo(configuration, submission, vreq);
 		return doPostEdit(vreq, entityToReturnTo);		
@@ -88,7 +89,7 @@ public class PostEditCleanupController extends FreemarkerHttpServlet{
             EditConfigurationVTwo editConfig = EditConfigurationVTwo.getConfigFromSession(session,vreq);
             //In order to support back button resubmissions, don't remove the editConfig from session.
             //EditConfiguration.clearEditConfigurationInSession(session, editConfig);            
-
+            //Here, edit submission is retrieved so it can be cleared out in case it exists
             MultiValueEditSubmission editSub = EditSubmissionUtils.getEditSubmissionFromSession(session,editConfig);        
             EditSubmissionUtils.clearEditSubmissionInSession(session, editSub);
             

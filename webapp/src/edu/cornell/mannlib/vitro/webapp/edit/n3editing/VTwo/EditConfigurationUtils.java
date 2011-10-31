@@ -212,10 +212,13 @@ public class EditConfigurationUtils {
     	Map<String, List<Literal>> literalsInScope = editConfig.getLiteralsInScope();
     	List<String> stringValues = new ArrayList<String>();
 		List<Literal> literalValues = literalsInScope.get(fieldName);
-    	for(Literal l: literalValues) {
-    		//Could do additional processing here if required, for example if date etc. if need be
-    		stringValues.add(l.getValue().toString());
-    	}
+		//TODO: Check whether it's correct that literal values would be null?
+		if(literalValues != null) {
+	    	for(Literal l: literalValues) {
+	    		//Could do additional processing here if required, for example if date etc. if need be
+	    		stringValues.add(l.getValue().toString());
+	    	}
+		}
 		return stringValues;
 	}
 
@@ -229,7 +232,10 @@ public class EditConfigurationUtils {
         Configuration fmConfig = FreemarkerConfigurationLoader.getConfig(vreq, vreq.getSession().getServletContext());
 
         FieldVTwo field = editConfig == null ? null : editConfig.getField(fieldName);
-        MultiValueEditSubmission editSub =  new MultiValueEditSubmission(vreq.getParameterMap(), editConfig);  
+        MultiValueEditSubmission editSub = EditSubmissionUtils.getEditSubmissionFromSession(vreq.getSession(), editConfig);
+        //Should we create one if one doesn't exist?
+        //TODO: Check if one needs to be created if it doesn't exist?
+        //MultiValueEditSubmission editSub =  new MultiValueEditSubmission(vreq.getParameterMap(), editConfig);  
         if( field != null && field.getEditElement() != null ){
     	  html = field.getEditElement().draw(fieldName, editConfig, editSub, fmConfig);
         }

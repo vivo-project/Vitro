@@ -153,7 +153,17 @@ public class EditN3GeneratorVTwo {
     }
     
     protected static String subInMultiLiterals(String var, List<Literal>values, String n3){        
-        String tmp = n3;
+	  if (n3==null ) {
+          log.error("subInMultiLiterals was passed a null n3 String");
+          return "blankBecauseTargetOrValueWasNull";
+      }else if( var == null ){
+          log.warn("subInMultiLiterals was passed a null var name");
+          return n3;
+      }else if( values == null ){
+          log.debug("subInMultiLiterals was passed a null value for var '"+var+"'; returning target: '"+n3+"'");
+          return n3;
+      }
+    	String tmp = n3;
         
         //make the multivalue literal string
         List<String> n3Values = new ArrayList<String>(values.size());        

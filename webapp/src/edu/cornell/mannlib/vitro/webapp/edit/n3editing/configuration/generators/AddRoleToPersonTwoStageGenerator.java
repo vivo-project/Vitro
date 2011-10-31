@@ -903,7 +903,8 @@ public abstract class AddRoleToPersonTwoStageGenerator implements EditConfigurat
 	 //Get edit mode
     private EditMode getEditMode(VitroRequest vreq) {
     	String roleToActivityPredicate = getRoleToActivityPredicate(vreq);
-    	EditMode mode = FrontEndEditingUtils.getEditMode(vreq, roleToActivityPredicate);
+    	Individual object = EditConfigurationUtils.getObjectIndividual(vreq);
+    	EditMode mode = FrontEndEditingUtils.getEditMode(vreq, object, roleToActivityPredicate);
     	return mode;
     	//(mode == EditMode.ADD || mode == EditMode.REPAIR) ? "\"nonempty\"
     }
@@ -969,7 +970,7 @@ public abstract class AddRoleToPersonTwoStageGenerator implements EditConfigurat
 	//Form specific data
 	public void addFormSpecificData(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
 		HashMap<String, Object> formSpecificData = new HashMap<String, Object>();
-		formSpecificData.put("editMode", getEditMode(vreq).name());
+		formSpecificData.put("editMode", getEditMode(vreq).name().toLowerCase());
 		//Fields that will need select lists generated
 		//Store field names
 		List<String> objectSelect = new ArrayList<String>();

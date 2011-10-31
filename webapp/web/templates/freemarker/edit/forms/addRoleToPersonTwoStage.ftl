@@ -6,7 +6,6 @@
 <#assign uriValues = editConfiguration.existingUriValues />
 <#assign htmlForElements = editConfiguration.pageData.htmlForElements />
 
-Edit Mode is ${editMode}
 <#--Freemarker variables with default values that can be overridden by specific forms-->
 
 
@@ -40,7 +39,7 @@ Edit Mode is ${editMode}
 	<#assign titleVerb = "Create"/>
 	<#assign submitButtonText>${buttonText}</#assign>
 	<#assign disabledVal = ""/>
-	<#--The original jsp sets editMode to add, why?-->
+	<#assign editMode = "add" />
 </#if>
 
 <#--Get existing value for specific data literals and uris-->
@@ -48,25 +47,23 @@ Edit Mode is ${editMode}
 
 <#--Get selected activity type value if it exists, this is alternative to below-->
 <#assign activityTypeValue = ""/>
-<#if uriValues?keys?seq_contains("activityType") && uriValues.activityType?size > 0>
-	<#assign activityTypeValue = uriValues.activityType[0] />
+<#if uriValues?keys?seq_contains("roleActivityType") && (uriValues.roleActivityType?size > 0)>
+	<#assign activityTypeValue = uriValues.roleActivityType[0] />
 </#if>
 
  <#--Get activity label value-->
 <#assign activityLabelValue = "" />
-<#if literalValues?keys?seq_contains("activityLabel") && literalValues.activityLabel?size > 0>
+<#if literalValues?keys?seq_contains("activityLabel") && (literalValues.activityLabel?size > 0)>
 	<#assign activityLabelValue = literalValues.activityLabel[0] />
 </#if>
 
 <#--Get role label-->
 <#assign roleLabel = "" />
-<#if literalValues?keys?seq_contains("roleLabel") && literalValues.roleLabel?size > 0 >
+<#if literalValues?keys?seq_contains("roleLabel") && (literalValues.roleLabel?size > 0) >
 	<#assign roleLabel = literalValues.roleLabel[0] />
 </#if>
 
 
-ActivityLabel:${activityLabelValue}
-Activity type: ${activityTypeValue}
 
 <h2>${titleVerb}&nbsp;${roleDescriptor} entry for ${editConfiguration.subjectName}</h2>
 
@@ -94,15 +91,20 @@ Activity type: ${activityTypeValue}
        <p class="inline"><label for="typeSelector">${roleDescriptor?capitalize} Type <span class='requiredHint'> *</span></label>
            <select id="typeSelector" name="roleActivityType" 
            <#if disabledVal?has_content>
-           	disabled = ${disabledVal}
+           	disabled = "${disabledVal}"
            </#if>
             >
+            <#--Code below allows for selection of first 'select one' option if no activity type selected-->
+            <#if activityTypeValue?has_content>
+            	<#assign selectedActivityType = activityTypeValue />
+            <#else>
+            	<#assign selectedActivityType = "" />
+            </#if>
            		<#assign roleActivityTypeSelect = editConfiguration.pageData.roleActivityType />
            		<#assign roleActivityTypeKeys = roleActivityTypeSelect?keys />
                 <#list roleActivityTypeKeys as key>
                     <option value="${key}"
-                    <#if activityTypeValue?has_content 
-                    && activityTypeValue = key>selected</#if>
+                    <#if selectedActivityType = key>selected</#if>
                     >
                     ${roleActivityTypeSelect[key]}
                     </option>
@@ -123,8 +125,8 @@ Activity type: ${activityTypeValue}
             </p>
             
             <#if editMode = "edit">
-            	<input type="hidden" id="roleActivityType" name="roleActivityType" value/>
-            	<input type="hidden" id="activityLabel" name="activityLabel"/>
+            	<input type="hidden" id="roleActivityType" name="roleActivityType" value="${activityTypeValue}"/>
+            	<input type="hidden" id="activityLabel" name="activityLabel" value="${activityLabelValue}}"/>
             </#if>
 
             <div class="acSelection">
@@ -163,7 +165,7 @@ Activity type: ${activityTypeValue}
         </div>
         <input type="hidden" id="editKey" name="editKey" value="${editKey} />
         <p class="submit">
-            <input type="submit" id="submit" value="submitButtonText"/><span class="or"> or <a class="cancel" href="${cancelUrl}">Cancel</a>
+            <input type="submit" id="submit" value="${submitButtonText}"/><span class="or"> or <a class="cancel" href="${cancelUrl}">Cancel</a>
         </p>
 
         <p id="requiredLegend" class="requiredHint">* required fields</p>
@@ -182,7 +184,7 @@ Activity type: ${activityTypeValue}
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css" />')}
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/customForm.css" />')}
-${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/customFormWithAutocomplete.cs" />')}
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/customFormWithAutocomplete.css" />')}
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"></script>')}
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/customFormUtils.js"></script>')}
