@@ -34,6 +34,10 @@ $(document).ready(function(){
             theSubmitButton.removeClass("disabledSubmit");
         });
     });
-
+    
+    $('.remove-proxy').click(function(){
+        theSubmitButton.removeAttr('disabled');
+        theSubmitButton.removeClass("disabledSubmit");
+    })
 });
 
