@@ -88,7 +88,7 @@ public class KnowledgeBaseUpdater {
 		
 		log.info("\tperforming SPARQL construct additions (abox)");
 		performSparqlConstructAdditions(settings.getSparqlConstructAdditionsDir(), settings.getUnionOntModelSelector().getABoxModel() , settings.getAssertionOntModelSelector().getABoxModel());
-		log.info("\tperforming SPARQL construct deletions (inferences)");
+		log.info("\tperforming SPARQL construct deletions (abox)");
 		performSparqlConstructRetractions(settings.getSparqlConstructDeletionsDir(), settings.getUnionOntModelSelector().getABoxModel() , settings.getAssertionOntModelSelector().getABoxModel());
 		
 		List<AtomicOntologyChange> rawChanges = getAtomicOntologyChanges();
