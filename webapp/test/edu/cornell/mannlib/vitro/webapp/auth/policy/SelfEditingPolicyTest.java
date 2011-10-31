@@ -17,6 +17,7 @@ import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndividual;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndividual.Mechanism;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
@@ -73,7 +74,7 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 		ind.setURI(SELFEDITOR_URI);
 		
 		ids = new ArrayIdentifierBundle();
-		ids.add(new HasAssociatedIndividual(SELFEDITOR_URI));
+		ids.add(new HasAssociatedIndividual(SELFEDITOR_URI, Mechanism.SELF));
 	}
 
 	@Test
@@ -322,11 +323,11 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 
 		IndividualImpl ind1 = new IndividualImpl();
 		ind1.setURI(SAFE_NS + "bozoUri");
-		ids.add(new HasAssociatedIndividual(ind1.getURI()));
+		ids.add(new HasAssociatedIndividual(ind1.getURI(), Mechanism.SELF));
 
 		IndividualImpl ind2 = new IndividualImpl();
 		ind2.setURI(SELFEDITOR_URI);
-		ids.add(new HasAssociatedIndividual(ind2.getURI()));
+		ids.add(new HasAssociatedIndividual(ind2.getURI(), Mechanism.SELF));
 	}
 
 	// ----------------------------------------------------------------------
