@@ -41,7 +41,7 @@ function proxyInfoElement(template, uri, label, classLabel, imageUrl, removeInfo
 	this.uri = uri;
 	this.label = label;
 	this.classLabel = classLabel;
-	this.imageUrl = imageUrl;
+	this.imageUrl = (imageUrl) ? imageUrl : imageUrl="../images/placeholders/person.thumbnail.jpg";
 	
 	this.toString = function() {
 		return "proxyInfoElement: " + content;
@@ -52,8 +52,10 @@ function proxyInfoElement(template, uri, label, classLabel, imageUrl, removeInfo
 				              .replace(/%label%/g, this.label)
 				              .replace(/%classLabel%/g, this.classLabel)
 				              .replace(/%imageUrl%/g, this.imageUrl);
+		
 
-		var element = $("<div name='proxyInfoElement'>" + content + "</div>");
+
+		var element = $("<div class='proxyInfoElement' name='proxyInfoElement'>" + content + "</div>");
 
 		var removeLink = $("[templatePart='remove']", element).first();
 		removeLink.click(function(event) {
