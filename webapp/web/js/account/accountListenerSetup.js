@@ -11,33 +11,33 @@ $(document).ready(function(){
     var theSubmitButton = theForm.find(':submit');
 
     theSubmitButton.addClass("disabledSubmit");
+    
+    function disableSubmit() {
+        theSubmitButton.removeAttr('disabled');
+        theSubmitButton.removeClass("disabledSubmit");
+    }
 
     $('input').each(function() {
         if ( $(this).attr('type') != 'submit' && $(this).attr('name') != 'querytext') {
             $(this).change(function() {
-                theSubmitButton.removeAttr('disabled');
-                theSubmitButton.removeClass("disabledSubmit");
+                disableSubmit()
             });
             $(this).bind("propertychange", function() {
-                theSubmitButton.removeAttr('disabled');
-                theSubmitButton.removeClass("disabledSubmit");
+                disableSubmit();
             });
             $(this).bind("input", function() {
-                theSubmitButton.removeAttr('disabled');
-                theSubmitButton.removeClass("disabledSubmit");
+                disableSubmit()
             });
         }
     });
     $('select').each(function() {
         $(this).change(function() {
-            theSubmitButton.removeAttr('disabled');
-            theSubmitButton.removeClass("disabledSubmit");
+            disableSubmit()
         });
     });
     
     $('.remove-proxy').click(function(){
-        theSubmitButton.removeAttr('disabled');
-        theSubmitButton.removeClass("disabledSubmit");
+        disableSubmit()
     })
 });
 
