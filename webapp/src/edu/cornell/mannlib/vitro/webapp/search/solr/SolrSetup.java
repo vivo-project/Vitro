@@ -80,9 +80,15 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
 
             OntModel jenaOntModel = ModelContext.getJenaOntModel(context);
             
-            List<DocumentModifier> modifiers = new ArrayList<DocumentModifier>();
-            modifiers.add(new CalculateParameters(dataset));
-            modifiers.add(new ContextNodeFields(jenaOntModel));
+            
+            /* try to get context attribute DocumentModifiers 
+             * and use that as the start of the list of DocumentModifier 
+             * objects.  This allows other listeners to add to the basic set of 
+             * DocumentModifiers. */
+            List<DocumentModifier> modifiers = (List<DocumentModifier>)context.getAttribute("DocumentModifiers");
+            if( modifiers == null )
+                modifiers = new ArrayList<DocumentModifier>();
+            
             modifiers.add(new NameBoost());
             modifiers.add(new ThumbnailImageURL(jenaOntModel));
             
