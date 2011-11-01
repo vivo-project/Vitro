@@ -38,7 +38,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/auto
                         <img class="photo-profile" width="90" alt="%label%" src="%imageUrl%">
                     </td>
                     <td class="proxy-info">
-                        %label% | %classLabel%
+                        %label% | <span class="class-label">%classLabel%</span>
                         <br /><a class='remove-proxy' href="." templatePart="remove">Remove selection</a>
                         <input type="hidden" name="proxyUri" value="%uri%" >
                     </td>

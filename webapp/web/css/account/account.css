@@ -286,6 +286,7 @@ a.disable-delete {
     border-radius: 10px;
     -moz-border-radius: 10px;
     -webkit-border-radius: 10px;
+    width: 400px;
 }
 #edit-myProxy h4 {
     padding-top: 0;
@@ -298,7 +299,6 @@ a.disable-delete {
     border-bottom: 1px dotted #E0DFDF;
     padding-bottom: 1em;
 }
-
 #edit-myProxy p.search-status {
     margin-top: -10px;
     font-size: .8em;
@@ -315,4 +315,7 @@ a.disable-delete {
 #edit-myProxy .proxy-info {
     padding-left: 1em; 
     vertical-align: middle;
+}
+#edit-myProxy span.class-label {
+    color: #7F8993;
 }
