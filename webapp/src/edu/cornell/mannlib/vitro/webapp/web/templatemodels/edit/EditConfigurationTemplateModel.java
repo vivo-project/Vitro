@@ -82,7 +82,8 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	
     	//Get the form specific data
     	HashMap<String, Object> formSpecificData = editConfig.getFormSpecificData();
-    	pageData.putAll(formSpecificData);
+    	if( formSpecificData != null)
+    	    pageData.putAll(formSpecificData);
     	populateDropdowns();
     	//populate html with edit element where appropriate
     	populateGeneratedHtml();
