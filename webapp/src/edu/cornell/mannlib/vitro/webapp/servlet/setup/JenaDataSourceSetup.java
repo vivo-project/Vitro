@@ -267,6 +267,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         WebappDaoFactory wadf = new WebappDaoFactorySDB(unionOms, bds, storeDesc, getDefaultNamespace(ctx), null, null);
         ctx.setAttribute("webappDaoFactory",wadf);
 
+        ModelContext.setOntModelSelector(unionOms, ctx);
         ModelContext.setUnionOntModelSelector(unionOms, ctx);          // assertions and inferences
         ModelContext.setBaseOntModelSelector(baseOms, ctx);            // assertions
         ModelContext.setInferenceOntModelSelector(inferenceOms, ctx);  // inferences       
