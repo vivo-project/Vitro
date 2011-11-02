@@ -174,7 +174,51 @@ public class JenaModelUtils {
 			tboxModel.add(construct(dataset, namespace, graphURI, OWL.minCardinality));
 			tboxModel.add(construct(dataset, namespace, graphURI, OWL.maxCardinality));
 			tboxModel.add(construct(dataset, namespace, graphURI, OWL.cardinality));
-			tboxModel.add(construct(dataset, namespace, graphURI, OWL.disjointWith));	
+			tboxModel.add(construct(dataset, namespace, graphURI, OWL.disjointWith));
+			tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
+					                                              VitroVocabulary.DISPLAY_LIMIT)));
+			tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
+                                                                  VitroVocabulary.DISPLAY_RANK_ANNOT)));
+			tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
+                                                                  VitroVocabulary.IN_CLASSGROUP)));
+			tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
+                                                                  VitroVocabulary.IN_CLASSGROUP)));
+			tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
+                                                                  VitroVocabulary.PROPERTY_INPROPERTYGROUPANNOT)));
+			tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
+                                                                  VitroVocabulary.PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT)));
+			tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
+                                                                  VitroVocabulary.HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT)));
+			tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
+                                                                  VitroVocabulary.DESCRIPTION_ANNOT)));
+			tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
+                                                                  VitroVocabulary.SHORTDEF)));
+			tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
+                                                                  VitroVocabulary.EXAMPLE_ANNOT)));
+			tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
+                                                                  VitroVocabulary.vitroURI + "extendedLinkedData")));
+			tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
+                                                                  VitroVocabulary.PROPERTY_OFFERCREATENEWOPTIONANNOT)));
+			tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
+                                                                  VitroVocabulary.PROPERTY_COLLATEBYSUBCLASSANNOT)));
+			tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
+                                                                  VitroVocabulary.PROPERTY_CUSTOM_LIST_VIEW_ANNOT)));
+			tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
+                                                                  VitroVocabulary.PROPERTY_CUSTOMDISPLAYVIEWANNOT)));
+			tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
+                                                                  VitroVocabulary.PROPERTY_CUSTOMENTRYFORMANNOT)));
+			tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
+                                                                  VitroVocabulary.PROPERTY_CUSTOMSEARCHVIEWANNOT)));
+			tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
+                                                                  VitroVocabulary.PROPERTY_CUSTOMSHORTVIEWANNOT)));
+			tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
+                                                                  VitroVocabulary.PROPERTY_ENTITYSORTDIRECTION)));
+			tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
+                                                                  VitroVocabulary.PROPERTY_ENTITYSORTFIELD)));
+			tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
+                                                                  VitroVocabulary.PROPERTY_OBJECTINDIVIDUALSORTPROPERTY)));
+			tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
+                                                                  VitroVocabulary.PROPERTY_SELECTFROMEXISTINGANNOT)));
 		}
 		return tboxModel;
 	}
