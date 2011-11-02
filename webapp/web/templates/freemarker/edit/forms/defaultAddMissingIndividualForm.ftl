@@ -14,15 +14,12 @@
 <h2>${formTitle}</h2>
 
 <form class="editForm" action="${submitUrl}">
-    <input type="hidden" name="editKey" id="editKey" value="${editKey}" role="input"/>
-    <input type="text" name="name" id="name" label="name (required)" size="30" role="input"/>
+    <input type="hidden" name="editKey" id="editKey" value="${editKey}" role="input" />
+    <input type="text" name="name" id="name" label="name (required)" size="30" role="input" />
     
     <p class="submit">
-        <input type="submit" id="submit" value="${submitLabel}">
+        <input type="submit" id="submit" value="${submitLabel}" role="submit" />
         <span class="or"> or </span>
         <a title="Cancel" href="${editConfiguration.cancelUrl}">Cancel</a>
     </p>     
 </form>
-
-
-
