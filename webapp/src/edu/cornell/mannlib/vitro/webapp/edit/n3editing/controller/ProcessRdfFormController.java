@@ -45,6 +45,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.AdditionsAndRetractions;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditSubmissionUtils;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditSubmissionVTwoPreprocessor;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.ProcessRdfForm;
@@ -77,6 +78,9 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
         MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq.getParameterMap(), configuration);        	
         EditSubmissionUtils.putEditSubmissionInSession(vreq.getSession(), submission);
 
+        //utilize preprocessors for edit submission
+        applyEditSubmissionPreprocessors(configuration, submission);
+        
         //if errors, return error response
 		ResponseValues errorResponse = doValidationErrors(vreq, configuration, submission);
 		if( errorResponse != null )
@@ -111,6 +115,14 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
         //For data property processing, need to update edit configuration for back button 
 		ProcessRdfForm.updateEditConfigurationForBackButton(configuration, submission, vreq, writeModel);
         return PostEditCleanupController.doPostEdit(vreq, entityToReturnTo);		
+	}
+
+	private void applyEditSubmissionPreprocessors(
+			EditConfigurationVTwo configuration, MultiValueEditSubmission submission) {
+		List<EditSubmissionVTwoPreprocessor> preprocessors = configuration.getEditSubmissionPreprocessors();
+		for(EditSubmissionVTwoPreprocessor p: preprocessors) {
+			p.preprocess(submission);
+		}
 	}
 
 	//In case of back button confusion
