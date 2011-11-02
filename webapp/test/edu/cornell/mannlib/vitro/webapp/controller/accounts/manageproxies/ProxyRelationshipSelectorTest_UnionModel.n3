@@ -1,0 +1,150 @@
+# $This file is distributed under the terms of the license in /doc/license.txt$ 
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix public: <http://vitro.mannlib.cornell.edu/ns/vitro/public#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix mydomain: <http://vivo.mydomain.edu/individual/> .
+
+### This file provides a UserAccounts model for ProxyRelationshipSelectorTest.java
+
+#
+# The first relationship to be returned, regardless of view, is this profile to its proxy,
+# and here is the self for that proxy also.
+#
+mydomain:firstProfile
+	a foaf:Person ;
+	rdfs:label "AAAA, FirstProfile" ;
+	vitro:mostSpecificType mydomain:profileType ;
+	public:mainImage mydomain:profileImage ;
+	.
+mydomain:firstSelf
+	a foaf:Person ;
+	vitro:mostSpecificType mydomain:selfType ; 
+	public:mainImage mydomain:selfImage ;
+	mydomain:matching "firstSelf" ;
+	.
+
+
+#
+# An individual with no proxy
+#
+mydomain:bozo
+	a foaf:Person ;
+	rdfs:label "Bozo, Not Just Any" ;
+	vitro:mostSpecificType mydomain:profileType; 
+	.
+
+
+#
+# This Individual can be edited by a bunch of proxies.
+#
+mydomain:popularProfile
+	a foaf:Person ;
+	rdfs:label "Profile, Popular" ;
+	vitro:mostSpecificType mydomain:profileType; 
+	public:mainImage mydomain:profileImage; 
+	.
+
+
+#
+# These Individuals can all be edited by one popular proxy.
+# Each profile has different combinations of attributes.
+#
+mydomain:profileWithNoClassLabel
+	a foaf:Person ;
+	rdfs:label "NoClassLabel, Profile with" ;
+	public:mainImage mydomain:profileImage; 
+	.
+
+mydomain:profileWithNoImageUrl
+	a foaf:Person ;
+	rdfs:label "NoImageUrl, Profile with" ;
+	vitro:mostSpecificType mydomain:profileType; 
+	.
+
+mydomain:profileWithNeither
+	a foaf:Person ;
+	rdfs:label "Neither, Profile with" ;
+	.
+
+mydomain:profileWithBoth
+	a foaf:Person ;
+	rdfs:label "Both, Profile with" ;
+	vitro:mostSpecificType mydomain:profileType; 
+	public:mainImage mydomain:profileImage; 
+	.
+	
+	
+#
+# These Individiauls are each the "self" for a different proxy.
+# Each profile has a different combination of attributes.
+#
+mydomain:individualWithNoClassLabel
+	a foaf:Person ;
+	rdfs:label "Person, Bozo" ;
+	public:mainImage mydomain:selfImage; 
+	mydomain:matching "individualWithNoClassLabel" ;
+	.
+
+mydomain:individualWithNoImageUrl
+	a foaf:Person ;
+	rdfs:label "Person, Bozo" ;
+	vitro:mostSpecificType mydomain:selfType; 
+	mydomain:matching "individualWithNoImageUrl" ;
+	.
+
+mydomain:individualWithNeither
+	a foaf:Person ;
+	rdfs:label "Person, Bozo" ;
+	mydomain:matching "individualWithNeither" ;
+	.
+
+mydomain:individualWithBoth
+	a foaf:Person ;
+	rdfs:label "Person, Bozo" ;
+	vitro:mostSpecificType mydomain:selfType;
+	public:mainImage mydomain:selfImage; 
+	mydomain:matching "individualWithBoth" ;
+	.
+
+#
+# Use this as a "most specific type" for Profiles.
+#
+mydomain:profileType 
+	rdfs:label "Profile";
+	.
+
+#
+# Use this as a "most specific type" for "selves".
+#
+mydomain:selfType 
+	rdfs:label "Self";
+	.
+
+#
+# Image hierarchy for those profiles that need one.
+#
+mydomain:profileImage
+	public:thumbnailImage mydomain:profileThumbnail;
+	.
+mydomain:profileThumbnail
+	public:downloadLocation mydomain:profileThumbStream;
+	.
+mydomain:profileThumbStream
+	public:directDownloadUrl "http://mydomain.edu/profileImage.jpg"
+	.
+
+#
+# Image hierarchy for those "selves" that need one.
+#
+mydomain:selfImage
+	public:thumbnailImage mydomain:selfThumbnail;
+	.
+mydomain:selfThumbnail
+	public:downloadLocation mydomain:selfThumbStream;
+	.
+mydomain:selfThumbStream
+	public:directDownloadUrl "http://mydomain.edu/selfImage.jpg"
+	.
