@@ -97,7 +97,8 @@ public class JsonServlet extends VitroHttpServlet {
         }        
     }
 
-    private void getVClassesForVClassGroup(HttpServletRequest req, HttpServletResponse resp) throws IOException, JSONException {                
+   
+	private void getVClassesForVClassGroup(HttpServletRequest req, HttpServletResponse resp) throws IOException, JSONException {                
         JSONObject map = new JSONObject();           
         VitroRequest vreq = new VitroRequest(req);        
         String vcgUri = vreq.getParameter("classgroupUri");

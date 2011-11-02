@@ -597,10 +597,18 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         this.nonuserNamespaces = base.nonuserNamespaces;
         this.preferredLanguages = base.preferredLanguages;
         this.userURI = base.userURI;
-        this.flag2ValueMap = new HashMap<String,OntClass>();
-        this.flag2ValueMap.putAll(base.flag2ValueMap);
-        this.flag2ClassLabelMap = new HashMap<Resource, String>();
-        this.flag2ClassLabelMap.putAll(base.flag2ClassLabelMap);
+        if(base.flag2ValueMap != null) {
+	        this.flag2ValueMap = new HashMap<String,OntClass>();
+	        this.flag2ValueMap.putAll(base.flag2ValueMap);
+        } else {
+        	this.flag2ValueMap = null;
+        }
+        if(base.flag2ClassLabelMap != null) {
+	        this.flag2ClassLabelMap = new HashMap<Resource, String>();
+	        this.flag2ClassLabelMap.putAll(base.flag2ClassLabelMap);
+        } else {
+        	this.flag2ClassLabelMap = null;
+        }
         this.dwf = base.dwf;
     }
     
