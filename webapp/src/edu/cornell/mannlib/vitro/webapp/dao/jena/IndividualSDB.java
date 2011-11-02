@@ -468,7 +468,14 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     			Individual subj = new IndividualSDB(((OntResource) s.getSubject().as(OntResource.class)).getURI(), this.dwf, datasetMode, webappDaoFactory);
     			Individual obj = new IndividualSDB(((OntResource) s.getObject().as(OntResource.class)).getURI(), this.dwf, datasetMode, webappDaoFactory);
     			ObjectProperty op = webappDaoFactory.getObjectPropertyDao().getObjectPropertyByURI(s.getPredicate().getURI());
-    			if (subj != null && obj != null && op != null) {
+    			// We don't want to filter out statements simply because we 
+    			// can't find a type for the property, so we'll just make a 
+    			// new ObjectProperty bean if we can't get one from the DAO.
+    			if (op == null) {
+    				op = new ObjectProperty();
+    				op.setURI(propertyURI);
+    			}
+    			if (subj != null && obj != null) {
     				ObjectPropertyStatement ops = new ObjectPropertyStatementImpl();
     				ops.setSubject(subj);
     				ops.setSubjectURI(subj.getURI());
