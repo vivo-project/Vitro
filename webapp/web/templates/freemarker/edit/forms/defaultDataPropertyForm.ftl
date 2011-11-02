@@ -11,9 +11,9 @@
 	</#if>   
 
 	
-	<input rows="2" type="textarea" 
+	<textarea rows="2" 
 	id="${editConfiguration.dataLiteral}" name="${editConfiguration.dataLiteral}"
-	value="${literalValues}"/>
+	value="${literalValues}" class="useTinyMce">${literalValues}</textarea>
 
 
 	<div style="margin-top: 0.2em">
