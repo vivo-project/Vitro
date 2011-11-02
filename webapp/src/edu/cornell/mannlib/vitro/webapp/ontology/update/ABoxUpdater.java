@@ -146,48 +146,33 @@ public class ABoxUpdater {
 		   
 		   StmtIterator iter = aboxModel.listStatements(oldClass, (Property) null, (RDFNode) null);
 
-		   int renameCount = 0;
 		   int removeCount = 0;
 		   while (iter.hasNext()) {
 			   Statement oldStatement = iter.next();
-			   if (newTBoxAnnotationsModel.contains(oldStatement)) {
-				   continue; 
-				   // if this statement was loaded from the new annotations,
-				   // don't attempt to remove it.
-				   // This happens in cases where a class hasn't really
-				   // been removed, but we just want to map any ABox
-				   // data using it to use a different class instead.
-			   } else {
-				   removeCount++;
-				   retractions.add(oldStatement);
-			   }
-			   //logChange(oldStatement, false);
-			   //logChange(newStatement,true);
+			   removeCount++;
+			   retractions.add(oldStatement);
 		   }
 		   
 		   //log summary of changes
-		   if (renameCount > 0) {
-			   logger.log("Changed " + renameCount + " subject reference" + ((renameCount > 1) ? "s" : "") + " from type"  + oldClass.getURI() + " to type " + newClass.getURI());
-		   }
 		   if (removeCount > 0) {
 			   logger.log("Removed " + removeCount + " subject reference" + ((removeCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class");
 		   }
 
 		   // Change class references in the objects of rdf:type statements
-		   iter = aboxModel.listStatements((Resource) null, (Property) null, oldClass);
+		   iter = aboxModel.listStatements((Resource) null, RDF.type, oldClass);
 
-		   renameCount = 0;
+		   int renameCount = 0;
 		   while (iter.hasNext()) {
 			   renameCount++;
 			   Statement oldStatement = iter.next();
-			   Statement newStatement = ResourceFactory.createStatement(oldStatement.getSubject(), oldStatement.getPredicate(), newClass);
+			   Statement newStatement = ResourceFactory.createStatement(oldStatement.getSubject(), RDF.type, newClass);
 			   retractions.add(oldStatement);
 			   additions.add(newStatement);
 		   }
 		   
 		   //log summary of changes
 		   if (renameCount > 0) {
-			   logger.log("Renamed " + renameCount + " object reference" + ((renameCount > 1) ? "s" : "") + " from type "  + oldClass.getURI() + " to type " + newClass.getURI());
+			   logger.log("Retyped " + renameCount + " individual" + ((renameCount > 1) ? "s" : "") + " from type "  + oldClass.getURI() + " to type " + newClass.getURI());
 		   }
 		   
 		   aboxModel.remove(retractions);

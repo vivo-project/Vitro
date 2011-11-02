@@ -1024,7 +1024,7 @@ public class SimpleReasoner extends StatementListener {
 	 * then reconciled with the inference graph used by the
 	 * application. The model reconciliation must be done
 	 * without reading the whole inference models into 
-	 * memory since we are supporting very large ABox 
+	 * memory in order to support very large ABox 
 	 * inference models.	  
 	 */
 	public synchronized void recomputeABox() {
@@ -1390,7 +1390,7 @@ public class SimpleReasoner extends StatementListener {
 	    		log.info("received BulkUpdateEvent(begin)");
 	    		
 	    		if (batchMode1 || batchMode2) {
-	    			log.info("received a BulkUpdateEvent(begin) while already in batch update mode; this event will be ignored.");
+	    			log.info("received a BulkUpdateEvent(begin) while already in batch update mode; this event will be ignored (and processing in batch mode will continue until there are no pending updates)");
 	    			return;  
 	    		} else {
 	    			batchMode1 = true;
