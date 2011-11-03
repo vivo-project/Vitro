@@ -13,6 +13,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
@@ -96,15 +97,15 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
             WebappDaoFactory wadf = vreq.getFullWebappDaoFactory();
             
             // Create map for data input entry form options list
-            List classGroups = wadf.getVClassGroupDao().getPublicGroupsWithVClasses(true,true,false); // order by displayRank, include uninstantiated classes, don't get the counts of individuals
+            List<VClassGroup> classGroups = wadf.getVClassGroupDao().getPublicGroupsWithVClasses(true,true,false); // order by displayRank, include uninstantiated classes, don't get the counts of individuals
     
             Set<String> seenGroupNames = new HashSet<String>();
             
-            Iterator classGroupIt = classGroups.iterator();
-            LinkedHashMap<String, List> orderedClassGroups = new LinkedHashMap<String, List>(classGroups.size());
+            Iterator<VClassGroup> classGroupIt = classGroups.iterator();
+            LinkedHashMap<String, List<Option>> orderedClassGroups = new LinkedHashMap<String, List<Option>>(classGroups.size());
             while (classGroupIt.hasNext()) {
-                VClassGroup group = (VClassGroup)classGroupIt.next();            
-                List opts = FormUtils.makeOptionListFromBeans(group.getVitroClassList(),"URI","PickListName",null,null,false);
+                VClassGroup group = classGroupIt.next();            
+                List<Option> opts = FormUtils.makeOptionListFromBeans(group.getVitroClassList(),"URI","PickListName",null,null,false);
                 if( seenGroupNames.contains(group.getPublicName() )){
                     //have a duplicate classgroup name, stick in the URI
                     orderedClassGroups.put(group.getPublicName() + " ("+group.getURI()+")", opts);
