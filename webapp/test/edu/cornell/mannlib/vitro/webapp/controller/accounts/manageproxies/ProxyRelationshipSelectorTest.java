@@ -2,15 +2,22 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies;
 
+import static edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies.ProxyRelationshipSelectionCriteria.ProxyRelationshipView.BY_PROFILE;
+import static edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies.ProxyRelationshipSelectionCriteria.ProxyRelationshipView.BY_PROXY;
 import static edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies.ProxyRelationshipSelectionCriteria.ProxyRelationshipView.DEFAULT_VIEW;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Level;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.hp.hpl.jena.ontology.OntModel;
@@ -21,29 +28,62 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies.ProxyRelationshipSelectionCriteria.ProxyRelationshipView;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies.ProxyRelationshipSelector.Context;
-import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner;
 
 /**
  * TODO
  */
 public class ProxyRelationshipSelectorTest extends AbstractTestClass {
-	/**
-	 * 
-	 */
-	private static final String URL_PROFILE_IMAGE = "http://mydomain.edu/profileImage.jpg";
-	/**
-	 * 
-	 */
-	private static final String URL_SELF_IMAGE = "http://mydomain.edu/selfImage.jpg";
+	private static final Log log = LogFactory
+			.getLog(ProxyRelationshipSelectorTest.class);
+
 	private static final String USER_ACCOUNT_DATA_FILENAME = "ProxyRelationshipSelectorTest_UserAccountsModel.n3";
 	private static final String UNION_DATA_FILENAME = "ProxyRelationshipSelectorTest_UnionModel.n3";
 
 	private static final String NS_MINE = "http://vivo.mydomain.edu/individual/";
 	private static final String MATCHING_PROPERTY = NS_MINE + "matching";
 
+	private static final String URL_PROFILE_IMAGE = "http://mydomain.edu/profileImage.jpg";
+	private static final String URL_SELF_IMAGE = "http://mydomain.edu/selfImage.jpg";
+
 	private static OntModel userAccountsModel;
 	private static OntModel unionModel;
 	private static Context context;
+
+	/** 1, when sorted by proxy */
+	private static final Relation RELATION_1 = relation(
+			list(mydomain("userFirstProxy")), list(mydomain("firstProfile")));
+
+	/** 2, when sorted by proxy */
+	private static final Relation RELATION_2 = relation(
+			list(mydomain("userProxyWithSelfWithBoth")),
+			list(mydomain("popularProfile")));
+
+	/** 3, when sorted by proxy */
+	private static final Relation RELATION_3 = relation(
+			list(mydomain("userProxyWithSelfWithNeither")),
+			list(mydomain("popularProfile")));
+
+	/** 4, when sorted by proxy */
+	private static final Relation RELATION_4 = relation(
+			list(mydomain("userProxyWithSelfWithNoClassLabel")),
+			list(mydomain("popularProfile")));
+
+	/** 5, when sorted by proxy */
+	private static final Relation RELATION_5 = relation(
+			list(mydomain("userProxyWithSelfWithNoImageUrl")),
+			list(mydomain("popularProfile")));
+
+	/** 6, when sorted by proxy */
+	private static final Relation RELATION_6 = relation(
+			list(mydomain("userProxyWithNoSelf")),
+			list(mydomain("popularProfile")));
+
+	/** 7, when sorted by proxy */
+	private static final Relation RELATION_7 = relation(
+			list(mydomain("userPopularProxy")),
+			list(mydomain("profileWithBoth"), mydomain("profileWithNeither"),
+					mydomain("profileWithNoImageUrl"),
+					mydomain("profileWithNoClassLabel")));
 
 	private ProxyRelationshipSelection selection;
 	private ProxyRelationshipSelectionCriteria criteria;
@@ -103,35 +143,86 @@ public class ProxyRelationshipSelectorTest extends AbstractTestClass {
 	// ----------------------------------------------------------------------
 
 	@Test
-	public void checkAllFieldsOnFirstRelationship() {
-		setLoggerLevel(SparqlQueryRunner.class, Level.DEBUG);
-		selectOnCriteria(1, 1, DEFAULT_VIEW, "");
-		System.out.println("SELECTION: " + selection);
+	public void checkAllFieldsOnFirstRelationshipByProxy() {
+		// setLoggerLevel(SparqlQueryRunner.class, Level.DEBUG);
+		selectOnCriteria(1, 1, BY_PROXY, "");
+		log.debug("SELECTION: " + selection);
 		assertExpectedCounts(7, counts(1, 1));
 
 		ProxyRelationship pr = selection.getProxyRelationships().get(0);
 		assertEquals(
 				"proxy",
-				item(NS_MINE + "userFirstProxy", "AAAA, FirstProxy", "Self",
+				item(mydomain("userFirstProxy"), "AAAA, FirstProxy", "Self",
 						URL_SELF_IMAGE), pr.getProxyInfos().get(0));
 		assertEquals(
 				"profile",
-				item(NS_MINE + "firstProfile", "AAAA, FirstProfile", "Profile",
+				item(mydomain("firstProfile"), "AAAA, FirstProfile", "Profile",
 						URL_PROFILE_IMAGE), pr.getProfileInfos().get(0));
+	}
+
+	@Test
+	@Ignore
+	public void checkAllFieldsOnFirstRelationshipByProfile() {
+		selectOnCriteria(1, 1, BY_PROFILE, "");
+		assertExpectedCounts(7, counts(1, 1));
+
+		ProxyRelationship pr = selection.getProxyRelationships().get(0);
+		assertEquals(
+				"proxy",
+				item(mydomain("userFirstProxy"), "AAAA, FirstProxy", "Self",
+						URL_SELF_IMAGE), pr.getProxyInfos().get(0));
+		assertEquals(
+				"profile",
+				item(mydomain("firstProfile"), "AAAA, FirstProfile", "Profile",
+						URL_PROFILE_IMAGE), pr.getProfileInfos().get(0));
+	}
+
+	// ----------------------------------------------------------------------
+	// pagination tests
+	// TODO -- also by profile
+	// ----------------------------------------------------------------------
+
+	@Test
+	public void paginationFirstOfSeveralByProxy() {
+		selectOnCriteria(3, 1, BY_PROXY, "");
+		assertExpectedRelations(7, RELATION_1, RELATION_2, RELATION_3);
+	}
+
+	@Test
+	public void paginationOnlyPageByProxy() {
+		selectOnCriteria(10, 1, BY_PROXY, "");
+		assertExpectedRelations(7, RELATION_1, RELATION_2, RELATION_3,
+				RELATION_4, RELATION_5, RELATION_6, RELATION_7);
+	}
+
+	@Test
+	public void paginationSecondOfSeveralByProxy() {
+		selectOnCriteria(3, 2, BY_PROXY, "");
+		assertExpectedRelations(7, RELATION_4, RELATION_5, RELATION_6);
+	}
+
+	@Test
+	public void paginationOutOfRangeTooHighByProxy() {
+		selectOnCriteria(3, 7, BY_PROXY, "");
+		assertExpectedRelations(7);
+	}
+
+	@Test
+	@Ignore
+	public void paginationLastFullPageByProxy() {
+		fail("paginationLastFullPageByProxy not implemented");
+	}
+
+	@Test
+	public void paginationLastPartialPageByProxy() {
+		selectOnCriteria(3, 3, BY_PROXY, "");
+		assertExpectedRelations(7, RELATION_7);
 	}
 
 	/**
 	 * test plan:
 	 * 
 	 * <pre>
-	 * pagination tests: (repeat both views?)
-	 *   page 1 of several
-	 *   page 1 of 1
-	 *   page 2 of several
-	 *   page out of range (zero results)
-	 *   last page divides evenly
-	 *   last page divides unevenly
-	 *   
 	 * search tests: (repeat both views)
 	 *   some results
 	 *   no results
@@ -153,41 +244,6 @@ public class ProxyRelationshipSelectorTest extends AbstractTestClass {
 	 * 	both
 	 * </pre>
 	 */
-
-	// ----------------------------------------------------------------------
-	// pagination tests
-	// ----------------------------------------------------------------------
-
-	// @Test
-	// public void showFirstPageOfFifteen() {
-	// selectOnCriteria(15, 1, DEFAULT_ORDERING, "", "");
-	// assertSelectedUris(10, "user01", "user02", "user03", "user04",
-	// "user05", "user06", "user07", "user08", "user09", "user10");
-	// }
-	//
-	// @Test
-	// public void showFirstPageOfOne() {
-	// selectOnCriteria(1, 1, DEFAULT_ORDERING, "", "");
-	// assertSelectedUris(10, "user01");
-	// }
-	//
-	// @Test
-	// public void showFirstPageOfFive() {
-	// selectOnCriteria(5, 1, DEFAULT_ORDERING, "", "");
-	// assertSelectedUris(10, "user01", "user02", "user03", "user04", "user05");
-	// }
-	//
-	// @Test
-	// public void showSecondPageOfSeven() {
-	// selectOnCriteria(7, 2, DEFAULT_ORDERING, "", "");
-	// assertSelectedUris(10, "user08", "user09", "user10");
-	// }
-	//
-	// @Test
-	// public void showTenthPageOfThree() {
-	// selectOnCriteria(3, 10, DEFAULT_ORDERING, "", "");
-	// assertSelectedUris(10);
-	// }
 
 	// ----------------------------------------------------------------------
 	// search tests
@@ -216,23 +272,7 @@ public class ProxyRelationshipSelectorTest extends AbstractTestClass {
 	// assertSelectedUris(0);
 	// }
 	//
-	// // ----------------------------------------------------------------------
-	// // combination tests
-	// // ----------------------------------------------------------------------
-	//
-	// @Test
-	// public void searchWithFilter() {
-	// selectOnCriteria(20, 1, DEFAULT_ORDERING, NS_MINE + "role1", "bob");
-	// assertSelectedUris(2, "user02", "user05");
-	// }
-	//
-	// @Test
-	// public void searchWithFilterPaginatedWithFunkySortOrder() {
-	// selectOnCriteria(1, 2, new UserAccountsOrdering(Field.STATUS,
-	// Direction.ASCENDING), NS_MINE + "role1", "bob");
-	// assertSelectedUris(2, "user02");
-	// }
-	//
+
 	// ----------------------------------------------------------------------
 	// helper methods
 	// ----------------------------------------------------------------------
@@ -261,6 +301,19 @@ public class ProxyRelationshipSelectorTest extends AbstractTestClass {
 		return new ProxyItemInfo(uri, label, classLabel, imageUrl);
 	}
 
+	private static List<String> list(String... uris) {
+		return Arrays.asList(uris);
+	}
+
+	private static Relation relation(List<String> proxyUris,
+			List<String> profileUris) {
+		return new Relation(proxyUris, profileUris);
+	}
+
+	private static String mydomain(String localName) {
+		return NS_MINE + localName;
+	}
+
 	private void assertExpectedCounts(int total, int[]... counts) {
 		assertEquals("total result count", total,
 				selection.getTotalResultCount());
@@ -278,4 +331,44 @@ public class ProxyRelationshipSelectorTest extends AbstractTestClass {
 		}
 	}
 
+	private void assertExpectedRelations(int total, Relation... relations) {
+		assertEquals("total result count", total,
+				selection.getTotalResultCount());
+		assertEquals("page result count", relations.length, selection
+				.getProxyRelationships().size());
+
+		for (int i = 0; i < relations.length; i++) {
+			assertEqualUris(i, relations[i], selection.getProxyRelationships()
+					.get(i));
+		}
+	}
+
+	private void assertEqualUris(int i, Relation relation,
+			ProxyRelationship proxyRelationship) {
+		List<String> expectedProxyUris = relation.proxyUris;
+		List<String> actualProxyUris = new ArrayList<String>();
+		for (ProxyItemInfo proxyInfo : proxyRelationship.getProxyInfos()) {
+			actualProxyUris.add(proxyInfo.getUri());
+		}
+		assertEquals("proxies for relationship " + i, expectedProxyUris,
+				actualProxyUris);
+
+		List<String> expectedProfileUris = relation.profileUris;
+		List<String> actualProfileUris = new ArrayList<String>();
+		for (ProxyItemInfo profileInfo : proxyRelationship.getProfileInfos()) {
+			actualProfileUris.add(profileInfo.getUri());
+		}
+		assertEquals("profiles for relationship " + i, expectedProfileUris,
+				actualProfileUris);
+	}
+
+	private static class Relation {
+		final List<String> proxyUris;
+		final List<String> profileUris;
+
+		public Relation(List<String> proxyUris, List<String> profileUris) {
+			this.proxyUris = proxyUris;
+			this.profileUris = profileUris;
+		}
+	}
 }
