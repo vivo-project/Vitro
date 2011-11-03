@@ -120,8 +120,10 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 	private void applyEditSubmissionPreprocessors(
 			EditConfigurationVTwo configuration, MultiValueEditSubmission submission) {
 		List<EditSubmissionVTwoPreprocessor> preprocessors = configuration.getEditSubmissionPreprocessors();
-		for(EditSubmissionVTwoPreprocessor p: preprocessors) {
-			p.preprocess(submission);
+		if(preprocessors != null) {
+			for(EditSubmissionVTwoPreprocessor p: preprocessors) {
+				p.preprocess(submission);
+			}
 		}
 	}
 

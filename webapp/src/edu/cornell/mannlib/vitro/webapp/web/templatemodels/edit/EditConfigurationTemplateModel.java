@@ -93,18 +93,20 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     //Based on certain pre-set fields/variables, look for what
     //drop-downs need to be populated
 	private void populateDropdowns() {
-		if(EditConfigurationUtils.isObjectProperty(editConfig.getPredicateUri(), vreq)) {
-    		setRangeOptions();
-    	}
-    	if(pageData.containsKey("objectSelect")) {
-    		List<String> fieldNames = (List<String>)pageData.get("objectSelect");
-    		for(String field:fieldNames) {
-    			WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-            	Map<String,String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, field , wdf);    	
-    			pageData.put(field, optionsMap);    		
-    		}
-    	}
-		
+		String predicateUri = editConfig.getPredicateUri();
+		if(predicateUri != null) {
+			if(EditConfigurationUtils.isObjectProperty(editConfig.getPredicateUri(), vreq)) {
+	    		setRangeOptions();
+	    	}
+	    	if(pageData.containsKey("objectSelect")) {
+	    		List<String> fieldNames = (List<String>)pageData.get("objectSelect");
+	    		for(String field:fieldNames) {
+	    			WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+	            	Map<String,String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, field , wdf);    	
+	    			pageData.put(field, optionsMap);    		
+	    		}
+	    	}
+		}
 	}
 
 	//TODO: Check if this should return a list instead
@@ -127,11 +129,13 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     }
     
 	private void setFormTitle() {
-		//if(editConfig.isObjectResource()) {
-		if(EditConfigurationUtils.isObjectProperty(editConfig.getPredicateUri(), vreq)) {
-			setObjectFormTitle();
-		} else {
-			setDataFormTitle();
+		String predicateUri = editConfig.getPredicateUri();
+		if(predicateUri != null) {
+			if(EditConfigurationUtils.isObjectProperty(editConfig.getPredicateUri(), vreq)) {
+				setObjectFormTitle();
+			} else {
+				setDataFormTitle();
+			}
 		}
 	}
 	
@@ -196,32 +200,36 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     
     private void setSubmitLabel() {
     	String submitLabel = null;
-		if(EditConfigurationUtils.isObjectProperty(editConfig.getPredicateUri(), vreq)) {
-	    	Individual objectIndividual = EditConfigurationUtils.getObjectIndividual(vreq);
-	    	ObjectProperty prop = EditConfigurationUtils.getObjectProperty(vreq);
-	    	
-	    	if(objectIndividual != null) {
-	    		submitLabel = "Save change";
-	    	}  else {
-	            if ( prop.getOfferCreateNewOption() ) {
-	                submitLabel = "Select existing";
-	            } else {
-	                submitLabel = "Save entry";
-	            }
-	        }
-		} else {
-			if(editConfig.isDataPropertyUpdate()) {
-				submitLabel = "Save change";
+    	String predicateUri = editConfig.getPredicateUri();
+    	if(predicateUri != null) {
+			if(EditConfigurationUtils.isObjectProperty(editConfig.getPredicateUri(), vreq)) {
+		    	Individual objectIndividual = EditConfigurationUtils.getObjectIndividual(vreq);
+		    	ObjectProperty prop = EditConfigurationUtils.getObjectProperty(vreq);
+		    	
+		    	if(objectIndividual != null) {
+		    		submitLabel = "Save change";
+		    	}  else {
+		            if ( prop.getOfferCreateNewOption() ) {
+		                submitLabel = "Select existing";
+		            } else {
+		                submitLabel = "Save entry";
+		            }
+		        }
 			} else {
-				submitLabel = "Save entry";
+				if(editConfig.isDataPropertyUpdate()) {
+					submitLabel = "Save change";
+				} else {
+					submitLabel = "Save entry";
+				}
 			}
-		}
+    	}
     	pageData.put("submitLabel", submitLabel);
+    	
     }
     
     private void setRangeOptions() {
     	ObjectProperty prop = EditConfigurationUtils.getObjectProperty(vreq);
-    	if( prop.getSelectFromExisting() ){
+    	if( prop != null && prop.getSelectFromExisting() ){
     		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
     		//TODO: Change this to varname for object from object property?
     		String fieldName = editConfig.getVarNameForObject();
@@ -320,11 +328,14 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     public Property getPredicateProperty() {
     	String predicateUri = getPredicateUri();
     	//If predicate uri corresponds to object property, return that
-    	if(EditConfigurationUtils.isObjectProperty(predicateUri, vreq)){
-    		return EditConfigurationUtils.getObjectPropertyForPredicate(this.vreq, predicateUri);
+    	if(predicateUri != null) {
+	    	if(EditConfigurationUtils.isObjectProperty(predicateUri, vreq)){
+	    		return EditConfigurationUtils.getObjectPropertyForPredicate(this.vreq, predicateUri);
+	    	}
+			//otherwise return Data property
+	    	return EditConfigurationUtils.getDataPropertyForPredicate(this.vreq, predicateUri);
     	}
-		//otherwise return Data property
-    	return EditConfigurationUtils.getDataPropertyForPredicate(this.vreq, predicateUri);
+    	return null;
     }
     
     public ObjectProperty getObjectPredicateProperty() {

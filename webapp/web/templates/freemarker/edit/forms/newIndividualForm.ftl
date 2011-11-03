@@ -2,8 +2,10 @@
 
 <#-- Template for adding a new individual from the Site Admin page: VIVO version -->
 
+<#--Retrieve certain edit configuration information-->
+<#assign typeName = editConfiguration.pageData.typeName />
 
-<h2>Create a new ${subclassName}</h2>
+<h2>Create a new ${typeName}</h2>
 
 <#if errorNameFieldIsEmpty??>
     <#assign errorMessage = "Enter a name." />
@@ -28,9 +30,9 @@
       </p>
 
       <p class="submit">
-          <input type="hidden" name = "editKey" value="${???}"/>
-          <input type="submit" id="submit" value="editConfiguration.submitLabel"/>
-          <span class="or"> or <a class="cancel" href="${editConfiguration.cancelUrl}">Cancel</a>
+          <input type="hidden" name = "editKey" value="${editKey}"/>
+          <input type="submit" id="submit" value="Create ${typeName}"/>
+          <span class="or"> or <a class="cancel" href="${urls.base}/siteAdmin">Cancel</a>
       </p>
 
       <p id="requiredLegend" class="requiredHint">* required fields</p>
