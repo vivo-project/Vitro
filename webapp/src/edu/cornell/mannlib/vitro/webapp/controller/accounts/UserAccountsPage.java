@@ -14,34 +14,24 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.controller.AbstractPageHandler;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
-import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
-import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
-import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 
 /**
  * Common routines for the page controllers.
  */
-public abstract class UserAccountsPage {
+public abstract class UserAccountsPage extends AbstractPageHandler {
 	private static final Log log = LogFactory.getLog(UserAccountsPage.class);
 
 	private static final String PERSON_CLASS_URI = "http://xmlns.com/foaf/0.1/Person";
@@ -52,82 +42,12 @@ public abstract class UserAccountsPage {
 	 */
 	protected static final int DAYS_TO_USE_PASSWORD_LINK = 90;
 
-	protected final VitroRequest vreq;
-	protected final ServletContext ctx;
-	protected final OntModel userAccountsModel;
-	protected final UserAccountsDao userAccountsDao;
-	protected final VClassDao vclassDao;
-	protected final IndividualDao indDao;
-	protected final DataPropertyStatementDao dpsDao;
-	protected final ObjectPropertyStatementDao opsDao;
-
 	protected UserAccountsPage(VitroRequest vreq) {
-		this.vreq = vreq;
-		this.ctx = vreq.getSession().getServletContext();
-
-		OntModelSelector oms = (OntModelSelector) this.ctx
-				.getAttribute("baseOntModelSelector");
-		userAccountsModel = oms.getUserAccountsModel();
-
-		WebappDaoFactory wdf = (WebappDaoFactory) this.ctx
-				.getAttribute("webappDaoFactory");
-		userAccountsDao = wdf.getUserAccountsDao();
-		vclassDao = wdf.getVClassDao();
-		indDao = wdf.getIndividualDao();
-		dpsDao = wdf.getDataPropertyStatementDao();
-		opsDao = wdf.getObjectPropertyStatementDao();
+		super(vreq);
 	}
 
 	protected boolean isEmailEnabled() {
 		return FreemarkerEmailFactory.isConfigured(vreq);
-	}
-
-	protected String getStringParameter(String key, String defaultValue) {
-		String value = vreq.getParameter(key);
-		return (value == null) ? defaultValue : value;
-	}
-
-	protected List<String> getStringParameters(String key) {
-		String[] values = vreq.getParameterValues(key);
-		if (values == null) {
-			return Collections.emptyList();
-		} else {
-			return new ArrayList<String>(Arrays.asList(values));
-		}
-	}
-
-	protected int getIntegerParameter(String key, int defaultValue) {
-		String value = vreq.getParameter(key);
-		if (value == null) {
-			return defaultValue;
-		}
-
-		try {
-			return Integer.parseInt(value);
-		} catch (NumberFormatException e) {
-			log.warn("Invalid integer for parameter '" + key + "': " + value);
-			return defaultValue;
-		}
-	}
-
-	/**
-	 * Check for the presence of a parameter, regardless of its value, even if
-	 * it's an empty string.
-	 */
-	protected boolean isFlagOnRequest(String key) {
-		String value = vreq.getParameter(key);
-		return (value != null);
-	}
-
-	/**
-	 * Treat the presence of a certain parameter, with a desired value, as a
-	 * boolean flag.
-	 * 
-	 * An example would be radio buttons with values of "yes" and "no". The
-	 * expected value would be "yes".
-	 */
-	protected boolean isParameterAsExpected(String key, String expected) {
-		return expected.equals(getStringParameter(key, ""));
 	}
 
 	/**
