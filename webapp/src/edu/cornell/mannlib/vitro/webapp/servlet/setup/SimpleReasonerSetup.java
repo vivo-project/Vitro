@@ -29,7 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.ReasonerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.reasoner.ReasonerPlugin;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
-import edu.cornell.mannlib.vitro.webapp.reasoner.support.SimpleReasonerTBoxListener;
+import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasonerTBoxListener;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase.TripleStoreType;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
