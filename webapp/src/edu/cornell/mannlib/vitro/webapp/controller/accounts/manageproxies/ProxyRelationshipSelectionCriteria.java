@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies;
 
+
 /**
  * On what basis are we selecting proxy relationships?
  * 
@@ -23,6 +24,21 @@ public class ProxyRelationshipSelectionCriteria {
 		BY_PROXY, BY_PROFILE;
 
 		public static ProxyRelationshipView DEFAULT_VIEW = BY_PROXY;
+
+		public static ProxyRelationshipView fromKeyword(String keyword) {
+			if (keyword == null) {
+				return DEFAULT_VIEW;
+			}
+
+			for (ProxyRelationshipView v : ProxyRelationshipView.values()) {
+				if (v.toString().equals(keyword)) {
+					return v;
+				}
+			}
+
+			return DEFAULT_VIEW;
+		}
+
 	}
 
 	/** How many relationships should we bring back, at most? */

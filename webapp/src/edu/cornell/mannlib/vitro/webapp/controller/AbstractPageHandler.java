@@ -38,6 +38,7 @@ public abstract class AbstractPageHandler {
 	protected final VitroRequest vreq;
 	protected final ServletContext ctx;
 	protected final OntModel userAccountsModel;
+	protected final OntModel unionModel;
 	protected final UserAccountsDao userAccountsDao;
 	protected final VClassDao vclassDao;
 	protected final IndividualDao indDao;
@@ -48,8 +49,9 @@ public abstract class AbstractPageHandler {
 		this.vreq = vreq;
 		this.ctx = vreq.getSession().getServletContext();
 
-		OntModelSelector oms = ModelContext.getBaseOntModelSelector(ctx);
+		OntModelSelector oms = ModelContext.getUnionOntModelSelector(ctx);
 		userAccountsModel = oms.getUserAccountsModel();
+		unionModel = oms.getFullModel();
 
 		WebappDaoFactory wdf = (WebappDaoFactory) this.ctx
 				.getAttribute("webappDaoFactory");

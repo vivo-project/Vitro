@@ -168,7 +168,7 @@ function searchStatusField(element, minLength) {
 
 	this.setText = function(searchTermLength, numberOfResults) {
 		if (numberOfResults > 0) {
-			element.text = '';
+			element.text('');
 		} else if (searchTermLength == 0) {
 			element.text(emptyText);
 		} else if (searchTermLength < minLength) {

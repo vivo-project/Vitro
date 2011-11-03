@@ -23,6 +23,10 @@
                 <li><a href="${siteConfig.userAccounts}">User accounts</a></li>
             </#if>           
             
+            <#if siteConfig.manageProxies?has_content>
+                <li><a href="${siteConfig.manageProxies}">Manage Proxies</a></li>
+            </#if>           
+            
             <#if siteConfig.startupStatus?has_content>
                 <li>
                     <a href="${siteConfig.startupStatus}">Startup Status</a>

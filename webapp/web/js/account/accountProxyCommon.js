@@ -6,6 +6,72 @@
 
 /* 
  * ----------------------------------------------------------------------------
+ * itemElement
+ * ----------------------------------------------------------------------------
+ * Display information about an entity according to the template. The entity 
+ * can be either:
+ *    a profile -- Individual to be edited.
+ *    a proxy   -- User Account to do the editing, optionally with info from a 
+ *                   profile associated with that individual.
+ * 
+ * You provide:
+ *   template -- the HTML text that determines how the element should look. 
+ *             The template must be a single HTML element, which may contain
+ *             any number of sub-elements. It needs to have a single outer
+ *             wrapper, however.
+ *   uri, label, classLabel, imageUrl -- as described below
+ *   remove -- a function that we can call when the user clicks on the remove 
+ *             link or button. We will pass a reference to this struct.
+ * ----------------------------------------------------------------------------
+ * The template must inlude a link or button with attribute templatePart="remove"
+ * 
+ * The template may include tokens to be replaced, from the following:
+ *    %uri% -- the URI of the individual being displayed 
+ *    %label& -- the label of the individual.
+ *    %classLabel% -- the label of the most specific class of the individual.
+ *    %imageUrl% -- the URL that will fetch the image of the individual, 
+ *                  or a placeholder image.
+ * ----------------------------------------------------------------------------
+ * This relies on magic names for the styles:
+ *   existingProxyItem -- for an item that was present when the page was loaded
+ *   newProxyItem      -- for an item that was added since the page was loaded
+ *   removedProxyItem  -- added to an item when the "remove" link is cheked.
+ * ----------------------------------------------------------------------------
+ */
+function itemElement(template, uri, label, classLabel, imageUrl, removeInfo) {
+	var self = this;
+	
+	this.uri = uri;
+	this.label = label;
+	this.classLabel = classLabel;
+	this.imageUrl = (imageUrl) ? imageUrl : imageUrl="../images/placeholders/person.thumbnail.jpg";
+	this.removeInfo = removeInfo;
+	
+	this.toString = function() {
+		return "proxyInfoElement: " + content;
+	}
+
+	this.element = function() {
+		var content = template.replace(/%uri%/g, this.uri)
+				              .replace(/%label%/g, this.label)
+				              .replace(/%classLabel%/g, this.classLabel)
+				              .replace(/%imageUrl%/g, this.imageUrl);
+		
+		var element = $(content);
+		element.addClass("proxyInfoElement");
+
+		var removeLink = $("[templatePart='remove']", element).first();
+		removeLink.click(function(event) {
+			self.removeInfo(self);
+			return false;
+		});
+
+		return element;
+	}
+}
+
+/* 
+ * ----------------------------------------------------------------------------
  * proxyInfoElement
  * ----------------------------------------------------------------------------
  * Display information about an entity according to the template. The entity 
@@ -53,8 +119,6 @@ function proxyInfoElement(template, uri, label, classLabel, imageUrl, removeInfo
 				              .replace(/%classLabel%/g, this.classLabel)
 				              .replace(/%imageUrl%/g, this.imageUrl);
 		
-
-
 		var element = $("<div class='proxyInfoElement' name='proxyInfoElement'>" + content + "</div>");
 
 		var removeLink = $("[templatePart='remove']", element).first();

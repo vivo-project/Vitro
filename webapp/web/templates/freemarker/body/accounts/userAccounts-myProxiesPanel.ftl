@@ -60,4 +60,5 @@ var proxyMechanism = {
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/account/proxyUtils.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/sparqlUtils.js"></script>',   
               '<script type="text/javascript" src="${urls.base}/js/account/accountProxyCommon.js"></script>',   
-              '<script type="text/javascript" src="${urls.base}/js/account/accountProxyProxiesPanel.js"></script>')}   
+              '<script type="text/javascript" src="${urls.base}/js/account/accountProxyProxiesPanel.js"></script>',  
+              '<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"></script>')}
