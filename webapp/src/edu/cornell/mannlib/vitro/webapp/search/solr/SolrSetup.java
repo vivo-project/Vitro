@@ -10,6 +10,7 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
+import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrServer;
@@ -61,14 +62,19 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
                         );
                 return;
             }            
-            CommonsHttpSolrServer server;                       
-            //It would be nice to use the default binary handler but there seem to be library problems 
-            server = new CommonsHttpSolrServer(new URL( solrServerUrl ),null,new XMLResponseParser(),false); 
+            
+            //HttpClient httpClient = new HttpClient();
+            
+            CommonsHttpSolrServer server;
+            boolean useMultiPartPost = true;
+            //It would be nice to use the default binary handler but there seem to be library problems
+            server = new CommonsHttpSolrServer(new URL( solrServerUrl ),null,new XMLResponseParser(),useMultiPartPost); 
             server.setSoTimeout(10000);  // socket read timeout
             server.setConnectionTimeout(10000);
             server.setDefaultMaxConnectionsPerHost(100);
             server.setMaxTotalConnections(100);         
-            server.setMaxRetries(1);            
+            server.setMaxRetries(1);
+            
             context.setAttribute(LOCAL_SOLR_SERVER, server);
             
             /* set up the individual to solr doc translation */            

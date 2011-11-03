@@ -10,7 +10,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,15 +17,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.FacetField.Count;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
@@ -100,12 +98,12 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
-        boolean wasXmlRequested = isRequestedFormatXml(request);
+        VitroRequest vreq = new VitroRequest(request);
+        boolean wasXmlRequested = isRequestedFormatXml(vreq);
         if( ! wasXmlRequested ){
-            super.doGet(request,response);
+            super.doGet(vreq,response);
         }else{
-            try {
-                VitroRequest vreq = new VitroRequest(request);
+            try {                
                 Configuration config = getConfig(vreq);            
                 ResponseValues rvalues = processRequest(vreq);
                 
@@ -119,9 +117,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     }
 
     @Override
-    protected ResponseValues processRequest(VitroRequest vreq) {
-    	
-    	log.debug("All parameters present in the request: "+ vreq.getParameterMap().toString());
+    protected ResponseValues processRequest(VitroRequest vreq) {    	    	
     	
         //There may be other non-html formats in the future
         Format format = getFormat(vreq);            
@@ -149,43 +145,42 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             int startIndex = getStartIndex(vreq);            
             int hitsPerPage = getHitsPerPage( vreq );           
 
-            String qtxt = vreq.getParameter(VitroQuery.QUERY_PARAMETER_NAME);  
-            //Clean text to prevent cross-scripting errors
-            qtxt = StringEscapeUtils.escapeHtml(qtxt);
-            log.debug("Query text is \""+ qtxt + "\""); 
+            String queryText = vreq.getParameter(VitroQuery.QUERY_PARAMETER_NAME);  
+            log.debug("Query text is \""+ queryText + "\""); 
 
-            String badQueryMsg = badQueryText( qtxt );
+
+            String badQueryMsg = badQueryText( queryText );
             if( badQueryMsg != null ){
-                return doFailedSearch(badQueryMsg, qtxt, format);
+                return doFailedSearch(badQueryMsg, queryText, format);
             }
                 
-            SolrQuery query = getQuery(qtxt, hitsPerPage, startIndex, vreq);            
+            SolrQuery query = getQuery(queryText, hitsPerPage, startIndex, vreq);            
             SolrServer solr = SolrSetup.getSolrServer(getServletContext());
             QueryResponse response = null;           
             
             try {
                 response = solr.query(query);
             } catch (Exception ex) {                
-                String msg = makeBadSearchMessage(qtxt, ex.getMessage());
+                String msg = makeBadSearchMessage(queryText, ex.getMessage());
                 log.error("could not run Solr query",ex);
-                return doFailedSearch(msg, qtxt, format);              
+                return doFailedSearch(msg, queryText, format);              
             }
             
             if (response == null) {
                 log.error("Search response was null");                                
-                return doFailedSearch("The search request contained errors.", qtxt, format);
+                return doFailedSearch("The search request contained errors.", queryText, format);
             }
             
             SolrDocumentList docs = response.getResults();
             if (docs == null) {
                 log.error("Document list for a search was null");                
-                return doFailedSearch("The search request contained errors.", qtxt,format);
+                return doFailedSearch("The search request contained errors.", queryText,format);
             }
                        
             long hitCount = docs.getNumFound();
             log.debug("Number of hits = " + hitCount);
             if ( hitCount < 1 ) {                
-                return doNoHits(qtxt,format);
+                return doNoHits(queryText,format);
             }            
             
             List<Individual> individuals = new ArrayList<Individual>(docs.size());
@@ -205,7 +200,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             }          
   
             ParamMap pagingLinkParams = new ParamMap();
-            pagingLinkParams.put(PARAM_QUERY_TEXT, qtxt);
+            pagingLinkParams.put(PARAM_QUERY_TEXT, queryText);
             pagingLinkParams.put(PARAM_HITS_PER_PAGE, String.valueOf(hitsPerPage));
             
             if( wasXmlRequested ){
@@ -238,11 +233,11 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             if( wasHtmlRequested ){                                
                 if ( !classGroupFilterRequested && !typeFilterRequested ) {
                     // Search request includes no ClassGroup and no type, so add ClassGroup search refinement links.
-                    body.put("classGroupLinks", getClassGroupsLinks(grpDao, docs, response, qtxt));                            
+                    body.put("classGroupLinks", getClassGroupsLinks(grpDao, docs, response, queryText));                            
                 } else if ( classGroupFilterRequested && !typeFilterRequested ) {
                     // Search request is for a ClassGroup, so add rdf:type search refinement links
                     // but try to filter out classes that are subclasses
-                    body.put("classLinks", getVClassLinks(vclassDao, docs, response, qtxt));                       
+                    body.put("classLinks", getVClassLinks(vclassDao, docs, response, queryText));                       
                     pagingLinkParams.put(PARAM_CLASSGROUP, classGroupParam);
 
                 } else {
@@ -254,8 +249,8 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             body.put("individuals", IndividualSearchResult
                     .getIndividualTemplateModels(individuals, vreq));
 
-            body.put("querytext", qtxt);
-            body.put("title", qtxt + " - " + appBean.getApplicationName()
+            body.put("querytext", queryText);
+            body.put("title", queryText + " - " + appBean.getApplicationName()
                     + " Search Results");
             
             body.put("hitCount", hitCount);
@@ -355,25 +350,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     private List<VClassSearchLink> getVClassLinks(VClassDao vclassDao, SolrDocumentList docs, QueryResponse rsp, String qtxt){        
         HashSet<String> typesInHits = getVClassUrisForHits(docs);                                
         List<VClass> classes = new ArrayList<VClass>(typesInHits.size());
-        Map<String,Long> typeURItoCount = new HashMap<String,Long>();
-        
-//        Iterator<String> it = typesInHits.iterator();
-//        while(it.hasNext()){
-//            String typeUri = it.next();
-//            try{
-//                if( VitroVocabulary.OWL_THING.equals(typeUri))
-//                    continue;
-//                VClass type = vclassDao.getVClassByURI(typeUri);
-//                if( type != null &&
-//                    ! type.isAnonymous() &&
-//                      type.getName() != null && !"".equals(type.getName()) &&
-//                      type.getGroupURI() != null ) //don't display classes that aren't in classgroups                      
-//                    classes.add(type);
-//            }catch(Exception ex){
-//                if( log.isDebugEnabled() )
-//                    log.debug("could not add type " + typeUri, ex);
-//            }                        
-//        }
+        Map<String,Long> typeURItoCount = new HashMap<String,Long>();        
         
         List<FacetField> ffs = rsp.getFacetFields();
         for(FacetField ff : ffs){
@@ -574,14 +551,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         Map<String, Object> body = new HashMap<String, Object>();
         body.put("message", "Search failed: " + e.getMessage());  
         return new ExceptionResponseValues(getTemplate(f,Result.ERROR), body, e);
-    }
-    
-//    private TemplateResponseValues doBadQuery(ApplicationBean appBean, String query, Format f) {
-//        Map<String, Object> body = new HashMap<String, Object>();
-//        body.put("title", "Search " + appBean.getApplicationName());
-//        body.put("query", query);
-//        return new TemplateResponseValues(getTemplate(f,Result.BAD_QUERY), body);
-//    }
+    }   
     
     private TemplateResponseValues doFailedSearch(String message, String querytext, Format f) {
         Map<String, Object> body = new HashMap<String, Object>();       
@@ -667,7 +637,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         throw new Error("PagedSearchController.search() is unimplemented");
     }
 
-    protected boolean isRequestedFormatXml(HttpServletRequest req){
+    protected boolean isRequestedFormatXml(VitroRequest req){
         if( req != null ){
             String param = req.getParameter(PARAM_XML_REQUEST);
             if( param != null && "1".equals(param)){
@@ -680,7 +650,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         }
     }
 
-    protected Format getFormat(HttpServletRequest req){
+    protected Format getFormat(VitroRequest req){
         if( req != null && req.getParameter("xml") != null && "1".equals(req.getParameter("xml")))
             return Format.XML;
         else 
