@@ -259,7 +259,7 @@ public class IndexBuilder extends VitroBackgroundThread {
         
         log.debug("Getting all URIs in the model");
         Iterator<String> uris = wdf.getIndividualDao().getAllOfThisTypeIterator();
-        
+         
         this.numberOfThreads = MAX_REINDEX_THREADS;
         doBuild(uris, Collections.<String>emptyList() );
         
@@ -414,7 +414,7 @@ public class IndexBuilder extends VitroBackgroundThread {
             work.get( counter % workers ).add( uris.next() );
             counter ++;
         }
-        log.debug("Number of individuals to be indexed : " + counter);
+        log.info("Number of individuals to be indexed : " + counter);
         return work;        
     }
     
