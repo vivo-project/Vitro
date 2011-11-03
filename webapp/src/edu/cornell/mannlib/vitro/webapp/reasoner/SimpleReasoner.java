@@ -1373,12 +1373,33 @@ public class SimpleReasoner extends StatementListener {
 		log.info("ABox inference model updated with mostSpecificType annotations");
 	}
 
-	public  boolean isABoxReasoningAsynchronous() {
+	public boolean isABoxReasoningAsynchronous() {
          if (batchMode1 || batchMode2) {
         	 return true;
          } else {
         	 return false;
          }
+	}
+	
+	protected  void startBatchMode() {
+		if (batchMode1 || batchMode2) {
+			return;  
+		} else {
+			batchMode1 = true;
+			batchMode2 = false;
+			aBoxDeltaModeler1.getRetractions().removeAll();
+			log.info("started processing retractions in batch mode");
+		}
+	}
+
+	protected void endBatchMode() {
+		
+		if (!batchMode1 && !batchMode2) {
+			log.warn("SimpleReasoner received an end batch mode request when not currently in batch mode. No action was taken");
+			return;
+		}
+		
+		new Thread(new DeltaComputer(),"DeltaComputer").start();
 	}
 	
 	@Override
@@ -1388,19 +1409,10 @@ public class SimpleReasoner extends StatementListener {
 	    	if (((BulkUpdateEvent) event).getBegin()) {
 	    		
 	    		log.info("received BulkUpdateEvent(begin)");
-	    		
-	    		if (batchMode1 || batchMode2) {
-	    			log.info("received a BulkUpdateEvent(begin) while already in batch update mode; this event will be ignored (and processing in batch mode will continue until there are no pending updates)");
-	    			return;  
-	    		} else {
-	    			batchMode1 = true;
-	    			batchMode2 = false;
-	    			aBoxDeltaModeler1.getRetractions().removeAll();
-	    			log.info("started processing retractions in batch mode");
-	    		}
+	            startBatchMode();
 	    	} else {
 	    		log.info("received BulkUpdateEvent(end)");
-	    		new Thread(new DeltaComputer(),"DeltaComputer").start();
+	    		endBatchMode();
 	    	}
 	    }
 	}
