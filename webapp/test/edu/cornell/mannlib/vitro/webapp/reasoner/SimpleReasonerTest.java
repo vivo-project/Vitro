@@ -26,7 +26,6 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
-import edu.cornell.mannlib.vitro.webapp.reasoner.support.SimpleReasonerTBoxListener;
 
 
 public class SimpleReasonerTest extends AbstractTestClass {
