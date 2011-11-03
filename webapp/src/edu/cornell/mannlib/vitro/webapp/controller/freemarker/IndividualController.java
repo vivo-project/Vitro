@@ -125,7 +125,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        // If this is an uploaded file, redirect to its "alias URL".
 	        String aliasUrl = getAliasUrlForBytestreamIndividual(vreq, individual);
 	        if (aliasUrl != null) {
-	        	return new RedirectResponseValues(aliasUrl);
+	            return new RedirectResponseValues(aliasUrl, HttpServletResponse.SC_SEE_OTHER);	            
 	        }
 
 	        Map<String, Object> body = new HashMap<String, Object>();

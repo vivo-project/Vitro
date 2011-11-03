@@ -281,8 +281,13 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     protected void doRedirect(HttpServletRequest request, HttpServletResponse response, ResponseValues values) 
         throws ServletException, IOException { 
         String redirectUrl = values.getRedirectUrl();
-        setResponseStatus(response, values.getStatusCode());
-        response.sendRedirect(redirectUrl);        
+        if( values.getStatusCode() == 0 || values.getStatusCode() == response.SC_FOUND ){
+            setResponseStatus(response, values.getStatusCode());
+            response.sendRedirect(redirectUrl);
+        }else{
+            response.setStatus(values.getStatusCode());
+            response.setHeader("Location", redirectUrl);
+        }
     }
     
     private void setResponseStatus(HttpServletResponse response, int statusCode) {
