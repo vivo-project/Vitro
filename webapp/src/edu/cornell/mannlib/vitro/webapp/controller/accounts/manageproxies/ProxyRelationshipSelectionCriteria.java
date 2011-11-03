@@ -47,7 +47,7 @@ public class ProxyRelationshipSelectionCriteria {
 
 		if (pageIndex <= 0) {
 			throw new IllegalArgumentException("pageIndex must be a "
-					+ "non-negative integer, not " + pageIndex);
+					+ "positive integer, not " + pageIndex);
 		}
 		this.pageIndex = pageIndex;
 
