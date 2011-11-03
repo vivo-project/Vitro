@@ -201,7 +201,7 @@ public class KnowledgeBaseUpdater {
                         if (num > 0) {
 						   logger.log((add ? "Added " : "Removed ") + num + 
 								   " statement"  + ((num > 1) ? "s" : "") + 
-								   " using the SPARQL construct query from file " + sparqlFiles[i].getName());
+								   " using the SPARQL construct query from file " + sparqlFiles[i].getParentFile().getName() + "/" + sparqlFiles[i].getName());
                         }
                         qe.close();
 					} finally {
