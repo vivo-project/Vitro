@@ -22,6 +22,7 @@ public class ManageProxiesController extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory
 			.getLog(ManageProxiesController.class);
 
+	private static final String ACTION_CREATE = "/create";
 	private static final String ACTION_EDIT = "/edit";
 
 	@Override
@@ -38,18 +39,21 @@ public class ManageProxiesController extends FreemarkerHttpServlet {
 		String action = vreq.getPathInfo();
 		log.debug("action = '" + action + "'");
 
-		if (ACTION_EDIT.equals(action)) {
+		
+		if (ACTION_CREATE.equals(action)) {
+			return handleCreateRequest(vreq);
+		} else if (ACTION_EDIT.equals(action)) {
 			return handleEditRequest(vreq);
 		} else {
 			return handleListRequest(vreq);
 		}
 	}
 
-	private ResponseValues handleEditRequest(VitroRequest vreq) {
-		ManageProxiesEditPage page = new ManageProxiesEditPage(vreq);
+	private ResponseValues handleCreateRequest(VitroRequest vreq) {
+		ManageProxiesCreatePage page = new ManageProxiesCreatePage(vreq);
 
 		if (page.isValid()) {
-			page.applyEdits();
+			page.createRelationships();
 			Message.setMessage(vreq, new SuccessMessage());
 		} else {
 			Message.setMessage(vreq, new FailureMessage());
@@ -58,6 +62,19 @@ public class ManageProxiesController extends FreemarkerHttpServlet {
 		return redirectToList();
 	}
 
+	private ResponseValues handleEditRequest(VitroRequest vreq) {
+		ManageProxiesEditPage page = new ManageProxiesEditPage(vreq);
+		
+		if (page.isValid()) {
+			page.applyEdits();
+			Message.setMessage(vreq, new SuccessMessage());
+		} else {
+			Message.setMessage(vreq, new FailureMessage());
+		}
+		
+		return redirectToList();
+	}
+	
 	private ResponseValues handleListRequest(VitroRequest vreq) {
 		ManageProxiesListPage page = new ManageProxiesListPage(vreq);
 		return page.showPage();
