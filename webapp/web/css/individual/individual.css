@@ -117,11 +117,11 @@ h1.fn .display-title {
 #property-group-menu {
     clear: both;
     width: 95%;;
-    height: 46px;
     border: 1px solid #dfebe5;
-    margin: 0 auto;
+    margin: 0 0 0 4px;;
     margin-bottom: 10px;
     margin-top: 20px;
+    float: left;
 }
 #property-group-menu ul {
     display: block;
@@ -129,9 +129,12 @@ h1.fn .display-title {
 }
 #property-group-menu li {
     float: left;
-    line-height: 46px;
     padding-right: 15px;
+    padding-top: .6em;
     padding-left: 15px;
+}
+#property-group-menu li:last-child {
+    margin-bottom: 7px;
 }
 #property-group-menu li:first-child {
      padding-left: 10px;
