@@ -30,8 +30,14 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 		//forward to Edit Request Dispatch Controller
 		String queryString = request.getQueryString();
 		//Instead of edit request which is what we'll do later, here we'll forward to Menu Management Controller
-		//response.sendRedirect("editRequestDispatch?" + queryString);
 		response.sendRedirect(request.getContextPath() + "/editDisplayModel?" + queryString);
+	}
+
+	//This is our way fo being able to test the new edit configuration
+	//TODO: Remove this when testing done
+	if(request.getParameter("testEdit") != null) {
+		String queryString = request.getQueryString();
+		response.sendRedirect(request.getContextPath() + "/editRequestDispatch?" + queryString);
 	}
     /*
     Decide which form to forward to, set subjectUri, subjectUriJson, predicateUri, and predicateUriJson in request.

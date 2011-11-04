@@ -139,7 +139,10 @@ public class EditConfigurationUtils {
     
   //is data property or vitro label
     public static boolean isDataProperty(String predicateUri, VitroRequest vreq) {
-    	
+    	if(predicateUri == null) {
+    		log.debug("Predicate URI is null so not data property");
+    		return false;
+    	}
     	if(isVitroLabel(predicateUri)) {
     		return true;
     	}
@@ -152,6 +155,10 @@ public class EditConfigurationUtils {
     }
     //is object property
     public static boolean isObjectProperty(String predicateUri, VitroRequest vreq) {
+    	if(predicateUri == null) {
+    		log.debug("Predicate URI is null so not object property");
+    		return false;
+    	}
     	WebappDaoFactory wdf = vreq.getWebappDaoFactory();
     	ObjectProperty op = wdf.getObjectPropertyDao().getObjectPropertyByURI(predicateUri);
     	DataProperty dp = wdf.getDataPropertyDao().getDataPropertyByURI(predicateUri);
