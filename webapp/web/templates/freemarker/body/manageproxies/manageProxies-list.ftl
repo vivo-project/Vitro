@@ -8,6 +8,8 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/cust
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/autocomplete.css" />')}
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css" />')}
 
+<h3><span>Manage proxy self editors & profiles</span></h3>
+
 <#if message??>
     <section class="account-feedback">
         <#if message.success?? >
@@ -24,6 +26,101 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
     </section>
 </#if>
 
+<form action="${formUrls.create}" method="POST">
+	<table style="width: 100%;">
+		<tr>
+		    <td style="border: thin solid black; width: 50%;">
+    		    <div name="proxyProxiesPanel">
+                    <p>Select proxies</p>
+    
+                    <p><input type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name"></p>
+                    <p class="search-status">
+                        <span name='proxySelectorSearchStatus' 
+                              moreCharsText='type more characters' 
+                              noMatchText='no match'>&nbsp;</span>
+                    </p>
+
+                    <p class="selected-editors">Selected proxies:</p>
+
+                    <#-- Magic div thst holds all of the proxy data and the template that shows how to display it. -->
+                    <div name="proxyData">
+
+                        <#-- 
+                            Each proxy will be shown using the HTML inside this div.
+                            It must contain at least:
+                            -- a link with templatePart="remove"
+                            -- a hidden input field with templatePart="uriField"  
+                        -->
+                        <div name="template" style="display: none">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <img class="photo-profile" width="90" alt="%label%" src="%imageUrl%">
+                                    </td>
+                                    <td class="proxy-info">
+                                        %label% | <span class="class-label">%classLabel%</span>
+                                        <br />
+                                        <a class='remove-proxy' href="." templatePart="remove">Remove selection</a>
+                                    </td>
+                                </tr> 
+                            </table>
+                            <input type="hidden" name="proxyUri" value="%uri%" >
+                        </div>
+                    </div>
+                </div>
+		    </td>
+
+		    <td style="border: thin solid black">
+    		    <div id="edit-myProxy" name="proxyProfilesPanel">
+                    <p>Select profiles</p>
+                    <p><input type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name"></p>
+                    <p class="search-status">
+                        <span name='proxySelectorSearchStatus' 
+                              moreCharsText='type more characters' 
+                              noMatchText='no match'>&nbsp;</span>
+                    </p>
+
+                    <p class="selected-editors">Selected profiles:</p>
+        
+                    <#-- Magic div thst holds all of the proxy data and the template that shows how to display it. -->
+                    <div name="proxyData">
+                        <#-- 
+                            Each proxy will be shown using the HTML inside this element.
+                            It must contain at least:
+                            -- a link with templatePart="remove"
+                            -- a hidden input field with templatePart="uriField"  
+                        -->
+                        <div name="template" style="display: none">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <img class="photo-profile" width="90" alt="%label%" src="%imageUrl%">
+                                    </td>
+                                    <td class="proxy-info">
+                                        %label% | <span class="class-label">%classLabel%</span>
+                                        <br />
+                                        <a class='remove-proxy' href="." templatePart="remove">Remove selection</a>
+                                    </td>
+                                </tr>
+                            </table>
+                            <input type="hidden" name="profileUri" templatePart="uriField" value="%uri%" >
+                        </div>
+                    </div>
+                </div>
+		    </td>
+		</tr>
+    </table>
+    <input type="submit" name="createRelationship" value="Save" />
+</form>
+
+<form action="${formUrls.list}" method="POST">
+<div>
+    <p>Proxy self editors</p>
+    <p>
+        <input type="text" name="searchTerm" >
+        <input type="submit" name="searchBytProxy" value="Search">
+    </p>    
+</div>
 
 <p>
     <#if page.previous??>

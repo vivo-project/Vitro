@@ -160,6 +160,7 @@ public class ManageProxiesListPage extends AbstractPageHandler {
 
 		map.put("list", UrlBuilder.getUrl("/manageProxies/list"));
 		map.put("edit", UrlBuilder.getUrl("/manageProxies/edit"));
+		map.put("create", UrlBuilder.getUrl("/manageProxies/create"));
 		map.put("sparqlQueryAjax", UrlBuilder.getUrl("/ajax/sparqlQuery"));
 		map.put("defaultImageUrl", DEFAULT_IMAGE_URL);
 
