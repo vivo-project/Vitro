@@ -168,7 +168,11 @@ public class EditN3GeneratorVTwo {
         //make the multivalue literal string
         List<String> n3Values = new ArrayList<String>(values.size());        
         for( Literal value : values){
-            n3Values.add( formatLiteral(value) );
+        	if(value != null) {
+        		n3Values.add( formatLiteral(value) );
+        	} else {
+                log.debug("value of literal for " + var + " was null");        
+        	}
         }
         String valueString = org.apache.commons.lang.StringUtils.join(n3Values, ",");
         

@@ -1,6 +1,6 @@
  <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
  
- <#if editConfiguration.rangeOptionsExist  = true >
+ <#if rangeOptionsExist  = true >
         <p>If you don't find the appropriate entry on the selection list above:</p>
  <#else>
         <p>Please create a new entry.</p>           

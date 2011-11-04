@@ -1,10 +1,17 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
+<#--Assign variables from editConfig-->
+<#assign rangeOptions = editConfiguration.pageData.objectVar />
+<#assign rangeOptionsExist = false />
+<#if (rangeOptions?keys?size > 0)>
+	<#assign rangeOptionsExist = true/>
+</#if>
+
 <h2>${editConfiguration.formTitle}</h2>
 
 <#if editConfiguration.propertySelectFromExisting = true>
-    <#if editConfiguration.rangeOptionsExist  = true >
-        <#assign rangeOptionKeys = editConfiguration.rangeOptions?keys />
+    <#if rangeOptionsExist  = true >
+        <#assign rangeOptionKeys = rangeOptions?keys />
         <form class="editForm" action = "${submitUrl}">
             <input type="hidden" name="editKey" id="editKey" value="${editKey}" role="input" />
             <#if editConfiguration.propertyPublicDescription?has_content>
@@ -12,14 +19,14 @@
                 
                 <select id="objectVar" name="objectVar" role="select">
                     <#list rangeOptionKeys as key>
-                     <option value="${key}" <#if editConfiguration.objectUri?has_content && editConfiguration.objectUri = key>selected</#if> role="option">${editConfiguration.rangeOptions[key]}</option>
+                     <option value="${key}" <#if editConfiguration.objectUri?has_content && editConfiguration.objectUri = key>selected</#if> role="option">${rangeOptions[key]}</option>
                     </#list>
                 </select>
                 
                 <p>
                     <input type="submit" id="submit" value="${editConfiguration.submitLabel}" role="button "/>
                     <span class="or"> or </span>
-                    <a title="Cancel" href="${editConfiguration.cancelUrl}">Cancel</a>
+                    <a title="Cancel" href="${cancelUrl}">Cancel</a>
                 </p>
             </#if>  
         </form>

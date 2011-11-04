@@ -28,5 +28,9 @@ public class MultiValueEditSubmissionTemplateModel {
     public Map<String, List<String>> getUrisFromForm() {
         return editSub.getUrisFromForm();
     }
+    
+    public boolean getSubmissionExists() {
+    	return (this.editSub != null);
+    }
 
 }

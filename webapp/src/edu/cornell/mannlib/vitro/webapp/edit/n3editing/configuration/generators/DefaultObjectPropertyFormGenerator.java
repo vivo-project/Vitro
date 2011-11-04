@@ -123,6 +123,8 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	setTemplate(editConfiguration, vreq);
     	//Set edit key
     	setEditKey(editConfiguration, vreq);
+    	//Adding additional data, specifically edit mode
+        addFormSpecificData(editConfiguration, vreq);
     	return editConfiguration;
     }
     
@@ -522,6 +524,18 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
             }
     	}
     }
+    
+  //Form specific data
+	public void addFormSpecificData(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
+		HashMap<String, Object> formSpecificData = new HashMap<String, Object>();
+		//range options need to be stored for object property 
+		//Store field names
+		List<String> objectSelect = new ArrayList<String>();
+		objectSelect.add(editConfiguration.getVarNameForObject());
+		//TODO: Check if this is the proper way to do this?
+		formSpecificData.put("objectSelect", objectSelect);
+		editConfiguration.setFormSpecificData(formSpecificData);
+	}
     
     
 

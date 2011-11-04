@@ -96,9 +96,6 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 	private void populateDropdowns() {
 		String predicateUri = editConfig.getPredicateUri();
 		if(predicateUri != null) {
-			if(EditConfigurationUtils.isObjectProperty(editConfig.getPredicateUri(), vreq)) {
-	    		setRangeOptions();
-	    	}
 	    	if(pageData.containsKey("objectSelect")) {
 	    		List<String> fieldNames = (List<String>)pageData.get("objectSelect");
 	    		for(String field:fieldNames) {
@@ -123,11 +120,6 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 		}
 		return selectedValue;
 	}
-
-	private boolean isRangeOptionsExist() {
-    	boolean rangeOptionsExist = (pageData.get("rangeOptionsExist") != null && (Boolean) pageData.get("rangeOptionsExist")  == true);
-    	return rangeOptionsExist;
-    }
     
 	private void setFormTitle() {
 		String predicateUri = editConfig.getPredicateUri();
@@ -228,29 +220,6 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	
     }
     
-    private void setRangeOptions() {
-    	ObjectProperty prop = EditConfigurationUtils.getObjectProperty(vreq);
-    	if( prop != null && prop.getSelectFromExisting() ){
-    		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-    		//TODO: Change this to varname for object from object property?
-    		String fieldName = editConfig.getVarNameForObject();
-        	//TODO: Check if this still works?
-        	Map<String,String> rangeOptions = SelectListGeneratorVTwo.getOptions(editConfig, fieldName , wdf);    	
-        	if( rangeOptions != null && rangeOptions.size() > 0 ) {
-        		pageData.put("rangeOptionsExist", true);
-        	    pageData.put("rangeOptions", rangeOptions);
-        	} else { 
-        		pageData.put("rangeOptionsExist",false);
-        	}
-        }
-    	
-    }
-    
-    
-    //Get page data
-   public boolean getRangeOptionsExist() {
-	   return isRangeOptionsExist();
-   }
     
     public String getFormTitle() {
     	return (String) pageData.get("formTitle");
