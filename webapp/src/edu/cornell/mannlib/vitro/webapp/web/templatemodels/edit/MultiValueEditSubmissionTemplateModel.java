@@ -20,10 +20,10 @@ public class MultiValueEditSubmissionTemplateModel {
         return editSub.getLiteralsFromForm();
     }
 
-    /*
-    public Map<String, List<String>> getValidationErrors() {
+   
+    public Map<String, String> getValidationErrors() {
         return editSub.getValidationErrors();
-    }*/
+    }
 
     public Map<String, List<String>> getUrisFromForm() {
         return editSub.getUrisFromForm();

@@ -45,7 +45,7 @@ public class MultiValueEditSubmission {
     private Map<String,List<String>> urisFromForm ;
 
     private Map<String,String> validationErrors;
-    private BasicValidation basicValidation;
+    private BasicValidationVTwo basicValidation;
 
     private Map<String, List<FileItem>> filesFromForm;
 
@@ -125,20 +125,20 @@ public class MultiValueEditSubmission {
         }
         
         processEditElementFields(editConfig,queryParameters);
-        //Not checking validation for now
-        /*
+        //Incorporating basic validation
+        this.basicValidation = new BasicValidationVTwo(editConfig, this);
         Map<String,String> errors = basicValidation.validateUris( urisFromForm );   
         
         if(editConfig.getValidators() != null ){
-            for( N3Validator validator : editConfig.getValidators()){
+            for( N3ValidatorVTwo validator : editConfig.getValidators()){
                 if( validator != null ){     
-                    throw new Error("need to implemente a validator interface that works with the new MultivalueEditSubmission.");
-                    //errors = validator.validate(editConfig, this);
-//                    if ( errors != null )
-//                        validationErrors.putAll(errors);
+                    //throw new Error("need to implemente a validator interface that works with the new MultivalueEditSubmission.");
+                    errors = validator.validate(editConfig, this);
+                    if ( errors != null )
+                        validationErrors.putAll(errors);
                 }
             }
-        } */              
+        }           
         
         if( log.isDebugEnabled() )
             log.debug( this.toString() );

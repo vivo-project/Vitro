@@ -110,8 +110,12 @@ public class PostEditCleanupController extends FreemarkerHttpServlet{
         if( resourceToRedirectTo != null ){
             ParamMap paramMap = new ParamMap();
             paramMap.put("uri", resourceToRedirectTo);
-            paramMap.put("extra","true"); //for ie6            
-            return new RedirectResponseValues( UrlBuilder.getPath(urlPattern,paramMap) + predicateAnchor );
+            paramMap.put("extra","true"); //for ie6           
+            String path = UrlBuilder.getPath(urlPattern,paramMap);
+            if(predicateAnchor != null) {
+            	path += predicateAnchor;
+            }
+            return new RedirectResponseValues( path );
         } else if ( !urlPattern.endsWith("individual") && !urlPattern.endsWith("entity") ){
             return new RedirectResponseValues( urlPattern );
         }

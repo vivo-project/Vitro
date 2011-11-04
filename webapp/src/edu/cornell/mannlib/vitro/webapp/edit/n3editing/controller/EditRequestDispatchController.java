@@ -28,9 +28,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditSubmissionUtils;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.EditConfigurationGenerator;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit.EditConfigurationTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit.MultiValueEditSubmissionTemplateModel;
 /**
  * This servlet is intended to handle all requests to create a form for use
  * by the N3 editing system.  It will examine the request parameters, determine
@@ -81,11 +84,15 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          //what template?
          String template = editConfig.getTemplate();
         
+         //Get the multi value edit submission object
+         MultiValueEditSubmission submission = getMultiValueSubmission(vreq, editConfig);
+         MultiValueEditSubmissionTemplateModel submissionTemplateModel = new MultiValueEditSubmissionTemplateModel(submission);
          
          //what goes in the map for templates?
          Map<String,Object> templateData = new HashMap<String,Object>();
          EditConfigurationTemplateModel etm = new EditConfigurationTemplateModel( editConfig, vreq);
          templateData.put("editConfiguration", etm);
+         templateData.put("editSubmission", submissionTemplateModel);
          //Corresponding to original note for consistency with selenium tests and 1.1.1
          templateData.put("title", "Edit");
          templateData.put("submitUrl", getSubmissionUrl(vreq));
@@ -104,6 +111,12 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          }
     }
     
+
+
+	private MultiValueEditSubmission getMultiValueSubmission(VitroRequest vreq, EditConfigurationVTwo editConfig) {
+		return EditSubmissionUtils.getEditSubmissionFromSession(vreq.getSession(), editConfig);
+	}
+
 
 
 	private EditConfigurationVTwo setupEditConfiguration(String editConfGeneratorName,
