@@ -113,6 +113,7 @@ public class HttpSessionStub implements HttpSession {
 				"HttpSessionStub.getMaxInactiveInterval() not implemented.");
 	}
 
+	@Deprecated
 	@Override
 	public javax.servlet.http.HttpSessionContext getSessionContext() {
 		throw new RuntimeException(
