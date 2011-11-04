@@ -35,9 +35,9 @@ function proxyItemsPanel(panel, contextInfo)  {
 		templateDiv.remove();
 		return templateHtml;
 	};
-	var templateHtml = parseTemplate(dataContainerElement);
+	this.templateHtml = parseTemplate(dataContainerElement);
 
-	var displayItemData = function() {
+	this.displayItemData = function() {
 		$(".proxyInfoElement", dataContainerElement).remove();
 		
 		for (i = 0; i < self.itemData.length; i++) {
@@ -49,27 +49,35 @@ function proxyItemsPanel(panel, contextInfo)  {
 		return self.itemData;	
 	}
 
-	/* callback function */
-	var addItemData = function(selection) {
+	this.removeItem = function(info) {
+		var idx = self.itemData.indexOf(info);
+		if (idx != -1) {
+			self.itemData.splice(idx, 1);
+		}
+		self.displayItemData();
+	}
+
+	this.addItemData = function(selection) {
 		var imageUrl = contextInfo.defaultImageUrl;
 		if (selection.imageUrl) {
 			imageUrl = contextInfo.baseUrl + selection.imageUrl;
 		}
 		
-		var info = new itemElement(templateHtml, selection.uri, selection.label, selection.classLabel, 
-				imageUrl, removeItem);
+		var classLabel = selection.classLabel ? selection.classLabel : "";
+		
+		var info = new itemElement(self.templateHtml, selection.uri, selection.label, classLabel, 
+				imageUrl, self.removeItem);
         self.itemData.unshift(info);
-        displayItemData();
+        self.displayItemData();
+        self.getAdditionalData(self, info, selection.externalAuthId)
 	}
 
-	var removeItem = function(info) {
-		var idx = self.itemData.indexOf(info);
-		if (idx != -1) {
-			self.itemData.splice(idx, 1);
-		}
-		displayItemData();
+	this.getAdditionalData = function(parent, info, externalAuthId) {
+		// For the plain vanilla panel, this need not do anything. For the 
+		// proxy panel, this will be replaced by a function that does another 
+		// AJAX call to get the classLabel and imageUrl.
 	}
-
+	
 	var parseOriginalData = function() {
 		var dataDivs = $("div[name='data']", dataContainerElement)
 		var data = [];
@@ -79,7 +87,7 @@ function proxyItemsPanel(panel, contextInfo)  {
 			var label = $("p[name='label']", dd).text();
 			var classLabel = $("p[name='classLabel']", dd).text();
 			var imageUrl = $("p[name='imageUrl']", dd).text();
-			data.push(new itemElement(templateHtml, uri, label, classLabel, imageUrl, removeItem));
+			data.push(new itemElement(self.templateHtml, uri, label, classLabel, imageUrl, self.removeItem));
 		}
 		return data;
 	}
@@ -92,12 +100,12 @@ function proxyItemsPanel(panel, contextInfo)  {
 		    url: contextInfo.sparqlQueryUrl
 		    };
 		var updateStatus = new statusFieldUpdater(searchStatusField, 3).setText;
-		var autocompleteInfo = new proxyAutocomplete(parms, excludedUris, getItemData, addItemData, updateStatus)
+		var autocompleteInfo = new proxyAutocomplete(parms, excludedUris, getItemData, self.addItemData, updateStatus)
 	    autoCompleteField.autocomplete(autocompleteInfo);
 	}
 	setupAutoCompleteFields();
 
-	displayItemData();
+	self.displayItemData();
 }
 
 function statusFieldUpdater(element, minLength) {
@@ -145,7 +153,77 @@ var profileQuery = ""
 	+ "ORDER BY ASC(?label) \n"
 	+ "LIMIT 25 \n";
 
+var proxyQuery = ""
+    + "PREFIX fn: <http://www.w3.org/2005/xpath-functions#> \n"
+	+ "PREFIX auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> \n"
+	+ "\n"
+	+ "SELECT DISTINCT ?uri ?label ?externalAuthId \n"
+	+ "WHERE { \n"
+	+ "    ?uri a auth:UserAccount ; \n"
+	+ "            auth:firstName ?firstName ; \n"
+	+ "            auth:lastName ?lastName . \n"
+	+ "    LET ( ?label := fn:concat(?lastName, ', ', ?firstName) )"
+	+ "    OPTIONAL { ?uri auth:externalAuthId ?externalAuthId } \n"
+	+ "    FILTER (REGEX(?label, '^%term%', 'i')) \n"
+	+ "} \n"
+	+ "ORDER BY ASC(?lastName) ASC(?firstName) \n"
+	+ "LIMIT 25 \n";
 
+var moreInfoQuery = ""
+	+ "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"
+	+ "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n"
+	+ "PREFIX p.1: <http://vitro.mannlib.cornell.edu/ns/vitro/public#> \n"
+	+ " \n"
+	+ "SELECT ?uri ?classLabel ?imageUrl \n"
+	+ "WHERE \n"
+	+ "{ \n"
+	+ "    ?uri <%matchingProperty%> '%externalAuthId%'. \n"
+	+ " \n"
+	+ "    OPTIONAL { \n" 
+	+ "       ?uri vitro:mostSpecificType ?type. \n"
+	+ "       ?type rdfs:label ?classLabel  \n"
+	+ "       }  \n"
+	+ " \n"
+	+ "   OPTIONAL { \n" 
+	+ "       ?uri p.1:mainImage ?imageUri. \n"
+	+ "       ?imageUri p.1:thumbnailImage ?thumbUri. \n"
+	+ "       ?thumbUri p.1:downloadLocation ?thumbstreamUri. \n"
+	+ "       ?thumbstreamUri p.1:directDownloadUrl ?imageUrl. \n"
+	+ "       }  \n"
+	+ "} \n"
+	+ "LIMIT 1 \n";
+
+/*
+ * This function will allow a proxy panel to execute another query for each proxy. 
+ */
+var getAdditionalProxyInfo = function(parent, info, externalAuthId) {
+    $.ajax({
+        url: proxyContextInfo.sparqlQueryUrl,
+        dataType: 'json',
+        data: {
+        	query: moreInfoQuery.replace("%matchingProperty%", proxyContextInfo.matchingProperty)
+        	                    .replace("%externalAuthId%", externalAuthId)
+        },
+        complete: function(xhr, status) {
+            var results = $.parseJSON(xhr.responseText);
+            var parsed = sparqlUtils.parseSparqlResults(results);
+            if (parsed.length > 0) {
+                if ("classLabel" in parsed[0]) {
+                    info.classLabel = parsed[0].classLabel;
+                }
+                if ("imageUrl" in parsed[0]) {
+                	info.imageUrl = proxyContextInfo.baseUrl + parsed[0].imageUrl;
+                }
+                parent.displayItemData();
+            }
+        }
+    });
+}
+
+
+/*
+ * Execute this when the page loads.
+ */
 $(document).ready(function() {
 	var disableFormInUnsupportedBrowsers = function() {
 		var disableWrapper = $('#ie67DisableWrapper');
@@ -161,10 +239,15 @@ $(document).ready(function() {
 		return false;
 	};
 
+	/* If we don't support this form in this browser, just stop here. */
 	if (disableFormInUnsupportedBrowsers()) {
 		return;
 	}
 
+	/* 
+	 * For each proxyProfilesPanel, create a plain vanilla panel using the 
+	 * profile query against the main model. 
+	 */
 	$("div[name='proxyProfilesPanel']").each(function(i) {
 		var context = {
 			excludedUris: [],
@@ -174,7 +257,25 @@ $(document).ready(function() {
 			query: profileQuery,
 			model: ''
 		}
-		var ppp = new proxyItemsPanel(this, context);
-		this["ppp"]=ppp;
+		this["proxyItemsPanel"] = new proxyItemsPanel(this, context);
+	});
+	
+	/* 
+	 * For each proxyProxiesPanel, we start with a plain panel using the proxy 
+	 * query against the user accounts model. Then we augment it with a method 
+	 * that will fetch more info from the main model for each proxy. 
+	 */
+	$("div[name='proxyProxiesPanel']").each(function(i) {
+		var context = {
+            excludedUris: [],
+			baseUrl: proxyContextInfo.baseUrl,
+			sparqlQueryUrl: proxyContextInfo.sparqlQueryUrl,
+			defaultImageUrl: proxyContextInfo.defaultImageUrl,
+			query: proxyQuery,
+			model: 'userAccounts'
+		}
+		var pip = new proxyItemsPanel(this, context);
+		pip.getAdditionalData = getAdditionalProxyInfo;
+		this["proxyItemsPanel"] = pip;
 	});
 });

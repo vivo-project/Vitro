@@ -49,16 +49,16 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/auto
 </div>
 
 <script type="text/javascript">
-var proxyMechanism = {
+var proxyContextInfo = {
     baseUrl: '${urls.base}',
     sparqlQueryUrl: '${formUrls.sparqlQueryAjax}',
+    defaultImageUrl: '${formUrls.defaultImageUrl}',
     matchingProperty: '${matchingProperty}',
-    myAccountUri: '${myAccountUri}'
 };
 </script>
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/account/proxyUtils.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/sparqlUtils.js"></script>',   
               '<script type="text/javascript" src="${urls.base}/js/account/accountProxyCommon.js"></script>',   
-              '<script type="text/javascript" src="${urls.base}/js/account/accountProxyProxiesPanel.js"></script>',  
+              '<script type="text/javascript" src="${urls.base}/js/account/accountProxyItemsPanel.js"></script>',  
               '<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"></script>')}
