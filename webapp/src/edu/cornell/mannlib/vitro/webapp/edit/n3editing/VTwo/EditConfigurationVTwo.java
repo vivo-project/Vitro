@@ -26,6 +26,7 @@ import org.json.JSONObject;
 
 
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.ModelSelector;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.StandardModelSelector;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.StandardWDFSelector;
@@ -211,19 +212,19 @@ public class EditConfigurationVTwo {
     	//sparql for additional uris in scope
     	editConfig.setSparqlForAdditionalUrisInScope(
     			this.copy(this.getSparqlForAdditionalUrisInScope(), 
-    					(Map) new HashMap<String, String>()));
+    					(Map<String, String>) new HashMap<String, String>()));
     	//sparql for additional literals in scope
     	editConfig.setSparqlForAdditionalLiteralsInScope(
     			this.copy(this.getSparqlForAdditionalLiteralsInScope(), 
-    					(Map) new HashMap<String, String>()));
+    					(Map<String, String>) new HashMap<String, String>()));
     	//sparql for existing literals
     	editConfig.setSparqlForExistingLiterals(
     			this.copy(this.getSparqlForExistingLiterals(), 
-    					(Map) new HashMap<String, String>()));
+    					(Map<String, String>) new HashMap<String, String>()));
     	//sparql for existing uris
     	editConfig.setSparqlForExistingUris(
     			this.copy(this.getSparqlForExistingUris(), 
-    					(Map) new HashMap<String, String>()));
+    					(Map<String, String>) new HashMap<String, String>()));
     	//TODO: Ensure this is true copy of field and not just shallow copy with same references
     	Map<String, FieldVTwo> fields = this.getFields();
     	editConfig.setFields(fields);
@@ -935,4 +936,59 @@ public class EditConfigurationVTwo {
 		// TODO Auto-generated method stub
 		return this.formSpecificData;
 	}
+	
+    public void addNewResource(String key, String namespace){        
+        if( key == null || key.isEmpty() ) throw new IllegalArgumentException("key of new resource must not be null");
+        Map<String,String> map = getNewResources();
+        if( map == null ) {
+            map = new HashMap<String,String>();
+            map.put(key, namespace);
+            setNewResources(map);
+        }else{
+            map.put(key, namespace);            
+        }        
+    }
+    
+    public void addSparqlForExistingLiteral(String key, String sparql){
+        if( key == null || key.isEmpty() ) throw new IllegalArgumentException("key must not be null");
+        if( sparql == null || sparql .isEmpty() ) throw new IllegalArgumentException("sparql must not be null");
+        
+        Map<String,String> map = getSparqlForExistingLiterals();
+        if( map == null ) {
+            map = new HashMap<String,String>();
+            map.put(key, sparql);
+            setSparqlForExistingLiterals(map);
+        }else{
+            map.put(key, sparql);            
+        }        
+    }
+    
+    public void addSparqlForExistingUris(String key, String sparql){
+        if( key == null || key.isEmpty() ) throw new IllegalArgumentException("key must not be null");
+        if( sparql == null || sparql .isEmpty() ) throw new IllegalArgumentException("sparql must not be null");
+        
+        Map<String,String> map = getSparqlForExistingUris();
+        if( map == null ) {
+            map = new HashMap<String,String>();
+            map.put(key, sparql);
+            setSparqlForExistingUris(map);
+        }else{
+            map.put(key, sparql);            
+        }        
+    }
+
+    public void addField( FieldVTwo field){
+        if( field == null ) throw new IllegalArgumentException("field must not be null");
+        if( field.getName() == null || field.getName().isEmpty() ) throw new IllegalArgumentException("field must not have null or empty name");
+        
+        Map<String,FieldVTwo> map = getFields();
+        if( map == null )
+            setFields( new HashMap<String, FieldVTwo>());
+        
+        if( map.containsKey(field.getName() ))
+            throw new IllegalArgumentException("adding filed that is already in the fieild list");
+        
+        map.put( field.getName(), field);                
+    }
+    
 }
