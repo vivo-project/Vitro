@@ -13,7 +13,6 @@
 <vitro:confirmAuthorization />
 
 <script type="text/javascript" src="js/jquery.js"></script>
-<script type="text/javascript" src="js/jenaIngest/ingestUtils.js"></script>
 
 <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Change Namespace of Resources</h2>
 
@@ -25,9 +24,13 @@ they will be updated to this format.</p>
 <p>This tool operates on the main web application model only, not on any 
    of the additional Jena models.</p>
 
+<c:if test="${!empty errorMsg}">
+    <p class="notice">${errorMsg}</p>
+</c:if>
+
 <form id="takeuri" action="ingest" method="get">
 <input type="hidden" name="action" value="renameResource"/>
-<p>Old namespace: <input id="uri1" type="text" size="52" name="uri1"/></p>
-<p>New namespace: <input id="uri2" type="text" size="52" name="uri2"/></p>
+<p>Old namespace: <input id="uri1" type="text" size="52" name="oldNamespace" value="${oldNamespace}" /></p>
+<p>New namespace: <input id="uri2" type="text" size="52" name="newNamespace" value="${newNamespace}" /></p>
 <p><input id="submit" type="submit" name="submit" value="Change namespace" /></p>
 </form>

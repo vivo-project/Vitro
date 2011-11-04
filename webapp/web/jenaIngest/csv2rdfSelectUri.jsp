@@ -1,5 +1,8 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
+<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+<%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+
 <%@ page import="com.hp.hpl.jena.ontology.Individual" %>
 <%@ page import="com.hp.hpl.jena.ontology.OntModel" %>
 <%@ page import="com.hp.hpl.jena.rdf.model.ModelMaker" %>
@@ -13,8 +16,7 @@
 <%@ page import="java.util.Set" %>
 <%@ page import="java.util.Map.Entry" %>
 
-<%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
-<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" %>
 <% request.setAttribute("requestedActions", new UseAdvancedDataToolsPages()); %>
 <vitro:confirmAuthorization />
 
@@ -22,7 +24,7 @@
 
     ModelMaker maker = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
     if (maker == null) {
-        maker = (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
+        maker = (ModelMaker) getServletContext().getAttribute("vitroJenaSDBModelMaker");
     }
 
 %>
@@ -46,16 +48,18 @@ function disableProperties(){
 
     <h3>Select URI prefix</h3>
    
-	<p>URIs will be constructed from the following string:</p>
+	<p>URIs will be constructed using the following base string:</p>
 	<input id="namespace" type="text" style="width:65%;" name="namespaceEtcStr"/> 
 
     <p/>
     
-    <p>You can concatenate above string with random integer OR your own pattern based on <b>values</b> of one of the properties (Properties will be enabled in the dropdown) </p>
+    <p>Each resource will be assigned a URI by taking the above string and 
+     adding either a random integer, or a string based on the value of one of the
+     the properties of the resource</p>
     
-    <input type="radio" value="integer" name="concatenate" checked="checked" onclick="disableProperties()"><b>No</b>, concatenate with random integer</input>
+    <input type="radio" value="integer" name="concatenate" checked="checked" onclick="disableProperties()">Use random integer</input>
     <br></br>
-    <input type="radio" value="pattern" name="concatenate" onclick="selectProperties()"><b>Yes</b>, concatenate with my pattern</input> 
+    <input type="radio" value="pattern" name="concatenate" onclick="selectProperties()">Use pattern based on values of </input> 
   
     
     <% Map<String,LinkedList<String>> propertyMap = (Map) request.getAttribute("propertyMap");
@@ -75,12 +79,16 @@ function disableProperties(){
     %>
     </select>
     <br></br>
-    <p>Enter your pattern that will prefix property value with an underscore eg. depID_$$$ where depID is your pattern and $$$ is the property value.</p>
+    <p>Enter a pattern using $$$ as the placeholder for the value of the property selected above.</p>
+    <p>For example, entering dept_$$$ might generate URIs with endings such as dept_Art or dept_Classics.</p>
     <input id="pattern" disabled="disabled" type="text" style="width:35%;" name="pattern"/> 
     
-    <%String modelName = (String) request.getAttribute("destinationModelName"); %>
+    <input type="hidden" name="destinationModelName" value="${destinationModelName}"/>
+    <input type="hidden" name="csv2rdf" value="${csv2rdf}"/>
     
-   <input type="hidden" name="destinationModelName" value="<%=modelName%>"/>
+    <c:forEach var="sourceModelValue" items="${sourceModel}">
+        <input type="hidden" name="sourceModelName" value="${sourceModelValue}"/>
+    </c:forEach>
     
     <input class="submit" type="submit" value="Convert CSV"/>
     

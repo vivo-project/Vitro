@@ -173,7 +173,11 @@ public class JenaIngestUtils {
 						if (stmt != null) {
 							Resource outRes = stmt.getSubject();
 							if(stmt.getObject().isLiteral()){
-								ResourceUtils.renameResource(outRes,namespaceEtc+pattern+"_"+stmt.getObject().toString());
+								String value = ((Literal) stmt.getObject()).getLexicalForm();
+								String suffix = (pattern.contains("$$$")) 
+								       ? pattern.replace("$$$", value)
+								       : pattern + value;
+								ResourceUtils.renameResource(outRes, namespaceEtc + suffix);
 							}
 							doneSet.add(res.getId().toString());
 						}
@@ -191,70 +195,58 @@ public class JenaIngestUtils {
 		
 	}
 	
-	public Map generatePropertyMap(String[] sourceModel, Model model, ModelMaker maker){
+	public Map<String, LinkedList<String>> generatePropertyMap(List<Model> sourceModels, ModelMaker maker){
 		Map<String,LinkedList<String>> propertyMap = Collections.synchronizedMap(new HashMap<String, LinkedList<String>>());
 		Set<String> doneList = new HashSet<String>();
-		if(sourceModel!=null && sourceModel.length!=0){
-			for(String modelName : sourceModel){
-				if(modelName != null){
-					model = maker.getModel(modelName);
-					ClosableIterator cItr = model.listSubjects();
-					while(cItr.hasNext()){
-						Resource res = (Resource) cItr.next();
-						if(res.isAnon() && !doneList.contains(res.getId())){
-							
-							doneList.add(res.getId().toString());
-							StmtIterator stmtItr = model.listStatements(res, (Property)null, (RDFNode)null);
-							while(stmtItr.hasNext()){
-								Statement stmt = stmtItr.next();
-								if(!stmt.getObject().isResource()){
-									if(propertyMap.containsKey(stmt.getPredicate().getURI())){
-										LinkedList linkList = propertyMap.get(stmt.getPredicate().getURI());
-										linkList.add(stmt.getObject().toString());
-										
-									}
-									else{
-										propertyMap.put(stmt.getPredicate().getURI(), new LinkedList());
-										LinkedList linkList = propertyMap.get(stmt.getPredicate().getURI());
-										linkList.add(stmt.getObject().toString());
-										
-									}
-									
-								}
-								
+		for(Model model : sourceModels) {
+			ClosableIterator cItr = model.listSubjects();
+			while(cItr.hasNext()){
+				Resource res = (Resource) cItr.next();
+				if(res.isAnon() && !doneList.contains(res.getId())){	
+					doneList.add(res.getId().toString());
+					StmtIterator stmtItr = model.listStatements(res, (Property)null, (RDFNode)null);
+					while(stmtItr.hasNext()){
+						Statement stmt = stmtItr.next();
+						if(!stmt.getObject().isResource()){
+							if(propertyMap.containsKey(stmt.getPredicate().getURI())){
+								LinkedList linkList = propertyMap.get(stmt.getPredicate().getURI());
+								linkList.add(stmt.getObject().toString());		
 							}
-						}
+							else{
+								propertyMap.put(stmt.getPredicate().getURI(), new LinkedList());
+								LinkedList linkList = propertyMap.get(stmt.getPredicate().getURI());
+								linkList.add(stmt.getObject().toString());						
+							}									
+						}								
 					}
-					cItr = model.listObjects();
-					while(cItr.hasNext()){
-						RDFNode rdfn = (RDFNode) cItr.next();
-						if(rdfn.isResource()){
-							Resource res = (Resource)rdfn;
-							if(res.isAnon() && !doneList.contains(res.getId())){
-								doneList.add(res.getId().toString());
-								StmtIterator stmtItr = model.listStatements(res, (Property)null, (RDFNode)null);
-								while(stmtItr.hasNext()){
-									Statement stmt = stmtItr.next();
-									if(!stmt.getObject().isResource()){
-										if(propertyMap.containsKey(stmt.getPredicate().getURI())){
-											LinkedList linkList = propertyMap.get(stmt.getPredicate().getURI());
-											linkList.add(stmt.getObject().toString());
-										
-										}
-										else{
-											propertyMap.put(stmt.getPredicate().getURI(), new LinkedList());
-											LinkedList linkList = propertyMap.get(stmt.getPredicate().getURI());
-											linkList.add(stmt.getObject().toString());
-											
-										}
-									}
-								}
-							}
-						}
-					}
-					cItr.close();
 				}
 			}
+			cItr = model.listObjects();
+			while(cItr.hasNext()){
+				RDFNode rdfn = (RDFNode) cItr.next();
+				if(rdfn.isResource()){
+					Resource res = (Resource)rdfn;
+					if(res.isAnon() && !doneList.contains(res.getId())){
+						doneList.add(res.getId().toString());
+						StmtIterator stmtItr = model.listStatements(res, (Property)null, (RDFNode)null);
+						while(stmtItr.hasNext()){
+							Statement stmt = stmtItr.next();
+							if(!stmt.getObject().isResource()){
+								if(propertyMap.containsKey(stmt.getPredicate().getURI())){
+									LinkedList linkList = propertyMap.get(stmt.getPredicate().getURI());
+									linkList.add(stmt.getObject().toString());					
+								}
+								else{
+									propertyMap.put(stmt.getPredicate().getURI(), new LinkedList());
+									LinkedList linkList = propertyMap.get(stmt.getPredicate().getURI());
+									linkList.add(stmt.getObject().toString());	
+								}
+							}
+						}
+					}
+				}
+			}
+			cItr.close();
 		}
 		return propertyMap;
 	}

@@ -14,7 +14,7 @@
 
     ModelMaker maker = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
     if (maker == null) {
-		maker = (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
+		maker = (ModelMaker) getServletContext().getAttribute("vitroJenaSDBModelMaker");
     }
 
 %>

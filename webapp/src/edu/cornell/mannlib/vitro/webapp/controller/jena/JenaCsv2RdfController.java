@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.jena;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,6 @@ import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 
 public class JenaCsv2RdfController extends BaseEditController{
 	private static final String CSV2RDF_JSP = "/jenaIngest/csv2rdf.jsp";
-	private static final String INGEST_MENU_JSP = "/jenaIngest/ingestMenu.jsp";
 	private static final String CSV2RDF_SELECT_URI_JSP = "/jenaIngest/csv2rdfSelectUri.jsp";
 	private static int maxFileSizeInBytes = 1024 * 1024 * 2000; //2000mb 
 	
@@ -62,17 +62,20 @@ public class JenaCsv2RdfController extends BaseEditController{
 		if ("csv2rdf".equals(actionStr)) {
 			String csvUrl = request.getParameter("csvUrl");
 			if (!csvUrl.isEmpty() || !filePath.isEmpty()) {
-				String[] sourceModel = new String[1];
-				sourceModel[0] = doExecuteCsv2Rdf(request,fileStream,filePath);
-				Model model = ModelFactory.createDefaultModel();
+				String destinationModelNameStr = request.getParameter(
+						"destinationModelName");
+				Model csv2rdfResult = doExecuteCsv2Rdf(
+						request, fileStream, filePath);
 				ModelMaker maker = getVitroJenaModelMaker(request);
 				Boolean csv2rdf = true;
 				JenaIngestUtils utils = new JenaIngestUtils();
-				Map<String,LinkedList<String>> propertyMap = utils.generatePropertyMap(sourceModel, model, maker);
+				List<Model> resultList = new ArrayList<Model>();
+				resultList.add(csv2rdfResult);
+				Map<String,LinkedList<String>> propertyMap = 
+					    utils.generatePropertyMap(resultList, maker);
 				request.setAttribute("propertyMap",propertyMap);
-				getServletContext().setAttribute("sourceModel", sourceModel);
-				getServletContext().setAttribute("csv2rdf",csv2rdf);
-				request.setAttribute("destinationModelName", sourceModel[0]);
+				request.setAttribute("csv2rdf", csv2rdf);
+				request.setAttribute("destinationModelName", destinationModelNameStr);
 				request.setAttribute("title","URI Select");
 				request.setAttribute("bodyJsp", CSV2RDF_SELECT_URI_JSP);
 			} else {
@@ -88,9 +91,7 @@ public class JenaCsv2RdfController extends BaseEditController{
         try {
             rd.forward(request, response);
         } catch (Exception e) {
-            System.out.println(this.getClass().getName()+" could not forward to view.");
-            System.out.println(e.getMessage());
-            System.out.println(e.getStackTrace());
+        	throw new RuntimeException(e);
         }		
 		
     }
@@ -106,7 +107,7 @@ public class JenaCsv2RdfController extends BaseEditController{
          return;
      }
 	 
-	 public String doExecuteCsv2Rdf(VitroRequest vreq,FileItem fileStream, String filePath) {
+	 public Model doExecuteCsv2Rdf(VitroRequest vreq, FileItem fileStream, String filePath) {
 			char[] quoteChars = {'"'};
 			String namespace = "";
 			String tboxNamespace = vreq.getParameter("tboxNamespace");
@@ -139,25 +140,26 @@ public class JenaCsv2RdfController extends BaseEditController{
 					is = fileStream.getInputStream();
 					
 			} catch (IOException e) {
-				System.out.println("IOException opening URL "+csvUrl);
-				return null;
+				throw new RuntimeException("Unable to access URL " + csvUrl);
 			}
 			
 			Model[] models = null;
 			
 			try {
-				 models = c2r.convertToRdf(is,vreq,destination);
+				 models = c2r.convertToRdf(
+						 is, vreq.getWebappDaoFactory(), destination);
 			} catch (IOException e) {
-				System.out.println("IOException converting "+csvUrl+" to RDF");
+				throw new RuntimeException(
+						"Unable to convert " + csvUrl + " to RDF");
 			}
 			
-			if (destination != null) {
-				destination.add(models[0]);
-			}
+			// TODO: rework this
+			vreq.getSession().setAttribute("csv2rdfResult", models[0]);
 			if (tboxDestination != null) {
 				tboxDestination.add(models[1]);
 			}	
-			return destinationModelNameStr;
+			
+			return models[0];
 		}
 	 
 	 private Model getModel(String name, HttpServletRequest request) {
