@@ -8,18 +8,35 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/cust
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/autocomplete.css" />')}
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css" />')}
 
+<#if message??>
+    <section class="account-feedback">
+        <#if message.success?? >
+            <p>
+                The operation was successful.
+            </p>
+        </#if>
+	
+        <#if message.failure?? >
+            <p>
+                The operation was unsuccessful. Full details can be found in the system log.
+            </p>
+        </#if>
+    </section>
+</#if>
+
+
 <p>
     <#if page.previous??>
-        <a href="${formUrls.list}?pageIndex='${page.previous}'">Previous</a>
+        <a href="${formUrls.list}?pageIndex=${page.previous}&searchTerm=${searchTerm}}">Previous</a>
     </#if>
     ${page.current} of ${page.last}
     <#if page.next??>
-        <a href="${formUrls.list}?pageIndex='${page.next}'">Next</a>
+        <a href="${formUrls.list}?pageIndex=${page.next}&searchTerm=${searchTerm}">Next</a>
     </#if>
 </p> 
 
 <#list relationships as r>
-    <form action="${formUrls.edit} method="POST">
+    <form action="${formUrls.edit}" method="POST">
     	<table style="width: 100%;">
     		<tr>
     		    <td style="border: thin solid black; width: 50%;">
@@ -81,7 +98,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
                                         </td>
                                     </tr>
                                 </table>
-                                <input type="hidden" name="proxyUri" value="%uri%" >
+                                <input type="hidden" name="profileUri" templatePart="uriField" value="%uri%" >
                             </div>
                         </div>
                     </div>

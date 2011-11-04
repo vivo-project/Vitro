@@ -96,7 +96,10 @@ public class ManageProxiesListPage extends AbstractPageHandler {
 		body.put("matchingProperty", getMatchingProperty());
 
 		body.put("formUrls", buildUrlsMap());
+		
+		applyMessage(vreq, body);
 
+		log.debug("body map is: " + body);
 		return body;
 	}
 
