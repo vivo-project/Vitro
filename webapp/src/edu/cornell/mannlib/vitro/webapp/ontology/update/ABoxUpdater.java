@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.ontology.update;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -23,6 +24,7 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.ontology.update.AtomicOntologyChange.AtomicChangeType;
 
@@ -326,8 +328,6 @@ public class ABoxUpdater {
 			logger.log("WARNING: didn't find the deleted class " +  change.getSourceURI() + " in the old model. Skipping updates for this deletion");
 			return;
 		}
-
-	    Model retractions = ModelFactory.createDefaultModel();
 		
 		// Remove instances of the deleted class
 		aboxModel.enterCriticalSection(Lock.WRITE);
@@ -338,28 +338,40 @@ public class ABoxUpdater {
 
     	   while (iter.hasNext()) {
 			   count++;
-			   Statement typeStmt = iter.next();
-			   
-			   StmtIterator iter2 = aboxModel.listStatements(typeStmt.getSubject(), (Property) null, (RDFNode) null);
-			   
-			   while (iter2.hasNext()) {
-				  Statement subjstmt = iter2.next();
-			      retractions.add(subjstmt);
-			   }
-			   
-			   StmtIterator iter3 = aboxModel.listStatements((Resource) null, (Property) null, typeStmt.getSubject());
-			   
-			   while (iter3.hasNext()) {
-				  Statement objstmt = iter3.next();
-			      retractions.add(objstmt);
-			      refCount++;
-			   }
+			   Statement typeStmt = iter.next();   
+			   refCount = deleteIndividual(typeStmt.getSubject());
 		   }   
 		   
-		   //log summary of changes
 		   if (count > 0) {
 			   logger.log("Removed " + count + " individual" + (((count > 1) ? "s" : "") + " of type " + deletedClass.getURI()) + " (refs = " + refCount + ")");
 		   }
+		   		   
+		} finally {
+			aboxModel.leaveCriticalSection();
+		}
+	}
+	
+	protected int deleteIndividual(Resource individual) throws IOException {
+
+	    Model retractions = ModelFactory.createDefaultModel();
+	    int refCount = 0;
+	    
+		aboxModel.enterCriticalSection(Lock.WRITE);
+	    try {			   
+		   StmtIterator iter = aboxModel.listStatements(individual, (Property) null, (RDFNode) null);
+			   
+		   while (iter.hasNext()) {
+			  Statement subjstmt = iter.next();
+			  retractions.add(subjstmt);
+		   }
+			   
+		   iter = aboxModel.listStatements((Resource) null, (Property) null, individual);
+			   
+		    while (iter.hasNext()) {
+			    Statement objstmt = iter.next();
+			    retractions.add(objstmt);
+			    refCount++;
+			}
 		   
 		   aboxModel.remove(retractions);
 		   record.recordRetractions(retractions);		
@@ -367,8 +379,9 @@ public class ABoxUpdater {
 		} finally {
 			aboxModel.leaveCriticalSection();
 		}
+		
+		return refCount;
 	}
-	
 	public void processPropertyChanges(List<AtomicOntologyChange> changes) throws IOException {
 				
 		Iterator<AtomicOntologyChange> propItr = changes.iterator();
@@ -553,6 +566,91 @@ public class ABoxUpdater {
 			
 		}
 	}
+
+	protected void migrateExternalConcepts() throws IOException {
+		
+		Property hasResearchArea = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#hasResearchArea");
+		Property researchAreaOf = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#researchAreaOf");
+		Property hasSubjectArea = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#hasSubjectArea");
+		Property subjectAreaFor = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#subjectAreaFor");
+		
+		HashSet<Resource> resourcesToDelete = new HashSet<Resource>();
+		migrateExternalConcepts(hasSubjectArea, subjectAreaFor, resourcesToDelete);
+		migrateExternalConcepts(hasResearchArea, researchAreaOf, resourcesToDelete);
+
+		int count = 0;
+		
+		Iterator<Resource> iter = resourcesToDelete.iterator();
+		while (iter.hasNext()) {
+			deleteIndividual(iter.next());
+			count++;
+		}
+		
+	    if (count > 0) {
+			   logger.log("migrated " + count + " external concept" + ((count == 1) ? "" : "s"));
+		}
+		
+		return;
+    }
+
+	private void migrateExternalConcepts(Property hasConcept, Property conceptOf, HashSet<Resource> resourcesToDelete) throws IOException {
+		
+		Property sourceVocabularyReference = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#sourceVocabularyReference");
+		Property linkURI = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#linkURI");
+		
+	    Model additions = ModelFactory.createDefaultModel();
+		int count = 0;
+		aboxModel.enterCriticalSection(Lock.WRITE);
+	    try {
+			StmtIterator iter1 = aboxModel.listStatements((Resource) null, sourceVocabularyReference, (RDFNode) null);
+	
+			while (iter1.hasNext()) {
+				 Statement stmt1 = iter1.next();
+				 Resource subjectArea = stmt1.getSubject();
+				 
+				 if (!stmt1.getObject().isResource()) continue;
+				 
+			     Resource vocabularySourceReference = stmt1.getObject().asResource();
+				 
+				 Statement linkURIStmt = aboxModel.getProperty(vocabularySourceReference, linkURI);
+				 
+				 if (linkURIStmt == null || !linkURIStmt.getObject().isLiteral()) continue;
+	
+				 Resource externalConceptResource = ResourceFactory.createResource(linkURIStmt.getObject().asLiteral().getString());
+				 
+				 if (externalConceptResource == null) continue;
+				 
+				 Statement conceptLabelStmt = aboxModel.getProperty(subjectArea, RDFS.label);
+				 
+				 if (conceptLabelStmt != null) {
+					 additions.add(externalConceptResource, RDFS.label, conceptLabelStmt.getObject().asLiteral());
+				 }
+				 
+				 StmtIterator iter2 = aboxModel.listStatements((Resource) null, hasConcept, subjectArea);
+				 while (iter2.hasNext()) {
+					 Statement stmt2 = iter2.next();
+					 Resource agent = stmt2.getSubject();
+					 additions.add(agent, hasConcept, externalConceptResource);
+					 additions.add(externalConceptResource, conceptOf, agent);
+				 }
+				 
+				 resourcesToDelete.add(subjectArea);
+
+				 count++;
+			}	
+			
+			aboxModel.add(additions);
+	    } finally {
+	        aboxModel.leaveCriticalSection();	
+	    }
+	    	
+	    if (count > 0) {
+			   logger.log("migrated " + count + " external " + hasConcept.getLocalName() + " reference" + ((count == 1) ? "" : "s"));
+		}
+	    
+	    record.recordAdditions(additions);
+        return;
+    }
 
 	public void logChanges(Statement oldStatement, Statement newStatement) throws IOException {
        logChange(oldStatement,false);

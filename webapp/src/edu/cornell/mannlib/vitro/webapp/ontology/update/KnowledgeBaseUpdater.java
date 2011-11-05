@@ -232,16 +232,13 @@ public class KnowledgeBaseUpdater {
 	private void updateABox(AtomicOntologyChangeLists changes) 
 			throws IOException {
 		
-
 		OntModel oldTBoxModel = settings.getOldTBoxModel();
 		OntModel newTBoxModel = settings.getNewTBoxModel();
 		OntModel ABoxModel = settings.getAssertionOntModelSelector().getABoxModel();
-		ABoxUpdater aboxUpdater = new ABoxUpdater(
-				oldTBoxModel, newTBoxModel, ABoxModel, 
-				settings.getNewTBoxAnnotationsModel(), logger, record);
+		ABoxUpdater aboxUpdater = new ABoxUpdater(oldTBoxModel, newTBoxModel, ABoxModel,settings.getNewTBoxAnnotationsModel(), logger, record);
+		aboxUpdater.migrateExternalConcepts();
 		aboxUpdater.processPropertyChanges(changes.getAtomicPropertyChanges());
 		aboxUpdater.processClassChanges(changes.getAtomicClassChanges());
- 
 	}
 	
 	private void updateTBoxAnnotations() throws IOException {
