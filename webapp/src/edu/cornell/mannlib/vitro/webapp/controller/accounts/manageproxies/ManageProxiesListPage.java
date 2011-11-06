@@ -35,6 +35,8 @@ public class ManageProxiesListPage extends AbstractPageHandler {
 
 	private static final String TEMPLATE_NAME = "manageProxies-list.ftl";
 
+	private static final String PROPERTY_PROFILE_TYPES = "proxy.eligibleTypeList";
+
 	private static final String DEFAULT_IMAGE_URL = UrlBuilder
 			.getUrl("/images/placeholders/person.thumbnail.jpg");
 
@@ -94,6 +96,7 @@ public class ManageProxiesListPage extends AbstractPageHandler {
 		body.put("page", buildPageMap(selection));
 
 		body.put("matchingProperty", getMatchingProperty());
+		body.put("profileTypes", buildProfileTypesString());
 
 		body.put("formUrls", buildUrlsMap());
 		
@@ -101,6 +104,11 @@ public class ManageProxiesListPage extends AbstractPageHandler {
 
 		log.debug("body map is: " + body);
 		return body;
+	}
+
+	private String buildProfileTypesString() {
+		return ConfigurationProperties.getBean(vreq).getProperty(
+				PROPERTY_PROFILE_TYPES, "http://www.w3.org/2002/07/owl#Thing");
 	}
 
 	private List<ProxyRelationship> wrapProxyRelationships(

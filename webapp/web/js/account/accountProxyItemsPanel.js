@@ -128,6 +128,7 @@ function statusFieldUpdater(element, minLength) {
 
 var profileQuery = ""
     + "PREFIX fn: <http://www.w3.org/2005/xpath-functions#> \n"
+    + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n"
 	+ "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"
     + "PREFIX foaf: <http://xmlns.com/foaf/0.1/> \n"
 	+ "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n"
@@ -136,8 +137,8 @@ var profileQuery = ""
 	+ "\n"
 	+ "SELECT DISTINCT ?uri ?label ?classLabel ?imageUrl \n"
 	+ "WHERE { \n"
-	+ "    ?uri a foaf:Person ; \n"
-	+ "            rdfs:label ?label ; \n"
+	+ "    %typesUnion% \n"
+	+ "    ?uri rdfs:label ?label ; \n"
 	+ "    OPTIONAL { \n" 
 	+ "       ?uri vitro:mostSpecificType ?type. \n"
 	+ "       ?type rdfs:label ?classLabel  \n"
@@ -220,6 +221,23 @@ var getAdditionalProxyInfo = function(parent, info, externalAuthId) {
     });
 }
 
+/*
+ * The profileTypes context string must have one or more type URIs, separated by commas.
+ */
+var applyProfileTypes = function(rawQuery) {
+	var typeClause = '';
+	var types = proxyContextInfo.profileTypes.split(',');
+
+    for (var i = 0; i < types.length; i++) {
+	    typeClause += '{ ?uri rdf:type <' + types[i].trim() + '> }';
+    	if (i + 1 < types.length) {
+	    	typeClause += ' UNION ';
+	    } else {
+		    typeClause += ' .';
+    	}
+	}
+    return rawQuery.replace("%typesUnion%", typeClause);
+}
 
 /*
  * Execute this when the page loads.
@@ -245,16 +263,18 @@ $(document).ready(function() {
 	}
 
 	/* 
-	 * For each proxyProfilesPanel, create a plain vanilla panel using the 
+	 * For each proxyProfilesPanel, modify the profile query to restrict it
+	 * to the permitted types, then create a plain vanilla panel using the 
 	 * profile query against the main model. 
 	 */
 	$("div[name='proxyProfilesPanel']").each(function(i) {
+		var query = applyProfileTypes(profileQuery);
 		var context = {
 			excludedUris: [],
 			baseUrl: proxyContextInfo.baseUrl,
 			sparqlQueryUrl: proxyContextInfo.sparqlQueryUrl,
 			defaultImageUrl: proxyContextInfo.defaultImageUrl,
-			query: profileQuery,
+			query: query,
 			model: ''
 		}
 		this["proxyItemsPanel"] = new proxyItemsPanel(this, context);

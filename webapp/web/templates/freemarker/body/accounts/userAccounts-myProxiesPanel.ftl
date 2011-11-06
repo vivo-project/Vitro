@@ -54,6 +54,7 @@ var proxyContextInfo = {
     sparqlQueryUrl: '${formUrls.sparqlQueryAjax}',
     defaultImageUrl: '${formUrls.defaultImageUrl}',
     matchingProperty: '${matchingProperty}',
+    profileTypes: '${profileTypes}'
 };
 </script>
 

@@ -18,6 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageOwnP
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsPage;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.admin.UserAccountsEditPage;
@@ -46,6 +47,8 @@ public class UserAccountsMyAccountPage extends UserAccountsPage {
 	private static final String ERROR_NO_LAST_NAME = "errorLastNameIsEmpty";
 
 	private static final String TEMPLATE_NAME = "userAccounts-myAccount.ftl";
+
+	private static final String PROPERTY_PROFILE_TYPES = "proxy.eligibleTypeList";
 
 	private final UserAccountsMyAccountPageStrategy strategy;
 
@@ -148,6 +151,7 @@ public class UserAccountsMyAccountPage extends UserAccountsPage {
 		}
 		body.put("formUrls", buildUrlsMap());
 		body.put("myAccountUri", userAccount.getUri());
+		body.put("profileTypes", buildProfileTypesString());
 
 		// Could I do this without exposing this mechanism? But how to search
 		// for an associated profile in AJAX?
@@ -170,6 +174,11 @@ public class UserAccountsMyAccountPage extends UserAccountsPage {
 		strategy.addMoreBodyValues(body);
 
 		return new TemplateResponseValues(TEMPLATE_NAME, body);
+	}
+
+	private String buildProfileTypesString() {
+		return ConfigurationProperties.getBean(vreq).getProperty(
+				PROPERTY_PROFILE_TYPES, "http://www.w3.org/2002/07/owl#Thing");
 	}
 
 	public void updateAccount() {
