@@ -19,6 +19,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
+import edu.cornell.mannlib.vitro.webapp.controller.AbstractPagingSelector;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.Field;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner.QueryParser;
@@ -26,7 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner.QueryParser;
 /**
  * Pull some UserAccounts from the model, based on a set of criteria.
  */
-public class UserAccountsSelector {
+public class UserAccountsSelector extends AbstractPagingSelector {
 	private static final Log log = LogFactory
 			.getLog(UserAccountsSelector.class);
 
@@ -67,13 +68,6 @@ public class UserAccountsSelector {
 			+ "WHERE {\n" //
 			+ "    <%uri%> auth:hasPermissionSet ?ps \n" //
 			+ "} \n";
-
-	/**
-	 * If the user enters any of these characters in a search term, escape it
-	 * with a backslash.
-	 */
-	private static final char[] REGEX_SPECIAL_CHARACTERS = "[\\^$.|?*+()]"
-			.toCharArray();
 
 	/**
 	 * Convenience method.
@@ -196,26 +190,6 @@ public class UserAccountsSelector {
 		}
 
 		return filters;
-	}
-
-	/**
-	 * Escape any regex special characters in the string.
-	 * 
-	 * Note that the SPARQL parser requires two backslashes, in order to pass a
-	 * single backslash to the REGEX function.
-	 */
-	private String escapeForRegex(String raw) {
-		StringBuilder clean = new StringBuilder();
-		outer: for (char c : raw.toCharArray()) {
-			for (char special : REGEX_SPECIAL_CHARACTERS) {
-				if (c == special) {
-					clean.append('\\').append('\\').append(c);
-					continue outer;
-				}
-			}
-			clean.append(c);
-		}
-		return clean.toString();
 	}
 
 	/** Sort as desired, and within ties, sort by EMail address. */
