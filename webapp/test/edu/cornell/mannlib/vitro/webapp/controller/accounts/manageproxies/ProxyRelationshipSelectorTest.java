@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Level;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -28,6 +29,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies.ProxyRelationshipSelectionCriteria.ProxyRelationshipView;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies.ProxyRelationshipSelector.Context;
+import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner;
 
 /**
  * TODO
@@ -144,7 +146,6 @@ public class ProxyRelationshipSelectorTest extends AbstractTestClass {
 
 	@Test
 	public void checkAllFieldsOnFirstRelationshipByProxy() {
-		// setLoggerLevel(SparqlQueryRunner.class, Level.DEBUG);
 		selectOnCriteria(1, 1, BY_PROXY, "");
 		log.debug("SELECTION: " + selection);
 		assertExpectedCounts(7, counts(1, 1));
@@ -247,31 +248,36 @@ public class ProxyRelationshipSelectorTest extends AbstractTestClass {
 
 	// ----------------------------------------------------------------------
 	// search tests
+	// TODO search by Profile also
 	// ----------------------------------------------------------------------
-	//
-	// @Test
-	// public void searchTermFoundInAllThreeFields() {
-	// selectOnCriteria(20, 1, DEFAULT_ORDERING, "", "bob");
-	// assertSelectedUris(3, "user02", "user05", "user10");
-	// }
-	//
-	// @Test
-	// public void searchTermNotFound() {
-	// selectOnCriteria(20, 1, DEFAULT_ORDERING, "", "bogus");
-	// assertSelectedUris(0);
-	// }
-	//
-	// /**
-	// * If the special characters were allowed into the Regex, this would have
-	// 3
-	// * matches. If they are escaped properly, it will have none.
-	// */
-	// @Test
-	// public void searchTermContainsSpecialRegexCharacters() {
-	// selectOnCriteria(20, 1, DEFAULT_ORDERING, "", "b.b");
-	// assertSelectedUris(0);
-	// }
-	//
+
+	@Test
+	public void searchFirstProxy() {
+		selectOnCriteria(10, 1, BY_PROXY, "AA");
+		assertExpectedRelations(1, RELATION_1);
+	}
+
+	@Test
+	public void searchAccountWithNoProxy() {
+		selectOnCriteria(10, 1, BY_PROXY, "None");
+		assertExpectedRelations(0);
+	}
+
+	@Test
+	public void searchMultipleProxies() {
+		selectOnCriteria(10, 1, BY_PROXY, "No");
+		assertExpectedRelations(3, RELATION_4, RELATION_5, RELATION_6);
+	}
+
+	// ----------------------------------------------------------------------
+	// combination tests
+	// ----------------------------------------------------------------------
+
+	@Test
+	public void searchPopularWithPagination() {
+		selectOnCriteria(2, 2, BY_PROXY, "No");
+		assertExpectedRelations(3, RELATION_6);
+	}
 
 	// ----------------------------------------------------------------------
 	// helper methods

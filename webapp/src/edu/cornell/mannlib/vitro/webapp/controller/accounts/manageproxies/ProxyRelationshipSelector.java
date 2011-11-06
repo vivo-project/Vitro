@@ -13,6 +13,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 
+import edu.cornell.mannlib.vitro.webapp.controller.AbstractPagingSelector;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies.ProxyRelationshipSelectionBuilder.ItemInfo;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies.ProxyRelationshipSelectionBuilder.Relationship;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies.ProxyRelationshipSelectionCriteria.ProxyRelationshipView;
@@ -23,7 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner.QueryParser;
  * A class which will accept a ProxyRelationshipSelectionCriteria and produce a
  * ProxyRelationshipSelection.
  */
-public class ProxyRelationshipSelector {
+public class ProxyRelationshipSelector extends AbstractPagingSelector {
 	private static final Log log = LogFactory
 			.getLog(ProxyRelationshipSelector.class);
 
@@ -84,17 +85,31 @@ public class ProxyRelationshipSelector {
 			+ "            auth:firstName ?firstName ; \n" //
 			+ "            auth:lastName ?lastName ; \n" //
 			+ "            auth:proxyEditorFor ?profile . \n" //
+			+ "    LET ( ?label := fn:concat(?lastName, ', ', ?firstName) )" //
+			+ "    %filterClause% \n" //
 			+ "} \n"; //
 
 	private void figureTotalResultCount() {
 		String qString = COUNT_QUERY_TEMPLATE.replace("%prefixes%",
 				PREFIX_LINES);
+		qString = replaceFilterClauses(qString);
 
 		int count = new SparqlQueryRunner<Integer>(context.userAccountsModel,
 				new CountQueryParser()).executeQuery(qString);
 
 		log.debug("result count: " + count);
 		builder.count = count;
+	}
+
+	private String replaceFilterClauses(String q) {
+		String searchTerm = criteria.getSearchTerm();
+		if (searchTerm.isEmpty()) {
+			return q.replace("%filterClause%", "");
+		} else {
+			String clean = escapeForRegex(searchTerm);
+			return q.replace("%filterClause%",
+					"FILTER (REGEX(str(?label), '^" + clean + "', 'i'))");
+		}
 	}
 
 	private static final String QUERY_PROXY_BASICS = "" //
@@ -107,6 +122,7 @@ public class ProxyRelationshipSelector {
 			+ "            auth:proxyEditorFor ?profile . \n" //
 			+ "    LET ( ?label := fn:concat(?lastName, ', ', ?firstName) )" //
 			+ "    OPTIONAL { ?uri auth:externalAuthId ?externalAuthId } \n" //
+			+ "    %filterClause% \n" //
 			+ "} \n" //
 			+ "ORDER BY ASC(?lastName) ASC(?firstName) \n" //
 			+ "LIMIT %perPage% \n" //
@@ -118,6 +134,7 @@ public class ProxyRelationshipSelector {
 				.replace("%perPage%",
 						String.valueOf(criteria.getRelationshipsPerPage()))
 				.replace("%offset%", offset());
+		qString = replaceFilterClauses(qString);
 
 		List<Relationship> relationships = new SparqlQueryRunner<List<Relationship>>(
 				context.userAccountsModel, new ProxyBasicsParser())
