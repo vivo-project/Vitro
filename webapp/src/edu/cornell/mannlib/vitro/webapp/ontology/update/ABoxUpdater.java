@@ -454,9 +454,7 @@ public class ABoxUpdater {
 			} finally {
 				aboxModel.leaveCriticalSection();
 			}
-			
 		}
-		
 	}
 	
 	private void deleteProperty(AtomicOntologyChange propObj) throws IOException{
@@ -561,9 +559,7 @@ public class ABoxUpdater {
 			logger.log("Changed " + renamePropRetractModel.size() + " statement" + 
 					((renamePropRetractModel.size() > 1) ? "s" : "") +
 					" with predicate " + propObj.getSourceURI() + " to use " +
-					propObj.getDestinationURI() + " instead");
-			
-			
+					propObj.getDestinationURI() + " instead");		
 		}
 	}
 
@@ -574,43 +570,28 @@ public class ABoxUpdater {
 		Property hasSubjectArea = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#hasSubjectArea");
 		Property subjectAreaFor = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#subjectAreaFor");
 		
-		HashSet<Resource> resourcesToDelete = new HashSet<Resource>();
-		migrateExternalConcepts(hasSubjectArea, subjectAreaFor, resourcesToDelete);
-		migrateExternalConcepts(hasResearchArea, researchAreaOf, resourcesToDelete);
-
-		int count = 0;
-		
-		Iterator<Resource> iter = resourcesToDelete.iterator();
-		while (iter.hasNext()) {
-			deleteIndividual(iter.next());
-			count++;
-		}
-		
-	    if (count > 0) {
-			   logger.log("migrated " + count + " external concept" + ((count == 1) ? "" : "s"));
-		}
-		
-		return;
-    }
-
-	private void migrateExternalConcepts(Property hasConcept, Property conceptOf, HashSet<Resource> resourcesToDelete) throws IOException {
-		
 		Property sourceVocabularyReference = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#sourceVocabularyReference");
 		Property linkURI = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#linkURI");
+		Property linkAnchorText = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#linkAnchorText");
 		
-	    Model additions = ModelFactory.createDefaultModel();
-		int count = 0;
+		HashSet<Resource> resourcesToDelete = new HashSet<Resource>();
+		
+		Model additions = ModelFactory.createDefaultModel();
+	    
+		int subjectRefCount = 0;
+		int researchRefCount = 0;
+		
 		aboxModel.enterCriticalSection(Lock.WRITE);
 	    try {
-			StmtIterator iter1 = aboxModel.listStatements((Resource) null, sourceVocabularyReference, (RDFNode) null);
+			StmtIterator iter = aboxModel.listStatements((Resource) null, sourceVocabularyReference, (RDFNode) null);
 	
-			while (iter1.hasNext()) {
-				 Statement stmt1 = iter1.next();
-				 Resource subjectArea = stmt1.getSubject();
+			while (iter.hasNext()) {
+				 Statement stmt = iter.next();
+				 Resource subjectAreaResource = stmt.getSubject();
 				 
-				 if (!stmt1.getObject().isResource()) continue;
+				 if (!stmt.getObject().isResource()) continue;
 				 
-			     Resource vocabularySourceReference = stmt1.getObject().asResource();
+			     Resource vocabularySourceReference = stmt.getObject().asResource();
 				 
 				 Statement linkURIStmt = aboxModel.getProperty(vocabularySourceReference, linkURI);
 				 
@@ -620,36 +601,77 @@ public class ABoxUpdater {
 				 
 				 if (externalConceptResource == null) continue;
 				 
-				 Statement conceptLabelStmt = aboxModel.getProperty(subjectArea, RDFS.label);
+				 Statement conceptLabelStmt = aboxModel.getProperty(vocabularySourceReference, linkAnchorText);
+				 
+				 if (conceptLabelStmt == null) {
+				      conceptLabelStmt = aboxModel.getProperty(subjectAreaResource, RDFS.label);
+				 }
 				 
 				 if (conceptLabelStmt != null) {
 					 additions.add(externalConceptResource, RDFS.label, conceptLabelStmt.getObject().asLiteral());
 				 }
 				 
-				 StmtIterator iter2 = aboxModel.listStatements((Resource) null, hasConcept, subjectArea);
-				 while (iter2.hasNext()) {
-					 Statement stmt2 = iter2.next();
-					 Resource agent = stmt2.getSubject();
-					 additions.add(agent, hasConcept, externalConceptResource);
-					 additions.add(externalConceptResource, conceptOf, agent);
-				 }
-				 
-				 resourcesToDelete.add(subjectArea);
+				 subjectRefCount += migrateConceptReferences(externalConceptResource, subjectAreaResource, hasSubjectArea, subjectAreaFor, additions);
+				 researchRefCount += migrateConceptReferences(externalConceptResource, subjectAreaResource, hasResearchArea, researchAreaOf, additions);
 
-				 count++;
+				 resourcesToDelete.add(subjectAreaResource);
 			}	
-			
+						
 			aboxModel.add(additions);
 	    } finally {
 	        aboxModel.leaveCriticalSection();	
 	    }
-	    	
-	    if (count > 0) {
-			   logger.log("migrated " + count + " external " + hasConcept.getLocalName() + " reference" + ((count == 1) ? "" : "s"));
-		}
 	    
 	    record.recordAdditions(additions);
+	   
+	    int count = 0;
+	    Iterator<Resource> iter = resourcesToDelete.iterator();
+	    while (iter.hasNext()) {
+	    	Resource ind = iter.next();
+	    	deleteIndividual(ind);
+	    	count++;
+	    }
+	    
+	    if (count > 0) {
+			   logger.log("migrated " + count + " external concept" + ((count == 1) ? "" : "s"));
+		}
+	    
+	    if (subjectRefCount > 0) {
+			   logger.log("migrated " + subjectRefCount + " external " + hasSubjectArea.getLocalName() + " reference" + ((subjectRefCount == 1) ? "" : "s"));
+		}
+	    
+	    if (researchRefCount > 0) {
+			   logger.log("migrated " + researchRefCount + " external " + hasResearchArea.getLocalName() + " reference" + ((researchRefCount == 1) ? "" : "s"));
+		}
+	    
         return;
+    }
+	
+	protected int migrateConceptReferences(Resource externalConceptResource, Resource subjectArea, Property hasConcept, Property conceptOf, Model additions) throws IOException {
+		
+	    int count = 0;
+	    
+		aboxModel.enterCriticalSection(Lock.WRITE);
+	    try {
+			 StmtIterator iter = aboxModel.listStatements((Resource) null, hasConcept, subjectArea);
+			 while (iter.hasNext()) {
+
+				 Statement stmt = iter.next();
+				 Resource agent = stmt.getSubject();
+				 if (!additions.contains(agent, hasConcept, externalConceptResource)) {
+					 additions.add(agent, hasConcept, externalConceptResource);
+					 count++;
+				 }
+				 
+				 if (!additions.contains(externalConceptResource, conceptOf, agent)) {
+				    additions.add(externalConceptResource, conceptOf, agent);
+				 }
+			 }
+	    } finally {
+	        aboxModel.leaveCriticalSection();	
+	    }
+
+		return count;
     }
 
 	public void logChanges(Statement oldStatement, Statement newStatement) throws IOException {
