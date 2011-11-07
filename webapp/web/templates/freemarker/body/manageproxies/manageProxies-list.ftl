@@ -22,7 +22,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
     </section>
 </#if>
 
-<h4>Relate proxy self editors and profiles</h4>
+<h4 class="grey">Relate proxy self editors and profiles</h4>
 
 <section class="proxy-profile">
     <form action="${formUrls.create}" method="POST">
@@ -145,8 +145,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
             <legend>Add profile</legend>
             
             <div name="proxyProfilesPanel">
-                <p></p>
-                <p><input type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name"></p>
+                <input type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name">
                 <p class="search-status">
                     <span name='proxySelectorSearchStatus' 
                           moreCharsText='type more characters' 

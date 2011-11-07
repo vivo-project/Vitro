@@ -309,6 +309,7 @@ a.disable-delete {
 #edit-myProxy p.selected-editors {
     padding-top: 1.2em;
     border-top: 1px solid #E0DFDF;
+    padding-left: 0;
 }
 #edit-myProxy a.remove-proxy {
     font-size: .9em;
@@ -329,7 +330,7 @@ a.disable-delete {
 
 .proxy-profile {
     width: 930px;
-    background-color: #e2e2dd;
+    background-color: #eaeae8;
     /*border-radius: 10px;
     -moz-border-radius: 10px;
     -webkit-border-radius: 10px;*/
@@ -349,10 +350,8 @@ a.disable-delete {
     display: block;
     border: 0;
     padding-left: 20px;
-}
-
-.proxy-profile legend {
-   padding-top: 1em;;
+    color: #064D68;
+    padding-top: 1em;
 }
 
 .proxy {
@@ -363,7 +362,7 @@ a.disable-delete {
 .profile {
     width: 440px;
     float: right;
-    border-left: 1px dotted #064D68;
+    border-left: 1px dotted #d7d6d6;
     padding-left: 30px;
     padding-right: 1em;
     margin-bottom: 1em;
@@ -378,6 +377,7 @@ a.disable-delete {
     float: right;
     margin-right: 1em;
     margin-bottom: 1em;
+    background-color: #317e95;
 }
 
 
