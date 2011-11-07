@@ -41,7 +41,6 @@
 				    <select name="Namespace"><form:option name="Namespace"/></select>
                 </c:otherwise>
             </c:choose>
-		    <span class="warning"><form:error name="Namespace"/></span>
 		</td>
 		<td valign="bottom" colspan="1">
 			<b>Internal Name</b><br/>
@@ -55,7 +54,7 @@
                     <input name="LocalName" value="${formValue['LocalName']}" style="width:90%"/>
                 </c:otherwise>
             </c:choose>
-			<span class="warning"><form:error name="LocalName"/></span>
+			<span class="notice"><form:error name="LocalName"/></span>
 		</td>
 	</tr>
 	<tr class="editformcell">

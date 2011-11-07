@@ -108,7 +108,7 @@ public class OperationController extends BaseEditController {
 
             //if validation failed, go back to the form controller
             if (!valid){
-            	retry(request,response);
+            	retry(request, response, epo);
             	return;
             }
 
@@ -116,7 +116,7 @@ public class OperationController extends BaseEditController {
             
             boolean status = performEdit(epo, newObj, action);
             if (status == FAILURE) {
-            	retry(request,response);
+            	retry(request, response, epo);
             	return;
             }
             
@@ -166,7 +166,7 @@ public class OperationController extends BaseEditController {
             epo.setAttribute("globalErrorMsg", errMsg);
        
             try {
-            	retry(request, response);
+            	retry(request, response, epo);
             	return;
             } catch (IOException ioe) {
             	log.error(this.getClass().getName() + " IOError on redirect: ", ioe);
@@ -174,18 +174,27 @@ public class OperationController extends BaseEditController {
         }
     }
     
-    private void retry(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void retry(HttpServletRequest request, 
+    		           HttpServletResponse response, 
+    		           EditProcessObject epo) throws IOException {
         String referer = request.getHeader("Referer");        
-        
+        referer = (referer == null) ? epo.getReferer() : referer;
         if( referer != null ){
             int epoKeyIndex = referer.indexOf("_epoKey");
             if (epoKeyIndex >= 0){
-                String url = referer.substring(0,epoKeyIndex) + "_epoKey="+request.getParameter("_epoKey");
+                String url = referer.substring(0,epoKeyIndex) + "_epoKey=" + 
+                        request.getParameter("_epoKey");
                 response.sendRedirect(url);
                 return;
             }
+            String redirectUrl = (referer.indexOf("?") > -1) 
+                    ? referer + "&"  
+                    : referer + "?";
+            redirectUrl += "_epoKey="+request.getParameter("_epoKey");
+            response.sendRedirect(redirectUrl);        
+        } else {
+        	response.sendRedirect(getDefaultLandingPage(request));
         }
-        response.sendRedirect(referer+"&_epoKey="+request.getParameter("_epoKey"));        
         return;
     }
     
