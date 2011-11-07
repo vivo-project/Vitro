@@ -320,42 +320,69 @@ a.disable-delete {
 #edit-myProxy span.class-label {
     color: #7F8993;
 }
-
 /* MANAGE PROXY ------>  */
-#relate-proxy-profiles {
+/* MANAGE PROXY ------>  */
+/* MANAGE PROXY ------>  */
+/* MANAGE PROXY ------>  */
+/* MANAGE PROXY ------>  */
+
+
+.proxy-profile {
     width: 930px;
-    background-color: #F7F7F4;
-    border-radius: 10px;
+    background-color: #e2e2dd;
+    /*border-radius: 10px;
     -moz-border-radius: 10px;
-    -webkit-border-radius: 10px;
+    -webkit-border-radius: 10px;*/
     overflow: hidden;
     margin-bottom: 20px;
+    
 }
-#relate-proxy-profiles legend {
+
+.bg-proxy-profile {
+    background-color: #F7F7F4;
+    border-bottom: 1px solid  #e2e2dd;
+    margin-bottom: 0;
+}
+
+
+.proxy-profile legend {
     display: block;
     border: 0;
     padding-left: 20px;
 }
-.relate-proxy {
-    width: 450px;
+
+.proxy-profile legend {
+   padding-top: 1em;;
+}
+
+.proxy {
+    width: 430px;
     float: left;
     padding-right: 10px;
 }
-.relate-profile {
-    width: 430px;
+.profile {
+    width: 440px;
     float: right;
-    border-left: 1px dotted #E0DFDF;
-    padding-left: 10px;
-    
+    border-left: 1px dotted #064D68;
+    padding-left: 30px;
+    padding-right: 1em;
+    margin-bottom: 1em;
 }
-#relate-proxy-profiles .submit {
+.proxy-profile .submit {
     clear: both;
+    float: left;
+    margin-left: 1em;
+    margin-bottom: 1em;
+}
+.proxy-profile .pos-submit {
     float: right;
     margin-right: 1em;
     margin-bottom: 1em;
 }
 
-#relate-proxy-profiles .acSelector {
+
+
+.proxy-profile .acSelector {
     margin-top: 10px;
     margin-left: 20px;
 }
@@ -371,14 +398,13 @@ a.disable-delete {
     margin-bottom: 0;
 }
 
-
-#relate-proxy-profiles .proxyInfoElement {
+.proxy-profile .proxyInfoElement {
     margin-left: 20px;
 }
-
 p.selected-editors {
     padding-top: 1.2em;
     border-top: 1px solid #E0DFDF;
+    padding-left: 1.2em;
 }
 a.remove-proxy {
     font-size: .9em;
@@ -389,6 +415,19 @@ a.remove-proxy {
 }
 span.class-label {
     color: #7F8993;
+}
+
+p.search-status {
+    margin-top: -10px;
+    font-size: .8em;
+    color: #7F8993;
+    padding-left: 25px;
+    height: 20px;
+    
+}
+.proxy-item {
+    margin-left: 20px;
+    margin-top: 20px;
 }
 
 
