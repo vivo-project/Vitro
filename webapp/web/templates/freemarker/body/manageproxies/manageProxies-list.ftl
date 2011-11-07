@@ -22,9 +22,13 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
     </section>
 </#if>
 
+<h4>Relate proxy self editors and profiles</h4>
+
+<section id="relate-proxy-profiles">
+    
 <form action="${formUrls.create}" method="POST">
-    <fieldset>
-        <legend>Select proxies:</legend>
+    <fieldset class="relate-proxy">
+        <legend>Select proxies</legend>
         
     <div name="proxyProxiesPanel">
         <p><input type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name"></p>
@@ -63,26 +67,10 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
     
     
     
-  <fieldset>
-      <legend>Select proxies:</legend>  
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
- 
-    		    <div class="edit-myProxy" name="proxyProfilesPanel">
+  <fieldset class="relate-profile">
+      <legend>Select profiles</legend>  
+
+      <div class="edit-myProxy" name="proxyProfilesPanel">
 
                     <p><input type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name"></p>
                     <p class="search-status">
@@ -91,7 +79,6 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
                               noMatchText='no match'>&nbsp;</span>
                     </p>
 
-                    <p class="selected-editors">Selected profiles:</p>
         
                     <#-- Magic div thst holds all of the proxy data and the template that shows how to display it. -->
                     <div name="proxyData">
@@ -120,12 +107,14 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
                 </div>
 
  </fieldset>
+    
     <input class="submit" type="submit" name="createRelationship" value="Save" />
+    
 </form>
 
 
 
-
+</section>
 
 
 <form action="${formUrls.list}" method="POST">
