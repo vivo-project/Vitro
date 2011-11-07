@@ -294,7 +294,7 @@ a.disable-delete {
 .photo-profile {
     border: 2px solid #DDE4E3;
 }
-.proxyInfoElement {
+#edit-myProxy .proxyInfoElement {
     padding-top: .8em;
     border-bottom: 1px dotted #E0DFDF;
     padding-bottom: 1em;
@@ -304,6 +304,7 @@ a.disable-delete {
     font-size: .8em;
     color: #7F8993;
     padding-left: 10px;
+    height: 20px;
 }
 #edit-myProxy p.selected-editors {
     padding-top: 1.2em;
@@ -319,3 +320,82 @@ a.disable-delete {
 #edit-myProxy span.class-label {
     color: #7F8993;
 }
+
+/* MANAGE PROXY ------>  */
+#relate-proxy-profiles {
+    width: 930px;
+    background-color: #F7F7F4;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+#relate-proxy-profiles legend {
+    display: block;
+    border: 0;
+    padding-left: 20px;
+}
+.relate-proxy {
+    width: 450px;
+    float: left;
+    padding-right: 10px;
+}
+.relate-profile {
+    width: 430px;
+    float: right;
+    border-left: 1px dotted #E0DFDF;
+    padding-left: 10px;
+    
+}
+#relate-proxy-profiles .submit {
+    clear: both;
+    float: right;
+    margin-right: 1em;
+    margin-bottom: 1em;
+}
+
+#relate-proxy-profiles .acSelector {
+    margin-top: 10px;
+    margin-left: 20px;
+}
+
+
+#search-proxy {
+    border-top: 1px solid #E1E5E7;
+    border-bottom: 1px solid #E1E5E7;
+    padding: 10px;
+}
+
+#search-proxy h4 {
+    margin-bottom: 0;
+}
+
+
+#relate-proxy-profiles .proxyInfoElement {
+    margin-left: 20px;
+}
+
+p.selected-editors {
+    padding-top: 1.2em;
+    border-top: 1px solid #E0DFDF;
+}
+a.remove-proxy {
+    font-size: .9em;
+}
+.proxy-info {
+    padding-left: 1em; 
+    vertical-align: middle;
+}
+span.class-label {
+    color: #7F8993;
+}
+
+
+
+
+
+
+
+
+
