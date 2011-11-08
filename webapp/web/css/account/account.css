@@ -325,8 +325,7 @@ a.disable-delete {
 /* MANAGE PROXY ------>  */
 .proxy-profile {
     width: 930px;
-    /*background-color: #eaeae8;*/
-    background-color: #F7F7F4;
+    background-color: #eaeae8;
     border-radius: 10px;
     -moz-border-radius: 10px;
     -webkit-border-radius: 10px;
@@ -335,7 +334,6 @@ a.disable-delete {
     
 }
 .list-proxy-profile {
-    /*background-color: #F7F7F4;*/
     background-color: #F7F7F4;
     border-bottom: 1px dotted  #e2e2dd;
     margin-bottom: 0;
@@ -417,4 +415,13 @@ p.search-status {
 .proxy-item {
     margin-left: 20px;
     margin-top: 20px;
+}
+.edit-proxy-profiles {
+
+}
+section.proxy-profile:nth-child(even) {
+    background-color: #fff;
+}
+section.proxy-profile:nth-child(0) {
+      background-color: #eaeae8;
 }

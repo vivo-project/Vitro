@@ -153,8 +153,8 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
                     </td>
                 </tr>
             </table>
+                 <a href="${formUrls.edit}?proxyUri=${p.uri}&deleteProxy=Delete proxy" title="ascending order">Delete profile editor</a>
                 
-                <input class="submit" type="submit" name="deleteProxy" value="Delete proxy" />
         </fieldset>  
         
         <fieldset class="profile">
