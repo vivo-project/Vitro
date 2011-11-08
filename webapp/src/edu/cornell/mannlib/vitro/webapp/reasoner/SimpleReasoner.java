@@ -1038,7 +1038,7 @@ public class SimpleReasoner extends StatementListener {
 			inferenceRebuildModel.removeAll();
 			
 			int numStmts = 0;
-			ArrayList<String> individuals = this.getIndividualURIs();
+			ArrayList<String> individuals = this.getAllIndividualURIs();
 			
 			for (String individualURI : individuals) {
 				
@@ -1246,21 +1246,27 @@ public class SimpleReasoner extends StatementListener {
 		log.info("ABox inference model updated");
 	}
 
-	/*
-	 * Special for version 1.3 
-	 */
+	
 	public synchronized void computeMostSpecificType() {
+	    recomputing = true;
+	    try {
+	    	doComputeMostSpecificType();
+	    } finally {
+	        recomputing = false;
+	    }
+	}
+	
+	/*
+	 * Special for version 1.4 
+	 */
+	public synchronized void doComputeMostSpecificType() {
 
 		log.info("Computing mostSpecificType annotations.");
 		HashSet<String> unknownTypes = new HashSet<String>();
-		
-		// recompute the inferences 
-		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);	
-		
-		try {
-			inferenceRebuildModel.removeAll();
 			
-			ArrayList<String> individuals = this.getIndividualURIs();
+		try {
+			String queryString = "select distinct ?subject where {?subject <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#Concept>}";
+			ArrayList<String> individuals = this.getIndividualURIs(queryString);
 
 			int numStmts = 0;
 			for (String individualURI : individuals ) {
@@ -1268,7 +1274,7 @@ public class SimpleReasoner extends StatementListener {
 				Resource individual = ResourceFactory.createResource(individualURI);
 				
 				try {
-				    setMostSpecificTypes(individual, inferenceRebuildModel, unknownTypes);
+				    setMostSpecificTypes(individual, inferenceModel, unknownTypes);
 				} catch (NullPointerException npe) {
 					log.error("a NullPointerException was received while computing mostSpecificType annotations. Halting inference computation.");	
 					return;
@@ -1294,83 +1300,10 @@ public class SimpleReasoner extends StatementListener {
 			}
 		} catch (Exception e) {
 			 log.error("Exception while computing mostSpecificType annotations", e);
-			 inferenceRebuildModel.removeAll(); // don't do this in the finally, it's needed in the case
-                                                // where there isn't an exception
 			 return;
-		} finally {
-			 inferenceRebuildModel.leaveCriticalSection();
-		}			
+		} 
 		
 		log.info("Finished computing mostSpecificType annotations");
-			
-		// reflect the recomputed inferences into the application inference
-		// model.
-        log.info("Updating ABox inference model with mostSpecificType annotations");
-
-        StmtIterator iter = null;
-        
-		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);
-		scratchpadModel.enterCriticalSection(Lock.WRITE);
-		try {		
-			// Add everything from the recomputed inference model that is not already
-			// in the current inference model to the current inference model.			
-			try {
-				scratchpadModel.removeAll();
-				iter = inferenceRebuildModel.listStatements();
-			
-				int numStmts = 0;
-				
-				while (iter.hasNext()) {				
-					Statement stmt = iter.next();
-					
-					inferenceModel.enterCriticalSection(Lock.READ);
-					try {
-						if (!inferenceModel.contains(stmt)) {
-							scratchpadModel.add(stmt);
-						}
-					} finally {
-						inferenceModel.leaveCriticalSection();
-					}
-									
-					numStmts++;
-	                if ((numStmts % 10000) == 0) {
-	                    log.info("Still updating ABox inference model with mostSpecificType annotations...");
-	                }
-	                
-	                if (stopRequested) {
-	                	log.info("a stopRequested signal was received during recomputeMostSpecificType. Halting Processing.");
-	                	return;
-	                }
-				}
-			} catch (Exception e) {		
-				log.error("Exception while reconciling the current and recomputed ABox inference models", e);
-				return;
-			} finally {
-				iter.close();			
-			}
-			
-			iter = scratchpadModel.listStatements();			
-			while (iter.hasNext()) {
-				Statement stmt = iter.next();
-				
-				inferenceModel.enterCriticalSection(Lock.WRITE);
-				try {
-					inferenceModel.add(stmt);
-				} catch (Exception e) {
-					log.error("Exception while reconciling the current and recomputed ABox inference models", e);
-					return;
-				} finally {
-					inferenceModel.leaveCriticalSection();
-				}
-			}
-		} finally {
-			inferenceRebuildModel.removeAll();
-			scratchpadModel.removeAll();
-			inferenceRebuildModel.leaveCriticalSection();
-			scratchpadModel.leaveCriticalSection();			
-		}
-		
-		log.info("ABox inference model updated with mostSpecificType annotations");
 	}
 
 	public boolean isABoxReasoningAsynchronous() {
@@ -1529,13 +1462,15 @@ public class SimpleReasoner extends StatementListener {
         	}
         }        
     }
-    
-	/**
-	 * 
-	 */
-	public ArrayList<String> getIndividualURIs() {
+   
+	public ArrayList<String> getAllIndividualURIs() {
 	    
 		String queryString = "select distinct ?subject where {?subject <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type}";
+        return getIndividualURIs(queryString);
+	}
+
+	public ArrayList<String> getIndividualURIs(String queryString) {
+	    
 		ArrayList<String> individuals = new ArrayList<String>();
 		aboxModel.enterCriticalSection(Lock.READ);	
 		
