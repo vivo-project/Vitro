@@ -459,10 +459,10 @@ public class SimpleReasoner extends StatementListener {
                 //TODO: have trouble paramterizing the template with ? extends OntProperty
 				List superProperties = prop.listSuperProperties(false).toList();
 				superProperties.addAll(prop.listEquivalentProperties().toList());
-				Iterator superIt = superProperties.iterator();
+				Iterator<OntProperty> superIt = superProperties.iterator();
 				
 				while (superIt.hasNext()) {
-					OntProperty superProp = (OntProperty)superIt.next();
+					OntProperty superProp = superIt.next();
 					
 					if ( !((prop.isObjectProperty() && superProp.isObjectProperty()) || (prop.isDatatypeProperty() && superProp.isDatatypeProperty())) ) {
 						log.warn("sub-property and super-property do not have the same type. No inferencing will be performed. sub-property: " + prop.getURI() + " super-property:" + superProp.getURI());
@@ -1246,25 +1246,20 @@ public class SimpleReasoner extends StatementListener {
 		log.info("ABox inference model updated");
 	}
 
-	
-	public synchronized void computeMostSpecificType() {
-	    recomputing = true;
-	    try {
-	    	doComputeMostSpecificType();
-	    } finally {
-	        recomputing = false;
-	    }
-	}
-	
 	/*
-	 * Special for version 1.4 
+	 * Special for version 1.3 
 	 */
-	public synchronized void doComputeMostSpecificType() {
+	public synchronized void computeMostSpecificType() {
 
 		log.info("Computing mostSpecificType annotations.");
 		HashSet<String> unknownTypes = new HashSet<String>();
+		
+		// recompute the inferences 
+		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);	
+		
+		try {
+			inferenceRebuildModel.removeAll();
 			
-		try {			
 			ArrayList<String> individuals = this.getIndividualURIs();
 
 			int numStmts = 0;
@@ -1273,7 +1268,7 @@ public class SimpleReasoner extends StatementListener {
 				Resource individual = ResourceFactory.createResource(individualURI);
 				
 				try {
-				    setMostSpecificTypes(individual, inferenceModel, unknownTypes);
+				    setMostSpecificTypes(individual, inferenceRebuildModel, unknownTypes);
 				} catch (NullPointerException npe) {
 					log.error("a NullPointerException was received while computing mostSpecificType annotations. Halting inference computation.");	
 					return;
@@ -1299,10 +1294,83 @@ public class SimpleReasoner extends StatementListener {
 			}
 		} catch (Exception e) {
 			 log.error("Exception while computing mostSpecificType annotations", e);
+			 inferenceRebuildModel.removeAll(); // don't do this in the finally, it's needed in the case
+                                                // where there isn't an exception
 			 return;
-		} 
+		} finally {
+			 inferenceRebuildModel.leaveCriticalSection();
+		}			
 		
 		log.info("Finished computing mostSpecificType annotations");
+			
+		// reflect the recomputed inferences into the application inference
+		// model.
+        log.info("Updating ABox inference model with mostSpecificType annotations");
+
+        StmtIterator iter = null;
+        
+		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);
+		scratchpadModel.enterCriticalSection(Lock.WRITE);
+		try {		
+			// Add everything from the recomputed inference model that is not already
+			// in the current inference model to the current inference model.			
+			try {
+				scratchpadModel.removeAll();
+				iter = inferenceRebuildModel.listStatements();
+			
+				int numStmts = 0;
+				
+				while (iter.hasNext()) {				
+					Statement stmt = iter.next();
+					
+					inferenceModel.enterCriticalSection(Lock.READ);
+					try {
+						if (!inferenceModel.contains(stmt)) {
+							scratchpadModel.add(stmt);
+						}
+					} finally {
+						inferenceModel.leaveCriticalSection();
+					}
+									
+					numStmts++;
+	                if ((numStmts % 10000) == 0) {
+	                    log.info("Still updating ABox inference model with mostSpecificType annotations...");
+	                }
+	                
+	                if (stopRequested) {
+	                	log.info("a stopRequested signal was received during recomputeMostSpecificType. Halting Processing.");
+	                	return;
+	                }
+				}
+			} catch (Exception e) {		
+				log.error("Exception while reconciling the current and recomputed ABox inference models", e);
+				return;
+			} finally {
+				iter.close();			
+			}
+			
+			iter = scratchpadModel.listStatements();			
+			while (iter.hasNext()) {
+				Statement stmt = iter.next();
+				
+				inferenceModel.enterCriticalSection(Lock.WRITE);
+				try {
+					inferenceModel.add(stmt);
+				} catch (Exception e) {
+					log.error("Exception while reconciling the current and recomputed ABox inference models", e);
+					return;
+				} finally {
+					inferenceModel.leaveCriticalSection();
+				}
+			}
+		} finally {
+			inferenceRebuildModel.removeAll();
+			scratchpadModel.removeAll();
+			inferenceRebuildModel.leaveCriticalSection();
+			scratchpadModel.leaveCriticalSection();			
+		}
+		
+		log.info("ABox inference model updated with mostSpecificType annotations");
 	}
 
 	public boolean isABoxReasoningAsynchronous() {
@@ -1467,7 +1535,7 @@ public class SimpleReasoner extends StatementListener {
 	 */
 	public ArrayList<String> getIndividualURIs() {
 	    
-		String queryString = "select distinct ?subject where {?subject <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#Concept>}";
+		String queryString = "select distinct ?subject where {?subject <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type}";
 		ArrayList<String> individuals = new ArrayList<String>();
 		aboxModel.enterCriticalSection(Lock.READ);	
 		
