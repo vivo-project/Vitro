@@ -127,29 +127,36 @@ function statusFieldUpdater(element, minLength) {
 }
 
 var profileQuery = ""
-    + "PREFIX fn: <http://www.w3.org/2005/xpath-functions#> \n"
     + "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n"
 	+ "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"
-    + "PREFIX foaf: <http://xmlns.com/foaf/0.1/> \n"
-	+ "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n"
-	+ "PREFIX vpublic: <http://vitro.mannlib.cornell.edu/ns/vitro/public#> \n"
-	+ "PREFIX auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> \n"
 	+ "\n"
 	+ "SELECT DISTINCT ?uri ?label ?classLabel ?imageUrl \n"
 	+ "WHERE { \n"
 	+ "    %typesUnion% \n"
 	+ "    ?uri rdfs:label ?label ; \n"
+	+ "    FILTER (REGEX(str(?label), '^%term%', 'i')) \n"
+	+ "} \n"
+	+ "ORDER BY ASC(?label) \n"
+	+ "LIMIT 25 \n";
+
+var profileMoreInfoQuery = ""
+	+ "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n"
+	+ "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"
+	+ "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n"
+	+ "PREFIX vpublic: <http://vitro.mannlib.cornell.edu/ns/vitro/public#> \n"
+	+ "\n"
+	+ "SELECT DISTINCT ?classLabel ?imageUrl \n"
+	+ "WHERE { \n"
 	+ "    OPTIONAL { \n" 
-	+ "       ?uri vitro:mostSpecificType ?type. \n"
+	+ "       <%uri%> vitro:mostSpecificType ?type. \n"
 	+ "       ?type rdfs:label ?classLabel  \n"
 	+ "       }  \n"
 	+ "   OPTIONAL { \n" 
-	+ "       ?uri vpublic:mainImage ?imageUri. \n"
+	+ "       <%uri%> vpublic:mainImage ?imageUri. \n"
 	+ "       ?imageUri vpublic:thumbnailImage ?thumbUri. \n"
 	+ "       ?thumbUri vpublic:downloadLocation ?thumbstreamUri. \n"
 	+ "       ?thumbstreamUri vpublic:directDownloadUrl ?imageUrl. \n"
 	+ "       }  \n"
-	+ "    FILTER (REGEX(str(?label), '^%term%', 'i')) \n"
 	+ "} \n"
 	+ "ORDER BY ASC(?label) \n"
 	+ "LIMIT 25 \n";
@@ -170,7 +177,7 @@ var proxyQuery = ""
 	+ "ORDER BY ASC(?lastName) ASC(?firstName) \n"
 	+ "LIMIT 25 \n";
 
-var moreInfoQuery = ""
+var proxyMoreInfoQuery = ""
 	+ "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"
 	+ "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n"
 	+ "PREFIX p.1: <http://vitro.mannlib.cornell.edu/ns/vitro/public#> \n"
@@ -202,8 +209,8 @@ var getAdditionalProxyInfo = function(parent, info, externalAuthId) {
         url: proxyContextInfo.sparqlQueryUrl,
         dataType: 'json',
         data: {
-        	query: moreInfoQuery.replace("%matchingProperty%", proxyContextInfo.matchingProperty)
-        	                    .replace("%externalAuthId%", externalAuthId)
+        	query: proxyMoreInfoQuery.replace(/%matchingProperty%/g, proxyContextInfo.matchingProperty)
+        	                    .replace(/%externalAuthId%/g, externalAuthId)
         },
         complete: function(xhr, status) {
             var results = $.parseJSON(xhr.responseText);
@@ -236,7 +243,33 @@ var applyProfileTypes = function(rawQuery) {
 		    typeClause += ' .';
     	}
 	}
-    return rawQuery.replace("%typesUnion%", typeClause);
+    return rawQuery.replace(/%typesUnion%/g, typeClause);
+}
+
+/*
+ * This function will allow a profile panel to execute another query for each profile. 
+ */
+var getAdditionalProfileInfo = function(parent, info) {
+    $.ajax({
+        url: proxyContextInfo.sparqlQueryUrl,
+        dataType: 'json',
+        data: {
+        	query: profileMoreInfoQuery.replace(/%uri%/g, info.uri)
+        },
+        complete: function(xhr, status) {
+            var results = $.parseJSON(xhr.responseText);
+            var parsed = sparqlUtils.parseSparqlResults(results);
+            if (parsed.length > 0) {
+                if ("classLabel" in parsed[0]) {
+                    info.classLabel = parsed[0].classLabel;
+                }
+                if ("imageUrl" in parsed[0]) {
+                	info.imageUrl = proxyContextInfo.baseUrl + parsed[0].imageUrl;
+                }
+                parent.displayItemData();
+            }
+        }
+    });
 }
 
 /*
@@ -277,7 +310,9 @@ $(document).ready(function() {
 			query: query,
 			model: ''
 		}
-		this["proxyItemsPanel"] = new proxyItemsPanel(this, context);
+		var pip = new proxyItemsPanel(this, context);
+		pip.getAdditionalData = getAdditionalProfileInfo;
+		this["proxyItemsPanel"] = pip;
 	});
 	
 	/* 
