@@ -167,3 +167,6 @@ solr/*
 
 # OWASP AntiSamy Project.  See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/src/edu/cornell/mannlib/vitro/webapp/web/antisamy-vitro-1.4.4.xml
+
+# A kluge class derived from JarJar code. See /doc/3rd-party-licenses.txt for LICENSE file
+utilities/buildutils/src/com/tonicsystems/jarjar/KlugedDepFind.java
