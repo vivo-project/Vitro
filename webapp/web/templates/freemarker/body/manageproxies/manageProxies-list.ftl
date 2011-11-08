@@ -8,7 +8,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/cust
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/autocomplete.css" />')}
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css" />')}
 
-<h3>Manage proxy self editors & profiles</h3>
+<h3>Manage profile editing</h3>
 
 <#if message??>
     <section class="account-feedback" role="region">
@@ -22,13 +22,18 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
     </section>
 </#if>
 
-<h4 class="grey">Relate proxy self editors and profiles</h4>
+<section id="error-alert" role="alert" class="hidden">
+    <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon" />
+    <p></p>
+</section>
+
+<h4 class="grey">Relate profile editors and profiles<a href="" title="The editors you select on the left hand side will have the ability to edit the VIVO profiles you select on the right hand side. You can select multiple editors and multiple profiles, but you must select a minimum of 1 each.">i</a></h4>
 
 <section class="proxy-profile">
 
-    <form action="${formUrls.create}" method="POST">
+    <form id="add-relation" action="${formUrls.create}" method="POST">
     <fieldset class="proxy">
-        <legend>Select proxies</legend>
+        <legend>Select editors</legend>
         
         <div name="proxyProxiesPanel">
             <input type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name" role="input" />
@@ -82,7 +87,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
                 <table>
                     <tr>
                         <td>
-                            <img class="photo-profile" width="90" alt="%label%" src="%imageUrl%">
+                            <img class="photo-profile" width="60" alt="%label%" src="%imageUrl%">
                         </td>
                         <td class="proxy-info">
                             %label% | <span class="class-label">%classLabel%</span>
@@ -102,9 +107,11 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
     </form>
 </section>
 
+
+<h4>Profile editors</h4>
 <section id="search-proxy" role="region">
     <form action="${formUrls.list}" method="POST">
-        <h4>Proxy self editors</h4>
+        
             <input type="text" name="searchTerm" role="input" />
             <input class="submit" type="submit" name="searchBytProxy" value="Search" role="button" /> | 
  
@@ -122,14 +129,15 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
 
 
 <#list relationships as r>
-<section class="proxy-profile bg-proxy-profile">
-    <form action="${formUrls.edit}" method="POST">
+<section class="proxy-profile list-proxy-profile">
+    
+    <form class="edit-proxy-profiles" action="${formUrls.edit}" method="POST">
         <fieldset class="proxy">
             <#assign p = r.proxyInfos[0]>
             <table class="proxy-item">
                 <tr>
                     <td>
-                        <img class="photo-profile" width="120" src="${p.imageUrl}" alt="${p.label}">
+                        <img class="photo-profile" width="90" src="${p.imageUrl}" alt="${p.label}">
                     </td>
                     <td class="proxyInfoElement proxy-info">
                         ${p.label} | <span class="class-label">${p.classLabel}</span>
@@ -138,7 +146,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
                     </td>
                 </tr>
             </table>
-                <#--><a href="${formUrls.edit}?deleteProxy=Delete%20proxy">Delete proxy</a>-->
+                
                 <input class="submit" type="submit" name="deleteProxy" value="Delete proxy" />
         </fieldset>  
         
@@ -176,7 +184,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
                         <table>
                             <tr>
                                 <td>
-                                    <img class="photo-profile" width="90" alt="%label%" src="%imageUrl%">
+                                    <img class="photo-profile" width="60" alt="%label%" src="%imageUrl%">
                                 </td>
                                 <td class="proxy-info">
                                     %label% | <span class="class-label">%classLabel%</span>

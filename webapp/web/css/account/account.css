@@ -321,13 +321,8 @@ a.disable-delete {
 #edit-myProxy span.class-label {
     color: #7F8993;
 }
-/* MANAGE PROXY ------>  */
-/* MANAGE PROXY ------>  */
-/* MANAGE PROXY ------>  */
-/* MANAGE PROXY ------>  */
-/* MANAGE PROXY ------>  */
 
-
+/* MANAGE PROXY ------>  */
 .proxy-profile {
     width: 930px;
     /*background-color: #eaeae8;*/
@@ -339,8 +334,7 @@ a.disable-delete {
     margin-bottom: 20px;
     
 }
-
-.bg-proxy-profile {
+.list-proxy-profile {
     /*background-color: #F7F7F4;*/
     background-color: #F7F7F4;
     border-bottom: 1px dotted  #e2e2dd;
@@ -348,16 +342,14 @@ a.disable-delete {
     border-radius: 0;
     -moz-border-radius: 0;
     -webkit-border-radius: 0;
+    padding-top: 1.3em;
 }
-
-
 .proxy-profile legend {
     display: block;
     border: 0;
     padding-left: 20px;
     color: #064D68;
 }
-
 .proxy {
     width: 430px;
     float: left;
@@ -383,25 +375,18 @@ a.disable-delete {
     margin-bottom: 1em;
     background-color: #317e95;
 }
-
-
-
 .proxy-profile .acSelector {
     margin-top: 10px;
     margin-left: 20px;
 }
-
-
 #search-proxy {
     border-top: 1px solid #E1E5E7;
     border-bottom: 1px solid #E1E5E7;
     padding: 10px;
 }
-
 #search-proxy h4 {
     margin-bottom: 0;
 }
-
 .proxy-profile .proxyInfoElement {
     margin-left: 20px;
 }
@@ -433,12 +418,3 @@ p.search-status {
     margin-left: 20px;
     margin-top: 20px;
 }
-
-
-
-
-
-
-
-
-
