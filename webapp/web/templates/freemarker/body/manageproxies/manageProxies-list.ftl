@@ -125,8 +125,8 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
             
             <#if searchTerm?has_content>
             	<p>
-            		Search results for "${searchTerm}" | 
-            		<a href="${formUrls.list}">View all proxies</a>
+            		Search results for "<span class="blue">${searchTerm}</span>" | 
+            		<a href="${formUrls.list}">View all profile editors</a>
             	</p>
             </#if>
     </form>

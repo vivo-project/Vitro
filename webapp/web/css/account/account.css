@@ -381,6 +381,7 @@ a.disable-delete {
     border-top: 1px solid #E1E5E7;
     border-bottom: 1px solid #E1E5E7;
     padding: 10px;
+    padding-top: 20px;
 }
 #search-proxy h4 {
     margin-bottom: 0;
@@ -419,9 +420,12 @@ p.search-status {
 .edit-proxy-profiles {
 
 }
-section.proxy-profile:nth-child(even) {
+section.list-proxy-profile:nth-child(2n) {
     background-color: #fff;
 }
-section.proxy-profile:nth-child(0) {
-      background-color: #eaeae8;
+/*section.proxy-profile:nth-child(0) {
+      background-color: #eaeae8 !important;
+}*/
+#search-proxy p {
+    margin-top: .3em;
 }
