@@ -113,7 +113,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
     <form action="${formUrls.list}" method="POST">
         
             <input type="text" name="searchTerm" role="input" />
-            <input class="submit" type="submit" name="searchBytProxy" value="Search" role="button" /> | 
+            <input class="submit" type="submit" name="searchByProxy" value="Search" role="button" /> | 
  
             <#if page.previous??>
                 <a href="${formUrls.list}?pageIndex=${page.previous}&searchTerm=${searchTerm}">Previous</a>
@@ -121,6 +121,13 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
             ${page.current} of ${page.last}
             <#if page.next??>
                 <a href="${formUrls.list}?pageIndex=${page.next}&searchTerm=${searchTerm}">Next</a>
+            </#if>
+            
+            <#if searchTerm?has_content>
+            	<p>
+            		Search results for "${searchTerm}" | 
+            		<a href="${formUrls.list}">View all proxies</a>
+            	</p>
             </#if>
     </form>
 </section>
