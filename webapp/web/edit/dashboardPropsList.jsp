@@ -2,7 +2,6 @@
 
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.DataProperty" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.beans.KeywordProperty" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Property" %>
