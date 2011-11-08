@@ -330,19 +330,24 @@ a.disable-delete {
 
 .proxy-profile {
     width: 930px;
-    background-color: #eaeae8;
-    /*border-radius: 10px;
+    /*background-color: #eaeae8;*/
+    background-color: #F7F7F4;
+    border-radius: 10px;
     -moz-border-radius: 10px;
-    -webkit-border-radius: 10px;*/
+    -webkit-border-radius: 10px;
     overflow: hidden;
     margin-bottom: 20px;
     
 }
 
 .bg-proxy-profile {
+    /*background-color: #F7F7F4;*/
     background-color: #F7F7F4;
-    border-bottom: 1px solid  #e2e2dd;
+    border-bottom: 1px dotted  #e2e2dd;
     margin-bottom: 0;
+    border-radius: 0;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
 }
 
 
@@ -351,7 +356,6 @@ a.disable-delete {
     border: 0;
     padding-left: 20px;
     color: #064D68;
-    padding-top: 1em;
 }
 
 .proxy {
@@ -370,7 +374,7 @@ a.disable-delete {
 .proxy-profile .submit {
     clear: both;
     float: left;
-    margin-left: 1em;
+    margin-left: 1.5em;
     margin-bottom: 1em;
 }
 .proxy-profile .pos-submit {

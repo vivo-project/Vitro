@@ -25,6 +25,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
 <h4 class="grey">Relate proxy self editors and profiles</h4>
 
 <section class="proxy-profile">
+
     <form action="${formUrls.create}" method="POST">
     <fieldset class="proxy">
         <legend>Select proxies</legend>
