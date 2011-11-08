@@ -17,6 +17,8 @@
         <#-- Display the group heading --> 
         <#if groupName?has_content>
             <h2 id="${groupName}">${groupName?capitalize}</h2>
+        <#else>
+            <h2 id="properties">Properties</h2>
         </#if>
         
         <#-- List the properties in the group -->
