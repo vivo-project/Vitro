@@ -192,4 +192,14 @@ input#externalAuthChkBox {
 span.controls {
     margin-top: -30px;
     padding-right: 5px;
+}    
+#search-proxy input {
+    float: left;
+}
+#search-proxy input:last-child {
+    margin-left: 10px;
+    margin-top: -2px;
+}
+#search-proxy {
+    padding-bottom: 20px;
 }
