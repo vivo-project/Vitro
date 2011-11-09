@@ -107,14 +107,14 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
     </form>
 </section>
 
-
+ <#if page.last != 0>
 <h4>Profile editors</h4>
 <section id="search-proxy" role="region">
     <form action="${formUrls.list}" method="POST">
         
             <input type="text" name="searchTerm" role="input" />
             <input class="submit" type="submit" name="searchByProxy" value="Search" role="button" /> 
-            <#if page.last != 0>
+           
                 <#if page.previous??>
                    | <a href="${formUrls.list}?pageIndex=${page.previous}&searchTerm=${searchTerm}">Previous</a>
                 </#if>
@@ -129,10 +129,10 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
                 		<a href="${formUrls.list}">View all profile editors</a>
                 	</p>
                 </#if>
-            </#if>
+            
     </form>
 </section>
-
+</#if>
 <#-- --------------------------------->
 
 
