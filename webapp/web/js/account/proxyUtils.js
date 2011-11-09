@@ -14,8 +14,15 @@ $(document).ready(function(){
 
        if ($proxyUri == undefined || $profileUri == undefined){
            $('#error-alert').removeClass('hidden');
-           $('#error-alert p').append("<strong>You must select a minimum of 1 editor and profile.</strong>");
-           return false;
+           
+           var $errorAlert = $('#error-alert p').html();
+           
+           if ($errorAlert !=""){
+               return false;
+           }else{
+               $('#error-alert p').append("You must select a minimum of 1 editor and profile.");
+               return false;
+           }
        }     
     });
 });
