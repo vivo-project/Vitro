@@ -24,7 +24,7 @@
             </#if>           
             
             <#if siteConfig.manageProxies?has_content>
-                <li><a href="${siteConfig.manageProxies}">Manage Proxies</a></li>
+                <li><a href="${siteConfig.manageProxies}">Manage Profile Editing</a></li>
             </#if>           
             
             <#if siteConfig.startupStatus?has_content>
