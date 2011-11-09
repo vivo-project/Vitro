@@ -27,7 +27,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
     <p></p>
 </section>
 
-<h4 class="grey">Relate profile editors and profiles <img src="${urls.images}/iconInfo.png" alt="The editors you select on the left hand side will have the ability to edit the VIVO profiles you select on the right hand side. You can select multiple editors and multiple profiles, but you must select a minimum of 1 each." /></h4>
+<h4 class="grey">Relate profile editors and profiles <img src="${urls.images}/iconInfo.png" alt="info icon" title="The editors you select on the left hand side will have the ability to edit the VIVO profiles you select on the right hand side. You can select multiple editors and multiple profiles, but you must select a minimum of 1 each." /></h4>
 
 <section class="proxy-profile">
 
@@ -113,21 +113,22 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
     <form action="${formUrls.list}" method="POST">
         
             <input type="text" name="searchTerm" role="input" />
-            <input class="submit" type="submit" name="searchByProxy" value="Search" role="button" /> | 
- 
-            <#if page.previous??>
-                <a href="${formUrls.list}?pageIndex=${page.previous}&searchTerm=${searchTerm}">Previous</a>
-            </#if>
-            ${page.current} of ${page.last}
-            <#if page.next??>
-                <a href="${formUrls.list}?pageIndex=${page.next}&searchTerm=${searchTerm}">Next</a>
-            </#if>
-            
-            <#if searchTerm?has_content>
-            	<p>
-            		Search results for "<span class="blue">${searchTerm}</span>" | 
-            		<a href="${formUrls.list}">View all profile editors</a>
-            	</p>
+            <input class="submit" type="submit" name="searchByProxy" value="Search" role="button" /> 
+            <#if page.last != 0>
+                <#if page.previous??>
+                   | <a href="${formUrls.list}?pageIndex=${page.previous}&searchTerm=${searchTerm}">Previous</a>
+                </#if>
+                ${page.current} of ${page.last}
+                <#if page.next??>
+                    <a href="${formUrls.list}?pageIndex=${page.next}&searchTerm=${searchTerm}">Next</a>
+                </#if>
+        
+                <#if searchTerm?has_content>
+                	<p>
+                		Search results for "<span class="blue">${searchTerm}</span>" | 
+                		<a href="${formUrls.list}">View all profile editors</a>
+                	</p>
+                </#if>
             </#if>
     </form>
 </section>
