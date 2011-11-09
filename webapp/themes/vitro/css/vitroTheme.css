@@ -378,6 +378,9 @@ a.ingestMenu:active {
     text-decoration: none;
     color: #47B6D0;
 }
+ul.ingestMenu {
+    margin-bottom: 1.5em;
+}
 
 /* ------------------------------------------------->  */
 /* HOMEPAGE AND INTERIOR PAGES STYLES -------------->  */
