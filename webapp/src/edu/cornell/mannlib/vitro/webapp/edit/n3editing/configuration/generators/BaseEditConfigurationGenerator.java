@@ -117,8 +117,9 @@ public abstract class BaseEditConfigurationGenerator implements EditConfiguratio
      */
     void initBasics(EditConfigurationVTwo editConf, VitroRequest vreq){
         editConf.setN3Generator( new EditN3GeneratorVTwo(editConf) );
-                
-        editConf.setEditKey( (String) vreq.getAttribute("editKey"));
+                        
+        String editKey = EditConfigurationUtils.getEditKey(vreq);   
+        editConf.setEditKey(editKey);        
         
         String formUrl = EditConfigurationUtils.getFormUrl(vreq);        
         editConf.setFormUrl(formUrl);                                   

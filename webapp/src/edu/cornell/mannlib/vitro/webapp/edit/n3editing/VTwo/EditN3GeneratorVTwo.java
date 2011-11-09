@@ -61,11 +61,31 @@ public class EditN3GeneratorVTwo {
             	 valueString = org.apache.commons.lang.StringUtils.join(value, ">, <");
             	 valueString = "<" + valueString + ">";
             	 log.debug("Value string is " + valueString);
-                 temp = subInUris( key, valueString, temp)  ;
+                 temp = subInNonBracketedURIS( key, valueString, temp)  ;
              }
              outv.add(temp);
          }
          return outv;
+    }
+    
+    //Already includes "<> for URIs so no need to add those here
+    private static String subInNonBracketedURIS(String var, String value, String target) {
+        //empty URIs get skipped
+        if( var == null || var.length() == 0 || value==null  )
+            return target;
+        /* var followed by dot some whitespace or var followed by whitespace*/
+        String varRegex = "\\?" + var + "(?=\\.\\p{Space}|\\p{Space})";
+        String out = null;
+        if("".equals(value))
+            out = target.replaceAll(varRegex,">::" + var + " was BLANK::< ");
+        else {
+            String replaceWith =  Matcher.quoteReplacement(value);
+            out = target.replaceAll(varRegex,replaceWith);
+        }
+        if( out != null && out.length() > 0 )
+            return out;
+        else
+            return target;
     }
     
     public static List<String> subInUris(Map<String,String> varsToVals, List<String> targets){
@@ -85,23 +105,11 @@ public class EditN3GeneratorVTwo {
     
     //Already includes "<> for URIs so no need to add those here
     public static String subInUris(String var, String value, String target) {
-    	//empty URIs get skipped
-        if( var == null || var.length() == 0 || value==null  )
+        if( var == null || var.isEmpty() || value == null )
             return target;
-        /* var followed by dot some whitespace or var followed by whitespace*/
-        String varRegex = "\\?" + var + "(?=\\.\\p{Space}|\\p{Space})";
-        String out = null;
-        if("".equals(value))
-        	out = target.replaceAll(varRegex,">::" + var + " was BLANK::< ");
-        else {
-        	String replaceWith = Matcher.quoteReplacement(value);
-        	out = target.replaceAll(varRegex,replaceWith);
-        }
-        if( out != null && out.length() > 0 )
-            return out;
-        else
-            return target;
+    	return subInNonBracketedURIS(var, "<" + value + ">", target);
     }
+    
     /*
     //For cases where comma delimited URIs sent in already including <>
     public static String subInMultipleUris(String var, List<String> values, String target){

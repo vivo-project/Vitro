@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
@@ -46,12 +48,12 @@ public class FieldVTwo {
     /**
      * List of basic validators.  See BaiscValidation.
      */
-    private List <String> validators;
+    private List <String> validators = new ArrayList<String>();
 
     /**
      * What type of options is this?
      */
-    private OptionsType optionsType;
+    private OptionsType optionsType = OptionsType.UNDEFINED;
     
     /**
      * Special class to use for option type
@@ -127,6 +129,10 @@ public class FieldVTwo {
     
     public FieldVTwo setEditElement(EditElementVTwo editElement){
         this.editElement = editElement;
+        
+        if( editElement instanceof BaseEditElementVTwo)
+            ((BaseEditElementVTwo) editElement).setField(this);
+        
         return this;
     }
        
@@ -274,4 +280,8 @@ public class FieldVTwo {
         return this;
     }
 
+    @Override
+    public String toString(){
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+    }
 }

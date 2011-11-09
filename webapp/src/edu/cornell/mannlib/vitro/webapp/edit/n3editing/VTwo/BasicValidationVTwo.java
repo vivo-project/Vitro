@@ -28,11 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfigu
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditSubmission;
 
-/**
- * User: bdc34
- * Date: Jan 24, 2008
- * Time: 1:55:39 PM
- */
+
 public class BasicValidationVTwo {
 
     Map<String, List<String>> varsToValidations;
@@ -253,6 +249,8 @@ public class BasicValidationVTwo {
     private void checkValidations(){
         List<String> unknown = new ArrayList<String>();
         for( String key : varsToValidations.keySet()){
+            if( varsToValidations.get(key) == null )
+                continue;            
             for( String validator : varsToValidations.get(key)){
                 if( ! basicValidations.contains( validator)) {
                     if ( ! ( ( validator != null) &&  

@@ -130,9 +130,9 @@ public class EditConfigurationUtils {
     public static String getEditKey(VitroRequest vreq) {
     	HttpSession session = vreq.getSession();        
         String editKey = 
-            (EditConfigurationVTwo.getEditKey(vreq) == null) 
+            (EditConfigurationVTwo.getEditKeyFromRequest(vreq) == null) 
                 ? EditConfigurationVTwo.newEditKey(session)
-                : EditConfigurationVTwo.getEditKey(vreq);
+                : EditConfigurationVTwo.getEditKeyFromRequest(vreq);
         return editKey;
     	
     }

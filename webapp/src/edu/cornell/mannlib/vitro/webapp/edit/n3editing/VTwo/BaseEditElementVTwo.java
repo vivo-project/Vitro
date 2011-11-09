@@ -22,6 +22,10 @@ public abstract class BaseEditElementVTwo  implements EditElementVTwo {
         this.field = field;
     }
     
+    public void setField(FieldVTwo field){
+        this.field = field;
+    }
+    
     /**
      * Utility method for use in EditElements to merge a freemarker template.
      */

@@ -14,6 +14,8 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
@@ -270,13 +272,8 @@ public class MultiValueEditSubmission {
         this.urisFromForm = urisFromForm;
     }
 
-    public String toString(){
-        String[] names ={
-                 "literalsFromForm",
-                 "urisFromForm","validationErrors","basicValidation"
-        };
-        JSONObject obj = new JSONObject(this,names);
-        return obj.toString();
+    public String toString(){        
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);        
     }
 
     private Log log = LogFactory.getLog(MultiValueEditSubmission.class);    

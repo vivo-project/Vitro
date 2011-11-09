@@ -4,35 +4,23 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.ModelSelector;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.StandardModelSelector;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.StandardWDFSelector;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.WDFSelector;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmission;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditSubmissionVTwoPreprocessor;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.Literal;
@@ -40,9 +28,13 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.ModelSelector;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.StandardModelSelector;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.StandardWDFSelector;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.WDFSelector;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.ModelChangePreprocessor;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.N3Validator;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
@@ -59,38 +51,38 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 public class EditConfigurationVTwo {
     
 	//Strings representing required n3 for RDF
-    List<String> n3Required = Collections.emptyList();
+    List<String> n3Required = new ArrayList<String>();
     //String representing optional N3 for RDF
-    List<String> n3Optional = Collections.emptyList();
+    List<String> n3Optional = new ArrayList<String>();
     //Names of variables of 'objects' i.e. URIs on form
-    List<String> urisOnform = Collections.emptyList();
+    List<String> urisOnform = new ArrayList<String>();
     //Names of variables corresponding to data values i.e. literals on form
-    List<String> literalsOnForm = Collections.emptyList();
+    List<String> literalsOnForm = new ArrayList<String>();
     //Names of variables corresponding to Files on form
-    List<String> filesOnForm = Collections.emptyList();
+    List<String> filesOnForm = new ArrayList<String>();
     
     //Multi values now supported for uris and literals, so second parameter needs to be List<String>
     //Mapping of variable name for object to values for object, i.e. URIs, e.g. "hasElement" = "<a.com>, <b.com>"
-    Map<String,List<String>> urisInScope = Collections.emptyMap();
+    Map<String,List<String>> urisInScope = new HashMap<String,List<String>>();
     //Mapping from variable name to values for literals
-    Map<String, List<Literal>> literalsInScope = Collections.emptyMap();
+    Map<String, List<Literal>> literalsInScope = new HashMap<String,List<Literal>>();
     
     //Map name of variable to sparql query which should return a one-column result set of URIs corresponding to variable
     //E.g. sparql for inverse of object property
-    Map<String,String> sparqlForAdditionalUrisInScope = Collections.emptyMap();
+    Map<String,String> sparqlForAdditionalUrisInScope = new HashMap<String,String>();
     //Mapping variable to sparql query returning literals 
-    Map<String,String> sparqlForAdditionalLiteralsInScope = Collections.emptyMap();
+    Map<String,String> sparqlForAdditionalLiteralsInScope = new HashMap<String,String>();
     
     //Variable names to URI prefixes for variables that are allowed to have new instances created
-    Map<String,String> newResources = Collections.emptyMap();
+    Map<String,String> newResources = new HashMap<String,String>();
     
     //Variable names to fields, Field = additional configuration for variable
-    Map<String,FieldVTwo> fields = Collections.emptyMap();
+    Map<String,FieldVTwo> fields = new HashMap<String,FieldVTwo>();
     
     //Mapping variable name to Sparql query to find existing literals corresponding to variable, result set should be one-column multi-row of literals
-    Map<String,String>sparqlForExistingLiterals = Collections.emptyMap();
+    Map<String,String>sparqlForExistingLiterals = new HashMap<String,String>();
     //Mapping variable name to Sparql query to find existing URIs corresponding to variable, result set should be one-column multi-row of URIs/URI resources
-    Map<String,String>sparqlForExistingUris = Collections.emptyMap();
+    Map<String,String>sparqlForExistingUris = new HashMap<String,String>();
 
     String subjectUri;
     String varNameForSubject;
@@ -636,7 +628,7 @@ public class EditConfigurationVTwo {
      * there first since multipart parsing might have cleared them from the request.
      */
     public static EditConfigurationVTwo getConfigFromSession( HttpSession sess, HttpServletRequest request ){
-        String key = getEditKey(request);
+        String key = getEditKeyFromRequest(request);
         
         if( key == null )
             return null;
@@ -646,9 +638,11 @@ public class EditConfigurationVTwo {
     /**
      * The editKey can be a HTTP query parameter or it can be a request attribute.
      */
-    public static String getEditKey( ServletRequest request){
+    public static String getEditKeyFromRequest( ServletRequest request){
         String key = null;
-        if( request instanceof HttpServletRequest ){
+        if( request instanceof VitroRequest ){
+            return request.getParameter("editKey");
+        }else if( request instanceof HttpServletRequest ){
             HttpServletRequest hsreq = (HttpServletRequest)request;
             boolean isMultipart = ServletFileUpload.isMultipartContent(hsreq);
             if( isMultipart ) {
@@ -677,9 +671,9 @@ public class EditConfigurationVTwo {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static String newEditKey(HttpSession sess){
-        DateTime time = new DateTime();
-        int mills = time.getMillisOfDay();
+        int mills = new DateTime().getMillisOfDay();
 
         Map<String,EditConfigurationVTwo> configs = (Map<String,EditConfigurationVTwo>)sess.getAttribute("EditConfigurations");
         if( configs == null ){
@@ -918,6 +912,10 @@ public class EditConfigurationVTwo {
         this.submitToUrl = submitToUrl;
     }
     
+    public boolean isUpdate(){
+        return isObjectPropertyUpdate() || isDataPropertyUpdate(); 
+    }
+    
     public boolean isObjectPropertyUpdate(){
         return this.getObject() != null && this.getObject().trim().length() > 0;  
     }
@@ -990,5 +988,9 @@ public class EditConfigurationVTwo {
         
         map.put( field.getName(), field);                
     }
-    
+
+    @Override
+    public String toString(){        
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);        
+    }
 }

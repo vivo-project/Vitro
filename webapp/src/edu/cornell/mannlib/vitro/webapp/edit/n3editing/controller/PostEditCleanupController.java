@@ -47,6 +47,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTw
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditSubmissionUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmission;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.N3EditUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.ProcessRdfForm;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.controller.ProcessRdfFormController.Utilities;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;
@@ -76,7 +77,7 @@ public class PostEditCleanupController extends FreemarkerHttpServlet{
         //The submission for getting the entity to return to is not retrieved from the session but needs
         //to be created - as it is in processRdfForm3.jsp
         MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq.getParameterMap(), configuration);  
-        String entityToReturnTo = ProcessRdfForm.processEntityToReturnTo(configuration, submission, vreq);
+        String entityToReturnTo = N3EditUtils.processEntityToReturnTo(configuration, submission, vreq);
 		return doPostEdit(vreq, entityToReturnTo);		
 	}
 

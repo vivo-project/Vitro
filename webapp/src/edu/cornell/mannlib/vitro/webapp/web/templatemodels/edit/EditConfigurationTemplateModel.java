@@ -94,17 +94,44 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     //Based on certain pre-set fields/variables, look for what
     //drop-downs need to be populated
 	private void populateDropdowns() {
-		String predicateUri = editConfig.getPredicateUri();
-		if(predicateUri != null) {
-	    	if(pageData.containsKey("objectSelect")) {
-	    		List<String> fieldNames = (List<String>)pageData.get("objectSelect");
-	    		for(String field:fieldNames) {
-	    			WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-	            	Map<String,String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, field , wdf);    	
-	    			pageData.put(field, optionsMap);    		
-	    		}
-	    	}
+	    
+//		String predicateUri = editConfig.getPredicateUri();
+//		if(predicateUri != null) {
+//			if(EditConfigurationUtils.isObjectProperty(editConfig.getPredicateUri(), vreq)) {
+//	    		setRangeOptions();
+//	    	}
+//	    	if(pageData.containsKey("objectSelect")) {
+//	    		List<String> fieldNames = (List<String>)pageData.get("objectSelect");
+//	    		for(String field:fieldNames) {
+//	    			WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+//	            	Map<String,String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, field , wdf);    	
+//	    			pageData.put(field, optionsMap);    		
+//	    		}
+//	    	}
+//		}	
+		
+		//For each field with an optionType defined, create the options
+		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+		for(String fieldName: editConfig.getFields().keySet()){
+		    FieldVTwo field = editConfig.getField(fieldName);
+		    if( field.getOptionsType() == FieldVTwo.OptionsType.UNDEFINED 
+		         || field.getOptionsType() == null ){
+		        continue;
+		    }
+		    pageData.put(fieldName, SelectListGeneratorVTwo.getOptions(editConfig, fieldName, wdf));		       
 		}
+		    
+//		String predicateUri = editConfig.getPredicateUri();
+//		if(predicateUri != null) {
+//	    	if(pageData.containsKey("objectSelect")) {
+//	    		List<String> fieldNames = (List<String>)pageData.get("objectSelect");
+//	    		for(String field:fieldNames) {
+//	    			WebappDaoFactory wdf = vreq.getWebappDaoFactory();
+//	            	Map<String,String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, field , wdf);    	
+//	    			pageData.put(field, optionsMap);    		
+//	    		}
+//	    	}
+//		}
 	}
 
 	//TODO: Check if this should return a list instead

@@ -16,6 +16,79 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 
 public class EditN3GeneratorVTwoTest {
+    @Test 
+    public void testSubInMultiUrisNull(){
+        String n3 = "?varXYZ" ;
+        List<String> targets = new ArrayList<String>();
+        targets.add(n3);
+        
+        Map<String,List<String>> keyToValues = new HashMap<String,List<String>>();
+        List<String> targetValue = new ArrayList<String>();        
+        targetValue.add(null);       
+        keyToValues.put("varXYZ", targetValue);
+        
+        List<String> result = EditN3GeneratorVTwo.subInMultiUris(keyToValues, targets);
+        Assert.assertNotNull(result);
+        Assert.assertEquals(1,result.size());
+        
+        String resultN3 = result.get(0);
+        Assert.assertNotNull(resultN3);
+        Assert.assertTrue("String was empty", !resultN3.isEmpty());
+        
+        String not_expected = "<null>";
+        Assert.assertTrue("must not sub in <null>", !not_expected.equals(resultN3));
+    }
+    
+    
+    @Test 
+    public void testSubInUrisNull(){
+        String n3 = " ?varXYZ " ;
+        List<String> targets = new ArrayList<String>();
+        targets.add(n3);
+        
+        Map<String,String> keyToValues = new HashMap<String,String>();                       
+        keyToValues.put("varXYZ", "xyzURI");
+        
+        List<String> result = EditN3GeneratorVTwo.subInUris(keyToValues, targets);
+        Assert.assertNotNull(result);
+        Assert.assertEquals(1,result.size());
+        
+        String resultN3 = result.get(0);
+        Assert.assertNotNull(resultN3);
+        Assert.assertTrue("String was empty", !resultN3.isEmpty());                
+        Assert.assertEquals(" <xyzURI> ", resultN3);
+        
+        keyToValues = new HashMap<String,String>();                       
+        keyToValues.put("varXYZ", null);
+        
+        result = EditN3GeneratorVTwo.subInUris(keyToValues, targets);
+        Assert.assertNotNull(result);
+        Assert.assertEquals(1,result.size());
+        
+        resultN3 = result.get(0);
+        resultN3 = result.get(0);
+        Assert.assertNotNull(resultN3);
+        Assert.assertTrue("String was empty", !resultN3.isEmpty());                
+        Assert.assertEquals(" ?varXYZ ", resultN3);
+    }
+
+    
+    
+    /*
+     
+      
+      [@prefix core: <http://vivoweb.org/ontology/core#> .
+?person core:educationalTraining  ?edTraining .
+?edTraining  a core:EducationalTraining ;
+core:educationalTrainingOf ?person ;
+<http://vivoweb.org/ontology/core#trainingAtOrganization> ?org .
+, ?org <http://www.w3.org/2000/01/rdf-schema#label> ?orgLabel ., ?org a ?orgType .] 
+
+     */
+
+    //{person=http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n2576, predicate=http://vivoweb.org/ontology/core#educationalTraining, edTraining=null}
+        
+    
 	@Test
     public void testSubInMultiUris() {
         String n3 = "?subject ?predicate ?multivalue ." ;

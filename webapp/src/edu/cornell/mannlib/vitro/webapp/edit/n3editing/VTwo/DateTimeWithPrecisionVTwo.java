@@ -38,9 +38,7 @@ import freemarker.template.Configuration;
  * $fieldname.value - DateTime literal  
  * 
  */
-public class DateTimeWithPrecisionVTwo extends BaseEditElementVTwo {
-    
-    String fieldName;
+public class DateTimeWithPrecisionVTwo extends BaseEditElementVTwo {        
     
     /**
      * This is the minimum datetime precision that this element 
@@ -68,8 +66,7 @@ public class DateTimeWithPrecisionVTwo extends BaseEditElementVTwo {
     protected static final String BLANK_SENTINEL = ">SUBMITTED VALUE WAS BLANK<";
     
     public DateTimeWithPrecisionVTwo(FieldVTwo field) {
-        super(field);
-        fieldName = field.getName();
+        super(field);        
         minimumPrecision = DEFAULT_MIN_PRECISION;
         displayRequiredLevel = DEFAULT_DISPLAY_LEVEL;
     }
@@ -104,6 +101,10 @@ public class DateTimeWithPrecisionVTwo extends BaseEditElementVTwo {
 //        }
     }
     
+    private String getFieldName(){ 
+        return field.getName(); 
+    }
+    
     private static final Log log = LogFactory.getLog(DateTimeWithPrecisionVTwo.class);
     protected String TEMPLATE_NAME = "dateTimeWithPrecision.ftl";
     
@@ -121,7 +122,7 @@ public class DateTimeWithPrecisionVTwo extends BaseEditElementVTwo {
         Map<String,Object>map = new HashMap<String,Object>();       
 
         //always need the fieldName, required precision, and constants
-        map.put("fieldName", fieldName);
+        map.put("fieldName", getFieldName());
         addPrecisionConstants(map);
         map.put("minimumPrecision", minimumPrecision.uri());
         map.put("requiredLevel", displayRequiredLevel.uri());
@@ -132,7 +133,7 @@ public class DateTimeWithPrecisionVTwo extends BaseEditElementVTwo {
         VitroVocabulary.Precision existingPrec = toPrecision(precisionUri);
         
         if( precisionUri != null && !"".equals(precisionUri) && existingPrec == null ){
-            log.error("field " + fieldName + ": existing precision uri was " +
+            log.error("field " + getFieldName() + ": existing precision uri was " +
             		"'" + precisionUri + "' but could not convert to Precision object");
         }
         
@@ -142,7 +143,7 @@ public class DateTimeWithPrecisionVTwo extends BaseEditElementVTwo {
             /* no precision so there should also be no datetime */
             DateTime value = getTimeValue(editConfig,editSub);
             if( value != null )
-                log.info("Unexpected state: Precision for " + fieldName 
+                log.info("Unexpected state: Precision for " + getFieldName() 
                         + " was '" + precisionUri + "' but date time was " + value);
             
             map.put("year", "");
@@ -167,7 +168,7 @@ public class DateTimeWithPrecisionVTwo extends BaseEditElementVTwo {
             DateTime value = getTimeValue(editConfig,editSub);
             /* This is the case where there is a precision so there should be a datetime */
             if( value == null )
-                log.error("Field " + fieldName + " has precision " + precisionUri 
+                log.error("Field " + getFieldName() + " has precision " + precisionUri 
                         + " but the date time is " + value);                        
             
             /* only put the values in the map for ones which are significant based on the precision */
@@ -288,25 +289,25 @@ public class DateTimeWithPrecisionVTwo extends BaseEditElementVTwo {
         if( BLANK_SENTINEL.equals( submittedPrec ) )
             return null;
         
-        Integer year = parseToInt(fieldName+"-year", queryParameters);
+        Integer year = parseToInt(getFieldName()+"-year", queryParameters);
         
         //this is the case where date has not been filled out at all.        
         if( year == null ) 
             return null;
         
-        Integer month = parseToInt(fieldName+"-month", queryParameters);
+        Integer month = parseToInt(getFieldName()+"-month", queryParameters);
         if( month == null || month == 0 ) 
             month = 1;        
-        Integer day = parseToInt(fieldName+"-day", queryParameters);
+        Integer day = parseToInt(getFieldName()+"-day", queryParameters);
         if( day == null || day == 0 )
             day = 1;
-        Integer hour = parseToInt(fieldName+"-hour", queryParameters);
+        Integer hour = parseToInt(getFieldName()+"-hour", queryParameters);
         if( hour == null )
             hour = 0;
-        Integer minute = parseToInt(fieldName+"-minute", queryParameters);
+        Integer minute = parseToInt(getFieldName()+"-minute", queryParameters);
         if( minute == null )
             minute = 0;
-        Integer second = parseToInt(fieldName+"-second", queryParameters);
+        Integer second = parseToInt(getFieldName()+"-second", queryParameters);
         if( second == null )
             second = 0;                
         
@@ -350,12 +351,12 @@ public class DateTimeWithPrecisionVTwo extends BaseEditElementVTwo {
      */
     protected String getSubmittedPrecision(Map<String, String[]> queryParameters) throws Exception {
         
-        Integer year = parseToInt(fieldName+"-year",queryParameters);
-        Integer month = parseToInt(fieldName+"-month",queryParameters);
-        Integer day = parseToInt(fieldName+"-day",queryParameters);
-        Integer hour  = parseToInt(fieldName+"-hour",queryParameters);
-        Integer minute = parseToInt(fieldName+"-minute",queryParameters);
-        Integer second = parseToInt(fieldName+"-second",queryParameters);
+        Integer year = parseToInt(getFieldName()+"-year",queryParameters);
+        Integer month = parseToInt(getFieldName()+"-month",queryParameters);
+        Integer day = parseToInt(getFieldName()+"-day",queryParameters);
+        Integer hour  = parseToInt(getFieldName()+"-hour",queryParameters);
+        Integer minute = parseToInt(getFieldName()+"-minute",queryParameters);
+        Integer second = parseToInt(getFieldName()+"-second",queryParameters);
         Integer[] values = { year, month, day, hour, minute, second };
         
         /*  find the most significant date field that is null. */
@@ -438,72 +439,72 @@ public class DateTimeWithPrecisionVTwo extends BaseEditElementVTwo {
                 
         //just check if the values for the precision parse to integers
         if( precisionURI.equals(VitroVocabulary.Precision.YEAR.uri() ) ){
-            if( ! canParseToNumber(fieldName+"-year" ,qp))
-                errors.put(fieldName+"-year", NON_INTEGER_YEAR);            
+            if( ! canParseToNumber(getFieldName()+"-year" ,qp))
+                errors.put(getFieldName()+"-year", NON_INTEGER_YEAR);            
         }else if( precisionURI.equals( VitroVocabulary.Precision.MONTH.uri() )){
-            if( ! canParseToNumber(fieldName+"-year" ,qp))
-                errors.put(fieldName+"-year", NON_INTEGER_YEAR);
-            if( ! canParseToNumber(fieldName+"-month" ,qp))
-                errors.put(fieldName+"-month", NON_INTEGER_MONTH);
+            if( ! canParseToNumber(getFieldName()+"-year" ,qp))
+                errors.put(getFieldName()+"-year", NON_INTEGER_YEAR);
+            if( ! canParseToNumber(getFieldName()+"-month" ,qp))
+                errors.put(getFieldName()+"-month", NON_INTEGER_MONTH);
         }else if( precisionURI.equals( VitroVocabulary.Precision.DAY.uri() )){
-            if( ! canParseToNumber(fieldName+"-year" ,qp))
-                errors.put(fieldName+"-year", NON_INTEGER_YEAR);
-            if( ! canParseToNumber(fieldName+"-month" ,qp))
-                errors.put(fieldName+"-month", NON_INTEGER_MONTH);
-            if( ! canParseToNumber(fieldName+"-day" ,qp))
-                errors.put(fieldName+"-day", NON_INTEGER_DAY);
+            if( ! canParseToNumber(getFieldName()+"-year" ,qp))
+                errors.put(getFieldName()+"-year", NON_INTEGER_YEAR);
+            if( ! canParseToNumber(getFieldName()+"-month" ,qp))
+                errors.put(getFieldName()+"-month", NON_INTEGER_MONTH);
+            if( ! canParseToNumber(getFieldName()+"-day" ,qp))
+                errors.put(getFieldName()+"-day", NON_INTEGER_DAY);
         }else if( precisionURI.equals( VitroVocabulary.Precision.HOUR.uri() )){
-            if( ! canParseToNumber(fieldName+"-year" ,qp))
-                errors.put(fieldName+"-year", NON_INTEGER_YEAR);
-            if( ! canParseToNumber(fieldName+"-month" ,qp))
-                errors.put(fieldName+"-month", NON_INTEGER_MONTH);
-            if( ! canParseToNumber(fieldName+"-day" ,qp))
-                errors.put(fieldName+"-day", NON_INTEGER_DAY);
-            if( ! canParseToNumber(fieldName+"-hour" ,qp))
-                errors.put(fieldName+"-hour", NON_INTEGER_HOUR);
+            if( ! canParseToNumber(getFieldName()+"-year" ,qp))
+                errors.put(getFieldName()+"-year", NON_INTEGER_YEAR);
+            if( ! canParseToNumber(getFieldName()+"-month" ,qp))
+                errors.put(getFieldName()+"-month", NON_INTEGER_MONTH);
+            if( ! canParseToNumber(getFieldName()+"-day" ,qp))
+                errors.put(getFieldName()+"-day", NON_INTEGER_DAY);
+            if( ! canParseToNumber(getFieldName()+"-hour" ,qp))
+                errors.put(getFieldName()+"-hour", NON_INTEGER_HOUR);
         }else if( precisionURI.equals( VitroVocabulary.Precision.MINUTE.uri() )){
-            if( ! canParseToNumber(fieldName+"-year" ,qp))
-                errors.put(fieldName+"-year", NON_INTEGER_YEAR);
-            if( ! canParseToNumber(fieldName+"-month" ,qp))
-                errors.put(fieldName+"-month", NON_INTEGER_MONTH);
-            if( ! canParseToNumber(fieldName+"-day" ,qp))
-                errors.put(fieldName+"-day", NON_INTEGER_DAY);
-            if( ! canParseToNumber(fieldName+"-hour" ,qp))
-                errors.put(fieldName+"-hour", NON_INTEGER_HOUR);
-            if( ! canParseToNumber(fieldName+"-minute" ,qp))
-                errors.put(fieldName+"-minute", NON_INTEGER_HOUR);
+            if( ! canParseToNumber(getFieldName()+"-year" ,qp))
+                errors.put(getFieldName()+"-year", NON_INTEGER_YEAR);
+            if( ! canParseToNumber(getFieldName()+"-month" ,qp))
+                errors.put(getFieldName()+"-month", NON_INTEGER_MONTH);
+            if( ! canParseToNumber(getFieldName()+"-day" ,qp))
+                errors.put(getFieldName()+"-day", NON_INTEGER_DAY);
+            if( ! canParseToNumber(getFieldName()+"-hour" ,qp))
+                errors.put(getFieldName()+"-hour", NON_INTEGER_HOUR);
+            if( ! canParseToNumber(getFieldName()+"-minute" ,qp))
+                errors.put(getFieldName()+"-minute", NON_INTEGER_HOUR);
         }else if( precisionURI.equals( VitroVocabulary.Precision.SECOND.uri() )){
-            if( ! canParseToNumber(fieldName+"-year" ,qp))
-                errors.put(fieldName+"-year", NON_INTEGER_YEAR);
-            if( ! canParseToNumber(fieldName+"-month" ,qp))
-                errors.put(fieldName+"-month", NON_INTEGER_MONTH);
-            if( ! canParseToNumber(fieldName+"-day" ,qp))
-                errors.put(fieldName+"-day", NON_INTEGER_DAY);
-            if( ! canParseToNumber(fieldName+"-hour" ,qp))
-                errors.put(fieldName+"-hour", NON_INTEGER_HOUR);
-            if( ! canParseToNumber(fieldName+"-minute" ,qp))
-                errors.put(fieldName+"-minute", NON_INTEGER_HOUR);
-            if( ! canParseToNumber(fieldName+"-second" ,qp))
-                errors.put(fieldName+"-second", NON_INTEGER_SECOND);
+            if( ! canParseToNumber(getFieldName()+"-year" ,qp))
+                errors.put(getFieldName()+"-year", NON_INTEGER_YEAR);
+            if( ! canParseToNumber(getFieldName()+"-month" ,qp))
+                errors.put(getFieldName()+"-month", NON_INTEGER_MONTH);
+            if( ! canParseToNumber(getFieldName()+"-day" ,qp))
+                errors.put(getFieldName()+"-day", NON_INTEGER_DAY);
+            if( ! canParseToNumber(getFieldName()+"-hour" ,qp))
+                errors.put(getFieldName()+"-hour", NON_INTEGER_HOUR);
+            if( ! canParseToNumber(getFieldName()+"-minute" ,qp))
+                errors.put(getFieldName()+"-minute", NON_INTEGER_HOUR);
+            if( ! canParseToNumber(getFieldName()+"-second" ,qp))
+                errors.put(getFieldName()+"-second", NON_INTEGER_SECOND);
         }
                        
         //check if we can make a valid date with these integers
-        year = parseToInt(fieldName+"-year", qp);
+        year = parseToInt(getFieldName()+"-year", qp);
         if( year == null ) 
             year = 1999;
-        month= parseToInt(fieldName+"-month", qp);
+        month= parseToInt(getFieldName()+"-month", qp);
         if(month == null )
             month = 1;
-        day = parseToInt(fieldName+"-day", qp);
+        day = parseToInt(getFieldName()+"-day", qp);
         if( day == null )
              day = 1;
-        hour = parseToInt(fieldName+"-hour", qp);
+        hour = parseToInt(getFieldName()+"-hour", qp);
         if( hour == null )
             hour = 0;
-        minute = parseToInt(fieldName+"-minute",qp);
+        minute = parseToInt(getFieldName()+"-minute",qp);
         if( minute == null )
             minute = 0;
-        second = parseToInt(fieldName+"-second", qp);
+        second = parseToInt(getFieldName()+"-second", qp);
         if( second == null )
             second = 0;                
                 
@@ -514,27 +515,27 @@ public class DateTimeWithPrecisionVTwo extends BaseEditElementVTwo {
         try{
             dateTime = dateTime.withYear(year);
         }catch(IllegalArgumentException iae){
-           errors.put(fieldName+"-year", iae.getLocalizedMessage());   
+           errors.put(getFieldName()+"-year", iae.getLocalizedMessage());   
         }
         try{
             dateTime = dateTime.withMonthOfYear(month);
         }catch(IllegalArgumentException iae){
-            errors.put(fieldName+"-month", iae.getLocalizedMessage());
+            errors.put(getFieldName()+"-month", iae.getLocalizedMessage());
         }
         try{
             dateTime = dateTime.withDayOfMonth(day);
         }catch(IllegalArgumentException iae){
-            errors.put(fieldName+"-day", iae.getLocalizedMessage());
+            errors.put(getFieldName()+"-day", iae.getLocalizedMessage());
         }
         try{
             dateTime = dateTime.withHourOfDay(hour);
         }catch(IllegalArgumentException iae){
-            errors.put(fieldName+"-hour", iae.getLocalizedMessage());
+            errors.put(getFieldName()+"-hour", iae.getLocalizedMessage());
         }
         try{
             dateTime = dateTime.withSecondOfMinute(second);
         }catch(IllegalArgumentException iae){
-            errors.put(fieldName+"-second", iae.getLocalizedMessage());    
+            errors.put(getFieldName()+"-second", iae.getLocalizedMessage());    
         }       
 
         return errors;
@@ -613,8 +614,8 @@ public class DateTimeWithPrecisionVTwo extends BaseEditElementVTwo {
         return null;                
     }
     
-    public String getValueVariableName(){ return fieldName + "-value" ; }
-    public String getPrecisionVariableName(){ return fieldName + "-precision" ; }
+    public String getValueVariableName(){ return getFieldName() + "-value" ; }
+    public String getPrecisionVariableName(){ return getFieldName() + "-precision" ; }
 }
 
 

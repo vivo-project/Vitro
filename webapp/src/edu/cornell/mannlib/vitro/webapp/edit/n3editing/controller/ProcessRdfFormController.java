@@ -5,10 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.controller;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -17,56 +15,44 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
-
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
-
-import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.rdf.model.Literal;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
+import edu.cornell.mannlib.vitro.webapp.dao.NewURIMakerVitro;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.AdditionsAndRetractions;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditSubmissionUtils;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditSubmissionVTwoPreprocessor;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmission;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.N3EditUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.ProcessRdfForm;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
 
-import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 /**
- * This servlet will process EditConfigurations with query parameters
- * to perform an edit.
- * 
- * TODO: rename this class ProcessN3Edit  
+ * This servlet will convert a request to an EditSubmission, 
+ * find the EditConfiguration associated with the request, 
+ * use ProcessRdfForm to process these to a set of RDF additions and retractions,
+ * the apply these to the models. 
  */
 public class ProcessRdfFormController extends FreemarkerHttpServlet{
 	
     private Log log = LogFactory.getLog(ProcessRdfFormController.class);
     	
-    
-	//bdc34: this is likely to become a servlet instead of a jsp.
-	// You can get a reference to the servlet from the context.
-	// this will need to be converted from a jsp to something else
-	
 	@Override 
 	protected ResponseValues processRequest(VitroRequest vreq) {			
 		//get the EditConfiguration 
@@ -77,10 +63,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
         //get the EditSubmission
         MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq.getParameterMap(), configuration);        	
         EditSubmissionUtils.putEditSubmissionInSession(vreq.getSession(), submission);
-
-        //utilize preprocessors for edit submission
-        applyEditSubmissionPreprocessors(configuration, submission);
-        
+       
         //if errors, return error response
 		ResponseValues errorResponse = doValidationErrors(vreq, configuration, submission);
 		if( errorResponse != null )
@@ -98,12 +81,18 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 	    }
 	    
 	    //Otherwise, process as usual
-	    AdditionsAndRetractions changes = getAdditionsAndRetractions(configuration, submission, vreq);
+	    
+	    AdditionsAndRetractions changes;
+        try {
+            changes = getAdditionsAndRetractions(configuration, submission, vreq);
+        } catch (Exception e) {
+            throw new Error(e);
+        }	    
 		
 		if( configuration.isUseDependentResourceDelete() )
 		    changes = ProcessRdfForm.addDependentDeletes(changes, queryModel);		
 		
-		ProcessRdfForm.preprocessModels(changes, configuration, vreq);
+		N3EditUtils.preprocessModels(changes, configuration, vreq);
 		
 		ProcessRdfForm.applyChangesToWriteModel(changes, queryModel, writeModel, EditN3Utils.getEditorUri(vreq) );
 		
@@ -111,21 +100,13 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		//More involved processing for data property apparently
 		//Also what do we actually DO with the vreq attribute: Answer: Use it for redirection
 		//And no where else so we could technically calculate and send that here
-		String entityToReturnTo = ProcessRdfForm.processEntityToReturnTo(configuration, submission, vreq);
+		String entityToReturnTo = N3EditUtils.processEntityToReturnTo(configuration, submission, vreq);
         //For data property processing, need to update edit configuration for back button 
-		ProcessRdfForm.updateEditConfigurationForBackButton(configuration, submission, vreq, writeModel);
+		N3EditUtils.updateEditConfigurationForBackButton(configuration, submission, vreq, writeModel);
         return PostEditCleanupController.doPostEdit(vreq, entityToReturnTo);		
 	}
 
-	private void applyEditSubmissionPreprocessors(
-			EditConfigurationVTwo configuration, MultiValueEditSubmission submission) {
-		List<EditSubmissionVTwoPreprocessor> preprocessors = configuration.getEditSubmissionPreprocessors();
-		if(preprocessors != null) {
-			for(EditSubmissionVTwoPreprocessor p: preprocessors) {
-				p.preprocess(submission);
-			}
-		}
-	}
+
 
 	//In case of back button confusion
 	//Currently returning an error message: 
@@ -175,17 +156,11 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 	
 	private AdditionsAndRetractions getAdditionsAndRetractions(
 			EditConfigurationVTwo configuration,
-			MultiValueEditSubmission submission, VitroRequest vreq) {
+			MultiValueEditSubmission submission, VitroRequest vreq) throws Exception {
 		
-		AdditionsAndRetractions changes = null;
-		//if editing existing resource or literal 
-		if(configuration.isObjectPropertyUpdate() || configuration.isDataPropertyUpdate()) {
-			changes = ProcessRdfForm.editExistingStatement(configuration, submission, vreq);
-		} else {
-			changes = ProcessRdfForm.createNewStatement(configuration, submission, vreq);
-		}
-		
-		return changes;
+	    return ProcessRdfForm.process(configuration, submission, 
+		        new NewURIMakerVitro(vreq.getWebappDaoFactory()));
+	    
 	}
 
 
@@ -227,7 +202,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 	public static class Utilities {
 		
 		private static Log log = LogFactory.getLog(ProcessRdfFormController.class);
-	    static Random random = new Random();
+	    
 		public static String assertionsType = "assertions";
 		public static String retractionsType = "retractions";
 		
@@ -273,87 +248,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 
 	     public static Map<String,List<String>> fieldsToRetractionMap( Map<String,FieldVTwo> fields){
 	      return fieldsToN3Map(fields, retractionsType);
-	    }	
-	     
-	     //this works differently based on whether this is object property editing or data property editing
-	     //Object prop version below
-	     //Also updating to allow an array to be returned with the uri instead of a single uri
-	     //Note this would require more analysis in context of multiple uris possible for a field
-	     public static Map<String,List<String>> newToUriMap(Map<String,String> newResources, WebappDaoFactory wdf){
-	         HashMap<String,List<String>> newVarsToUris = new HashMap<String,List<String>>();
-	         HashSet<String> newUris = new HashSet<String>();
-	         for( String key : newResources.keySet()){        	
-	             String prefix = newResources.get(key);
-	         	String uri = makeNewUri(prefix, wdf);
-	         	while( newUris.contains(uri) ){
-	         		uri = makeNewUri(prefix,wdf);
-	         	}
-	         	List<String> urisList = new ArrayList<String>();
-	         	urisList.add(uri);
-	         	newVarsToUris.put(key,urisList);
-	         	newUris.add(uri);
-	         }
-	          return newVarsToUris;
-	     }
-
-	     
-	     public static String makeNewUri(String prefix, WebappDaoFactory wdf){
-	         if( prefix == null || prefix.length() == 0 ){
-	         	String uri = null;       
-	         	try{
-	         		uri = wdf.getIndividualDao().getUnusedURI(null);
-	             }catch(InsertException ex){
-	             	log.error("could not create uri");
-	             }        
-	 			return uri;
-	         }
-	         
-	         String goodURI = null;
-	         int attempts = 0;
-	         while( goodURI == null && attempts < 30 ){            
-	             Individual ind = new IndividualImpl();
-	             ind.setURI( prefix + random.nextInt() );
-	             try{
-	         		goodURI = wdf.getIndividualDao().getUnusedURI(ind);
-	             }catch(InsertException ex){
-	             	log.debug("could not create uri");
-	             }
-	             attempts++;
-	         }        
-	         if( goodURI == null )
-	         	log.error("could not create uri for prefix " + prefix);
-	         return goodURI;
-	     
-	     }
-	     
-	     //Data prop version, from processDatapropRdfForm.jsp
-	     //TODO: Should this even be set this way as this needs to be changed somehow?
-	     public static String defaultUriPrefix = "http://vivo.library.cornell.edu/ns/0.1#individual";
-	     public static Map<String, List<String>> newToUriMap(Map<String, String> newResources,
-	             Model model) {
-	         HashMap<String, List<String>> newUris = new HashMap<String, List<String>>();
-	         for (String key : newResources.keySet()) {
-	        	 List<String> urisList = new ArrayList<String>();
-		         urisList.add(makeNewUri(newResources.get(key), model));
-	             newUris.put(key, urisList);
-	         }
-	         return newUris;
-	     }
-
-	     //This is the data property  method, this is to be removed
-	     //TODO: Remove this method and ensure this is not called
-	     public static String makeNewUri(String prefix, Model model) {
-	         if (prefix == null || prefix.length() == 0)
-	             prefix = defaultUriPrefix;
-
-	         String uri = prefix + random.nextInt();
-	         Resource r = ResourceFactory.createResource(uri);
-	         while (model.containsResource(r)) {
-	             uri = prefix + random.nextInt();
-	             r = ResourceFactory.createResource(uri);
-	         }
-	         return uri;
-	     }
+	    }		     		    
 	     
 	     //TODO: Check if this would be correct with multiple values and uris being passed back
 	     //First, need to order by uris in original and new values probably and 
@@ -404,6 +299,8 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 	                 + (fieldChanged ? "did Change" : "did NOT change"));
 	         return fieldChanged;
 	     }
+	     
+	     
 		public static boolean checkForEmptyString(
 				MultiValueEditSubmission submission,
 				EditConfigurationVTwo configuration, VitroRequest vreq) {
