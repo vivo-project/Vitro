@@ -217,14 +217,6 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         	loadDataFromFilesystem(baseOms, ctx);
         }
         
-        log.info("Adding vitro application ontology");
-        
-        // add the vitroontologies to the tbox models
-        OntModel vitroTBoxModel = (new JenaBaseDaoCon()).getConstModel();
-        baseOms.getTBoxModel().addSubModel(vitroTBoxModel);
-        inferenceOms.getTBoxModel().addSubModel(vitroTBoxModel);
-        unionOms.getTBoxModel().addSubModel(vitroTBoxModel);
-        
         log.info("Setting up union models and DAO factories");
         
         // create TBox + ABox union models and set up webapp DAO factories
@@ -375,8 +367,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
         readOntologyFilesInPathSet(USER_TBOX_PATH, ctx, baseOms.getTBoxModel());
         readOntologyFilesInPathSet(
         		USER_APPMETA_PATH, ctx, baseOms.getApplicationMetadataModel());
-        //readOntologyFilesInPathSet(SYSTEMPATH, ctx, initialDataModel);
-        log.debug(((System.currentTimeMillis()-startTime)/1000)
+        log.debug(((System.currentTimeMillis() - startTime) / 1000)
         		+ " seconds to read RDF files ");
     }
 
