@@ -20,6 +20,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies.ProxyR
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.utils.ImageUtil;
 
 /**
  * TODO
@@ -99,7 +101,7 @@ public class ManageProxiesListPage extends AbstractPageHandler {
 		body.put("profileTypes", buildProfileTypesString());
 
 		body.put("formUrls", buildUrlsMap());
-		
+
 		applyMessage(vreq, body);
 
 		log.debug("body map is: " + body);
@@ -115,28 +117,48 @@ public class ManageProxiesListPage extends AbstractPageHandler {
 			ProxyRelationshipSelection selection) {
 		List<ProxyRelationship> wrapped = new ArrayList<ProxyRelationship>();
 		for (ProxyRelationship r : selection.getProxyRelationships()) {
-			wrapped.add(new ProxyRelationship(wrapItemList(r.getProxyInfos()),
-					wrapItemList(r.getProfileInfos())));
+			wrapped.add(new ProxyRelationship(wrapProxyItemList(r
+					.getProxyInfos()), wrapProfileItemList(r.getProfileInfos())));
 		}
 		return wrapped;
 	}
 
-	private List<ProxyItemInfo> wrapItemList(List<ProxyItemInfo> items) {
+	private List<ProxyItemInfo> wrapProxyItemList(List<ProxyItemInfo> items) {
 		List<ProxyItemInfo> wrapped = new ArrayList<ProxyItemInfo>();
 		for (ProxyItemInfo item : items) {
-			wrapped.add(wrapItem(item));
+			wrapped.add(wrapProxyItem(item));
 		}
 		return wrapped;
 	}
 
-	private ProxyItemInfo wrapItem(ProxyItemInfo item) {
-		if (item.getImageUrl().isEmpty()) {
-			return new ProxyItemInfo(item.getUri(), item.getLabel(),
-					item.getClassLabel(), DEFAULT_IMAGE_URL);
-		} else {
-			return new ProxyItemInfo(item.getUri(), item.getLabel(),
-					item.getClassLabel(), UrlBuilder.getUrl(item.getImageUrl()));
+	private List<ProxyItemInfo> wrapProfileItemList(List<ProxyItemInfo> items) {
+		List<ProxyItemInfo> wrapped = new ArrayList<ProxyItemInfo>();
+		for (ProxyItemInfo item : items) {
+			wrapped.add(wrapProfileItem(item));
 		}
+		return wrapped;
+	}
+
+	private ProxyItemInfo wrapProxyItem(ProxyItemInfo item) {
+		String imagePath = item.getImageUrl();
+		if (imagePath.isEmpty()) {
+			imagePath = ImageUtil
+					.getPlaceholderImagePathForType(VitroVocabulary.USERACCOUNT);
+		}
+
+		return new ProxyItemWrapper(item.getUri(), item.getLabel(),
+				item.getClassLabel(), UrlBuilder.getUrl(imagePath));
+	}
+
+	private ProxyItemInfo wrapProfileItem(ProxyItemInfo item) {
+		String imagePath = item.getImageUrl();
+		if (imagePath.isEmpty()) {
+			imagePath = ImageUtil
+					.getPlaceholderImagePathForIndividual(vreq, item.getUri());
+		}
+
+		return new ProfileItemWrapper(item.getUri(), item.getLabel(),
+				item.getClassLabel(), UrlBuilder.getUrl(imagePath));
 	}
 
 	private Map<String, Integer> buildPageMap(
@@ -175,4 +197,17 @@ public class ManageProxiesListPage extends AbstractPageHandler {
 		return map;
 	}
 
+	private static class ProxyItemWrapper extends ProxyItemInfo {
+		public ProxyItemWrapper(String uri, String label, String classLabel,
+				String imageUrl) {
+			super(uri, label, classLabel, imageUrl);
+		}
+	}
+
+	private static class ProfileItemWrapper extends ProxyItemInfo {
+		public ProfileItemWrapper(String uri, String label, String classLabel,
+				String imageUrl) {
+			super(uri, label, classLabel, imageUrl);
+		}
+	}
 }
