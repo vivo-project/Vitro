@@ -27,7 +27,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
     <p></p>
 </section>
 
-<h4 class="grey">Relate profile editors and profiles<a href="" title="The editors you select on the left hand side will have the ability to edit the VIVO profiles you select on the right hand side. You can select multiple editors and multiple profiles, but you must select a minimum of 1 each.">i</a></h4>
+<h4 class="grey">Relate profile editors and profiles <img src="${urls.images}/iconInfo.png" alt="The editors you select on the left hand side will have the ability to edit the VIVO profiles you select on the right hand side. You can select multiple editors and multiple profiles, but you must select a minimum of 1 each." /></h4>
 
 <section class="proxy-profile">
 
@@ -149,11 +149,12 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
                     <td class="proxyInfoElement proxy-info">
                         ${p.label} | <span class="class-label">${p.classLabel}</span>
                         <br>
+                        <a class="remove-proxyUri" href="${formUrls.edit}?proxyUri=${p.uri}&deleteProxy=Delete proxy">Delete profile editor</a>
                         <input type="hidden" value="${p.uri}" name="proxyUri">
                     </td>
                 </tr>
             </table>
-                 <a href="${formUrls.edit}?proxyUri=${p.uri}&deleteProxy=Delete proxy" title="ascending order">Delete profile editor</a>
+                 
                 
         </fieldset>  
         

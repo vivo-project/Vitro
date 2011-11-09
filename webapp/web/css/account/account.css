@@ -428,4 +428,8 @@ section.list-proxy-profile:nth-child(2n) {
 }*/
 #search-proxy p {
     margin-top: .3em;
+    font-size: .8em;
+}
+a.remove-proxyUri {
+    font-size: .9em;
 }
