@@ -220,16 +220,12 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
 <script type="text/javascript">
 var proxyContextInfo = {
     baseUrl: '${urls.base}',
-    sparqlQueryUrl: '${formUrls.sparqlQueryAjax}',
-    defaultImageUrl: '${formUrls.defaultImageUrl}',
-    matchingProperty: '${matchingProperty}',
-    profileTypes: '${profileTypes}'
+    ajaxUrl: '${formUrls.ajax}'
 };
 </script>
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"></script>')}
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/account/proxyUtils.js"></script>',
-              '<script type="text/javascript" src="${urls.base}/js/sparqlUtils.js"></script>',   
               '<script type="text/javascript" src="${urls.base}/js/account/accountProxyCommon.js"></script>',   
               '<script type="text/javascript" src="${urls.base}/js/account/accountProxyItemsPanel.js"></script>')}   

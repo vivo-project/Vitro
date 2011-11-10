@@ -104,7 +104,7 @@ public abstract class UserAccountsPage extends AbstractPageHandler {
 		map.put("firstTimeExternal",
 				UrlBuilder.getUrl("/accounts/firstTimeExternal"));
 		map.put("accountsAjax", UrlBuilder.getUrl("/accountsAjax"));
-		map.put("sparqlQueryAjax", UrlBuilder.getUrl("/ajax/sparqlQuery"));
+		map.put("proxyAjax", UrlBuilder.getUrl("/proxiesAjax"));
 		map.put("defaultImageUrl", DEFAULT_IMAGE_URL);
 
 		return map;

@@ -70,6 +70,7 @@ function itemElement(template, uri, label, classLabel, imageUrl, removeInfo) {
 	}
 }
 
+
 /* 
  * ----------------------------------------------------------------------------
  * proxyAutoComplete
@@ -77,8 +78,7 @@ function itemElement(template, uri, label, classLabel, imageUrl, removeInfo) {
  * Attach the autocomplete funcionality that we like in proxy panels. 
  * 
  * You provide:
- *   parms -- a map containing the URL of the AJAX controller, the query, and 
- *          the model selector.
+ *   parms -- a map containing the URL and the action code needed for the AJAX call.
  *   excludedUris -- these URIs are always filtered out of the results.
  *   getProxyInfos -- a function that will return an array of itemElements
  *   	    that are already present in the list and so should be filtered out of 
@@ -90,8 +90,7 @@ function itemElement(template, uri, label, classLabel, imageUrl, removeInfo) {
  *          will accept the length of the search term and the number of results, 
  *          and will display it in some way.
  * ----------------------------------------------------------------------------
- * Before executing the AJAX request, the query from the parms map will be modified, 
- * replacing "%term%" with the current search term.
+ * The AJAX request will include a "term" parameter, set to the current search term.
  * ----------------------------------------------------------------------------
  * The functionality includes:
  *   -- fetching data for the autocomplete list.
@@ -137,14 +136,13 @@ function proxyAutocomplete(parms, excludedUris, getProxyInfos, addProxyInfo, rep
             url: parms.url,
             dataType: 'json',
             data: {
-            	model: parms.model,
-            	query: parms.query.replace("%term%", request.term)
+            	action: parms.action,
+            	term: request.term
             },
             complete: function(xhr, status) {
                 var results = $.parseJSON(xhr.responseText);
-                var parsed = sparqlUtils.parseSparqlResults(results); 
-                cache[request.term] = parsed; 
-                sendResponse(request, response, filterResults(parsed));
+                cache[request.term] = results; 
+                sendResponse(request, response, filterResults(results));
             }
         });
     }
@@ -154,6 +152,4 @@ function proxyAutocomplete(parms, excludedUris, getProxyInfos, addProxyInfo, rep
         event.preventDefault();
         event.target.value = '';
 	}
-    
 }
-

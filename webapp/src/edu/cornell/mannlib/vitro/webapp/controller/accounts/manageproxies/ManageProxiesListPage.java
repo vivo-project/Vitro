@@ -37,11 +37,6 @@ public class ManageProxiesListPage extends AbstractPageHandler {
 
 	private static final String TEMPLATE_NAME = "manageProxies-list.ftl";
 
-	private static final String PROPERTY_PROFILE_TYPES = "proxy.eligibleTypeList";
-
-	private static final String DEFAULT_IMAGE_URL = UrlBuilder
-			.getUrl("/images/placeholders/person.thumbnail.jpg");
-
 	private final Context selectorContext;
 
 	private ProxyRelationshipSelectionCriteria criteria = ProxyRelationshipSelectionCriteria.DEFAULT_CRITERIA;
@@ -80,6 +75,8 @@ public class ManageProxiesListPage extends AbstractPageHandler {
 	public ResponseValues showPage() {
 		ProxyRelationshipSelection selection = ProxyRelationshipSelector
 				.select(selectorContext, criteria);
+		log.debug("Selection: " + selection);
+
 		Map<String, Object> body = buildTemplateBodyMap(selection);
 		return new TemplateResponseValues(TEMPLATE_NAME, body);
 	}
@@ -97,20 +94,12 @@ public class ManageProxiesListPage extends AbstractPageHandler {
 		body.put("total", selection.getTotalResultCount());
 		body.put("page", buildPageMap(selection));
 
-		body.put("matchingProperty", getMatchingProperty());
-		body.put("profileTypes", buildProfileTypesString());
-
 		body.put("formUrls", buildUrlsMap());
 
 		applyMessage(vreq, body);
 
 		log.debug("body map is: " + body);
 		return body;
-	}
-
-	private String buildProfileTypesString() {
-		return ConfigurationProperties.getBean(vreq).getProperty(
-				PROPERTY_PROFILE_TYPES, "http://www.w3.org/2002/07/owl#Thing");
 	}
 
 	private List<ProxyRelationship> wrapProxyRelationships(
@@ -153,8 +142,8 @@ public class ManageProxiesListPage extends AbstractPageHandler {
 	private ProxyItemInfo wrapProfileItem(ProxyItemInfo item) {
 		String imagePath = item.getImageUrl();
 		if (imagePath.isEmpty()) {
-			imagePath = ImageUtil
-					.getPlaceholderImagePathForIndividual(vreq, item.getUri());
+			imagePath = ImageUtil.getPlaceholderImagePathForIndividual(vreq,
+					item.getUri());
 		}
 
 		return new ProfileItemWrapper(item.getUri(), item.getLabel(),
@@ -191,8 +180,7 @@ public class ManageProxiesListPage extends AbstractPageHandler {
 		map.put("list", UrlBuilder.getUrl("/manageProxies/list"));
 		map.put("edit", UrlBuilder.getUrl("/manageProxies/edit"));
 		map.put("create", UrlBuilder.getUrl("/manageProxies/create"));
-		map.put("sparqlQueryAjax", UrlBuilder.getUrl("/ajax/sparqlQuery"));
-		map.put("defaultImageUrl", DEFAULT_IMAGE_URL);
+		map.put("ajax", UrlBuilder.getUrl("/proxiesAjax"));
 
 		return map;
 	}
