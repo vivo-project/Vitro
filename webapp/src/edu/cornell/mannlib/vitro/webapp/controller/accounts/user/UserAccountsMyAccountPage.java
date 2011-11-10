@@ -282,9 +282,9 @@ public class UserAccountsMyAccountPage extends UserAccountsPage {
 		return new ProxyInfo(userUri, label, classLabel, imageUrl);
 	}
 
-	private String assembleUserAccountLabel(UserAccount userAccount) {
-		String last = userAccount.getLastName();
-		String first = userAccount.getFirstName();
+	private String assembleUserAccountLabel(UserAccount ua) {
+		String last = ua.getLastName();
+		String first = ua.getFirstName();
 		if (last.isEmpty()) {
 			return first;
 		} else if (first.isEmpty()) {
