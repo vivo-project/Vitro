@@ -5,19 +5,15 @@ package edu.cornell.mannlib.vitro.webapp.controller.accounts.admin.ajax;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
-import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 
 /**
  * Handle the AJAX functions that are specific to the UserAccounts pages.
@@ -49,42 +45,6 @@ public class UserAccountsAjaxController extends VitroAjaxController {
 			log.error(e, e);
 			resp.getWriter().write("[]");
 		}
-	}
-
-	static abstract class AjaxResponder {
-		protected static final String EMPTY_RESPONSE = "[]";
-
-		protected final HttpServlet parent;
-		protected final VitroRequest vreq;
-		protected final HttpServletResponse resp;
-		protected final IndividualDao indDao;
-		protected final UserAccountsDao uaDao;
-
-		public AjaxResponder(HttpServlet parent, VitroRequest vreq,
-				HttpServletResponse resp) {
-			this.parent = parent;
-			this.vreq = vreq;
-			this.resp = resp;
-			this.indDao = vreq.getWebappDaoFactory().getIndividualDao();
-			this.uaDao = vreq.getWebappDaoFactory().getUserAccountsDao();
-		}
-
-		public final void processRequest() {
-			try {
-				resp.getWriter().write(prepareResponse());
-			} catch (Exception e) {
-				log.error("Problem with AJAX response", e);
-			}
-		}
-
-		protected abstract String prepareResponse() throws IOException,
-				JSONException;
-
-		protected String getStringParameter(String key, String defaultValue) {
-			String value = vreq.getParameter(key);
-			return (value == null) ? defaultValue : value;
-		}
-
 	}
 
 }

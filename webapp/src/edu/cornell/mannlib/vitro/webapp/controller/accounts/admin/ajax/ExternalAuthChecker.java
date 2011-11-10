@@ -17,7 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.accounts.admin.ajax.UserAccountsAjaxController.AjaxResponder;
+import edu.cornell.mannlib.vitro.webapp.controller.ajax.AbstractAjaxResponder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 
 /**
@@ -32,7 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
  * 
  * If the externalAuthId is empty, or if there is any error, say "neither".
  */
-class ExternalAuthChecker extends AjaxResponder {
+class ExternalAuthChecker extends AbstractAjaxResponder {
 	private static final Log log = LogFactory.getLog(ExternalAuthChecker.class);
 
 	private static final String PARAMETER_USER_ACCOUNT_URI = "userAccountUri";

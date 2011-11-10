@@ -28,7 +28,7 @@ import com.hp.hpl.jena.query.Syntax;
 
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.accounts.admin.ajax.UserAccountsAjaxController.AjaxResponder;
+import edu.cornell.mannlib.vitro.webapp.controller.ajax.AbstractAjaxResponder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 
 /**
@@ -42,7 +42,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
  * If the matching property is not defined, or if the search term is empty, or
  * if an error occurs, return an empty result.
  */
-class ProfileAutoCompleter extends AjaxResponder {
+class ProfileAutoCompleter extends AbstractAjaxResponder {
 	private static final Log log = LogFactory
 			.getLog(ProfileAutoCompleter.class);
 
