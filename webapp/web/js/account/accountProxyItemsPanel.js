@@ -24,10 +24,13 @@ function proxyItemsPanel(panel, contextInfo)  {
 
 	this.itemData = [];
 
-	var excludedUris = contextInfo.excludedUris;
 	var dataContainerElement = $("[name='proxyData']", panel).first();
 	var autoCompleteField = $("input[name='proxySelectorAC']", panel).first();
 	var searchStatusField = $("span[name='proxySelectorSearchStatus']", panel).first();
+	var excludedUris =  [];
+	$("[name='excludeUri']", panel).each(function(index) {
+		excludedUris.push($(this).text());
+	});
 
 	var parseTemplate = function(dataContainer) {
 		var templateDiv = $("div[name='template']", dataContainer)
@@ -161,7 +164,6 @@ $(document).ready(function() {
 
 	$("div[name='proxyProfilesPanel']").each(function(i) {
 		var context = {
-			excludedUris: [],
 			baseUrl: proxyContextInfo.baseUrl,
 			ajaxUrl: proxyContextInfo.ajaxUrl,
 			basicInfoAction: "getAvailableProfiles",
@@ -172,7 +174,6 @@ $(document).ready(function() {
 	
 	$("div[name='proxyProxiesPanel']").each(function(i) {
 		var context = {
-            excludedUris: [],
 			baseUrl: proxyContextInfo.baseUrl,
 			ajaxUrl: proxyContextInfo.ajaxUrl,
 			basicInfoAction: "getAvailableProxies",

@@ -169,6 +169,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/sm
                           moreCharsText='type more characters' 
                           noMatchText='no match'>&nbsp;</span>
                 </p>
+                <p name="excludeUri" style="display: none">${r.proxyInfos[0].profileUri}<p>
 
                 <p class="selected-editors">Selected profiles:</p>
     

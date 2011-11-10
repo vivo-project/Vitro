@@ -12,6 +12,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/auto
     
     <p><input type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name"></p>
     <p class="search-status"><span name='proxySelectorSearchStatus' moreCharsText='type more characters' noMatchText='no match'>&nbsp;</span></p>
+    <p name="excludeUri" style="display: none">${myAccountUri}<p>
 
     <p class="selected-editors">Selected editors:</p>
     <#-- Magic div thst holds all of the proxy data and the template that shows how to display it. -->
