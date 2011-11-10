@@ -382,6 +382,7 @@ public class ABoxUpdater {
 		
 		return refCount;
 	}
+	
 	public void processPropertyChanges(List<AtomicOntologyChange> changes) throws IOException {
 				
 		Iterator<AtomicOntologyChange> propItr = changes.iterator();
@@ -571,15 +572,21 @@ public class ABoxUpdater {
 		Property subjectAreaFor = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#subjectAreaFor");
 		
 		Property sourceVocabularyReference = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#sourceVocabularyReference");
+		Property webpage = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#webpage");
 		Property linkURI = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#linkURI");
 		Property linkAnchorText = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#linkAnchorText");
 		
 		HashSet<Resource> resourcesToDelete = new HashSet<Resource>();
-		
+		HashSet<Resource> resourcesToDetype = new HashSet<Resource>();
+			
 		Model additions = ModelFactory.createDefaultModel();
+		Model retractions = ModelFactory.createDefaultModel();
 	    
 		int subjectRefCount = 0;
 		int researchRefCount = 0;
+		int webpageCount = 0;
+		int typeCount = 0;
+		int count = 0;
 		
 		aboxModel.enterCriticalSection(Lock.WRITE);
 	    try {
@@ -591,57 +598,87 @@ public class ABoxUpdater {
 				 
 				 if (!stmt.getObject().isResource()) continue;
 				 
-			     Resource vocabularySourceReference = stmt.getObject().asResource();
-				 
-				 Statement linkURIStmt = aboxModel.getProperty(vocabularySourceReference, linkURI);
-				 
-				 if (linkURIStmt == null || !linkURIStmt.getObject().isLiteral()) continue;
-	
-				 Resource externalConceptResource = ResourceFactory.createResource(linkURIStmt.getObject().asLiteral().getString());
-				 
-				 if (externalConceptResource == null) continue;
-				 
-				 Statement conceptLabelStmt = aboxModel.getProperty(vocabularySourceReference, linkAnchorText);
-				 
-				 if (conceptLabelStmt == null) {
-				      conceptLabelStmt = aboxModel.getProperty(subjectAreaResource, RDFS.label);
-				 }
-				 
-				 if (conceptLabelStmt != null) {
-					 additions.add(externalConceptResource, RDFS.label, conceptLabelStmt.getObject().asLiteral());
-				 }
-				 
+			     Resource vocabularySourceReferenceResource = stmt.getObject().asResource();
+			     Resource externalConceptResource = null;
+			     Resource webpageResource = null;
+			     
+			     if (subjectAreaResource.hasProperty(webpage)) {
+			    	 Statement webpageStmt = subjectAreaResource.getProperty(webpage);
+			    	 RDFNode webpageObject = webpageStmt.getObject();
+			    	 if (!webpageObject.isResource()) continue;
+			    	 webpageResource = webpageObject.asResource();
+			    	 if (!webpageResource.hasProperty(linkURI)) continue;
+			    	 Statement linkURIStmt = webpageResource.asResource().getProperty(linkURI);
+			    	 RDFNode linkURIObject = linkURIStmt.getObject();
+			    	 if (!linkURIObject.isLiteral()) continue;
+			    	 externalConceptResource = ResourceFactory.createResource(linkURIObject.asLiteral().getString()); 
+			    	 if (externalConceptResource == null) continue;
+			    	 resourcesToDelete.add(webpageResource.asResource());
+	                 resourcesToDetype.add(vocabularySourceReferenceResource);
+			         additions.add(externalConceptResource,RDFS.isDefinedBy,vocabularySourceReferenceResource);
+			         additions.add(externalConceptResource, RDF.type, OWL_THING);
+			         Statement conceptLabelStmt = subjectAreaResource.getProperty(RDFS.label);
+			         if (conceptLabelStmt == null) {
+			        	 conceptLabelStmt = webpageResource.asResource().getProperty(RDFS.label);
+			         }
+			         if (conceptLabelStmt != null) {
+			        	 additions.add(externalConceptResource, RDFS.label, conceptLabelStmt.getObject().asLiteral());
+			         }
+			     } else {
+			    	 continue;
+			     }
+			     				 
 				 subjectRefCount += migrateConceptReferences(externalConceptResource, subjectAreaResource, hasSubjectArea, subjectAreaFor, additions);
 				 researchRefCount += migrateConceptReferences(externalConceptResource, subjectAreaResource, hasResearchArea, researchAreaOf, additions);
-
+				 migrateRelatedConcepts(externalConceptResource, subjectAreaResource, additions);
+				 
 				 resourcesToDelete.add(subjectAreaResource);
+				 if (webpageResource != null) {
+					 resourcesToDelete.add(webpageResource);
+					 webpageCount++;
+				 }
+				 count++;
 			}	
-						
+		
+		    Iterator<Resource> vsrIter = resourcesToDetype.iterator();
+		    while (vsrIter.hasNext()) { 
+		    	 Resource resource = vsrIter.next();
+		   		 StmtIterator typeiter = resource.listProperties(RDF.type);
+				 while (typeiter.hasNext()) {
+					 retractions.add(typeiter.next());
+				 }	
+				 additions.add(resource,RDF.type, OWL_THING);
+				 typeCount++;
+		    }
+
 			aboxModel.add(additions);
+			aboxModel.remove(retractions);
 	    } finally {
 	        aboxModel.leaveCriticalSection();	
 	    }
 	    
 	    record.recordAdditions(additions);
+	    record.recordRetractions(retractions);
 	   
-	    int count = 0;
 	    Iterator<Resource> iter = resourcesToDelete.iterator();
 	    while (iter.hasNext()) {
 	    	Resource ind = iter.next();
 	    	deleteIndividual(ind);
-	    	count++;
 	    }
 	    
 	    if (count > 0) {
-			   logger.log("migrated " + count + " external concept" + ((count == 1) ? "" : "s"));
+;		   logger.log("migrated " + count + " external concept" + ((count == 1) ? "" : "s") + ", which involved deleting " + 
+				   count + " vivo:SubjectArea individual" + ((count == 1) ? "" : "s") + " and " +
+				   webpageCount + " vivo:URLLink individual" + ((webpageCount == 1) ? "" : "s") +
+				   ", and changing the type for " + typeCount + " vivo:VocabularySourceReference individual" + ((typeCount == 1) ? "" : "s") + " to owl:Thing");
 		}
 	    
 	    if (subjectRefCount > 0) {
-			   logger.log("migrated " + subjectRefCount + " external " + hasSubjectArea.getLocalName() + " reference" + ((subjectRefCount == 1) ? "" : "s"));
+			   logger.log("migrated " + subjectRefCount + " " + hasSubjectArea.getLocalName() + " external concept reference" + ((subjectRefCount == 1) ? "" : "s"));
 		}
 	    
 	    if (researchRefCount > 0) {
-			   logger.log("migrated " + researchRefCount + " external " + hasResearchArea.getLocalName() + " reference" + ((researchRefCount == 1) ? "" : "s"));
+			   logger.log("migrated " + researchRefCount + " " + hasResearchArea.getLocalName() + " external concept reference" + ((researchRefCount == 1) ? "" : "s"));
 		}
 	    
         return;
@@ -650,7 +687,7 @@ public class ABoxUpdater {
 	protected int migrateConceptReferences(Resource externalConceptResource, Resource subjectArea, Property hasConcept, Property conceptOf, Model additions) throws IOException {
 		
 	    int count = 0;
-	    
+	    	    
 		aboxModel.enterCriticalSection(Lock.WRITE);
 	    try {
 			 StmtIterator iter = aboxModel.listStatements((Resource) null, hasConcept, subjectArea);
@@ -674,6 +711,29 @@ public class ABoxUpdater {
 		return count;
     }
 
+	protected void migrateRelatedConcepts(Resource externalConceptResource, Resource subjectAreaResource, Model additions) throws IOException {
+	    	
+		Property related = ResourceFactory.createProperty("http://www.w3.org/2004/02/skos/core#related");
+		
+		aboxModel.enterCriticalSection(Lock.WRITE);
+	    try {
+			 StmtIterator iter = subjectAreaResource.listProperties(related);
+			 while (iter.hasNext()) {
+				 Statement stmt = iter.next();
+				 if (!stmt.getObject().isResource()) continue;
+				 Resource relatedConcept = stmt.getObject().asResource();
+				 if (!additions.contains(externalConceptResource, related, relatedConcept)) {
+					 additions.add(externalConceptResource, related, relatedConcept);
+				 }
+				 if (!additions.contains(relatedConcept, related, externalConceptResource)) {
+					 additions.add(relatedConcept, related, externalConceptResource);
+				 }				 
+			 }
+	    } finally {
+	        aboxModel.leaveCriticalSection();	
+	    }
+    }
+	
 	public void logChanges(Statement oldStatement, Statement newStatement) throws IOException {
        logChange(oldStatement,false);
        logChange(newStatement,true);
