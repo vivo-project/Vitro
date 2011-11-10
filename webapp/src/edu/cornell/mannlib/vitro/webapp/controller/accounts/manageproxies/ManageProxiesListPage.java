@@ -12,6 +12,9 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.AbstractPageHandler;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -135,8 +138,14 @@ public class ManageProxiesListPage extends AbstractPageHandler {
 					.getPlaceholderImagePathForType(VitroVocabulary.USERACCOUNT);
 		}
 
+		UserAccount ua = userAccountsDao.getUserAccountByUri(item.getUri());
+		List<Individual> profiles = SelfEditingConfiguration.getBean(vreq)
+				.getAssociatedIndividuals(indDao, ua);
+		String profileUri = (profiles.isEmpty()) ? "" : profiles.get(0)
+				.getURI();
+
 		return new ProxyItemWrapper(item.getUri(), item.getLabel(),
-				item.getClassLabel(), UrlBuilder.getUrl(imagePath));
+				item.getClassLabel(), UrlBuilder.getUrl(imagePath), profileUri);
 	}
 
 	private ProxyItemInfo wrapProfileItem(ProxyItemInfo item) {
@@ -185,10 +194,24 @@ public class ManageProxiesListPage extends AbstractPageHandler {
 		return map;
 	}
 
-	private static class ProxyItemWrapper extends ProxyItemInfo {
+	public static class ProxyItemWrapper extends ProxyItemInfo {
+		private final String profileUri;
+
 		public ProxyItemWrapper(String uri, String label, String classLabel,
-				String imageUrl) {
+				String imageUrl, String profileUri) {
 			super(uri, label, classLabel, imageUrl);
+			this.profileUri = profileUri;
+		}
+
+		public String getProfileUri() {
+			return profileUri;
+		}
+
+		@Override
+		public String toString() {
+			return "ProxyItemWrapper[uri=" + getUri() + ", label=" + getLabel()
+					+ ", classLabel=" + getClassLabel() + ", imageUrl="
+					+ getImageUrl() + ", profileUri=" + profileUri + "]";
 		}
 	}
 
