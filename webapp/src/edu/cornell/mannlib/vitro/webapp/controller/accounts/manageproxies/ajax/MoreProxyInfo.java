@@ -25,6 +25,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 
 /**
  * Get more information (class label and image URL) about a selected proxy.
+ * 
+ * If there is no image URL, just omit it from the result. The proxy already has
+ * a placeholder image.
  */
 public class MoreProxyInfo extends AbstractAjaxResponder {
 	private static final Log log = LogFactory.getLog(MoreProxyInfo.class);
@@ -65,7 +68,10 @@ public class MoreProxyInfo extends AbstractAjaxResponder {
 		Individual profileInd = inds.get(0);
 
 		Map<String, String> map = new HashMap<String, String>();
-		map.put("imageUrl", getFullImageUrl(profileInd));
+		String imagePath = profileInd.getThumbUrl();
+		if ((imagePath != null) && (!imagePath.isEmpty())) {
+			map.put("imageUrl", UrlBuilder.getUrl(imagePath));
+		}
 		map.put("classLabel", getMostSpecificTypeLabel(profileInd.getURI()));
 
 		JSONArray jsonArray = new JSONArray();
@@ -86,12 +92,4 @@ public class MoreProxyInfo extends AbstractAjaxResponder {
 		}
 	}
 
-	private String getFullImageUrl(Individual ind) {
-		String thumbnailUrl = ind.getThumbUrl();
-		if ((thumbnailUrl == null) || thumbnailUrl.isEmpty()) {
-			return "";
-		} else {
-			return UrlBuilder.getUrl(thumbnailUrl);
-		}
-	}
 }
