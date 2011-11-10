@@ -645,9 +645,12 @@ public class ABoxUpdater {
 		    	 Resource resource = vsrIter.next();
 		   		 StmtIterator typeiter = resource.listProperties(RDF.type);
 				 while (typeiter.hasNext()) {
-					 retractions.add(typeiter.next());
+					 Statement typeStatement = typeiter.next();
+					 if (!typeStatement.getObject().equals(OWL_THING)) {
+					    retractions.add(typeStatement);
+					 }
 				 }	
-				 additions.add(resource,RDF.type, OWL_THING);
+				 additions.add(resource, RDF.type, OWL_THING);
 				 typeCount++;
 		    }
 
