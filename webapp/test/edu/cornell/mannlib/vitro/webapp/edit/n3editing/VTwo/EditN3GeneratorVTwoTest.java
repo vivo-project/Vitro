@@ -12,12 +12,36 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 
 public class EditN3GeneratorVTwoTest {
     static EditN3GeneratorVTwo gen = new EditN3GeneratorVTwo();
+    
+    @Test
+    public void testNullTarget(){
+        List<String> targets = Arrays.asList("?var",null,null,"?var"); 
+        
+        Map<String,List<String>> keyToValues = new HashMap<String,List<String>>();        
+        keyToValues.put("var", Arrays.asList("ABC"));
+        keyToValues.put("var2", Arrays.asList((String)null));        
+        /* test for exception */
+        gen.subInMultiUris(null, targets);
+        gen.subInMultiUris(keyToValues, null);
+        gen.subInMultiUris(keyToValues, targets);
+        
+        Map<String,List<Literal>> keyToLiterals = new HashMap<String,List<Literal>>();        
+        keyToLiterals.put("var", Arrays.asList( ResourceFactory.createTypedLiteral("String")));
+        keyToLiterals.put("var2", Arrays.asList( (Literal)null));
+        /* test for exception */
+        gen.subInMultiLiterals(keyToLiterals, targets);
+        gen.subInMultiLiterals(keyToLiterals, null);
+        gen.subInMultiLiterals(null, targets);
+    }
+    
     
     @Test
     public void testPunctAfterVarName(){        
