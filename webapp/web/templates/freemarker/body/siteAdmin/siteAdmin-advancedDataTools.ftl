@@ -3,15 +3,15 @@
 <#-- Template for Site Administration advanced data tools panel -->
 
 <#if dataTools?has_content>
-    <section class="pageBodyGroup">
+    <section class="pageBodyGroup" role="region">
         <h3>Advanced Data Tools</h3>
         
-        <ul>
-            <li><a href="${dataTools.ingest}">Ingest tools</a></li>
-            <li><a href="${dataTools.rdfData}">Add/Remove RDF data</a></li>
-            <li><a href="${dataTools.rdfExport}">RDF export</a></li>
-            <li><a href="${dataTools.sparqlQuery}">SPARQL query</a></li>
-            <li><a href="${dataTools.sparqlQueryBuilder}">SPARQL query builder</a></li>
+        <ul role="navigation">
+            <li role="listitem"><a href="${dataTools.rdfData}">Add/Remove RDF data</a></li>
+            <li role="listitem"><a href="${dataTools.ingest}">Ingest tools</a></li>
+            <li role="listitem"><a href="${dataTools.rdfExport}">RDF export</a></li>
+            <li role="listitem"><a href="${dataTools.sparqlQuery}">SPARQL query</a></li>
+            <li role="listitem"><a href="${dataTools.sparqlQueryBuilder}">SPARQL query builder</a></li>
         </ul>
     </section>
 </#if>
