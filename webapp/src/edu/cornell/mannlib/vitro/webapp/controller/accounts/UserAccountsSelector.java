@@ -19,15 +19,15 @@ import com.hp.hpl.jena.rdf.model.Resource;
 
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
-import edu.cornell.mannlib.vitro.webapp.controller.AbstractPagingSelector;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsOrdering.Field;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner.QueryParser;
+import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 
 /**
  * Pull some UserAccounts from the model, based on a set of criteria.
  */
-public class UserAccountsSelector extends AbstractPagingSelector {
+public class UserAccountsSelector {
 	private static final Log log = LogFactory
 			.getLog(UserAccountsSelector.class);
 
@@ -171,7 +171,7 @@ public class UserAccountsSelector extends AbstractPagingSelector {
 		String searchTerm = criteria.getSearchTerm();
 
 		if (!roleFilterUri.isEmpty()) {
-			String clean = escapeForRegex(roleFilterUri);
+			String clean = SparqlQueryUtils.escapeForRegex(roleFilterUri);
 			filters += "OPTIONAL { ?uri auth:hasPermissionSet ?role } \n"
 					+ "    FILTER (REGEX(str(?role), '^" + clean + "$'))";
 		}
@@ -181,7 +181,7 @@ public class UserAccountsSelector extends AbstractPagingSelector {
 		}
 
 		if (!searchTerm.isEmpty()) {
-			String clean = escapeForRegex(searchTerm);
+			String clean = SparqlQueryUtils.escapeForRegex(searchTerm);
 			filters += "FILTER ("
 					+ ("REGEX(?email, '" + clean + "', 'i')")
 					+ " || "
