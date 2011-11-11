@@ -42,11 +42,14 @@ public class EditN3GeneratorVTwo {
      */       
     public void subInMultiUris(Map<String,List<String>> varsToVals, List<String> n3targets){       
     	
-    	if( varsToVals == null || varsToVals.isEmpty() ) return;
+    	if( varsToVals == null || varsToVals.isEmpty() || n3targets == null)
+    	    return;
 
         //for (String target : n3targets) {
     	for( int i = 0; i < n3targets.size() ; i++ ){
     	    String result = n3targets.get(i);
+    	    if( result == null )
+    	        continue;
             Set<String> keySet = varsToVals.keySet();
             for (String key : keySet) {
                 List<String> value = varsToVals.get(key);                
@@ -71,7 +74,9 @@ public class EditN3GeneratorVTwo {
             return;
 
         for( int i = 0; i < targets.size() ; i++ ){
-            String result = targets.get(i);            
+            String result = targets.get(i);   
+            if( result == null )
+                continue;
             for( String key : varsToVals.keySet()) {
                 result =  subInUris( key, varsToVals.get(key), result);
             }
@@ -81,13 +86,15 @@ public class EditN3GeneratorVTwo {
    
     public String subInUris(String var, String value, String target) {
         // empty URIs get skipped
-        if( var == null || var.isEmpty() || value == null )
+        if( var == null || var.isEmpty() || value == null || target == null)
             return target;        
         
     	return subInNonBracketedURIS(var, "<" + value + ">", target);
     }
  
-    public void subInUris(String var, String value, List<String> targets){        
+    public void subInUris(String var, String value, List<String> targets){
+        if( targets == null )
+            return;
         for( String target : targets){
              subInUris( var, value, target);
         }        
@@ -106,6 +113,8 @@ public class EditN3GeneratorVTwo {
         
         for( int i=0; i< n3targets.size() ; i++ ){
             String orginalN3 = n3targets.get(i);
+            if( orginalN3 == null)
+                continue;
             String newN3 = orginalN3;
             for( String key : varsToVals.keySet() ){
                 newN3 = subInMultiLiterals( key, varsToVals.get(key), newN3 );                
@@ -120,6 +129,8 @@ public class EditN3GeneratorVTwo {
         
         for( int i=0; i< n3targets.size() ; i++ ){
             String orginalN3 = n3targets.get(i);
+            if( orginalN3 == null ) 
+                continue;
             String newN3 = orginalN3;
             for( String key : varsToVals.keySet() ){
                 newN3 = subInLiterals( key, varsToVals.get(key), newN3 );                
@@ -179,32 +190,7 @@ public class EditN3GeneratorVTwo {
     }    
     
     
-     private Map<String,List<String>> substituteIntoValues
-             (Map<String,List<String>> varsToUris,
-              Map<String,List<Literal>> varsToLiterals,
-              Map<String,List<String>> namesToN3 )
-     {
-        Map<String,List<String>> outHash = new HashMap<String,List<String>>();
-
-        if (namesToN3==null) {
-            return outHash;
-        } else if (namesToN3.isEmpty()) {
-            return outHash;
-        } else {
-            for(String fieldName : namesToN3.keySet()){
-                List<String> n3strings = namesToN3.get(fieldName);
-                List<String> newList  = new ArrayList<String>();
-//                if( varsToUris != null)
-//                    newList = subInMultiUris(varsToUris, n3strings);
-//                if( varsToLiterals != null)
-//                    newList = subInMultiLiterals(varsToLiterals, newList);
-                outHash.put(fieldName, newList);
-            }
-        }
-        return outHash;
-    }
-     
-    protected String subInMultiLiterals(String var, List<Literal>values, String n3){        
+     protected String subInMultiLiterals(String var, List<Literal>values, String n3){        
 	  if (n3==null ) {
           log.error("subInMultiLiterals was passed a null n3 String");
           return "blankBecauseTargetOrValueWasNull";
