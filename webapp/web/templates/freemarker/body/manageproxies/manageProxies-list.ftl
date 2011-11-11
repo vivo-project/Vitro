@@ -21,19 +21,20 @@
     <p></p>
 </section>
 
-<h4 class="grey">Relate profile editors and profiles <img src="${urls.images}/iconInfo.png" alt="info icon" title="The editors you select on the left hand side will have the ability to edit the VIVO profiles you select on the right hand side. You can select multiple editors and multiple profiles, but you must select a minimum of 1 each." /></h4>
-
 <section class="proxy-profile">
+    <h4>Relate profile editors and profiles <img src="${urls.images}/iconInfo.png" alt="info icon" title="The editors you select on the left hand side will have the ability to edit the VIVO profiles you select on the right hand side. You can select multiple editors and multiple profiles, but you must select a minimum of 1 each." /></h4>
+    
     <form id="add-relation" action="${formUrls.create}" method="POST">
         <fieldset class="proxy">
             <legend>Select editors</legend>
-    
+            
             <section name="proxyProxiesPanel" role="section">
-                <input type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name" role="input" />
+                <label for="selectProfileEditors">Select editors</label>
+                <input id="selectProfileEditors" type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name" role="input" />
                 <p class="search-status"><span name='proxySelectorSearchStatus' moreCharsText='type more characters' noMatchText='no match'>&nbsp;</span></p>
     
                 <#-- Magic div that holds all of the proxy data and the template that shows how to display it. -->
-                <ul name="proxyData">
+                <ul name="proxyData" role="navigation">
                 <#-- 
                     Each proxy will be shown using the HTML inside this div.
                     It must contain at least:
@@ -41,15 +42,15 @@
                     -- a hidden input field with templatePart="uriField"  
                 -->
                     <div name="template" style="display: none">
-                        <li>
-                            <img class="photo-profile" width="90" alt="%label%" src="%imageUrl%">
+                        <li role="listitem">
+                            <img class="photo-proxy" width="90" alt="%label%" src="%imageUrl%">
                     
-                            <div class="proxy-info">
+                            <p class="proxy-info">
                                 %label% | <span class="class-label">%classLabel%</span>
                                 <br />
                                 <a class='remove-proxy' href="." templatePart="remove">Remove selection</a>
                                 <input type="hidden" name="proxyUri" value="%uri%" >
-                            </div>
+                            </p>
                         </li>
                     </div>
                 </ul>
@@ -60,11 +61,13 @@
           <legend>Select profiles</legend>  
       
           <section name="proxyProfilesPanel" role="region">
-              <input type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name">
+              <label for="selectProfileEditors">Select profiles</label>
+              <input id="selectProfileEditors" type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name" role="input" />
+            
               <p class="search-status"><span name='proxySelectorSearchStatus' moreCharsText='type more characters' noMatchText='no match'>&nbsp;</span></p>
 
                 <#-- Magic div thst holds all of the proxy data and the template that shows how to display it. -->
-                <ul name="proxyData">
+                <ul name="proxyData" role="navigation">
                     <#-- 
                         Each proxy will be shown using the HTML inside this element.
                         It must contain at least:
@@ -72,27 +75,26 @@
                         -- a hidden input field with templatePart="uriField"  
                     -->
                     <div name="template" style="display: none">
-                        <li>
-                                    <img class="photo-profile" width="60" alt="%label%" src="%imageUrl%">
-                                <div class="proxy-info">
-                                    %label% | <span class="class-label">%classLabel%</span>
-                                    <br />
-                                    <a class='remove-proxy' href="." templatePart="remove">Remove selection</a>
-                                </div>
-                        
-                        <input type="hidden" name="profileUri" templatePart="uriField" value="%uri%" >
-                    </li>
+                        <li role="listitem">
+                            <img class="photo-profile" width="60" alt="%label%" src="%imageUrl%">
+                            
+                            <p class="proxy-info-profile">%label% | <span class="class-label">%classLabel%</span>
+                                <br /><a class='remove-proxy' href="." templatePart="remove">Remove selection</a>
+                            </p>
+    
+                            <input type="hidden" name="profileUri" templatePart="uriField" value="%uri%" role="input" />
+                        </li>
                     </div>
                 </ul>
             </section>
         </fieldset>
 
-        <p><input class="submit pos-submit" type="submit" name="createRelationship" value="Save"  role="button" /></p>
+        <input class="submit pos-submit" type="submit" name="createRelationship" value="Save"  role="button" />
     </form>
 </section>
 
-<#if page.last != 0>
-<h4>Profile editors</h4>
+
+<h4 class="profile-editors">Profile editors</h4>
 
 <section id="search-proxy" role="region">
     <form action="${formUrls.list}" method="POST">
@@ -101,24 +103,24 @@
             <#if page.previous??>
                | <a href="${formUrls.list}?pageIndex=${page.previous}&searchTerm=${searchTerm}">Previous</a>
             </#if>
-            ${page.current} of ${page.last}
+            
+            <#if page.last != 0>
+                ${page.current} of ${page.last}
+            </#if>
+            
             <#if page.next??>
                 <a href="${formUrls.list}?pageIndex=${page.next}&searchTerm=${searchTerm}">Next</a>
             </#if>
 
             <#if searchTerm?has_content>
-                <p>
-                    Search results for "<span class="blue">${searchTerm}</span>" | 
-                    <a href="${formUrls.list}">View all profile editors</a>
-                </p>
+                <p>Search results for "<span class="blue">${searchTerm}</span>" | <a href="${formUrls.list}">View all profile editors</a></p>
             </#if>
     </form>
 </section>
-</#if>
 
 <#list relationships as r>
 <section class="proxy-profile list-proxy-profile">
-    <form class="edit-proxy-profiles" action="${formUrls.edit}" method="POST">
+    <form id="list-relation" class="edit-proxy-profiles" action="${formUrls.edit}" method="POST">
         <fieldset class="proxy">
             <#assign p = r.proxyInfos[0]>
             <div class="proxy-item">
@@ -137,13 +139,15 @@
             <legend>Add profile</legend>
             
             <section name="proxyProfilesPanel" role="region">
-                <input type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name">
+                <label for="addProfile">Add profile</label>
+                <input id="addProfile" type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name" role="input" />
+                
                 <p class="search-status"><span name='proxySelectorSearchStatus' moreCharsText='type more characters' noMatchText='no match'>&nbsp;</span></p>
                 <p name="excludeUri" style="display: none">${r.proxyInfos[0].profileUri}<p>
                 <p class="selected-editors">Selected profiles:</p>
     
                 <#-- Magic div that holds all of the proxy data and the template that shows how to display it. -->
-                <ul name="proxyData">
+                <ul name="proxyData" role="navigation">
                     <#list r.profileInfos as p>
                         <div name="data" style="display: none">
                             <p name="uri">${p.uri}</p>
@@ -160,20 +164,20 @@
                         -- a hidden input field with templatePart="uriField"  
                     -->
                     <div name="template" style="display: none">
-                        <li>
+                        <li role="listitem">
                             <img class="photo-profile" width="60" alt="%label%" src="%imageUrl%">
                              
-                            <div class="proxy-info">%label% | <span class="class-label">%classLabel%</span>
+                            <p class="proxy-info-profile">%label% | <span class="class-label">%classLabel%</span>
                                 <br /><a class='remove-proxy' href="." templatePart="remove">Remove selection</a>
-                            </div>
+                            </p>
                         </li>
                         
-                        <input type="hidden" name="profileUri" templatePart="uriField" value="%uri%" >
+                        <input type="hidden" name="profileUri" templatePart="uriField" value="%uri%" role="input" />
                     </div>
                 </ul>
             </section>
             
-            <input class="submit" type="submit" name="modifyProfileList" value="Save changes to profiles" />
+            <input class="submit" type="submit" name="modifyProfileList" value="Save changes to profiles" role="button" />
         </fieldset> 
     </form>
 </section>
