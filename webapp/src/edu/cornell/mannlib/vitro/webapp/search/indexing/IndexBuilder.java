@@ -64,6 +64,12 @@ public class IndexBuilder extends VitroBackgroundThread {
     /** Length of pause between when work comes into queue to when indexing starts */
     public static final long WAIT_AFTER_NEW_WORK_INTERVAL = 500; //msec
     
+    /** Flag so we can tell that the index is being updated. */
+    public static final String FLAG_UPDATING = "updating";
+    
+    /** Flag so we can tell that the index is being rebuilt. */
+    public static final String FLAG_REBUILDING = "rebuilding";
+    
     /** Number of threads to use during indexing. */
     protected int numberOfThreads = 10;
     
@@ -152,12 +158,12 @@ public class IndexBuilder extends VitroBackgroundThread {
         while(! stopRequested ){                        
             try{
                 if( reindexRequested ){
-                	setWorkLevel(WorkLevel.WORKING);
+                	setWorkLevel(WorkLevel.WORKING, FLAG_REBUILDING);
                     log.debug("full re-index requested");
                     indexRebuild();
                     setWorkLevel(WorkLevel.IDLE);
                 }else if( !changedStmtQueue.isEmpty() ){                       
-                	setWorkLevel(WorkLevel.WORKING);
+                	setWorkLevel(WorkLevel.WORKING, FLAG_UPDATING);
                     Thread.sleep(WAIT_AFTER_NEW_WORK_INTERVAL); //wait a bit to let a bit more work to come into the queue
                     log.debug("work found for IndexBuilder, starting update");
                     updatedIndex();

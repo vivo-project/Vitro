@@ -3,6 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.search.controller;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -140,9 +142,29 @@ public class IndexController extends FreemarkerHttpServlet {
 			Map<String, Object> body) {
 		WorkLevelStamp stamp = builder.getWorkLevel();
 		body.put("worklevel", stamp.getLevel().toString());
+		body.put("currentTask", figureCurrentTask(stamp.getFlags()));
 		body.put("since", stamp.getSince());
+		body.put("elapsed", formatElapsedTime(stamp.getSince()));
 		body.put("hasPreviousBuild", stamp.getSince().getTime() > 0L);
 		return new TemplateResponseValues(TEMPLATE_NAME, body);
+	}
+
+	private String formatElapsedTime(Date since) {
+		long elapsedMillis = System.currentTimeMillis() - since.getTime();
+		long seconds = (elapsedMillis / 1000L) % 60L;
+		long minutes = (elapsedMillis / 60000L) % 60L;
+		long hours = elapsedMillis / 3600000L;
+		return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+	}
+
+	private String figureCurrentTask(Collection<String> flags) {
+		if (flags.contains(IndexBuilder.FLAG_REBUILDING)) {
+			return "rebuilt";
+		} else if (flags.contains(IndexBuilder.FLAG_UPDATING)) {
+			return "updated";
+		} else {
+			return "";
+		}
 	}
 
 }

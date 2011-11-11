@@ -4,6 +4,9 @@ package edu.cornell.mannlib.vitro.webapp.utils.threads;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -47,9 +50,10 @@ public class VitroBackgroundThread extends Thread {
 		allThreads.add(new WeakReference<VitroBackgroundThread>(this));
 	}
 
-	protected void setWorkLevel(WorkLevel level) {
-		log.debug("Set work level on '" + this.getName() + "' to " + level);
-		stamp = new WorkLevelStamp(level);
+	protected void setWorkLevel(WorkLevel level, String... flags) {
+		log.debug("Set work level on '" + this.getName() + "' to " + level
+				+ ", flags=" + flags);
+		stamp = new WorkLevelStamp(level, flags);
 	}
 
 	public WorkLevelStamp getWorkLevel() {
@@ -59,14 +63,19 @@ public class VitroBackgroundThread extends Thread {
 	/**
 	 * An immutable object that holds both the current work level and the time
 	 * that it was set.
+	 * 
+	 * Particular threads may want to assign additional state using zero or more
+	 * "flags".
 	 */
 	public static class WorkLevelStamp {
 		private final WorkLevel level;
 		private final long since;
+		private final List<String> flags;
 
-		public WorkLevelStamp(WorkLevel level) {
+		public WorkLevelStamp(WorkLevel level, String... flags) {
 			this.level = level;
 			this.since = System.currentTimeMillis();
+			this.flags = Collections.unmodifiableList(Arrays.asList(flags));
 		}
 
 		public WorkLevel getLevel() {
@@ -75,6 +84,10 @@ public class VitroBackgroundThread extends Thread {
 
 		public Date getSince() {
 			return new Date(since);
+		}
+
+		public Collection<String> getFlags() {
+			return flags;
 		}
 	}
 }
