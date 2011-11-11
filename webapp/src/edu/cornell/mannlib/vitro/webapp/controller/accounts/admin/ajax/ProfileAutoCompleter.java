@@ -30,6 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.AbstractAjaxResponder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 
 /**
  * Get a list of Profiles with last names that begin with this search term, and
@@ -122,9 +123,10 @@ class ProfileAutoCompleter extends AbstractAjaxResponder {
 	}
 
 	private String prepareQueryString() {
+		String cleanTerm = SparqlQueryUtils.escapeForRegex(term);
 		String queryString = QUERY_TEMPLATE
 				.replace("%matchingPropertyUri%", selfEditingIdMatchingProperty)
-				.replace("%searchTerm%", term)
+				.replace("%searchTerm%", cleanTerm)
 				.replace("%externalAuthId%", externalAuthId);
 		log.debug("Query string is '" + queryString + "'");
 		return queryString;

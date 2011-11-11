@@ -26,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.utils.ImageUtil;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner;
+import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 
 /**
  * Get the basic auto-complete info for the proxy selection.
@@ -73,7 +74,8 @@ public class BasicProxiesGetter extends AbstractAjaxResponder {
 		if (term.isEmpty()) {
 			return EMPTY_RESPONSE;
 		} else {
-			String queryStr = QUERY_BASIC_PROXIES.replace("%term%", term);
+			String cleanTerm = SparqlQueryUtils.escapeForRegex(term);
+			String queryStr = QUERY_BASIC_PROXIES.replace("%term%", cleanTerm);
 
 			JSONArray jsonArray = new SparqlQueryRunner<JSONArray>(
 					userAccountsModel, new BasicProxyInfoParser(

@@ -24,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.utils.ImageUtil;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner;
+import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 
 /**
  * Get the basic auto-complete info for the profile selection.
@@ -68,8 +69,9 @@ public class BasicProfilesGetter extends AbstractAjaxResponder {
 		if (term.isEmpty()) {
 			return EMPTY_RESPONSE;
 		} else {
+			String cleanTerm = SparqlQueryUtils.escapeForRegex(term);
 			String queryStr = QUERY_BASIC_PROFILES.replace("%typesUnion%",
-					buildTypeClause()).replace("%term%", term);
+					buildTypeClause()).replace("%term%", cleanTerm);
 
 			JSONArray jsonArray = new SparqlQueryRunner<JSONArray>(fullModel,
 					new BasicProfileInfoParser()).executeQuery(queryStr);
