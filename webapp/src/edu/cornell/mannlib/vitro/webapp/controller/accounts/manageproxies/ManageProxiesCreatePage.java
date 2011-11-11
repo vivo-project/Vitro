@@ -98,24 +98,28 @@ public class ManageProxiesCreatePage extends AbstractPageHandler {
 		return valid;
 	}
 
-	/** We don't remove any existing relationships, we just add new ones. */
+	/**
+	 * We don't remove any existing relationships, we just add new ones. But we
+	 * won't add a relationship to one's self.
+	 */
 	public void createRelationships() {
 		for (UserAccount proxyAccount : proxyAccounts) {
 			Set<String> profiles = new HashSet<String>();
-			profiles.addAll(proxyAccount.getProxiedIndividualUris());
 			profiles.addAll(figureNonSelfProfileUris(proxyAccount));
+			profiles.addAll(proxyAccount.getProxiedIndividualUris());
 
 			proxyAccount.setProxiedIndividualUris(profiles);
 			userAccountsDao.updateUserAccount(proxyAccount);
 		}
 	}
 
+	/* Look at the desired profiles, and remove any that are this proxy's self. */
 	private Collection<String> figureNonSelfProfileUris(UserAccount proxyAccount) {
-		List<Individual> mySelves = selfEditingConfiguration
-				.getAssociatedIndividuals(indDao, proxyAccount);
-
 		List<String> myProfiles = new ArrayList<String>(profileUris);
-		myProfiles.removeAll(mySelves);
+		for (Individual self : selfEditingConfiguration
+				.getAssociatedIndividuals(indDao, proxyAccount)) {
+			myProfiles.remove(self.getURI());
+		}
 		return myProfiles;
 	}
 
