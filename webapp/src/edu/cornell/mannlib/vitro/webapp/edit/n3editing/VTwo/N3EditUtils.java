@@ -17,8 +17,7 @@ public class N3EditUtils {
 
     
     /**
-     * Execute any modelChangePreprocessors in the editConfiguration;
-     * TODO: Should be moved to Utils or Controller
+     * Execute any modelChangePreprocessors in the editConfiguration; 
      */
     public static void preprocessModels(
             AdditionsAndRetractions changes, 
@@ -49,8 +48,8 @@ public class N3EditUtils {
         EditN3GeneratorVTwo n3Subber = configuration.getN3Generator();
         
         //Substitute URIs and literals from form
-        entityToReturnTo = n3Subber.subInMultiUris(submission.getUrisFromForm(), entityToReturnTo);
-        entityToReturnTo = n3Subber.subInMultiLiterals(submission.getLiteralsFromForm(), entityToReturnTo);
+        n3Subber.subInMultiUris(submission.getUrisFromForm(), entityToReturnTo);
+        n3Subber.subInMultiLiterals(submission.getLiteralsFromForm(), entityToReturnTo);
         
         //TODO: this won't work, must the same new resources as in ProcessRdfForm.process
         //setVarToNewResource(configuration, vreq);

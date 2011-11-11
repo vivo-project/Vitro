@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
@@ -248,6 +250,45 @@ public class EditConfigurationUtils {
         }
 		return html;
 	}
-   
 
+	   /** Make a copy of list of Strings. */
+    public static List<String> copy(List<String> list) {
+        List<String> copyList = new ArrayList<String>();
+        for(String l: list) {
+            copyList.add( new String (l) );
+        }
+        return copyList;
+   }        
+    
+    /** Make a copy of a Map<String,String> */
+    public static Map<String,String> copyMap(Map<String,String> source) {
+        HashMap<String, String> map = new HashMap<String, String>();
+        Set<String> keys = map.keySet();
+        for(String key: keys) {            
+            if( source.get(key) != null )
+                map.put(new String(key), new String( source.get(key)) );
+            else
+                map.put(new String(key),null);
+        }
+        return map;
+    }
+    
+    /** Make a copy of a Map<String,List<String>> */
+    public static Map<String, List<String>> copyListMap(Map<String, List<String>> source) {
+        HashMap<String, List<String>> map = new HashMap<String, List<String>>();
+        Set<String> keys = map.keySet();
+        for(String key: keys) {
+            List<String> vals = map.get(key);
+            map.put(new String(key), copy(vals));
+        }
+        return map;
+    }    
+
+    
+    public static EditConfigurationVTwo getEditConfiguration(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        EditConfigurationVTwo editConfiguration = EditConfigurationVTwo.getConfigFromSession(session, request);     
+        return editConfiguration;
+    }
+    
 }

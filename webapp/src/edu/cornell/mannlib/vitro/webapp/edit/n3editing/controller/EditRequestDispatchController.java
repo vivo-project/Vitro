@@ -13,6 +13,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.rdf.model.Model;
+
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -77,6 +79,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          /****  make new or get an existing edit configuration ***/         
          EditConfigurationVTwo editConfig = setupEditConfiguration(editConfGeneratorName, vreq);
          
+         
          //what template?
          String template = editConfig.getTemplate();
         
@@ -124,6 +127,19 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     	//put edit configuration in session
     	
         EditConfigurationVTwo.putConfigInSession(editConfig, session);
+        
+        Model model = (Model) getServletContext().getAttribute("jenaOntModel");
+        String objectUri = EditConfigurationUtils.getObjectUri(vreq);
+        String dataKey = EditConfigurationUtils.getDataPropKey(vreq);
+        if (objectUri != null) { // editing existing object  
+            editConfig.prepareForObjPropUpdate(model);
+        } else if( dataKey != null ) { // edit of a data prop
+            //do nothing since the data prop form generator must take care of it
+        } else{
+            //this might be a create new or a form  
+            editConfig.prepareForNonUpdate(model);
+        }
+        
 		return editConfig;
 	}
 

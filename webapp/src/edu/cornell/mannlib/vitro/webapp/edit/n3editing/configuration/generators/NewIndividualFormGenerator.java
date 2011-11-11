@@ -47,28 +47,23 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
  */
 public class NewIndividualFormGenerator implements EditConfigurationGenerator {
 	
-	private Log log = LogFactory.getLog(NewIndividualFormGenerator.class);
-	private boolean isObjectPropForm = false;
 	private String subjectUri = null;
 	private String predicateUri = null;
 	private String objectUri = null;
-	private String datapropKeyStr= null;
-	private int dataHash = 0;
-	private DataPropertyStatement dps = null;
-	private String dataLiteral = null;
+		
 	private String template = "newIndividualForm.ftl";
+	
 	private static HashMap<String,String> defaultsForXSDtypes ;
 	  static {
 		defaultsForXSDtypes = new HashMap<String,String>();
 		//defaultsForXSDtypes.put("http://www.w3.org/2001/XMLSchema#dateTime","2001-01-01T12:00:00");
 		defaultsForXSDtypes.put("http://www.w3.org/2001/XMLSchema#dateTime","#Unparseable datetime defaults to now");
 	  }
+	  
     @Override
     public EditConfigurationVTwo getEditConfiguration(VitroRequest vreq, HttpSession session) {
     	EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();
-    	//Set n3 generator
-    	editConfiguration.setN3Generator(new EditN3GeneratorVTwo(editConfiguration));
-    	
+    
     	//process subject, predicate, object parameters
     	this.initProcessParameters(vreq, session, editConfiguration);
     	
@@ -154,7 +149,6 @@ public class NewIndividualFormGenerator implements EditConfigurationGenerator {
     	editConfiguration.setPredicateUri(predicateUri);
     	
 		//not concerned about remainder, can move into default obj prop form if required
-		this.isObjectPropForm = true;
 		this.initObjectParameters(vreq);
 		this.processObjectPropForm(vreq, editConfiguration);
     }
@@ -171,21 +165,8 @@ public class NewIndividualFormGenerator implements EditConfigurationGenerator {
     	//this needs to be set for the editing to be triggered properly, otherwise the 'prepare' method
     	//pretends this is a data property editing statement and throws an error
     	//TODO: Check if null in case no object uri exists but this is still an object property
-    	if(objectUri != null) {
-    		editConfiguration.setObjectResource(true);
-    	}
     }
-    
-    private void processDataPropForm(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
-    	editConfiguration.setObjectResource(false);
-    	//set data prop value, data prop key str, 
-    	editConfiguration.setDatapropKey((datapropKeyStr==null)?"":datapropKeyStr);
-    	editConfiguration.setVarNameForObject(dataLiteral);
-    	//original set datapropValue, which in this case would be empty string but no way here
-    	editConfiguration.setDatapropValue("");
-    	editConfiguration.setUrlPatternToReturnTo("/entity");
-    }
-    
+       
     //Get N3 required 
     //Handles both object and data property    
     private List<String> generateN3Required(VitroRequest vreq) {
@@ -202,15 +183,7 @@ public class NewIndividualFormGenerator implements EditConfigurationGenerator {
     	return n3Optional;
     	
     }
-    
-    //Set queries
-    private String retrieveQueryForInverse () {
-    	String queryForInverse =  "PREFIX owl:  <http://www.w3.org/2002/07/owl#>"
-			+ " SELECT ?inverse_property "
-			+ "    WHERE { ?inverse_property owl:inverseOf ?predicate } ";
-    	return queryForInverse;
-    }
-    
+       
     private void setUrisAndLiteralsInScope(EditConfigurationVTwo editConfiguration) {
     	HashMap<String, List<String>> urisInScope = new HashMap<String, List<String>>();
     	//note that at this point the subject, predicate, and object var parameters have already been processed
@@ -235,12 +208,7 @@ public class NewIndividualFormGenerator implements EditConfigurationGenerator {
     	literalsOnForm.add("lastName");
     	editConfiguration.setUrisOnform(urisOnForm);
     	editConfiguration.setLiteralsOnForm(literalsOnForm);
-    }
-    
-    private String getDataLiteral(VitroRequest vreq) {
-    	DataProperty prop = EditConfigurationUtils.getDataProperty(vreq);
-    	return prop.getLocalName() + "Edited";
-    }
+    }    
     
     //This is for various items
     private void setSparqlQueries(EditConfigurationVTwo editConfiguration) {
@@ -276,8 +244,7 @@ public class NewIndividualFormGenerator implements EditConfigurationGenerator {
     private void getLabelField(EditConfigurationVTwo editConfiguration,
 			VitroRequest vreq, Map<String, FieldVTwo> fields) {
     	FieldVTwo field = new FieldVTwo();
-    	field.setName("label");
-    	field.setNewResource(false);
+    	field.setName("label");    	
     	//queryForExisting is not being used anywhere in Field
 		String stringDatatypeUri = XSD.xstring.toString();
 
@@ -296,11 +263,7 @@ public class NewIndividualFormGenerator implements EditConfigurationGenerator {
     	
     	field.setLiteralOptions(new ArrayList<List<String>>());
     	
-    	//set assertions
-    	List<String> assertions = new ArrayList<String>();
-    	field.setAssertions(assertions);
-    	fields.put(field.getName(), field);
-		
+    	fields.put(field.getName(), field);		
 	}
 
 	

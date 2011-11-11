@@ -12,7 +12,6 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
  * This is a data structure to allow a method to return
  * a pair of Model objects for additions and retractions.
  * 
- * Move this to its own class    
  */
 public class AdditionsAndRetractions {
     Model additions;

@@ -16,11 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * User: bdc34
- * Date: Jan 22, 2008
- * Time: 5:55:57 PM
- */
+
 public class SparqlEvaluateVTwo {
     private static Log log = LogFactory.getLog( SparqlEvaluateVTwo.class );
 
@@ -99,8 +95,8 @@ public class SparqlEvaluateVTwo {
             
             List<String> queryStrings = new ArrayList <String>();
             queryStrings.add( query );
-            queryStrings= editConfig.getN3Generator().subInMultiUris(uriScope, queryStrings);
-            queryStrings = editConfig.getN3Generator().subInMultiLiterals(literalScope,queryStrings);
+            editConfig.getN3Generator().subInMultiUris(uriScope, queryStrings);
+            editConfig.getN3Generator().subInMultiLiterals(literalScope,queryStrings);
             varToLiterals.put(var, queryToLiteral(  queryStrings.get(0) ));   //might result in (key -> null)
         }
 
@@ -120,8 +116,8 @@ public class SparqlEvaluateVTwo {
                 continue;
             List<String> queryStrings = new ArrayList <String>();
             queryStrings.add(query);
-            queryStrings= editConfig.getN3Generator().subInMultiUris(uriScope, queryStrings);
-            queryStrings = editConfig.getN3Generator().subInMultiLiterals(literalScope,queryStrings);
+            editConfig.getN3Generator().subInMultiUris(uriScope, queryStrings);
+            editConfig.getN3Generator().subInMultiLiterals(literalScope,queryStrings);
             List<String> uriFromQuery = queryToUri(  queryStrings.get(0) );
             if( uriFromQuery != null )
             {    

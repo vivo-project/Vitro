@@ -131,13 +131,9 @@ public class DefaultDeleteGenerator implements EditConfigurationGenerator {
     	//this needs to be set for the editing to be triggered properly, otherwise the 'prepare' method
     	//pretends this is a data property editing statement and throws an error
     	//TODO: Check if null in case no object uri exists but this is still an object property
-    	if(objectUri != null) {
-    		editConfiguration.setObjectResource(true);
-    	}
     }
     
     private void processDataPropForm(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
-    	editConfiguration.setObjectResource(false);
     	//set data prop value, data prop key str, 
     	editConfiguration.setDatapropKey((datapropKeyStr==null)?"":datapropKeyStr);
     	//original set datapropValue, which in this case would be empty string but no way here

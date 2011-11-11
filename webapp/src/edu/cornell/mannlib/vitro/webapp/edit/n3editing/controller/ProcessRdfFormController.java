@@ -56,7 +56,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 	@Override 
 	protected ResponseValues processRequest(VitroRequest vreq) {			
 		//get the EditConfiguration 
-		EditConfigurationVTwo configuration = getEditConfiguration(vreq);
+		EditConfigurationVTwo configuration = EditConfigurationUtils.getEditConfiguration(vreq);
         if(configuration == null)
             throw new Error("No edit configuration found.");        
 
@@ -84,7 +84,11 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 	    
 	    AdditionsAndRetractions changes;
         try {
-            changes = getAdditionsAndRetractions(configuration, submission, vreq);
+
+            ProcessRdfForm prf = 
+                new ProcessRdfForm(configuration, new NewURIMakerVitro(vreq.getWebappDaoFactory()));        
+            changes = prf.process(configuration, submission);  
+            
         } catch (Exception e) {
             throw new Error(e);
         }	    
@@ -92,7 +96,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		if( configuration.isUseDependentResourceDelete() )
 		    changes = ProcessRdfForm.addDependentDeletes(changes, queryModel);		
 		
-		N3EditUtils.preprocessModels(changes, configuration, vreq);
+		N3EditUtils.preprocessModels(changes, configuration, vreq);		
 		
 		ProcessRdfForm.applyChangesToWriteModel(changes, queryModel, writeModel, EditN3Utils.getEditorUri(vreq) );
 		
@@ -101,12 +105,11 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		//Also what do we actually DO with the vreq attribute: Answer: Use it for redirection
 		//And no where else so we could technically calculate and send that here
 		String entityToReturnTo = N3EditUtils.processEntityToReturnTo(configuration, submission, vreq);
+		
         //For data property processing, need to update edit configuration for back button 
 		N3EditUtils.updateEditConfigurationForBackButton(configuration, submission, vreq, writeModel);
         return PostEditCleanupController.doPostEdit(vreq, entityToReturnTo);		
 	}
-
-
 
 	//In case of back button confusion
 	//Currently returning an error message: 
@@ -153,35 +156,6 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 
 	}
 	
-	
-	private AdditionsAndRetractions getAdditionsAndRetractions(
-			EditConfigurationVTwo configuration,
-			MultiValueEditSubmission submission, VitroRequest vreq) throws Exception {
-		
-	    return ProcessRdfForm.process(configuration, submission, 
-		        new NewURIMakerVitro(vreq.getWebappDaoFactory()));
-	    
-	}
-
-
-	private EditConfigurationVTwo getEditConfiguration(HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		EditConfigurationVTwo editConfiguration = EditConfigurationVTwo.getConfigFromSession(session, request);		
-		return editConfiguration;
-	}
-	
-	
-//	private ResponseValues doEditConfigNotFound(VitroRequest request) {
-//        HashMap<String,Object>map = new HashMap<String,Object>();
-//        map.put("message", "No editing configuration found, cannot process edit.");
-//        ResponseValues values = new TemplateResponseValues("message.ftl", map);        
-//        try {
-//            doResponse(request,values);
-//        } catch (TemplateProcessingException e) {
-//            log.error("Could not process template for doEditConfigNotFound()",e);
-//        }        
-//    }
-
 	private ResponseValues doValidationErrors(VitroRequest vreq,
 			EditConfigurationVTwo editConfiguration, MultiValueEditSubmission submission) {
 		
@@ -196,7 +170,6 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		}
 		return null; //no errors		
 	}
-
 	
 	//Move to EditN3Utils but keep make new uris here
 	public static class Utilities {
@@ -222,33 +195,6 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
             }
             return copyOfN3;
 	    }
-	    
-	    public static List<String> getFieldStmts(FieldVTwo field, String stmtType) {
-	    	if(stmtType.equals(assertionsType)) {
-	    		return field.getAssertions();
-            } else {
-            	return field.getRetractions();
-            }
-	    }
-	    
-	    public static Map<String, List<String>> fieldsToN3Map(Map<String, FieldVTwo> fields, String stmtType) {
-	    	Map<String,List<String>> out = new HashMap<String,List<String>>();
-	        for( String fieldName : fields.keySet()){
-	            FieldVTwo field = fields.get(fieldName);
-	            List<String> n3Stmts = getFieldStmts(field, stmtType);
-	            List<String> copyOfN3 = makeListCopy(n3Stmts);
-	            out.put( fieldName, copyOfN3 );
-	        }
-	        return out;
-	    }
-	    
-	    public static Map<String,List<String>> fieldsToAssertionMap( Map<String,FieldVTwo> fields){
-	       return fieldsToN3Map(fields, assertionsType);
-	    }
-
-	     public static Map<String,List<String>> fieldsToRetractionMap( Map<String,FieldVTwo> fields){
-	      return fieldsToN3Map(fields, retractionsType);
-	    }		     		    
 	     
 	     //TODO: Check if this would be correct with multiple values and uris being passed back
 	     //First, need to order by uris in original and new values probably and 
@@ -299,35 +245,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 	                 + (fieldChanged ? "did Change" : "did NOT change"));
 	         return fieldChanged;
 	     }
-	     
-	     
-		public static boolean checkForEmptyString(
-				MultiValueEditSubmission submission,
-				EditConfigurationVTwo configuration, VitroRequest vreq) {
-			// TODO Auto-generated method stub
-			if(isDataProperty(configuration, vreq)) {
-				// Our editors have gotten into the habbit of clearing the text from the
-			    // textarea and saving it to invoke a delete.  see Issue VITRO-432   
-		        if (configuration.getFields().size() == 1) {
-		            String onlyField = configuration.getFields().keySet().iterator()
-		                    .next();
-		            List<Literal> value = submission.getLiteralsFromForm().get(onlyField);
-		            if( value == null || value.size() == 0){
-		            	log.debug("No parameters found in submission for field \"" + onlyField +"\"");
-		            	return true;
-		            }else {
-		            	if(value.size() == 1) {
-		            		if( "".equals(value.get(0).getLexicalForm())) {
-		            			log.debug("Submission was a single field named \"" + onlyField + "\" with an empty string");
-		            			return true;
-		            		}
-		            	}
-		            }
-		        }
-			}
-			return false;    
-		}
-		
+	     		
 		//Get predicate local anchor
 		public static String getPredicateLocalName(EditConfigurationVTwo editConfig) {
 			String predicateLocalName = null;

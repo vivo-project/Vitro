@@ -38,10 +38,7 @@ public class FieldVTwo {
     };
 
     public static String RDF_XML_LITERAL_URI = "http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral";
-        
-    private boolean newResource;
-
-    private static Log log = LogFactory.getLog( FieldVTwo.class ); 
+                
        
     private String name;
     
@@ -91,31 +88,6 @@ public class FieldVTwo {
     private List<List<String>> literalOptions;
 
     /**
-     * Strings of N3 to add to model.
-     */
-    private List <String> assertions;
-
-    /**
-     * JSON configuration that was used to build this object.
-     */ 
-    private String originalJson;
-    
-    /**
-     * Do not attempt to set the retractions when configuring a Field; they get built by the
-     * edit processing object.
-     *
-     * The strings in this list should be N3 for statements that need to be retracted to affect an update.
-     * Per Field retractions are necessary since we only want to retract for fields that have changed.
-     * The Model should be checked to make sure that all of the retractions exist so we are changing the
-     * statements that existed when this edit was configured.
-     *
-     * These retractions are just the assertions with the values subistituted in from before the change.
-     */
-    private List <String> retractions;
-
-    private Map<String, String> queryForExisting;
-
-    /**
      * Property for special edit element.
      */
     private EditElementVTwo editElement=null;;
@@ -140,37 +112,7 @@ public class FieldVTwo {
 
     public String getName(){
         return name;
-    }
-    
-    public List<String> getRetractions() {
-        return retractions;
-    }
-
-    public FieldVTwo setRetractions(List<String> retractions) {
-        this.retractions = retractions;
-        return this;
-    }
-
-    public List<String> getAssertions() {
-        return assertions;
-    }
-
-    public FieldVTwo setAssertions(List<String> assertions) {
-        this.assertions = assertions;
-        return this;
-    }
-
-    public FieldVTwo setAssertions( String ... assertions ){        
-        return setAssertions( Arrays.asList( assertions ));
-    }
-    
-    public boolean isNewResource() {
-        return newResource;
-    }
-    public FieldVTwo setNewResource(boolean b) {
-        newResource = b;
-        return this;
-    }
+    }                    
 
     public List <String> getValidators() {
         return validators;

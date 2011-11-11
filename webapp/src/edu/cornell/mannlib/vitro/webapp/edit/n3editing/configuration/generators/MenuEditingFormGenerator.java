@@ -171,9 +171,7 @@ public class MenuEditingFormGenerator implements EditConfigurationGenerator {
     
     private void processObjectPropForm(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
     	editConfiguration.setVarNameForObject("objectVar");    	
-    	editConfiguration.setObject(objectUri);
-    	//For page    	
-    	editConfiguration.setObjectResource(true);
+    	editConfiguration.setObject(objectUri);    	
     }
     
     private void processDataPropForm(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
@@ -369,15 +367,13 @@ public class MenuEditingFormGenerator implements EditConfigurationGenerator {
     	//Field should be for page title and other associations (assuming this is what actually goes on the form)
     	FieldVTwo field = new FieldVTwo();
     	field.setName("title");
-    	field.setNewResource(false);
+
     	List<String> validators = new ArrayList<String>();
     	validators.add("nonempty");
     	field.setValidators(validators);
     	field.setOptionsType("LITERALS");
     	field.setPredicateUri(DisplayVocabulary.DISPLAY_NS + "title");
-    	List<String> assertions = this.generateN3Required(vreq);
-    	assertions.addAll(this.generateN3Optional());
-    	field.setAssertions(assertions);
+
     	fields.put("title", field);
     	//Object Var Field
     	//Won't need this in our case

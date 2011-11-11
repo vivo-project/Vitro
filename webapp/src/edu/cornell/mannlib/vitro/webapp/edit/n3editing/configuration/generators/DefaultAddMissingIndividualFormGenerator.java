@@ -79,8 +79,6 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     @Override
     public EditConfigurationVTwo getEditConfiguration(VitroRequest vreq, HttpSession session) {
     	EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();
-    	//Set n3 generator
-    	editConfiguration.setN3Generator(new EditN3GeneratorVTwo(editConfiguration));
     	
     	//process subject, predicate, object parameters
     	this.initProcessParameters(vreq, session, editConfiguration);
@@ -199,10 +197,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	}
     	//this needs to be set for the editing to be triggered properly, otherwise the 'prepare' method
     	//pretends this is a data property editing statement and throws an error
-    	//TODO: Check if null in case no object uri exists but this is still an object property
-    	if(objectUri != null) {
-    		editConfiguration.setObjectResource(true);
-    	} 
+    	//TODO: Check if null in case no object uri exists but this is still an object property    	
     }
     
     
@@ -358,8 +353,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
 			EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
 		Map<String, FieldVTwo> fields = new HashMap<String, FieldVTwo>();
 		FieldVTwo field = new FieldVTwo();
-    	field.setName("name");
-    	field.setNewResource(false);
+    	field.setName("name");    	
     	//queryForExisting is not being used anywhere in Field
     	
     	List<String> validators = new ArrayList<String>();
@@ -379,8 +373,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	field.setLiteralOptions(new ArrayList<List<String>>());
     	
     	List<String> assertions = new ArrayList<String>();
-    	assertions.add(getN3ForName());
-    	field.setAssertions(assertions);
+    	assertions.add(getN3ForName());    	
     	fields.put(field.getName(), field);
     	
     	return fields;

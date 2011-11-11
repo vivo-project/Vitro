@@ -75,8 +75,6 @@ public class RDFSLabelGenerator implements EditConfigurationGenerator {
     
      private EditConfigurationVTwo setupEditConfiguration(VitroRequest vreq, HttpSession session) {
     	EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();
-    	//Set n3 generator
-    	editConfiguration.setN3Generator(new EditN3GeneratorVTwo(editConfiguration));
     	
     	//process subject, predicate, object parameters
     	this.initProcessParameters(vreq, session, editConfiguration);
@@ -164,10 +162,10 @@ public class RDFSLabelGenerator implements EditConfigurationGenerator {
 
     
     private void processDataPropForm(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
-    	editConfiguration.setObjectResource(false);
     	//set data prop value, data prop key str, 
     	editConfiguration.setDatapropKey((datapropKeyStr==null)?"":datapropKeyStr);
     	editConfiguration.setVarNameForObject(literalName);
+    	
     	//original set datapropValue, which in this case would be empty string but no way here
     	editConfiguration.setDatapropValue("");
     	editConfiguration.setUrlPatternToReturnTo("/entity");
@@ -249,7 +247,6 @@ public class RDFSLabelGenerator implements EditConfigurationGenerator {
 		Map<String, FieldVTwo> fields = new HashMap<String, FieldVTwo>();
 		FieldVTwo field = new FieldVTwo();
     	field.setName(literalName);
-    	field.setNewResource(false);
     	//queryForExisting is not being used anywhere in Field
     	String rangeDatatypeUri = getRangeDatatypeUri(editConfiguration, vreq);
     	String rangeLang = getRangeLang(editConfiguration, vreq);
@@ -270,11 +267,7 @@ public class RDFSLabelGenerator implements EditConfigurationGenerator {
     		field.setRangeLang(rangeLang);
     	}
     	field.setLiteralOptions(getLiteralOptions(editConfiguration, vreq));
-    	
-    	//set assertions
-    	List<String> assertions = new ArrayList<String>();
-    	assertions.addAll(editConfiguration.getN3Required());
-    	field.setAssertions(assertions);
+    	    	
     	fields.put(field.getName(), field);
     	return fields;
 	}

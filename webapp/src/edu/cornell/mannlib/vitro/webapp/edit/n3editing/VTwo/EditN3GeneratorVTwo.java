@@ -26,141 +26,185 @@ import com.hp.hpl.jena.vocabulary.XSD;
  * 
  */
 public class EditN3GeneratorVTwo {
-	
-    EditConfigurationVTwo editConfig;
-    static final Log log = LogFactory.getLog( EditN3GeneratorVTwo.class );
-
-    public EditN3GeneratorVTwo( EditConfigurationVTwo editConfig ){
-        this.editConfig = editConfig;
-    }
-
-    public List<String> generateN3(MultiValueEditSubmission editSub, Model model){
-        return Collections.EMPTY_LIST;
-    }
+    
+    static final Log log = LogFactory.getLog( EditN3GeneratorVTwo.class );  
 
     /**
      * This is the method to use to substitute in URIs into variables of target N3 strings.
      * This takes into account multiple values that would be returned from a select list.
      * subInUris should no longer be used.
+     * 
      * It's important that the map contain String to List<String> mapping.  
-     * Before values are sent in, all of the values for a variable should be placed within an array
-     */
-   
-    
-    public static List<String> subInMultiUris(Map<String,List<String>> varsToVals, List<String> n3targets){       
+     * 
+     * Before values are sent in, all of the values for a variable should be placed within an array.
+     * 
+     * The List n3targets will be modified.
+     */       
+    public void subInMultiUris(Map<String,List<String>> varsToVals, List<String> n3targets){       
     	
-    	if( varsToVals == null || varsToVals.isEmpty() ) return n3targets;
-         ArrayList<String> outv = new ArrayList<String>();
-         for( String target : n3targets){
-             String temp = target;
-             Set<String> keySet = varsToVals.keySet();
-             for( String key : keySet) {
-            	 List<String> value = varsToVals.get(key);
-            	 String valueString = value.toString();
-            	 log.debug("Value String is " + valueString);
-            	 valueString = org.apache.commons.lang.StringUtils.join(value, ">, <");
-            	 valueString = "<" + valueString + ">";
-            	 log.debug("Value string is " + valueString);
-                 temp = subInNonBracketedURIS( key, valueString, temp)  ;
-             }
-             outv.add(temp);
-         }
-         return outv;
-    }
-    
-    //Already includes "<> for URIs so no need to add those here
-    private static String subInNonBracketedURIS(String var, String value, String target) {
-        //empty URIs get skipped
-        if( var == null || var.length() == 0 || value==null  )
-            return target;
-        /* var followed by dot some whitespace or var followed by whitespace*/
-        String varRegex = "\\?" + var + "(?=\\.\\p{Space}|\\p{Space})";
-        String out = null;
-        if("".equals(value))
-            out = target.replaceAll(varRegex,">::" + var + " was BLANK::< ");
-        else {
-            String replaceWith =  Matcher.quoteReplacement(value);
-            out = target.replaceAll(varRegex,replaceWith);
-        }
-        if( out != null && out.length() > 0 )
-            return out;
-        else
-            return target;
-    }
-    
-    public static List<String> subInUris(Map<String,String> varsToVals, List<String> targets){
-        if( varsToVals == null || varsToVals.isEmpty() ) return targets;
-        ArrayList<String> outv = new ArrayList<String>();
-        for( String target : targets){
-            String temp = target;
-            for( String key : varsToVals.keySet()) {
-                temp = subInUris( key, varsToVals.get(key), temp)  ;
+    	if( varsToVals == null || varsToVals.isEmpty() ) return;
+
+        //for (String target : n3targets) {
+    	for( int i = 0; i < n3targets.size() ; i++ ){
+    	    String result = n3targets.get(i);
+            Set<String> keySet = varsToVals.keySet();
+            for (String key : keySet) {
+                List<String> value = varsToVals.get(key);                
+                log.debug("The original value String is " + value.toString());
+                
+                String valueString = org.apache.commons.lang.StringUtils.join(value,
+                        ">, <");                                
+                valueString = "<" + valueString + ">";                
+                log.debug("The multiUri value String is " + valueString);
+                
+                result = subInNonBracketedURIS(key, valueString, result);
             }
-            outv.add(temp);
-        }
-        return outv;
+            n3targets.set(i, result);
+        }         
     }
+  
+    /**
+     * The List targets will be modified.
+     */
+    public void subInUris(Map<String,String> varsToVals, List<String> targets){
+        if( varsToVals == null || varsToVals.isEmpty() || targets == null )
+            return;
 
-
-    
-    //Already includes "<> for URIs so no need to add those here
-    public static String subInUris(String var, String value, String target) {
+        for( int i = 0; i < targets.size() ; i++ ){
+            String result = targets.get(i);            
+            for( String key : varsToVals.keySet()) {
+                result =  subInUris( key, varsToVals.get(key), result);
+            }
+            targets.set(i,result);
+        }        
+    }
+   
+    public String subInUris(String var, String value, String target) {
+        // empty URIs get skipped
         if( var == null || var.isEmpty() || value == null )
-            return target;
+            return target;        
+        
     	return subInNonBracketedURIS(var, "<" + value + ">", target);
     }
-    
-    /*
-    //For cases where comma delimited URIs sent in already including <>
-    public static String subInMultipleUris(String var, List<String> values, String target){
-        //empty URIs get skipped
-        if( var == null || var.length() == 0 || values==null  || values.size() == 0)
-            return target;
-        
-        String varRegex = "\\?" + var + "(?=\\.\\p{Space}|\\p{Space})";
-        String out = null;
-        //Process each 
-        for(String value: values) {
-	        if("".equals(value))
-	        	out = target.replaceAll(varRegex,">::" + var + " was BLANK::< ");
-	        else
-	        	out = target.replaceAll(varRegex,"<"+Matcher.quoteReplacement(value)+"> ");
-        }
-        if( out != null && out.length() > 0 )
-            return out;
-        else
-            return target;
-        
-    }
-    */
-    public static List<String>subInUris(String var, String value, List<String> targets){
-        ArrayList<String> outv =new ArrayList<String>();
+ 
+    public void subInUris(String var, String value, List<String> targets){        
         for( String target : targets){
-            outv.add( subInUris( var,value, target) ) ;
-        }
-        return outv;
+             subInUris( var, value, target);
+        }        
     }
 
     /**
      * This is the method to use to substitute in Literals into variables of target N3 strings.
      * This takes into account multiple values that would be returned from a select list.
      * subInUris should no longer be used.
+     * 
+     * It will modify the list n3targets.
      */
-    public static List<String> subInMultiLiterals(Map<String,List<Literal>> varsToVals, List<String> n3targets){
-        if( varsToVals == null || varsToVals.isEmpty()) return n3targets;
-
-        ArrayList<String>outv=new ArrayList<String>();
-        for( String n3 : n3targets ){
-            String tmp = n3;
-            for( String key : varsToVals.keySet()){
-                tmp = subInMultiLiterals( key, varsToVals.get(key),tmp);                
-            }
-            outv.add(tmp);
+    public void subInMultiLiterals(Map<String,List<Literal>> varsToVals, List<String> n3targets){
+        if( varsToVals == null || varsToVals.isEmpty() || n3targets == null) 
+            return;
+        
+        for( int i=0; i< n3targets.size() ; i++ ){
+            String orginalN3 = n3targets.get(i);
+            String newN3 = orginalN3;
+            for( String key : varsToVals.keySet() ){
+                newN3 = subInMultiLiterals( key, varsToVals.get(key), newN3 );                
+            }         
+            n3targets.set(i, newN3);
         }
-       return outv;
     }
     
-    protected static String subInMultiLiterals(String var, List<Literal>values, String n3){        
+    public void subInLiterals(Map<String, Literal> varsToVals, List<String> n3targets){
+        if( varsToVals == null || varsToVals.isEmpty() || n3targets==null) 
+            return;
+        
+        for( int i=0; i< n3targets.size() ; i++ ){
+            String orginalN3 = n3targets.get(i);
+            String newN3 = orginalN3;
+            for( String key : varsToVals.keySet() ){
+                newN3 = subInLiterals( key, varsToVals.get(key), newN3 );                
+            }         
+            n3targets.set(i, newN3);
+        }        
+    }
+
+
+    /**
+     * When we sub in literals we have to take in to account the Lang or Datatype of
+     * the literal.  N3 needs to have its literals escaped in Python style.  Java regex
+     * Matcher is used to do the substitution and it need escaping to avoid group
+     * references, Matcher.quoteReplacement() serves the purpose.
+     *
+     */
+    protected String subInLiterals(String var, Literal literal, String target){
+        String varRegex = "\\?" + var + "(?=\\.\\p{Space}|\\p{Space})";
+        if (target==null ) {
+            log.error("subInLiterals was passed a null target");
+            return "blankBecauseTargetOrValueWasNull";
+        }else if( var == null ){
+            log.warn("subInLiterals was passed a null var name");
+            return target;
+        }else if( literal == null ){
+            log.debug("subInLiterals was passed a null value for var '"+var+"'; returning target: '"+target+"'");
+            return target;
+        }
+                
+        try{
+        if( literal.getValue() == null )
+            log.debug("value of literal for " + var + " was null");        
+        }catch(com.hp.hpl.jena.datatypes.DatatypeFormatException ex){           
+            log.debug("value for " + var + " " + ex.getMessage());
+        }        
+        
+        String replacement = null;                       
+        if ( literal.getLexicalForm().length()==0 ) {
+            log.debug("empty string found on form for " + var + ".");
+            replacement = ">::" + var + " was empty::<";
+        }else{
+            replacement = formatLiteral(literal);
+        }
+        
+        String out = null;
+        if( replacement != null )
+            out = target.replaceAll(varRegex, Matcher.quoteReplacement( replacement ));
+        else
+            out = target;
+        
+        if( out != null && out.length() > 0 ) 
+            return out;
+        else{
+            log.debug("After attempting to substitue in literals, the target N3 was empty" );
+            return target;
+        }
+    }    
+    
+    
+     private Map<String,List<String>> substituteIntoValues
+             (Map<String,List<String>> varsToUris,
+              Map<String,List<Literal>> varsToLiterals,
+              Map<String,List<String>> namesToN3 )
+     {
+        Map<String,List<String>> outHash = new HashMap<String,List<String>>();
+
+        if (namesToN3==null) {
+            return outHash;
+        } else if (namesToN3.isEmpty()) {
+            return outHash;
+        } else {
+            for(String fieldName : namesToN3.keySet()){
+                List<String> n3strings = namesToN3.get(fieldName);
+                List<String> newList  = new ArrayList<String>();
+//                if( varsToUris != null)
+//                    newList = subInMultiUris(varsToUris, n3strings);
+//                if( varsToLiterals != null)
+//                    newList = subInMultiLiterals(varsToLiterals, newList);
+                outHash.put(fieldName, newList);
+            }
+        }
+        return outHash;
+    }
+     
+    protected String subInMultiLiterals(String var, List<Literal>values, String n3){        
 	  if (n3==null ) {
           log.error("subInMultiLiterals was passed a null n3 String");
           return "blankBecauseTargetOrValueWasNull";
@@ -197,114 +241,26 @@ public class EditN3GeneratorVTwo {
     }
     
     
-    public  List<String> subInLiterals(Map<String, Literal> varsToVals, List<String> targets){
-        if( varsToVals == null || varsToVals.isEmpty()) return targets;
 
-        ArrayList<String> outv =new ArrayList<String>();
-        for( String target : targets){
-            String temp = target;
-            for( String key : varsToVals.keySet()) {
-                temp = subInLiterals( key, varsToVals.get(key), temp);
-            }
-            outv.add(temp);
-        }
-        return outv;
-    }
-
-//    public  List<String>subInLiterals(String var, String value, List<String> targets){
-//        ArrayList<String> outv =new ArrayList<String>();
-//        for( String target : targets){
-//            outv.add( subInLiterals( var,value, target) ) ;
-//        }
-//        return outv;
-//    }
-
-    /**
-     * When we sub in literals we have to take in to account the Lang or Datatype of
-     * the literal.  N3 needs to have its literals escaped in Python style.  Java regex
-     * Matcher is used to do the substitution and it need escaping to avoid group
-     * references, Matcher.quoteReplacement() serves the purpose.
-     *
-     */
-    public  String subInLiterals(String var, Literal literal, String target){
-        String varRegex = "\\?" + var + "(?=\\.\\p{Space}|\\p{Space})";
-        if (target==null ) {
-            log.error("subInLiterals was passed a null target");
-            return "blankBecauseTargetOrValueWasNull";
-        }else if( var == null ){
-            log.warn("subInLiterals was passed a null var name");
-            return target;
-        }else if( literal == null ){
-            log.debug("subInLiterals was passed a null value for var '"+var+"'; returning target: '"+target+"'");
-            return target;
-        }
-                
-        try{
-        if( literal.getValue() == null )
-            log.debug("value of literal for " + var + " was null");        
-        }catch(com.hp.hpl.jena.datatypes.DatatypeFormatException ex){        	
-        	log.debug("value for " + var + " " + ex.getMessage());
-        }
-        
-        //if( editConfig != null && editConfig.getFields() != null &&
-        //    editConfig.getFields().get(var) != null ){
-            //The var might not be in the editConfig.fields if an EditN3Generator
-            //is being used to substitute in values that are not on the form, 
-            //eg ?fileSize for file uploads
-        
-        String replacement = null;                       
-        if ( literal.getLexicalForm().length()==0 ) {
-            log.debug("empty string found on form for " + var + ".");
-            replacement = ">::" + var + " was empty::<";
-        }else{
-            replacement = formatLiteral(literal);
-        }
-        
-        String out = null;
-        if( replacement != null )
-            out = target.replaceAll(varRegex, Matcher.quoteReplacement( replacement ));
-        else
-            out = target;
-        
-        if( out != null && out.length() > 0 ) 
-            return out;
-        else{
-            log.debug("After attempting to substitue in literals, the target N3 was empty" );
-            return target;
-        }
-    }    
-    
-    
-     public Map<String,List<String>> substituteIntoValues
-             (Map<String,List<String>> varsToUris,
-              Map<String,List<Literal>> varsToLiterals,
-              Map<String,List<String>> namesToN3 )
-     {
-        Map<String,List<String>> outHash = new HashMap<String,List<String>>();
-
-        if (namesToN3==null) {
-            return outHash;
-        } else if (namesToN3.isEmpty()) {
-            return outHash;
-        } else {
-            for(String fieldName : namesToN3.keySet()){
-                List<String> n3strings = namesToN3.get(fieldName);
-                List<String> newList  = new ArrayList<String>();
-                if( varsToUris != null)
-                    newList = subInMultiUris(varsToUris, n3strings);
-                if( varsToLiterals != null)
-                    newList = subInMultiLiterals(varsToLiterals, newList);
-                outHash.put(fieldName, newList);
-            }
-        }
-        return outHash;
-    }
 
     protected String quoteForN3(String in){
         //TODO: THIS  NEEDS TO BE ESCAPED FOR N3 which is python string escaping
         return in;
     }
     
+    
+    //Already includes "<> for URIs so no need to add those here
+    protected String subInNonBracketedURIS(String var, String value, String target) {       
+        /* var followed by dot some whitespace or var followed by whitespace*/
+        String varRegex = "\\?" + var + "(?=\\p{Punct}|\\p{Space})";
+        String out = null;
+        if("".equals(value))
+            return target.replaceAll(varRegex,">::" + var + " was BLANK::< ");
+        else {
+            String replaceWith =  Matcher.quoteReplacement(value);
+            return target.replaceAll(varRegex,replaceWith);
+        }        
+    }
     
     /*
      * bdc34 2008-07-33

@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,8 +17,27 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 
 public class EditN3GeneratorVTwoTest {
+    static EditN3GeneratorVTwo gen = new EditN3GeneratorVTwo();
+    
+    @Test
+    public void testPunctAfterVarName(){        
+        List<String> targets = Arrays.asList("?var.","?var;","?var]","?var,"); 
+        
+        Map<String,List<String>> keyToValues = new HashMap<String,List<String>>();        
+        keyToValues.put("var", Arrays.asList("ABC"));
+        
+        gen.subInMultiUris(keyToValues, targets);
+        Assert.assertNotNull(targets);
+        Assert.assertEquals(4,targets.size());
+        
+        Assert.assertEquals("<ABC>.", targets.get(0));
+        Assert.assertEquals("<ABC>;", targets.get(1));
+        Assert.assertEquals("<ABC>]", targets.get(2));
+        Assert.assertEquals("<ABC>,", targets.get(3));                
+    }
+    
     @Test 
-    public void testSubInMultiUrisNull(){
+    public void testSubInMultiUrisNull(){        
         String n3 = "?varXYZ" ;
         List<String> targets = new ArrayList<String>();
         targets.add(n3);
@@ -27,11 +47,11 @@ public class EditN3GeneratorVTwoTest {
         targetValue.add(null);       
         keyToValues.put("varXYZ", targetValue);
         
-        List<String> result = EditN3GeneratorVTwo.subInMultiUris(keyToValues, targets);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(1,result.size());
+        gen.subInMultiUris(keyToValues, targets);
+        Assert.assertNotNull(targets);
+        Assert.assertEquals(1,targets.size());
         
-        String resultN3 = result.get(0);
+        String resultN3 = targets.get(0);
         Assert.assertNotNull(resultN3);
         Assert.assertTrue("String was empty", !resultN3.isEmpty());
         
@@ -49,7 +69,8 @@ public class EditN3GeneratorVTwoTest {
         Map<String,String> keyToValues = new HashMap<String,String>();                       
         keyToValues.put("varXYZ", "xyzURI");
         
-        List<String> result = EditN3GeneratorVTwo.subInUris(keyToValues, targets);
+        gen.subInUris(keyToValues, targets);
+        List<String> result = targets;
         Assert.assertNotNull(result);
         Assert.assertEquals(1,result.size());
         
@@ -60,13 +81,15 @@ public class EditN3GeneratorVTwoTest {
         
         keyToValues = new HashMap<String,String>();                       
         keyToValues.put("varXYZ", null);
+                
+        List<String> targets2 = new ArrayList<String>();
+        targets2.add(n3);
         
-        result = EditN3GeneratorVTwo.subInUris(keyToValues, targets);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(1,result.size());
+        gen.subInUris(keyToValues, targets2);
+        Assert.assertNotNull(targets2);
+        Assert.assertEquals(1,targets2.size());
         
-        resultN3 = result.get(0);
-        resultN3 = result.get(0);
+        resultN3 = targets2.get(0);        
         Assert.assertNotNull(resultN3);
         Assert.assertTrue("String was empty", !resultN3.isEmpty());                
         Assert.assertEquals(" ?varXYZ ", resultN3);
@@ -109,19 +132,19 @@ core:educationalTrainingOf ?person ;
         keyToValues.put("subject", subject);
         keyToValues.put("predicate", predicate);
         
-        List<String> n3results = EditN3GeneratorVTwo.subInMultiUris(keyToValues, strs);
+        gen.subInMultiUris(keyToValues, strs);        
         
-        Assert.assertNotNull(n3results);
-        Assert.assertTrue( n3results.size() == 1 );
+        Assert.assertNotNull(strs);
+        Assert.assertTrue( strs.size() == 1 );
         String expected ="<http://testsubject.com/1> <http://testpredicate.com/2> <http://a.com/2>, <http://b.com/ont#2>, <http://c.com/individual/n23431> .";
-        Assert.assertEquals(expected, n3results.get(0));
+        Assert.assertEquals(expected, strs.get(0));
         
         //Replace subject and predicate with other variables
         
         //make a model,
         Model expectedModel = ModelFactory.createDefaultModel();
         StringReader expectedReader = new StringReader(expected);
-        StringReader resultReader = new StringReader(n3results.get(0));
+        StringReader resultReader = new StringReader(strs.get(0));
         expectedModel.read(expectedReader, null, "N3");
         Model resultModel = ModelFactory.createDefaultModel();
         resultModel.read(resultReader, null, "N3");

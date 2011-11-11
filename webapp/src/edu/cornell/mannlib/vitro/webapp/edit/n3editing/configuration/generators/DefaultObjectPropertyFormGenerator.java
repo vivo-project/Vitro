@@ -2,8 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators;
 
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,29 +13,19 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
-
-
+import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.ontology.OntModel;
+
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditN3GeneratorVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.SelectListGeneratorVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
-import edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 /**
@@ -43,7 +33,8 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
  *
  */
 public class DefaultObjectPropertyFormGenerator implements EditConfigurationGenerator {
-	
+
+    //TODO: bdc34 why does the DefaultObjectPropertyForm have all this data property stuff?
 	private Log log = LogFactory.getLog(DefaultObjectPropertyFormGenerator.class);
 	private boolean isObjectPropForm = false;
 	private String subjectUri = null;
@@ -76,9 +67,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     }
     
     private EditConfigurationVTwo getDefaultObjectEditConfiguration(VitroRequest vreq, HttpSession session) {
-    	EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();
-    	//Set n3 generator
-    	editConfiguration.setN3Generator(new EditN3GeneratorVTwo(editConfiguration));
+    	EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();    	
     	
     	//process subject, predicate, object parameters
     	this.initProcessParameters(vreq, session, editConfiguration);
@@ -204,19 +193,11 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	//this needs to be set for the editing to be triggered properly, otherwise the 'prepare' method
     	//pretends this is a data property editing statement and throws an error
     	//TODO: Check if null in case no object uri exists but this is still an object property
-    	if(objectUri != null) {
-    		editConfiguration.setObjectResource(true);
-    	}
     }
     
     private void processDataPropForm(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
-    	editConfiguration.setObjectResource(false);
-    	//set data prop value, data prop key str, 
-    	editConfiguration.setDatapropKey((datapropKeyStr==null)?"":datapropKeyStr);
-    	editConfiguration.setVarNameForObject(dataLiteral);
-    	//original set datapropValue, which in this case would be empty string but no way here
-    	editConfiguration.setDatapropValue("");
-    	editConfiguration.setUrlPatternToReturnTo("/entity");
+        //bdc34
+        throw new Error("DefaultObjectPropertyForm should not be doing data property editng");    	
     }
     
     //Get N3 required 
@@ -338,7 +319,6 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 		Map<String, FieldVTwo> fields = new HashMap<String, FieldVTwo>();
 		FieldVTwo field = new FieldVTwo();
     	field.setName(dataLiteral);
-    	field.setNewResource(false);
     	//queryForExisting is not being used anywhere in Field
     	String rangeDatatypeUri = getRangeDatatypeUri(editConfiguration, vreq);
     	String rangeLang = getRangeLang(editConfiguration, vreq);
@@ -360,12 +340,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	}
     	field.setLiteralOptions(getLiteralOptions(editConfiguration, vreq));
     	
-    	//set assertions
-    	List<String> assertions = new ArrayList<String>();
-    	assertions.addAll(editConfiguration.getN3Required());
-    	field.setAssertions(assertions);
-    	fields.put(field.getName(), field);
-    	
+    	fields.put(field.getName(), field);    	
     	return fields;
 	}
 
@@ -436,8 +411,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 			EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
 		Map<String, FieldVTwo> fields = new HashMap<String, FieldVTwo>();
 		FieldVTwo field = new FieldVTwo();
-    	field.setName("objectVar");
-    	field.setNewResource(false);
+    	field.setName("objectVar");    	
     	//queryForExisting is not being used anywhere in Field
     	
     	List<String> validators = new ArrayList<String>();
@@ -454,11 +428,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	
     	field.setRangeLang(null);
     	field.setLiteralOptions(new ArrayList<List<String>>());
-    	
-    	List<String> assertions = new ArrayList<String>();
-    	assertions.addAll(editConfiguration.getN3Required());
-    	assertions.addAll(editConfiguration.getN3Optional());
-    	field.setAssertions(assertions);
+    	    	
     	fields.put(field.getName(), field);
     	
     	return fields;
@@ -480,6 +450,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 	            editConfiguration.prepareForNonUpdate( model );
 	        }
     	} else {
+    	    //TODO: why is this checking for data prop keys? 
     		if(datapropKeyStr != null && datapropKeyStr.trim().length() > 0 ) {
 	    		DataPropertyStatement dps = EditConfigurationUtils.getDataPropertyStatement(vreq, 
 	    				session, 
@@ -490,13 +461,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     		}
     	}
     }
-    
-    //Command processing
-    private boolean isTypeOfNew(VitroRequest vreq) {
-    	String typeOfNew = vreq.getParameter("typeOfNew");
-    	return (typeOfNew != null && !typeOfNew.isEmpty());
-    }
-    
+      
     private boolean isSelectFromExisting(VitroRequest vreq) {
     	String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
     	if(EditConfigurationUtils.isDataProperty(predicateUri, vreq)) {

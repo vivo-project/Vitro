@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.DefaultDataPropEmptyField;
 import edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils;
 
 public class DefaultDataPropertyFormGenerator implements EditConfigurationGenerator {
@@ -119,12 +121,10 @@ public class DefaultDataPropertyFormGenerator implements EditConfigurationGenera
     	editConfiguration.setVarNameForPredicate("predicate");
     	editConfiguration.setPredicateUri(predicateUriJson);
 
-
-
-	    
+    	//deal with empty field
+    	editConfiguration.addModelChangePreprocessor( new DefaultDataPropEmptyField() );	        	
     	
-    	
-		return null;
+		return editConfiguration;
 	}
 
 	private EditConfigurationVTwo doHelp(VitroRequest vreq, String string) {
