@@ -16,7 +16,8 @@
  * ----------------------------------------------------------------------------
  * You provide:
  *   p -- the DOM element that contains the template and the data. 
- *         It also contains the autocomplete field.
+ *         It also contains the autocomplete field, with a status element and
+ *         perhaps 1 or more excluded URIs
  * ----------------------------------------------------------------------------
  */
 function proxyItemsPanel(panel, contextInfo)  {
@@ -53,9 +54,12 @@ function proxyItemsPanel(panel, contextInfo)  {
 	}
 
 	this.removeItem = function(info) {
-		var idx = self.itemData.indexOf(info);
-		if (idx != -1) {
-			self.itemData.splice(idx, 1);
+		var i;
+		for (i = 0; i < self.itemData.length; i++) {
+			if (self.itemData[i] === info) {
+				self.itemData.splice(i, 1);
+				break;
+			}
 		}
 		self.displayItemData();
 	}
