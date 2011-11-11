@@ -386,9 +386,9 @@ a.disable-delete {
 #search-proxy h4 {
     margin-bottom: 0;
 }
-.proxy-profile .proxyInfoElement {
+/*.proxy-profile .proxyInfoElement {
     margin-left: 20px;
-}
+}*/
 p.selected-editors {
     padding-top: 1.2em;
     border-top: 1px solid #E0DFDF;
@@ -432,4 +432,10 @@ section.list-proxy-profile:nth-child(2n) {
 }
 a.remove-proxyUri {
     font-size: .9em;
+}
+
+li.proxyInfoElement {
+    padding-bottom: 1em;
+    clear: both;
+    padding-left: 20px;
 }

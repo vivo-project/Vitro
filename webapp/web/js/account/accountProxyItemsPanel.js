@@ -162,7 +162,7 @@ $(document).ready(function() {
 		return;
 	}
 
-	$("div[name='proxyProfilesPanel']").each(function(i) {
+	$("section[name='proxyProfilesPanel']").each(function(i) {
 		var context = {
 			baseUrl: proxyContextInfo.baseUrl,
 			ajaxUrl: proxyContextInfo.ajaxUrl,
@@ -172,7 +172,7 @@ $(document).ready(function() {
 		this["proxyItemsPanel"] = new proxyItemsPanel(this, context);
 	});
 	
-	$("div[name='proxyProxiesPanel']").each(function(i) {
+	$("section[name='proxyProxiesPanel']").each(function(i) {
 		var context = {
 			baseUrl: proxyContextInfo.baseUrl,
 			ajaxUrl: proxyContextInfo.ajaxUrl,

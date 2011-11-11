@@ -1,13 +1,12 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
     
 $(document).ready(function(){
-      
      //Remove initial value of input text 'Select an existing last name'
     $('input[name="proxySelectorAC"]').click(function(){
         $(this).val('');
     });
     
-    //Alert when user doesn't select an editor and a profile
+    //Alert when user doesn't select an editor and a profile after submitting from for relating proxy-profiles
     $('input[name="createRelationship"]').click(function(){
         var $proxyUri = $('#add-relation input[name="proxyUri"]').val();
         var $profileUri = $('#add-relation input[name="profileUri"]').val();
