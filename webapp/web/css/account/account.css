@@ -291,13 +291,13 @@ a.disable-delete {
 #edit-myProxy h4 {
     padding-top: 0;
 }
-.photo-profile {
-    border: 2px solid #DDE4E3;
-}
-#edit-myProxy .proxyInfoElement {
+
+#edit-myProxy li.proxyInfoElement {
     padding-top: .8em;
     border-bottom: 1px dotted #E0DFDF;
-    padding-bottom: 1em;
+    padding-bottom: 2em;
+    padding-left: 0;
+    clear: both;
 }
 #edit-myProxy p.search-status {
     margin-top: -10px;
@@ -311,15 +311,19 @@ a.disable-delete {
     border-top: 1px solid #E0DFDF;
     padding-left: 0;
 }
-#edit-myProxy a.remove-proxy {
-    font-size: .9em;
+#edit-myProxy img.photo-profile {
+    border: 2px solid #DDE4E3;
+    float: left;
 }
-#edit-myProxy .proxy-info {
-    padding-left: 1em; 
-    vertical-align: middle;
+#edit-myProxy p.proxy-info {
+    padding-left: 110px;
+    padding-top: 15px;
 }
 #edit-myProxy span.class-label {
     color: #7F8993;
+}
+#edit-myProxy a.remove-proxy {
+    font-size: .9em;
 }
 
 /* MANAGE PROXY ------>  */

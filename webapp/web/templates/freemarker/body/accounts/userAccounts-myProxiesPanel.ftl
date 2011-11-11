@@ -5,14 +5,15 @@
 <section id="edit-myProxy" name="proxyProxiesPanel" role="region">
     <h4>Who can edit my profile</h4>
     
-    <p>Add profile editor</p>
-    <p><input type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name"></p>
+    <label for="addProfileEditor">Add profile editor</label>
+    <input id="addProfileEditor" type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name" role="input" />
+    
     <p class="search-status"><span name='proxySelectorSearchStatus' moreCharsText='type more characters' noMatchText='no match'>&nbsp;</span></p>
     <p name="excludeUri" style="display: none">${myAccountUri}<p>
-
     <p class="selected-editors">Selected editors:</p>
-    <#-- Magic div thst holds all of the proxy data and the template that shows how to display it. -->
-    <ul name="proxyData">
+    
+    <#-- Magic ul that holds all of the proxy data and the template that shows how to display it. -->
+    <ul name="proxyData" role="navigation">
         <#list proxies as proxy>
             <div name="data" style="display: none">
                 <p name="uri">${proxy.uri}</p>
@@ -29,15 +30,16 @@
               -- a hidden input field with templatePart="uriField"  
         -->
         <div name="template" style="display: none">
-            <li>
-                        <img class="photo-profile" width="90" alt="%label%" src="%imageUrl%">
-
-                    <div class="proxy-info">
-                        %label% | <span class="class-label">%classLabel%</span>
-                        <br /><a class='remove-proxy' href="." templatePart="remove">Remove selection</a>
-                        <input type="hidden" name="proxyUri" value="%uri%" >
-                    </div
-                </li>
+            <li role="listitem">
+                <img class="photo-profile" width="90" alt="%label%" src="%imageUrl%">
+                
+                <p class="proxy-info">%label% | <span class="class-label">%classLabel%</span>
+                    <br />
+                    <a class='remove-proxy' href="." templatePart="remove">Remove selection</a>
+                    
+                    <input type="hidden" name="proxyUri" value="%uri%" role="input" />
+                </p>
+            </li>
         </div>
     </ul>
 </section>
