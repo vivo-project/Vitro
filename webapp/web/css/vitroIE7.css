@@ -192,7 +192,8 @@ input#externalAuthChkBox {
 span.controls {
     margin-top: -30px;
     padding-right: 5px;
-}    
+}
+/* Fix meny proxy page */    
 #search-proxy input {
     float: left;
 }
