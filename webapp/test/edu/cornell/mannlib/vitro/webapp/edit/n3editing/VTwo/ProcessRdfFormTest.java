@@ -149,7 +149,54 @@ public class ProcessRdfFormTest extends AbstractTestClass{
         assertEquals("b.1 <" + testXURI + "> <" + testYURI + "> <" + testZURI + ">.", b.get(1));
         
     }
-    
+
+    @Test
+    public void unicodeTest() throws Exception{
+        /* A test unicode characters with new statement edit. */                
+        
+        /* make configuration */
+        EditConfigurationVTwo config = new EditConfigurationVTwo();
+        config.setEditKey("mockEditKey");
+        config.setN3Required(Arrays.asList("?test1 ?test2 ?test3 ." ));
+        config.setUrisOnform(Arrays.asList("test1", "test2", "test3"));
+        
+        String test1 = "http://test.com/uriWithUnicodeƺ",
+            test2 = "http://test.com/latin-1-ÙåàÞñöÿ",
+            test3 = "http://test.com/moreUnicode-ἎἘὤ" ;
+        
+        /* make submission */
+        Map<String,String[]> values = new HashMap<String, String[]>();        
+        values.put("test1", (new String[] {test1}));
+        values.put("test2", (new String[] {test2}));
+        values.put("test3", (new String[] {test3}));
+        values.put("editKey", (new String[] {"mockEditKey"}));                
+        MultiValueEditSubmission submission = new MultiValueEditSubmission(values, config);
+                
+        ProcessRdfForm processor = new ProcessRdfForm(config,getMockNewURIMaker());
+        
+        /* test just the N3 substitution part */
+        List<String>req = config.getN3Required();
+        List<String>opt = config.getN3Optional();
+        processor.subInValuesToN3( config , submission, req, opt, null , null);
+        assertNotNull(req);
+        assertTrue( req.size() > 0);
+        assertNotNull(req.get(0));
+        assertEquals("<" +test1+ "> <" +test2+ "> <" +test3+ "> .", req.get(0));
+        
+        /* test the N3 and parse RDF parts */
+        AdditionsAndRetractions changes = processor.process( config, submission );
+        
+        assertNotNull( changes );
+        assertNotNull( changes.getAdditions() );
+        assertNotNull( changes.getRetractions());
+        assertTrue( changes.getAdditions().size() == 1 );
+        assertTrue( changes.getRetractions().size() == 0 );
+        
+        assertTrue( changes.getAdditions().contains(
+                ResourceFactory.createResource(test1), 
+                ResourceFactory.createProperty(test2),
+                ResourceFactory.createResource(test3)));
+    }
     
     public NewURIMaker getMockNewURIMaker(){
         return new NewURIMaker() {
