@@ -17,8 +17,7 @@ import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 
 public class ProcessRdfFormTest extends AbstractTestClass{
- 
-    
+     
     @Test
     public void basicNewStatementTest() throws Exception{
         

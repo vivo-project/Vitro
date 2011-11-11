@@ -116,27 +116,39 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 		return EditSubmissionUtils.getEditSubmissionFromSession(vreq.getSession(), editConfig);
 	}
 
-
-
+	//TODO: should more of what happens in this method
+    //happen in the generators?
 	private EditConfigurationVTwo setupEditConfiguration(String editConfGeneratorName,
-			VitroRequest vreq) {
-
+			VitroRequest vreq) {	    	    	    
     	HttpSession session = vreq.getSession();
-    	EditConfigurationVTwo editConfig = makeEditConfigurationVTwo( editConfGeneratorName, vreq, session);
-        //edit key should now always be set in the generator class
-    	//put edit configuration in session
-    	
+    	EditConfigurationVTwo editConfig = 
+    	    makeEditConfigurationVTwo( editConfGeneratorName, vreq, session);
+
+        //edit key is set here, NOT in the generator class
+    	String editKey = EditConfigurationUtils.getEditKey(vreq);  
+        editConfig.setEditKey(editKey);        
+
+        //put edit configuration in session so it can be accessed on form submit.
         EditConfigurationVTwo.putConfigInSession(editConfig, session);
         
         Model model = (Model) getServletContext().getAttribute("jenaOntModel");
+        
+        if( editConfig.getSubjectUri() == null)
+            editConfig.setSubjectUri( EditConfigurationUtils.getSubjectUri(vreq));
+        if( editConfig.getPredicateUri() == null )
+            editConfig.setPredicateUri( EditConfigurationUtils.getPredicateUri(vreq));
+        
         String objectUri = EditConfigurationUtils.getObjectUri(vreq);
         String dataKey = EditConfigurationUtils.getDataPropKey(vreq);
-        if (objectUri != null) { // editing existing object  
+        if (objectUri != null && ! objectUri.trim().isEmpty()) { 
+            // editing existing object
+            if( editConfig.getObject() == null)
+                editConfig.setObject( EditConfigurationUtils.getObjectUri(vreq));
             editConfig.prepareForObjPropUpdate(model);
         } else if( dataKey != null ) { // edit of a data prop
             //do nothing since the data prop form generator must take care of it
         } else{
-            //this might be a create new or a form  
+            //this might be a create new or a form
             editConfig.prepareForNonUpdate(model);
         }
         

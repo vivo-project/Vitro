@@ -462,14 +462,18 @@ public class ProcessRdfForm {
            Map<String, List<String>> multiUris, List<String> ... n3StrLists) {
        
        for( List<String> n3s : n3StrLists){
-           populator.subInMultiUris(multiUris, n3s);
+           if( n3s != null ){
+               populator.subInMultiUris(multiUris, n3s);
+           }
        }                
    }
 
    private void substituteInURIs(
            Map<String, String> uris, List<String> ... n3StrLists) {        
        for( List<String> n3s : n3StrLists){
-           populator.subInUris(uris, n3s);
+           if( n3s != null ){
+               populator.subInUris(uris, n3s);
+           }
        }                
    }    
       

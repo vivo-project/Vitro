@@ -101,7 +101,7 @@ public class EditConfigurationVTwo {
     String datapropKey;
     String datapropValue;
 
-    String urlPatternToReturnTo;
+    String urlPatternToReturnTo = INDIVIDUAL_CONTROLLER ;
     String entityToReturnTo;
     String formUrl;
     String editKey;
@@ -948,4 +948,6 @@ public class EditConfigurationVTwo {
     public String toString(){        
         return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);        
     }
+    
+    private static final String INDIVIDUAL_CONTROLLER = "/individual";
 }
