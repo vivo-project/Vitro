@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -14,7 +13,6 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Query;
@@ -24,6 +22,8 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.ResIterator;
+import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -36,13 +36,13 @@ import com.hp.hpl.jena.sdb.store.DatabaseType;
 import com.hp.hpl.jena.sdb.store.LayoutType;
 import com.hp.hpl.jena.sdb.util.StoreUtils;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.util.ResourceUtils;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
@@ -291,39 +291,66 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase implements java
 	private void checkForNamespaceMismatch(OntModel model, ServletContext ctx) {
 		String expectedNamespace = getDefaultNamespace(ctx);
 
-		List<String> portalURIs = new ArrayList<String>();
+		List<Resource> portals = getPortal1s(model);
+
+		if(!portals.isEmpty() && noPortalForNamespace(
+				portals, expectedNamespace)) {
+			// There really should be only one portal 1, but if there happen to 
+			// be multiple, just arbitrarily pick the first in the list.
+			Resource portal = portals.get(0); 
+			String oldNamespace = portal.getNameSpace();
+			renamePortal(portal, expectedNamespace, model);
+			StartupStatus ss = StartupStatus.getBean(ctx);
+			ss.warning(this, "\nThe default namespace has been changed \n" +  
+					         "from " + oldNamespace + 
+					         "\nto " + expectedNamespace + ".\n" +
+					         "The application will function normally, but " +
+					         "any individuals in the \n" + oldNamespace + " " + 
+					         "namespace will need to have their URIs \n" +
+					         "changed in order to be served as linked data. " +
+					         "You can use the Ingest Tools \nto change the " +
+					         "URIs for a batch of resources.");
+		}
+	}
+	
+    private List<Resource> getPortal1s(Model model) {
+		List<Resource> portals = new ArrayList<Resource>();
 		try {
 			model.enterCriticalSection(Lock.READ);
-			Iterator<Individual> portalIt = model.listIndividuals(PORTAL);
+			ResIterator portalIt = model.listResourcesWithProperty(
+					RDF.type, PORTAL);
 			while (portalIt.hasNext()) {
-				portalURIs.add(portalIt.next().getURI());
+				Resource portal = portalIt.nextResource();
+				if ("portal1".equals(portal.getLocalName())) {
+					portals.add(portal);
+				}
 			}
 		} finally {
 			model.leaveCriticalSection();
 		}
-
-		for (String portalUri : portalURIs) {
-			if (portalUri == null) {
-				continue;
-			}
-
-			int splitHere = portalUri.lastIndexOf("/") + 1;
-			String actualNamespace = portalUri.substring(0, splitHere);
-			String portalName = portalUri.substring(splitHere);
-
-			if ("portal1".equals(portalName)
-					&& (!expectedNamespace.equals(actualNamespace))) {
-				StartupStatus ss = StartupStatus.getBean(ctx);
-				ss.fatal(this, "Default namespace mis-match. "
-						+ "The default namespace specified in deploy.properties ('" + expectedNamespace + "') "
-						+ "does not match the namespace used in the database ('" + actualNamespace + "'). "
-						+ "Perhaps the 'Vitro.defaultNamespace' property in deploy.properties is incorrect, "
-						+ "or perhaps the 'VitroConnection.DataSource.url' property in deploy.properties "
-						+ "specifies the wrong database.");
+		return portals;
+    }
+	
+	private boolean noPortalForNamespace(List<Resource> portals, 
+                                         String expectedNamespace) {
+		for (Resource portal : portals) {
+			if(expectedNamespace.equals(portal.getNameSpace())) {
+				return false;
 			}
 		}
+		return true;
 	}
 
+	private void renamePortal(Resource portal, String namespace, Model model) {
+		model.enterCriticalSection(Lock.WRITE);
+		try {
+			ResourceUtils.renameResource(
+					portal, namespace + portal.getLocalName());
+		} finally {
+			model.leaveCriticalSection();
+		}
+	}
+	
 
     /* ====================================================================== */
     
