@@ -86,8 +86,6 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
         this.nonuserNamespaces = base.nonuserNamespaces;
         this.preferredLanguages = base.preferredLanguages;
         this.userURI = userURI;
-        this.flag2ValueMap = base.flag2ValueMap;
-        this.flag2ClassLabelMap = base.flag2ClassLabelMap;
         this.dwf = base.dwf;
     }
 	

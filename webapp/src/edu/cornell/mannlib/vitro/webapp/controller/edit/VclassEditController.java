@@ -50,10 +50,8 @@ public class VclassEditController extends BaseEditController {
         VClass vcl = (VClass)vcwDao.getVClassByURI(request.getParameter("uri"));
         
         if (vcl == null) {
-        	if (VitroModelProperties.isRDFS(request.getFullWebappDaoFactory().getLanguageProfile()) 
-        			&& ( (RDF.getURI()+"Resource").equals(request.getParameter("uri")))) {
-        		vcl = new VClass(RDF.getURI()+"Resource");
-        	}
+        	vcl = request.getFullWebappDaoFactory()
+        	        .getVClassDao().getTopConcept();
         }
 
         request.setAttribute("VClass",vcl);

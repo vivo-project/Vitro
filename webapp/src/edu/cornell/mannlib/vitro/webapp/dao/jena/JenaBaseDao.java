@@ -887,22 +887,6 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     protected String getDefaultLanguage() {
         return PREFERRED_LANGUAGES[0];
     }
-
-    protected Map<String,OntClass>getFlag2ValueMap() {
-        try {
-            return ((WebappDaoFactoryJena) this.webappDaoFactory).getFlag2ValueMap();
-        } catch (ClassCastException cce) {
-            return null;
-        }
-    }
-
-    protected Map<Resource,String>getFlag2ClassLabelMap() {
-        try {
-            return ((WebappDaoFactoryJena) this.webappDaoFactory).getFlag2ClassLabelMap();
-        } catch (ClassCastException cce) {
-            return null;
-        }
-    }
     
     /**
      * Checks a URI for validity.  Jena models can store invalid URIs, but this causes RDF/XML output serialization to fail.

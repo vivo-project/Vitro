@@ -93,10 +93,6 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
         //TODO: need to clone the filtering factory
         return innerWebappDaoFactory.getUserAwareDaoFactory(userURI);
     }
-
-    public int getLanguageProfile() {
-    	return innerWebappDaoFactory.getLanguageProfile();
-    }
     
     public String getDefaultNamespace() {
         return innerWebappDaoFactory.getDefaultNamespace();

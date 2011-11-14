@@ -84,36 +84,15 @@ public class ClassHierarchyListingController extends BaseEditController {
         } else if (startClassUri != null) {
         	roots = new LinkedList<VClass>();
         	roots.add(vcDao.getVClassByURI(startClassUri));
-        } else {
-        	/* TODO: this needs more thinking */
-        	if (false) { // (getWebappDaoFactory() instanceof WebappDaoFactoryJena) {
-        		String topConceptURI = null;
-        		int langProfile = ((WebappDaoFactoryJena) vrequest.getFullWebappDaoFactory()).getLanguageProfile();
-        		if (langProfile==WebappDaoFactoryJena.OWL_CONST) {
-        			topConceptURI = OWL.Thing.getURI();
-        		} else if (langProfile==WebappDaoFactoryJena.RDFS_CONST) {
-        			topConceptURI = RDFS.Resource.getURI();
-        		}
-        		VClass top = vcDao.getVClassByURI(topConceptURI);
-        		if (top != null) {
-        			roots = new LinkedList<VClass>();
-        			roots.add(top);
-        		} else {
-        			roots = vcDao.getRootClasses();
-        		}
-        	} else {
-        		roots = vcDao.getRootClasses();
-        	}
+        } else {    	
+       		roots = vcDao.getRootClasses();
         }
         
         // DEBUGGING
         if (roots == null) {
         	roots = new LinkedList<VClass>();
-        	if (VitroModelProperties.isOWL(vrequest.getFullWebappDaoFactory().getLanguageProfile())) {
-        		roots.add(vcDao.getVClassByURI(OWL.Thing.getURI()));
-        	} else if (VitroModelProperties.isRDFS(vrequest.getFullWebappDaoFactory().getLanguageProfile())) {
-        		roots.add(new VClass(RDF.getURI()+"Resource"));
-        	} 
+        	roots.add(vrequest.getFullWebappDaoFactory().getVClassDao()
+        			.getTopConcept());
         }
         
         Collections.sort(roots);

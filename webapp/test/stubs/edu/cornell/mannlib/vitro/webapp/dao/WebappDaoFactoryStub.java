@@ -105,12 +105,6 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	}
 
 	@Override
-	public int getLanguageProfile() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getLanguageProfile() not implemented.");
-	}
-
-	@Override
 	public String getDefaultNamespace() {
 		throw new RuntimeException(
 				"WebappDaoFactory.getDefaultNamespace() not implemented.");
