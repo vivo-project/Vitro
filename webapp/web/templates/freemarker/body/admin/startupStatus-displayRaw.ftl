@@ -23,88 +23,90 @@
     <#else>
         <#assign color = "" >
     </#if>
-    <tr><td>
-        <table cellspacing="0" class="item ${color}">
-            <tr class="top">
-                <td width="20%">${item.level}</td>
-                <td>${item.shortSourceName}</td>
-            </tr>
-            <tr>
-                <td colspan="2">${item.message}</td>
-            </tr>
-            <tr>
-                <td colspan="2">${item.sourceName}</td>
-            </tr>
+    <li class="item ${color}" role="listitem">
+        <h4>${item.level}: ${item.shortSourceName}</h4>
+        
+        <ul class="item-spec" role="navigation">
+            <li role="listitem">${item.message}</li>
+            <li role="listitem">${item.sourceName}</li>
             <#if item.cause??>
-                <tr>
-                    <td colspan="2"><pre>${item.cause}</pre></td>
-                </tr>
+            <li role="listitem"><pre>${item.cause}</pre></li>
             </#if>
-        </table>
-    </td></tr>
+        </ul>
+    </li>
 </#macro>
 
-<html>
+<!DOCTYPE html>
+
+<html lang="en">
     <head>
         <title>Startup Status</title>
         
         <style TYPE="text/css">
-            table.item {
-                border: thin solid black;
-                font-family: monospace;
-                width: 100%;
-            }
-            table.item tr.top {
-                font-size: larger;
-            }
-            table.item td {
-                border: thin solid black;
-            }
-            .error td {
-                background: #FFDDDD;
-                font-weight: bolder;
-            }
-            .warning td {
-                background: #FFFFDD;
-            }
-            .info td {
-                background: #DDFFDD;
-            }
-            .not_executed td {
-                color: #444444;
-            }
+           #startup-trace {
+               width: 100%;
+           }
+           #startup-trace h4 {
+               padding: .5em;
+               margin-bottom: 0;
+               padding-bottom: .5em;
+               padding-top: 1em;
+           }
+           #startup-trace ul.item-spec {
+               margin-bottom: 1em;
+           }
+           #startup-trace ul.item-spec li{
+               padding-left: .5em;
+               padding-bottom: .4em;
+           }
+           #startup-trace li.error {
+               background-color: #FFDDDD;
+           }
+           #startup-trace li.warning{
+               background-color: #FFFFDD; 
+           }
+           #startup-trace li.info {
+               background-color: #DDFFDD;
+           }
+           #startup-trace li.not_executed {
+               background-color: #F3F3F0;
+           }
+           
         </style> 
     </head>
 
     <body>
-    	<#if status.errorItems?has_content>
-    	    <h2>Fatal error</h2>
-    	    <p>${contextPath} detected a fatal error during startup.</p>
-    	    <#if showLink>
-                <p><a href=".">Continue</a></p>
-    	    </#if>
-    	    <#list status.errorItems as item>
+        <#if status.errorItems?has_content>
+            <h2>Fatal error</h2>
+
+            <p>VIVO detected a fatal error during startup.</p>
+
+            <ul id="startup-trace" cellspacing="0" class="trace" role="navigation">
+            <#list status.errorItems as item>
               <@statusItem item=item />
-    	    </#list>
-    	</#if>
-    
-    	<#if status.warningItems?has_content>
-    	    <h2>Warning</h2>
-    	    <p>${contextPath} found problems during startup.</p>
-    	    <#if showLink>
-                <p><a href=".">Continue</a></p>
-    	    </#if>
-    	    <#list status.warningItems as item>
-              <@statusItem item=item />
-    	    </#list>
-    	</#if>
-    
-    	<h2>Startup trace</h2>
-    	<p>The full list of startup events and messages.</p>
-    	<table cellspacing="0" class="trace">
-            <#list status.statusItems as item>
-                <@statusItem item=item />
             </#list>
-        </table>
+            </ul>
+        </#if>
+
+        <#if status.warningItems?has_content>
+            <h2>Warning</h2>
+
+            <p>VIVO issued warnings during startup.</p>
+
+            <ul id="startup-trace" cellspacing="0" class="trace" role="navigation"><#list status.warningItems as item>
+              <@statusItem item=item />
+            </#list>
+            </ul>
+        </#if>
+
+        <h2>Startup trace</h2>
+
+        <p>The full list of startup events and messages.</p>
+
+        <ul id="startup-trace" cellspacing="0" class="trace" role="navigation">
+              <#list status.statusItems as item>
+                  <@statusItem item=item />
+              </#list>
+        </ul>
     </body>
 </html>

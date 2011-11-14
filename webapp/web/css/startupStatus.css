@@ -2,27 +2,31 @@
 
 /* Styles for Freemarker template startupStatus-display */
 
-table.item {
-    border: thin solid black;
-    font-family: monospace;
+#startup-trace {
     width: 100%;
 }
-table.item tr.top {
-    font-size: larger;
+#startup-trace h4 {
+    padding: .5em;
+    margin-bottom: 0;
+    padding-bottom: .5em;
+    padding-top: 1em;
 }
-table.item td {
-    border: thin solid black;
+#startup-trace ul.item-spec {
+    margin-bottom: 1em;
 }
-.error td {
-    background: #FFDDDD;
-    font-weight: bolder;
+#startup-trace ul.item-spec li{
+    padding-left: .5em;
+    padding-bottom: .4em;
 }
-.warning td {
-    background: #FFFFDD;
+#startup-trace li.error {
+    background-color: #FFDDDD;
 }
-.info td {
-    background: #DDFFDD;
+#startup-trace li.warning{
+    background-color: #FFFFDD; 
 }
-.not_executed td {
-    color: #444444;
+#startup-trace li.info {
+    background-color: #DDFFDD;
+}
+#startup-trace li.not_executed {
+    background-color: #F3F3F0;
 }
