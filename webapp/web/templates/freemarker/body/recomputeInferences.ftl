@@ -2,7 +2,7 @@
 
 <#if formAction?has_content>
     <form method="post" action="${formAction}">
-        <input type="submit" value="Recompute Inferences" name="submit"/>
+        <input class="submit" type="submit" value="Recompute Inferences" name="submit" role="input" />
     </form>
 </#if>
 

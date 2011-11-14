@@ -13,11 +13,11 @@
     
     <form action="${actionUrl}" method="POST">
     	<p>
-            <input type="submit" name="update" value="Update">
+            <input class="submit" type="submit" name="update" value="Update" role="button" />
             Add the latest changes to the index.
         </p>
         <p>
-            <input type="submit" name="rebuild" value="Rebuild">
+            <input class="submit" type="submit" name="rebuild" value="Rebuild" role="button" />
             Start with an empty index and build it completely.
         </p>
     </form>
