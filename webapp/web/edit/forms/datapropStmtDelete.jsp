@@ -99,6 +99,8 @@
 
 <%      } else { %>
             <jsp:include page="${preForm}"/>
+<h1>JSP form, must be removed for the 1.4!</h1>
+
             <form action="editDatapropStmtRequestDispatch.jsp" method="get">
 			    <label for="submit"><h2>Are you sure you want to delete the following entry from <em>${propertyName}</em>?</h2></label>
                 <div class="toBeDeleted dataProp"><%=dataValue%></div>

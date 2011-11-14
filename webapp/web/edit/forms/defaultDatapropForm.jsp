@@ -149,6 +149,8 @@
 	<jsp:param name="useTinyMCE" value="true"/>
 </jsp:include>
 
+<h1>JSP form, must be removed for the 1.4!</h1>
+
 <h2><%=formTitle%></h2>
 <form class="editForm" action="<c:url value="/edit/processDatapropRdfForm.jsp"/>" method="post" > <%-- see VITRO-435 Jira issue: need POST, not GET --%>
 	<c:if test="${!empty predicate.publicDescription}">

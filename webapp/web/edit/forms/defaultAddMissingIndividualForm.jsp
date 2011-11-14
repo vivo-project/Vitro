@@ -241,6 +241,7 @@
 </jsp:include>
 
 <h2>${formTitle}</h2>
+<h1>JSP form, must be removed for the 1.4!</h1>
 <form action="<c:url value="/edit/processRdfForm2.jsp"/>" ><br/>
     <v:input type="text" label="name (required)" id="name" size="30"/><br/>    
     <v:input type="submit" id="submit" value="<%=submitButtonLabel%>" cancel="true"/>

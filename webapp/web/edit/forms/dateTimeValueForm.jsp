@@ -179,7 +179,7 @@
 <jsp:include page="${preForm}" />
 
 <h2>${titleVerb} date time value for <%= subjectName %></h2>
-
+<h1>JSP form, must be removed for the 1.4!</h1>
 <form class="customForm" action="<c:url value="/edit/processRdfForm2.jsp"/>" >
     
     <v:input id="dateTimeField" />

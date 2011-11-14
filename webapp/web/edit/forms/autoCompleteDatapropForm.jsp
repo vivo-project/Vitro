@@ -131,6 +131,8 @@
     <jsp:param name="useAutoComplete" value="true"/>
 </jsp:include>
 
+<h1>JSP form, must be removed for the 1.4!</h1>
+
 <script type="text/javascript" language="javascript">
 $(this).load($(this).parent().children('a').attr('src')+" .editForm");
 

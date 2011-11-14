@@ -24,7 +24,52 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 <vitro:confirmAuthorization />
 
 <%
-	
+    HashMap<String,String> jspFormToGenerator = new HashMap<String,String>();
+    HashMap<String,String> map = jspFormToGenerator;   
+    //vitro forms:
+        map.put("autoCompleteDatapropForm.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AutoCompleteDatapropForm");
+        map.put("autoCompleteObjPropForm.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AutoCompleteObjPropForm");
+        map.put("datapropStmtDelete.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DatapropStmtDelete");
+        map.put("dateTimeIntervalForm.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DateTimeIntervalForm");
+        map.put("dateTimeValueForm.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DateTimeValueForm");
+        map.put("defaultAddMissingIndividualForm.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultAddMissingIndividualForm");
+        map.put("defaultDatapropForm.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDatapropForm");
+        map.put("defaultObjPropForm.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultObjPropForm");
+        map.put("newIndividualForm.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.NewIndividualForm");
+        map.put("propDelete.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.PropDelete");
+        map.put("rdfsLabelForm.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.RdfsLabelForm");
+
+        //vivo forms:
+
+        map.put("addAuthorsToInformationResource.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddAuthorsToInformationResource");
+        map.put("manageWebpagesForIndividual.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManageWebpagesForIndividual");
+        map.put("newIndividualForm.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.NewIndividualForm");
+        map.put("organizationHasPositionHistory.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.OrganizationHasPositionHistory");
+        map.put("personHasEducationalTraining.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.PersonHasEducationalTraining");
+        map.put("personHasPositionHistory.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.PersonHasPositionHistory");
+        map.put("redirectToPublication.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.RedirectToPublication");
+        map.put("terminologyAnnotation.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.TerminologyAnnotation");
+        map.put("unsupportedBrowserMessage.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.UnsupportedBrowserMessage");
+
+        //vivo 2 stage role forms:
+
+        map.put("addAttendeeRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddAttendeeRoleToPerson");
+        map.put("addClinicalRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddClinicalRoleToPerson");
+        map.put("addEditWebpageForm.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddEditWebpageForm");
+        map.put("addEditorRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddEditorRoleToPerson");
+        map.put("addGrantRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddGrantRoleToPerson");
+        map.put("addHeadOfRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddHeadOfRoleToPerson");
+        map.put("addMemberRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddMemberRoleToPerson");
+        map.put("addOrganizerRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddOrganizerRoleToPerson");
+        map.put("addOutreachRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddOutreachRoleToPerson");
+        map.put("addPresenterRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddPresenterRoleToPerson");
+        map.put("addPublicationToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddPublicationToPerson");
+        map.put("addResearcherRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddResearcherRoleToPerson");
+        map.put("addReviewerRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddReviewerRoleToPerson");
+        map.put("addRoleToPersonTwoStage.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddRoleToPersonTwoStage");
+        map.put("addServiceProviderRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddServiceProviderRoleToPerson");
+        map.put("addTeacherRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddTeacherRoleToPerson");
+
 	//Check if special model, in which case forward
 	if(request.getParameter("switchToDisplayModel") != null) {
 		//forward to Edit Request Dispatch Controller
@@ -39,6 +84,8 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 		String queryString = request.getQueryString();
 		response.sendRedirect(request.getContextPath() + "/editRequestDispatch?" + queryString);
 	}
+	
+	
     /*
     Decide which form to forward to, set subjectUri, subjectUriJson, predicateUri, and predicateUriJson in request.
     Also get the Individual for the subjectUri and put it in the request scope.
@@ -239,6 +286,14 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
         //case where a form was passed as a http parameter
         form = formParam;
     }
+    
+    String generator = jspFormToGenerator.get(form);
+    if( generator != null ){
+        String queryString = request.getQueryString();
+        response.sendRedirect(request.getContextPath() + "/editRequestDispatch?" + queryString);
+        return;
+    }            
+    
     request.setAttribute("form", form);
 %>
 <jsp:forward page="/edit/forms/${form}" />
