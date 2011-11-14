@@ -392,6 +392,7 @@ public class EditConfigurationVTwo {
         return EditConfigurationUtils.copy(n3Required);
     }
 
+    //TODO: can we use varargs here?
     public void setN3Required(List<String> n3Required) {
         this.n3Required = n3Required;
     }
@@ -447,6 +448,14 @@ public class EditConfigurationVTwo {
         this.urisInScope = urisInScope;
     }
 
+    public EditConfigurationVTwo addUrisInScope(String key, List<String> list) {
+        if( urisInScope  == null ){
+            urisInScope = new HashMap<String, List<String>>();
+        }
+        urisInScope.put(key, list);
+        return this;        
+    }
+    
     public Map<String, List<Literal>> getLiteralsInScope() {
         return literalsInScope;
     }
@@ -950,4 +959,6 @@ public class EditConfigurationVTwo {
     }
     
     private static final String INDIVIDUAL_CONTROLLER = "/individual";
+
+    
 }
