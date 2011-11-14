@@ -101,9 +101,23 @@ public class EditConfigurationVTwo {
     String datapropKey;
     String datapropValue;
 
+    
+    /** urlPatternToReturnTo is the URL to use as the servlet to return to.
+     * Usually it is "/individual" and entityToReturnTo will be added as a
+     * "uri" parameter.   */
     String urlPatternToReturnTo = INDIVIDUAL_CONTROLLER ;
+    
+    /** If this is non-null it should be the URI of an Individual to return to after
+     * the edit. */     
     String entityToReturnTo;
+    
+    /**
+     * formUrl saves the URL that was used to request the form so that it can be 
+     * reissued if a form validation fails and the client can be redirected back
+     * to the original form. */
     String formUrl;
+    
+    
     String editKey;
 
     List<N3ValidatorVTwo> validators;

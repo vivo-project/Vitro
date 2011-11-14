@@ -35,33 +35,45 @@ public class N3EditUtils {
     
 
 
-    /** Process Entity to Return to - substituting uris etc. */
-    //TODO: move this to utils or contorller
-    public static String processEntityToReturnTo(EditConfigurationVTwo configuration, 
-            MultiValueEditSubmission submission, VitroRequest vreq) {
-        List<String> entityToReturnTo = new ArrayList<String>();
-        String entity = configuration.getEntityToReturnTo();
-        entityToReturnTo.add(entity);
-        //Substitute uris and literals on form
-        //Substitute uris and literals in scope
-        //Substite var to new resource
-        EditN3GeneratorVTwo n3Subber = configuration.getN3Generator();
+    /** 
+     * Process Entity to Return to - substituting uris etc. 
+     * May return null.  */
+    public static String processEntityToReturnTo(
+            EditConfigurationVTwo configuration, 
+            MultiValueEditSubmission submission, 
+            VitroRequest vreq) {
+        //TODO: move this method to utils or contorller?
         
-        //Substitute URIs and literals from form
-        n3Subber.subInMultiUris(submission.getUrisFromForm(), entityToReturnTo);
-        n3Subber.subInMultiLiterals(submission.getLiteralsFromForm(), entityToReturnTo);
+        String returnTo = null;
         
-        //TODO: this won't work, must the same new resources as in ProcessRdfForm.process
-        //setVarToNewResource(configuration, vreq);
-        //entityToReturnTo = n3Subber.subInMultiUris(varToNewResource, entityToReturnTo);
+        //usually the submission should have a returnTo that is
+        // already substituted in with values during ProcessRdfForm.process()
+        if( submission != null && submission.getEntityToReturnTo() != null 
+                && !submission.getEntityToReturnTo().trim().isEmpty()){
+            returnTo = submission.getEntityToReturnTo();            
+        }else{
+            //If submission doesn't have it, do the best that we can do.
+            //this will not have the new resource URIs.
+            List<String> entityToReturnTo = new ArrayList<String>();
+            String entity = configuration.getEntityToReturnTo();
+            entityToReturnTo.add(entity);
+            EditN3GeneratorVTwo n3Subber = configuration.getN3Generator();
         
-        String processedEntity = entityToReturnTo.get(0);
-        if(processedEntity != null) {
-            
-            processedEntity = processedEntity.trim().replaceAll("<","").replaceAll(">","");       
+            //Substitute URIs and literals from form
+            n3Subber.subInMultiUris(submission.getUrisFromForm(), entityToReturnTo);
+            n3Subber.subInMultiLiterals(submission.getLiteralsFromForm(), entityToReturnTo);
+        
+            //TODO: this won't work, must the same new resources as in ProcessRdfForm.process
+            //setVarToNewResource(configuration, vreq);
+            //entityToReturnTo = n3Subber.subInMultiUris(varToNewResource, entityToReturnTo);        
+            returnTo = entityToReturnTo.get(0);
         }
-        return processedEntity;
 
+        //TODO: what is this about?
+        if(returnTo != null) {            
+            returnTo = returnTo.trim().replaceAll("<","").replaceAll(">","");       
+        }
+        return returnTo;
     }
     
     /**

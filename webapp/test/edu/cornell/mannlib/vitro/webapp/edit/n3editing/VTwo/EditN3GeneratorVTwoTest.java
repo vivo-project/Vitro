@@ -22,6 +22,12 @@ public class EditN3GeneratorVTwoTest {
     static EditN3GeneratorVTwo gen = new EditN3GeneratorVTwo();
     
     @Test
+    public void testVarAtEndOfString(){                
+        String result = gen.subInNonBracketedURIS("newRes", "<http://someuri.com/n23", "?newRes");
+        Assert.assertEquals("<http://someuri.com/n23", result);
+    }
+    
+    @Test
     public void testNullTarget(){
         List<String> targets = Arrays.asList("?var",null,null,"?var"); 
         

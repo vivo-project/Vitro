@@ -237,8 +237,8 @@ public class EditN3GeneratorVTwo {
     
     //Already includes "<> for URIs so no need to add those here
     protected String subInNonBracketedURIS(String var, String value, String target) {       
-        /* var followed by dot some whitespace or var followed by whitespace*/
-        String varRegex = "\\?" + var + "(?=\\p{Punct}|\\p{Space})";
+        /* var followed by dot some whitespace OR var followed by whitespace OR at end of line*/
+        String varRegex = "\\?" + var + "(?=\\p{Punct}|\\p{Space}|$)";
         String out = null;
         if("".equals(value))
             return target.replaceAll(varRegex,">::" + var + " was BLANK::< ");

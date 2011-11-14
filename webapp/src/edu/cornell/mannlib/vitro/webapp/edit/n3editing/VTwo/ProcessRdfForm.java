@@ -59,6 +59,9 @@ public class ProcessRdfForm {
      * This will handle data property editing, object property editing 
      * and general editing.
      * 
+     * The submission object will be modified to have its entityToReturnTo string
+     * substituted with the values from the processing.
+     * 
      * @throws Exception May throw an exception if Required N3 does not
      * parse correctly.
      */
@@ -116,40 +119,6 @@ public class ProcessRdfForm {
         return parseN3ToChange(requiredN3, optionalN3, null, null);        
     }
 
-//    @SuppressWarnings("unchecked")
-//    protected void substituteInValuesForCreateNew(
-//            EditConfigurationVTwo configuration,
-//            MultiValueEditSubmission submission, List<String> requiredN3,
-//            List<String> optionalN3) throws InsertException {
-//        logRequiredOpt("Original valus for required and optional", requiredN3, optionalN3);
-//        
-//        /* add subject from configuration */
-//        substituteInSubPredObjURIs( configuration, requiredN3, optionalN3);
-//        logRequiredOpt("attempted to substitute in subject, predicate and object from configuration", requiredN3, optionalN3);
-//        
-//        /* add URIs from the form/EditSubmission */
-//        substituteInMultiURIs( submission.getUrisFromForm(), requiredN3, optionalN3);        
-//        logRequiredOpt("substitued in URIs from submission", requiredN3, optionalN3);
-//                
-//        /* add Literals from the form/EditSubmission */
-//        substituteInMultiLiterals( submission.getLiteralsFromForm(), requiredN3, optionalN3);        
-//        logRequiredOpt("substitued in Literals from form", requiredN3, optionalN3);
-//        
-//        /* Add URIs in scope */
-//        substituteInMultiURIs( configuration.getUrisInScope(), requiredN3, optionalN3);        
-//        logRequiredOpt("substitued in URIs from configuration scope", requiredN3, optionalN3);
-//        
-//        /* Add Literals in scope */
-//        substituteInMultiLiterals(configuration.getLiteralsInScope(), requiredN3, optionalN3);                        
-//        logRequiredOpt("substitued in Literals from scope", requiredN3, optionalN3);
-//        
-//        /* add URIs for new resources */
-//        urisForNewResources = URIsForNewRsources(configuration, newURIMaker);
-//        substituteInURIs( urisForNewResources, requiredN3, optionalN3);        
-//        logRequiredOpt("substitued in new resource URIs", requiredN3, optionalN3);
-//    }
-
-
     /* for a list of N3 strings, substitute in the subject, predicate and object URIs 
      * from the EditConfiguration. */
     protected void substituteInSubPredObjURIs(
@@ -199,36 +168,41 @@ public class ProcessRdfForm {
             EditConfigurationVTwo editConfig, MultiValueEditSubmission submission, 
             List<String> requiredAsserts, List<String> optionalAsserts,
             List<String> requiredRetracts, List<String> optionalRetracts ) throws InsertException{
+        
+        //need to substitute into the return to URL becase it may need new resource URIs
+        List<String> URLToReturnTo = Arrays.asList(submission.getEntityToReturnTo());
                 
         /* ********** Form submission URIs ********* */
-        substituteInMultiURIs(submission.getUrisFromForm(), requiredAsserts, optionalAsserts);
+        substituteInMultiURIs(submission.getUrisFromForm(), requiredAsserts, optionalAsserts, URLToReturnTo);
         logSubstitue( "Added form URIs", requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts);
         //Retractions does NOT get values from form.
         
         /* ******** Form submission Literals *********** */
-        substituteInMultiLiterals( submission.getLiteralsFromForm(), requiredAsserts, optionalAsserts);
+        substituteInMultiLiterals( submission.getLiteralsFromForm(), requiredAsserts, optionalAsserts, URLToReturnTo);
         logSubstitue( "Added form Literals", requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts);
         //Retractions does NOT get values from form.                               
         
         /* *********** Add subject, object and predicate ******** */
-        substituteInSubPredObjURIs(editConfig, requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts);
+        substituteInSubPredObjURIs(editConfig, requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts, URLToReturnTo);
         logSubstitue( "Added sub, pred and obj URIs", requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts);
         
         /* ********* Existing URIs and Literals ********** */
         substituteInMultiURIs(editConfig.getUrisInScope(), 
-                requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts);
+                requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts, URLToReturnTo);
         logSubstitue( "Added existing URIs", requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts);
         
         substituteInMultiLiterals(editConfig.getLiteralsInScope(), 
-                requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts);
+                requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts, URLToReturnTo);
         logSubstitue( "Added existing Literals", requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts);
         //Both Assertions and Retractions get existing values.
         
         /* ************  Edits may need new resources *********** */
         urisForNewResources = URIsForNewRsources(editConfig, newURIMaker);
-        substituteInURIs( urisForNewResources, requiredAsserts, optionalAsserts);
+        substituteInURIs( urisForNewResources, requiredAsserts, optionalAsserts, URLToReturnTo);
         logSubstitue( "Added URIs for new Resources", requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts);
         // Only Assertions get new resources.       
+        
+        submission.setEntityToReturnTo(URLToReturnTo.get(0));
     }
 
     //TODO: maybe move this to utils or contorller?

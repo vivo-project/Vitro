@@ -42,7 +42,6 @@ public class MultiValueEditSubmission {
 
     String editKey;
     
-    //TODO: Need to change below to be able to support multiple values
     private Map<String,List<Literal>> literalsFromForm ;
     private Map<String,List<String>> urisFromForm ;
 
@@ -52,7 +51,9 @@ public class MultiValueEditSubmission {
     private Map<String, List<FileItem>> filesFromForm;
 
     private static Model literalCreationModel;
-     
+    
+    private String entityToReturnTo;
+    
     static{
         literalCreationModel = ModelFactory.createDefaultModel();
     }
@@ -64,6 +65,8 @@ public class MultiValueEditSubmission {
         if( this.editKey == null || this.editKey.trim().length() == 0)
             throw new Error("EditSubmission needs an 'editKey' parameter from the EditConfiguration");        
 
+        entityToReturnTo = editConfig.getEntityToReturnTo();
+        
         validationErrors = new HashMap<String,String>();
         
         this.urisFromForm = new HashMap<String,List<String>>();
@@ -141,7 +144,7 @@ public class MultiValueEditSubmission {
                 }
             }
         }           
-        
+                
         if( log.isDebugEnabled() )
             log.debug( this.toString() );
     }
@@ -276,5 +279,13 @@ public class MultiValueEditSubmission {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);        
     }
 
-    private Log log = LogFactory.getLog(MultiValueEditSubmission.class);    
+    private Log log = LogFactory.getLog(MultiValueEditSubmission.class);
+
+    public String getEntityToReturnTo() {
+        return entityToReturnTo;
+    }
+
+    public void setEntityToReturnTo(String string) {
+        entityToReturnTo = string;
+    }    
 }

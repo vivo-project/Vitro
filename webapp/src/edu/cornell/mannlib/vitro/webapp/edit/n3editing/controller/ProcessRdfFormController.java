@@ -102,8 +102,6 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		
 		//Here we are trying to get the entity to return to URL,  
 		//More involved processing for data property apparently
-		//Also what do we actually DO with the vreq attribute: Answer: Use it for redirection
-		//And no where else so we could technically calculate and send that here
 		String entityToReturnTo = N3EditUtils.processEntityToReturnTo(configuration, submission, vreq);
 		
         //For data property processing, need to update edit configuration for back button 
