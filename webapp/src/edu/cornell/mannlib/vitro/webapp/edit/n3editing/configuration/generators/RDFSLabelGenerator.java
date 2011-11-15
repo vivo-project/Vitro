@@ -145,25 +145,13 @@ public class RDFSLabelGenerator implements EditConfigurationGenerator {
    
     
     private void initDataParameters(VitroRequest vreq, HttpSession session) {
-    	datapropKeyStr = EditConfigurationUtils.getDataPropKey(vreq);
-	    if( datapropKeyStr != null ){
-	        try {
-	            dataHash = Integer.parseInt(datapropKeyStr);
-	            log.debug("Found a datapropKey in parameters and parsed it to int: " + dataHash);
-	         } catch (NumberFormatException ex) {
-	            //return doHelp(vreq, "Cannot decode incoming datapropKey value "+datapropKeyStr+" as an integer hash in EditDataPropStmtRequestDispatchController");
-	        }
-	    }
+    	dataHash = EditConfigurationUtils.getDataHash(vreq);	    
 	    dps = EditConfigurationUtils.getDataPropertyStatement(vreq, session, dataHash, predicateUri);
 	}
-
-
-    
-
     
     private void processDataPropForm(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
     	//set data prop value, data prop key str, 
-    	editConfiguration.setDatapropKey((datapropKeyStr==null)?"":datapropKeyStr);
+    	editConfiguration.setDatapropKey( EditConfigurationUtils.getDataHash(vreq) );
     	editConfiguration.setVarNameForObject(literalName);
     	
     	//original set datapropValue, which in this case would be empty string but no way here
@@ -346,7 +334,7 @@ public class RDFSLabelGenerator implements EditConfigurationGenerator {
     	//Here, retrieve model from 
     	Model model = (Model) session.getServletContext().getAttribute("jenaOntModel");
 		if(datapropKeyStr != null && datapropKeyStr.trim().length() > 0 ) {
-    		editConfiguration.prepareForDataPropUpdate(model, dps);
+    		editConfiguration.prepareForDataPropUpdate(model, vreq.getWebappDaoFactory().getDataPropertyDao());
 		}
     	
     }

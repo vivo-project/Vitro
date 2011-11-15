@@ -160,17 +160,15 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 	}
 	
     private void setDataFormTitle() {
-		String formTitle = "";
-		String datapropKeyStr = editConfig.getDatapropKey();
-		DataProperty  prop = EditConfigurationUtils.getDataProperty(vreq);
-		if(prop != null) {
-			if( datapropKeyStr != null && datapropKeyStr.trim().length() > 0  ) {
-		        formTitle   = "Change text for: <em>"+prop.getPublicName()+"</em>";
-		        
-		    } else {
-		        formTitle   ="Add new entry for: <em>"+prop.getPublicName()+"</em>";
-		    }
-		}
+		String formTitle = "";		
+	    DataProperty  prop = EditConfigurationUtils.getDataProperty(vreq);
+	    if(prop != null) {
+	        if( editConfig.isDataPropertyUpdate() ) {
+	            formTitle   = "Change text for: <em>"+prop.getPublicName()+"</em>";		        
+	        } else {
+	            formTitle   ="Add new entry for: <em>"+prop.getPublicName()+"</em>";
+	        }
+	    }		
 		pageData.put("formTitle", formTitle);
 	}
 
@@ -578,7 +576,10 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     }
     
     public String getDatapropKey() {
-    	return editConfig.getDatapropKey();
+        if( editConfig.getDatapropKey() == null )
+            return null;
+        else
+            return editConfig.getDatapropKey().toString();
     }
     
     public DataPropertyStatement getDataPropertyStatement() {
@@ -592,14 +593,12 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     
     //Check whether deletion form should be included for default object property
     public boolean getIncludeDeletionForm() {
-    	if(isDeleteProhibited()) 
+    	if( isDeleteProhibited() ) 
     		return false;
-    	if(isObjectProperty()) {
-    		return (getObjectUri() != null && !getObjectUri().isEmpty());
-    	}
-    	else {
-    		String datapropKey = editConfig.getDatapropKey();
-    		return (datapropKey != null && !datapropKey.isEmpty());
+    	if( isObjectProperty() ) {
+    	    return editConfig.isObjectPropertyUpdate();
+    	} else {
+    	    return  editConfig.isDataPropertyUpdate();     	        
     	}
      }
     

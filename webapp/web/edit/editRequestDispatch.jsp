@@ -1,5 +1,7 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
+<%@page import="java.util.Map"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.JspToGeneratorMapping"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Individual" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest" %>
@@ -24,51 +26,7 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 <vitro:confirmAuthorization />
 
 <%
-    HashMap<String,String> jspFormToGenerator = new HashMap<String,String>();
-    HashMap<String,String> map = jspFormToGenerator;   
-    //vitro forms:
-        map.put("autoCompleteDatapropForm.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AutoCompleteDatapropFormGenerator");
-        map.put("autoCompleteObjPropForm.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AutoCompleteObjPropFormGenerator");
-        map.put("datapropStmtDelete.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDeleteGenerator");
-        map.put("dateTimeIntervalForm.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DateTimeIntervalFormGenerator");
-        map.put("dateTimeValueForm.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DateTimeValueFormGenerator");
-        map.put("defaultAddMissingIndividualForm.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultAddMissingIndividualFormGenerator");
-        map.put("defaultDatapropForm.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDataPropertyFormGenerator");
-        map.put("defaultObjPropForm.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultObjectPropertyFormGenerator");
-        map.put("newIndividualForm.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.NewIndividualFormGenerator");
-        map.put("propDelete.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDeleteGenerator");
-        map.put("rdfsLabelForm.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.RdfsLabelGenerator");
-
-        //vivo forms:
-
-        map.put("addAuthorsToInformationResource.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddAuthorsToInformationResourceGenerator");
-        map.put("manageWebpagesForIndividual.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManageWebpagesForIndividualGenerator");
-        map.put("newIndividualForm.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.NewIndividualFormGenerator");
-        map.put("organizationHasPositionHistory.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.OrganizationHasPositionHistoryGenerator");
-        map.put("personHasEducationalTraining.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.PersonHasEducationalTraining");
-        map.put("personHasPositionHistory.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.PersonHasPositionHistoryGenerator");
-        map.put("redirectToPublication.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.RedirectToPublicationGenerator");
-        map.put("terminologyAnnotation.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.TerminologyAnnotationGenerator");
-        map.put("unsupportedBrowserMessage.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.UnsupportedBrowserMessage");
-        map.put("addGrantRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddGrantRoleToPersonGenerator");
-        map.put("addEditWebpageForm.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddEditWebpageFormGenerator");
-
-        //vivo 2 stage role forms:
-
-        map.put("addAttendeeRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddAttendeeRoleToPersonGenerator");
-        map.put("addClinicalRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddClinicalRoleToPersonGenerator");
-        map.put("addEditorRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddEditorRoleToPersonGenerator");
-        map.put("addHeadOfRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddHeadOfRoleToPersonGenerator");
-        map.put("addMemberRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddMemberRoleToPersonGenerator");
-        map.put("addOrganizerRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddOrganizerRoleToPersonGenerator");
-        map.put("addOutreachRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddOutreachRoleToPersonGenerator");
-        map.put("addPresenterRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddPresenterRoleToPersonGenerator");
-        map.put("addPublicationToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddPublicationToPersonGenerator");
-        map.put("addResearcherRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddResearcherRoleToPersonGenerator");
-        map.put("addReviewerRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddReviewerRoleToPersonGenerator");
-        map.put("addRoleToPersonTwoStage.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddRoleToPersonTwoStageGenerator");
-        map.put("addServiceProviderRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddServiceProviderRoleToPersonGenerator");
-        map.put("addTeacherRoleToPerson.jsp", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AddTeacherRoleToPersonGenerator");
+    Map<String,String> jspFormToGenerator = JspToGeneratorMapping.jspsToGenerators; 
 
 	//Check if special model, in which case forward
 	if(request.getParameter("switchToDisplayModel") != null) {

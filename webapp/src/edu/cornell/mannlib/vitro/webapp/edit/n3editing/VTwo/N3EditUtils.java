@@ -2,7 +2,9 @@
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Literal;
@@ -10,6 +12,8 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.EditConfigurationGenerator;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.RDFSLabelGenerator;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.ModelChangePreprocessor;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
 
@@ -109,12 +113,14 @@ public class N3EditUtils {
                     dps.setLanguage( submittedLiteral.getLanguage() );
                     dps.setData( submittedLiteral.getLexicalForm() );
                    
-                    copy.prepareForDataPropUpdate(writeModel, dps);
-                    copy.setDatapropKey( Integer.toString(RdfLiteralHash.makeRdfLiteralHash(dps)) );
+                    copy.prepareForDataPropUpdate(writeModel, vreq.getWebappDaoFactory().getDataPropertyDao());
+                    copy.setDatapropKey( RdfLiteralHash.makeRdfLiteralHash(dps));
                 }
                 EditConfigurationVTwo.putConfigInSession(copy,vreq.getSession());
             }
         }
         
-    }
+    }    
+    
+   
 }

@@ -2,134 +2,135 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.rdf.model.Model;
+
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.DefaultDataPropEmptyField;
-import edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
 
-public class DefaultDataPropertyFormGenerator implements EditConfigurationGenerator {
+public class DefaultDataPropertyFormGenerator extends BaseEditConfigurationGenerator implements EditConfigurationGenerator {
 	
-	private Log log = LogFactory.getLog(DefaultDataPropertyFormGenerator.class);
-	private static HashMap<String,String> defaultsForXSDtypes;
-	
-	  static {
-			defaultsForXSDtypes = new HashMap<String,String>();
-			//defaultsForXSDtypes.put("http://www.w3.org/2001/XMLSchema#dateTime","2001-01-01T12:00:00");
-			defaultsForXSDtypes.put("http://www.w3.org/2001/XMLSchema#dateTime","#Unparseable datetime defaults to now");
-		  }
+	private static Log log = LogFactory.getLog(DefaultDataPropertyFormGenerator.class);
 
+	static String literalVar =  "literal";                             
+    static String literalPlaceholder = "?"+literalVar;
+    
 	@Override
-	public EditConfigurationVTwo getEditConfiguration(VitroRequest vreq,
-			HttpSession session) {
+	public EditConfigurationVTwo getEditConfiguration(VitroRequest vreq, HttpSession session) {	    		
+	    String command      = vreq.getParameter("cmd");	    	    	    
 	    
-		String subjectUri   = vreq.getParameter("subjectUri");
+	    String subjectUri   = vreq.getParameter("subjectUri");
+        Individual subject = vreq.getWebappDaoFactory().getIndividualDao().getIndividualByURI(subjectUri);
+        if( subject == null ) 
+            throw new Error("In DefaultDataPropertyFormGenerator, could not find individual for URI " + subjectUri);
+        
 	    String predicateUri = vreq.getParameter("predicateUri");
-    	String subjectUriJson = (String)vreq.getAttribute("subjectUriJson");
-    	String predicateUriJson = (String)vreq.getAttribute("predicateUriJson");
-    	String objectUriJson = (String)vreq.getAttribute("objectUriJson");
-	    
-	    DataPropertyStatement dps = (DataPropertyStatement)vreq.getAttribute("dataprop");
-	    
-	    String datapropKeyStr = vreq.getParameter("datapropKey");
-	    int dataHash=0;
-	    
-	    DataProperty prop = (DataProperty)vreq.getAttribute("predicate");
-	    //if( prop == null ) return doHelp(vreq, "In DefaultDataPropertyFormGenerator, could not find predicate " + predicateUri);
-	    vreq.setAttribute("propertyName",prop.getPublicName());
-
-	    Individual subject = (Individual)vreq.getAttribute("subject");
-	    //if( subject == null ) return doHelp(vreq,"In DefaultDataPropertyFormGenerator, could not find subject " + subjectUri);
-	    vreq.setAttribute("subjectName",subject.getName());
-	    
-	    String rangeDatatypeUri = vreq.getWebappDaoFactory().getDataPropertyDao().getRequiredDatatypeURI(subject, prop);
-	    //String rangeDatatypeUri = prop.getRangeDatatypeURI();
-	    vreq.setAttribute("rangeDatatypeUriJson", MiscWebUtils.escape(rangeDatatypeUri));
-	    
-	    
-	    if( dps != null ){
-	        try {
-	            dataHash = Integer.parseInt(datapropKeyStr);
-	            log.debug("dataHash is " + dataHash);            
-	        } catch (NumberFormatException ex) {
-	            log.debug("could not parse dataprop hash "+ 
-	                    "but there was a dataproperty; hash: '"+datapropKeyStr+"'"); 
-	        }
-	        
-	        String rangeDatatype = dps.getDatatypeURI();
-	        if( rangeDatatype == null ){
-	            log.debug("no range datatype uri set on data property statement when property's range datatype is "+prop.getRangeDatatypeURI()+" in DefaultDataPropertyFormGenerator");
-	            vreq.setAttribute("rangeDatatypeUriJson","");
-	        } else {
-	            log.debug("range datatype uri of ["+rangeDatatype+"] on data property statement in DefaultDataPropertyFormGenerator");
-	            vreq.setAttribute("rangeDatatypeUriJson",rangeDatatype);
-	        }
-	        String rangeLang = dps.getLanguage();
-	        if( rangeLang == null ) {
-	            log.debug("no language attribute on data property statement in DefaultDataPropertyFormGenerator");
-	            vreq.setAttribute("rangeLangJson","");
-	        }else{
-	            log.debug("language attribute of ["+rangeLang+"] on data property statement in DefaultDataPropertyFormGenerator");
-	            vreq.setAttribute("rangeLangJson", rangeLang);
-	        }
-	    } else {
-	        log.debug("No incoming dataproperty statement attribute for property "+prop.getPublicName()+"; adding a new statement");                
-	        if(rangeDatatypeUri != null && rangeDatatypeUri.length() > 0) {                        
-	            String defaultVal = defaultsForXSDtypes.get(rangeDatatypeUri);
-	            if( defaultVal == null )            	
-	            	vreq.setAttribute("rangeDefaultJson", "");
-	            else
-	            	vreq.setAttribute("rangeDefaultJson", '"' + MiscWebUtils.escape(defaultVal)  + '"' );
+	    WebappDaoFactory unfilteredWdf = vreq.getUnfilteredWebappDaoFactory();
+	    DataProperty dataproperty = unfilteredWdf.getDataPropertyDao().getDataPropertyByURI( predicateUri );
+	    if( dataproperty == null) {
+	        // No dataproperty will be returned for rdfs:label, but we shouldn't throw an error.
+	        // This is controlled by the Jena layer, so we can't change the behavior.
+	        if (! predicateUri.equals(VitroVocabulary.LABEL)) {
+	            log.error("Could not find data property '"+predicateUri+"' in model");
+	            throw new Error("editDatapropStmtRequest.jsp: Could not find DataProperty in model: " + predicateUri);
 	        }
 	    }
 	    
+       String rangeDatatypeUri = dataproperty.getRangeDatatypeURI(); 
+        if( rangeDatatypeUri == null || rangeDatatypeUri.trim().isEmpty() ){
+            rangeDatatypeUri = vreq.getWebappDaoFactory().getDataPropertyDao().getRequiredDatatypeURI(subject, dataproperty);    
+        }   
+	        	    
+	    EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();
+	    	
+	    editConfiguration.setTemplate("defaultDataPropertyForm.ftl");
 	    
-	    String localName = prop.getLocalName();
-	    String dataLiteral = localName + "Edited";
-	    String formUrl = (String)vreq.getAttribute("formUrl");
-	    String editKey = (String)vreq.getAttribute("editKey");
-	    
-    	EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();
-	    
-    	List<String> n3ForEdit = new ArrayList<String>();
-    	n3ForEdit.add("?subject");
-    	n3ForEdit.add("?predicate");
-    	n3ForEdit.add("?"+dataLiteral);
-    	editConfiguration.setN3Required(n3ForEdit);	    
-    	
-    	editConfiguration.setFormUrl(formUrl);
-    	editConfiguration.setEditKey(editKey); 
-    	
-    	editConfiguration.setDatapropKey((datapropKeyStr==null)?"":datapropKeyStr);
-    	editConfiguration.setUrlPatternToReturnTo("/individual");
+    	editConfiguration.setN3Required(Arrays.asList( "?subject ?predicate " + literalPlaceholder + " . "));	    
+    	    	    	
+    	editConfiguration.setDatapropKey( EditConfigurationUtils.getDataHash(vreq) );
     	
     	editConfiguration.setVarNameForSubject("subject");
-    	editConfiguration.setSubjectUri(subjectUriJson);
+    	editConfiguration.setSubjectUri(subjectUri);
+    	editConfiguration.setEntityToReturnTo( subjectUri );
     	
     	editConfiguration.setVarNameForPredicate("predicate");
-    	editConfiguration.setPredicateUri(predicateUriJson);
+    	editConfiguration.setPredicateUri(predicateUri);
 
+    	editConfiguration.setLiteralsOnForm( Arrays.asList( literalVar ));    	    	    
+    	
+    	editConfiguration.addField( new FieldVTwo()
+    	       .setName( literalVar )
+    	       .setPredicateUri(predicateUri)
+    	       .setRangeDatatypeUri(rangeDatatypeUri));
+    	
     	//deal with empty field
     	editConfiguration.addModelChangePreprocessor( new DefaultDataPropEmptyField() );	        	
     	
-		return editConfiguration;
-	}
-
-	private EditConfigurationVTwo doHelp(VitroRequest vreq, String string) {
-		// TODO Auto-generated method stub
-		return null;
+		return editConfiguration;	
 	}
 	
+	
+	public static void prepareForDataPropUpdate(Model model, EditConfigurationVTwo editConfiguration, DataPropertyDao dataPropertyDao){
+	      
+	    String subjectUri = editConfiguration.getSubjectUri();
+	    String predicateUri = editConfiguration.getPredicateUri();
+	    Integer dataHash = editConfiguration.getDatapropKey();
+	    
+	    DataProperty dataproperty = dataPropertyDao.getDataPropertyByURI( predicateUri );
+	    if( dataproperty == null )
+	        throw new Error("could not get data property for " + predicateUri);
+	    
+        DataPropertyStatement dps = null;
+        if( dataHash == null ){
+            throw new Error("prepareForDataPropUpdate() should not be called if the EditConfiguration is not a data property statement update ");
+        }else{
+            dps = RdfLiteralHash.getPropertyStmtByHash(subjectUri, predicateUri, dataHash, model);                                  
+            if (dps==null){ 
+                throw new Error("No match to existing data property \""+predicateUri+"\" statement for subject \""+subjectUri+"\" via key "+dataHash);
+            }else{
+
+                //Put data property statement's literal in scope                
+                //TODO: Check if multiple statements might affect this implementation?                
+                editConfiguration.addLiteralInScope(literalVar, new EditLiteral(dps.getData(),dps.getDatatypeURI(), dps.getLanguage()) );
+                
+                String statementDataType = null;
+                String statementLang = null;
+                                      
+                statementDataType = dps.getDatatypeURI();
+                if( statementDataType == null ){
+                    log.debug("no range datatype uri set on data property statement when property's range datatype is "+dataproperty.getRangeDatatypeURI()+" in DefaultDataPropertyFormGenerator");                
+                } else {
+                    log.debug("range datatype uri of ["+statementDataType+"] on data property statement in DefaultDataPropertyFormGenerator");
+                }
+                statementLang = dps.getLanguage();
+                if( statementLang == null ) {
+                    log.debug("no language attribute on data property statement in DefaultDataPropertyFormGenerator");                
+                }else{
+                    log.debug("language attribute of ["+statementLang+"] on data property statement in DefaultDataPropertyFormGenerator");                
+                }  
+                
+                
+            }
+        }         
+        
+
+
+	}
 }

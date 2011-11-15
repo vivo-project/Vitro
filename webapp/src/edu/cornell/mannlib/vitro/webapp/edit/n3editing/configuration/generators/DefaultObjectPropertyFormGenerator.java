@@ -42,7 +42,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 	private String objectUri = null;
 	private String datapropKeyStr= null;
 	private int dataHash = 0;
-	private DataPropertyStatement dps = null;
+	
 	private String dataLiteral = null;
 	private String objectPropertyTemplate = "defaultPropertyForm.ftl";
 	private String dataPropertyTemplate = "defaultDataPropertyForm.ftl";
@@ -161,25 +161,9 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     		this.processObjectPropForm(vreq, editConfiguration);
     	} else {
     		this.isObjectPropForm = false;
-    		this.initDataParameters(vreq, session);
     	   this.processDataPropForm(vreq, editConfiguration);
     	}
-    }
-    
-    private void initDataParameters(VitroRequest vreq, HttpSession session) {
-    	dataLiteral = getDataLiteral(vreq);
-    	datapropKeyStr = EditConfigurationUtils.getDataPropKey(vreq);
-	    if( datapropKeyStr != null ){
-	        try {
-	            dataHash = Integer.parseInt(datapropKeyStr);
-	            log.debug("Found a datapropKey in parameters and parsed it to int: " + dataHash);
-	         } catch (NumberFormatException ex) {
-	            //return doHelp(vreq, "Cannot decode incoming datapropKey value "+datapropKeyStr+" as an integer hash in EditDataPropStmtRequestDispatchController");
-	        }
-	    }
-	    dps = EditConfigurationUtils.getDataPropertyStatement(vreq, session, dataHash, predicateUri);
-	}
-
+    }    
 
     
 	private void initObjectParameters(VitroRequest vreq) {
@@ -450,15 +434,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 	            editConfiguration.prepareForNonUpdate( model );
 	        }
     	} else {
-    	    //TODO: why is this checking for data prop keys? 
-    		if(datapropKeyStr != null && datapropKeyStr.trim().length() > 0 ) {
-	    		DataPropertyStatement dps = EditConfigurationUtils.getDataPropertyStatement(vreq, 
-	    				session, 
-	    				dataHash, 
-	    				EditConfigurationUtils.getPredicateUri(vreq));
-	    		
-	    		editConfiguration.prepareForDataPropUpdate(model, dps);
-    		}
+    	    throw new Error("DefaultObjectPropertyForm does not handle data properties.");
     	}
     }
       

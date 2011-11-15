@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.rdf.model.Model;
 
+import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -78,7 +79,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
  
          /****  make new or get an existing edit configuration ***/         
          EditConfigurationVTwo editConfig = setupEditConfiguration(editConfGeneratorName, vreq);
-         
+         log.debug("editConfiguration:\n" + editConfig );
          
          //what template?
          String template = editConfig.getTemplate();
@@ -139,14 +140,15 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
             editConfig.setPredicateUri( EditConfigurationUtils.getPredicateUri(vreq));
         
         String objectUri = EditConfigurationUtils.getObjectUri(vreq);
-        String dataKey = EditConfigurationUtils.getDataPropKey(vreq);
+        Integer dataKey = EditConfigurationUtils.getDataHash(vreq);
         if (objectUri != null && ! objectUri.trim().isEmpty()) { 
             // editing existing object
             if( editConfig.getObject() == null)
                 editConfig.setObject( EditConfigurationUtils.getObjectUri(vreq));
             editConfig.prepareForObjPropUpdate(model);
-        } else if( dataKey != null ) { // edit of a data prop
+        } else if( dataKey != null ) { // edit of a data prop statement
             //do nothing since the data prop form generator must take care of it
+            editConfig.prepareForDataPropUpdate(model, vreq.getWebappDaoFactory().getDataPropertyDao());
         } else{
             //this might be a create new or a form
             editConfig.prepareForNonUpdate(model);
@@ -168,37 +170,43 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 	//e.g. default add individual form etc. and additional scenarios
 	//TODO: Check if additional scenarios should be checked here
 	private String processEditConfGeneratorName(VitroRequest vreq) {
-		 WebappDaoFactory wdf = vreq.getWebappDaoFactory();
     	//use default object property form if nothing else works
         String editConfGeneratorName = DEFAULT_OBJ_FORM;
-        String predicateUri =  getPredicateUri(vreq);
-        String formParam = getFormParam(vreq);
-        //Handle deletion before any of the other cases
+
+        //Handle deletion before any of the other cases        
         if(isDeleteForm(vreq)) {
-        	editConfGeneratorName = DEFAULT_DELETE_FORM;
-        }
+        	return DEFAULT_DELETE_FORM;
+        }        
+                        
         // *** handle the case where the form is specified as a request parameter ***
-        //TODO: Substitute the original line in again which checks for null predicate, currently overriding
-        //in order to test
-        //else if( predicateUri == null && ( formParam != null && !formParam.isEmpty()) ){
-        else if(  formParam != null && !formParam.isEmpty() ){
+        String formParam = getFormParam(vreq);
+        if(  formParam != null && !formParam.isEmpty() ){
             //form parameter must be a fully qualified java class name of a EditConfigurationVTwoGenerator implementation.
-            editConfGeneratorName = formParam;              
-        } else if(isVitroLabel(predicateUri)) { //in case of data property
-        	editConfGeneratorName = RDFS_LABEL_FORM;
+            return formParam;              
+        }
+        
+        String predicateUri =  getPredicateUri(vreq);        
+        if( isVitroLabel(predicateUri) ) { //in case of data property
+        	return RDFS_LABEL_FORM;
+        } 
+        
+        WebappDaoFactory wdf = vreq.getWebappDaoFactory();        
+        Property prop = getPropertyByUri(predicateUri, wdf);
+        
+        if(isDataProperty( prop , wdf )){
+            editConfGeneratorName = DEFAULT_DATA_FORM;
         } else{
-        	String customForm = getCustomForm(predicateUri, wdf);
-        	if(customForm != null && !customForm.isEmpty()) {
+        	String customForm = prop.getCustomEntryForm();
+        	if(customForm != null && !customForm.trim().isEmpty()) {
         		editConfGeneratorName = customForm;
         	}
         }
+        
+        log.debug("generator name is " + editConfGeneratorName);
         return editConfGeneratorName;
 	}
-	
-	
-	
 
-	private String getCustomForm(String predicateUri, WebappDaoFactory wdf) {
+    private String getCustomForm(String predicateUri, WebappDaoFactory wdf) {
 		Property prop = getPropertyByUri(predicateUri, wdf);
 		return prop.getCustomEntryForm();
 	}
@@ -212,10 +220,21 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 		return p;
 	}
 
-
 	private boolean isVitroLabel(String predicateUri) {
 		return predicateUri.equals(VitroVocabulary.LABEL);
 	}
+
+    private boolean isDataProperty(Property prop, WebappDaoFactory wdf) {
+        if( prop != null && prop instanceof DataProperty ){
+            return true;
+        }else{
+            DataProperty dataProp = wdf.getDataPropertyDao().getDataPropertyByURI(prop.getURI());
+            if( dataProp != null )
+                return true;
+            else
+                return false;
+        }
+    }
 
 
 	//if skip edit form

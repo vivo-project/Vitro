@@ -48,9 +48,8 @@ public class DefaultDeleteGenerator implements EditConfigurationGenerator {
 	private Log log = LogFactory.getLog(DefaultObjectPropertyFormGenerator.class);
 	private String subjectUri = null;
 	private String predicateUri = null;
-	private String objectUri = null;
-	private String datapropKeyStr= null;
-	private int dataHash = 0;
+	private String objectUri = null;	
+	private Integer dataHash = 0;
 	private DataPropertyStatement dps = null;
 	private String dataLiteral = null;
 	private String template = "confirmDeletePropertyForm.ftl";
@@ -107,14 +106,9 @@ public class DefaultDeleteGenerator implements EditConfigurationGenerator {
     }
     
     private void initDataParameters(VitroRequest vreq, HttpSession session) {
-    	datapropKeyStr = EditConfigurationUtils.getDataPropKey(vreq);
-	    if( datapropKeyStr != null ){
-	        try {
-	            dataHash = Integer.parseInt(datapropKeyStr);
-	            log.debug("Found a datapropKey in parameters and parsed it to int: " + dataHash);
-	         } catch (NumberFormatException ex) {
-	            //return doHelp(vreq, "Cannot decode incoming datapropKey value "+datapropKeyStr+" as an integer hash in EditDataPropStmtRequestDispatchController");
-	        }
+    	dataHash = EditConfigurationUtils.getDataHash(vreq);
+	    if( dataHash != null ){	    
+	        log.debug("Found a datapropKey in parameters and parsed it to int: " + dataHash);	         
 	    }
 	    dps = EditConfigurationUtils.getDataPropertyStatement(vreq, session, dataHash, predicateUri);
 	}
@@ -135,7 +129,7 @@ public class DefaultDeleteGenerator implements EditConfigurationGenerator {
     
     private void processDataPropForm(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
     	//set data prop value, data prop key str, 
-    	editConfiguration.setDatapropKey((datapropKeyStr==null)?"":datapropKeyStr);
+    	editConfiguration.setDatapropKey( EditConfigurationUtils.getDataHash(vreq) );
     	//original set datapropValue, which in this case would be empty string but no way here
     	editConfiguration.setDatapropValue("");
     }

@@ -25,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.SelectListGeneratorVTwo;
@@ -175,9 +176,8 @@ public class MenuEditingFormGenerator implements EditConfigurationGenerator {
     }
     
     private void processDataPropForm(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
-    	 String datapropKeyStr = vreq.getParameter("datapropKey");
- 	    int dataHash=0;
-    	 DataPropertyStatement dps = (DataPropertyStatement)vreq.getAttribute("dataprop");
+        Integer dataHash = EditConfigurationUtils.getDataHash(vreq); 	    
+    	DataPropertyStatement dps = (DataPropertyStatement)vreq.getAttribute("dataprop");
 
  		//ObjectUriJson is null, so should include data prop info here
  		//Use dataprop key info here instead
@@ -194,14 +194,8 @@ public class MenuEditingFormGenerator implements EditConfigurationGenerator {
 		    vreq.setAttribute("rangeDatatypeUriJson", MiscWebUtils.escape(rangeDatatypeUri));
 		    
 		    
-		    if( dps != null ){
-		        try {
-		            dataHash = Integer.parseInt(datapropKeyStr);
-		            log.debug("dataHash is " + dataHash);            
-		        } catch (NumberFormatException ex) {
-		            log.debug("could not parse dataprop hash "+ 
-		                    "but there was a dataproperty; hash: '"+datapropKeyStr+"'"); 
-		        }
+		    if( dps != null ){		        		           
+		        log.debug("dataHash is " + dataHash);            		        
 		        
 		        String rangeDatatype = dps.getDatatypeURI();
 		        if( rangeDatatype == null ){
@@ -229,7 +223,7 @@ public class MenuEditingFormGenerator implements EditConfigurationGenerator {
 		            	vreq.setAttribute("rangeDefaultJson", '"' + MiscWebUtils.escape(defaultVal)  + '"' );
 		        }
 		    }   
-	    	editConfiguration.setDatapropKey((datapropKeyStr==null)?"":datapropKeyStr);
+	    	editConfiguration.setDatapropKey(dataHash);
 
     }
     

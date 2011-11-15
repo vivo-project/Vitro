@@ -27,13 +27,13 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
+import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.ModelSelector;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.StandardModelSelector;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.StandardWDFSelector;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.WDFSelector;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDataPropertyFormGenerator;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.ModelChangePreprocessor;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
@@ -98,7 +98,7 @@ public class EditConfigurationVTwo {
     String object;
     String varNameForObject;   
 
-    String datapropKey;
+    Integer datapropKey=null;
     String datapropValue;
 
     
@@ -299,29 +299,22 @@ public class EditConfigurationVTwo {
                     + varNameForObject + " and object is " + object);
         }        
     }
-    
-    //TODO: Check if require 
+     
     /**
-     * Make a copy of this EditConfiguration, prepare for a DataProperty update
-     * and return it.  
-     * 
-     * TODO: there is a good chance that this could be moved to the generator for 
-     * the default data property form since that is the only place this is useful.
+     * Prepare an EditConfiguration for a DataProperty update.
+     * This should only be used when editing a existing data property statement. 
      */
-    public void prepareForDataPropUpdate( Model model, DataPropertyStatement dpStmt){
+    public void prepareForDataPropUpdate( Model model, DataPropertyDao dataPropertyDao ){
         if( model == null ) throw new Error("EditConfiguration.prepareForDataPropUpdate() needs a Model");        
         if( isObjectResource() ){
            throw new Error("This request does not seems to be a DataPropStmt update");
         } else  if (datapropKey == null) {
-            throw new Error("This request does not appear to be for an update since it lacks a dataprop object or a dataProp hash key ");                           
+            throw new Error("This request does not appear to be for an update since it lacks a dataProp hash key ");                           
         }                     
         
         basicPrepare();
         
-        //TODO: Check if multiple statements might affect this implementation?
-        List<Literal> dataPropLiterals = new ArrayList<Literal>();
-        dataPropLiterals.add(new EditLiteral(dpStmt.getData(),dpStmt.getDatatypeURI(), dpStmt.getLanguage()));
-        literalsInScope.put(varNameForObject, dataPropLiterals);
+        DefaultDataPropertyFormGenerator.prepareForDataPropUpdate(model, this,dataPropertyDao );        
 
         // run SPARQL, sub in values
         SparqlEvaluateVTwo sparqlEval = new SparqlEvaluateVTwo(model);
@@ -332,13 +325,13 @@ public class EditConfigurationVTwo {
     }
 
     /**
-     * Make a copy of this EditConfiguration, prepare for a ObjectProperty update
-     * and return it.
+     * Prepare for a ObjectProperty update. Run SPARQL for existing values.
+     *  This can be used for an object property or a direct form.
      */
     public void prepareForObjPropUpdate( Model model ){
         if( model == null ) {
         	log.debug("Model is null and will be throwing an error");
-        	throw new Error("EditConfiguration.prepareForObjPropUpdate() needs a Model");}
+        	throw new Error("EditConfiguration.prepareForObjPropUpdate() needs a non-null Model");}
         if( !isObjectResource() ) {
         	log.debug("This does not seem to be an object property update. Lacks object.");
             throw new Error("This request does not appear to be for a object property update.");              
@@ -358,9 +351,12 @@ public class EditConfigurationVTwo {
         hasBeenPreparedForUpdate = true;
     }
 
-
+    /**
+     * Run SPARQL for Additional values.  This can be used for
+     * a data property, an object property or a direct form.
+     */
     public void prepareForNonUpdate( Model model ){
-        if( model == null ) throw new Error("EditConfiguration.prepareForNonUpdate() needs a Model");
+        if( model == null ) throw new Error("prepareForNonUpdate() needs a non-null Model");
 
         basicPrepare();
         
@@ -675,18 +671,18 @@ public class EditConfigurationVTwo {
         boolean dataKeyFound = false;
 		if( object != null && ! object.trim().isEmpty() )
 		    objectFound = true;
-		if( getDatapropKey() != null && ! getDatapropKey().isEmpty() )
+		if( getDatapropKey() != null )
 		    dataKeyFound = true;
 		if( dataKeyFound && objectFound )
 		    throw new Error("Bad configuration: both datapropKey and object are defined.");
 		return objectFound;
 	}	
 
-	public String getDatapropKey() {
+	public Integer getDatapropKey() {
         return datapropKey;
     }
 
-    public void setDatapropKey(String datapropKey) {
+    public void setDatapropKey(Integer datapropKey) {
         this.datapropKey = datapropKey;
     }
     
@@ -893,7 +889,7 @@ public class EditConfigurationVTwo {
     }
     
     public boolean isDataPropertyUpdate() {
-    	return this.getDatapropKey() != null && this.getDatapropKey().length() > 0;
+    	return this.getDatapropKey() != null ;
     }
     
     //This is for specific data for a form that will be set by the generator
@@ -973,6 +969,14 @@ public class EditConfigurationVTwo {
     }
     
     private static final String INDIVIDUAL_CONTROLLER = "/individual";
+
+    public EditConfigurationVTwo addLiteralInScope(String key, Literal ... values) {
+        if( literalsInScope  == null ){
+            literalsInScope = new HashMap<String, List<Literal>>();
+        }        
+        literalsInScope.put(key, Arrays.asList(values));
+        return this;                
+    }
 
     
 }

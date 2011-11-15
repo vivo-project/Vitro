@@ -131,17 +131,18 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		if(EditConfigurationUtils.isObjectProperty(editConfig.getPredicateUri(), vreq)) {
 			return false;
 		}
-		Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
+		
 		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-		 if (editConfig.getDatapropKey() == null
-	                || editConfig.getDatapropKey().length() == 0)
+		 if ( ! editConfig.isDataPropertyUpdate())
 	            return false;
 	        
-        int dpropHash = Integer.parseInt(editConfig.getDatapropKey());
-        DataPropertyStatement dps = RdfLiteralHash.getPropertyStmtByHash(subject, editConfig.getPredicateUri(), dpropHash, model);
-
+        Integer dpropHash = editConfig.getDatapropKey();
+        DataPropertyStatement dps = 
+            RdfLiteralHash.getPropertyStmtByHash(editConfig.getSubjectUri(), 
+                    editConfig.getPredicateUri(), dpropHash, model);
         if (dps != null)
             return false;
+        
         DataProperty dp = wdf.getDataPropertyDao().getDataPropertyByURI(
                 editConfig.getPredicateUri());
         if (dp != null) {

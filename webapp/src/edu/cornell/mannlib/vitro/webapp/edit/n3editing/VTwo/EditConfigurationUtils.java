@@ -152,9 +152,10 @@ public class EditConfigurationUtils {
     	return (dataProp != null);
     }
     
-    public static String getDataPropKey(VitroRequest vreq) {
-    	return vreq.getParameter("datapropKey");
+    protected static String getDataPropKey(VitroRequest vreq) {
+        return vreq.getParameter("datapropKey");        
     }
+    
     //is object property
     public static boolean isObjectProperty(String predicateUri, VitroRequest vreq) {
     	if(predicateUri == null) {
@@ -171,25 +172,21 @@ public class EditConfigurationUtils {
 		return predicateUri.equals(VitroVocabulary.LABEL);
 	}
 	
-    public static DataPropertyStatement getDataPropertyStatement(VitroRequest vreq, HttpSession session, int dataHash, String predicateUri) {
+	/**
+	 * May return null if data property statement cannot be found. 
+	 */
+    public static DataPropertyStatement getDataPropertyStatement(VitroRequest vreq, HttpSession session, Integer dataHash, String predicateUri) {
     	DataPropertyStatement dps = null;
    	    if( dataHash != 0) {
    	        Model model = (Model)session.getServletContext().getAttribute("jenaOntModel");
-   	        dps = RdfLiteralHash.getPropertyStmtByHash(EditConfigurationUtils.getSubjectIndividual(vreq), predicateUri, dataHash, model);
-   	                              
-   	        if (dps==null) {
-   	            //log.error("No match to existing data property \""+predicateUri+"\" statement for subject \""+subjectUri+"\" via key "+datapropKeyStr);
-   	            //TODO: Needs to forward to dataPropMissingStatement.jsp
-   	            //return null;
-   	        }                     
-   	        
+   	        dps = RdfLiteralHash.getPropertyStmtByHash(EditConfigurationUtils.getSubjectUri(vreq), predicateUri, dataHash, model);   	        
    	    }
    	    return dps;
     }
     
     //TODO: Include get object property statement
-    public static int getDataHash(VitroRequest vreq) {
-    	int dataHash = 0;
+    public static Integer getDataHash(VitroRequest vreq) {
+    	Integer dataHash = null;
 		String datapropKey = EditConfigurationUtils.getDataPropKey(vreq);
 		if (datapropKey!=null && datapropKey.trim().length()>0) {
 	        try {

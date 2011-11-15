@@ -52,7 +52,7 @@ public abstract class BaseEditConfigurationGenerator implements EditConfiguratio
      * Method to turn Strings or multiple List<String> to List<String>. 
      * Only accepts String and List<String> as multi args.  
      */
-    List<String> list( Object ... objs){
+    static List<String> list( Object ... objs){
         List<String> rv = new ArrayList<String>();        
         for( Object obj: objs){
             if( obj instanceof String)
