@@ -26,7 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHas
 public class DataPropertyStatementTemplateModel extends PropertyStatementTemplateModel {
     
     private static final Log log = LogFactory.getLog(DataPropertyStatementTemplateModel.class); 
-    private static final String EDIT_PATH = "edit/editDatapropStmtRequestDispatch.jsp";  
+    private static final String EDIT_PATH = "editRequestDispatch";  
     
     protected String value;
    

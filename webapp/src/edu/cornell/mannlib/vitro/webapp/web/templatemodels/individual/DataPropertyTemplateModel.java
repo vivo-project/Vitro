@@ -29,7 +29,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     private static final Log log = LogFactory.getLog(DataPropertyTemplateModel.class);  
     
     private static final String TYPE = "data";
-    private static final String EDIT_PATH = "edit/editDatapropStmtRequestDispatch.jsp";  
+    private static final String EDIT_PATH = "editRequestDispatch";  
     
     private final List<DataPropertyStatementTemplateModel> statements;
     
