@@ -19,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
@@ -30,7 +31,8 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 	 * For use when any database connection associated with the Dataset
 	 * is managed externally
 	 */
-	public WebappDaoFactorySDB(OntModelSelector ontModelSelector, Dataset dataset) {
+	public WebappDaoFactorySDB(OntModelSelector ontModelSelector, 
+                               Dataset dataset) {
 		super(ontModelSelector);
 		this.dwf = new StaticDatasetFactory(dataset);
 	}
@@ -41,10 +43,8 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
      */
 	public WebappDaoFactorySDB(OntModelSelector ontModelSelector, 
 	                            Dataset dataset, 
-	                            String defaultNamespace, 
-	                            HashSet<String> nonuserNamespaces, 
-	                            String[] preferredLanguages) {
-		super(ontModelSelector, defaultNamespace, nonuserNamespaces, preferredLanguages);
+	                            WebappDaoFactoryConfig config) {
+		super(ontModelSelector, config);
         this.dwf = new StaticDatasetFactory(dataset);
 	}
 	
@@ -55,10 +55,8 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
     public WebappDaoFactorySDB(OntModelSelector ontModelSelector, 
                                 BasicDataSource bds,
                                 StoreDesc storeDesc,
-                                String defaultNamespace, 
-                                HashSet<String> nonuserNamespaces, 
-                                String[] preferredLanguages) {
-        super(ontModelSelector, defaultNamespace, nonuserNamespaces, preferredLanguages);
+                                WebappDaoFactoryConfig config) {
+        super(ontModelSelector, config);
         this.dwf = new ReconnectingDatasetFactory(bds, storeDesc);
     }
     
@@ -69,11 +67,9 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
     public WebappDaoFactorySDB(OntModelSelector ontModelSelector, 
                                 BasicDataSource bds,
                                 StoreDesc storeDesc,
-                                String defaultNamespace, 
-                                HashSet<String> nonuserNamespaces, 
-                                String[] preferredLanguages,
+                                WebappDaoFactoryConfig config,
                                 SDBDatasetMode datasetMode) {
-        super(ontModelSelector, defaultNamespace, nonuserNamespaces, preferredLanguages);
+        super(ontModelSelector, config);
         this.dwf = new ReconnectingDatasetFactory(bds, storeDesc);
         this.datasetMode = datasetMode;
     }
@@ -82,9 +78,7 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
     public WebappDaoFactorySDB(WebappDaoFactorySDB base, String userURI) {
         super(base.ontModelSelector);
         this.ontModelSelector = base.ontModelSelector;
-        this.defaultNamespace = base.defaultNamespace;
-        this.nonuserNamespaces = base.nonuserNamespaces;
-        this.preferredLanguages = base.preferredLanguages;
+        this.config = base.config;
         this.userURI = userURI;
         this.dwf = base.dwf;
     }
@@ -125,7 +119,6 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 	}
 	
 	public WebappDaoFactory getUserAwareDaoFactory(String userURI) {
-        // TODO: put the user-aware factories in a hashmap so we don't keep re-creating them
         return new WebappDaoFactorySDB(this, userURI);
     }
 	
@@ -174,7 +167,8 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 	    private BasicDataSource _bds;
 	    private StoreDesc _storeDesc;
 	    
-	    public ReconnectingDatasetFactory(BasicDataSource bds, StoreDesc storeDesc) {
+	    public ReconnectingDatasetFactory(BasicDataSource bds, 
+                                          StoreDesc storeDesc) {
 	        _bds = bds;
 	        _storeDesc = storeDesc;
 	    }
@@ -187,7 +181,8 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
                 Dataset dataset = SDBFactory.connectDataset(store);
                 return new DatasetWrapper(dataset, conn);
             } catch (SQLException sqe) {
-                throw new RuntimeException("Unable to connect to database", sqe);
+                throw new RuntimeException(
+                		"Unable to connect to database", sqe);
             }
 	    }
 	    

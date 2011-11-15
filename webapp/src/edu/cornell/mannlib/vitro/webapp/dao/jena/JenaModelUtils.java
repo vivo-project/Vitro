@@ -25,11 +25,8 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
@@ -38,6 +35,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 
 public class JenaModelUtils {
 	
@@ -67,7 +65,10 @@ public class JenaModelUtils {
 		SimpleOntModelSelector oms = new SimpleOntModelSelector();
 		oms.setTBoxModel(ontModel);
 		oms.setApplicationMetadataModel(modelForClassgroups);
-		WebappDaoFactory myWebappDaoFactory = new WebappDaoFactoryJena(new SimpleOntModelSelector(ontModel),wadf.getDefaultNamespace(),null,null,null);
+		WebappDaoFactoryConfig config = new WebappDaoFactoryConfig();
+		config.setDefaultNamespace(wadf.getDefaultNamespace());
+		WebappDaoFactory myWebappDaoFactory = new WebappDaoFactoryJena(
+				new SimpleOntModelSelector(ontModel), config, null);
 		OntModel tempModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);
 	    Resource classGroupClass = ResourceFactory.createResource(VitroVocabulary.CLASSGROUP);
 	    Property inClassGroupProperty = ResourceFactory.createProperty(VitroVocabulary.IN_CLASSGROUP);

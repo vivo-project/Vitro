@@ -28,7 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroModelProperties;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class VclassEditController extends BaseEditController {

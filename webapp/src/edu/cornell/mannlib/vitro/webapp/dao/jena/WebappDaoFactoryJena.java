@@ -54,6 +54,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
@@ -72,16 +73,11 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     
     protected OntModelSelector ontModelSelector;
     
-    protected String defaultNamespace;
-    protected HashSet<String> nonuserNamespaces;
-    protected String[] preferredLanguages;
+    protected WebappDaoFactoryConfig config;
     
     protected PelletListener pelletListener;
 
     protected String userURI;
-
-	protected boolean INCLUDE_TOP_CONCEPT = false;
-	protected boolean INCLUDE_BOTTOM_CONCEPT = false;
 	
 	private Map<String,String> properties = new HashMap<String,String>();
 	
@@ -91,9 +87,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
 
     public WebappDaoFactoryJena(WebappDaoFactoryJena base, String userURI) {
         this.ontModelSelector = base.ontModelSelector;
-        this.defaultNamespace = base.defaultNamespace;
-        this.nonuserNamespaces = base.nonuserNamespaces;
-        this.preferredLanguages = base.preferredLanguages;
+        this.config = base.config;
         this.userURI = userURI;
         this.dwf = base.dwf;
     }
@@ -101,50 +95,12 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     public WebappDaoFactoryJena(OntModelSelector ontModelSelector, 
                                 OntModelSelector baseOntModelSelector,
                                 OntModelSelector inferenceOntModelSelector,
-                                String defaultNamespace, 
-                                HashSet<String> nonuserNamespaces, 
-                                String[] preferredLanguages, 
-                                String userURI){
+                                WebappDaoFactoryConfig config, 
+                                String userURI) {
     	
         this.ontModelSelector = ontModelSelector;
-        
-        if (defaultNamespace != null) {
-            this.defaultNamespace = defaultNamespace;
-        } else {
-            initDefaultNamespace();
-        }
-        if (nonuserNamespaces != null) {
-            this.nonuserNamespaces = nonuserNamespaces;
-        } else {
-            initNonuserNamespaces();
-        }
-        if (preferredLanguages != null) {
-            this.preferredLanguages = preferredLanguages;
-        } else {
-            initPreferredLanguages();
-        }
+        this.config = config;
         this.userURI = userURI;
-        Model languageUniversalsModel = ModelFactory.createDefaultModel();
-        if (INCLUDE_TOP_CONCEPT) {
-        	Resource top = getTopConcept();
-        	if (top != null) {
-        		languageUniversalsModel.add(top, RDF.type, 
-        				this.ontModelSelector.getTBoxModel().getProfile()
-        				        .CLASS());
-        	}
-        }
-        if (INCLUDE_BOTTOM_CONCEPT) {
-        	Resource bottom = getBottomConcept();
-        	if (bottom != null) {
-        		languageUniversalsModel.add(bottom, RDF.type, 
-        				this.ontModelSelector.getTBoxModel().getProfile()
-        				        .CLASS());
-        	}
-        }
-        if (languageUniversalsModel.size()>0) {
-        	this.ontModelSelector.getTBoxModel().addSubModel(
-        			languageUniversalsModel);
-        }
         
         Model assertions = (baseOntModelSelector != null) 
                 ? baseOntModelSelector.getFullModel()
@@ -157,7 +113,46 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         this.dwf = new StaticDatasetFactory(dataset);
         
     } 
+
+    public WebappDaoFactoryJena(OntModelSelector ontModelSelector, 
+                                WebappDaoFactoryConfig config,
+                                String userURI) {
+        this(ontModelSelector, null, null, config, userURI);
+    }
+
+    public WebappDaoFactoryJena(OntModelSelector ontModelSelector, 
+                                WebappDaoFactoryConfig config) {
+        this(ontModelSelector, config, null);
+    }
     
+    public WebappDaoFactoryJena(OntModelSelector ontModelSelector, 
+    		                    OntModelSelector baseOntModelSelector, 
+    		                    OntModelSelector inferenceOntModelSelector, 
+    		                    WebappDaoFactoryConfig config) {
+        this(ontModelSelector, 
+             baseOntModelSelector, 
+             inferenceOntModelSelector, 
+             config,
+             null);
+    }
+
+    public WebappDaoFactoryJena(OntModelSelector ontModelSelector) {
+        this(ontModelSelector, new WebappDaoFactoryConfig(), null);
+    }
+    
+    public WebappDaoFactoryJena(OntModel ontModel) {
+    	this(new SimpleOntModelSelector(
+    			ontModel), new WebappDaoFactoryConfig(), null);
+    }
+    
+    public OntModelSelector getOntModelSelector() {
+    	return this.ontModelSelector;
+    }
+    
+    public OntModel getOntModel() {
+    	return this.ontModelSelector.getFullModel();
+    }
+       
     public static Dataset makeInMemoryDataset(Model assertions, 
                                               Model inferences) {
         DataSource dataset = DatasetFactory.create();        
@@ -174,128 +169,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         }
         dataset.setDefaultModel(union);
         return dataset;
-    }
-    
-    public WebappDaoFactoryJena(OntModelSelector ontModelSelector, 
-            String defaultNamespace, 
-            HashSet<String> nonuserNamespaces, 
-            String[] preferredLanguages, 
-            String userURI){
-        this(ontModelSelector, 
-             null, 
-             null,
-             defaultNamespace,
-             nonuserNamespaces, 
-             preferredLanguages, 
-             userURI);
-    }
-
-    public WebappDaoFactoryJena(OntModelSelector ontModelSelector, 
-    		                    String defaultNamespace, 
-    		                    HashSet<String> nonuserNamespaces, 
-    		                    String[] preferredLanguages) {
-        this(ontModelSelector, 
-             defaultNamespace, 
-             nonuserNamespaces, 
-             preferredLanguages, 
-             null);
-    }
-    
-    public WebappDaoFactoryJena(OntModelSelector ontModelSelector, 
-    		                    OntModelSelector baseOntModelSelector, 
-    		                    OntModelSelector inferenceOntModelSelector, 
-    		                    String defaultNamespace, 
-    		                    HashSet<String> nonuserNamespaces, 
-    		                    String[] preferredLanguages){
-        this(ontModelSelector, 
-             baseOntModelSelector, 
-             inferenceOntModelSelector, 
-             defaultNamespace, 
-             nonuserNamespaces, 
-             preferredLanguages, 
-             null);
-    }
-
-    public WebappDaoFactoryJena(OntModelSelector ontModelSelector) {
-        this(ontModelSelector, null, null, null, null, null);
-    }
-
-    public WebappDaoFactoryJena(OntModel ontModel, 
-    		                    String defaultNamespace, 
-    		                    HashSet<String> nonuserNamespaces, 
-    		                    String[] preferredLanguages, 
-    		                    String userURI) {
-    	this(new SimpleOntModelSelector(ontModel), 
-             defaultNamespace, 
-             nonuserNamespaces, 
-             preferredLanguages, 
-             userURI);
-    } 
-
-    public WebappDaoFactoryJena(OntModel ontModel, 
-                                String defaultNamespace, 
-                                HashSet<String> nonuserNamespaces, 
-                                String[] preferredLanguages) {
-        this(new SimpleOntModelSelector(ontModel), 
-             defaultNamespace, 
-             nonuserNamespaces, 
-             preferredLanguages, 
-             null);
-    }
-
-    public WebappDaoFactoryJena(OntModel ontModel) {
-        this(new SimpleOntModelSelector(
-        		ontModel), null, null, null, null, null);
-    }
-    
-    public OntModelSelector getOntModelSelector() {
-    	return this.ontModelSelector;
-    }
-    
-    public OntModel getOntModel() {
-    	return this.ontModelSelector.getFullModel();
-    }
-    
-    /**
-     * Return the current language profile's Top concept as a Jena resource, 
-     * or null if not applicable.  The special case is RDFS, where we use 
-     * rdfs:Resource as the analog of Top, rather than returning null.
-     * @return
-     */
-    public Resource getTopConcept() {
-      	Resource top = null;
-    	if (this.ontModelSelector.getTBoxModel().getProfile().NAMESPACE()
-    			.equals(RDFS.getURI())) {
-    		top = RDFS.Resource;
-    	} else {
-    		top = this.ontModelSelector.getTBoxModel().getProfile().THING();
-    	}
-    	return top;
-    }
-    
-    /**
-     * Return the current language profile's Bottom concept as a Jena resource, 
-     * or null if not applicable.
-     * @return
-     */
-    public Resource getBottomConcept() {
-    	return this.ontModelSelector.getTBoxModel().getProfile().THING();
-    }
-    
-    private void initDefaultNamespace() {
-        defaultNamespace = "http://vivo.library.cornell.edu/ns/0.1#";
-    }
-
-    private void initNonuserNamespaces() {
-        nonuserNamespaces = new HashSet<String>();
-        nonuserNamespaces.add(VitroVocabulary.vitroURI);
-    }
-
-    private void initPreferredLanguages() {
-        preferredLanguages = new String[3];
-        preferredLanguages[0] = "en-US";
-        preferredLanguages[1] = "en";
-        preferredLanguages[2] = "EN";
     }
 
     /* ******************************************** */
@@ -366,15 +239,15 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     /* **************** accessors ***************** */
 
     public String getDefaultNamespace() {
-        return defaultNamespace;
+        return config.getDefaultNamespace();
     }
     
     public String[] getPreferredLanguages() {
-    	return this.preferredLanguages;
+    	return config.getPreferredLanguages();
     }
     
     public Set<String> getNonuserNamespaces() {
-    	return nonuserNamespaces;
+    	return config.getNonUserNamespaces();
     }
     
     /**
@@ -595,9 +468,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     		//Not sure what this is but will set to equivalence here
     		this.ontModelSelector = base.ontModelSelector;
     	}   	
-        this.defaultNamespace = base.defaultNamespace;
-        this.nonuserNamespaces = base.nonuserNamespaces;
-        this.preferredLanguages = base.preferredLanguages;
+        this.config = base.config;
         this.userURI = base.userURI;
         this.dwf = base.dwf;
     }
