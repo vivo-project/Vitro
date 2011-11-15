@@ -37,7 +37,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayModelDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.MenuDao;
-import edu.cornell.mannlib.vitro.webapp.dao.NamespaceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
@@ -347,13 +346,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         if( individualDao == null )
             individualDao = new IndividualDaoJena(this);
         return individualDao;
-    }
-
-    NamespaceDao namespaceDao = null;
-    public NamespaceDao getNamespaceDao() {
-        if( namespaceDao == null )
-            namespaceDao = new NamespaceDaoJena(this);
-        return namespaceDao;
     }
 
     ObjectPropertyStatementDao objectPropertyStatementDao = null;

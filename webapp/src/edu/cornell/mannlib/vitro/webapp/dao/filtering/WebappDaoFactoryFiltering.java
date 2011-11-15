@@ -14,7 +14,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayModelDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.MenuDao;
-import edu.cornell.mannlib.vitro.webapp.dao.NamespaceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
@@ -175,10 +174,6 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
 
     public DatatypeDao getDatatypeDao() {
         return innerWebappDaoFactory.getDatatypeDao();
-    }
-
-    public NamespaceDao getNamespaceDao() {
-        return innerWebappDaoFactory.getNamespaceDao();
     }
 
     public OntologyDao getOntologyDao() {

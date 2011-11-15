@@ -4,8 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +14,6 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
-import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
@@ -26,7 +23,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntolo
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.NamespaceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 
 public class OntologyRetryController extends BaseEditController {
@@ -52,7 +48,6 @@ public class OntologyRetryController extends BaseEditController {
 
         OntologyDao oDao = request.getFullWebappDaoFactory().getOntologyDao();
         epo.setDataAccessObject(oDao);
-        NamespaceDao nDao = request.getFullWebappDaoFactory().getNamespaceDao();
 
         Ontology ontologyForEditing = null;
         if (!epo.getUseRecycledBean()){
@@ -97,17 +92,6 @@ public class OntologyRetryController extends BaseEditController {
 
 
         FormObject foo = new FormObject();
-
-        HashMap optionMap = new HashMap();
-        try {
-            List namespaceIdList = FormUtils.makeOptionListFromBeans(nDao.getAllNamespaces(),"Id","Name",Integer.valueOf(ontologyForEditing.getNamespaceId()).toString(),null,false);
-            namespaceIdList.add(0,new Option("-1","none", false));
-            optionMap.put("NamespaceId", namespaceIdList);
-        } catch (Exception e) {
-            log.error(this.getClass().getName());
-            e.printStackTrace();
-        }
-        foo.setOptionLists(optionMap);
 
         foo.setErrorMap(epo.getErrMsgMap());
 

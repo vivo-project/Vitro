@@ -127,8 +127,6 @@ public interface WebappDaoFactory {
 
     public PropertyGroupDao getPropertyGroupDao();
     
-    public NamespaceDao getNamespaceDao();
-    
     public PropertyInstanceDao getPropertyInstanceDao();
 
     public PageDao getPageDao();    

@@ -14,7 +14,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayModelDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.MenuDao;
-import edu.cornell.mannlib.vitro.webapp.dao.NamespaceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
@@ -198,12 +197,6 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	public PropertyGroupDao getPropertyGroupDao() {
 		throw new RuntimeException(
 				"WebappDaoFactory.getPropertyGroupDao() not implemented.");
-	}
-
-	@Override
-	public NamespaceDao getNamespaceDao() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getNamespaceDao() not implemented.");
 	}
 
 	@Override
