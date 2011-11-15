@@ -7,6 +7,8 @@ import static javax.mail.Message.RecipientType.TO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Calendar;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -419,6 +422,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
         Map<String, Object> map = new HashMap<String, Object>();
         
+        ApplicationBean appBean = vreq.getAppBean();
         // This may be overridden by the body data model received from the subcontroller.
         map.put("title", getTitle(vreq.getAppBean().getApplicationName(), vreq));
         
@@ -435,6 +439,9 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
 
         // Let the page template know which page it's processing.
         map.put("currentServlet", normalizeServletName(vreq.getServletPath().replaceFirst("/", "")));
+        // NIHVIVO-3307: we need this here instead of FreemarkerConfiguration.java so that updates to
+        // the copyright text can be viewed with having to restart Tomcat
+        map.put("copyright", getCopyrightInfo(appBean));    
         
         map.put("url", new edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective()); 
         map.put("widget", new edu.cornell.mannlib.vitro.webapp.web.directives.WidgetDirective());
@@ -454,6 +461,24 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return vreq.getWebappDaoFactory().getMenuDao().getMainMenu(url);
     }
     
+    // NIHVIVO-3307: we need this here instead of FreemarkerConfiguration.java so that updates to
+    // the copyright text can be viewed with having to restart Tomcat
+    private final Map<String, Object> getCopyrightInfo(ApplicationBean appBean) {
+
+        Map<String, Object> copyright = null;
+        String copyrightText = appBean.getCopyrightAnchor();
+        if ( ! StringUtils.isEmpty(copyrightText) ) {
+            copyright =  new HashMap<String, Object>();
+            copyright.put("text", copyrightText);
+            int thisYear = Calendar.getInstance().get(Calendar.YEAR);  // use ${copyrightYear?c} in template
+            //String thisYear = ((Integer)Calendar.getInstance().get(Calendar.YEAR)).toString(); // use ${copyrightYear} in template
+            //SimpleDate thisYear = new SimpleDate(Calendar.getInstance().getTime(), TemplateDateModel.DATE); // use ${copyrightYear?string("yyyy")} in template
+            copyright.put("year", thisYear);
+            copyright.put("url", appBean.getCopyrightURL());
+        } 
+        return copyright;
+    }
+
     // Subclasses may override. This serves as a default.
     protected String getTitle(String siteName, VitroRequest vreq) {        
         return siteName;

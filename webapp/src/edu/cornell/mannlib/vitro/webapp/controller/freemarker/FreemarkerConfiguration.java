@@ -137,7 +137,6 @@ public class FreemarkerConfiguration extends Configuration {
         
         sharedVariables.putAll(getDirectives());
         sharedVariables.putAll(getMethods());
-        sharedVariables.put("copyright", getCopyrightInfo());    
         sharedVariables.put("siteTagline", appBean.getShortHand()); 
         
         for ( Map.Entry<String, Object> variable : sharedVariables.entrySet() ) {
@@ -208,22 +207,6 @@ public class FreemarkerConfiguration extends Configuration {
         map.put("profileUrl", new edu.cornell.mannlib.vitro.webapp.web.methods.IndividualProfileUrlMethod());
         map.put("localName", new edu.cornell.mannlib.vitro.webapp.web.methods.IndividualLocalNameMethod());
         return map;
-    }
-    
-    private final Map<String, Object> getCopyrightInfo() {
-
-        Map<String, Object> copyright = null;
-        String copyrightText = appBean.getCopyrightAnchor();
-        if ( ! StringUtils.isEmpty(copyrightText) ) {
-            copyright =  new HashMap<String, Object>();
-            copyright.put("text", copyrightText);
-            int thisYear = Calendar.getInstance().get(Calendar.YEAR);  // use ${copyrightYear?c} in template
-            //String thisYear = ((Integer)Calendar.getInstance().get(Calendar.YEAR)).toString(); // use ${copyrightYear} in template
-            //SimpleDate thisYear = new SimpleDate(Calendar.getInstance().getTime(), TemplateDateModel.DATE); // use ${copyrightYear?string("yyyy")} in template
-            copyright.put("year", thisYear);
-            copyright.put("url", appBean.getCopyrightURL());
-        } 
-        return copyright;
     }
     
     // Define template locations. Template loader will look first in the theme-specific
