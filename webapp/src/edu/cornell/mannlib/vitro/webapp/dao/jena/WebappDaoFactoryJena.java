@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,8 +28,6 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.Classes2ClassesDao;
@@ -39,8 +36,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayModelDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.dao.LinksDao;
-import edu.cornell.mannlib.vitro.webapp.dao.LinktypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.MenuDao;
 import edu.cornell.mannlib.vitro.webapp.dao.NamespaceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
@@ -52,7 +47,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
@@ -61,8 +55,6 @@ import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 public class WebappDaoFactoryJena implements WebappDaoFactory {
 
     protected IndividualDao entityWebappDao;
-    protected LinksDao linksDao;
-    protected LinktypeDao linktypeDao;
     protected ApplicationDaoJena applicationDao;
     protected UserAccountsDao userAccountsDao;
     protected VClassGroupDao vClassGroupDao;
