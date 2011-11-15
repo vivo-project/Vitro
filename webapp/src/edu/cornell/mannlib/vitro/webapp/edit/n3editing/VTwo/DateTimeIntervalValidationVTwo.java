@@ -70,7 +70,7 @@ public class DateTimeIntervalValidationVTwo implements N3ValidatorVTwo {
         
         //Assuming form start year and form end year are working in conjunction with multiple values
         int index;
-        if (formStartYear != null && formEndYear != null) {
+        if (!literalListIsNull(formStartYear) && !literalListIsNull(formEndYear)) {
         	int numberStartYears = formStartYear.size();
         	int numberEndYears = formEndYear.size();
         	if(numberStartYears > 1 && numberEndYears > 1) {
@@ -81,7 +81,7 @@ public class DateTimeIntervalValidationVTwo implements N3ValidatorVTwo {
         	if(numberStartYears > 0 && numberEndYears > 0) {
         		errors.putAll(checkDateLiterals(formStartYear.get(0), formEndYear.get(0), startPrecision, endPrecision));
         	}
-        } else if (formStartYear != null && existingEndYear != null) {
+        } else if (!literalListIsNull(formStartYear) && !literalListIsNull(existingEndYear)) {
         	int numberStartYears = formStartYear.size();
         	int numberEndYears = existingEndYear.size();
         	if(numberStartYears > 1 && numberEndYears > 1) {
@@ -92,7 +92,8 @@ public class DateTimeIntervalValidationVTwo implements N3ValidatorVTwo {
         	if(numberStartYears > 0 && numberEndYears > 0) {
         		errors.putAll(checkDateLiterals(formStartYear.get(0), existingEndYear.get(0), startPrecision, endPrecision));
         	}
-        } else if (existingStartYear != null && formEndYear != null) {
+        } else if (!literalListIsNull(existingStartYear)  && !literalListIsNull(formEndYear)) {
+        	
         	int numberStartYears = existingStartYear.size();
         	int numberEndYears = formEndYear.size();
         	if(numberStartYears > 1 && numberEndYears > 1) {
@@ -103,7 +104,7 @@ public class DateTimeIntervalValidationVTwo implements N3ValidatorVTwo {
         	if(numberStartYears > 0 && numberEndYears > 0) {
         		errors.putAll(checkDateLiterals(existingStartYear.get(0), formEndYear.get(0), startPrecision, endPrecision));
         	}
-        } else if (existingStartYear != null && existingEndYear != null) {
+        } else if (!literalListIsNull(existingStartYear) && !literalListIsNull(existingEndYear)) {
         	int numberStartYears = existingStartYear.size();
         	int numberEndYears = existingEndYear.size();
         	if(numberStartYears > 1 && numberEndYears > 1) {
@@ -212,5 +213,17 @@ public class DateTimeIntervalValidationVTwo implements N3ValidatorVTwo {
         }
         
         return errors;
+    }
+    
+    //MEthod that checks whether list of literals is null or contains only null
+    private boolean literalListIsNull(List<Literal> literalList) {
+    	if(literalList == null)
+    		return true;
+    	boolean allNulls = true;
+    	for(Literal l: literalList) {
+    		if(l != null)
+    			allNulls = false;
+    	}
+    	return allNulls;
     }
 }

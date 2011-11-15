@@ -116,12 +116,20 @@ public class EditConfigurationUtils {
       	return dataProp;
     }
     
+    //get url without context - used for edit configuration object
+    public static String getFormUrlWithoutContext(VitroRequest vreq) {
+    	return getEditUrlWithoutContext(vreq) + "?" + vreq.getQueryString();
+    }
     public static String getFormUrl(VitroRequest vreq) {
     	return getEditUrl(vreq) + "?" + vreq.getQueryString();
     }
     
     public static String getEditUrl(VitroRequest vreq) {
-    	return vreq.getContextPath() + "/editRequestDispatch";
+    	return vreq.getContextPath() + getEditUrlWithoutContext(vreq);
+    }
+    
+    public static String getEditUrlWithoutContext(VitroRequest vreq) {
+    	return "/editRequestDispatch";
     }
     
     public static String getCancelUrlBase(VitroRequest vreq) {

@@ -125,7 +125,7 @@ public class RDFSLabelGenerator implements EditConfigurationGenerator {
 	//Initialize setup: process parameters
 	//As this is a data property, don't require any additional processing for object properties
     private void initProcessParameters(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {
-    	String formUrl = EditConfigurationUtils.getFormUrl(vreq);
+    	String formUrl = EditConfigurationUtils.getFormUrlWithoutContext(vreq);
 
     	subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
     	predicateUri = EditConfigurationUtils.getPredicateUri(vreq);

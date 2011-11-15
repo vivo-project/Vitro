@@ -133,7 +133,7 @@ public class NewIndividualFormGenerator implements EditConfigurationGenerator {
 
 	//Initialize setup: process parameters
     private void initProcessParameters(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {
-    	String formUrl = EditConfigurationUtils.getFormUrl(vreq);
+    	String formUrl = EditConfigurationUtils.getFormUrlWithoutContext(vreq);
 
     	subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
     	predicateUri = EditConfigurationUtils.getPredicateUri(vreq);

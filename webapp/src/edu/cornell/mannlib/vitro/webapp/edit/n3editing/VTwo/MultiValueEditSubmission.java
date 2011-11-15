@@ -131,8 +131,14 @@ public class MultiValueEditSubmission {
         
         processEditElementFields(editConfig,queryParameters);
         //Incorporating basic validation
+        //Validate URIS
         this.basicValidation = new BasicValidationVTwo(editConfig, this);
-        Map<String,String> errors = basicValidation.validateUris( urisFromForm );   
+        Map<String,String> errors = basicValidation.validateUris( urisFromForm ); 
+        //Validate literals
+        errors = basicValidation.validateLiterals( literalsFromForm );
+        if( errors != null ) {
+            validationErrors.putAll( errors);
+        }              
         
         if(editConfig.getValidators() != null ){
             for( N3ValidatorVTwo validator : editConfig.getValidators()){

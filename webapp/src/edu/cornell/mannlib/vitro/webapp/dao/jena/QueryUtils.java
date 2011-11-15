@@ -109,6 +109,11 @@ public class QueryUtils {
         return queryString.replaceAll("\\?" + varName + "\\b", "<" + uri + ">");
     }
     
+    /**Replace one variable name with another**/
+    public static String replaceQueryVar(String queryString, String varName, String newVarName) {
+        return queryString.replaceAll("\\?" + varName + "\\b", "?" + newVarName);
+    }
+    
     public static ResultSet getQueryResults(String queryStr, VitroRequest vreq) {
         
         Dataset dataset = vreq.getDataset();

@@ -24,7 +24,7 @@ public abstract class BaseEditConfigurationGenerator implements EditConfiguratio
         String editKey = EditConfigurationUtils.getEditKey(vreq);   
         editConf.setEditKey(editKey);        
         
-        String formUrl = EditConfigurationUtils.getFormUrl(vreq);  
+        String formUrl = EditConfigurationUtils.getFormUrlWithoutContext(vreq);  
         editConf.setFormUrl(formUrl);                                   
     }
     

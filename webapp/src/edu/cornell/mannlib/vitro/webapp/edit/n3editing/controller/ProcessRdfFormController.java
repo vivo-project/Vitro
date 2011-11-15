@@ -163,9 +163,13 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		if(errors != null && !errors.isEmpty()){
 			String form = editConfiguration.getFormUrl();
 			vreq.setAttribute("formUrl", form);
-			vreq.setAttribute("view", vreq.getParameter("view"));			
-							        
-	        return new RedirectResponseValues(editConfiguration.getFormUrl());
+			vreq.setAttribute("view", vreq.getParameter("view"));	
+			//Need to ensure that edit key is set so that the correct
+			//edit configuration and edit submission are retrieved
+			//This can also be set as a parameter instead
+			String formUrl = editConfiguration.getFormUrl();
+			formUrl += "&editKey=" + editConfiguration.getEditKey();
+	        return new RedirectResponseValues(formUrl);
 		}
 		return null; //no errors		
 	}

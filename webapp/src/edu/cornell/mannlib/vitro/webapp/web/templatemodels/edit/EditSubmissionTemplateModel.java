@@ -17,14 +17,20 @@ public class EditSubmissionTemplateModel {
     }
     
     public Map<String, Literal> getLiteralsFromForm() {
+    	if(editSub == null)
+    		return null;
         return editSub.getLiteralsFromForm();
     }
 
     public Map<String, String> getValidationErrors() {
+    	if(editSub == null) 
+    		return null;
         return editSub.getValidationErrors();
     }
 
     public Map<String, String> getUrisFromForm() {
+    	if(editSub == null)
+    		return null;
         return editSub.getUrisFromForm();
     }
 

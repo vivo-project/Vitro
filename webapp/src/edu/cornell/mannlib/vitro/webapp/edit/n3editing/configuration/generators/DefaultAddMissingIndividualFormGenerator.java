@@ -147,7 +147,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
 	//Initialize setup: process parameters
 	//Doesn't look like we need to set up separate processing for data property form
     private void initProcessParameters(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {
-    	String formUrl = EditConfigurationUtils.getFormUrl(vreq);
+    	String formUrl = EditConfigurationUtils.getFormUrlWithoutContext(vreq);
 
     	subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
     	predicateUri = EditConfigurationUtils.getPredicateUri(vreq);

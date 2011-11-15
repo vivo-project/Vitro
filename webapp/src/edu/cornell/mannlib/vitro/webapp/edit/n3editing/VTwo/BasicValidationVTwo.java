@@ -93,31 +93,40 @@ public class BasicValidationVTwo {
                 for( String validationType : validations){
                     String value = null;
                     String validateMsg = null;
-                    for(Literal literal: literals) {
-	                    try{
-	                        if( literal != null ){
-	                            value = literal.getString();
-	                        }
-	                    }catch(Throwable th){ 
-	                        log.debug("could not convert literal to string" , th); 
+                    //If no literals and this field was required, this is an error message
+                    //and can return
+                    if((literals == null || literals.size() == 0) && isRequiredField) {
+                    	errors.put(name, REQUIRED_FIELD_EMPTY_MSG);     
+                        break;
+                    }
+                    //Loop through literals if literals exist
+                    if(literals != null) {
+	                    for(Literal literal: literals) {
+		                    try{
+		                        if( literal != null ){
+		                            value = literal.getString();
+		                        }
+		                    }catch(Throwable th){ 
+		                        log.debug("could not convert literal to string" , th); 
+		                    }
+		                    // Empty field: if required, include only the empty field
+		                    // error message, not a format validation message. If non-required, 
+		                    // don't do format validation, since that is both unnecessary and may 
+		                    // incorrectly generate errors.
+		                    if (isEmpty(value)) {
+		                        if (isRequiredField) {
+		                           errors.put(name, REQUIRED_FIELD_EMPTY_MSG);
+		                        }
+		                        break;
+		                    }
+		                    String thisValidateMsg = validate(validationType,value);
+	                		if(validateMsg != null && thisValidateMsg != null) {
+	                			validateMsg += ", " + thisValidateMsg;
+	                		} else {
+	                			validateMsg = thisValidateMsg;
+	
+	                		}
 	                    }
-	                    // Empty field: if required, include only the empty field
-	                    // error message, not a format validation message. If non-required, 
-	                    // don't do format validation, since that is both unnecessary and may 
-	                    // incorrectly generate errors.
-	                    if (isEmpty(value)) {
-	                        if (isRequiredField) {
-	                           errors.put(name, REQUIRED_FIELD_EMPTY_MSG);
-	                        }
-	                        break;
-	                    }
-	                    String thisValidateMsg = validate(validationType,value);
-                		if(validateMsg != null && thisValidateMsg != null) {
-                			validateMsg += ", " + thisValidateMsg;
-                		} else {
-                			validateMsg = thisValidateMsg;
-
-                		}
                     }
                     if( validateMsg != null) {
                         errors.put(name,validateMsg);
