@@ -73,12 +73,14 @@ public class DefaultDataPropertyFormGenerator extends BaseEditConfigurationGener
     	editConfiguration.setVarNameForPredicate("predicate");
     	editConfiguration.setPredicateUri(predicateUri);
 
+    	editConfiguration.setVarNameForObject( literalVar );
+    	
     	editConfiguration.setLiteralsOnForm( Arrays.asList( literalVar ));    	    	    
     	
     	editConfiguration.addField( new FieldVTwo()
     	       .setName( literalVar )
     	       .setPredicateUri(predicateUri)
-    	       .setRangeDatatypeUri(rangeDatatypeUri));
+    	       .setRangeDatatypeUri(rangeDatatypeUri));    	    
     	
     	//deal with empty field
     	editConfiguration.addModelChangePreprocessor( new DefaultDataPropEmptyField() );	        	

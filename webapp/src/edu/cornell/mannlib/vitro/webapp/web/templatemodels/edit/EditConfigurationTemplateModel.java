@@ -2,31 +2,16 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit;
 
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditSubmissionUtils;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.SelectListGeneratorVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditElementVTwo;
-
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultObjectPropertyFormGenerator;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils;
-import edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils.EditMode;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.Collator;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -35,11 +20,20 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.rdf.model.Literal;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditElementVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.SelectListGeneratorVTwo;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 public class EditConfigurationTemplateModel extends BaseTemplateModel {
     EditConfigurationVTwo editConfig;
@@ -377,6 +371,10 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     		dataLiteralName = literalsOnForm.get(0);
     	}
     	return dataLiteralName;
+    }
+    
+    public String getVarNameForObject() {
+        return editConfig.getVarNameForObject();
     }
     
     //Get data property key
