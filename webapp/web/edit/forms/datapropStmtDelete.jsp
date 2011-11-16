@@ -62,7 +62,7 @@
     
     String vitroNsProp  = vreq.getParameter("vitroNsProp");
     
-    DataPropertyStatement dps = RdfLiteralHash.getPropertyStmtByHash(subject, predicateUri, dataHash, model);
+    DataPropertyStatement dps = RdfLiteralHash.getPropertyStmtByHash(subject.getURI(), predicateUri, dataHash, model);
     
     if( log.isDebugEnabled() ){
         log.debug("attempting to delete dataPropertyStatement: subjectURI <" + dps.getIndividualURI() +">");
