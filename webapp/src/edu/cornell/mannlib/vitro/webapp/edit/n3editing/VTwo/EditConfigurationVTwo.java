@@ -895,6 +895,13 @@ public class EditConfigurationVTwo {
 		this.formSpecificData = formSpecificData;
 	}
 
+	public void addFormSpecificData( String key, Object value){
+	    if( this.formSpecificData == null){
+	        this.formSpecificData = new HashMap<String,Object>();
+	    }
+	    this.formSpecificData.put(key,value);	    
+	}
+	
 	public HashMap<String, Object> getFormSpecificData() {
 		// TODO Auto-generated method stub
 		return this.formSpecificData;
