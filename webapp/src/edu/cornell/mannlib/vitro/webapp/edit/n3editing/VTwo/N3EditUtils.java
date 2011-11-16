@@ -100,8 +100,7 @@ public class N3EditUtils {
             //need a new DataPropHash and a new editConfig that uses that, and replace 
             //the editConfig used for this submission in the session.  The same thing
             //is done for an update or a new insert since it will convert the insert
-            //EditConfig into an update EditConfig.            
-            FieldVTwo dataField = copy.getField(copy.getVarNameForObject());
+            //EditConfig into an update EditConfig.                       
              
             DataPropertyStatement dps = new DataPropertyStatementImpl();
             List<Literal> submitted = submission.getLiteralsFromForm().get(copy.getVarNameForObject());
