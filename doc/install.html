@@ -106,8 +106,6 @@
             <p>
                 In 2009, the National Institutes of Health (NIH) awarded a major grant to advance the development of VIVO. 
                 Much of the recent development on Vitro has been in support of that grant. 
-            </p>
-            <p>
                 However, Vitro retains its own identity, 
                 and still serves as the core of many projects and products. 
                 Some of these are currently in use, and some are still in the planning stages.
@@ -167,9 +165,7 @@
 
             <hr><!-- Page break --><!-- Installation process for Version 1.3 --><h2 id="installation">Installation process for Version 1.3</h2>
             <p>
-                This document is a summary of the VIVO installation process. This 
-                and other documentation can be found on the <a href="http://vivoweb.org/support">support page</a>
-                at <a href="http://vivoweb.org">VIVOweb.org</a>
+                This document is a summary of the Vitro installation process. 
             </p>
             <toc>
                 <h3>Steps to Installation</h3>
@@ -208,19 +204,19 @@
                     </li>
                     <li>
                         <a href="#external_auth">Using an External Authentication
-                            System with VIVO</a>
+                            System with Vitro</a>
                     </li>
                     <li>
                         <a href="#installation_check">Was the installation successful?</a>
                     </li>
                     <li>
-                        <a href="#termsofuse">Review the VIVO Terms of Use</a>
+                        <a href="#termsofuse">Review the Vitro Terms of Use</a>
                     </li>
                 </ol>
             </toc>
             <h3 id="required_software">I. Install required software </h3>
             <p>
-                Before installing VIVO, make sure that the following software is 
+                Before installing Vitro, make sure that the following software is 
                 installed on the desired machine: 
             </p>
             <ul>
@@ -237,6 +233,9 @@
                 <li>
                     MySQL 5.1 or higher*, <a href="http://www.mysql.com">http://www.mysql.com</a>
                 </li>
+                <li>
+                    Apache Subversion 1.6.x or higher*, <a href="http://subversion.apache.org/">http://subversion.apache.org/</a>
+                </li>
             </ul>
             <p>
                 Be sure to set up the environment variables for <code java_home="">JAVA_HOME</code>
@@ -245,12 +244,7 @@
                 your operating system and installation directions from the software  
                 support websites. 
             </p>
-            <p>
-                * Note that VIVO V1.2 or V1.3 will not run on older versions of MySQL that 
-                may have worked with 1.1.1. Be sure to run VIVO 1.2 with MySQL 5.1 or 
-                higher. Using unsupported versions may result in strange error messages  
-                related to table formatting or other unexpected problems. 
-            </p>
+
             <h3 id="create_database">II. Create an empty MySQL database </h3>
             <p>
                 Decide on a database name, username, and password. Log into your 
@@ -282,7 +276,7 @@
             </p>
             <h3 id="deploy_properties">IV. Specify deployment properties </h3>
             <p>
-                At the top level of the VIVO distribution directory, copy the file <code>example.deploy.properties</code>
+                In the <code>webapp</code> directory of the Vitro distribution, copy the file <code>example.deploy.properties</code>
                 to a file named simply <code>deploy.properties</code>. This file sets 
                 several properties used in compilation and deployment. 
             </p>
@@ -297,8 +291,7 @@
                 If you want to use an external 
                 authentication system like Shibboleth or CUWebAuth, you will need to 
                 set two additional properties in this file. See the section below  
-                entitled <a href="#external_auth">Using an External Authentication
-                    System with VIVO</a>. 
+                entitled <a href="#external_auth">Using an External Authentication System with Vitro</a>. 
             </p>
             <table border='1' bordercolor="#CCCCCC" cellspacing="5">
                 <tbody>
@@ -312,18 +305,18 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            Default namespace: VIVO installations make their
+                            Default namespace: Vitro installations make their
                             RDF resources available for harvest using linked data. Requests for RDF
                             resource URIs redirect to HTML or RDF representations as specified by
-                            the client. To make this possible, VIVO's default namespace must have a
-                            certain structure and begin with the public web address of the VIVO
-                            installation. For example, if the web address of a VIVO installation is
-                            "http://vivo.example.edu/" the default namespace must be set to
-                            "http://vivo.example.edu/individual/" in order to support linked data.
-                            Similarly, if VIVO is installed at "http://www.example.edu/vivo" the
+                            the client. To make this possible, Vitro's default namespace must have a
+                            certain structure and begin with the public web address of the Vitro
+                            installation. For example, if the web address of a Vitro installation is
+                            "http://vitro.example.edu/" the default namespace must be set to
+                            "http://vitro.example.edu/individual/" in order to support linked data.
+                            Similarly, if Vitro is installed at "http://www.example.edu/vitro" the
                             default namespace must be set to
-                            "http://www.example.edu/vivo/individual/"<h5>* The namespace must end with "individual/" (including the
-                                trailing slash).</h5>
+                            "http://www.example.edu/vitro/individual/"
+                            <h5>* The namespace must end with "individual/" (including the trailing slash).</h5>
                         </td>
                     </tr>
                     <tr class="odd_row">
@@ -331,7 +324,7 @@
                             Vitro.defaultNamespace 
                         </td>
                         <td>
-                            http://vivo.mydomain.edu/individual/ 
+                            http://vitro.mydomain.edu/individual/ 
                         </td>
                     </tr>
                     <tr>
@@ -349,7 +342,7 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            Name of your VIVO application. 
+                            Name of your Vitro application. 
                         </td>
                     </tr>
                     <tr class="odd_row">
@@ -357,16 +350,16 @@
                             webapp.name 
                         </td>
                         <td>
-                            vivo 
+                            vitro 
                         </td>
                     </tr>
                     <tr>
                         <td colspan="2">
-                            URL of Solr context used in local VIVO search.
-                            Should consist of:<pre>    scheme + servername + port + vivo_webapp_name + "solr"</pre>
+                            URL of Solr context used in local Vitro search.
+                            Should consist of:<pre>    scheme + servername + port + vitro_webapp_name + "solr"</pre>
                             In the standard installation, the Solr context will be on the same 
-                            server as VIVO, and in the same Tomcat instance. The path will be the  
-                            VIVO webapp.name (specified above) + "solr" 
+                            server as Vitro, and in the same Tomcat instance. The path will be the  
+                            Vitro webapp.name (specified above) + "solr" 
                         </td>
                     </tr>
                     <tr class="odd_row">
@@ -374,7 +367,7 @@
                             vitro.local.solr.url 
                         </td>
                         <td>
-                            http://localhost:8080/vivosolr 
+                            http://localhost:8080/vitrosolr 
                         </td>
                     </tr>
                     <tr>
@@ -410,7 +403,7 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            Directory where the VIVO application will store 
+                            Directory where the Vitro application will store 
                             the data that it creates. This includes uploaded files (usually images) 
                             and the Solr search index. Be sure this directory exists and is  
                             writable by the user who the Tomcat service is running as. 
@@ -421,7 +414,7 @@
                             vitro.home.directory 
                         </td>
                         <td>
-                            /usr/local/vivo/data 
+                            /usr/local/vitro/data 
                         </td>
                     </tr>
                     <tr>
@@ -455,13 +448,13 @@
                             email.replyTo 
                         </td>
                         <td>
-                            vivoAdmin@my.domain.edu 
+                            vitroAdmin@my.domain.edu 
                         </td>
                     </tr>
                     <tr>
                         <td colspan="2">
                             Specify the JDBC URL of your database. Change
-                            the end of the URL to reflect your database name (if it is not "vivo").
+                            the end of the URL to reflect your database name (if it is not "vitro").
                         </td>
                     </tr>
                     <tr class="odd_row">
@@ -469,7 +462,7 @@
                             VitroConnection.DataSource.url 
                         </td>
                         <td>
-                            jdbc:mysql://localhost/vivo 
+                            jdbc:mysql://localhost/vitro 
                         </td>
                     </tr>
                     <tr>
@@ -582,12 +575,12 @@
                     <tr>
                         <td colspan="2">
                             Specify the email address of the root user
-                            account for the VIVO application. This user will have an initial
+                            account for the Vitro application. This user will have an initial
                             temporary password of 'rootPassword'. You will be prompted to create a
                             new password on first login.
                             <p>
                                 NOTE: The root user account has access to all data and all 
-                                operations in VIVO. Data views may be surprising when logged in as the 
+                                operations in Vitro. Data views may be surprising when logged in as the 
                                 root user. It is best to create a Site Admin account to use for every  
                                 day administrative tasks. 
                             </p>
@@ -598,7 +591,7 @@
                             rootUser.emailAddress 
                         </td>
                         <td>
-                            vivoAdmin@my.domain.edu 
+                            vitroAdmin@my.domain.edu 
                         </td>
                     </tr>
                     <tr>
@@ -615,7 +608,7 @@
                             selfEditing.idMatchingProperty 
                         </td>
                         <td>
-                            http://vivo.mydomain.edu/ns#networkId 
+                            http://vitro.mydomain.edu/ns#networkId 
                         </td>
                     </tr>
                     <tr>
@@ -649,22 +642,22 @@
             </table>
             <h3 id="deploy">V. Compile and deploy</h3>
             <p>
-                At the command line, from the top level of the VIVO distribution 
+                At the command line, from the top level of the Vitro distribution 
                 directory, type: 
             </p>
             <pre>                ant all<br>            </pre>
             <p>
-                to build VIVO and deploy to Tomcat's webapps directory. 
+                to build Vitro and deploy to Tomcat's webapps directory. 
             </p>
             <h3 id="tomcat_settings">VI. Set Tomcat JVM parameters and security
                 limits</h3>
             <p>
-                VIVO copies small sections of your RDF database into 
+                Vitro copies small sections of your RDF database into 
                 memory in order to serve Web requests quickly (the in-memory copy and  
                 the underlying database are kept in synch as edits are performed). 
             </p>
             <p>
-                VIVO may require more memory than that allocated to Tomcat by 
+                Vitro may require more memory than that allocated to Tomcat by 
                 default. With most installations of Tomcat, the "setenv.sh" or 
                 "setenv.bat" file in Tomcat's bin directory is a convenient place to  
                 set the memory parameters. <em>If this file does not exist in Tomcat's
@@ -679,11 +672,11 @@
                 values may suffice, especially for small test installations.
             </p>
             <p>
-                If an OutOfMemoryError is encountered during VIVO execution, it can 
+                If an OutOfMemoryError is encountered during Vitro execution, it can 
                 be remedied by increasing the heap parameters and restarting Tomcat. 
             </p>
             <p>
-                Security limits: VIVO is a multithreaded web application that may 
+                Security limits: Vitro is a multithreaded web application that may 
                 require more threads than are permitted under your Linux installation's 
                 default configuration. Ensure that your installation can support the  
                 required number of threads by making the following edits to <code>/etc/security/limits.conf</code>:
@@ -694,8 +687,8 @@
                 Most Tomcat installations can be started by running <code>startup.sh</code>
                 or <code>startup.bat</code>
                 in Tomcat's bin directory. Point your
-                browser to "http://localhost:8080/vivo/" to test the application. If 
-                Tomcat does not start up, or the VIVO application is not visible, check 
+                browser to "http://localhost:8080/vitro/" to test the application. If 
+                Tomcat does not start up, or the Vitro application is not visible, check 
                 the files in Tomcat's logs directory. Error messages are commonly found  
                 in <code>catalina.out</code>
                 or <code>localhost.log</code>
@@ -703,7 +696,7 @@
             <h3 id="add_rdf">VIII. Log in and add RDF data </h3>
             <p>
                 If the startup was successful, you will see a welcome message 
-                informing you that you have successfully installed VIVO. Click the "Log  
+                informing you that you have successfully installed Vitro. Click the "Log  
                 in" link near the upper right corner. Log in with the <code>rootUser.emailAddress</code>
                 you set up in Step IV. The initial password for the root account is 
                 "rootPassword" (without the quotes). On first login, you will be  
@@ -739,7 +732,7 @@
             <p>
                 If you have configured your application to use the "Contact Us"
                 feature in Step IV (<code>email.smtpHost</code>), you will also need to 
-                add an email address to the VIVO application.&nbsp; This is the email 
+                add an email address to the Vitro application.&nbsp; This is the email 
                 to which the contact form will submit. It can be a list server or an  
                 individual's email address. 
             </p>
@@ -761,17 +754,16 @@
                 It is recommended that a Tomcat Connector such as mod_jk be used to 
                 ensure that the site address does not include the port number (e.g. 
                 8080) and an additional reference to the Tomcat context name (e.g.  
-                /vivo). 
+                /vitro). 
             </p>
             <p>
-                This will make VIVO available at "http://example.com" instead of 
-                "http://example.com:8080/vivo" 
+                This will make Vitro available at "http://example.com" instead of 
+                "http://example.com:8080/vitro" 
             </p>
             <p>
                 Using the mod_jk connector allows for communication between Tomcat 
                 and the primary web server. The <a href="http://tomcat.apache.org/connectors-doc/generic_howto/quick.html">Quick
-                    Start
-                    HowTo</a>
+                    Start HowTo</a>
                 on the Apache site describes the minimum server 
                 configurations for several popular web servers. 
             </p>
@@ -803,7 +795,7 @@
                    &lt;Alias&gt;example.com&lt;/Alias&gt;
                    
                    &lt;Context path=""
-                           docBase="/usr/local/tomcat/webapps/vivo"
+                           docBase="/usr/local/tomcat/webapps/vitro"
                            reloadable="true"
                            cookies="true" &gt;
                    
@@ -818,22 +810,22 @@
                    ...
             </pre>
             <h3 id="external_auth">XI. Using an External Authentication System 
-                with VIVO </h3>
+                with Vitro </h3>
             <p>
             </p>
             <p>
-                VIVO can be configured to work with an external authentication 
+                Vitro can be configured to work with an external authentication 
                 system like Shibboleth or CUWebAuth. 
             </p>
             <p>
-                VIVO must be accessible only through an Apache HTTP server. The 
+                Vitro must be accessible only through an Apache HTTP server. The 
                 Apache server will be configured to invoke the external authentication 
                 system. When the user completes the authentication, the Apache server  
-                will pass a network ID to VIVO, to identify the user. 
+                will pass a network ID to Vitro, to identify the user. 
             </p>
             <p>
-                If VIVO has an account for that user, the user will be logged in 
-                with the privileges of that account. In the absence of an account, VIVO 
+                If Vitro has an account for that user, the user will be logged in 
+                with the privileges of that account. In the absence of an account, Vitro 
                 will try to find a page associated with the user. If such a page is  
                 found, the user can log in to edit his own profile information. 
             </p>
@@ -841,19 +833,19 @@
             <p>
                 Your institution will provide you with instructions for setting up
                 the external authentication system. The Apache server must be
-                configured to secure a page in VIVO. When a user reaches this secured
+                configured to secure a page in Vitro. When a user reaches this secured
                 page, the Apache server will invoke the external authentication system.
             </p>
             <p>
-                For VIVO, this secured page is named: <code>/loginExternalAuthReturn</code>
+                For Vitro, this secured page is named: <code>/loginExternalAuthReturn</code>
             </p>
             <p>
                 When your instructions call for the location of the secured page, 
                 this is the value you should use. 
             </p>
-            <h4>Configuring VIVO</h4>
+            <h4>Configuring Vitro</h4>
             <p>
-                To enable external authentication, VIVO requires three values in 
+                To enable external authentication, Vitro requires three values in 
                 the <code>deploy.properties</code>
                 file. 
             </p>
@@ -868,7 +860,7 @@
                         which header is used for this purpose. 
                     </p>
                     <p>
-                        You need to tell VIVO the name of that HTTP header. Insert a 
+                        You need to tell Vitro the name of that HTTP header. Insert a 
                         line like this in the deploy.properties file: 
                     </p>
                     <pre>externalAuth.netIdHeaderName = [the header name]</pre>
@@ -880,7 +872,7 @@
                 <li>
                     <h5>The text for the Login button.</h5>
                     To start the authentication process, the user will click on a button in
-                    the VIVO login form. You need to tell VIVO what text should appear in
+                    the Vitro login form. You need to tell Vitro what text should appear in
                     that button.
                     <p>
                         Put a line like this in the deploy.properties file:
@@ -888,25 +880,25 @@
                     </p>
                     <pre>externalAuth.buttonText = Log in using BearCat Shibboleth</pre>
                     <p>
-                        The VIVO login form will display a button labelled "Log in 
+                        The Vitro login form will display a button labelled "Log in 
                         using BearCat Shibboleth". 
                     </p>
                 </li>
                 <li>
                     <h5>Associating a User with a profile page.</h5>
                     <p>
-                        VIVO will try to associate the user with a profile
-                        page, so the user may edit his own profile data. VIVO will search the
+                        Vitro will try to associate the user with a profile
+                        page, so the user may edit his own profile data. Vitro will search the
                         data model for a person with a property that matches the User’s network 
                         ID (the value of the property must be either a String literal or an 
-                        untyped literal). You need to tell VIVO what property should be used  
+                        untyped literal). You need to tell Vitro what property should be used  
                         for matching. Insert a line like this in the deploy.properties file: 
                     </p>
                     <pre>selfEditing.idMatchingProperty = [the URI of the property]</pre>
                     <p>
                         For example: 
                     </p>
-                    <pre>selfEditing.idMatchingProperty = http://vivo.mydomain.edu/ns#networkId</pre>
+                    <pre>selfEditing.idMatchingProperty = http://vitro.mydomain.edu/ns#networkId</pre>
                 </li>
             </ul>
             <h3 id="installation_check">XII. Was the installation successful? </h3>
@@ -935,7 +927,7 @@
                     "Geographic Location." The index is built in a background thread, so on
                     your first login, you may see an empty index instead. Refresh the page
                     periodically to see whether the index will be populated. This may take 
-                    some time: with VIVO installed on a modest laptop computer, loading the 
+                    some time: with Vitro installed on a modest laptop computer, loading the 
                     ontology files and building the index took more than 5 minutes from the  
                     time that Tomcat was started. 
                 </li>
@@ -991,23 +983,35 @@
                     Type the word "Australia" into the search box, and click on the
                     Search button.You should see a page of results, with links to countries 
                     that border Australia, individuals that include Australia, and to 
-                    Australia itself. To trigger the search index, you can log in as a site  
-                    administrator and go to "http://your-vivo-url/SearchIndex". 
+                    Australia itself. If the search is not successful, try rebuilding the search index: 
+                    log in as a site  
+                    administrator and go to "http://your-vitro-url/SearchIndex". 
                 </li>
             </ul>
-            <h3 id="termsofuse">XIII. Review the VIVO Terms of Use</h3>
+            <h3 id="termsofuse">XIII. Review the Vitro Terms of Use</h3>
             <p>
-                VIVO comes with a "Terms of Use" statement linked from the footer. 
+                Vitro comes with a "Terms of Use" statement linked from the footer. 
                 The "Site Name" you assign in the "Site Information" form under the <strong>Site Admin</strong>
                 area will be inserted into the "Terms of Use" 
                 statement.  If you want to edit the text content more than just  the 
-                "Site Name", the file can be found here:<pre>[vivo_source_dir]/vitro-core/webapp/web/templates/freemarker/body/termsOfUse.ftl</pre>
+                "Site Name", the file can be found here:<pre>[vitro_source_dir]/webapp/web/templates/freemarker/body/termsOfUse.ftl</pre>
                 Be sure to make the changes in your source files and deploy them to your 
                 tomcat so you don't lose your changes next time you deploy for another reason.
             </p>
             <h3>Next Step ...</h3>
             <p>
-                Now that you have VIVO up and running, please go read the <a href="http://sourceforge.net/apps/mediawiki/vivo/index.php?title=Site_Administrator_Guide">Site Administrator's Guide</a>.
+                There is no further documentation specifically for Vitro. 
+                However, you may find helpful information in the
+                <a href="http://sourceforge.net/apps/mediawiki/vivo/index.php?title=Site_Administrator_Guide">
+                VIVO Site Administrator's Guide</a>.
+            </p>
+            <p>
+                For instant access to Vitro developers visit the VIVO IRC Channel:
+                <pre>                Network: irc.freenode.net
+                Channel: #VIVO
+                WebInterface: http://webchat.freenode.net/</pre>
+            </p>
+            <p>
             </p>
         </div>
         <!-- #wrapper-content -->
@@ -1016,22 +1020,7 @@
                 <small>
                     ©2011 All Rights Reserved
                 </small>
-                | Powered 
-                by <a class="powered-by-vivo" href="http://vivoweb.org" target="_blank"><strong>VIVO</strong></a>
             </p>
-            <div id="nav" role="navigation">
-                <ul id="footer-nav" role="list">
-                    <li role="listitem">
-                        <a href="http://vivoweb.org/about">About</a>
-                    </li>
-                    <li role="listitem">
-                        <a href="http://vivoweb.org/contact">Contact Us</a>
-                    </li>
-                    <li role="listitem">
-                        <a href="http://www.vivoweb.org/support" target="blank">Support</a>
-                    </li>
-                </ul>
-            </div>
         </div>
     </body>
 </html>
