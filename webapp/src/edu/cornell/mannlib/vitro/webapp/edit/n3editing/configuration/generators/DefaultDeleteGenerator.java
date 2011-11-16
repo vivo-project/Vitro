@@ -130,8 +130,6 @@ public class DefaultDeleteGenerator implements EditConfigurationGenerator {
     private void processDataPropForm(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
     	//set data prop value, data prop key str, 
     	editConfiguration.setDatapropKey( EditConfigurationUtils.getDataHash(vreq) );
-    	//original set datapropValue, which in this case would be empty string but no way here
-    	editConfiguration.setDatapropValue("");
     }
     
 

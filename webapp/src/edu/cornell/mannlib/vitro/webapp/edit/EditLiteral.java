@@ -5,10 +5,10 @@ package edu.cornell.mannlib.vitro.webapp.edit;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.datatypes.RDFDatatype;
 import com.hp.hpl.jena.graph.Node;/**
- * bdc34: I needed to have a representation of a rdf literal for
+ * bdc34: I needed to have a representation of a RDF literal for
  * editing.  Jena seems to have a Model associated with the literals and
- * has deprecated the creation of simple Literals as if they were data
- * structures.  So this code was writen.
+ * has depreciated the creation of simple Literals as if they were data
+ * structures.  So this code was written.
  *
  * THESE MAY NOT BE USED AS LITERALS WITH THE JENA LIBRARY
  */

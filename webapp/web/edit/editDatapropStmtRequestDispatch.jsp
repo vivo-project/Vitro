@@ -121,7 +121,7 @@
     DataPropertyStatement dps = null;
     if( dataHash != 0) {
         Model model = (Model)application.getAttribute("jenaOntModel");
-        dps = RdfLiteralHash.getPropertyStmtByHash(subject, predicateUri, dataHash, model);
+        dps = RdfLiteralHash.getPropertyStmtByHash(subject.getURI(), predicateUri, dataHash, model);
                               
         if (dps==null) {
             log.error("No match to existing data property \""+predicateUri+"\" statement for subject \""+subjectUri+"\" via key "+datapropKeyStr);

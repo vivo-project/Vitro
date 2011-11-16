@@ -321,6 +321,7 @@ public class ProcessRdfForm {
             List<String> optionalAsserts, List<String> requiredRetracts,
             List<String> optionalRetracts) {
         if( !log.isDebugEnabled() ) return;
+        log.debug(msg);
         logSubstitueN3( msg, requiredAsserts, "required assertions");
         logSubstitueN3( msg, optionalAsserts, "optional assertions");
         logSubstitueN3( msg, requiredRetracts, "required retractions");
@@ -328,7 +329,7 @@ public class ProcessRdfForm {
     }
     
     private void logSubstitueN3(String msg, List<String> n3, String label){
-        if( n3 == null) return;        
+        if( n3 == null || n3.size() == 0) return;        
         String out = label + ":\n";
         for( String str : n3 ){
             out += "    " + str + "\n";

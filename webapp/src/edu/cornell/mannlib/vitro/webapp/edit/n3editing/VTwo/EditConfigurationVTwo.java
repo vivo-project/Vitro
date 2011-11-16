@@ -93,14 +93,17 @@ public class EditConfigurationVTwo {
     /** When this is a DataPropertyStmt edit, the object is not used, the
      * DataPropertyStatement is retrieved using the subject, predicate and the
      * datapropKey.  When this edit is for a ObjectPropertyStmt,
-     * object is the uri without the quoting &lt; or &gt;.
+     * object is the URI, it has no quoting or &lt; or &gt;.
      */
     String object;
+    
+    /**
+     * This can be the variable name for the object of a statement in
+     * a object property or data property form.
+     */
     String varNameForObject;   
 
     Integer datapropKey=null;
-    String datapropValue;
-
     
     /** urlPatternToReturnTo is the URL to use as the servlet to return to.
      * Usually it is "/individual" and entityToReturnTo will be added as a
@@ -194,8 +197,7 @@ public class EditConfigurationVTwo {
     	editConfig.setVarNameForObject(this.getVarNameForObject());
 
     	editConfig.setDatapropKey(this.getDatapropKey());
-    	//original set datapropValue, which in this case would be empty string but no way here
-    	editConfig.setDatapropValue(this.datapropValue);
+    	    	
     	editConfig.setUrlPatternToReturnTo(this.getUrlPatternToReturnTo());
    
     	//n3 required
@@ -686,11 +688,6 @@ public class EditConfigurationVTwo {
         this.datapropKey = datapropKey;
     }
     
-    //to allow for external setting
-    public void setDatapropValue(String datapropValue) {
-    	this.datapropValue = datapropValue;
-    }
-
     public String getSubjectUri() {
         return subjectUri;
     }

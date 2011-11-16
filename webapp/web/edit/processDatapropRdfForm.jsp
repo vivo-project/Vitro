@@ -374,7 +374,7 @@ and set a flag in the request to indicate "back button confusion"
         
         Model model = (Model)application.getAttribute("jenaOntModel");
         int dpropHash = Integer.parseInt(editConfig.getDatapropKey());
-        DataPropertyStatement dps = RdfLiteralHash.getPropertyStmtByHash(subject, editConfig.getPredicateUri(), dpropHash, model);
+        DataPropertyStatement dps = RdfLiteralHash.getPropertyStmtByHash(subject.getURI(), editConfig.getPredicateUri(), dpropHash, model);
 
         if (dps != null)
             return false;

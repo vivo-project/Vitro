@@ -47,19 +47,13 @@ public class RDFSLabelGenerator implements EditConfigurationGenerator {
 	private Log log = LogFactory.getLog(DefaultObjectPropertyFormGenerator.class);
 	
 	private String subjectUri = null;
-	private String predicateUri = null;
-	private String datapropKeyStr= null;
-	private int dataHash = 0;
-	private DataPropertyStatement dps = null;
+	private String predicateUri = null;	
+	private Integer dataHash = null;
+
 	private String literalName = "label";
-	
+
 	private String template = "rdfsLabelForm.ftl";
-	private static HashMap<String,String> defaultsForXSDtypes ;
-	  static {
-		defaultsForXSDtypes = new HashMap<String,String>();
-		//defaultsForXSDtypes.put("http://www.w3.org/2001/XMLSchema#dateTime","2001-01-01T12:00:00");
-		defaultsForXSDtypes.put("http://www.w3.org/2001/XMLSchema#dateTime","#Unparseable datetime defaults to now");
-	  }
+
     @Override
     public EditConfigurationVTwo getEditConfiguration(VitroRequest vreq, HttpSession session) {
     	//Check if an edit configuration exists and return that, otherwise create a new one
@@ -145,18 +139,13 @@ public class RDFSLabelGenerator implements EditConfigurationGenerator {
    
     
     private void initDataParameters(VitroRequest vreq, HttpSession session) {
-    	dataHash = EditConfigurationUtils.getDataHash(vreq);	    
-	    dps = EditConfigurationUtils.getDataPropertyStatement(vreq, session, dataHash, predicateUri);
+    	dataHash = EditConfigurationUtils.getDataHash(vreq);	    	    
 	}
     
     private void processDataPropForm(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
     	//set data prop value, data prop key str, 
     	editConfiguration.setDatapropKey( EditConfigurationUtils.getDataHash(vreq) );
-    	editConfiguration.setVarNameForObject(literalName);
-    	
-    	//original set datapropValue, which in this case would be empty string but no way here
-    	editConfiguration.setDatapropValue("");
-    	editConfiguration.setUrlPatternToReturnTo("/entity");
+    	editConfiguration.setVarNameForObject(literalName);    	    
     }
     
     //Get N3 required 
@@ -333,10 +322,9 @@ public class RDFSLabelGenerator implements EditConfigurationGenerator {
 	private void prepareForUpdate(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {
     	//Here, retrieve model from 
     	Model model = (Model) session.getServletContext().getAttribute("jenaOntModel");
-		if(datapropKeyStr != null && datapropKeyStr.trim().length() > 0 ) {
-    		editConfiguration.prepareForDataPropUpdate(model, vreq.getWebappDaoFactory().getDataPropertyDao());
+		if( editConfiguration.isDataPropertyUpdate() ){
+    		editConfiguration.prepareForDataPropUpdate(model, vreq.getWebappDaoFactory().getDataPropertyDao());	
 		}
-    	
     }
     
 }

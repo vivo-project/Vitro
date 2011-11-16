@@ -91,10 +91,13 @@ public class DefaultDataPropertyFormGenerator extends BaseEditConfigurationGener
 	      
 	    String subjectUri = editConfiguration.getSubjectUri();
 	    String predicateUri = editConfiguration.getPredicateUri();
-	    Integer dataHash = editConfiguration.getDatapropKey();
+	    Integer dataHash = editConfiguration.getDatapropKey();	    
+	    
+	    if( predicateUri == null )
+	        throw new Error("predicateUri was null");
 	    
 	    DataProperty dataproperty = dataPropertyDao.getDataPropertyByURI( predicateUri );
-	    if( dataproperty == null )
+	    if( dataproperty == null && ! VitroVocabulary.LABEL.equals( predicateUri ))
 	        throw new Error("could not get data property for " + predicateUri);
 	    
         DataPropertyStatement dps = null;
@@ -105,32 +108,46 @@ public class DefaultDataPropertyFormGenerator extends BaseEditConfigurationGener
             if (dps==null){ 
                 throw new Error("No match to existing data property \""+predicateUri+"\" statement for subject \""+subjectUri+"\" via key "+dataHash);
             }else{
-
                 //Put data property statement's literal in scope                
                 //TODO: Check if multiple statements might affect this implementation?                
-                editConfiguration.addLiteralInScope(literalVar, new EditLiteral(dps.getData(),dps.getDatatypeURI(), dps.getLanguage()) );
-                
-                String statementDataType = null;
-                String statementLang = null;
-                                      
-                statementDataType = dps.getDatatypeURI();
-                if( statementDataType == null ){
-                    log.debug("no range datatype uri set on data property statement when property's range datatype is "+dataproperty.getRangeDatatypeURI()+" in DefaultDataPropertyFormGenerator");                
-                } else {
-                    log.debug("range datatype uri of ["+statementDataType+"] on data property statement in DefaultDataPropertyFormGenerator");
-                }
-                statementLang = dps.getLanguage();
-                if( statementLang == null ) {
-                    log.debug("no language attribute on data property statement in DefaultDataPropertyFormGenerator");                
-                }else{
-                    log.debug("language attribute of ["+statementLang+"] on data property statement in DefaultDataPropertyFormGenerator");                
-                }  
-                
-                
+                editConfiguration.addLiteralInScope(
+                        editConfiguration.getVarNameForObject(), 
+                        new EditLiteral(dps.getData(),dps.getDatatypeURI(), dps.getLanguage()) );
+    
+                dataTypeDebug( dps, dataproperty );                                               
             }
         }         
         
 
 
 	}
+
+
+    private static void dataTypeDebug(DataPropertyStatement dps,
+            DataProperty dataproperty) {
+        if( dps == null )
+            return;
+        
+        String statementDataType = null;
+        String statementLang = null;
+        
+        statementLang = dps.getLanguage();
+        if( statementLang == null ) {
+            log.debug("no language attribute on data property statement in DefaultDataPropertyFormGenerator");                
+        }else{
+            log.debug("language attribute of ["+statementLang+"] on data property statement in DefaultDataPropertyFormGenerator");                
+        }
+                
+        if( dataproperty == null )
+            return;
+                                     
+        statementDataType = dps.getDatatypeURI();
+        if( statementDataType == null ){
+            log.debug("no range datatype uri set on data property statement when property's range datatype is "+dataproperty.getRangeDatatypeURI()+" in DefaultDataPropertyFormGenerator");                
+        } else {
+            log.debug("range datatype uri of ["+statementDataType+"] on data property statement in DefaultDataPropertyFormGenerator");
+        }                          
+    }
+	
+	
 }
