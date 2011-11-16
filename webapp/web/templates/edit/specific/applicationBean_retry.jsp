@@ -10,19 +10,10 @@
 <% request.setAttribute("requestedActions", new ManagePortals()); %>
 <vitro:confirmAuthorization />
 
-<c:set var="appNameLabel" value="Site Name"/> 
-
-
-<c:set var="smallCell" value="style='width: 33%;'" />
-<c:set var="longField" value="style='width: 75%;'" />
- 
-<tr class="editformcell">
-    <td valign="top" colspan="2">
-        <b>${appNameLabel}</b> <i>(max 50 characters)</i><br />
-            <input type="text" name="ApplicationName" value="<form:value name="ApplicationName"/>" ${longField} maxlength="50" />
-            <font color="red"><form:error name="ApplicationName"/></font>
-    </td>
-</tr>
+<c:set var="appNameLabel" value="Site name"/> 
+<label for="site-name">${appNameLabel}<span class="note"> (max 50 characters)</span></label>
+<input type="text" name="ApplicationName" value="<form:value name="ApplicationName"/>" ${longField} maxlength="50" />
+<font color="red"><form:error name="ApplicationName"/></font>
 
 <!-- With introduction of new logo that includes tagline as part of the image, hiding this field for now to reduce user confusion -->        
 <!-- <tr class="editformcell">
@@ -32,37 +23,27 @@
         <font color="red"><form:error name="ShortHand"/></font>
     </td>
 </tr> -->
-<tr class="editformcell">
-    <td valign="bottom" colspan="2">
-        <b>Contact Email Address</b> <i>contact form submissions will be sent to this address</i><br />
-        <input type="text" name="ContactMail" value="<form:value name="ContactMail"/>" ${longField} maxlength="255" />
-        <font color="red"><form:error name="ContactMail"/></font>
-    </td>
 
-</tr>
-<tr class="editformcell">
-    <td valign="top" colspan="2">
-        <b>Theme</b><br />
+        <label>Contact email address <span class="note">contact form submissions will be sent to this address</span></label>
+        <input type="text" name="ContactMail" value="<form:value name="ContactMail"/>" ${longField} maxlength="255" size="30" />
+        <font color="red"><form:error name="ContactMail"/></font>
+        <br />
+
+        <label class="display-inline">Theme</label>
         <select id="ThemeDir" name="ThemeDir">
             <form:option name="ThemeDir" />
         </select>
         <font color="red"><form:error name="ThemeDir"/></font>
-    </td>
-</tr>
-<tr class="editformcell">
-    <td valign="bottom" colspan="2">
-        <b>Copyright text</b> <i>used in footer (e.g., name of your institution)</i><br />
-        <input type="text" name="CopyrightAnchor" value="<form:value name="CopyrightAnchor"/>" ${longField} maxlength="120" />
+
+
+        <label>Copyright text<span class="note"> used in footer (e.g., name of your institution)</span></label>
+        <input type="text" name="CopyrightAnchor" value="<form:value name="CopyrightAnchor"/>" ${longField} maxlength="120" size="40" />
         <font color="red"><form:error name="CopyrightAnchor"/></font>
-    </td>
-</tr>
-<tr class="editformcell">
-    <td valign="bottom" colspan="2">
-        <b>Copyright URL</b> <i>copyright text links to this URL</i><br />
-        <input type="text" name="CopyrightURL" value="<form:value name="CopyrightURL"/>" ${longField} maxlength="120" />
+
+        <label>Copyright URL<span class="note"> copyright text links to this URL</span></label>
+        <input type="text" name="CopyrightURL" value="<form:value name="CopyrightURL"/>" ${longField} maxlength="120" size="30" />
         <font color="red"><form:error name="CopyrightURL"/></font>
-    </td>
-</tr>
+
 <!--
 <tr class="editformcell">
     <td valign="bottom" colspan="4">
@@ -79,37 +60,29 @@
     </td>
 </tr>
 -->
-<tr class="editformcell hideFromVivoWeb">   
-    <td valign="bottom" colspan="1">
-        <b>Banner image</b><br />
+<!--
+        <label>Banner image</label>
         <input type="text" name="BannerImage" value="<form:value name="BannerImage"/>" style="width:90%" maxlength="255" />
         <font color="red"><form:error name="BannerImage"/></font>
-    </td>
-    <td valign="bottom" colspan="1">
-        <b>Banner image width</b><br />
+  
+        <label>Banner image width</label>
         <input type="text" name="BannerWidth" value="<form:value name="BannerWidth"/>" ${smallCell} maxlength="11" />
         <font color="red"><form:error name="BannerWidth"/></font>
-    </td>
-    <td valign="bottom" colspan="1">
-        <b>Banner image height</b><br />
+
+        <label>Banner image height</label>
         <input type="text" name="BannerHeight" value="<form:value name="BannerHeight"/>" ${smallCell} maxlength="11" />
         <font color="red"><form:error name="BannerHeight"/></font>
-    </td>
-</tr>
-<tr class="editformcell hideFromVivoWeb">   
-    <td valign="bottom" colspan="1">
-        <b>Logotype image</b><br />
+
+        <label>Logotype image</label>
         <input type="text" name="LogotypeImage" value="<form:value name="LogotypeImage"/>" style="width:90%" maxlength="255" />
         <font color="red"><form:error name="LogotypeImage"/></font>
-    </td>
-    <td valign="bottom" colspan="1">
-        <b>Logotype image width</b><br />
+
+        <label>Logotype image width</label>
         <input type="text" name="LogotypeWidth" value="<form:value name="LogotypeWidth"/>" ${smallCell} maxlength="11" />
         <font color="red"><form:error name="LogotypeWidth"/></font>
-    </td>
-    <td valign="bottom" colspan="1">
-        <b>Logotype image height</b><br />
+
+        <label>Logotype image height</label>
         <input type="text" name="LogotypeHeight" value="<form:value name="LogotypeHeight"/>" ${smallCell} maxlength="11" />
         <font color="red"><form:error name="LogotypeHeight"/></font>
-    </td>
-</tr>  
+ 
+-->

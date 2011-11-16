@@ -19,20 +19,19 @@
 <form id="editForm" name="editForm" action="${action}" method="post" onsubmit="${onSubmit}">
     <input type="hidden" name="_epoKey" value="${epoKey}" />
 
-<div align="center">
 <table cellpadding="4" cellspacing="2">
 	<tr><th colspan="${colspan}">
-	<div class="entryFormHead">
+	<div>
 		<h2>${title}</h2>
 			<c:choose>
 				<c:when test='${_action == "insert"}'>
-					<h3>Creating New Record</h3>
+					<h3 class="blue">Creating New Record
 				</c:when>
 				<c:otherwise>
-					<h3>Editing Existing Record</h3>
+					<h3 class="blue">Editing Existing Record
 				</c:otherwise>
 			</c:choose>
-		<span class="entryFormHeadInstructions">(<sup>*</sup> Required Fields)</span>
+	 <span class="note">(<sup>*</sup> Required Fields)</span></h3>
 	</div><!--entryFormHead-->
 	</th></tr>
 	
@@ -41,33 +40,32 @@
 	<jsp:include page="${formJsp}"/>
 	
 	<tr class="editformcell">
-		<td colspan="${colspan}" align="center">
+		<td colspan="${colspan}">
 			<c:choose>
 				<c:when test='${_action == "insert"}'>
-					<input id="primaryAction" type="submit" class="form-button" name="_insert" value="Create New Record"/>
+					<input id="primaryAction" type="submit" class="submit" name="_insert" value="Create New Record"/>
 				</c:when>
 				<c:otherwise>		
-    				<input id="primaryAction" type="submit" class="form-button" name="_update" value="Submit Changes"/>
+    				<input id="primaryAction" type="submit" class="submit" name="_update" value="Submit Changes"/>
                     <c:if test="${ ! (_cancelButtonDisabled == 'disabled') }">	
-				        <input type="submit" class="form-button" name="_delete" onclick="return confirmDelete();" value="Delete"/>
+				        <input type="submit" class="delete" name="_delete" onclick="return confirmDelete();" value="Delete"/>
                     </c:if>
 				</c:otherwise>
 			</c:choose>
 			
-			<input type="reset"  class="form-button" value="Reset"/>
+			<input type="reset"  class="delete" value="Reset"/>
 			
             <c:choose>
                 <c:when test="${!empty formOnCancel}">
-                    <input type="submit" class="form-button" name="_cancel" onclick="${formOnCancel}" value="Cancel"/> 
+                    <input type="submit" class="delete" name="_cancel" onclick="${formOnCancel}" value="Cancel"/> 
                 </c:when>
                 <c:otherwise>
-		            <input type="submit" class="form-button" name="_cancel" value="Cancel"/>
+		            <input type="submit" class="delete" name="_cancel" value="Cancel"/>
                 </c:otherwise>
             </c:choose>
 		</td>
 	</tr>
 </table>
-</div><!--alignCenter-->
 
 </form>
 

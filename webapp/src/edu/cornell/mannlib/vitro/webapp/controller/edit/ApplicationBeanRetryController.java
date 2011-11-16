@@ -86,10 +86,10 @@ public class ApplicationBeanRetryController extends BaseEditController {
         FormUtils.populateFormFromBean(applicationForEditing, epo.getAction(), foo);
    
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
+        request.setAttribute("bodyJsp","/templates/edit/formContact.jsp");
         request.setAttribute("formJsp","/templates/edit/specific/applicationBean_retry.jsp");
         request.setAttribute("scripts","/templates/edit/formBasic.js");
-        request.setAttribute("title","Site Information Editing Form");
+        request.setAttribute("title","Site Information");
         request.setAttribute("_action",action);
         request.setAttribute("unqualifiedClassName","ApplicationBean");
         setRequestAttributes(request,epo);
