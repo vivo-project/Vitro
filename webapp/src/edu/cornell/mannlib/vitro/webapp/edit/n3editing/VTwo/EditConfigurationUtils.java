@@ -207,34 +207,42 @@ public class EditConfigurationUtils {
 		return dataHash;
     }
     
+    //
+    
     //Copied from the original input element formatting tag
     //Allows the retrieval of the string values for the literals
     //Useful for cases with date/time and other mechanisms
     public static Map<String, List<String>> getExistingLiteralValues(VitroRequest vreq, EditConfigurationVTwo editConfig) {
-    	Map<String, List<String>> literalsInScopeStringValues = new HashMap<String, List<String>>();
-    	Map<String, List<Literal>> literalsInScope = editConfig.getLiteralsInScope();
-    	
-    	for(String key: literalsInScope.keySet() ) {
-    		List<String> stringValues = processLiteral(editConfig, key);
-    		literalsInScopeStringValues.put(key, stringValues);
-    	}
+    	Map<String, List<String>> literalsInScopeStringValues = transformLiteralMap(editConfig.getLiteralsInScope());
     	return literalsInScopeStringValues;
     }
     
-    //Copied from input element formatting tag
-    private static List<String> processLiteral(EditConfigurationVTwo editConfig, String fieldName) {
-    	Map<String, List<Literal>> literalsInScope = editConfig.getLiteralsInScope();
+    private static List<String> transformLiteralListToStringList(List<Literal> literalValues){
     	List<String> stringValues = new ArrayList<String>();
-		List<Literal> literalValues = literalsInScope.get(fieldName);
-		//TODO: Check whether it's correct that literal values would be null?
-		if(literalValues != null) {
+    	if(literalValues != null) {
 	    	for(Literal l: literalValues) {
 	    		//Could do additional processing here if required, for example if date etc. if need be
-	    		stringValues.add(l.getValue().toString());
+	    		if(l != null) {
+	    			stringValues.add(l.getValue().toString());
+	    		} 
+	    		//else {
+	    			//TODO: //Do we keep null as a value for this key?
+	    			//stringValues.add(null);
+	    		//}
 	    	}
 		}
-		return stringValues;
-	}
+    	return stringValues;
+    }
+    
+    public static Map<String, List<String>> transformLiteralMap(Map<String, List<Literal>> map) {
+    	Map<String, List<String>> literalMapStringValues = new HashMap<String, List<String>>();
+    	
+    	for(String key: map.keySet() ) {
+    		List<String> stringValues = transformLiteralListToStringList(map.get(key));
+    		literalMapStringValues.put(key, stringValues);
+    	}
+    	return literalMapStringValues;
+    }
 
 	public static Map<String, List<String>> getExistingUriValues(EditConfigurationVTwo editConfig) {
     	return editConfig.getUrisInScope();
