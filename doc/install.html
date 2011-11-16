@@ -336,21 +336,6 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            Directory where Vitro code is located. In most 
-                            deployments, this is set to ./vitro-core (It is not uncommon for this  
-                            setting to point elsewhere in development environments). 
-                        </td>
-                    </tr>
-                    <tr class="odd_row">
-                        <td>
-                            vitro.core.dir 
-                        </td>
-                        <td>
-                            ./vitro-core 
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
                             Directory where tomcat is installed. 
                         </td>
                     </tr>
@@ -656,67 +641,8 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            The temporal graph visualization can require
-                            extensive machine resources. This can have a particularly noticable
-                            impact on memory usage if
-                            <ul>
-                                <li>
-                                    The organization tree is deep, 
-                                </li>
-                                <li>
-                                    The number of grants and publications is large. 
-                                </li>
-                            </ul>
-                            VIVO V1.3 mitigates this problem by the way of a caching 
-                            mechanism and hence we can safely set this to be enabled by default. 
-                        </td>
-                    </tr>
-                    <tr class="odd_row">
-                        <td>
-                            visualization.temporal 
-                        </td>
-                        <td>
-                            enabled 
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            The temporal graph visualization is used to
-                            compare different organizations/people within an organization on
-                            parameters like number of publications or grants. By default, the app
-                            will attempt to make its best guess at the top level organization in
-                            your instance. If you're unhappy with this selection, uncomment out the
-                            property below and set it to the URI of the organization individual you
-                            want to identify as the top level organization. It will be used as the 
-                            default whenever the temporal graph visualization is rendered without 
-                            being passed an explicit org. For example, to use "Ponce School of  
-                            Medicine" as the top organization: 
-                            <br>
-                            <code>visualization.topLevelOrg =
-                                http://vivo.psm.edu/individual/n2862</code>
-                            <br>
-                        </td>
-                    </tr>
-                    <tr class="odd_row">
-                        <td>
-                            visualization.topLevelOrg 
-                        </td>
-                        <td>
-                            http://vivo-trunk.indiana.edu/individual/topLevelOrgURI 
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
                             An absolute file path, pointing to the root directory of the Harvester utility.
                             You must include the final slash.
-                        </td>
-                    </tr>
-                    <tr class="odd_row">
-                        <td>
-                            harvester.location 
-                        </td>
-                        <td>
-                            /usr/local/vivo/harvester/ 
                         </td>
                     </tr>
                 </tbody>
@@ -733,12 +659,12 @@
             <h3 id="tomcat_settings">VI. Set Tomcat JVM parameters and security
                 limits</h3>
             <p>
-                Currently, VIVO copies the contents of your RDF database into 
+                VIVO copies small sections of your RDF database into 
                 memory in order to serve Web requests quickly (the in-memory copy and  
                 the underlying database are kept in synch as edits are performed). 
             </p>
             <p>
-                VIVO will require more memory than that allocated to Tomcat by 
+                VIVO may require more memory than that allocated to Tomcat by 
                 default. With most installations of Tomcat, the "setenv.sh" or 
                 "setenv.bat" file in Tomcat's bin directory is a convenient place to  
                 set the memory parameters. <em>If this file does not exist in Tomcat's
@@ -746,14 +672,11 @@
                 <br>
                 For example: 
             </p>
-            <pre>                    export CATALINA_OPTS="-Xms2048m -Xmx1024m -XX:MaxPermSize=128m"<br>                </pre>
+            <pre>                    export CATALINA_OPTS="-Xms512m -Xmx512m -XX:MaxPermSize=128m"<br>                </pre>
             <p>
-                This sets Tomcat to allocate an initial heap of 2048 megabytes, a
-                maximum heap of 1024 megabytes, and a PermGen space of 128 megs. 1024
-                megabytes is a minimum practical heap size for production installations 
-                storing data for large academic institutions, and additional heap space 
-                is preferable. For testing with small sets of data, 256m to 512m should  
-                be sufficient. 
+                This sets Tomcat to allocate an initial heap of 512 megabytes, a
+                maximum heap of 512 megabytes, and a PermGen space of 128 megs. Lower 
+                values may suffice, especially for small test installations.
             </p>
             <p>
                 If an OutOfMemoryError is encountered during VIVO execution, it can 
@@ -795,8 +718,8 @@
                 properties, data properties, and configure the display of data.
                 Currently, any classes you wish to make visible on your website must be 
                 part of a class group, and there are a number of visibility and display 
-                options available for each ontology entity. VIVO comes with a core VIVO  
-                ontology, but you may also upload other ontologies from an RDF file. 
+                options available for each ontology entity. Vitro comes with a minimal  
+                ontology. You will likely want to upload additional ontologies from an RDF file. 
             </p>
             <p>
                 Under the "Advanced Data Tools" click "Add/Remove RDF Data." Note
@@ -810,10 +733,7 @@
                 Clicking the "Index" tab in the navigation bar at the top right of 
                 the page will show a simple index of the knowledge base. 
             </p>
-            <p>
-                See more documentation for configuring VIVO, ingesting data, and 
-                manually adding data at <a href="http://vivoweb.org/support">http://vivoweb.org/support</a>.
-            </p>
+
             <h3 id="contact_email">IX. Set the Contact Email Address (if using
                 "Contact Us" form)</h3>
             <p>
@@ -875,7 +795,28 @@
                 directive 
                 and update as follows: 
             </p>
-            <pre>	    <br>			&lt;Host name="localhost" appBase="webapps"<br>	        <br>				DeployOnStartup="false"<br>	        <br>				unpackWARs="true" autoDeploy="false"<br>	        <br>				xmlValidation="false" xmlNamespaceAware="false"&gt;<br>	<br>		<br>				&lt;Alias&gt;example.com&lt;/Alias&gt;<br>		<br>				&lt;Context path=""<br>			<br>					docBase="/usr/local/tomcat/webapps/vivo"<br>			<br>					reloadable="true"<br>			<br>					cookies="true" &gt;<br>			<br>					&lt;Manager pathname="" /&gt;<br>			<br>					&lt;Environment type="java.lang.String" override="false" <br>				<br>						name="path.configuration" <br>				<br>						value="deploy.properties"<br>			<br>					/&gt;<br>		<br>				&lt;/Context&gt;<br>		<br>				...<br>			</pre>
+            <pre>              &lt;Host name="localhost" appBase="webapps"
+                       DeployOnStartup="false"
+                       unpackWARs="true" autoDeploy="false"
+                       xmlValidation="false" xmlNamespaceAware="false"&gt;
+                   
+                   &lt;Alias&gt;example.com&lt;/Alias&gt;
+                   
+                   &lt;Context path=""
+                           docBase="/usr/local/tomcat/webapps/vivo"
+                           reloadable="true"
+                           cookies="true" &gt;
+                   
+                       &lt;Manager pathname="" /&gt;
+                   
+                       &lt;Environment type="java.lang.String" override="false"
+                               name="path.configuration"
+                               value="deploy.properties"
+                       /&gt;
+                   &lt;/Context&gt;
+                  
+                   ...
+            </pre>
             <h3 id="external_auth">XI. Using an External Authentication System 
                 with VIVO </h3>
             <p>
@@ -954,11 +895,7 @@
                 <li>
                     <h5>Associating a User with a profile page.</h5>
                     <p>
-                        If VIVO has an account for the user, the user will be given the 
-                        privileges assigned to that account. 
-                    </p>
-                    <p>
-                        In addition, VIVO will try to associate the user with a profile
+                        VIVO will try to associate the user with a profile
                         page, so the user may edit his own profile data. VIVO will search the
                         data model for a person with a property that matches the User’s network 
                         ID (the value of the property must be either a String literal or an 

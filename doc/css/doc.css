@@ -28,7 +28,7 @@ body{
     margin: 0 auto;
 }
 body{
-   background: #f3f3f0 url(../images/header-background.png) center 0 no-repeat; 
+   background: #fff url(../images/header-background.gif) center 0 repeat-x; 
 }
 /* h1,h2,h3,h4,h5,h6 ------>  */
 h1 {
