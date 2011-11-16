@@ -113,8 +113,8 @@ public class N3EditUtils {
                     dps.setLanguage( submittedLiteral.getLanguage() );
                     dps.setData( submittedLiteral.getLexicalForm() );
                    
-                    copy.prepareForDataPropUpdate(writeModel, vreq.getWebappDaoFactory().getDataPropertyDao());
-                    copy.setDatapropKey( RdfLiteralHash.makeRdfLiteralHash(dps));
+                    copy.setDatapropKey( RdfLiteralHash.makeRdfLiteralHash(dps) );                    
+                    copy.prepareForDataPropUpdate(writeModel, vreq.getWebappDaoFactory().getDataPropertyDao());                    
                 }
                 EditConfigurationVTwo.putConfigInSession(copy,vreq.getSession());
             }
