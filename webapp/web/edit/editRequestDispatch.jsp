@@ -246,7 +246,9 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
     }
     
     String generator = jspFormToGenerator.get(form);
-    if( generator != null ){
+    String oldEdit = request.getParameter("oldEdit");
+   
+    if( oldEdit == null && generator != null ){
         String queryString = request.getQueryString();
         response.sendRedirect(
                 request.getContextPath() +
