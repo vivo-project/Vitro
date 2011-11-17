@@ -23,11 +23,27 @@ public class VitroBackgroundThread extends Thread {
 
 	private static final ConcurrentLinkedQueue<WeakReference<VitroBackgroundThread>> allThreads = new ConcurrentLinkedQueue<WeakReference<VitroBackgroundThread>>();
 
+	/**
+	 * Get a list of all VitroBackgroundThreads that have not been garbage-collected.
+	 */
 	public static List<VitroBackgroundThread> getThreads() {
 		List<VitroBackgroundThread> list = new ArrayList<VitroBackgroundThread>();
 		for (WeakReference<VitroBackgroundThread> ref : allThreads) {
 			VitroBackgroundThread t = ref.get();
 			if (t != null) {
+				list.add(t);
+			}
+		}
+		return list;
+	}
+
+	/**
+	 * Get a list of all VitroBackgroundThreads that have not died.
+	 */
+	public static List<VitroBackgroundThread> getLivingThreads() {
+		List<VitroBackgroundThread> list = new ArrayList<VitroBackgroundThread>();
+		for (VitroBackgroundThread t : getThreads()) {
+			if (t.isAlive()) {
 				list.add(t);
 			}
 		}
