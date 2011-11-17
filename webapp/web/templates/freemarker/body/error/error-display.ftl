@@ -11,15 +11,15 @@
     
 <#if adminErrorData??> <#-- view for site administrators -->
    <#if adminErrorData.errorMessage?has_content>
-        <p><strong>Error message:</strong> ${adminErrorData.errorMessage}</p>
+        <p><strong>Error message:</strong> ${adminErrorData.errorMessage?html}</p>
     </#if>
     <#if adminErrorData.stackTrace?has_content>
         <p>
-            <strong>Stack trace</strong> (full trace available in the vivo log): ${adminErrorData.stackTrace}
+            <strong>Stack trace</strong> (full trace available in the vivo log): ${adminErrorData.stackTrace?html}
         </p>
                    
         <#if adminErrorData.cause?has_content>
-            <p><strong>Caused by:</strong> ${adminErrorData.cause}</p>            
+            <p><strong>Caused by:</strong> ${adminErrorData.cause?html}</p>            
         </#if>
     </#if>  
 
