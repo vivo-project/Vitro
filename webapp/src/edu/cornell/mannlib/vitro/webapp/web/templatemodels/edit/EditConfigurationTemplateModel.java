@@ -27,6 +27,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
@@ -46,12 +48,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
         this.vreq = vreq;
         //get additional data that may be required to generate template
         this.retrieveEditData();
-    }
-    
-    //Seeing if returning edit config object might work
-    public EditConfigurationVTwo getEditConfigObject() {
-    	return editConfig;
-    }
+    }    
     
     public String getEditKey(){
         return editConfig.getEditKey();
@@ -542,10 +539,17 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     //Additional methods that were originally in edit request dispatch controller
     //to be employed here instead
     
-    public String getUrlToReturnTo() {
-    	return vreq
-        .getParameter("urlPattern") == null ? "/entity" : vreq
-                .getParameter("urlPattern");
+    public String getUrlToReturnTo() {               
+        if(   editConfig.getEntityToReturnTo() != null && 
+            ! editConfig.getEntityToReturnTo().trim().isEmpty()) {
+            ParamMap params = new ParamMap();
+            params.put("uri", editConfig.getEntityToReturnTo());
+            return UrlBuilder.getUrl(UrlBuilder.Route.INDIVIDUAL, params);
+        }else if( vreq.getParameter("urlPattern") != null ){
+            return vreq.getParameter("urlPattern");
+        }else{
+            return UrlBuilder.Route.INDIVIDUAL.path(); 
+        }
     }
     
     public String getCurrentUrl() {
