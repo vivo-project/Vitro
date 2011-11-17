@@ -32,21 +32,10 @@
                     <@p.label individual editable />
                         
                     <#--  Most-specific types -->
-                    <@p.mostSpecificTypes individual />
+                    <@p.mostSpecificTypes individual /><img id="uriIcon" title="${individual.uri}" class="middle" src="${urls.images}/individual/uriIcon.gif" alt="uri icon"/>
                 </h1>
             </#if>
         </header>
-        
-        <nav role="navigation">
-            <ul id ="individual-tools" role="list">
-                <li role="listitem"><img id="uriIcon" title="${individual.uri}" class="middle" src="${urls.images}/individual/uriIcon.gif" alt="uri icon"/></li>
-                
-                <#assign rdfUrl = individual.rdfUrl>
-                <#if rdfUrl??>
-                    <li role="listitem"><a title="View this individual in RDF format" class="icon-rdf" href="${rdfUrl}">RDF</a></li>
-                </#if>
-            </ul>
-        </nav>
                 
     <#if individualProductExtension??>
         ${individualProductExtension}
@@ -62,6 +51,14 @@
 
 <#-- Ontology properties -->
 <#include "individual-properties.ftl">
+
+<#assign rdfUrl = individual.rdfUrl>
+
+<#if rdfUrl??>
+    <script>
+        var individualRdfUrl = '${rdfUrl}';
+    </script>
+</#if>
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/individual/individual.css" />')}
 

@@ -32,8 +32,18 @@ var menuManagement = {
         
         menuItems.attr('title', 'Drag and drop to reorder menu items');
         
+        
+        
+           /*$("#loading").ajaxStart(function(){
+               $(this).show();
+             });
+             $("#loading").ajaxStop(function(){
+                $(this).hide();
+              });*/
+
+        
         this.menuItemsList.sortable({
-            cursor: 'move',
+            cursor: 'move',				
             update: function(event, ui) {
                 menuManagement.reorderMenuItems(event, ui);
             }
@@ -45,6 +55,9 @@ var menuManagement = {
         var menuItems = $('li.menuItem').map(function(index, el) {
             return $(this).data('menuItemUri');
         }).get();
+        
+        
+     
 
         $.ajax({
             url: menuManagement.reorderUrl,
@@ -61,7 +74,8 @@ var menuManagement = {
                     pos = index + 1;
                     // Set the new position for this element. The only function of this value 
                     // is so we can reset an element to its original position in case reordering fails.
-                    menuManagement.setPosition(this, pos);                
+                    menuManagement.setPosition(this, pos);  
+          
                 });      
             },
             error: function(request, status, error) {
