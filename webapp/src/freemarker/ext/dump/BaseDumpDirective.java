@@ -344,9 +344,11 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     }
     
     private Map<String, Object> getObjectDump(TemplateHashModelEx model, Object object) throws TemplateModelException {
-        
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(Key.TYPE.toString(), object.getClass().getName());
+        
+        if( object instanceof java.lang.reflect.Method)
+            return map;                   
         
         // Compile the collections of properties and methods available to the template
         SortedMap<String, Object> properties = new TreeMap<String, Object>();
@@ -376,11 +378,25 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
             // like name/getName - we'll keep only the first form.
             for ( Method method : classMethods ) {
     
+                if( "declaringClass".equals( method.getName() )) 
+                        continue;
+                
                 // Eliminate methods declared on Object
                 Class<?> c = method.getDeclaringClass();
-                if (c.equals(java.lang.Object.class)) {
+                
+                if (c.equals(java.lang.Object.class) ||
+                    c.equals(java.lang.reflect.Constructor.class) ||
+                    c.equals(java.lang.reflect.Field.class )    ) 
                     continue;
-                }
+                
+                
+                if( 
+                    c.getPackage().getName().startsWith("sun.") ||
+                    c.getPackage().getName().startsWith("java.lang") ||
+                    c.getPackage().getName().startsWith("java.security") )
+                    continue;
+                
+                log.error("decalring class of method " + method.getName() + " is " + c.getName());
                 
                 // Eliminate deprecated methods
                 if (method.isAnnotationPresent(Deprecated.class)) {
@@ -399,8 +415,12 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                     
                     // The method is available as a property
                     if (keySet.contains(propertyName)) {   
-                        TemplateModel value = model.get(propertyName);
-                        properties.put(propertyName, getDump(value));
+                        try{
+                            TemplateModel value = model.get(propertyName);
+                            properties.put(propertyName, getDump(value));
+                        }catch(Throwable th){
+                            log.error("problem dumping " + propertyName + " on " + object.getClass().getName(), th);
+                        }
                         continue;
                     }
                 }

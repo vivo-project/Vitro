@@ -44,7 +44,8 @@ public class UrlBuilder {
         VISUALIZATION("/visualization"),
         VISUALIZATION_SHORT("/vis"),
         VISUALIZATION_AJAX("/visualizationAjax"),
-        VISUALIZATION_DATA("/visualizationData");
+        VISUALIZATION_DATA("/visualizationData"),
+        EDIT_REQUEST_DISPATCH("/editRequestDispatch");
 
         private final String path;
         
