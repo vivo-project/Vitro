@@ -33,7 +33,7 @@ public class DateTimeIntervalFormGenerator extends
         initPropertyParameters(vreq, session, conf);
         initObjectPropForm(conf, vreq);               
         
-        conf.setTemplate("dateTimeValueForm.ftl");
+        conf.setTemplate("dateTimeIntervalForm.ftl");
         
         conf.setVarNameForSubject("subject");
         conf.setVarNameForPredicate("toDateTimeInterval");

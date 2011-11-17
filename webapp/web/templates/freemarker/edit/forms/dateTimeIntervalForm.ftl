@@ -16,7 +16,7 @@
         <#assign titleVerb="Create">        
         <#assign submitButtonText="Create Date/Time Interval">
         <#assign disabledVal=""/>
-</#if>starField-
+</#if>startField-
 
 <h2>${titleVerb} date time interval for ${subjectName}</h2>
 
@@ -24,47 +24,47 @@
     
     <fieldset class="dateTime" role="group"> 
         <h3>Start</h3>
-        <label for="starField-year">Year</label>
-        <input class="text-field" name="starField-year" id="starField-year" type="text" value="" size="4" maxlength="4" role="input"/>
+        <label for="startField-year">Year</label>
+        <input class="text-field" name="startField-year" id="startField-year" type="text" value="" size="4" maxlength="4" role="input"/>
 
-        <label for="starField-month">Month</label>
-        <select name="starField-month" id="starField-month" role="select">
-            <option value=""  role="option" <#if starField-month="">selected</#if>month</option>
-            <#list starField-months as starField-month>
-            <option value="starField-month" <#if starField-month = starField-month.uri>selected</#if> >${starField-month.label}</option>
+        <label for="startField-month">Month</label>
+        <select name="startField-month" id="startField-month" role="select">
+            <option value=""  role="option" <#if startField-month="">selected</#if>month</option>
+            <#list startField-months as startFieldMonth>
+            <option value="startField-month" <#if startFieldMonth = startField-month.uri>selected</#if> >${startFieldMonth.label}</option>
             </#list>
         </select>
 
-        <label for="starField-day">Day</label>
-        <select name="starField-day" id="starField-day" role="select">
-            <option value="" role="option"><#if starField-day="">selected</#if>day</option>
-            <#list starField-day as starField-day>
-            <option value="starField-day" role="option" <#if starField-day=starField-day.uri>selected</#if> >${starField-day.label}</option>
+        <label for="startField-day">Day</label>
+        <select name="startField-day" id="startField-day" role="select">
+            <option value="" role="option"><#if startField-day="">selected</#if>day</option>
+            <#list startField-day as startField-day>
+            <option value="startField-day" role="option" <#if startField-day=startField-day.uri>selected</#if> >${startField-day.label}</option>
             </#list>
         </select>
     </fieldset>
     <fieldset class="dateTime" role="group">  
-        <label for="starField-hour">Hour</label>
-        <select name="starField-hour" id="starField-hour" role="select">
-            <option value="" role="option"><#if starField-hour="">selected</#if>hour</option>
-            <#list starField-hours as starField-hour>
-            <option value="starField-hour" role="option" <#if starField-hour=starField-hour.uri>selected</#if> >${starField-hour.label}</option>
+        <label for="startField-hour">Hour</label>
+        <select name="startField-hour" id="startField-hour" role="select">
+            <option value="" role="option"><#if startField-hour="">selected</#if>hour</option>
+            <#list startField-hours as startField-hour>
+            <option value="startField-hour" role="option" <#if startField-hour=startField-hour.uri>selected</#if> >${startField-hour.label}</option>
             </#list>
         </select>
 
-        <label for="starField-minute">Minutes</label>
-        <select name="starField-hour" id="starField-hour" role="select">
-            <option value="" role="option"><#if starField-minute="">selected</#if>minutes</option>
-            <#list starField-minutes as starField-minute>
-            <option value="starField-minute" role="option" <#if starField-minute=starField-minute.uri>selected</#if> >${starField-minute.label}</option>
+        <label for="startField-minute">Minutes</label>
+        <select name="startField-hour" id="startField-hour" role="select">
+            <option value="" role="option"><#if startField-minute="">selected</#if>minutes</option>
+            <#list startField-minutes as startField-minute>
+            <option value="startField-minute" role="option" <#if startField-minute=startField-minute.uri>selected</#if> >${startField-minute.label}</option>
             </#list>
         </select>    
         
-        <label for="starField-second">Seconds</label>
-        <select name="starField-second" id="starField-second" role="select">
-            <option value="" role="option"><#if starField-second="">selected</#if>seconds</option>
-            <#list starField-seconds as starField-second>
-            <option value="starField-second" role="option" <#if starField-second=starField-second.uri>selected</#if> >${starField-second.label}</option>
+        <label for="startField-second">Seconds</label>
+        <select name="startField-second" id="startField-second" role="select">
+            <option value="" role="option"><#if startField-second="">selected</#if>seconds</option>
+            <#list startField-seconds as startField-second>
+            <option value="startField-second" role="option" <#if startField-second=startField-second.uri>selected</#if> >${startField-second.label}</option>
             </#list>
         </select>
     </fieldset>                   
