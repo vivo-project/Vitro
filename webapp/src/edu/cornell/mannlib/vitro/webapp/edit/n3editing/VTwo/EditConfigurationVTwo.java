@@ -133,6 +133,7 @@ public class EditConfigurationVTwo {
     
     private ProhibitedFromSearch prohibitedFromSearch;
 
+    //TODO: can we rename this to match the name "pageData" that is used on the templates for this?
     private HashMap<String, Object> formSpecificData;
     
     /** Name of freemarker template to generate form. */
@@ -889,12 +890,13 @@ public class EditConfigurationVTwo {
     	return this.getDatapropKey() != null ;
     }
     
-    //This is for specific data for a form that will be set by the generator
-    
+    //TODO: can we rename this to match the name "pageData" that is used on the templates for this? 
+    //This is for specific data for a form that will be set by the generator    
 	public  void setFormSpecificData(HashMap<String, Object> formSpecificData) {
 		this.formSpecificData = formSpecificData;
 	}
 
+    //TODO: can we rename this to match the name "pageData" that is used on the templates for this?
 	public void addFormSpecificData( String key, Object value){
 	    if( this.formSpecificData == null){
 	        this.formSpecificData = new HashMap<String,Object>();
@@ -902,6 +904,7 @@ public class EditConfigurationVTwo {
 	    this.formSpecificData.put(key,value);	    
 	}
 	
+    //TODO: can we rename this to match the name "pageData" that is used on the templates for this?
 	public HashMap<String, Object> getFormSpecificData() {
 		// TODO Auto-generated method stub
 		return this.formSpecificData;
