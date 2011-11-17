@@ -3,13 +3,14 @@
 package edu.cornell.mannlib.vitro.webapp.reasoner;
 
 
+import java.util.Iterator;
+
 import org.apache.log4j.Level;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mindswap.pellet.jena.PelletReasonerFactory;
 
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.AnnotationProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -17,28 +18,28 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
 
 public class SimpleReasonerTest extends AbstractTestClass {
 	
-	
 	private Resource objectProperty = ResourceFactory.createResource("http://www.w3.org/2002/07/owl#ObjectProperty");
 	private static final String mostSpecificTypePropertyURI = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType";
+	long delay = 50;
   
 	@Before
 	public void suppressErrorOutput() {
 		suppressSyserr();
         //Turn off log messages to console
 		setLoggerLevel(SimpleReasoner.class, Level.OFF);
+		setLoggerLevel(SimpleReasonerTBoxListener.class, Level.OFF);
 	}
 	
 	/*
@@ -51,7 +52,6 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Create a Tbox with a simple class hierarchy. B is a subclass of A.
 		// Pellet will compute TBox inferences
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		
 		OntClass classA = tBox.createClass("http://test.vivo/A");
 	    classA.setLabel("class A", "en-US");
@@ -90,7 +90,6 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Create a Tbox with a simple class hierarchy. D and E are subclasses
 		// of C. B and C are subclasses of A. Pellet will compute TBox inferences.
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		
 		OntClass classA = tBox.createClass("http://test.vivo/A");
 	    classA.setLabel("class A", "en-US");
@@ -137,20 +136,20 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	* Test inference based on class equivalence
 	*/ 
 	@Test
-	public void addABoxTypeAssertion3(){
+	public void addABoxTypeAssertion3() throws InterruptedException {
 				
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
         SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
 		aBox.register(simpleReasoner);
-		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
+		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
+		tBox.register(simpleReasonerTBoxListener);
 
 		// Add classes A, B and C to the TBox
 	    // A is equivalent to B
@@ -168,6 +167,10 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	    classA.addEquivalentClass(classB);
 	    classA.addSubClass(classC);
 	    
+	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
+	    	Thread.sleep(delay);
+	    }
+	       
         // Add a statement that individual x is of type C to the ABox
 		Resource ind_x = aBox.createResource("http://test.vivo/x");
 		aBox.add(ind_x, RDF.type, classC);		
@@ -178,28 +181,30 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		
 		// Verify that "x is of type B" was inferred
 		Statement xisb = ResourceFactory.createStatement(ind_x, RDF.type, classB);	
-		Assert.assertTrue(inf.contains(xisb));		
+		Assert.assertTrue(inf.contains(xisb));	
+		
+		simpleReasonerTBoxListener.setStopRequested();;
 	}
 	
 	/*
 	 * Test inference based on class equivalence
 	 */ 
 	@Test
-	public void addABoxTypeAssertion4() {
+	public void addABoxTypeAssertion4() throws InterruptedException {
 				
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
         SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
 		aBox.register(simpleReasoner);
-		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
-
+		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
+		tBox.register(simpleReasonerTBoxListener);
+		
 		// Add classes A and B to the TBox
 	    // A is equivalent to B
 		
@@ -211,13 +216,19 @@ public class SimpleReasonerTest extends AbstractTestClass {
 
 	    classA.addEquivalentClass(classB);
 	    
+	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
+	    	Thread.sleep(delay);
+	    }
+	    
         // Add a statement that individual x is of type B to the ABox
 		Resource ind_x = aBox.createResource("http://test.vivo/x");
 		aBox.add(ind_x, RDF.type, classB);		
 	    
 		// Verify that "x is of type A" was inferred
 		Statement xisa = ResourceFactory.createStatement(ind_x, RDF.type, classA);	
-		Assert.assertTrue(inf.contains(xisa));		
+		Assert.assertTrue(inf.contains(xisa));	
+
+		simpleReasonerTBoxListener.setStopRequested();
 	}
 	
 
@@ -225,20 +236,20 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	 * Test inference based on class equivalence
 	 */
 	@Test
-	public void addABoxTypeAssertion5() {
+	public void addABoxTypeAssertion5() throws InterruptedException {
 				
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
         SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
 		aBox.register(simpleReasoner);
-		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
+		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
+		tBox.register(simpleReasonerTBoxListener);
 
 		// Add classes classes A and B to the TBox
 	    // A is equivalent to B
@@ -250,6 +261,10 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	    classB.setLabel("class B", "en-US");
 
 	    classA.addEquivalentClass(classB);
+	    
+	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
+	    	Thread.sleep(delay);
+	    }
 	    
         // Add a statement that individual x is of type B to the ABox
 		Resource ind_x = aBox.createResource("http://test.vivo/x");
@@ -264,6 +279,8 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		
 		// Verify that "x is of type A" was removed from the inference graph
 		Assert.assertFalse(inf.contains(xisa));	
+
+		simpleReasonerTBoxListener.setStopRequested();
 	}
 
 	/*
@@ -281,7 +298,6 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// and B is a subclass of A. Pellet will compute TBox inferences.
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		
 		OntClass classA = tBox.createClass("http://test.vivo/A");
 	    classA.setLabel("class A", "en-US");
@@ -340,20 +356,20 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	 * as a test of equivalentClass statements also.
 	 */
 	@Test
-	public void addTBoxSubClassAssertion1(){
+	public void addTBoxSubClassAssertion1() throws InterruptedException {
 				
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
         SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
 		aBox.register(simpleReasoner);
-		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
+		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
+		tBox.register(simpleReasonerTBoxListener);
 
 		// Add classes classes A, B, C and D to the TBox
 	
@@ -377,6 +393,10 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	    
 	    classA.addSubClass(classC);
 		
+	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
+	    	Thread.sleep(delay);
+	    }
+	    
 		// Verify that "x is of type A" was inferred
 		Statement xisa = ResourceFactory.createStatement(ind_x, RDF.type, classA);	
 		Assert.assertTrue(inf.contains(xisa));
@@ -389,6 +409,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		Statement xisd = ResourceFactory.createStatement(ind_x, RDF.type, classD);	
 		Assert.assertFalse(inf.contains(xisd));	
 		
+		simpleReasonerTBoxListener.setStopRequested();
 	}
 
 	/*
@@ -408,21 +429,21 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	 * 
 	 */
 	@Test
-	public void addTBoxSubClassAssertion2() {
+	public void addTBoxSubClassAssertion2() throws InterruptedException {
 				
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
         SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
 		aBox.register(simpleReasoner);
-		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
-
+		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
+		tBox.register(simpleReasonerTBoxListener);
+		
 		// Add classes classes A, B, C and D to the TBox
 	    // D is a subclass of C
 		
@@ -440,16 +461,26 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	    	   
 	    classC.addSubClass(classD);
 	    
+	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
+	    	Thread.sleep(delay);
+	    }
+	    
         // Add a statement that individual x is of type D to the ABox
 		Resource ind_x = aBox.createResource("http://test.vivo/x");
 		aBox.add(ind_x, RDF.type, classD);		
 	    
         // Add a statement that C is a subclass of A to the TBox	
 	    classA.addSubClass(classC);
-		
+
+	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
+	    	Thread.sleep(delay);
+	    }
+	    
 		// Verify that "x is of type A" was inferred
 		Statement xisa = ResourceFactory.createStatement(ind_x, RDF.type, classA);	
-		Assert.assertTrue(inf.contains(xisa));		
+		Assert.assertTrue(inf.contains(xisa));	
+		
+		simpleReasonerTBoxListener.setStopRequested();
 	}
 	
 	@Test
@@ -469,19 +500,19 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	 * as a test of equivalentClass assertions also.
 	 * 
 	 */
-	public void removeTBoxSubClassAssertion1(){
+	public void removeTBoxSubClassAssertion1() throws InterruptedException {
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
         SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
 		aBox.register(simpleReasoner);
-		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
+		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
+		tBox.register(simpleReasonerTBoxListener);
 
 		// Add classes A, B, C, D, E, F, G and H to the TBox.
 		// B, C and D are subclasses of A.
@@ -521,12 +552,20 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	    classC.addSubClass(classG);
 	    classD.addSubClass(classH);
 	    
+	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
+	    	Thread.sleep(delay);
+	    }
+	    
         // Add a statement that individual x is of type E to the ABox
 		Resource ind_x = aBox.createResource("http://test.vivo/x");
 		aBox.add(ind_x, RDF.type, classE);		
 	    
 		// Remove the statement that B is a subclass of A from the TBox
 		classA.removeSubClass(classB);
+		
+	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
+	    	Thread.sleep(delay);
+	    }
 		
 		// Verify that "x is of type A" is not in the inference graph
 		Statement xisa = ResourceFactory.createStatement(ind_x, RDF.type, classA);	
@@ -544,9 +583,15 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Remove the statement that C is a subclass of A from the TBox
 		classA.removeSubClass(classC);
 
+	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
+	    	Thread.sleep(delay);
+	    }
+		
 		// Verify that "y is of type A" is in the inference graph
 		Statement yisa = ResourceFactory.createStatement(ind_y, RDF.type, classA);	
 		Assert.assertTrue(inf.contains(yisa));
+		
+		simpleReasonerTBoxListener.setStopRequested();
 	}
 	
 	
@@ -554,20 +599,20 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	 * tests rdfs:subPropertyOf materialization for object properties.
 	 */
 	// @Test  uncomment when sub/equiv property inferencing is enabled. sjm222 5/13/2011
-	public void addABoxAssertion1(){
+	public void addABoxAssertion1() throws InterruptedException {
 				
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
         SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
 		aBox.register(simpleReasoner);
-		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
+		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
+		tBox.register(simpleReasonerTBoxListener);
 
 		// Add object properties propA and propB to the TBox.
 	    // propB is a sub-property of propA.
@@ -604,14 +649,14 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
         SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
 		aBox.register(simpleReasoner);
-		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
-
+		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
+		tBox.register(simpleReasonerTBoxListener);
+		
 		// Add object properties propA and propB to the TBox.
 	    // propB is a sub-property of propA.
 		
@@ -646,14 +691,14 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
         SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
 		aBox.register(simpleReasoner);
-		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
-
+		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
+		tBox.register(simpleReasonerTBoxListener);
+		
 		// Add properties A, B and C to the TBox
 	    // A is equivalent to B
 		// C is a subclass of A
@@ -701,13 +746,13 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
         SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
 		aBox.register(simpleReasoner);
-		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
+		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
+		tBox.register(simpleReasonerTBoxListener);
 
 		// Add object properties propA and propB to the TBox.
 	    // propB is a sub-property of propA.
@@ -744,14 +789,14 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
         SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
 		aBox.register(simpleReasoner);
-		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
-
+		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
+		tBox.register(simpleReasonerTBoxListener);
+		
 		// Add properties A and B to the TBox
 	    // A is equivalent to B
 		
@@ -801,14 +846,14 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
         SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
 		aBox.register(simpleReasoner);
-		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
-
+		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
+		tBox.register(simpleReasonerTBoxListener);
+		
 		// Add properties A, B, C and D to the TBox	  
 		OntProperty propA = tBox.createOntProperty("http://test.vivo/A");
         tBox.add(propA, RDF.type, objectProperty);
@@ -869,14 +914,14 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
         SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
 		aBox.register(simpleReasoner);
-		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
-
+		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
+		tBox.register(simpleReasonerTBoxListener);
+		
 		// Add properties A, B, C, D, E, F, G and H to the TBox.
 		// B, C and D are subproperties of A.
 		// E is a subproperty of B.
@@ -960,7 +1005,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
      * to an added/removed ABox type assertion.
 	 */
 	@Test
-	public void mstTest1(){
+	public void mstTest1() throws InterruptedException {
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
 		// Pellet will compute TBox inferences
@@ -971,7 +1016,8 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		
         SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
 		aBox.register(simpleReasoner);
-		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
+		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
+		tBox.register(simpleReasonerTBoxListener);
 		
 		// Set up the Tbox with a class hierarchy. C is a subclass of A
 		// and Y. D and E are subclasses C. B is a subclass of D.
@@ -1005,6 +1051,10 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	    
 	    classD.addSubClass(classB);
   
+	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
+	    	Thread.sleep(delay);
+	    }
+	    
         // Add the statement individual x is of type Y to the ABox
 		Resource ind_x = aBox.createResource("http://test.vivo/x");
 		aBox.add(ind_x, RDF.type, classD);		
@@ -1023,6 +1073,8 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		aBox.remove(ind_x, RDF.type, classD); // retract assertion that x is of type D.
 		// Verify that D is not longer the most specific type
 		Assert.assertFalse(inf.contains(ind_x, mostSpecificType, ResourceFactory.createResource(classD.getURI())));	
+		
+		simpleReasonerTBoxListener.setStopRequested();
 	}
 	
 
@@ -1031,7 +1083,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
      * to an added ABox type assertion.
 	 */
 	@Test
-	public void mstTest2(){
+	public void mstTest2() throws InterruptedException {
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
 		// Pellet will compute TBox inferences
@@ -1042,7 +1094,8 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		
         SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
 		aBox.register(simpleReasoner);
-		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
+		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
+		tBox.register(simpleReasonerTBoxListener);
 		
 		// Set up the Tbox with a class hierarchy. B is a subclass of A,
 		// C is a subclass of B, and A is a subclass of C.
@@ -1063,16 +1116,20 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	    classB.addSubClass(classC);	   
 	    classC.addSubClass(classA);
 
+	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
+	    	Thread.sleep(delay);
+	    }
+	    
 	    // Add the statement individual x is of type B to the ABox
 		Resource ind_x = aBox.createResource("http://test.vivo/x");
 		aBox.add(ind_x, RDF.type, classB);		
-	    
-		StmtIterator stmtIterator = aBox.listStatements(ind_x, mostSpecificType, (RDFNode)null);
-				
+	    				
 		// Verify ind_x mostSpecificType annotation for A, B and C
 		Assert.assertTrue(inf.contains(ind_x, mostSpecificType, ResourceFactory.createResource(classA.getURI())));	
 		Assert.assertTrue(inf.contains(ind_x, mostSpecificType, ResourceFactory.createResource(classB.getURI())));	
 		Assert.assertTrue(inf.contains(ind_x, mostSpecificType, ResourceFactory.createResource(classC.getURI())));	
+		
+		simpleReasonerTBoxListener.setStopRequested();
 	}
 		
 	/*
@@ -1080,7 +1137,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
      * to an added/removed TBox assertions.
 	 */
 	@Test
-	public void mstTest3(){
+	public void mstTest3() throws InterruptedException {
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
 		// Pellet will compute TBox inferences
@@ -1091,7 +1148,8 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		
         SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
 		aBox.register(simpleReasoner);
-		tBox.register(new SimpleReasonerTBoxListener(simpleReasoner));
+		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
+		tBox.register(simpleReasonerTBoxListener);
 		
 		OntClass OWL_THING = tBox.createClass(OWL.Thing.getURI());
 		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
@@ -1120,6 +1178,10 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	    OntClass classG = tBox.createClass("http://test.vivo/G");
 	    classE.setLabel("class G", "en-US");
 		
+	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
+	    	Thread.sleep(delay);
+	    }
+	    
 		// add individuals x, y and z to the aBox
 		Resource ind_x = aBox.createResource("http://test.vivo/x");
 		Resource ind_y = aBox.createResource("http://test.vivo/y");
@@ -1150,16 +1212,30 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	    classD.addSubClass(classF);
 	    classD.addSubClass(classG);
 	    
+	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
+	    	Thread.sleep(delay);
+	    }
+	    
 		Assert.assertFalse(inf.contains(ind_y, mostSpecificType, ResourceFactory.createResource(classD.getURI())));
 		Assert.assertTrue(inf.contains(ind_y, mostSpecificType, ResourceFactory.createResource(classF.getURI())));
 	    
 		// If F is removed as a subclass of D, then D should once again be a most specific type
 		// for y.
 		classD.removeSubClass(classF);
-		Assert.assertTrue(inf.contains(ind_y, mostSpecificType, ResourceFactory.createResource(classD.getURI())));
 		
+	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
+	    	Thread.sleep(delay);
+	    }
+		
+		Assert.assertTrue(inf.contains(ind_y, mostSpecificType, ResourceFactory.createResource(classD.getURI())));	
+		
+		simpleReasonerTBoxListener.setStopRequested();
 	}
 	
+	SimpleReasonerTBoxListener getTBoxListener(SimpleReasoner simpleReasoner) {
+	    return new SimpleReasonerTBoxListener(simpleReasoner, new Exception().getStackTrace()[1].getMethodName());
+	}
+		
 	// To help in debugging the unit test
 	void printModel(Model model, String modelName) {
 	    

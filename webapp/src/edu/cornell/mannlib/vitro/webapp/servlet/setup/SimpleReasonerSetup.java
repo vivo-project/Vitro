@@ -153,7 +153,9 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	            new Thread(new MostSpecificTypeRecomputer(simpleReasoner),"MostSpecificTypeComputer").start();
 	        }
 
-	        assertionsOms.getTBoxModel().register(new SimpleReasonerTBoxListener(simpleReasoner));
+	        SimpleReasonerTBoxListener simpleReasonerTBoxListener = new SimpleReasonerTBoxListener(simpleReasoner);
+	        sce.getServletContext().setAttribute(SimpleReasonerTBoxListener.class.getName(),simpleReasonerTBoxListener);
+	        assertionsOms.getTBoxModel().register(simpleReasonerTBoxListener);
 	        
 	        log.info("Simple reasoner connected for the ABox");
 	        
@@ -165,12 +167,19 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		log.info("received contextDestroyed notification");
-        SimpleReasoner simpleReasoner = getSimpleReasonerFromServletContext(sce.getServletContext());
-	    
+   
+		SimpleReasoner simpleReasoner = getSimpleReasonerFromServletContext(sce.getServletContext());   
 	    if (simpleReasoner != null) {
 	    	log.info("sending stop request to SimpleReasoner");
 	    	simpleReasoner.setStopRequested();
 	    } 
+	
+		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getSimpleReasonerTBoxListenerFromContext(sce.getServletContext());   
+	    if (simpleReasonerTBoxListener != null) {
+	    	log.info("sending stop request to simpleReasonerTBoxListener");
+	    	simpleReasonerTBoxListener.setStopRequested();
+	    } 
+	    
 	}
 	
 	public static SimpleReasoner getSimpleReasonerFromServletContext(ServletContext ctx) {
@@ -178,6 +187,16 @@ public class SimpleReasonerSetup implements ServletContextListener {
 	    
 	    if (simpleReasoner instanceof SimpleReasoner) {
 	        return (SimpleReasoner) simpleReasoner;
+	    } else {
+	        return null;
+	    }
+	}
+	
+	public static SimpleReasonerTBoxListener getSimpleReasonerTBoxListenerFromContext(ServletContext ctx) {
+	    Object simpleReasonerTBoxListener = ctx.getAttribute(SimpleReasonerTBoxListener.class.getName());
+	    
+	    if (simpleReasonerTBoxListener instanceof SimpleReasonerTBoxListener) {
+	        return (SimpleReasonerTBoxListener) simpleReasonerTBoxListener;
 	    } else {
 	        return null;
 	    }
