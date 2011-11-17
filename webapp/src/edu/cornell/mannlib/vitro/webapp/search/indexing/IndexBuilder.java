@@ -136,8 +136,7 @@ public class IndexBuilder extends VitroBackgroundThread {
     }
     
     /** 
-     * This will re-index Individuals that changed because of modtime or because they
-     * were added with addChangedUris(). 
+     * This will re-index Individuals were added with addToChanged(). 
      */
     public synchronized void doUpdateIndex() {        	    
     	//wake up thread and it will attempt to index anything in changedUris
