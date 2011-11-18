@@ -106,7 +106,8 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		
         //For data property processing, need to update edit configuration for back button 
 		N3EditUtils.updateEditConfigurationForBackButton(configuration, submission, vreq, writeModel);
-        return PostEditCleanupController.doPostEdit(vreq, entityToReturnTo);		
+        PostEditCleanupController.doPostEditCleanup(vreq);
+        return PostEditCleanupController.doPostEditRedirect(vreq, entityToReturnTo);
 	}
 
 	//In case of back button confusion
@@ -306,15 +307,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 			return resourceToRedirectTo;
 		}
 		
-		public static String getPredicateAnchorPostEdit(String urlPattern,
-				String predicateLocalName) {
-			String predicateAnchor = null;
-			if( urlPattern.endsWith("individual") || urlPattern.endsWith("entity") ){           
-                if( predicateLocalName != null && predicateLocalName.length() > 0){
-                    predicateAnchor = "#" + predicateLocalName;
-                }
-            }
-			return predicateAnchor;
-		}
+
+			
 	}
 }

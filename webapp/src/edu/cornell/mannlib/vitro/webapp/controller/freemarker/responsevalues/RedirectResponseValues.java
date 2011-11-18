@@ -5,10 +5,19 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 
+/**
+ * Also see DirectRedirectResponseValues
+ *
+ */
 public class RedirectResponseValues extends BaseResponseValues {
 
     private final String redirectUrl;
 
+    //TODO: document this.  What does this do and mean?
+    //should redirectUrl have the context?  Or is the context added?
+    //If the context is added, what if we already have it because 
+    //UrlBuilder was used?  
+    //what about an off site redirect?  Maybe check for a magic "://" ?    
     public RedirectResponseValues(String redirectUrl) {
         this.redirectUrl = getRedirectUrl(redirectUrl);
     }
@@ -27,7 +36,7 @@ public class RedirectResponseValues extends BaseResponseValues {
         return this.redirectUrl;
     }
     
-    private String getRedirectUrl(String redirectUrl) {
+    protected String getRedirectUrl(String redirectUrl) {
         return redirectUrl.contains("://") ? redirectUrl : UrlBuilder.getUrl(redirectUrl);
     }
 

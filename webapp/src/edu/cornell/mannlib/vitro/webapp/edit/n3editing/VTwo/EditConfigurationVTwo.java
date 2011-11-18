@@ -115,6 +115,12 @@ public class EditConfigurationVTwo {
     String entityToReturnTo;
     
     /**
+     * If this value is not null, it will force the edit to return to the specified 
+     * URL from the PostEditCleanupController after an edit or a cancel.  This string does not get values substituted in. 
+     */
+    String urlToReturnTo = null;
+    
+    /**
      * formUrl saves the URL that was used to request the form so that it can be 
      * reissued if a form validation fails and the client can be redirected back
      * to the original form. */
@@ -985,5 +991,12 @@ public class EditConfigurationVTwo {
         return this;                
     }
 
+    public void setUrlToReturnTo(String url){
+        this.urlToReturnTo = url;
+    }
+
+    public String getUrlToReturnTo() {
+        return this.urlToReturnTo;
+    }
     
 }

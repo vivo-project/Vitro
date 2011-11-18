@@ -196,6 +196,9 @@ public class UrlBuilder {
         return getUrl(path);       
     }
 
+    //TODO: document this as it is used all over the app
+    //does this append the context?  What if params is null? 
+    //What if you want a route that isn't in Route?
     public static String getUrl(Route route, ParamMap params) {
         return getUrl(route.path(), params);
     }
