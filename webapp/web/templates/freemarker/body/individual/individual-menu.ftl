@@ -24,7 +24,9 @@
     <#if editable>
         <#assign addUrl = hasElement.addUrl>
         <#if addUrl?has_content>
-            <a class="add-hasElement green button" href="${addUrl}" title="Add new menu item">Add menu item</a>
+            <p><a class="add-hasElement green button" href="${addUrl}" title="Add new menu item">Add menu item</a></p>
+            
+            <p class="note">Refresh page after reordering menu items</p>
         </#if>
     </#if>
     
