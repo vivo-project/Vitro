@@ -134,8 +134,8 @@ public class MultiValueEditSubmission {
         //Validate URIS
         this.basicValidation = new BasicValidationVTwo(editConfig, this);
         Map<String,String> errors = basicValidation.validateUris( urisFromForm ); 
-        //Validate literals
-        errors = basicValidation.validateLiterals( literalsFromForm );
+        //Validate literals and add errors to the list of existing errors
+        errors.putAll(basicValidation.validateLiterals( literalsFromForm ));
         if( errors != null ) {
             validationErrors.putAll( errors);
         }              
