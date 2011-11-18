@@ -26,7 +26,7 @@
             <p>
                 <input type="submit" id="submit" value="${editConfiguration.submitLabel}" role="button "/>
                 <span class="or"> or </span>
-                <a title="Cancel" href="${cancelUrl}">Cancel</a>
+                <a title="Cancel" class="cancel" href="${cancelUrl}">Cancel</a>
             </p>
         </form>
     <#else>
