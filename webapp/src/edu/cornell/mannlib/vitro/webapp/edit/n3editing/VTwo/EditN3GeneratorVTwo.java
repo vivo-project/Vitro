@@ -148,7 +148,7 @@ public class EditN3GeneratorVTwo {
      *
      */
     protected String subInLiterals(String var, Literal literal, String target){
-        String varRegex = "\\?" + var + "(?=\\.\\p{Space}|\\p{Space})";
+        String varRegex = "\\?" + var + "(?=\\p{Punct}||\\p{Space}|&)";
         if (target==null ) {
             log.error("subInLiterals was passed a null target");
             return "blankBecauseTargetOrValueWasNull";
@@ -215,7 +215,7 @@ public class EditN3GeneratorVTwo {
         String valueString = org.apache.commons.lang.StringUtils.join(n3Values, ",");
         
         //Substitute it in to n3
-        String varRegex = "\\?" + var + "(?=\\.\\p{Space}|\\p{Space})";
+        String varRegex = "\\?" + var + "(?=\\p{Punct}|\\p{Space}|$)";
         
         String out = null;
         if( valueString != null )

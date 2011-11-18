@@ -385,7 +385,8 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                 // and other unusual places that can cause problems.
                 Class<?> c = method.getDeclaringClass();
                 
-                if (c.equals(java.lang.Object.class) ||
+                if (c == null || 
+                    c.equals(java.lang.Object.class) ||
                     c.equals(java.lang.reflect.Constructor.class) ||
                     c.equals(java.lang.reflect.Field.class )    ) 
                     continue;
@@ -416,7 +417,8 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
                             TemplateModel value = model.get(propertyName);
                             properties.put(propertyName, getDump(value));
                         }catch(Throwable th){
-                            log.error("problem dumping " + propertyName + " on " + object.getClass().getName(), th);
+                            log.error("problem dumping " + propertyName + " on " + object.getClass().getName() +
+                                    " declared in " + c.getName(), th);
                         }
                         continue;
                     }

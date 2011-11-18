@@ -17,6 +17,8 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
+import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
+
 
 public class EditN3GeneratorVTwoTest {
     static EditN3GeneratorVTwo gen = new EditN3GeneratorVTwo();
@@ -63,8 +65,73 @@ public class EditN3GeneratorVTwoTest {
         Assert.assertEquals("<ABC>.", targets.get(0));
         Assert.assertEquals("<ABC>;", targets.get(1));
         Assert.assertEquals("<ABC>]", targets.get(2));
-        Assert.assertEquals("<ABC>,", targets.get(3));                
+        Assert.assertEquals("<ABC>,", targets.get(3));                      
     }
+    
+    @Test
+    public void testPunctAfterVarNameForLiterals(){        
+        List<String> targets = Arrays.asList("?var.","?var;","?var]","?var,"); 
+        
+        Map keyToValues = new HashMap();        
+        keyToValues.put("var", Arrays.asList(new EditLiteral("ABC", null, null)));
+        
+        gen.subInMultiLiterals(keyToValues, targets);
+        Assert.assertNotNull(targets);
+        Assert.assertEquals(4,targets.size());
+        
+        Assert.assertEquals("\"ABC\".", targets.get(0));
+        Assert.assertEquals("\"ABC\";", targets.get(1));
+        Assert.assertEquals("\"ABC\"]", targets.get(2));
+        Assert.assertEquals("\"ABC\",", targets.get(3));                   
+    }
+    
+    @Test
+    public void testLiterlasWithDatatypes(){
+        List<String> targets = Arrays.asList("?var.","?var;","?var]","?var,","?var", " ?var "); 
+                                                
+        String value = "ABC";
+        String datatype = "http://someDataType.com/bleck";
+        String expected = '"' + value + '"' + "^^<" + datatype + ">";
+        
+        Map keyToValues = new HashMap();           
+        keyToValues.put("var", Arrays.asList(new EditLiteral(value,datatype,null)));
+        
+        gen.subInMultiLiterals(keyToValues, targets);
+        Assert.assertNotNull(targets);
+        Assert.assertEquals(6,targets.size());
+        
+        Assert.assertEquals( expected + ".", targets.get(0));
+        Assert.assertEquals(expected + ";", targets.get(1));
+        Assert.assertEquals(expected + "]", targets.get(2));
+        Assert.assertEquals(expected + ",", targets.get(3));
+        Assert.assertEquals(expected , targets.get(4));
+        Assert.assertEquals(" " + expected + " ", targets.get(5));
+    }        
+    
+    @Test
+    public void testLiterlasWithLang(){
+        List<String> targets = Arrays.asList("?var.","?var;","?var]","?var,","?var", " ?var "); 
+                                                
+        String value = "ABC";
+        String datatype = null;
+        String lang = "XYZ";
+        String expected = '"' + value + '"' + "@" + lang + "";
+        
+        Map keyToValues = new HashMap();           
+        keyToValues.put("var", Arrays.asList(new EditLiteral(value,datatype,lang)));
+        
+        gen.subInMultiLiterals(keyToValues, targets);
+        Assert.assertNotNull(targets);
+        Assert.assertEquals(6,targets.size());
+        
+        Assert.assertEquals( expected + ".", targets.get(0));
+        Assert.assertEquals(expected + ";", targets.get(1));
+        Assert.assertEquals(expected + "]", targets.get(2));
+        Assert.assertEquals(expected + ",", targets.get(3));
+        Assert.assertEquals(expected , targets.get(4));
+        Assert.assertEquals(" " + expected + " ", targets.get(5));
+    }
+    
     
     @Test 
     public void testSubInMultiUrisNull(){        
