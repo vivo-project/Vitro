@@ -623,8 +623,8 @@ public class SimpleReasoner extends StatementListener {
 					if ( !(stmt.getObject().asResource().getNameSpace()).equals(OWL.NS)) {
 						if (!unknownTypes.contains(stmt.getObject().asResource().getURI())) {
 						   unknownTypes.add(stmt.getObject().asResource().getURI());
-					       log.warn("Didn't find the target class (the object of an added rdf:type statement) in the TBox: " +
-						          	(stmt.getObject().asResource()).getURI() + ". No mostSpecificType computation will be done based on type assertions of this type.");
+					       log.warn("Didn't find the target class (the object of an asserted or inferred rdf:type statement) in the TBox: " +
+						          	(stmt.getObject().asResource()).getURI() + ". No mostSpecificType computation will be done based on " + (stmt.getObject().asResource()).getURI() + " type statements.");
 						}
 					}
 					continue;
