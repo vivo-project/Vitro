@@ -76,8 +76,9 @@ public class PostEditCleanupController extends FreemarkerHttpServlet{
             //Try to redirect to the entityToReturnTo
             ParamMap paramMap = new ParamMap();
             paramMap.put("uri", entityToReturnTo);
-            paramMap.put("extra","true"); //for ie6           
-            String path = UrlBuilder.getPath(urlPattern,paramMap);            
+            paramMap.put("extra","true"); //for ie6       
+            //If url already contains an ? then need to add extra params
+            String path = UrlBuilder.addParams(urlPattern, paramMap);
             path += getPredicateAnchor( vreq, editConfig );
             return new RedirectResponseValues( path );
             
