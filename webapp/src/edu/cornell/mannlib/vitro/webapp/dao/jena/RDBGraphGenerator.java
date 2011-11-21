@@ -17,7 +17,7 @@ import com.hp.hpl.jena.graph.Graph;
 
 
 
-public class RDBGraphGenerator implements GraphGenerator {
+public class RDBGraphGenerator implements SQLGraphGenerator {
 
 	private static final Log log = LogFactory.getLog(RDBGraphGenerator.class.getName());
 	
@@ -32,6 +32,14 @@ public class RDBGraphGenerator implements GraphGenerator {
         this.graphID = graphID;
     }
 
+    public boolean isGraphClosed() {
+    	try {
+    		return (connection == null || connection.isClosed());
+        } catch (SQLException e) {
+        	throw new RuntimeException(e);
+        }
+    }
+    
     public Graph generateGraph() {
     	log.info("Regenerate the graph.");
         try {

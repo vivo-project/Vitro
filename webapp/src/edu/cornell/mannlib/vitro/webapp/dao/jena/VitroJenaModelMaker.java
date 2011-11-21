@@ -346,7 +346,7 @@ public class VitroJenaModelMaker implements ModelMaker {
         Graph g = gen.generateGraph();
         Model m = ModelFactory.createModelForGraph(g);	
         memCache.add(m);
-        memCache.register(new MemToRDBModelSynchronizer(gen));
+        memCache.register(new MemToDBModelSynchronizer(gen));
         m.close();
         try {
             gen.getConnection().close();

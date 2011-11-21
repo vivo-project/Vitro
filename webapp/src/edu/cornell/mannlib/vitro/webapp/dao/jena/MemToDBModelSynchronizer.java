@@ -11,22 +11,23 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 
 /**
- * This listener will open and close RDB models as it performs edits to avoid
+ * This listener will open and close DB models as it performs edits to avoid
  * wasting DB connections
  * @author bjl23
  *
  */
-public class MemToRDBModelSynchronizer extends StatementListener {
+public class MemToDBModelSynchronizer extends StatementListener {
 
-	private static long IDLE_MILLIS = 2000; // how long to let a model site idle after an edit has been performed
+	private static long IDLE_MILLIS = 2000; // how long to let a model site idle
+	                                        // after an edit has been performed
 	
-	RDBGraphGenerator generator;
+	SQLGraphGenerator generator;
 	Model model;
 	boolean editInProgress;
 	boolean cleanupThreadActive;
 	long lastEditTimeMillis;
 	
-	public MemToRDBModelSynchronizer(RDBGraphGenerator generator) {
+	public MemToDBModelSynchronizer(SQLGraphGenerator generator) {
 		this.generator = generator;
 	}
 	
@@ -49,7 +50,8 @@ public class MemToRDBModelSynchronizer extends StatementListener {
 			lastEditTimeMillis = System.currentTimeMillis();
 			this.editInProgress = false;
 			if (!cleanupThreadActive) {
-				(new Thread(new Cleanup(this), "MemToRDBModelSynchronizer")).start();
+				(new Thread(
+						new Cleanup(this), "MemToDBModelSynchronizer")).start();
 			}
 		}
 	}
@@ -63,33 +65,39 @@ public class MemToRDBModelSynchronizer extends StatementListener {
 			lastEditTimeMillis = System.currentTimeMillis();
 			this.editInProgress = false;
 			if (!cleanupThreadActive) {
-				(new Thread(new Cleanup(this), "MemToRDBModelSynchronizer")).start();
+				(new Thread(
+						new Cleanup(this), "MemToDBModelSynchronizer")).start();
 			}
 		}
 	}
 	
 	private class Cleanup implements Runnable {
 		
-		private MemToRDBModelSynchronizer s;
+		private MemToDBModelSynchronizer s;
 				
-		public Cleanup(MemToRDBModelSynchronizer s) {
+		public Cleanup(MemToDBModelSynchronizer s) {
 			this.s = s;
 		}
 		
 		public void run() {
 			s.cleanupThreadActive = true;
-			while( (s.editInProgress) || (System.currentTimeMillis() - s.lastEditTimeMillis < IDLE_MILLIS ) ) {
+			while( (s.editInProgress) 
+					|| (System.currentTimeMillis() 
+							- s.lastEditTimeMillis < IDLE_MILLIS ) ) {
 				try {
 					Thread.currentThread().sleep(1000);
 				} catch (InterruptedException e) {
-					throw new RuntimeException("Interrupted cleanup thread in " + this.getClass().getName(), e);
+					throw new RuntimeException(
+							"Interrupted cleanup thread in " 
+							+ this.getClass().getName(), e);
 				}
 			}
 			if (s.model != null) {
 				s.model.close();
 				s.model = null;
 			} else {
-				throw new RuntimeException(this.getClass().getName()+"Model already null");
+				throw new RuntimeException(
+						this.getClass().getName() + "Model already null");
 			}
 			java.sql.Connection c = generator.getConnection();
 			try {

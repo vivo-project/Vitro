@@ -2,10 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import com.hp.hpl.jena.ontology.OntModel;
+import java.sql.Connection;
 
-public interface ModelGenerator {
+public interface SQLGraphGenerator extends GraphGenerator {
 
-    public OntModel generateModel();
-
+	public Connection getConnection();
+	
 }

@@ -13,7 +13,7 @@ import com.hp.hpl.jena.sdb.StoreDesc;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class SDBGraphGenerator implements GraphGenerator {
+public class SDBGraphGenerator implements SQLGraphGenerator {
 
 	private static final Log log = LogFactory.getLog(SDBGraphGenerator.class.getName());
 	
@@ -27,6 +27,14 @@ public class SDBGraphGenerator implements GraphGenerator {
     	this.ds = dataSource;
     	this.storeDesc = storeDesc;
     	this.graphID = graphID;
+    }
+    
+    public boolean isGraphClosed() {
+    	try {
+    		return (connection == null || connection.isClosed());
+        } catch (SQLException e) {
+        	throw new RuntimeException(e);
+        }
     }
 
     public Graph generateGraph() {
