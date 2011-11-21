@@ -55,10 +55,12 @@ public class DateTimeValueFormGenerator extends BaseEditConfigurationGenerator
         		"dateTimeField-precision", existingPrecisionQuery);
         conf.addSparqlForExistingUris("valueNode", existingNodeQuery);
         
-        conf.addField(new FieldVTwo().setName("dateTimeField").
-        		setEditElement(new DateTimeWithPrecisionVTwo(null, 
+        FieldVTwo dateTimeField = new FieldVTwo().setName("dateTimeField");
+        		dateTimeField.setEditElement(new DateTimeWithPrecisionVTwo(dateTimeField, 
         				VitroVocabulary.Precision.SECOND.uri(), 
-        				VitroVocabulary.Precision.NONE.uri())));
+        				VitroVocabulary.Precision.NONE.uri()));
+        
+        conf.addField(dateTimeField);
         
         //Adding additional data, specifically edit mode
         addFormSpecificData(conf, vreq);
@@ -75,7 +77,7 @@ public class DateTimeValueFormGenerator extends BaseEditConfigurationGenerator
 	final static String existingDateTimeValueQuery = 
         "SELECT ?existingDateTimeValue WHERE { \n" +
         "?subject <" + toDateTimeValue + "> ?existingValueNode . \n" +
-        "?existingValueNode a <" + valueType + " . \n" +
+        "?existingValueNode a <" + valueType + "> . \n" +
         "?existingValueNode <" + dateTimeValue + "> ?existingDateTimeValue }";
 	
 	final static String existingPrecisionQuery = 
