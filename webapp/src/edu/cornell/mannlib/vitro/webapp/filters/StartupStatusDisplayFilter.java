@@ -28,8 +28,9 @@ import freemarker.template.TemplateException;
  * contains errors or warnings. If it does, hijack the request to show the
  * StartupStatus display page.
  * 
- * This only happens once. This filter does nothing after displaying the startup
- * status page one time.
+ * If the status only contains warnings, this only happens once. Subsequent
+ * requests will display normally. However, if the status contains a fatal 
+ * error, this filter will hijack every request, and will not let you proceed.
  */
 public class StartupStatusDisplayFilter implements Filter {
 	private static final String TEMPLATE_PATH = "/templates/freemarker/body/admin/startupStatus-displayRaw.ftl";
