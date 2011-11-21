@@ -2,15 +2,24 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 import javax.servlet.http.HttpSession;
+
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.DateTimeWithPrecisionVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils.EditMode;
+import edu.cornell.mannlib.vitro.webapp.utils.generators.EditModeUtils;
+
 
 public class DateTimeValueFormGenerator extends BaseEditConfigurationGenerator
         implements EditConfigurationGenerator {
@@ -51,6 +60,9 @@ public class DateTimeValueFormGenerator extends BaseEditConfigurationGenerator
         				VitroVocabulary.Precision.SECOND.uri(), 
         				VitroVocabulary.Precision.NONE.uri())));
         
+        //Adding additional data, specifically edit mode
+        addFormSpecificData(conf, vreq);
+
         return conf;
 	}
 	
@@ -76,4 +88,18 @@ public class DateTimeValueFormGenerator extends BaseEditConfigurationGenerator
         "SELECT ?existingNode WHERE { \n" +
         "?subject <" + toDateTimeValue + "> ?existingNode . \n" +
         "?existingNode a <" + valueType + "> }";
+
+
+//Adding form specific data such as edit mode
+	public void addFormSpecificData(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
+		HashMap<String, Object> formSpecificData = new HashMap<String, Object>();
+		formSpecificData.put("editMode", getEditMode(vreq).name().toLowerCase());
+		editConfiguration.setFormSpecificData(formSpecificData);
+	}
+	
+	public EditMode getEditMode(VitroRequest vreq) {
+		List<String> predicates = new ArrayList<String>();
+		predicates.add(dateTimeValue);
+		return EditModeUtils.getEditMode(vreq, predicates);
+	}
 }
