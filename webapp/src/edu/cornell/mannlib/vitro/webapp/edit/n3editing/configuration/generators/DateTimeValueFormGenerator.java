@@ -101,7 +101,7 @@ public class DateTimeValueFormGenerator extends BaseEditConfigurationGenerator
 	
 	public EditMode getEditMode(VitroRequest vreq) {
 		List<String> predicates = new ArrayList<String>();
-		predicates.add(dateTimeValue);
+		predicates.add(toDateTimeValue);
 		return EditModeUtils.getEditMode(vreq, predicates);
 	}
 }

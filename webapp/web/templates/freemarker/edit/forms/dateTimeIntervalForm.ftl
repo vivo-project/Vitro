@@ -1,126 +1,77 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#-- Custom form for adding date time intervals -->
+<#-- Template for adding/editing time values -->
 
-<#if editConfig.object?has_content>
-    <#assign editMode = "edit">
-<#else>
-    <#assign editMode = "add">
-</#if>
+<#--Retrieve certain edit configuration information-->
+<#assign editMode = editConfiguration.pageData.editMode />
+<#assign htmlForElements = editConfiguration.pageData.htmlForElements />
 
 <#if editMode == "edit">        
         <#assign titleVerb="Edit">        
-        <#assign submitButtonText="Edit Date/Time Interval">
+        <#assign submitButtonText="Edit Date/Time Value">
         <#assign disabledVal="disabled">
 <#else>
         <#assign titleVerb="Create">        
-        <#assign submitButtonText="Create Date/Time Interval">
+        <#assign submitButtonText="Create Date/Time Value">
         <#assign disabledVal=""/>
-</#if>startField-
+</#if>
+<#--If edit submission exists, then retrieve validation errors if they exist-->
+<#if editSubmission?has_content && editSubmission.submissionExists = true && editSubmission.validationErrors?has_content>
+	<#assign submissionErrors = editSubmission.validationErrors/>
+</#if>
 
-<h2>${titleVerb} date time interval for ${subjectName}</h2>
 
+<h2>${titleVerb} date time value for ${editConfiguration.subjectName}</h2>
+
+<#--Display error messages if any-->
+<#if submissionErrors?has_content>
+    <section id="error-alert" role="alert">
+        <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon" />
+        <p>
+        <#--below shows examples of both printing out all error messages and checking the error message for a specific field-->
+        <#list submissionErrors?keys as errorFieldName>
+        	<#if errorFieldName == "startField">
+        	    <#if submissionErrors[errorFieldName]?contains("before")>
+        	        The Start interval must be earlier than the End interval.
+        	    <#else>
+        	        ${submissionErrors[errorFieldName]}
+        	    </#if>
+        	    <br />
+        	<#elseif errorFieldName == "endField">
+    	        <#if submissionErrors[errorFieldName]?contains("after")>
+    	            The End interval must be later than the Start interval.
+    	        <#else>
+    	            ${submissionErrors[errorFieldName]}
+    	        </#if>
+	        </#if>
+        </#list>
+        </p>
+    </section>
+</#if>
 <form class="customForm" action ="${submitUrl}" class="customForm">
-    
-    <fieldset class="dateTime" role="group"> 
-        <h3>Start</h3>
-        <label for="startField-year">Year</label>
-        <input class="text-field" name="startField-year" id="startField-year" type="text" value="" size="4" maxlength="4" role="input"/>
+<p></p>
+<#--Need to draw edit elements for dates here-->
+ <#if htmlForElements?keys?seq_contains("startField")>
+	Start&nbsp; ${htmlForElements["startField"]}
+ </#if>
+ <br /><br />
+ <#if htmlForElements?keys?seq_contains("endField")>
+	End&nbsp; ${htmlForElements["endField"]}
+ </#if>
 
-        <label for="startField-month">Month</label>
-        <select name="startField-month" id="startField-month" role="select">
-            <option value=""  role="option" <#if startField-month="">selected</#if>month</option>
-            <#list startField-months as startFieldMonth>
-            <option value="startField-month" <#if startFieldMonth = startField-month.uri>selected</#if> >${startFieldMonth.label}</option>
-            </#list>
-        </select>
-
-        <label for="startField-day">Day</label>
-        <select name="startField-day" id="startField-day" role="select">
-            <option value="" role="option"><#if startField-day="">selected</#if>day</option>
-            <#list startField-day as startField-day>
-            <option value="startField-day" role="option" <#if startField-day=startField-day.uri>selected</#if> >${startField-day.label}</option>
-            </#list>
-        </select>
-    </fieldset>
-    <fieldset class="dateTime" role="group">  
-        <label for="startField-hour">Hour</label>
-        <select name="startField-hour" id="startField-hour" role="select">
-            <option value="" role="option"><#if startField-hour="">selected</#if>hour</option>
-            <#list startField-hours as startField-hour>
-            <option value="startField-hour" role="option" <#if startField-hour=startField-hour.uri>selected</#if> >${startField-hour.label}</option>
-            </#list>
-        </select>
-
-        <label for="startField-minute">Minutes</label>
-        <select name="startField-hour" id="startField-hour" role="select">
-            <option value="" role="option"><#if startField-minute="">selected</#if>minutes</option>
-            <#list startField-minutes as startField-minute>
-            <option value="startField-minute" role="option" <#if startField-minute=startField-minute.uri>selected</#if> >${startField-minute.label}</option>
-            </#list>
-        </select>    
-        
-        <label for="startField-second">Seconds</label>
-        <select name="startField-second" id="startField-second" role="select">
-            <option value="" role="option"><#if startField-second="">selected</#if>seconds</option>
-            <#list startField-seconds as startField-second>
-            <option value="startField-second" role="option" <#if startField-second=startField-second.uri>selected</#if> >${startField-second.label}</option>
-            </#list>
-        </select>
-    </fieldset>                   
-       
-     <fieldset class="dateTime" role="group"> 
-         <h3>End</h3>
-         <label for="endField-year">Year</label>
-         <input class="text-field" name="endField-year" id="endField-year" type="text" value="" size="4" maxlength="4" role="input"/>
-
-         <label for="endField-month">Month</label>
-         <select name="endField-month" id="endField-month" role="select">
-             <option value=""  role="option" <#if endField-month="">selected</#if>month</option>
-             <#list endField-months as endField-month>
-             <option value="endField-month" <#if endField-month = endField-month.uri>selected</#if> >${endField-month.label}</option>
-             </#list>
-         </select>
-
-         <label for="endField-day">Day</label>
-         <select name="endField-day" id="endField-day" role="select">
-             <option value="" role="option"><#if endField-day="">selected</#if>day</option>
-             <#list endField-day as endField-day>
-             <option value="endField-day" role="option" <#if endField-day=endField-day.uri>selected</#if> >${endField-day.label}</option>
-             </#list>
-         </select>
-     </fieldset>
-     <fieldset class="dateTime" role="group">  
-         <label for="endField-hour">Hour</label>
-         <select name="endField-hour" id="endField-hour" role="select">
-             <option value="" role="option"><#if endField-hour="">selected</#if>hour</option>
-             <#list endField-hours as endField-hour>
-             <option value="endField-hour" role="option" <#if endField-hour=endField-hour.uri>selected</#if> >${endField-hour.label}</option>
-             </#list>
-         </select>
-
-         <label for="endField-minute">Minutes</label>
-         <select name="endField-hour" id="endField-hour" role="select">
-             <option value="" role="option"><#if endField-minute="">selected</#if>minutes</option>
-             <#list endField-minutes as endField-minute>
-             <option value="endField-minute" role="option" <#if endField-minute=endField-minute.uri>selected</#if> >${endField-minute.label}</option>
-             </#list>
-         </select>    
-
-         <label for="endField-second">Seconds</label>
-         <select name="endField-second" id="endField-second" role="select">
-             <option value="" role="option"><#if endField-second="">selected</#if>seconds</option>
-             <#list endField-seconds as endField-second>
-             <option value="endField-second" role="option" <#if endField-second=endField-second.uri>selected</#if> >${endField-second.label}</option>
-             </#list>
-         </select>
-    </fieldset>  
-       
     <p class="submit">
-           <input type="submit" id="submit" value="${submitButtonText}" role="button" />
-
-           <span class="or"> or </span>
-
-           <a class="Cancel" href="${editConfiguration.cancelUrl}" title="Cancel">Cancel</a>
-       </p>
+        <input type="hidden" name="editKey" value="${editKey}" />
+        <input type="submit" id="submit" value="${submitButtonText}" role="button" />
+    
+        <span class="or"> or </span>
+    
+        <a class="cancel" href="${editConfiguration.cancelUrl}" title="Cancel">Cancel</a>
+    </p>
 </form>
+
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/customForm.css" />',
+                  '<link rel="stylesheet" href="${urls.base}/edit/forms/css/personHasEducationalTraining.css" />')}
+
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/utils.js"></script>',
+              '<script type="text/javascript" src="${urls.base}/js/customFormUtils.js"></script>',
+              '<script type="text/javascript" src="${urls.base}/edit/forms/js/customFormWithAutocomplete.js"></script>')}

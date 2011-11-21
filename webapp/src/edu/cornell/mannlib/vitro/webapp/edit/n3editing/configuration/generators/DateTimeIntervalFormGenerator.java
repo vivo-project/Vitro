@@ -2,15 +2,23 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 import javax.servlet.http.HttpSession;
+
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.DateTimeWithPrecisionVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils.EditMode;
+import edu.cornell.mannlib.vitro.webapp.utils.generators.EditModeUtils;
 
 public class DateTimeIntervalFormGenerator extends
 		BaseEditConfigurationGenerator implements EditConfigurationGenerator {
@@ -58,21 +66,28 @@ public class DateTimeIntervalFormGenerator extends
         conf.addSparqlForExistingUris(
         		"endField-precision", existingEndPrecisionQuery);
         
-        conf.addField(new FieldVTwo().setName("startField").
-        		setEditElement(new DateTimeWithPrecisionVTwo(null, 
+        FieldVTwo startField = new FieldVTwo().setName("startField");
+        		startField.setEditElement(new DateTimeWithPrecisionVTwo(startField, 
         				VitroVocabulary.Precision.SECOND.uri(), 
-        				VitroVocabulary.Precision.NONE.uri())));
-        conf.addField(new FieldVTwo().setName("endField").
-        		setEditElement(new DateTimeWithPrecisionVTwo(null, 
-				        VitroVocabulary.Precision.SECOND.uri(), 
-				        VitroVocabulary.Precision.NONE.uri())));
+        				VitroVocabulary.Precision.NONE.uri()));
+
+        FieldVTwo endField = new FieldVTwo().setName("endField");
+        		endField.setEditElement(new DateTimeWithPrecisionVTwo(endField, 
+        		        VitroVocabulary.Precision.SECOND.uri(), 
+            			VitroVocabulary.Precision.NONE.uri()));
         
+        conf.addField(startField);
+        conf.addField(endField);
+
+        //Adding additional data, specifically edit mode
+        addFormSpecificData(conf, vreq);
+
         return conf;
         
 	}
 	
 	final static String n3ForStart = 
-	    "?subject <" + toDateTimeInterval + " ?intervalNode . \n" +    
+	    "?subject <" + toDateTimeInterval + "> ?intervalNode . \n" +    
 	    "?intervalNode  a <" + intervalType + "> . \n" + 
 	    "?intervalNode <" + intervalToStart + "> ?startNode . \n" +    
 	    "?startNode a <" + dateTimeValueType + "> . \n" +
@@ -134,8 +149,20 @@ public class DateTimeIntervalFormGenerator extends
 		"SELECT ?existingEndPrecision WHERE { \n" +
         "?subject <" + toDateTimeInterval + "> ?existingIntervalNode . \n" +      
         "?intervalNode a <" + intervalType + "> . \n" +
-        "intervalNode <" + intervalToEnd + "> ?endNode . \n" +
+        "?intervalNode <" + intervalToEnd + "> ?endNode . \n" +
         "?endNode a <" + dateTimeValueType + "> . \n" +          
         "?endNode <" + dateTimePrecision + "> ?existingEndPrecision . }";
 
+    //Adding form specific data such as edit mode
+    public void addFormSpecificData(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
+    	HashMap<String, Object> formSpecificData = new HashMap<String, Object>();
+    	formSpecificData.put("editMode", getEditMode(vreq).name().toLowerCase());
+    	editConfiguration.setFormSpecificData(formSpecificData);
+    }
+
+	public EditMode getEditMode(VitroRequest vreq) {
+		List<String> predicates = new ArrayList<String>();
+		predicates.add(toDateTimeInterval);
+		return EditModeUtils.getEditMode(vreq, predicates);
+	}
 }
