@@ -204,7 +204,11 @@ public class SparqlQueryServlet extends BaseEditController {
 	}
 
     
-    private void executeQuery(HttpServletResponse response, String resultFormatParam, String rdfResultFormatParam, String queryParam, Dataset dataset ) throws IOException {
+    private void executeQuery(HttpServletResponse response, 
+                              String resultFormatParam, 
+                              String rdfResultFormatParam, 
+                              String queryParam, 
+                              Dataset dataset ) throws IOException {
         
     	ResultSetFormat rsf = null;
     	/* BJL23 2008-11-06
@@ -241,7 +245,8 @@ public class SparqlQueryServlet extends BaseEditController {
                 }else if ( query.isDescribeType() ){
                     resultModel = qe.execDescribe();
                 }else if(query.isAskType()){
-                	//Irrespective of the ResultFormatParam, this always prints a boolean to the default OutputStream.
+                	// Irrespective of the ResultFormatParam, 
+                	// this always prints a boolean to the default OutputStream.
                 	String result = (qe.execAsk() == true) ? "true" : "false";
                 	PrintWriter p = response.getWriter();
                 	p.write(result);
@@ -269,8 +274,8 @@ public class SparqlQueryServlet extends BaseEditController {
     }
 
     private void toCsv(Writer out, ResultSet results) {
-    	// The Skife library wouldn't quote and escape the normal way, so I'm trying it manually
-   	
+    	// The Skife library wouldn't quote and escape the normal way, 
+    	// so I'm trying it manually.   	
     	while (results.hasNext()) {
     		QuerySolution solution = (QuerySolution) results.next();
     		List<String> valueList = new LinkedList<String>();
@@ -353,32 +358,4 @@ public class SparqlQueryServlet extends BaseEditController {
             rd.forward(req,res);
     }
 
-    @SuppressWarnings("unused")
-	private String example =
-        "PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
-        "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n"+
-        "PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>\n"+
-        "PREFIX owl:   <http://www.w3.org/2002/07/owl#>\n" +
-        "PREFIX swrl:  <http://www.w3.org/2003/11/swrl#>\n" +
-        "PREFIX swrlb: <http://www.w3.org/2003/11/swrlb#>\n" +
-        "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#>\n"+
-        "PREFIX vivo:  <http://vivo.library.cornell.edu/ns/0.1#>\n" +
-        "PREFIX bibo: <http://purl.org/ontology/bibo/>\n" +
-        "PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n" +
-        "PREFIX core: <http://vivoweb.org/ontology/core#>\n" +
-        "PREFIX aktp:  <http://www.aktors.org/ontology/portal#>\n"+
-        "#\n" +
-        "# This query gets all range entities labels and types of a person\n"+
-        "# A query like this could be used to get enough info to create a display\n"+
-        "# page for an entity.\n"+
-        "#\n"+
-        "SELECT ?person ?personLabel ?focus ?netid\n"+
-        "WHERE \n"+
-        "{\n"+
-        " ?person vivo:CornellemailnetId ?netid .\n"+
-        " ?person rdf:type vivo:CornellEmployee .\n"+
-        " ?person vivo:researchFocus ?focus. \n"+
-        " OPTIONAL { ?person rdfs:label ?personLabel }\n"+
-        "}\n"+
-        "limit 20\n";
 }
