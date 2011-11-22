@@ -11,7 +11,7 @@ import org.apache.xerces.util.XMLChar;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndividual;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasProfile;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasRoleLevel;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.IsUser;
 
@@ -22,7 +22,7 @@ public class EditN3Utils {
 
         List<String> uris = new ArrayList<String>();
         uris.addAll(IsUser.getUserUris(ids));
-        uris.addAll(HasAssociatedIndividual.getIndividualUris(ids));
+        uris.addAll(HasProfile.getProfileUris(ids));
         uris.addAll(HasRoleLevel.getRoleLevelUris(ids));
         uris.add("Unknown N3 Editor");
         return uris.get(0);

@@ -2,9 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.identifier.common;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndividual.Mechanism.EXPLICIT_PROXY;
-import static edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndividual.Mechanism.SELF;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -108,7 +105,7 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 			if (id != null) {
 				ids.add(id);
 			} else {
-				ids.add(new HasAssociatedIndividual(ind.getURI(), SELF));
+				ids.add(new HasProfile(ind.getURI()));
 			}
 		}
 
@@ -153,7 +150,7 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 		UserAccount user = LoginStatusBean.getCurrentUser(req);
 		if (user != null) {
 			for(String proxiedUri: user.getProxiedIndividualUris()) {
-				ids.add(new HasAssociatedIndividual(proxiedUri, EXPLICIT_PROXY));
+				ids.add(new HasProxyEditingRights(proxiedUri));
 			}
 		}
 

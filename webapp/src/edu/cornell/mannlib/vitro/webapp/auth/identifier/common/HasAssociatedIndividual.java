@@ -10,17 +10,17 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 
 /**
- * The current user is associated with this Individual.
+ * The current user is associated with this Individual page, and has editing
+ * rights relating to it.
  * 
- * This includes a thick factory method that will look through a directory of
- * files to determine whether the associated individual is blacklisted.
- * 
- * The mechanism is only to record how this was created, for diagnostic purposes.
+ * Subclasses exist to indicate how that association is created, as either a
+ * Self-Editor or a Proxy Editor. In some cases (e.g., the MyProfile link) the
+ * distinction is important.
  */
-public class HasAssociatedIndividual extends AbstractCommonIdentifier implements
-		Identifier {
+public abstract class HasAssociatedIndividual extends AbstractCommonIdentifier
+		implements Identifier {
 
-	public static Collection<HasAssociatedIndividual> getIdentifiers(
+	private static Collection<HasAssociatedIndividual> getIdentifiers(
 			IdentifierBundle ids) {
 		return getIdentifiersForClass(ids, HasAssociatedIndividual.class);
 	}
@@ -32,24 +32,14 @@ public class HasAssociatedIndividual extends AbstractCommonIdentifier implements
 		}
 		return set;
 	}
-	
-	public enum Mechanism {SELF, EXPLICIT_PROXY}
 
 	private final String associatedIndividualUri;
-	private final Mechanism mechanism;
 
-	public HasAssociatedIndividual(String associatedIndividualUri, Mechanism mechanism) {
+	public HasAssociatedIndividual(String associatedIndividualUri) {
 		this.associatedIndividualUri = associatedIndividualUri;
-		this.mechanism = mechanism;
 	}
 
 	public String getAssociatedIndividualUri() {
 		return associatedIndividualUri;
-	}
-
-	@Override
-	public String toString() {
-		return "HasAssociatedIndividual[" + associatedIndividualUri + " (" + mechanism +
-				")]";
 	}
 }

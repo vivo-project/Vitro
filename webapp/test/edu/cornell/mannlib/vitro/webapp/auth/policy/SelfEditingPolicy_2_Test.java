@@ -22,8 +22,7 @@ import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndividual;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndividual.Mechanism;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasProfile;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
@@ -96,7 +95,7 @@ public class SelfEditingPolicy_2_Test extends AbstractTestClass {
 		seIndividual.setURI(SELFEDITOR_URI);
 
 		ids = new ArrayIdentifierBundle();
-		ids.add(new HasAssociatedIndividual(SELFEDITOR_URI, Mechanism.SELF));
+		ids.add(new HasProfile(SELFEDITOR_URI));
 
 		// setLoggerLevel(SelfEditingPolicySetupTest.class, Level.DEBUG);
 	}
