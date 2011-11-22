@@ -17,6 +17,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import freemarker.cache.WebappTemplateLoader;
 import freemarker.template.Configuration;
@@ -29,7 +30,7 @@ import freemarker.template.TemplateException;
  * StartupStatus display page.
  * 
  * If the status only contains warnings, this only happens once. Subsequent
- * requests will display normally. However, if the status contains a fatal 
+ * requests will display normally. However, if the status contains a fatal
  * error, this filter will hijack every request, and will not let you proceed.
  */
 public class StartupStatusDisplayFilter implements Filter {
@@ -72,6 +73,7 @@ public class StartupStatusDisplayFilter implements Filter {
 			bodyMap.put("status", ss);
 			bodyMap.put("showLink", !isFatal());
 			bodyMap.put("contextPath", getContextPath());
+			bodyMap.put("applicationName", getApplicationName());
 
 			hResp.setStatus(SC_INTERNAL_SERVER_ERROR);
 			Template tpl = loadFreemarkerTemplate();
@@ -87,6 +89,22 @@ public class StartupStatusDisplayFilter implements Filter {
 			return "The application";
 		} else {
 			return cp;
+		}
+	}
+
+	private Object getApplicationName() {
+		String name = "";
+		try {
+			ApplicationBean app = ApplicationBean.getAppBean(ctx);
+			name = app.getApplicationName();
+		} catch (Exception e) {
+			// deal with problems below
+		}
+
+		if ((name != null) && (!name.isEmpty())) {
+			return name;
+		} else {
+			return getContextPath();
 		}
 	}
 

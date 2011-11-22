@@ -29,7 +29,7 @@
         <ul class="item-spec" role="navigation">
             <li role="listitem">${item.message}</li>
             <li role="listitem">${item.sourceName}</li>
-            <#if item.cause??>
+            <#if item.cause?has_content>
             <li role="listitem"><pre>${item.cause}</pre></li>
             </#if>
         </ul>
@@ -79,7 +79,7 @@
         <#if status.errorItems?has_content>
             <h2>Fatal error</h2>
 
-            <p>VIVO detected a fatal error during startup.</p>
+            <p>${applicationName} detected a fatal error during startup.</p>
 
             <ul id="startup-trace" cellspacing="0" class="trace" role="navigation">
             <#list status.errorItems as item>
@@ -91,12 +91,18 @@
         <#if status.warningItems?has_content>
             <h2>Warning</h2>
 
-            <p>VIVO issued warnings during startup.</p>
+            <p>${applicationName} issued warnings during startup.</p>
 
             <ul id="startup-trace" cellspacing="0" class="trace" role="navigation"><#list status.warningItems as item>
               <@statusItem item=item />
             </#list>
             </ul>
+            
+            <#-- If there were no fatal errors, let them go forward from here. -->
+            <#if showLink>
+                <p><a href=".">Continue</a></p>
+    	    </#if>
+            
         </#if>
 
         <h2>Startup trace</h2>
