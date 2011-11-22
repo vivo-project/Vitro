@@ -21,7 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndivi
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditSiteInformation;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageOwnProxies;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageProxies;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeSiteAdminPage;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeStartupStatus;
@@ -132,7 +132,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
         	data.put("userAccounts", UrlBuilder.getUrl("/accountsAdmin"));
         }
  
-        if (PolicyHelper.isAuthorizedForActions(vreq, new ManageOwnProxies())) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, new ManageProxies())) {
         	data.put("manageProxies", UrlBuilder.getUrl("/manageProxies"));
         }
         
