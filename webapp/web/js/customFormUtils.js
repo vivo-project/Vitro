@@ -41,8 +41,12 @@ vitro.customFormUtils = {
     },
        
     // Return true iff there are validation errors on the form
+    //Updating to include new functionality where errors are on top of page
     findValidationErrors: function() {
-
+    	var validationErrorSection = $('#error-alert');
+    	if(validationErrorSection.length > 0) {
+    		return true;
+    	}
         return this.form.find('.validationError').length > 0;
     	
 // RY For now, we just need to look for the presence of the error elements.
