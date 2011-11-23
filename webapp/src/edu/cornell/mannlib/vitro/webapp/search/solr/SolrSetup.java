@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.search.solr;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,6 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
-import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrServer;
@@ -51,24 +51,33 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
     	ServletContext context = sce.getServletContext();
 		StartupStatus ss = StartupStatus.getBean(context);
 		
+        /* setup the http connection with the solr server */
+        String solrServerUrlString = ConfigurationProperties.getBean(sce).getProperty("vitro.local.solr.url");
+        if( solrServerUrlString == null ){
+            ss.fatal(this, "Could not find vitro.local.solr.url in deploy.properties.  "+
+                    "Vitro application needs a URL of a solr server that it can use to index its data. " +
+                    "It should be something like http://localhost:${port}" + context.getContextPath() + "solr" 
+                    );
+            return;
+        }
+        
+        URL solrServerUrl = null;
+        try {
+        	solrServerUrl = new URL(solrServerUrlString);
+        } catch (MalformedURLException e) {
+            ss.fatal(this, "Can't connect with the solr server. " +
+            		"The value for vitro.local.solr.url in deploy.properties is not a valid URL: " + solrServerUrlString);
+            return;
+        }
+        
         try {        
-            
-            /* setup the http connection with the solr server */
-            String solrServerUrl = ConfigurationProperties.getBean(sce).getProperty("vitro.local.solr.url");
-            if( solrServerUrl == null ){
-                log.error("Could not find vitro.local.solr.url in deploy.properties.  "+
-                        "Vitro application needs a URL of a solr server that it can use to index its data. " +
-                        "It should be something like http://localhost:${port}" + context.getContextPath() + "solr" 
-                        );
-                return;
-            }            
             
             //HttpClient httpClient = new HttpClient();
             
             CommonsHttpSolrServer server;
             boolean useMultiPartPost = true;
             //It would be nice to use the default binary handler but there seem to be library problems
-            server = new CommonsHttpSolrServer(new URL( solrServerUrl ),null,new XMLResponseParser(),useMultiPartPost); 
+            server = new CommonsHttpSolrServer(solrServerUrl,null,new XMLResponseParser(),useMultiPartPost); 
             server.setSoTimeout(10000);  // socket read timeout
             server.setConnectionTimeout(10000);
             server.setDefaultMaxConnectionsPerHost(100);
@@ -131,10 +140,9 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             SearchReindexingListener srl = new SearchReindexingListener( builder );
             ModelContext.registerListenerForChanges(ctx, srl);
             
-            log.info("Setup of Solr index completed.");   
             ss.info(this, "Setup of Solr index completed.");   
         } catch (Throwable e) {
-            ss.fatal(this, "could not setup local solr server",e);
+        	ss.fatal(this, "could not setup local solr server",e);
         }
        
     }
