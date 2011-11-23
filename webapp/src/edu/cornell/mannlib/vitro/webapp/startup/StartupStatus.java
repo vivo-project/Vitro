@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.startup;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -17,6 +16,9 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Accumulates a list of messages from the StartupManager, and from the context
  * listeners that the run during startup.
+ * 
+ * This is thread-safe, with immutable items in the list and synchronized access
+ * to the list.
  */
 public class StartupStatus {
 	private static final Log log = LogFactory.getLog(StartupStatus.class);
@@ -45,7 +47,7 @@ public class StartupStatus {
 	// methods to set status - note that these write to the log also.
 	// ----------------------------------------------------------------------
 
-	private List<StatusItem> itemList = new ArrayList<StatusItem>();
+	private SynchronizedStatusItemList itemList = new SynchronizedStatusItemList();
 
 	public void info(ServletContextListener listener, String message) {
 		addItem(StatusItem.Level.INFO, listener, message, null);
@@ -84,12 +86,10 @@ public class StartupStatus {
 
 	/** Create a simple item for this listener if no other exists. */
 	public void listenerExecuted(ServletContextListener listener) {
-		for (StatusItem item : itemList) {
-			if (item.getSourceName().equals(listener.getClass().getName())) {
-				return;
-			}
+		List<StatusItem> itemsForThisListener = getItemsForListener(listener);
+		if (itemsForThisListener.isEmpty()) {
+			addItem(StatusItem.Level.INFO, listener, "Ran successfully.", null);
 		}
-		addItem(StatusItem.Level.INFO, listener, "Ran successfully.", null);
 	}
 
 	private void addItem(StatusItem.Level level, ServletContextListener source,
@@ -133,33 +133,29 @@ public class StartupStatus {
 	}
 
 	public List<StatusItem> getStatusItems() {
-		return Collections.unmodifiableList(itemList);
+		return itemList.filterItems(StatusItemFilter.ALL_ITEMS_FILTER);
 	}
 
 	public List<StatusItem> getErrorItems() {
-		List<StatusItem> list = new ArrayList<StartupStatus.StatusItem>();
-		for (StatusItem item : itemList) {
-			if (item.level == StatusItem.Level.FATAL) {
-				list.add(item);
-			}
-		}
-		return list;
+		return itemList.filterItems(StatusItemFilter.ERROR_ITEMS_FILTER);
 	}
 
 	public List<StatusItem> getWarningItems() {
-		List<StatusItem> list = new ArrayList<StartupStatus.StatusItem>();
-		for (StatusItem item : itemList) {
-			if (item.level == StatusItem.Level.WARNING) {
-				list.add(item);
-			}
-		}
-		return list;
+		return itemList.filterItems(StatusItemFilter.WARNING_ITEMS_FILTER);
+	}
+
+	public List<StatusItem> getItemsForListener(ServletContextListener listener) {
+		return itemList.filterItems(StatusItemFilter.listenerFilter(listener));
 	}
 
 	// ----------------------------------------------------------------------
 	// helper classes
 	// ----------------------------------------------------------------------
 
+	/**
+	 * An immutable item that can't throw an exception during construction and
+	 * will always contain suitable, non-null values.
+	 */
 	public static class StatusItem {
 		public enum Level {
 			INFO, WARNING, FATAL, NOT_EXECUTED
@@ -257,4 +253,70 @@ public class StartupStatus {
 
 	}
 
+	/**
+	 * A filter class and some basic instances.
+	 */
+	private static abstract class StatusItemFilter {
+		public abstract boolean accept(StatusItem item);
+
+		public static final StatusItemFilter ALL_ITEMS_FILTER = new StatusItemFilter() {
+			@Override
+			public boolean accept(StatusItem item) {
+				return true;
+			}
+		};
+
+		public static final StatusItemFilter ERROR_ITEMS_FILTER = new StatusItemFilter() {
+			@Override
+			public boolean accept(StatusItem item) {
+				return item.level == StatusItem.Level.FATAL;
+			}
+		};
+
+		public static final StatusItemFilter WARNING_ITEMS_FILTER = new StatusItemFilter() {
+			@Override
+			public boolean accept(StatusItem item) {
+				return item.level == StatusItem.Level.WARNING;
+			}
+		};
+
+		public static StatusItemFilter listenerFilter(
+				ServletContextListener listener) {
+			final String listenerName = listener.getClass().getName();
+
+			return new StatusItemFilter() {
+				@Override
+				public boolean accept(StatusItem item) {
+					return item.getSourceName().equals(listenerName);
+				}
+			};
+
+		}
+	}
+
+	/**
+	 * A list, with synchronized methods for adding to it, and for getting a
+	 * filtered subset of it.
+	 */
+	private class SynchronizedStatusItemList {
+		private final List<StatusItem> list = new ArrayList<StatusItem>();
+
+		public void add(StatusItem item) {
+			synchronized (list) {
+				list.add(item);
+			}
+		}
+
+		public List<StatusItem> filterItems(StatusItemFilter filter) {
+			List<StatusItem> filteredList = new ArrayList<StatusItem>();
+			synchronized (list) {
+				for (StatusItem item : list) {
+					if (filter.accept(item)) {
+						filteredList.add(item);
+					}
+				}
+			}
+			return filteredList;
+		}
+	}
 }
