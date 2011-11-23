@@ -284,7 +284,7 @@ public class FormUtils {
         Class[] paramList = new Class[1];
         Method setterMethod = getSetterMethod(cls, field, SUPPORTED_TYPE_LIST);
         if (setterMethod == null) {
-        	log.warn("Could not find method set" + field + " on " 
+        	log.debug("Could not find method set" + field + " on " 
         			+ cls.getName());
         	return;
         }
