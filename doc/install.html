@@ -186,8 +186,7 @@
                         <a href="#deploy">Compile and deploy</a>
                     </li>
                     <li>
-                        <a href="#tomcat_settings">Set Tomcat JVM parameters and
-                            security limits</a>
+                        <a href="#tomcat_settings">Configure Tomcat</a>
                     </li>
                     <li>
                         <a href="#start_tomcat">Start Tomcat</a>
@@ -649,8 +648,8 @@
             <p>
                 to build Vitro and deploy to Tomcat's webapps directory. 
             </p>
-            <h3 id="tomcat_settings">VI. Set Tomcat JVM parameters and security
-                limits</h3>
+            <h3 id="tomcat_settings">VI. Configure Tomcat</h3>
+            <h4>Set JVM parameters</h4>
             <p>
                 Vitro copies small sections of your RDF database into 
                 memory in order to serve Web requests quickly (the in-memory copy and  
@@ -675,13 +674,35 @@
                 If an OutOfMemoryError is encountered during Vitro execution, it can 
                 be remedied by increasing the heap parameters and restarting Tomcat. 
             </p>
+            <h4>Set security limits</h4>
             <p>
-                Security limits: Vitro is a multithreaded web application that may 
+                Vitro is a multithreaded web application that may 
                 require more threads than are permitted under your Linux installation's 
                 default configuration. Ensure that your installation can support the  
                 required number of threads by making the following edits to <code>/etc/security/limits.conf</code>:
             </p>
             <pre>                    apache	hard	nproc	400<br>                    tomcat6	hard	nproc	1500 <br>                </pre>
+            <h4>Set URI encoding</h4>
+            <p>
+                In order for Solr to correctly search for international characters (>127), 
+                you must configure Tomcat to conform to the URI standard by 
+                accepting percent-encoded UTF-8.
+            </p>
+            <p>
+                Edit Tomcat's conf/server.xml and add the following attribute to each of the 
+                Connector elements: URIEncoding="UTF-8".
+            <pre>
+                    &lt;Server ...>
+                      &lt;Service ...>
+                        &lt;Connector ... URIEncoding="UTF-8"/>
+                          ...
+                        &lt;/Connector>
+                      &lt;/Service>
+                    &lt;/Server>
+            </pre>
+            </p>
+            <p>
+
             <h3 id="start_tomcat">VII. Start Tomcat </h3>
             <p>
                 Most Tomcat installations can be started by running <code>startup.sh</code>
