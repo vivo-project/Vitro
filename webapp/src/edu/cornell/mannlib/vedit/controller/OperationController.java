@@ -108,6 +108,7 @@ public class OperationController extends BaseEditController {
 
             //if validation failed, go back to the form controller
             if (!valid){
+            	epo.setAttribute("globalErrorMsg", "Please correct errors highlighted below.");
             	retry(request, response, epo);
             	return;
             }

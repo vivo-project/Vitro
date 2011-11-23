@@ -7,7 +7,6 @@
 				<select name="IndividualURI" >
 					<form:option name="IndividualURI"/>
  				</select>
-				<font size="2" color="red"><form:error name="IndividualURI"/></font>
 		</td>
 	</tr>
 	<tr class='editformcell'>
@@ -16,13 +15,15 @@
 				<select name="DatapropURI" >
 					<form:option name="DatapropURI"/>
 				</select>
-				<br><font size="2" color="red"><form:error name="DatapropURI"/></font>
 		</td>
 	</tr>
 	<tr class="editformcell">
 		<td valign="bottom" colspan="3">
 			<b>Value</b><br/>
 				<input type="text" name="Data" value="<form:value name="Data"/>" size="75%" maxlength="255" />
-				<font size="2" color="red"><form:error name="Value"/></font>
+            <c:set var="DataError"><form:error name="Data"/></c:set>
+            <c:if test="${!empty DataError}">
+                <span class="notice"><c:out value="${DataError}"/></span>
+            </c:if>
 		</td>
 	</tr>

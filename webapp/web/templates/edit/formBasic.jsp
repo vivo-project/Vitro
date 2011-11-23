@@ -35,7 +35,9 @@
 	</div><!--entryFormHead-->
 	</th></tr>
 	
-	<tr><td><span class="warning">${globalErrorMsg}</span></td></tr>
+	<c:if test="${!empty globalErrorMsg}">
+	    <tr><td><span class="notice">${globalErrorMsg}</span></td></tr>
+	</c:if>
 	
 	<jsp:include page="${formJsp}"/>
 	

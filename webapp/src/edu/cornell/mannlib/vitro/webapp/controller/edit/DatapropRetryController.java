@@ -143,7 +143,7 @@ public class DatapropRetryController extends BaseEditController {
         if (objectForEditing.getDomainClassURI() != null) {
         	VClass domain = vreq.getWebappDaoFactory().getVClassDao()
         	        .getVClassByURI(objectForEditing.getDomainClassURI());
-        	if (domain.isAnonymous()) {
+        	if (domain != null && domain.isAnonymous()) {
         		domainOptionList.add(0, new Option(
         			    domain.getURI(), 
         			    domain.getName(), 

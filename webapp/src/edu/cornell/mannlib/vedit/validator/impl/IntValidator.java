@@ -47,6 +47,8 @@ public class IntValidator implements Validator {
         return vo;
     }
 
+    public IntValidator(){}
+    
     public IntValidator (int minVal, int maxVal){
         this.minVal = minVal;
         this.maxVal = maxVal;

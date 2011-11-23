@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -176,9 +177,8 @@ public class VclassRetryController extends BaseEditController {
         try {
             rd.forward(request, response);
         } catch (Exception e) {
-            log.error("VclassRetryController could not forward to view.");
-            log.error(e.getMessage());
-            log.error(e.getStackTrace());
+            log.error("VclassRetryController could not forward to view.", e);
+            throw new RuntimeException(e);
         }
 
     }

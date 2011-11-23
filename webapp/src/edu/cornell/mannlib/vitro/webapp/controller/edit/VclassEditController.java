@@ -215,7 +215,7 @@ public class VclassEditController extends BaseEditController {
         request.setAttribute("instantiable", instantiable);
         request.setAttribute("bodyJsp","/templates/edit/specific/classes_edit.jsp");
         request.setAttribute("title","Class Control Panel");
-        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+request.getAppBean().getThemeDir()+"css/edit.css\"/>");
+        //request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+request.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
             rd.forward(request, response);

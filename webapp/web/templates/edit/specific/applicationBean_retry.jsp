@@ -13,7 +13,10 @@
 <c:set var="appNameLabel" value="Site name"/> 
 <label for="site-name">${appNameLabel}<span class="note"> (max 50 characters)</span></label>
 <input type="text" name="ApplicationName" value="<form:value name="ApplicationName"/>" ${longField} maxlength="50" />
-<font color="red"><form:error name="ApplicationName"/></font>
+<c:set var="ApplicationNameError"><form:error name="ApplicationName"/></c:set>
+<c:if test="${!empty ApplicationNameError}">
+    <span class="notice"><c:out value="${ApplicationNameError}"/></span>
+</c:if>
 
 <!-- With introduction of new logo that includes tagline as part of the image, hiding this field for now to reduce user confusion -->        
 <!-- <tr class="editformcell">
@@ -26,23 +29,30 @@
 
         <label>Contact email address <span class="note">contact form submissions will be sent to this address</span></label>
         <input type="text" name="ContactMail" value="<form:value name="ContactMail"/>" ${longField} maxlength="255" size="30" />
-        <font color="red"><form:error name="ContactMail"/></font>
+        <c:set var="ContactMailError"><form:error name="ContactMail"/></c:set>
+        <c:if test="${!empty ContactMailError}">
+            <span class="notice"><c:out value="${ContactMailError}"/></span>
+        </c:if>
         <br />
 
         <label class="display-inline">Theme</label>
         <select id="ThemeDir" name="ThemeDir">
             <form:option name="ThemeDir" />
         </select>
-        <font color="red"><form:error name="ThemeDir"/></font>
-
 
         <label>Copyright text<span class="note"> used in footer (e.g., name of your institution)</span></label>
         <input type="text" name="CopyrightAnchor" value="<form:value name="CopyrightAnchor"/>" ${longField} maxlength="120" size="40" />
-        <font color="red"><form:error name="CopyrightAnchor"/></font>
+        <c:set var="CopyrightAnchorError"><form:error name="CopyrightAnchor"/></c:set>
+        <c:if test="${!empty CopyrightAnchorError}">
+            <span class="notice"><c:out value="${CopyrightAnchorError}"/></span>
+        </c:if>
 
         <label>Copyright URL<span class="note"> copyright text links to this URL</span></label>
         <input type="text" name="CopyrightURL" value="<form:value name="CopyrightURL"/>" ${longField} maxlength="120" size="30" />
-        <font color="red"><form:error name="CopyrightURL"/></font>
+        <c:set var="CopyrightURLError"><form:error name="CopyrightURL"/></c:set>
+        <c:if test="${!empty CopyrightURLError}">
+            <span class="notice"><c:out value="${CopyrightURLError}"/></span>
+        </c:if>
 
 <!--
 <tr class="editformcell">

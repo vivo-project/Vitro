@@ -27,6 +27,8 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
 import edu.cornell.mannlib.vedit.util.FormUtils;
+import edu.cornell.mannlib.vedit.validator.Validator;
+import edu.cornell.mannlib.vedit.validator.impl.IntValidator;
 import edu.cornell.mannlib.vedit.validator.impl.XMLNameValidator;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionListener;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
@@ -115,6 +117,9 @@ public class PropertyRetryController extends BaseEditController {
         localNameInverseValidatorList.add(new XMLNameValidator(true));
         epo.getValidatorMap().put("LocalName", localNameValidatorList);
         epo.getValidatorMap().put("LocalNameInverse", localNameInverseValidatorList);
+        List<Validator> displayRankValidatorList = new ArrayList<Validator>();
+        displayRankValidatorList.add(new IntValidator());
+        epo.getValidatorMap().put("DisplayRank", displayRankValidatorList);
 
         //set up any listeners
         List changeListenerList = new ArrayList();

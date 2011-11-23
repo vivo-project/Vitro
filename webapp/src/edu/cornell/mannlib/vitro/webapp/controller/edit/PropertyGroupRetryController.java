@@ -3,6 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +19,8 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
 import edu.cornell.mannlib.vedit.util.FormUtils;
+import edu.cornell.mannlib.vedit.validator.Validator;
+import edu.cornell.mannlib.vedit.validator.impl.RequiredFieldValidator;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
@@ -75,6 +79,11 @@ public class PropertyGroupRetryController extends BaseEditController {
         } else {
             propertyGroupForEditing = (PropertyGroup) epo.getNewBean();
         }
+        
+        //validators
+        List<Validator> validatorList = new ArrayList<Validator>();
+        validatorList.add(new RequiredFieldValidator());
+        epo.getValidatorMap().put("Name", validatorList);
 
         //make a postinsert pageforwarder that will send us to a new class's fetch screen
         epo.setPostInsertPageForwarder(new PropertyGroupInsertPageForwarder());

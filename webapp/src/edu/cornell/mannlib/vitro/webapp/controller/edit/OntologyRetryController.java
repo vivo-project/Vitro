@@ -4,6 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +20,8 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
 import edu.cornell.mannlib.vedit.util.FormUtils;
+import edu.cornell.mannlib.vedit.validator.Validator;
+import edu.cornell.mannlib.vedit.validator.impl.RequiredFieldValidator;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
@@ -67,6 +71,11 @@ public class OntologyRetryController extends BaseEditController {
             action = "update";
             log.error("using newBean");
         }
+        
+        //validators
+        List<Validator> validatorList = new ArrayList<Validator>();
+        validatorList.add(new RequiredFieldValidator());
+        epo.getValidatorMap().put("URI", validatorList);
 
         //make a simple mask for the class's id
         Object[] simpleMaskPair = new Object[2];

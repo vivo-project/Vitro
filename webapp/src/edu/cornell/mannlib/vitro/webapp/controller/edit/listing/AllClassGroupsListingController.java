@@ -43,7 +43,7 @@ public class AllClassGroupsListingController extends BaseEditController {
         results.add("XX");
         results.add("Group");
         results.add("display rank");
-        results.add("XX");
+        results.add("");
         results.add("XX");
 
         if (groups != null) {
