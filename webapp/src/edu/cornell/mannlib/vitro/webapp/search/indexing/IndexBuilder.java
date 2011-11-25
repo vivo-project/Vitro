@@ -339,8 +339,6 @@ public class IndexBuilder extends VitroBackgroundThread {
         if( numberOfThreads > MAX_THREADS )
             numberOfThreads = MAX_THREADS;            
             
-        IndexWorkerThread.setStartTime(System.currentTimeMillis());
-                                                                                                                              
         //make lists of work URIs for workers
         List<List<String>> workLists = makeWorkerUriLists(updateUris, numberOfThreads);                                     
 
@@ -349,7 +347,10 @@ public class IndexBuilder extends VitroBackgroundThread {
         for(int i = 0; i< numberOfThreads ;i++){
             Iterator<Individual> workToDo = new UriToIndividualIterator(workLists.get(i), wdf);
             workers.add( new IndexWorkerThread(indexer, i, workToDo) ); 
-        }        
+        }
+        
+        // reset the counters so we can monitor the progress
+        IndexWorkerThread.resetCounters(System.currentTimeMillis(), figureWorkLoad(workLists));
 
         log.debug("Starting the building and indexing of documents in worker threads");
         // starting worker threads        
@@ -371,8 +372,6 @@ public class IndexBuilder extends VitroBackgroundThread {
         	    return;
         	}
         }
-        
-        IndexWorkerThread.resetCount();        
     }               
     
     /* maybe ObjectSourceIface should be replaced with just an iterator. */
@@ -421,6 +420,14 @@ public class IndexBuilder extends VitroBackgroundThread {
         }
         log.info("Number of individuals to be indexed : " + counter);
         return work;        
+    }
+    
+    private long figureWorkLoad(List<List<String>> workLists) {
+    	long load = 0;
+    	for (List<String> list: workLists) {
+    		load += list.size();
+    	}
+    	return load;
     }
     
     private static class UriLists {
