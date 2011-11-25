@@ -106,14 +106,16 @@ public class SolrSmokeTest implements ServletContextListener {
 
 		private void warnForbidden() {
 			ss.warning(listener, "Can't connect to the Solr search engine. "
-					+ "The server will not accept connections from this host. "
-					+ "Check the value of vitro.local.solr.ipaddress.mask "
-					+ "in deploy.properties");
+					+ "The Solr server will not accept connections from this "
+					+ "host. Check the value of "
+					+ "vitro.local.solr.ipaddress.mask in "
+					+ "deploy.properties -- "
+					+ "does it authorize access from this IP address?");
 		}
 
 		private void warnBadHttpStatus(int status) {
 			ss.warning(listener, "Can't connect to the Solr search engine. "
-					+ "The server returned a status code of " + status
+					+ "The Solr server returned a status code of " + status
 					+ ". Check the value of vitro.local.solr.url in "
 					+ "deploy.properties.");
 		}
