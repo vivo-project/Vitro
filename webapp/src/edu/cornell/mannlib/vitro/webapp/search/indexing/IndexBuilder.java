@@ -430,6 +430,14 @@ public class IndexBuilder extends VitroBackgroundThread {
     	return load;
     }
     
+    public long getCompletedCount() {
+    	return IndexWorkerThread.getCount();
+    }
+    
+    public long getTotalToDo() {
+    	return IndexWorkerThread.getCountToIndex();
+    }
+    
     private static class UriLists {
         private final List<String> updatedUris = new ArrayList<String>();
         private final List<String> deletedUris = new ArrayList<String>();

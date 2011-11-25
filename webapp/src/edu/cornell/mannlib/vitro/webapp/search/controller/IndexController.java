@@ -51,18 +51,15 @@ public class IndexController extends FreemarkerHttpServlet {
 	 * SETUP -- Index is not building and nothing is requested. Solicit requests.
 	 * REFRESH  -- Index is building, nothing is requested. Show continuing status.
 	 * REBUILD -- Rebuild is requested. Set the rebuild flag and show continuing status.
-	 * UPDATE -- Update is requested. Set the update flag and show continuing status.
 	 * </pre>
 	 */
 	private enum RequestType {
-		SETUP, REFRESH, REBUILD, UPDATE;
+		SETUP, REFRESH, REBUILD;
 
 		/** What type of request is this? */
 		static RequestType fromRequest(HttpServletRequest req) {
 			if (hasParameter(req, "rebuild")) {
 				return REBUILD;
-			} else if (hasParameter(req, "update")) {
-				return UPDATE;
 			} else {
 				ServletContext ctx = req.getSession().getServletContext();
 				IndexBuilder builder = IndexBuilder.getBuilder(ctx);
@@ -94,7 +91,7 @@ public class IndexController extends FreemarkerHttpServlet {
 
 	@Override
 	protected String getTitle(String siteName, VitroRequest vreq) {
-		return "Search Index Update or Rebuild";
+		return "Rebuild Search Index";
 	}
 
 	@Override
@@ -117,10 +114,8 @@ public class IndexController extends FreemarkerHttpServlet {
 			switch (RequestType.fromRequest(vreq)) {
 			case REBUILD:
 				builder.doIndexRebuild();
-				return redirectToRefresh(body);
-			case UPDATE:
-				builder.doUpdateIndex();
-				return redirectToRefresh(body);
+				Thread.sleep(500);
+				return redirectToRefresh();
 			default:
 				return showCurrentStatus(builder, body);
 			}
@@ -134,23 +129,53 @@ public class IndexController extends FreemarkerHttpServlet {
 		}
 	}
 
-	private ResponseValues redirectToRefresh(Map<String, Object> body) {
+	private ResponseValues redirectToRefresh() {
 		return new RedirectResponseValues(PAGE_URL);
 	}
 
 	private ResponseValues showCurrentStatus(IndexBuilder builder,
 			Map<String, Object> body) {
 		WorkLevelStamp stamp = builder.getWorkLevel();
-		body.put("worklevel", stamp.getLevel().toString());
+
+		WorkLevel workLevel = stamp.getLevel();
+		long completedCount = builder.getCompletedCount();
+		long totalToDo = builder.getTotalToDo();
+		Date since = stamp.getSince();
+		Date expectedCompletion = figureExpectedCompletion(since, totalToDo,
+				completedCount);
+
+		body.put("worklevel", workLevel.toString());
+		body.put("completedCount", completedCount);
+		body.put("totalToDo", totalToDo);
 		body.put("currentTask", figureCurrentTask(stamp.getFlags()));
-		body.put("since", stamp.getSince());
-		body.put("elapsed", formatElapsedTime(stamp.getSince()));
-		body.put("hasPreviousBuild", stamp.getSince().getTime() > 0L);
+		body.put("since", since);
+		body.put("elapsed", formatElapsedTime(since, new Date()));
+		body.put("expected", formatElapsedTime(since, expectedCompletion));
+		body.put("hasPreviousBuild", since.getTime() > 0L);
 		return new TemplateResponseValues(TEMPLATE_NAME, body);
 	}
 
-	private String formatElapsedTime(Date since) {
-		long elapsedMillis = System.currentTimeMillis() - since.getTime();
+	private Date figureExpectedCompletion(Date startTime, long totalToDo,
+			long completedCount) {
+		Date now = new Date();
+		long elapsedMillis = now.getTime() - startTime.getTime();
+		if (elapsedMillis <= 0) {
+			return now;
+		}
+		if (completedCount <= 0) {
+			return now;
+		}
+		if (totalToDo <= completedCount) {
+			return now;
+		}
+
+		long millisPerRecord = elapsedMillis / completedCount;
+		long expectedDuration = totalToDo * millisPerRecord;
+		return new Date(expectedDuration + startTime.getTime());
+	}
+
+	private String formatElapsedTime(Date since, Date until) {
+		long elapsedMillis = until.getTime() - since.getTime();
 		long seconds = (elapsedMillis / 1000L) % 60L;
 		long minutes = (elapsedMillis / 60000L) % 60L;
 		long hours = elapsedMillis / 3600000L;

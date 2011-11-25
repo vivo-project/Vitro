@@ -8,20 +8,17 @@
 
 <#if worklevel == "IDLE">
     <#if hasPreviousBuild??>
-        <p>Previous activity completed at ${since?string("hh:mm:ss a, MMMM dd, yyyy")}</p>
+        <p>Most recent update was at ${since?string("hh:mm:ss a, MMMM dd, yyyy")}</p>
     </#if>
     
     <form action="${actionUrl}" method="POST">
-    	<p>
-            <input class="submit" type="submit" name="update" value="Update" role="button" />
-            Add the latest changes to the index.
-        </p>
         <p>
             <input class="submit" type="submit" name="rebuild" value="Rebuild" role="button" />
-            Start with an empty index and build it completely.
+            Reset the search index and re-populate it.
         </p>
     </form>
 <#else>
     <h3>The search index is currently being ${currentTask}.</h3>
-    <p>since ${since?string("hh:mm:ss a, MMMM dd, yyyy")}, elapsed time ${elapsed}</p>
+    <p>since ${since?string("hh:mm:ss a, MMMM dd, yyyy")}, elapsed time ${elapsed}, expected total time ${expected}</p>
+    <p>Completed ${completedCount} out of ${totalToDo} index records.</p>
 </#if>
