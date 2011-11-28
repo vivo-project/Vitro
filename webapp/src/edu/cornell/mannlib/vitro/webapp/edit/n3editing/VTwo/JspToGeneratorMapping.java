@@ -25,10 +25,10 @@ public class JspToGeneratorMapping {
 //                edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AutoCompleteObjPropFormGenerator.class.getName());
         map.put("datapropStmtDelete.jsp",
                 edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDeleteGenerator.class.getName());
-//        map.put("dateTimeIntervalForm.jsp",
-//                edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DateTimeIntervalFormGenerator.class.getName());
-//        map.put("dateTimeValueForm.jsp",
-//                edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DateTimeValueFormGenerator.class.getName());
+        map.put("dateTimeIntervalForm.jsp",
+                edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DateTimeIntervalFormGenerator.class.getName());
+        map.put("dateTimeValueForm.jsp",
+                edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DateTimeValueFormGenerator.class.getName());
         map.put("defaultAddMissingIndividualForm.jsp",
                 edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultAddMissingIndividualFormGenerator.class.getName());
         map.put("defaultDatapropForm.jsp",
