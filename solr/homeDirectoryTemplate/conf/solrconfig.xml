@@ -708,7 +708,7 @@
       -->
      <lst name="defaults">
        <str name="defType">edismax</str>
-       <str name="qf">ALLTEXT ALLTEXTUNSTEMMED nameUnstemmed nameStemmed</str>
+       <str name="qf">ALLTEXT ALLTEXTUNSTEMMED nameUnstemmed nameStemmed nameLowercase</str>
        <str name="echoParams">explicit</str>
        <str name="qs">2</str>
        <int name="rows">10</int>
