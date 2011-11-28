@@ -43,21 +43,24 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServ
 public class RDFUploadController extends BaseEditController {
 	
     private static int maxFileSizeInBytes = 1024 * 1024 * 2000; //2000mb
-    private static FileItem fileStream=null; 
+    private static FileItem fileStream = null; 
     private static final String INGEST_MENU_JSP = "/jenaIngest/ingestMenu.jsp";
-    private static final String LOAD_RDF_DATA_JSP = "/jenaIngest/loadRDFData.jsp";
+    private static final String LOAD_RDF_DATA_JSP="/jenaIngest/loadRDFData.jsp";
     private static final String LIST_MODELS_JSP = "/jenaIngest/listModels.jsp";
 	
 	public void doPost(HttpServletRequest rawRequest,
 			HttpServletResponse response) throws ServletException, IOException {
-        if (!isAuthorizedToDisplayPage(rawRequest, response, new Actions(new UseAdvancedDataToolsPages()))) {
+        if (!isAuthorizedToDisplayPage(rawRequest, response, new Actions(
+        		new UseAdvancedDataToolsPages()))) {
         	return;
         }
 
-		FileUploadServletRequest req = FileUploadServletRequest.parseRequest(rawRequest,
-				maxFileSizeInBytes);
+		FileUploadServletRequest req = FileUploadServletRequest.parseRequest(
+                rawRequest, maxFileSizeInBytes);
 		if (req.hasFileUploadException()) {
-			forwardToFileUploadError(req.getFileUploadException().getLocalizedMessage(), req, response);
+			forwardToFileUploadError(
+					req.getFileUploadException().getLocalizedMessage(), 
+                            req, response);
 			return;
 		}
 
@@ -77,11 +80,13 @@ public class RDFUploadController extends BaseEditController {
 		
 		String languageStr = request.getParameter("language");
 		
-		boolean makeClassgroups = (request.getParameter("makeClassgroups") != null);
+		boolean makeClassgroups = 
+			    (request.getParameter("makeClassgroups") != null);
 		
 		// add directly to the ABox model without reading first into 
 		// a temporary in-memory model
-		boolean directRead = ("directAddABox".equals(request.getParameter("mode")));
+		boolean directRead = ("directAddABox".equals(request.getParameter(
+                "mode")));
           
 		String uploadDesc ="";		
 				
@@ -95,38 +100,47 @@ public class RDFUploadController extends BaseEditController {
 			try {
 			    uploadModel.enterCriticalSection(Lock.WRITE);
 			    try {
-			        uploadModel.read(RDFUrlStr, languageStr); // languageStr may be null and default would be RDF/XML
+			        uploadModel.read(RDFUrlStr, languageStr); 
+			        // languageStr may be null and default would be RDF/XML
 			    } finally {
 			        uploadModel.leaveCriticalSection();
 			    }
 				uploadDesc = verb + " RDF from " + RDFUrlStr;				
 			} catch (JenaException ex){
-	                forwardToFileUploadError("Could not parse file to " + languageStr + ": " + ex.getMessage(), req, response);
+	                forwardToFileUploadError("Could not parse file to " + 
+                           languageStr + ": " + ex.getMessage(), req, response);
 	                return;
 			}catch (Exception e) {                               
-                forwardToFileUploadError("Could not load from URL: " + e.getMessage(), req, response);                  
+                forwardToFileUploadError("Could not load from URL: " + 
+                		e.getMessage(), req, response);                  
                 return;
 			}			
 		} else {
 		    /* **************** upload RDF from POST ********************* */
-		    if( fileStreams.get("rdfStream") != null && fileStreams.get("rdfStream").size() > 0 ){
+		    if( fileStreams.get("rdfStream") != null 
+		    		&& fileStreams.get("rdfStream").size() > 0 ) {
 		        FileItem rdfStream = fileStreams.get("rdfStream").get(0);
 		        try {
 		            uploadModel.enterCriticalSection(Lock.WRITE);
 		            try {
-		                uploadModel.read( rdfStream.getInputStream(), null, languageStr);
+		                uploadModel.read(
+		                		rdfStream.getInputStream(), null, languageStr);
 		            } finally {
 		                uploadModel.leaveCriticalSection();
 		            }
 		            uploadDesc = verb + " RDF from file " + rdfStream.getName();                
 		        } catch (IOException e) {
-		            forwardToFileUploadError("Could not read file: " + e.getLocalizedMessage(), req, response);
+		            forwardToFileUploadError("Could not read file: " + 
+		            		e.getLocalizedMessage(), req, response);
 		            return;
 		        }catch (JenaException ex){
-		            forwardToFileUploadError("Could not parse file to " + languageStr + ": " + ex.getMessage(), req, response);
+		            forwardToFileUploadError("Could not parse file to " + 
+		            		languageStr + ": " + ex.getMessage(), 
+		            		        req, response);
 		            return;
 		        }catch (Exception e) {                               
-	                forwardToFileUploadError("Could not load from file: " + e.getMessage(), req, response);                  
+	                forwardToFileUploadError("Could not load from file: " + 
+	                		e.getMessage(), req, response);                  
 	                return;
 	            }finally{		    
 		            rdfStream.delete();
@@ -167,15 +181,17 @@ public class RDFUploadController extends BaseEditController {
 		        		makeClassgroups,
 		        		loginBean.getUserURI());
 		    }
-		    request.setAttribute("uploadDesc", uploadDesc + ". " + verb + " " + (tboxstmtCount + aboxstmtCount) + "  statements.");
+		    request.setAttribute("uploadDesc", uploadDesc + ". " + verb + " " + 
+                    (tboxstmtCount + aboxstmtCount) + "  statements.");
 		} else {
 		    request.setAttribute("uploadDesc", "RDF upload successful.");
 		}
 	    
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        request.setAttribute("bodyJsp","/templates/edit/specific/upload_rdf_result.jsp");
+        RequestDispatcher rd = request.getRequestDispatcher(
+        		Controllers.BASIC_JSP);
+        request.setAttribute(
+        		"bodyJsp", "/templates/edit/specific/upload_rdf_result.jsp");
         request.setAttribute("title","Ingest RDF Data");
-        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+request.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
             rd.forward(request, response);
@@ -185,7 +201,9 @@ public class RDFUploadController extends BaseEditController {
     }
 
 	public void loadRDF(FileUploadServletRequest req,
-			VitroRequest request,HttpServletResponse response) throws ServletException, IOException {
+                        VitroRequest request,
+                        HttpServletResponse response) 
+                                throws ServletException, IOException {
 		Map<String, List<FileItem>> fileStreams = req.getFiles();
 		String filePath = fileStreams.get("filePath").get(0).getName();
 		fileStream = fileStreams.get("filePath").get(0);
@@ -205,15 +223,15 @@ public class RDFUploadController extends BaseEditController {
 			request.setAttribute("bodyJsp",LOAD_RDF_DATA_JSP);
 		}
 		
-		RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);      
-        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+request.getAppBean().getThemeDir()+"css/edit.css\"/>");
+		RequestDispatcher rd = request.getRequestDispatcher(
+				Controllers.BASIC_JSP);      
 
         try {
             rd.forward(request, response);
         } catch (Exception e) {
-            System.out.println(this.getClass().getName()+" could not forward to view.");
-            System.out.println(e.getMessage());
-            System.out.println(e.getStackTrace());
+            String errMsg = " could not forward to view.";
+            log.error(errMsg, e);
+            throw new ServletException(errMsg, e);
         }
 		
 	}
@@ -259,7 +277,11 @@ public class RDFUploadController extends BaseEditController {
         return changesModel.size();        
     }
     
-    private void doLoadRDFData(String modelName, String docLoc, String filePath, String language, ModelMaker modelMaker) {
+    private void doLoadRDFData(String modelName, 
+                               String docLoc, 
+    		                   String filePath, 
+    		                   String language, 
+    		                   ModelMaker modelMaker) {
 		Model m = modelMaker.getModel(modelName);
 		m.enterCriticalSection(Lock.WRITE);
 		try {
@@ -276,14 +298,15 @@ public class RDFUploadController extends BaseEditController {
 				}
 				for (int i=0; i<files.length; i++) {
 					File currentFile = files[i];
-					log.info("Reading file "+currentFile.getName());
-					
+					log.debug("Reading file " + currentFile.getName());
 					try {
-					
 						m.read(fileStream.getInputStream(), null, language);
 						fileStream.delete();
 					} catch (IOException ioe) {
-						throw new RuntimeException(ioe);
+						String errMsg = "Error loading RDF from " + 
+						        currentFile.getName();
+						log.error(errMsg, ioe);
+						throw new RuntimeException(errMsg, ioe);
 					}
 				}
 			}
@@ -292,20 +315,29 @@ public class RDFUploadController extends BaseEditController {
 		}
 	}
     
-     private void forwardToFileUploadError( String errrorMsg , HttpServletRequest req, HttpServletResponse response) throws ServletException{
+     private void forwardToFileUploadError( String errrorMsg , 
+                                            HttpServletRequest req, 
+    		                                HttpServletResponse response) 
+                                                    throws ServletException{
          req.setAttribute("errors", errrorMsg);
-         RequestDispatcher rd = req.getRequestDispatcher("/edit/fileUploadError.jsp");            
+         RequestDispatcher rd = req.getRequestDispatcher(
+                 "/edit/fileUploadError.jsp");            
          try {
              rd.forward(req, response);
          } catch (IOException e1) {
+        	 log.error(e1);
              throw new ServletException(e1);
          }            
          return;
      }
      
      private ModelMaker getVitroJenaModelMaker(HttpServletRequest request) {
-  		ModelMaker myVjmm = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
-  		myVjmm = (myVjmm == null) ? (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker") : myVjmm;
+  		ModelMaker myVjmm = (ModelMaker) request.getSession().getAttribute(
+  				"vitroJenaModelMaker");
+  		myVjmm = (myVjmm == null) 
+                ? (ModelMaker) getServletContext().getAttribute(
+                		"vitroJenaModelMaker") 
+                : myVjmm;
   		return new VitroJenaSpecialModelMaker(myVjmm, request);
   	 }
      
@@ -335,5 +367,6 @@ public class RDFUploadController extends BaseEditController {
          }
      }    
      
-	private static final Log log = LogFactory.getLog(RDFUploadController.class.getName());
+	private static final Log log = LogFactory.getLog(
+			RDFUploadController.class.getName());
 }
