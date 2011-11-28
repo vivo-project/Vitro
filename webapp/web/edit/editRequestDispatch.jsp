@@ -246,11 +246,19 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
     
     String oldEdit = request.getParameter("oldEdit");
     if( oldEdit == null){
+    	//First check to see if the form is actually a jsp
+    	//IF so use the custom form mapping
+    	if(form.endsWith(".jsp")) {
+    		//Get the java mapping
+    		if(JspToGeneratorMapping.jspsToGenerators.containsKey(form)) {
+    			form = JspToGeneratorMapping.jspsToGenerators.get(form);
+    		}
+    	}
         String queryString = request.getQueryString();
         response.sendRedirect(
                 request.getContextPath() +
                 "/editRequestDispatch?" +
-                queryString);
+                queryString + "&editForm=" + form);
         return;
     } else {
     	//For testing the jsp when test parameter has value,
