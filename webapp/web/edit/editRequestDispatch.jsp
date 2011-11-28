@@ -26,7 +26,6 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 <vitro:confirmAuthorization />
 
 <%
-    Map<String,String> jspFormToGenerator = JspToGeneratorMapping.jspsToGenerators; 
 
 	//Check if special model, in which case forward
 	if(request.getParameter("switchToDisplayModel") != null) {
@@ -245,17 +244,25 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
         form = formParam;
     }
     
-    String generator = jspFormToGenerator.get(form);
     String oldEdit = request.getParameter("oldEdit");
-   
-    if( oldEdit == null && generator != null ){
+    if( oldEdit == null){
         String queryString = request.getQueryString();
         response.sendRedirect(
                 request.getContextPath() +
                 "/editRequestDispatch?" +
-                queryString + "&editForm=" + generator);
+                queryString);
         return;
-    }            
+    } else {
+    	//For testing the jsp when test parameter has value,
+    	//Do a reverse mapping from generator to jsp where it exists
+    	for (Map.Entry<String, String> entry: JspToGeneratorMapping.jspsToGenerators.entrySet()) {
+    		if(form.equals(entry.getValue())) {
+    			//Get the jsp corresponding to the Java generator
+    			form = entry.getKey();
+    			break;
+    		}
+    	}
+    }
     
     request.setAttribute("form", form);
 %>
