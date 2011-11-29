@@ -31,14 +31,12 @@ if( request.getParameter("uri") != null ){
 
 <% /* BJL23 put this is in a catch block because it seems to fail ungracefully for 
       some clones */ %>
-<c:catch>
-    <jsp:include page="/templates/page/freemarkerTransition/identity.jsp" flush="true"/>
-    <div id="contentwrap">
-        <jsp:include page="/templates/page/freemarkerTransition/menu.jsp" flush="true"/>
-        <!-- end of formPrefix.jsp -->
-</c:catch>
 
 <form>
 <input name="uri" type="text" size="200" />
 <input type="submit" value="Lookup Individual for URI"/>
 </form>
+
+</div>
+</body>
+</html>
