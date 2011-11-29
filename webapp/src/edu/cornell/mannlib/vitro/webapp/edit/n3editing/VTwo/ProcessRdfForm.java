@@ -355,9 +355,9 @@ public class ProcessRdfForm {
         }else{
             log.debug("no varNameForPredicate found in configuration");
         }
-        
         String varNameForObj = configuration.getVarNameForObject();
-        if( varNameForObj != null && ! varNameForObj.isEmpty()){            
+        if( varNameForObj != null 
+        		&& ! varNameForObj.isEmpty()){            
             varToValue.put( varNameForObj, configuration.getObject());
         }else{
             log.debug("no varNameForObject found in configuration");

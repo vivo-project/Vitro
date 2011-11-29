@@ -86,7 +86,7 @@ public class EditN3GeneratorVTwo {
    
     public String subInUris(String var, String value, String target) {
         // empty URIs get skipped
-        if( var == null || var.isEmpty() || value == null || target == null)
+        if( var == null || var.isEmpty() || value == null || value.isEmpty() || target == null)
             return target;        
         
     	return subInNonBracketedURIS(var, "<" + value + ">", target);

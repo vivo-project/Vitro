@@ -123,9 +123,8 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     
     private Map<String, String> generateNewResources(VitroRequest vreq) {
 		HashMap<String, String> newResources = new HashMap<String, String>();
-		//TODO: Get default namespace
-		String defaultNamespace = vreq.getWebappDaoFactory().getDefaultNamespace();
-		newResources.put(objectVarName, defaultNamespace + "individual");
+		//Null triggers default namespace
+		newResources.put(objectVarName, null);
 		return newResources;
 	}
 	//Need to replace edit key
@@ -183,7 +182,11 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     
 	private void initObjectParameters(VitroRequest vreq) {
 		//in case of object property
-    	objectUri = EditConfigurationUtils.getObjectUri(vreq);
+		String thisObjectUri = EditConfigurationUtils.getObjectUri(vreq);
+		if(thisObjectUri != null && !thisObjectUri.isEmpty()) {
+			objectUri = EditConfigurationUtils.getObjectUri(vreq);
+		}
+		//otherwise object uri will stay null - since don't want to set it to empty string
 	}
 
 	//this particular form uses a different var name for object "newIndividual"

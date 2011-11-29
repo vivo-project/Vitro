@@ -34,15 +34,17 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
 		//Instead of edit request which is what we'll do later, here we'll forward to Menu Management Controller
 		response.sendRedirect(request.getContextPath() + "/editDisplayModel?" + queryString);
 	}
-
-	//This is our way fo being able to test the new edit configuration
-	//TODO: Remove this when testing done
-	if(request.getParameter("testEdit") != null) {
-		String queryString = request.getQueryString();
-		response.sendRedirect(request.getContextPath() + "/editRequestDispatch?" + queryString);
+	
+	//If you find the parameter for testing the old edit, go ahead with the rest of the form
+	//otherwise forward immediately to the new edit request dispatch controller
+	String oldEdit = request.getParameter("oldEdit");
+	if(oldEdit == null) {
+	 	String queryString = request.getQueryString();
+        response.sendRedirect(
+                request.getContextPath() +
+                "/editRequestDispatch?" +
+                queryString);
 	}
-	
-	
     /*
     Decide which form to forward to, set subjectUri, subjectUriJson, predicateUri, and predicateUriJson in request.
     Also get the Individual for the subjectUri and put it in the request scope.
@@ -244,34 +246,16 @@ public static Log log = LogFactory.getLog("edu.cornell.mannlib.vitro.webapp.jsp.
         form = formParam;
     }
     
-    String oldEdit = request.getParameter("oldEdit");
-    if( oldEdit == null){
-    	//First check to see if the form is actually a jsp
-    	//IF so use the custom form mapping
-    	if(form.endsWith(".jsp")) {
-    		//Get the java mapping
-    		if(JspToGeneratorMapping.jspsToGenerators.containsKey(form)) {
-    			form = JspToGeneratorMapping.jspsToGenerators.get(form);
-    		}
-    	}
-        String queryString = request.getQueryString();
-        response.sendRedirect(
-                request.getContextPath() +
-                "/editRequestDispatch?" +
-                queryString + "&editForm=" + form);
-        return;
-    } else {
-    	//For testing the jsp when test parameter has value,
-    	//Do a reverse mapping from generator to jsp where it exists
-    	for (Map.Entry<String, String> entry: JspToGeneratorMapping.jspsToGenerators.entrySet()) {
-    		if(form.equals(entry.getValue())) {
-    			//Get the jsp corresponding to the Java generator
-    			form = entry.getKey();
-    			break;
-    		}
-    	}
-    }
-    
+    //If doing old edit, which we must be b/c otherwise we wouldn't be here
+    //then get the other
+    for (Map.Entry<String, String> entry: JspToGeneratorMapping.jspsToGenerators.entrySet()) {
+   		if(form.equals(entry.getValue())) {
+   			//Get the jsp corresponding to the Java generator
+   			form = entry.getKey();
+   			break;
+   		}
+   	}
+ 
     request.setAttribute("form", form);
 %>
 <jsp:forward page="/edit/forms/${form}" />
