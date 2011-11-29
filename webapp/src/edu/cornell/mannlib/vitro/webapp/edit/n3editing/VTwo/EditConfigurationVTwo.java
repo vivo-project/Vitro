@@ -116,7 +116,8 @@ public class EditConfigurationVTwo {
     
     /**
      * If this value is not null, it will force the edit to return to the specified 
-     * URL from the PostEditCleanupController after an edit or a cancel.  This string does not get values substituted in. 
+     * URL from the PostEditCleanupController after an edit or a cancel.  This string does 
+     * NOT get values substituted in and it does NOT get the context appended. 
      */
     String urlToReturnTo = null;
     
