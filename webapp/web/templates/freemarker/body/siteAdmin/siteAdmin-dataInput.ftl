@@ -12,7 +12,7 @@
             <select id="VClassURI" name="typeOfNew" class="form-item" role="select">
                 <@form.optionGroups groups=dataInput.groupedClassOptions />
             </select>
-            <input type="hidden" name="editform" value="newIndividualForm.jsp" role="input" />
+            <input type="hidden" name="editForm" value="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.NewIndividualFormGenerator" role="input" />
             <input type="submit" id="submit" value="Add individual of this class" role="button" />
         </form>
     </section>
