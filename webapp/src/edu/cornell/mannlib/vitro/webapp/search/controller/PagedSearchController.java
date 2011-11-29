@@ -428,7 +428,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     private SolrQuery getQuery(String queryText, int hitsPerPage, int startIndex, VitroRequest vreq) {
         // Lowercase the search term to support wildcard searches: Solr applies no text
         // processing to a wildcard search term.
-        SolrQuery query = new SolrQuery(queryText.toLowerCase());
+        SolrQuery query = new SolrQuery( queryText );
         
         query.setStart( startIndex )
              .setRows(hitsPerPage);
