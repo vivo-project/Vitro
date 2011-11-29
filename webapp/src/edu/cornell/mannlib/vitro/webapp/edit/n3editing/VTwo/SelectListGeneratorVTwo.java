@@ -268,7 +268,7 @@ public class SelectListGeneratorVTwo {
                         Collections.sort(individuals);
                         
                         if (individuals.size()==0){ 
-                            log.error("No individuals of type "+vclass.getName()+" to add to pick list in SelectListGenerator.getOptions()");
+                            log.debug("No individuals of type "+vclass.getName()+" to add to pick list in SelectListGenerator.getOptions()");
                             optionsMap.put("", "No " + vclass.getName() + " found");
                         }else{
                             for( Individual ind : individuals ) {
