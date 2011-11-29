@@ -21,26 +21,16 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditSubmissionUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.N3EditUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.controller.ProcessRdfFormController.Utilities;
-/**
- * This servlet will process EditConfigurations with query parameters
- * to perform an edit.
- * 
- * TODO: rename this class ProcessN3Edit  
- */
+
+
 public class PostEditCleanupController extends FreemarkerHttpServlet{
 	
-    private Log log = LogFactory.getLog(PostEditCleanupController.class);
-    	
-    
-	//bdc34: this is likely to become a servlet instead of a jsp.
-	// You can get a reference to the servlet from the context.
-	// this will need to be converted from a jsp to something else
+    private static Log log = LogFactory.getLog(PostEditCleanupController.class);    	    
 	
 	@Override 
 	protected ResponseValues processRequest(VitroRequest vreq) {	
 		doPostEditCleanup( vreq );
-		return doPostEditRedirect( vreq, null);
-	
+		return doPostEditRedirect( vreq, null);	
 	}
 
 	/**
@@ -51,8 +41,10 @@ public class PostEditCleanupController extends FreemarkerHttpServlet{
 	 */
     protected static ResponseValues doPostEditRedirect( VitroRequest vreq , String entityToReturnTo){
         EditConfigurationVTwo editConfig = EditConfigurationVTwo.getConfigFromSession(vreq.getSession(), vreq);      
-        if(editConfig == null)
-            throw new Error("No edit configuration found.");
+        if(editConfig == null){
+            log.error("No edit configuration found in doPostEditRedirect()");        
+            return new RedirectResponseValues( UrlBuilder.getHomeUrl() );
+        }
         
         // If there is a urlToReturnTo that takes precedence 
         if( editConfig.getUrlToReturnTo() != null && ! editConfig.getUrlToReturnTo().trim().isEmpty()){
@@ -108,7 +100,7 @@ public class PostEditCleanupController extends FreemarkerHttpServlet{
     public static void doPostEditCleanup( VitroRequest vreq ) {
         EditConfigurationVTwo configuration = EditConfigurationVTwo.getConfigFromSession(vreq.getSession(), vreq);      
         if(configuration == null)
-            throw new Error("No edit configuration found.");        
+            return;        
         
         HttpSession session = vreq.getSession(false);
         if( session != null ) {
@@ -143,5 +135,5 @@ public class PostEditCleanupController extends FreemarkerHttpServlet{
         }else{
             return "";
         }
-    }
+    }    
 }
