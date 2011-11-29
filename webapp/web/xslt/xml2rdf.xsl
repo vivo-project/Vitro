@@ -2,11 +2,8 @@
 <!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 <xsl:stylesheet 
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-    xmlns:mf="http://vitro.mannlib.cornell.edu/XSL/functions"
-    xmlns:xtor="http://ingest.mannlib.cornell.edu/generalizedXMLtoRDF/0.1/"
-    xmlns:vitro="http://vitro.mannlib.cornell.edu/ns/vitro/0.7#"
-    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"    
+    xmlns:vitro="http://vitro.mannlib.cornell.edu/ns/vitro/0.7#"    
     version="2.0">    
 <xsl:output method="xml" indent="yes"/>    
     <!--
@@ -29,37 +26,36 @@
     -->
     
     <!-- This XSL will attempt to use URIs from namespaces that are found
-        in the XML document.  If elements lack namespaces this string is used. 
-        Important: If you use a prefix here it should exist in the NS declerations -->
-    <xsl:variable name="defaultNS">xtor:</xsl:variable>
+        in the XML document.  If an Element lacks a namespace then this NS is used. -->
+    <xsl:variable name="defaultNS">http://ingest.mannlib.cornell.edu/generalizedXMLtoRDF/0.1/</xsl:variable>
     
     <!-- This is a regular expression used to test then QNames of nodes.  Any node 
          with a QName that matches this regex will have position dataproperties on each of 
          their children nodes -->
-    <xsl:param name="positionParentRegex" select="''"/>
-
+    <xsl:param name="positionParentRegex" select="''"/>    
+    
     <xsl:template match="/">
-      <rdf:RDF
-         xmlns:xtor="http://ingest.mannlib.cornell.edu/generalizedXMLtoRDF/0.1/"
-         xmlns:vitro="http://vitro.mannlib.cornell.edu/ns/vitro/0.7#">
+      <rdf:RDF>                               
         <xsl:apply-templates mode="rdfDescription" select="*"/>
       </rdf:RDF>
     </xsl:template>
     
     <!-- create description elements -->
     <xsl:template mode="rdfDescription" match="*">        
-      <rdf:Description>        
+      <rdf:Description>                             
         <xsl:element name="rdf:type">
           <xsl:attribute name="rdf:resource" 
                          select="concat((if(namespace-uri())then namespace-uri() else $defaultNS),local-name())"/>
         </xsl:element>
-        <xsl:apply-templates select="*|@*"/>
+        <xsl:apply-templates select="*"/>
       </rdf:Description>
     </xsl:template>   
     
-    <!-- recursive tempate to turn elements into bnodes -->
+    <!-- Recursive tempate to turn Elements with Attributes and/or Text into bnodes -->
     <xsl:template match="*">
-        <xsl:element name="{if(namespace-uri()) then namespace-uri() else $defaultNS}{local-name()}" >
+        <xsl:element 
+            name="{ local-name() }" 
+            namespace="{ (if(namespace-uri() and string-length(namespace-uri())>0 )then namespace-uri() else $defaultNS) }" >
             <rdf:Description>
             <xsl:apply-templates select="*|@*"/>
                 
@@ -69,16 +65,18 @@
                                                             
             <xsl:if test="matches(../name(),$positionParentRegex) or 
                           matches(concat(../namespace-uri(),../local-name()),$positionParentRegex)">                            
-                <xtor:position><xsl:value-of select="position()"/></xtor:position>
+                <vitro:position><xsl:value-of select="position()"/></vitro:position>
             </xsl:if>
 
             </rdf:Description>
         </xsl:element>
     </xsl:template>
     
-    <!-- Match all leaf elements that have attributes and turn them into bnodes -->
-    <xsl:template  match="*[not(*) and @* and string-length(text())>0]">        
-        <xsl:element name="{if(namespace-uri()) then namespace-uri() else $defaultNS}{name()}">
+    <!-- Match all leaf Elements that have Attributes and/or Text and turn them into bnodes -->
+    <xsl:template  match="*[not(*) and @* and string-length(text())>0]">
+        <xsl:element
+            name="{ local-name() }" 
+            namespace="{ (if(namespace-uri() and string-length(namespace-uri())>0 )then namespace-uri() else $defaultNS) }" >                                                   
             <rdf:Description>
                 <xsl:apply-templates  select="@*"/>
                 <vitro:value>
@@ -88,12 +86,22 @@
         </xsl:element>
     </xsl:template>
     
-    <!-- Match all leaf elements and attributes and turn them into data properties. -->
-    <xsl:template match="@*|*[not(*) and not(@*) and string-length(text())>0]">        
-        <xsl:element name="{if(namespace-uri()) then namespace-uri() else $defaultNS}{name()}">
+    <!-- Match all attributes and turn them into data properties. -->
+    <xsl:template match="@*">       
+        <xsl:element 
+            name="{ local-name() }" 
+            namespace="{ (if(namespace-uri() and string-length(namespace-uri())>0 )then namespace-uri() else $defaultNS) }" >                                   
             <xsl:value-of select="."/>
         </xsl:element>
     </xsl:template>
    
+   <!-- Match all Elements with only a text node and turn them into data properties. -->
+    <xsl:template match="*[not(*) and not(@*) and string-length(text())>0]">       
+        <xsl:element 
+            name="{ local-name() }" 
+            namespace="{ (if(namespace-uri() and string-length(namespace-uri())>0 )then namespace-uri() else $defaultNS) }" >             
+            <xsl:value-of select="."/>
+        </xsl:element>
+    </xsl:template>
     
 </xsl:stylesheet>
