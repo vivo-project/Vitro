@@ -31,7 +31,7 @@
         <input type="hidden" name="objectUri"    value="${editConfiguration.objectUri}" role="input" />
     </#if>
     
-   
+   <br />
     <#if editConfiguration.objectProperty = true>
     <p class="submit">
     </#if>
