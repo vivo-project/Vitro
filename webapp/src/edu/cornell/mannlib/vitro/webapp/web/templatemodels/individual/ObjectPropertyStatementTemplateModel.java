@@ -2,10 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -35,7 +33,6 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
             Map<String, String> data, EditingPolicyHelper policyHelper, String templateName, VitroRequest vreq) {
         super(subjectUri, propertyUri, policyHelper, vreq);
         
-        cleanMapValuesForDisplay( data );
         this.data = data;
         this.objectUri = data.get(objectKey);        
         this.templateName = templateName;
@@ -123,6 +120,10 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
 
     public Object get(String key) {
         return cleanTextForDisplay( data.get(key) );
+    }
+  
+    public String uri(String key) {
+    	return cleanURIForDisplay(data.get(key));
     }
   
 }

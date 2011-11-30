@@ -16,6 +16,9 @@ import edu.cornell.mannlib.vitro.webapp.web.AntiScript;
 public abstract class BaseTemplateModel {
 
     private static final Log log = LogFactory.getLog(BaseTemplateModel.class);
+
+	private static final String URI_CHARACTERS = 
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=";
     
     protected static ServletContext servletContext;
     
@@ -36,10 +39,19 @@ public abstract class BaseTemplateModel {
 
     /**
      * Used to do any processing for display of URIs or URLs.  
-     * Currently this only checks for XSS exploits.
+     * 
+     * If we used AntiSami on a URI it would escape any ampersands as &amp;
+     * and perhaps do other nastiness as well. Instead we delete any character 
+     * that shouldn't be in a URI.
      */
     protected String cleanURIForDisplay( String dirty ){
-        return AntiScript.cleanURI(dirty, getServletContext());
+    	StringBuilder clean = new StringBuilder(dirty.length());
+    	for (char ch: dirty.toCharArray()) {
+    		if (URI_CHARACTERS.indexOf(ch) != -1) {
+    			clean.append(ch);
+    		}
+    	}
+        return clean.toString();
     }
     
     /**
@@ -65,7 +77,5 @@ public abstract class BaseTemplateModel {
     public static void setServletContext(ServletContext context) {
         servletContext = context;
     }
- 
-    /* Template properties */
     
 }
