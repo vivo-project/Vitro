@@ -6,15 +6,15 @@
     <#assign toBeDeletedClass = "objProp" />
 </#if>
 
+<#assign deletionTemplateName = editConfiguration.deleteTemplate/>
 <#assign statement = editConfiguration.statementDisplay />
-
 <form action="${editConfiguration.deleteProcessingUrl}" method="get">
     <h2>Are you sure you want to delete the following entry from <em>${editConfiguration.propertyName}</em>?</h2>
     
     <p class="toBeDeleted ${toBeDeletedClass}">
         <#if editConfiguration.objectProperty = true>
-            <#if statement.object?has_content>
-                <#include "propStatement-default.ftl" />
+            <#if statement?has_content>
+                <#include deletionTemplateName />
             </#if>
         <#else>
             ${statement.dataValue}

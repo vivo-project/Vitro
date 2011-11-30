@@ -51,7 +51,7 @@ $(document).ready(function() {
     <form id="autoCompleteDatapropForm" class="editForm" action="${submitUrl}"  role="autocomplete">
     
     <#if predicate.offerCreateNewOption >
-        <#assign var="createNewUrl = "/edit/editRequestDispatch.jsp?subjectUri=${param.subjectUri}&predicateUri=${param.predicateUri}&clearEditConfig=true&cmd=create >
+        <#assign var="createNewUrl = "/editRequestDispatch?subjectUri=${param.subjectUri}&predicateUri=${param.predicateUri}&clearEditConfig=true&cmd=create >
     </#if>
     
     <#if predicate.publicDescription?has_content >       

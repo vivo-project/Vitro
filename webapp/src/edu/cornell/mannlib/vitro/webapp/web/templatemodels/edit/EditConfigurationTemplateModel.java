@@ -435,6 +435,15 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	return statementDisplay;
     }
     
+    //Used for deletion in case there's a specific template to be employed
+    public String getDeleteTemplate() {
+    	String templateName = vreq.getParameter("templateName");
+    	if(templateName == null || templateName.isEmpty()) {
+    		templateName = "propStatement-default.ftl";
+    	}
+    	return templateName;
+    }
+    
     //Retrieves data propkey from parameter and gets appropriate data value
     private String getDataLiteralValuesFromParameter() {
     	String dataValue = null;

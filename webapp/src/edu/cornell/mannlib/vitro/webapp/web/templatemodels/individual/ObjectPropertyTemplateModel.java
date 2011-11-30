@@ -46,7 +46,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     
     private static final Log log = LogFactory.getLog(ObjectPropertyTemplateModel.class);      
     private static final String TYPE = "object";
-    private static final String EDIT_PATH = "edit/editRequestDispatch.jsp";
+    private static final String EDIT_PATH = "editRequestDispatch";
     private static final String IMAGE_UPLOAD_PATH = "/uploadImages";
     
     private static final String END_DATE_TIME_VARIABLE = "dateTimeEnd";

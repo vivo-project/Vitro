@@ -23,7 +23,7 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     
     private static final Log log = LogFactory.getLog(ObjectPropertyStatementTemplateModel.class); 
     
-    private static final String EDIT_PATH = "edit/editRequestDispatch.jsp";
+    private static final String EDIT_PATH = "editRequestDispatch";
 
     private final Map<String, String> data;
     
