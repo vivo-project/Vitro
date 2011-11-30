@@ -93,7 +93,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
         
         if (PolicyHelper.isAuthorizedForActions(vreq, new EditIndividuals())) {
 
-            map.put("formAction", UrlBuilder.getUrl("/editRequestDispatch.jsp"));
+            map.put("formAction", UrlBuilder.getUrl("/editRequestDispatch"));
             
             WebappDaoFactory wadf = vreq.getFullWebappDaoFactory();
             
