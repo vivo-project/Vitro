@@ -941,7 +941,8 @@ public class EditConfigurationVTwo {
         Map<String,String> map = sparqlForExistingLiterals;
         if( map == null ) {
             map = new HashMap<String,String>();
-            map.put(key, sparql);            
+            map.put(key, sparql);   
+            setSparqlForExistingLiterals(map);
         }else{
             map.put(key, sparql);            
         }        
@@ -958,6 +959,38 @@ public class EditConfigurationVTwo {
             map = new HashMap<String,String>();
             map.put(key, sparql);
             setSparqlForExistingUris(map);
+        }else{
+            map.put(key, sparql);            
+        }        
+    }
+    
+    public void addSparqlForAdditionalLiteralsInScope(String key, String sparql){
+        if( key == null || key.isEmpty() ) 
+            throw new IllegalArgumentException("key must not be null");
+        if( sparql == null || sparql .isEmpty() ) 
+            throw new IllegalArgumentException("sparql must not be null");
+        
+        Map<String,String> map = sparqlForAdditionalLiteralsInScope;
+        if( map == null ) {
+            map = new HashMap<String,String>();
+            map.put(key, sparql);      
+            setSparqlForAdditionalLiteralsInScope(map);
+        }else{
+            map.put(key, sparql);            
+        }        
+    }
+    
+    public void addSparqlForAdditionalUrisInScope(String key, String sparql){
+        if( key == null || key.isEmpty() ) 
+            throw new IllegalArgumentException("key must not be null");
+        if( sparql == null || sparql .isEmpty() )
+            throw new IllegalArgumentException("sparql must not be null");
+        
+        Map<String,String> map = sparqlForAdditionalUrisInScope;
+        if( map == null ) {
+            map = new HashMap<String,String>();
+            map.put(key, sparql);
+            setSparqlForAdditionalUrisInScope(map);
         }else{
             map.put(key, sparql);            
         }        
