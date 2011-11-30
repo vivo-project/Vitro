@@ -8,19 +8,19 @@
         
         <ul role="navigation">
             <#if indexCacheRebuild.rebuildClassGroupCache?has_content>
-                <li role="listitem"><a href="${indexCacheRebuild.rebuildClassGroupCache}">Rebuild class group cache</a></li>
+                <li role="listitem"><a href="${indexCacheRebuild.rebuildClassGroupCache}" title="Rebuild class group cache">Rebuild class group cache</a></li>
             </#if>
             
             <#if indexCacheRebuild.rebuildSearchIndex?has_content>
-                <li role="listitem"><a href="${indexCacheRebuild.rebuildSearchIndex }">Rebuild search index</a></li>
+                <li role="listitem"><a href="${indexCacheRebuild.rebuildSearchIndex }" title="Rebuild search index">Rebuild search index</a></li>
             </#if>
             
             <#if indexCacheRebuild.rebuildVisCache?has_content>
-                <li role="listitem"><a href="${indexCacheRebuild.rebuildVisCache}">Rebuild visualization cache</a></li>
+                <li role="listitem"><a href="${indexCacheRebuild.rebuildVisCache}" title="Rebuild visualization cache">Rebuild visualization cache</a></li>
             </#if>
             
             <#if indexCacheRebuild.recomputeInferences?has_content>
-                <li role="listitem"><a href="${indexCacheRebuild.recomputeInferences}">Recompute inferences</a></li>
+                <li role="listitem"><a href="${indexCacheRebuild.recomputeInferences}" title="Recompute inferences">Recompute inferences</a></li>
             </#if>
         </ul>
     </section>

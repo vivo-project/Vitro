@@ -17,7 +17,7 @@
     
     <p class="submit">
         <input type="submit" id="submit" value="${submitLabel}" role="input"/>
-        or <a href="${cancelUrl}" class="cancel">Cancel</a>
+        or <a href="${cancelUrl}" class="cancel" title="cancel">Cancel</a>
     </p>
     
 </form>

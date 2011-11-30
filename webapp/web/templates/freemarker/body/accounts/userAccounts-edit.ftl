@@ -2,7 +2,7 @@
 
 <#-- Template for editing a user account -->
 
-<h3><a class="account-menu" href="accountsAdmin">User accounts</a> > Edit account</h3>
+<h3><a class="account-menu" href="accountsAdmin" title="edit account">User accounts</a> > Edit account</h3>
 
     <#if errorEmailIsEmpty??>
         <#assign errorMessage = "You must supply an email address." />
@@ -97,7 +97,7 @@
             </section>
         </#if>
 
-        <p><input type="submit" id="submitMyAccount" name="submitEdit" value="Save changes" class="submit" disabled /> or <a class="cancel" href="${formUrls.list}">Cancel</a></p>
+        <p><input type="submit" id="submitMyAccount" name="submitEdit" value="Save changes" class="submit" disabled /> or <a class="cancel" href="${formUrls.list}" title="cancel">Cancel</a></p>
 
         <p class="requiredHint">* required fields</p>
     </form>

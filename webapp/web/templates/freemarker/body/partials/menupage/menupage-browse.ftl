@@ -24,7 +24,7 @@
             <h3 class="selected-class"></h3>
             <#assign alphabet = ["A", "B", "C", "D", "E", "F", "G" "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"] />
             <ul id="alpha-browse-individuals">
-                <li><a href="#" class="selected" data-alpha="all">All</a></li>
+                <li><a href="#" class="selected" data-alpha="all" title="select all">All</a></li>
                 <#list alphabet as letter>
                     <li><a href="#" data-alpha="${letter?lower_case}" title="Browse all individuals whose name starts with ${letter}">${letter}</a></li>
                 </#list>

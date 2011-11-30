@@ -9,7 +9,7 @@
     
     <section class="property-group" role="region">
         <nav class="scroll-up" role="navigation">
-            <a href="#branding">
+            <a href="#branding" title="scroll up">
                 <img src="${urls.images}/individual/scroll-up.gif" alt="scroll to property group menus" />
             </a>
         </nav>

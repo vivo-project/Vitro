@@ -46,7 +46,7 @@
             <p>Selected content type for the associated page</p>
             <p>
                 <span id="selectedContentTypeValue" name="selectedContentTypeValue">${associatedPage}</span>
-                <a href="#" id="changeContentType" name="changeContentType">Change content type</a>
+                <a href="#" id="changeContentType" name="changeContentType" title="change content type">Change content type</a>
             </p>
         </section>
         
@@ -92,7 +92,7 @@
             </ul>
         </section>
         
-        <input type="submit" name="submit-${menuAction}" value="Save changes" class="submit" role="input" /> or <a class="cancel" href="${cancelUrl}">Cancel</a>
+        <input type="submit" name="submit-${menuAction}" value="Save changes" class="submit" role="input" /> or <a class="cancel" href="${cancelUrl}" title="cancel">Cancel</a>
 
         <p class="requiredHint">* required fields</p>
     </form>

@@ -48,7 +48,7 @@
                             <p class="proxy-info">
                                 %label% | <span class="class-label">%classLabel%</span>
                                 <br />
-                                <a class='remove-proxy' href="." templatePart="remove">Remove selection</a>
+                                <a class='remove-proxy' href="." templatePart="remove" title="remove selection">Remove selection</a>
                                 <input type="hidden" name="proxyUri" value="%uri%" >
                             </p>
                         </li>
@@ -79,7 +79,7 @@
                             <img class="photo-profile" width="60" alt="%label%" src="%imageUrl%">
                             
                             <p class="proxy-info-profile">%label% | <span class="class-label">%classLabel%</span>
-                                <br /><a class='remove-proxy' href="." templatePart="remove">Remove selection</a>
+                                <br /><a class='remove-proxy' href="." templatePart="remove" title="remove selection">Remove selection</a>
                             </p>
     
                             <input type="hidden" name="profileUri" templatePart="uriField" value="%uri%" role="input" />
@@ -101,7 +101,7 @@
         <input type="text" name="searchTerm" role="input" />
         <input class="submit" type="submit" name="searchByProxy" value="Search" role="button" /> 
             <#if page.previous??>
-               | <a href="${formUrls.list}?pageIndex=${page.previous}&searchTerm=${searchTerm}">Previous</a>
+               | <a href="${formUrls.list}?pageIndex=${page.previous}&searchTerm=${searchTerm}" title="previous">Previous</a>
             </#if>
             
             <#if page.last != 0>
@@ -109,11 +109,11 @@
             </#if>
             
             <#if page.next??>
-                <a href="${formUrls.list}?pageIndex=${page.next}&searchTerm=${searchTerm}">Next</a>
+                <a href="${formUrls.list}?pageIndex=${page.next}&searchTerm=${searchTerm}" title="next">Next</a>
             </#if>
 
             <#if searchTerm?has_content>
-                <p>Search results for "<span class="blue">${searchTerm}</span>" | <a href="${formUrls.list}">View all profile editors</a></p>
+                <p>Search results for "<span class="blue">${searchTerm}</span>" | <a href="${formUrls.list}" title="view all profile editors">View all profile editors</a></p>
             </#if>
     </form>
 </section>
@@ -129,7 +129,7 @@
                 <p class="proxyInfoElement proxy-info">
                     ${p.label} | <span class="class-label">${p.classLabel}</span>
                     <br>
-                    <a class="remove-proxyUri" href="${formUrls.edit}?proxyUri=${p.uri}&deleteProxy=Delete proxy">Delete profile editor</a>
+                    <a class="remove-proxyUri" href="${formUrls.edit}?proxyUri=${p.uri}&deleteProxy=Delete proxy" title="delete profile editor">Delete profile editor</a>
                     <input type="hidden" value="${p.uri}" name="proxyUri">
                 </p>
             </div>       
@@ -168,7 +168,7 @@
                             <img class="photo-profile" width="60" alt="%label%" src="%imageUrl%">
                              
                             <p class="proxy-info-profile">%label% | <span class="class-label">%classLabel%</span>
-                                <br /><a class='remove-proxy' href="." templatePart="remove">Remove selection</a>
+                                <br /><a class='remove-proxy' href="." templatePart="remove" title="remove selection">Remove selection</a>
                             </p>
                         </li>
                         

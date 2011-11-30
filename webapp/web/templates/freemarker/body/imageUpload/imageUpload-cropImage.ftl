@@ -45,7 +45,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/uploadImages.cs
                                       
                 <input  class="submit" type="submit" value="Save photo">
                 
-                <span class="or"> or <a class="cancel"  href="${cancelUrl}">Cancel</a></span>
+                <span class="or"> or <a class="cancel"  href="${cancelUrl}" title="cancel">Cancel</a></span>
             </form>
        </section>
     </section>

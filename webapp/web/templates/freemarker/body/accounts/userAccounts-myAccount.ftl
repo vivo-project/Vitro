@@ -84,7 +84,7 @@
             <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
         </#if>
 
-        <p><input type="submit" id="submitMyAccount" name="submitMyAccount" value="Save changes" class="submit" disabled /> or <a class="cancel" href="${urls.referringPage}">Cancel</a></p>
+        <p><input type="submit" id="submitMyAccount" name="submitMyAccount" value="Save changes" class="submit" disabled /> or <a class="cancel" href="${urls.referringPage}" title="cancel">Cancel</a></p>
 
         <p class="requiredHint">* required fields</p>
     </form>

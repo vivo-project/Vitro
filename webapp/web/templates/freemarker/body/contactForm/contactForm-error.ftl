@@ -10,4 +10,4 @@
     </section>
 </#if>
 
-<p class="contactUsReturnHome">Return to the <a href="${urls.home}">home page</a>.</p> 
+<p class="contactUsReturnHome">Return to the <a href="${urls.home}" title="home page">home page</a>.</p> 

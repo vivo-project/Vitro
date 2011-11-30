@@ -25,7 +25,7 @@
         <header>
             <#if relatedSubject??>
                 <h2>${relatedSubject.relatingPredicateDomainPublic} for ${relatedSubject.name}</h2>
-                <p><a href="${relatedSubject.url}">&larr; return to ${relatedSubject.name}</a></p>                
+                <p><a href="${relatedSubject.url}" title="return to subject">&larr; return to ${relatedSubject.name}</a></p>                
             <#else>                
                 <h1 class="fn">
                     <#-- Label -->

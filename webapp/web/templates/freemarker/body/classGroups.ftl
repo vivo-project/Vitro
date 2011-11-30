@@ -16,7 +16,7 @@
                             <#list classGroup.classes as class> 
                                 <#-- Only render populated classes -->
                                 <#if (class.individualCount > 0)>
-                                    <li role="listitem"><a href="${class.url}">${class.name}</a> (${class.individualCount})</li>
+                                    <li role="listitem"><a href="${class.url}" title="class name">${class.name}</a> (${class.individualCount})</li>
                                 </#if>
                             </#list>
                         </ul>

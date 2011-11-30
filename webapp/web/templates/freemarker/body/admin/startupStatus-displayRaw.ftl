@@ -100,7 +100,7 @@
             
             <#-- If there were no fatal errors, let them go forward from here. -->
             <#if showLink>
-                <p><a href=".">Continue</a></p>
+                <p><a href="." title="continue">Continue</a></p>
     	    </#if>
             
         </#if>

@@ -35,7 +35,7 @@
                 
                 <p class="proxy-info">%label% | <span class="class-label">%classLabel%</span>
                     <br />
-                    <a class='remove-proxy' href="." templatePart="remove">Remove selection</a>
+                    <a class='remove-proxy' href="." templatePart="remove" title="remove selection">Remove selection</a>
                     
                     <input type="hidden" name="proxyUri" value="%uri%" role="input" />
                 </p>

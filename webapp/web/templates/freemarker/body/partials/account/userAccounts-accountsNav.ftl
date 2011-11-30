@@ -35,11 +35,11 @@
           accounts per page <input type="submit" name="accounts-per-page" value="Update" /> | 
 
           <#if page.previous?has_content>
-              <a href="${formUrls.list}?accountsPerPage=${accountsPerPage}&pageIndex=${page.previous}">Previous</a> <!-- only present if current page is not 1.-->
+              <a href="${formUrls.list}?accountsPerPage=${accountsPerPage}&pageIndex=${page.previous}" title="previous">Previous</a> <!-- only present if current page is not 1.-->
           </#if>
               ${page.current} of ${page.last} 
           <#if page.next?has_content>
-              <a href="${formUrls.list}?accountsPerPage=${accountsPerPage}&pageIndex=${page.next}">Next</a><!-- only present if current page is not last page.-->
+              <a href="${formUrls.list}?accountsPerPage=${accountsPerPage}&pageIndex=${page.next}" title="next">Next</a><!-- only present if current page is not last page.-->
           </#if>
       </nav>
   </section>

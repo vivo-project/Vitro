@@ -9,10 +9,10 @@
     third parties, both individuals and organizations, commercial and otherwise. To the extent copyrightable,
     the information presented on the VIVO website and available as Resource Description Framework (RDF) data
     from VIVO at ${termsOfUse.siteHost} is intended for public use and is freely distributed under the terms of the
-    <a href="http://creativecommons.org/licenses/by/3.0/" target="_blank">Creative Commons CC-BY 3.0</a> license which allows you
+    <a href="http://creativecommons.org/licenses/by/3.0/" target="_blank" title="creative commons">Creative Commons CC-BY 3.0</a> license which allows you
     to copy, distribute, display and make derivatives of this information provided you give credit to 
     ${termsOfUse.siteHost}. Any non-copyrightable information is available to you under a
-    <a href="http://creativecommons.org/publicdomain/zero/1.0/"  target="_blank">CC0 waiver</a>.  However, source documents,
+    <a href="http://creativecommons.org/publicdomain/zero/1.0/"  target="_blank" title="cco waiver">CC0 waiver</a>.  However, source documents,
     images or web pages attached to or linked from VIVO may contain copyrighted information and should only be
     used or distributed under terms included with each source or in accordance with the principles of fair use.
     </p>

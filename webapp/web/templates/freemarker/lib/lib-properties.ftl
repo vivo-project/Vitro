@@ -171,7 +171,7 @@ name will be used as the label. -->
     <#local verboseDisplay = property.verboseDisplay!>
     <#if verboseDisplay?has_content>       
         <section class="verbosePropertyListing">
-            <a class="propertyLink" href="${verboseDisplay.propertyEditUrl}">${verboseDisplay.localName}</a> 
+            <a class="propertyLink" href="${verboseDisplay.propertyEditUrl}" title="name">${verboseDisplay.localName}</a> 
             (<span>${property.type?lower_case}</span> property);
             order in group: <span>${verboseDisplay.displayRank};</span> 
             display level: <span>${verboseDisplay.displayLevel};</span>
@@ -200,7 +200,7 @@ name will be used as the label. -->
     <#-- Don't assume that if the mainImage property is populated, there is a thumbnail image (though that is the general case).
          If there's a mainImage statement but no thumbnail image, treat it as if there is no image. -->
     <#if (mainImage.statements)?has_content && thumbUrl?has_content>
-        <a href="${individual.imageUrl}"><img class="individual-photo" src="${thumbUrl}" title="click to view larger image" alt="${individual.name}" width="160" /></a>
+        <a href="${individual.imageUrl}" title="individual photo"><img class="individual-photo" src="${thumbUrl}" title="click to view larger image" alt="${individual.name}" width="160" /></a>
         <@editingLinks "${mainImage.localName}" mainImage.first() editable extraParams />
     <#else>
         <#local imageLabel><@addLinkWithLabel mainImage editable "Photo" extraParams /></#local>

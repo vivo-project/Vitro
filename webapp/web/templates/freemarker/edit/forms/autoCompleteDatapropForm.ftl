@@ -63,7 +63,7 @@ $(document).ready(function() {
 
     <p class="submit">
         <input type="submit" id="submit" value="editConfiguration.submitLabel"/>
-        <span class="or"> or <a class="cancel" href="${editConfiguration.cancelUrl}">Cancel</a>
+        <span class="or"> or <a class="cancel" href="${editConfiguration.cancelUrl}" title="cancel">Cancel</a>
     </p>
 
     </form>

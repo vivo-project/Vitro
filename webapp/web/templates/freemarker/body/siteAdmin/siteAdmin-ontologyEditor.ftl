@@ -18,19 +18,19 @@
         <h4>Class Management</h4>
         
         <ul role="navigation">
-            <li role="listitem"><a href="${ontologyEditor.urls.classGroups}">Class groups</a></li>
-            <li role="listitem"><a href="${ontologyEditor.urls.classHierarchy}">Class hierarchy</a></li>
+            <li role="listitem"><a href="${ontologyEditor.urls.classGroups}" title="Class groups">Class groups</a></li>
+            <li role="listitem"><a href="${ontologyEditor.urls.classHierarchy}" title="Class hierarchy">Class hierarchy</a></li>
             
         </ul>
         
         <h4>Property Management</h4>
         
         <ul role="navigation">
-            <li role="listitem"><a href="${ontologyEditor.urls.dataPropertyHierarchy}">Data property hierarchy</a></li>
-            <li role="listitem"><a href="${ontologyEditor.urls.objectPropertyHierarchy}">Object property hierarchy</a></li>
-            <li role="listitem"><a href="${ontologyEditor.urls.propertyGroups}">Property groups</a></li>
+            <li role="listitem"><a href="${ontologyEditor.urls.dataPropertyHierarchy}" title="Data property hierarchy">Data property hierarchy</a></li>
+            <li role="listitem"><a href="${ontologyEditor.urls.objectPropertyHierarchy}" title="Object property hierarchy">Object property hierarchy</a></li>
+            <li role="listitem"><a href="${ontologyEditor.urls.propertyGroups}" title="Property groups">Property groups</a></li>
         </ul>
         
-        <h4><a href="${ontologyEditor.urls.ontologies}">Ontology list</a></h4>
+        <h4><a href="${ontologyEditor.urls.ontologies}" title="Ontology list">Ontology list</a></h4>
     </section>
 </#if>

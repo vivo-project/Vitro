@@ -32,7 +32,7 @@
         </p>
         
         <p>
-            <a href="${passwordLink}">${passwordLink}</a>
+            <a href="${passwordLink}" title="password">${passwordLink}</a>
         </p>
         
         <p>
