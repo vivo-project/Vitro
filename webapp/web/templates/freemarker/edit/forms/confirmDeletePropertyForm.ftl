@@ -13,7 +13,7 @@
     
     <p class="toBeDeleted ${toBeDeletedClass}">
         <#if editConfiguration.objectProperty = true>
-            <#if statement?has_content>
+            <#if statement?has_content && (statement?keys?size > 0)>
                 <#include deletionTemplateName />
             </#if>
         <#else>
