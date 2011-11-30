@@ -136,6 +136,7 @@ td.verticalfieldlabel {
     margin-top: 2px;
     width: auto;
     overflow: visible;
+    padding: 5px;
 }
 tr.form-row-even {
     background-color: #e9f0ff;
