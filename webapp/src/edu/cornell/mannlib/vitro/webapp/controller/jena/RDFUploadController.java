@@ -319,9 +319,16 @@ public class RDFUploadController extends BaseEditController {
                                             HttpServletRequest req, 
     		                                HttpServletResponse response) 
                                                     throws ServletException{
+         VitroRequest vreq = new VitroRequest(req);
+         req.setAttribute("title","RDF Upload Error ");
+         req.setAttribute("bodyJsp","/jsp/fileUploadError.jsp");
          req.setAttribute("errors", errrorMsg);
+         
          RequestDispatcher rd = req.getRequestDispatcher(
-                 "/edit/fileUploadError.jsp");            
+                 Controllers.BASIC_JSP);      
+         req.setAttribute("css", 
+                 "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + 
+                 vreq.getAppBean().getThemeDir() + "css/edit.css\"/>");
          try {
              rd.forward(req, response);
          } catch (IOException e1) {

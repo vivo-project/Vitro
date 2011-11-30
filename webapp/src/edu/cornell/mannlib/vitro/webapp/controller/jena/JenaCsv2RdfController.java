@@ -16,10 +16,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
@@ -34,7 +35,9 @@ import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 
 
 public class JenaCsv2RdfController extends BaseEditController{
-	private static final String CSV2RDF_JSP = "/jenaIngest/csv2rdf.jsp";
+	Log log = LogFactory.getLog( JenaCsv2RdfController.class );
+    
+    private static final String CSV2RDF_JSP = "/jenaIngest/csv2rdf.jsp";
 	private static final String CSV2RDF_SELECT_URI_JSP = "/jenaIngest/csv2rdfSelectUri.jsp";
 	private static int maxFileSizeInBytes = 1024 * 1024 * 2000; //2000mb 
 	
@@ -64,8 +67,14 @@ public class JenaCsv2RdfController extends BaseEditController{
 			if (!csvUrl.isEmpty() || !filePath.isEmpty()) {
 				String destinationModelNameStr = request.getParameter(
 						"destinationModelName");
-				Model csv2rdfResult = doExecuteCsv2Rdf(
-						request, fileStream, filePath);
+				Model csv2rdfResult = null;
+				try{
+    				csv2rdfResult = doExecuteCsv2Rdf(
+    						request, fileStream, filePath);
+				}catch(Exception ex){
+				    forwardToFileUploadError(ex.getMessage(),req,response);
+				    return;
+				}
 				ModelMaker maker = getVitroJenaModelMaker(request);
 				Boolean csv2rdf = true;
 				JenaIngestUtils utils = new JenaIngestUtils();
@@ -96,18 +105,39 @@ public class JenaCsv2RdfController extends BaseEditController{
 		
     }
 	
-	 private void forwardToFileUploadError( String errrorMsg , HttpServletRequest req, HttpServletResponse response) throws ServletException{
-         req.setAttribute("errors", errrorMsg);
-         RequestDispatcher rd = req.getRequestDispatcher("/edit/fileUploadError.jsp");            
-         try {
-             rd.forward(req, response);
-         } catch (IOException e1) {
-             throw new ServletException(e1);
-         }            
-         return;
-     }
-	 
-	 public Model doExecuteCsv2Rdf(VitroRequest vreq, FileItem fileStream, String filePath) {
+//	 private void forwardToFileUploadError( String errrorMsg , HttpServletRequest req, HttpServletResponse response) throws ServletException{
+//         req.setAttribute("errors", errrorMsg);
+//         RequestDispatcher rd = req.getRequestDispatcher("/jsp/fileUploadError.jsp");            
+//         try {
+//             rd.forward(req, response);
+//         } catch (IOException e1) {
+//             throw new ServletException(e1);
+//         }            
+//         return;
+//     }
+
+    private void forwardToFileUploadError(String errrorMsg,
+            HttpServletRequest req, HttpServletResponse response)
+            throws ServletException {
+        VitroRequest vreq = new VitroRequest(req);
+        req.setAttribute("title", "CSV to RDF Error ");
+        req.setAttribute("bodyJsp", "/jsp/fileUploadError.jsp");
+        req.setAttribute("errors", errrorMsg);
+
+        RequestDispatcher rd = req.getRequestDispatcher(Controllers.BASIC_JSP);
+        req.setAttribute("css",
+                "<link rel=\"stylesheet\" type=\"text/css\" href=\""
+                        + vreq.getAppBean().getThemeDir() + "css/edit.css\"/>");
+        try {
+            rd.forward(req, response);
+        } catch (IOException e1) {
+            log.error(e1);
+            throw new ServletException(e1);
+        }
+        return;
+    }
+
+	 public Model doExecuteCsv2Rdf(VitroRequest vreq, FileItem fileStream, String filePath) throws Exception {
 			char[] quoteChars = {'"'};
 			String namespace = "";
 			String tboxNamespace = vreq.getParameter("tboxNamespace");
@@ -140,7 +170,7 @@ public class JenaCsv2RdfController extends BaseEditController{
 					is = fileStream.getInputStream();
 					
 			} catch (IOException e) {
-				throw new RuntimeException("Unable to access URL " + csvUrl);
+				throw new Exception("Unable to access URL " + csvUrl);
 			}
 			
 			Model[] models = null;
@@ -149,7 +179,7 @@ public class JenaCsv2RdfController extends BaseEditController{
 				 models = c2r.convertToRdf(
 						 is, vreq.getWebappDaoFactory(), destination);
 			} catch (IOException e) {
-				throw new RuntimeException(
+				throw new Exception(
 						"Unable to convert " + csvUrl + " to RDF");
 			}
 			
