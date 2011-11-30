@@ -204,3 +204,8 @@ span.controls {
 #search-proxy {
     padding-bottom: 20px;
 }
+select[name="roleActivityType"],
+input[name="startField-year"],
+input[name="endField-year"] {
+    vertical-align: middle;
+}
