@@ -29,13 +29,12 @@ public class DefaultDataPropertyFormGenerator extends BaseEditConfigurationGener
 	
 	private static Log log = LogFactory.getLog(DefaultDataPropertyFormGenerator.class);
 
-	static String literalVar =  "literal";                             
-    static String literalPlaceholder = "?"+literalVar;
+	static final String literalVar =  "literal";                             
+    static final String literalPlaceholder = "?"+literalVar;
+    static final String dataPropN3 = "?subject ?predicate " + literalPlaceholder + " . " ;
     
 	@Override
-	public EditConfigurationVTwo getEditConfiguration(VitroRequest vreq, HttpSession session) {	    		
-	    String command      = vreq.getParameter("cmd");	    	    	    
-	    
+	public EditConfigurationVTwo getEditConfiguration(VitroRequest vreq, HttpSession session) {	    			    	    	    	   	    
 	    String subjectUri   = vreq.getParameter("subjectUri");
         Individual subject = vreq.getWebappDaoFactory().getIndividualDao().getIndividualByURI(subjectUri);
         if( subject == null ) 
@@ -58,32 +57,42 @@ public class DefaultDataPropertyFormGenerator extends BaseEditConfigurationGener
             rangeDatatypeUri = vreq.getWebappDaoFactory().getDataPropertyDao().getRequiredDatatypeURI(subject, dataproperty);    
         }   
 	        	    
+        Integer dataHash = EditConfigurationUtils.getDataHash(vreq);
+        boolean update = ( dataHash != null );
+        
 	    EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();
 	    	
-	    editConfiguration.setTemplate("defaultDataPropertyForm.ftl");
+	    initBasics(editConfiguration, vreq);
+	    initPropertyParameters(vreq, session, editConfiguration);
 	    
-    	editConfiguration.setN3Required(Arrays.asList( "?subject ?predicate " + literalPlaceholder + " . "));	    
-    	    	    	
-    	editConfiguration.setDatapropKey( EditConfigurationUtils.getDataHash(vreq) );
+	    editConfiguration.setTemplate("defaultDataPropertyForm.ftl");
+	        		        	    	    	
+    	editConfiguration.setDatapropKey( dataHash );
     	
-    	editConfiguration.setVarNameForSubject("subject");
-    	editConfiguration.setSubjectUri(subjectUri);
-    	editConfiguration.setEntityToReturnTo( subjectUri );
-    	
-    	editConfiguration.setVarNameForPredicate("predicate");
-    	editConfiguration.setPredicateUri(predicateUri);
-
+    	editConfiguration.setVarNameForSubject("subject");    	    	    	
+    	editConfiguration.setVarNameForPredicate("predicate");    	
     	editConfiguration.setVarNameForObject( literalVar );
     	
     	editConfiguration.setLiteralsOnForm( Arrays.asList( literalVar ));    	    	    
     	
-    	editConfiguration.addField( new FieldVTwo()
-    	       .setName( literalVar )
-    	       .setPredicateUri(predicateUri)
-    	       .setRangeDatatypeUri(rangeDatatypeUri));    	    
-    	
-    	//deal with empty field
-    	editConfiguration.addModelChangePreprocessor( new DefaultDataPropEmptyField() );	        	
+    	FieldVTwo literalField =  new FieldVTwo()
+            .setName( literalVar )
+            .setPredicateUri(predicateUri)
+            .setRangeDatatypeUri(rangeDatatypeUri);
+    	        
+    	editConfiguration.addField( literalField );    	    
+        
+        // An empty field on an update gets special treatment 
+        if( update ) {
+            // on update, allow an empty field and deal with it in DefaultDataPropEmptyField
+            // see comments in DefaultDataPropEmptyField and VITRO-432
+            editConfiguration.addModelChangePreprocessor( new DefaultDataPropEmptyField() );
+            editConfiguration.setN3Optional(Arrays.asList( dataPropN3 ));
+        }else{
+            //on new, don't allow an empty field 
+            literalField.setValidators(list( "nonempty" ));
+            editConfiguration.setN3Required(Arrays.asList( dataPropN3 ));                        
+        }
     	
 		return editConfiguration;	
 	}
@@ -123,7 +132,6 @@ public class DefaultDataPropertyFormGenerator extends BaseEditConfigurationGener
 
 
 	}
-
 
     private static void dataTypeDebug(DataPropertyStatement dps,
             DataProperty dataproperty) {

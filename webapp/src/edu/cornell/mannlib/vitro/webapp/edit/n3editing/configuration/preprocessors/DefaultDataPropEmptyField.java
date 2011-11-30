@@ -49,8 +49,7 @@ public class DefaultDataPropEmptyField implements ModelChangePreprocessor{
             // Our editors have gotten into the habit of clearing the text from the
             // textarea and saving it to invoke a delete.  see Issue VITRO-432   
             if (configuration.getFields().size() == 1) {
-                String onlyField = configuration.getFields().keySet().iterator()
-                        .next();
+                String onlyField = configuration.getFields().keySet().iterator().next();
                 List<Literal> value = submission.getLiteralsFromForm().get(onlyField);
                 if( value == null || value.size() == 0){
                     return true;

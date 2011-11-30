@@ -1,6 +1,26 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
+<#--If edit submission exists, then retrieve validation errors if they exist-->
+<#if editSubmission?has_content && editSubmission.submissionExists = true && editSubmission.validationErrors?has_content>
+    <#assign submissionErrors = editSubmission.validationErrors/>
+</#if>
+
+
 <h2>${editConfiguration.formTitle}</h2>
+
+<#--Display error messages if any-->
+<#if submissionErrors?has_content>
+    <section id="error-alert" role="alert">
+        <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon" />
+        <p>
+        
+        <#list submissionErrors?keys as errorFieldName>
+            ${submissionErrors[errorFieldName]}
+        </#list>
+                        
+        </p>
+    </section>
+</#if>
 
 <#assign literalValues = "${editConfiguration.dataLiteralValuesAsString}" />
 
