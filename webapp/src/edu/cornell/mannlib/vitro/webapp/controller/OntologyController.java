@@ -108,8 +108,12 @@ public class OntologyController extends VitroHttpServlet{
 			
 		} catch (Throwable th) {
 			log.error("problem while checking accept header " , th);
-		}
-		return null;
+		} 
+		//return null;
+		// Returning null would default to html in the calling method.
+		// But since we don't have a useful html representation yet,
+		// we're going to default to returning RDF/XML.
+		return new ContentType(RDFXML_MIMETYPE);
 	}  
 	
 	private void doRdf(HttpServletRequest req, HttpServletResponse res,
