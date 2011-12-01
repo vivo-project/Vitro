@@ -2,4 +2,4 @@
 
 <#-- Simple object property statement template -->
 
-<a href="${profileUrl(statement.object)}" title="name">${statement.name!}</a>  
+<a href="${profileUrl(statement.uri("object"))}" title="name">${statement.name!}</a>  
