@@ -206,6 +206,7 @@ span.controls {
 }
 select[name="roleActivityType"],
 input[name="startField-year"],
-input[name="endField-year"] {
+input[name="endField-year"],
+input[name="dateTimeField-year"] {
     vertical-align: middle;
 }

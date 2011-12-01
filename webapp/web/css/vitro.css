@@ -25,7 +25,7 @@
     color: #900;
     padding: 10px;
     margin-bottom: 5px;
-    height: 30px;
+    height: auto;
 }
 #error-alert img {
     float:left;
