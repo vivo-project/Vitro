@@ -43,7 +43,7 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
  * This is the page to which the user is redirected if they select Delete on the default property form. 
  *
  */
-public class DefaultDeleteGenerator implements EditConfigurationGenerator {
+public class DefaultDeleteGenerator extends BaseEditConfigurationGenerator implements EditConfigurationGenerator {
 	
 	private Log log = LogFactory.getLog(DefaultObjectPropertyFormGenerator.class);
 	private String subjectUri = null;
@@ -74,6 +74,8 @@ public class DefaultDeleteGenerator implements EditConfigurationGenerator {
     		editConfiguration = setupEditConfiguration(vreq, session);
     	}
     	editConfiguration.setTemplate(template);
+    	//prepare update?
+    	prepare(vreq, editConfiguration);
     	return editConfiguration;
     }
 

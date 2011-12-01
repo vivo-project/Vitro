@@ -116,8 +116,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	//default obj property form.populateTemplate or some such method
     	//Select from existing also set within template itself
     	setTemplate(editConfiguration, vreq);
-    	//Set edit key
-    	setEditKey(session, editConfiguration, vreq);
+    	//edit key now set in the edit request dispatch controller
     	return editConfiguration;
     }
     
@@ -307,7 +306,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     private HashMap<String, String> generateSparqlForExistingLiterals() {
     	HashMap<String, String> map = new HashMap<String, String>();
     	String query = "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ";
-    	query += "SELECT ?existingName WHERE { ?" + objectVarName + " rdfs:label ?existingName }";
+    	query += "SELECT ?existingName WHERE { ?" + objectVarName + " rdfs:label ?existingName . }";
     	map.put("name", query);
     	return map;
     }
@@ -374,9 +373,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	
     	field.setRangeLang(null);
     	field.setLiteralOptions(new ArrayList<List<String>>());
-    	
-    	List<String> assertions = new ArrayList<String>();
-    	assertions.add(getN3ForName());    	
+      	
     	fields.put(field.getName(), field);
     	
     	return fields;

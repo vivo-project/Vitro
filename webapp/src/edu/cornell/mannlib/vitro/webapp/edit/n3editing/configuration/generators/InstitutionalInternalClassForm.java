@@ -16,7 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
  *  
  *
  */
-public class InstitutionalInternalClassForm implements EditConfigurationGenerator {
+public class InstitutionalInternalClassForm extends BaseEditConfigurationGenerator implements EditConfigurationGenerator {
 
     String INTERNAL_CLASS_ANNOTATION_URI= "<http://example.com/vivo#ChangeMeUniveristy>";
     
@@ -47,6 +47,8 @@ public class InstitutionalInternalClassForm implements EditConfigurationGenerato
         editConfig.setUrlPatternToReturnTo("/siteAdmin");        
         
         editConfig.setSubmitToUrl("/edit/process");
+        //prepare
+        prepare(vreq, editConfig);
         return editConfig;
     }
 

@@ -64,7 +64,8 @@ public class DateTimeValueFormGenerator extends BaseEditConfigurationGenerator
         
         //Adding additional data, specifically edit mode
         addFormSpecificData(conf, vreq);
-
+        //prepare
+        prepare(vreq, conf);
         return conf;
 	}
 	

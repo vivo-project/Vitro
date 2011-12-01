@@ -93,7 +93,8 @@ public class DefaultDataPropertyFormGenerator extends BaseEditConfigurationGener
             literalField.setValidators(list( "nonempty" ));
             editConfiguration.setN3Required(Arrays.asList( dataPropN3 ));                        
         }
-    	
+        //prepare
+        prepare(vreq, editConfiguration);
 		return editConfiguration;	
 	}
 	

@@ -81,7 +81,8 @@ public class DateTimeIntervalFormGenerator extends
 
         //Adding additional data, specifically edit mode
         addFormSpecificData(conf, vreq);
-
+        //Prepare
+        prepare(vreq, conf);
         return conf;
         
 	}

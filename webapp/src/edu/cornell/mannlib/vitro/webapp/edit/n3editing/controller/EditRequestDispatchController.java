@@ -150,29 +150,6 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 
         //put edit configuration in session so it can be accessed on form submit.
         EditConfigurationVTwo.putConfigInSession(editConfig, session);
-        
-        Model model = (Model) getServletContext().getAttribute("jenaOntModel");
-        
-        if( editConfig.getSubjectUri() == null)
-            editConfig.setSubjectUri( EditConfigurationUtils.getSubjectUri(vreq));
-        if( editConfig.getPredicateUri() == null )
-            editConfig.setPredicateUri( EditConfigurationUtils.getPredicateUri(vreq));
-        
-        String objectUri = EditConfigurationUtils.getObjectUri(vreq);
-        Integer dataKey = EditConfigurationUtils.getDataHash(vreq);
-        if (objectUri != null && ! objectUri.trim().isEmpty()) { 
-            // editing existing object
-            if( editConfig.getObject() == null)
-                editConfig.setObject( EditConfigurationUtils.getObjectUri(vreq));
-            editConfig.prepareForObjPropUpdate(model);
-        } else if( dataKey != null ) { // edit of a data prop statement
-            //do nothing since the data prop form generator must take care of it
-            editConfig.prepareForDataPropUpdate(model, vreq.getWebappDaoFactory().getDataPropertyDao());
-        } else{
-            //this might be a create new or a form
-            editConfig.prepareForNonUpdate(model);
-        }
-        
 		return editConfig;
 	}
 

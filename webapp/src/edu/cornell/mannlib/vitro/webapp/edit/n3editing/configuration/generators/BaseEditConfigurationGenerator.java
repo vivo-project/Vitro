@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
+import com.hp.hpl.jena.rdf.model.Model;
+
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
@@ -47,6 +49,35 @@ public abstract class BaseEditConfigurationGenerator implements EditConfiguratio
     void initObjectPropForm(EditConfigurationVTwo editConfiguration,VitroRequest vreq) {                      
         editConfiguration.setObject( EditConfigurationUtils.getObjectUri(vreq) );        
     }    
+    
+    //Prepare for update or non-update
+    //Originally included in edit request dispatch controller but moved here due to
+    //exceptions such as default add missing individual form
+    void prepare(VitroRequest vreq, EditConfigurationVTwo editConfig) {
+    	//This used to get the model from the servlet context
+    	//        Model model = (Model) getServletContext().getAttribute("jenaOntModel");
+        Model model = vreq.getJenaOntModel();
+        
+        if( editConfig.getSubjectUri() == null)
+            editConfig.setSubjectUri( EditConfigurationUtils.getSubjectUri(vreq));
+        if( editConfig.getPredicateUri() == null )
+            editConfig.setPredicateUri( EditConfigurationUtils.getPredicateUri(vreq));
+        
+        String objectUri = EditConfigurationUtils.getObjectUri(vreq);
+        Integer dataKey = EditConfigurationUtils.getDataHash(vreq);
+        if (objectUri != null && ! objectUri.trim().isEmpty()) { 
+            // editing existing object
+            if( editConfig.getObject() == null)
+                editConfig.setObject( EditConfigurationUtils.getObjectUri(vreq));
+            editConfig.prepareForObjPropUpdate(model);
+        } else if( dataKey != null ) { // edit of a data prop statement
+            //do nothing since the data prop form generator must take care of it
+            editConfig.prepareForDataPropUpdate(model, vreq.getWebappDaoFactory().getDataPropertyDao());
+        } else{
+            //this might be a create new or a form
+            editConfig.prepareForNonUpdate(model);
+        }
+    }
     
     /**
      * Method to turn Strings or multiple List<String> to List<String>. 
