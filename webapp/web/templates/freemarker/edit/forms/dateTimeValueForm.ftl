@@ -38,5 +38,4 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/cust
                   '<link rel="stylesheet" href="${urls.base}/edit/forms/css/personHasEducationalTraining.css" />')}
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/utils.js"></script>',
-              '<script type="text/javascript" src="${urls.base}/js/customFormUtils.js"></script>',
-              '<script type="text/javascript" src="${urls.base}/edit/forms/js/customFormWithAutocomplete.js"></script>')}
+              '<script type="text/javascript" src="${urls.base}/js/customFormUtils.js"></script>')}
