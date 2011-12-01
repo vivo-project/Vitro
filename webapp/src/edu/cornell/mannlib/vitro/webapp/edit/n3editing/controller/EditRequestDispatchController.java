@@ -20,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.DirectRedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
@@ -64,22 +65,24 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          }
         
          //if edit form needs to be skipped to object instead
-         if(isSkipEditForm(vreq)) {
+         if(isSkipPredicate(vreq)) {
         	 return processSkipEditForm(vreq);
-         }
+         }                  
      
         //Get the edit generator name
          String editConfGeneratorName = processEditConfGeneratorName(vreq);
-
-        //forward to create new handled in default object property form generator
         
          //session attribute 
          setSessionRequestFromEntity(vreq);
-         //Test
  
-         /****  make new or get an existing edit configuration ***/         
+         // make new or get an existing edit configuration          
          EditConfigurationVTwo editConfig = setupEditConfiguration(editConfGeneratorName, vreq);
          log.debug("editConfiguration:\n" + editConfig );
+
+         //if the EditConfig indicates a URL to skip to, then redirect to that URL
+         if( editConfig.getSkipToUrl() != null ){
+             return new DirectRedirectResponseValues(editConfig.getSkipToUrl());
+         }
          
          //what template?
          String template = editConfig.getTemplate();
@@ -109,11 +112,9 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
         	 return new TemplateResponseValues("error-message.ftl", map);
         
          }
-    }
-    
+    }    
 
-
-	private MultiValueEditSubmission getMultiValueSubmission(VitroRequest vreq, EditConfigurationVTwo editConfig) {
+    private MultiValueEditSubmission getMultiValueSubmission(VitroRequest vreq, EditConfigurationVTwo editConfig) {
 		return EditSubmissionUtils.getEditSubmissionFromSession(vreq.getSession(), editConfig);
 	}
 
@@ -238,7 +239,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 
 
 	//if skip edit form
-	private boolean isSkipEditForm(VitroRequest vreq) {
+	private boolean isSkipPredicate(VitroRequest vreq) {
 		 //Certain predicates may be annotated to change the behavior of the edit
         //link.  Check for this annotation and, if present, simply redirect 
         //to the normal individual display for the object URI instead of bringing

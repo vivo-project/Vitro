@@ -127,6 +127,12 @@ public class EditConfigurationVTwo {
      * to the original form. */
     String formUrl;
     
+    /**
+     * skipToUrl is a URL that should be forwarded to instead of displaying
+     * a form.  This will need the context if it is relative.  It may be a
+     * full off site URL.
+     */
+    String skipToUrl;
     
     String editKey;
 
@@ -1031,6 +1037,14 @@ public class EditConfigurationVTwo {
 
     public String getUrlToReturnTo() {
         return this.urlToReturnTo;
+    }
+
+    public void setSkipToUrl(String url){
+        skipToUrl=url;
+    }
+    
+    public String getSkipToUrl() {
+        return skipToUrl;
     }
     
 }

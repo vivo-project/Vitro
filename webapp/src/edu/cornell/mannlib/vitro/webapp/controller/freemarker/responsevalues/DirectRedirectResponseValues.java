@@ -8,9 +8,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues;
  * It redirects to the URL specified.  It does not attempt to add a 
  * context node.  This is useful when you want to redirect to a URL
  * created by the UrlBuilder which uses statics to sneak a context
- * into the URL strings it creates. 
- *  
- * @author bdc34 
+ * into the URL strings it creates.    
  */
 public class DirectRedirectResponseValues extends RedirectResponseValues {
 

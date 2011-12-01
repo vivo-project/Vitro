@@ -13,11 +13,14 @@ public class RedirectResponseValues extends BaseResponseValues {
 
     private final String redirectUrl;
 
-    //TODO: document this.  What does this do and mean?
-    //should redirectUrl have the context?  Or is the context added?
-    //If the context is added, what if we already have it because 
-    //UrlBuilder was used?  
-    //what about an off site redirect?  Maybe check for a magic "://" ?    
+    /** 
+     * The string redirectUrl will get the context added.    
+       If you want a redirect for a URL that has the context already added, 
+       as is the case if a UrlBuilder was used. use the class DirectRedirectResponseValues. 
+       
+       This will attempt to handle an off site redirect by checking for
+        "://" in the URL. 
+     */
     public RedirectResponseValues(String redirectUrl) {
         this.redirectUrl = getRedirectUrl(redirectUrl);
     }
