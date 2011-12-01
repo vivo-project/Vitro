@@ -148,7 +148,6 @@ public class JenaModelUtils {
 		
 		// Perform the SPARQL DESCRIBEs
 		for ( String queryStr : queryStrList ) {
-			log.info(queryStr + "\n\n");
 			Query tboxSparqlQuery = QueryFactory.create(queryStr);
 			QueryExecution qe = QueryExecutionFactory.create(tboxSparqlQuery,dataset);
 			try {
