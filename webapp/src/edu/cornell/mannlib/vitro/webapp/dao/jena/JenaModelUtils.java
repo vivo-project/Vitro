@@ -141,13 +141,14 @@ public class JenaModelUtils {
 		// if we're using to a hash namespace, the URI of the Ontology resource will be
 		// that namespace minus the final hash mark.
 		if ( namespace != null && namespace.endsWith("#") ) {
-			queryStrList.add( makeDescribeQueryStr( OWL.Ontology.getURI(), namespace.substring(0,namespace.length()-2), graphURI ) );	
+			queryStrList.add( makeDescribeQueryStr( OWL.Ontology.getURI(), namespace.substring(0,namespace.length()-1), graphURI ) );	
 		} else {
 			queryStrList.add( makeDescribeQueryStr( OWL.Ontology.getURI(), namespace, graphURI ) );
 		}
 		
 		// Perform the SPARQL DESCRIBEs
 		for ( String queryStr : queryStrList ) {
+			log.info(queryStr + "\n\n");
 			Query tboxSparqlQuery = QueryFactory.create(queryStr);
 			QueryExecution qe = QueryExecutionFactory.create(tboxSparqlQuery,dataset);
 			try {
@@ -303,9 +304,9 @@ public class JenaModelUtils {
         } else {
             // limit resources to those in the supplied namespace
             buff
-            .append("    FILTER (afn:namespace(?res) = \"")
+            .append("    FILTER (regex(str(?res), \"^")
             .append(namespace)
-            .append("\") \n");  
+            .append("\")) \n");  
         }
 	    return buff.toString();
 	}
