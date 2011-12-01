@@ -58,7 +58,12 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
       
     	try{
         WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-         //check some error conditions and if they exist return response values
+        
+        if(isMenuMode(vreq)) {
+        	return redirectToMenuEdit(vreq);
+        }
+        
+        //check some error conditions and if they exist return response values
          //with error message
          if(isErrorCondition(vreq)){
         	 return doHelp(vreq, getErrorMessage(vreq));
@@ -114,6 +119,19 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          }
     }    
 
+
+
+	private boolean isMenuMode(VitroRequest vreq) {
+		//Check if special model, in which case forward
+    	return(vreq.getParameter("switchToDisplayModel") != null); 
+	}
+
+	private ResponseValues redirectToMenuEdit(VitroRequest vreq) {
+		String queryString = vreq.getQueryString();
+		String redirectPage = vreq.getContextPath() + "/editDisplayModel?" + queryString;
+        return new RedirectResponseValues(redirectPage, HttpServletResponse.SC_SEE_OTHER);
+
+	}
     private MultiValueEditSubmission getMultiValueSubmission(VitroRequest vreq, EditConfigurationVTwo editConfig) {
 		return EditSubmissionUtils.getEditSubmissionFromSession(vreq.getSession(), editConfig);
 	}

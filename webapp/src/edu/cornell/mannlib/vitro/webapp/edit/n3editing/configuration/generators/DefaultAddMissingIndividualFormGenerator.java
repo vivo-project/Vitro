@@ -306,7 +306,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     
     private HashMap<String, String> generateSparqlForExistingLiterals() {
     	HashMap<String, String> map = new HashMap<String, String>();
-    	String query = StringUtils.join(getN3Prefixes(), "");
+    	String query = "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ";
     	query += "SELECT ?existingName WHERE { ?" + objectVarName + " rdfs:label ?existingName }";
     	map.put("name", query);
     	return map;

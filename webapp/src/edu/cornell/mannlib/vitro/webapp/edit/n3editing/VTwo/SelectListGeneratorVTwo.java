@@ -2,8 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -452,6 +454,50 @@ public class SelectListGeneratorVTwo {
         }
         log.debug("removed "+removeCount+" duplicate range individuals");
         return individuals;
+    }
+    
+    //Methods to sort the options map 
+    // from http://forum.java.sun.com/thread.jspa?threadID=639077&messageID=4250708
+    public static Map<String,String> getSortedMap(Map<String,String> hmap){
+        // first make temporary list of String arrays holding both the key and its corresponding value, so that the list can be sorted with a decent comparator
+        List<String[]> objectsToSort = new ArrayList<String[]>(hmap.size());
+        for (String key:hmap.keySet()) {
+            String[] x = new String[2];
+            x[0] = key;
+            x[1] = hmap.get(key);
+            objectsToSort.add(x);
+        }
+        Collections.sort(objectsToSort, new MapPairsComparator());
+
+        HashMap<String,String> map = new LinkedHashMap<String,String>(objectsToSort.size());
+        for (String[] pair:objectsToSort) {
+            map.put(pair[0],pair[1]);
+        }
+        return map;
+    }
+
+    private static class MapPairsComparator implements Comparator<String[]> {
+        public int compare (String[] s1, String[] s2) {
+            Collator collator = Collator.getInstance();
+            if (s2 == null) {
+                return 1;
+            } else if (s1 == null) {
+                return -1;
+            } else {
+            	if ("".equals(s1[0])) {
+            		return -1;
+            	} else if ("".equals(s2[0])) {
+            		return 1;
+            	}
+                if (s2[1]==null) {
+                    return 1;
+                } else if (s1[1] == null){
+                    return -1;
+                } else {
+                    return collator.compare(s1[1],s2[1]);
+                }
+            }
+        }
     }
 
     private static final String LEFT_BLANK = "";
