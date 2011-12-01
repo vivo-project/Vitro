@@ -18,7 +18,7 @@ public abstract class BaseTemplateModel {
     private static final Log log = LogFactory.getLog(BaseTemplateModel.class);
 
 	private static final String URI_CHARACTERS = 
-			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=";
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&%'()*+,;=";
     
     protected static ServletContext servletContext;
     
