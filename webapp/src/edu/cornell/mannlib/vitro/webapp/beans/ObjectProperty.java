@@ -289,12 +289,6 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     public void setDomainEntitySortDirection(String domainEntitySortDirection) {
         this.domainEntitySortDirection = domainEntitySortDirection;
     }
-    public String getDomainEntitySortField() {
-        return domainEntitySortField;
-    }
-    public void setDomainEntitySortField(String domainEntitySortField) {
-        this.domainEntitySortField = domainEntitySortField;
-    }
     public String getObjectIndividualSortPropertyURI() {
     	return this.objectIndividualSortPropertyURI;
     }
@@ -336,12 +330,6 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     }
     public void setRangeEntitySortDirection(String rangeEntitySortDirection) {
         this.rangeEntitySortDirection = rangeEntitySortDirection;
-    }
-    public String getRangeEntitySortField() {
-        return rangeEntitySortField;
-    }
-    public void setRangeEntitySortField(String rangeEntitySortField) {
-        this.rangeEntitySortField = rangeEntitySortField;
     }
     public boolean getSelectFromExisting() {
         return selectFromExisting;
@@ -389,79 +377,65 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
             tier2 = (tier2 == null) ? 0 : tier2;
             return tier1 - tier2;
         }
-    }
-
-    private Collator collator = Collator.getInstance();    
+    }  
     
     /**
      * Sorts the object property statements taking into account the sort order.
      */
-    public static List<ObjectPropertyStatement> sortObjectPropertyStatementsForDisplay(ObjectProperty prop, List objPropStmtsList) {
-        if (objPropStmtsList==null) {
-            log.error("incoming object property statement list is null; returning null");
+    public static List<ObjectPropertyStatement> sortObjectPropertyStatementsForDisplay(
+    		ObjectProperty prop, List objPropStmtsList) {
+    	
+        if (objPropStmtsList == null) {
+            log.error("incoming object property statement list is null; " +
+            		  "returning null");
             return null;
         }
-        if (objPropStmtsList.size()<2) { // no need to sort
+        if (objPropStmtsList.size() < 2) { // no need to sort
             return objPropStmtsList;
         }
-        String tmpDirection = prop.getDomainEntitySortDirection(); //valid values are "desc" and "asc", anything else will default to ascending
-        final boolean direction = !"desc".equalsIgnoreCase(tmpDirection);
+        
+        String tmpDirection = prop.getDomainEntitySortDirection(); 
+        // Valid values are "desc" and "asc";
+        // anything else will default to ascending.
+        final boolean ascending = !"desc".equalsIgnoreCase(tmpDirection);
 
-        String objIndivSortPropURI=prop.getObjectIndividualSortPropertyURI();
-        if (prop.getObjectIndividualSortPropertyURI() == null || prop.getObjectIndividualSortPropertyURI().length()==0) {
-            String tmpField = prop.getDomainEntitySortField();
-            log.debug("objectIndividualSortPropertyURI is null or blank so sorting by field "+tmpField);
-            if( tmpField == null || tmpField.length() == 0) {
-                tmpField = "name";
-            }
-            final String field = tmpField;
+        String objIndivSortPropURI = prop.getObjectIndividualSortPropertyURI();
+        if (prop.getObjectIndividualSortPropertyURI() == null 
+        		|| prop.getObjectIndividualSortPropertyURI().length() == 0) {
+            log.debug("objectIndividualSortPropertyURI is null or blank " +
+                      "so sorting by name ");
             
             Comparator fieldComp = new Comparator() {
-                final String cField= field;
-                final boolean cAsc = direction;
-    
+                
                 public final int compare(Object o1, Object o2) {
-                    ObjectPropertyStatement e2e1= (ObjectPropertyStatement)o1, e2e2=(ObjectPropertyStatement)o2;
+                    ObjectPropertyStatement e2e1 = (ObjectPropertyStatement) o1, 
+                                            e2e2 = (ObjectPropertyStatement) o2;
                     Individual e1 , e2;
                     e1 = e2e1 != null ? e2e1.getObject():null;
                     e2 = e2e2 != null ? e2e2.getObject():null;
     
                     Object val1 = null, val2 = null;
                     if( e1 != null ) {
-                        try {
-                            val1 = e1.getField(cField);
-                        } catch (NoSuchMethodException e) {
-                            e.printStackTrace();
-                        }
+                        val1 = e1.getName();
                     } else {
-                        log.debug( "PropertyWebapp.sortObjectPropertiesForDisplay() passed object property statement with no range entity.");
+                        log.debug( "PropertyWebapp.sortObjectPropertiesForDisplay() " +
+                        		   "passed object property statement with no range entity.");
                     }
                     if( e2 != null ) {
-                        try {
-                            val2 = e2.getField(cField);
-                        } catch (NoSuchMethodException e) {
-                            e.printStackTrace();
-                        }
+                        val2 = e2.getName();
                     } else {
-                    	log.debug( "PropertyWebapp.sortObjectPropertyStatementsForDisplay passed object property statement with no range entity.");
+                    	log.debug( "PropertyWebapp.sortObjectPropertyStatementsForDisplay " +
+                    			   "passed object property statement with no range entity.");
                     }
                     int rv = 0;
                     try {
                         if( val1 instanceof String ) {
-                        	
-                        	if (val1 == null && val2 == null) {
-                        		rv = 0;
-                        	} else if (val1 == null) {
-                        		rv = 1;
-                        	} else if (val2 == null) {
+                            if (val2 == null) {
                         		rv = -1;
                         	} else {
-                               	
                                 Collator collator = Collator.getInstance();
-                            	rv = collator.compare( ((String)val1) , ((String)val2) );
-                                //rv = ((String)val1).compareTo((String)val2);                 		
+                            	rv = collator.compare( ((String)val1) , ((String)val2) );                		
                         	}
- 
                         } else if( val1 instanceof Date ) {
                             DateTime dt1 = new DateTime((Date)val1);
                             DateTime dt2 = new DateTime((Date)val2);
@@ -473,7 +447,7 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
                         e.printStackTrace();
                     }
     
-                    if( cAsc ) {
+                    if( ascending ) {
                         return rv;
                     } else {
                         return rv * -1;
@@ -487,11 +461,9 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
             }
         } else { // sort by specified range entity data property value instead of a property having a get() method in Individual.java
             log.debug("using data property "+prop.getObjectIndividualSortPropertyURI()+" to sort related entities");
-            final boolean compDirection = direction;
             final String objIndSortPropURI = prop.getObjectIndividualSortPropertyURI();
             Comparator dpComp = new Comparator() {
                 final String cDatapropURI = objIndSortPropURI;
-                final boolean cAscending = compDirection;
     
                 public final int compare(Object o1, Object o2){
                     ObjectPropertyStatement e2e1= (ObjectPropertyStatement)o1, e2e2=(ObjectPropertyStatement)o2;
@@ -567,7 +539,7 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
                     }
  
                     
-                    if ( !cAscending ) {
+                    if ( !ascending ) {
                     	rv = rv * -1;
                     }
                     
@@ -582,14 +554,10 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
                 }
             };
             try {
-                if (dpComp==null) {
-                    log.error("data property comparator is null; returning unsorted object property statements list");
-                    return objPropStmtsList;
-                } else {
-                    Collections.sort(objPropStmtsList, dpComp);
-                }
+                Collections.sort(objPropStmtsList, dpComp);
             } catch (Exception e) {
-                log.error("Exception sorting object property statements for object property "+prop.getURI());
+                log.error("Exception sorting object property statements " +
+                          "for object property " + prop.getURI(), e);
             }
         }
         return objPropStmtsList;
@@ -619,7 +587,6 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
         "domainDisplayTier: " + getDomainDisplayTier() + "\n\t" +
         "domainEntityId: " + getDomainEntityURI() + "\n\t" +
         "domainEntitySortDirection: " + getDomainEntitySortDirection() + "\n\t" +
-        "domainEntitySortField: " + getDomainEntitySortField() + "\n\t" +
         "domainVClass: " + getDomainVClass() + "\n\t" +
         "domainClassId: " + getDomainVClassURI() + "\n\t" +
         "domainPublic: " + getDomainPublic() + "\n\t" +
@@ -628,7 +595,6 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
         "rangeDisplayTier: " + getRangeDisplayTier() + "\n\t" +
         "rangeEntityId: " + getRangeEntityURI() + "\n\t" +
         "rangeEntitySortDirection: " + getRangeEntitySortDirection() + "\n\t" +
-        "rangeEntitySortField: " + getRangeEntitySortField() + "\n\t" +
         "rangeVClass: " + getRangeVClass() + "\n\t" +
         "rangeClassId: " + getRangeVClassURI() + "\n\t" +
         "rangePublic: " + getRangePublic() + "\n\t" +

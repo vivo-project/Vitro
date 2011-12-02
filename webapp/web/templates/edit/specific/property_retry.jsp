@@ -153,14 +153,7 @@
 </tr>
 <tr class="editformcell">
     <td valign="bottom" colspan="2">
-        <em>Optional: <strong>sort related individuals</strong> by<br />
-	    (default is sort by name)</em><br/>
-        <input name="DomainEntitySortField" value="<form:value name="DomainEntitySortField"/>" />
-        <c:set var="DomainEntitySortFieldError"><form:error name="DomainEntitySortField"/></c:set>
-        <c:if test="${!empty DomainEntitySortFieldError}">
-            <span class="notice"><c:out value="${DomainEntitySortFieldError}"/></span> 
-        </c:if>
-    </td>
+     &nbsp;</td>
     <td valign="bottom" colspan="1">
         <em>Optional: <strong>sort direction</strong><br />
 	    (blank for ascending, &quot;desc&quot; for descending)</em><br/>
@@ -276,13 +269,7 @@
 
     <tr class="editformcell">
         <td valign="bottom" colspan="2">
-            <em>Optional: <strong>sort related object individuals of inverse property</strong> by<br />
-	    (default is sort by name)</em><br/>
-            <input name="RangeEntitySortField" value="<form:value name="RangeEntitySortField"/>" />
-            <c:set var="RangeEntitySortFieldError"><form:error name="RangeEntitySortField"/></c:set>
-            <c:if test="${!empty RangeEntitySortFieldError}">
-                <span class="notice"><c:out value="${RangeEntitySortFieldError}"/></span>
-            </c:if>
+            &nbsp;
         </td>
      	<td valign="bottom" colspan="1">
             <em>Optional: <strong>inverse sort direction</strong><br />

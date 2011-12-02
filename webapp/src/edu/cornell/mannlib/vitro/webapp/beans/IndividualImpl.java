@@ -319,33 +319,6 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
         JSONObject jsonObj = new JSONObject(this, INCLUDED_IN_JSON);
         return jsonObj;
     }
-    /**
-    *
-    * @param fieldName- expected to be the field name in the format
-    * @return
-    * @throws NoSuchMethodException
-    */
-   public Object getField(String fieldName) throws NoSuchMethodException{
-       if( fieldName == null || fieldName.length() == 0) return null;
-
-       if( "name".equalsIgnoreCase(fieldName) )
-           return getName();
-
-       //not one of the more common ones, try reflection
-
-       //capitalize first letter
-       String methodName = "get" + fieldName.substring(0,1).toUpperCase()
-           + fieldName.substring(1,fieldName.length());
-
-       Class cls = this.getClass();
-       try {
-           Method meth = cls.getMethod(methodName, (Class[]) null);
-           return meth.invoke(this,(Object[])null);
-       } catch (Exception e) { }
-       //should never get here
-       throw new NoSuchMethodException("Entity.getField() attempt to use a method called "
-               + methodName +"() for field " + fieldName + " but the method doesn't exist.");
-   }
 
    public int compareTo(Individual o2) {
        Collator collator = Collator.getInstance();

@@ -91,11 +91,6 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     }
 
     @Override
-    public String getDomainEntitySortField() {
-        return innerObjectProperty.getDomainEntitySortField();
-    }
-
-    @Override
     public String getDomainEntityURI() {
         return innerObjectProperty.getDomainEntityURI();
     }    
@@ -228,11 +223,6 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     }
 
     @Override
-    public String getRangeEntitySortField() {
-        return innerObjectProperty.getRangeEntitySortField();
-    }
-
-    @Override
     public String getRangeEntityURI() {
         return innerObjectProperty.getRangeEntityURI();
     }
@@ -316,11 +306,6 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     public void setDomainEntitySortDirection(String domainEntitySortDirection) {
         innerObjectProperty
                 .setDomainEntitySortDirection(domainEntitySortDirection);
-    }
-
-    @Override
-    public void setDomainEntitySortField(String domainEntitySortField) {
-        innerObjectProperty.setDomainEntitySortField(domainEntitySortField);
     }
 
     @Override
@@ -462,11 +447,6 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     public void setRangeEntitySortDirection(String rangeEntitySortDirection) {
         innerObjectProperty
                 .setRangeEntitySortDirection(rangeEntitySortDirection);
-    }
-
-    @Override
-    public void setRangeEntitySortField(String rangeEntitySortField) {
-        innerObjectProperty.setRangeEntitySortField(rangeEntitySortField);
     }
 
     @Override

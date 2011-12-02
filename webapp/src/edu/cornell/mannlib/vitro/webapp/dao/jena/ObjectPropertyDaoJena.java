@@ -160,8 +160,6 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
            	p.setRangeDisplayTier(getPropertyNonNegativeIntegerValue(invOp,DISPLAY_RANK_ANNOT));
             p.setDomainDisplayLimit(getPropertyNonNegativeIntValue(op,DISPLAY_LIMIT));
             p.setRangeDisplayLimit(getPropertyNonNegativeIntValue(invOp,DISPLAY_LIMIT));
-            p.setDomainEntitySortField(getPropertyStringValue(op,PROPERTY_ENTITYSORTFIELD));
-            p.setRangeEntitySortField(getPropertyStringValue(invOp,PROPERTY_ENTITYSORTFIELD));
             RDFNode objectIndividualSortPropertyNode = op.getPropertyValue(PROPERTY_OBJECTINDIVIDUALSORTPROPERTY);
             if (objectIndividualSortPropertyNode instanceof Resource) {  
             	p.setObjectIndividualSortPropertyURI( ((Resource)objectIndividualSortPropertyNode).getURI() ); 
@@ -532,13 +530,11 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         updatePropertyStringValue(p,DESCRIPTION_ANNOT,prop.getDescription(),getOntModel());
         updatePropertyStringValue(p,PUBLIC_DESCRIPTION_ANNOT,prop.getPublicDescription(),getOntModel());
         updatePropertyNonNegativeIntegerValue(p,DISPLAY_LIMIT,prop.getDomainDisplayLimitInteger(),getOntModel());
-        updatePropertyStringValue(p,PROPERTY_ENTITYSORTFIELD,prop.getDomainEntitySortField(),getOntModel());
         updatePropertyStringValue(p,PROPERTY_ENTITYSORTDIRECTION,prop.getDomainEntitySortDirection(),getOntModel());
         if (inv != null) {
             updatePropertyStringValue(inv,EXAMPLE_ANNOT,prop.getExample(),getOntModel());
             updatePropertyStringValue(inv,DESCRIPTION_ANNOT,prop.getDescription(),getOntModel());
             updatePropertyNonNegativeIntegerValue(inv,DISPLAY_LIMIT,prop.getRangeDisplayLimitInteger(),getOntModel());
-            updatePropertyStringValue(inv,PROPERTY_ENTITYSORTFIELD,prop.getRangeEntitySortField(),getOntModel());
             updatePropertyStringValue(inv,PROPERTY_ENTITYSORTDIRECTION,prop.getRangeEntitySortDirection(),getOntModel());
         }
                 

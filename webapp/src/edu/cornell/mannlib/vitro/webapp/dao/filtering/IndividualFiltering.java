@@ -213,11 +213,6 @@ public class IndividualFiltering implements Individual {
         return _innerIndividual.getExternalIds();
     }
 
-    @Override
-    public Object getField(String fieldName) throws NoSuchMethodException {
-        return _innerIndividual.getField(fieldName);
-    }
-
 	@Override
 	public String getMainImageUri() {
 		return _innerIndividual.getMainImageUri();
