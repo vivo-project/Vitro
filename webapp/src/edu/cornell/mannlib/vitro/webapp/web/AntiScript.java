@@ -51,7 +51,7 @@ public class AntiScript {
             cr = as.scan(dirtyInput);
             return cr.getCleanHTML();
         } catch (ScanException e) {
-            log.error("Error while scaning HTML" ,e );
+            log.error("Error while scanning HTML" ,e );
         } catch (PolicyException e) {
             log.error("Error while scanning HTML", e);
         }        
