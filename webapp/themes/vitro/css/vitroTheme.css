@@ -1495,3 +1495,16 @@ h2#personInPosition .verbosePropertyListing,
 h2#hasResearchArea .verbosePropertyListing {
     display: block;
 }
+form.customForm .hint {
+    color: #9c9c9c;
+    font-weight: normal;
+}
+form.customForm .requiredHint {
+    color: #c00;
+    font-weight: normal;
+    font-size: small;
+}
+form.customForm #requiredLegend {
+    font-style: italic;
+    margin-top: .5em;
+}

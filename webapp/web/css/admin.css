@@ -14,10 +14,14 @@
     margin: 1em 0;
     padding: 0 1em;
 }
-#adminDashboard .pageBodyGroup h4 {
+#adminDashboard .pageBodyGroup h4,
+#adminDashboard .pageBodyGroup h4 a {
     margin: 0;
     padding: 0;
     color: #666;
+}
+#adminDashboard .pageBodyGroup h4 a {
+    font-weight: bold;
 }
 #adminDashboard .pageBodyGroup h3 {
     background-color: #efefef;
