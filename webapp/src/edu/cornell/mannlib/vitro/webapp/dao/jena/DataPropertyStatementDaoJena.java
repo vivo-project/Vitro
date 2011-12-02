@@ -34,12 +34,18 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.controller.edit.ReorderController;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualUpdateEvent;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPropertyStatementDao
 {
+    private static final Log log = LogFactory.getLog(DataPropertyStatementDaoJena.class);
+
 
     private DatasetWrapperFactory dwf;
     
@@ -156,7 +162,11 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
             Property datatypeProperty = ResourceFactory.createProperty(
                     dataPropertyURI);
             ontModel.removeAll(indRes, datatypeProperty, (Literal)null);
-        } finally {
+        } catch(Exception ex) {
+        	log.error("Error occurred in removal of data property " + dataPropertyURI + " for " + individualURI);
+        }
+        finally {
+        
         	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(
         	        getWebappDaoFactory().getUserURI(),
         	        false,
@@ -280,7 +290,9 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
             if (res != null && prop != null && literal != null && dataPropertyStmt.getData().length()>0) {
                 res.addProperty(prop, literal);
             }
-        } finally {
+        } catch(Exception ex){
+        	log.error("Error occurred in adding a data property for " + dataPropertyStmt.toString());
+        }finally {
         	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),false,dataPropertyStmt.getIndividualURI()));
             ontModel.leaveCriticalSection();
         }
