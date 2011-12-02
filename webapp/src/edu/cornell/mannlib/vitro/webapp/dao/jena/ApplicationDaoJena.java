@@ -52,8 +52,10 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
     	}
     	ontModel.enterCriticalSection(Lock.READ);
     	try {
-    		
-    		application.setApplicationName(appInd.getLabel(null));
+    		String appName = appInd.getLabel(null);
+    		if (appName != null) {
+    			application.setApplicationName(appName);
+    		} // else leave as default
 	        application.setAboutText(getPropertyStringValue(
 	        		appInd, APPLICATION_ABOUTTEXT));
 	        application.setAcknowledgeText(getPropertyStringValue(
@@ -82,7 +84,7 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
     	Individual appInd = ontModel.getIndividual(
     			getApplicationResourceURI());
     	if (appInd == null) {
-    		appInd = getOntModel().createIndividual(
+    		appInd = ontModel.createIndividual(
     				getApplicationResourceURI(), PORTAL);
     	}
     	ontModel.enterCriticalSection(Lock.WRITE);
