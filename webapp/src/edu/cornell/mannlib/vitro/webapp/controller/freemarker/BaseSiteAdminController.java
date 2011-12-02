@@ -17,7 +17,7 @@ import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndividuals;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoBackEndEditing;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditSiteInformation;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
@@ -91,7 +91,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
     
         Map<String, Object> map = new HashMap<String, Object>();
         
-        if (PolicyHelper.isAuthorizedForActions(vreq, new EditIndividuals())) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, new DoBackEndEditing())) {
 
             map.put("formAction", UrlBuilder.getUrl("/editRequestDispatch"));
             

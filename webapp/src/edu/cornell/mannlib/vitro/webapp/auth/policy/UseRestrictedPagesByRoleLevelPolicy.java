@@ -16,7 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.querymodel.QueryFul
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.querymodel.QueryUserAccountsModel;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.AccessSpecialDataModels;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoFrontEndEditing;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndividuals;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoBackEndEditing;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOwnAccount;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditSiteInformation;
@@ -110,7 +110,7 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		} else if (whatToAuth instanceof UseMiscellaneousCuratorPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
 
-		} else if (whatToAuth instanceof EditIndividuals) {
+		} else if (whatToAuth instanceof DoBackEndEditing) {
 			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
 
 		} else if (whatToAuth instanceof SeeSiteAdminPage) {
