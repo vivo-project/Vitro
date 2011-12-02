@@ -204,8 +204,6 @@ public class NewIndividualFormGenerator implements EditConfigurationGenerator {
     	List<String> urisOnForm = new ArrayList<String>();
     	List<String> literalsOnForm = new ArrayList<String>();
     	literalsOnForm.add("label");
-    	literalsOnForm.add("firstName");
-    	literalsOnForm.add("lastName");
     	editConfiguration.setUrisOnform(urisOnForm);
     	editConfiguration.setLiteralsOnForm(literalsOnForm);
     }    
@@ -237,11 +235,11 @@ public class NewIndividualFormGenerator implements EditConfigurationGenerator {
     
     private void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri) {
     	Map<String, FieldVTwo> fields = new HashMap<String, FieldVTwo>();
-    	getLabelField(editConfiguration, vreq, fields);
+    	setLabelField(editConfiguration, vreq, fields);
 
     }
     
-    private void getLabelField(EditConfigurationVTwo editConfiguration,
+    private void setLabelField(EditConfigurationVTwo editConfiguration,
 			VitroRequest vreq, Map<String, FieldVTwo> fields) {
     	FieldVTwo field = new FieldVTwo();
     	field.setName("label");    	
@@ -264,6 +262,7 @@ public class NewIndividualFormGenerator implements EditConfigurationGenerator {
     	field.setLiteralOptions(new ArrayList<List<String>>());
     	
     	fields.put(field.getName(), field);		
+    	editConfiguration.setFields(fields);
 	}
 
 	

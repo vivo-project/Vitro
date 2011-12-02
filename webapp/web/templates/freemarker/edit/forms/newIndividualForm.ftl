@@ -5,18 +5,29 @@
 <#--Retrieve certain edit configuration information-->
 <#assign typeName = editConfiguration.pageData.typeName />
 
+<#--If edit submission exists, then retrieve validation errors if they exist-->
+<#if editSubmission?has_content && editSubmission.submissionExists = true && editSubmission.validationErrors?has_content>
+	<#assign submissionErrors = editSubmission.validationErrors/>
+</#if>
+
+
 <h2>Create a new ${typeName}</h2>
 
-<#if errorNameFieldIsEmpty??>
-    <#assign errorMessage = "Enter a name." />
-</#if>
-
-<#if errorMessage?has_content>
+<#if submissionErrors?has_content >
     <section id="error-alert" role="alert">
         <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon" />
-        <p>${errorMessage}</p>
+        <p>
+        <#list submissionErrors?keys as errorFieldName>
+        	<#if  errorFieldName == "label">
+        	    Please enter a value in the name field.
+    	    </#if>
+    	    <br />
+    	</#list>
+        </p>
     </section>
 </#if>
+
+
 
 <#assign requiredHint = "<span class='requiredHint'> *</span>" />
 
@@ -26,7 +37,7 @@
  
       <p>
           <label for="name">Name ${requiredHint}</label>
-          <input size="30"  type="text" id="name" name="name" value="" />
+          <input size="30"  type="text" id="label" name="label" value="" />
       </p>
 
       <p class="submit">
