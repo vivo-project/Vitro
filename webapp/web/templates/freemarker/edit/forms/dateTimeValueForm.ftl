@@ -16,7 +16,7 @@
         <#assign disabledVal=""/>
 </#if>
 
-<h2>${editMode} date time value for ${editConfiguration.subjectName}</h2>
+<h2>${titleVerb} date time value for ${editConfiguration.subjectName}</h2>
 
 <form class="customForm" action ="${submitUrl}" class="customForm">
 <#--Need to draw edit elements for dates here-->
@@ -33,7 +33,6 @@
         <a class="cancel" href="${editConfiguration.cancelUrl}" title="Cancel">Cancel</a>
     </p>
 </form>
-
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/customForm.css" />',
                   '<link rel="stylesheet" href="${urls.base}/edit/forms/css/personHasEducationalTraining.css" />')}
 
