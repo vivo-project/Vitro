@@ -31,7 +31,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
     protected String value;
    
     //Extended to include vitro request to check for special parameters
-    DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, 
+    public DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, 
             Literal literal, EditingPolicyHelper policyHelper, VitroRequest vreq) {
         super(subjectUri, propertyUri, policyHelper, vreq);
         
@@ -51,7 +51,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
         super(subjectUri, propertyUri, policyHelper, vreq);
     }
     
-    protected void setValue(String value) {
+    public void setValue(String value) {
         this.value = value;
     }
     

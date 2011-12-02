@@ -32,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditSubmissionUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.EditConfigurationGenerator;
 import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
+import edu.cornell.mannlib.vitro.webapp.web.beanswrappers.ReadOnlyBeansWrapper;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit.EditConfigurationTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit.MultiValueEditSubmissionTemplateModel;
 /**
@@ -105,7 +106,9 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          //what goes in the map for templates?
          Map<String,Object> templateData = new HashMap<String,Object>();
          EditConfigurationTemplateModel etm = new EditConfigurationTemplateModel( editConfig, vreq);
-         templateData.put("editConfiguration", etm);
+         //Similar to individual controller, we're exposing getters that require paramters as well here - 
+         //Used specifically since we are including object property statement template model
+         templateData.put("editConfiguration", wrap(etm, new ReadOnlyBeansWrapper()));
          templateData.put("editSubmission", submissionTemplateModel);
          //Corresponding to original note for consistency with selenium tests and 1.1.1
          templateData.put("title", "Edit");
@@ -135,7 +138,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 	private ResponseValues redirectToMenuEdit(VitroRequest vreq) {
 		String queryString = vreq.getQueryString();
 		String redirectPage = vreq.getContextPath() + "/editDisplayModel?" + queryString;
-        return new RedirectResponseValues(redirectPage, HttpServletResponse.SC_SEE_OTHER);
+        return new DirectRedirectResponseValues(redirectPage, HttpServletResponse.SC_SEE_OTHER);
 
 	}
     private MultiValueEditSubmission getMultiValueSubmission(VitroRequest vreq, EditConfigurationVTwo editConfig) {

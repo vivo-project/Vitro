@@ -36,6 +36,10 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditElementVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.SelectListGeneratorVTwo;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DataPropertyStatementTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.EditingPolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ObjectPropertyStatementTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.PropertyStatementTemplateModel;
 
 public class EditConfigurationTemplateModel extends BaseTemplateModel {
     EditConfigurationVTwo editConfig;
@@ -420,24 +424,38 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     }
     
     //TODO: Implement statement display
-    public Map<String, String> getStatementDisplay() {
+    public ObjectPropertyStatementTemplateModel getObjectStatementDisplay() {
     	Map<String, String> statementDisplay = new HashMap<String, String>();
-    	if(isDataProperty()) {
-    		statementDisplay.put("dataValue", getDataLiteralValuesFromParameter());
-    	} else {
-    		//Expecting statement parameters to be passed in
-    		Map params = vreq.getParameterMap();
-    		for (Object key : params.keySet()) {
-    	        String keyString = (String) key; //key.toString()
-    	        if (keyString.startsWith("statement_")) {
-    	            keyString = keyString.replaceFirst("statement_", "");
-    	            String value = ( (String[]) params.get(key))[0];
-    	            statementDisplay.put(keyString, value);
-    	        }
-    	    }
-    		
-    	}
-    	return statementDisplay;
+    	String subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
+		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
+    	String objectUri = EditConfigurationUtils.getObjectUri(vreq);
+		//ObjectPropertyStatementTemplate Model should pass the object key as part of the delete url
+		String objectKey = vreq.getParameter("objectKey");
+		statementDisplay.put(objectKey, objectUri);
+		//Set data map
+		Map params = vreq.getParameterMap();
+		for (Object key : params.keySet()) {
+	        String keyString = (String) key; //key.toString()
+	        if (keyString.startsWith("statement_")) {
+	            keyString = keyString.replaceFirst("statement_", "");
+	            String value = ( (String[]) params.get(key))[0];
+	            statementDisplay.put(keyString, value);
+	        }
+	    }
+		
+		//Using object property statement template model here
+		ObjectPropertyStatementTemplateModel osm = new ObjectPropertyStatementTemplateModel(
+				subjectUri, 
+				predicateUri, 
+				objectKey, 
+		        statementDisplay, 
+		        null, null, vreq);
+		return osm;
+    }
+    
+    public String getDataStatementDisplay() {
+    	//Just return the value of the data property
+    	return getDataLiteralValuesFromParameter();
     }
     
     //Used for deletion in case there's a specific template to be employed
@@ -464,6 +482,8 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 		return dataValue;
 		
 	}
+    
+   
 
 	//TODO:Check where this logic should actually go, copied from input element formatting tag
     public Map<String, String> getOfferTypesCreateNew() {

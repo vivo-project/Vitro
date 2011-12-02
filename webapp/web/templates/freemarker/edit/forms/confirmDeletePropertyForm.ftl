@@ -4,20 +4,23 @@
 
 <#if editConfiguration.objectProperty = true>
     <#assign toBeDeletedClass = "objProp" />
+    <#assign statement = editConfiguration.objectStatementDisplay />
+<#else>
+	<#assign statement = editConfiguration.dataStatementDisplay />
 </#if>
 
 <#assign deletionTemplateName = editConfiguration.deleteTemplate/>
-<#assign statement = editConfiguration.statementDisplay />
+
 <form action="${editConfiguration.deleteProcessingUrl}" method="get">
     <h2>Are you sure you want to delete the following entry from <em>${editConfiguration.propertyName}</em>?</h2>
     
     <p class="toBeDeleted ${toBeDeletedClass}">
         <#if editConfiguration.objectProperty = true>
-            <#if statement?has_content && (statement?keys?size > 0)>
+            <#if statement?has_content>
                 <#include deletionTemplateName />
             </#if>
         <#else>
-            ${statement.dataValue}
+            ${statement}
         </#if>
     </p>
     

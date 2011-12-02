@@ -28,14 +28,16 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     // Used for editing
     private final String objectUri;
     private final String templateName;
-
-    ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, String objectKey, 
+    private final String objectKey;
+    public ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, String objectKey, 
             Map<String, String> data, EditingPolicyHelper policyHelper, String templateName, VitroRequest vreq) {
         super(subjectUri, propertyUri, policyHelper, vreq);
         
         this.data = data;
         this.objectUri = data.get(objectKey);        
         this.templateName = templateName;
+        //to keep track of later
+        this.objectKey = objectKey;
         setEditUrls(policyHelper);
     }
 
@@ -67,7 +69,8 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
                     "subjectUri", subjectUri,
                     "predicateUri", propertyUri,
                     "objectUri", objectUri,
-                    "cmd", "delete");
+                    "cmd", "delete",
+                    "objectKey", objectKey);
             
             for ( String key : data.keySet() ) {
                 String value = data.get(key);
