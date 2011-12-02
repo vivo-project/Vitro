@@ -154,8 +154,34 @@ public class EditN3GeneratorVTwoTest {
         
         String not_expected = "<null>";
         Assert.assertTrue("must not sub in <null>", !not_expected.equals(resultN3));
+                        
+        not_expected = "<>";        
+        Assert.assertTrue("must not sub in <>", !not_expected.equals(resultN3));
+        
+        Assert.assertEquals("?varXYZ", resultN3);
     }
     
+    @Test 
+    public void testSubInMultiUrisEmptyString(){        
+        String n3 = "?varXYZ" ;
+        List<String> targets = new ArrayList<String>();
+        targets.add(n3);
+        
+        Map<String,List<String>> keyToValues = new HashMap<String,List<String>>();
+        List<String> targetValue = new ArrayList<String>();        
+        targetValue.add("");       
+        keyToValues.put("varXYZ", targetValue);
+        
+        gen.subInMultiUris(keyToValues, targets);
+        Assert.assertNotNull(targets);
+        Assert.assertEquals(1,targets.size());
+        
+        String resultN3 = targets.get(0);
+        Assert.assertNotNull(resultN3);
+        Assert.assertTrue("String was empty", !resultN3.isEmpty());                
+                                
+        Assert.assertEquals("?varXYZ", resultN3);
+    }
     
     @Test 
     public void testSubInUrisNull(){

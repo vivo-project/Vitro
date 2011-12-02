@@ -52,10 +52,22 @@ public class EditN3GeneratorVTwo {
     	        continue;
             Set<String> keySet = varsToVals.keySet();
             for (String key : keySet) {
-                List<String> value = varsToVals.get(key);                
-                log.debug("The original value String is " + value.toString());
+                List<String> values = varsToVals.get(key);  
+                if( values == null ){
+                    log.debug("skipping var " + key + " because value List is null");
+                    continue;
+                }else if( containsNullOrEmpty( values )){
+                    
+                    //bdc34: what should we do if the list contains nulls or empty strings?
+                    //for now we just skip the whole key/var.  
+                    //Maybe it would be useful to strip the nulls+empties out of the list?
+                    
+                    log.debug("skipping var " + key + " because it contains nulls or empty strings");
+                    continue;
+                }
+                log.debug("The original value String is " + values.toString());                
                 
-                String valueString = org.apache.commons.lang.StringUtils.join(value,
+                String valueString = org.apache.commons.lang.StringUtils.join(values,
                         ">, <");                                
                 valueString = "<" + valueString + ">";                
                 log.debug("The multiUri value String is " + valueString);
@@ -66,6 +78,10 @@ public class EditN3GeneratorVTwo {
         }         
     }
   
+    private boolean containsNullOrEmpty(List<String> values) {        
+        return values != null && ( values.contains(null) || values.contains("") );       
+    }
+
     /**
      * The List targets will be modified.
      */
