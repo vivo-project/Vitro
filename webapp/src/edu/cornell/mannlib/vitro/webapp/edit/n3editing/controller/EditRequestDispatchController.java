@@ -13,8 +13,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.rdf.model.Model;
-
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoFrontEndEditing;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -53,7 +53,13 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     //TODO: Create this generator
     final String RDFS_LABEL_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.RDFSLabelGenerator";
     final String DEFAULT_DELETE_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDeleteGenerator";
+
     @Override
+	protected Actions requiredActions(VitroRequest vreq) {
+    	return new Actions(new DoFrontEndEditing());
+	}
+
+	@Override
     protected ResponseValues processRequest(VitroRequest vreq) {
       
     	try{

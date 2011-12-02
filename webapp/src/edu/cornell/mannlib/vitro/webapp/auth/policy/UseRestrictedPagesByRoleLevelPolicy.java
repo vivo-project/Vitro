@@ -15,6 +15,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.querymodel.QueryFullModel;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.querymodel.QueryUserAccountsModel;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.AccessSpecialDataModels;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoFrontEndEditing;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndividuals;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOwnAccount;
@@ -137,6 +138,9 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
 			
 		} else if (whatToAuth instanceof QueryUserAccountsModel) {
+			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
+			
+		} else if (whatToAuth instanceof DoFrontEndEditing) {
 			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
 			
 		} else if (whatToAuth instanceof QueryFullModel) {

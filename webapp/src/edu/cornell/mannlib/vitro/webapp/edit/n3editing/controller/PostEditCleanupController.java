@@ -8,6 +8,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoFrontEndEditing;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -27,7 +29,12 @@ public class PostEditCleanupController extends FreemarkerHttpServlet{
 	
     private static Log log = LogFactory.getLog(PostEditCleanupController.class);    	    
 	
-	@Override 
+    @Override
+	protected Actions requiredActions(VitroRequest vreq) {
+    	return new Actions(new DoFrontEndEditing());
+	}
+
+    @Override 
 	protected ResponseValues processRequest(VitroRequest vreq) {	
 		doPostEditCleanup( vreq );
 		return doPostEditRedirect( vreq, null);	
