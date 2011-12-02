@@ -106,9 +106,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
          //what goes in the map for templates?
          Map<String,Object> templateData = new HashMap<String,Object>();
          EditConfigurationTemplateModel etm = new EditConfigurationTemplateModel( editConfig, vreq);
-         //Similar to individual controller, we're exposing getters that require paramters as well here - 
-         //Used specifically since we are including object property statement template model
-         templateData.put("editConfiguration", wrap(etm, new ReadOnlyBeansWrapper()));
+         templateData.put("editConfiguration", etm);
          templateData.put("editSubmission", submissionTemplateModel);
          //Corresponding to original note for consistency with selenium tests and 1.1.1
          templateData.put("title", "Edit");

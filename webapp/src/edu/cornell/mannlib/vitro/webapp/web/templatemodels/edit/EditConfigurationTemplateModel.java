@@ -35,11 +35,16 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTw
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditElementVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.SelectListGeneratorVTwo;
+import edu.cornell.mannlib.vitro.webapp.web.beanswrappers.ReadOnlyBeansWrapper;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DataPropertyStatementTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.EditingPolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ObjectPropertyStatementTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.PropertyStatementTemplateModel;
+import freemarker.ext.beans.BeansWrapper;
+import freemarker.template.DefaultObjectWrapper;
+import freemarker.template.TemplateModel;
+import freemarker.template.TemplateModelException;
 
 public class EditConfigurationTemplateModel extends BaseTemplateModel {
     EditConfigurationVTwo editConfig;
@@ -89,21 +94,6 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     //Based on certain pre-set fields/variables, look for what
     //drop-downs need to be populated
 	private void populateDropdowns() {
-	    
-//		String predicateUri = editConfig.getPredicateUri();
-//		if(predicateUri != null) {
-//			if(EditConfigurationUtils.isObjectProperty(editConfig.getPredicateUri(), vreq)) {
-//	    		setRangeOptions();
-//	    	}
-//	    	if(pageData.containsKey("objectSelect")) {
-//	    		List<String> fieldNames = (List<String>)pageData.get("objectSelect");
-//	    		for(String field:fieldNames) {
-//	    			WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-//	            	Map<String,String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, field , wdf);    	
-//	    			pageData.put(field, optionsMap);    		
-//	    		}
-//	    	}
-//		}	
 		
 		//For each field with an optionType defined, create the options
 		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
@@ -120,18 +110,6 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 		    }
 		    pageData.put(fieldName, SelectListGeneratorVTwo.getOptions(editConfig, fieldName, wdf));		       
 		}
-		    
-//		String predicateUri = editConfig.getPredicateUri();
-//		if(predicateUri != null) {
-//	    	if(pageData.containsKey("objectSelect")) {
-//	    		List<String> fieldNames = (List<String>)pageData.get("objectSelect");
-//	    		for(String field:fieldNames) {
-//	    			WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-//	            	Map<String,String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, field , wdf);    	
-//	    			pageData.put(field, optionsMap);    		
-//	    		}
-//	    	}
-//		}
 	}
 
 	//TODO: Check if this should return a list instead
@@ -254,10 +232,11 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	return (String) pageData.get("submitLabel");
     }
     
+    /*
     public Map<String, String> getRangeOptions() {
     	Map<String, String> rangeOptions = (Map<String, String>) pageData.get("rangeOptions");
     	return rangeOptions;
-    }
+    }*/
     
     //Get literals in scope, i.e. variable names with values assigned
     public Map<String, List<Literal>> getLiteralValues() {
@@ -424,7 +403,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     }
     
     //TODO: Implement statement display
-    public ObjectPropertyStatementTemplateModel getObjectStatementDisplay() {
+    public TemplateModel getObjectStatementDisplay() throws TemplateModelException {
     	Map<String, String> statementDisplay = new HashMap<String, String>();
     	String subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
 		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
@@ -450,7 +429,15 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 				objectKey, 
 		        statementDisplay, 
 		        null, null, vreq);
-		return osm;
+		ReadOnlyBeansWrapper wrapper = new ReadOnlyBeansWrapper();
+		return wrapper.wrap(osm);
+       /* TemplateModel tm = null;
+        try {
+        	tm = wrapper.wrap(osm);
+        } catch(Exception ex) {
+        	log.error("Error occurred in wrapping object property statement model", ex);
+        } 
+        return tm;*/
     }
     
     public String getDataStatementDisplay() {
