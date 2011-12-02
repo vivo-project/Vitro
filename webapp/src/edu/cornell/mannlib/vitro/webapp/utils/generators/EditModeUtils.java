@@ -30,20 +30,26 @@ public class EditModeUtils {
     	int numberPredicates = possiblePredicates.size();
     	for(String predicate:possiblePredicates) {
     		EditMode mode = FrontEndEditingUtils.getEditMode(vreq, object, predicate);
+    		log.debug("Checking edit mode for " + predicate + " and retrieved " + mode.toString());
     		//Any error  mode should result in error
     		if(mode == EditMode.ERROR) {
+    			log.debug("Edit mode is error for " + predicate);
     			foundErrorMode = true;
     			break;
     		}
     		if(mode == EditMode.EDIT) {
+    			log.debug("Edit mode is EDIT for " + predicate);
     			numberEditModes++;
     		}
     		else if(mode == EditMode.REPAIR) {
+    			log.debug("Edit mode is REPAIR for " + predicate);
     			numberRepairModes++;
     		}
     		
     	}
-    	
+    	log.debug("Number of edit editModes " + numberEditModes);
+    	log.debug("Number of repair editModes " + numberRepairModes);
+    	log.debug("Found error mode: " + foundErrorMode);
     	//if found an error or if more than one edit mode returned, incorrect
 
     	if(foundErrorMode || numberEditModes > 1) 
