@@ -258,3 +258,22 @@ section.verbosePropertyListing {
 h2#overview .verbosePropertyListing {
     display: block;
 }
+/* URI/RDF ICON DISPLAY ------->  */
+.qtip-content h5 {
+    margin: 0;
+    padding: 0;
+}
+input#uriLink {
+    margin: 0;
+    width: 350px;
+    font-size: .8em;
+}
+a.close {
+    float: right;
+    margin-right: .3em;
+    font-size: .8em;
+}
+.rdf-url {
+    display: block;
+    padding-top: 0.8em;
+}
