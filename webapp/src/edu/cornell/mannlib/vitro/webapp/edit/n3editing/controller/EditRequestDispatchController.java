@@ -372,6 +372,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
         if(EditConfigurationVTwoGenerator == null){
         	throw new Error("Could not find EditConfigurationVTwoGenerator " + editConfGeneratorName);        	
         } else {
+            log.debug("Created EditConfiguration using " + editConfGeneratorName);
             return EditConfigurationVTwoGenerator.getEditConfiguration(vreq, session);
         }
         

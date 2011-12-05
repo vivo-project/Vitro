@@ -45,6 +45,9 @@ public abstract class BaseTemplateModel {
      * that shouldn't be in a URI.
      */
     protected String cleanURIForDisplay( String dirty ){
+        if( dirty == null )
+            return null;
+        
     	StringBuilder clean = new StringBuilder(dirty.length());
     	for (char ch: dirty.toCharArray()) {
     		if (URI_CHARACTERS.indexOf(ch) != -1) {
@@ -59,7 +62,7 @@ public abstract class BaseTemplateModel {
      * Currently this only checks for XSS exploits.
      */
     protected String cleanTextForDisplay( String dirty){
-        return AntiScript.cleanText(dirty, getServletContext());
+        return AntiScript.cleanText(dirty);
     }
     
     /**
@@ -67,7 +70,7 @@ public abstract class BaseTemplateModel {
      * a map.  Map may be modified. 
      */
     protected <T> void cleanMapValuesForDisplay( Map<T,String> map){
-        AntiScript.cleanMapValues(map, getServletContext());
+        AntiScript.cleanMapValues(map);
     }
     
     protected static ServletContext getServletContext() {

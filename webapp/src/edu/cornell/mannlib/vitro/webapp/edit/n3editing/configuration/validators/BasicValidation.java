@@ -29,9 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditSubmission;
 
 /**
- * User: bdc34
- * Date: Jan 24, 2008
- * Time: 1:55:39 PM
+ * 
  */
 public class BasicValidation {
 
@@ -271,7 +269,7 @@ public class BasicValidation {
     static final List<String> basicValidations;
     static{
         basicValidations = Arrays.asList(
-        "nonempty","isDate","dateNotPast","httpUrl" );
+        "nonempty","isDate","dateNotPast","httpUrl" ,"anti-xss");
     }
 
     private Log log = LogFactory.getLog(BasicValidation.class);

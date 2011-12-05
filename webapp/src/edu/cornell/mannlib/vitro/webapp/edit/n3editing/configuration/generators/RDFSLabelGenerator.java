@@ -31,6 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.AntiXssValidation;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditN3GeneratorVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.SelectListGeneratorVTwo;
@@ -100,6 +101,8 @@ public class RDFSLabelGenerator implements EditConfigurationGenerator {
     	//placing in session depends on having edit key which is handled in edit request dispatch controller
     	prepareForUpdate(vreq, session, editConfiguration);
 
+    	editConfiguration.addValidator(new AntiXssValidation());
+    	
     	//Form title and submit label now moved to edit configuration template
     	setTemplate(editConfiguration, vreq);
     	//Set edit key

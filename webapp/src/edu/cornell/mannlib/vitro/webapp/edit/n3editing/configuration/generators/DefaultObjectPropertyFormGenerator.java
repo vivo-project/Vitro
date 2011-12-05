@@ -26,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.AntiXssValidation;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 /**
@@ -110,6 +111,9 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	//default obj property form.populateTemplate or some such method
     	//Select from existing also set within template itself
     	setTemplate(editConfiguration, vreq);
+    	
+    	editConfiguration.addValidator(new AntiXssValidation());
+    	
     	//Set edit key
     	setEditKey(editConfiguration, vreq);
     	//Adding additional data, specifically edit mode

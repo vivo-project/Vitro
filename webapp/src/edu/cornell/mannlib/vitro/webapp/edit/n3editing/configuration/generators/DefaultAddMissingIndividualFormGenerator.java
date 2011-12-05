@@ -38,6 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.SelectListGeneratorV
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.DefaultAddMissingIndividualFormModelPreprocessor;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.AntiXssValidation;
 
 /**
  * Generates the edit configuration for a default property form.
@@ -116,6 +117,9 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	//default obj property form.populateTemplate or some such method
     	//Select from existing also set within template itself
     	setTemplate(editConfiguration, vreq);
+    	
+    	editConfiguration.addValidator(new AntiXssValidation());
+    	
     	//edit key now set in the edit request dispatch controller
     	return editConfiguration;
     }

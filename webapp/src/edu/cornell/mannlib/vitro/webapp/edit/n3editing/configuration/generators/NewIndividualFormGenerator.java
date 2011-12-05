@@ -34,6 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.AntiXssValidation;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditN3GeneratorVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.SelectListGeneratorVTwo;
@@ -96,6 +97,7 @@ public class NewIndividualFormGenerator implements EditConfigurationGenerator {
 
     	prepareForUpdate(vreq, session, editConfiguration);
     	
+    	editConfiguration.addValidator(new AntiXssValidation());
     	
     	//Form title and submit label now moved to edit configuration template
     	//TODO: check if edit configuration template correct place to set those or whether
