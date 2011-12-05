@@ -12,21 +12,13 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Set" %>
 <%@ page import="java.util.Map.Entry" %>
-<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" %>
 <% request.setAttribute("requestedActions", new UseAdvancedDataToolsPages()); %>
 <vitro:confirmAuthorization />
 
-<%
-
-    ModelMaker maker = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
-    if (maker == null) {
-        maker = (ModelMaker) getServletContext().getAttribute("vitroJenaSDBModelMaker");
-    }
-
-%>
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript">
 function selectProperties(){
@@ -104,13 +96,9 @@ function disableProperties(){
 
     <select name="destinationModelName">
         <option value="vitro:baseOntModel">webapp assertions</option>
-<%
-    for (Iterator it = maker.listModels(); it.hasNext(); ) {
-	String modelName = (String) it.next();
-        %> <option value="<%=modelName%>"/><%=modelName%></option>
-        <%    
-    }
-%>   
+        <c:forEach var="modelName" items="${modelNames}">
+            <option value="${modelName}"/>${modelName}</option>
+        </c:forEach>
     </select>
 
     <input class="submit" type="submit" value="Rename Blank Nodes"/>

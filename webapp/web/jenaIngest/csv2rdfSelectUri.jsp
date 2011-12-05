@@ -20,14 +20,6 @@
 <% request.setAttribute("requestedActions", new UseAdvancedDataToolsPages()); %>
 <vitro:confirmAuthorization />
 
-<%
-
-    ModelMaker maker = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
-    if (maker == null) {
-        maker = (ModelMaker) getServletContext().getAttribute("vitroJenaSDBModelMaker");
-    }
-
-%>
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript" src="js/jenaIngest/renameNode.js"></script>
 <script type="text/javascript">
@@ -89,6 +81,8 @@ function disableProperties(){
     <c:forEach var="sourceModelValue" items="${sourceModel}">
         <input type="hidden" name="sourceModelName" value="${sourceModelValue}"/>
     </c:forEach>
+    
+    <p/>
     
     <input class="submit" type="submit" value="Convert CSV"/>
     

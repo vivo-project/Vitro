@@ -9,18 +9,11 @@
 <%@ page import="java.net.URLEncoder" %>
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" %>
 <% request.setAttribute("requestedActions", new UseAdvancedDataToolsPages()); %>
 <vitro:confirmAuthorization />
-
-<%
-
-    ModelMaker maker = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
-    if (maker == null) {
-        maker = (ModelMaker) getServletContext().getAttribute("vitroJenaSDBModelMaker");
-    }
-
-%>
 
     <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Convert CSV to RDF</h2>
 
@@ -49,7 +42,7 @@
 -->
 
     <p>
-    <p>Each row in the spreadsheet will produce an resource.  Each of these
+    <p>Each row in the spreadsheet will produce a resource.  Each of these
     resources will be a member of a class in the namespace selected above.</p>  
     <p>What should the local name of this class be? This is normally a word or two 
     in "camel case" starting with an uppercase letter.  (For example, if the 
@@ -60,25 +53,19 @@
 
     <select name="destinationModelName">
         <option value="vitro:baseOntModel">webapp assertions</option>
-<%
-    for (Iterator it = maker.listModels(); it.hasNext(); ) {
-	String modelName = (String) it.next();
-        %> <option value="<%=modelName%>"><%=modelName%></option>
-        <%    
-    }
-%>    <option value="">(none)</option>
+        <c:forEach var="modelName" items="${modelNames}">
+           <option value="${modelName}">${modelName}</option>
+        </c:forEach>
+        <option value="">(none)</option>
     </select>
     <p>Model in which to save the converted spreadsheet data</p>
 
    <select name="tboxDestinationModelName">
         <option value="vitro:baseOntModel">webapp assertions</option>
-<%
-    for (Iterator it = maker.listModels(); it.hasNext(); ) {
-	String modelName = (String) it.next();
-        %> <option value="<%=modelName%>"><%=modelName%></option>
-        <%    
-    }
-%>    <option value="">(none)</option>
+        <c:forEach var="modelName" items="${modelNames}">
+           <option value="${modelName}">${modelName}</option>
+        </c:forEach>
+   <option value="">(none)</option>
     </select>
     <p>Model in which to save the automatically-generated ontology</p>
 

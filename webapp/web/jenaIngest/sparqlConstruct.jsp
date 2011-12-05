@@ -16,12 +16,7 @@
 <vitro:confirmAuthorization />
 
 <%
-
-    ModelMaker maker = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
-    if (maker == null) {
-        maker = (ModelMaker) getServletContext().getAttribute("vitroJenaSDBModelMaker");
-    }
-
+    ModelMaker maker = (ModelMaker) request.getAttribute("vitroJenaModelMaker");
 %>
 
 

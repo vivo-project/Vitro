@@ -3,21 +3,12 @@
 <%@ page import="com.hp.hpl.jena.rdf.model.ModelMaker" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.net.URLEncoder" %>
-<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" %>
 <% request.setAttribute("requestedActions", new UseAdvancedDataToolsPages()); %>
 <vitro:confirmAuthorization />
-
-<%
-
-    ModelMaker maker = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
-    if (maker == null) {
-		maker = (ModelMaker) getServletContext().getAttribute("vitroJenaSDBModelMaker");
-    }
-
-%>
 
     <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Load XML and convert to RDF</h2>
 
@@ -29,10 +20,9 @@
     
 	<select name="targetModel">
         <option value="vitro:baseOntModel">webapp assertions</option>
-<%  for (Iterator it = maker.listModels(); it.hasNext(); ) {
-	String modelName = (String) it.next();        %> 
-	  <option value="<%=modelName%>"><%= modelName %></option>                
-<% } %>
+        <c:forEach var="modelName" items="${modelNames}">
+            <option value="${modelName}">${modelName}</option>
+        </c:forEach>
         </select>
 
         <p>Destination model</p>

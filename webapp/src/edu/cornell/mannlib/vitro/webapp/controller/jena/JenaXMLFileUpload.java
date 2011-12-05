@@ -41,7 +41,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 
-public class JenaXMLFileUpload  extends BaseEditController  {	
+public class JenaXMLFileUpload  extends JenaIngestController  {	
 	Log log = LogFactory.getLog(JenaXMLFileUpload.class);
 	private String baseDirectoryForFiles;
 	private int maxFileSize = 1024 * 1024 * 500;
@@ -88,6 +88,7 @@ public class JenaXMLFileUpload  extends BaseEditController  {
 	 * defaultNamespace - namespace to use for elements in xml that lack a namespace
 	 * 
 	 */
+	@Override
 	public void doPost(HttpServletRequest rawRequest, HttpServletResponse resp)
 	throws ServletException, IOException {
 		FileUploadServletRequest request = FileUploadServletRequest.parseRequest(rawRequest, maxFileSize);
@@ -151,8 +152,8 @@ public class JenaXMLFileUpload  extends BaseEditController  {
         }
 	}
 	
-		
-	protected void doGet(HttpServletRequest request,
+	@Override	
+	public void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {		
         if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseAdvancedDataToolsPages()))) {
         	return;
@@ -164,6 +165,7 @@ public class JenaXMLFileUpload  extends BaseEditController  {
 		request.setAttribute("title","Upload file and convert to RDF");
 		request.setAttribute("bodyJsp","/jenaIngest/xmlFileUpload.jsp");
 		
+		request.setAttribute("modelNames", getVitroJenaModelMaker(vreq).listModels().toList());
 		request.setAttribute("models", null);				
 
 		RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);      
@@ -267,13 +269,6 @@ public class JenaXMLFileUpload  extends BaseEditController  {
         }
         return filesToLoad;
 	}
-	
-	private ModelMaker getVitroJenaModelMaker(HttpServletRequest request) {
-		ModelMaker myVjmm = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
-		myVjmm = (myVjmm == null) ? (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker") : myVjmm;
-		return new VitroJenaSpecialModelMaker(myVjmm, request);
-	}
-	
 
 	private long countOfStatements( List<Model> models){
 		
