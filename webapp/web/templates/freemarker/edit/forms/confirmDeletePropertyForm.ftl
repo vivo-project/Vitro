@@ -4,7 +4,9 @@
 
 <#if editConfiguration.objectProperty = true>
     <#assign toBeDeletedClass = "objProp" />
-    <#assign statement = editConfiguration.objectStatementDisplay />
+    <#if editConfiguration.objectStatementDisplay?has_content>
+    	<#assign statement = editConfiguration.objectStatementDisplay />
+    </#if>
 <#else>
 	<#assign statement = editConfiguration.dataStatementDisplay />
 </#if>

@@ -408,9 +408,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	String subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
 		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
     	String objectUri = EditConfigurationUtils.getObjectUri(vreq);
-		//ObjectPropertyStatementTemplate Model should pass the object key as part of the delete url
-		String objectKey = vreq.getParameter("objectKey");
-		statementDisplay.put(objectKey, objectUri);
+		
 		//Set data map
 		Map params = vreq.getParameterMap();
 		for (Object key : params.keySet()) {
@@ -421,6 +419,16 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 	            statementDisplay.put(keyString, value);
 	        }
 	    }
+		
+		
+		//If no statement parameters being sent back, then just pass back null
+		if(statementDisplay.size() == 0) {
+			return null;
+		}
+		
+		//ObjectPropertyStatementTemplate Model should pass the object key as part of the delete url
+		String objectKey = vreq.getParameter("objectKey");
+		statementDisplay.put(objectKey, objectUri);
 		
 		//Using object property statement template model here
 		ObjectPropertyStatementTemplateModel osm = new ObjectPropertyStatementTemplateModel(
