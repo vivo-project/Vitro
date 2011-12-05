@@ -114,9 +114,8 @@ public class NewIndividualFormGenerator implements EditConfigurationGenerator {
     
     private Map<String, String> generateNewResources(VitroRequest vreq) {
     	HashMap<String, String> newResources = new HashMap<String, String>();
-		//TODO: Get default namespace
-		String defaultNamespace = vreq.getWebappDaoFactory().getDefaultNamespace();
-		newResources.put("newInd", defaultNamespace + "individual");
+		//null makes default namespace be triggered
+		newResources.put("newInd", null);
 		return newResources;
 	}
 
