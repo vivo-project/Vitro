@@ -34,13 +34,14 @@ import edu.cornell.mannlib.vitro.webapp.utils.Csv2Rdf;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 
 
-public class JenaCsv2RdfController extends BaseEditController{
+public class JenaCsv2RdfController extends JenaIngestController {
 	Log log = LogFactory.getLog( JenaCsv2RdfController.class );
     
     private static final String CSV2RDF_JSP = "/jenaIngest/csv2rdf.jsp";
 	private static final String CSV2RDF_SELECT_URI_JSP = "/jenaIngest/csv2rdfSelectUri.jsp";
 	private static int maxFileSizeInBytes = 1024 * 1024 * 2000; //2000mb 
 	
+	@Override
 	public void doPost(HttpServletRequest rawRequest,
 			HttpServletResponse response) throws ServletException, IOException {
         if (!isAuthorizedToDisplayPage(rawRequest, response, new Actions(new UseAdvancedDataToolsPages()))) {
@@ -190,39 +191,6 @@ public class JenaCsv2RdfController extends BaseEditController{
 			}	
 			
 			return models[0];
-		}
-	 
-	 private Model getModel(String name, HttpServletRequest request) {
-			if ("vitro:jenaOntModel".equals(name)) {
-				Object sessionOntModel = request.getSession().getAttribute("jenaOntModel");
-				if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
-					return (OntModel) sessionOntModel;
-				} else {
-					return (OntModel) getServletContext().getAttribute("jenaOntModel");
-				}
-			} else if ("vitro:baseOntModel".equals(name)) {
-				Object sessionOntModel = request.getSession().getAttribute("baseOntModel");
-				if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
-					return (OntModel) sessionOntModel;
-				} else {
-					return (OntModel) getServletContext().getAttribute("baseOntModel");
-				}
-			} else if ("vitro:inferenceOntModel".equals(name)) {
-				Object sessionOntModel = request.getSession().getAttribute("inferenceOntModel");
-				if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
-					return (OntModel) sessionOntModel;
-				} else {
-					return (OntModel) getServletContext().getAttribute("inferenceOntModel");
-				}
-			} else {
-				return getVitroJenaModelMaker(request).getModel(name);
-			}
-		}
-	 
-	 private ModelMaker getVitroJenaModelMaker(HttpServletRequest request) {
-			ModelMaker myVjmm = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
-			myVjmm = (myVjmm == null) ? (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker") : myVjmm;
-			return new VitroJenaSpecialModelMaker(myVjmm, request);
 		}
 
 }

@@ -701,7 +701,7 @@ public class JenaIngestController extends BaseEditController {
         return new VitroJenaSpecialModelMaker(myVjmm, request);
     }
     
-    private Model getModel(String name, HttpServletRequest request) {
+    protected Model getModel(String name, HttpServletRequest request) {
         if ("vitro:jenaOntModel".equals(name)) {
             Object sessionOntModel = request.getSession().getAttribute("jenaOntModel");
             if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
