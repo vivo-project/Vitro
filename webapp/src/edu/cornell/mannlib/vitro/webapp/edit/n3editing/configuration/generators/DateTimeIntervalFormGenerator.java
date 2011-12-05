@@ -14,9 +14,12 @@ import com.hp.hpl.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.DateTimeIntervalValidationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.DateTimeWithPrecisionVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils.EditMode;
 import edu.cornell.mannlib.vitro.webapp.utils.generators.EditModeUtils;
 
@@ -78,7 +81,8 @@ public class DateTimeIntervalFormGenerator extends
         
         conf.addField(startField);
         conf.addField(endField);
-
+        //Need to add validators
+        conf.addValidator(new DateTimeIntervalValidationVTwo("startField","endField"));
         //Adding additional data, specifically edit mode
         addFormSpecificData(conf, vreq);
         //Prepare
@@ -162,8 +166,14 @@ public class DateTimeIntervalFormGenerator extends
     }
 
 	public EditMode getEditMode(VitroRequest vreq) {
-		List<String> predicates = new ArrayList<String>();
-		predicates.add(toDateTimeInterval);
-		return EditModeUtils.getEditMode(vreq, predicates);
+		//In this case, the original jsp didn't rely on FrontEndEditingUtils
+		//but instead relied on whether or not the object Uri existed
+		String objectUri = EditConfigurationUtils.getObjectUri(vreq);
+		EditMode editMode = FrontEndEditingUtils.EditMode.ADD;
+		if(objectUri != null && !objectUri.isEmpty()) {
+			editMode = FrontEndEditingUtils.EditMode.EDIT;
+			
+		}
+		return editMode;
 	}
 }
