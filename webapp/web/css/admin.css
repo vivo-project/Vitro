@@ -43,3 +43,15 @@
 #alertIcon {
     vertical-align:middle
 }
+/* BUBBLE ALERT FOR ADDING INDIVIDUAL CLASSES -----> */
+#addClassBubble p{
+    width: 258px;
+    height: 64px;
+    font-size: 13px;
+    line-height: 1.3em;
+    padding: 25px 5px 5px 13px;
+    background: #fff url('../images/siteAdmin/addClassBubble.png') 0 0 no-repeat; 
+    color: #797979;
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
