@@ -27,7 +27,7 @@
             </p> 
         </#if>
         
-        <#if editConfiguration.propertySelectFromExisting = true && editConfiguration.propertyOfferCreateNewOption = true>
+        <#if editConfiguration.propertySelectFromExisting = true || editConfiguration.propertyOfferCreateNewOption = true>
             <p>
                 <input type="submit" id="delete" value="Delete" role="button "/>
             </p>      
