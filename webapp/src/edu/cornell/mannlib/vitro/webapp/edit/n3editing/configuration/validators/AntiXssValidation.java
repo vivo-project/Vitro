@@ -155,21 +155,23 @@ public class AntiXssValidation implements N3ValidatorVTwo{
         AntiSamy antiSamy = AntiScript.getAntiSamyScanner();
         
         ArrayList errorMsgs = new ArrayList();        
-        for( Literal literal : list ){                        
-            CleanResults cr = antiSamy.scan(literal.getLexicalForm());
-            errorMsgs.addAll( cr.getErrorMessages() );
-                         
-            String dt = literal.getDatatypeURI();
-            if( dt != null ){
-                cr = antiSamy.scan( dt );
-                errorMsgs.addAll( cr.getErrorMessages() );
-            }
-             
-            String lang = literal.getLanguage() ;
-            if( lang != null ){
-                cr = antiSamy.scan( lang );
-                errorMsgs.addAll( cr.getErrorMessages() );
-            }
+        for( Literal literal : list ){   
+        	if(literal != null) {
+	            CleanResults cr = antiSamy.scan(literal.getLexicalForm());
+	            errorMsgs.addAll( cr.getErrorMessages() );
+	                         
+	            String dt = literal.getDatatypeURI();
+	            if( dt != null ){
+	                cr = antiSamy.scan( dt );
+	                errorMsgs.addAll( cr.getErrorMessages() );
+	            }
+	             
+	            String lang = literal.getLanguage() ;
+	            if( lang != null ){
+	                cr = antiSamy.scan( lang );
+	                errorMsgs.addAll( cr.getErrorMessages() );
+	            }
+        	}
         }
         
         if( errorMsgs.isEmpty() )
