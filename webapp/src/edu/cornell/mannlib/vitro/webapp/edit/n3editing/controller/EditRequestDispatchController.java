@@ -20,6 +20,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.DirectRedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -78,6 +80,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
         
          //if edit form needs to be skipped to object instead
          if(isSkipPredicate(vreq)) {
+             log.debug("The predicate is a annotated as a skip.");
         	 return processSkipEditForm(vreq);
          }                  
      
@@ -255,17 +258,15 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
         return (isEditOfExistingStmt && (wdf.getObjectPropertyDao().skipEditForm(predicateUri)));
 	}
 
-	//TODO: Implement below correctly or integrate
-    private ResponseValues processSkipEditForm(VitroRequest vreq) {
-        String redirectPage = vreq.getContextPath() + "/individual";
-        String objectUri = EditConfigurationUtils.getObjectUri(vreq);
-        String subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
-        String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
-        redirectPage += "uri=" + URLEncoder.encode(objectUri) + 
-        	"&relatedSubjectUri=" + URLEncoder.encode(subjectUri) + 
-        	"&relatingPredicateUri=" + URLEncoder.encode(predicateUri);
-        return new RedirectResponseValues(redirectPage, HttpServletResponse.SC_SEE_OTHER);
-		
+    private ResponseValues processSkipEditForm(VitroRequest vreq) {        
+        ParamMap params = new ParamMap();
+        params.put("uri",EditConfigurationUtils.getObjectUri(vreq));
+        params.put("relatedSubjectUri",EditConfigurationUtils.getSubjectUri(vreq));
+        params.put("relatingPredicateUri",EditConfigurationUtils.getPredicateUri(vreq));
+                
+        return new DirectRedirectResponseValues(
+                UrlBuilder.getUrl(UrlBuilder.Route.INDIVIDUAL, params),
+                HttpServletResponse.SC_SEE_OTHER);		
 	}
 
 	//Check error conditions
