@@ -19,6 +19,6 @@
     </form>
 <#else>
     <h3>The search index is currently being ${currentTask}.</h3>
-    <p>since ${since?string("hh:mm:ss a, MMMM dd, yyyy")}, elapsed time ${elapsed}, expected total time ${expected}</p>
+    <p>since ${since?string("hh:mm:ss a, MMMM dd, yyyy")}, elapsed time ${elapsed}, estimated total time ${expected}</p>
     <p>Completed ${completedCount} out of ${totalToDo} index records.</p>
 </#if>
