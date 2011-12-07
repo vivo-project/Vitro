@@ -163,7 +163,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	    while (iter.hasNext()) {
 	    	Statement stmt = iter.next();
 	    	retractions.add(stmt);
-	    	additions.add(stmt.getSubject(), RDF.type, internalClassesPage);
+	    	additions.add(stmt.getSubject(), RDF.type, internalDataGetterClass);
 	    }
 		
 	    iter = displayModel.listStatements((Resource) null, RDF.type, classGroupPage);
