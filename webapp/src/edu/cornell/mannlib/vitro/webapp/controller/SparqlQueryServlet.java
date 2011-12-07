@@ -14,7 +14,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -33,11 +32,9 @@ import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFormatter;
-import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -51,6 +48,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
+import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 
 
 /**
@@ -62,8 +60,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
  */
 public class SparqlQueryServlet extends BaseEditController {
     private static final Log log = LogFactory.getLog(SparqlQueryServlet.class.getName());
-
-    protected static final Syntax SYNTAX = Syntax.syntaxARQ;
     
     protected static HashMap<String,ResultSetFormat>formatSymbols = new HashMap<String,ResultSetFormat>();
     static{
@@ -225,7 +221,7 @@ public class SparqlQueryServlet extends BaseEditController {
         
         QueryExecution qe = null;
         try{
-            Query query = QueryFactory.create(queryParam, SYNTAX);
+            Query query = SparqlQueryUtils.create(queryParam);
             qe = QueryExecutionFactory.create(query, dataset);
             if( query.isSelectType() ){
                 ResultSet results = null;

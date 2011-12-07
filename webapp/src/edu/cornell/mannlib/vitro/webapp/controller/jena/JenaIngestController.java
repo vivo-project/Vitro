@@ -68,6 +68,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
+import edu.cornell.mannlib.vitro.webapp.controller.SparqlQueryServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
@@ -77,6 +78,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetup;
+import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestWorkflowProcessor;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaOutputUtils;
@@ -920,7 +922,7 @@ public class JenaIngestController extends BaseEditController {
             }
         }
         Model tempModel = ModelFactory.createDefaultModel();
-        Query query = QueryFactory.create(queryStr, Syntax.syntaxARQ);
+        Query query = SparqlQueryUtils.create(queryStr);
         QueryExecution qexec = QueryExecutionFactory.create(query,source);
         try {
             qexec.execConstruct(tempModel);
