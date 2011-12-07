@@ -158,8 +158,30 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	Individual objectIndividual = EditConfigurationUtils.getObjectIndividual(vreq);
     	ObjectProperty prop = EditConfigurationUtils.getObjectProperty(vreq);
     	Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
+    	String propertyTitle = getObjectPropertyNameForDisplay();
     	if(objectIndividual != null) {
-    		formTitle = "Change entry for: <em>" + prop.getDomainPublic() + " </em>";
+    		formTitle = "Change entry for: <em>" + propertyTitle + " </em>";
+    	}  else {
+            if ( prop.getOfferCreateNewOption() ) {
+            	
+                log.debug("property set to offer \"create new\" option; custom form: ["+prop.getCustomEntryForm()+"]");
+                formTitle   = "Select an existing "+propertyTitle+" for "+subject.getName();
+               
+            } else {
+                formTitle   = "Add an entry to: <em>"+propertyTitle+"</em>";
+            }
+        }
+    	pageData.put("formTitle", formTitle);
+    }
+    
+    //Also used above and can be used in object auto complete form
+    public String getObjectPropertyNameForDisplay() {
+    	String propertyTitle = null;
+    	Individual objectIndividual = EditConfigurationUtils.getObjectIndividual(vreq);
+    	ObjectProperty prop = EditConfigurationUtils.getObjectProperty(vreq);
+    	Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
+    	if(objectIndividual != null) {
+    		propertyTitle = prop.getDomainPublic();
     	}  else {
     		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
             if ( prop.getOfferCreateNewOption() ) {
@@ -183,14 +205,13 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     		    	if( classOfObjectFillers == null )
     		    		classOfObjectFillers = wdf.getVClassDao().getTopConcept();
     		    }
-                log.debug("property set to offer \"create new\" option; custom form: ["+prop.getCustomEntryForm()+"]");
-                formTitle   = "Select an existing "+classOfObjectFillers.getName()+" for "+subject.getName();
+                propertyTitle   = classOfObjectFillers.getName();
                
             } else {
-                formTitle   = "Add an entry to: <em>"+prop.getDomainPublic()+"</em>";
+                propertyTitle   = prop.getDomainPublic();
             }
         }
-    	pageData.put("formTitle", formTitle);
+    	return propertyTitle;
     }
     
     
