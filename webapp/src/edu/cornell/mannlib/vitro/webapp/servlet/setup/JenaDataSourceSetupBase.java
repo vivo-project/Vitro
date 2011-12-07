@@ -181,7 +181,8 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     * Sets up a BasicDataSource using values from
     * a properties file.
     */
-    public final BasicDataSource makeDataSourceFromConfigurationProperties(ServletContext ctx){
+    public final BasicDataSource makeDataSourceFromConfigurationProperties(
+            ServletContext ctx) {
         String dbDriverClassname = ConfigurationProperties.getBean(ctx)
                 .getProperty("VitroConnection.DataSource.driver",
                         getDbDriverClassName(ctx));
@@ -291,8 +292,8 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
            String jenaDbModelName, 
            OntModelSpec jenaDbOntModelSpec, 
            TripleStoreType storeType, ServletContext ctx) {
-       return makeDBModel (
-               ds, jenaDbModelName, jenaDbOntModelSpec, storeType, getDbType(ctx), ctx);
+       return makeDBModel (ds, jenaDbModelName, jenaDbOntModelSpec, storeType, 
+               getDbType(ctx), ctx);
    }
    
    public static Model makeDBModel(BasicDataSource ds, 
@@ -351,7 +352,9 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         }
     }
    
-    public static void readOntologyFileFromPath(String p, Model model, ServletContext ctx) {
+    public static void readOntologyFileFromPath(String p, 
+                                                Model model, 
+                                                ServletContext ctx) {
         //Check that this is a file and not a directory
         File f = new File(ctx.getRealPath(p));
         if(f.exists() && f.isFile()){
@@ -371,7 +374,8 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
                 log.debug("File for path " + p + " does not exist");
             }
             else if(f.isDirectory()) {
-                log.debug("Path " + p + " corresponds to directory and not file so was not read in");
+                log.debug("Path " + p + 
+                        " corresponds to directory and not file so was not read in");
             }
         }
    }
@@ -393,9 +397,11 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     private static final String sdbModelMaker = "vitroJenaSDBModelMaker";
     private static final String rdbModelMaker = "vitroJenaModelMaker";
     
-    protected void makeModelMakerFromConnectionProperties(TripleStoreType type, ServletContext ctx){
+    protected void makeModelMakerFromConnectionProperties(TripleStoreType type, 
+                                                          ServletContext ctx) {
         String jdbcUrl = getJdbcUrl(ctx);
-      String dbtypeStr = ConfigurationProperties.getBean(ctx).getProperty("VitroConnection.DataSource.dbtype","MySQL");
+        String dbtypeStr = ConfigurationProperties.getBean(ctx).getProperty(
+                "VitroConnection.DataSource.dbtype","MySQL");
         String username = ConfigurationProperties.getBean(ctx).getProperty(
                 "VitroConnection.DataSource.username");
         String password = ConfigurationProperties.getBean(ctx).getProperty(
@@ -432,10 +438,12 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         if( dir == null )
             throw new IllegalStateException("Must pass a File to getModelFromDir()");
         if( !dir.isDirectory() )
-            throw new IllegalStateException("Directory must be a File object for a directory");
+            throw new IllegalStateException(
+                    "Directory must be a File object for a directory");
         if( !dir.canRead() )
             throw new IllegalStateException("getModelFromDir(): Directory " +
-                    " must be readable, check premissions on " + dir.getAbsolutePath());
+                    " must be readable, check premissions on " 
+                    + dir.getAbsolutePath());
         
         OntModel model = ModelFactory.createOntologyModel();
         for( File file : dir.listFiles()){
