@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -81,7 +82,8 @@ public class SolrSmokeTest implements ServletContextListener {
 			GetMethod method = new GetMethod(solrUrl.toExternalForm());
 			try {
 				int statusCode = client.executeMethod(method);
-				method.getResponseBody();
+				InputStream stream = method.getResponseBodyAsStream();
+				stream.close();
 
 				if (statusCode == HttpStatus.SC_OK) {
 					reportSuccess();
