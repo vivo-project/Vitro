@@ -107,8 +107,11 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
         StoreDesc storeDesc = makeStoreDesc(ctx);
         setApplicationStoreDesc(storeDesc, ctx);
 
-        BasicDataSource bds = makeDataSourceFromConfigurationProperties(ctx);
-        this.setApplicationDataSource(bds, ctx);
+        BasicDataSource bds = getApplicationDataSource(ctx); 
+        if (bds == null) {
+            bds = makeDataSourceFromConfigurationProperties(ctx);
+            setApplicationDataSource(bds, ctx);
+        }
         
         Store store = connectStore(bds, storeDesc);
         setApplicationStore(store, ctx);
