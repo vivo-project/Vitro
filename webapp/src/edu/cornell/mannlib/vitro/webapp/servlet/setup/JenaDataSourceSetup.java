@@ -61,15 +61,15 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
     private static final Log log = LogFactory.getLog(JenaDataSourceSetup.class);
     
     @Override
-	public void contextInitialized(ServletContextEvent sce) {
-    	ServletContext ctx = sce.getServletContext();
-    	StartupStatus ss = StartupStatus.getBean(ctx);
+    public void contextInitialized(ServletContextEvent sce) {
+        ServletContext ctx = sce.getServletContext();
+        StartupStatus ss = StartupStatus.getBean(ctx);
         
         try {
-        	long startTime = System.currentTimeMillis();
-        	setUpJenaDataSource(ctx);
-        	log.info((System.currentTimeMillis() - startTime) / 1000 + 
-        			" seconds to set up SDB store");
+            long startTime = System.currentTimeMillis();
+            setUpJenaDataSource(ctx);
+            log.info((System.currentTimeMillis() - startTime) / 1000 + 
+                    " seconds to set up SDB store");
         } catch (SQLException sqle) {   
             // SQL exceptions are fatal and should halt startup
             log.error("Error using SQL database; startup aborted.", sqle);
@@ -82,19 +82,19 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
     } 
 
     private void setUpJenaDataSource(ServletContext ctx) throws SQLException {
-                   	
+                       
         OntModelSelectorImpl baseOms = new OntModelSelectorImpl();     
         OntModelSelectorImpl inferenceOms = new OntModelSelectorImpl();       
         OntModelSelectorImpl unionOms = new OntModelSelectorImpl();
         
         OntModel userAccountsModel = ontModelFromContextAttribute(
-        		ctx, "userAccountsOntModel");     
+                ctx, "userAccountsOntModel");     
         baseOms.setUserAccountsModel(userAccountsModel);
         inferenceOms.setUserAccountsModel(userAccountsModel);
         unionOms.setUserAccountsModel(userAccountsModel);       
         
         OntModel displayModel = ontModelFromContextAttribute(
-        		ctx,"displayOntModel");
+                ctx,"displayOntModel");
         baseOms.setDisplayModel(displayModel);
         inferenceOms.setDisplayModel(displayModel);
         unionOms.setDisplayModel(displayModel);
@@ -119,9 +119,9 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
         if (!isSetUp(store)) {
             log.info("Initializing SDB store");
             if (isFirstStartup()) {
-            	setupSDB(ctx, store);	
+                setupSDB(ctx, store);    
             } else {
-            	migrateToSDBFromExistingRDBStore(ctx, store); 
+                migrateToSDBFromExistingRDBStore(ctx, store); 
             }
         }
         
@@ -135,22 +135,22 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
 
         // ABox assertions
         Model aboxAssertions = makeDBModel(
-        		bds, JenaDataSourceSetupBase.JENA_DB_MODEL, DB_ONT_MODEL_SPEC, 
-        		TripleStoreType.SDB, ctx);
+                bds, JenaDataSourceSetupBase.JENA_DB_MODEL, DB_ONT_MODEL_SPEC, 
+                TripleStoreType.SDB, ctx);
         Model listenableAboxAssertions = ModelFactory.createUnion(
-        		aboxAssertions, ModelFactory.createDefaultModel());
+                aboxAssertions, ModelFactory.createDefaultModel());
         baseOms.setABoxModel(
-        		ModelFactory.createOntologyModel(
-        				OntModelSpec.OWL_MEM, listenableAboxAssertions));
+                ModelFactory.createOntologyModel(
+                        OntModelSpec.OWL_MEM, listenableAboxAssertions));
         
         // ABox inferences
         Model aboxInferences = makeDBModel(
-        		bds, JenaDataSourceSetupBase.JENA_INF_MODEL, DB_ONT_MODEL_SPEC, 
-        		TripleStoreType.SDB, ctx);
+                bds, JenaDataSourceSetupBase.JENA_INF_MODEL, DB_ONT_MODEL_SPEC, 
+                TripleStoreType.SDB, ctx);
         Model listenableAboxInferences = ModelFactory.createUnion(
-        		aboxInferences, ModelFactory.createDefaultModel());
+                aboxInferences, ModelFactory.createDefaultModel());
         inferenceOms.setABoxModel(ModelFactory.createOntologyModel(
-        		OntModelSpec.OWL_MEM, listenableAboxInferences));
+                OntModelSpec.OWL_MEM, listenableAboxInferences));
       
         
         // Since the TBox models are in memory, they do not have timeout issues 
@@ -160,22 +160,22 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
         // TBox assertions
         try {
             Model tboxAssertionsDB = makeDBModel(
-            		bds, JENA_TBOX_ASSERTIONS_MODEL, DB_ONT_MODEL_SPEC, 
-            		TripleStoreType.SDB, ctx);
+                    bds, JENA_TBOX_ASSERTIONS_MODEL, DB_ONT_MODEL_SPEC, 
+                    TripleStoreType.SDB, ctx);
             OntModel tboxAssertions = ModelFactory.createOntologyModel(
-            		MEM_ONT_MODEL_SPEC);
+                    MEM_ONT_MODEL_SPEC);
             
             if (tboxAssertionsDB != null) {
                 long startTime = System.currentTimeMillis();
                 System.out.println(
-                		"Copying cached tbox assertions into memory");
+                        "Copying cached tbox assertions into memory");
                 tboxAssertions.add(tboxAssertionsDB);
                 System.out.println((System.currentTimeMillis() - startTime)
-                		/ 1000 + " seconds to load tbox assertions");
+                        / 1000 + " seconds to load tbox assertions");
             }
 
             tboxAssertions.getBaseModel().register(new ModelSynchronizer(
-            		tboxAssertionsDB));
+                    tboxAssertionsDB));
             baseOms.setTBoxModel(tboxAssertions);
         } catch (Throwable e) {
             log.error("Unable to load tbox assertion cache from DB", e);
@@ -184,22 +184,22 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
         // TBox inferences
         try {
             Model tboxInferencesDB = makeDBModel(
-            		bds, JENA_TBOX_INF_MODEL, DB_ONT_MODEL_SPEC, 
-            		TripleStoreType.SDB, ctx);
+                    bds, JENA_TBOX_INF_MODEL, DB_ONT_MODEL_SPEC, 
+                    TripleStoreType.SDB, ctx);
             OntModel tboxInferences = ModelFactory.createOntologyModel(
-            		MEM_ONT_MODEL_SPEC);
+                    MEM_ONT_MODEL_SPEC);
             
             if (tboxInferencesDB != null) {
                 long startTime = System.currentTimeMillis();
                 System.out.println(
-                		"Copying cached tbox inferences into memory");
+                        "Copying cached tbox inferences into memory");
                 tboxInferences.add(tboxInferencesDB);
                 System.out.println((System.currentTimeMillis() - startTime)
-                		/ 1000 + " seconds to load tbox inferences");
+                        / 1000 + " seconds to load tbox inferences");
             }
             
             tboxInferences.getBaseModel().register(new ModelSynchronizer(
-            		tboxInferencesDB));
+                    tboxInferencesDB));
             inferenceOms.setTBoxModel(tboxInferences);
         } catch (Throwable e) {
             log.error("Unable to load tbox inference cache from DB", e);
@@ -207,14 +207,14 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
                               
         // union ABox
         OntModel unionABoxModel = ModelFactory.createOntologyModel(
-        		MEM_ONT_MODEL_SPEC,ModelFactory.createUnion(
-        				baseOms.getABoxModel(), inferenceOms.getABoxModel()));
+                MEM_ONT_MODEL_SPEC,ModelFactory.createUnion(
+                        baseOms.getABoxModel(), inferenceOms.getABoxModel()));
         unionOms.setABoxModel(unionABoxModel);
         
         // union TBox
         OntModel unionTBoxModel = ModelFactory.createOntologyModel(
-        		MEM_ONT_MODEL_SPEC,ModelFactory.createUnion(
-        				baseOms.getTBoxModel(), inferenceOms.getTBoxModel()));       
+                MEM_ONT_MODEL_SPEC,ModelFactory.createUnion(
+                        baseOms.getTBoxModel(), inferenceOms.getTBoxModel()));       
         unionOms.setTBoxModel(unionTBoxModel);
                   
         
@@ -222,37 +222,37 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
         try {
             
             Model applicationMetadataModelDB = makeDBModel(
-            		bds, JENA_APPLICATION_METADATA_MODEL, DB_ONT_MODEL_SPEC, 
-            		TripleStoreType.SDB, ctx);
+                    bds, JENA_APPLICATION_METADATA_MODEL, DB_ONT_MODEL_SPEC, 
+                    TripleStoreType.SDB, ctx);
             OntModel applicationMetadataModel = 
                     ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
             
             long startTime = System.currentTimeMillis();
             System.out.println(
-            		"Copying cached application metadata model into memory");
+                    "Copying cached application metadata model into memory");
             applicationMetadataModel.add(applicationMetadataModelDB);
             System.out.println((System.currentTimeMillis() - startTime) 
-            		/ 1000 + " seconds to load application metadata model " +
-            		"assertions of size " + applicationMetadataModel.size());
+                    / 1000 + " seconds to load application metadata model " +
+                    "assertions of size " + applicationMetadataModel.size());
             applicationMetadataModel.getBaseModel().register(
-            		new ModelSynchronizer(applicationMetadataModelDB));
+                    new ModelSynchronizer(applicationMetadataModelDB));
             
             if (isFirstStartup()) {
-            	applicationMetadataModel.add(
-            			InitialJenaModelUtils.loadInitialModel(
-            					ctx, getDefaultNamespace(ctx)));
-            	
+                applicationMetadataModel.add(
+                        InitialJenaModelUtils.loadInitialModel(
+                                ctx, getDefaultNamespace(ctx)));
+                
             } else if (applicationMetadataModelDB.size() == 0) {
                 repairAppMetadataModel(
-                		applicationMetadataModel, aboxAssertions, 
-                		aboxInferences);
+                        applicationMetadataModel, aboxAssertions, 
+                        aboxInferences);
             }
             
             baseOms.setApplicationMetadataModel(applicationMetadataModel);
             inferenceOms.setApplicationMetadataModel(
-            		baseOms.getApplicationMetadataModel());
+                    baseOms.getApplicationMetadataModel());
             unionOms.setApplicationMetadataModel(
-            		baseOms.getApplicationMetadataModel());
+                    baseOms.getApplicationMetadataModel());
             
         } catch (Throwable e) {
             log.error("Unable to load application metadata model cache from DB"
@@ -262,16 +262,16 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
         checkForNamespaceMismatch( baseOms.getApplicationMetadataModel(), ctx );
         
         if (isFirstStartup()) {
-        	loadDataFromFilesystem(baseOms, ctx);
+            loadDataFromFilesystem(baseOms, ctx);
         }
         
         log.info("Setting up union models and DAO factories");
         
         // create TBox + ABox union models and set up webapp DAO factories
         OntModel baseUnion = ModelFactory.createOntologyModel(
-        		OntModelSpec.OWL_MEM,
+                OntModelSpec.OWL_MEM,
                 ModelFactory.createUnion(baseOms.getABoxModel(), 
-                		baseOms.getTBoxModel()));
+                        baseOms.getTBoxModel()));
         baseOms.setFullModel(baseUnion);
         ModelContext.setBaseOntModel(baseOms.getFullModel(), ctx);
         WebappDaoFactoryConfig config = new WebappDaoFactoryConfig();
@@ -282,10 +282,10 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
         ctx.setAttribute("assertionsWebappDaoFactory",baseWadf);
         
         OntModel inferenceUnion = ModelFactory.createOntologyModel(
-        		OntModelSpec.OWL_MEM,
+                OntModelSpec.OWL_MEM,
                 ModelFactory.createUnion(
-                		inferenceOms.getABoxModel(), 
-                		inferenceOms.getTBoxModel()));
+                        inferenceOms.getABoxModel(), 
+                        inferenceOms.getTBoxModel()));
         inferenceOms.setFullModel(inferenceUnion);
         ModelContext.setInferenceOntModel(inferenceOms.getFullModel(), ctx);
         WebappDaoFactory infWadf = new WebappDaoFactorySDB(
@@ -294,13 +294,13 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
         ctx.setAttribute("deductionsWebappDaoFactory", infWadf);
         
         OntModel masterUnion = ModelFactory.createOntologyModel(
-        		DB_ONT_MODEL_SPEC, makeDBModel(
-        				bds, WebappDaoFactorySDB.UNION_GRAPH,
-        						DB_ONT_MODEL_SPEC, TripleStoreType.SDB, ctx));
+                DB_ONT_MODEL_SPEC, makeDBModel(
+                        bds, WebappDaoFactorySDB.UNION_GRAPH,
+                                DB_ONT_MODEL_SPEC, TripleStoreType.SDB, ctx));
         unionOms.setFullModel(masterUnion);
         ctx.setAttribute("jenaOntModel", masterUnion);  
         WebappDaoFactory wadf = new WebappDaoFactorySDB(
-        		unionOms, bds, storeDesc, config);
+                unionOms, bds, storeDesc, config);
         ctx.setAttribute("webappDaoFactory",wadf);
 
         ModelContext.setOntModelSelector(unionOms, ctx);
@@ -325,84 +325,84 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
         log.info("Model makers set up");
     }
 
-	/**
-	 * If we find a "portal1" portal (and we should), its URI should use the
-	 * default namespace.
-	 */
-	private void checkForNamespaceMismatch(OntModel model, ServletContext ctx) {
-		String expectedNamespace = getDefaultNamespace(ctx);
+    /**
+     * If we find a "portal1" portal (and we should), its URI should use the
+     * default namespace.
+     */
+    private void checkForNamespaceMismatch(OntModel model, ServletContext ctx) {
+        String expectedNamespace = getDefaultNamespace(ctx);
 
-		List<Resource> portals = getPortal1s(model);
+        List<Resource> portals = getPortal1s(model);
 
-		if(!portals.isEmpty() && noPortalForNamespace(
-				portals, expectedNamespace)) {
-			// There really should be only one portal 1, but if there happen to 
-			// be multiple, just arbitrarily pick the first in the list.
-			Resource portal = portals.get(0); 
-			String oldNamespace = portal.getNameSpace();
-			renamePortal(portal, expectedNamespace, model);
-			StartupStatus ss = StartupStatus.getBean(ctx);
-			ss.warning(this, "\nThe default namespace has been changed \n" +  
-					         "from " + oldNamespace + 
-					         "\nto " + expectedNamespace + ".\n" +
-					         "The application will function normally, but " +
-					         "any individuals in the \n" + oldNamespace + " " + 
-					         "namespace will need to have their URIs \n" +
-					         "changed in order to be served as linked data. " +
-					         "You can use the Ingest Tools \nto change the " +
-					         "URIs for a batch of resources.");
-		}
-	}
-	
-    private List<Resource> getPortal1s(Model model) {
-		List<Resource> portals = new ArrayList<Resource>();
-		try {
-			model.enterCriticalSection(Lock.READ);
-			ResIterator portalIt = model.listResourcesWithProperty(
-					RDF.type, PORTAL);
-			while (portalIt.hasNext()) {
-				Resource portal = portalIt.nextResource();
-				if ("portal1".equals(portal.getLocalName())) {
-					portals.add(portal);
-				}
-			}
-		} finally {
-			model.leaveCriticalSection();
-		}
-		return portals;
+        if(!portals.isEmpty() && noPortalForNamespace(
+                portals, expectedNamespace)) {
+            // There really should be only one portal 1, but if there happen to 
+            // be multiple, just arbitrarily pick the first in the list.
+            Resource portal = portals.get(0); 
+            String oldNamespace = portal.getNameSpace();
+            renamePortal(portal, expectedNamespace, model);
+            StartupStatus ss = StartupStatus.getBean(ctx);
+            ss.warning(this, "\nThe default namespace has been changed \n" +  
+                             "from " + oldNamespace + 
+                             "\nto " + expectedNamespace + ".\n" +
+                             "The application will function normally, but " +
+                             "any individuals in the \n" + oldNamespace + " " + 
+                             "namespace will need to have their URIs \n" +
+                             "changed in order to be served as linked data. " +
+                             "You can use the Ingest Tools \nto change the " +
+                             "URIs for a batch of resources.");
+        }
     }
-	
-	private boolean noPortalForNamespace(List<Resource> portals, 
+    
+    private List<Resource> getPortal1s(Model model) {
+        List<Resource> portals = new ArrayList<Resource>();
+        try {
+            model.enterCriticalSection(Lock.READ);
+            ResIterator portalIt = model.listResourcesWithProperty(
+                    RDF.type, PORTAL);
+            while (portalIt.hasNext()) {
+                Resource portal = portalIt.nextResource();
+                if ("portal1".equals(portal.getLocalName())) {
+                    portals.add(portal);
+                }
+            }
+        } finally {
+            model.leaveCriticalSection();
+        }
+        return portals;
+    }
+    
+    private boolean noPortalForNamespace(List<Resource> portals, 
                                          String expectedNamespace) {
-		for (Resource portal : portals) {
-			if(expectedNamespace.equals(portal.getNameSpace())) {
-				return false;
-			}
-		}
-		return true;
-	}
+        for (Resource portal : portals) {
+            if(expectedNamespace.equals(portal.getNameSpace())) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-	private void renamePortal(Resource portal, String namespace, Model model) {
-		model.enterCriticalSection(Lock.WRITE);
-		try {
-			ResourceUtils.renameResource(
-					portal, namespace + portal.getLocalName());
-		} finally {
-			model.leaveCriticalSection();
-		}
-	}
-	
+    private void renamePortal(Resource portal, String namespace, Model model) {
+        model.enterCriticalSection(Lock.WRITE);
+        try {
+            ResourceUtils.renameResource(
+                    portal, namespace + portal.getLocalName());
+        } finally {
+            model.leaveCriticalSection();
+        }
+    }
+    
 
     /* ===================================================================== */
     
     
     @Override
-	public void contextDestroyed(ServletContextEvent sce) {
-    	// Nothing to do.
+    public void contextDestroyed(ServletContextEvent sce) {
+        // Nothing to do.
     }
     
     private OntModel ontModelFromContextAttribute(ServletContext ctx, 
-    	                                          String attribute) {
+                                                  String attribute) {
         OntModel ontModel;
         Object attributeValue = ctx.getAttribute(attribute);
         if (attributeValue != null && attributeValue instanceof OntModel) {
@@ -430,20 +430,20 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
     }
     
     private void loadDataFromFilesystem(OntModelSelector baseOms, 
-    	                                ServletContext ctx) {
+                                        ServletContext ctx) {
         Long startTime = System.currentTimeMillis();
         log.debug("Initializing models from RDF files");    
         readOntologyFilesInPathSet(USER_ABOX_PATH, ctx, baseOms.getABoxModel());
         readOntologyFilesInPathSet(USER_TBOX_PATH, ctx, baseOms.getTBoxModel());
         readOntologyFilesInPathSet(
-        		USER_APPMETA_PATH, ctx, baseOms.getApplicationMetadataModel());
+                USER_APPMETA_PATH, ctx, baseOms.getApplicationMetadataModel());
         log.debug(((System.currentTimeMillis() - startTime) / 1000)
-        		+ " seconds to read RDF files ");
+                + " seconds to read RDF files ");
     }
 
     private static void getTBoxModel(Model fullModel, 
-    		                         Model submodels, 
-    		                         Model tboxModel) {
+                                     Model submodels, 
+                                     Model tboxModel) {
   
         JenaModelUtils modelUtils = new JenaModelUtils();
        
@@ -467,8 +467,8 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
      * Copy all statements from model 1 that are not in model 2 to model 3.
      */
     private static void copyDifference(Model model1, 
-    	                               Model model2, 
-    	                               Model model3) {
+                                       Model model2, 
+                                       Model model3) {
                  
         StmtIterator iter = model1.listStatements();
         
@@ -483,41 +483,41 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
     }
     
     private static void getAppMetadata(Model source, Model target) {
-             	
+                 
         String amdQuery = "DESCRIBE ?x WHERE { " +
                     "{?x a <" + VitroVocabulary.PORTAL +"> } UNION " +
                     "{?x a <" + VitroVocabulary.PROPERTYGROUP +"> } UNION " +
                     "{?x a <" + VitroVocabulary.CLASSGROUP +"> } } ";
         
-		try {						
-			Query q = QueryFactory.create(amdQuery, Syntax.syntaxARQ);
-			QueryExecution qe = QueryExecutionFactory.create(q, source);
-			qe.execDescribe(target);
-	   	} catch (Exception e) {
-			log.error("unable to create the application metadata model",e);
-		}	
+        try {                        
+            Query q = QueryFactory.create(amdQuery, Syntax.syntaxARQ);
+            QueryExecution qe = QueryExecutionFactory.create(q, source);
+            qe.execDescribe(target);
+           } catch (Exception e) {
+            log.error("unable to create the application metadata model",e);
+        }    
         
-   		return;
+           return;
     }
     
     private static void repairAppMetadataModel(Model applicationMetadataModel,
                                                Model aboxAssertions, 
                                                Model aboxInferences) {
-     	
-    	log.info("Moving application metadata from ABox to dedicated model");
+         
+        log.info("Moving application metadata from ABox to dedicated model");
         getAppMetadata(aboxAssertions, applicationMetadataModel);
         getAppMetadata(aboxInferences, applicationMetadataModel);
         aboxAssertions.remove(applicationMetadataModel);
         aboxInferences.remove(applicationMetadataModel);
         
-   		return;
+           return;
     }
     
     public static StoreDesc makeStoreDesc(ServletContext ctx) {
-		String layoutStr = ConfigurationProperties.getBean(ctx).getProperty(
-				"VitroConnection.DataSource.sdb.layout", "layout2/hash");
-		String dbtypeStr = ConfigurationProperties.getBean(ctx).getProperty(
-				"VitroConnection.DataSource.dbtype", "MySQL");
+        String layoutStr = ConfigurationProperties.getBean(ctx).getProperty(
+                "VitroConnection.DataSource.sdb.layout", "layout2/hash");
+        String dbtypeStr = ConfigurationProperties.getBean(ctx).getProperty(
+                "VitroConnection.DataSource.dbtype", "MySQL");
        return new StoreDesc(
                 LayoutType.fetch(layoutStr),
                 DatabaseType.fetch(dbtypeStr) );
@@ -530,10 +530,10 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
     }
     
     public static void setupSDB(ServletContext ctx, Store store) {
-    	setupSDB(ctx, 
-    			 store, 
-    			 ModelFactory.createDefaultModel(), 
-    			 ModelFactory.createDefaultModel());
+        setupSDB(ctx, 
+                 store, 
+                 ModelFactory.createDefaultModel(), 
+                 ModelFactory.createDefaultModel());
     }
     
     public static void setupSDB(ServletContext ctx, 
@@ -550,16 +550,16 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
         
             // This is a one-time copy of stored KB data - from a Jena RDB store
             // to a Jena SDB store. In the process, we will also separate out 
-        	// the TBox from the Abox; these are in the same graph in pre-1.2 
-        	// VIVO versions and will now be stored and maintained in separate 
-        	// models.  Access to the Jena RDB data is through the 
-        	// OntModelSelectors that have been set up earlier in the current 
-        	// session by JenaPersistentDataSourceSetup.java.  In the code 
-        	// below, note that the current getABoxModel() methods on the 
-        	// OntModelSelectors return a graph with both ABox and TBox data.
+            // the TBox from the Abox; these are in the same graph in pre-1.2 
+            // VIVO versions and will now be stored and maintained in separate 
+            // models.  Access to the Jena RDB data is through the 
+            // OntModelSelectors that have been set up earlier in the current 
+            // session by JenaPersistentDataSourceSetup.java.  In the code 
+            // below, note that the current getABoxModel() methods on the 
+            // OntModelSelectors return a graph with both ABox and TBox data.
         
             OntModel submodels = ModelFactory.createOntologyModel(
-            		MEM_ONT_MODEL_SPEC);
+                    MEM_ONT_MODEL_SPEC);
             readOntologyFilesInPathSet(SUBMODELS, ctx, submodels);
             
             Model tboxAssertions = SDBFactory.connectNamedModel(
@@ -591,13 +591,13 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
                     store, 
                     JenaDataSourceSetupBase.JENA_APPLICATION_METADATA_MODEL);
             getAppMetadata(memModel, applicationMetadataModel);
-    	   	log.info("During initial SDB setup, created an application " +
-    	   			"metadata model of size " +
-    	   			applicationMetadataModel.size());
-    	   	
-    	   	// remove application metadata from ABox model
-    	   	aboxAssertions.remove(applicationMetadataModel);
-    	   	aboxInferences.remove(applicationMetadataModel);
+               log.info("During initial SDB setup, created an application " +
+                       "metadata model of size " +
+                       applicationMetadataModel.size());
+               
+               // remove application metadata from ABox model
+               aboxAssertions.remove(applicationMetadataModel);
+               aboxInferences.remove(applicationMetadataModel);
                     
             // Make sure the reasoner takes into account the newly-set-up data.
             SimpleReasonerSetup.setRecomputeRequired(ctx);
@@ -610,12 +610,12 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
     }
 
     private void migrateToSDBFromExistingRDBStore(ServletContext ctx, 
-    											  Store store) {
-    	Model rdbAssertionsModel = makeDBModelFromConfigurationProperties(
-    			JENA_DB_MODEL, DB_ONT_MODEL_SPEC, ctx);
-    	Model rdbInferencesModel = makeDBModelFromConfigurationProperties(
-    			JENA_INF_MODEL, DB_ONT_MODEL_SPEC, ctx);
-    	setupSDB(ctx, store, rdbAssertionsModel, rdbInferencesModel);
+                                                  Store store) {
+        Model rdbAssertionsModel = makeDBModelFromConfigurationProperties(
+                JENA_DB_MODEL, DB_ONT_MODEL_SPEC, ctx);
+        Model rdbInferencesModel = makeDBModelFromConfigurationProperties(
+                JENA_INF_MODEL, DB_ONT_MODEL_SPEC, ctx);
+        setupSDB(ctx, store, rdbAssertionsModel, rdbInferencesModel);
     }
     
 
@@ -634,9 +634,9 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
         
         try {
             return (SDBFactory.connectNamedModel(
-            		store, 
-            		JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL))
-            		        .size() > 0;    
+                    store, 
+                    JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL))
+                            .size() > 0;    
         } catch (Exception e) { 
             return false;
         }
