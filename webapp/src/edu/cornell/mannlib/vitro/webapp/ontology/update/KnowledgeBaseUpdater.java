@@ -278,7 +278,10 @@ public class KnowledgeBaseUpdater {
 			required = true;
 			if (JenaDataSourceSetupBase.isFirstStartup()) {
 				assertSuccess();  
-				log.info("The application is starting with an empty DB, an indication will be added to the DB that a knowledge base migration to the current version is not required.");
+				log.info("The application is starting with an empty database. " +
+				         "An indication will be added to the database that a " +
+				         "knowledge base migration to the current version is " +
+				         "not required.");
 			    required = false;	
 			}
 		}
