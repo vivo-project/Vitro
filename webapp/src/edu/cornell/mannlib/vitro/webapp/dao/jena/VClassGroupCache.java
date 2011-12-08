@@ -295,9 +295,11 @@ public class VClassGroupCache {
         log.debug("query: " + query);
         
         QueryResponse rsp = solrServer.query(query);
-        
+        //Get individual count
+        long individualCount = rsp.getResults().getNumFound();
+        log.debug("Number of individuals found " + individualCount);
+        group.setIndividualCount((int) individualCount);        
         //get counts for classes
-        group.setIndividualCount(0);
         FacetField ff = rsp.getFacetField( VitroSearchTermNames.RDFTYPE );
         List<Count> counts = ff.getValues();        
         for( Count ct: counts){                    
@@ -312,7 +314,6 @@ public class VClassGroupCache {
         for( VClass clz : group){
             if( clz.getURI().equals(classUri)){
                 clz.setEntityCount( (int) individualsInClass );
-                group.setIndividualCount( ((int)individualsInClass + group.getIndividualCount()));
             }
         }
         
