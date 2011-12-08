@@ -100,9 +100,9 @@ public class VClassGroupCache {
         _cacheRebuildThread.start();        
     }
 
-    public synchronized VClassGroup getGroup(String vClassGroupURI) {
+    public synchronized VClassGroup getGroup(String vClassGroupURI) {        
         if (vClassGroupURI == null || vClassGroupURI.isEmpty())
-            return null;
+            return null;                
         List<VClassGroup> cgList = getGroups();
         for (VClassGroup cg : cgList) {
             if (vClassGroupURI.equals(cg.getURI()))
@@ -112,6 +112,11 @@ public class VClassGroupCache {
     }
 
     public synchronized List<VClassGroup> getGroups() {
+        //try to build the cache if it doesn't exist
+        if (_groupList == null){
+            doSynchronousRebuild();
+        }
+        
         if (_groupList == null){
             log.error("VClassGroup cache has not been created");
             requestCacheUpdate();
@@ -123,16 +128,22 @@ public class VClassGroupCache {
 
     // Get specific VClass corresponding to Map
     public synchronized VClass getCachedVClass(String classUri) {
-        if( VclassMap != null){
-            if (VclassMap.containsKey(classUri)) {
-                return VclassMap.get(classUri);
-            }
-            return null;
-        }else{
+        //try to build the cache if it doesn't exist
+        if ( VclassMap == null ){
+            doSynchronousRebuild();
+        }
+        
+        if( VclassMap == null){
             log.error("VClassGroup cache has not been created");
             requestCacheUpdate();
             return null;
-        }
+        }else{
+            if (VclassMap.containsKey(classUri)) {
+                return VclassMap.get(classUri);
+            }else{ 
+                return null; 
+            }
+        }    
     }
 
     protected synchronized void setCache(List<VClassGroup> newGroups, Map<String,VClass> classMap){
@@ -151,7 +162,7 @@ public class VClassGroupCache {
             try {
                 _cacheRebuildThread.join();
             } catch (InterruptedException e) {
-                log.warn("Waiting for the thread to die, but interrupted.", e);
+                //don't log message since shutting down
             }
         }
     }
@@ -165,11 +176,56 @@ public class VClassGroupCache {
             return wdf.getVClassGroupDao();
     }
     
-//    protected void doSynchronousRebuild(){
-//        _cacheRebuildThread.rebuildCacheUsingSolr(this);        
-//    }
+    protected void doSynchronousRebuild(){
+        //try to rebuild a couple times since the Solr server may not yet be up.
+        
+        int attempts = 0;
+        int maxTries = 3;
+        SolrServerException exception = null;
+        
+        while( attempts < 2 ){
+            try {
+                rebuildCacheUsingSolr(this);
+                break;
+            } catch (SolrServerException e) {
+                exception = e;  
+            }
+        }
+        
+        if( exception != null )
+            log.error("could not rebuild cache after " + maxTries + " attempts: " + exception.getMessage());
+    }
     
     /* **************** static utility methods ***************** */
+    
+    protected static void rebuildCacheUsingSolr( VClassGroupCache cache ) throws SolrServerException{                        
+        long start = System.currentTimeMillis();
+        WebappDaoFactory wdFactory = (WebappDaoFactory) cache.context.getAttribute("webappDaoFactory");
+        if (wdFactory == null) 
+            log.error("Unable to rebuild cache: could not get 'webappDaoFactory' from Servletcontext");                
+        
+        SolrServer solrServer = (SolrServer)cache.context.getAttribute(SolrSetup.SOLR_SERVER);
+        if( solrServer == null)
+            log.error("Unable to rebuild cache: could not get solrServer from ServletContext");              
+        
+        ProhibitedFromSearch pfs = (ProhibitedFromSearch)cache.context.getAttribute(SolrSetup.PROHIBITED_FROM_SEARCH);
+        if(pfs==null)
+            log.error("Unable to rebuild cache: could not get ProhibitedFromSearch from ServletContext");
+        
+        VitroFilters vFilters = VitroFilterUtils.getPublicFilter(cache.context);
+        WebappDaoFactory filteringDaoFactory = new WebappDaoFactoryFiltering(wdFactory, vFilters);
+        
+        List<VClassGroup> groups = getGroups( 
+                filteringDaoFactory.getVClassGroupDao(), !INCLUDE_INDIVIDUAL_COUNT);
+        
+        // Remove classes that have been configured to be hidden from search results.                
+        removeClassesHiddenFromSearch(groups,pfs);
+
+        addCountsUsingSolr(groups, solrServer);
+        
+        cache.setCache(groups, classMapForGroups(groups));
+            log.debug("msec to build cache: " + (System.currentTimeMillis() - start));
+    }
     
     protected static List<VClassGroup> getGroups(VClassGroupDao vcgDao,
             boolean includeIndividualCount) {
@@ -267,7 +323,7 @@ public class VClassGroupCache {
      * Add the Individual count to classes in groups.
      * @throws SolrServerException 
      */
-    private void addCountsUsingSolr(List<VClassGroup> groups, SolrServer solrServer) throws SolrServerException {
+    protected static void addCountsUsingSolr(List<VClassGroup> groups, SolrServer solrServer) throws SolrServerException {
         
         if( groups == null || solrServer == null ) 
             return;
@@ -278,7 +334,7 @@ public class VClassGroupCache {
     }
     
     
-    private void addClassCountsToGroup(VClassGroup group, SolrServer solrServer) throws SolrServerException {
+    protected static void addClassCountsToGroup(VClassGroup group, SolrServer solrServer) throws SolrServerException {
         if( group == null ) return;
         
         String groupUri = group.getURI();
@@ -309,7 +365,7 @@ public class VClassGroupCache {
         }
     }
 
-    private void setClassCount(VClassGroup group, String classUri,
+    protected static void setClassCount(VClassGroup group, String classUri,
             long individualsInClass) {
         for( VClass clz : group){
             if( clz.getURI().equals(classUri)){
@@ -355,7 +411,7 @@ public class VClassGroupCache {
                         timeToBuildLastCache = System.currentTimeMillis() - start;
                         log.debug("rebuildGroupCacheThread.run() -- rebuilt cache in " 
                                 + timeToBuildLastCache + " msec");
-                        delay = 0;
+                        delay = 100;
                     } catch (SolrServerException e) {
                         //wait a couple seconds and try again.
                         log.error("Will attempt to rebuild cache once solr comes up.");
@@ -382,34 +438,7 @@ public class VClassGroupCache {
             log.debug("rebuildGroupCacheThread.run() -- die()");
         }
 
-        protected void rebuildCacheUsingSolr(VClassGroupCache cache ) throws SolrServerException{                        
-            long start = System.currentTimeMillis();
-            WebappDaoFactory wdFactory = (WebappDaoFactory) cache.context.getAttribute("webappDaoFactory");
-            if (wdFactory == null) 
-                log.error("Unable to rebuild cache: could not get 'webappDaoFactory' from Servletcontext");                
-            
-            SolrServer solrServer = (SolrServer)cache.context.getAttribute(SolrSetup.SOLR_SERVER);
-            if( solrServer == null)
-                log.error("Unable to rebuild cache: could not get solrServer from ServletContext");              
-            
-            ProhibitedFromSearch pfs = (ProhibitedFromSearch)cache.context.getAttribute(SolrSetup.PROHIBITED_FROM_SEARCH);
-            if(pfs==null)
-                log.error("Unable to rebuild cache: could not get ProhibitedFromSearch from ServletContext");
-            
-            VitroFilters vFilters = VitroFilterUtils.getPublicFilter(context);
-            WebappDaoFactory filteringDaoFactory = new WebappDaoFactoryFiltering(wdFactory, vFilters);
-            
-            List<VClassGroup> groups = getGroups( 
-                    filteringDaoFactory.getVClassGroupDao(), !INCLUDE_INDIVIDUAL_COUNT);
-            
-            // Remove classes that have been configured to be hidden from search results.                
-            removeClassesHiddenFromSearch(groups,pfs);
-
-            addCountsUsingSolr(groups, solrServer);
-            
-            cache.setCache(groups, classMapForGroups(groups));
-                log.debug("msec to build cache: " + (System.currentTimeMillis() - start));
-        }
+        
 
         synchronized void informOfQueueChange() {
             queueChangeMillis = System.currentTimeMillis();

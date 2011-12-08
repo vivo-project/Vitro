@@ -179,9 +179,7 @@ public class IndexBuilder extends VitroBackgroundThread {
         }
         
         if( indexer != null)
-            indexer.abortIndexingAndCleanUp();
-        
-        log.info("Stopping IndexBuilder thread");
+            indexer.abortIndexingAndCleanUp();        
     }
     
     
