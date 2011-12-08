@@ -36,6 +36,12 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 public class SolrSmokeTest implements ServletContextListener {
 	private static final Log log = LogFactory.getLog(SolrSmokeTest.class);
 
+	/*
+	 * We don't want to treat socket timeout as a non-recoverable error like the
+	 * other exceptions. So pretend there's a status code for it instead.
+	 */
+	private static final int SOCKET_TIMEOUT_STATUS = -500;
+
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		final StartupStatus ss = StartupStatus.getBean(sce.getServletContext());
@@ -70,16 +76,9 @@ public class SolrSmokeTest implements ServletContextListener {
 	}
 
 	private static class SolrSmokeTestThread extends VitroBackgroundThread {
-		/* Use this code instead of an exception to track socket timeout. */
-		private static final int SOCKET_TIMEOUT_STATUS = -500; 
-		
-		private static final long SLEEP_INTERVAL = 10000; // 10 seconds
 		private final SolrSmokeTest listener;
 		private final URL solrUrl;
 		private final StartupStatus ss;
-		private final HttpClient httpClient = new HttpClient();
-
-		private int statusCode;
 
 		public SolrSmokeTestThread(SolrSmokeTest listener, URL solrUrl,
 				StartupStatus ss) {
@@ -96,75 +95,56 @@ public class SolrSmokeTest implements ServletContextListener {
 		@Override
 		public void run() {
 			try {
-				tryToConnect();
-				if (!isDone()) {
-					sleep();
-					tryToConnect();
-					if (!isDone()) {
-						sleep();
-						tryToConnect();
-					}
-				}
-
-				if (statusCode == HttpStatus.SC_OK) {
-					reportSuccess();
-				} else if (statusCode == HttpStatus.SC_FORBIDDEN) {
-					warnForbidden();
-				} else if (statusCode == SOCKET_TIMEOUT_STATUS) {
-					warnSocketTimeout();
-				} else {
-					warnBadHttpStatus();
-				}
-			} catch (HttpException e) {
-				warnProtocolViolation(e);
-			} catch (UnknownHostException e) {
-				warnUnknownHost(e);
-			} catch (ConnectException e) {
-				warnConnectionRefused(e);
-			} catch (IOException e) {
-				warnTransportError(e);
+				new SolrHomePager(solrUrl).connect();
+				reportSuccess();
+			} catch (SolrProblemException e) {
+				reportProblem(e);
+				return;
 			}
-		}
 
-		private void tryToConnect() throws IOException {
-			GetMethod method = new GetMethod(solrUrl.toExternalForm());
 			try {
-				log.debug("Trying to connect to Solr");
-				statusCode = httpClient.executeMethod(method);
-				log.debug("HTTP status was " + statusCode);
-
-				// clear the buffer.
-				InputStream stream = method.getResponseBodyAsStream();
-				stream.close();
-			} catch (SocketTimeoutException e) {
-				// Catch the exception so we can retry this.
-				// Save the status so we know why we failed.
-				statusCode = SOCKET_TIMEOUT_STATUS;
-			} finally {
-				method.releaseConnection();
-			}
-		}
-
-		/**
-		 * Stop trying to connect if we succeed, or if we receive an error that
-		 * won't change on retry.
-		 */
-		private boolean isDone() {
-			return (statusCode == HttpStatus.SC_OK)
-					|| (statusCode == HttpStatus.SC_FORBIDDEN);
-		}
-
-		private void sleep() {
-			try {
-				Thread.sleep(SLEEP_INTERVAL);
-			} catch (InterruptedException e) {
-				e.printStackTrace(); // Should never happen
+				new SolrPinger(solrUrl).ping();
+				reportGoodPing();
+			} catch (SolrProblemException e) {
+				reportPingProblem(e);
+				return;
 			}
 		}
 
 		private void reportSuccess() {
 			ss.info(listener,
-					"Successfully connected to the Solr search engine.");
+					"Successfully connected to the Solr search server.");
+		}
+
+		private void reportGoodPing() {
+			ss.info(listener, "The Solr search server responded to a 'ping'.");
+		}
+
+		private void reportProblem(SolrProblemException e) {
+			int status = e.getStatusCode();
+			Throwable cause = e.getCause();
+
+			if (status == HttpStatus.SC_FORBIDDEN) {
+				warnForbidden();
+			} else if (status == SOCKET_TIMEOUT_STATUS) {
+				warnSocketTimeout();
+			} else if (status != 0) {
+				warnBadHttpStatus(status);
+			} else if (cause instanceof HttpException) {
+				warnProtocolViolation((HttpException) cause);
+			} else if (cause instanceof UnknownHostException) {
+				warnUnknownHost((UnknownHostException) cause);
+			} else if (cause instanceof ConnectException) {
+				warnConnectionRefused((ConnectException) cause);
+			} else if (cause instanceof IOException) {
+				warnTransportError((IOException) cause);
+			} else {
+				warnUnknownProblem(e);
+			}
+		}
+
+		private void reportPingProblem(SolrProblemException e) {
+			ss.warning(listener, "The Solr search engine did not respond to a 'ping' request", e);
 		}
 
 		private void warnSocketTimeout() {
@@ -183,9 +163,9 @@ public class SolrSmokeTest implements ServletContextListener {
 					+ "does it authorize access from this IP address?");
 		}
 
-		private void warnBadHttpStatus() {
+		private void warnBadHttpStatus(int status) {
 			ss.warning(listener, "Can't connect to the Solr search engine. "
-					+ "The Solr server returned a status code of " + statusCode
+					+ "The Solr server returned a status code of " + status
 					+ ". Check the value of vitro.local.solr.url in "
 					+ "deploy.properties.");
 		}
@@ -215,5 +195,140 @@ public class SolrSmokeTest implements ServletContextListener {
 					+ "Detected a transport error: " + e.getMessage(), e);
 		}
 
+		private void warnUnknownProblem(SolrProblemException e) {
+			ss.warning(listener, "Can't connect to the Solr search engine. "
+					+ "Unrecognized error: " + e.getMessage(), e);
+		}
+
+	}
+
+	/**
+	 * <pre>
+	 * This gets a little tricky. Try to connect until:
+	 *   -- we suceed
+	 *   -- we detect a non-recoverable error
+	 *   -- we fail three times
+	 * </pre>
+	 */
+	private static class SolrHomePager {
+		private static final long SLEEP_INTERVAL = 10000; // 10 seconds
+
+		private final URL solrUrl;
+		private final HttpClient httpClient = new HttpClient();
+
+		private int statusCode;
+
+		public SolrHomePager(URL solrUrl) {
+			this.solrUrl = solrUrl;
+		}
+
+		public void connect() throws SolrProblemException {
+			tryToConnect();
+
+			if (!isDone()) {
+				sleep();
+				tryToConnect();
+			}
+
+			if (!isDone()) {
+				sleep();
+				tryToConnect();
+			}
+
+			if (statusCode != HttpStatus.SC_OK) {
+				throw new SolrProblemException(statusCode);
+			}
+		}
+
+		private void tryToConnect() throws SolrProblemException {
+			GetMethod method = new GetMethod(solrUrl.toExternalForm());
+			try {
+				SolrSmokeTest.log.debug("Trying to connect to Solr");
+				statusCode = httpClient.executeMethod(method);
+				SolrSmokeTest.log.debug("HTTP status was " + statusCode);
+
+				// clear the buffer.
+				InputStream stream = method.getResponseBodyAsStream();
+				stream.close();
+			} catch (SocketTimeoutException e) {
+				// Catch the exception so we can retry this.
+				// Save the status so we know why we failed.
+				statusCode = SolrSmokeTest.SOCKET_TIMEOUT_STATUS;
+			} catch (Exception e) {
+				throw new SolrProblemException(e);
+			} finally {
+				method.releaseConnection();
+			}
+		}
+
+		/**
+		 * Stop trying to connect if we succeed, or if we receive an error that
+		 * won't change on retry.
+		 */
+		private boolean isDone() {
+			return (statusCode == HttpStatus.SC_OK)
+					|| (statusCode == HttpStatus.SC_FORBIDDEN);
+		}
+
+		private void sleep() {
+			try {
+				Thread.sleep(SLEEP_INTERVAL);
+			} catch (InterruptedException e) {
+				e.printStackTrace(); // Should never happen
+			}
+		}
+
+	}
+
+	/**
+	 * Issue a "ping" to Solr. If we get here, we've already established
+	 * contact, so any error is a fatal one.
+	 */
+	private static class SolrPinger {
+		private final URL solrUrl;
+		private final HttpClient httpClient = new HttpClient();
+
+		public SolrPinger(URL solrUrl) {
+			this.solrUrl = solrUrl;
+		}
+
+		public void ping() throws SolrProblemException {
+			GetMethod method = new GetMethod(solrUrl.toExternalForm() + "/admin/ping");
+			try {
+				SolrSmokeTest.log.debug("Trying to ping Solr");
+				int statusCode = httpClient.executeMethod(method);
+				SolrSmokeTest.log.debug("Finished pinging Solr");
+				
+				// clear the buffer.
+				InputStream stream = method.getResponseBodyAsStream();
+				stream.close();
+				
+				if (statusCode != HttpStatus.SC_OK) {
+					throw new SolrProblemException(statusCode);
+				}
+			} catch (IOException e) {
+				throw new SolrProblemException(e);
+			} finally {
+				method.releaseConnection();
+			}
+		}
+	}
+
+	private static class SolrProblemException extends Exception {
+		private final int statusCode;
+
+		SolrProblemException(int statusCode) {
+			super("HTTP status code = " + statusCode);
+			this.statusCode = statusCode;
+		}
+
+		SolrProblemException(Throwable cause) {
+			super(cause);
+			this.statusCode = 0;
+		}
+
+		int getStatusCode() {
+			return this.statusCode;
+		}
 	}
 }
