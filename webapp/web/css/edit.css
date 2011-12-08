@@ -132,11 +132,9 @@ td.verticalfieldlabel {
 }
 .editingForm .form-button {
     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
-    font-size: 1em;
     margin-top: 2px;
     width: auto;
     overflow: visible;
-    padding: 5px;
 }
 tr.form-row-even {
     background-color: #e9f0ff;
