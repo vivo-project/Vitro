@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -73,6 +74,10 @@ public class IndexBuilder extends VitroBackgroundThread {
     /** Number of threads to use during indexing. */
     protected int numberOfThreads = 10;
     
+    /** List of IndexingEventListeners */
+    protected LinkedList<IndexingEventListener> indexingEventListeners = 
+        new LinkedList<IndexingEventListener>();
+    
     public static final int MAX_REINDEX_THREADS= 10;
     public static final int MAX_UPDATE_THREADS= 10;    
     public static final int MAX_THREADS = Math.max( MAX_UPDATE_THREADS, MAX_REINDEX_THREADS);
@@ -132,7 +137,7 @@ public class IndexBuilder extends VitroBackgroundThread {
         //set flag for full index rebuild
         this.reindexRequested = true;   
         //wake up                           
-        this.notifyAll();       
+        this.notifyAll();              
     }
     
     /** 
@@ -142,7 +147,15 @@ public class IndexBuilder extends VitroBackgroundThread {
     	//wake up thread and it will attempt to index anything in changedUris
         this.notifyAll();    	    	   
     }
-       
+    
+    /**
+     * Add a listener for indexing events.  Methods on listener will be called when
+     * events happen in the IndexBuilder.  This is not a Jena ModelListener.
+     */
+    public synchronized void addIndexBuilderListener(IndexingEventListener listener){
+        indexingEventListeners.add(listener);
+    }
+    
 	/**
 	 * This is called when the system shuts down.
 	 */
@@ -159,13 +172,22 @@ public class IndexBuilder extends VitroBackgroundThread {
                 if( reindexRequested ){
                 	setWorkLevel(WorkLevel.WORKING, FLAG_REBUILDING);
                     log.debug("full re-index requested");
+                    
+                    notifyListeners( IndexingEventListener.EventTypes.START_FULL_REBUILD );
                     indexRebuild();
+                    notifyListeners( IndexingEventListener.EventTypes.FINISH_FULL_REBUILD );
+                    
                     setWorkLevel(WorkLevel.IDLE);
                 }else if( !changedStmtQueue.isEmpty() ){                       
-                	setWorkLevel(WorkLevel.WORKING, FLAG_UPDATING);
-                    Thread.sleep(WAIT_AFTER_NEW_WORK_INTERVAL); //wait a bit to let a bit more work to come into the queue
+                	setWorkLevel(WorkLevel.WORKING, FLAG_UPDATING);                	
+                	
+                	//wait a bit to let a bit more work to come into the queue
+                    Thread.sleep(WAIT_AFTER_NEW_WORK_INTERVAL);                     
                     log.debug("work found for IndexBuilder, starting update");
+                    
+                    notifyListeners( IndexingEventListener.EventTypes.START_UPDATE );
                     updatedIndex();
+                    notifyListeners( IndexingEventListener.EventTypes.FINISHED_UPDATE );
                     setWorkLevel(WorkLevel.IDLE);
                 } else {
                     log.debug("there is no indexing working to do, waiting for work");              
@@ -179,7 +201,9 @@ public class IndexBuilder extends VitroBackgroundThread {
         }
         
         if( indexer != null)
-            indexer.abortIndexingAndCleanUp();        
+            indexer.abortIndexingAndCleanUp();
+        
+        notifyListeners( IndexingEventListener.EventTypes.SHUTDOWN );
     }
     
     
@@ -439,6 +463,17 @@ public class IndexBuilder extends VitroBackgroundThread {
     private static class UriLists {
         private final List<String> updatedUris = new ArrayList<String>();
         private final List<String> deletedUris = new ArrayList<String>();
+    }
+    
+    protected void notifyListeners(IndexingEventListener.EventTypes event){
+        for ( IndexingEventListener listener : indexingEventListeners ){
+            try{
+                if(listener != null )
+                    listener.notifyOfIndexingEvent( event );
+            }catch(Throwable th){
+                log.error("problem during NotifyListeners(): " , th);
+            }
+        }
     }
 }
 

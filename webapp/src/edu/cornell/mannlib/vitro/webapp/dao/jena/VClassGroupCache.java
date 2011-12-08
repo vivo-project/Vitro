@@ -41,6 +41,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
+import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
+import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexingEventListener;
 import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
@@ -52,7 +54,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
  * As of VIVO release 1.4, the counts come from the solr index.  Before that they
  * came from the DAOs.  
  */
-public class VClassGroupCache {
+public class VClassGroupCache implements IndexingEventListener {
     private static final Log log = LogFactory.getLog(VClassGroupCache.class);
 
     private static final String ATTRIBUTE_NAME = "VClassGroupCache";
@@ -453,6 +455,10 @@ public class VClassGroupCache {
     }        
 
     /* ****************** Jena Model Change Listener***************************** */
+    
+    /**
+     * Listen for changes to what class group classes are in and their display rank.
+     */
     protected class VClassGroupCacheChangeListener extends StatementListener {        
         public void addedStatement(Statement stmt) {
             checkAndDoUpdate(stmt);
@@ -488,11 +494,15 @@ public class VClassGroupCache {
     public static class Setup implements ServletContextListener {
         @Override
         public void contextInitialized(ServletContextEvent sce) {            
-            ServletContext servletContext = sce.getServletContext();
-            VClassGroupCache vcgc = new VClassGroupCache(servletContext);
+            ServletContext context = sce.getServletContext();
+            VClassGroupCache vcgc = new VClassGroupCache(context);
             vcgc.requestCacheUpdate();
-            servletContext.setAttribute(ATTRIBUTE_NAME,vcgc);           
-            log.info("VClassGroupCache added to context");            
+            context.setAttribute(ATTRIBUTE_NAME,vcgc);           
+            log.info("VClassGroupCache added to context");   
+            
+            IndexBuilder indexBuilder = IndexBuilder.getBuilder(context);
+            indexBuilder.addIndexBuilderListener(vcgc);
+            log.info("VClassGroupCache set to listen to events from IndexBuilder");
         }
 
         @Override
@@ -510,6 +520,24 @@ public class VClassGroupCache {
      */
     public static VClassGroupCache getVClassGroupCache(ServletContext sc) {
         return (VClassGroupCache) sc.getAttribute(ATTRIBUTE_NAME);
+    }
+
+    /**
+     * Handle notification of events from the IndexBuilder.
+     */
+    @Override
+    public void notifyOfIndexingEvent(EventTypes event) {
+        switch( event ){
+            case FINISH_FULL_REBUILD: 
+            case FINISHED_UPDATE:
+                log.debug("rebuilding because of IndexBuilder " + event.name());
+                requestCacheUpdate();
+                break;            
+            default: 
+                log.debug("ignoring event type " + event.name());
+                break;
+                    
+        }        
     }
 
 }
