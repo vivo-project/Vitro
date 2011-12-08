@@ -64,7 +64,7 @@ public class SelectListGeneratorVTwo {
         FieldVTwo.OptionsType optionsType = field.getOptionsType();
         String vclassUri = null;
         switch (optionsType){
-            case HARDCODED_LITERALS:  // not auto-sorted, and empty values not removed or replaced
+            case HARDCODED_LITERALS:  // originally not auto-sorted but sorted now, and empty values not removed or replaced
                 List<List<String>> hardcodedLiteralOptions = field.getLiteralOptions();
                 if (hardcodedLiteralOptions==null) {
                     log.error("no literalOptions List found for field \""+fieldName+"\" in SelectListGenerator.getOptions() when OptionsType HARDCODED_LITERALS specified");

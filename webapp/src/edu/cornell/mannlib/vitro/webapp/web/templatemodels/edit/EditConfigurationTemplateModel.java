@@ -104,10 +104,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 		        continue;
 		    }
 		    Map<String, String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, fieldName, wdf);
-		    //Sort options map if not hardcoded literals
-		    if(field.getOptionsType()!=FieldVTwo.OptionsType.HARDCODED_LITERALS) {
-		    	optionsMap = SelectListGeneratorVTwo.getSortedMap(optionsMap);
-		    }
+		    optionsMap = SelectListGeneratorVTwo.getSortedMap(optionsMap);
 		    pageData.put(fieldName, optionsMap);		       
 		}
 	}
