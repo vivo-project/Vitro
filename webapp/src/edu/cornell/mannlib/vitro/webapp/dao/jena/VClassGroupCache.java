@@ -340,6 +340,7 @@ public class VClassGroupCache implements IndexingEventListener {
         if( group == null ) return;
         
         String groupUri = group.getURI();
+        String facetOnField = VitroSearchTermNames.RDFTYPE;
         
         SolrQuery query = new SolrQuery( ).
             setRows(0).
@@ -347,7 +348,7 @@ public class VClassGroupCache implements IndexingEventListener {
             setQuery(VitroSearchTermNames.CLASSGROUP_URI + ":" + groupUri ).        
             //facet on type to get counts for classes in classgroup
             setFacet(true).
-            addFacetField( VitroSearchTermNames.RDFTYPE ).
+            addFacetField( facetOnField ).
             setFacetMinCount(0);
         
         log.debug("query: " + query);
@@ -358,12 +359,22 @@ public class VClassGroupCache implements IndexingEventListener {
         log.debug("Number of individuals found " + individualCount);
         group.setIndividualCount((int) individualCount);        
         //get counts for classes
-        FacetField ff = rsp.getFacetField( VitroSearchTermNames.RDFTYPE );
-        List<Count> counts = ff.getValues();        
-        for( Count ct: counts){                    
-            String classUri = ct.getName();
-            long individualsInClass = ct.getCount();            
-            setClassCount( group, classUri, individualsInClass);            
+        FacetField ff = rsp.getFacetField( facetOnField );
+        if( ff != null ){
+            List<Count> counts = ff.getValues();
+            if( counts != null ){
+                for( Count ct: counts){
+                    if( ct != null ){
+                        String classUri = ct.getName();
+                        long individualsInClass = ct.getCount();            
+                        setClassCount( group, classUri, individualsInClass);
+                    }
+                }
+            }else{
+               log.debug("no Counts found for FacetField " + facetOnField);   
+            }            
+        }else{
+            log.debug("no FaccetField found for " + facetOnField);
         }
     }
 
