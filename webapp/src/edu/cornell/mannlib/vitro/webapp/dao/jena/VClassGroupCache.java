@@ -178,7 +178,7 @@ public class VClassGroupCache implements IndexingEventListener {
             return wdf.getVClassGroupDao();
     }
     
-    protected void doSynchronousRebuild(){
+    public void doSynchronousRebuild(){
         //try to rebuild a couple times since the Solr server may not yet be up.
         
         int attempts = 0;
