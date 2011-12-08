@@ -204,13 +204,10 @@ public class IndividualToSolrDocument {
         } else {
             value = ind.getLocalName();
         }            
+
         doc.addField(term.NAME_RAW, value);
-        doc.addField(term.NAME_LOWERCASE, value);
-        doc.addField(term.NAME_UNSTEMMED, value);
-        doc.addField(term.NAME_STEMMED, value);
-        doc.addField(term.NAME_PHONETIC, value);
-        doc.addField(term.AC_NAME_UNTOKENIZED, value);
-        doc.addField(term.AC_NAME_STEMMED, value);         
+        // NAME_RAW will be copied by solr into the following fields:
+        // NAME_LOWERCASE, NAME_UNSTEMMED, NAME_STEMMED, NAME_PHONETIC, AC_NAME_UNTOKENIZED, AC_NAME_STEMMED
     }
 
     /**
