@@ -108,7 +108,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 		    if(field.getOptionsType()!=FieldVTwo.OptionsType.HARDCODED_LITERALS) {
 		    	optionsMap = SelectListGeneratorVTwo.getSortedMap(optionsMap);
 		    }
-		    pageData.put(fieldName, SelectListGeneratorVTwo.getOptions(editConfig, fieldName, wdf));		       
+		    pageData.put(fieldName, optionsMap);		       
 		}
 	}
 
