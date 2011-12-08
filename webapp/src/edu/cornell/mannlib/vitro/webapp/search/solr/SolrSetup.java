@@ -44,8 +44,9 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 public class SolrSetup implements javax.servlet.ServletContextListener{   
     private static final Log log = LogFactory.getLog(SolrSetup.class.getName());
     
-    protected static final String LOCAL_SOLR_SERVER  = "vitro.local.solr.server";
-    
+    public static final String SOLR_SERVER  = "vitro.local.solr.server";    
+    public static final String PROHIBITED_FROM_SEARCH = "edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch";
+        
     @Override
     public void contextInitialized(ServletContextEvent sce) {        
     	ServletContext context = sce.getServletContext();
@@ -70,10 +71,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             return;
         }
         
-        try {        
-            
-            //HttpClient httpClient = new HttpClient();
-            
+        try {                                            
             CommonsHttpSolrServer server;
             boolean useMultiPartPost = true;
             //It would be nice to use the default binary handler but there seem to be library problems
@@ -84,14 +82,14 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             server.setMaxTotalConnections(100);         
             server.setMaxRetries(1);
             
-            context.setAttribute(LOCAL_SOLR_SERVER, server);
+            context.setAttribute(SOLR_SERVER, server);
             
             /* set up the individual to solr doc translation */            
-            OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
-            
-            OntModel abox = ModelContext.getBaseOntModelSelector(context).getABoxModel();            
-            OntModel inferences = (OntModel)context.getAttribute( JenaBaseDao.INFERENCE_ONT_MODEL_ATTRIBUTE_NAME);
-            Dataset dataset = DatasetFactory.create(ModelContext.getJenaOntModel(context));
+//            OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
+//            
+//            OntModel abox = ModelContext.getBaseOntModelSelector(context).getABoxModel();            
+//            OntModel inferences = (OntModel)context.getAttribute( JenaBaseDao.INFERENCE_ONT_MODEL_ATTRIBUTE_NAME);
+//            Dataset dataset = DatasetFactory.create(ModelContext.getJenaOntModel(context));
 
             OntModel jenaOntModel = ModelContext.getJenaOntModel(context);
             
@@ -107,10 +105,11 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             modifiers.add(new NameBoost());
             modifiers.add(new ThumbnailImageURL(jenaOntModel));
             
-            // setup probhibited froms earch based on N3 files in the
-            // directory WEB-INF/ontologies/search
+            // setup prohibited from search based on N3 files in the directory WEB-INF/ontologies/search
+            
             File dir = new File(sce.getServletContext().getRealPath("/WEB-INF/ontologies/search"));            
-            ProhibitedFromSearch pfs = new FileBasedProhibitedFromSearch(DisplayVocabulary.SEARCH_INDEX_URI, dir);
+            ProhibitedFromSearch pfs = new FileBasedProhibitedFromSearch(DisplayVocabulary.SEARCH_INDEX_URI, dir);            
+            context.setAttribute(PROHIBITED_FROM_SEARCH,pfs);
             
             IndividualToSolrDocument indToSolrDoc = new IndividualToSolrDocument(            
                     pfs,
@@ -118,6 +117,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             		modifiers);                        
             
             /* setup solr indexer */
+            
             SolrIndexer solrIndexer = new SolrIndexer(server, indToSolrDoc);                  
             
             // This is where the builder gets the list of places to try to
@@ -170,7 +170,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
     }
     
     public static SolrServer getSolrServer(ServletContext ctx){
-        return (SolrServer) ctx.getAttribute(LOCAL_SOLR_SERVER);
+        return (SolrServer) ctx.getAttribute(SOLR_SERVER);
     }
     
 }
