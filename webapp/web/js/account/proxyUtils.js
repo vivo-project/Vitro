@@ -4,6 +4,7 @@ $(document).ready(function(){
      //Remove initial value of input text 'Select an existing last name'
     $('input[name="proxySelectorAC"]').click(function(){
         $(this).val('');
+        $("span[name='proxySelectorSearchStatus']").text('')
     });
     
     //Alert when user doesn't select an editor and a profile after submitting from for relating proxy-profiles

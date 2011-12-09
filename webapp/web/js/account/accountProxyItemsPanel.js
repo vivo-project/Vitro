@@ -185,4 +185,29 @@ $(document).ready(function() {
 		}
 		this["proxyItemsPanel"] = new proxyItemsPanel(this, context);
 	});
+	
+	//Add progress indicator for autocomplete input fields
+	
+	var progressImage;
+    
+    $('#selectProfileEditors').click(function(event){
+        progressImage = $(event.target).closest("section").find(".loading-relateEditor")
+    });
+    
+    $('#selectProfiles').click(function(event){
+        progressImage = $(event.target).closest("section").find(".loading-relateProfile")
+    });
+    
+    $('#addProfile').click(function(event){
+        progressImage = $(event.target).closest("section").find(".loading-addProfile")
+    });
+    
+    
+    $(document).ajaxStart(function(){
+      progressImage.removeClass('hidden').css('display', 'inline-block');
+    });
+    
+    $(document).ajaxStop(function(){
+      progressImage.hide().addClass('hidden');
+    });
 });

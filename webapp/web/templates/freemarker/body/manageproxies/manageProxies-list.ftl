@@ -30,7 +30,7 @@
             
             <section name="proxyProxiesPanel" role="section">
                 <label for="selectProfileEditors">Select editors</label>
-                <input id="selectProfileEditors" type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name" role="input" />
+                <input id="selectProfileEditors" type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name" role="input" /><span><img class="loading-relateEditor hidden" src="${urls.images}/indicatorWhite.gif" /></span>
                 <p class="search-status"><span name='proxySelectorSearchStatus' moreCharsText='type more characters' noMatchText='no match'>&nbsp;</span></p>
     
                 <#-- Magic div that holds all of the proxy data and the template that shows how to display it. -->
@@ -61,8 +61,8 @@
           <legend>Select profiles</legend>  
       
           <section name="proxyProfilesPanel" role="region">
-              <label for="selectProfileEditors">Select profiles</label>
-              <input id="selectProfileEditors" type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name" role="input" />
+              <label for="selectProfiles">Select profiles</label>
+              <input id="selectProfiles" type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name" role="input" /><span><img class="loading-relateProfile hidden" src="${urls.images}/indicatorWhite.gif" /></span>
             
               <p class="search-status"><span name='proxySelectorSearchStatus' moreCharsText='type more characters' noMatchText='no match'>&nbsp;</span></p>
 
@@ -140,7 +140,7 @@
             
             <section name="proxyProfilesPanel" role="region">
                 <label for="addProfile">Add profile</label>
-                <input id="addProfile" type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name" role="input" />
+                <input id="addProfile" type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name" role="input" /><span><img class="loading-addProfile hidden" src="${urls.images}/indicatorWhite.gif" /></span>
                 
                 <p class="search-status"><span name='proxySelectorSearchStatus' moreCharsText='type more characters' noMatchText='no match'>&nbsp;</span></p>
                 <p name="excludeUri" style="display: none">${r.proxyInfos[0].profileUri}<p>
