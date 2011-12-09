@@ -201,9 +201,7 @@ public class IndexBuilder extends VitroBackgroundThread {
         }
         
         if( indexer != null)
-            indexer.abortIndexingAndCleanUp();
-        
-        notifyListeners( IndexingEventListener.EventTypes.SHUTDOWN );
+            indexer.abortIndexingAndCleanUp();        
     }
     
     

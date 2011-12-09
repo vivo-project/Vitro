@@ -11,8 +11,7 @@ public interface IndexingEventListener {
         START_UPDATE,
         FINISHED_UPDATE,
         START_FULL_REBUILD,
-        FINISH_FULL_REBUILD,
-        SHUTDOWN
+        FINISH_FULL_REBUILD        
     }
 
     

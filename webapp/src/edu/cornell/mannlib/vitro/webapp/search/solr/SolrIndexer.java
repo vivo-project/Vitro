@@ -199,6 +199,10 @@ public class SolrIndexer implements IndexerIface {
     	return modified;
     }
 
+    /**
+     * Returns true if there are documents in the index, false if there are none,
+     * and returns false on failure to connect to server.
+     */
     public boolean isIndexEmpty() {
     	SolrQuery query = new SolrQuery();
     	query.setQuery("*:*");
@@ -209,7 +213,7 @@ public class SolrIndexer implements IndexerIface {
     			return true;
     		}
     	} catch (SolrServerException e) {
-    		log.error(e,e);
+    		log.error("Could not connect to solr server" ,e.getRootCause());
     	}
         return false;
     }

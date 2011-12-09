@@ -19,8 +19,8 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.FacetField.Count;
+import org.apache.solr.client.solrj.response.QueryResponse;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
@@ -33,6 +33,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -51,7 +52,14 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
  * This is a cache of classgroups with classes.  Each class should have a count
  * of individuals. These counts are cached so they don't have to be recomputed. 
  * 
- * As of VIVO release 1.4, the counts come from the solr index.  Before that they
+ * The cache is updated asynchronously by the thread RebuildGroupCacheThread. 
+ * A synchronous rebuild can be performed with VClassGroupCache.doSynchronousRebuild() 
+ * 
+ * This class should handle the condition where Solr is not available.  
+ * VClassGroupCache.doSynchronousRebuild() and the RebuildGroupCacheThread will try
+ * to connect to the Solr server a couple of times and then give up.  
+ * 
+ * As of VIVO release 1.4, the counts come from the Solr index.  Before that they
  * came from the DAOs.  
  */
 public class VClassGroupCache implements IndexingEventListener {
@@ -61,7 +69,7 @@ public class VClassGroupCache implements IndexingEventListener {
 
     private static final boolean ORDER_BY_DISPLAYRANK = true;
     private static final boolean INCLUDE_UNINSTANTIATED = true;
-    private static final boolean INCLUDE_INDIVIDUAL_COUNT = true;
+    private static final boolean DONT_INCLUDE_INDIVIDUAL_COUNT = false;
 
     /**
      * This is the cache of VClassGroups. It is a list of VClassGroups. If this
@@ -120,7 +128,6 @@ public class VClassGroupCache implements IndexingEventListener {
         }
         
         if (_groupList == null){
-            log.error("VClassGroup cache has not been created");
             requestCacheUpdate();
             return Collections.emptyList();
         }else{
@@ -136,7 +143,6 @@ public class VClassGroupCache implements IndexingEventListener {
         }
         
         if( VclassMap == null){
-            log.error("VClassGroup cache has not been created");
             requestCacheUpdate();
             return null;
         }else{
@@ -185,61 +191,81 @@ public class VClassGroupCache implements IndexingEventListener {
         int maxTries = 3;
         SolrServerException exception = null;
         
-        while( attempts < 2 ){
+        while( attempts < maxTries ){
             try {
+                attempts++;
                 rebuildCacheUsingSolr(this);
-                break;
+                break;                
             } catch (SolrServerException e) {
-                exception = e;  
+                exception = e;
+                try { Thread.sleep(250); }
+                catch (InterruptedException e1) {/*ignore interrupt*/}
             }
         }
         
         if( exception != null )
-            log.error("could not rebuild cache after " + maxTries + " attempts: " + exception.getMessage());
+            log.error("Could not rebuild cache. " + exception.getRootCause().getMessage() );
+    }
+    
+    /**
+     * Handle notification of events from the IndexBuilder.
+     */
+    @Override
+    public void notifyOfIndexingEvent(EventTypes event) {
+        switch( event ){
+            case FINISH_FULL_REBUILD: 
+            case FINISHED_UPDATE:
+                log.debug("rebuilding because of IndexBuilder " + event.name());
+                requestCacheUpdate();
+                break;            
+            default: 
+                log.debug("ignoring event type " + event.name());
+                break;
+                    
+        }        
     }
     
     /* **************** static utility methods ***************** */
     
+    /**
+     * Use getVClassGroupCache(ServletContext) to get a VClassGroupCache.
+     */
+    public static VClassGroupCache getVClassGroupCache(ServletContext sc) {
+        return (VClassGroupCache) sc.getAttribute(ATTRIBUTE_NAME);
+    }
+
+    /**
+     * Method that rebuilds the cache. This will use a WebappDaoFactory, 
+     * a SolrSever and maybe a ProhibitedFromSearch from the cache.context.
+     * 
+     * If ProhibitedFromSearch is not found in the context, that will be skipped.
+     * 
+     * @throws SolrServerException if there are problems with the Solr server. 
+     */
     protected static void rebuildCacheUsingSolr( VClassGroupCache cache ) throws SolrServerException{                        
         long start = System.currentTimeMillis();
         WebappDaoFactory wdFactory = (WebappDaoFactory) cache.context.getAttribute("webappDaoFactory");
-        if (wdFactory == null) 
-            log.error("Unable to rebuild cache: could not get 'webappDaoFactory' from Servletcontext");                
-        
+        if (wdFactory == null){ 
+            log.error("Unable to rebuild cache: could not get 'webappDaoFactory' from Servletcontext");
+            return;
+        }        
         SolrServer solrServer = (SolrServer)cache.context.getAttribute(SolrSetup.SOLR_SERVER);
-        if( solrServer == null)
-            log.error("Unable to rebuild cache: could not get solrServer from ServletContext");              
-        
-        ProhibitedFromSearch pfs = (ProhibitedFromSearch)cache.context.getAttribute(SolrSetup.PROHIBITED_FROM_SEARCH);
-        if(pfs==null)
-            log.error("Unable to rebuild cache: could not get ProhibitedFromSearch from ServletContext");
+        if( solrServer == null){
+            log.error("Unable to rebuild cache: could not get solrServer from ServletContext");
+            return;
+        }                
         
         VitroFilters vFilters = VitroFilterUtils.getPublicFilter(cache.context);
-        WebappDaoFactory filteringDaoFactory = new WebappDaoFactoryFiltering(wdFactory, vFilters);
+        VClassGroupDao vcgDao = new WebappDaoFactoryFiltering(wdFactory, vFilters).getVClassGroupDao();
         
-        List<VClassGroup> groups = getGroups( 
-                filteringDaoFactory.getVClassGroupDao(), !INCLUDE_INDIVIDUAL_COUNT);
-        
-        // Remove classes that have been configured to be hidden from search results.                
-        removeClassesHiddenFromSearch(groups,pfs);
-
-        addCountsUsingSolr(groups, solrServer);
-        
+        List<VClassGroup> groups = vcgDao.getPublicGroupsWithVClasses(ORDER_BY_DISPLAYRANK, 
+                INCLUDE_UNINSTANTIATED, DONT_INCLUDE_INDIVIDUAL_COUNT);
+                                
+        removeClassesHiddenFromSearch(groups, cache.context);
+        addCountsUsingSolr(groups, solrServer);        
         cache.setCache(groups, classMapForGroups(groups));
-            log.debug("msec to build cache: " + (System.currentTimeMillis() - start));
-    }
-    
-    protected static List<VClassGroup> getGroups(VClassGroupDao vcgDao,
-            boolean includeIndividualCount) {
-        // Get all classgroups, each populated with a list of their member vclasses
-        List<VClassGroup> groups = vcgDao.getPublicGroupsWithVClasses(
-                ORDER_BY_DISPLAYRANK, INCLUDE_UNINSTANTIATED,
-                includeIndividualCount);
-
-        // remove classes that have been configured to be hidden from search results
-        vcgDao.removeClassesHiddenFromSearch(groups);
-
-        return groups;
+        
+        log.debug("msec to build cache: " + (System.currentTimeMillis() - start));
     }
 
     protected static Map<String,VClass> classMapForGroups( List<VClassGroup> groups){
@@ -254,61 +280,19 @@ public class VClassGroupCache implements IndexingEventListener {
             }
         }
         return newClassMap;
-    }
-    
-    protected static List<VClassGroup> removeFilteredOutGroupsAndClasses(
-            List<VClassGroup> unfilteredGroups, List<VClassGroup> filteredGroups) {
-        List<VClassGroup> groups = new ArrayList<VClassGroup>();
-        Set<String> allowedGroups = new HashSet<String>();
-        Set<String> allowedVClasses = new HashSet<String>();
-        for (VClassGroup group : filteredGroups) {
-            if (group.getURI() != null) {
-                allowedGroups.add(group.getURI());
-            }
-            for (VClass vcl : group) {
-                if (vcl.getURI() != null) {
-                    allowedVClasses.add(vcl.getURI());
-                }
-            }
-        }
-        for (VClassGroup group : unfilteredGroups) {
-            if (allowedGroups.contains(group.getURI())) {
-                groups.add(group);
-            }
-            List<VClass> tmp = new ArrayList<VClass>();
-            for (VClass vcl : group) {
-                if (allowedVClasses.contains(vcl.getURI())) {
-                    tmp.add(vcl);
-                }
-            }
-            group.setVitroClassList(tmp);
-        }
-        return groups;
-    }
+    }      
 
-    protected static boolean isClassNameChange(Statement stmt, OntModel jenaOntModel) {
-        // Check if the stmt is a rdfs:label change and that the
-        // subject is an owl:Class.
-        if( RDFS.label.equals( stmt.getPredicate() )) {                
-            jenaOntModel.enterCriticalSection(Lock.READ);
-            try{                                                  
-                return jenaOntModel.contains(
-                        ResourceFactory.createStatement(
-                                ResourceFactory.createResource(stmt.getSubject().getURI()), 
-                                RDF.type, 
-                                OWL.Class));
-            }finally{
-                jenaOntModel.leaveCriticalSection();
-            }
-        }else{
-            return false;
-        }
-    }
         
     /**
      * Removes classes from groups that are prohibited from search. 
      */
-    protected static void removeClassesHiddenFromSearch(List<VClassGroup> groups,ProhibitedFromSearch pfs) {         
+    protected static void removeClassesHiddenFromSearch(List<VClassGroup> groups, ServletContext context2) {
+        ProhibitedFromSearch pfs = (ProhibitedFromSearch)context2.getAttribute(SolrSetup.PROHIBITED_FROM_SEARCH);
+        if(pfs==null){
+            log.debug("Could not get ProhibitedFromSearch from ServletContext");
+            return;
+        }
+        
         for (VClassGroup group : groups) {
             List<VClass> classList = new ArrayList<VClass>();
             for (VClass vclass : group.getVitroClassList()) {
@@ -325,18 +309,17 @@ public class VClassGroupCache implements IndexingEventListener {
      * Add the Individual count to classes in groups.
      * @throws SolrServerException 
      */
-    protected static void addCountsUsingSolr(List<VClassGroup> groups, SolrServer solrServer) throws SolrServerException {
-        
+    protected static void addCountsUsingSolr(List<VClassGroup> groups, SolrServer solrServer) 
+    throws SolrServerException {        
         if( groups == null || solrServer == null ) 
-            return;
-        
+            return;       
         for( VClassGroup group : groups){            
             addClassCountsToGroup(group, solrServer);            
         }
-    }
+    }    
     
-    
-    protected static void addClassCountsToGroup(VClassGroup group, SolrServer solrServer) throws SolrServerException {
+    protected static void addClassCountsToGroup(VClassGroup group, SolrServer solrServer)
+    throws SolrServerException {
         if( group == null ) return;
         
         String groupUri = group.getURI();
@@ -344,20 +327,20 @@ public class VClassGroupCache implements IndexingEventListener {
         
         SolrQuery query = new SolrQuery( ).
             setRows(0).
-            //make a query for the  group URI in the solr classgroup field
             setQuery(VitroSearchTermNames.CLASSGROUP_URI + ":" + groupUri ).        
-            //facet on type to get counts for classes in classgroup
-            setFacet(true).
+            setFacet(true). //facet on type to get counts for classes in classgroup
             addFacetField( facetOnField ).
             setFacetMinCount(0);
         
         log.debug("query: " + query);
         
         QueryResponse rsp = solrServer.query(query);
+
         //Get individual count
         long individualCount = rsp.getResults().getNumFound();
         log.debug("Number of individuals found " + individualCount);
-        group.setIndividualCount((int) individualCount);        
+        group.setIndividualCount((int) individualCount);
+        
         //get counts for classes
         FacetField ff = rsp.getFacetField( facetOnField );
         if( ff != null ){
@@ -384,20 +367,37 @@ public class VClassGroupCache implements IndexingEventListener {
             if( clz.getURI().equals(classUri)){
                 clz.setEntityCount( (int) individualsInClass );
             }
-        }
-        
+        }        
     }
 
-
+    protected static boolean isClassNameChange(Statement stmt, OntModel jenaOntModel) {
+        // Check if the stmt is a rdfs:label change and that the
+        // subject is an owl:Class.
+        if( RDFS.label.equals( stmt.getPredicate() )) {                
+            jenaOntModel.enterCriticalSection(Lock.READ);
+            try{                                                  
+                return jenaOntModel.contains(
+                        ResourceFactory.createStatement(
+                                ResourceFactory.createResource(stmt.getSubject().getURI()), 
+                                RDF.type, 
+                                OWL.Class));
+            }finally{
+                jenaOntModel.leaveCriticalSection();
+            }
+        }else{
+            return false;
+        }
+    }
     /* ******************** RebuildGroupCacheThread **************** */
     
     protected class RebuildGroupCacheThread extends VitroBackgroundThread {
         private final VClassGroupCache cache;
-        private long queueChangeMillis = 0L;
-        private long timeToBuildLastCache = 100L; //in msec 
+        private long queueChangeMillis = 0L; 
         private boolean rebuildRequested = false;
         private volatile boolean die = false;
-
+        private int failedAttempts = 0;
+        private final int maxFailedAttempts = 5;
+        
         RebuildGroupCacheThread(VClassGroupCache cache) {
             super("VClassGroupCache.RebuildGroupCacheThread");
             this.cache = cache;
@@ -408,28 +408,34 @@ public class VClassGroupCache implements IndexingEventListener {
                 int delay;
 
                 if ( !rebuildRequested ) {
-                    log.debug("rebuildGroupCacheThread.run() -- queue empty, sleep");
+                    log.debug("rebuildGroupCacheThread.run() -- nothing to do, sleep");
                     delay = 1000 * 60;
                 } else if ((System.currentTimeMillis() - queueChangeMillis ) < 500) {
                     log.debug("rebuildGroupCacheThread.run() -- delay start of rebuild");
                     delay = 500;
-                } else {
-                    log.debug("rebuildGroupCacheThread.run() -- starting rebuildCache()");                    
-                    long start = System.currentTimeMillis();
-                    
+                } else {                                        
                     setWorkLevel(WorkLevel.WORKING);
                     rebuildRequested = false;                    
                     try {
-                        rebuildCacheUsingSolr( cache );
-                        timeToBuildLastCache = System.currentTimeMillis() - start;
-                        log.debug("rebuildGroupCacheThread.run() -- rebuilt cache in " 
-                                + timeToBuildLastCache + " msec");
+                        rebuildCacheUsingSolr( cache );                        
+                        log.debug("rebuildGroupCacheThread.run() -- rebuilt cache ");
+                        failedAttempts = 0;
                         delay = 100;
-                    } catch (SolrServerException e) {
-                        //wait a couple seconds and try again.
-                        log.error("Will attempt to rebuild cache once solr comes up.");
-                        rebuildRequested = true;
-                        delay = 1000;                        
+                    } catch (SolrServerException e) {                        
+                        failedAttempts++;
+                        if( failedAttempts >= maxFailedAttempts ){                                                        
+                            log.error("Could not build VClassGroupCache. " +
+                            		  "Could not connect with Solr after " + 
+                            		   failedAttempts + " attempts.", e.getRootCause());
+                            rebuildRequested = false;
+                            failedAttempts = 0;
+                            delay = 1000;
+                        }else{
+                            rebuildRequested = true;
+                            delay = (int) (( Math.pow(2, failedAttempts) ) * 1000);
+                            log.debug("Could not connect with Solr, will attempt " +
+                            		  "again in " + delay + " msec.");                            
+                        }
                     }catch(Exception ex){
                         log.error("could not build cache",ex);
                         delay = 1000;
@@ -449,9 +455,7 @@ public class VClassGroupCache implements IndexingEventListener {
                 }
             }
             log.debug("rebuildGroupCacheThread.run() -- die()");
-        }
-
-        
+        }        
 
         synchronized void informOfQueueChange() {
             queueChangeMillis = System.currentTimeMillis();
@@ -499,6 +503,8 @@ public class VClassGroupCache implements IndexingEventListener {
                 }
             }
         }       
+        
+       
     }
     
     /* ******************** ServletContextListener **************** */
@@ -525,30 +531,6 @@ public class VClassGroupCache implements IndexingEventListener {
         }
     }
 
-    
-    /**
-     * Use getVClassGroupCache(ServletContext) to get a VClassGroupCache.
-     */
-    public static VClassGroupCache getVClassGroupCache(ServletContext sc) {
-        return (VClassGroupCache) sc.getAttribute(ATTRIBUTE_NAME);
-    }
-
-    /**
-     * Handle notification of events from the IndexBuilder.
-     */
-    @Override
-    public void notifyOfIndexingEvent(EventTypes event) {
-        switch( event ){
-            case FINISH_FULL_REBUILD: 
-            case FINISHED_UPDATE:
-                log.debug("rebuilding because of IndexBuilder " + event.name());
-                requestCacheUpdate();
-                break;            
-            default: 
-                log.debug("ignoring event type " + event.name());
-                break;
-                    
-        }        
-    }
+  
 
 }
