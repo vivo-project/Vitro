@@ -185,4 +185,41 @@ $(document).ready(function() {
 		}
 		this["proxyItemsPanel"] = new proxyItemsPanel(this, context);
 	});
+	
+	//Add progress indicator for autocomplete input fields
+	
+	var inputClick; 
+    
+    $('#selectProfileEditors').click(function(){
+        inputClick = ".loading-relateEditor";
+    });
+    
+    $('#selectProfiles').click(function(){
+        inputClick = ".loading-relateProfile";
+    });
+    
+    $('#addProfile').click(function(){
+        inputClick = ".loading-addProfile";
+    });
+    
+    
+    $(document).ajaxStart(function(){
+        if (inputClick = ".loading-relateProfile"){
+        $('.loading-relateProfile').removeClass('hidden').css('display', 'inline-block');  
+        }else if (inputClick = ".loading-addProfile"){
+            $('.loading-addProfile').removeClass('hidden').css('display', 'inline-block');
+        }else if (inputClick = ".loading-relateEditor"){
+            $('.loading-relateEditor').removeClass('hidden').css('display', 'inline-block');
+        }
+    });
+    
+    $(document).ajaxStop(function(){
+        if (inputClick = ".loading-relateProfile"){
+            $('.loading-relateProfile').hide().addClass('hidden');;
+        }else if (inputClick = ".loading-addProfile"){
+            $('.loading-addProfile').hide().addClass('hidden');;  
+        }else if (inputClick = ".loading-relateEditor"){
+            $('.loading-relateEditor').hide().addClass('hidden');;
+        }
+    });
 });

@@ -471,3 +471,11 @@ h4.profile-editors {
     margin-left: 20px;
     margin-top: 20px;
 }
+span[name=proxySelectorSearchStatus] {
+    color: red;
+}
+img.loading-relateEdior,
+img.loading-relateProfile,
+img.loading-addProfile {
+    padding-left: 10px;
+}
