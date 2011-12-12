@@ -132,16 +132,8 @@ public class SimpleReasoner extends StatementListener {
 			    setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
 			} 
 			
-			for (ReasonerPlugin plugin : getPluginList()) {
-				try {
-					if (plugin.isInterestedInAddedStatement(stmt)) {
-						plugin.addedABoxStatement(
-								stmt, aboxModel, inferenceModel, tboxModel);
-					}
-				} catch (Throwable t) {
-					log.error(t, t);
-				}
-			}
+			doPlugins(ModelUpdate.Operation.ADD,stmt);
+
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
 			log.error("Exception while computing inferences: " + e.getMessage());
@@ -158,11 +150,7 @@ public class SimpleReasoner extends StatementListener {
 	
 		try {
 			
-			// The delta modeler could optionally record only statements relevant
-			// to reasoning by checking the .isInterestedInRemovedStatement()
-			// methods on the plugins in addition to recording rdf:type 
-			// statements.  If property reasoning were uncommented, however,
-			// almost all statements would be relevant.
+            if (!isInterestedInRemovedStatement(stmt)) return;
 			
 			if (batchMode1) {
 				 aBoxDeltaModeler1.removedStatement(stmt);
@@ -174,16 +162,7 @@ public class SimpleReasoner extends StatementListener {
 					setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
 				}
 								
-				for (ReasonerPlugin plugin : getPluginList()) {
-					try {
-						if (plugin.isInterestedInRemovedStatement(stmt)) {
-							plugin.removedABoxStatement(
-									stmt, aboxModel, inferenceModel, tboxModel);
-						}
-					} catch (Throwable t) {
-						log.error(t, t);
-					}
-				}
+				doPlugins(ModelUpdate.Operation.RETRACT,stmt);
 			}
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
@@ -1061,18 +1040,11 @@ public class SimpleReasoner extends StatementListener {
     					Statement stmt = iter.next();
     					
     					try {
-    				        removedABoxTypeAssertion(stmt, inferenceModel);
-    				        for (ReasonerPlugin plugin : getPluginList()) {
-    				        	try {
-	    				        	if (plugin.isInterestedInRemovedStatement(stmt)) {
-	    				        		plugin.removedABoxStatement(
-	    				        				stmt, aboxModel, inferenceModel, tboxModel);
-	    				        	}
-	    				        } catch (Throwable t) {
-	    				        	log.error(t, t);
-	    				        }
-    				        }
+    						if (stmt.getPredicate().equals(RDF.type)) {
+    							removedABoxTypeAssertion(stmt, inferenceModel);
+    						}
     				        setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
+    				        doPlugins(ModelUpdate.Operation.RETRACT,stmt);
     					} catch (NullPointerException npe) {
     						 abort = true;
     						 break;
@@ -1183,6 +1155,43 @@ public class SimpleReasoner extends StatementListener {
 		return individuals;
 	}
     
+	/**
+	 * 
+	 */
+	protected void doPlugins(ModelUpdate.Operation op, Statement stmt) {
+		
+		for (ReasonerPlugin plugin : getPluginList()) {
+			try {
+				switch (op) {
+				  case ADD: 
+				     if (plugin.isInterestedInAddedStatement(stmt)) {
+					    plugin.addedABoxStatement(stmt, aboxModel, inferenceModel, tboxModel);
+				     }
+				     break;
+				  case RETRACT: 
+					     if (plugin.isInterestedInRemovedStatement(stmt)) {
+						    plugin.removedABoxStatement(stmt, aboxModel, inferenceModel, tboxModel);
+					     }	
+					     break;
+				}
+			} catch (Throwable t) {
+				log.error("Exception while processing " + (op == ModelUpdate.Operation.ADD ? "an added" : "a removed") + 
+						" statement in SimpleReasoner plugin:" + plugin.getClass().getName() + " -- " + t.getMessage());
+			}
+		}
+	}
+	
+	public boolean isInterestedInRemovedStatement(Statement stmt) {
+		
+		if (stmt.getPredicate().equals(RDF.type)) return true;
+
+		for (ReasonerPlugin plugin : getPluginList()) {
+			if (plugin.isInterestedInRemovedStatement(stmt)) return true;
+		}
+		
+        return false;
+	}
+	
 	/**
 	 * This is called when the system shuts down.
 	 */
