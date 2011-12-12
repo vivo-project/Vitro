@@ -6,7 +6,7 @@
     <h4>Who can edit my profile</h4>
     
     <label for="addProfileEditor">Add profile editor</label>
-    <input id="addProfileEditor" type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name" role="input" />
+    <input id="addProfileEditor" type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name" role="input" /><span><img class="loading-profileMyAccoount hidden" src="${urls.images}/indicatorWhite.gif" /></span>
     
     <p class="search-status"><span name='proxySelectorSearchStatus' moreCharsText='type more characters' noMatchText='no match'>&nbsp;</span></p>
     <p name="excludeUri" style="display: none">${myAccountUri}<p>
