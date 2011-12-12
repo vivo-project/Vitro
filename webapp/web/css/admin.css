@@ -45,8 +45,8 @@
 }
 /* BUBBLE ALERT FOR ADDING INDIVIDUAL CLASSES -----> */
 #addClassBubble p{
-    width: 258px;
-    height: 64px;
+    width: 290px;
+    height: 50px;
     font-size: 13px;
     line-height: 1.3em;
     padding: 25px 5px 5px 13px;
