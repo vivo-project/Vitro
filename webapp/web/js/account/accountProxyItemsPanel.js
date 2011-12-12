@@ -189,6 +189,10 @@ $(document).ready(function() {
 	//Add progress indicator for autocomplete input fields
 	
 	var progressImage;
+	
+	$('#addProfileEditor').click(function(event){
+        progressImage = $(event.target).closest("section").find(".loading-profileMyAccoount")
+    });
     
     $('#selectProfileEditors').click(function(event){
         progressImage = $(event.target).closest("section").find(".loading-relateEditor")

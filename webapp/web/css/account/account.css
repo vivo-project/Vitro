@@ -476,6 +476,7 @@ span[name=proxySelectorSearchStatus] {
 }
 img.loading-relateEdior,
 img.loading-relateProfile,
-img.loading-addProfile {
+img.loading-addProfile,
+img.loading-profileMyAccoount {
     padding-left: 10px;
 }
