@@ -158,10 +158,6 @@
                 In the Vitro code repository, the release tags illustrate this relationship. 
                 For example, the Vitro revision that was tagged for version 1.4 of VIVO is named “rel-vivo-1.4”
             </p>
-            <p>
-                As the project progresses, 
-                we will also see Vitro releases named for versions of Datastar and other Vitro-based products.
-            </p>
 
             <hr><!-- Page break --><!-- Installation process for Version 1.4 --><h2 id="installation">Installation process for Version 1.4</h2>
             <p>
@@ -496,8 +492,7 @@
                         <td colspan="2">
                             Specify the maximum number of active connections 
                             in the database connection pool to support the anticipated number of 
-                            concurrent page requests. It is not necessary to adjust this value when  
-                            using the RDB configuration. 
+                            concurrent page requests. 
                         </td>
                     </tr>
                     <tr class="odd_row">
@@ -650,11 +645,6 @@
             </p>
             <h3 id="tomcat_settings">VI. Configure Tomcat</h3>
             <h4>Set JVM parameters</h4>
-            <p>
-                Vitro copies small sections of your RDF database into 
-                memory in order to serve Web requests quickly (the in-memory copy and  
-                the underlying database are kept in synch as edits are performed). 
-            </p>
             <p>
                 Vitro may require more memory than that allocated to Tomcat by 
                 default. With most installations of Tomcat, the "setenv.sh" or 
