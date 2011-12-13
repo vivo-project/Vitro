@@ -91,31 +91,34 @@ public class JenaModelUtils {
         ontModel.enterCriticalSection(Lock.READ);
         try { 
             try {                    
-                for (Iterator rootClassIt = myWebappDaoFactory.getVClassDao()
-                        .getRootClasses().iterator(); rootClassIt.hasNext(); ) {
-                    VClass rootClass = (VClass) rootClassIt.next();
-                    
-                    Individual classGroup = modelForClassgroups.createIndividual(
-                            wadf.getDefaultNamespace() + "vitroClassGroup" + 
-                                   rootClass.getLocalName(), classGroupClass);
-                    classGroup.setLabel(rootClass.getName(), null);
-    
-                    Resource rootClassRes = modelForClassgroupAnnotations.getResource(
-                            rootClass.getURI());
-                    modelForClassgroupAnnotations.add(
-                            rootClassRes, inClassGroupProperty, classGroup);
-                    for (Iterator<String> childIt = myWebappDaoFactory.getVClassDao()
-                            .getAllSubClassURIs(rootClass.getURI()).iterator(); 
-                                    childIt.hasNext(); ) {
-                        String childURI = (String) childIt.next();
-                        Resource childClass = modelForClassgroupAnnotations
-                                .getResource(childURI);
-                        if (!modelForClassgroupAnnotations.contains(
-                                childClass, inClassGroupProperty, (RDFNode) null)) {
-                            childClass.addProperty(inClassGroupProperty, classGroup);    
-                        }          
-                    }
-                }
+            	List<VClass> rootClasses = myWebappDaoFactory.getVClassDao()
+                .getRootClasses();
+            	if(rootClasses != null) {
+            		for (Iterator rootClassIt = rootClasses.iterator(); rootClassIt.hasNext(); ) {
+	                    VClass rootClass = (VClass) rootClassIt.next();
+	                    
+	                    Individual classGroup = modelForClassgroups.createIndividual(
+	                            wadf.getDefaultNamespace() + "vitroClassGroup" + 
+	                                   rootClass.getLocalName(), classGroupClass);
+	                    classGroup.setLabel(rootClass.getName(), null);
+	    
+	                    Resource rootClassRes = modelForClassgroupAnnotations.getResource(
+	                            rootClass.getURI());
+	                    modelForClassgroupAnnotations.add(
+	                            rootClassRes, inClassGroupProperty, classGroup);
+	                    for (Iterator<String> childIt = myWebappDaoFactory.getVClassDao()
+	                            .getAllSubClassURIs(rootClass.getURI()).iterator(); 
+	                                    childIt.hasNext(); ) {
+	                        String childURI = (String) childIt.next();
+	                        Resource childClass = modelForClassgroupAnnotations
+	                                .getResource(childURI);
+	                        if (!modelForClassgroupAnnotations.contains(
+	                                childClass, inClassGroupProperty, (RDFNode) null)) {
+	                            childClass.addProperty(inClassGroupProperty, classGroup);    
+	                        }          
+	                    }
+	                }
+            	}
             } catch (Exception e) {
                 String errMsg = "Unable to create class groups automatically " +
                         "based on class hierarchy";
