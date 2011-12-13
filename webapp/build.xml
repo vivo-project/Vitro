@@ -281,6 +281,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 					<srcfiles dir="${appbase.dir}/config/solr/" />
 				</uptodate>
 				<filesmatch file1="${solr.context.temp.file}" file2="${solr.context.file}" />
+				<filesmatch file1="${solr.context.temp.file}" file2="${tomcat.home}/webapps/${solr.context.name}/META-INF/context.xml" />
 			</and>
 		</condition>
 	</target>
