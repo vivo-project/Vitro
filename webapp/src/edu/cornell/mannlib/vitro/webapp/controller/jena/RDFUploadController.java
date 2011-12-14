@@ -41,7 +41,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 
-public class RDFUploadController extends BaseEditController {
+public class RDFUploadController extends JenaIngestController {
     
     private static int maxFileSizeInBytes = 1024 * 1024 * 2000; //2000mb
     private static FileItem fileStream = null; 
@@ -214,11 +214,9 @@ public class RDFUploadController extends BaseEditController {
         ModelMaker maker = getVitroJenaModelMaker(request);
         
         if (docLoc!=null && modelName != null) {
-            doLoadRDFData(modelName,docLoc,filePath,languageStr,maker);
-            //request.setAttribute("title","Ingest Menu");
-            //request.setAttribute("bodyJsp",INGEST_MENU_JSP);
-            request.setAttribute("title","Available Models");
-            request.setAttribute("bodyJsp",LIST_MODELS_JSP);
+            doLoadRDFData(modelName, docLoc, filePath, languageStr, maker);
+            String modelType = getModelType(request, maker);
+            showModelList(request, maker, modelType);
         } else {
             request.setAttribute("title","Load RDF Data");
             request.setAttribute("bodyJsp",LOAD_RDF_DATA_JSP);
@@ -352,16 +350,6 @@ public class RDFUploadController extends BaseEditController {
          }            
          return;
      }
-     
-     private ModelMaker getVitroJenaModelMaker(HttpServletRequest request) {
-          ModelMaker myVjmm = (ModelMaker) request.getSession().getAttribute(
-                  "vitroJenaModelMaker");
-          myVjmm = (myVjmm == null) 
-                ? (ModelMaker) getServletContext().getAttribute(
-                        "vitroJenaModelMaker") 
-                : myVjmm;
-          return new VitroJenaSpecialModelMaker(myVjmm, request);
-       }
      
      private OntModel getABoxModel(HttpSession session, ServletContext ctx) {   
          if (session != null 

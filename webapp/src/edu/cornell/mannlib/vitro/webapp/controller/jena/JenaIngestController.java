@@ -730,7 +730,7 @@ public class JenaIngestController extends BaseEditController {
         }
     }
     
-    private String getModelType(VitroRequest vreq, ModelMaker maker) {
+    protected String getModelType(VitroRequest vreq, ModelMaker maker) {
         String modelType = vreq.getParameter("modelType");
         maker = (maker instanceof VitroJenaSpecialModelMaker) 
                 ? ((VitroJenaSpecialModelMaker) maker).getInnerModelMaker()
@@ -1230,7 +1230,7 @@ public class JenaIngestController extends BaseEditController {
         return result;
     }
     
-    private void showModelList(VitroRequest vreq, ModelMaker maker, String modelType) {
+    protected void showModelList(VitroRequest vreq, ModelMaker maker, String modelType) {
         if(modelType.equals("rdb")){
             vreq.setAttribute("modelType", "rdb");
             vreq.setAttribute("infoLine", "RDB models");
@@ -1238,6 +1238,7 @@ public class JenaIngestController extends BaseEditController {
             vreq.setAttribute("modelType", "sdb");
             vreq.setAttribute("infoLine", "SDB models");
         }
+        vreq.setAttribute("modelNames", maker.listModels().toList());
         vreq.setAttribute("bodyAttr", "onLoad=\"init()\"");
         vreq.setAttribute("title","Available Models");
         vreq.setAttribute("bodyJsp",LIST_MODELS_JSP);
