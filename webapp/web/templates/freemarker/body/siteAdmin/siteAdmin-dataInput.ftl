@@ -9,7 +9,7 @@
         <h3>Data Input</h3>
 
         <form id="addIndividualClass" action="${dataInput.formAction}" method="get">
-            <select id="VClassURI" name="typeOfNew" class="form-item" role="select">
+            <select id="VClassURI" name="typeOfNew" class="form-item long-options" role="select">
                 <@form.optionGroups groups=dataInput.groupedClassOptions />
             </select>
             <input type="hidden" name="editForm" value="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.NewIndividualFormGenerator" role="input" />
