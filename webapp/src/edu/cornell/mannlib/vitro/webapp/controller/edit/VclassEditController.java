@@ -181,7 +181,7 @@ public class VclassEditController extends BaseEditController {
 	        }
 	        request.setAttribute("disjointClasses",djVClasses);
         } catch (Exception e) {
-        	e.printStackTrace();
+        	log.error(e, e);
         }
         
         try {
@@ -200,7 +200,7 @@ public class VclassEditController extends BaseEditController {
 	        request.setAttribute("equivalentClasses",eqVClasses);
         } catch (Exception e) {
         	log.error("Couldn't get the equivalent classes: ");
-        	e.printStackTrace();
+        	log.error(e, e);
         }
 
         // add the options

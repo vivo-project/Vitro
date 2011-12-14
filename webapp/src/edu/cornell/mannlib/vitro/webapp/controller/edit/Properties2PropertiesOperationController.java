@@ -46,7 +46,8 @@ public class Properties2PropertiesOperationController extends
 		        try {
 		            response.sendRedirect(defaultLandingPage);
 		        } catch (IOException f) {
-		            e.printStackTrace();
+	                log.error(f, f);
+	                throw new RuntimeException(f);
 		        }
 		        return;
 		    }
@@ -88,13 +89,15 @@ public class Properties2PropertiesOperationController extends
 		        try {
 		            response.sendRedirect(defaultLandingPage);
 		        } catch (IOException e) {
-		            e.printStackTrace();
+	                log.error(e, e);
+	                throw new RuntimeException(e);
 		        }
 		    } else {
 		        try {
 		            response.sendRedirect(referer);
 		        } catch (IOException e) {
-		            e.printStackTrace();
+	                log.error(e, e);
+	                throw new RuntimeException(e);
 		        }
 		    }
 

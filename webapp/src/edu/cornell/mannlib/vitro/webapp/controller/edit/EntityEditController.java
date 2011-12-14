@@ -145,7 +145,9 @@ public class EntityEditController extends BaseEditController {
                 }
             }
             OptionMap.put("externalIds", externalIdOptionList);
-        } catch (Exception e) {e.printStackTrace();}
+        } catch (Exception e) {
+            log.error(e, e);
+        }
                 
         List classGroups = vreq.getFullWebappDaoFactory().getVClassGroupDao().getPublicGroupsWithVClasses(true,true,false); // order by displayRank, include uninstantiated classes, don't count the individuals
         Iterator classGroupIt = classGroups.iterator();
@@ -158,7 +160,9 @@ public class EntityEditController extends BaseEditController {
         }
         try {
             OptionMap.put("VClassURI", optGroupMap);
-        } catch (Exception e) {e.printStackTrace();}       
+        } catch (Exception e) {
+            log.error(e, e);
+        }       
         
         PropertyInstanceDao piDao = vreq.getFullWebappDaoFactory().getPropertyInstanceDao();
         // existing property statements
@@ -173,7 +177,7 @@ public class EntityEditController extends BaseEditController {
             }
             OptionMap.put("ExistingPropertyInstances", epiOptionList);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e, e);
         }
         // possible property statements
         try {
@@ -182,7 +186,7 @@ public class EntityEditController extends BaseEditController {
             piList.addAll(piColl);
             OptionMap.put("PropertyURI", FormUtils.makeOptionListFromBeans(piList, "PropertyURI", "DomainPublic", (String)null, (String)null, false));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e, e);
         }
 
         foo.setOptionLists(OptionMap);

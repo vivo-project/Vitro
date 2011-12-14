@@ -952,7 +952,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                         else
                             rv = 0;
                     } catch (NullPointerException e) {
-                        e.printStackTrace();
+                        log.error(e, e);
                     }
 
                     if( cAsc )

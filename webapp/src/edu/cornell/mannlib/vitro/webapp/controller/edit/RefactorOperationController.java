@@ -471,7 +471,8 @@ public class RefactorOperationController extends BaseEditController {
             try {
                 response.sendRedirect(defaultLandingPage);
             } catch (IOException f) {
-                e.printStackTrace();
+                log.error(f, f);
+                throw new RuntimeException(f);
             }
             return;
         }
@@ -507,7 +508,8 @@ public class RefactorOperationController extends BaseEditController {
 	        try {
 	            response.sendRedirect(redirectStr);
 	        } catch (IOException e) {
-	            e.printStackTrace();
+                log.error(e, e);
+                throw new RuntimeException(e);
 	        }
         }
 

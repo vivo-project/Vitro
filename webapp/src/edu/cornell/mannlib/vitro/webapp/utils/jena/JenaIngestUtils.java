@@ -293,7 +293,7 @@ public class JenaIngestUtils {
 			processor = stringProcessorClass.newInstance();
 			meth = stringProcessorClass.getMethod(processorMethod,methArgs);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e, e);
 			return;
 		}
 		Property prop = ResourceFactory.createProperty(originalPropertyURI);
@@ -314,7 +314,7 @@ public class JenaIngestUtils {
 					    }
 						newLex = (String) meth.invoke(processor,args);
 					} catch (Exception e) {
-						e.printStackTrace();
+						log.error(e, e);
 						return;
 					}
 					if (!newLex.equals(lex)) {

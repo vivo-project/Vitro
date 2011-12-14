@@ -166,7 +166,7 @@ public class VitroJenaSDBModelMaker implements ModelMaker {
                 qe.execAsk();
                 return true;
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error(e, e);
                 return false;
             } finally {
                 qe.close();

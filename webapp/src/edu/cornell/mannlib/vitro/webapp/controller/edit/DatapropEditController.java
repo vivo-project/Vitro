@@ -88,7 +88,7 @@ public class DatapropEditController extends BaseEditController {
         try {
             domainStr = (dp.getDomainClassURI() == null) ? "" : "<a href=\"vclassEdit?uri="+URLEncoder.encode(dp.getDomainClassURI(),"UTF-8")+"\">"+dp.getDomainClassURI()+"</a>";
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            log.error(e, e);
         }
         results.add(domainStr);
         
