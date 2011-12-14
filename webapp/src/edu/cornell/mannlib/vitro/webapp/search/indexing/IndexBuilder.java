@@ -260,9 +260,10 @@ public class IndexBuilder extends VitroBackgroundThread {
 				try {
 					Individual ind = indDao.getIndividualByURI(uri);
 					if (ind != null) {
+					    log.debug("uri to update or add to search index: " + uri);
 						uriLists.updatedUris.add(uri);
 					} else {
-						log.debug("found delete in changed uris");
+						log.debug("found delete in changed uris: " + uri);
 						uriLists.deletedUris.add(uri);
 					}
 				} catch (QueryParseException ex) {
