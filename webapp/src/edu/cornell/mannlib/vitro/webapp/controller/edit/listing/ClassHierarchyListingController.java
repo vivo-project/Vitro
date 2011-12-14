@@ -88,8 +88,7 @@ public class ClassHierarchyListingController extends BaseEditController {
        		roots = vcDao.getRootClasses();
         }
         
-        // DEBUGGING
-        if (roots == null) {
+        if (roots.isEmpty()) {
         	roots = new LinkedList<VClass>();
         	roots.add(vrequest.getFullWebappDaoFactory().getVClassDao()
         			.getTopConcept());
