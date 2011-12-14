@@ -286,6 +286,14 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
     	} catch (ProfileException pe) {
     		// Current language profile does not support equivalent classes.
     		// We'd prefer to return an empty list instead of throwing an exception
+    	} catch (Exception e) {
+            // we'll try this again using a different method that 
+    	    // doesn't try to convert to OntClass
+            List<Resource> supList = this.listDirectObjectPropertyValues(
+                    getOntModel().getResource(classURI), OWL.equivalentClass);
+            for (Resource res : supList) {
+                equivalentClassURIs.add(getClassURIStr(res));
+            }  
     	} finally {
     		getOntModel().leaveCriticalSection();
     	}
