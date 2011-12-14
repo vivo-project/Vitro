@@ -40,8 +40,8 @@ public class SimpleReasonerSetup implements ServletContextListener {
     public static final String FILE_OF_PLUGINS = "/WEB-INF/resources/reasoner_plugins.txt";
     
     // Models used during a full recompute of the ABox
-    static final String JENA_INF_MODEL_REBUILD = "http://vitro.mannlib.cornell.edu/default/vitro-kb-inf-rebuild";
-    static final String JENA_INF_MODEL_SCRATCHPAD = "http://vitro.mannlib.cornell.edu/default/vitro-kb-inf-scratchpad";
+    public static final String JENA_INF_MODEL_REBUILD = "http://vitro.mannlib.cornell.edu/default/vitro-kb-inf-rebuild";
+    public static final String JENA_INF_MODEL_SCRATCHPAD = "http://vitro.mannlib.cornell.edu/default/vitro-kb-inf-scratchpad";
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {

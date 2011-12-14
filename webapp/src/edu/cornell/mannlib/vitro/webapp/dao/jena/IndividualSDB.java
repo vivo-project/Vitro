@@ -429,8 +429,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                 webappDaoFactory.getObjectPropertyStatementDao()
                         .fillExistingObjectPropertyStatements(this);
             } catch (Exception e) {
-                log.error(this.getClass().getName() + 
-                        " could not fill existing ObjectPropertyStatements for "
+                log.error("Could not fill existing ObjectPropertyStatements for "
                         + this.getURI(), e);
             }
             return this.objectPropertyStatements;
@@ -579,8 +578,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                 webappDaoFactory.getObjectPropertyDao()
                         .fillObjectPropertiesForIndividual( this );
             } catch (Exception e) {
-                log.error(this.getClass().getName() + 
-                        " could not fillEntityProperties for " + this.getURI());
+                log.error("Could not fillEntityProperties for " + this.getURI(), e);
             }
             return this.propertyList;
         }
@@ -623,9 +621,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                 webappDaoFactory.getDataPropertyStatementDao()
                         .fillExistingDataPropertyStatementsForIndividual(this);
             } catch (Exception e) {
-                log.error(this.getClass().getName() + 
-                        " could not fill existing DataPropertyStatements for "
-                                + this.getURI());
+                log.error("Could not fill existing DataPropertyStatements for "
+                                + this.getURI(), e);
             }
             return this.dataPropertyStatements;
         }
@@ -639,8 +636,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                 webappDaoFactory.getDataPropertyDao()
                         .fillDataPropertiesForIndividual( this );
             } catch (Exception e) {
-                log.error(this.getClass().getName() + 
-                        " could not fill data properties for " + this.getURI());
+                log.error("Could not fill data properties for " + this.getURI(), e);
             }
             return this.datatypePropertyList;
         }
@@ -686,8 +682,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                         .getExternalIds(this.getURI(), null));
                 this.externalIds = dpsList;
             } catch (Exception e) {
-                log.error(this.getClass().getName() + 
-                        " could not fill external IDs for " + this.getURI());
+                log.error("Could not fill external IDs for " + this.getURI(), e);
             }
             return this.externalIds;
         }
