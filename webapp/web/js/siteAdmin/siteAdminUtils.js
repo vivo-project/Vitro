@@ -22,6 +22,8 @@ $(document).ready(function(){
          
          $('#VClassURI').removeClass('width');
          
+         $('.long-options').css('width','300px');
+         
          $('#addClassBubble').hide();
      }
 });
