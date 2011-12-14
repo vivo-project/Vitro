@@ -49,8 +49,8 @@
 				var myPrefixAjax = new Ajax.Request( preurl, {method: "get", parameters: "", onComplete: function(originalRequest){
 							var response = originalRequest.responseXML;
 							var options = response.getElementsByTagName("option");
-							if (options == null || options.length == 0){
-								alert("Error: Cannot get all the prefix.");
+							if (options == null || options.length == 0) {
+								alert("Error: Cannot get all the prefixes.");
 								return;
 							}
 							for(i=0; i<options.length; i++)
