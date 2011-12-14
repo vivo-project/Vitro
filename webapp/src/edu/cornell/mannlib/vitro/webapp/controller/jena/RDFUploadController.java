@@ -151,6 +151,9 @@ public class RDFUploadController extends BaseEditController {
         
         /* ********** Do the model changes *********** */
         if( !directRead && uploadModel != null ){
+            
+            uploadModel.loadImports();
+            
             long tboxstmtCount = 0L;
             long aboxstmtCount = 0L;
 
