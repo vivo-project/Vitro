@@ -270,23 +270,9 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
         group.setURI(groupInd.getURI());
         group.setNamespace(groupInd.getNameSpace());
         group.setLocalName(groupInd.getLocalName());
-        try {
-            if (groupInd.getProperty(PUBLIC_DESCRIPTION_ANNOT)!=null) {
-                // without the convenience method, just for reference
-                // String valueStr = ((Literal)groupInd.getProperty(PUBLIC_DESCRIPTION_ANNOT).getObject()).getLexicalForm();
-                String valueStr = null;
-                if ((valueStr=getPropertyStringValue(groupInd,PUBLIC_DESCRIPTION_ANNOT)) != null) {
-                    group.setPublicDescription(valueStr);
-                }
-            }
-        } catch (Exception e) {
-            log.error("error setting public description in groupFromGroupIndividual() for "+groupInd.getURI());
-        }
-        try {
-            group.setDisplayRank(Integer.decode(((Literal)(groupInd.getProperty(DISPLAY_RANK).getObject())).getString()).intValue());
-        } catch (Exception e) {
-            log.debug("error setting display rank in groupFromGroupIndividual() for "+groupInd.getURI());
-        }
+        group.setPublicDescription(getPropertyStringValue(
+                groupInd, PUBLIC_DESCRIPTION_ANNOT));
+        group.setDisplayRank(getPropertyNonNegativeIntValue(groupInd, DISPLAY_RANK));    
         return group;
     }
 	

@@ -180,16 +180,7 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
         group.setURI(groupInd.getURI());
         group.setNamespace(groupInd.getNameSpace());
         group.setLocalName(groupInd.getLocalName());
-        try {
-        	DatatypeProperty drProp = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createDatatypeProperty(VitroVocabulary.DISPLAY_RANK);
-        	if( drProp == null ){
-        	    log.debug("No display rank in model for " + groupInd.getURI() );
-        	}else{
-        	    group.setDisplayRank(Integer.decode(((Literal)(groupInd.getProperty(drProp).getObject())).getString()).intValue());
-        	}
-        } catch (Exception e) {
-            log.warn("Cannot get display rank for " + groupInd.getURI() + " " + e.getMessage() );            
-        }
+        group.setDisplayRank(getPropertyNonNegativeIntValue(groupInd, DISPLAY_RANK));       
         return group;
     }
 
