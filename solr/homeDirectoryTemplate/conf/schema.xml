@@ -193,7 +193,7 @@
   <!-- RY Not sure if we need to store nameLowercase. Is it ever displayed? -->
   <field name="nameLowercase" type="lowercase" indexed="true" stored="true" multiValued="true"/>
   <!-- A sortable version of nameLowercase -->
-  <field name="nameLowercaseSingleValued" type="lowercase" indexed="true" stored="false" multiValued="false" />  
+  <field name="nameLowercaseSingleValued" type="lowercase" indexed="true" stored="false" multiValued="false" omitNorms="true" />  
   <field name="nameUnstemmed" type="text_unstemmed" indexed="true" stored="false" multiValued="true"/>
   <field name="nameStemmed" type="text_stemmed" indexed="true" stored="false" multiValued="true"/>  
      
@@ -236,7 +236,7 @@
   <copyField source="nameRaw" dest="NAME_PHONETIC" />
   <copyField source="nameRaw" dest="acNameUntokenized" />
   <copyField source="nameRaw" dest="acNameStemmed" />
-  <copyField source="nameLowercase" dest="nameLowercaseSingleValued" />
+  <copyField source="nameRaw" dest="nameLowercaseSingleValued" />
      
   <!-- ****************************  End Vitro Fields *************************** -->
    

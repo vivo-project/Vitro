@@ -44,7 +44,8 @@ public class ProhibitedFromSearch implements ClassProhibitedFromSearch{
 	public synchronized boolean isClassProhibitedFromSearch(String classURI){
 		if( classURI != null ){
 			boolean p = prohibitedClasses.contains(classURI);
-			log.debug( classURI + " is " + (p?"prohibited":"not prohibited"));
+			if( p )
+			    log.debug( classURI + " is prohibited from search");
 			return p;
 		}else{
 			return false;

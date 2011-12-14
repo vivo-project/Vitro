@@ -18,16 +18,14 @@ import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.client.solrj.impl.XMLResponseParser;
 
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.DatasetFactory;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.search.beans.FileBasedProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearchImpl;
@@ -39,6 +37,7 @@ import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForObjectP
 import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForTypeStatements;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.SearchReindexingListener;
+import edu.cornell.mannlib.vitro.webapp.search.indexing.URIsForClassGroupChange;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 public class SolrSetup implements javax.servlet.ServletContextListener{   
@@ -85,14 +84,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             context.setAttribute(SOLR_SERVER, server);
             
             /* set up the individual to solr doc translation */            
-//            OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
-//            
-//            OntModel abox = ModelContext.getBaseOntModelSelector(context).getABoxModel();            
-//            OntModel inferences = (OntModel)context.getAttribute( JenaBaseDao.INFERENCE_ONT_MODEL_ATTRIBUTE_NAME);
-//            Dataset dataset = DatasetFactory.create(ModelContext.getJenaOntModel(context));
-
-            OntModel jenaOntModel = ModelContext.getJenaOntModel(context);
-            
+            OntModel jenaOntModel = ModelContext.getJenaOntModel(context);            
             
             /* try to get context attribute DocumentModifiers 
              * and use that as the start of the list of DocumentModifier 
@@ -128,7 +120,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             wadf = new WebappDaoFactoryFiltering(wadf, vf);            
             
             // make objects that will find additional URIs for context nodes etc
-            List<StatementToURIsToUpdate> uriFinders = makeURIFinders(jenaOntModel);
+            List<StatementToURIsToUpdate> uriFinders = makeURIFinders(jenaOntModel,wadf.getIndividualDao());
             
             // Make the IndexBuilder
             IndexBuilder builder = new IndexBuilder( solrIndexer, wadf, uriFinders );
@@ -150,13 +142,15 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
     /**
      * Make a list of StatementToURIsToUpdate objects for use by the
      * IndexBuidler.
+     * @param indDao 
      */
-    public List<StatementToURIsToUpdate> makeURIFinders( OntModel jenaOntModel ){
+    public List<StatementToURIsToUpdate> makeURIFinders( OntModel jenaOntModel, IndividualDao indDao ){
         List<StatementToURIsToUpdate> uriFinders = new ArrayList<StatementToURIsToUpdate>();
         uriFinders.add( new AdditionalURIsForDataProperties() );
         uriFinders.add( new AdditionalURIsForObjectProperties(jenaOntModel) );
         uriFinders.add( new AdditionalURIsForContextNodes(jenaOntModel) );
         uriFinders.add( new AdditionalURIsForTypeStatements() );
+        uriFinders.add( new URIsForClassGroupChange( indDao ));
         return uriFinders;
     }
     
