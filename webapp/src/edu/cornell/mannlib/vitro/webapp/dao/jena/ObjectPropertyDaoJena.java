@@ -221,7 +221,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 p.setGroupURI(groupRes.getURI());
             }
         } catch (Throwable t) {
-            t.printStackTrace();
+            log.error(t, t);
         }
         return p;
     }
@@ -401,7 +401,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             try {
 	             doUpdate(prop,p,inv,ontModel);
             } catch (Exception e) {
-                 e.printStackTrace();
+                 log.error(e, e);
             }
         } finally {
         	getOntModel().getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),false));

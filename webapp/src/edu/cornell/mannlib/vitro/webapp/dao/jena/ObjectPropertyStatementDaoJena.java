@@ -105,7 +105,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 	                            try {
 	                                objPropertyStmt.setObjectURI(((Resource)st.getObject()).getURI());
 	                            } catch (Throwable t) {
-	                                t.printStackTrace();
+	                                log.error(t, t);
 	                            }
 	                            objPropertyStmt.setPropertyURI(st.getPredicate().getURI());
 	                            try {
@@ -137,7 +137,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 	                                objPropertyStmtList.add(objPropertyStmt);                           
 	                            } 
 	                        } catch (Throwable t) {
-	                            t.printStackTrace();
+	                            log.error(t, t);
 	                        }
 	                    }
 	                }

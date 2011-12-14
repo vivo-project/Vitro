@@ -82,7 +82,9 @@ public class PropertyEditController extends BaseEditController {
         	if (parent != null && parent.getURI() != null) {
         		try {
         			parentPropertyStr = "<a href=\"propertyEdit?uri="+URLEncoder.encode(parent.getURI(),"UTF-8")+"\">"+parent.getLocalNameWithPrefix()+"</a>";
-        		} catch (UnsupportedEncodingException e) {e.printStackTrace();}
+        		} catch (UnsupportedEncodingException e) {
+        		    log.error(e, e);
+        		}
         	}
     	} 
         results.add(parentPropertyStr); // column 2
@@ -97,7 +99,9 @@ public class PropertyEditController extends BaseEditController {
         			} else {
         				domainStr = "<a href=\"vclassEdit?uri="+URLEncoder.encode(domainClass.getURI(),"UTF-8")+"\">"+domainClass.getLocalNameWithPrefix()+"</a>";
         			}
-        		} catch (UnsupportedEncodingException e) {e.printStackTrace();}
+        		} catch (UnsupportedEncodingException e) {
+        		    log.error(e, e);
+        		}
         	}
         }
         results.add(domainStr); // column 3
@@ -112,7 +116,9 @@ public class PropertyEditController extends BaseEditController {
         			} else {
         				rangeStr = "<a href=\"vclassEdit?uri="+URLEncoder.encode(rangeClass.getURI(),"UTF-8")+"\">"+rangeClass.getLocalNameWithPrefix()+"</a>";
         			}
-        		} catch (UnsupportedEncodingException e) {e.printStackTrace();}
+        		} catch (UnsupportedEncodingException e) {
+        		    log.error(e, e);
+        		}
         	}
         }
         results.add(rangeStr); // column 4

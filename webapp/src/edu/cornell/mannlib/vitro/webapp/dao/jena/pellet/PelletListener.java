@@ -392,8 +392,7 @@ public class PelletListener implements ModelChangedListener {
 						        
 						        localRemovalQueue.clear();
 						    } catch (Exception e) {
-								log.error("Exception in "+this.getClass().getName()+".getInferences()");
-								e.printStackTrace();
+								log.error("Error getting inferences", e);
 						    } 
 						    tempModel = null;
 				        }

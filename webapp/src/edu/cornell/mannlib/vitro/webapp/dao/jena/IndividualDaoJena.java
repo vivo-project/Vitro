@@ -319,7 +319,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error(e, e);
                 }
                 for (Iterator<String> oldIt = oldTypeURIsSet.iterator(); oldIt.hasNext();) {
                     String uri = oldIt.next();
