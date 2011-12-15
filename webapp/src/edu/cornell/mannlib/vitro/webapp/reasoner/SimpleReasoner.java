@@ -87,7 +87,7 @@ public class SimpleReasoner extends StatementListener {
 		aBoxDeltaModeler2 = new CumulativeDeltaModeler();
 		stopRequested = false;
 				
-	    aboxModel.getBaseModel().register(this);
+	    aboxModel.getBaseModel().register(this);    
 	}
 	
 	/**
@@ -307,7 +307,7 @@ public class SimpleReasoner extends StatementListener {
 	 * 
 	 */
 	public void addedABoxTypeAssertion(Statement stmt, Model inferenceModel, HashSet<String> unknownTypes) {
-				
+		
 		tboxModel.enterCriticalSection(Lock.READ);
 		
 		try {
@@ -450,9 +450,6 @@ public class SimpleReasoner extends StatementListener {
 	// Returns true if it is entailed by class subsumption that
 	// subject is of type cls; otherwise returns false.
 	public boolean entailedType(Resource subject, OntClass cls) {
-		
-		log.info("subject = " + subject.getURI() + " class = " + cls.getURI());
-		
 		aboxModel.enterCriticalSection(Lock.READ);
 		tboxModel.enterCriticalSection(Lock.READ);
 		
@@ -465,7 +462,7 @@ public class SimpleReasoner extends StatementListener {
 						
 			while (iter.hasNext()) {		
 				OntClass childClass = iter.next();
-				if (childClass.equals(cls)) continue; //TODO: this was break and I changed it to continue (?) 12/14/2011
+				if (childClass.equals(cls)) continue;
 				Statement stmt = ResourceFactory.createStatement(subject, RDF.type, childClass);
 				if (aboxModel.contains(stmt)) return true;
 			}
@@ -529,8 +526,6 @@ public class SimpleReasoner extends StatementListener {
 	 * of A (including A itself)
 	 */
 	public void removedSubClass(OntClass subClass, OntClass superClass, Model inferenceModel) {
-		
-		log.info("removedSubClass class called. subClass = " + subClass.getURI() + " superClass = " + superClass.getURI());
 		OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
 		unionModel.addSubModel(aboxModel);
 		unionModel.addSubModel(inferenceModel);
@@ -545,37 +540,20 @@ public class SimpleReasoner extends StatementListener {
         } finally {
             aboxModel.leaveCriticalSection();
         }
-        
-		List<OntClass> superClassList = superClass.listSuperClasses(false).toList();
-		superClassList.add(superClass);
-		        
-        for (Resource ind : subjectList) {	
-        	
-        	log.info("in resource For. individual = " + ind.getURI());
-        	
-		    for (OntClass sClass : superClassList) {
-		
-		    	log.info("in superClass for. sClass = " + sClass.getURI());
-		    	
-		    	if (sClass.isAnon() || sClass.getURI().equals(OWL.Thing.getURI())) continue;
-		    	
-				if (entailedType(ind,sClass)) {
-					log.info("it is otherwise entailed that " + ind.getURI() + " is of type " + sClass.getURI() + ". Will not remove that assertion from the inf graph");
-					continue;
-				}
-				
-				Statement infStmt = ResourceFactory.createStatement(ind, RDF.type, sClass);
-				inferenceModel.enterCriticalSection(Lock.WRITE);
-				try {
-					log.info("trying to remove this statment from the inference graph: " + stmtString(infStmt));
-				    if (inferenceModel.contains(infStmt)) {
-					    inferenceModel.remove(infStmt);
-				    } 
-				    setMostSpecificTypes(ind, inferenceModel, new HashSet<String>());
-	            } finally {
-	                inferenceModel.leaveCriticalSection();
-	            }
-		    }
+        for (Resource ind : subjectList) {
+			if (entailedType(ind,superClass)) {
+				continue;
+			}
+			Statement infStmt = ResourceFactory.createStatement(ind, RDF.type, superClass);
+			inferenceModel.enterCriticalSection(Lock.WRITE);
+			try {
+			    if (inferenceModel.contains(infStmt)) {
+				    inferenceModel.remove(infStmt);
+			    } 
+			    setMostSpecificTypes(ind, inferenceModel, new HashSet<String>());
+            } finally {
+                inferenceModel.leaveCriticalSection();
+            }
 		}
 	}
 

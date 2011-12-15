@@ -3,8 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.reasoner;
 
 
-import java.util.Iterator;
-
 import org.apache.log4j.Level;
 import org.junit.Assert;
 import org.junit.Before;
@@ -483,23 +481,15 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		simpleReasonerTBoxListener.setStopRequested();
 	}
 	
-	@Test
+	
 	/*
 	 * Test the removal of a subClassOf statement from 
 	 * the TBox. The instance data that is the basis
 	 * for the inference is in the ABox graph and the
-	 * inference graph. The existing instance of the
-	 * subclass of the newly added subclass should
-	 * be inferred to have the type of the superclass
-	 * of the newly added subclass. 
-	 * 
-	 * Since the addition of an owl:equivalentClass
-	 * statement is implemented as two calls to the
-	 * method that handles the addition of an
-	 * rdfs:subClassOf statement, this test serves
-	 * as a test of equivalentClass assertions also.
+	 * inference graph. 
 	 * 
 	 */
+	@Test
 	public void removeTBoxSubClassAssertion1() throws InterruptedException {
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
@@ -594,6 +584,68 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		simpleReasonerTBoxListener.setStopRequested();
 	}
 	
+	/*
+	 * Test the removal of a subClassOf statement from 
+	 * the TBox. The instance data that is the basis
+	 * for the inference is in the ABox graph and the
+	 * inference graph. 
+	 * 
+	 */
+	//@Test  - enable this in 1.5 - will need to add in PelletListener infrastructure
+	public void removeTBoxSubClassAssertion2() throws InterruptedException {
+		// Create TBox, ABox and Inference models and register
+		// the ABox reasoner listeners with the ABox and TBox
+		// Pellet will compute TBox inferences
+		
+		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+        Model inf = ModelFactory.createDefaultModel();
+		
+        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+		aBox.register(simpleReasoner);
+		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
+		tBox.register(simpleReasonerTBoxListener);
+		
+		// Add classes LivingThing, Flora, Brassica to the TBox
+		// Brassica is a subClass of Flora and Flora is a subclass of Brassica
+	
+		OntClass LivingThing = tBox.createClass("http://test.vivo/LivingThing");
+		LivingThing.setLabel("Living Thing", "en-US");
+
+		OntClass Flora = tBox.createClass("http://test.vivo/Flora");
+	    Flora.setLabel("Flora", "en-US");
+
+		OntClass Brassica = tBox.createClass("http://test.vivo/Brassica");
+	    Brassica.setLabel("Brassica", "en-US");
+
+	    LivingThing.addSubClass(Flora);
+	    Flora.addSubClass(Brassica);
+	    
+	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
+	    	Thread.sleep(delay);
+	    }
+	    
+        // Add a statement that individual kale is of type Brassica to the ABox
+		Resource kale = aBox.createResource("http://test.vivo/kale");
+		aBox.add(kale, RDF.type, Brassica);		
+	    
+		// Remove the statement that Brassica is a subclass of Flora from the TBox
+		Flora.removeSubClass(Brassica);
+		
+	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
+	    	Thread.sleep(delay);
+	    }
+		
+		// Verify that "kale is of type Flora" is not in the inference graph
+		Statement kaleIsFlora = ResourceFactory.createStatement(kale, RDF.type, Flora);	
+		Assert.assertFalse(inf.contains(kaleIsFlora));
+		
+		// Verify that "kale is of type LivingThing" is not in the inference graph
+		Statement kaleIsLivingThing = ResourceFactory.createStatement(kale, RDF.type, LivingThing);	
+		Assert.assertFalse(inf.contains(kaleIsLivingThing));
+		
+		simpleReasonerTBoxListener.setStopRequested();
+	}
 	
 	/*
 	 * tests rdfs:subPropertyOf materialization for object properties.
