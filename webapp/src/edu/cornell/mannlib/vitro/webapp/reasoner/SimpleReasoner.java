@@ -87,7 +87,7 @@ public class SimpleReasoner extends StatementListener {
 		aBoxDeltaModeler2 = new CumulativeDeltaModeler();
 		stopRequested = false;
 				
-	    aboxModel.getBaseModel().register(this);
+	    aboxModel.getBaseModel().register(this);    
 	}
 	
 	/**
@@ -307,7 +307,7 @@ public class SimpleReasoner extends StatementListener {
 	 * 
 	 */
 	public void addedABoxTypeAssertion(Statement stmt, Model inferenceModel, HashSet<String> unknownTypes) {
-				
+		
 		tboxModel.enterCriticalSection(Lock.READ);
 		
 		try {
@@ -450,9 +450,6 @@ public class SimpleReasoner extends StatementListener {
 	// Returns true if it is entailed by class subsumption that
 	// subject is of type cls; otherwise returns false.
 	public boolean entailedType(Resource subject, OntClass cls) {
-		
-		//log.debug("subject = " + subject.getURI() + " class = " + cls.getURI());
-		
 		aboxModel.enterCriticalSection(Lock.READ);
 		tboxModel.enterCriticalSection(Lock.READ);
 		
@@ -465,7 +462,7 @@ public class SimpleReasoner extends StatementListener {
 						
 			while (iter.hasNext()) {		
 				OntClass childClass = iter.next();
-				if (childClass.equals(cls)) break;
+				if (childClass.equals(cls)) continue;
 				Statement stmt = ResourceFactory.createStatement(subject, RDF.type, childClass);
 				if (aboxModel.contains(stmt)) return true;
 			}

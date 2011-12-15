@@ -138,6 +138,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
             SimpleReasonerTBoxListener simpleReasonerTBoxListener = new SimpleReasonerTBoxListener(simpleReasoner);
             sce.getServletContext().setAttribute(SimpleReasonerTBoxListener.class.getName(),simpleReasonerTBoxListener);
             assertionsOms.getTBoxModel().register(simpleReasonerTBoxListener);
+            inferencesOms.getTBoxModel().register(simpleReasonerTBoxListener);
             
             log.info("Simple reasoner connected for the ABox");
             
