@@ -77,7 +77,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseClassGrou
     <#else>
         <#-- Would be nice to update classgroups-checkForData.ftl with macro so it could be used here as well -->
         <#-- <#include "classgroups-checkForData.ftl"> -->
-        <h3>There is currently no content in the system</h3>
+        <h3>There is currently no content in the system, or you need to create class groups and assign your classes to them.</h3>
         
         <#if user.loggedIn>
             <#if user.hasSiteAdminAccess>
