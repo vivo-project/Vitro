@@ -56,6 +56,7 @@ public class SimpleReasonerTBoxListener extends StatementListener {
 
 	@Override
 	public void removedStatement(Statement statement) {
+		log.info("removedStatement called for statement = " + statement);
 		ModelUpdate mu = new ModelUpdate(statement, ModelUpdate.Operation.RETRACT, JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL);	
 		processUpdate(mu);
 	}
@@ -96,12 +97,13 @@ public class SimpleReasonerTBoxListener extends StatementListener {
         @Override
         public void run() {  
             try {
-	        	 log.debug("starting thread");
+	        	 log.info("starting thread");
 	        	 ModelUpdate mu = nextUpdate();
 	        	 while (mu != null && !stopRequested) {       	   
 	    		    if (mu.getOperation() == ModelUpdate.Operation.ADD) {
 	    				simpleReasoner.addedTBoxStatement(mu.getStatement());	
 	    		    } else if (mu.getOperation() == ModelUpdate.Operation.RETRACT) {
+	    		    	log.info("calling simpleReasoner.removedTBoxStatement for statment = " + SimpleReasoner.stmtString(mu.getStatement()));
 	    			    simpleReasoner.removedTBoxStatement(mu.getStatement());
 	    		    } else {
 	    			    log.error("unexpected operation value in ModelUpdate object: " + mu.getOperation());
@@ -110,7 +112,7 @@ public class SimpleReasonerTBoxListener extends StatementListener {
 	        	 }	        	
             }  finally {
         	     processingUpdates = false;
-        	     log.debug("ending thread");
+        	     log.info("ending thread");
             }
         }
     }
