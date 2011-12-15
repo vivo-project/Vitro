@@ -3,9 +3,10 @@ package edu.cornell.mannlib.vitro.webapp.sparql;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -69,8 +70,11 @@ public class GetAllPrefix extends BaseEditController {
 		PrintWriter out = response.getWriter();
 		String respo = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 		respo += "<options>";
-		for (String namespace : prefixMap.keySet()) {
-		    respo += makeOption(prefixMap.get(namespace), namespace);
+		List<String> prefixList = new ArrayList<String>();
+		prefixList.addAll(prefixMap.keySet());
+		Collections.sort(prefixList, Collator.getInstance());
+		for (String prefix : prefixList) {
+		    respo += makeOption(prefix, prefixMap.get(prefix));
 		}
 		respo += "</options>";
 		out.println(respo);
@@ -79,11 +83,11 @@ public class GetAllPrefix extends BaseEditController {
 	}
 	
 	/**
-	 * Returns a map to prefixes for use in building queries.  Will manufacture a 
+	 * Returns a map of prefixes for use in building queries.  Will manufacture a 
 	 * prefix for any namespace that doesn't have an associated owl:Ontology resource
 	 * with a prefix annotation  
 	 * @param wadf
-	 * @return map of namespace URIs to prefix strings
+	 * @return map of prefix strings to namespace URIs
 	 */
 	private Map<String, String> getPrefixMap(WebappDaoFactory wadf) {
 	    Map<String, String> prefixMap = new HashMap<String, String>();
@@ -113,10 +117,10 @@ public class GetAllPrefix extends BaseEditController {
 	    ontEntityList.addAll(wadf.getDataPropertyDao().getAllDataProperties());
 	    for (BaseResourceBean ontEntity : ontEntityList) {
 	        if (!ontEntity.isAnonymous() 
-	                && !prefixMap.containsKey(ontEntity.getNamespace())) {
+	                && !prefixMap.containsValue(ontEntity.getNamespace())) {
 	            newPrefixCount++;
-	            prefixMap.put(ontEntity.getNamespace(), "p."  + Integer.toString(
-	                    newPrefixCount));
+	            prefixMap.put("p."  + Integer.toString(
+	                    newPrefixCount), ontEntity.getNamespace());
 	        }
 	    }
 	    
@@ -125,8 +129,8 @@ public class GetAllPrefix extends BaseEditController {
 	
 	private void addPrefixIfNecessary(String prefix, String namespace, 
 	        Map<String, String> prefixMap) {
-	    if (!prefixMap.containsKey(namespace)) {
-	        prefixMap.put(namespace, prefix);
+	    if (!prefixMap.containsValue(namespace)) {
+	        prefixMap.put(prefix, namespace);
 	    }
 	}
 	
