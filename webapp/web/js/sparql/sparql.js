@@ -22,10 +22,10 @@
 				var myAjax = new Ajax.Request( url, {method: "get", parameters: "", onComplete: function(originalRequest){
 							var response = originalRequest.responseXML;
 							var options = response.getElementsByTagName("option");
-							if (options == null || options.length == 0){
-								alert("Error: Cannot get all the classes.");
-								return;
-							}
+//							if (options == null || options.length == 0){
+//								alert("Error: Cannot get all the classes.");
+//								return;
+//							}
 							for(i=0; i<options.length; i++){
 								base[base.length] = new Option(options[i].childNodes[0].firstChild.data, options[i].childNodes[1].firstChild.data);
 							}
