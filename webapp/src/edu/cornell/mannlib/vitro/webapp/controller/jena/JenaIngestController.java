@@ -80,6 +80,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetup;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils.MergeResult;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestWorkflowProcessor;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaOutputUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.WorkflowOntology;
@@ -621,23 +622,25 @@ public class JenaIngestController extends BaseEditController {
           if(uri1!=null){
               JenaIngestUtils utils = new JenaIngestUtils();
               /*
-               * get baseOnt, Ont and infOnt models
+               * get baseOnt and infOnt models
                */
-              OntModel baseOntModel = (OntModel) getServletContext().getAttribute("baseOntModel");
-              OntModel ontModel = (OntModel)
-              getServletContext().getAttribute("jenaOntModel");
-              OntModel infOntModel = (OntModel)
-              getServletContext().getAttribute(JenaBaseDao.INFERENCE_ONT_MODEL_ATTRIBUTE_NAME);
+              OntModel baseOntModel = ModelContext.getBaseOntModel(
+                      getServletContext());
+              OntModel tboxOntModel = ModelContext.getUnionOntModelSelector(
+                      getServletContext()).getTBoxModel();
+              
               /*
                * calling method that does the merge operation.
                */
-              String result = utils.doMerge(uri1,uri2,baseOntModel,ontModel,infOntModel,usePrimaryLabelOnly);
-              vreq.getSession().setAttribute("leftoverModel", utils.getLeftOverModel());
-              vreq.setAttribute("result",result);
-              vreq.setAttribute("title","Merge Resources");
-              vreq.setAttribute("bodyJsp",MERGE_RESULT);
-          }
-          else{
+              MergeResult result = utils.doMerge(
+                      uri1, uri2, baseOntModel, tboxOntModel, usePrimaryLabelOnly);
+              
+              vreq.getSession().setAttribute(
+                      "leftoverModel", result.getLeftoverModel());
+              vreq.setAttribute("result", result);
+              vreq.setAttribute("title", "Merge Resources");
+              vreq.setAttribute("bodyJsp", MERGE_RESULT);
+          } else{
               vreq.setAttribute("title","Merge Resources");
               vreq.setAttribute("bodyJsp",MERGE_RESOURCES);  
           }
@@ -1192,7 +1195,7 @@ public class JenaIngestController extends BaseEditController {
             ontModel.leaveCriticalSection();
         }
         if(!namespacePresent){
-            result = "0 resource renamed";
+            result = "no resources renamed";
             return result;
         }    
         for( String oldURIStr : urisToChange){
