@@ -130,7 +130,7 @@ public class EntityEditController extends BaseEditController {
         request.setAttribute("epo", epo);
 
         FormObject foo = new FormObject();
-        HashMap OptionMap = new HashMap();
+        HashMap<String, List<Option>> OptionMap = new HashMap<String, List<Option>>();
         
         request.setAttribute("types",ent.getVClasses(false)); // we're displaying all assertions, including indirect types
         
@@ -149,20 +149,13 @@ public class EntityEditController extends BaseEditController {
             log.error(e, e);
         }
                 
-        List classGroups = vreq.getFullWebappDaoFactory().getVClassGroupDao().getPublicGroupsWithVClasses(true,true,false); // order by displayRank, include uninstantiated classes, don't count the individuals
-        Iterator classGroupIt = classGroups.iterator();
-        ListOrderedMap optGroupMap = new ListOrderedMap();
-        while (classGroupIt.hasNext()) {
-            VClassGroup group = (VClassGroup)classGroupIt.next();
-            List classes = group.getVitroClassList();
-            optGroupMap.put(group.getPublicName(),FormUtils.makeOptionListFromBeans(classes,"URI","PickListName",ent.getVClassURI(),null,false));
-            //mixes group names with classes:optGroupMap.put(group.getPublicName(),FormUtils.makeVClassOptionList(getFullWebappDaoFactory(),ent.getVClassURI()));
-        }
-        try {
-            OptionMap.put("VClassURI", optGroupMap);
+        try{
+            OptionMap.put("VClassURI", FormUtils.makeOptionListFromBeans(
+                    vreq.getFullWebappDaoFactory().getVClassDao().getAllVclasses(),
+                            "URI", "PickListName", ent.getVClassURI(), null, false));        
         } catch (Exception e) {
             log.error(e, e);
-        }       
+        }
         
         PropertyInstanceDao piDao = vreq.getFullWebappDaoFactory().getPropertyInstanceDao();
         // existing property statements
