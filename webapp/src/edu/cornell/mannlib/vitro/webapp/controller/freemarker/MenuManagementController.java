@@ -2,29 +2,15 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.MenuManagementDataUtils;
-
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
-import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
-
-import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.Individual;
+import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -32,8 +18,15 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetter;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.DataGetterUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.MenuManagementDataUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetter;
 import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.SelectDataGetterUtils;
 
 /*
@@ -54,7 +47,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     
     protected final static String ITEM_PARAM = "objectUri";
      
-    public final static Actions REQUIRED_ACTIONS = new Actions(new ManageMenus());
+    public final static Actions REQUIRED_ACTIONS = SimplePermission.MANAGE_MENUS.ACTIONS;
     
     @Override
     protected Actions requiredActions(VitroRequest vreq) {

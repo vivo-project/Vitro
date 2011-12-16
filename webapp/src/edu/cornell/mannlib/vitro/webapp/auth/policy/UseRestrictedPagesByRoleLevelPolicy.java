@@ -15,12 +15,11 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.querymodel.QueryFullModel;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.querymodel.QueryUserAccountsModel;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.AccessSpecialDataModels;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoFrontEndEditing;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoBackEndEditing;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoFrontEndEditing;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOwnAccount;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditSiteInformation;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageOwnProxies;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManagePortals;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageProxies;
@@ -66,9 +65,6 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
 
 		} else if (whatToAuth instanceof ManageUserAccounts) {
-			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
-
-		} else if (whatToAuth instanceof ManageMenus) {
 			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
 
 		} else if (whatToAuth instanceof ManageSearchIndex) {

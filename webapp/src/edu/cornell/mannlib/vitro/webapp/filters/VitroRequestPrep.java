@@ -34,10 +34,10 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.AccessSpecialDataModels;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
@@ -196,7 +196,7 @@ public class VitroRequestPrep implements Filter {
     
 	private boolean authorizedForSpecialModel(HttpServletRequest req) {
 		if (isParameterPresent(req, SWITCH_TO_DISPLAY_MODEL)) {
-			return PolicyHelper.isAuthorizedForActions(req, new ManageMenus());
+			return PolicyHelper.isAuthorizedForActions(req, SimplePermission.MANAGE_MENUS.ACTION);
 		} else if (anyOtherSpecialProperties(req)){
 			return PolicyHelper.isAuthorizedForActions(req, new AccessSpecialDataModels());
 		} else {

@@ -1,0 +1,10 @@
+# $This file is distributed under the terms of the license in /doc/license.txt$ 
+
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix simplePermission: <java://edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
+
+auth:ADMIN 
+    a auth:PermissionSet ;
+    auth:hasPermission simplePermission:ManageMenus ;
+    .
+

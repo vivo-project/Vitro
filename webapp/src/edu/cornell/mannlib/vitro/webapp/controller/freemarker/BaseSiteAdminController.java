@@ -15,12 +15,12 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.util.FormUtils;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoBackEndEditing;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditSiteInformation;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageProxies;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeSiteAdminPage;
@@ -140,7 +140,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
             data.put("siteInfo", UrlBuilder.getUrl("/editForm", "controller", "ApplicationBean"));
         }
         
-        if (PolicyHelper.isAuthorizedForActions(vreq, new ManageMenus())) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.MANAGE_MENUS.ACTION)) {
             data.put("menuManagement", UrlBuilder.getUrl("/individual",
                     "uri", "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#DefaultMenu",
                     "switchToDisplayModel", "true"));
