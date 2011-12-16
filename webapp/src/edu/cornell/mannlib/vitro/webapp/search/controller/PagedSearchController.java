@@ -315,14 +315,23 @@ public class PagedSearchController extends FreemarkerHttpServlet {
      * Get the class groups represented for the individuals in the documents.
      * @param qtxt 
      */
-    private List<VClassGroupSearchLink> getClassGroupsLinks(VClassGroupDao grpDao, SolrDocumentList docs, QueryResponse rsp, String qtxt) {                                 
+    private List<VClassGroupSearchLink> getClassGroupsLinks(VClassGroupDao grpDao, SolrDocumentList docs, QueryResponse rsp, String qtxt) {        
         Map<String,Long> cgURItoCount = new HashMap<String,Long>();
+        if( rsp == null )
+            return Collections.emptyList();
         
         List<VClassGroup> classgroups = new ArrayList<VClassGroup>( );
         List<FacetField> ffs = rsp.getFacetFields();
+        if( ffs == null )
+            return Collections.emptyList();
+        
         for(FacetField ff : ffs){
+            if( ff == null )
+                continue;
             if(VitroSearchTermNames.CLASSGROUP_URI.equals(ff.getName())){
                 List<Count> counts = ff.getValues();
+                if( counts == null )
+                    continue;
                 for( Count ct: counts){                    
                     VClassGroup vcg = grpDao.getGroupByURI( ct.getName() );
                     if( vcg == null ){
@@ -347,15 +356,23 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         return classGroupLinks;
     }
 
-    private List<VClassSearchLink> getVClassLinks(VClassDao vclassDao, SolrDocumentList docs, QueryResponse rsp, String qtxt){        
+    private List<VClassSearchLink> getVClassLinks(VClassDao vclassDao, SolrDocumentList docs, QueryResponse rsp, String qtxt){
+        if( rsp == null )
+            return Collections.emptyList();
+        
         HashSet<String> typesInHits = getVClassUrisForHits(docs);                                
         List<VClass> classes = new ArrayList<VClass>(typesInHits.size());
         Map<String,Long> typeURItoCount = new HashMap<String,Long>();        
         
         List<FacetField> ffs = rsp.getFacetFields();
+        if( ffs == null )
+            return Collections.emptyList();
+        
         for(FacetField ff : ffs){
             if(VitroSearchTermNames.RDFTYPE.equals(ff.getName())){
                 List<Count> counts = ff.getValues();
+                if( counts == null )
+                    continue;
                 for( Count ct: counts){  
                     String typeUri = ct.getName();
                     long count = ct.getCount();
