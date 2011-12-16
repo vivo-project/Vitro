@@ -40,6 +40,7 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DataPropertyStatementTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.EditingPolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ObjectPropertyStatementTemplateModel;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ObjectPropertyTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.PropertyStatementTemplateModel;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.DefaultObjectWrapper;
@@ -457,13 +458,18 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 		        null, null, vreq);
 		ReadOnlyBeansWrapper wrapper = new ReadOnlyBeansWrapper();
 		return wrapper.wrap(osm);
-       /* TemplateModel tm = null;
-        try {
-        	tm = wrapper.wrap(osm);
-        } catch(Exception ex) {
-        	log.error("Error occurred in wrapping object property statement model", ex);
-        } 
-        return tm;*/
+    }
+    
+    //HasEditor and HasReviewer Roles also expect the Property template model to be passed
+    public TemplateModel getObjectPropertyStatementDisplayPropertyModel() throws TemplateModelException {
+    	Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
+    	ObjectProperty op = EditConfigurationUtils.getObjectProperty(vreq);
+		List<ObjectProperty> propList = new ArrayList<ObjectProperty>();
+		propList.add(op);
+    	EditingPolicyHelper policyHelper = new EditingPolicyHelper(vreq);
+    	ObjectPropertyTemplateModel otm = ObjectPropertyTemplateModel.getObjectPropertyTemplateModel(op, subject, vreq, policyHelper,propList);
+		ReadOnlyBeansWrapper wrapper = new ReadOnlyBeansWrapper();
+		return wrapper.wrap(otm);
     }
     
     public String getDataStatementDisplay() {

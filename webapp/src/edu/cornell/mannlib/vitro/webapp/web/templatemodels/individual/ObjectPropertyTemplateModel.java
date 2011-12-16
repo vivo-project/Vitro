@@ -208,7 +208,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         return object;
     }
      
-    protected static ObjectPropertyTemplateModel getObjectPropertyTemplateModel(ObjectProperty op, 
+    public static ObjectPropertyTemplateModel getObjectPropertyTemplateModel(ObjectProperty op, 
             Individual subject, VitroRequest vreq, EditingPolicyHelper policyHelper, 
             List<ObjectProperty> populatedObjectPropertyList) {
         

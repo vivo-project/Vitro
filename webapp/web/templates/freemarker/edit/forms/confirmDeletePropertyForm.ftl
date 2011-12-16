@@ -6,6 +6,8 @@
     <#assign toBeDeletedClass = "objProp" />
     <#if editConfiguration.objectStatementDisplay?has_content>
     	<#assign statement = editConfiguration.objectStatementDisplay />
+    	<#--Reviewer and editor role list views required object property template model object for property-->
+    	<#assign property = editConfiguration.objectPropertyStatementDisplayPropertyModel />
     </#if>
 <#else>
 	<#assign statement = editConfiguration.dataStatementDisplay />
