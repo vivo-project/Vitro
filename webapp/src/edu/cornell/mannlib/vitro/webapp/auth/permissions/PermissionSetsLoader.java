@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.permissions;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.VITRO_AUTH;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -30,11 +32,11 @@ public class PermissionSetsLoader implements ServletContextListener {
 	private static final Log log = LogFactory
 			.getLog(PermissionSetsLoader.class);
 
-	public static final String URI_SELF_EDITOR = "http://permissionSet-1";
-	public static final String URI_EDITOR = "http://permissionSet-4";
-	public static final String URI_CURATOR = "http://permissionSet-5";
-	public static final String URI_DBA = "http://permissionSet-50";
-	
+	public static final String URI_SELF_EDITOR = VITRO_AUTH + "SELF_EDITOR";
+	public static final String URI_EDITOR = VITRO_AUTH + "EDITOR";
+	public static final String URI_CURATOR = VITRO_AUTH + "CURATOR";
+	public static final String URI_DBA = VITRO_AUTH + "ADMIN";
+
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		ServletContext ctx = sce.getServletContext();

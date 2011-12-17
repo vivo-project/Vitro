@@ -2,31 +2,54 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.permissions;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.ServletContext;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Holds a map of known Permission objects by URI. Resides in the
  * ServletContext.
+ * 
+ * This is not thread-safe, so all Permissions should be added during context
+ * initialization.
  */
 public class PermissionRegistry {
-	/**
-	 * Get the registry from the context. If the context doesn't contain a
-	 * registry yet, write a warning and return an immutable registry with no
-	 * permissions.
-	 */
-	public static PermissionRegistry getRegistry(ServletContext ctx) {
-		throw new RuntimeException(
-				"PermissionRegistry.getBean not implemented.");
-	}
+	private static final Log log = LogFactory.getLog(PermissionRegistry.class);
+
+	private static final String ATTRIBUTE_NAME = PermissionRegistry.class
+			.getName();
 
 	/**
-	 * Create an empty registry and set it into the context. This should only be
-	 * called from PermissionSetsLoader.
+	 * Get the registry from the context. If the context doesn't contain a
+	 * registry yet, create one.
 	 */
-	protected static void setRegistry(ServletContext ctx,
-			PermissionRegistry registry) {
-		throw new RuntimeException(
-				"PermissionRegistry.setRegistry not implemented.");
+	public static PermissionRegistry getRegistry(ServletContext ctx) {
+		if (ctx == null) {
+			throw new NullPointerException("ctx may not be null.");
+		}
+
+		Object o = ctx.getAttribute(ATTRIBUTE_NAME);
+		if (o instanceof PermissionRegistry) {
+			return (PermissionRegistry) o;
+		}
+		if (o != null) {
+			log.error("Error: PermissionRegistry was set to an "
+					+ "invalid object: " + o);
+		}
+
+		PermissionRegistry registry = new PermissionRegistry();
+		ctx.setAttribute(ATTRIBUTE_NAME, registry);
+		return registry;
+	}
+
+	private final Map<String, Permission> permissionsMap = new HashMap<String, Permission>();
+
+	private PermissionRegistry() {
+		// nothing to initialize;
 	}
 
 	/**
@@ -34,24 +57,37 @@ public class PermissionRegistry {
 	 * already present, throw an IllegalStateException.
 	 */
 	public void addPermission(Permission p) {
-		throw new RuntimeException(
-				"PermissionRegistry.addPermission not implemented.");
+		if (p == null) {
+			throw new NullPointerException("p may not be null.");
+		}
+
+		String uri = p.getUri();
+		if (isPermission(uri)) {
+			throw new IllegalStateException(
+					"A Permission is already registered with this URI: '" + uri
+							+ "'.");
+		}
+
+		permissionsMap.put(uri, p);
 	}
 
 	/**
 	 * Is there already a Permission registered with this URI?
 	 */
 	public boolean isPermission(String uri) {
-		throw new RuntimeException(
-				"PermissionRegistry.isPermission not implemented.");
+		return permissionsMap.containsKey(uri);
 	}
 
 	/**
 	 * Get the permission that is registered with this URI. If there is no such
 	 * Permission, return a dummy Permission that always denies authorization.
+	 * 
+	 * If you want to know whether an actual Permission has been registered at
+	 * this URI, call isPermission() instead.
 	 */
 	public Permission getPermission(String uri) {
-		throw new RuntimeException(
-				"PermissionRegistry.getPermission not implemented.");
+		Permission p = permissionsMap.get(uri);
+		return (p == null) ? Permission.NOT_AUTHORIZED : p;
 	}
+
 }
