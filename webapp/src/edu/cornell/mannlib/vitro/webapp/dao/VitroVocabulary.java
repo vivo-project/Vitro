@@ -169,6 +169,7 @@ public class VitroVocabulary {
 
     public static final String PERMISSIONSET = VITRO_AUTH + "PermissionSet";
     public static final String PERMISSIONSET_HAS_PERMISSION = VITRO_AUTH + "hasPermission";
+    public static final String DEFAULT_PERMISSION_SET_FOR_NEW_USERS = VITRO_AUTH + "DefaultPermissionSetForNewUsers";
 
     public static final String PERMISSION = VITRO_AUTH + "Permission";
 

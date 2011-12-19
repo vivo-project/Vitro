@@ -2,6 +2,7 @@
 
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
 @prefix mydomain: <http://vivo.mydomain.edu/individual/> .
@@ -30,6 +31,7 @@ mydomain:role1
 	
 mydomain:role2
 	a auth:PermissionSet ;
+    a auth:DefaultPermissionSetForNewUsers ;
 	rdfs:label "Role 2" ;
 	.
 	
