@@ -20,7 +20,7 @@ public class SimpleRequestedAction extends RequestedAction {
 
 	@Override
 	public String getURI() {
-		return "java://" + this.getClass().getName() + "#" + localName;
+		return "java:" + this.getClass().getName() + "#" + localName;
 	}
 
 	@Override

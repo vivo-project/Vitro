@@ -37,7 +37,7 @@ public interface Permission {
 
 		@Override
 		public String getUri() {
-			return "java://" + Permission.class.getName() + "#NOT_AUTHORIZED";
+			return "java:" + Permission.class.getName() + "#NOT_AUTHORIZED";
 		}
 
 		@Override
@@ -47,7 +47,7 @@ public interface Permission {
 
 		@Override
 		public String getNamespace() {
-			return "java://" + Permission.class.getName();
+			return "java:" + Permission.class.getName();
 		}
 
 		@Override

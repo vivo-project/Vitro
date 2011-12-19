@@ -22,7 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
 public class SimplePermission implements Permission {
 	private static final Log log = LogFactory.getLog(SimplePermission.class);
 
-	private static final String NAMESPACE = "java://"
+	private static final String NAMESPACE = "java:"
 			+ SimplePermission.class.getName() + "#";
 
 	private static final Map<String, SimplePermission> allInstances = new HashMap<String, SimplePermission>();
