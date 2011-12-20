@@ -13,42 +13,40 @@ import com.hp.hpl.jena.sdb.StoreDesc;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class SDBGraphGenerator implements GraphGenerator {
+public class SDBGraphGenerator implements SQLGraphGenerator {
 
 	private static final Log log = LogFactory.getLog(SDBGraphGenerator.class.getName());
 	
-    private BasicDataSource ds;
+	private SDBGraphConnectionGenerator connGen;
     private Connection connection;
     private StoreDesc storeDesc;
     private String graphID;
-	
+    
     public SDBGraphGenerator(BasicDataSource dataSource, StoreDesc storeDesc,
     							String graphID) {
-    	this.ds = dataSource;
+    	this.connGen = new SDBGraphConnectionGenerator(dataSource);
     	this.storeDesc = storeDesc;
     	this.graphID = graphID;
+    }
+    
+    public SDBGraphGenerator(SDBGraphConnectionGenerator connectionGenerator, 
+            StoreDesc storeDesc, String graphID) {
+    	this.connGen = connectionGenerator;
+    	this.storeDesc = storeDesc;
+    	this.graphID = graphID;
+    }
+    
+    public boolean isGraphClosed() {
+    	try {
+    		return (connection == null || connection.isClosed());
+        } catch (SQLException e) {
+        	throw new RuntimeException(e);
+        }
     }
 
     public Graph generateGraph() {
         try {
-            if ( this.connection == null ) {
-                this.connection = ds.getConnection();
-            } else if ( this.connection.isClosed() ) {
-                try {
-                    this.connection.close();
-                } catch (SQLException e) {                  
-                    // The connection will throw an "Already closed"
-                    // SQLException that we need to catch.  We need to 
-                    // make this extra call to .close() in order to make
-                    // sure that the connection is returned to the pool.
-                    // This depends on the particular behavior of version
-                    // 1.4 of the Apache Commons connection pool library.
-                    // Earlier versions threw the exception right away,
-                    // making this impossible. Future versions may do the
-                    // same.
-                }
-                this.connection = ds.getConnection();
-            }
+        	this.connection = connGen.generateConnection();
             Store store = SDBFactory.connectStore(connection, storeDesc);
             return SDBFactory.connectNamedGraph(store, graphID); 
         } catch (SQLException e) {

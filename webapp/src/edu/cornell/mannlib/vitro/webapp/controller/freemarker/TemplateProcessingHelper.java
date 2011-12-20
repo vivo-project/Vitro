@@ -97,7 +97,7 @@ public class TemplateProcessingHelper {
             } else {
                 msg = "IOException getting template " + templateName;
             }
-            throw new TemplateProcessingException(msg);
+            throw new TemplateProcessingException(msg, e);
         }  
         return template;
     }

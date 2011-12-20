@@ -27,6 +27,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaOutputUtils;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 
 public class OntologyController extends VitroHttpServlet{
@@ -107,8 +108,12 @@ public class OntologyController extends VitroHttpServlet{
 			
 		} catch (Throwable th) {
 			log.error("problem while checking accept header " , th);
-		}
-		return null;
+		} 
+		//return null;
+		// Returning null would default to html in the calling method.
+		// But since we don't have a useful html representation yet,
+		// we're going to default to returning RDF/XML.
+		return new ContentType(RDFXML_MIMETYPE);
 	}  
 	
 	private void doRdf(HttpServletRequest req, HttpServletResponse res,
@@ -161,7 +166,8 @@ public class OntologyController extends VitroHttpServlet{
             //respond to HTTP outside of critical section
             doNotFound(req,res);
             return;
-        } else {		
+        } else {	
+        	JenaOutputUtils.setNameSpacePrefixes(newModel,vreq.getWebappDaoFactory());
             res.setContentType(rdfFormat.getMediaType());
             String format = ""; 
             if ( RDFXML_MIMETYPE.equals(rdfFormat.getMediaType()))

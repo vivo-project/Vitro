@@ -46,7 +46,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     
     private static final Log log = LogFactory.getLog(ObjectPropertyTemplateModel.class);      
     private static final String TYPE = "object";
-    private static final String EDIT_PATH = "edit/editRequestDispatch.jsp";
+    private static final String EDIT_PATH = "editRequestDispatch";
     private static final String IMAGE_UPLOAD_PATH = "/uploadImages";
     
     private static final String END_DATE_TIME_VARIABLE = "dateTimeEnd";
@@ -90,9 +90,6 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     private PropertyListConfig config;
     private String objectKey;    
     
-    // Used for editing
-    private boolean addAccess; // defaults to false
-    
     ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, 
             EditingPolicyHelper policyHelper)
         throws InvalidConfigurationException {
@@ -111,18 +108,33 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         
         objectKey = getQueryObjectVariableName();
         
-        setAddAccess(policyHelper, op);
+        setAddUrl(policyHelper, op);
     }
 
-    // Determine whether a new statement can be added
     @Override
-    protected void setAddAccess(EditingPolicyHelper policyHelper, Property property) {
-        if (policyHelper != null) {
-            RequestedAction action = new AddObjectPropStmt(subjectUri, propertyUri, RequestActionConstants.SOME_URI);
-            if (policyHelper.isAuthorizedAction(action)) {
-                addAccess = true;
-            }
-        }        
+    protected void setAddUrl(EditingPolicyHelper policyHelper, Property property) {
+
+        if (policyHelper == null) {
+            return;
+        }
+        
+        // Determine whether a new statement can be added
+        RequestedAction action = new AddObjectPropStmt(subjectUri, propertyUri, RequestActionConstants.SOME_URI);
+        if ( ! policyHelper.isAuthorizedAction(action) ) {
+            return;
+        }
+        
+        if (propertyUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
+            addUrl = getImageUploadUrl(subjectUri, "add");
+        } else {
+            ParamMap params = new ParamMap(
+                    "subjectUri", subjectUri,
+                    "predicateUri", propertyUri);  
+            
+            params.putAll(UrlBuilder.getModelParams(vreq));
+
+            addUrl = UrlBuilder.getUrl(EDIT_PATH, params);  
+        }
     }
     
     protected List<Map<String, String>> getStatementData() {
@@ -134,9 +146,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     
     @Override 
     protected int getPropertyDisplayTier(Property p) {
-        // For some reason ObjectProperty.getDomainDisplayTier() returns a String
-        // rather than an int. That should probably be fixed.
-        return Integer.parseInt(((ObjectProperty)p).getDomainDisplayTier());
+    	Integer displayTier = ((ObjectProperty)p).getDomainDisplayTier(); 
+        return (displayTier != null) ? displayTier : -1;
     }
 
     @Override 
@@ -167,7 +178,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         return config.isDefaultConfig;
     }
     
-    public static String getImageUploadUrl(String subjectUri, String action) {
+    protected static String getImageUploadUrl(String subjectUri, String action) {
         ParamMap params = new ParamMap(
                 "entityUri", subjectUri,
                 "action", action);                              
@@ -197,7 +208,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         return object;
     }
      
-    protected static ObjectPropertyTemplateModel getObjectPropertyTemplateModel(ObjectProperty op, 
+    public static ObjectPropertyTemplateModel getObjectPropertyTemplateModel(ObjectProperty op, 
             Individual subject, VitroRequest vreq, EditingPolicyHelper policyHelper, 
             List<ObjectProperty> populatedObjectPropertyList) {
         
@@ -560,7 +571,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         }
     }
     
-    /* Access methods for templates */
+    /* Template properties */
     
     public String getType() {
         return TYPE;
@@ -571,28 +582,5 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     }
     
     public abstract boolean isCollatedBySubclass();
-
-    @Override
-    public String getAddUrl() {
-        String addUrl = "";
-        if (addAccess) {
-            if (propertyUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
-                return getImageUploadUrl(subjectUri, "add");
-            } 
-            ParamMap params = new ParamMap(
-                    "subjectUri", subjectUri,
-                    "predicateUri", propertyUri);  
-            
-            //Check if special parameters being sent
-            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vreq);
-            if(specialParams.size() > 0) {
-            	params.putAll(specialParams);
-            }
-             
-            addUrl = UrlBuilder.getUrl(EDIT_PATH, params);  
-
-        }
-        return addUrl;
-    }
 
 }

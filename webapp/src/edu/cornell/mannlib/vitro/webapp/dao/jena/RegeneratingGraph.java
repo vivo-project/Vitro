@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.graph.BulkUpdateHandler;
 import com.hp.hpl.jena.graph.Capabilities;
 import com.hp.hpl.jena.graph.Graph;
@@ -22,6 +25,8 @@ import com.hp.hpl.jena.vocabulary.RDF;
 
 public class RegeneratingGraph implements Graph, Regenerable {
 
+	private final static Log log = LogFactory.getLog(RegeneratingGraph.class);
+	
 	private GraphGenerator generator;
 	private Graph g;
 	
@@ -30,12 +35,21 @@ public class RegeneratingGraph implements Graph, Regenerable {
 		regenerate();
 	}
 	
-	public void regenerate() {
-		this.g = generator.generateGraph();
+	public RegeneratingGraph(Graph initGraph, GraphGenerator graphGenerator) {
+		this.g = initGraph;
+		this.generator = graphGenerator;
 	}
 	
+	public void regenerate() {
+		this.g = generator.generateGraph();
+	}	
+	
+	/*
+	 * a nonsense query that should never send back actual result data
+	 */
 	private void sendTestQuery() {
-		this.g.contains(DAML_OIL.Thing.asNode(),RDF.type.asNode(),DAML_OIL.Thing.asNode());
+		this.g.contains(
+				DAML_OIL.Thing.asNode(),RDF.type.asNode(),DAML_OIL.Thing.asNode());
 	}
 
 	protected void finalize() {
@@ -56,6 +70,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	
 	public boolean contains(Triple arg0) {
 		try {
+			regenerateIfClosed();
             return g.contains(arg0);
         } catch (Exception e) {
             regenerate();
@@ -65,7 +80,8 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	
 	public boolean contains(Node arg0, Node arg1, Node arg2) {
 		try {
-            return g.contains(arg0, arg1, arg2);
+			regenerateIfClosed();
+			return g.contains(arg0, arg1, arg2);
         } catch (Exception e) {
             regenerate();
             return g.contains(arg0, arg1, arg2);
@@ -74,6 +90,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	
 	public void delete(Triple arg0) throws DeleteDeniedException {
 		try {
+			regenerateIfClosed();			
             g.delete(arg0);
         } catch (Exception e) {
             regenerate();
@@ -83,6 +100,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	
 	public boolean dependsOn(Graph arg0) {
 		try {
+			regenerateIfClosed();			
             return g.dependsOn(arg0);
         } catch (Exception e) {
             regenerate();
@@ -92,6 +110,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 
 	public ExtendedIterator find(TripleMatch arg0) {
 		try {
+			regenerateIfClosed();
             return g.find(arg0);
         } catch (Exception e) {
             regenerate();
@@ -101,6 +120,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 
 	public ExtendedIterator find(Node arg0, Node arg1, Node arg2) {
 		try {
+			regenerateIfClosed();
             return g.find(arg0,arg1,arg2);
         } catch (Exception e) {
             regenerate();
@@ -110,6 +130,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	
 	public BulkUpdateHandler getBulkUpdateHandler() {
 		try {
+			regenerateIfClosed();
 			sendTestQuery();
             return g.getBulkUpdateHandler();
         } catch (Exception e) {
@@ -120,6 +141,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 
 	public Capabilities getCapabilities() {
 		try {
+			regenerateIfClosed();
 			sendTestQuery();
             return g.getCapabilities();
         } catch (Exception e) {
@@ -131,6 +153,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	
 	public GraphEventManager getEventManager() {
 		try {
+			regenerateIfClosed();
 			sendTestQuery();
             return g.getEventManager();
         } catch (Exception e) {
@@ -142,6 +165,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	
 	public PrefixMapping getPrefixMapping() {
 		try {
+			regenerateIfClosed();
 			sendTestQuery();
             return g.getPrefixMapping();
         } catch (Exception e) {
@@ -153,6 +177,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	
 	public Reifier getReifier() {
 		try {
+			regenerateIfClosed();
 			sendTestQuery();
             return g.getReifier();
         } catch (Exception e) {
@@ -164,6 +189,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	
 	public GraphStatisticsHandler getStatisticsHandler() {
 		try {
+			regenerateIfClosed();
 			sendTestQuery();
             return g.getStatisticsHandler();
         } catch (Exception e) {
@@ -175,6 +201,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	
 	public TransactionHandler getTransactionHandler() {
 		try {
+			regenerateIfClosed();
 			sendTestQuery();
             return g.getTransactionHandler();
         } catch (Exception e) {
@@ -186,6 +213,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	
 	public boolean isClosed() {
 		try {
+			regenerateIfClosed();
             return g.isClosed();
         } catch (Exception e) {
             regenerate();
@@ -196,6 +224,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	
 	public boolean isEmpty() {
 		try {
+			regenerateIfClosed();
             return g.isEmpty();
         } catch (Exception e) {
             regenerate();
@@ -206,6 +235,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	
 	public boolean isIsomorphicWith(Graph arg0) {
 		try {
+			regenerateIfClosed();
             return g.isIsomorphicWith(arg0);
         } catch (Exception e) {
             regenerate();
@@ -216,6 +246,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	
 	public QueryHandler queryHandler() {
 		try {
+			regenerateIfClosed();
 			sendTestQuery();
 			return g.queryHandler();
 		} catch (Exception e) {
@@ -227,6 +258,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	
 	public int size() {
 		try {
+			regenerateIfClosed();
             return g.size();
         } catch (Exception e) {
             regenerate();
@@ -237,11 +269,18 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	
 	public void add(Triple arg0) throws AddDeniedException {
 		try {
+			regenerateIfClosed();
             g.add(arg0);
         } catch (Exception e) {
             regenerate();
             g.add(arg0);
         }
+	}
+	
+	private void regenerateIfClosed() {
+		if (generator.isGraphClosed()) {
+			regenerate();
+		}
 	}
 
 }

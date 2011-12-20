@@ -18,7 +18,7 @@
 
     <#include "copyright.ftl">
 
-    All Rights Reserved. <a href="${urls.termsOfUse}">Terms of Use</a>
+    All Rights Reserved. <a href="${urls.termsOfUse}" title="terms of use">Terms of Use</a>
 
     <#include "version.ftl">
 </div>

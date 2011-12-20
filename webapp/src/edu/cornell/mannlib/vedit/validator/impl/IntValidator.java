@@ -7,8 +7,8 @@ import edu.cornell.mannlib.vedit.validator.ValidationObject;
 
 public class IntValidator implements Validator {
 
-    protected int minVal = -1;
-    protected int maxVal = -1;
+    protected int minVal = 0; // the edit framework doesn't handle negative ints
+    protected int maxVal = Integer.MAX_VALUE;
 
     public ValidationObject validate (Object obj) throws IllegalArgumentException {
 
@@ -47,6 +47,8 @@ public class IntValidator implements Validator {
         return vo;
     }
 
+    public IntValidator(){}
+    
     public IntValidator (int minVal, int maxVal){
         this.minVal = minVal;
         this.maxVal = maxVal;

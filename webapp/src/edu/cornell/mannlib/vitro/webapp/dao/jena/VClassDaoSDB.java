@@ -112,7 +112,9 @@ public class VClassDaoSDB extends VClassDaoJena {
                                         group.add(vcw);
                                     }
                                 }
-                            } catch (ClassCastException cce) {cce.printStackTrace();}
+                            } catch (ClassCastException cce) {
+                                log.error(cce, cce);
+                            }
                         }
                     } finally {
                         annotIt.close();

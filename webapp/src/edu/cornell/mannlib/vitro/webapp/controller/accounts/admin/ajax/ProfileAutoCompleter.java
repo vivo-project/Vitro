@@ -27,9 +27,11 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.Syntax;
 
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.accounts.admin.ajax.UserAccountsAjaxController.AjaxResponder;
+import edu.cornell.mannlib.vitro.webapp.controller.ajax.AbstractAjaxResponder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 
 /**
  * Get a list of Profiles with last names that begin with this search term, and
@@ -42,10 +44,11 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
  * If the matching property is not defined, or if the search term is empty, or
  * if an error occurs, return an empty result.
  */
-class ProfileAutoCompleter extends AjaxResponder {
+class ProfileAutoCompleter extends AbstractAjaxResponder {
 	private static final Log log = LogFactory
 			.getLog(ProfileAutoCompleter.class);
 
+	private static final String PROPERTY_PROFILE_TYPES = "profile.eligibleTypeList";
 	private static final String PARAMETER_SEARCH_TERM = "term";
 	private static final String PARAMETER_ETERNAL_AUTH_ID = "externalAuthId";
 
@@ -53,17 +56,16 @@ class ProfileAutoCompleter extends AjaxResponder {
 
 	private static final String QUERY_TEMPLATE = "" //
 			+ "PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n"
-			+ "PREFIX foaf: <http://xmlns.com/foaf/0.1/> \n" + "\n" //
-			+ "SELECT DISTINCT ?uri ?fn ?ln \n" //
+			+ "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" //
+			+ "SELECT DISTINCT ?uri ?label \n" //
 			+ "WHERE {\n" //
-			+ "    ?uri rdf:type foaf:Person ; \n" //
-			+ "         foaf:firstName ?fn ; \n" //
-			+ "         foaf:lastName ?ln . \n" //
+			+ "    %typesUnion% \n" //
+			+ "    ?uri rdfs:label ?label . \n" //
 			+ "    OPTIONAL { ?uri <%matchingPropertyUri%> ?id} \n" //
 			+ "    FILTER ( !bound(?id) || (?id = '%externalAuthId%') ) \n" //
-			+ "    FILTER ( REGEX(?ln, '%searchTerm%', 'i') ) \n" //
+			+ "    FILTER ( REGEX(?label, '%searchTerm%', 'i') ) \n" //
 			+ "} \n" //
-			+ "ORDER BY ?ln ?fn \n" //
+			+ "ORDER BY ?label \n" //
 			+ "LIMIT 20 \n";
 
 	private final String term;
@@ -122,12 +124,27 @@ class ProfileAutoCompleter extends AjaxResponder {
 	}
 
 	private String prepareQueryString() {
+		String cleanTerm = SparqlQueryUtils.escapeForRegex(term);
 		String queryString = QUERY_TEMPLATE
+				.replace("%typesUnion%", buildTypeClause())
 				.replace("%matchingPropertyUri%", selfEditingIdMatchingProperty)
-				.replace("%searchTerm%", term)
+				.replace("%searchTerm%", cleanTerm)
 				.replace("%externalAuthId%", externalAuthId);
 		log.debug("Query string is '" + queryString + "'");
 		return queryString;
+	}
+
+	private String buildTypeClause() {
+		String typesString = ConfigurationProperties.getBean(vreq).getProperty(
+				PROPERTY_PROFILE_TYPES, "http://www.w3.org/2002/07/owl#Thing");
+		String[] types = typesString.split(",");
+
+		String typeClause = "{ ?uri rdf:type <" + types[0].trim() + "> }";
+		for (int i = 1; i < types.length; i++) {
+			typeClause += " UNION { ?uri rdf:type <" + types[i].trim() + "> }";
+		}
+		
+		return typeClause;
 	}
 
 	private List<ProfileInfo> parseResults(ResultSet results) {
@@ -144,11 +161,7 @@ class ProfileAutoCompleter extends AjaxResponder {
 	private ProfileInfo parseSolution(QuerySolution solution) {
 		String uri = solution.getResource("uri").getURI();
 		String url = UrlBuilder.getIndividualProfileUrl(uri, vreq);
-
-		String firstName = solution.getLiteral("fn").getString();
-		String lastName = solution.getLiteral("ln").getString();
-		String label = lastName + ", " + firstName;
-
+		String label = solution.getLiteral("label").getString();
 		return new ProfileInfo(uri, url, label);
 	}
 

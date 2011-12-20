@@ -43,7 +43,7 @@ public class AllClassGroupsListingController extends BaseEditController {
         results.add("XX");
         results.add("Group");
         results.add("display rank");
-        results.add("last modified");
+        results.add("");
         results.add("XX");
 
         if (groups != null) {
@@ -58,8 +58,9 @@ public class AllClassGroupsListingController extends BaseEditController {
                 } catch (Exception e) {
                     results.add(publicName);
                 }
-                results.add(Integer.valueOf(vcg.getDisplayRank()).toString());
-                results.add("???"); // VClassGroup doesn't yet supprt getModTime()
+                Integer t;
+                results.add(((t = Integer.valueOf(vcg.getDisplayRank())) != -1) ? t.toString() : "");
+                results.add(""); // VClassGroup doesn't yet supprt getModTime()
                 results.add("XX");
                 List<VClass> classList = vcg.getVitroClassList();
                 if (classList != null && classList.size()>0) {

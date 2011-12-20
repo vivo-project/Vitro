@@ -60,7 +60,7 @@ public class Csv2Rdf {
 		return convertToRdf(fis, null, null);
 	}
 	
-	public Model[] convertToRdf(InputStream fis,VitroRequest vreq, Model destination) throws IOException {
+	public Model[] convertToRdf(InputStream fis, WebappDaoFactory wadf, Model destination) throws IOException {
 		OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		OntModel tboxOntModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
         ontModel.addSubModel(tboxOntModel);
@@ -70,8 +70,8 @@ public class Csv2Rdf {
 		cReader.setSeperator(separatorChar);
 		cReader.setQuoteCharacters(quoteChars);	
 
-		URIGenerator uriGen = (vreq != null && destination != null) 
-				? new RandomURIGenerator(vreq, destination)
+		URIGenerator uriGen = (wadf != null && destination != null) 
+				? new RandomURIGenerator(wadf, destination)
 		        : new SequentialURIGenerator();
 		
 		List<String[]> fileRows = cReader.parse(fis);
@@ -115,12 +115,12 @@ public class Csv2Rdf {
 	
 	private class RandomURIGenerator implements URIGenerator {
 		
-		private VitroRequest vreq;
+		private WebappDaoFactory wadf;
 		private Model destination;
 		private Random random = new Random(System.currentTimeMillis());
 		
-		public RandomURIGenerator(VitroRequest vreq, Model destination) {
-			this.vreq = vreq;
+		public RandomURIGenerator(WebappDaoFactory webappDaoFactory, Model destination) {
+			this.wadf = webappDaoFactory;
 			this.destination = destination;
 		}
 		
@@ -132,7 +132,7 @@ public class Csv2Rdf {
 			if(namespace!=null && !namespace.isEmpty()){
         		while( uriIsGood == false && attempts < 30 ){	
         			uri = namespace+individualNameBase+random.nextInt( Math.min(Integer.MAX_VALUE,(int)Math.pow(2,attempts + 13)) );
-        			String errMsg = vreq.getWebappDaoFactory().checkURI(uri);
+        			String errMsg = wadf.checkURI(uri);
         			Resource res = ResourceFactory.createResource(uri);
         			inDestination = destination.contains(res, null);
         			if( errMsg != null && !inDestination)

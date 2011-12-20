@@ -173,7 +173,6 @@ public class ObjectPropertyStatementImpl implements ObjectPropertyStatement
         pi.setPropertyURI(propertyURI);
         pi.setSubjectEntURI(subjectURI);
         pi.setObjectEntURI(objectURI);
-        pi.setSubjectSide(subjectOriented);
         return pi;
     }
 

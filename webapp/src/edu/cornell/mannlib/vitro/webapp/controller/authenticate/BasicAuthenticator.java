@@ -137,8 +137,7 @@ public class BasicAuthenticator extends Authenticator {
 		
 		if (IsRootUser.isRootUser(RequestIdentifiers
 				.getIdBundleForRequest(request))) {
-			IndexBuilder.checkIndexOnRootLogin(request);
-		}
+			IndexBuilder.checkIndexOnRootLogin(request);		}
 	}
 
 	/**

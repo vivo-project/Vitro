@@ -20,7 +20,7 @@ public class EditingPolicyHelper {
     private final PolicyIface policy;
     private final IdentifierBundle ids;
     
-    protected EditingPolicyHelper(VitroRequest vreq) {
+    public EditingPolicyHelper(VitroRequest vreq) {
         this.policy = RequestPolicyList.getPolicies(vreq);
         this.ids = RequestIdentifiers.getIdBundleForRequest(vreq);
     }

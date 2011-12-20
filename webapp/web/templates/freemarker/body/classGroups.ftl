@@ -16,7 +16,7 @@
                             <#list classGroup.classes as class> 
                                 <#-- Only render populated classes -->
                                 <#if (class.individualCount > 0)>
-                                    <li role="listitem"><a href="${class.url}">${class.name}</a> (${class.individualCount})</li>
+                                    <li role="listitem"><a href="${class.url}" title="class name">${class.name}</a> (${class.individualCount})</li>
                                 </#if>
                             </#list>
                         </ul>
@@ -29,7 +29,7 @@
     ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/jquery_plugins/isotope/jquery.isotope.min.js"></script>')}
     <script>
         var initHeight = $("#isotope-container").height();
-        initHeight = (initHeight/2.5)+200 ;
+        initHeight = (initHeight/2.225)+200 ;
         $("#isotope-container").css("height",initHeight + "px");
     </script>
     <script>

@@ -16,41 +16,36 @@ public abstract class PropertyStatementTemplateModel extends BaseTemplateModel {
 
     private static final Log log = LogFactory.getLog(PropertyStatementTemplateModel.class); 
     
-    private static enum EditAccess {
-        EDIT, DELETE;
-    }
-    
     protected final VitroRequest vreq;
     // Used for editing
     protected final String subjectUri;
     protected final String propertyUri;
-    private final List<EditAccess> editAccessList;
+    protected String editUrl;
+    protected String deleteUrl;
  
     
     PropertyStatementTemplateModel(String subjectUri, String propertyUri, EditingPolicyHelper policyHelper, VitroRequest vreq) {
-        this.vreq = vreq;
-        // Instantiate the list even if not editing, so calls to getEditUrl() and getDeleteUrl() from 
-        // dump methods don't generate an error when they call isEditable() and isDeletable().
-        editAccessList = new ArrayList<EditAccess>();         
+        this.vreq = vreq;        
         this.subjectUri = subjectUri;
         this.propertyUri = propertyUri;              
-       
+        editUrl = "";
+        deleteUrl = "";
     }
     
-    protected void markEditable() {
-        editAccessList.add(EditAccess.EDIT);
+    
+    
+    /* Template properties */
+    
+    public String getEditUrl() {
+        return editUrl;
     }
     
-    protected void markDeletable() {
-        editAccessList.add(EditAccess.DELETE);
+    public String getDeleteUrl() {
+        return deleteUrl;
     }
     
-    protected boolean isEditable() {
-        return editAccessList.contains(EditAccess.EDIT);
+    public boolean isEditable() {
+        return ! editUrl.isEmpty();
     }
-    
-    protected boolean isDeletable() {
-        return editAccessList.contains(EditAccess.DELETE);
-    }
-    
+
 }

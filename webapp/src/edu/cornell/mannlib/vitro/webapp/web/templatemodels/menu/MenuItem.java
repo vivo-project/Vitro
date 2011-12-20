@@ -26,6 +26,8 @@ public class MenuItem extends BaseTemplateModel {
         this.active = active;
     }
     
+    /* Template properties */
+    
     public String getLinkText() {
         return text; 
     }

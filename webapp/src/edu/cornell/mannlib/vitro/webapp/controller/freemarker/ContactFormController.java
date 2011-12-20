@@ -47,7 +47,7 @@ public class ContactFormController extends FreemarkerHttpServlet {
             templateName = TEMPLATE_ERROR;
         }
         
-        else if (StringUtils.isEmpty(appBean.getContactMail())) {
+        else if (StringUtils.isBlank(appBean.getContactMail())) {
             body.put("errorMessage", 
             		"The feedback form is currently disabled. In order to activate the form, a site administrator must provide a contact email address in the <a href='editForm?home=1&amp;controller=ApplicationBean&amp;id=1'>Site Configuration</a>");
             
@@ -56,7 +56,6 @@ public class ContactFormController extends FreemarkerHttpServlet {
         
         else {
           
-            String appName = appBean.getApplicationName();
             body.put("formAction", "submitFeedback");
 
             if (vreq.getHeader("Referer") == null) {

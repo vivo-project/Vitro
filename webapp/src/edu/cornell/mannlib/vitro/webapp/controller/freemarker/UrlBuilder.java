@@ -44,7 +44,8 @@ public class UrlBuilder {
         VISUALIZATION("/visualization"),
         VISUALIZATION_SHORT("/vis"),
         VISUALIZATION_AJAX("/visualizationAjax"),
-        VISUALIZATION_DATA("/visualizationData");
+        VISUALIZATION_DATA("/visualizationData"),
+        EDIT_REQUEST_DISPATCH("/editRequestDispatch");
 
         private final String path;
         
@@ -195,6 +196,9 @@ public class UrlBuilder {
         return getUrl(path);       
     }
 
+    //TODO: document this as it is used all over the app
+    //does this append the context?  What if params is null? 
+    //What if you want a route that isn't in Route?
     public static String getUrl(Route route, ParamMap params) {
         return getUrl(route.path(), params);
     }
@@ -272,7 +276,7 @@ public class UrlBuilder {
         }        
 
     	if (profileUrl != null) {
-    		HashMap<String, String> specialParams = getSpecialParams(vreq);
+    		HashMap<String, String> specialParams = getModelParams(vreq);
     		if(specialParams.size() != 0) {
     			profileUrl = addParams(profileUrl, new ParamMap(specialParams));
     		}
@@ -321,7 +325,7 @@ public class UrlBuilder {
     
     //To be used in different property templates so placing method for reuse here
     //Check if special params included, specifically for menu management and other models
-    public static HashMap<String,String> getSpecialParams(VitroRequest vreq) {
+    public static HashMap<String,String> getModelParams(VitroRequest vreq) {
     	
     	HashMap<String,String> specialParams = new HashMap<String, String>();
     	if(vreq != null) {

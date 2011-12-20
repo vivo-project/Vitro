@@ -2,45 +2,7 @@
 
 <#-- Template for dump directives -->
 
-<#-- Styles here are temporary; use stylesheets.add() once that's working (see below) -->
-<style>
-div.dump {
-    margin-top: 1em;
-    border-top: 2px solid #ccc; 
-    padding-top: .75em;
-}
-
-.dump ul li.variable {
-    margin-bottom: .5em;
-    border-bottom: 1px solid #ccc; 
-    padding-top: .75em;
-    padding-bottom: .75em;
-}
-
-.dump ul ul {
-    margin-left: 1.5em;
-}
-
-.dump ul li {
-    list-style: none;
-}
-
-.dump ul li p {
-    margin-bottom: .25em;  
-}
-
-.dump ul li.item {
-    margin-bottom: 1.25em;
-}
-
-.dump ul li.item .value { 
-    margin-left: 1.5em;
-}
-
-.dump ul.methods li {
-    margin-bottom: .25em;
-}
-</style>
+ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/dump.css" />')}
 
 <div class="dump">
     <h3>${title}</h3>
@@ -67,7 +29,7 @@ div.dump {
     </#if>
 </#macro>
 
-<#macro doTypeAndValue map>
+<#macro doTypeAndValue map isMethod=false>
     <#local type = map.type!>
     <#if type?has_content>
         <p><strong>Type:</strong> ${type}</p>
@@ -77,8 +39,11 @@ div.dump {
         </#if>
     </#if>   
 
-    <#local value = map.value!>    
-    <#if value??>
+    <#local value = map.value!>   
+    <#-- Not value?has_content: we want to print [empty] for empty strings.
+         See doScalarValue macro. For methods, we don't show a list of values
+         unless there is a value. --> 
+    <#if value?? && (value?has_content || ! isMethod)> 
         <div class="values">
             <#if type?contains(".")><@doObjectValue value />
             <#elseif value?is_sequence><@doSequenceValue value type />
@@ -86,7 +51,7 @@ div.dump {
             <#else><@doScalarValue value />
             </#if>
        </div>
-   </#if>                    
+    </#if>                         
 </#macro>
 
 <#macro doObjectValue obj>
@@ -104,8 +69,18 @@ div.dump {
     <#if obj.methods?has_content>
         <p><strong>Methods:</strong</p>
         <ul class="methods">
-            <#list obj.methods as method>
-                <@liItem>${method}</@liItem>
+            <#list obj.methods?keys as method>
+                <#local value = obj.methods[method]>
+                <@liItem>
+                    <#if ! value?has_content> <#-- no return value -->
+                        ${method} 
+                    <#elseif value?is_string> <#-- value is return type -->
+                        ${method} => ${value}
+                    <#else> <#-- no-arg method: value is result of method invocation -->
+                        <#local isMethod = true>
+                        ${method} => <@divValue><@doTypeAndValue value isMethod /></@divValue>
+                    </#if>
+                </@liItem>
             </#list>
         </ul>
     </#if>
@@ -196,7 +171,3 @@ div.dump {
     <li class="item"><#nested></li>
 </#macro>
 
-
-<#-- This will work after we move stylesheets to Configuration sharedVariables 
-${stylesheets.add('<link rel="stylesheet" href="/css/fmdump.css">')}
--->

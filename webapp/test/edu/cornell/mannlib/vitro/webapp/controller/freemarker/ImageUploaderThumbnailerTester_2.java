@@ -49,6 +49,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploaderThumb
  * The goal here is to see whether differences in crop dimensions might cause
  * one or more black edges on the thumbnails.
  */
+@SuppressWarnings("deprecation")
 public class ImageUploaderThumbnailerTester_2 extends Frame {
 	private static final Log log = LogFactory
 			.getLog(ImageUploaderThumbnailerTester_2.class);

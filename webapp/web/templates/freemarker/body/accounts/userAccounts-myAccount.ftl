@@ -58,11 +58,15 @@
     </#if>
 
 <section id="my-account" role="region">
-    <form method="POST" action="${formUrls.myAccount}" class="customForm" role="my account">
+    <form id="main-form" method="POST" action="${formUrls.myAccount}" class="customForm" role="my account">
+        <#if showProxyPanel?? >
+            <#include "userAccounts-myProxiesPanel.ftl">
+        </#if>
+
         <label for="email-address">Email address<span class="requiredHint"> *</span></label>
         <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
 
-        <p class="note">Note: if email changes, a confirmation email will be sent to the new email address entered above.</p>
+        <p class="note">Note: if email changes, a confirmation email will<br />be sent to the new email address entered above.</p>
         
         <label for="first-name">First name<span class="requiredHint"> *</span></label> 
         <input type="text" name="firstName" value="${firstName}" id="first-name" role="input" />
@@ -74,13 +78,13 @@
             <label for="new-password">New password</label>
             <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
 
-            <p class="note">Minimum of ${minimumLength} characters in length. Leaving this blank means that the password will not be changed.</p>
+            <p class="note">Minimum of ${minimumLength} characters in length.<br />If left blank, the password will not be changed.</p>
 
             <label for="confirm-password">Confirm new password</label> 
             <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
         </#if>
 
-        <p><input type="submit" name="submitMyAccount" value="Save changes" class="submit" /> or <a class="cancel" href="${urls.referringPage}">Cancel</a></p>
+        <p><input type="submit" id="submitMyAccount" name="submitMyAccount" value="Save changes" class="submit" disabled /> or <a class="cancel" href="${urls.referringPage}" title="cancel">Cancel</a></p>
 
         <p class="requiredHint">* required fields</p>
     </form>
@@ -88,3 +92,6 @@
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/account.css" />')}
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/customForm.css" />')}
+
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"></script>',
+              '<script type="text/javascript" src="${urls.base}/js/account/accountListenerSetup.js"></script>')}

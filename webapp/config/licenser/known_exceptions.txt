@@ -113,21 +113,21 @@ webapp/web/src/xml/*
 webapp/web/templates/freemarker/page/partials/googleAnalytics.ftl
 
 # See /doc/3rd-party-licenses.txt for LICENSE file
-webapp/config/tlds/sparqltag.tld
+webapp/web/WEB-INF/tlds/sparqltag.tld
 
 # See /doc/3rd-party-licenses.txt for LICENSE file
-webapp/config/tlds/c.tld
-webapp/config/tlds/fn.tld
+webapp/web/WEB-INF/tlds/c.tld
+webapp/web/WEB-INF/tlds/fn.tld
 
 # PROBLEM: Can't find any info on licensing.
-webapp/config/tlds/database.tld
+webapp/web/WEB-INF/tlds/database.tld
 
 # See /doc/3rd-party-licenses.txt for LICENSE file
-webapp/config/tlds/taglibs-mailer.tld
+webapp/web/WEB-INF/tlds/taglibs-mailer.tld
 
 # See /doc/3rd-party-licenses.txt for LICENSE file
-webapp/config/tlds/taglibs-random.tld
-webapp/config/tlds/taglibs-string.tld
+webapp/web/WEB-INF/tlds/taglibs-random.tld
+webapp/web/WEB-INF/tlds/taglibs-string.tld
 
 # See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/themes/enhanced/css/blueprint/grid.css
@@ -167,3 +167,6 @@ solr/*
 
 # OWASP AntiSamy Project.  See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/src/edu/cornell/mannlib/vitro/webapp/web/antisamy-vitro-1.4.4.xml
+
+# A kluge class derived from JarJar code. See /doc/3rd-party-licenses.txt for LICENSE file
+utilities/buildutils/src/com/tonicsystems/jarjar/KlugedDepFind.java

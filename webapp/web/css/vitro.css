@@ -25,7 +25,7 @@
     color: #900;
     padding: 10px;
     margin-bottom: 5px;
-    height: 30px;
+    height: auto;
 }
 #error-alert img {
     float:left;
@@ -80,10 +80,6 @@
     font-size: .8em;
 }
 
-/* <------ SITE ADMIN*/
-ul.ingestMenu {
-    margin-bottom: 1.2em;
-}
 
 /* <------ INDEX PAGE*/
 .siteMap h2 {

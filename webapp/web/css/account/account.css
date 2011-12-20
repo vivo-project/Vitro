@@ -175,7 +175,7 @@ padding-right: 5px;
     display:none;
 }
 #associated label {
-    margin-bottom:5px;
+    margin-bottom: 10px;
 }
 #associationOptions {
     float:right; 
@@ -209,8 +209,8 @@ padding-right: 5px;
 }
 #associateProfileBackgroundTwo {
     background-color:#f1f2ee;
-    padding:7px 94px 42px 0;
-    margin-top:-112px; 
+    padding:7px 94px 33px 0;
+    margin-top:-129px; 
     margin-right:-8px;
     z-index:-100;
     border:1px solid #ccc;
@@ -225,7 +225,7 @@ padding-right: 5px;
 #associateProfileBackgroundThree {
     background-color:#f1f2ee;
     padding:7px 94px 26px 12px;
-    margin-top:-112px; 
+    margin-top:-129px; 
     margin-left:-12px;
     margin-right:-8px;
     z-index:-100;
@@ -272,4 +272,211 @@ a.disable-delete {
 }
 #passwordContainer {
     margin-top: 20px;
+}
+.disabledSubmit {
+    cursor: default ! important;
+}
+
+/* PROXY MY ACCOUNT'S PROFILE ------>  */
+#edit-myProxy {
+    float: right;
+    padding: 2em;
+    padding-top: 1em;
+    background-color: #f7f7f4;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    width: 400px;
+}
+#edit-myProxy h4 {
+    padding-top: 0;
+}
+
+#edit-myProxy li.proxyInfoElement {
+    padding-top: .8em;
+    border-bottom: 1px dotted #E0DFDF;
+    padding-bottom: 2em;
+    padding-left: 0;
+    clear: both;
+}
+#edit-myProxy p.search-status {
+    margin-top: -10px;
+    font-size: .8em;
+    color: #7F8993;
+    padding-left: 10px;
+    height: 20px;
+}
+#edit-myProxy p.selected-editors {
+    padding-top: 1.2em;
+    border-top: 1px solid #E0DFDF;
+    padding-left: 0;
+}
+#edit-myProxy img.photo-profile {
+    border: 2px solid #DDE4E3;
+    float: left;
+}
+#edit-myProxy p.proxy-info {
+    padding-left: 110px;
+    padding-top: 15px;
+}
+#edit-myProxy span.class-label {
+    color: #7F8993;
+}
+#edit-myProxy a.remove-proxy {
+    font-size: .9em;
+}
+
+/* MANAGE PROXY ------>  */
+
+section.proxy-profile h4 {
+    padding-left: 20px;
+    padding-top: 20px;
+}
+#add-relation legend{
+    display: none;
+}
+.proxy-profile .acSelector {
+    margin-left: 20px;
+}
+#add-relation label {
+    margin-left: 20px;
+}
+#add-relation input.pos-submit {
+    float: right;
+    margin-right: 1em;
+    margin-bottom: 1em;
+    background-color: #317e95;
+}
+#add-relation input.pos-submit:hover {
+    background-color: #87b4c1;
+}
+.proxy-profile {
+    width: 930px;
+    /*background-color: #eaeae8;*/
+    background-color: #F7F7F4;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    
+}
+.list-proxy-profile {
+    background-color: #F7F7F4;
+    border-bottom: 1px dotted  #e2e2dd;
+    margin-bottom: 0;
+    border-radius: 0;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    padding-top: 1.3em;
+}
+/*.list-proxy-profile:nth-child(2n-1) {
+    background-color: #F7F7F4;
+}*/
+.proxy {
+    width: 430px;
+    float: left;
+    padding-right: 10px;
+}
+.profile {
+    width: 440px;
+    float: right;
+    border-left: 1px dotted #d7d6d6;
+    padding-left: 30px;
+    padding-right: 1em;
+    margin-bottom: 1em;
+}
+#add-relation p.search-status,
+#list-relation p.search-status{
+    margin-top: -10px;
+    font-size: .8em;
+    color: #7F8993;
+    padding-left: 25px;
+    height: 20px;
+    
+}
+#list-relation label {
+    color: #064D68;
+    padding-left: 20px;
+}
+li.proxyInfoElement {
+    padding-bottom: 1em;
+    clear: both;
+    padding-left: 20px;
+}
+#list-relation li {
+    padding-bottom: 30px;
+}
+p.selected-editors {
+    padding-top: 1.2em;
+    border-top: 1px solid #E0DFDF;
+    padding-left: 1.2em;
+}
+img.photo-proxy {
+    border: 2px solid #DDE4E3;
+    float: left;
+}
+
+img.photo-profile {
+    border: 1px solid #DDE4E3;
+    float: left;
+}
+#add-relation p.proxy-info,
+#list-relation p.proxy-info {
+    padding-left: 110px;
+    padding-top: 15px;
+}
+#add-relation p.proxy-info-profile,
+#list-relation p.proxy-info-profile {
+    padding-left: 75px;
+    padding-top: 5px;
+    margin-bottom: 0;
+}
+span.class-label {
+    color: #7F8993;
+}
+a.remove-proxy {
+    font-size: .9em;
+}
+a.remove-proxyUri {
+    font-size: .9em;
+}
+
+a.remove-proxyUri {
+    font-size: .9em;
+}
+h4.profile-editors {
+    margin-left: 10px;
+}
+#search-proxy {
+    border-top: 1px solid #E1E5E7;
+    padding: 10px;
+    padding-top: 20px;
+}
+#search-proxy h4 {
+    margin-bottom: 0;
+}
+
+#search-proxy p {
+    margin-top: .3em;
+    font-size: .8em;
+}
+.proxy-profile .submit {
+    clear: both;
+    float: left;
+    margin-left: 1.5em;
+    margin-bottom: 1em;
+}
+.proxy-item {
+    margin-left: 20px;
+    margin-top: 20px;
+}
+span[name=proxySelectorSearchStatus] {
+    color: red;
+}
+img.loading-relateEdior,
+img.loading-relateProfile,
+img.loading-addProfile,
+img.loading-profileMyAccoount {
+    padding-left: 10px;
 }

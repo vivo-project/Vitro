@@ -9,18 +9,10 @@
 <%@ page import="java.net.URLEncoder" %>
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" %>
 <% request.setAttribute("requestedActions", new UseAdvancedDataToolsPages()); %>
 <vitro:confirmAuthorization />
-
-<%
-
-    ModelMaker maker = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
-    if (maker == null) {
-        maker = (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
-    }
-
-%>
 
     <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Subtract One Model from Another</h2>
 
@@ -29,38 +21,25 @@
 
     <select name="modela">
          <option value="vitro:baseOntModel">webapp assertions</option>
-<%
-    for (Iterator it = maker.listModels(); it.hasNext(); ) {
-	String modelName = (String) it.next();
-        %> <option value="<%=modelName%>"><%=modelName%></option>
-        <%    
-    }
-%>   
+         <c:forEach var="modelName" items="${modelNames}">
+             <option value="${modelName}">${modelName}</option>
+         </c:forEach>
     </select>
     <p>model to be subtracted from</p>
 
     <select name="modelb">
          <option value="vitro:baseOntModel">webapp assertions</option>
-<%
-    for (Iterator it = maker.listModels(); it.hasNext(); ) {
-	String modelName = (String) it.next();
-        %> <option value="<%=modelName%>"><%=modelName%></option>
-        <%    
-    }
-%>   
+         <c:forEach var="modelName" items="${modelNames}">
+             <option value="${modelName}">${modelName}</option>
+         </c:forEach>
 	</select>
     <p>model to subtract</p>
 
     <select name="destinationModelName">
          <option value="vitro:baseOntModel">webapp assertions</option>
-
-<%
-    for (Iterator it = maker.listModels(); it.hasNext(); ) {
-	String modelName = (String) it.next();
-        %> <option value="<%=modelName%>"><%=modelName%></option>
-        <%    
-    }
-%>   
+         <c:forEach var="modelName" items="${modelNames}">
+             <option value="${modelName}">${modelName}</option>
+         </c:forEach>
 	</select>
     <p>model in which difference should be saved</p>
 

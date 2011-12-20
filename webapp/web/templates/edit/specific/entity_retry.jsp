@@ -1,12 +1,16 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
 <%@ taglib prefix="form" uri="http://vitro.mannlib.cornell.edu/edit/tags" %>
+<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
 
     <tr class="editformcell" id="entityNameTr">
         <td valign="bottom" id="entityNameTd" colspan="2">
-			<b>Individual Name</b><br/>
+			<b>Individual Name *</b><br/>
             <input style="width:80%;" type="text" name="Name" value="<form:value name="Name"/>" />
-            <p class="error"><form:error name="Name"/></p>
+           <c:set var="NameError"><form:error name="Name"/></c:set>
+            <c:if test="${!empty NameError}">
+                <span class="notice"><c:out value="${NameError}"/></span>
+            </c:if>
         </td>
     </tr>
 

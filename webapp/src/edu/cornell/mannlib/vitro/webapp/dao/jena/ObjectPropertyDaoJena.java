@@ -98,11 +98,6 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 p.setPickListName(p.getLocalName()+" ("+prefix+")");
             }
             String propertyName = getPropertyStringValue(op,PROPERTY_FULLPROPERTYNAMEANNOT);
-            if (propertyName != null) {
-            	p.setDomainSidePhasedOut(propertyName);
-            } else {
-            	p.setDomainSidePhasedOut(op.getLocalName());
-            }
             if (op.getLabel(null) != null)
                 p.setDomainPublic(getLabelOrId(op));
             else
@@ -135,11 +130,6 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 p.setNamespaceInverse(invOp.getNameSpace());
                 p.setLocalNameInverse(invOp.getLocalName());
                 String invPropertyName = getPropertyStringValue(invOp,PROPERTY_FULLPROPERTYNAMEANNOT);
-                if (invPropertyName != null) {
-                	p.setRangeSidePhasedOut(invPropertyName);
-                } else {
-                	p.setRangeSidePhasedOut(invOp.getLocalName());
-                }
                 p.setRangePublic(getLabelOrId(invOp));
             }
             try {
@@ -166,20 +156,10 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             p.setDescription(getPropertyStringValue(op,DESCRIPTION_ANNOT));
             p.setPublicDescription(getPropertyStringValue(op,PUBLIC_DESCRIPTION_ANNOT));
            
-            try {
-            	p.setDomainDisplayTier(Integer.toString(getPropertyNonNegativeIntValue(op,DISPLAY_RANK_ANNOT)));
-            } catch (Exception e) {
-            	log.error("Error converting displayRank integer to string for "+op.getURI());
-            }
-            try {
-            	p.setRangeDisplayTier(Integer.toString(getPropertyNonNegativeIntValue(invOp,DISPLAY_RANK_ANNOT)));
-            } catch (Exception e) {
-            	log.error("Error converting displayRank integer to string for "+invOp.getURI());
-            }
+           	p.setDomainDisplayTier(getPropertyNonNegativeIntegerValue(op,DISPLAY_RANK_ANNOT));
+           	p.setRangeDisplayTier(getPropertyNonNegativeIntegerValue(invOp,DISPLAY_RANK_ANNOT));
             p.setDomainDisplayLimit(getPropertyNonNegativeIntValue(op,DISPLAY_LIMIT));
             p.setRangeDisplayLimit(getPropertyNonNegativeIntValue(invOp,DISPLAY_LIMIT));
-            p.setDomainEntitySortField(getPropertyStringValue(op,PROPERTY_ENTITYSORTFIELD));
-            p.setRangeEntitySortField(getPropertyStringValue(invOp,PROPERTY_ENTITYSORTFIELD));
             RDFNode objectIndividualSortPropertyNode = op.getPropertyValue(PROPERTY_OBJECTINDIVIDUALSORTPROPERTY);
             if (objectIndividualSortPropertyNode instanceof Resource) {  
             	p.setObjectIndividualSortPropertyURI( ((Resource)objectIndividualSortPropertyNode).getURI() ); 
@@ -236,19 +216,12 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             Boolean collateBySubclass = getPropertyBooleanValue(op,PROPERTY_COLLATEBYSUBCLASSANNOT);
             p.setCollateBySubclass(collateBySubclass==null ? false : collateBySubclass);
             
-            // the <i> thing from the old system causes sorting problems and ugliness; here is an inelegant way of dealing with it for now (Note <i>s will disappear on update)
-            if (p.getDomainSidePhasedOut() != null) {
-            	p.setDomainSidePhasedOut(stripItalics(p.getDomainSidePhasedOut()));
-            }
-            if (p.getRangeSidePhasedOut() != null) {
-            	p.setRangeSidePhasedOut(stripItalics(p.getRangeSidePhasedOut()));
-            }
             Resource groupRes = (Resource) op.getPropertyValue(PROPERTY_INPROPERTYGROUPANNOT);
             if (groupRes != null) {
                 p.setGroupURI(groupRes.getURI());
             }
         } catch (Throwable t) {
-            t.printStackTrace();
+            log.error(t, t);
         }
         return p;
     }
@@ -428,7 +401,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             try {
 	             doUpdate(prop,p,inv,ontModel);
             } catch (Exception e) {
-                 e.printStackTrace();
+                 log.error(e, e);
             }
         } finally {
         	getOntModel().getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),false));
@@ -524,20 +497,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         		getOntModel().remove(p,RDF.type,OWL.InverseFunctionalProperty);
         	}
         }
- 
-/*     3/29/2010 sjm. Commenting out per bjl. As far as we can tell from looking at the code, these fields
- *                    are no longer used by the application. Leaving this here commented out for now though,
- *                    just in case.   
- 
-        
-        if (prop.getDomainSidePhasedOut() != null) {
-        	updatePropertyStringValue(p,PROPERTY_FULLPROPERTYNAMEANNOT,prop.getDomainSidePhasedOut(),ontModel);
-        }
-        if (prop.getRangeSidePhasedOut() != null && inv != null) {
-        	updatePropertyStringValue(inv,PROPERTY_FULLPROPERTYNAMEANNOT,prop.getRangeSidePhasedOut(),ontModel);
-        }
-*/        
-    	
+     	
         if ( (prop.getDomainVClassURI() != null) && (prop.getDomainVClassURI().length()>0) ) {
             if (!p.hasDomain(ontModel.getResource(prop.getDomainVClassURI()))) {
         	    p.setDomain(ontModel.getResource(prop.getDomainVClassURI()));
@@ -569,26 +529,19 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         updatePropertyStringValue(p,EXAMPLE_ANNOT,prop.getExample(),getOntModel());
         updatePropertyStringValue(p,DESCRIPTION_ANNOT,prop.getDescription(),getOntModel());
         updatePropertyStringValue(p,PUBLIC_DESCRIPTION_ANNOT,prop.getPublicDescription(),getOntModel());
-        updatePropertyNonNegativeIntValue(p,DISPLAY_LIMIT,prop.getDomainDisplayLimit(),getOntModel());
-        updatePropertyStringValue(p,PROPERTY_ENTITYSORTFIELD,prop.getDomainEntitySortField(),getOntModel());
+        updatePropertyNonNegativeIntegerValue(p,DISPLAY_LIMIT,prop.getDomainDisplayLimitInteger(),getOntModel());
         updatePropertyStringValue(p,PROPERTY_ENTITYSORTDIRECTION,prop.getDomainEntitySortDirection(),getOntModel());
         if (inv != null) {
             updatePropertyStringValue(inv,EXAMPLE_ANNOT,prop.getExample(),getOntModel());
             updatePropertyStringValue(inv,DESCRIPTION_ANNOT,prop.getDescription(),getOntModel());
-            updatePropertyNonNegativeIntValue(inv,DISPLAY_LIMIT,prop.getRangeDisplayLimit(),getOntModel());
-            updatePropertyStringValue(inv,PROPERTY_ENTITYSORTFIELD,prop.getRangeEntitySortField(),getOntModel());
+            updatePropertyNonNegativeIntegerValue(inv,DISPLAY_LIMIT,prop.getRangeDisplayLimitInteger(),getOntModel());
             updatePropertyStringValue(inv,PROPERTY_ENTITYSORTDIRECTION,prop.getRangeEntitySortDirection(),getOntModel());
         }
                 
-    	if (prop.getDomainDisplayTier() != null) {
-    		updatePropertyNonNegativeIntValue(p,DISPLAY_RANK_ANNOT,Integer.decode(prop.getDomainDisplayTier()),getOntModel());
-
-    		if (inv != null) {
-            	if (prop.getRangeDisplayTier() != null) {
-            		updatePropertyNonNegativeIntValue(inv,DISPLAY_RANK_ANNOT,Integer.decode(prop.getRangeDisplayTier()),getOntModel());
-            	}
-    		}
-    	}
+    	updatePropertyNonNegativeIntegerValue(p, DISPLAY_RANK_ANNOT, prop.getDomainDisplayTierInteger(), getOntModel());
+    	if (inv != null) {
+        	updatePropertyNonNegativeIntegerValue(inv, DISPLAY_RANK_ANNOT, prop.getRangeDisplayTierInteger(), getOntModel());
+		}
     	
         String oldObjectIndividualSortPropertyURI = null;
     	RDFNode sortPropertyNode = p.getPropertyValue(PROPERTY_OBJECTINDIVIDUALSORTPROPERTY);
@@ -909,13 +862,25 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         if (customListViewConfigFileMap == null) {
             customListViewConfigFileMap = new HashMap<ObjectProperty, String>();
             OntModel displayModel = getOntModelSelector().getDisplayModel();
+            //Get all property to list view config file mappings in the system
             QueryExecution qexec = QueryExecutionFactory.create(listViewConfigFileQuery, displayModel); 
-            ResultSet results = qexec.execSelect();           
+            ResultSet results = qexec.execSelect();  
+            //Iterate through mappings looking for the current property and setting up a hashmap for subsequent retrieval
             while (results.hasNext()) {
                 QuerySolution soln = results.next();
-                ObjectProperty prop = getObjectPropertyByURI(soln.getResource("property").getURI());
-                String filename = soln.getLiteral("filename").getLexicalForm();
-                customListViewConfigFileMap.put(prop, filename);                
+                String propertyUri = soln.getResource("property").getURI();
+                ObjectProperty prop = getObjectPropertyByURI(propertyUri);
+                if (prop == null) {
+                	//This is a warning only if this property is the one for which we're searching
+                	if(op.getURI().equals(propertyUri)){
+                		log.warn("Can't find property for uri " + propertyUri);
+                	} else {
+                		log.debug("Can't find property for uri " + propertyUri);
+                	}
+                } else {
+                    String filename = soln.getLiteral("filename").getLexicalForm();
+                    customListViewConfigFileMap.put(prop, filename);     
+                }
             }       
             qexec.close();
         }        

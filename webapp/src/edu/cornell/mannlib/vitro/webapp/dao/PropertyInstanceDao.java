@@ -11,8 +11,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstanceIface;
 
 public interface PropertyInstanceDao {
 
-    public abstract Iterator getAllOfThisTypeIterator();
-
     void deleteObjectPropertyStatement(String subjectURI, String propertyURI, String objectURI);
 
     Collection<PropertyInstance> getAllPossiblePropInstForIndividual(String individualURI);

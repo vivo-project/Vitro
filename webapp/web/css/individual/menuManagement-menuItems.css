@@ -1,0 +1,20 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+/* MENU ITEMS------>  */
+ul.menuItems {
+    width: 35%;
+    margin-bottom: 1.5em;
+}
+ul.menuItems li {
+    margin: .2em 0;
+    padding: .5em;
+    background: #f3f3f0;
+}
+ul.menuItems.dragNdrop li {
+    padding-left: 1.4em;
+    background: url("../../edit/forms/images/sortable_icon.png") no-repeat .4em center #f3f3f0;
+    cursor: move;
+}
+span.controls {
+    float: right;
+}

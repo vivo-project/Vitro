@@ -1,7 +1,7 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
 <header id="branding" role="banner">
-    <h1 class="vivo-logo"><a href="${urls.home}"><span class="displace">${siteName}</span></a></h1>
+    <h1 class="vivo-logo"><a href="${urls.home}" title="site name"><span class="displace">${siteName}</span></a></h1>
     <#if siteTagline?has_content>
         <em>${siteTagline}</em>
     </#if>
@@ -31,7 +31,7 @@
         <fieldset>
             <legend>Search form</legend>
             
-            <form id="search-form" action="${urls.search}" name="search" role="search"> 
+            <form id="search-form" action="${urls.search}" name="search" role="search" accept-charset="UTF-8" method="POST"> 
                 <div id="search-field">
                     <input type="text" name="querytext" class="search-vitro" value="${querytext!}" autocapitalize="off" />
                     <input type="submit" value="Search" class="submit">

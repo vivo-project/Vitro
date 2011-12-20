@@ -34,15 +34,15 @@ public class IndividualToSolrDocument {
     
     public static VitroSearchTermNames term = new VitroSearchTermNames();
     
-    private static String entClassName = Individual.class.getName();
+    protected static String entClassName = Individual.class.getName();
     
-    private ClassProhibitedFromSearch classesProhibitedFromSearch;
+    protected ClassProhibitedFromSearch classesProhibitedFromSearch;
     
-    private IndividualProhibitedFromSearch individualProhibitedFromSearch;
+    protected IndividualProhibitedFromSearch individualProhibitedFromSearch;
     
-    private final String label = "http://www.w3.org/2000/01/rdf-schema#label";
+    protected final String label = "http://www.w3.org/2000/01/rdf-schema#label";
     
-    public List<DocumentModifier> documentModifiers = new ArrayList<DocumentModifier>();
+    protected List<DocumentModifier> documentModifiers = new ArrayList<DocumentModifier>();
     
     public IndividualToSolrDocument(
             ClassProhibitedFromSearch classesProhibitedFromSearch, 
@@ -130,7 +130,7 @@ public class IndividualToSolrDocument {
     }
     
            
-    private void runAdditionalDocModifers( Individual ind, SolrInputDocument doc, StringBuffer addUri ) 
+	protected void runAdditionalDocModifers( Individual ind, SolrInputDocument doc, StringBuffer addUri ) 
     throws SkipIndividualException{
         //run the document modifiers
         if( documentModifiers != null && !documentModifiers.isEmpty()){
@@ -140,7 +140,7 @@ public class IndividualToSolrDocument {
         }
     }
     
-    private void checkForSkipBasedOnNS(Individual ind) throws SkipIndividualException {
+    protected void checkForSkipBasedOnNS(Individual ind) throws SkipIndividualException {
         String id = ind.getURI();                  
         if(id == null){            
             throw new SkipIndividualException("cannot add individuals without URIs to search index");
@@ -152,7 +152,7 @@ public class IndividualToSolrDocument {
         }        
     }
 
-    private void addAllText(Individual ind, SolrInputDocument doc, StringBuffer classPublicNames, StringBuffer objectNames) {
+    protected void addAllText(Individual ind, SolrInputDocument doc, StringBuffer classPublicNames, StringBuffer objectNames) {
         String t=null;
         //ALLTEXT, all of the 'full text'
         StringBuffer allTextValue = new StringBuffer();
@@ -165,6 +165,11 @@ public class IndividualToSolrDocument {
                 DataPropertyStatement dataPropertyStmt =  dataPropertyStmtIter.next();
                 if(dataPropertyStmt.getDatapropURI().equals(label)){ // we don't want label to be added to alltext
                     continue;
+                } else if(dataPropertyStmt.getDatapropURI().equals("http://vivoweb.org/ontology/core#preferredTitle")){
+                	//add the preferredTitle field
+                	String preferredTitle = null;
+                	doc.addField(term.PREFERRED_TITLE, ((preferredTitle=dataPropertyStmt.getData()) == null)?"":preferredTitle);
+                	log.debug("Preferred Title: " + dataPropertyStmt.getData());
                 }
                 allTextValue.append(" ");
                 allTextValue.append(((t=dataPropertyStmt.getData()) == null)?"":t);
@@ -191,7 +196,7 @@ public class IndividualToSolrDocument {
         doc.addField(term.ALLTEXT_PHONETIC, alltext);
     }
 
-    private void addLabel(Individual ind, SolrInputDocument doc) {
+    protected void addLabel(Individual ind, SolrInputDocument doc) {
         String value = "";
         String label = ind.getRdfsLabel();
         if (label != null) {
@@ -199,19 +204,16 @@ public class IndividualToSolrDocument {
         } else {
             value = ind.getLocalName();
         }            
+
         doc.addField(term.NAME_RAW, value);
-        doc.addField(term.NAME_LOWERCASE, value);
-        doc.addField(term.NAME_UNSTEMMED, value);
-        doc.addField(term.NAME_STEMMED, value);
-        doc.addField(term.NAME_PHONETIC, value);
-        doc.addField(term.AC_NAME_UNTOKENIZED, value);
-        doc.addField(term.AC_NAME_STEMMED, value);         
+        // NAME_RAW will be copied by solr into the following fields:
+        // NAME_LOWERCASE, NAME_UNSTEMMED, NAME_STEMMED, NAME_PHONETIC, AC_NAME_UNTOKENIZED, AC_NAME_STEMMED
     }
 
     /**
      * Adds if the individual has a thumbnail image or not.
      */
-    private void addThumbnailExistance(Individual ind, SolrInputDocument doc) {
+    protected void addThumbnailExistance(Individual ind, SolrInputDocument doc) {
         try{
             if(ind.hasThumb())
                 doc.addField(term.THUMBNAIL, "1");
@@ -226,7 +228,7 @@ public class IndividualToSolrDocument {
      * Get the rdfs:labes for objects of statements and put in objectNames.
      *  Get the URIs for objects of statements and put in addUri.
      */
-    private void addObjectPropertyText(Individual ind, SolrInputDocument doc,
+    protected void addObjectPropertyText(Individual ind, SolrInputDocument doc,
             StringBuffer objectNames, StringBuffer addUri) {
         List<ObjectPropertyStatement> objectPropertyStatements = ind.getObjectPropertyStatements();
         if (objectPropertyStatements != null) {

@@ -59,6 +59,7 @@ import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 public class RefactorOperationController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(RefactorOperationController.class.getName());
+	private static final boolean NOTIFY = true;
 	
 	private String doFixDataTypes(HttpServletRequest request, HttpServletResponse response)
 	{
@@ -252,6 +253,10 @@ public class RefactorOperationController extends BaseEditController {
     		dataset.getLock().leaveCriticalSection();
     	}
 		
+		renameResourceInModel(ModelContext.getOntModelSelector(
+				getServletContext()).getUserAccountsModel(), 
+				        userURI, oldURIStr, newURIStr, !NOTIFY);
+    	
 		// there are no statements to delete, but we want indexes updated appropriately
 		request.getFullWebappDaoFactory().getIndividualDao().deleteIndividual(oldURIStr);
 		
@@ -466,7 +471,8 @@ public class RefactorOperationController extends BaseEditController {
             try {
                 response.sendRedirect(defaultLandingPage);
             } catch (IOException f) {
-                e.printStackTrace();
+                log.error(f, f);
+                throw new RuntimeException(f);
             }
             return;
         }
@@ -502,7 +508,8 @@ public class RefactorOperationController extends BaseEditController {
 	        try {
 	            response.sendRedirect(redirectStr);
 	        } catch (IOException e) {
-	            e.printStackTrace();
+                log.error(e, e);
+                throw new RuntimeException(e);
 	        }
         }
 

@@ -28,12 +28,14 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
+import freemarker.core.CollectionAndSequence;
 import freemarker.core.Environment;
 import freemarker.ext.beans.BeansWrapper;
+import freemarker.ext.beans.CollectionModel;
 import freemarker.ext.dump.BaseDumpDirective.DateType;
 import freemarker.ext.dump.BaseDumpDirective.Key;
-import freemarker.ext.dump.BaseDumpDirective.Value;
 import freemarker.ext.dump.BaseDumpDirective.Type;
+import freemarker.ext.dump.BaseDumpDirective.Value;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleCollection;
 import freemarker.template.Template;
@@ -79,7 +81,7 @@ public class DumpDirectiveTest {
         Map<String, Object> dataModel = new HashMap<String, Object>();
         
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
-        expectedDumpValue.put(Key.VALUE.toString(), Value.UNDEFINED);
+        expectedDumpValue.put(Key.VALUE.toString(), Value.UNDEFINED.toString());
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
         expectedDump.put(varName, expectedDumpValue);
@@ -445,14 +447,14 @@ public class DumpDirectiveTest {
         
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
         expectedDumpValue.put(Key.TYPE.toString(), Type.SEQUENCE);
-        List<Map<String, Object>> myArrayexpectedDumpValue = new ArrayList<Map<String, Object>>(myArray.length);
+        List<Map<String, Object>> myArrayExpectedDumpValue = new ArrayList<Map<String, Object>>(myArray.length);
         for ( String str : myArray) {
             Map<String, Object> itemDump = new HashMap<String, Object>();
             itemDump.put(Key.TYPE.toString(), Type.STRING);
             itemDump.put(Key.VALUE.toString(), str);
-            myArrayexpectedDumpValue.add(itemDump);
+            myArrayExpectedDumpValue.add(itemDump);
         }
-        expectedDumpValue.put(Key.VALUE.toString(), myArrayexpectedDumpValue);
+        expectedDumpValue.put(Key.VALUE.toString(), myArrayExpectedDumpValue);
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
         expectedDump.put(varName, expectedDumpValue);
@@ -488,36 +490,36 @@ public class DumpDirectiveTest {
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
         expectedDumpValue.put(Key.TYPE.toString(), Type.SEQUENCE);
         
-        List<Map<String, Object>> mixedListexpectedDumpValue = new ArrayList<Map<String, Object>>(mixedList.size());
+        List<Map<String, Object>> mixedListExpectedDumpValue = new ArrayList<Map<String, Object>>(mixedList.size());
         
-        Map<String, Object> myStringexpectedDumpValue = new HashMap<String, Object>();        
-        myStringexpectedDumpValue.put(Key.TYPE.toString(), Type.STRING);
-        myStringexpectedDumpValue.put(Key.VALUE.toString(), myString);
-        mixedListexpectedDumpValue.add(myStringexpectedDumpValue);
+        Map<String, Object> myStringExpectedDumpValue = new HashMap<String, Object>();        
+        myStringExpectedDumpValue.put(Key.TYPE.toString(), Type.STRING);
+        myStringExpectedDumpValue.put(Key.VALUE.toString(), myString);
+        mixedListExpectedDumpValue.add(myStringExpectedDumpValue);
  
-        Map<String, Object> myIntexpectedDumpValue = new HashMap<String, Object>();  
-        myIntexpectedDumpValue.put(Key.TYPE.toString(), Type.NUMBER);
-        myIntexpectedDumpValue.put(Key.VALUE.toString(), myInt);
-        mixedListexpectedDumpValue.add(myIntexpectedDumpValue);
+        Map<String, Object> myIntExpectedDumpValue = new HashMap<String, Object>();  
+        myIntExpectedDumpValue.put(Key.TYPE.toString(), Type.NUMBER);
+        myIntExpectedDumpValue.put(Key.VALUE.toString(), myInt);
+        mixedListExpectedDumpValue.add(myIntExpectedDumpValue);
         
-        Map<String, Object> myBoolexpectedDumpValue = new HashMap<String, Object>();  
-        myBoolexpectedDumpValue.put(Key.TYPE.toString(), Type.BOOLEAN);
-        myBoolexpectedDumpValue.put(Key.VALUE.toString(), myBool);
-        mixedListexpectedDumpValue.add(myBoolexpectedDumpValue);
+        Map<String, Object> myBoolExpectedDumpValue = new HashMap<String, Object>();  
+        myBoolExpectedDumpValue.put(Key.TYPE.toString(), Type.BOOLEAN);
+        myBoolExpectedDumpValue.put(Key.VALUE.toString(), myBool);
+        mixedListExpectedDumpValue.add(myBoolExpectedDumpValue);
         
-        Map<String, Object> myListexpectedDumpValue = new HashMap<String, Object>();
-        myListexpectedDumpValue.put(Key.TYPE.toString(), Type.SEQUENCE); 
-        List<Map<String, Object>> myListItemsexpectedDumpValue = new ArrayList<Map<String, Object>>(myList.size());
+        Map<String, Object> myListExpectedDumpValue = new HashMap<String, Object>();
+        myListExpectedDumpValue.put(Key.TYPE.toString(), Type.SEQUENCE); 
+        List<Map<String, Object>> myListItemsExpectedDumpValue = new ArrayList<Map<String, Object>>(myList.size());
         for ( String animal : myList ) {
             Map<String, Object> itemDump = new HashMap<String, Object>();
             itemDump.put(Key.TYPE.toString(), Type.STRING);
             itemDump.put(Key.VALUE.toString(), animal);
-            myListItemsexpectedDumpValue.add(itemDump);            
+            myListItemsExpectedDumpValue.add(itemDump);            
         }        
-        myListexpectedDumpValue.put(Key.VALUE.toString(), myListItemsexpectedDumpValue);
-        mixedListexpectedDumpValue.add(myListexpectedDumpValue);
+        myListExpectedDumpValue.put(Key.VALUE.toString(), myListItemsExpectedDumpValue);
+        mixedListExpectedDumpValue.add(myListExpectedDumpValue);
         
-        expectedDumpValue.put(Key.VALUE.toString(), mixedListexpectedDumpValue);
+        expectedDumpValue.put(Key.VALUE.toString(), mixedListExpectedDumpValue);
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
         expectedDump.put(varName, expectedDumpValue);
@@ -541,14 +543,14 @@ public class DumpDirectiveTest {
         
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
         expectedDumpValue.put(Key.TYPE.toString(), Type.SEQUENCE);        
-        List<Map<String, Object>> myIntSetexpectedDumpValue = new ArrayList<Map<String, Object>>(myIntSet.size());
+        List<Map<String, Object>> myIntSetExpectedDumpValue = new ArrayList<Map<String, Object>>(myIntSet.size());
         for ( int i : myIntSet ) {
             Map<String, Object> itemDump = new HashMap<String, Object>();
             itemDump.put(Key.TYPE.toString(), Type.NUMBER);
             itemDump.put(Key.VALUE.toString(), i);
-            myIntSetexpectedDumpValue.add(itemDump);
+            myIntSetExpectedDumpValue.add(itemDump);
         }
-        expectedDumpValue.put(Key.VALUE.toString(), myIntSetexpectedDumpValue);
+        expectedDumpValue.put(Key.VALUE.toString(), myIntSetExpectedDumpValue);
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
         expectedDump.put(varName, expectedDumpValue);
@@ -557,7 +559,7 @@ public class DumpDirectiveTest {
     }
     
     @Test
-    public void dumpNumberCollection() {
+    public void dumpSimpleCollection() {
 
         String varName = "oddNums";
         Map<String, Object> dataModel = new HashMap<String, Object>();
@@ -573,25 +575,85 @@ public class DumpDirectiveTest {
         
         Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
         expectedDumpValue.put(Key.TYPE.toString(), Type.COLLECTION);       
-        List<Map<String, Object>> myCollectionexpectedDumpValue = new ArrayList<Map<String, Object>>(odds.size());
+        List<Map<String, Object>> myCollectionExpectedDumpValue = new ArrayList<Map<String, Object>>(odds.size());
         for ( int i : odds ) {
             Map<String, Object> itemDump = new HashMap<String, Object>();
             itemDump.put(Key.TYPE.toString(), Type.NUMBER);
             itemDump.put(Key.VALUE.toString(), i);
-            myCollectionexpectedDumpValue.add(itemDump);
+            myCollectionExpectedDumpValue.add(itemDump);
         }
-        expectedDumpValue.put(Key.VALUE.toString(), myCollectionexpectedDumpValue);
+        expectedDumpValue.put(Key.VALUE.toString(), myCollectionExpectedDumpValue);
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
         expectedDump.put(varName, expectedDumpValue);
         
         test(varName, dataModel, expectedDump); 
     }    
-    
+
     @Test
-    public void dumpHash() {
+    public void dumpCollectionModel() {
+
+        String varName = "oddNums";
+        Map<String, Object> dataModel = new HashMap<String, Object>();
         
-    }
+        Set<Integer> odds = new HashSet<Integer>();
+        for (int i=0; i <= 10; i++) {
+            if (i % 2 == 1) {
+                odds.add(i);
+            }
+        }
+        TemplateCollectionModel myCollection = new CollectionModel(odds, new BeansWrapper());
+        dataModel.put(varName, myCollection);
+        
+        Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
+        expectedDumpValue.put(Key.TYPE.toString(), Type.COLLECTION);       
+        List<Map<String, Object>> myCollectionExpectedDumpValue = new ArrayList<Map<String, Object>>(odds.size());
+        for ( int i : odds ) {
+            Map<String, Object> itemDump = new HashMap<String, Object>();
+            itemDump.put(Key.TYPE.toString(), Type.NUMBER);
+            itemDump.put(Key.VALUE.toString(), i);
+            myCollectionExpectedDumpValue.add(itemDump);
+        }
+        expectedDumpValue.put(Key.VALUE.toString(), myCollectionExpectedDumpValue);
+
+        Map<String, Object> expectedDump = new HashMap<String, Object>();
+        expectedDump.put(varName, expectedDumpValue);
+        
+        test(varName, dataModel, expectedDump); 
+    }  
+ 
+    @Test
+    public void dumpCollectionAndSequenceModel() {
+
+        String varName = "oddNums";
+        Map<String, Object> dataModel = new HashMap<String, Object>();
+        
+        Set<Integer> odds = new HashSet<Integer>();
+        for (int i=0; i <= 10; i++) {
+            if (i % 2 == 1) {
+                odds.add(i);
+            }
+        }
+        TemplateCollectionModel coll = new CollectionModel(odds, new BeansWrapper());
+        TemplateCollectionModel myCollection = new CollectionAndSequence(coll);
+        dataModel.put(varName, myCollection);
+        
+        Map<String, Object> expectedDumpValue = new HashMap<String, Object>();
+        expectedDumpValue.put(Key.TYPE.toString(), Type.SEQUENCE);       
+        List<Map<String, Object>> myCollectionExpectedDumpValue = new ArrayList<Map<String, Object>>(odds.size());
+        for ( int i : odds ) {
+            Map<String, Object> itemDump = new HashMap<String, Object>();
+            itemDump.put(Key.TYPE.toString(), Type.NUMBER);
+            itemDump.put(Key.VALUE.toString(), i);
+            myCollectionExpectedDumpValue.add(itemDump);
+        }
+        expectedDumpValue.put(Key.VALUE.toString(), myCollectionExpectedDumpValue);
+
+        Map<String, Object> expectedDump = new HashMap<String, Object>();
+        expectedDump.put(varName, expectedDumpValue);
+        
+        test(varName, dataModel, expectedDump); 
+    }  
 
     @Test
     public void dumpStringToStringMap() {
@@ -972,6 +1034,7 @@ public class DumpDirectiveTest {
         private int id;
         private String middleName;
         private List<String> favoriteColors;
+        // private Map<String, String> degrees;
         private Employee supervisor;
         private float salary;
         
@@ -1004,6 +1067,10 @@ public class DumpDirectiveTest {
                 favoriteColors.add(color);
             }
         }
+        
+//        void setDegrees(Map<String, String> degrees) {
+//            this.degrees = degrees;
+//        }
 
         float getSalary() {
             return salary;
@@ -1052,8 +1119,20 @@ public class DumpDirectiveTest {
             return supervisor;
         }
         
+        public Employee boss() {
+            return supervisor;
+        }
+        
         public List<String> getFavoriteColors() {
             return favoriteColors;
+        }
+        
+//        public Map<String, String> getDegrees() {
+//            return degrees;
+//        }
+        
+        public String familyName() {
+            return lastName;
         }
     }
     
@@ -1066,6 +1145,11 @@ public class DumpDirectiveTest {
         jdoe.setFavoriteColors("blue", "green");
         jdoe.setSalary(65000);
 
+//        Map<String, String> degrees = new HashMap<String, String>();
+//        degrees.put("BA", "Mathematics");
+//        degrees.put("MS", "Computer Science");
+//        jdoe.setDegrees(degrees);
+        
         c.clear();
         c.set(1975, Calendar.OCTOBER, 25);
         c = DateUtils.truncate(c, Calendar.DATE);
@@ -1080,6 +1164,10 @@ public class DumpDirectiveTest {
     private Map<String, Object> getJohnDoeExpectedDump(int exposureLevel) {
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
+
+        Map<String, Object> supervisorExpectedDump = new HashMap<String, Object>();
+        supervisorExpectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
+        supervisorExpectedDump.put(Key.VALUE.toString(), getJaneSmithExpectedDump(exposureLevel));
         
         // Properties
         SortedMap<String, Object> propertiesExpectedDump = new TreeMap<String, Object>();
@@ -1111,18 +1199,15 @@ public class DumpDirectiveTest {
             propertiesExpectedDump.put("nickname", nicknameExpectedDump);
     
             Map<String, Object> middleNameExpectedDump = new HashMap<String, Object>();
-            middleNameExpectedDump.put(Key.VALUE.toString(), Value.NULL);
+            middleNameExpectedDump.put(Key.VALUE.toString(), Value.NULL.toString());
             propertiesExpectedDump.put("middleName", middleNameExpectedDump);
             
             Map<String, Object> marriedExpectedDump = new HashMap<String, Object>();
             marriedExpectedDump.put(Key.TYPE.toString(), Type.BOOLEAN);
             marriedExpectedDump.put(Key.VALUE.toString(), true);
             propertiesExpectedDump.put("married", marriedExpectedDump);
-    
-            Map<String, Object> supervisorExpectedDump = new HashMap<String, Object>();
-            supervisorExpectedDump.put(Key.TYPE.toString(), "freemarker.ext.dump.DumpDirectiveTest$Employee");
+                 
 
-            supervisorExpectedDump.put(Key.VALUE.toString(), getJaneSmithExpectedDump(exposureLevel));               
             propertiesExpectedDump.put("supervisor", supervisorExpectedDump);    
             
             Map<String, Object> favoriteColorsExpectedDump = new HashMap<String, Object>(); 
@@ -1138,32 +1223,70 @@ public class DumpDirectiveTest {
             favoriteColorListExpectedDump.add(color2ExpectedDump);
             favoriteColorsExpectedDump.put(Key.VALUE.toString(), favoriteColorListExpectedDump);        
             propertiesExpectedDump.put("favoriteColors", favoriteColorsExpectedDump);
+
+// This test fails, don't know why
+//            Map<String, Object> degreesExpectedDump = new HashMap<String, Object>();
+//            degreesExpectedDump.put(Key.TYPE.toString(), Type.HASH);
+//            Map<String, Map<String, Object>> degreeMapExpectedDump = new HashMap<String, Map<String, Object>>();
+//            Map<String, Object> degree1ExpectedDump = new HashMap<String, Object>();
+//            degree1ExpectedDump.put(Key.TYPE.toString(), Type.STRING);
+//            degree1ExpectedDump.put(Key.VALUE.toString(), "Mathematics");
+//            degreeMapExpectedDump.put("BA", degree1ExpectedDump);
+//            Map<String, Object> degree2ExpectedDump = new HashMap<String, Object>();
+//            degree2ExpectedDump.put(Key.TYPE.toString(), Type.STRING);
+//            degree2ExpectedDump.put(Key.VALUE.toString(), "Computer Science");
+//            degreeMapExpectedDump.put("MS", degree2ExpectedDump);
+//            degreesExpectedDump.put(Key.VALUE.toString(), degreeMapExpectedDump);
+//            propertiesExpectedDump.put("degrees", degreesExpectedDump);
+            
         }        
         
         expectedDump.put(Key.PROPERTIES.toString(), propertiesExpectedDump);
         
         // Methods       
-        expectedDump.put(Key.METHODS.toString(), getEmployeeMethodsExpectedDump(exposureLevel)); 
+        SortedMap<String, Object> methodDump = getEmployeeMethodsExpectedDump(exposureLevel, "Doe");
+        if ( ! methodDump.isEmpty()) {
+            methodDump.put("boss()", supervisorExpectedDump);
+        }
+        expectedDump.put(Key.METHODS.toString(), methodDump);
         
         return expectedDump;
     }
     
-    private List<String> getEmployeeMethodsExpectedDump(int exposureLevel) {
+    private SortedMap<String, Object> getEmployeeMethodsExpectedDump(int exposureLevel, String familyName) {
         
-        List<String> expectedDump = new ArrayList<String>();
+        SortedMap<String, Object> expectedDump = new TreeMap<String, Object>();
+        
         if (exposureLevel <= BeansWrapper.EXPOSE_SAFE) {
-            expectedDump.add("getEmployeeCount");
-            expectedDump.add("getName(String)");
-            expectedDump.add("setFavoriteColors(Strings)");
-            expectedDump.add("setNickname(String)");
+
+            Map<String, Object> nameExpectedDump = new HashMap<String, Object>();
+            nameExpectedDump.put(Key.TYPE.toString(), "String");
+            expectedDump.put("getName(String)", nameExpectedDump);
+            
+            expectedDump.put("setFavoriteColors(Strings)", Collections.emptyMap());
+            
+            expectedDump.put("setNickname(String)", Collections.emptyMap());
+            
+            Map<String, Object> familyNameExpectedDump = new HashMap<String, Object>();
+            familyNameExpectedDump.put(Key.TYPE.toString(), Type.STRING);
+            familyNameExpectedDump.put(Key.VALUE.toString(), familyName);
+            expectedDump.put("familyName()", familyNameExpectedDump);
+
+            Map<String, Object> employeeCountExpectedDump = new HashMap<String, Object>();
+            employeeCountExpectedDump.put(Key.TYPE.toString(), Type.NUMBER);
+            employeeCountExpectedDump.put(Key.VALUE.toString(), Employee.getEmployeeCount());
+            expectedDump.put("getEmployeeCount()", employeeCountExpectedDump);
         }   
-        Collections.sort(expectedDump);
+
         return expectedDump;
     }
     
     private Map<String, Object> getJaneSmithExpectedDump(int exposureLevel) {
 
         Map<String, Object> expectedDump = new HashMap<String, Object>();
+
+        Map<String, Object> supervisorExpectedDump = new HashMap<String, Object>();
+        supervisorExpectedDump.put(Key.VALUE.toString(), Value.NULL.toString());
         
         SortedMap<String, Object> propertiesExpectedDump = new TreeMap<String, Object>();
         
@@ -1195,7 +1318,7 @@ public class DumpDirectiveTest {
             propertiesExpectedDump.put("nickname", nicknameExpectedDump);
         
             Map<String, Object> middleNameExpectedDump = new HashMap<String, Object>();
-            middleNameExpectedDump.put(Key.VALUE.toString(), Value.NULL);
+            middleNameExpectedDump.put(Key.VALUE.toString(), Value.NULL.toString());
             propertiesExpectedDump.put("middleName", middleNameExpectedDump);
               
             Map<String, Object> marriedExpectedDump = new HashMap<String, Object>();
@@ -1203,8 +1326,6 @@ public class DumpDirectiveTest {
             marriedExpectedDump.put(Key.VALUE.toString(), true);
             propertiesExpectedDump.put("married", marriedExpectedDump);      
         
-            Map<String, Object> supervisorExpectedDump = new HashMap<String, Object>();
-            supervisorExpectedDump.put(Key.VALUE.toString(), Value.NULL);
             propertiesExpectedDump.put("supervisor", supervisorExpectedDump);             
     
             Map<String, Object> favoriteColorsExpectedDump = new HashMap<String, Object>(); 
@@ -1220,11 +1341,19 @@ public class DumpDirectiveTest {
             favoriteColorListExpectedDump.add(color2ExpectedDump);
             favoriteColorsExpectedDump.put(Key.VALUE.toString(), favoriteColorListExpectedDump);        
             propertiesExpectedDump.put("favoriteColors", favoriteColorsExpectedDump);
+            
+//            Map<String, Object> degreesExpectedDump = new HashMap<String, Object>();
+//            degreesExpectedDump.put(Key.VALUE.toString(), Value.NULL.toString());
+//            propertiesExpectedDump.put("degrees", degreesExpectedDump);            
         }
         expectedDump.put(Key.PROPERTIES.toString(), propertiesExpectedDump);
         
         // Methods
-        expectedDump.put(Key.METHODS.toString(), getEmployeeMethodsExpectedDump(exposureLevel)); 
+        SortedMap<String, Object> methodDump = getEmployeeMethodsExpectedDump(exposureLevel, "Smith");
+        if ( ! methodDump.isEmpty()) {
+            methodDump.put("boss()", supervisorExpectedDump);
+        }
+        expectedDump.put(Key.METHODS.toString(), methodDump);
         
         return expectedDump;
     }

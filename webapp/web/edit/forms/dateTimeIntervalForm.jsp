@@ -251,7 +251,7 @@
 %>
 
 <jsp:include page="${preForm}" />
-
+<h1>JSP form, must be removed for the 1.4!</h1>
 <h2>${titleVerb}&nbsp;date time interval for <%= subjectName %></h2>
 
 <form class="customForm" action="<c:url value="/edit/processRdfForm2.jsp"/>" >

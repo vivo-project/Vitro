@@ -4,56 +4,208 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.shared.Lock;
 
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.ModelChangePreprocessor;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.controller.ProcessRdfFormController.Utilities;
 
-public class ProcessRdfForm {
+/**
+ * The goal of this class is to provide processing from 
+ * an EditConfiguration and an EditSubmission to produce
+ * a set of additions and retractions.
+ * 
+ * When working with the default object property form or the 
+ * default data property from, the way to avoid having 
+ * any optional N3 is to originally configure the 
+ * configuration.setN3Optional() to be empty. 
+ */
+public class ProcessRdfForm {               
+       
+    private NewURIMaker newURIMaker;
+    private EditN3GeneratorVTwo populator;
     
-    private static Log log = LogFactory.getLog(ProcessRdfForm.class);    
+    private Map<String,String> urisForNewResources = null; 
     
     /**
-     * Execute any modelChangePreprocessors in the editConfiguration;
-     * 
+     * Construct the ProcessRdfForm object. 
      */
-    public static void preprocessModels(AdditionsAndRetractions changes, EditConfigurationVTwo editConfiguration, VitroRequest request){
+    public ProcessRdfForm( EditConfigurationVTwo config, NewURIMaker newURIMaker){
+        this.newURIMaker = newURIMaker;
+        this.populator = config.getN3Generator();
+    }
+    
+    /**
+     * This detects if this is an edit of an existing statement or an edit
+     * to create a new statement or set of statements. Then the correct
+     * method will be called to convert the EditConfiguration and EditSubmission
+     * into a set of additions and retractions.
+     * 
+     * This will handle data property editing, object property editing 
+     * and general editing.
+     * 
+     * The submission object will be modified to have its entityToReturnTo string
+     * substituted with the values from the processing.
+     * 
+     * @throws Exception May throw an exception if Required N3 does not
+     * parse correctly.
+     */
+    public AdditionsAndRetractions  process(
+            EditConfigurationVTwo configuration,
+            MultiValueEditSubmission submission) 
+    throws Exception{  
+        log.debug("configuration:\n" + configuration.toString());
+        log.debug("submission:\n" + submission.toString());
+        
+        applyEditSubmissionPreprocessors( configuration, submission );
+        
+        AdditionsAndRetractions changes;
+        if( configuration.isUpdate() ){
+            changes = editExistingStatements(configuration, submission);
+        } else {
+            changes = createNewStatements(configuration, submission );
+        }       
 
-        List<ModelChangePreprocessor> modelChangePreprocessors = editConfiguration.getModelChangePreprocessors();
-        if ( modelChangePreprocessors != null ) {
-            for ( ModelChangePreprocessor pp : modelChangePreprocessors ) {
-                //these work by side effect
-                pp.preprocess( changes.getRetractions(), changes.getAdditions(), request );
-            }
-        }                   
-    }
-       
-    protected static AdditionsAndRetractions getMinimalChanges( AdditionsAndRetractions changes ){
-        //make a model with all the assertions and a model with all the 
-        //retractions, do a diff on those and then only add those to the jenaOntModel
-        Model allPossibleAssertions = changes.getAdditions();
-        Model allPossibleRetractions = changes.getRetractions();        
+        changes = getMinimalChanges(changes);      
+        logChanges( configuration, changes);        
         
-        //find the minimal change set
-        Model assertions = allPossibleAssertions.difference( allPossibleRetractions );    
-        Model retractions = allPossibleRetractions.difference( allPossibleAssertions );        
-        return new AdditionsAndRetractions(assertions,retractions);
+        return changes;
     }
+    
+    /** 
+     * Processes an EditConfiguration for to create a new statement or a 
+     * set of new statements.
+     *  
+     * This will handle data property editing, object property editing 
+     * and general editing.
+     * 
+     * When working with the default object property form or the 
+     * default data property from, the way to avoid having 
+     * any optional N3 is to originally configure the 
+     * configuration.setN3Optional() to be empty. 
+     * 
+     * @throws Exception May throw an exception if the required N3 
+     * does not parse.
+     */          
+    private AdditionsAndRetractions createNewStatements(
+            EditConfigurationVTwo configuration, 
+            MultiValueEditSubmission submission) throws Exception {                
+        log.debug("in createNewStatements()" );        
         
+        //getN3Required and getN3Optional will return copies of the 
+        //N3 String Lists so that this code will not modify the originals.
+        List<String> requiredN3 = configuration.getN3Required();
+        List<String> optionalN3 = configuration.getN3Optional();                        
+        
+        /* substitute in the form values and existing values */
+        subInValuesToN3( configuration, submission, requiredN3, optionalN3, null , null);
+                   
+        /* parse N3 to RDF Models, No retractions since all of the statements are new. */         
+        return parseN3ToChange(requiredN3, optionalN3, null, null);        
+    }
+
+    /* for a list of N3 strings, substitute in the subject, predicate and object URIs 
+     * from the EditConfiguration. */
+    protected void substituteInSubPredObjURIs(
+            EditConfigurationVTwo configuration,
+            List<String>... n3StrLists){                
+        Map<String, String> valueMap = getSubPedObjVarMap(configuration);
+        for (List<String> n3s : n3StrLists) {
+            populator.subInUris(valueMap, n3s);
+        }
+    }
+
+    /**
+     * Process an EditConfiguration to edit a set of existing statements.
+     * 
+     * This will handle data property editing, object property editing and
+     * general editing.
+     * 
+     * No longer checking if field has changed, because assertions and
+     * retractions are mutually diff'ed before statements are added to or
+     * removed from the model. The explicit change check can cause problems in
+     * more complex setups, like the automatic form building in DataStaR.
+     */
+    protected AdditionsAndRetractions editExistingStatements(
+            EditConfigurationVTwo editConfig,
+            MultiValueEditSubmission submission) throws Exception {
+
+        log.debug("editing an existing resource: " + editConfig.getObject() );        
+
+        //getN3Required and getN3Optional will return copies of the 
+        //N3 String Lists so that this code will not modify the originals.
+        List<String> N3RequiredAssert = editConfig.getN3Required();        
+        List<String> N3OptionalAssert = editConfig.getN3Optional();
+        List<String> N3RequiredRetract = editConfig.getN3Required();        
+        List<String> N3OptionalRetract = editConfig.getN3Optional();
+
+        subInValuesToN3(editConfig, submission, 
+                N3RequiredAssert, N3OptionalAssert, 
+                N3RequiredRetract, N3OptionalRetract);
+                                  
+        return parseN3ToChange( 
+                N3RequiredAssert,N3OptionalAssert, 
+                N3RequiredRetract, N3OptionalRetract);        
+    }    
+    
+    @SuppressWarnings("unchecked")
+    protected void subInValuesToN3(
+            EditConfigurationVTwo editConfig, MultiValueEditSubmission submission, 
+            List<String> requiredAsserts, List<String> optionalAsserts,
+            List<String> requiredRetracts, List<String> optionalRetracts ) throws InsertException{
+        
+        //need to substitute into the return to URL becase it may need new resource URIs
+        List<String> URLToReturnTo = Arrays.asList(submission.getEntityToReturnTo());
+                
+        /* ********** Form submission URIs ********* */
+        substituteInMultiURIs(submission.getUrisFromForm(), requiredAsserts, optionalAsserts, URLToReturnTo);
+        logSubstitue( "Added form URIs", requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts);
+        //Retractions does NOT get values from form.
+        
+        /* ******** Form submission Literals *********** */
+        substituteInMultiLiterals( submission.getLiteralsFromForm(), requiredAsserts, optionalAsserts, URLToReturnTo);
+        logSubstitue( "Added form Literals", requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts);
+        //Retractions does NOT get values from form.                               
+        
+        /* *********** Add subject, object and predicate ******** */
+        substituteInSubPredObjURIs(editConfig, requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts, URLToReturnTo);
+        logSubstitue( "Added sub, pred and obj URIs", requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts);
+        
+        /* ********* Existing URIs and Literals ********** */
+        substituteInMultiURIs(editConfig.getUrisInScope(), 
+                requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts, URLToReturnTo);
+        logSubstitue( "Added existing URIs", requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts);
+        
+        substituteInMultiLiterals(editConfig.getLiteralsInScope(), 
+                requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts, URLToReturnTo);
+        logSubstitue( "Added existing Literals", requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts);
+        //Both Assertions and Retractions get existing values.
+        
+        /* ************  Edits may need new resources *********** */
+        urisForNewResources = URIsForNewRsources(editConfig, newURIMaker);
+        substituteInURIs( urisForNewResources, requiredAsserts, optionalAsserts, URLToReturnTo);
+        logSubstitue( "Added URIs for new Resources", requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts);
+        // Only Assertions get new resources.       
+        
+        submission.setEntityToReturnTo(URLToReturnTo.get(0));
+    }
+
+    //TODO: maybe move this to utils or contorller?
     public static AdditionsAndRetractions addDependentDeletes( AdditionsAndRetractions changes, Model queryModel){
         //Add retractions for dependent resource delete if that is configured and 
         //if there are any dependent resources.                     
@@ -64,9 +216,11 @@ public class ProcessRdfForm {
         changes.getRetractions().add(depResRetractions);        
         return changes; 
     }
-    
-    
-    public static void applyChangesToWriteModel(AdditionsAndRetractions changes, OntModel queryModel, OntModel writeModel, String editorUri) {                             
+       
+    //TODO: move this to utils or controller?
+    public static void applyChangesToWriteModel(
+            AdditionsAndRetractions changes, 
+            OntModel queryModel, OntModel writeModel, String editorUri) {                             
         //side effect: modify the write model with the changes      
         Lock lock = null;
         try{
@@ -82,198 +236,221 @@ public class ProcessRdfForm {
             lock.leaveCriticalSection();
         }          
     }
-
-
-    @SuppressWarnings("static-access")
-    public static AdditionsAndRetractions createNewResource(EditConfigurationVTwo editConfiguration , MultiValueEditSubmission submission){
-        List<String> errorMessages = new ArrayList<String>();
         
-        EditN3GeneratorVTwo n3Subber = editConfiguration.getN3Generator();
+    protected AdditionsAndRetractions parseN3ToChange( 
+            List<String> requiredAdds, List<String> optionalAdds,
+            List<String> requiredDels, List<String> optionalDels) throws Exception{
         
-        if(log.isDebugEnabled()){
-            log.debug("creating a new relation " + editConfiguration.getPredicateUri());
+        List<Model> adds = parseN3ToRDF(requiredAdds, REQUIRED);
+        adds.addAll( parseN3ToRDF(optionalAdds, OPTIONAL));
+        
+        List<Model> retracts = new ArrayList<Model>();
+        if( requiredDels != null && optionalDels != null ){
+            retracts.addAll( parseN3ToRDF(requiredDels, REQUIRED) );
+            retracts.addAll( parseN3ToRDF(optionalDels, OPTIONAL) );
         }
         
-        //handle creation of a new object property and maybe a resource
-        List<String> n3Required = editConfiguration.getN3Required();
-        List<String> n3Optional = editConfiguration.getN3Optional();
-        
-        /* ********** URIs and Literals on Form/Parameters *********** */
-        //sub in resource uris off form
-        n3Required = n3Subber.subInMultiUris(submission.getUrisFromForm(), n3Required);
-        n3Optional = n3Subber.subInMultiUris(submission.getUrisFromForm(), n3Optional);      
-        if(log.isDebugEnabled()) {
-            logRequiredOpt("substituted in URIs  off from ",n3Required,n3Optional);
-        }
-        
-        //sub in literals from form
-        n3Required = n3Subber.subInMultiLiterals(submission.getLiteralsFromForm(), n3Required);
-        n3Optional = n3Subber.subInMultiLiterals(submission.getLiteralsFromForm(), n3Optional);
-        if(log.isDebugEnabled()) {
-            logRequiredOpt("substituted in literals off from ",n3Required,n3Optional);
-        }
-        
-        /* ****************** URIs and Literals in Scope ************** */        
-        n3Required = n3Subber.subInMultiUris( editConfiguration.getUrisInScope(), n3Required);
-        n3Optional = n3Subber.subInMultiUris( editConfiguration.getUrisInScope(), n3Optional);
-        if(log.isDebugEnabled()) {
-            logRequiredOpt("substituted in URIs from scope ",n3Required,n3Optional);
-        }
-        
-        n3Required = n3Subber.subInMultiLiterals( editConfiguration.getLiteralsInScope(), n3Required);
-        n3Optional = n3Subber.subInMultiLiterals( editConfiguration.getLiteralsInScope(), n3Optional);
-        if(log.isDebugEnabled()) {
-            logRequiredOpt("substituted in Literals from scope ",n3Required,n3Optional);
-        }
-        
-        //deal with required N3
-        List<Model> requiredNewModels = new ArrayList<Model>();
-        for(String n3 : n3Required){
-            try{
-                Model model = ModelFactory.createDefaultModel();
-                StringReader reader = new StringReader(n3);
-                model.read(reader, "", "N3");
-                requiredNewModels.add(model);
-            } catch(Throwable t){
-                errorMessages.add("error processing required n3 string \n" + t.getMessage() + '\n' + "n3: \n" + n3);
-            }
-        }
-        
-        if(!errorMessages.isEmpty()){
-            String error = "problems processing required n3: \n";
-            for(String errorMsg: errorMessages){
-                error += errorMsg + '\n';
-            }
-            if(log.isDebugEnabled()){
-                log.debug(error);
-            }        
-        }
-        List<Model> requiredAssertions = requiredNewModels;        
-        
-        //deal with optional N3
-        List<Model> optionalNewModels = new ArrayList<Model>();
-        for(String n3 : n3Optional){
-            try{
-                Model model = ModelFactory.createDefaultModel();
-                StringReader reader = new StringReader(n3);
-                model.read(reader, "", "N3");
-                optionalNewModels.add(model);
-            }catch(Throwable t){
-                //if an optional N3 block fails to parse it will be ignored
-                //this is what is meant by optional.
-            }
-        }
-        requiredAssertions.addAll( optionalNewModels );
-        
-        return getMinimalChanges(new AdditionsAndRetractions(requiredAssertions, Collections.<Model>emptyList()));
-    }
-
-    @SuppressWarnings("static-access")
-    public static AdditionsAndRetractions editExistingResource(EditConfigurationVTwo editConfiguration, MultiValueEditSubmission submission) {
-        
-        Map<String, List<String>> fieldAssertions = Utilities.fieldsToAssertionMap(editConfiguration.getFields());
-        Map<String, List<String>> fieldRetractions = Utilities.fieldsToRetractionMap(editConfiguration.getFields());
-        EditN3GeneratorVTwo n3Subber = editConfiguration.getN3Generator();
-
-        /* ********** URIs and Literals on Form/Parameters *********** */
-        fieldAssertions = n3Subber.substituteIntoValues(submission.getUrisFromForm(), submission.getLiteralsFromForm(), fieldAssertions);
-        if(log.isDebugEnabled()) {
-            logAddRetract("substituted in literals from form",fieldAssertions,fieldRetractions);
-        }        
-        
-        /* ****************** URIs and Literals in Scope ************** */
-        fieldAssertions = n3Subber.substituteIntoValues(editConfiguration.getUrisInScope(), editConfiguration.getLiteralsInScope(), fieldAssertions );
-        fieldRetractions = n3Subber.substituteIntoValues(editConfiguration.getUrisInScope(), editConfiguration.getLiteralsInScope(), fieldRetractions);
-        if(log.isDebugEnabled()) {
-            logAddRetract("substituted in URIs and Literals from scope",fieldAssertions,fieldRetractions);
-        }        
-        
-        //do edits ever need new resources? (YES)
-/*        Map<String,String> varToNewResource = newToUriMap(editConfiguration.getNewResources(),wdf);
-        fieldAssertions = n3Subber.substituteIntoValues(varToNewResource, null, fieldAssertions);
-        if(log.isDebugEnabled()) {
-            Utilities.logAddRetract("substituted in URIs for new resources",fieldAssertions,fieldRetractions);
-        }
-        entToReturnTo = n3Subber.subInUris(varToNewResource,entToReturnTo);
-*/        
-        //editing an existing statement
-        List<Model> requiredFieldAssertions  = new ArrayList<Model>();
-        List<Model> requiredFieldRetractions = new ArrayList<Model>();
-        
-        List<String> errorMessages = new ArrayList<String>();
-        
-        for(String fieldName : fieldAssertions.keySet()){                   
-            List<String> assertions = fieldAssertions.get(fieldName);
-            List<String> retractions = fieldRetractions.get(fieldName);
-            
-            for(String n3: assertions){
-                try{
-                    Model model = ModelFactory.createDefaultModel();
-                    StringReader reader = new StringReader(n3);
-                    model.read(reader, "", "N3");
-                }catch(Throwable t){
-                    String errMsg = "error processing N3 assertion string from field " + fieldName + "\n" +
-                    t.getMessage() + '\n' + "n3: \n" + n3;
-                    errorMessages.add(errMsg);
-                    if(log.isDebugEnabled()){
-                        log.debug(errMsg);
-                    }
-                }
-            }
-            
-            for(String n3 : retractions){
-                try{
-                    Model model = ModelFactory.createDefaultModel();
-                    StringReader reader = new StringReader(n3);
-                    model.read(reader, "", "N3");
-                    requiredFieldRetractions.add(model);
-                }catch(Throwable t){
-                    String errMsg = "error processing N3 retraction string from field " + fieldName + "\n"+
-                    t.getMessage() + '\n' + "n3: \n" + n3;
-                    errorMessages.add(errMsg);
-                    if(log.isDebugEnabled()){
-                        log.debug(errMsg);
-                    }
-                }
-            }        
-        }
-        
-        return getMinimalChanges(new AdditionsAndRetractions(requiredFieldAssertions, requiredFieldRetractions));
+        return new AdditionsAndRetractions(adds,retracts);
     }
     
-
     /**
-     * This is intended to substitute vars from the EditConfiguration and
-     * EditSubmission into the URL to return to.
+     * Parse the n3Strings to a List of RDF Model objects.
+     * 
+     * @param n3Strings
+     * @param parseType if OPTIONAL, then don't throw exceptions on errors
+     * If REQUIRED, then throw exceptions on errors.
+     * @throws Exception 
      */
-    public static String substitueForURL(EditConfigurationVTwo configuration, MultiValueEditSubmission submission){
+    protected static List<Model> parseN3ToRDF(
+            List<String> n3Strings, N3ParseType parseType ) throws Exception {
+       List<String> errorMessages = new ArrayList<String>();
+       
+        List<Model> rdfModels = new ArrayList<Model>();
+        for(String n3 : n3Strings){
+            try{
+                Model model = ModelFactory.createDefaultModel();
+                StringReader reader = new StringReader(n3);
+                model.read(reader, "", "N3");
+                rdfModels.add( model );
+            }catch(Throwable t){
+                errorMessages.add(t.getMessage() + "\nN3: \n" + n3 + "\n");
+            }
+        }
         
-        List<String> entToReturnTo = new ArrayList<String>(1);
-        entToReturnTo.add(configuration.getEntityToReturnTo());
+        String errors = "";
+        for( String errorMsg : errorMessages){
+            errors += errorMsg + '\n';
+        }
         
-        EditN3GeneratorVTwo n3Subber = configuration.getN3Generator();
-        // Substitute in URIs from the submission
-        entToReturnTo = n3Subber.subInMultiUris(submission.getUrisFromForm(), entToReturnTo);                       
-        
-        // Substitute in URIs from the scope of the EditConfiguration                
-        entToReturnTo = n3Subber.subInMultiUris(configuration.getUrisInScope(), entToReturnTo);                
-        
-        //The problem is that subInURI will add < and > around URIs for the N3 syntax.
-        //for the URL to return to, replace < and > from URI additions.  
-        return entToReturnTo.get(0).trim().replaceAll("<","").replaceAll(">","");        
+       if( !errorMessages.isEmpty() ){
+           if( REQUIRED.equals(parseType)  ){        
+               throw new Exception("Errors processing required N3. The EditConfiguration should " +
+                    "be setup so that if a submission passes validation, there will not be errors " +
+                    "in the required N3.\n" +  errors );
+           }else if( OPTIONAL.equals(parseType) ){
+               log.debug("Some Optional N3 did not parse, if a optional N3 does not parse it " +
+                    "will be ignored.  This allows optional parts of a form submission to " +
+                    "remain unfilled out and then the optional N3 does not get values subsituted in from" +
+                    "the form submission values.  It may also be the case that there are unintentional " +
+                    "syntax errors the optional N3." );
+               log.debug( errors );                            
+           }
+       }
+              
+       return rdfModels;       
+    }  
+
+	/**
+	 * TODO: bdc34: what does this check? Why?
+	 */
+	public static boolean isGenerateModelFromField(
+	        String fieldName, 
+	        EditConfigurationVTwo configuration, MultiValueEditSubmission submission) {
+//		if(Utilities.isObjectProperty(configuration, vreq)) {
+//			return true;
+//		}
+//		if(Utilities.isDataProperty(configuration, vreq)) {
+//			if(Utilities.hasFieldChanged(fieldName, configuration, submission)) {
+//				return true;
+//			}
+//		}
+		return false;
+	}	
+		    
+    protected void logSubstitue(String msg, List<String> requiredAsserts,
+            List<String> optionalAsserts, List<String> requiredRetracts,
+            List<String> optionalRetracts) {
+        if( !log.isDebugEnabled() ) return;
+        log.debug(msg);
+        logSubstitueN3( msg, requiredAsserts, "required assertions");
+        logSubstitueN3( msg, optionalAsserts, "optional assertions");
+        logSubstitueN3( msg, requiredRetracts, "required retractions");
+        logSubstitueN3( msg, optionalRetracts, "optional retractions");        
     }
     
-    private static boolean logAddRetract(String msg, Map<String,List<String>>add, Map<String,List<String>>retract){
-        log.debug(msg);
-        if( add != null ) log.debug( "assertions: " + add.toString() );
-        if( retract != null ) log.debug( "retractions: " +  retract.toString() );
-        return true;
+    private void logSubstitueN3(String msg, List<String> n3, String label){
+        if( n3 == null || n3.size() == 0) return;        
+        String out = label + ":\n";
+        for( String str : n3 ){
+            out += "    " + str + "\n";
+        }                      
+        log.debug(out);
     }
-  
-    private static boolean logRequiredOpt(String msg, List<String>required, List<String>optional){
-        log.debug(msg);
-        if( required != null ) log.debug( "required: " + required.toString() );
-        if( optional != null ) log.debug( "optional: " +  optional.toString() );
-        return true;
-    }  
+    
+	private static Map<String, String> getSubPedObjVarMap(
+            EditConfigurationVTwo configuration) 
+    {
+        Map<String,String> varToValue = new HashMap<String,String>();
+        
+        String varNameForSub = configuration.getVarNameForSubject();
+        if( varNameForSub != null && ! varNameForSub.isEmpty()){            
+            varToValue.put( varNameForSub,configuration.getSubjectUri());                 
+        }else{
+            log.debug("no varNameForSubject found in configuration");
+        }
+        
+        String varNameForPred = configuration.getVarNameForPredicate();
+        if( varNameForPred != null && ! varNameForPred.isEmpty()){            
+            varToValue.put( varNameForPred,configuration.getPredicateUri());
+        }else{
+            log.debug("no varNameForPredicate found in configuration");
+        }
+        String varNameForObj = configuration.getVarNameForObject();
+        if( varNameForObj != null 
+        		&& ! varNameForObj.isEmpty()){            
+            varToValue.put( varNameForObj, configuration.getObject());
+        }else{
+            log.debug("no varNameForObject found in configuration");
+        }        
+        
+        return varToValue;        
+    }
+    
+	protected static AdditionsAndRetractions getMinimalChanges( AdditionsAndRetractions changes ){
+        //make a model with all the assertions and a model with all the 
+        //retractions, do a diff on those and then only add those to the jenaOntModel
+        Model allPossibleAssertions = changes.getAdditions();
+        Model allPossibleRetractions = changes.getRetractions();        
+        
+        //find the minimal change set
+        Model assertions = allPossibleAssertions.difference( allPossibleRetractions );    
+        Model retractions = allPossibleRetractions.difference( allPossibleAssertions );        
+        return new AdditionsAndRetractions(assertions,retractions);
+    }
+
+   private void applyEditSubmissionPreprocessors(
+            EditConfigurationVTwo configuration, MultiValueEditSubmission submission) {
+        List<EditSubmissionVTwoPreprocessor> preprocessors = configuration.getEditSubmissionPreprocessors();
+        if(preprocessors != null) {
+            for(EditSubmissionVTwoPreprocessor p: preprocessors) {
+                p.preprocess(submission);
+            }
+        }
+    }
+
+   
+   //Note this would require more analysis in context of multiple URIs
+   public Map<String,String> URIsForNewRsources(
+           EditConfigurationVTwo configuration, NewURIMaker newURIMaker) 
+           throws InsertException {       
+       Map<String,String> newResources = configuration.getNewResources();
+       
+       HashMap<String,String> varToNewURIs = new HashMap<String,String>();       
+       for (String key : newResources.keySet()) {
+           String prefix = newResources.get(key);
+           String uri = newURIMaker.getUnusedNewURI(prefix);                        
+           varToNewURIs.put(key, uri);  
+       }   
+       log.debug( "URIs for new resources: " + varToNewURIs );
+       return varToNewURIs;
+   }
+
+   private static void logChanges(EditConfigurationVTwo configuration,
+           AdditionsAndRetractions changes) {
+       if( log.isDebugEnabled() )
+           log.debug("Changes for edit " + configuration.getEditKey() + 
+                   "\n" + changes.toString());
+   }
+   
+   private static N3ParseType OPTIONAL = N3ParseType.OPTIONAL;
+   private static N3ParseType REQUIRED = N3ParseType.REQUIRED;
+   
+   private enum N3ParseType {
+       /* indicates that the n3 is optional and that a parse error should not 
+        * throw an exception */         
+       OPTIONAL,  
+       /* indicates that the N3 is required and that a parse error should 
+        * stop the processing and throw an exception. */
+       REQUIRED 
+   };
+
+   private void substituteInMultiLiterals(
+           Map<String, List<Literal>> literalsFromForm,
+           List<String> ... n3StrLists) {
+       
+       for( List<String> n3s : n3StrLists){
+           populator.subInMultiLiterals(literalsFromForm, n3s);
+       }
+   }
+
+   private  void substituteInMultiURIs(
+           Map<String, List<String>> multiUris, List<String> ... n3StrLists) {
+       
+       for( List<String> n3s : n3StrLists){
+           if( n3s != null ){
+               populator.subInMultiUris(multiUris, n3s);
+           }
+       }                
+   }
+
+   private void substituteInURIs(
+           Map<String, String> uris, List<String> ... n3StrLists) {        
+       for( List<String> n3s : n3StrLists){
+           if( n3s != null ){
+               populator.subInUris(uris, n3s);
+           }
+       }                
+   }    
+      
+   private static Log log = LogFactory.getLog(ProcessRdfForm.class);
 }

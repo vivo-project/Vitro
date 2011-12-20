@@ -7,7 +7,7 @@ import java.util.Collection;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndividual;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasProfile;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -29,7 +29,7 @@ public class User extends BaseTemplateModel {
     
 	private String figureAssociatedProfileUrl() {
         IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(vreq);
-		Collection<String> uris = HasAssociatedIndividual.getIndividualUris(ids);
+		Collection<String> uris = HasProfile.getProfileUris(ids);
         if (uris.isEmpty()) {
         	return "";
         }
@@ -42,6 +42,8 @@ public class User extends BaseTemplateModel {
         
         return url;
 	}
+	
+	/* Template properties */
 
 	public boolean isLoggedIn() {
         return currentUser != null;

@@ -45,6 +45,13 @@ public class UserAccountsCreatePasswordPage extends
 	}
 
 	@Override
+	protected String alreadyLoggedInMessage(String currentUserEmail) {
+		return "You may not activate the account for " + userEmail
+				+ " while you are logged in as " + currentUserEmail
+				+ ". Please log out and try again.";
+	}
+
+	@Override
 	protected String passwordChangeNotPendingMessage() {
 		return "The account for " + userEmail + " has already been activated.";
 	}

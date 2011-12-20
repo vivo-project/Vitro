@@ -8,6 +8,7 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,6 +37,9 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
  * TODO
  */
 public class UserAccountsDaoJenaTest extends AbstractTestClass {
+
+	private static final Set<String> EMPTY = Collections.<String> emptySet();
+
 	/**
 	 * Where the model statements are stored for this test.
 	 */
@@ -47,15 +51,26 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 	private static final String URI_NO_SUCH_USER = NS_MINE + "bogusUser";
 
 	private static final String EMAIL_USER1 = "email@able.edu";
-	private static final String EMAIL_NO_SUCH_USER = NS_MINE + "bogus@email.com";
-	
+	private static final String EMAIL_NO_SUCH_USER = NS_MINE
+			+ "bogus@email.com";
+
 	private static final String URI_ROLE1 = NS_MINE + "role1";
 	private static final String URI_ROLE2 = NS_MINE + "role2";
 	private static final String URI_ROLE3 = NS_MINE + "role3";
 
+	private static final String URI_PROFILE1 = NS_MINE + "profile1";
+	private static final String URI_PROFILE2 = NS_MINE + "profile2";
+
 	private OntModel ontModel;
 	private WebappDaoFactoryJena wadf;
 	private UserAccountsDaoJena dao;
+
+	private UserAccount user1;
+	private UserAccount userNew;
+
+	private UserAccount userA;
+	private UserAccount userB;
+	private UserAccount userC;
 
 	@Before
 	public void setup() throws IOException {
@@ -73,24 +88,34 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		dao = new UserAccountsDaoJena(wadf);
 	}
 
+	@Before
+	public void createUserAccountValues() {
+		user1 = userAccount(URI_USER1, "email@able.edu", "Zack", "Roberts",
+				"garbage", "", 0L, false, 5, 12345678L, Status.ACTIVE, "user1",
+				false, collection(URI_ROLE1), false, EMPTY);
+		userNew = userAccount("", "email@here", "Joe", "Blow", "XXXX", "YYYY",
+				0L, false, 1, 0L, Status.ACTIVE, "jblow", false, EMPTY, false,
+				EMPTY);
+
+		userA = userAccount("", "aahern@here", "Alf", "Ahern", "XXXX", "YYYY",
+				0L, false, 1, 0L, Status.ACTIVE, "aahern", false, EMPTY, false,
+				collection(URI_PROFILE1));
+		userB = userAccount("", "email@here", "Betty", "Boop", "XXXX", "YYYY",
+				0L, false, 1, 0L, Status.ACTIVE, "bboop", false, EMPTY, false,
+				collection(URI_PROFILE1, URI_PROFILE2));
+		userC = userAccount("", "ccallas@here", "Charlie", "Callas", "XXXX",
+				"YYYY", 0L, false, 1, 0L, Status.ACTIVE, "ccallas", false,
+				EMPTY, false, collection(URI_PROFILE2));
+	}
+
+	// ----------------------------------------------------------------------
+	// Tests for UserAccount methods.
+	// ----------------------------------------------------------------------
+
 	@Test
 	public void getUserAccountByUriSuccess() {
 		UserAccount u = dao.getUserAccountByUri(URI_USER1);
-		assertEquals("uri", URI_USER1, u.getUri());
-		assertEquals("email", "email@able.edu", u.getEmailAddress());
-		assertEquals("firstName", "Zack", u.getFirstName());
-		assertEquals("lastName", "Roberts", u.getLastName());
-		assertEquals("md5Password", "garbage", u.getMd5Password());
-		assertEquals("oldPassword", "", u.getOldPassword());
-		assertEquals("linkExpires", 0L, u.getPasswordLinkExpires());
-		assertEquals("changeRequired", false, u.isPasswordChangeRequired());
-		assertEquals("externalOnly", false, u.isExternalAuthOnly());
-		assertEquals("loginCount", 5, u.getLoginCount());
-		assertEquals("loginTime", 12345678L, u.getLastLoginTime());
-		assertEquals("status", Status.ACTIVE, u.getStatus());
-		assertEquals("externalAuthId", "user1", u.getExternalAuthId());
-		assertEquals("permissionSetUris", Collections.singleton(URI_ROLE1),
-				u.getPermissionSetUris());
+		assertEqualAccounts(user1, u);
 	}
 
 	@Test
@@ -104,11 +129,11 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		UserAccount u = dao.getUserAccountByUri("bogusUri");
 		assertNull("null result", u);
 	}
-	
+
 	@Test
 	public void getUserAccountByUriWrongType() {
 		UserAccount u = dao.getUserAccountByUri(URI_ROLE1);
-		//System.out.println(u);
+		// System.out.println(u);
 		assertNull("null result", u);
 	}
 
@@ -132,40 +157,10 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 
 	@Test
 	public void insertUserAccountSuccess() {
-		UserAccount in = new UserAccount();
-		in.setUri("");
-		in.setEmailAddress("my@email.address");
-		in.setFirstName("Joe");
-		in.setLastName("Bagadonuts");
-		in.setMd5Password("passwordHash");
-		in.setOldPassword("oldHash");
-		in.setPasswordLinkExpires(999966663333L);
-		in.setPasswordChangeRequired(true);
-		in.setExternalAuthOnly(true);
-		in.setLoginCount(42);
-		in.setLastLoginTime(8877665544332211L);
-		in.setStatus(Status.INACTIVE);
-		in.setExternalAuthId("newUser");
-		in.setPermissionSetUris(buildSet(URI_ROLE1, URI_ROLE2));
-
-		String newUri = dao.insertUserAccount(in);
-
-		UserAccount u = dao.getUserAccountByUri(newUri);
-		assertEquals("uri", newUri, u.getUri());
-		assertEquals("email", "my@email.address", u.getEmailAddress());
-		assertEquals("firstName", "Joe", u.getFirstName());
-		assertEquals("lastName", "Bagadonuts", u.getLastName());
-		assertEquals("md5Password", "passwordHash", u.getMd5Password());
-		assertEquals("oldPassword", "oldHash", u.getOldPassword());
-		assertEquals("linkExpires", 999966663333L, u.getPasswordLinkExpires());
-		assertEquals("changeRequired", true, u.isPasswordChangeRequired());
-		assertEquals("externalOnly", true, u.isExternalAuthOnly());
-		assertEquals("loginCount", 42, u.getLoginCount());
-		assertEquals("lastLoginTime", 8877665544332211L, u.getLastLoginTime());
-		assertEquals("status", Status.INACTIVE, u.getStatus());
-		assertEquals("externalAuthId", "newUser", u.getExternalAuthId());
-		assertEquals("permissionSetUris", buildSet(URI_ROLE1, URI_ROLE2),
-				u.getPermissionSetUris());
+		UserAccount raw = userAccount(userNew);
+		String uri = dao.insertUserAccount(raw);
+		UserAccount processed = dao.getUserAccountByUri(uri);
+		assertEqualAccounts(raw, processed);
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -183,40 +178,15 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 
 	@Test
 	public void updateUserAccountSuccess() {
-		UserAccount up = new UserAccount();
-		up.setUri(URI_USER1);
-		up.setEmailAddress("updatedEmail@able.edu");
-		up.setFirstName("Ezekiel");
-		up.setLastName("Roberts");
-		up.setMd5Password("differentHash");
-		up.setOldPassword("oldHash");
-		up.setPasswordLinkExpires(1L);
-		up.setPasswordChangeRequired(false);
-		up.setExternalAuthOnly(false);
-		up.setLoginCount(43);
-		up.setLastLoginTime(1020304050607080L);
-		up.setStatus(Status.ACTIVE);
-		up.setExternalAuthId("updatedUser1");
-		up.setPermissionSetUris(buildSet(URI_ROLE1, URI_ROLE3));
+		UserAccount orig = userAccount(URI_USER1, "updatedEmail@able.edu",
+				"Ezekiel", "Roberts", "differentHash", "oldHash", 1L, false,
+				43, 1020304050607080L, Status.ACTIVE, "updatedUser1", false,
+				collection(URI_ROLE1, URI_ROLE3), false, EMPTY);
 
-		dao.updateUserAccount(up);
+		dao.updateUserAccount(orig);
 
-		UserAccount u = dao.getUserAccountByUri(URI_USER1);
-		assertEquals("uri", URI_USER1, u.getUri());
-		assertEquals("email", "updatedEmail@able.edu", u.getEmailAddress());
-		assertEquals("firstName", "Ezekiel", u.getFirstName());
-		assertEquals("lastName", "Roberts", u.getLastName());
-		assertEquals("md5Password", "differentHash", u.getMd5Password());
-		assertEquals("oldPassword", "oldHash", u.getOldPassword());
-		assertEquals("changeExpires", 1L, u.getPasswordLinkExpires());
-		assertEquals("changeRequired", false, u.isPasswordChangeRequired());
-		assertEquals("externalOnly", false, u.isExternalAuthOnly());
-		assertEquals("loginCount", 43, u.getLoginCount());
-		assertEquals("lastLoginTime", 1020304050607080L, u.getLastLoginTime());
-		assertEquals("status", Status.ACTIVE, u.getStatus());
-		assertEquals("externalAuthId", "updatedUser1", u.getExternalAuthId());
-		assertEquals("permissionSetUris", buildSet(URI_ROLE1, URI_ROLE3),
-				u.getPermissionSetUris());
+		UserAccount updated = dao.getUserAccountByUri(URI_USER1);
+		assertEqualAccounts(orig, updated);
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -259,6 +229,93 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 	}
 
 	@Test
+	public void insertUserAccountWithProxies() {
+		userNew.setProxiedIndividualUris(collection(
+				NS_MINE + "userNewProxyOne", NS_MINE + "userNewProxyTwo"));
+		String userUri = dao.insertUserAccount(userNew);
+
+		UserAccount inserted = dao.getUserAccountByUri(userUri);
+		assertEqualAccounts(userNew, inserted);
+	}
+
+	@Test
+	public void updateUserAccountWithProxies() {
+		UserAccount beforeAccount = dao.getUserAccountByUri(URI_USER1);
+		user1.setProxiedIndividualUris(collection(NS_MINE + "newProxyForUser1"));
+
+		dao.updateUserAccount(user1);
+
+		UserAccount updated = dao.getUserAccountByUri(URI_USER1);
+		assertEqualAccounts(user1, updated);
+	}
+
+	// ----------------------------------------------------------------------
+	// Tests for proxy-related methods
+	// ----------------------------------------------------------------------
+
+	@Test
+	public void getProxyEditorsFirst() {
+		String profileOne = NS_MINE + "userNewProxyOne";
+		String profileTwo = NS_MINE + "userNewProxyTwo";
+		userNew.setProxiedIndividualUris(collection(profileOne, profileTwo));
+
+		String userUri = dao.insertUserAccount(userNew);
+		UserAccount user = dao.getUserAccountByUri(userUri);
+
+		assertExpectedAccountUris("proxy for profile one",
+				Collections.singleton(user),
+				dao.getUserAccountsWhoProxyForPage(profileOne));
+	}
+
+	@Test
+	public void getProxyEditorsSecond() {
+		String profileOne = NS_MINE + "userNewProxyOne";
+		String profileTwo = NS_MINE + "userNewProxyTwo";
+		userNew.setProxiedIndividualUris(collection(profileOne, profileTwo));
+
+		String userUri = dao.insertUserAccount(userNew);
+		UserAccount user = dao.getUserAccountByUri(userUri);
+
+		assertExpectedAccountUris("proxy for profile two",
+				Collections.singleton(user),
+				dao.getUserAccountsWhoProxyForPage(profileTwo));
+	}
+
+	@Test
+	public void getProxyEditorsBogus() {
+		String profileOne = NS_MINE + "userNewProxyOne";
+		String profileTwo = NS_MINE + "userNewProxyTwo";
+		String bogusProfile = NS_MINE + "bogus";
+		userNew.setProxiedIndividualUris(collection(profileOne, profileTwo));
+
+		dao.insertUserAccount(userNew);
+
+		assertExpectedAccountUris("proxy for bogus profile",
+				Collections.<UserAccount> emptySet(),
+				dao.getUserAccountsWhoProxyForPage(bogusProfile));
+	}
+
+	@Test
+	public void setProxyEditorsOnProfile() {
+		String uriA = dao.insertUserAccount(userA);
+		String uriB = dao.insertUserAccount(userB);
+		String uriC = dao.insertUserAccount(userC);
+
+		dao.setProxyAccountsOnProfile(URI_PROFILE1, collection(uriB, uriC));
+
+		assertExpectedProxies("userA", collection(),
+				dao.getUserAccountByUri(uriA).getProxiedIndividualUris());
+		assertExpectedProxies("userB", collection(URI_PROFILE1, URI_PROFILE2),
+				dao.getUserAccountByUri(uriB).getProxiedIndividualUris());
+		assertExpectedProxies("userC", collection(URI_PROFILE1, URI_PROFILE2),
+				dao.getUserAccountByUri(uriC).getProxiedIndividualUris());
+	}
+
+	// ----------------------------------------------------------------------
+	// Tests for PermissionSet methods
+	// ----------------------------------------------------------------------
+
+	@Test
 	public void getPermissionSetByUriSuccess() {
 		PermissionSet ps = dao.getPermissionSetByUri(URI_ROLE1);
 		assertEquals("uri", URI_ROLE1, ps.getUri());
@@ -285,7 +342,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		PermissionSet ps = dao.getPermissionSetByUri(URI_USER1);
 		assertNull("null result", ps);
 	}
-	
+
 	@Test
 	public void getAllPermissionSets() {
 		setLoggerLevel(JenaBaseDao.class, Level.DEBUG);
@@ -310,6 +367,85 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 	// helper methods
 	// ----------------------------------------------------------------------
 
+	private Collection<String> collection(String... args) {
+		return Arrays.asList(args);
+	}
+
+	private UserAccount userAccount(String uri, String emailAddress,
+			String firstName, String lastName, String md5Password,
+			String oldPassword, long passwordLinkExpires,
+			boolean passwordChangeRequired, int loginCount, long lastLoginTime,
+			Status status, String externalAuthId, boolean externalAuthOnly,
+			Collection<String> permissionSetUris, boolean rootUser,
+			Collection<String> proxiedIndividualUris) {
+		UserAccount ua = new UserAccount();
+		ua.setUri(uri);
+		ua.setEmailAddress(emailAddress);
+		ua.setFirstName(firstName);
+		ua.setLastName(lastName);
+		ua.setMd5Password(md5Password);
+		ua.setOldPassword(oldPassword);
+		ua.setPasswordLinkExpires(passwordLinkExpires);
+		ua.setPasswordChangeRequired(passwordChangeRequired);
+		ua.setLoginCount(loginCount);
+		ua.setLastLoginTime(lastLoginTime);
+		ua.setStatus(status);
+		ua.setExternalAuthId(externalAuthId);
+		ua.setExternalAuthOnly(externalAuthOnly);
+		ua.setPermissionSetUris(permissionSetUris);
+		ua.setRootUser(rootUser);
+		ua.setProxiedIndividualUris(proxiedIndividualUris);
+		return ua;
+	}
+
+	private UserAccount userAccount(UserAccount in) {
+		UserAccount out = new UserAccount();
+		out.setUri(in.getUri());
+		out.setEmailAddress(in.getEmailAddress());
+		out.setFirstName(in.getFirstName());
+		out.setLastName(in.getLastName());
+		out.setMd5Password(in.getMd5Password());
+		out.setOldPassword(in.getOldPassword());
+		out.setPasswordLinkExpires(in.getPasswordLinkExpires());
+		out.setPasswordChangeRequired(in.isPasswordChangeRequired());
+		out.setLoginCount(in.getLoginCount());
+		out.setLastLoginTime(in.getLastLoginTime());
+		out.setStatus(in.getStatus());
+		out.setExternalAuthId(in.getExternalAuthId());
+		out.setExternalAuthOnly(in.isExternalAuthOnly());
+		out.setPermissionSetUris(in.getPermissionSetUris());
+		out.setRootUser(in.isRootUser());
+		out.setProxiedIndividualUris(in.getProxiedIndividualUris());
+		return out;
+	}
+
+	private void assertEqualAccounts(UserAccount e, UserAccount a) {
+		if (!e.getUri().equals("")) {
+			assertEquals("uri", e.getUri(), a.getUri());
+		}
+		assertEquals("email", e.getEmailAddress(), a.getEmailAddress());
+		assertEquals("first name", e.getFirstName(), a.getFirstName());
+		assertEquals("last name", e.getLastName(), a.getLastName());
+		assertEquals("password", e.getMd5Password(), a.getMd5Password());
+		assertEquals("old password", e.getOldPassword(), a.getOldPassword());
+		assertEquals("link expires", e.getPasswordLinkExpires(),
+				a.getPasswordLinkExpires());
+		assertEquals("password change", e.isPasswordChangeRequired(),
+				a.isPasswordChangeRequired());
+		assertEquals("login count", e.getLoginCount(), a.getLoginCount());
+		assertEquals("last login", e.getLastLoginTime(), a.getLastLoginTime());
+		assertEquals("status", e.getStatus(), a.getStatus());
+		assertEquals("external ID", e.getExternalAuthId(),
+				a.getExternalAuthId());
+		assertEquals("external only", e.isExternalAuthOnly(),
+				a.isExternalAuthOnly());
+		assertEquals("permission sets", e.getPermissionSetUris(),
+				a.getPermissionSetUris());
+		assertEquals("root user", e.isRootUser(), a.isRootUser());
+		assertEquals("proxied URIs", e.getProxiedIndividualUris(),
+				a.getProxiedIndividualUris());
+	}
+
 	private void assertCorrectPermissionSets(Set<PermissionSet> expected,
 			Collection<PermissionSet> actual) {
 		Set<Map<String, Object>> expectedMaps = new HashSet<Map<String, Object>>();
@@ -333,12 +469,34 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		assertEquals("all permission sets", expectedMaps, actualMaps);
 	}
 
+	private void assertExpectedAccountUris(String label,
+			Set<UserAccount> expectedUserAccounts,
+			Collection<UserAccount> actualUserAccounts) {
+		Set<String> expectedUris = new HashSet<String>();
+		for (UserAccount ua : expectedUserAccounts) {
+			expectedUris.add(ua.getUri());
+		}
+
+		Set<String> actualUris = new HashSet<String>();
+		for (UserAccount ua : actualUserAccounts) {
+			actualUris.add(ua.getUri());
+		}
+
+		assertEqualSets(label, expectedUris, actualUris);
+	}
+
+	private void assertExpectedProxies(String label,
+			Collection<String> expected, Set<String> actual) {
+		Set<String> expectedSet = new HashSet<String>(expected);
+		assertEqualSets(label, expectedSet, actual);
+	}
+
 	@SuppressWarnings("unused")
 	private void dumpModelStatements() {
 		StmtIterator stmts = ontModel.listStatements();
 		while (stmts.hasNext()) {
 			Statement stmt = stmts.next();
-			//System.out.println(formatStatement(stmt));
+			// System.out.println(formatStatement(stmt));
 		}
 	}
 

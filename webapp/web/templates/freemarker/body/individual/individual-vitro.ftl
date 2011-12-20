@@ -25,28 +25,17 @@
         <header>
             <#if relatedSubject??>
                 <h2>${relatedSubject.relatingPredicateDomainPublic} for ${relatedSubject.name}</h2>
-                <p><a href="${relatedSubject.url}">&larr; return to ${relatedSubject.name}</a></p>                
+                <p><a href="${relatedSubject.url}" title="return to subject">&larr; return to ${relatedSubject.name}</a></p>                
             <#else>                
                 <h1 class="fn">
                     <#-- Label -->
                     <@p.label individual editable />
                         
                     <#--  Most-specific types -->
-                    <@p.mostSpecificTypes individual />
+                    <@p.mostSpecificTypes individual /><img id="uriIcon" title="${individual.uri}" class="middle" src="${urls.images}/individual/uriIcon.gif" alt="uri icon"/>
                 </h1>
             </#if>
         </header>
-        
-        <nav role="navigation">
-            <ul id ="individual-tools" role="list">
-                <li role="listitem"><img id="uriIcon" title="${individual.uri}" class="middle" src="${urls.images}/individual/uriIcon.gif" alt="uri icon"/></li>
-                
-                <#assign rdfUrl = individual.rdfUrl>
-                <#if rdfUrl??>
-                    <li role="listitem"><a title="View this individual in RDF format" class="icon-rdf" href="${rdfUrl}">RDF</a></li>
-                </#if>
-            </ul>
-        </nav>
                 
     <#if individualProductExtension??>
         ${individualProductExtension}
@@ -63,9 +52,18 @@
 <#-- Ontology properties -->
 <#include "individual-properties.ftl">
 
+<#assign rdfUrl = individual.rdfUrl>
+
+<#if rdfUrl??>
+    <script>
+        var individualRdfUrl = '${rdfUrl}';
+    </script>
+</#if>
+
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/individual/individual.css" />')}
 
 ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/jquery_plugins/qtip/jquery.qtip-1.0.0-rc3.min.js"></script>',
                   '<script type="text/javascript" src="${urls.base}/js/tiny_mce/tiny_mce.js"></script>')}
 
-${scripts.add('<script type="text/javascript" src="${urls.base}/js/imageUpload/imageUploadUtils.js"></script>')}
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/imageUpload/imageUploadUtils.js"></script>',
+              '<script type="text/javascript" src="${urls.base}/js/individual/individualUriRdf.js"></script>')}

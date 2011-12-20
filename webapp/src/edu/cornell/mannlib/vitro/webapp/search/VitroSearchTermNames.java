@@ -67,4 +67,16 @@ public class VitroSearchTermNames {
     /** adding phonetic field **/
     public static final String ALLTEXT_PHONETIC = "ALLTEXT_PHONETIC";
     public static final String NAME_PHONETIC = "NAME_PHONETIC";
+    
+    /** download url location for thumbnail */
+	public static final String THUMBNAIL_URL = "THUMBNAIL_URL";
+	
+	/** source institution url */
+	public static final String SITE_URL = "siteURL";
+	
+	/** source institution name */
+	public static final String SITE_NAME = "siteName";
+	
+	/** preferred title */
+	public static final String PREFERRED_TITLE = "PREFERRED_TITLE";
 }

@@ -14,7 +14,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -33,11 +32,9 @@ import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFormatter;
-import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -51,6 +48,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
+import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 
 
 /**
@@ -62,8 +60,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
  */
 public class SparqlQueryServlet extends BaseEditController {
     private static final Log log = LogFactory.getLog(SparqlQueryServlet.class.getName());
-
-    protected static final Syntax SYNTAX = Syntax.syntaxARQ;
     
     protected static HashMap<String,ResultSetFormat>formatSymbols = new HashMap<String,ResultSetFormat>();
     static{
@@ -204,7 +200,11 @@ public class SparqlQueryServlet extends BaseEditController {
 	}
 
     
-    private void executeQuery(HttpServletResponse response, String resultFormatParam, String rdfResultFormatParam, String queryParam, Dataset dataset ) throws IOException {
+    private void executeQuery(HttpServletResponse response, 
+                              String resultFormatParam, 
+                              String rdfResultFormatParam, 
+                              String queryParam, 
+                              Dataset dataset ) throws IOException {
         
     	ResultSetFormat rsf = null;
     	/* BJL23 2008-11-06
@@ -221,7 +221,7 @@ public class SparqlQueryServlet extends BaseEditController {
         
         QueryExecution qe = null;
         try{
-            Query query = QueryFactory.create(queryParam, SYNTAX);
+            Query query = SparqlQueryUtils.create(queryParam);
             qe = QueryExecutionFactory.create(query, dataset);
             if( query.isSelectType() ){
                 ResultSet results = null;
@@ -241,7 +241,8 @@ public class SparqlQueryServlet extends BaseEditController {
                 }else if ( query.isDescribeType() ){
                     resultModel = qe.execDescribe();
                 }else if(query.isAskType()){
-                	//Irrespective of the ResultFormatParam, this always prints a boolean to the default OutputStream.
+                	// Irrespective of the ResultFormatParam, 
+                	// this always prints a boolean to the default OutputStream.
                 	String result = (qe.execAsk() == true) ? "true" : "false";
                 	PrintWriter p = response.getWriter();
                 	p.write(result);
@@ -269,8 +270,8 @@ public class SparqlQueryServlet extends BaseEditController {
     }
 
     private void toCsv(Writer out, ResultSet results) {
-    	// The Skife library wouldn't quote and escape the normal way, so I'm trying it manually
-   	
+    	// The Skife library wouldn't quote and escape the normal way, 
+    	// so I'm trying it manually.   	
     	while (results.hasNext()) {
     		QuerySolution solution = (QuerySolution) results.next();
     		List<String> valueList = new LinkedList<String>();
@@ -353,32 +354,4 @@ public class SparqlQueryServlet extends BaseEditController {
             rd.forward(req,res);
     }
 
-    @SuppressWarnings("unused")
-	private String example =
-        "PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"+
-        "PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>\n"+
-        "PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>\n"+
-        "PREFIX owl:   <http://www.w3.org/2002/07/owl#>\n" +
-        "PREFIX swrl:  <http://www.w3.org/2003/11/swrl#>\n" +
-        "PREFIX swrlb: <http://www.w3.org/2003/11/swrlb#>\n" +
-        "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#>\n"+
-        "PREFIX vivo:  <http://vivo.library.cornell.edu/ns/0.1#>\n" +
-        "PREFIX bibo: <http://purl.org/ontology/bibo/>\n" +
-        "PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n" +
-        "PREFIX core: <http://vivoweb.org/ontology/core#>\n" +
-        "PREFIX aktp:  <http://www.aktors.org/ontology/portal#>\n"+
-        "#\n" +
-        "# This query gets all range entities labels and types of a person\n"+
-        "# A query like this could be used to get enough info to create a display\n"+
-        "# page for an entity.\n"+
-        "#\n"+
-        "SELECT ?person ?personLabel ?focus ?netid\n"+
-        "WHERE \n"+
-        "{\n"+
-        " ?person vivo:CornellemailnetId ?netid .\n"+
-        " ?person rdf:type vivo:CornellEmployee .\n"+
-        " ?person vivo:researchFocus ?focus. \n"+
-        " OPTIONAL { ?person rdfs:label ?personLabel }\n"+
-        "}\n"+
-        "limit 20\n";
 }

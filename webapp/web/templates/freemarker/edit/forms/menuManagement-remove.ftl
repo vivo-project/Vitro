@@ -12,7 +12,7 @@
 
         <p>Are you sure you want to remove <em>${menuName}</em> menu item?</p>
 
-        <input type="submit" name="removeMenuItem" value="Remove menu item" class="submit" role="input" /> or <a class="cancel" href="${cancelUrl}">Cancel</a>
+        <input type="submit" name="removeMenuItem" value="Remove menu item" class="submit" role="input" /> or <a class="cancel" href="${cancelUrl}" title="cancel">Cancel</a>
     </form>
 </section>
 

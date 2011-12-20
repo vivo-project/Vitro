@@ -26,7 +26,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
-import edu.cornell.mannlib.vitro.webapp.utils.ThemeUtils;
 
 public class ApplicationBeanRetryController extends BaseEditController {
 	
@@ -84,13 +83,13 @@ public class ApplicationBeanRetryController extends BaseEditController {
         foo.setOptionLists(optionMap);
 
         epo.setFormObject(foo);
-        FormUtils.htmlFormFromBean(applicationForEditing, epo.getAction(), foo);
+        FormUtils.populateFormFromBean(applicationForEditing, epo.getAction(), foo);
    
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
+        request.setAttribute("bodyJsp","/templates/edit/formContact.jsp");
         request.setAttribute("formJsp","/templates/edit/specific/applicationBean_retry.jsp");
         request.setAttribute("scripts","/templates/edit/formBasic.js");
-        request.setAttribute("title","Site Information Editing Form");
+        request.setAttribute("title","Site Information");
         request.setAttribute("_action",action);
         request.setAttribute("unqualifiedClassName","ApplicationBean");
         setRequestAttributes(request,epo);
@@ -118,7 +117,7 @@ public class ApplicationBeanRetryController extends BaseEditController {
     	// Get the available themes
     	ServletContext sc = getServletContext();
     	boolean doSort = true;
-    	ArrayList<String> themeNames = ThemeUtils.getThemes(sc, doSort);
+    	List<String> themeNames = ApplicationBean.themeInfo.getThemeNames();
 
         // Create the list of theme Options
         String currentThemeDir = application.getThemeDir(); 

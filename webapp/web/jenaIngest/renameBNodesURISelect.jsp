@@ -12,22 +12,14 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Set" %>
 <%@ page import="java.util.Map.Entry" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" %>
 <% request.setAttribute("requestedActions", new UseAdvancedDataToolsPages()); %>
 <vitro:confirmAuthorization />
 
-<%
-
-    ModelMaker maker = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
-    if (maker == null) {
-        maker = (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
-    }
-
-%>
 <script type="text/javascript" src="js/jquery.js"></script>
-<script type="text/javascript" src="js/jenaIngest/renameNode.js"></script>
 <script type="text/javascript">
 function selectProperties(){
 	document.getElementById("properties").disabled = false;
@@ -46,16 +38,24 @@ function disableProperties(){
 
     <h3>Select URI prefix</h3>
    
-	<p>URIs will be constructed from the following string:</p>
+    <c:if test="${!empty errorMsg}">
+       <p class="notice">${errorMsg}</p>
+    </c:if>
+   
+	<p>URIs will be constructed using the following base string:</p>
 	<input id="namespace" type="text" style="width:65%;" name="namespaceEtcStr"/> 
 
-    <p/>
+     <p/>
+
+<c:choose>
+  <c:when test="${enablePropertyPatternURIs}">    
+    <p>Each resource will be assigned a URI by taking the above string and 
+     adding either a random integer, or a string based on the value of one of the
+     the properties of the resource</p>
     
-    <p>You can concatenate above string with random integer OR your own pattern based on <b>values</b> of one of the properties (Properties will be enabled in the dropdown) </p>
-    
-    <input type="radio" value="integer" name="concatenate" checked="checked" onclick="disableProperties()"><b>No</b>, concatenate with random integer</input>
+    <input type="radio" value="integer" name="concatenate" checked="checked" onclick="disableProperties()">Use random integer</input>
     <br></br>
-    <input type="radio" value="pattern" name="concatenate" onclick="selectProperties()"><b>Yes</b>, concatenate with my pattern</input> 
+    <input type="radio" value="pattern" name="concatenate" onclick="selectProperties()">Use pattern based on values of </input> 
   
     
     <% Map<String,LinkedList<String>> propertyMap = (Map) request.getAttribute("propertyMap");
@@ -75,22 +75,30 @@ function disableProperties(){
     %>
     </select>
     <br></br>
-    <p>Enter your pattern that will prefix property value with an underscore eg. depID_$$$ where depID is your pattern and $$$ is the property value.</p>
+    <p>Enter a pattern using $$$ as the placeholder for the value of the property selected above.</p>
+    <p>For example, entering dept_$$$ might generate URIs with endings such as dept_Art or dept_Classics.</p>
     <input id="pattern" disabled="disabled" type="text" style="width:35%;" name="pattern"/> 
     
+  </c:when>
+  <c:otherwise>
+   <p>Each resource will be assigned a URI by taking the above string and 
+     adding a random integer.</p>
+   <input type="hidden" value="integer" name="concatenate"/>
+  </c:otherwise>
+</c:choose>
+    
+    <c:forEach var="sourceModelValue" items="${sourceModel}">
+        <input type="hidden" name="sourceModelName" value="${sourceModelValue}"/>
+    </c:forEach>
     
   
     <h3>Select Destination Model</h3>
 
     <select name="destinationModelName">
         <option value="vitro:baseOntModel">webapp assertions</option>
-<%
-    for (Iterator it = maker.listModels(); it.hasNext(); ) {
-	String modelName = (String) it.next();
-        %> <option value="<%=modelName%>"/><%=modelName%></option>
-        <%    
-    }
-%>   
+        <c:forEach var="modelName" items="${modelNames}">
+            <option value="${modelName}"/>${modelName}</option>
+        </c:forEach>
     </select>
 
     <input class="submit" type="submit" value="Rename Blank Nodes"/>

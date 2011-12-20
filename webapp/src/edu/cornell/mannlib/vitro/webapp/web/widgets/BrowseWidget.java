@@ -95,7 +95,7 @@ public class BrowseWidget extends Widget {
     
     private Map<String,Object> getCommonValues(Environment env, ServletContext context){
         Map<String,Object> values = new HashMap<String,Object>();
-        values.putAll(FreemarkerHttpServlet.getDirectives());
+        //values.putAll(VitroFreemarkerConfiguration.getDirectives());
         try {
             values.put("urls",env.getDataModel().get("urls"));
             values.put("currentServlet", env.getDataModel().get("currentServlet"));            

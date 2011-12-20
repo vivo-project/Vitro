@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,24 +23,23 @@ import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.StandardModelSelector;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;
 
 public class PrimitiveRdfEdit extends VitroAjaxController {
 
     private static final long serialVersionUID = 1L;
 
-	/**
-	 * No need to restrict authorization here. doRequest() will return an error
-	 * if the user is not authorized.
-	 */
-	@Override
-	protected Actions requiredActions(VitroRequest vreq) {
-		return Actions.AUTHORIZED;
-	}
+    //Using the same setsup as primitive delete
+    @Override
+    protected Actions requiredActions(VitroRequest vreq) {
+    	return new Actions(new UseBasicAjaxControllers());
+    }
     
     @Override
     protected void doRequest(VitroRequest vreq,
@@ -93,29 +93,23 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
 					.getDependentResourceDeleteForChange(toBeAdded,
 							toBeRetracted, getWriteModel(vreq));
 			toBeRetracted.add(depResRetractions);
-        	
-        	if (!isAuthorized(vreq, toBeAdded, toBeRetracted)) {
-        		doError(response, "Not authorized for these RDF edits", HttpStatus.SC_UNAUTHORIZED);
-        		return;
-        	}
-        	
         	processChanges(editorUri, getWriteModel(vreq), toBeAdded, toBeRetracted);
         } catch (Exception e) {
             doError(response,e.getMessage(),HttpStatus.SC_INTERNAL_SERVER_ERROR);
         }           
         
     }
-
-	private boolean isAuthorized(VitroRequest vreq, Model toBeAdded, Model toBeRetracted) {
-		return PolicyHelper.isAuthorizedToAdd(vreq, toBeAdded)
-				&& PolicyHelper.isAuthorizedToDrop(vreq, toBeRetracted);
-	}
-
+    
 	/** Package access to allow for unit testing. */
 	void processChanges(String editorUri, OntModel writeModel,
 			Model toBeAdded, Model toBeRetracted) throws Exception {
-		Lock lock = writeModel.getLock();
+		Lock lock = null;
+		log.debug("Model to be retracted is");
+		StringWriter sw = new StringWriter();
+		toBeRetracted.write(sw, "N3");
+		log.debug(sw.toString());
 		try {
+			lock = writeModel.getLock();
 			lock.enterCriticalSection(Lock.WRITE);
 			writeModel.getBaseModel().notifyEvent(new EditEvent(editorUri, true));
 			writeModel.add(toBeAdded);
@@ -152,12 +146,8 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
         return models;
     }
 
-    private OntModel getWriteModel(HttpServletRequest request){
-        HttpSession session = request.getSession(false);
-        if( session == null || session.getAttribute("jenaOntModel") == null )
-            return (OntModel)getServletContext().getAttribute("jenaOntModel");
-        else
-            return (OntModel)session.getAttribute("jenaOntModel");
+    private OntModel getWriteModel(VitroRequest vreq){
+    	return StandardModelSelector.selector.getModel(vreq,getServletContext());  
     }
 
 	/** Package access to allow for unit testing. */

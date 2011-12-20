@@ -4,10 +4,10 @@
 
 <h2>${title}</h2>
 
-<#if aboutText??>
+<#if aboutText?has_content>
     <div class="pageGroupBody" id="aboutText">${aboutText}</div>
 </#if>
     
-<#if acknowledgeText??>
+<#if acknowledgeText?has_content>
     <div class="pageGroupBody" id="acknowledgementText">${acknowledgeText}</div> 
 </#if>

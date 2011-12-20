@@ -49,6 +49,13 @@ public class BrowseController extends FreemarkerHttpServlet {
         String message = null;
         String templateName = TEMPLATE_DEFAULT;
                        
+        if ( vreq.getParameter("clearcache") != null ) {
+            //mainly for debugging
+            if( PolicyHelper.isAuthorizedForActions(vreq, new RebuildVClassGroupCache()) ){
+                clearGroupCache();
+            }
+        }
+        
         List<VClassGroup> groups = null;
         VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(getServletContext());
         if ( vcgc == null ) {
@@ -68,17 +75,12 @@ public class BrowseController extends FreemarkerHttpServlet {
             templateName = Template.TITLED_MESSAGE.toString();
         }
         
-        if ( vreq.getParameter("clearcache") != null ) {
-            //mainly for debugging
-            if( PolicyHelper.isAuthorizedForActions(vreq, new RebuildVClassGroupCache()) ){
-                clearGroupCache();
-            }
-        }
+
         
         return new TemplateResponseValues(templateName, body);
     }
     
     protected void clearGroupCache(){
-        VClassGroupCache.getVClassGroupCache(getServletContext()).requestCacheUpdate();
+        VClassGroupCache.getVClassGroupCache(getServletContext()).doSynchronousRebuild();
     }
 }

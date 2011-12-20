@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.ontology.update;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -23,6 +24,7 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.ontology.update.AtomicOntologyChange.AtomicChangeType;
 
@@ -95,7 +97,7 @@ public class ABoxUpdater {
 			      break;
 			   case DELETE:
 				  if ("Delete".equals(change.getNotes())) {
-				     deleteClass(change);
+				     deleteIndividualsOfType(change);
 				  } else {
 					 renameClassToParent(change);
 				  }
@@ -146,48 +148,33 @@ public class ABoxUpdater {
 		   
 		   StmtIterator iter = aboxModel.listStatements(oldClass, (Property) null, (RDFNode) null);
 
-		   int renameCount = 0;
 		   int removeCount = 0;
 		   while (iter.hasNext()) {
 			   Statement oldStatement = iter.next();
-			   if (newTBoxAnnotationsModel.contains(oldStatement)) {
-				   continue; 
-				   // if this statement was loaded from the new annotations,
-				   // don't attempt to remove it.
-				   // This happens in cases where a class hasn't really
-				   // been removed, but we just want to map any ABox
-				   // data using it to use a different class instead.
-			   } else {
-				   removeCount++;
-				   retractions.add(oldStatement);
-			   }
-			   //logChange(oldStatement, false);
-			   //logChange(newStatement,true);
+			   removeCount++;
+			   retractions.add(oldStatement);
 		   }
 		   
 		   //log summary of changes
-		   if (renameCount > 0) {
-			   logger.log("Changed " + renameCount + " subject reference" + ((renameCount > 1) ? "s" : "") + " from type"  + oldClass.getURI() + " to type " + newClass.getURI());
-		   }
 		   if (removeCount > 0) {
 			   logger.log("Removed " + removeCount + " subject reference" + ((removeCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class");
 		   }
 
 		   // Change class references in the objects of rdf:type statements
-		   iter = aboxModel.listStatements((Resource) null, (Property) null, oldClass);
+		   iter = aboxModel.listStatements((Resource) null, RDF.type, oldClass);
 
-		   renameCount = 0;
+		   int renameCount = 0;
 		   while (iter.hasNext()) {
 			   renameCount++;
 			   Statement oldStatement = iter.next();
-			   Statement newStatement = ResourceFactory.createStatement(oldStatement.getSubject(), oldStatement.getPredicate(), newClass);
+			   Statement newStatement = ResourceFactory.createStatement(oldStatement.getSubject(), RDF.type, newClass);
 			   retractions.add(oldStatement);
 			   additions.add(newStatement);
 		   }
 		   
 		   //log summary of changes
 		   if (renameCount > 0) {
-			   logger.log("Renamed " + renameCount + " object reference" + ((renameCount > 1) ? "s" : "") + " from type "  + oldClass.getURI() + " to type " + newClass.getURI());
+			   logger.log("Retyped " + renameCount + " individual" + ((renameCount > 1) ? "s" : "") + " from type "  + oldClass.getURI() + " to type " + newClass.getURI());
 		   }
 		   
 		   aboxModel.remove(retractions);
@@ -325,13 +312,13 @@ public class ABoxUpdater {
 	
 	/**
 	 * 
-	 * Remove all instances of and references to a class in the abox of the knowledge base.
+	 * Remove all instances of the given class from the abox of the knowledge base.
 	 * 
 	 * @param   change - an AtomicOntologyChange object representing a class
 	 *                   delete operation.
 	 *                    
 	 */
-	public void deleteClass(AtomicOntologyChange change) throws IOException {
+	public void deleteIndividualsOfType(AtomicOntologyChange change) throws IOException {
 
 		//logger.log("Processing a class deletion of class " + change.getSourceURI());
 		
@@ -341,25 +328,50 @@ public class ABoxUpdater {
 			logger.log("WARNING: didn't find the deleted class " +  change.getSourceURI() + " in the old model. Skipping updates for this deletion");
 			return;
 		}
-
-	    Model retractions = ModelFactory.createDefaultModel();
 		
 		// Remove instances of the deleted class
 		aboxModel.enterCriticalSection(Lock.WRITE);
 	    try {
 	       int count = 0;
+	       int refCount = 0;
 	       StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, deletedClass);
 
     	   while (iter.hasNext()) {
 			   count++;
-			   Statement typeStmt = iter.next();
-			   retractions.add(typeStmt);
+			   Statement typeStmt = iter.next();   
+			   refCount = deleteIndividual(typeStmt.getSubject());
 		   }   
 		   
-		   //log summary of changes
 		   if (count > 0) {
-			   logger.log("Removed " + count + " " + deletedClass.getURI() + " type assertion" + ((count > 1) ? "s" : ""));
+			   logger.log("Removed " + count + " individual" + (((count > 1) ? "s" : "") + " of type " + deletedClass.getURI()) + " (refs = " + refCount + ")");
 		   }
+		   		   
+		} finally {
+			aboxModel.leaveCriticalSection();
+		}
+	}
+	
+	protected int deleteIndividual(Resource individual) throws IOException {
+
+	    Model retractions = ModelFactory.createDefaultModel();
+	    int refCount = 0;
+	    
+		aboxModel.enterCriticalSection(Lock.WRITE);
+	    try {			   
+		   StmtIterator iter = aboxModel.listStatements(individual, (Property) null, (RDFNode) null);
+			   
+		   while (iter.hasNext()) {
+			  Statement subjstmt = iter.next();
+			  retractions.add(subjstmt);
+		   }
+			   
+		   iter = aboxModel.listStatements((Resource) null, (Property) null, individual);
+			   
+		    while (iter.hasNext()) {
+			    Statement objstmt = iter.next();
+			    retractions.add(objstmt);
+			    refCount++;
+			}
 		   
 		   aboxModel.remove(retractions);
 		   record.recordRetractions(retractions);		
@@ -367,6 +379,8 @@ public class ABoxUpdater {
 		} finally {
 			aboxModel.leaveCriticalSection();
 		}
+		
+		return refCount;
 	}
 	
 	public void processPropertyChanges(List<AtomicOntologyChange> changes) throws IOException {
@@ -441,9 +455,7 @@ public class ABoxUpdater {
 			} finally {
 				aboxModel.leaveCriticalSection();
 			}
-			
 		}
-		
 	}
 	
 	private void deleteProperty(AtomicOntologyChange propObj) throws IOException{
@@ -548,12 +560,183 @@ public class ABoxUpdater {
 			logger.log("Changed " + renamePropRetractModel.size() + " statement" + 
 					((renamePropRetractModel.size() > 1) ? "s" : "") +
 					" with predicate " + propObj.getSourceURI() + " to use " +
-					propObj.getDestinationURI() + " instead");
-			
-			
+					propObj.getDestinationURI() + " instead");		
 		}
 	}
 
+	protected void migrateExternalConcepts() throws IOException {
+		
+		Property hasResearchArea = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#hasResearchArea");
+		Property researchAreaOf = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#researchAreaOf");
+		Property hasSubjectArea = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#hasSubjectArea");
+		Property subjectAreaFor = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#subjectAreaFor");
+		
+		Property sourceVocabularyReference = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#sourceVocabularyReference");
+		Property webpage = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#webpage");
+		Property linkURI = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#linkURI");
+		Property linkAnchorText = ResourceFactory.createProperty("http://vivoweb.org/ontology/core#linkAnchorText");
+		
+		HashSet<Resource> resourcesToDelete = new HashSet<Resource>();
+		HashSet<Resource> resourcesToDetype = new HashSet<Resource>();
+			
+		Model additions = ModelFactory.createDefaultModel();
+		Model retractions = ModelFactory.createDefaultModel();
+	    
+		int subjectRefCount = 0;
+		int researchRefCount = 0;
+		int webpageCount = 0;
+		int typeCount = 0;
+		int count = 0;
+		
+		aboxModel.enterCriticalSection(Lock.WRITE);
+	    try {
+			StmtIterator iter = aboxModel.listStatements((Resource) null, sourceVocabularyReference, (RDFNode) null);
+	
+			while (iter.hasNext()) {
+				 Statement stmt = iter.next();
+				 Resource subjectAreaResource = stmt.getSubject();
+				 
+				 if (!stmt.getObject().isResource()) continue;
+				 
+			     Resource vocabularySourceReferenceResource = stmt.getObject().asResource();
+			     Resource externalConceptResource = null;
+			     Resource webpageResource = null;
+			     
+			     if (subjectAreaResource.hasProperty(webpage)) {
+			    	 Statement webpageStmt = subjectAreaResource.getProperty(webpage);
+			    	 RDFNode webpageObject = webpageStmt.getObject();
+			    	 if (!webpageObject.isResource()) continue;
+			    	 webpageResource = webpageObject.asResource();
+			    	 if (!webpageResource.hasProperty(linkURI)) continue;
+			    	 Statement linkURIStmt = webpageResource.asResource().getProperty(linkURI);
+			    	 RDFNode linkURIObject = linkURIStmt.getObject();
+			    	 if (!linkURIObject.isLiteral()) continue;
+			    	 externalConceptResource = ResourceFactory.createResource(linkURIObject.asLiteral().getString()); 
+			    	 if (externalConceptResource == null) continue;
+			    	 resourcesToDelete.add(webpageResource.asResource());
+	                 resourcesToDetype.add(vocabularySourceReferenceResource);
+			         additions.add(externalConceptResource,RDFS.isDefinedBy,vocabularySourceReferenceResource);
+			         additions.add(externalConceptResource, RDF.type, OWL_THING);
+			         Statement conceptLabelStmt = subjectAreaResource.getProperty(RDFS.label);
+			         if (conceptLabelStmt == null) {
+			        	 conceptLabelStmt = webpageResource.asResource().getProperty(RDFS.label);
+			         }
+			         if (conceptLabelStmt != null) {
+			        	 additions.add(externalConceptResource, RDFS.label, conceptLabelStmt.getObject().asLiteral());
+			         }
+			     } else {
+			    	 continue;
+			     }
+			     				 
+				 subjectRefCount += migrateConceptReferences(externalConceptResource, subjectAreaResource, hasSubjectArea, subjectAreaFor, additions);
+				 researchRefCount += migrateConceptReferences(externalConceptResource, subjectAreaResource, hasResearchArea, researchAreaOf, additions);
+				 migrateRelatedConcepts(externalConceptResource, subjectAreaResource, additions);
+				 
+				 resourcesToDelete.add(subjectAreaResource);
+				 if (webpageResource != null) {
+					 resourcesToDelete.add(webpageResource);
+					 webpageCount++;
+				 }
+				 count++;
+			}	
+		
+		    Iterator<Resource> vsrIter = resourcesToDetype.iterator();
+		    while (vsrIter.hasNext()) { 
+		    	 Resource resource = vsrIter.next();
+		   		 StmtIterator typeiter = resource.listProperties(RDF.type);
+				 while (typeiter.hasNext()) {
+					 Statement typeStatement = typeiter.next();
+					 if (!typeStatement.getObject().equals(OWL_THING)) {
+					    retractions.add(typeStatement);
+					 }
+				 }	
+				 additions.add(resource, RDF.type, OWL_THING);
+				 typeCount++;
+		    }
+
+			aboxModel.add(additions);
+			aboxModel.remove(retractions);
+	    } finally {
+	        aboxModel.leaveCriticalSection();	
+	    }
+	    
+	    record.recordAdditions(additions);
+	    record.recordRetractions(retractions);
+	   
+	    Iterator<Resource> iter = resourcesToDelete.iterator();
+	    while (iter.hasNext()) {
+	    	Resource ind = iter.next();
+	    	deleteIndividual(ind);
+	    }
+	    
+	    if (count > 0) {
+;		   logger.log("migrated " + count + " external concept" + ((count == 1) ? "" : "s") + ", which involved deleting " + 
+				   count + " vivo:SubjectArea individual" + ((count == 1) ? "" : "s") + " and " +
+				   webpageCount + " vivo:URLLink individual" + ((webpageCount == 1) ? "" : "s") +
+				   ", and changing the type for " + typeCount + " vivo:VocabularySourceReference individual" + ((typeCount == 1) ? "" : "s") + " to owl:Thing");
+		}
+	    
+	    if (subjectRefCount > 0) {
+			   logger.log("migrated " + subjectRefCount + " " + hasSubjectArea.getLocalName() + " external concept reference" + ((subjectRefCount == 1) ? "" : "s"));
+		}
+	    
+	    if (researchRefCount > 0) {
+			   logger.log("migrated " + researchRefCount + " " + hasResearchArea.getLocalName() + " external concept reference" + ((researchRefCount == 1) ? "" : "s"));
+		}
+	    
+        return;
+    }
+	
+	protected int migrateConceptReferences(Resource externalConceptResource, Resource subjectArea, Property hasConcept, Property conceptOf, Model additions) throws IOException {
+		
+	    int count = 0;
+	    	    
+		aboxModel.enterCriticalSection(Lock.WRITE);
+	    try {
+			 StmtIterator iter = aboxModel.listStatements((Resource) null, hasConcept, subjectArea);
+			 while (iter.hasNext()) {
+
+				 Statement stmt = iter.next();
+				 Resource agent = stmt.getSubject();
+				 if (!additions.contains(agent, hasConcept, externalConceptResource)) {
+					 additions.add(agent, hasConcept, externalConceptResource);
+					 count++;
+				 }
+				 
+				 if (!additions.contains(externalConceptResource, conceptOf, agent)) {
+				    additions.add(externalConceptResource, conceptOf, agent);
+				 }
+			 }
+	    } finally {
+	        aboxModel.leaveCriticalSection();	
+	    }
+
+		return count;
+    }
+
+	protected void migrateRelatedConcepts(Resource externalConceptResource, Resource subjectAreaResource, Model additions) throws IOException {
+	    	
+		Property related = ResourceFactory.createProperty("http://www.w3.org/2004/02/skos/core#related");
+		
+		aboxModel.enterCriticalSection(Lock.WRITE);
+	    try {
+			 StmtIterator iter = subjectAreaResource.listProperties(related);
+			 while (iter.hasNext()) {
+				 Statement stmt = iter.next();
+				 if (!stmt.getObject().isResource()) continue;
+				 Resource relatedConcept = stmt.getObject().asResource();
+				 if (!additions.contains(externalConceptResource, related, relatedConcept)) {
+					 additions.add(externalConceptResource, related, relatedConcept);
+				 }
+				 if (!additions.contains(relatedConcept, related, externalConceptResource)) {
+					 additions.add(relatedConcept, related, externalConceptResource);
+				 }				 
+			 }
+	    } finally {
+	        aboxModel.leaveCriticalSection();	
+	    }
+    }
+	
 	public void logChanges(Statement oldStatement, Statement newStatement) throws IOException {
        logChange(oldStatement,false);
        logChange(newStatement,true);

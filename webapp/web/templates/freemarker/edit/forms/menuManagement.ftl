@@ -46,7 +46,7 @@
             <p>Selected content type for the associated page</p>
             <p>
                 <span id="selectedContentTypeValue" name="selectedContentTypeValue">${associatedPage}</span>
-                <a href="#" id="changeContentType" name="changeContentType">Change content type</a>
+                <a href="#" id="changeContentType" name="changeContentType" title="change content type">Change content type</a>
             </p>
         </section>
         
@@ -65,22 +65,9 @@
         <section id="classesInSelectedGroup" name="classesInSelectedGroup" ${existingClassGroupStyle}>
             <#-- Select classes in a class group -->    
             <p id="selectClassesMessage" name="selectClassesMessage">Select content to display<span class="requiredHint"> *</span></p>
-
-            <section id="internal-class" role="region">
-                <#if internalClass?has_content>
-                    <#assign enableInternalClass = '' />
-                    <#assign disableClass = 'class="inline"' />
-                <#else>
-                    <#assign enableInternalClass = '<p class="note">To enable this option, you must first select an <a href="${urls.base}/processInstitutionalInternalClass">institutional internal class</a> for your instance</p>' />
-                    <#assign disableClass = 'class="disable inline" disabled="disabled"' />
-                </#if>
-                
-                <input type="checkbox" ${disableClass} name="display-internalClass" value="${internalClassUri}" id="display-internalClass" <#if pageInternalOnly?has_content>checked</#if> role="input" />
-                <label ${disableClass} class="inline" for="display-internalClass">Only display <em>${associatedPage}</em> within my institution</label>
-                
-                ${enableInternalClass}
-            </section>
-                
+            
+            <#include "menuManagement--classIntersections.ftl">
+            
             <ul id="selectedClasses" name="selectedClasses" role="menu">
                 <#--Adding a default class for "ALL" in case all classes selected-->
                 <li class="ui-state-default" role="menuitem">
@@ -105,7 +92,7 @@
             </ul>
         </section>
         
-        <input type="submit" name="submit-${menuAction}" value="Save changes" class="submit" role="input" /> or <a class="cancel" href="${cancelUrl}">Cancel</a>
+        <input type="submit" name="submit-${menuAction}" value="Save changes" class="submit" role="input" /> or <a class="cancel" href="${cancelUrl}" title="cancel">Cancel</a>
 
         <p class="requiredHint">* required fields</p>
     </form>

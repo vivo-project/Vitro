@@ -9,6 +9,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
@@ -24,6 +25,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
+import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase 
                                            implements ServletContextListener {
@@ -34,16 +36,17 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
 	@Override	
 	public void contextInitialized(ServletContextEvent sce) {	    
         ServletContext ctx = sce.getServletContext();
-		
-	    if (AbortStartup.isStartupAborted(ctx)) {
-            return;
-        }
-
+        StartupStatus ss = StartupStatus.getBean(ctx);
+        
+        // we do not want to fetch imports when we wrap Models in OntModels
         OntDocumentManager.getInstance().setProcessImports(false);
         
+        BasicDataSource bds = makeDataSourceFromConfigurationProperties(ctx);
+        setApplicationDataSource(bds, ctx);
+		
         // user accounts Model
         try {
-        	Model userAccountsDbModel = makeDBModelFromConfigurationProperties(
+        	Model userAccountsDbModel = makeDBModel(bds,
         	        JENA_USER_ACCOUNTS_MODEL, DB_ONT_MODEL_SPEC, ctx);
 			if (userAccountsDbModel.size() == 0) {
 				firstStartup = true;
@@ -62,11 +65,12 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
         	}
         } catch (Throwable t) {
         	log.error("Unable to load user accounts model from DB", t);
+        	ss.fatal(this, "Unable to load user accounts model from DB", t);
         }
              
         // display, editing and navigation Model 
 	    try {
-	    	Model displayDbModel = makeDBModelFromConfigurationProperties(
+	    	Model displayDbModel = makeDBModel(bds,
 	    	        JENA_DISPLAY_METADATA_MODEL, DB_ONT_MODEL_SPEC, ctx);
 			if (displayDbModel.size() == 0) {
 				readOntologyFilesInPathSet(APPPATH, ctx,displayDbModel);
@@ -80,11 +84,12 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
 	    	initializeDisplayLoadedAtStartup(ctx, displayModel);		    	
 	    } catch (Throwable t) {
 	    	log.error("Unable to load user application configuration model", t);
+	    	ss.fatal(this, "Unable to load user application configuration model", t);
 	    }
 	    
 	    //display tbox - currently reading in every time
 	    try {
-	    	Model displayTboxModel = makeDBModelFromConfigurationProperties(
+	    	Model displayTboxModel = makeDBModel(bds,
 	    	        JENA_DISPLAY_TBOX_MODEL, DB_ONT_MODEL_SPEC, ctx);
 	    	//Reading in single file every time
 	    	//TODO: Check if original needs to be cleared/removed every time?
@@ -97,11 +102,12 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
 	    	log.debug("Loaded file " + APPPATH_LOAD + "displayTBOX.n3 into display tbox model");
 	    } catch (Throwable t) {
 	    	log.error("Unable to load user application configuration model TBOX", t);
+	    	ss.fatal(this, "Unable to load user application configuration model TBOX", t);
 	    }
 	    
 	    //Display Display model, currently empty, create if doesn't exist but no files to load
 	    try {
-	    	Model displayDisplayModel = makeDBModelFromConfigurationProperties(
+	    	Model displayDisplayModel = makeDBModel(bds,
 	    	        JENA_DISPLAY_DISPLAY_MODEL, DB_ONT_MODEL_SPEC, ctx);
 	    	//Reading in single file every time
 	    	//TODO: Check if original needs to be cleared/removed every time?
@@ -115,6 +121,7 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
 	    	log.debug("Loaded file " + APPPATH_LOAD + "displayDisplay.n3 into display display model");
 	    } catch (Throwable t) {
 	    	log.error("Unable to load user application configuration model Display Model", t);
+	    	ss.fatal(this, "Unable to load user application configuration model Display Model", t);
 	    }
 	}
 	

@@ -22,7 +22,13 @@
             OPTIONAL { ?object rdfs:label ?label } 
             
             <collated> 
-            OPTIONAL { ?object a ?subclass } 
+            OPTIONAL { 
+                ?object a ?subclass.
+                # Require the subclasses retrieved to be in a classgroup, since others are not generally
+                # for display. See vivo-dev-all thread titled "Internal Entity and mostSpecificType,"
+                # Aug 9-10, 2011.
+                ?subclass vitro:inClassGroup ?classgroup 
+            } 
             FILTER ( afn:namespace(?subclass) != "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" )   
             </collated>       
         

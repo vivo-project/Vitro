@@ -2,7 +2,7 @@
 
 <#-- Template for scripts loaded at the end of the body element -->
 
-${scripts.list}
+${scripts.list()}
 
 <#include "googleAnalytics.ftl">
 

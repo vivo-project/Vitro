@@ -7,10 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -24,18 +21,15 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.util.ResourceUtils;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.UpdateSettings;
 
@@ -68,13 +62,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private static final String NEW_TBOX_ANNOTATIONS_DIR = "/WEB-INF/ontologies/user/tbox/";
 	
 	public void contextInitialized(ServletContextEvent sce) {
-				
-	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
-            return;
-        }
-	    
 		try {
-
 			ServletContext ctx = sce.getServletContext();
 			
 			String logFileName =  DATA_DIR + LOG_DIR + timestampedFileName("knowledgeBaseUpdate", "log");
@@ -96,6 +84,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setDefaultNamespace(wadf.getDefaultNamespace());
 			settings.setAssertionOntModelSelector(ModelContext.getBaseOntModelSelector(ctx));
 			settings.setInferenceOntModelSelector(ModelContext.getInferenceOntModelSelector(ctx));
+			settings.setUnionOntModelSelector(ModelContext.getUnionOntModelSelector(ctx));
 			
 			try {
 				OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_MODEL_DIR));
@@ -117,11 +106,8 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			  
 			   try {
 				  if (ontologyUpdater.updateRequired()) {
-					  //ctx.setAttribute(IndexConstants.INDEX_REBUILD_REQUESTED_AT_STARTUP, Boolean.TRUE);
 					  ctx.setAttribute(KBM_REQURIED_AT_STARTUP, Boolean.TRUE);
-					  //doMiscAppMetadataReplacements(ctx.getRealPath(MISC_REPLACEMENTS_FILE), oms);
-					  //reloadDisplayModel(ctx);
-					  log.info("Migrating display model");
+					  log.info("Migrating data model");
 					  doMigrateDisplayModel(ctx);
 					  log.info("Display model migrated");
 					  ontologyUpdater.update();
@@ -142,76 +128,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			t.printStackTrace();
 		}
 	}	
-	
-	/**
-	 * 
-	 * Behavior changed from 1.0
-	 * 
-	 * Replace any triple X P S in the application metadata model
-	 * with X P T where X, P, and T are specified in the input file
-	 * @param filename containing replacement values
-	 * @param OntModelSelector oms
-	 */
-	private void doMiscAppMetadataReplacements(String filename, OntModelSelector oms) {
-		try {
-		    Model replacementValues = ModelFactory.createDefaultModel();
-		    OntModel applicationMetadataModel = oms.getApplicationMetadataModel();
-		    FileInputStream fis = new FileInputStream(new File(filename));
-		    replacementValues.read(fis, null);
-		    Model retractions = ModelFactory.createDefaultModel();
-		    Model additions = ModelFactory.createDefaultModel();
-		    StmtIterator replaceIt = replacementValues.listStatements();
-		    while (replaceIt.hasNext()) {
-		    	Statement replacement = replaceIt.nextStatement();
-		    	applicationMetadataModel.enterCriticalSection(Lock.WRITE);
-		    	try {
-		    		StmtIterator stmtIt = 
-		    			    applicationMetadataModel.listStatements( 
-		    			    		replacement.getSubject(), 
-		    			    		replacement.getPredicate(),
-		    			    		(RDFNode) null);
-		    		while (stmtIt.hasNext()) {
-		    			Statement stmt = stmtIt.nextStatement();
-		    			retractions.add(stmt);
-		    			additions.add(stmt.getSubject(),
-		    					replacement.getPredicate(), 
-		    					replacement.getObject());
-		    		}
-		    		applicationMetadataModel.remove(retractions);
-		    		applicationMetadataModel.add(additions);
-		    	} finally {
-		    		applicationMetadataModel.leaveCriticalSection();
-		    	}
-		    }
-		} catch (FileNotFoundException fnfe) {
-			log.warn("Couldn't find miscellaneous application metadata replacement file: " + filename);
-		
-		} catch (Exception e) {
-			log.error("Error performing miscellaneous application metadata " +
-					" replacements.", e);
-		}
-	}
-	
-	private void reloadDisplayModel(ServletContext ctx) {
-	    log.info("Reloading display model");
-	    Object o = ctx.getAttribute("displayOntModel");
-	    if (o instanceof OntModel) {
-	        OntModel displayModel = (OntModel) o;
-	        displayModel.removeAll((Resource) null, (Property) null, (RDFNode) null);
-	        if (displayModel.size() != 0) {
-	            log.error("Display model not cleared successfully");
-	        }
-            JenaPersistentDataSourceSetup.readOntologyFilesInPathSet(
-                    JenaPersistentDataSourceSetup.APPPATH, ctx, displayModel);
-            log.info("Display model reloaded");
-            if (displayModel.size() == 0) {
-                log.warn("Display model empty after reloading");
-            }
-	    } else {
-	        log.error("No display model found in context");
-	    }
-	}
-	
+			
 	private void doMigrateDisplayModel(ServletContext ctx) {
 		Object o = ctx.getAttribute("displayOntModel");
 	    if (!(o instanceof OntModel)) {
@@ -220,59 +137,51 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	    OntModel displayModel = (OntModel) o;
 	    migrateDisplayModel(displayModel);
 	}
-	
+		
 	public static void migrateDisplayModel(Model displayModel) {
-	    Resource indexRes = displayModel.getResource(
-	    		DisplayVocabulary.DISPLAY_NS + "PrimaryLuceneIndex");
-	    ResourceUtils.renameResource(
-	    		indexRes, DisplayVocabulary.DISPLAY_NS + "SearchIndex");
-	    Iterator<Resource> pageIt = displayModel.listResourcesWithProperty(
-	    		RDF.type, displayModel.getResource(
-	    				DisplayVocabulary.PAGE_TYPE));
-	    while (pageIt.hasNext()) {
-	    	Resource pageRes = pageIt.next();
-	    	Resource classgroupType = displayModel.getResource(
-					DisplayVocabulary.CLASSGROUP_PAGE_TYPE);
-	    	Property forClassGroup = displayModel.getProperty(
-	    			DisplayVocabulary.FOR_CLASSGROUP);
-	    	if (pageRes.hasProperty(RDF.type, classgroupType)) {
-	    		displayModel.remove(pageRes, RDF.type, classgroupType);
-	    		StmtIterator fcgIt = pageRes.listProperties(forClassGroup);
-	    		List<Resource> classGroupResources = new ArrayList<Resource>();
-	    		while (fcgIt.hasNext()) {
-	    			Statement fcgStmt = fcgIt.nextStatement();
-	    			RDFNode classGroupNode = fcgStmt.getObject();
-	    			if (!classGroupNode.isURIResource()) {
-	    				continue;
-	    			}
-	    			classGroupResources.add((Resource) classGroupNode);
-	    		}
- 	    		int classGroupIndex = 0;
- 	    		Iterator<Resource> classGroupResIt = 
- 	    		        classGroupResources.iterator();
-	    		while (classGroupResIt.hasNext()) {
-	    			classGroupIndex++;
-	    			Resource classGroupRes = classGroupResIt.next();
-	    			String URIsuffix = "DataGetter" + classGroupIndex;
-	    			String dataGetterURI = (!pageRes.isAnon()) 
-	    			        ? pageRes.getURI() + URIsuffix
-	    			        : DisplayVocabulary.DISPLAY_NS + 
-	    			                "page-" + pageRes.getId().toString() + "-"
-	    			                + URIsuffix;
-	    			Resource dataGetterRes = displayModel.createResource(
-	    					dataGetterURI);
-	    			pageRes.addProperty(
-	    					displayModel.getProperty(
-	    							DisplayVocabulary.HAS_DATA_GETTER), 
-	    							        dataGetterRes);
-	    			dataGetterRes.addProperty(forClassGroup, classGroupRes);
-	    			dataGetterRes.addProperty(RDF.type, classgroupType);
-	    			displayModel.removeAll(pageRes, RDF.type, classgroupType);
-	    			displayModel.removeAll(
-	    					pageRes, forClassGroup, (RDFNode) null);
-	    		}	    		
-	    	}
+				
+		Resource browseDataGetterClass = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.BrowseDataGetter");
+		Resource pageDataGetterClass = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.ClassGroupPageData");
+		Resource internalDataGetterClass = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.InternalClassesDataGetter");
+		Resource individualsDataGetterClass = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.IndividualsForClassesDataGetter");
+		
+		Resource homeDataGetter = ResourceFactory.createResource(DisplayVocabulary.DISPLAY_NS + "homeDataGetter");
+		Property dataGetterProperty = displayModel.getProperty(DisplayVocabulary.HAS_DATA_GETTER);
+	
+		Resource homePage = displayModel.getResource(DisplayVocabulary.HOME_PAGE_URI);
+		Resource classGroupPage = displayModel.getResource(DisplayVocabulary.CLASSGROUP_PAGE_TYPE);
+		Resource internalClassesPage = displayModel.getResource(DisplayVocabulary.CLASSINDIVIDUALS_INTERNAL_TYPE);
+		Resource individualsPage = displayModel.getResource(DisplayVocabulary.CLASSINDIVIDUALS_PAGE_TYPE);
+				
+		displayModel.add(homePage, dataGetterProperty, homeDataGetter);	
+		displayModel.add(homeDataGetter, RDF.type, browseDataGetterClass);
+		
+		Model additions = ModelFactory.createDefaultModel();
+	    Model retractions = ModelFactory.createDefaultModel();
+	    
+	    StmtIterator iter = displayModel.listStatements((Resource) null, RDF.type, internalClassesPage);
+	    while (iter.hasNext()) {
+	    	Statement stmt = iter.next();
+	    	retractions.add(stmt);
+	    	additions.add(stmt.getSubject(), RDF.type, internalDataGetterClass);
 	    }
+		
+	    iter = displayModel.listStatements((Resource) null, RDF.type, classGroupPage);
+	    while (iter.hasNext()) {
+	    	Statement stmt = iter.next();
+	    	retractions.add(stmt);
+	    	additions.add(stmt.getSubject(), RDF.type, pageDataGetterClass);
+	    }
+	    
+	    iter = displayModel.listStatements((Resource) null, RDF.type, individualsPage);
+	    while (iter.hasNext()) {
+	    	Statement stmt = iter.next();
+	    	retractions.add(stmt);
+	    	additions.add(stmt.getSubject(), RDF.type, individualsDataGetterClass);
+	    }
+	    
+	    displayModel.remove(retractions);
+	    displayModel.add(additions);
 	}
 	
 	private OntModel loadModelFromDirectory(String directoryPath) {

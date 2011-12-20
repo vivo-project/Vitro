@@ -9,18 +9,11 @@
 <%@ page import="java.net.URLEncoder" %>
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" %>
 <% request.setAttribute("requestedActions", new UseAdvancedDataToolsPages()); %>
 <vitro:confirmAuthorization />
 
-<%
-
-    ModelMaker maker = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
-    if (maker == null) {
-        maker = (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
-    }
-
-%>
     <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Split Property Value Strings into Multiple Property Values</h2>
 
     <form action="ingest" method="get">
@@ -29,13 +22,9 @@
     <ul>
 		  <li><input type="checkbox" name="sourceModelName" value="vitro:jenaOntModel"/>webapp model</li>
 		  <li><input type="checkbox" name="sourceModelName" value="vitro:baseOntModel"/>webapp assertions</li>
-<%
-    for (Iterator it = maker.listModels(); it.hasNext(); ) {
-	String modelName = (String) it.next();
-        %> <li> <input type="checkbox" name="sourceModelName" value="<%=modelName%>"/><%=modelName%></li>
-        <%    
-    }
-%>
+          <c:forEach var="modelName" items="${modelNames}">
+              <li> <input type="checkbox" name="sourceModelName" value="${modelName}"/>${modelName}</li>
+          </c:forEach>
     </ul>
 
 	
@@ -57,13 +46,9 @@
     <h3>Select Destination Model</h3>
 
     <select name="destinationModelName">
-<%
-    for (Iterator it = maker.listModels(); it.hasNext(); ) {
-	String modelName = (String) it.next();
-        %> <option value="<%=modelName%>"/><%=modelName%></option>
-        <%    
-    }
-%>   
+        <c:forEach var="modelName" items="${modelNames}">
+            <option value="${modelName}"/>${modelName}</option>
+        </c:forEach>
     </select>
 
     <input id="submit" type="submit" value="Split Values"/>

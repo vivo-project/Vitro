@@ -11,5 +11,5 @@
     </p>
 
     <br/>
-    <a href="${urls.home}">Continue</a>
+    <a href="${urls.home}" title="continue">Continue</a>
 </section>

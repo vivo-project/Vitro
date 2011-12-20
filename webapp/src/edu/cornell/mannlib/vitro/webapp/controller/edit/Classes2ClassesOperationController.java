@@ -42,7 +42,8 @@ public class Classes2ClassesOperationController extends BaseEditController {
             try {
                 response.sendRedirect(defaultLandingPage);
             } catch (IOException f) {
-                e.printStackTrace();
+                log.error(f, f);
+                throw new RuntimeException(f);
             }
             return;
         }
@@ -52,7 +53,8 @@ public class Classes2ClassesOperationController extends BaseEditController {
             try {
                 response.sendRedirect(defaultLandingPage);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e, e);
+                throw new RuntimeException(e);
             }
             return;
         }
@@ -115,7 +117,7 @@ public class Classes2ClassesOperationController extends BaseEditController {
 	            	}
 	            }
 	        } catch (Exception e) {
-	            //e.printStackTrace();
+	            log.error(e, e);
 	        }
         }
 	        
@@ -127,13 +129,15 @@ public class Classes2ClassesOperationController extends BaseEditController {
             try {
                 response.sendRedirect(defaultLandingPage);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e, e);
+                throw new RuntimeException(e);
             }
         } else {
             try {
                 response.sendRedirect(referer);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e, e);
+                throw new RuntimeException(e);
             }
         }
 

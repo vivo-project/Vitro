@@ -17,7 +17,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
+import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
  * A factory that creates Freemarker-based email messages.
@@ -154,18 +154,24 @@ public class FreemarkerEmailFactory {
 		@Override
 		public void contextInitialized(ServletContextEvent sce) {
 			ServletContext ctx = sce.getServletContext();
-
-			if (AbortStartup.isStartupAborted(ctx)) {
-				return;
-			}
+			StartupStatus ss = StartupStatus.getBean(ctx);
 
 			try {
-				ctx.setAttribute(ATTRIBUTE_NAME,
-						new FreemarkerEmailFactory(ctx));
+				FreemarkerEmailFactory factory = new FreemarkerEmailFactory(ctx);
+				ctx.setAttribute(ATTRIBUTE_NAME, factory);
+
+				if (factory.isConfigured()) {
+					ss.info(this, "The system is configured to "
+							+ "send mail to users.");
+				} else {
+					ss.info(this, "Configuration parameters are missing: "
+							+ "the system will not send mail to users.");
+				}
 			} catch (Exception e) {
-				log.error(e, e);
-				AbortStartup.abortStartup(ctx);
-				throw new RuntimeException(e);
+				ss.warning(this,
+						"Failed to initialize FreemarkerEmailFactory. "
+								+ "The system will not be able to send email "
+								+ "to users.", e);
 			}
 		}
 

@@ -34,6 +34,7 @@ public class BaseEditController extends VitroHttpServlet {
     public static final String JSP_PREFIX = "/templates/edit/specific/";
 	
     protected static DateFormat DISPLAY_DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy");
+    protected static final int BASE_10 = 10;
 
     private static final Log log = LogFactory.getLog(BaseEditController.class.getName());
     private static final String DEFAULT_LANDING_PAGE = Controllers.SITE_ADMIN;

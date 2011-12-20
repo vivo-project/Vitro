@@ -17,6 +17,7 @@ import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -87,44 +88,53 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
 	public List<PropertyGroup> getPublicGroups(boolean withProperties) {
         ObjectPropertyDao opDao = getWebappDaoFactory().getObjectPropertyDao();
         DataPropertyDao dpDao = getWebappDaoFactory().getDataPropertyDao();
+        List<PropertyGroup> groups = new ArrayList<PropertyGroup>();
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            List<PropertyGroup> groups = new ArrayList<PropertyGroup>();
             ClosableIterator groupIt = getOntModel().listIndividuals(PROPERTYGROUP);
             try {
                 while (groupIt.hasNext()) {
                     Individual grp = (Individual) groupIt.next();
                     PropertyGroup pgrp = groupFromGroupIndividual(grp);
-                    List<Property> properties = new ArrayList<Property>();
-                    if (withProperties) {
-                        ClosableIterator closeIt = getOntModel().listStatements(null, PROPERTY_INPROPERTYGROUPANNOT, grp);
-                        try {
-                        	for (Iterator stmtIt = closeIt; stmtIt.hasNext(); ) {
-                        		Statement stmt = (Statement) stmtIt.next();
-                        		Resource subjRes = stmt.getSubject();
-                        		if (subjRes.canAs(com.hp.hpl.jena.ontology.ObjectProperty.class)) {
-                        			properties.add(opDao.getObjectPropertyByURI(subjRes.getURI()));
-                        		} else if (subjRes.canAs(com.hp.hpl.jena.ontology.DatatypeProperty.class)) {
-                        			properties.add(dpDao.getDataPropertyByURI(subjRes.getURI()));
-                        		}
-                        	}
-                        } finally {
-                        	closeIt.close();
-                        }
-                    }
-                    if (pgrp!=null) {
-                        pgrp.setPropertyList(properties);
-                        groups.add(pgrp);
-                        Collections.sort(groups);
+                    if (pgrp != null) {
+                    	groups.add(pgrp);
                     }
                 }
             } finally {
                 groupIt.close();
             }
-            return groups;
         } finally {
             getOntModel().leaveCriticalSection();
         }
+        if (withProperties) {
+        	Model tboxModel = getOntModelSelector().getTBoxModel();
+        	tboxModel.enterCriticalSection(Lock.READ);
+        	try {
+	        	for (PropertyGroup pgrp : groups) {	
+		            List<Property> properties = new ArrayList<Property>();            
+		            ClosableIterator closeIt = tboxModel.listStatements(
+		            		null, PROPERTY_INPROPERTYGROUPANNOT, tboxModel.getResource(pgrp.getURI()));
+		            try {
+		            	for (Iterator stmtIt = closeIt; stmtIt.hasNext(); ) {
+		            		Statement stmt = (Statement) stmtIt.next();
+		            		Resource subjRes = stmt.getSubject();
+		            		if (subjRes.canAs(com.hp.hpl.jena.ontology.ObjectProperty.class)) {
+		            			properties.add(opDao.getObjectPropertyByURI(subjRes.getURI()));
+		            		} else if (subjRes.canAs(com.hp.hpl.jena.ontology.DatatypeProperty.class)) {
+		            			properties.add(dpDao.getDataPropertyByURI(subjRes.getURI()));
+		            		}
+		            	}
+		            } finally {
+		            	closeIt.close();
+		            }
+		            pgrp.setPropertyList(properties);
+	        	}
+        	} finally {
+        		tboxModel.leaveCriticalSection();
+        	}
+        }
+        Collections.sort(groups);
+        return groups;
 	}
 	
 	public String insertNewPropertyGroup(PropertyGroup group) {
@@ -260,23 +270,9 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
         group.setURI(groupInd.getURI());
         group.setNamespace(groupInd.getNameSpace());
         group.setLocalName(groupInd.getLocalName());
-        try {
-            if (groupInd.getProperty(PUBLIC_DESCRIPTION_ANNOT)!=null) {
-                // without the convenience method, just for reference
-                // String valueStr = ((Literal)groupInd.getProperty(PUBLIC_DESCRIPTION_ANNOT).getObject()).getLexicalForm();
-                String valueStr = null;
-                if ((valueStr=getPropertyStringValue(groupInd,PUBLIC_DESCRIPTION_ANNOT)) != null) {
-                    group.setPublicDescription(valueStr);
-                }
-            }
-        } catch (Exception e) {
-            log.error("error setting public description in groupFromGroupIndividual() for "+groupInd.getURI());
-        }
-        try {
-            group.setDisplayRank(Integer.decode(((Literal)(groupInd.getProperty(DISPLAY_RANK).getObject())).getString()).intValue());
-        } catch (Exception e) {
-            log.debug("error setting display rank in groupFromGroupIndividual() for "+groupInd.getURI());
-        }
+        group.setPublicDescription(getPropertyStringValue(
+                groupInd, PUBLIC_DESCRIPTION_ANNOT));
+        group.setDisplayRank(getPropertyNonNegativeIntValue(groupInd, DISPLAY_RANK));    
         return group;
     }
 	

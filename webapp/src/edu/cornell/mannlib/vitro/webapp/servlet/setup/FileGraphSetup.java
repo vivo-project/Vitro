@@ -43,10 +43,6 @@ public class FileGraphSetup implements ServletContextListener {
 		
 	public void contextInitialized(ServletContextEvent sce) {
 		
-	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
-            return;
-        }
-	    
 		boolean aboxChanged = false; // indicates whether any ABox file graph model has changed
 		boolean tboxChanged = false; // indicates whether any TBox file graph model has changed
 		OntModelSelector baseOms = null;

@@ -78,12 +78,12 @@ public class IndividualListController extends FreemarkerHttpServlet {
                         + VClass.class.getName() + ".");
             }
             
-            String vclassUri = vclass.getURI();
-            body.put("vclassId", vclassUri);
-            vreq.setAttribute("displayType", vclassUri); // used by the template model object
-            
             if (vclass != null) {
                 
+            	String vclassUri = vclass.getURI();
+            	body.put("vclassId", vclassUri);
+            	vreq.setAttribute("displayType", vclassUri); // used by the template model object
+            	
                 // Set title and subtitle. 
                 VClassGroup classGroup = vclass.getGroup();  
                 String title;

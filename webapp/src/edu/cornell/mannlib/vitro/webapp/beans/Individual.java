@@ -93,8 +93,6 @@ public interface Individual extends ResourceBean, Comparable<Individual> {
     void sortForDisplay();
 
     JSONObject toJSON() throws JSONException;
-
-    Object getField(String fieldName) throws NoSuchMethodException;
     
     Float getSearchBoost();
     void setSearchBoost( Float boost );

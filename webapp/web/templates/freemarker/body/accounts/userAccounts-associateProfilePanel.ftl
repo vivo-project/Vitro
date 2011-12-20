@@ -26,8 +26,8 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/auto
             <p>
                 <label for="associatedProfileName">Associated profile:</label>
                 <span class="acSelectionInfo" id="associatedProfileName"></span>
-                <a href="" id="verifyProfileLink">(verify this match)</a>
-                <a href="" id="changeProfileLink">(change profile)</a>
+                <a href="" id="verifyProfileLink" title="verify this match">(verify this match)</a>
+                <a href="" id="changeProfileLink" title="change profile">(change profile)</a>
             </p>
             <input type="hidden" id="associatedProfileUri" name="associatedProfileUri" value="" />
         </div>

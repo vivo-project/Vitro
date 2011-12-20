@@ -12,19 +12,26 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.RebuildVClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.querymodel.QueryFullModel;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.querymodel.QueryUserAccountsModel;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.AccessSpecialDataModels;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndividuals;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoFrontEndEditing;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoBackEndEditing;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOwnAccount;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditSiteInformation;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageOwnProxies;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManagePortals;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageProxies;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageSearchIndex;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageTabs;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.RefreshVisualizationCacheAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeIndividualEditingPanel;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeRevisionInfo;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeSiteAdminPage;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeVerbosePropertyInformation;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
@@ -64,10 +71,25 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		} else if (whatToAuth instanceof ManageMenus) {
 			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
 
+		} else if (whatToAuth instanceof ManageSearchIndex) {
+			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
+			
 		} else if (whatToAuth instanceof UseMiscellaneousAdminPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
 
 		} else if (whatToAuth instanceof AccessSpecialDataModels) {
+			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
+			
+		} else if (whatToAuth instanceof RebuildVClassGroupCache) {
+            result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
+
+		} else if (whatToAuth instanceof RefreshVisualizationCacheAction) {
+			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
+		
+		} else if (whatToAuth instanceof SeeStartupStatus) {
+			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
+			
+		} else if (whatToAuth instanceof ManageProxies) {
 			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
 			
 		} else if (whatToAuth instanceof EditOntology) {
@@ -88,7 +110,7 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		} else if (whatToAuth instanceof UseMiscellaneousCuratorPages) {
 			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
 
-		} else if (whatToAuth instanceof EditIndividuals) {
+		} else if (whatToAuth instanceof DoBackEndEditing) {
 			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
 
 		} else if (whatToAuth instanceof SeeSiteAdminPage) {
@@ -112,10 +134,18 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		} else if (whatToAuth instanceof EditOwnAccount) {
 			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
 
-		} else if (whatToAuth instanceof RebuildVClassGroupCache) {
-            result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
-		} else if (whatToAuth instanceof RefreshVisualizationCacheAction) {
-			result = isAuthorized(whatToAuth, RoleLevel.DB_ADMIN, userRole);
+		} else if (whatToAuth instanceof ManageOwnProxies) {
+			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
+			
+		} else if (whatToAuth instanceof QueryUserAccountsModel) {
+			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
+			
+		} else if (whatToAuth instanceof DoFrontEndEditing) {
+			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
+			
+		} else if (whatToAuth instanceof QueryFullModel) {
+			result = isAuthorized(whatToAuth, RoleLevel.PUBLIC, userRole);
+			
 		} else {
 			result = defaultDecision("Unrecognized action");
 		}

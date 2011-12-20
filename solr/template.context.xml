@@ -1,0 +1,16 @@
+<Context crossContext="true" override="true">
+
+   <!-- For security, restrict access to clients on this machine
+        for IPv4 requests, localhost is 127.0.0.1
+        for IPv6 requests, localhost is 0:0:0:0:0:0:0:1 -->
+    <Valve className="org.apache.catalina.valves.RemoteAddrValve" 
+        allow="${vitro.local.solr.ipaddress.mask}"/>
+
+   <Environment
+        type="java.lang.String" 
+        name="solr/home"  
+        value="${solr.home.dir}" override="true"/>
+
+   <!-- Disable persist sessions on shut down.-->
+   <Manager pathname="" />
+</Context>

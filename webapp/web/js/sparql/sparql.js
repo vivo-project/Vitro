@@ -1,12 +1,13 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 			var namespaces = {
-					rdf		:	"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-					rdfs	:	"http://www.w3.org/2000/01/rdf-schema#",
-					xsd		:	"http://www.w3.org/2001/XMLSchema#",
-					owl		:	"http://www.w3.org/2002/07/owl#",
-					swrl	:	"http://www.w3.org/2003/11/swrl#",
-					swrlb	:	"http://www.w3.org/2003/11/swrlb#",
-					vitro	:	"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#"
+//                  now handled in GetAllPrefix.java
+//					rdf		:	"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+//					rdfs	:	"http://www.w3.org/2000/01/rdf-schema#",
+//					xsd		:	"http://www.w3.org/2001/XMLSchema#",
+//					owl		:	"http://www.w3.org/2002/07/owl#",
+//					swrl	:	"http://www.w3.org/2003/11/swrl#",
+//					swrlb	:	"http://www.w3.org/2003/11/swrlb#",
+//					vitro	:	"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#"
 				};
 			
 			var level = 0;
@@ -21,10 +22,10 @@
 				var myAjax = new Ajax.Request( url, {method: "get", parameters: "", onComplete: function(originalRequest){
 							var response = originalRequest.responseXML;
 							var options = response.getElementsByTagName("option");
-							if (options == null || options.length == 0){
-								alert("Error: Cannot get all the classes.");
-								return;
-							}
+//							if (options == null || options.length == 0){
+//								alert("Error: Cannot get all the classes.");
+//								return;
+//							}
 							for(i=0; i<options.length; i++){
 								base[base.length] = new Option(options[i].childNodes[0].firstChild.data, options[i].childNodes[1].firstChild.data);
 							}
@@ -49,8 +50,8 @@
 				var myPrefixAjax = new Ajax.Request( preurl, {method: "get", parameters: "", onComplete: function(originalRequest){
 							var response = originalRequest.responseXML;
 							var options = response.getElementsByTagName("option");
-							if (options == null || options.length == 0){
-								alert("Error: Cannot get all the prefix.");
+							if (options == null || options.length == 0) {
+								alert("Error: Cannot get all the prefixes.");
 								return;
 							}
 							for(i=0; i<options.length; i++)

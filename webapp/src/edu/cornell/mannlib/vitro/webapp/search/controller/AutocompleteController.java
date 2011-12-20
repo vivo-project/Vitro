@@ -45,6 +45,8 @@ public class AutocompleteController extends VitroAjaxController {
     
     private static final String PARAM_QUERY = "term";
     private static final String PARAM_RDFTYPE = "type";
+    private static final String PARAM_MULTIPLE_RDFTYPE = "multipleTypes";
+
     
     String NORESULT_MSG = "";    
     private static final int DEFAULT_MAX_HIT_COUNT = 1000; 
@@ -156,8 +158,9 @@ public class AutocompleteController extends VitroAjaxController {
         
         // Filter by type
         String typeParam = (String) vreq.getParameter(PARAM_RDFTYPE);
+        String multipleTypesParam = (String) vreq.getParameter(PARAM_MULTIPLE_RDFTYPE);
         if (typeParam != null) {
-            query.addFilterQuery(VitroSearchTermNames.RDFTYPE + ":\"" + typeParam + "\"");
+        	addFilterQuery(query, typeParam,  multipleTypesParam);
         }   
         
         query.setFields(VitroSearchTermNames.NAME_RAW, VitroSearchTermNames.URI); // fields to retrieve
@@ -168,7 +171,28 @@ public class AutocompleteController extends VitroAjaxController {
         return query;
     }
     
-    private void setNameQuery(SolrQuery query, String queryStr, HttpServletRequest request) {
+    private void addFilterQuery(SolrQuery query, String typeParam, String multipleTypesParam) {
+    	if(multipleTypesParam == null || multipleTypesParam.equals("null") || multipleTypesParam.isEmpty()) {
+    		//Single type parameter, process as usual
+            query.addFilterQuery(VitroSearchTermNames.RDFTYPE + ":\"" + typeParam + "\"");
+    	} else {
+    		//Types should be comma separated
+    		String[] typeParams = typeParam.split(",");
+    		int len = typeParams.length;
+    		int i;
+    		List<String> filterQueries = new ArrayList<String>();
+    		
+    		for(i = 0; i < len; i++) {
+    			filterQueries.add(VitroSearchTermNames.RDFTYPE + ":\"" + typeParams[i] + "\" ");
+    		}
+    		String filterQuery = StringUtils.join(filterQueries, " OR ");
+    		query.addFilterQuery(filterQuery);
+    	}
+
+		
+	}
+
+	private void setNameQuery(SolrQuery query, String queryStr, HttpServletRequest request) {
 
         if (StringUtils.isBlank(queryStr)) {
             log.error("No query string");

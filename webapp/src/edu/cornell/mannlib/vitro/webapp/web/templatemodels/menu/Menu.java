@@ -26,6 +26,8 @@ public class Menu extends BaseTemplateModel {
         items.add(new MenuItem(text, path));
     }
     
+    /* Template properties */
+    
     public List<MenuItem> getItems() {
         return items;
     }  

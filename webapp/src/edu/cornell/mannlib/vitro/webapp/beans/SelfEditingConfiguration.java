@@ -126,7 +126,9 @@ public class SelfEditingConfiguration {
 
 	/**
 	 * Get all Individuals associated with this externalAuthId through the
-	 * matching property. Never returns null.
+	 * matching property. If the externalAuthId is empty or null, it won't match
+	 * anything, even though many individuals might have empty matching
+	 * properties. Never returns null.
 	 */
 	public List<Individual> getAssociatedIndividuals(IndividualDao indDao,
 			String externalAuthId) {
@@ -136,6 +138,10 @@ public class SelfEditingConfiguration {
 		}
 		if (externalAuthId == null) {
 			log.debug("externalAuthId is null");
+			return Collections.emptyList();
+		}
+		if (externalAuthId.isEmpty()) {
+			log.debug("externalAuthId is empty");
 			return Collections.emptyList();
 		}
 		if (selfEditingIdMatchingProperty == null) {

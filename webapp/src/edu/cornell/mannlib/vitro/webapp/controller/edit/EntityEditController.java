@@ -25,7 +25,7 @@ import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndividuals;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoBackEndEditing;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -42,7 +42,7 @@ public class EntityEditController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(EntityEditController.class.getName());
 
     public void doGet (HttpServletRequest request, HttpServletResponse response) {
-        if (!isAuthorizedToDisplayPage(request, response, new Actions(new EditIndividuals()))) {
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new DoBackEndEditing()))) {
         	return;
         }
 
@@ -130,7 +130,7 @@ public class EntityEditController extends BaseEditController {
         request.setAttribute("epo", epo);
 
         FormObject foo = new FormObject();
-        HashMap OptionMap = new HashMap();
+        HashMap<String, List<Option>> OptionMap = new HashMap<String, List<Option>>();
         
         request.setAttribute("types",ent.getVClasses(false)); // we're displaying all assertions, including indirect types
         
@@ -145,20 +145,17 @@ public class EntityEditController extends BaseEditController {
                 }
             }
             OptionMap.put("externalIds", externalIdOptionList);
-        } catch (Exception e) {e.printStackTrace();}
-                
-        List classGroups = vreq.getFullWebappDaoFactory().getVClassGroupDao().getPublicGroupsWithVClasses(true,true,false); // order by displayRank, include uninstantiated classes, don't count the individuals
-        Iterator classGroupIt = classGroups.iterator();
-        ListOrderedMap optGroupMap = new ListOrderedMap();
-        while (classGroupIt.hasNext()) {
-            VClassGroup group = (VClassGroup)classGroupIt.next();
-            List classes = group.getVitroClassList();
-            optGroupMap.put(group.getPublicName(),FormUtils.makeOptionListFromBeans(classes,"URI","PickListName",ent.getVClassURI(),null,false));
-            //mixes group names with classes:optGroupMap.put(group.getPublicName(),FormUtils.makeVClassOptionList(getFullWebappDaoFactory(),ent.getVClassURI()));
+        } catch (Exception e) {
+            log.error(e, e);
         }
-        try {
-            OptionMap.put("VClassURI", optGroupMap);
-        } catch (Exception e) {e.printStackTrace();}       
+                
+        try{
+            OptionMap.put("VClassURI", FormUtils.makeOptionListFromBeans(
+                    vreq.getFullWebappDaoFactory().getVClassDao().getAllVclasses(),
+                            "URI", "PickListName", ent.getVClassURI(), null, false));        
+        } catch (Exception e) {
+            log.error(e, e);
+        }
         
         PropertyInstanceDao piDao = vreq.getFullWebappDaoFactory().getPropertyInstanceDao();
         // existing property statements
@@ -173,7 +170,7 @@ public class EntityEditController extends BaseEditController {
             }
             OptionMap.put("ExistingPropertyInstances", epiOptionList);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e, e);
         }
         // possible property statements
         try {
@@ -182,7 +179,7 @@ public class EntityEditController extends BaseEditController {
             piList.addAll(piColl);
             OptionMap.put("PropertyURI", FormUtils.makeOptionListFromBeans(piList, "PropertyURI", "DomainPublic", (String)null, (String)null, false));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e, e);
         }
 
         foo.setOptionLists(OptionMap);

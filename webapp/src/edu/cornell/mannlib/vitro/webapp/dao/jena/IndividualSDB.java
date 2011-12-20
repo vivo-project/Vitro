@@ -18,7 +18,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 
-import com.clarkparsia.pellet.sparqldl.engine.QueryExec;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntResource;
@@ -46,8 +45,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
-import edu.cornell.mannlib.vitro.webapp.beans.Keyword;
-import edu.cornell.mannlib.vitro.webapp.beans.Link;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
@@ -117,9 +114,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	this.datasetMode = datasetMode;
     	this.dwf = datasetWrapperFactory;
     	
-        // TODO revisit.  Skipping initialization no longer
-        // buys us anything when we call noTriplesFor()
-    	if (false && skipInitialization) {
+    	if (skipInitialization) {
             OntModel ontModel = ModelFactory.createOntologyModel(
                     OntModelSpec.OWL_MEM);
             this.ind = ontModel.createOntResource(individualURI);  
@@ -434,8 +429,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                 webappDaoFactory.getObjectPropertyStatementDao()
                         .fillExistingObjectPropertyStatements(this);
             } catch (Exception e) {
-                log.error(this.getClass().getName() + 
-                        " could not fill existing ObjectPropertyStatements for "
+                log.error("Could not fill existing ObjectPropertyStatements for "
                         + this.getURI(), e);
             }
             return this.objectPropertyStatements;
@@ -473,7 +467,14 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     			Individual subj = new IndividualSDB(((OntResource) s.getSubject().as(OntResource.class)).getURI(), this.dwf, datasetMode, webappDaoFactory);
     			Individual obj = new IndividualSDB(((OntResource) s.getObject().as(OntResource.class)).getURI(), this.dwf, datasetMode, webappDaoFactory);
     			ObjectProperty op = webappDaoFactory.getObjectPropertyDao().getObjectPropertyByURI(s.getPredicate().getURI());
-    			if (subj != null && obj != null && op != null) {
+    			// We don't want to filter out statements simply because we 
+    			// can't find a type for the property, so we'll just make a 
+    			// new ObjectProperty bean if we can't get one from the DAO.
+    			if (op == null) {
+    				op = new ObjectProperty();
+    				op.setURI(propertyURI);
+    			}
+    			if (subj != null && obj != null) {
     				ObjectPropertyStatement ops = new ObjectPropertyStatementImpl();
     				ops.setSubject(subj);
     				ops.setSubjectURI(subj.getURI());
@@ -577,8 +578,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                 webappDaoFactory.getObjectPropertyDao()
                         .fillObjectPropertiesForIndividual( this );
             } catch (Exception e) {
-                log.error(this.getClass().getName() + 
-                        " could not fillEntityProperties for " + this.getURI());
+                log.error("Could not fillEntityProperties for " + this.getURI(), e);
             }
             return this.propertyList;
         }
@@ -621,9 +621,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                 webappDaoFactory.getDataPropertyStatementDao()
                         .fillExistingDataPropertyStatementsForIndividual(this);
             } catch (Exception e) {
-                log.error(this.getClass().getName() + 
-                        " could not fill existing DataPropertyStatements for "
-                                + this.getURI());
+                log.error("Could not fill existing DataPropertyStatements for "
+                                + this.getURI(), e);
             }
             return this.dataPropertyStatements;
         }
@@ -637,8 +636,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                 webappDaoFactory.getDataPropertyDao()
                         .fillDataPropertiesForIndividual( this );
             } catch (Exception e) {
-                log.error(this.getClass().getName() + 
-                        " could not fill data properties for " + this.getURI());
+                log.error("Could not fill data properties for " + this.getURI(), e);
             }
             return this.datatypePropertyList;
         }
@@ -684,8 +682,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                         .getExternalIds(this.getURI(), null));
                 this.externalIds = dpsList;
             } catch (Exception e) {
-                log.error(this.getClass().getName() + 
-                        " could not fill external IDs for " + this.getURI());
+                log.error("Could not fill external IDs for " + this.getURI(), e);
             }
             return this.externalIds;
         }
@@ -950,7 +947,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                         else
                             rv = 0;
                     } catch (NullPointerException e) {
-                        e.printStackTrace();
+                        log.error(e, e);
                     }
 
                     if( cAsc )

@@ -7,7 +7,10 @@
 	<td valign="top" colspan="1">
 		<b>Public Name</b><br/><i>as will display on public pages</i><br/>
 		<input name="PublicName" value="<form:value name="PublicName"/>"/>
-		<div class="warning"><form:error name="PublicName"/></div>
+        <c:set var="PublicNameError"><form:error name="PublicName"/></c:set>
+        <c:if test="${!empty PublicNameError}">
+            <span class="notice"><c:out value="${PublicNameError}"/></span>
+        </c:if>
 	</td>
 	<td valign="top" colspan="1">
 		<b>Property Group</b><br/>
@@ -15,17 +18,14 @@
 		<select name="GroupURI">
 		  <form:option name="GroupURI"/>
 		</select>
-		<div class="warning"><form:error name="GroupURI"/></div>
 	</td>
 	<td valign="bottom" colspan="1">
         <b>Display Level</b><br /><i>(specify least restrictive level allowed)</i><br/>
         <select name="HiddenFromDisplayBelowRoleLevelUsingRoleUri"><form:option name="HiddenFromDisplayBelowRoleLevelUsingRoleUri"/></select>
-        <font size="2" color="red"><form:error name="HiddenFromDisplayBelowRoleLevelUsingRoleUri"/></font>
     </td>
     <td valign="bottom" colspan="1">
         <b>Update Level</b><br /><i>(specify least restrictive level allowed)</i><br />
         <select name="ProhibitedFromUpdateBelowRoleLevelUsingRoleUri"><form:option name="ProhibitedFromUpdateBelowRoleLevelUsingRoleUri"/></select>
-        <font size="2" color="red"><form:error name="ProhibitedFromUpdateBelowRoleLevelUsingRoleUri"/></font>
     </td>
 </tr>
 <tr class="editformcell">
@@ -46,10 +46,9 @@
 				</select>
 			</c:otherwise>
 		</c:choose>
-		<div class="warning"><form:error name="Namespace"/></div>
 	</td>
 	<td valign="top" colspan="2">
-		<b>Local Name</b>
+		<b>Local Name*</b>
         <c:choose>
         	<c:when test="${_action eq 'update'}">
         		<br/><i>Change only via the "change URI" button on the previous screen</i><br/>
@@ -60,7 +59,10 @@
 				<input name="LocalName" value="<form:value name="LocalName"/>"/>
 			</c:otherwise>
 		</c:choose>
-		<div class="warning"><form:error name="LocalName"/></div>
+        <c:set var="LocalNameError"><form:error name="LocalName"/></c:set>
+        <c:if test="${!empty LocalNameError}">
+            <span class="notice"><c:out value="${LocalNameError}"/></span>
+        </c:if>
 	</td>
 </tr>
 
@@ -70,7 +72,6 @@
 		<select name="DomainClassURI">
 			<form:option name="DomainClassURI"/>
 		</select>
-		<span class="warning"><form:error name="DomainClassURI"/></span>
 	</td>
 </tr>
 
@@ -80,7 +81,6 @@
 		<select name="RangeDatatypeURI">
 			<form:option name="RangeDatatypeURI"/>
 		</select>
-		<span class="warning"><form:error name="RangeDatatypeURI"/></span>
 	</td>
     <td valign="bottom" colspan="2">
         <c:set var="functionalLabel" value="<b>Functional property</b> <i>(has at most one value for each individual)</i>" />
@@ -99,7 +99,10 @@
     <td valign="top" colspan="4">
         <b>Example</b><br/>
         <textarea name="Example"><form:value name="Example"/></textarea>
-        <span class="warning"><form:error name="Example"/></span>
+        <c:set var="ExampleError"><form:error name="Example"/></c:set>
+        <c:if test="${!empty ExampleError}">
+            <span class="notice"><c:out value="${ExampleError}"/></span>
+        </c:if>
     </td>
 </tr>
 
@@ -107,7 +110,10 @@
 	<td valign="top" colspan="4">
 		<b>Description</b> for ontology editors<br/>
 		<textarea name="Description"><form:value name="Description"/></textarea>
-		<span class="warning"><form:error name="Description"/></span>
+        <c:set var="DescriptionError"><form:error name="Description"/></c:set>
+        <c:if test="${!empty DescriptionError}">
+            <span class="notice"><c:out value="${DescriptionError}"/></span>
+        </c:if>
 	</td>
 </tr>
 
@@ -115,7 +121,10 @@
 	<td valign="top" colspan="4">
 		<b>Public Description</b> for front-end users, as it will appear on editing forms<br/>
 		<textarea name="PublicDescription"><form:value name="PublicDescription"/></textarea>
-		<span class="warning"><form:error name="PublicDescription"/></span>
+        <c:set var="PublicDescriptionError"><form:error name="PublicDescription"/></c:set>
+        <c:if test="${!empty PublicDescriptionError}">
+            <span class="notice"><c:out value="${PublicDescriptionError}"/></span>
+        </c:if>
 	</td>
 </tr>
 
@@ -123,17 +132,26 @@
 	<td valign="top" colspan="1">
 		<b>Display Tier</b><br/>
 		<input name="DisplayTier" value="<form:value name="DisplayTier"/>"/>
-		<span class="warning"><form:error name="DisplayTier"/></span>
+        <c:set var="DisplayTierError"><form:error name="DisplayTier"/></c:set>
+        <c:if test="${!empty DisplayTierError}">
+            <span class="notice"><c:out value="${DisplayTierError}"/></span>
+        </c:if>
 	</td>
 	<td valign="top" colspan="1">
 		<b>Display Limit</b><br/>
 		<input name="DisplayLimit" value="<form:value name="DisplayLimit"/>"/>
-		<span class="warning"><form:error name="DisplayLimit"/></span>
+        <c:set var="DisplayLimitError"><form:error name="DisplayLimit"/></c:set>
+        <c:if test="${!empty DisplayLimitError}">
+            <span class="notice"><c:out value="${DisplayLimitError}"/></span>
+        </c:if>
 	</td>
 	<td valign="top" colspan="1">
     	<em>Optional: <b>custom entry form</b></em><br />
     	<input name="CustomEntryForm" size="30" value="<form:value name="CustomEntryForm"/>" />
-    	<span class="warning"><form:error name="CustomEntryForm"/></span>
+        <c:set var="CustomEntryFormError"><form:error name="CustomEntryForm"/></c:set>
+        <c:if test="${!empty CustomEntryFormError}">
+            <span class="notice"><c:out value="${CustomEntryFormError}"/></span>
+        </c:if>
     	</td>
 	</td>
 </tr>

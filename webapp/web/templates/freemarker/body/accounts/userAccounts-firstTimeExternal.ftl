@@ -54,7 +54,7 @@
             </p>
         </#if>
 
-        <p><input type="submit" name="submit" value="Create account" class="submit"/> or <a class="cancel" href="${urls.home}">Cancel</a></p>
+        <p><input type="submit" name="submit" value="Create account" class="submit"/> or <a class="cancel" href="${urls.home}" title="cancel">Cancel</a></p>
     </form>
 </section>
 

@@ -28,7 +28,7 @@
         </span>
     </#if>
     
-    <h3>There is currently no content in the system</h3>
+    <h3>There is currently no content in the system, or you need to create class groups and assign your classes to them.</h3>
     
     <#if user.loggedIn && user.hasSiteAdminAccess>
         <p>You can <a href="${urls.siteAdmin}" title="Manage content">add content and manage this site</a> from the Site Administration page.</p>

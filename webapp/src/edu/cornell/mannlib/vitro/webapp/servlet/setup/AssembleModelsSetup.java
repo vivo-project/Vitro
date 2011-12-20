@@ -43,10 +43,6 @@ public class AssembleModelsSetup implements ServletContextListener {
 	
 	public void contextInitialized(ServletContextEvent sce) {
 	    
-	    if (AbortStartup.isStartupAborted(sce.getServletContext())) {
-	        return;
-	    }
-	    
 		OntModel jenaOntModel = null;
 		try {
 			jenaOntModel = (OntModel) sce.getServletContext().getAttribute("baseOntModel");

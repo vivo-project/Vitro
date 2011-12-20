@@ -1,0 +1,88 @@
+# $This file is distributed under the terms of the license in /doc/license.txt$ 
+
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix mydomain: <http://vivo.mydomain.edu/individual/> .
+
+### This file provides a UserAccounts model for ProxyRelationshipSelectorTest.java
+
+#
+# The first relationship to be returned, regardless of view, is this proxy to its profile.
+#
+mydomain:userFirstProxy
+	a auth:UserAccount ;
+	auth:emailAddress "firstProxy@some.edu" ;
+	auth:firstName "FirstProxy" ;
+	auth:lastName "AAAA" ;
+	auth:externalAuthId "firstSelf" ;
+	auth:proxyEditorFor mydomain:firstProfile ;
+	.
+
+
+#
+# A user account with no proxy relationship and no profile.
+#
+mydomain:userProxyForNone
+	a auth:UserAccount ;
+	auth:emailAddress "proxyForNone@some.edu" ;
+	auth:firstName "Proxy4" ;
+	auth:lastName "None" ;
+	.
+
+#
+# This user account is proxy for a bunch of profiles. 
+# This user account has no self
+#
+mydomain:userPopularProxy
+	a auth:UserAccount ;
+	auth:emailAddress "popularProxy@some.edu" ;
+	auth:firstName "Popular" ;
+	auth:lastName "Proxy" ;
+	auth:proxyEditorFor mydomain:profileWithNoClassLabel ;
+	auth:proxyEditorFor mydomain:profileWithNoImageUrl ;
+	auth:proxyEditorFor mydomain:profileWithNeither ;
+	auth:proxyEditorFor mydomain:profileWithBoth ;
+	.
+
+#
+# These user accounts are each proxy for a popular profile.
+# All but one has a self, but each self has different combinations of attributes.
+#
+mydomain:userProxyWithNoSelf
+	a auth:UserAccount ;
+	auth:emailAddress "proxyWithNoSelf@some.edu" ;
+	auth:firstName "ProxyWith" ;
+	auth:lastName "NoSelf" ;
+	auth:proxyEditorFor mydomain:popularProfile ;
+	.
+mydomain:userProxyWithSelfWithNoClassLabel
+	a auth:UserAccount ;
+	auth:emailAddress "proxyWithSelfWithNoClassLabel@some.edu" ;
+	auth:firstName "ProxyWithSelfWith" ;
+	auth:lastName "NoClassLabel" ;
+	auth:externalAuthId "individualWithNoClassLabel" ;
+	auth:proxyEditorFor mydomain:popularProfile ;
+	.
+mydomain:userProxyWithSelfWithNoImageUrl
+	a auth:UserAccount ;
+	auth:emailAddress "proxyWithSelfWithNoImageUrl@some.edu" ;
+	auth:firstName "ProxyWithSelfWith" ;
+	auth:lastName "NoImageUrl" ;
+	auth:externalAuthId "individualWithNoImageUrl" ;
+	auth:proxyEditorFor mydomain:popularProfile ;
+	.
+mydomain:userProxyWithSelfWithNeither
+	a auth:UserAccount ;
+	auth:emailAddress "proxyWithSelfWithNeither@some.edu" ;
+	auth:firstName "ProxyWithSelfWith" ;
+	auth:lastName "Neither" ;
+	auth:externalAuthId "individualWithNeither" ;
+	auth:proxyEditorFor mydomain:popularProfile ;
+	.
+mydomain:userProxyWithSelfWithBoth
+	a auth:UserAccount ;
+	auth:emailAddress "proxyWithSelfWithBoth@some.edu" ;
+	auth:firstName "ProxyWithSelfWith" ;
+	auth:lastName "Both" ;
+	auth:externalAuthId "individualWithBoth" ;
+	auth:proxyEditorFor mydomain:popularProfile ;
+	.

@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -74,7 +75,7 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         return isVClass;
     }
     
-    /* These methods perform some manipulation of the data returned by the Individual methods */
+    /* Template properties */
     
     public String getProfileUrl() {
         return UrlBuilder.getIndividualProfileUrl(individual, vreq);        
@@ -102,10 +103,6 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         boolean isUriInDefaultNamespace = UrlBuilder.isUriInDefaultNamespace(individualUri, vreq);
         return isUriInDefaultNamespace ? profileUrl + "/" + getLocalName() + ".rdf" 
                                        : UrlBuilder.addParams(profileUrl, "format", "rdfxml");
-    }
-    
-    public String getEditUrl() {
-        return UrlBuilder.getUrl(Route.INDIVIDUAL_EDIT, "uri", getUri());
     }
 
     public GroupedPropertyList getPropertyList() {
@@ -165,13 +162,70 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
     public String getLocalName() {
         return individual.getLocalName();
     }   
+   
+// For testing dump
+//    // Properties
+//    public String getANullString() {
+//        return null;
+//    }    
+//    public String getAnEmptyString() {
+//        return "";
+//    }    
+//    public String[] getANullArray() {
+//        return null;
+//    }    
+//    public String[] getAnEmptyArray() {
+//        String[] a = {};
+//        return a;
+//    }    
+//    public List<String> getANullList() {
+//        return null;
+//    }    
+//    public List<String> getAnEmptyList() {
+//        return Collections.emptyList();
+//    }    
+//    public Map<String, String> getANullMap() {
+//        return null;
+//    }    
+//    public Map<String, String> getAnEmptyMap() {
+//        return Collections.emptyMap();
+//    }    
+//    
+//    // Methods
+//    public String nullString() {
+//        return null;
+//    }    
+//    public String emptyString() {
+//        return "";
+//    }    
+//    public String[] nullArray() {
+//        return null;
+//    }    
+//    public String[] emptyArray() {
+//        String[] a = {};
+//        return a;
+//    }    
+//    public List<String> nullList() {
+//        return null;
+//    }    
+//    public List<String> emptyList() {
+//        return Collections.emptyList();
+//    }   
+//    public Map<String, String> nullMap() {
+//        return null;
+//    }    
+//    public Map<String, String> emptyMap() {
+//        return Collections.emptyMap();
+//    }
+    
+    
+    /* Template methods */
  
-    public String getSelfEditingId() {
+    public String selfEditingId() {
         String id = null;
-        String idMatchingProperty = ConfigurationProperties.getBean(getServletContext()).getProperty("selfEditing.idMatchingProperty");
+        String idMatchingProperty = 
+            ConfigurationProperties.getBean(getServletContext()).getProperty("selfEditing.idMatchingProperty");
         if (! StringUtils.isBlank(idMatchingProperty)) {
-            // Use assertions model to side-step filtering. We need to get the value regardless of whether the property
-            // is visible to the current user.
             WebappDaoFactory wdf = vreq.getUnfilteredWebappDaoFactory();
             Collection<DataPropertyStatement> ids = 
                 wdf.getDataPropertyStatementDao().getDataPropertyStatementsForIndividualByDataPropertyURI(individual, idMatchingProperty);
@@ -181,4 +235,9 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         }
         return id;
     }
+    
+    public String controlPanelUrl() {
+        return UrlBuilder.getUrl(Route.INDIVIDUAL_EDIT, "uri", getUri());
+    }
+    
 }

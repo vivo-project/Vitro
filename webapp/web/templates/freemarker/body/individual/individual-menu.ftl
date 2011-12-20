@@ -24,12 +24,14 @@
     <#if editable>
         <#assign addUrl = hasElement.addUrl>
         <#if addUrl?has_content>
-            <a class="add-hasElement green button" href="${addUrl}" title="Add new menu item">Add menu item</a>
+            <p><a class="add-hasElement green button" href="${addUrl}" title="Add new menu item">Add menu item</a></p>
+            
+            <p class="note">Refresh page after reordering menu items</p>
         </#if>
     </#if>
     
     ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/individual/individual.css" />',
-                      '<link rel="stylesheet" href="${urls.base}/css/individual/menuManagement.css" />')}
+                      '<link rel="stylesheet" href="${urls.base}/css/individual/menuManagement-menuItems.css" />')}
                       
     ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"></script>')}
     

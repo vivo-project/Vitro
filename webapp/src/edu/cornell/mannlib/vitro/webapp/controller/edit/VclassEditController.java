@@ -28,7 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroModelProperties;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class VclassEditController extends BaseEditController {
@@ -50,10 +50,8 @@ public class VclassEditController extends BaseEditController {
         VClass vcl = (VClass)vcwDao.getVClassByURI(request.getParameter("uri"));
         
         if (vcl == null) {
-        	if (VitroModelProperties.isRDFS(request.getFullWebappDaoFactory().getLanguageProfile()) 
-        			&& ( (RDF.getURI()+"Resource").equals(request.getParameter("uri")))) {
-        		vcl = new VClass(RDF.getURI()+"Resource");
-        	}
+        	vcl = request.getFullWebappDaoFactory()
+        	        .getVClassDao().getTopConcept();
         }
 
         request.setAttribute("VClass",vcl);
@@ -183,7 +181,7 @@ public class VclassEditController extends BaseEditController {
 	        }
 	        request.setAttribute("disjointClasses",djVClasses);
         } catch (Exception e) {
-        	e.printStackTrace();
+        	log.error(e, e);
         }
         
         try {
@@ -202,7 +200,7 @@ public class VclassEditController extends BaseEditController {
 	        request.setAttribute("equivalentClasses",eqVClasses);
         } catch (Exception e) {
         	log.error("Couldn't get the equivalent classes: ");
-        	e.printStackTrace();
+        	log.error(e, e);
         }
 
         // add the options
@@ -217,7 +215,7 @@ public class VclassEditController extends BaseEditController {
         request.setAttribute("instantiable", instantiable);
         request.setAttribute("bodyJsp","/templates/edit/specific/classes_edit.jsp");
         request.setAttribute("title","Class Control Panel");
-        request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+request.getAppBean().getThemeDir()+"css/edit.css\"/>");
+        //request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+request.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
             rd.forward(request, response);

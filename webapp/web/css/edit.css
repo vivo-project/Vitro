@@ -132,7 +132,6 @@ td.verticalfieldlabel {
 }
 .editingForm .form-button {
     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
-    font-size: 1em;
     margin-top: 2px;
     width: auto;
     overflow: visible;
@@ -347,6 +346,10 @@ div.sparqlform .parenthetical {
     font-style: italic;
     margin-top: 0;
     margin-bottom: .25em;
+}
+/* custom list view for mailingAddress */
+div.adr {
+    display: inline-block;
 }
 /* Temporary hack to remove stuff from forms in vivoweb only */
 .hideFromVivoWeb {

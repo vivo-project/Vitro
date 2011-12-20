@@ -3,7 +3,7 @@
 <%@ page import="com.hp.hpl.jena.rdf.model.ModelMaker" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.net.URLEncoder" %>
-<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" %>
@@ -21,15 +21,6 @@ function init(){
 	}
 }
 </script>
-
-<%
-
-    ModelMaker maker = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
-    if (maker == null) {
-	maker = (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
-	getServletContext().setAttribute("vitroJenaModelMaker",maker);
-    }
-%>
 
     <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Available Jena Models</h2>
 
@@ -60,15 +51,13 @@ function init(){
     
             Currently showing <font color="red">${infoLine}</font>
     <ul>
-<%
-    for (Iterator it = maker.listModels(); it.hasNext(); ) {
-	String modelName = (String) it.next();
-        %>  <li style="padding-bottom:2em;padding-top:2em;"> <%=modelName%>
+      <c:forEach var="modelName" items="${modelNames}">
+          <li style="padding-bottom:2em;padding-top:2em;"> ${modelName}
             <table style="margin-left:2em;"><tr>
             <td>
             <form action="ingest" method="get">
                 <input type="hidden" name="action" value="loadRDFData"/>
-                <input type="hidden" name="modelName" value="<%=modelName%>"/>
+                <input type="hidden" name="modelName" value="${modelName}"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
                 <input type="submit" name="submit" value="load RDF data"/>
             </form>
@@ -76,14 +65,14 @@ function init(){
             <td>
             <c:url var="outputModelURL" value="ingest">
             	<c:param name="action" value="outputModel"/>
-            	<c:param name="modelName" value="<%=modelName%>"/>
+            	<c:param name="modelName" value="${modelName}"/>
             </c:url>
             <a href="${outputModelURL}">output model</a>
             </td>
             <td>
             <form action="ingest" method="post">
                 <input type="hidden" name="action" value="clearModel"/>
-                <input type="hidden" name="modelName" value="<%=modelName%>"/>
+                <input type="hidden" name="modelName" value="${modelName}"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
                 <input type="submit" name="submit" value="clear statements"/>
             </form>
@@ -91,7 +80,7 @@ function init(){
             <td>
             <form action="ingest" method="post">
                 <input type="hidden" name="action" value="removeModel"/>
-                <input type="hidden" name="modelName" value="<%=modelName%>"/>
+                <input type="hidden" name="modelName" value="${modelName}"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
                 <input type="submit" name="submit" value="remove"/>
             </form>
@@ -101,7 +90,7 @@ function init(){
             <td>
             <form action="ingest" method="post">
                 <input type="hidden" name="action" value="attachModel"/>
-                <input type="hidden" name="modelName" value="<%=modelName%>"/>
+                <input type="hidden" name="modelName" value="${modelName}"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
                 <input type="submit" name="submit" value="attach to TBox (ontology)"/>
             </form>
@@ -109,7 +98,7 @@ function init(){
             <td>
             <form action="ingest" method="post">
                 <input type="hidden" name="action" value="detachModel"/>
-                <input type="hidden" name="modelName" value="<%=modelName%>"/>
+                <input type="hidden" name="modelName" value="${modelName}"/>
                 <input type="hidden" name="modelType" value="${modelType}"/>
                 <input type="submit" name="submit" value="detach from TBox (ontology)"/>
             </form>
@@ -117,16 +106,14 @@ function init(){
             <td>
 			<form action="ingest" method="get">
 			    <input type="hidden" name="action" value="permanentURI" />
-			    <input type="hidden" name="modelName" value="<%=modelName%>" /> 
+			    <input type="hidden" name="modelName" value="${modelName}" /> 
 				<input type="hidden" name="modelType" value="${modelType}"/>
 				<input type="submit" name="submit" value="generate permanent URIs" /></form>
 			</td>
             <td>&nbsp;</td>
             </tr>
             </table>
-        </li> <%    
-    }
-%>
+        </li>
+      </c:forEach>
     </ul>
-    
-    <BODY onLoad="init()"></BODY>
+

@@ -1,0 +1,32 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+/* Styles for Freemarker template startupStatus-display */
+
+#startup-trace {
+    width: 100%;
+}
+#startup-trace h4 {
+    padding: .5em;
+    margin-bottom: 0;
+    padding-bottom: .5em;
+    padding-top: 1em;
+}
+#startup-trace ul.item-spec {
+    margin-bottom: 1em;
+}
+#startup-trace ul.item-spec li{
+    padding-left: .5em;
+    padding-bottom: .4em;
+}
+#startup-trace li.error {
+    background-color: #FFDDDD;
+}
+#startup-trace li.warning{
+    background-color: #FFFFDD; 
+}
+#startup-trace li.info {
+    background-color: #DDFFDD;
+}
+#startup-trace li.not_executed {
+    background-color: #F3F3F0;
+}

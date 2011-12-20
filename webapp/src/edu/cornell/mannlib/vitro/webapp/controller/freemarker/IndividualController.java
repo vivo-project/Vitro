@@ -57,10 +57,11 @@ import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.ExtendedLinkedDataUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaOutputUtils;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
+import edu.cornell.mannlib.vitro.webapp.web.beanswrappers.ReadOnlyBeansWrapper;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividual;
-import freemarker.ext.beans.BeansWrapper;
 
 /**
  * Handles requests for entity information.
@@ -77,6 +78,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     private static final String PERSON_CLASS_URI = "http://xmlns.com/foaf/0.1/Person";
     private static final String INCLUDE_ALL = "all";
     
+    @SuppressWarnings("serial")
     private static final Map<String, String> namespaces = new HashMap<String, String>() {{
         put("display", VitroVocabulary.DISPLAY);
         put("vitro", VitroVocabulary.vitroURI);
@@ -123,7 +125,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        // If this is an uploaded file, redirect to its "alias URL".
 	        String aliasUrl = getAliasUrlForBytestreamIndividual(vreq, individual);
 	        if (aliasUrl != null) {
-	        	return new RedirectResponseValues(aliasUrl);
+	            return new RedirectResponseValues(aliasUrl, HttpServletResponse.SC_SEE_OTHER);	            
 	        }
 
 	        Map<String, Object> body = new HashMap<String, Object>();
@@ -140,11 +142,14 @@ public class IndividualController extends FreemarkerHttpServlet {
     		 * This is still safe, because we are only putting BaseTemplateModel objects
     		 * into the data model: no real data can be modified. 
     		 */
-	        body.put("individual", wrap(itm, BeansWrapper.EXPOSE_SAFE));
+	        // body.put("individual", wrap(itm, BeansWrapper.EXPOSE_SAFE));
+    		body.put("individual", wrap(itm, new ReadOnlyBeansWrapper()));
+    		
 	        body.put("headContent", getRdfLinkTag(itm));	       
 	        
 	        //If special values required for individuals like menu, include values in template values
-	        this.includeSpecialEditingValues(vreq, body);
+	        body.putAll(getSpecialEditingValues(vreq));
+	        
 	        String template = getIndividualTemplate(individual, vreq);
 	                
 	        return new TemplateResponseValues(template, body);
@@ -214,10 +219,15 @@ public class IndividualController extends FreemarkerHttpServlet {
     }
     
     //Get special values for cases such as Menu Management editing
-    private void includeSpecialEditingValues(VitroRequest vreq, Map<String, Object> body) {
+    private Map<String, Object> getSpecialEditingValues(VitroRequest vreq) {
+        
+        Map<String, Object> map = new HashMap<String, Object>();
+        
     	if(vreq.getAttribute(VitroRequest.SPECIAL_WRITE_MODEL) != null) {
-    		body.put("reorderUrl", vreq.getContextPath() + DisplayVocabulary.REORDER_MENU_URL);
+    		map.put("reorderUrl", UrlBuilder.getUrl(DisplayVocabulary.REORDER_MENU_URL));
     	}
+    	
+    	return map;
     }
     
     private Map<String, Object> getRelatedSubject(VitroRequest vreq) {
@@ -262,11 +272,7 @@ public class IndividualController extends FreemarkerHttpServlet {
     
 	private IndividualTemplateModel getIndividualTemplateModel(Individual individual, VitroRequest vreq) 
 	    throws ServletException, IOException {
-		
-    	IndividualDao iwDao = vreq.getWebappDaoFactory().getIndividualDao();
-        
         individual.sortForDisplay();
-
         return new IndividualTemplateModel(individual, vreq);
 	}
 	
@@ -349,7 +355,7 @@ public class IndividualController extends FreemarkerHttpServlet {
                 
         String[] includes = vreq.getParameterValues("include");
 		Model newModel = getRDF(individual,ontModel,ModelFactory.createDefaultModel(),0,includes);		
-		
+		JenaOutputUtils.setNameSpacePrefixes(newModel, vreq.getWebappDaoFactory());
 		return new RdfResponseValues(rdfFormat, newModel);
 	}
 
@@ -646,7 +652,6 @@ public class IndividualController extends FreemarkerHttpServlet {
 	    	List<ObjectPropertyStatement> ostates = entity.getObjectPropertyStatements();
 	    	
 	    	for (ObjectPropertyStatement os: ostates) {
-	    		ObjectProperty objProp = os.getProperty();
 	    		Property prop = newModel.getProperty(os.getPropertyURI());
 	    		Resource obj = newModel.getResource(os.getObjectURI());
 	    		newModel.add(newModel.createStatement(subj, prop, obj));

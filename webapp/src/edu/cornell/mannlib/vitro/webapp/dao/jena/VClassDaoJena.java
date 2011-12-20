@@ -286,6 +286,14 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
     	} catch (ProfileException pe) {
     		// Current language profile does not support equivalent classes.
     		// We'd prefer to return an empty list instead of throwing an exception
+    	} catch (Exception e) {
+            // we'll try this again using a different method that 
+    	    // doesn't try to convert to OntClass
+            List<Resource> supList = this.listDirectObjectPropertyValues(
+                    getOntModel().getResource(classURI), OWL.equivalentClass);
+            for (Resource res : supList) {
+                equivalentClassURIs.add(getClassURIStr(res));
+            }  
     	} finally {
     		getOntModel().leaveCriticalSection();
     	}
@@ -435,19 +443,19 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
     }
 
     public List <VClass> getAllVclasses() {
-        List classes = new ArrayList();
+        List<VClass> classes = new ArrayList<VClass>();
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            ClosableIterator classIt = getOntModel().listClasses();
+            ClosableIterator<OntClass> classIt = getOntModel().listClasses();
             try {
                 while (classIt.hasNext()) {
                     try {
-                        OntClass cls = (OntClass) classIt.next();
+                        OntClass cls = classIt.next();
                         if (!cls.isAnon() && !(NONUSER_NAMESPACES.contains(cls.getNameSpace()))) {
                             classes.add(new VClassJena(cls,getWebappDaoFactory()));
                         }
                     } catch (ClassCastException cce) {
-                        cce.printStackTrace();
+                        log.error(cce, cce);
                     }
                 }
             } finally {
@@ -459,45 +467,27 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
         Collections.sort(classes);
         return classes;
     }
-    /*
-    private boolean sameLevelOrHigher( RoleLevel userLevel, RoleLevel resourceLevel ){        
-        if( resourceLevel == null )
-            return true; //default to visible
-        if ( userLevel == null ) { //default to PUBLIC
-            userLevel = BaseResourceBean.RoleLevel.PUBLIC;
-        }
-        int comparison = userLevel.compareTo(resourceLevel);
-        if (log.isDebugEnabled()) {
-            if (comparison == 0) {
-                log.debug("user role "+userLevel.getShorthand()+" judged equal to current user role "+resourceLevel.getShorthand());
-            } else if (comparison > 0) {
-                log.debug("user role "+userLevel.getShorthand()+" judged greater than current user role "+resourceLevel.getShorthand());
-            } else if (comparison < 0) {
-                log.debug("user role "+userLevel.getShorthand()+" judged less than current user role "+resourceLevel.getShorthand());
-            }
-        }
-        return ( userLevel.compareTo(resourceLevel) >= 0 );            
-    } */
     
-    
-    private Iterator smarterListHierarchyRootClasses(OntModel ontModel) {
+    private Iterator<OntClass> smarterListHierarchyRootClasses(OntModel ontModel) {
     	return smarterListHierarchyRootClasses(ontModel, null);
     }
     
     /** 
-     * The basic idea here is that we ignore anonymous superclasses for the purpose of determining whether something is a root class.
-     * We also avoid ClassCastExceptions deep in Jena-land by eschewing Jena's listSuperClasses() method.
+     * The basic idea here is that we ignore anonymous superclasses for the purpose 
+     * of determining whether something is a root class.
+     * We also avoid ClassCastExceptions deep in Jena-land by eschewing Jena's 
+     * listSuperClasses() method.
      * @author bjl23
 	 */
-    private Iterator smarterListHierarchyRootClasses(OntModel ontModel, String ontologyURI) {
-    	List rootClassList = new ArrayList();
+    private Iterator<OntClass> smarterListHierarchyRootClasses(OntModel ontModel, String ontologyURI) {
+    	List<OntClass> rootClassList = new ArrayList<OntClass>();
     	ClosableIterator ci = ontModel.listClasses();
     	try {
 	    	for (ClosableIterator i = ci ; i.hasNext(); ) {
 	    		try {
 		    		OntClass ontClass = (OntClass) i.next();
 	    			boolean isRoot = true;
-	    			for (Iterator j = ontClass.listPropertyValues(RDFS.subClassOf); j.hasNext(); ) {
+	    			for (Iterator<RDFNode> j = ontClass.listPropertyValues(RDFS.subClassOf); j.hasNext(); ) {
 	    				Resource res = (Resource) j.next();
 	    				if (res.canAs(OntClass.class)) {
 		    				OntClass superClass = (OntClass) res.as(OntClass.class);
@@ -507,7 +497,9 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
 		    					!superClass.equals(ontClass) && 
 		    					!( ontModel.contains(ontClass,OWL.equivalentClass,superClass) || 
 		    					  ontModel.contains(superClass,OWL.equivalentClass,ontClass) ) )  {	
-									if ( (superClass.getNameSpace() != null) && (!(NONUSER_NAMESPACES.contains(superClass.getNameSpace()))) ) {
+									if ( (superClass.getNameSpace() != null) 
+									        && (!(NONUSER_NAMESPACES.contains(
+									                superClass.getNameSpace()))) ) {
 			    				    	isRoot=false;
 			    				    	break;
 									}
@@ -532,28 +524,23 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
     }
     
     private List <VClass> getRootClasses(String ontologyURI) {
-        List rootClasses = new ArrayList();
+        List<VClass> rootClasses = new ArrayList<VClass>();
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            //ClosableIterator rootIt = getOntModel().listHierarchyRootClasses();
-        	Iterator rootIt = smarterListHierarchyRootClasses(getOntModel(),ontologyURI);
-            try {
-                while (rootIt.hasNext()) {
-                    try {
-                        OntClass cls = (OntClass) rootIt.next();
-                        if (!cls.isAnon() && cls.getNameSpace() != null && !(NONUSER_NAMESPACES.contains(cls.getNameSpace()))) {
-                            rootClasses.add(new VClassJena(cls,getWebappDaoFactory()));
-                        }
-                    } catch (ClassCastException e) {}
+        	Iterator<OntClass> rootIt = smarterListHierarchyRootClasses(
+        	        getOntModel(), ontologyURI);
+            while (rootIt.hasNext()) {    
+                OntClass cls = rootIt.next();
+                if (!cls.isAnon() && cls.getNameSpace() != null 
+                        && !(NONUSER_NAMESPACES.contains(cls.getNameSpace()))) {
+                    rootClasses.add(new VClassJena(cls,getWebappDaoFactory()));
                 }
-            } finally {
-                //rootIt.close();
             }
             Collections.sort(rootClasses);
         } finally {
             getOntModel().leaveCriticalSection();
         }
-        return (rootClasses.size()>0) ? rootClasses : null;
+        return rootClasses;
     }
 
 
@@ -839,7 +826,9 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                                             group.add(vcw);
                                         }
                                     }
-                                } catch (ClassCastException cce) {cce.printStackTrace();}
+                                } catch (ClassCastException cce) {
+                                    log.error(cce, cce);
+                                }
                             }
                         } finally {
                             annotIt.close();
@@ -973,8 +962,8 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                     updatePropertyStringValue(ontCls,SHORTDEF,cls.getShortDef(),ontModel);
                     updatePropertyStringValue(ontCls,EXAMPLE_ANNOT,cls.getExample(),ontModel);
                     updatePropertyStringValue(ontCls,DESCRIPTION_ANNOT,cls.getDescription(),ontModel);
-                    updatePropertyIntValue(ontCls,DISPLAY_LIMIT,cls.getDisplayLimit(),ontModel);
-                    updatePropertyIntValue(ontCls,DISPLAY_RANK_ANNOT,cls.getDisplayRank(),ontModel);
+                    updatePropertyNonNegativeIntValue(ontCls,DISPLAY_LIMIT,cls.getDisplayLimit(),ontModel);
+                    updatePropertyNonNegativeIntValue(ontCls,DISPLAY_RANK_ANNOT,cls.getDisplayRank(),ontModel);
                     updatePropertyFloatValue(ontCls, SEARCH_BOOST_ANNOT, cls.getSearchBoost(), ontModel);
                     
                     if (cls.getHiddenFromDisplayBelowRoleLevel() != null) {

@@ -14,6 +14,8 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
@@ -40,17 +42,18 @@ public class MultiValueEditSubmission {
 
     String editKey;
     
-    //TODO: Need to change below to be able to support multiple values
     private Map<String,List<Literal>> literalsFromForm ;
     private Map<String,List<String>> urisFromForm ;
 
     private Map<String,String> validationErrors;
-    private BasicValidation basicValidation;
+    private BasicValidationVTwo basicValidation;
 
     private Map<String, List<FileItem>> filesFromForm;
 
     private static Model literalCreationModel;
-     
+    
+    private String entityToReturnTo;
+    
     static{
         literalCreationModel = ModelFactory.createDefaultModel();
     }
@@ -62,39 +65,15 @@ public class MultiValueEditSubmission {
         if( this.editKey == null || this.editKey.trim().length() == 0)
             throw new Error("EditSubmission needs an 'editKey' parameter from the EditConfiguration");        
 
+        entityToReturnTo = editConfig.getEntityToReturnTo();
+        
         validationErrors = new HashMap<String,String>();
         
         this.urisFromForm = new HashMap<String,List<String>>();
         for( String var: editConfig.getUrisOnform() ){     
             String[] valuesArray = queryParameters.get( var );
             //String uri = null;
-            List<String> values = (valuesArray != null) ? Arrays.asList(valuesArray) : null;
-            //Iterate through the values and check to see if they should be added or removed from form
-            urisFromForm.put(var, values);
-            for(String uri : values) {
-	            if( uri != null && uri.length() == 0 && editConfig.getNewResources().containsKey(var) ){
-	                log.debug("A new resource URI will be made for var " + var + " since it was blank on the form.");
-	                urisFromForm.remove(var);
-	            }
-            }
-            /*
-            if( values != null && values.size() > 0){
-                if(  values.size() == 1 ) {
-                    uri = values.get(0);                        
-                } else if( values.size() > 1 ){
-                	//TODO: Change this and above so array/list sent as uri and not single value
-                    uri = values.get(0);
-                    log.error("Cannot yet handle multiple URIs for a single field, using first URI on list");
-                } 
-                urisFromForm.put(var,uri);
-            } else {
-                log.debug("No value found for query parameter " + var);              
-            }
-            //check to see if a URI field from the form was blank but was intended to create a new URI
-            if( uri != null && uri.length() == 0 && editConfig.getNewResources().containsKey(var) ){
-                log.debug("A new resource URI will be made for var " + var + " since it was blank on the form.");
-                urisFromForm.remove(var);
-            }*/
+            addUriToForm(editConfig, var, valuesArray);
         }
         
         this.literalsFromForm =new HashMap<String,List<Literal>>();        
@@ -106,45 +85,8 @@ public class MultiValueEditSubmission {
             } else if( field.getEditElement() != null ){                
                 log.debug("skipping field with edit element, it should not be in literals on form list");
             }else{
-                String[] valuesArray = queryParameters.get(var); 
-                List<String> valueList = (valuesArray != null) ? Arrays.asList(valuesArray) : null;                
-                if( valueList != null && valueList.size() > 0 ) {
-                	List<Literal> literalsArray = new ArrayList<Literal>();
-                	//now support multiple values
-                	for(String value:valueList) {
-                		value = EditN3Utils.stripInvalidXMLChars(value);
-                        //Add to array of literals corresponding to this variable
-                        if (!StringUtils.isEmpty(value)) {
-                            literalsArray.add(createLiteral(
-                                                        value, 
-                                                        field.getRangeDatatypeUri(), 
-                                                        field.getRangeLang()));
-                        }
-                	}
-                	literalsFromForm.put(var, literalsArray);
-                	/*
-                    String value = valueList.get(0);
-                    
-                    // remove any characters that are not valid in XML 1.0
-                    // from user input so they don't cause problems
-                    // with model serialization
-                    value = EditN3Utils.stripInvalidXMLChars(value);
-                    
-                    if (!StringUtils.isEmpty(value)) {
-                        literalsFromForm.put(var, createLiteral(
-                                                    value, 
-                                                    field.getRangeDatatypeUri(), 
-                                                    field.getRangeLang()));
-                    }
-                    
-                    if(valueList != null && valueList.size() > 1 )
-                        log.debug("For field " + var +", cannot yet handle multiple " +
-                                "Literals for a single field, using first Literal on list");
-                    */
-                    
-                }else{
-                    log.debug("could not find value for parameter " + var  );
-                }
+               String[] valuesArray = queryParameters.get(var); 
+               addLiteralToForm(editConfig, field, var, valuesArray);
             }
         }
 
@@ -158,21 +100,27 @@ public class MultiValueEditSubmission {
         }
         
         processEditElementFields(editConfig,queryParameters);
-        //Not checking validation for now
-        /*
-        Map<String,String> errors = basicValidation.validateUris( urisFromForm );   
+        //Incorporating basic validation
+        //Validate URIS
+        this.basicValidation = new BasicValidationVTwo(editConfig, this);
+        Map<String,String> errors = basicValidation.validateUris( urisFromForm ); 
+        //Validate literals and add errors to the list of existing errors
+        errors.putAll(basicValidation.validateLiterals( literalsFromForm ));
+        if( errors != null ) {
+            validationErrors.putAll( errors);
+        }              
         
         if(editConfig.getValidators() != null ){
-            for( N3Validator validator : editConfig.getValidators()){
+            for( N3ValidatorVTwo validator : editConfig.getValidators()){
                 if( validator != null ){     
-                    throw new Error("need to implemente a validator interface that works with the new MultivalueEditSubmission.");
-                    //errors = validator.validate(editConfig, this);
-//                    if ( errors != null )
-//                        validationErrors.putAll(errors);
+                    //throw new Error("need to implemente a validator interface that works with the new MultivalueEditSubmission.");
+                    errors = validator.validate(editConfig, this);
+                    if ( errors != null )
+                        validationErrors.putAll(errors);
                 }
             }
-        } */              
-        
+        }           
+                
         if( log.isDebugEnabled() )
             log.debug( this.toString() );
     }
@@ -303,14 +251,57 @@ public class MultiValueEditSubmission {
         this.urisFromForm = urisFromForm;
     }
 
-    public String toString(){
-        String[] names ={
-                 "literalsFromForm",
-                 "urisFromForm","validationErrors","basicValidation"
-        };
-        JSONObject obj = new JSONObject(this,names);
-        return obj.toString();
+    public String toString(){        
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);        
     }
 
-    private Log log = LogFactory.getLog(MultiValueEditSubmission.class);    
+    private Log log = LogFactory.getLog(MultiValueEditSubmission.class);
+
+    public String getEntityToReturnTo() {
+        return entityToReturnTo;
+    }
+
+    public void setEntityToReturnTo(String string) {
+        entityToReturnTo = string;
+    }    
+    
+    //Added specifically to help with "dynamic" forms such as addition of concept
+    public void addLiteralToForm(EditConfigurationVTwo editConfig, FieldVTwo field, String var, String[] valuesArray) {
+    	List<String> valueList = (valuesArray != null) ? Arrays.asList(valuesArray) : null;                
+        if( valueList != null && valueList.size() > 0 ) {
+        	List<Literal> literalsArray = new ArrayList<Literal>();
+        	//now support multiple values
+        	for(String value:valueList) {
+        		value = EditN3Utils.stripInvalidXMLChars(value);
+                //Add to array of literals corresponding to this variable
+                if (!StringUtils.isEmpty(value)) {
+                    literalsArray.add(createLiteral(
+                                                value, 
+                                                field.getRangeDatatypeUri(), 
+                                                field.getRangeLang()));
+                }
+        	}
+        	literalsFromForm.put(var, literalsArray);
+            
+        }else{
+            log.debug("could not find value for parameter " + var  );
+        }
+    }
+    //Add literal to form
+    //Add uri to form
+    public void addUriToForm(EditConfigurationVTwo editConfig, String var, String[] valuesArray) {
+         List<String> values = (valuesArray != null) ? Arrays.asList(valuesArray) : null;
+         if( values != null && values.size() > 0){
+	            //Iterate through the values and check to see if they should be added or removed from form
+	            urisFromForm.put(var, values);
+	            for(String uri : values) {
+		            if( uri != null && uri.length() == 0 && editConfig.getNewResources().containsKey(var) ){
+		                log.debug("A new resource URI will be made for var " + var + " since it was blank on the form.");
+		                urisFromForm.remove(var);
+		            }
+	            }
+         }  else {
+             log.debug("No value found for query parameter " + var);              
+         }
+    }
 }

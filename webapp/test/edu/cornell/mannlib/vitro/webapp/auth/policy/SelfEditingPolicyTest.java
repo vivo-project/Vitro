@@ -16,7 +16,7 @@ import stubs.javax.servlet.ServletContextStub;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndividual;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasProfile;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
@@ -47,8 +47,10 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 	private static final String UNSAFE_NS = VitroVocabulary.vitroURI;
 
 	private static final String SELFEDITOR_URI = SAFE_NS + "individual244";
-	private static final String SAFE_RESOURCE = SAFE_NS	+ "otherIndividual77777";
-	private static final String UNSAFE_RESOURCE = UNSAFE_NS	+ "otherIndividual99999";
+	private static final String SAFE_RESOURCE = SAFE_NS
+			+ "otherIndividual77777";
+	private static final String UNSAFE_RESOURCE = UNSAFE_NS
+			+ "otherIndividual99999";
 
 	private static final String SAFE_PREDICATE = SAFE_NS + "hasHairStyle";
 	private static final String UNSAFE_PREDICATE = UNSAFE_NS + "hasSuperPowers";
@@ -71,9 +73,9 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 
 		IndividualImpl ind = new IndividualImpl();
 		ind.setURI(SELFEDITOR_URI);
-		
+
 		ids = new ArrayIdentifierBundle();
-		ids.add(new HasAssociatedIndividual(SELFEDITOR_URI));
+		ids.add(new HasProfile(SELFEDITOR_URI));
 	}
 
 	@Test
@@ -322,11 +324,11 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 
 		IndividualImpl ind1 = new IndividualImpl();
 		ind1.setURI(SAFE_NS + "bozoUri");
-		ids.add(new HasAssociatedIndividual(ind1.getURI()));
+		ids.add(new HasProfile(ind1.getURI()));
 
 		IndividualImpl ind2 = new IndividualImpl();
 		ind2.setURI(SELFEDITOR_URI);
-		ids.add(new HasAssociatedIndividual(ind2.getURI()));
+		ids.add(new HasProfile(ind2.getURI()));
 	}
 
 	// ----------------------------------------------------------------------

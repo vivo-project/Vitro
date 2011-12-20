@@ -46,7 +46,13 @@ public class UserAccountsDaoFiltering extends BaseFiltering implements
 	public UserAccount getUserAccountByExternalAuthId(String externalAuthId) {
 		return innerDao.getUserAccountByExternalAuthId(externalAuthId);
 	}
-	
+
+	@Override
+	public Collection<UserAccount> getUserAccountsWhoProxyForPage(
+			String profilePageUri) {
+		return innerDao.getUserAccountsWhoProxyForPage(profilePageUri);
+	}
+
 	@Override
 	public String insertUserAccount(UserAccount userAccount) {
 		return innerDao.insertUserAccount(userAccount);
@@ -60,6 +66,12 @@ public class UserAccountsDaoFiltering extends BaseFiltering implements
 	@Override
 	public void deleteUserAccount(String userAccountUri) {
 		innerDao.deleteUserAccount(userAccountUri);
+	}
+
+	@Override
+	public void setProxyAccountsOnProfile(String profilePageUri,
+			Collection<String> userAccountUris) {
+		innerDao.setProxyAccountsOnProfile(profilePageUri, userAccountUris);
 	}
 
 	@Override

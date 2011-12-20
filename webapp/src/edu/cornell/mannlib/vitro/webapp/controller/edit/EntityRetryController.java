@@ -37,7 +37,7 @@ import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vedit.validator.impl.RequiredFieldValidator;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndividuals;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoBackEndEditing;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -59,7 +59,7 @@ public class EntityRetryController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(EntityRetryController.class.getName());
 
     public void doPost (HttpServletRequest request, HttpServletResponse response) {
-        if (!isAuthorizedToDisplayPage(request, response, new Actions(new EditIndividuals()))) {
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new DoBackEndEditing()))) {
         	return;
         }
 
@@ -275,8 +275,7 @@ public class EntityRetryController extends BaseEditController {
         // DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         DateFormat minutesOnlyDateFormat = new SimpleDateFormat ("yyyy-MM-dd HH:mm");
         DateFormat dateOnlyFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-        String html = FormUtils.htmlFormFromBean(individualForEditing,action,epo,foo,epo.getBadValueMap());
+        FormUtils.populateFormFromBean(individualForEditing,action,epo,foo,epo.getBadValueMap());
 
         List cList = new ArrayList();
         cList.add(new IndividualDataPropertyStatementProcessor());
@@ -289,7 +288,6 @@ public class EntityRetryController extends BaseEditController {
         ApplicationBean appBean = vreq.getAppBean();
         
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        request.setAttribute("formHtml",html);
         request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
         request.setAttribute("formJsp","/templates/edit/specific/entity_retry.jsp");
         request.setAttribute("epoKey",epo.getKey());

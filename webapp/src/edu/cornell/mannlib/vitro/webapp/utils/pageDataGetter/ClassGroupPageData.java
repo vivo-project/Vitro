@@ -121,7 +121,7 @@ public class ClassGroupPageData implements PageDataGetter{
     }
     
     public String getType(){
-        return DisplayVocabulary.CLASSGROUP_PAGE_TYPE;
+        return DataGetterUtils.generateDataGetterTypeURI(ClassGroupPageData.class.getName());
     } 
     
   //Get data servuice

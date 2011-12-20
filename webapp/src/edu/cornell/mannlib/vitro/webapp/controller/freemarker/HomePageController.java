@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -13,6 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetter;
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.DataGetterUtils;
 
 public class HomePageController extends FreemarkerHttpServlet {
 
@@ -25,20 +26,16 @@ public class HomePageController extends FreemarkerHttpServlet {
     protected ResponseValues processRequest(VitroRequest vreq) { 
         
         Map<String, Object> body = new HashMap<String, Object>();    
-//        VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache( getServletContext() );
-//        List<VClassGroup> vClassGroups =  vcgc.getGroups(vreq.getPortalId());
-//        body.put("vClassGroups", vClassGroups);
-        
-        PageDataGetter dataGetter =
-            PageController.getPageDataGetterMap(getServletContext())
-            .get(DisplayVocabulary.HOME_PAGE_TYPE);        
-        if( dataGetter != null ){
-            String uriOfPageInDisplayModel = "not defined";            
-            Map<String, Object> pageData = 
-                dataGetter.getData(getServletContext(), vreq, 
-                        uriOfPageInDisplayModel, body);
-            if(pageData != null)
-                body.putAll(pageData);            
+        List<PageDataGetter> dataGetters = DataGetterUtils.getDataGetterObjects(vreq, DisplayVocabulary.HOME_PAGE_URI);
+        for(PageDataGetter dataGetter: dataGetters) {
+	        if( dataGetter != null ){
+	            String uriOfPageInDisplayModel = "not defined";            
+	            Map<String, Object> pageData = 
+	                dataGetter.getData(getServletContext(), vreq, 
+	                        uriOfPageInDisplayModel, body);
+	            if(pageData != null)
+	                body.putAll(pageData);            
+	        }
         }
         body.put("dataServiceUrlVClassesForVClassGroup", UrlBuilder.getUrl("/dataservice?getVClassesForVClassGroup=1&classgroupUri="));
         

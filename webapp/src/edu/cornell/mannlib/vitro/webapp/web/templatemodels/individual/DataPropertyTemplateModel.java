@@ -29,7 +29,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     private static final Log log = LogFactory.getLog(DataPropertyTemplateModel.class);  
     
     private static final String TYPE = "data";
-    private static final String EDIT_PATH = "edit/editDatapropStmtRequestDispatch.jsp";  
+    private static final String EDIT_PATH = "editRequestDispatch";  
     
     private final List<DataPropertyStatementTemplateModel> statements;
     
@@ -51,33 +51,47 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
             }
         } else {
             log.debug("Data property " + getUri() + " is unpopulated.");
-        }
+        }        
         
-        setAddAccess(policyHelper, dp);
-        
+        setAddUrl(policyHelper, dp);
     }
 
-    // Determine whether a new statement can be added
+
     @Override
-    protected void setAddAccess(EditingPolicyHelper policyHelper, Property property) {
-        if (policyHelper != null) {
-            
-            DataProperty dp = (DataProperty) property;
-            
-            // NIHVIVO-2790 vitro:moniker now included in the display, but don't allow new statements
-            if (dp.getURI().equals(VitroVocabulary.MONIKER)) {
-                return;
-            }
-            // If the display limit has already been reached, we can't add a new statement
-            int displayLimit = dp.getDisplayLimit();
-            // Display limit of -1 (default value for new property) means no display limit
-            if ( (displayLimit < 0) || (displayLimit > statements.size()) ) {
-                RequestedAction action = new AddDataPropStmt(subjectUri, propertyUri,RequestActionConstants.SOME_LITERAL, null, null);
-                if (policyHelper.isAuthorizedAction(action)) {
-                    addAccess = true;
-                }
-            }
-        }        
+    protected void setAddUrl(EditingPolicyHelper policyHelper, Property property) {
+
+        if (policyHelper == null) {
+            return;
+        }
+           
+        DataProperty dp = (DataProperty) property;        
+        // NIHVIVO-2790 vitro:moniker now included in the display, but don't allow new statements
+        if (dp.getURI().equals(VitroVocabulary.MONIKER)) {
+            return;
+        }
+        
+        // If the display limit has already been reached, we can't add a new statement.
+        // NB This appears to be a misuse of a value called "display limit". Note that it's 
+        // not used to limit display, either, so should be renamed.
+        int displayLimit = dp.getDisplayLimit();
+        // Display limit of -1 (default value for new property) means no display limit
+        if ( displayLimit >= 0 && statements.size() >= displayLimit ) {
+            return;
+        }
+          
+        // Determine whether a new statement can be added
+        RequestedAction action = new AddDataPropStmt(subjectUri, propertyUri, RequestActionConstants.SOME_LITERAL, null, null);
+        if ( ! policyHelper.isAuthorizedAction(action) ) {
+            return;
+        }
+        
+        ParamMap params = new ParamMap(
+                "subjectUri", subjectUri,
+                "predicateUri", propertyUri);
+        
+        params.putAll(UrlBuilder.getModelParams(vreq));
+        
+        addUrl = UrlBuilder.getUrl(EDIT_PATH, params);       
     }
     
     @Override 
@@ -90,40 +104,25 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
         return Route.DATA_PROPERTY_EDIT;
     }
     
-    /* Access methods for templates */
+    /* Template properties */
     
     public String getType() {
         return TYPE;
     }
 
-    @Override
-    public String getAddUrl() {
-        String addUrl = "";
-        if (addAccess) {
-            ParamMap params = new ParamMap(
-                    "subjectUri", subjectUri,
-                    "predicateUri", propertyUri);
-            
-            //Check if special parameters being sent            
-            HashMap<String, String> specialParams = UrlBuilder.getSpecialParams(vreq);
-            if(specialParams.size() > 0) {
-            	params.putAll(specialParams);
-            }
-            addUrl = UrlBuilder.getUrl(EDIT_PATH, params);       
-        }
-        return addUrl;
-    }
-    
     public List<DataPropertyStatementTemplateModel> getStatements() {
         return statements;
     }
     
-    public DataPropertyStatementTemplateModel getFirst() {
+    
+    /* Template methods */
+    
+    public DataPropertyStatementTemplateModel first() {
         return ( (statements == null || statements.isEmpty()) ) ? null : statements.get(0);
     }
     
-    public String getFirstValue() {
-        DataPropertyStatementTemplateModel first = getFirst();
+    public String firstValue() {
+        DataPropertyStatementTemplateModel first = first();
         return first == null ? null : first.getValue();
     }
     

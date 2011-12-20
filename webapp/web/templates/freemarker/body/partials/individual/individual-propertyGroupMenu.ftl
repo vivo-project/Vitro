@@ -16,7 +16,7 @@
                         <#if groupname?has_content>
                             <#-- capitalize will capitalize each word in the name; cap_first only the first. We may need a custom
                             function to capitalize all except function words. -->
-                            <li role="listitem"><a href="#${groupname}">${groupname?capitalize}</a></li>
+                            <li role="listitem"><a href="#${groupname}" title="group name">${groupname?capitalize}</a></li>
                         </#if>
                     </#list>
                 </ul>

@@ -31,6 +31,7 @@ import com.hp.hpl.jena.sdb.sql.SDBConnection;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
@@ -103,8 +104,9 @@ public class WebappDaoFactorySDBPrep implements Filter {
 				store = SDBFactory.connectStore(conn, storeDesc);
 				dataset = SDBFactory.connectDataset(store);
 				VitroRequest vreq = new VitroRequest((HttpServletRequest) request);
-				wadf = 
-					new WebappDaoFactorySDB(oms, dataset, defaultNamespace, null, null);
+				WebappDaoFactoryConfig config = new WebappDaoFactoryConfig();
+				config.setDefaultNamespace(defaultNamespace);
+				wadf = new WebappDaoFactorySDB(oms, dataset, config);
 				vreq.setWebappDaoFactory(wadf);
 				vreq.setFullWebappDaoFactory(wadf);
 				vreq.setDataset(dataset);

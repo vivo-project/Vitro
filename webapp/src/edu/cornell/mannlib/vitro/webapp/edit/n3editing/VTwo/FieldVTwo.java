@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
@@ -36,22 +38,19 @@ public class FieldVTwo {
     };
 
     public static String RDF_XML_LITERAL_URI = "http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral";
-        
-    private boolean newResource;
-
-    private static Log log = LogFactory.getLog( FieldVTwo.class ); 
+                
        
     private String name;
     
     /**
      * List of basic validators.  See BaiscValidation.
      */
-    private List <String> validators;
+    private List <String> validators = new ArrayList<String>();
 
     /**
      * What type of options is this?
      */
-    private OptionsType optionsType;
+    private OptionsType optionsType = OptionsType.UNDEFINED;
     
     /**
      * Special class to use for option type
@@ -89,31 +88,6 @@ public class FieldVTwo {
     private List<List<String>> literalOptions;
 
     /**
-     * Strings of N3 to add to model.
-     */
-    private List <String> assertions;
-
-    /**
-     * JSON configuration that was used to build this object.
-     */ 
-    private String originalJson;
-    
-    /**
-     * Do not attempt to set the retractions when configuring a Field; they get built by the
-     * edit processing object.
-     *
-     * The strings in this list should be N3 for statements that need to be retracted to affect an update.
-     * Per Field retractions are necessary since we only want to retract for fields that have changed.
-     * The Model should be checked to make sure that all of the retractions exist so we are changing the
-     * statements that existed when this edit was configured.
-     *
-     * These retractions are just the assertions with the values subistituted in from before the change.
-     */
-    private List <String> retractions;
-
-    private Map<String, String> queryForExisting;
-
-    /**
      * Property for special edit element.
      */
     private EditElementVTwo editElement=null;;
@@ -125,99 +99,39 @@ public class FieldVTwo {
     private static String[] parameterNames = {"editElement","newResource","validators","optionsType","predicateUri","objectClassUri","rangeDatatypeUri","rangeLang","literalOptions","assertions"};
     static{  Arrays.sort(parameterNames); }
     
-    public void setEditElement(EditElementVTwo editElement){
+    public FieldVTwo setEditElement(EditElementVTwo editElement){
         this.editElement = editElement;
-    }
-    
-    /**
-     * A field may specify a class for additional features. 
-     */
-    private void setEditElement(JSONObject fieldConfigObj, String fieldName) {        
-        String className = fieldConfigObj.optString("editElement");
-        if( className == null || className.isEmpty() )
-            return;
-        setOptionsType(FieldVTwo.OptionsType.UNDEFINED);
-        Class clz = null;
-        try {
-            clz = Class.forName(className);           
-        } catch (ClassNotFoundException e) {
-            log.error("Java Class " + className + " not found for field " + name);
-            return;
-        } catch (SecurityException e) {
-            log.error("Problem with Java Class " + className + " for field " + name, e);
-            return;
-        } catch (IllegalArgumentException e) {
-            log.error("Problem with Java Class " +className + " for field " + name, e);
-            return;
-        } 
-
-        Class[] types = new Class[]{ FieldVTwo.class };
-        Constructor cons;
-        try {
-            cons = clz.getConstructor(types);
-        } catch (SecurityException e) {
-            log.error("Problem with Java Class " + className + " for field " + name, e);            
-            return;                        
-        } catch (NoSuchMethodException e) {
-            log.error("Java Class " + className + " must have a constructor that takes a Field.", e);            
-            return;
-        }
-        Object[] args = new Object[] { this };        
-        Object obj;
-        try {
-            obj = cons.newInstance(args);
-        } catch (Exception e) {
-            log.error("Problem with Java Class " + className + " for field " + name, e);            
-            return;   
-        }  
         
-        editElement = (EditElementVTwo)obj;                       
+        if( editElement instanceof BaseEditElementVTwo)
+            ((BaseEditElementVTwo) editElement).setField(this);
+        
+        return this;
     }
-
+       
     /* ****************** Getters and Setters ******************************* */
 
     public String getName(){
         return name;
-    }
-    
-    public List<String> getRetractions() {
-        return retractions;
-    }
-
-    public void setRetractions(List<String> retractions) {
-        this.retractions = retractions;
-    }
-
-    public List<String> getAssertions() {
-        return assertions;
-    }
-
-    public void setAssertions(List<String> assertions) {
-        this.assertions = assertions;
-    }
-
-    public boolean isNewResource() {
-        return newResource;
-    }
-    public void setNewResource(boolean b) {
-        newResource = b;
-    }
+    }                    
 
     public List <String> getValidators() {
         return validators;
     }
-    public void setValidators(List <String> v) {
+    public FieldVTwo setValidators(List <String> v) {
         validators = v;
+        return this;
     }
 
     public OptionsType getOptionsType() {
         return optionsType;
     }
-    public void setOptionsType(OptionsType ot) {
+    public FieldVTwo setOptionsType(OptionsType ot) {
         optionsType = ot;
+        return this;
     }
-    public void setOptionsType(String s) {
+    public FieldVTwo setOptionsType(String s) {
         setOptionsType( getOptionForString(s));
+        return this;
     }
 
     public static OptionsType getOptionForString(String s){
@@ -255,93 +169,61 @@ public class FieldVTwo {
     public String getPredicateUri() {
         return predicateUri;
     }
-    public void setPredicateUri(String s) {
+    public FieldVTwo setPredicateUri(String s) {
         predicateUri = s;
+        return this;
     }
 
     public String getObjectClassUri() {
         return objectClassUri;
     }
-    public void setObjectClassUri(String s) {
+    public FieldVTwo setObjectClassUri(String s) {
         objectClassUri = s;
+        return this;
     }
     
     public String getRangeDatatypeUri() {
         return rangeDatatypeUri;
     }
-    public void setRangeDatatypeUri(String r) {
+    public FieldVTwo setRangeDatatypeUri(String r) {
         if( rangeLang != null && rangeLang.trim().length() > 0 )
             throw new IllegalArgumentException("A Field object may not have both rangeDatatypeUri and rangeLanguage set");
         
         rangeDatatypeUri = r;
+        return this;
     }
 
     public List <List<String>> getLiteralOptions() {
         return literalOptions;
     }
-    public void setLiteralOptions(List<List<String>> literalOptions) {
+    public FieldVTwo setLiteralOptions(List<List<String>> literalOptions) {
         this.literalOptions = literalOptions;
+        return this;
     }
-    
-    /**
-     * Expects a JSONArray of JSONArrays like: 
-     * [ ["http://example.org/bob", "bob"] , ["http://example.org/kate", "kate"] ]
-     */
-    private void setLiteralOptions(JSONArray array) {
-        if( array == null ) 
-            literalOptions = Collections.EMPTY_LIST;
-        
-        literalOptions = Collections.EMPTY_LIST;
-        List<List<String>> out = new ArrayList<List<String>>( array.length() );
-        
-        for(int i =0; i<array.length() ; i++){
-            JSONArray pair = array.optJSONArray(i);            
-            if( pair == null ){
-                String value = array.optString(i);            
-                if( value != null ){
-                    List<String>option = new ArrayList<String>(2);
-                    option.add(value);
-                    option.add(value);
-                    out.add( option );
-                } else { log.warn("could not get option list for " + this.name ); }
-            }else{
-                if( pair.length() == 0 ){
-                    log.warn("option list too short for " + this.name + ": " + array.opt(i));
-                    continue;
-                }
-                if( pair.length() > 2 )
-                    log.warn("option list too long for " + this.name + ": " + array.opt(i) + " using first two items");
-                
-                List<String>option = new ArrayList<String>(2);
-                option.add(pair.optString(0));
-                if( pair.length() > 1 )
-                    option.add(pair.optString(1));
-                else 
-                    option.add(pair.optString(0));
-                out.add( option );            
-            }            
-        }        
-        literalOptions = out;
-    }
-    
+     
     public String getRangeLang() {
         return rangeLang;
     }
 
-    public void setRangeLang(String rangeLang) {
+    public FieldVTwo setRangeLang(String rangeLang) {
         if( rangeDatatypeUri != null && rangeDatatypeUri.trim().length() > 0)
             throw new IllegalArgumentException("A Field object may not have both rangeDatatypeUri and rangeLanguage set");
         
         this.rangeLang = rangeLang;
+        return this;
     }
 
     public EditElementVTwo getEditElement(){
         return editElement;
     }
-    
-    /* this is mainly for unit testing */
-    public void setName(String name){
+        
+    public FieldVTwo setName(String name){
         this.name = name;    
+        return this;
     }
 
+    @Override
+    public String toString(){
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+    }
 }

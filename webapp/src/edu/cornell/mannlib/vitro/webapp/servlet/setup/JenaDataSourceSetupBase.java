@@ -34,16 +34,24 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 
 public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
-    
+    private static final String VITRO_DEFAULT_NAMESPACE = "Vitro.defaultNamespace";
+
     private static final Log log = LogFactory.getLog(
             JenaDataSourceSetupBase.class);
 
+    protected final static String MAX_ACTIVE_PROPERTY = 
+        "VitroConnection.DataSource.pool.maxActive";
+    
+    protected final static String MAX_IDLE_PROPERTY = 
+        "VitroConnection.DataSource.pool.maxIdle";
+    
     protected final static int DEFAULT_MAXWAIT = 10000, // ms
             DEFAULT_MAXACTIVE = 40,
+            MINIMUM_MAXACTIVE = 20,
             DEFAULT_MAXIDLE = 10,
-            DEFAULT_TIMEBETWEENEVICTIONS =  3 * 1000, // ms
+            DEFAULT_TIMEBETWEENEVICTIONS =  180 * 1000, // ms
             DEFAULT_TESTSPEREVICTION = DEFAULT_MAXACTIVE,
-            DEFAULT_MINEVICTIONIDLETIME = 3 * 1000; // ms
+            DEFAULT_MINEVICTIONIDLETIME = 180 * 1000; // ms
 
     protected final static boolean DEFAULT_TESTONBORROW = true,
             DEFAULT_TESTONRETURN = true, DEFAULT_TESTWHILEIDLE = true;
@@ -126,18 +134,13 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     static final String JENA_DISPLAY_DISPLAY_MODEL = 
         DisplayVocabulary.DISPLAY_DISPLAY_MODEL_URI;
 
-    static final String DEFAULT_DEFAULT_NAMESPACE = 
-            "http://vitro.mannlib.cornell.edu/ns/default#";
-   
-    static String defaultNamespace = DEFAULT_DEFAULT_NAMESPACE; // FIXME
-   
     // use OWL models with no reasoning
     static final OntModelSpec DB_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
     static final OntModelSpec MEM_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM; 
    
     private String getJdbcUrl(ServletContext ctx) {
-		String jdbcUrl = ConfigurationProperties.getBean(ctx).getProperty(
-				"VitroConnection.DataSource.url");
+        String jdbcUrl = ConfigurationProperties.getBean(ctx).getProperty(
+                "VitroConnection.DataSource.url");
 
         // Ensure that MySQL handles unicode properly, else all kinds of
         // horrible nastiness ensues.
@@ -159,17 +162,13 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
        
         String jdbcUrl = getJdbcUrl(ctx);
    
-		String username = ConfigurationProperties.getBean(ctx).getProperty(
-				"VitroConnection.DataSource.username");
+        String username = ConfigurationProperties.getBean(ctx).getProperty(
+                "VitroConnection.DataSource.username");
         String password = ConfigurationProperties.getBean(ctx).getProperty(
                 "VitroConnection.DataSource.password");
         BasicDataSource ds = makeBasicDataSource(
                 getDbDriverClassName(ctx), jdbcUrl, username, password, ctx);
 
-        String dns = ConfigurationProperties.getBean(ctx).getProperty(
-                "Vitro.defaultNamespace");
-        defaultNamespace = (dns != null && dns.length() > 0) ? dns : null;
-       
        jenaDbOntModelSpec = (jenaDbOntModelSpec != null) 
                ? jenaDbOntModelSpec 
                : DB_ONT_MODEL_SPEC;
@@ -182,30 +181,31 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     * Sets up a BasicDataSource using values from
     * a properties file.
     */
-    public final BasicDataSource makeDataSourceFromConfigurationProperties(ServletContext ctx){
-		String dbDriverClassname = ConfigurationProperties.getBean(ctx)
-				.getProperty("VitroConnection.DataSource.driver",
-						getDbDriverClassName(ctx));
+    public final BasicDataSource makeDataSourceFromConfigurationProperties(
+            ServletContext ctx) {
+        String dbDriverClassname = ConfigurationProperties.getBean(ctx)
+                .getProperty("VitroConnection.DataSource.driver",
+                        getDbDriverClassName(ctx));
         String jdbcUrl = getJdbcUrl(ctx);
-		String username = ConfigurationProperties.getBean(ctx).getProperty(
-				"VitroConnection.DataSource.username");
-		String password = ConfigurationProperties.getBean(ctx).getProperty(
-				"VitroConnection.DataSource.password");
+        String username = ConfigurationProperties.getBean(ctx).getProperty(
+                "VitroConnection.DataSource.username");
+        String password = ConfigurationProperties.getBean(ctx).getProperty(
+                "VitroConnection.DataSource.password");
         return makeBasicDataSource(
                 dbDriverClassname, jdbcUrl, username, password, ctx);
     }
    
    public void setApplicationDataSource(BasicDataSource bds, 
                                         ServletContext ctx) {
-	   ctx.setAttribute(getDataSourceAttributeName(), bds);
+       ctx.setAttribute(getDataSourceAttributeName(), bds);
    }
    
    public static BasicDataSource getApplicationDataSource(ServletContext ctx) {
-	   return (BasicDataSource) ctx.getAttribute(getDataSourceAttributeName());
+       return (BasicDataSource) ctx.getAttribute(getDataSourceAttributeName());
    }
    
    private static String getDataSourceAttributeName() {
-	   return JenaDataSourceSetupBase.class.getName() + ".dataSource";
+       return JenaDataSourceSetupBase.class.getName() + ".dataSource";
    }
 
    public static BasicDataSource makeBasicDataSource(String dbDriverClassname,
@@ -221,21 +221,29 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
        ds.setUsername(username);
        ds.setPassword(password);
        int maxActiveInt = DEFAULT_MAXACTIVE;
-		String maxActiveStr = ConfigurationProperties.getBean(ctx).getProperty(
-				"VitroConnection.DataSource.pool.maxActive");
+       String maxActiveStr = ConfigurationProperties.getBean(ctx).getProperty(
+                MAX_ACTIVE_PROPERTY);
        if (!StringUtils.isEmpty(maxActiveStr)) {
            try {
-               maxActiveInt = Integer.parseInt(maxActiveStr);    
+               int maxActiveIntFromConfigProperties = Integer.parseInt(maxActiveStr);
+               if (maxActiveIntFromConfigProperties < MINIMUM_MAXACTIVE) {
+                   log.warn("Specified value for " + MAX_ACTIVE_PROPERTY + 
+                            " is too low. Using minimum value of " + 
+                            MINIMUM_MAXACTIVE);
+                   maxActiveInt = MINIMUM_MAXACTIVE;
+               } else {
+                   maxActiveInt = maxActiveIntFromConfigProperties;
+               }
            } catch (NumberFormatException nfe) {
                log.error("Unable to parse connection pool maxActive setting " 
                        + maxActiveStr + " as an integer");
-               }
+           }
        }
        int maxIdleInt = (maxActiveInt > DEFAULT_MAXACTIVE) 
                ? maxActiveInt / 4
                : DEFAULT_MAXIDLE;
-		String maxIdleStr = ConfigurationProperties.getBean(ctx).getProperty(
-				"VitroConnection.DataSource.pool.maxIdle");
+        String maxIdleStr = ConfigurationProperties.getBean(ctx).getProperty(
+                MAX_IDLE_PROPERTY);
        if (!StringUtils.isEmpty(maxIdleStr)) {
            try {
                maxIdleInt = Integer.parseInt(maxIdleStr);    
@@ -253,6 +261,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
        ds.setMinEvictableIdleTimeMillis(DEFAULT_MINEVICTIONIDLETIME);
        ds.setNumTestsPerEvictionRun(maxActiveInt);
        ds.setTimeBetweenEvictionRunsMillis(DEFAULT_TIMEBETWEENEVICTIONS);
+       ds.setInitialSize(ds.getMaxActive() / 10);
 
        try {
            ds.getConnection().close();
@@ -264,27 +273,27 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
    }
    
    public enum TripleStoreType {
-	   RDB, SDB
+       RDB, SDB
    }
    
    public static boolean isFirstStartup() {
-	   return firstStartup;
+       return firstStartup;
    }
    
    protected Model makeDBModel(BasicDataSource ds, 
                                String jenaDbModelname, 
                                OntModelSpec jenaDbOntModelSpec, 
                                ServletContext ctx) {
-	   return makeDBModel(
-	           ds, jenaDbModelname, jenaDbOntModelSpec, TripleStoreType.RDB, ctx);
+       return makeDBModel(
+               ds, jenaDbModelname, jenaDbOntModelSpec, TripleStoreType.RDB, ctx);
    }
    
    protected Model makeDBModel(BasicDataSource ds, 
            String jenaDbModelName, 
            OntModelSpec jenaDbOntModelSpec, 
            TripleStoreType storeType, ServletContext ctx) {
-       return makeDBModel (
-               ds, jenaDbModelName, jenaDbOntModelSpec, storeType, getDbType(ctx), ctx);
+       return makeDBModel (ds, jenaDbModelName, jenaDbOntModelSpec, storeType, 
+               getDbType(ctx), ctx);
    }
    
    public static Model makeDBModel(BasicDataSource ds, 
@@ -298,28 +307,28 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         try {
             Graph g = null;
             switch (storeType) {
-            	case RDB:
-            		g = new RegeneratingGraph(
-            		        new RDBGraphGenerator(
-            		                ds, dbType, jenaDbModelName)); 
-            		break;
-            	case SDB:
-					String layoutStr = ConfigurationProperties.getBean(ctx)
-							.getProperty(
-									"VitroConnection.DataSource.sdb.layout",
-									"layout2/hash");
-					String dbtypeStr = ConfigurationProperties.getBean(ctx)
-							.getProperty("VitroConnection.DataSource.dbtype",
-									"MySQL");
-            		StoreDesc desc = new StoreDesc(
-            		        LayoutType.fetch(layoutStr),
-            		        DatabaseType.fetch(dbtypeStr) );
-                	g = new RegeneratingGraph(
-                	        new SDBGraphGenerator(
-                	                ds, desc, jenaDbModelName)); 
-                	break;
-            	default: throw new RuntimeException (
-            	        "Unsupported store type " + storeType); 
+                case RDB:
+                    g = new RegeneratingGraph(
+                            new RDBGraphGenerator(
+                                    ds, dbType, jenaDbModelName)); 
+                    break;
+                case SDB:
+                    String layoutStr = ConfigurationProperties.getBean(ctx)
+                            .getProperty(
+                                    "VitroConnection.DataSource.sdb.layout",
+                                    "layout2/hash");
+                    String dbtypeStr = ConfigurationProperties.getBean(ctx)
+                            .getProperty("VitroConnection.DataSource.dbtype",
+                                    "MySQL");
+                    StoreDesc desc = new StoreDesc(
+                            LayoutType.fetch(layoutStr),
+                            DatabaseType.fetch(dbtypeStr) );
+                    g = new RegeneratingGraph(
+                            new SDBGraphGenerator(
+                                    ds, desc, jenaDbModelName)); 
+                    break;
+                default: throw new RuntimeException (
+                        "Unsupported store type " + storeType); 
             }
             dbModel = ModelFactory.createModelForGraph(g);
             log.debug("Using database at "+ds.getUrl());
@@ -343,29 +352,32 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         }
     }
    
-    public static void readOntologyFileFromPath(String p, Model model, ServletContext ctx) {
-    	//Check that this is a file and not a directory
-    	File f = new File(ctx.getRealPath(p));
-    	if(f.exists() && f.isFile()){
-	    	String format = getRdfFormat(p);
-	         log.info("Loading ontology file at " + p + 
-	                  " as format " + format);
-	         InputStream ontologyInputStream = ctx.getResourceAsStream(p);
-	         try {
-	             model.read(ontologyInputStream, null, format);
-	             log.debug("...successful");
-	         } catch (Throwable t) {
-	             log.error("Failed to load ontology file at '" + p + 
-	                       "' as format " + format, t);
-	         }
-    	} else {
-    		if(!f.exists()) {
-    			log.debug("File for path " + p + " does not exist");
-    		}
-    		else if(f.isDirectory()) {
-    			log.debug("Path " + p + " corresponds to directory and not file so was not read in");
-    		}
-    	}
+    public static void readOntologyFileFromPath(String p, 
+                                                Model model, 
+                                                ServletContext ctx) {
+        //Check that this is a file and not a directory
+        File f = new File(ctx.getRealPath(p));
+        if(f.exists() && f.isFile()){
+            String format = getRdfFormat(p);
+             log.info("Loading ontology file at " + p + 
+                      " as format " + format);
+             InputStream ontologyInputStream = ctx.getResourceAsStream(p);
+             try {
+                 model.read(ontologyInputStream, null, format);
+                 log.debug("...successful");
+             } catch (Throwable t) {
+                 log.error("Failed to load ontology file at '" + p + 
+                           "' as format " + format, t);
+             }
+        } else {
+            if(!f.exists()) {
+                log.debug("File for path " + p + " does not exist");
+            }
+            else if(f.isDirectory()) {
+                log.debug("Path " + p + 
+                        " corresponds to directory and not file so was not read in");
+            }
+        }
    }
     
     private static String getRdfFormat(String filename){
@@ -385,33 +397,36 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     private static final String sdbModelMaker = "vitroJenaSDBModelMaker";
     private static final String rdbModelMaker = "vitroJenaModelMaker";
     
-    protected void makeModelMakerFromConnectionProperties(TripleStoreType type, ServletContext ctx){
-    	String jdbcUrl = getJdbcUrl(ctx);
-      String dbtypeStr = ConfigurationProperties.getBean(ctx).getProperty("VitroConnection.DataSource.dbtype","MySQL");
-    	String username = ConfigurationProperties.getBean(ctx).getProperty(
-    	        "VitroConnection.DataSource.username");
-    	String password = ConfigurationProperties.getBean(ctx).getProperty(
-    	        "VitroConnection.DataSource.password");
-    	
-    	if (TripleStoreType.RDB.equals(type)){
-    		vjmm = new VitroJenaModelMaker(
-    		        jdbcUrl, username, password, dbtypeStr, ctx);
-    	}
-    	
-    	else if(TripleStoreType.SDB.equals(type)){
-    		StoreDesc storeDesc = new StoreDesc(
-    		        LayoutType.LayoutTripleNodesHash, DatabaseType.fetch(dbtypeStr));
-    	    BasicDataSource bds = JenaDataSourceSetup.makeBasicDataSource(
-    	            getDbDriverClassName(ctx), jdbcUrl, username, password, ctx);
-    	    try {
-    	        vsmm = new VitroJenaSDBModelMaker(storeDesc, bds);
-    	    } catch (SQLException sqle) {
-    	        log.error("Unable to set up SDB ModelMaker", sqle);
-    	    }
-    	}
-    	
-		return;
-		
+    protected void makeModelMakerFromConnectionProperties(TripleStoreType type, 
+                                                          ServletContext ctx) {
+        String jdbcUrl = getJdbcUrl(ctx);
+        String dbtypeStr = ConfigurationProperties.getBean(ctx).getProperty(
+                "VitroConnection.DataSource.dbtype","MySQL");
+        String username = ConfigurationProperties.getBean(ctx).getProperty(
+                "VitroConnection.DataSource.username");
+        String password = ConfigurationProperties.getBean(ctx).getProperty(
+                "VitroConnection.DataSource.password");
+        
+        if (TripleStoreType.RDB.equals(type)){
+            vjmm = new VitroJenaModelMaker(
+                    jdbcUrl, username, password, dbtypeStr, ctx);
+        } else if (TripleStoreType.SDB.equals(type)) {
+            StoreDesc storeDesc = new StoreDesc(
+                    LayoutType.LayoutTripleNodesHash, DatabaseType.fetch(dbtypeStr));
+            BasicDataSource bds = JenaDataSourceSetup.makeBasicDataSource(
+                    getDbDriverClassName(ctx), jdbcUrl, username, password, ctx);
+            bds.setMaxActive(4); // for now, the SDB model makers should not use more
+                                 // than a small handful of connections
+            bds.setMaxIdle(2);
+            try {
+                vsmm = new VitroJenaSDBModelMaker(storeDesc, bds);
+            } catch (SQLException sqle) {
+                log.error("Unable to set up SDB ModelMaker", sqle);
+            }
+        }
+        
+        return;
+        
     }
     
     /**
@@ -423,10 +438,12 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         if( dir == null )
             throw new IllegalStateException("Must pass a File to getModelFromDir()");
         if( !dir.isDirectory() )
-            throw new IllegalStateException("Directory must be a File object for a directory");
+            throw new IllegalStateException(
+                    "Directory must be a File object for a directory");
         if( !dir.canRead() )
             throw new IllegalStateException("getModelFromDir(): Directory " +
-                    " must be readable, check premissions on " + dir.getAbsolutePath());
+                    " must be readable, check premissions on " 
+                    + dir.getAbsolutePath());
         
         OntModel model = ModelFactory.createOntologyModel();
         for( File file : dir.listFiles()){
@@ -449,36 +466,47 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     
     public static void setVitroJenaModelMaker(VitroJenaModelMaker vjmm, 
                                               ServletContext ctx){
-    	ctx.setAttribute(rdbModelMaker, vjmm);
+        ctx.setAttribute(rdbModelMaker, vjmm);
     }
     
     public static void setVitroJenaSDBModelMaker(VitroJenaSDBModelMaker vsmm, 
                                                  ServletContext ctx){
-    	ctx.setAttribute(sdbModelMaker, vsmm);
+        ctx.setAttribute(sdbModelMaker, vsmm);
+    }
+    
+    protected String getDefaultNamespace(ServletContext ctx) {
+        String dns = ConfigurationProperties.getBean(ctx).getProperty(
+                VITRO_DEFAULT_NAMESPACE);
+        if ((dns != null) && (!dns.isEmpty())) {
+            return dns;
+        } else {
+            throw new IllegalStateException("deploy.properties does not "
+                    + "contain a value for '" + VITRO_DEFAULT_NAMESPACE + "'");
+        }
     }
     
     protected VitroJenaModelMaker getVitroJenaModelMaker(){
-    	return vjmm;
+        return vjmm;
     }
     
     protected VitroJenaSDBModelMaker getVitroJenaSDBModelMaker(){
-    	return vsmm;
+        return vsmm;
     }
 
-	private static String getDbType(ServletContext ctx) {
-		return ConfigurationProperties.getBean(ctx).getProperty( // database type
-				"VitroConnection.DataSource.dbtype", "MySQL");
-	}
+    private static String getDbType(ServletContext ctx) {
+        return ConfigurationProperties.getBean(ctx).getProperty( // database type
+                "VitroConnection.DataSource.dbtype", "MySQL");
+    }
 
-	private static String getDbDriverClassName(ServletContext ctx) {
-		return ConfigurationProperties.getBean(ctx).getProperty(
-				"VitroConnection.DataSource.driver", "com.mysql.jdbc.Driver");
+    private static String getDbDriverClassName(ServletContext ctx) {
+        return ConfigurationProperties.getBean(ctx).getProperty(
+                "VitroConnection.DataSource.driver", "com.mysql.jdbc.Driver");
 
-	}
+    }
 
-	private static String getValidationQuery(ServletContext ctx) {
-		return ConfigurationProperties.getBean(ctx).getProperty(
-				"VitroConnection.DataSource.validationQuery", "SELECT 1");
-	}
+    private static String getValidationQuery(ServletContext ctx) {
+        return ConfigurationProperties.getBean(ctx).getProperty(
+                "VitroConnection.DataSource.validationQuery", "SELECT 1");
+    }
 
 }

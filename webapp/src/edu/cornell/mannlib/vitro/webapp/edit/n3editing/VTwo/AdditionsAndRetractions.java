@@ -2,8 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 
+import java.io.StringWriter;
 import java.util.List;
-import java.util.Map;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -12,7 +12,6 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
  * This is a data structure to allow a method to return
  * a pair of Model objects for additions and retractions.
  * 
- * Move this to its own class    
  */
 public class AdditionsAndRetractions {
     Model additions;
@@ -49,6 +48,29 @@ public class AdditionsAndRetractions {
     }
     public void setRetractions(Model retractions) {
         this.retractions = retractions;
+    }
+    
+    @Override
+    public String toString(){
+        String str = "{";
+        
+        str += "\nadditions:[";
+        if( getAdditions() != null ) {
+           StringWriter writer = new StringWriter();
+           getAdditions().write(writer, "N3-PP");
+           str += "\n" + writer.toString() + "\n";
+        }
+        str += "],\n";        
+        
+        str += "\nretractions:[";
+        if( getRetractions() != null ) {
+           StringWriter writer = new StringWriter();
+           getRetractions().write(writer, "N3-PP");
+           str += "\n" + writer.toString() + "\n";
+        }
+        str += "],\n";        
+        
+        return str;
     }
     
 }

@@ -14,10 +14,14 @@
     margin: 1em 0;
     padding: 0 1em;
 }
-#adminDashboard .pageBodyGroup h4 {
+#adminDashboard .pageBodyGroup h4,
+#adminDashboard .pageBodyGroup h4 a {
     margin: 0;
     padding: 0;
     color: #666;
+}
+#adminDashboard .pageBodyGroup h4 a {
+    font-weight: bold;
 }
 #adminDashboard .pageBodyGroup h3 {
     background-color: #efefef;
@@ -35,4 +39,19 @@
 }
 #adminDashboard .add-action-button {
     margin-top: .75em;
+}
+#alertIcon {
+    vertical-align:middle
+}
+/* BUBBLE ALERT FOR ADDING INDIVIDUAL CLASSES -----> */
+#addClassBubble p{
+    width: 290px;
+    height: 50px;
+    font-size: 13px;
+    line-height: 1.3em;
+    padding: 25px 5px 5px 13px;
+    background: #fff url('../images/siteAdmin/addClassBubble.png') 0 0 no-repeat; 
+    color: #797979;
+    padding-bottom: 0;
+    margin-bottom: 0;
 }

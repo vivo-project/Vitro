@@ -13,14 +13,6 @@
 <% request.setAttribute("requestedActions", new UseAdvancedDataToolsPages()); %>
 <vitro:confirmAuthorization />
 
-<%
-
-    ModelMaker maker = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
-    if (maker == null) {
-        maker = (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
-    }
-
-%>
     <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Execute RDF-Encoded Ingest Workflow</h2>
 
     <form action="ingest" method="get"i>

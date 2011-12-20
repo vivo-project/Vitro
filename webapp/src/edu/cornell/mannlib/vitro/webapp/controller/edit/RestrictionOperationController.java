@@ -191,12 +191,13 @@ public class RestrictionOperationController extends BaseEditController {
             }
 		    
 	    } catch (Exception e) {
-	    	e.printStackTrace();
+	    	log.error(e, e);
 	    	try {
 	    		response.sendRedirect(defaultLandingPage);
 	    		return;
 	    	} catch (Exception f) {
-	    		e.printStackTrace();
+                log.error(f, f);
+                throw new RuntimeException(f);
 	    	}
 	    }
     

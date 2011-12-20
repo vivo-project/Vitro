@@ -5,6 +5,6 @@
 <#-- Only show version info if user has access -->
 <#if user.hasRevisionInfoAccess>
     <div id="revision">
-        Version <a href="${version.moreInfoUrl}">${version.label}</a>
+        Version <a href="${version.moreInfoUrl}" title="version">${version.label}</a>
     </div>
 </#if>

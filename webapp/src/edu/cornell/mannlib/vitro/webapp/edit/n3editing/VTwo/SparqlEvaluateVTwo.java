@@ -16,11 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * User: bdc34
- * Date: Jan 22, 2008
- * Time: 5:55:57 PM
- */
+
 public class SparqlEvaluateVTwo {
     private static Log log = LogFactory.getLog( SparqlEvaluateVTwo.class );
 
@@ -31,21 +27,25 @@ public class SparqlEvaluateVTwo {
     }
 
     public void evaluateForAdditionalUris( EditConfigurationVTwo editConfig ){
+    	log.debug("Evaluating for Additional URIS");
         Map<String,List<String>> varsToUris = sparqlEvaluateForUris(editConfig, editConfig.getSparqlForAdditionalUrisInScope());
         editConfig.getUrisInScope().putAll(varsToUris);
     }
 
     public void evalulateForAdditionalLiterals( EditConfigurationVTwo editConfig ){
+    	log.debug("Evaluating for Additional Literals");
         Map<String,List<Literal>> varsToLiterals = sparqlEvaluateForLiterals(editConfig, editConfig.getSparqlForAdditionalLiteralsInScope());
         editConfig.getLiteralsInScope().putAll(varsToLiterals);
     }
 
     public void evaluateForExistingUris( EditConfigurationVTwo editConfig){
+    	log.debug("Evaluating for existing URIS");
         Map<String,List<String>> varsToUris = sparqlEvaluateForUris(editConfig, editConfig.getSparqlForExistingUris());
         editConfig.getUrisInScope().putAll(varsToUris);
     }
 
     public void evaluateForExistingLiterals( EditConfigurationVTwo editConfig){
+    	log.debug("Evaluating for existing literals");
         Map<String,List<Literal>> varsToLiterals = sparqlEvaluateForLiterals(editConfig, editConfig.getSparqlForExistingLiterals());
         editConfig.getLiteralsInScope().putAll(varsToLiterals);
     }
@@ -92,15 +92,18 @@ public class SparqlEvaluateVTwo {
         Map<String,List<Literal>> varToLiterals = new HashMap<String,List<Literal>>();
         for(String var : varToSparql.keySet()){
             String query = varToSparql.get(var);
-                        
+            log.debug("Var name " + var + " and query = " + query);           
             /* skip if var set to use a system generated value */
-            if( query == null || EditConfigurationVTwo.USE_SYSTEM_VALUE.equals( query ))
+            if( query == null || EditConfigurationVTwo.USE_SYSTEM_VALUE.equals( query )) {
+            	log.debug("Query is null or using system value so will not continue with rest of method");
                 continue;
-            
+            }
             List<String> queryStrings = new ArrayList <String>();
             queryStrings.add( query );
-            queryStrings= editConfig.getN3Generator().subInMultiUris(uriScope, queryStrings);
-            queryStrings = editConfig.getN3Generator().subInMultiLiterals(literalScope,queryStrings);
+            editConfig.getN3Generator().subInMultiUris(uriScope, queryStrings);
+            log.debug("Query after substituting uris in scope: " + queryStrings.toString());
+            editConfig.getN3Generator().subInMultiLiterals(literalScope,queryStrings);
+            log.debug("Query after substituting literals in scope: " + queryStrings.toString());
             varToLiterals.put(var, queryToLiteral(  queryStrings.get(0) ));   //might result in (key -> null)
         }
 
@@ -115,13 +118,18 @@ public class SparqlEvaluateVTwo {
 
         for(String var : varToSparql.keySet()){
             String query = varToSparql.get(var);
+            log.debug("Var name " + var + " and query = " + query);           
             /* skip if var set to use a system generated value */
-            if( query == null || EditConfigurationVTwo.USE_SYSTEM_VALUE.equals( query ))
+            if( query == null || EditConfigurationVTwo.USE_SYSTEM_VALUE.equals( query )) {
+            	log.debug("Query is null or using system value so will not continue with rest of method");
                 continue;
+            }
             List<String> queryStrings = new ArrayList <String>();
             queryStrings.add(query);
-            queryStrings= editConfig.getN3Generator().subInMultiUris(uriScope, queryStrings);
-            queryStrings = editConfig.getN3Generator().subInMultiLiterals(literalScope,queryStrings);
+            editConfig.getN3Generator().subInMultiUris(uriScope, queryStrings);
+            log.debug("Query after substituting uris in scope: " + queryStrings.toString());
+            editConfig.getN3Generator().subInMultiLiterals(literalScope,queryStrings);
+            log.debug("Query after substituting literals in scope: " + queryStrings.toString());
             List<String> uriFromQuery = queryToUri(  queryStrings.get(0) );
             if( uriFromQuery != null )
             {    
@@ -185,6 +193,7 @@ public class SparqlEvaluateVTwo {
                     
                    
                 }else{
+                	log.debug("Query had no results");
                     return null;
                 }
             } else {
@@ -202,6 +211,7 @@ public class SparqlEvaluateVTwo {
 
 
     public  List<Literal> queryToLiteral(String querystr){
+    	log.debug("Executing query " + querystr);
         Literal value = null;
         List<Literal> values = new ArrayList<Literal>();
         QueryExecution qe = null;
@@ -221,6 +231,7 @@ public class SparqlEvaluateVTwo {
                     	values.add(value);
                     }
                 }else{
+                	log.debug("Query had no results");
                     return null;
                 }
             } else {

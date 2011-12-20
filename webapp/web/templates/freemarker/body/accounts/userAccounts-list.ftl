@@ -12,7 +12,7 @@
     <section class="account-feedback">
         <p>
             A new account for 
-            <a href="${newUserAccount.editUrl}">${newUserAccount.firstName} ${newUserAccount.lastName}</a>
+            <a href="${newUserAccount.editUrl}" title="new account">${newUserAccount.firstName} ${newUserAccount.lastName}</a>
             was successfully created. 
             <#if emailWasSent?? > 
                 A notification email has been sent to ${newUserAccount.emailAddress}
@@ -26,7 +26,7 @@
     <section class="account-feedback">
         <p>
             The account for 
-            <a href="${updatedUserAccount.editUrl}">${updatedUserAccount.firstName} ${updatedUserAccount.lastName}</a>
+            <a href="${updatedUserAccount.editUrl}" title="updated account">${updatedUserAccount.firstName} ${updatedUserAccount.lastName}</a>
             has been updated.
             <#if emailWasSent?? > 
                 A confirmation email has been sent to ${updatedUserAccount.emailAddress}
@@ -60,7 +60,7 @@
         </select>
         
         <#if roleFilterUri?has_content>
-             <span><a href="${formUrls.list}"> View all accounts</a></span>
+             <span><a href="${formUrls.list}" title="view all acounts"> View all accounts</a></span>
         </#if>
     </form>
 </section>
@@ -80,7 +80,7 @@
 </section>
 <#if searchTerm?has_content>
 <section id="search-feedback">
-    <p>Search results for "<strong>${searchTerm}</strong>" | <span><a href="${formUrls.list}"> View all accounts</a></span></p>
+    <p>Search results for "<strong>${searchTerm}</strong>" | <span><a href="${formUrls.list}" title="view all accounts"> View all accounts</a></span></p>
 </section>
 </#if>
 <form method="POST" action="${formUrls.list}" id="account-display" class="customForm" role="accounts display">
@@ -156,7 +156,7 @@
                         </#if>
     
                         <#if account.editUrl != "">
-                            <a ${disableDeleteAccount} href="${account.editUrl}" >${account.emailAddress}</a>
+                            <a ${disableDeleteAccount} href="${account.editUrl}"  title="disable account">${account.emailAddress}</a>
                             <!-- when this link is clicked, editAccount is noticed and all other fields are ignored. -->
                         <#else>
                             ${account.emailAddress}

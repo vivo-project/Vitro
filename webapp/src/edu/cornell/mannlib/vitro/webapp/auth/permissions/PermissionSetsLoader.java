@@ -17,7 +17,7 @@ import com.hp.hpl.jena.shared.Lock;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
+import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
  * Load the initial configuration of PermissionSets and Permissions.
@@ -38,10 +38,7 @@ public class PermissionSetsLoader implements ServletContextListener {
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		ServletContext ctx = sce.getServletContext();
-
-		if (AbortStartup.isStartupAborted(ctx)) {
-			return;
-		}
+		StartupStatus ss = StartupStatus.getBean(ctx);
 
 		try {
 			String ns = ConfigurationProperties.getBean(ctx).getProperty(
@@ -56,9 +53,7 @@ public class PermissionSetsLoader implements ServletContextListener {
 			wrapper.createPermissionSet(URI_CURATOR, "Curator");
 			wrapper.createPermissionSet(URI_DBA, "Site Admin");
 		} catch (Exception e) {
-			log.error("could not run PermissionSetsLoader" + e);
-			AbortStartup.abortStartup(ctx);
-			throw new RuntimeException(e);
+			ss.fatal(this, "could not run PermissionSetsLoader" + e);
 		}
 	}
 

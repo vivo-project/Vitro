@@ -75,7 +75,12 @@ public class ObjectPropertyHierarchyListingController extends BaseEditController
 
         if (startPropertyUri != null) {
         	roots = new LinkedList<ObjectProperty>();
-        	roots.add(opDao.getObjectPropertyByURI(startPropertyUri));
+        	ObjectProperty op = opDao.getObjectPropertyByURI(startPropertyUri);
+        	if (op == null) {
+        		op = new ObjectProperty();
+        		op.setURI(startPropertyUri);
+        	}
+        	roots.add(op);
         } else {
             roots = opDao.getRootObjectProperties();
             if (roots!=null){
@@ -83,7 +88,7 @@ public class ObjectPropertyHierarchyListingController extends BaseEditController
             }
         }
 
-        if (roots!=null) {
+        if (roots != null) {
             Iterator<ObjectProperty> rootIt = roots.iterator();
             if (!rootIt.hasNext()) {
                 ObjectProperty op = new ObjectProperty();
@@ -94,7 +99,10 @@ public class ObjectPropertyHierarchyListingController extends BaseEditController
             } else {
                 while (rootIt.hasNext()) {
                     ObjectProperty root = rootIt.next();
-                    if ( (ontologyUri==null) || ( (ontologyUri!=null) && (root.getNamespace()!=null) && (ontologyUri.equals(root.getNamespace())) ) ) {
+                    if ( (ontologyUri==null) || 
+                    		( (ontologyUri != null) 
+                    		  && (root.getNamespace() != null) 
+                    		  && (ontologyUri.equals(root.getNamespace())) ) ) {
                     	ArrayList childResults = new ArrayList();
                     	addChildren(root, childResults, 0, ontologyUri);
                     	results.addAll(childResults);
@@ -165,8 +173,6 @@ public class ObjectPropertyHierarchyListingController extends BaseEditController
     private List addObjectPropertyDataToResultsList(ObjectProperty op, int position, String ontologyUri) {
         List results = new ArrayList();
         if (ontologyUri == null || ( (op.getNamespace()!=null) && (op.getNamespace().equals(ontologyUri)) ) ) {
-            //if (position==1)
-            //  position=2;
             for (int i=0; i<position; i++) {
                 results.add("@@entities");  // column 1
             }
@@ -201,9 +207,24 @@ public class ObjectPropertyHierarchyListingController extends BaseEditController
             } else {
                 numCols = addColToResults("unspecified", results, numCols);
             }
-            numCols = addColToResults(op.getDomainDisplayTier(), results, numCols); // ("d"+op.getDomainDisplayTier()+",r"+op.getRangeDisplayTier(), results, numCols); // column 6
-            numCols = addColToResults(op.getHiddenFromDisplayBelowRoleLevel()  == null ? "unspecified" : op.getHiddenFromDisplayBelowRoleLevel().getShorthand(), results, numCols); // column 7
-            numCols = addColToResults(op.getProhibitedFromUpdateBelowRoleLevel() == null ? "unspecified" : op.getProhibitedFromUpdateBelowRoleLevel().getShorthand(), results, numCols); // column 8
+            Integer displayTier = op.getDomainDisplayTierInteger();
+            numCols = addColToResults(
+            		(displayTier == null) 
+            		        ? "" 
+            		        : Integer.toString(displayTier, BASE_10), 
+            		 results, numCols); // column 6
+            numCols = addColToResults(
+            		(op.getHiddenFromDisplayBelowRoleLevel() == null) 
+            		        ? "unspecified" 
+            		        : op.getHiddenFromDisplayBelowRoleLevel()
+            		                .getShorthand(), 
+            		 results, numCols); // column 7
+            numCols = addColToResults(
+            		(op.getProhibitedFromUpdateBelowRoleLevel() == null)
+            		        ? "unspecified" 
+            		        : op.getProhibitedFromUpdateBelowRoleLevel()
+            		                .getShorthand(), 
+            		 results, numCols); // column 8
             results.add("XX"); // column 9
         }
         return results;

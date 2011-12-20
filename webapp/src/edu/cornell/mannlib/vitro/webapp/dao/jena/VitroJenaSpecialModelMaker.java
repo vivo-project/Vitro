@@ -35,6 +35,10 @@ public class VitroJenaSpecialModelMaker implements ModelMaker {
 		this.request = request;
 	}
 	
+	public ModelMaker getInnerModelMaker() {
+		return this.innerModelMaker;
+	}
+	
 	public void close() {
 		innerModelMaker.close();
 	}

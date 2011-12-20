@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.search.solr;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,16 +18,14 @@ import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.client.solrj.impl.XMLResponseParser;
 
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.DatasetFactory;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.search.beans.FileBasedProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearchImpl;
@@ -38,59 +37,71 @@ import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForObjectP
 import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForTypeStatements;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.SearchReindexingListener;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.AbortStartup;
+import edu.cornell.mannlib.vitro.webapp.search.indexing.URIsForClassGroupChange;
+import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 public class SolrSetup implements javax.servlet.ServletContextListener{   
     private static final Log log = LogFactory.getLog(SolrSetup.class.getName());
     
-    protected static final String LOCAL_SOLR_SERVER  = "vitro.local.solr.server";
-    
+    public static final String SOLR_SERVER  = "vitro.local.solr.server";    
+    public static final String PROHIBITED_FROM_SEARCH = "edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch";
+        
     @Override
     public void contextInitialized(ServletContextEvent sce) {        
-        if (AbortStartup.isStartupAborted(sce.getServletContext())) {
+    	ServletContext context = sce.getServletContext();
+		StartupStatus ss = StartupStatus.getBean(context);
+		
+        /* setup the http connection with the solr server */
+        String solrServerUrlString = ConfigurationProperties.getBean(sce).getProperty("vitro.local.solr.url");
+        if( solrServerUrlString == null ){
+            ss.fatal(this, "Could not find vitro.local.solr.url in deploy.properties.  "+
+                    "Vitro application needs a URL of a solr server that it can use to index its data. " +
+                    "It should be something like http://localhost:${port}" + context.getContextPath() + "solr" 
+                    );
             return;
         }
-                              
-        try {        
-            ServletContext context = sce.getServletContext();
-            
-            /* setup the http connection with the solr server */
-            String solrServerUrl = ConfigurationProperties.getBean(sce).getProperty("vitro.local.solr.url");
-            if( solrServerUrl == null ){
-                log.error("Could not find vitro.local.solr.url in deploy.properties.  "+
-                        "Vitro application needs a URL of a solr server that it can use to index its data. " +
-                        "It should be something like http://localhost:${port}" + context.getContextPath() + "solr" 
-                        );
-                return;
-            }            
-            CommonsHttpSolrServer server;                       
-            //It would be nice to use the default binary handler but there seem to be library problems 
-            server = new CommonsHttpSolrServer(new URL( solrServerUrl ),null,new XMLResponseParser(),false); 
+        
+        URL solrServerUrl = null;
+        try {
+        	solrServerUrl = new URL(solrServerUrlString);
+        } catch (MalformedURLException e) {
+            ss.fatal(this, "Can't connect with the solr server. " +
+            		"The value for vitro.local.solr.url in deploy.properties is not a valid URL: " + solrServerUrlString);
+            return;
+        }
+        
+        try {                                            
+            CommonsHttpSolrServer server;
+            boolean useMultiPartPost = true;
+            //It would be nice to use the default binary handler but there seem to be library problems
+            server = new CommonsHttpSolrServer(solrServerUrl,null,new XMLResponseParser(),useMultiPartPost); 
             server.setSoTimeout(10000);  // socket read timeout
             server.setConnectionTimeout(10000);
             server.setDefaultMaxConnectionsPerHost(100);
             server.setMaxTotalConnections(100);         
-            server.setMaxRetries(1);            
-            context.setAttribute(LOCAL_SOLR_SERVER, server);
+            server.setMaxRetries(1);
+            
+            context.setAttribute(SOLR_SERVER, server);
             
             /* set up the individual to solr doc translation */            
-            OntModel displayOntModel = (OntModel) sce.getServletContext().getAttribute("displayOntModel");
+            OntModel jenaOntModel = ModelContext.getJenaOntModel(context);            
             
-            OntModel abox = ModelContext.getBaseOntModelSelector(context).getABoxModel();            
-            OntModel inferences = (OntModel)context.getAttribute( JenaBaseDao.INFERENCE_ONT_MODEL_ATTRIBUTE_NAME);
-            Dataset dataset = DatasetFactory.create(ModelContext.getJenaOntModel(context));
-
-            OntModel jenaOntModel = ModelContext.getJenaOntModel(context);
+            /* try to get context attribute DocumentModifiers 
+             * and use that as the start of the list of DocumentModifier 
+             * objects.  This allows other listeners to add to the basic set of 
+             * DocumentModifiers. */
+            List<DocumentModifier> modifiers = (List<DocumentModifier>)context.getAttribute("DocumentModifiers");
+            if( modifiers == null )
+                modifiers = new ArrayList<DocumentModifier>();
             
-            List<DocumentModifier> modifiers = new ArrayList<DocumentModifier>();
-            modifiers.add(new CalculateParameters(dataset));
-            modifiers.add(new ContextNodeFields(jenaOntModel));
             modifiers.add(new NameBoost());
+            modifiers.add(new ThumbnailImageURL(jenaOntModel));
             
-            // setup probhibited froms earch based on N3 files in the
-            // directory WEB-INF/ontologies/search
+            // setup prohibited from search based on N3 files in the directory WEB-INF/ontologies/search
+            
             File dir = new File(sce.getServletContext().getRealPath("/WEB-INF/ontologies/search"));            
-            ProhibitedFromSearch pfs = new FileBasedProhibitedFromSearch(DisplayVocabulary.SEARCH_INDEX_URI, dir);
+            ProhibitedFromSearch pfs = new FileBasedProhibitedFromSearch(DisplayVocabulary.SEARCH_INDEX_URI, dir);            
+            context.setAttribute(PROHIBITED_FROM_SEARCH,pfs);
             
             IndividualToSolrDocument indToSolrDoc = new IndividualToSolrDocument(            
                     pfs,
@@ -98,6 +109,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             		modifiers);                        
             
             /* setup solr indexer */
+            
             SolrIndexer solrIndexer = new SolrIndexer(server, indToSolrDoc);                  
             
             // This is where the builder gets the list of places to try to
@@ -108,7 +120,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             wadf = new WebappDaoFactoryFiltering(wadf, vf);            
             
             // make objects that will find additional URIs for context nodes etc
-            List<StatementToURIsToUpdate> uriFinders = makeURIFinders(jenaOntModel);
+            List<StatementToURIsToUpdate> uriFinders = makeURIFinders(jenaOntModel,wadf.getIndividualDao());
             
             // Make the IndexBuilder
             IndexBuilder builder = new IndexBuilder( solrIndexer, wadf, uriFinders );
@@ -120,9 +132,9 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             SearchReindexingListener srl = new SearchReindexingListener( builder );
             ModelContext.registerListenerForChanges(ctx, srl);
             
-            log.info("Setup of Solr index completed.");   
+            ss.info(this, "Setup of Solr index completed.");   
         } catch (Throwable e) {
-            log.error("could not setup local solr server",e);
+        	ss.fatal(this, "could not setup local solr server",e);
         }
        
     }
@@ -130,13 +142,15 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
     /**
      * Make a list of StatementToURIsToUpdate objects for use by the
      * IndexBuidler.
+     * @param indDao 
      */
-    public List<StatementToURIsToUpdate> makeURIFinders( OntModel jenaOntModel ){
+    public List<StatementToURIsToUpdate> makeURIFinders( OntModel jenaOntModel, IndividualDao indDao ){
         List<StatementToURIsToUpdate> uriFinders = new ArrayList<StatementToURIsToUpdate>();
         uriFinders.add( new AdditionalURIsForDataProperties() );
         uriFinders.add( new AdditionalURIsForObjectProperties(jenaOntModel) );
         uriFinders.add( new AdditionalURIsForContextNodes(jenaOntModel) );
         uriFinders.add( new AdditionalURIsForTypeStatements() );
+        uriFinders.add( new URIsForClassGroupChange( indDao ));
         return uriFinders;
     }
     
@@ -150,7 +164,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
     }
     
     public static SolrServer getSolrServer(ServletContext ctx){
-        return (SolrServer) ctx.getAttribute(LOCAL_SOLR_SERVER);
+        return (SolrServer) ctx.getAttribute(SOLR_SERVER);
     }
     
 }

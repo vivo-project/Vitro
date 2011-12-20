@@ -78,69 +78,131 @@ public class RdfLiteralHash {
     
     /**
      * Forward to either getDataPropertyStmtByHash or getRdfsLabelStatementByHash, depending on the property.
-     * @param ind
+     * @param subjectUri, 
+     * @param predicateUri, 
      * @param hash
-     * @param model
+     * @param model, may not be null
      * @return a DataPropertyStatement if found or null if not found
      */
 
-    public static DataPropertyStatement getPropertyStmtByHash(Individual ind, String predicateUri, int hash, Model model) {
+    public static DataPropertyStatement getPropertyStmtByHash(String subjectUri, String predicateUri, int hash, Model model) {        
+        if (subjectUri == null || predicateUri == null ) return null;
         
-        if (ind == null) return null;
-
-        // RY Instead of a code fork here, we should have a method of Individual getAllDataPropertyStatements() which
-        // doesn't filter out rdfs:label. 
-        DataPropertyStatement dps = predicateUri.equals(VitroVocabulary.LABEL) 
-            ? getRdfsLabelStatementByHash(ind, model, hash) 
-            : getDataPropertyStmtByHash(ind, hash);
-            
-        return dps;
-    }
-    
-
-    public static DataPropertyStatement getDataPropertyStmtByHash( Individual ind, int hash){       
-
-        List<DataPropertyStatement> statements = ind.getDataPropertyStatements();
-        if( statements == null ) return null;
-        for( DataPropertyStatement dps : statements){  
-            if( doesStmtMatchHash(dps, hash) )
-                return dps;
-        }
-        return null;
-    }
-
-    /**
-     * 
-     * @param ind, may be null 
-     * @param hash
-     * @return a DataPropertyStatement if found or null if not found
-     */
-    public static DataPropertyStatement getRdfsLabelStatementByHash(Individual ind, Model model, int hash) {
-
-        String predicateUri = VitroVocabulary.LABEL;
-        
-        DataPropertyStatement dps = null;
-        StmtIterator stmts = model.listStatements(model.createResource(ind.getURI()),  
+        model.enterCriticalSection(false);
+        StmtIterator stmts = model.listStatements(model.createResource(subjectUri),  
                                                   model.getProperty(predicateUri),
-                                                  (RDFNode)null);
+                                                  (RDFNode)null);        
         try {
             while (stmts.hasNext()) {
                 Statement stmt = stmts.nextStatement();
                 RDFNode node = stmt.getObject();
                 if ( node.isLiteral() ){
-                    dps = makeDataPropertyStatementFromStatement(stmt, node);          
+                    DataPropertyStatement dps =
+                        makeDataPropertyStatementFromStatement(stmt, node);          
                     if (doesStmtMatchHash(dps, hash)) {
                         return dps;
                     }
                 }
             }
-            //} catch {
-
-            } finally{
-                stmts.close();
-            }
             return null;
-        }
+        } finally {
+                stmts.close();
+                model.leaveCriticalSection();
+        }    
+    }
+    
+
+//    /**
+//     * Get data property for subject, predicate and hash.  This does not use 
+//     * filtering DAOs to avoid the problems when attempting to edit predicates that
+//     * are filtered out.
+//     *         
+//     * @param ind, may be null 
+//     * @param hash
+//     * @return a DataPropertyStatement if found or null if not found
+//     */
+//    protected static DataPropertyStatement getStatementByHash(String subjectUri, Model model, int hash) {
+//
+//    
+//    
+//    DataPropertyStatement dps = null;
+//    
+// // Not using getAllDataPropertyStatements() because it filters out rdfs:labels
+////      
+////      List<DataPropertyStatement> statements = ind.getDataPropertyStatements();
+////      if( statements == null ) return null;
+////      for( DataPropertyStatement dps : statements){  
+////          if( doesStmtMatchHash(dps, hash) )
+////              return dps;
+////      }
+////      return null;
+//    
+//    StmtIterator stmts = model.listStatements(model.createResource(subjectUri),  
+//                                              model.getProperty(predicateUri),
+//                                              (RDFNode)null);
+//    try {
+//        while (stmts.hasNext()) {
+//            Statement stmt = stmts.nextStatement();
+//            RDFNode node = stmt.getObject();
+//            if ( node.isLiteral() ){
+//                dps = makeDataPropertyStatementFromStatement(stmt, node);          
+//                if (doesStmtMatchHash(dps, hash)) {
+//                    return dps;
+//                }
+//            }
+//        }
+//        //} catch {
+//
+//        } finally{
+//            stmts.close();
+//        }
+//        return null;
+//    }
+    
+    /**
+     * Get data property for subject, predicate and hash.  This does not use 
+     * filtering DAOs to avoid the problems when attempting to edit predicates that
+     * are filtered out.
+     *         
+     * @param ind, may be null 
+     * @param hash
+     * @return a DataPropertyStatement if found or null if not found
+     */
+//    protected static DataPropertyStatement getStatementByHash(String subjectUri, String predicateUri, Model model, int hash) {        
+//        // Not using getAllDataPropertyStatements() because it filters out rdfs:labels
+////         
+////         List<DataPropertyStatement> statements = ind.getDataPropertyStatements();
+////         if( statements == null ) return null;
+////         for( DataPropertyStatement dps : statements){  
+////             if( doesStmtMatchHash(dps, hash) )
+////                 return dps;
+////         }
+////         return null;
+//
+//        
+//        model.enterCriticalSection(false);
+//        StmtIterator stmts = model.listStatements(model.createResource(subjectUri),  
+//                                                  model.getProperty(predicateUri),
+//                                                  (RDFNode)null);        
+//        try {
+//            while (stmts.hasNext()) {
+//                Statement stmt = stmts.nextStatement();
+//                RDFNode node = stmt.getObject();
+//                if ( node.isLiteral() ){
+//                    DataPropertyStatement dps =
+//                        makeDataPropertyStatementFromStatement(stmt, node);          
+//                    if (doesStmtMatchHash(dps, hash)) {
+//                        return dps;
+//                    }
+//                }
+//            }
+//            return null;
+//        } finally {
+//                stmts.close();
+//                model.leaveCriticalSection();
+//        }            
+//    }
+    
     
     public static int makeRdfsLabelLiteralHash( Individual subject, String value, Model  model) { 
         

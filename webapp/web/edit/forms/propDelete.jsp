@@ -8,11 +8,9 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.beans.VClass" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.beans.Link" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.dao.LinksDao" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils" %>
@@ -20,6 +18,7 @@
 <%@page import="edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfigurationLoader"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfiguration" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper"%>
 
@@ -98,9 +97,7 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
     if( subject == null ) throw new Error("could not find subject " + subjectUri);
     request.setAttribute("subjectName",subject.getName());
     
-    // Get the statement data to display
-    // rjy7 Alternative implementation: have the template put the markup into a url or form param
-    // which can then just be spit out here.
+    // Get the statement data to be displayed
     String templateName = request.getParameter("templateName");
     Map params = request.getParameterMap();
     Map<String, String> statement = new HashMap<String, String>();
@@ -121,16 +118,18 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
  
         /* Some propStatements (propStatement-educationalTraining.ftl) make reference to the individual,  
          * but instead of adding it to the data model we'll test in the template for non-existence. If
-         * this becomes more common, add it here instead.
+         * this becomes more common, add it here instead. We don't want to generate the property
+         * list for the individual, though, so should modify IndividualTemplateModel to make that
+         * conditional, or perhaps use a different template model that contains only the limited
+         * information needed in the propStatement templates.
          */
         //map.put("individual", new IndividualTemplateModel(subject, vreq));
 
-        map.putAll(FreemarkerHttpServlet.getDirectives());
-        map.putAll(FreemarkerHttpServlet.getMethods());
+        //map.putAll(FreemarkerHttpServlet.getDirectives());
+        //map.putAll(FreemarkerHttpServlet.getMethods());
         ServletContext context = getServletContext();
-        FreemarkerConfigurationLoader loader = 
-            FreemarkerConfigurationLoader.getFreemarkerConfigurationLoader(context);
-        Configuration fmConfig = loader.getConfig(vreq);
+        FreemarkerConfiguration fmConfig = FreemarkerConfigurationLoader.getConfig(vreq, context);
+        fmConfig.resetRequestSpecificSharedVariables();
         TemplateProcessingHelper helper = new TemplateProcessingHelper(fmConfig, vreq, context);
         statementDisplay =  helper.processTemplateToString(templateName, map);       
     }
@@ -138,6 +137,8 @@ public WebappDaoFactory getUnfilteredDaoFactory() {
 %>
 
 <jsp:include page="${preForm}"/>
+
+<h1>JSP form, must be removed for the 1.4!</h1>
 
 <form action="editRequestDispatch.jsp" method="get">
     <label for="submit"><h2>Are you sure you want to delete the following entry from <em>${propertyName}</em>?</h2></label>

@@ -3,7 +3,7 @@
 <#-- Template for Site Administration Ontology Editor -->
 
 <#if ontologyEditor?has_content>
-    <section class="pageBodyGroup">
+    <section class="pageBodyGroup" role="region">
         <h3>Ontology Editor</h3>
         
         <#if ontologyEditor.pellet?has_content>
@@ -15,23 +15,26 @@
             </div>
         </#if>
         
-        <ul>
-            <li><a href="${ontologyEditor.urls.ontologies}">Ontology list</a></li>
+        <ul role="navigation">
+            <li role="listitem">
+                <a href="${ontologyEditor.urls.ontologies}" title="Ontology list">Ontology list</a></h4>
+            </li>
         </ul>
-        
+    
         <h4>Class Management</h4>
         
-        <ul>
-            <li><a href="${ontologyEditor.urls.classHierarchy}">Class hierarchy</a></li>
-            <li><a href="${ontologyEditor.urls.classGroups}">Class groups</a></li>
+        <ul role="navigation">
+            <li role="listitem"><a href="${ontologyEditor.urls.classHierarchy}" title="Class hierarchy">Class hierarchy</a></li>
+            <li role="listitem"><a href="${ontologyEditor.urls.classGroups}" title="Class groups">Class groups</a></li>
         </ul>
         
         <h4>Property Management</h4>
         
-        <ul>
-            <li><a href="${ontologyEditor.urls.objectPropertyHierarchy}">Object property hierarchy</a></li>
-            <li><a href="${ontologyEditor.urls.dataPropertyHierarchy}">Data property hierarchy</a></li>
-            <li><a href="${ontologyEditor.urls.propertyGroups}">Property groups</a></li>
+        <ul role="navigation">
+            <li role="listitem"><a href="${ontologyEditor.urls.objectPropertyHierarchy}" title="Object property hierarchy">Object property hierarchy</a></li>
+            <li role="listitem"><a href="${ontologyEditor.urls.dataPropertyHierarchy}" title="Data property hierarchy">Data property hierarchy</a></li>
+            <li role="listitem"><a href="${ontologyEditor.urls.propertyGroups}" title="Property groups">Property groups</a></li>
         </ul>
+        
     </section>
 </#if>

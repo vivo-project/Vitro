@@ -16,12 +16,7 @@
 <vitro:confirmAuthorization />
 
 <%
-
-    ModelMaker maker = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
-    if (maker == null) {
-        maker = (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
-    }
-
+    ModelMaker maker = (ModelMaker) request.getAttribute("vitroJenaModelMaker");
 %>
 
 
@@ -69,7 +64,7 @@
         %>
 </select> 
 
-<textarea rows="16" cols="40" name="sparqlQueryStr" class="maxWidth"><c:choose>
+<textarea rows="25" cols="40" name="sparqlQueryStr" class="maxWidth"><c:choose>
     <c:when test="${param.sparqlQueryStr != null}">
         ${param.sparqlQueryStr}
     </c:when>
@@ -88,10 +83,12 @@ if(prefixes != null){
 		String prefixText = (String) prefixItr.next();
 		if(prefixText.equals("(not yet specified)")){
 			count++;
-			prefixText = "j." + count.toString();		
+			prefixText = "p." + count.toString();		
 		}
 		String urlText = (String) prefixItr.next();%>
 PREFIX <%=prefixText%>: <<%=urlText%>><%}}%>
+
+
 </c:otherwise>
 </c:choose>
 

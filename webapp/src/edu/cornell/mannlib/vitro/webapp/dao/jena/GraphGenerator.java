@@ -8,4 +8,6 @@ public interface GraphGenerator {
 
 	public Graph generateGraph();
 	
+	public boolean isGraphClosed();
+	
 }

@@ -100,6 +100,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
     @Override
     protected void removeDuplicates(List<Map<String, String>> data) {
        filterSubclasses(data);
+       super.removeDuplicates(data);
     }
     
     /*
@@ -284,7 +285,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
 //    }
     
     
-    /* Access methods for templates */
+    /* Template properties */
     
     public List<SubclassTemplateModel> getSubclasses() {
         return subclasses;

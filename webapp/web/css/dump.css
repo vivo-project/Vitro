@@ -2,47 +2,35 @@
 
 /* Styles for Freemarker template variable dump */
 
-.dump {
-    border-top: 3px solid #ccc;
-    border-bottom: 3px solid #ccc;
-    padding: 1em 0;
-    margin: 1em 0;
-}
-
-.dump li {
-    list-style-type: none;
-}
-
-.dump .directive h6 {
+.div.dump {
     margin-top: 1em;
+    border-top: 2px solid #ccc; 
+    padding-top: .75em;
 }
 
-.dump.datamodel .var, 
-.dump.datamodel .directive {
-    border-bottom: 1px solid #ccc; 
-    padding: 1em 0;
-    margin: 1em 0;   
-}
-
-.dump ol li, 
-.dump ul li {
+.dump ul li.variable {
     margin-bottom: .5em;
+    border-bottom: 1px solid #ccc; 
+    padding-top: .75em;
+    padding-bottom: .75em;
 }
 
-.dump .var p {
-    margin-bottom: .3em;
-}
-
-.dump .directive ol, 
-.dump .directive ul {
+.dump ul ul {
     margin-left: 1.5em;
 }
 
-.dump .directive ol li {
-    list-style: decimal inside none;
+.dump ul li {
+    list-style: none;
 }
 
-.dump .var .var,
-.dump.datamodel .var .var {
+.dump ul li p {
+    margin-bottom: .25em;  
+}
+
+.dump ul li.item {
+    margin-bottom: 1.25em;
+}
+
+.dump ul li.item .value { 
     margin-left: 1.5em;
 }

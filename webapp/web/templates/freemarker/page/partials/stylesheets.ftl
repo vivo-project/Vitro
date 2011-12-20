@@ -5,7 +5,7 @@
 <!-- vitro base styles (application-wide) -->
 <link rel="stylesheet" href="${urls.base}/css/vitro.css" />
 
-${stylesheets.list}
+${stylesheets.list()}
 
 <#--temporary until edit controller can include this when needed -->
 <link rel="stylesheet" href="${urls.base}/css/edit.css" />

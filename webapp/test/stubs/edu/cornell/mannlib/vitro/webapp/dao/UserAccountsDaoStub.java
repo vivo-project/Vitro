@@ -90,4 +90,18 @@ public class UserAccountsDaoStub implements UserAccountsDao {
 				"UserAccountsDao.getAllUserAccounts() not implemented.");
 	}
 
+	@Override
+	public Collection<UserAccount> getUserAccountsWhoProxyForPage(
+			String profilePageUri) {
+		throw new RuntimeException(
+				"UserAccountsDaoStub.getUserAccountsWhoProxyForPage() not implemented.");
+	}
+
+	@Override
+	public void setProxyAccountsOnProfile(String profilePageUri,
+			Collection<String> userAccountUris) {
+		throw new RuntimeException(
+				"UserAccountsDaoStub.setProxyAccountsOnProfile() not implemented.");
+	}
+
 }

@@ -211,9 +211,21 @@ public class DataPropertyHierarchyListingController extends BaseEditController {
             } else {
                 numCols = addColToResults("unspecified", results, numCols);
             }
-            numCols = addColToResults(Integer.toString(dp.getDisplayTier()), results, numCols); // ("d"+dp.getDomainDisplayTier()+",r"+dp.getRangeDisplayTier(), results, numCols); // column 6
-            numCols = addColToResults(dp.getHiddenFromDisplayBelowRoleLevel()  == null ? "unspecified" : dp.getHiddenFromDisplayBelowRoleLevel().getShorthand(), results, numCols); // column 7
-            numCols = addColToResults(dp.getProhibitedFromUpdateBelowRoleLevel() == null ? "unspecified" : dp.getProhibitedFromUpdateBelowRoleLevel().getShorthand(), results, numCols); // column 8
+            Integer displayTier = dp.getDisplayTier();
+            String displayTierStr = (displayTier < 0) 
+                    ? "" 
+                    : Integer.toString(displayTier);  
+            numCols = addColToResults(displayTierStr, results, numCols);
+            numCols = addColToResults(
+            		(dp.getHiddenFromDisplayBelowRoleLevel() == null) 
+            		        ? "unspecified" 
+            		        : dp.getHiddenFromDisplayBelowRoleLevel()
+            		                .getShorthand(), results, numCols); // column 7
+            numCols = addColToResults(
+            		(dp.getProhibitedFromUpdateBelowRoleLevel() == null)
+            		        ? "unspecified" 
+            		        : dp.getProhibitedFromUpdateBelowRoleLevel()
+            		                .getShorthand(), results, numCols); // column 8
             results.add("XX"); // column 9
         }
         return results;

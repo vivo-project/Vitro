@@ -149,16 +149,16 @@ public class SolrIndexer implements IndexerIface {
                 removeDocumentsFromBeforeRebuild( );
             }
          } catch (Throwable e) {
-             if( log != null)
+             if( ! shutdownRequested )
                  log.debug("could not remove documents from before build, " ,e);
         }
         try {
-           UpdateResponse res = server.commit();
-           log.debug("Response after committing to server: "+ res );
+           UpdateResponse res = server.commit();           
         } catch (Throwable e) {
-            if( log != null)
+            if( ! shutdownRequested ){
                 log.debug("could not commit to solr server, " +
-                        "this should not be a problem since solr will do autocommit");
+                "this should not be a problem since solr will do autocommit");
+            }
         }                
         indexing = false;
         notifyAll();
@@ -169,9 +169,11 @@ public class SolrIndexer implements IndexerIface {
             server.deleteByQuery("indexedTime:[ * TO " + reindexStart + " ]");
             server.commit();            
         } catch (SolrServerException e) {
-            log.error("could not delete documents from before rebuild.",e);            
+            if( ! shutdownRequested )
+                log.error("could not delete documents from before rebuild.",e);            
         } catch (IOException e) {
-            log.error("could not delete documents from before rebuild.",e);
+            if( ! shutdownRequested )
+                log.error("could not delete documents from before rebuild.",e);
         }
     }
     
@@ -197,6 +199,10 @@ public class SolrIndexer implements IndexerIface {
     	return modified;
     }
 
+    /**
+     * Returns true if there are documents in the index, false if there are none,
+     * and returns false on failure to connect to server.
+     */
     public boolean isIndexEmpty() {
     	SolrQuery query = new SolrQuery();
     	query.setQuery("*:*");
@@ -207,7 +213,7 @@ public class SolrIndexer implements IndexerIface {
     			return true;
     		}
     	} catch (SolrServerException e) {
-    		log.error(e,e);
+    		log.error("Could not connect to solr server" ,e.getRootCause());
     	}
         return false;
     }

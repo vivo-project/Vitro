@@ -34,8 +34,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
-import edu.cornell.mannlib.vitro.webapp.beans.Keyword;
-import edu.cornell.mannlib.vitro.webapp.beans.Link;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
@@ -620,7 +618,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
                         else
                             rv = 0;
                     } catch (NullPointerException e) {
-                        e.printStackTrace();
+                        log.error(e, e);
                     }
 
                     if( cAsc )

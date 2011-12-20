@@ -9,18 +9,11 @@
 <%@ page import="java.net.URLEncoder" %>
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" %>
 <% request.setAttribute("requestedActions", new UseAdvancedDataToolsPages()); %>
 <vitro:confirmAuthorization />
 
-<%
-
-    ModelMaker maker = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
-    if (maker == null) {
-        maker = (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
-    }
-
-%>
     <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Process Property Value Strings</h2>
 
     <form action="ingest" method="get"i>
@@ -39,38 +32,26 @@
     <p>New Property URI</p>
 
     <select name="destinationModelName">
-<%
-    for (Iterator it = maker.listModels(); it.hasNext(); ) {
-	String modelName = (String) it.next();
-        %> <option value="<%=modelName%>"/><%=modelName%></option>
-        <%    
-    }
-%>   
+    <c:forEach var="modelName" items="${modelName}">
+        <option value="${modelName}"/>${modelName}</option>
+    </c:forEach>
     </select>
     <input type="checkbox" name="processModel" value="TRUE"/> apply changes directly to this model
     <p>model to use</p>
    
     <select name="additionsModel">
 		<option value="">none</option>
-<%
-    for (Iterator it = maker.listModels(); it.hasNext(); ) {
-	String modelName = (String) it.next();
-        %> <option value="<%=modelName%>"><%=modelName%></option>
-        <%    
-    }
-%>   
+		<forEach var="modelName" items="${modelNames}">
+            <option value="${modelName}">${modelName}</option>
+        </forEach>
 	</select>
     <p>model in which to save added statements</p>
 
     <select name="retractionsModel">
 		<option value="">none</option>
-<%
-    for (Iterator it = maker.listModels(); it.hasNext(); ) {
-	String modelName = (String) it.next();
-        %> <option value="<%=modelName%>"><%=modelName%></option>
-        <%    
-    }
-%>   
+		<c:forEach var="modelName" items="${modelNames}">
+            <option value="${modelName}">${modelName}</option>
+        </c:forEach>
 	</select>
     <p>model in which to save retracted statements</p>
 

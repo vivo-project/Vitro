@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.search.indexing;
 
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,7 +22,8 @@ class IndexWorkerThread extends Thread{
 	protected boolean stopRequested = false;
 	
 	private Log log = LogFactory.getLog(IndexWorkerThread.class);
-	private static long count=0;		
+	private static AtomicLong countCompleted= new AtomicLong();		
+	private static AtomicLong countToIndex= new AtomicLong();		
 	private static long starttime = 0;		
 	
 	public IndexWorkerThread(IndexerIface indexer, int threadNum , Iterator<Individual> individualsToIndex){
@@ -71,16 +73,14 @@ class IndexWorkerThread extends Thread{
                 }
     		    
     			
-    			synchronized(this){
-    				count++;
-    				if( log.isInfoEnabled() ){            
-    					if( (count % 100 ) == 0 && count > 0 ){
-    						long dt = (System.currentTimeMillis() - starttime);
-    						log.info("individuals indexed: " + count + " in " + dt + " msec " +
-    								" time per individual = " + (dt / count) + " msec" );                          
-    					}                
-    				} 
-    			}
+				long countNow = countCompleted.incrementAndGet();
+				if( log.isInfoEnabled() ){            
+					if( (countNow % 100 ) == 0 ){
+						long dt = (System.currentTimeMillis() - starttime);
+						log.info("individuals indexed: " + countNow + " in " + dt + " msec " +
+								" time per individual = " + (dt / countNow) + " msec" );                          
+					}                
+				} 
 		    }catch(Throwable th){
 		        //on tomcat shutdown odd exceptions get thrown and log can be null
 		        if( log != null )
@@ -88,13 +88,18 @@ class IndexWorkerThread extends Thread{
 		    }
 		}
 	}
-	
-	public static void resetCount(){
-		count = 0;
+
+	public static void resetCounters(long time, long workload) {
+		IndexWorkerThread.starttime = time;
+		IndexWorkerThread.countToIndex.set(workload);
+		IndexWorkerThread.countCompleted.set(0);
 	}
 	
-	public static void setStartTime(long startTime){
-		starttime = startTime;
+	public static long getCount() {
+		return countCompleted.get();
 	}
 	
+	public static long getCountToIndex() {
+		return countToIndex.get();
+	}
 }

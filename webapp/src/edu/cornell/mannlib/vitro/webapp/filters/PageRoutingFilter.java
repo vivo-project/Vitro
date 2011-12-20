@@ -81,7 +81,13 @@ public class PageRoutingFilter implements Filter{
                 String controllerName = getControllerToForwardTo(req, pageUri, pageDao);            
                 log.debug(path + " is being forwarded to controller " + controllerName);
                 
-                RequestDispatcher rd = filterConfig.getServletContext().getNamedDispatcher( controllerName );            
+                RequestDispatcher rd = filterConfig.getServletContext().getNamedDispatcher( controllerName );
+                if( rd == null ){
+                    log.error(path + " should be forwarded to controller " + controllerName + " but there " +
+                    		"is no servlet named that defined for the web application in web.xml");
+                    //TODO: what should be done in this case?
+                }
+                
                 rd.forward(req, response);
             }else if( "/".equals( path ) || path.isEmpty() ){
                 log.debug("url '" +path + "' is being forward to home controller" );

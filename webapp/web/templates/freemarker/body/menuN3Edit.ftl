@@ -20,7 +20,7 @@
             <textarea name="navigationN3" id="navigationN3" cols="45" rows="40" class="maxWidth">
                 ${menuN3}<#t><#-- The trim directive here is to trim leading and trailing white-space -->
             </textarea><#lt><#-- This directive trims only leading white-space -->
-            <input name="submit" id="submit" value="Save" type="submit"/> or <a href="${urls.base}${cancelUrl}">Cancel</a>
+            <input name="submit" id="submit" value="Save" type="submit"/> or <a href="${urls.base}${cancelUrl}" title="cancel">Cancel</a>
         </form>
     </#if>
 </div>

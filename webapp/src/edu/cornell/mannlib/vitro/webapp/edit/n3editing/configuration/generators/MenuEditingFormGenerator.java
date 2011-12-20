@@ -25,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.SelectListGeneratorVTwo;
@@ -97,7 +98,7 @@ public class MenuEditingFormGenerator implements EditConfigurationGenerator {
     	this.setSparqlQueries(editConfiguration);
     	
     	//Set up fields
-    	this.setUpFields(editConfiguration, vreq);
+    	this.setFields(editConfiguration, vreq);
 
     	//set submission url
     	editConfiguration.setSubmitToUrl("/edit/process");
@@ -171,15 +172,12 @@ public class MenuEditingFormGenerator implements EditConfigurationGenerator {
     
     private void processObjectPropForm(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
     	editConfiguration.setVarNameForObject("objectVar");    	
-    	editConfiguration.setObject(objectUri);
-    	//For page    	
-    	editConfiguration.setObjectResource(true);
+    	editConfiguration.setObject(objectUri);    	
     }
     
     private void processDataPropForm(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
-    	 String datapropKeyStr = vreq.getParameter("datapropKey");
- 	    int dataHash=0;
-    	 DataPropertyStatement dps = (DataPropertyStatement)vreq.getAttribute("dataprop");
+        Integer dataHash = EditConfigurationUtils.getDataHash(vreq); 	    
+    	DataPropertyStatement dps = (DataPropertyStatement)vreq.getAttribute("dataprop");
 
  		//ObjectUriJson is null, so should include data prop info here
  		//Use dataprop key info here instead
@@ -196,14 +194,8 @@ public class MenuEditingFormGenerator implements EditConfigurationGenerator {
 		    vreq.setAttribute("rangeDatatypeUriJson", MiscWebUtils.escape(rangeDatatypeUri));
 		    
 		    
-		    if( dps != null ){
-		        try {
-		            dataHash = Integer.parseInt(datapropKeyStr);
-		            log.debug("dataHash is " + dataHash);            
-		        } catch (NumberFormatException ex) {
-		            log.debug("could not parse dataprop hash "+ 
-		                    "but there was a dataproperty; hash: '"+datapropKeyStr+"'"); 
-		        }
+		    if( dps != null ){		        		           
+		        log.debug("dataHash is " + dataHash);            		        
 		        
 		        String rangeDatatype = dps.getDatatypeURI();
 		        if( rangeDatatype == null ){
@@ -231,7 +223,7 @@ public class MenuEditingFormGenerator implements EditConfigurationGenerator {
 		            	vreq.setAttribute("rangeDefaultJson", '"' + MiscWebUtils.escape(defaultVal)  + '"' );
 		        }
 		    }   
-	    	editConfiguration.setDatapropKey((datapropKeyStr==null)?"":datapropKeyStr);
+	    	editConfiguration.setDatapropKey(dataHash);
 
     }
     
@@ -362,22 +354,20 @@ public class MenuEditingFormGenerator implements EditConfigurationGenerator {
     //Just get the properties?
     
     //Fields
-    private void setUpFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
+    private void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
     	Map<String, FieldVTwo> fields = new HashMap<String, FieldVTwo>();
     	
     	
     	//Field should be for page title and other associations (assuming this is what actually goes on the form)
     	FieldVTwo field = new FieldVTwo();
     	field.setName("title");
-    	field.setNewResource(false);
+
     	List<String> validators = new ArrayList<String>();
     	validators.add("nonempty");
     	field.setValidators(validators);
     	field.setOptionsType("LITERALS");
     	field.setPredicateUri(DisplayVocabulary.DISPLAY_NS + "title");
-    	List<String> assertions = this.generateN3Required(vreq);
-    	assertions.addAll(this.generateN3Optional());
-    	field.setAssertions(assertions);
+
     	fields.put("title", field);
     	//Object Var Field
     	//Won't need this in our case

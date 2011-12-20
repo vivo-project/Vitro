@@ -1,0 +1,27 @@
+#
+# A list of JARs that we know to be required by the source code (and notes on where they are required).
+#
+# The "jarlist" target of the build script will work on the assumption that these JARs and any JARs 
+# that they depend on are required by the app.
+#
+# For example, the JDBC drivers are never explicitly included, but instead are invoked using Class.forName(), 
+# so they are required even though the "jarlist" target won't find any such requirement.
+#
+
+# JDBC drivers that we want to include.
+#  Oracle and MySQL
+ojdbc14_g.jar
+mysql-connector-java-5.1.16-bin.jar
+
+# Don't know who requires the Commons Logging package - Maybe JENA?
+commons-logging-1.1.1.jar
+
+# Needed by a variety of JSPs
+#    datapropertyBackButtonProblems.jsp
+#    n3Delete.jsp
+#    processDatapropRdfForm.jsp
+#    processRdfForm2.jsp
+xstream-1.2.2.jar
+
+# Used in error.jsp, which should probably go away.
+cos.jar

@@ -9,6 +9,8 @@ import com.hp.hpl.jena.rdf.model.ModelChangedListener;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
+import edu.cornell.mannlib.vitro.webapp.dao.jena.event.CloseEvent;
+
 /**
  * Simple change listener to keep a model (the 'synchronizee') in synch with the model with which it is registered.
  * @author bjl23

@@ -83,12 +83,11 @@ public class DatatypeRetryController extends BaseEditController {
 
         FormObject foo = new FormObject();
         epo.setFormObject(foo);
-        String html = FormUtils.htmlFormFromBean(objectForEditing,action,foo);
+        FormUtils.populateFormFromBean(objectForEditing,action,foo);
         //for now, this is also making the value hash - need to separate this out
 
 
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        request.setAttribute("formHtml",html);
         request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
         request.setAttribute("scripts","/templates/edit/formBasic.js");
         request.setAttribute("formJsp","/templates/edit/specific/datatype_retry.jsp");

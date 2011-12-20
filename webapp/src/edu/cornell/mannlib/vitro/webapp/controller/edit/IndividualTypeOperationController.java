@@ -14,7 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndividuals;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoBackEndEditing;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 
@@ -23,7 +23,7 @@ public class IndividualTypeOperationController extends BaseEditController {
     private static final Log log = LogFactory.getLog(IndividualTypeOperationController.class.getName());
 
     public void doGet(HttpServletRequest req, HttpServletResponse response) {
-        if (!isAuthorizedToDisplayPage(req, response, new Actions(new EditIndividuals()))) {
+        if (!isAuthorizedToDisplayPage(req, response, new Actions(new DoBackEndEditing()))) {
         	return;
         }
 
@@ -40,7 +40,8 @@ public class IndividualTypeOperationController extends BaseEditController {
             try {
                 response.sendRedirect(defaultLandingPage);
             } catch (IOException f) {
-                e.printStackTrace();
+                log.error(f, f);
+                throw new RuntimeException(f);
             }
             return;
         }
@@ -50,7 +51,8 @@ public class IndividualTypeOperationController extends BaseEditController {
             try {
                 response.sendRedirect(defaultLandingPage);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e, e);
+                throw new RuntimeException(e);
             }
             return;
         }
@@ -71,7 +73,7 @@ public class IndividualTypeOperationController extends BaseEditController {
 		                dao.addVClass(request.getParameter("individualURI"),request.getParameter("TypeURI"));
 	            }
 	        } catch (Exception e) {
-	            //e.printStackTrace();
+	            log.error(e, e);
 	        }
         }
 
@@ -83,13 +85,15 @@ public class IndividualTypeOperationController extends BaseEditController {
             try {
                 response.sendRedirect(defaultLandingPage);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e, e);
+                throw new RuntimeException(e);
             }
         } else {
             try {
                 response.sendRedirect(referer);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e, e);
+                throw new RuntimeException(e);
             }
         }
 

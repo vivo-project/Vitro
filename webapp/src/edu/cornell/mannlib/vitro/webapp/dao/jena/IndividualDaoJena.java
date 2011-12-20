@@ -6,11 +6,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -18,20 +16,15 @@ import java.util.Set;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.joda.time.DateTime;
 
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.ontology.UnionClass;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
@@ -40,14 +33,12 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.Keyword;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
@@ -296,6 +287,13 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
             com.hp.hpl.jena.ontology.Individual ind = ontModel.getIndividual(ent.getURI());
             if (ind != null) {
                 if (ent.getName() != null && ( (ind.getLabel(getDefaultLanguage())==null) || (ind.getLabel(getDefaultLanguage())!=null && ent.getName()!=null && !ent.getName().equals(ind.getLabel(getDefaultLanguage())) ) ) ) {
+                	
+                	// removal of existing values done this odd way to trigger
+                	// the change listeners
+                	Model temp = ModelFactory.createDefaultModel();
+                	temp.add(ontModel.listStatements(ind, RDFS.label, (RDFNode) null));
+                	ontModel.remove(temp);
+
                     ind.setLabel(ent.getName(), getDefaultLanguage());
                 }
                 Set<String> oldTypeURIsSet = new HashSet<String>();
@@ -306,7 +304,9 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                     }
                 }
                 Set<String> newTypeURIsSet = new HashSet<String>();
-                newTypeURIsSet.add(ent.getVClassURI());
+                if (ent.getVClassURI() != null) {
+                	newTypeURIsSet.add(ent.getVClassURI());
+                }
                 boolean conservativeTypeDeletion = false;
                 try {
                     List<VClass> vcl = ent.getVClasses(false);
@@ -319,7 +319,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error(e, e);
                 }
                 for (Iterator<String> oldIt = oldTypeURIsSet.iterator(); oldIt.hasNext();) {
                     String uri = oldIt.next();

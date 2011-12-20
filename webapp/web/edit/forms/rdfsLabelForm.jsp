@@ -163,6 +163,8 @@
     <jsp:param name="useTinyMCE" value="false"/>
 </jsp:include>
 
+<h1>JSP form, must be removed for the 1.4!</h1>
+
 <h2><%= title %></h2>
 <form action="<c:url value="/edit/processDatapropRdfForm.jsp"/>" >
     <v:input type="text" id="label" size="30" />

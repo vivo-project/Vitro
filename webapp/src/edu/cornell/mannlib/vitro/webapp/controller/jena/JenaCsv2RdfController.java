@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.jena;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -15,10 +16,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
@@ -32,12 +34,14 @@ import edu.cornell.mannlib.vitro.webapp.utils.Csv2Rdf;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 
 
-public class JenaCsv2RdfController extends BaseEditController{
-	private static final String CSV2RDF_JSP = "/jenaIngest/csv2rdf.jsp";
-	private static final String INGEST_MENU_JSP = "/jenaIngest/ingestMenu.jsp";
+public class JenaCsv2RdfController extends JenaIngestController {
+	Log log = LogFactory.getLog( JenaCsv2RdfController.class );
+    
+    private static final String CSV2RDF_JSP = "/jenaIngest/csv2rdf.jsp";
 	private static final String CSV2RDF_SELECT_URI_JSP = "/jenaIngest/csv2rdfSelectUri.jsp";
 	private static int maxFileSizeInBytes = 1024 * 1024 * 2000; //2000mb 
 	
+	@Override
 	public void doPost(HttpServletRequest rawRequest,
 			HttpServletResponse response) throws ServletException, IOException {
         if (!isAuthorizedToDisplayPage(rawRequest, response, new Actions(new UseAdvancedDataToolsPages()))) {
@@ -62,17 +66,26 @@ public class JenaCsv2RdfController extends BaseEditController{
 		if ("csv2rdf".equals(actionStr)) {
 			String csvUrl = request.getParameter("csvUrl");
 			if (!csvUrl.isEmpty() || !filePath.isEmpty()) {
-				String[] sourceModel = new String[1];
-				sourceModel[0] = doExecuteCsv2Rdf(request,fileStream,filePath);
-				Model model = ModelFactory.createDefaultModel();
+				String destinationModelNameStr = request.getParameter(
+						"destinationModelName");
+				Model csv2rdfResult = null;
+				try{
+    				csv2rdfResult = doExecuteCsv2Rdf(
+    						request, fileStream, filePath);
+				}catch(Exception ex){
+				    forwardToFileUploadError(ex.getMessage(),req,response);
+				    return;
+				}
 				ModelMaker maker = getVitroJenaModelMaker(request);
 				Boolean csv2rdf = true;
 				JenaIngestUtils utils = new JenaIngestUtils();
-				Map<String,LinkedList<String>> propertyMap = utils.generatePropertyMap(sourceModel, model, maker);
+				List<Model> resultList = new ArrayList<Model>();
+				resultList.add(csv2rdfResult);
+				Map<String,LinkedList<String>> propertyMap = 
+					    utils.generatePropertyMap(resultList, maker);
 				request.setAttribute("propertyMap",propertyMap);
-				getServletContext().setAttribute("sourceModel", sourceModel);
-				getServletContext().setAttribute("csv2rdf",csv2rdf);
-				request.setAttribute("destinationModelName", sourceModel[0]);
+				request.setAttribute("csv2rdf", csv2rdf);
+				request.setAttribute("destinationModelName", destinationModelNameStr);
 				request.setAttribute("title","URI Select");
 				request.setAttribute("bodyJsp", CSV2RDF_SELECT_URI_JSP);
 			} else {
@@ -88,25 +101,44 @@ public class JenaCsv2RdfController extends BaseEditController{
         try {
             rd.forward(request, response);
         } catch (Exception e) {
-            System.out.println(this.getClass().getName()+" could not forward to view.");
-            System.out.println(e.getMessage());
-            System.out.println(e.getStackTrace());
+        	throw new RuntimeException(e);
         }		
 		
     }
 	
-	 private void forwardToFileUploadError( String errrorMsg , HttpServletRequest req, HttpServletResponse response) throws ServletException{
-         req.setAttribute("errors", errrorMsg);
-         RequestDispatcher rd = req.getRequestDispatcher("/edit/fileUploadError.jsp");            
-         try {
-             rd.forward(req, response);
-         } catch (IOException e1) {
-             throw new ServletException(e1);
-         }            
-         return;
-     }
-	 
-	 public String doExecuteCsv2Rdf(VitroRequest vreq,FileItem fileStream, String filePath) {
+//	 private void forwardToFileUploadError( String errrorMsg , HttpServletRequest req, HttpServletResponse response) throws ServletException{
+//         req.setAttribute("errors", errrorMsg);
+//         RequestDispatcher rd = req.getRequestDispatcher("/jsp/fileUploadError.jsp");            
+//         try {
+//             rd.forward(req, response);
+//         } catch (IOException e1) {
+//             throw new ServletException(e1);
+//         }            
+//         return;
+//     }
+
+    private void forwardToFileUploadError(String errrorMsg,
+            HttpServletRequest req, HttpServletResponse response)
+            throws ServletException {
+        VitroRequest vreq = new VitroRequest(req);
+        req.setAttribute("title", "CSV to RDF Error ");
+        req.setAttribute("bodyJsp", "/jsp/fileUploadError.jsp");
+        req.setAttribute("errors", errrorMsg);
+
+        RequestDispatcher rd = req.getRequestDispatcher(Controllers.BASIC_JSP);
+        req.setAttribute("css",
+                "<link rel=\"stylesheet\" type=\"text/css\" href=\""
+                        + vreq.getAppBean().getThemeDir() + "css/edit.css\"/>");
+        try {
+            rd.forward(req, response);
+        } catch (IOException e1) {
+            log.error(e1);
+            throw new ServletException(e1);
+        }
+        return;
+    }
+
+	 public Model doExecuteCsv2Rdf(VitroRequest vreq, FileItem fileStream, String filePath) throws Exception {
 			char[] quoteChars = {'"'};
 			String namespace = "";
 			String tboxNamespace = vreq.getParameter("tboxNamespace");
@@ -139,58 +171,26 @@ public class JenaCsv2RdfController extends BaseEditController{
 					is = fileStream.getInputStream();
 					
 			} catch (IOException e) {
-				System.out.println("IOException opening URL "+csvUrl);
-				return null;
+				throw new Exception("Unable to access URL " + csvUrl);
 			}
 			
 			Model[] models = null;
 			
 			try {
-				 models = c2r.convertToRdf(is,vreq,destination);
+				 models = c2r.convertToRdf(
+						 is, vreq.getWebappDaoFactory(), destination);
 			} catch (IOException e) {
-				System.out.println("IOException converting "+csvUrl+" to RDF");
+				throw new Exception(
+						"Unable to convert " + csvUrl + " to RDF");
 			}
 			
-			if (destination != null) {
-				destination.add(models[0]);
-			}
+			// TODO: rework this
+			vreq.getSession().setAttribute("csv2rdfResult", models[0]);
 			if (tboxDestination != null) {
 				tboxDestination.add(models[1]);
 			}	
-			return destinationModelNameStr;
-		}
-	 
-	 private Model getModel(String name, HttpServletRequest request) {
-			if ("vitro:jenaOntModel".equals(name)) {
-				Object sessionOntModel = request.getSession().getAttribute("jenaOntModel");
-				if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
-					return (OntModel) sessionOntModel;
-				} else {
-					return (OntModel) getServletContext().getAttribute("jenaOntModel");
-				}
-			} else if ("vitro:baseOntModel".equals(name)) {
-				Object sessionOntModel = request.getSession().getAttribute("baseOntModel");
-				if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
-					return (OntModel) sessionOntModel;
-				} else {
-					return (OntModel) getServletContext().getAttribute("baseOntModel");
-				}
-			} else if ("vitro:inferenceOntModel".equals(name)) {
-				Object sessionOntModel = request.getSession().getAttribute("inferenceOntModel");
-				if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
-					return (OntModel) sessionOntModel;
-				} else {
-					return (OntModel) getServletContext().getAttribute("inferenceOntModel");
-				}
-			} else {
-				return getVitroJenaModelMaker(request).getModel(name);
-			}
-		}
-	 
-	 private ModelMaker getVitroJenaModelMaker(HttpServletRequest request) {
-			ModelMaker myVjmm = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
-			myVjmm = (myVjmm == null) ? (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker") : myVjmm;
-			return new VitroJenaSpecialModelMaker(myVjmm, request);
+			
+			return models[0];
 		}
 
 }

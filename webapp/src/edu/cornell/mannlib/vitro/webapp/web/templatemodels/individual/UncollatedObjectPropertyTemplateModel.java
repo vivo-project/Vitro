@@ -56,7 +56,7 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
         return statements.isEmpty();
     }
     
-    /* Access methods for templates */
+    /* Template properties */
 
     public List<ObjectPropertyStatementTemplateModel> getStatements() {
         return statements;
@@ -67,7 +67,9 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
         return false;
     }
     
-    public ObjectPropertyStatementTemplateModel getFirst() {
+    /* Template methods */
+    
+    public ObjectPropertyStatementTemplateModel first() {
         return ( (statements == null || statements.isEmpty()) ) ? null : statements.get(0);
     }
 }

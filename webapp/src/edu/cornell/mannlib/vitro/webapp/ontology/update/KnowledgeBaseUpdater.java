@@ -32,11 +32,8 @@ import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 
 /**
- * Performs knowledge base updates if necessary to align with a
+ * Performs knowledge base updates necessary to align with a
  * new ontology version.
- * 
- * @author bjl23
- *
  */
 public class KnowledgeBaseUpdater {
 
@@ -90,9 +87,9 @@ public class KnowledgeBaseUpdater {
 	private void performUpdate() throws IOException {
 		
 		log.info("\tperforming SPARQL construct additions (abox)");
-		performSparqlConstructAdditions(settings.getSparqlConstructAdditionsDir(), settings.getAssertionOntModelSelector().getABoxModel());
-		log.info("\tperforming SPARQL construct deletions (inferences)");
-		performSparqlConstructRetractions(settings.getSparqlConstructDeletionsDir(), settings.getInferenceOntModelSelector().getABoxModel());
+		performSparqlConstructAdditions(settings.getSparqlConstructAdditionsDir(), settings.getUnionOntModelSelector().getABoxModel() , settings.getAssertionOntModelSelector().getABoxModel());
+		log.info("\tperforming SPARQL construct deletions (abox)");
+		performSparqlConstructRetractions(settings.getSparqlConstructDeletionsDir(), settings.getUnionOntModelSelector().getABoxModel() , settings.getAssertionOntModelSelector().getABoxModel());
 		
 		List<AtomicOntologyChange> rawChanges = getAtomicOntologyChanges();
 		
@@ -107,51 +104,50 @@ public class KnowledgeBaseUpdater {
     	updateABox(changes);
 	}
 	
-	private void performSparqlConstructAdditions(String sparqlConstructDir, OntModel aboxModel) throws IOException {
+	private void performSparqlConstructAdditions(String sparqlConstructDir, OntModel readModel, OntModel writeModel) throws IOException {
 		
-		Model anonModel = performSparqlConstructs(sparqlConstructDir, aboxModel, true);
+		Model anonModel = performSparqlConstructs(sparqlConstructDir, readModel, true);
 		
 		if (anonModel == null) {
 			return;
 		}
 		
-		aboxModel.enterCriticalSection(Lock.WRITE);
+		writeModel.enterCriticalSection(Lock.WRITE);
 		try {
 			JenaIngestUtils jiu = new JenaIngestUtils();
-			Model additions = jiu.renameBNodes(anonModel, settings.getDefaultNamespace() + "n", aboxModel);
+			Model additions = jiu.renameBNodes(anonModel, settings.getDefaultNamespace() + "n", writeModel);
 			Model actualAdditions = ModelFactory.createDefaultModel();
 			StmtIterator stmtIt = additions.listStatements();
 			
 			while (stmtIt.hasNext()) {
 				Statement stmt = stmtIt.nextStatement();
-				if (!aboxModel.contains(stmt)) {
+				if (!writeModel.contains(stmt)) {
 					actualAdditions.add(stmt);
 				}
 			}
 			
-			aboxModel.add(actualAdditions);
+			writeModel.add(actualAdditions);
 			record.recordAdditions(actualAdditions);
 		} finally {
-			aboxModel.leaveCriticalSection();
-		}
-		
+			writeModel.leaveCriticalSection();
+		}	
 	}
 	
-	private void performSparqlConstructRetractions(String sparqlConstructDir, OntModel model) throws IOException {
+	private void performSparqlConstructRetractions(String sparqlConstructDir, OntModel readModel, OntModel writeModel) throws IOException {
 		
-		Model retractions = performSparqlConstructs(sparqlConstructDir, model, false);
+		Model retractions = performSparqlConstructs(sparqlConstructDir, readModel, false);
 		
 		if (retractions == null) {
 			return;
 		}
 		
-		model.enterCriticalSection(Lock.WRITE);
+		writeModel.enterCriticalSection(Lock.WRITE);
 		
 		try {
-			model.remove(retractions);
+			writeModel.remove(retractions);
 			record.recordRetractions(retractions);
 		} finally {
-			model.leaveCriticalSection();
+			writeModel.leaveCriticalSection();
 		}
 		
 	}
@@ -165,7 +161,8 @@ public class KnowledgeBaseUpdater {
 	 * @param aboxModel
 	 */
 	private Model performSparqlConstructs(String sparqlConstructDir, 
-			                              OntModel aboxModel, boolean add) throws IOException {
+			                              OntModel readModel,
+			                              boolean add)   throws IOException {
 		
 		Model anonModel = ModelFactory.createDefaultModel();
 		File sparqlConstructDirectory = new File(sparqlConstructDir);
@@ -182,32 +179,33 @@ public class KnowledgeBaseUpdater {
 		for (int i = 0; i < sparqlFiles.length; i ++) {
 			File sparqlFile = sparqlFiles[i];			
 			try {
-				BufferedReader reader = 
-					new BufferedReader(new FileReader(sparqlFile));
+				BufferedReader reader = new BufferedReader(new FileReader(sparqlFile));
 				StringBuffer fileContents = new StringBuffer();
 				String ln;
+				
 				while ( (ln = reader.readLine()) != null) {
 					fileContents.append(ln).append('\n');
 				}
+				
 				try {
 					log.debug("\t\tprocessing SPARQL construct query from file " + sparqlFiles[i].getName());
 					Query q = QueryFactory.create(fileContents.toString(), Syntax.syntaxARQ);
-					aboxModel.enterCriticalSection(Lock.WRITE);
+					readModel.enterCriticalSection(Lock.READ);
 					try {
-						QueryExecution qe = QueryExecutionFactory.create(q,	aboxModel);
+						QueryExecution qe = QueryExecutionFactory.create(q,	readModel);
 						long numBefore = anonModel.size();
 						qe.execConstruct(anonModel);
 						long numAfter = anonModel.size();
                         long num = numAfter - numBefore;
                         
                         if (num > 0) {
-						   logger.log((add ? "Added " : "Removed ") + num + (add ? "" : " inferred") +
+						   logger.log((add ? "Added " : "Removed ") + num + 
 								   " statement"  + ((num > 1) ? "s" : "") + 
-								   " using the SPARQL construct query from file " + sparqlFiles[i].getName());
+								   " using the SPARQL construct query from file " + sparqlFiles[i].getParentFile().getName() + "/" + sparqlFiles[i].getName());
                         }
                         qe.close();
 					} finally {
-						aboxModel.leaveCriticalSection();
+						readModel.leaveCriticalSection();
 					}
 				} catch (Exception e) {
 					logger.logError(this.getClass().getName() + 
@@ -234,16 +232,13 @@ public class KnowledgeBaseUpdater {
 	private void updateABox(AtomicOntologyChangeLists changes) 
 			throws IOException {
 		
-
 		OntModel oldTBoxModel = settings.getOldTBoxModel();
 		OntModel newTBoxModel = settings.getNewTBoxModel();
 		OntModel ABoxModel = settings.getAssertionOntModelSelector().getABoxModel();
-		ABoxUpdater aboxUpdater = new ABoxUpdater(
-				oldTBoxModel, newTBoxModel, ABoxModel, 
-				settings.getNewTBoxAnnotationsModel(), logger, record);
+		ABoxUpdater aboxUpdater = new ABoxUpdater(oldTBoxModel, newTBoxModel, ABoxModel,settings.getNewTBoxAnnotationsModel(), logger, record);
+		aboxUpdater.migrateExternalConcepts();
 		aboxUpdater.processPropertyChanges(changes.getAtomicPropertyChanges());
 		aboxUpdater.processClassChanges(changes.getAtomicClassChanges());
- 
 	}
 	
 	private void updateTBoxAnnotations() throws IOException {
@@ -283,7 +278,10 @@ public class KnowledgeBaseUpdater {
 			required = true;
 			if (JenaDataSourceSetupBase.isFirstStartup()) {
 				assertSuccess();  
-				log.info("The application is starting with an empty DB, an indication will be added to the DB that a knowledge base migration to the current version is not required.");
+				log.info("The application is starting with an empty database. " +
+				         "An indication will be added to the database that a " +
+				         "knowledge base migration to the current version is " +
+				         "not required.");
 			    required = false;	
 			}
 		}

@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean.LevelRevisionInfo;
+import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
  * <pre>
@@ -71,7 +72,8 @@ public class RevisionInfoSetup implements ServletContextListener {
 			List<String> lines = readRevisionInfo(context);
 			bean = parseRevisionInformation(lines);
 		} catch (Exception e) {
-			log.error(e, e);
+			StartupStatus.getBean(context).warning(this,
+					"Failed to load the revision info", e);
 			bean = DUMMY_BEAN;
 		}
 

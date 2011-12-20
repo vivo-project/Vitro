@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.MenuManagementDataUtils;
+
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -29,6 +31,10 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
+
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetter;
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.DataGetterUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.SelectDataGetterUtils;
 
 /*
  * Custom controller for menu management.  This will be replaced later once N3 Editing
@@ -84,8 +90,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     private void initializeData(Map<String, Object> data, VitroRequest vreq) {
     	data.put("formUrls", vreq.getContextPath() + SUBMIT_FORM);
     	data.put("cancelUrl", vreq.getContextPath() + CANCEL_FORM);
-    	data.put("internalClassUri", "");
-    	
+     	MenuManagementDataUtils.includeRequiredSystemData(getServletContext(), data);
     }
 
     //Based on parameters, ascertain command
@@ -116,7 +121,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     	//not a page already assigned a class group
     	data.put("isClassGroupPage", false);
     	data.put("includeAllClasses", false);
-    	data.put("classGroups", this.getClassGroups());
+    	data.put("classGroups", DataGetterUtils.getClassGroups(getServletContext()));
     	data.put("selectedTemplateType", "default");
     	//
     	this.getMenuItemData(vreq, menuItem, data);
@@ -136,11 +141,9 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     	//not a page already assigned a class group
     	data.put("isClassGroupPage", false);
     	data.put("includeAllClasses", false);
-    	data.put("classGroups", this.getClassGroups());
+    	data.put("classGroups", DataGetterUtils.getClassGroups(getServletContext()));
     	data.put("selectedTemplateType", "default");
     	//defaults to regular class group page
-     	//Check whether institutional internal class exists
-		this.checkInstitutionalInternalClass(data);
 	}
 
 	private void processEditMenuItem(VitroRequest vreq, Map<String, Object> data) {
@@ -153,9 +156,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     	data.put("menuItem", menuItem);
     	data.put("menuAction", "Edit");
     	//Get All class groups
-    	data.put("classGroups", this.getClassGroups());
-     	//Check whether institutional internal class exists
-		this.checkInstitutionalInternalClass(data);
+    	data.put("classGroups", DataGetterUtils.getClassGroups(getServletContext()));
     	//Get data for menu item and associated page
     	this.getMenuItemData(vreq, menuItem, data);
     	this.getPageData(vreq, data);    	
@@ -219,7 +220,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
 	    	this.getCustomTemplate(writeModel, page, data);
 	    	//retrieve information for page based on the data getter, with class group and individuals for classes getting different information
 	    	//the browse page does not have a "data getter"
-	    	this.getPageDataGetterInfo(writeModel, page, data);
+	    	this.getPageDataGetterInfo(vreq, writeModel, page, data);
 	    	//This is an all statement iterator
 	    	log.debug("Debug statements: all statements in model for debugger");
 	    	StmtIterator debugIt = writeModel.listStatements(page, null, (RDFNode) null);
@@ -261,9 +262,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
 	//Get data getter related info
     //All items will have data getter except for Browse or Home page
     //Home can be edited but not removed
-    private void getPageDataGetterInfo(OntModel writeModel, Resource page, Map<String, Object> data) {
-    	
-    	
+    private void getPageDataGetterInfo(VitroRequest vreq, OntModel writeModel, Resource page, Map<String, Object> data) {
     	//Alternative is to do this via sparql query
     	StmtIterator dataGetterIt = writeModel.listStatements(page, ResourceFactory.createProperty(DisplayVocabulary.HAS_DATA_GETTER), (RDFNode) null);
     	while(dataGetterIt.hasNext()) {
@@ -273,141 +272,31 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     		StmtIterator dataGetterTypes = writeModel.listStatements(dataGetter, RDF.type, (RDFNode) null);
     		while(dataGetterTypes.hasNext()) {
     			String dataGetterType = dataGetterTypes.nextStatement().getResource().getURI();
-    			if(dataGetterType.equals(DisplayVocabulary.CLASSGROUP_PAGE_TYPE)) {
-    				this.retrieveClassGroupPage(writeModel, dataGetter, data);
-    			} else if(dataGetterType.equals(DisplayVocabulary.CLASSINDIVIDUALS_INTERNAL_TYPE)) {
-    				this.retrieveIndividualsForClassesPage(writeModel, dataGetter, data);
-    			} else {
-    				//Not sure what to do here
-    			}
+    			this.retrieveData(vreq, page, dataGetterType, data);
     		}
     	}
     
     }
   
-    //Based on institutional internal page and not general individualsForClasses
-    private void retrieveIndividualsForClassesPage(OntModel writeModel,
-		Resource dataGetter, Map<String, Object> data) {
-		data.put("isIndividualsForClassesPage", true);
-		data.put("isClassGroupPage", false);
-		data.put("includeAllClasses", false);
-		//Get the classes and put them here
-		this.getClassesForInternalDataGetter(writeModel, dataGetter, data);
-		//Also save the class group for display
-		this.getClassGroupForDataGetter(writeModel, dataGetter, data);
-		this.checkIfPageInternal(writeModel, data);
-		
-	}
+    private void retrieveData(VitroRequest vreq, Resource page, String dataGetterType,  Map<String, Object> templateData) {
+    	//Data Getter type is now a class name
+    	String className = DataGetterUtils.getClassNameFromUri(dataGetterType);
+    	try{
+    		String pageURI = page.getURI();
+    		PageDataGetter pg = (PageDataGetter) Class.forName(className).newInstance();
+    		Map<String, Object> pageInfo = DataGetterUtils.getMapForPage( vreq, pageURI );
 
-	private void checkIfPageInternal(OntModel writeModel,
-			Map<String, Object> data) {
-		//if internal class exists, and data getter indicates page is internal
-		if(data.containsKey("internalClass") && data.containsKey("isInternal")) {
-			data.put("pageInternalOnly", true);
-			
-		}
-		
-	}
-
-	private void retrieveClassGroupPage(OntModel writeModel, Resource dataGetter,
-			Map<String, Object> data) {
-		//This is a class group page so 
-		data.put("isClassGroupPage", true);
-		data.put("includeAllClasses", true);
-		
-		//Get the class group
-		this.getClassGroupForDataGetter(writeModel, dataGetter, data);
-		
-	}
-
-	//Instead of returning vclasses, just returning class Uris as vclasses appear to need their own template
-	//to show up correctly
-	private void getClassesForInternalDataGetter(OntModel writeModel, Resource dataGetter,
-			Map<String, Object> data) {
+    		Map<String, Object> pageData = DataGetterUtils.getAdditionalData(pageURI, dataGetterType, pageInfo, vreq, pg, getServletContext());
+    		SelectDataGetterUtils.processAndRetrieveData(vreq, getServletContext(), pageData, className, templateData);
+    	} catch(Exception ex) {
+    		log.error("Exception occurred in instantiation page data getter for " + className, ex);
+    	}
     	
-
-		StmtIterator classesIt = writeModel.listStatements(dataGetter, 
-				ResourceFactory.createProperty(DisplayVocabulary.GETINDIVIDUALS_FOR_CLASS), 
-				(RDFNode) null);
-		
-    	//Just need the class uris
-    	List<String> classUris = new ArrayList<String>();
-
-		while(classesIt.hasNext()) {
-			String classUri = classesIt.nextStatement().getResource().getURI();
-    		classUris.add(classUri);
-		}
-		data.put("includeClasses", classUris);
-		
-		//This checks whether restrict classes returned and include institutional internal class
-		//TODO: Create separate method to get restricted classes
-		//Get restrict classes - specifically internal class 
-		
-		StmtIterator internalIt = writeModel.listStatements(dataGetter, 
-				ResourceFactory.createProperty(DisplayVocabulary.RESTRICT_RESULTS_BY_INTERNAL), 
-				(RDFNode) null);
-		if(internalIt.hasNext()) {
-			data.put("isInternal", internalIt.nextStatement().getLiteral().getString());
-		}
-		
-	}
-	
-	
-	//Check whether any classes exist with internal class restrictions
-	private void checkInstitutionalInternalClass(Map<String, Object> data) {
-		//TODO: replace with more generic ModelContext retrieval method
-		OntModel mainModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
-		StmtIterator internalIt = mainModel.listStatements(null, ResourceFactory.createProperty(VitroVocabulary.IS_INTERNAL_CLASSANNOT), (RDFNode) null);
-		//List<String> internalClasses = new ArrayList<String>();
-		if(internalIt.hasNext()) {			
-			String internalClass = internalIt.nextStatement().getSubject().getURI();
-			data.put("internalClass", internalClass);
-			data.put("internalClassUri", internalClass);
-		}
 		
 	}
 
-    //Get the class page
-	private void getClassGroupForDataGetter(OntModel writeModel, Resource dataGetter,
-			Map<String, Object> data) {
-		StmtIterator classGroupIt = writeModel.listStatements(dataGetter, 
-				ResourceFactory.createProperty(DisplayVocabulary.FOR_CLASSGROUP), 
-				(RDFNode) null);
-		//Assuming just one class group per page/item
-		if(classGroupIt.hasNext()) {
-			String classGroup = classGroupIt.nextStatement().getResource().getURI();
-			VClassGroup vclassGroup = getClassGroup(classGroup);
-			data.put("classGroup", vclassGroup);
-			data.put("associatedPage", vclassGroup.getPublicName());
-			data.put("associatedPageURI", vclassGroup.getURI());
-		}
-		
-	}
-
-	//Get classes in class group, useful in case of edit
-    private VClassGroup getClassGroup(String classGroupUri) {
-    	VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(getServletContext());
-    	VClassGroup group = vcgc.getGroup(classGroupUri);
-    	return group;
-    }
     
-    //Get All VClass Groups
-    private List<HashMap<String, String>> getClassGroups() {
-    	//Wanted this to be 
-    	VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(getServletContext());
-        List<VClassGroup> vcgList = vcgc.getGroups();
-        //For now encoding as hashmap with label and URI as trying to retrieve class group
-        //results in errors for some reason
-        //TODO: Check how to do this properly
-        List<HashMap<String, String>> classGroups = new ArrayList<HashMap<String, String>>();
-        for(VClassGroup vcg: vcgList) {
-        	HashMap<String, String> hs = new HashMap<String, String>();
-        	hs.put("publicName", vcg.getPublicName());
-        	hs.put("URI", vcg.getURI());
-        	classGroups.add(hs);
-        }
-        return classGroups;
-    }
+
     
     
     

@@ -5,21 +5,12 @@
 <%@ page import="java.util.Iterator"%>
 <%@ page import="java.net.URLEncoder"%>
 <%@ page import="java.util.List"%>
-<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" %>
 <% request.setAttribute("requestedActions", new UseAdvancedDataToolsPages()); %>
 <vitro:confirmAuthorization />
-
-<%
-
-    ModelMaker maker = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
-    if (maker == null) {
-	maker = (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
-    }
-
-%>
 
 <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Assign Permanent URIs To Resources</h2>
 
@@ -34,32 +25,30 @@ resources."  Otherwise, the "use default namespace" option will generate
 URIs exactly of the form created through the GUI interface.</p>
 
 <form action="ingest" method="get" >
-<%String modelName = (String)request.getAttribute("modelName"); %>
-<input type="hidden" name="oldModel" value="<%=modelName%>"/>
+<input type="hidden" name="oldModel" value="${modelName}"/>
 <input type="hidden" name="action" value="permanentURI" />
-<p>Current namespace of resources  <select name=oldNamespace><%List namespaces = (List)request.getAttribute("namespaceList");
-if(namespaces != null){
+<p>Current namespace of resources  
+<select name=oldNamespace>
+<%List namespaces = (List)request.getAttribute("namespaceList");
+if(namespaces != null) {
 	Iterator namespaceItr = namespaces.iterator();
 	Integer count = 0;
 	while (namespaceItr.hasNext()){
 		String namespaceText = (String) namespaceItr.next();
 		%>
-<option value="<%=namespaceText%>"><%=namespaceText%></option><%}}%>
+        <option value="<%=namespaceText%>"><%=namespaceText%></option>
+<%  }
+}%>
 </select></p>
 
-<p>Model to save  <select name=newModel>
-<%
-    for (Iterator it = maker.listModels(); it.hasNext(); ) {
-	String modelNames = (String) it.next();
-        %>
-<option value="<%=modelNames%>"><%=modelNames%></option>
-<%    
-    }
-%>
+<p>Model in which to save results  <select name="newModel">
+<c:forEach var="modelName" items="${modelNames}">
+    <option value="${modelName}">${modelName}</option>
+</c:forEach>
+
 </select></p>
 <p>New namespace for resources  <input type="text" name="newNamespace" /></p>
-Or <%String defaultNamespace = (String)request.getAttribute("defaultNamespace");%>
-<p>Use default namespace <%=defaultNamespace%>  <input type="checkbox" name="defaultNamespace" value ="<%=defaultNamespace%>"/>
+<p>Use default namespace ${defaultNamespace}  <input type="checkbox" name="defaultNamespace" value ="${defaultNamespace}"/>
 </p>
 
 <p><input class="submit" type="submit" name="submit" value="Generate URIs" /></p>

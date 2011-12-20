@@ -406,11 +406,6 @@ public class IndividualStub implements Individual {
 	}
 
 	@Override
-	public Object getField(String fieldName) throws NoSuchMethodException {
-		throw new RuntimeException("Individual.getField() not implemented.");
-	}
-
-	@Override
 	public Float getSearchBoost() {
 		throw new RuntimeException(
 				"Individual.getSearchBoost() not implemented.");

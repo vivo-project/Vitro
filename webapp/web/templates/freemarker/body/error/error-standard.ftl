@@ -4,4 +4,4 @@
 
 <p>There was an error in the system.</p>
 
-<p>Return to the <a href="${urls.home}">home page</a>.</p> 
+<p>Return to the <a href="${urls.home}" title="home page">home page</a>.</p> 

@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,6 +22,7 @@ import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.listener.ChangeListener;
 import edu.cornell.mannlib.vedit.listener.EditPreProcessor;
 import edu.cornell.mannlib.vedit.util.FormUtils;
+import edu.cornell.mannlib.vedit.util.FormUtils.NegativeIntegerException;
 import edu.cornell.mannlib.vedit.util.OperationUtils;
 import edu.cornell.mannlib.vedit.validator.ValidationObject;
 import edu.cornell.mannlib.vedit.validator.Validator;
@@ -108,7 +108,8 @@ public class OperationController extends BaseEditController {
 
             //if validation failed, go back to the form controller
             if (!valid){
-            	retry(request,response);
+            	epo.setAttribute("globalErrorMsg", "Please correct errors highlighted below.");
+            	retry(request, response, epo);
             	return;
             }
 
@@ -116,7 +117,7 @@ public class OperationController extends BaseEditController {
             
             boolean status = performEdit(epo, newObj, action);
             if (status == FAILURE) {
-            	retry(request,response);
+            	retry(request, response, epo);
             	return;
             }
             
@@ -166,7 +167,7 @@ public class OperationController extends BaseEditController {
             epo.setAttribute("globalErrorMsg", errMsg);
        
             try {
-            	retry(request, response);
+            	retry(request, response, epo);
             	return;
             } catch (IOException ioe) {
             	log.error(this.getClass().getName() + " IOError on redirect: ", ioe);
@@ -174,18 +175,27 @@ public class OperationController extends BaseEditController {
         }
     }
     
-    private void retry(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void retry(HttpServletRequest request, 
+    		           HttpServletResponse response, 
+    		           EditProcessObject epo) throws IOException {
         String referer = request.getHeader("Referer");        
-        
+        referer = (referer == null) ? epo.getReferer() : referer;
         if( referer != null ){
             int epoKeyIndex = referer.indexOf("_epoKey");
             if (epoKeyIndex >= 0){
-                String url = referer.substring(0,epoKeyIndex) + "_epoKey="+request.getParameter("_epoKey");
+                String url = referer.substring(0,epoKeyIndex) + "_epoKey=" + 
+                        request.getParameter("_epoKey");
                 response.sendRedirect(url);
                 return;
             }
+            String redirectUrl = (referer.indexOf("?") > -1) 
+                    ? referer + "&"  
+                    : referer + "?";
+            redirectUrl += "_epoKey="+request.getParameter("_epoKey");
+            response.sendRedirect(redirectUrl);        
+        } else {
+        	response.sendRedirect(getDefaultLandingPage(request));
         }
-        response.sendRedirect(referer+"&_epoKey="+request.getParameter("_epoKey"));        
         return;
     }
     
@@ -199,17 +209,6 @@ public class OperationController extends BaseEditController {
                 } catch (ClassCastException e) {}
             }
         }
-    }
-    
-    private void applySimpleMask(EditProcessObject epo, Object newObj) {
-        // apply the simple mask
-        //if (epo.getSimpleMask() != null) {
-        //  Iterator smaskIt = epo.getSimpleMask().iterator();
-        //  while (smaskIt.hasNext()){
-        //      Object[] simpleMaskPair = (Object[]) smaskIt.next();
-        //      FormUtils.beanSet(newObj,(String)simpleMaskPair[0],simpleMaskPair[1].toString());
-        //  }
-        //}
     }
     
     private Object getNewObj(EditProcessObject epo) {
@@ -292,10 +291,14 @@ public class OperationController extends BaseEditController {
                         epo.getBadValueMap().remove(currParam);
                     } catch (NumberFormatException e) {
                         if (currValue.length()>0) {
-                            valid=false;
+                            valid = false;
                             epo.getErrMsgMap().put(currParam,"Please enter an integer");
                             epo.getBadValueMap().put(currParam,currValue);
                         }
+                    } catch (NegativeIntegerException nie) {
+                        valid = false;
+                        epo.getErrMsgMap().put(currParam,"Please enter a positive integer");
+                        epo.getBadValueMap().put(currParam,currValue);                    	
                     } catch (IllegalArgumentException f) {
                         valid=false;
                         log.error("doPost() reports IllegalArgumentException for "+currParam);

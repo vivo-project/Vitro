@@ -9,18 +9,11 @@
 <%@ page import="java.net.URLEncoder" %>
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" %>
 <% request.setAttribute("requestedActions", new UseAdvancedDataToolsPages()); %>
 <vitro:confirmAuthorization />
-
-<%
-
-    ModelMaker maker = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
-    if (maker == null) {
-        maker = (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
-    }
-
-%>
 
     <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Convert CSV to RDF</h2>
 
@@ -36,38 +29,49 @@
     <p>Or upload a file from your computer:</p>
     <p><input type="file" name="filePath" /></p>
 
+    <p/>
+    <p>This tool will automatically generate a mini ontology to represent the 
+    data in the CSV file.  A property will be produced for each column in the 
+    spreadsheet, based on the text in the header for that column.</p><p>In what 
+    namespace should these properties be created?</p>
 	<input type="text" name="tboxNamespace"/>
-    <p>Namespace in which to generate class and properties</p>
+    <p>Namespace in which to generate properties</p>
 
 <!-- 
  <input type="checkbox" name="discardTbox"/> do not add TBox or RBox to result model
 -->
 
+    <p>
+    <p>Each row in the spreadsheet will produce a resource.  Each of these
+    resources will be a member of a class in the namespace selected above.</p>  
+    <p>What should the local name of this class be? This is normally a word or two 
+    in "camel case" starting with an uppercase letter.  (For example, if the 
+    spreadsheet represents a list of faculty members, you might enter 
+    "FacultyMember" on the next line.)</p> 
     <input type="text" name="typeName"/>
-    <p>Class Name for Resources</p>
+    <p>Class Local Name for Resources</p>
 
     <select name="destinationModelName">
         <option value="vitro:baseOntModel">webapp assertions</option>
-<%
-    for (Iterator it = maker.listModels(); it.hasNext(); ) {
-	String modelName = (String) it.next();
-        %> <option value="<%=modelName%>"><%=modelName%></option>
-        <%    
-    }
-%>    <option value="">(none)</option>
+        <c:forEach var="modelName" items="${modelNames}">
+           <option value="${modelName}">${modelName}</option>
+        </c:forEach>
+        <option value="">(none)</option>
     </select>
-    <p>Destination Model</p>
+    <p>Model in which to save the converted spreadsheet data</p>
 
    <select name="tboxDestinationModelName">
         <option value="vitro:baseOntModel">webapp assertions</option>
-<%
-    for (Iterator it = maker.listModels(); it.hasNext(); ) {
-	String modelName = (String) it.next();
-        %> <option value="<%=modelName%>"><%=modelName%></option>
-        <%    
-    }
-%>    <option value="">(none)</option>
+        <c:forEach var="modelName" items="${modelNames}">
+           <option value="${modelName}">${modelName}</option>
+        </c:forEach>
+   <option value="">(none)</option>
     </select>
-    <p>Destination Model for TBox</p>
+    <p>Model in which to save the automatically-generated ontology</p>
+
+    <p/>
+    <p>The data in the CSV file will initially be represented using blank
+    nodes (RDF resources without URIs).  You will choose how to assign
+    URIs to these resources in the next step.</p>
 
     <input class="submit" type="submit" value="Next Step"/>

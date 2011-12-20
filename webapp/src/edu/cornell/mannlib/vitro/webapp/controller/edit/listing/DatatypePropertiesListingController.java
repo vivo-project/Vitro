@@ -139,8 +139,16 @@ public class DatatypePropertiesListingController extends BaseEditController {
                     } else {
                         results.add("unspecified");
                     }
-                    results.add(String.valueOf(prop.getDisplayTier())); // column 6
-                    results.add(String.valueOf(prop.getDisplayLimit())); // column 7
+                    Integer displayTier = prop.getDisplayTier();
+                    String displayTierStr = (displayTier < 0) 
+                            ? "" 
+                            : Integer.toString(displayTier);  
+                    results.add(displayTierStr); // column 6
+                    Integer displayLimit = prop.getDisplayLimit();
+                    String displayLimitStr = (displayLimit < 0) 
+                            ? "" 
+                            : Integer.toString(displayLimit);  
+                    results.add(displayLimitStr); // column 7
                     results.add(prop.getHiddenFromDisplayBelowRoleLevel()  == null ? "unspecified" : prop.getHiddenFromDisplayBelowRoleLevel().getShorthand()); // column 8
                     results.add(prop.getProhibitedFromUpdateBelowRoleLevel() == null ? "unspecified" : prop.getProhibitedFromUpdateBelowRoleLevel().getShorthand()); // column 9
                 }

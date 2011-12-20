@@ -8,7 +8,6 @@ import java.util.List;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.Keyword;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;

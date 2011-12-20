@@ -24,7 +24,7 @@ import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditIndividuals;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoBackEndEditing;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
@@ -42,7 +42,7 @@ public class ObjectPropertyStatementRetryController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(ObjectPropertyStatementRetryController.class.getName());
 
     public void doPost (HttpServletRequest request, HttpServletResponse response) {
-        if (!isAuthorizedToDisplayPage(request, response, new Actions(new EditIndividuals()))) {
+        if (!isAuthorizedToDisplayPage(request, response, new Actions(new DoBackEndEditing()))) {
         	return;
         }
 
@@ -143,10 +143,9 @@ public class ObjectPropertyStatementRetryController extends BaseEditController {
         foo.setOptionLists(optionMap);
         epo.setFormObject(foo);
 
-        String html = FormUtils.htmlFormFromBean(objectForEditing,action,foo);
+        FormUtils.populateFormFromBean(objectForEditing,action,foo);
 
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        request.setAttribute("formHtml",html);
         request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
         request.setAttribute("formJsp","/templates/edit/specific/ents2ents_retry_domainSide.jsp");
         request.setAttribute("scripts","/templates/edit/formBasic.js");

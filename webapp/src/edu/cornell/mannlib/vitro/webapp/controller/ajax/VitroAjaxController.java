@@ -75,10 +75,7 @@ public abstract class VitroAjaxController extends HttpServlet {
 	 * its data through a template.
 	 */
 	protected final Configuration getFreemarkerConfiguration(VitroRequest vreq) {
-	    ServletContext context = getServletContext();
-        FreemarkerConfigurationLoader loader = 
-            FreemarkerConfigurationLoader.getFreemarkerConfigurationLoader(context);
-        return loader.getConfig(vreq);	    
+		return FreemarkerConfigurationLoader.getConfig(vreq, getServletContext());
 	}
 	
 	/**

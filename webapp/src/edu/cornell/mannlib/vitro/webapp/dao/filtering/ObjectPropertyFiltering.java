@@ -71,18 +71,23 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     }
 
     @Override
-    public String getDomainDisplayTier() {
+    public Integer getDomainDisplayLimitInteger() {
+        return innerObjectProperty.getDomainDisplayLimitInteger();
+    }
+    
+    @Override
+    public int getDomainDisplayTier() {
         return innerObjectProperty.getDomainDisplayTier();
     }
 
     @Override
+    public Integer getDomainDisplayTierInteger() {
+        return innerObjectProperty.getDomainDisplayTierInteger();
+    }
+    
+    @Override
     public String getDomainEntitySortDirection() {
         return innerObjectProperty.getDomainEntitySortDirection();
-    }
-
-    @Override
-    public String getDomainEntitySortField() {
-        return innerObjectProperty.getDomainEntitySortField();
     }
 
     @Override
@@ -94,17 +99,7 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     public String getDomainPublic() {
         return innerObjectProperty.getDomainPublic();
     }
-
-    @Override
-    public String getDomainQuickEditJsp() {
-        return innerObjectProperty.getDomainQuickEditJsp();
-    }
-
-    @Override
-    public String getDomainSidePhasedOut() {
-        return innerObjectProperty.getDomainSidePhasedOut();
-    }
-
+    
     @Override
     public VClass getDomainVClass() {
         return innerObjectProperty.getDomainVClass();
@@ -208,18 +203,23 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     }
 
     @Override
-    public String getRangeDisplayTier() {
+    public Integer getRangeDisplayLimitInteger() {
+        return innerObjectProperty.getRangeDisplayLimitInteger();
+    }
+    
+    @Override
+    public int getRangeDisplayTier() {
         return innerObjectProperty.getRangeDisplayTier();
     }
 
     @Override
+    public Integer getRangeDisplayTierInteger() {
+        return innerObjectProperty.getRangeDisplayTierInteger();
+    }
+    
+    @Override
     public String getRangeEntitySortDirection() {
         return innerObjectProperty.getRangeEntitySortDirection();
-    }
-
-    @Override
-    public String getRangeEntitySortField() {
-        return innerObjectProperty.getRangeEntitySortField();
     }
 
     @Override
@@ -230,16 +230,6 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     @Override
     public String getRangePublic() {
         return innerObjectProperty.getRangePublic();
-    }
-
-    @Override
-    public String getRangeQuickEditJsp() {
-        return innerObjectProperty.getRangeQuickEditJsp();
-    }
-
-    @Override
-    public String getRangeSidePhasedOut() {
-        return innerObjectProperty.getRangeSidePhasedOut();
     }
 
     @Override
@@ -303,12 +293,12 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     }
 
     @Override
-    public void setDomainDisplayLimit(int domainDisplayLimit) {
+    public void setDomainDisplayLimit(Integer domainDisplayLimit) {
         innerObjectProperty.setDomainDisplayLimit(domainDisplayLimit);
     }
 
     @Override
-    public void setDomainDisplayTier(String domainDisplayTier) {
+    public void setDomainDisplayTier(Integer domainDisplayTier) {
         innerObjectProperty.setDomainDisplayTier(domainDisplayTier);
     }
 
@@ -319,11 +309,6 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     }
 
     @Override
-    public void setDomainEntitySortField(String domainEntitySortField) {
-        innerObjectProperty.setDomainEntitySortField(domainEntitySortField);
-    }
-
-    @Override
     public void setDomainEntityURI(String domainEntityURI) {
         innerObjectProperty.setDomainEntityURI(domainEntityURI);
     }
@@ -331,16 +316,6 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     @Override
     public void setDomainPublic(String domainPublic) {
         innerObjectProperty.setDomainPublic(domainPublic);
-    }
-
-    @Override
-    public void setDomainQuickEditJsp(String domainQuickEditJsp) {
-        innerObjectProperty.setDomainQuickEditJsp(domainQuickEditJsp);
-    }
-
-    @Override
-    public void setDomainSidePhasedOut(String domainSidePhasedOut) {
-        innerObjectProperty.setDomainSidePhasedOut(domainSidePhasedOut);
     }
 
     @Override
@@ -464,7 +439,7 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     }
 
     @Override
-    public void setRangeDisplayTier(String rangeDisplayTier) {
+    public void setRangeDisplayTier(Integer rangeDisplayTier) {
         innerObjectProperty.setRangeDisplayTier(rangeDisplayTier);
     }
 
@@ -475,11 +450,6 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     }
 
     @Override
-    public void setRangeEntitySortField(String rangeEntitySortField) {
-        innerObjectProperty.setRangeEntitySortField(rangeEntitySortField);
-    }
-
-    @Override
     public void setRangeEntityURI(String rangeEntityURI) {
         innerObjectProperty.setRangeEntityURI(rangeEntityURI);
     }
@@ -487,16 +457,6 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     @Override
     public void setRangePublic(String rangePublic) {
         innerObjectProperty.setRangePublic(rangePublic);
-    }
-
-    @Override
-    public void setRangeQuickEditJsp(String rangeQuickEditJsp) {
-        innerObjectProperty.setRangeQuickEditJsp(rangeQuickEditJsp);
-    }
-
-    @Override
-    public void setRangeSidePhasedOut(String rangeSide) {
-        innerObjectProperty.setRangeSidePhasedOut(rangeSide);
     }
 
     @Override

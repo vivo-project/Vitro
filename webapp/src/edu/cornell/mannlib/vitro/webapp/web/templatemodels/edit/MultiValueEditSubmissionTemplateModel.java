@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.List;
 import com.hp.hpl.jena.rdf.model.Literal;
 
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmission;
 
 public class MultiValueEditSubmissionTemplateModel {
@@ -16,17 +17,28 @@ public class MultiValueEditSubmissionTemplateModel {
         this.editSub = editSub;
     }
     
-    public Map<String, List<Literal>> getLiteralsFromForm() {
-        return editSub.getLiteralsFromForm();
+    public Map<String, List<String>> getLiteralsFromForm() {
+    	if(editSub == null)
+    		return null;
+    	//Transforms from string to list of literals TO string to list of strings
+        return EditConfigurationUtils.transformLiteralMap(editSub.getLiteralsFromForm());
     }
 
-    /*
-    public Map<String, List<String>> getValidationErrors() {
+   
+    public Map<String, String> getValidationErrors() {
+    	if(editSub ==  null)
+    		return null;
         return editSub.getValidationErrors();
-    }*/
+    }
 
     public Map<String, List<String>> getUrisFromForm() {
+    	if(editSub ==  null)
+    		return null;
         return editSub.getUrisFromForm();
+    }
+    
+    public boolean getSubmissionExists() {
+    	return (this.editSub != null);
     }
 
 }

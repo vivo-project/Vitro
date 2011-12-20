@@ -45,6 +45,13 @@ public class UserAccountsResetPasswordPage extends UserAccountsPasswordBasePage 
 	}
 
 	@Override
+	protected String alreadyLoggedInMessage(String currentUserEmail) {
+		return "You may not reset the password for " + userEmail
+				+ " while you are logged in as " + currentUserEmail
+				+ ". Please log out and try again.";
+	}
+
+	@Override
 	protected String passwordChangeNotPendingMessage() {
 		return "The password for " + userEmail + " has already been reset.";
 	}

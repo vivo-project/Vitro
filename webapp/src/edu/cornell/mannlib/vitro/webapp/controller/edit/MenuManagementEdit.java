@@ -2,32 +2,21 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
-import java.io.File;
+
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
 
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.rdf.model.Literal;
+
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -38,21 +27,10 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
-
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
-import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Generator;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditSubmission;
-import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
-import edu.cornell.mannlib.vitro.webapp.utils.MailUtil;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.SelectDataGetterUtils;
 
 /**
  *Process edits from display model editing, so form should submit to this page which should
@@ -349,62 +327,11 @@ public class MenuManagementEdit extends VitroHttpServlet {
     				dataGetterResource, 
     				ResourceFactory.createProperty(DisplayVocabulary.FOR_CLASSGROUP), 
     				classGroupResource));
-    		//If "All selected" then use class group else use individuals for classes
-    		Model dataGetterModel = ModelFactory.createDefaultModel();
-    		if(!internalClassSelected(vreq) && allClassesSelected(vreq)) {
-    			dataGetterModel = getClassGroupDataGetter(vreq, dataGetterResource, addModel, displayModel);
-    		} else {
-    			dataGetterModel = getIndividualsForClassesDataGetter(vreq, dataGetterResource, addModel, displayModel, pageResource);
-    		}
-    		
+    		//Get the model corresponding to the data getter to be employed and return
+    		Model dataGetterModel = SelectDataGetterUtils.createDataGetterModel(vreq, dataGetterResource);
     		addModel.add(dataGetterModel);
     	}
 		
-	}
-	
-	private boolean allClassesSelected(VitroRequest vreq) {
-		String allClasses = vreq.getParameter("allSelected");
-		return (allClasses != null && !allClasses.isEmpty());
-	}
-	
-	private boolean internalClassSelected(VitroRequest vreq) {
-    	String internalClass = vreq.getParameter("display-internalClass");
-    	return (internalClass != null && !internalClass.isEmpty());
-	}
-	
-	private Model getIndividualsForClassesDataGetter(VitroRequest vreq, Resource dataGetterResource, 
-			Model addModel, OntModel displayModel, Resource pageResource) {
-		String[] selectedClasses = vreq.getParameterValues("classInClassGroup");
-		Model dgModel = ModelFactory.createDefaultModel();
-		dgModel.add(dgModel.createStatement(dataGetterResource, 
-				RDF.type, 
-				ResourceFactory.createResource(DisplayVocabulary.CLASSINDIVIDUALS_INTERNAL_TYPE)));
-		for(String classUri: selectedClasses) {
-			dgModel.add(dgModel.createStatement(
-					dataGetterResource, 
-					ResourceFactory.createProperty(DisplayVocabulary.GETINDIVIDUALS_FOR_CLASS),
-					ResourceFactory.createResource(classUri)));
-		}
-		
-		//Also check if internal class checked
-		if(internalClassSelected(vreq)) {
-			String internalClass = vreq.getParameter("display-internalClass");
-			//The value should be the internal class uri
-			dgModel.add(dgModel.createStatement(
-					dataGetterResource, 
-					ResourceFactory.createProperty(DisplayVocabulary.RESTRICT_RESULTS_BY_INTERNAL),
-					dgModel.createLiteral("true")));
-		}
-		return dgModel;
-	}
-
-	private Model getClassGroupDataGetter(VitroRequest vreq, Resource dataGetterResource, Model addModel, 
-			OntModel displayModel) {
-			Model dgModel = ModelFactory.createDefaultModel();
-			dgModel.add(dgModel.createStatement(dataGetterResource, 
-					RDF.type, 
-					ResourceFactory.createResource(DisplayVocabulary.CLASSGROUP_PAGE_TYPE)));
-			return dgModel;
 	}
 
 	//For now returning the first "data getter" we have - this will be a more complex operation

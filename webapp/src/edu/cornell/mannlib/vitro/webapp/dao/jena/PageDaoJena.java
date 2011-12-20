@@ -25,6 +25,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
@@ -45,7 +46,7 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
     static protected Query individualsForClassesRestrictedQuery;
     static protected Query institutionalInternalClassQuery;
     static protected Query individualsForClassesInternalQuery;
-
+    static protected Query dataGetterClassQuery;
 
     static final String prefixes = 
         "PREFIX rdf:   <" + VitroVocabulary.RDF +"> \n" +
@@ -89,26 +90,22 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         "    ?pageUri rdf:type <" + DisplayVocabulary.HOME_PAGE_TYPE + "> .\n"+                
         "} \n" ;
 
-    /*
-    static final protected String classGroupPageQueryString = 
-        prefixes + "\n" +
-        "SELECT ?classGroup WHERE { ?pageUri <" + DisplayVocabulary.FOR_CLASSGROUP + "> ?classGroup . }";
-    */
-    //Updated class group page query string
+   
+    //Updated class group page query string so no longer check for type, as types have changed
+   
     static final protected String classGroupPageQueryString = 
     	prefixes + "\n" + 
     	 "SELECT ?classGroup WHERE {\n" +
-         "    ?pageUri display:hasDataGetter ?dg .\n"+    
-         " 	 ?dg rdf:type <" + DisplayVocabulary.CLASSGROUP_PAGE_TYPE + ">. \n" + 
+         " ?pageUri display:hasDataGetter ?dg .\n"+    
          " ?dg <" + DisplayVocabulary.FOR_CLASSGROUP + "> ?classGroup . \n" +
          "} \n" ;
    
     //Query to get what classes are to be employed on the page 
+    //TODO: Commented out type but check if should include correct type
     static final protected String individualsForClassesDataGetterQueryString = 
     	prefixes + "\n" + 
     	 "SELECT ?dg ?class ?restrictClass WHERE {\n" +
-         "    ?pageUri display:hasDataGetter ?dg .\n"+    
-         " 	 ?dg rdf:type <" + DisplayVocabulary.CLASSINDIVIDUALS_PAGE_TYPE + ">. \n" + 
+         "    ?pageUri display:hasDataGetter ?dg .\n"+    //" 	 ?dg rdf:type <" + DisplayVocabulary.CLASSINDIVIDUALS_PAGE_TYPE + ">. \n" + 
          " ?dg <" + DisplayVocabulary.GETINDIVIDUALS_FOR_CLASS + "> ?class . \n" +
          "    OPTIONAL {?dg <"+ DisplayVocabulary.RESTRICT_RESULTS_BY + "> ?restrictClass } .\n" +    
          "} \n" ;
@@ -129,16 +126,21 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
     
     //Query to get classes employed on internal class page
     //and restriction classes if they exist
+    //TODO: Check if need to substitute class name type instead
     static final protected String individualsForClassesInternalQueryString = 
     	prefixes + "\n" + 
     	 "SELECT ?dg ?class ?isInternal WHERE {\n" +
-         "    ?pageUri display:hasDataGetter ?dg .\n"+    
-         " 	 ?dg rdf:type <" + DisplayVocabulary.CLASSINDIVIDUALS_INTERNAL_TYPE + ">. \n" + 
+         "    ?pageUri display:hasDataGetter ?dg .\n"+   // " 	 ?dg rdf:type <" + DisplayVocabulary.CLASSINDIVIDUALS_INTERNAL_TYPE + ">. \n" + 
          " ?dg <" + DisplayVocabulary.GETINDIVIDUALS_FOR_CLASS + "> ?class . \n" +
          " OPTIONAL {  ?dg <"+ DisplayVocabulary.RESTRICT_RESULTS_BY_INTERNAL + "> ?isInternal } .\n" +    
          "} \n" ;
     
-	
+    static final protected String usesDataGetterClassQueryString = 
+    	prefixes + "\n" + 
+    	 "SELECT ?dgClass WHERE {\n" +
+         " ?pageUri display:hasDataGetter ?dg .\n"+    
+         " ?dg <" + RDF.type.getURI() +  "> ?dgClass . \n" +   
+         "} \n" ;
     static{
         try{    
             pageQuery=QueryFactory.create(pageQueryString);
@@ -202,6 +204,13 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         }catch(Throwable th){
             log.error("could not create SPARQL query for individualsForClassesInternalQuery " + th.getMessage());
             log.error(individualsForClassesInternalQueryString);
+        } 
+        //Check what class to use for data getter - returns java class name
+        try{    
+            dataGetterClassQuery = QueryFactory.create(usesDataGetterClassQueryString);
+        }catch(Throwable th){
+            log.error("could not create SPARQL query for dataGetterClassQuery " + th.getMessage());
+            log.error(usesDataGetterClassQueryString);
         } 
         
         
@@ -379,8 +388,8 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
      * Although to be used specifically for internal class filtering and will usually be one class returned,
      * allowing for multiple classes to be returned.
      */
-    public Map<String, List<String>> getClassesAndRestrictionsForPage(String pageUri) {
-   	 	Map<String, List<String>> classesAndRestrictions = new HashMap<String, List<String>>();
+    public Map<String,Object> getClassesAndRestrictionsForPage(String pageUri) {
+   	 	Map<String, Object> classesAndRestrictions = new HashMap<String, Object>();
     	QuerySolutionMap initialBindings = new QuerySolutionMap();
         initialBindings.add("pageUri", ResourceFactory.createResource(pageUri));
         List<String> classes = new ArrayList<String>();
@@ -460,6 +469,36 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         }
     }
     
+    public List<String> getDataGetterClass(String pageUri) {
+    	 QuerySolutionMap initialBindings = new QuerySolutionMap();
+         initialBindings.add("pageUri", ResourceFactory.createResource(pageUri));
+         List<String> dataGetterClasses = new ArrayList<String>();
+
+         Model displayModel = getOntModelSelector().getDisplayModel();
+         displayModel.enterCriticalSection(false);
+         try{                    
+             QueryExecution qexec = QueryExecutionFactory.create( dataGetterClassQuery, displayModel , initialBindings);
+             try{
+                 ResultSet resultSet = qexec.execSelect();        
+                 while(resultSet.hasNext()){
+                     QuerySolution soln = resultSet.next();
+                     dataGetterClasses.add( nodeToString(soln.get("dgClass")) );        
+                 }
+                 if( dataGetterClasses.size() == 0 ){
+                     log.debug("No data getter classes defined for  "+ pageUri);
+                     return null;
+                 }
+                    
+                 
+             }finally{
+                 qexec.close();
+             }            
+         }finally{
+             displayModel.leaveCriticalSection();
+         }
+         return dataGetterClasses;
+    }
+
    
     
     /* *************************** Utility methods ********************************* */

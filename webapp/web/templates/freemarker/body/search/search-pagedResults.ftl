@@ -16,7 +16,7 @@
             <h4>Display only</h4>           
             <ul>           
             <#list classGroupLinks as link>
-                <li><a href="${link.url}">${link.text}</a></li>
+                <li><a href="${link.url}" title="class group link">${link.text}</a></li>
             </#list>
             </ul>           
         </div>
@@ -27,7 +27,7 @@
             <h4>Limit ${classGroupName} to</h4>
             <ul>           
             <#list classLinks as link>
-                <li><a href="${link.url}">${link.text}</a></li>
+                <li><a href="${link.url}" title="class link">${link.text}</a></li>
             </#list>
             </ul>
         </div>
@@ -46,15 +46,15 @@
     <#if (pagingLinks?size > 0)>
         <div class="searchpages">
             Pages: 
-            <#if prevPage??><a class="prev" href="${prevPage}">Previous</a></#if>
+            <#if prevPage??><a class="prev" href="${prevPage}" title="previous">Previous</a></#if>
             <#list pagingLinks as link>
                 <#if link.url??>
-                    <a href="${link.url}">${link.text}</a>
+                    <a href="${link.url}" title="page link">${link.text}</a>
                 <#else>
                     <span>${link.text}</span> <#-- no link if current page -->
                 </#if>
             </#list>
-            <#if nextPage??><a class="next" href="${nextPage}">Next</a></#if>
+            <#if nextPage??><a class="next" href="${nextPage}" title="next">Next</a></#if>
         </div>
     </#if>
 
