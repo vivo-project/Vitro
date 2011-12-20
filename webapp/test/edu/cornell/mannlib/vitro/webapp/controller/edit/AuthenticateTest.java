@@ -37,6 +37,8 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.CommonIdentifierBundleFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.Permission;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionRegistry;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
@@ -130,7 +132,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		userAccountsDao.addUser(createUserFromUserInfo(OLD_STRANGER));
 
 		individualDao = new IndividualDaoStub();
-		
+
 		webappDaoFactory = new WebappDaoFactoryStub();
 		webappDaoFactory.setUserAccountsDao(userAccountsDao);
 		webappDaoFactory.setIndividualDao(individualDao);
@@ -151,12 +153,15 @@ public class AuthenticateTest extends AbstractTestClass {
 
 		response = new HttpServletResponseStub();
 
+		PermissionRegistry.createRegistry(servletContext,
+				Collections.<Permission> emptySet());
+
 		auth = new Authenticate();
 		auth.init(servletConfig);
 
 		setLoggerLevel(ConfigurationProperties.class, Level.WARN);
 		new ConfigurationPropertiesStub().setBean(servletContext);
-		
+
 		ActiveIdentifierBundleFactories.addFactory(servletContext,
 				new CommonIdentifierBundleFactory(servletContext));
 	}
