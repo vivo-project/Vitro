@@ -1,10 +1,27 @@
 # $This file is distributed under the terms of the license in /doc/license.txt$ 
 
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
-@prefix simplePermission: <java://edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
+@prefix simplePermission: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
 
 auth:ADMIN 
     a auth:PermissionSet ;
+    rdfs:label "Site Admin" ;
     auth:hasPermission simplePermission:ManageMenus ;
     .
 
+auth:CURATOR 
+    a auth:PermissionSet ;
+    rdfs:label "Curator" ;
+    .
+
+auth:EDITOR 
+    a auth:PermissionSet ;
+    rdfs:label "Editor" ;
+    .
+
+auth:SELF_EDITOR
+    a auth:PermissionSet ;
+    a auth:DefaultPermissionSetForNewUsers ;
+    rdfs:label "Self Editor" ;
+    .
