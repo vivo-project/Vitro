@@ -5,8 +5,8 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
-<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousCuratorPages" %>
-<% request.setAttribute("requestedActions", new UseMiscellaneousCuratorPages()); %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission" %>
+<% request.setAttribute("requestedActions", SimplePermission.USE_MISCELLANEOUS_CURATOR_PAGES.ACTION); %>
 <vitro:confirmAuthorization />
 
 

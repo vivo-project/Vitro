@@ -9,10 +9,10 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 <%@ taglib prefix="form" uri="http://vitro.mannlib.cornell.edu/edit/tags" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousEditorPages" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission" %>
 
 <%
-	if (PolicyHelper.isAuthorizedForActions(request, new UseMiscellaneousEditorPages())) {
+	if (PolicyHelper.isAuthorizedForActions(request, SimplePermission.USE_MISCELLANEOUS_EDITOR_PAGES.ACTIONS)) {
 		request.setAttribute("isEditor", Boolean.TRUE);
 	}
 %>
