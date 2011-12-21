@@ -34,6 +34,14 @@ auth:ADMIN
     auth:hasPermission simplePermission:SeeRevisionInfo ;
     auth:hasPermission simplePermission:SeeSiteAdminPage ;
     auth:hasPermission simplePermission:UseMiscellaneousEditorPages ;
+
+    # permissions for ANY logged-in user.
+    auth:hasPermission simplePermission:DoFrontEndEditing ;
+    auth:hasPermission simplePermission:EditOwnAccount ;
+    auth:hasPermission simplePermission:ManageOwnProxies ;
+    auth:hasPermission simplePermission:QueryUserAccountsModel ;
+    auth:hasPermission simplePermission:UseBasicAjaxControllers ;
+    auth:hasPermission simplePermission:UseMiscellaneousPages ;
     .
 
 auth:CURATOR 
@@ -54,6 +62,14 @@ auth:CURATOR
     auth:hasPermission simplePermission:SeeRevisionInfo ;
     auth:hasPermission simplePermission:SeeSiteAdminPage ;
     auth:hasPermission simplePermission:UseMiscellaneousEditorPages ;
+
+    # permissions for ANY logged-in user.
+    auth:hasPermission simplePermission:DoFrontEndEditing ;
+    auth:hasPermission simplePermission:EditOwnAccount ;
+    auth:hasPermission simplePermission:ManageOwnProxies ;
+    auth:hasPermission simplePermission:QueryUserAccountsModel ;
+    auth:hasPermission simplePermission:UseBasicAjaxControllers ;
+    auth:hasPermission simplePermission:UseMiscellaneousPages ;
     .
 
 auth:EDITOR 
@@ -66,10 +82,26 @@ auth:EDITOR
     auth:hasPermission simplePermission:SeeRevisionInfo ;
     auth:hasPermission simplePermission:SeeSiteAdminPage ;
     auth:hasPermission simplePermission:UseMiscellaneousEditorPages ;
+
+    # permissions for ANY logged-in user.
+    auth:hasPermission simplePermission:DoFrontEndEditing ;
+    auth:hasPermission simplePermission:EditOwnAccount ;
+    auth:hasPermission simplePermission:ManageOwnProxies ;
+    auth:hasPermission simplePermission:QueryUserAccountsModel ;
+    auth:hasPermission simplePermission:UseBasicAjaxControllers ;
+    auth:hasPermission simplePermission:UseMiscellaneousPages ;
     .
 
 auth:SELF_EDITOR
     a auth:PermissionSet ;
     a auth:DefaultPermissionSetForNewUsers ;
     rdfs:label "Self Editor" ;
+
+    # permissions for ANY logged-in user.
+    auth:hasPermission simplePermission:DoFrontEndEditing ;
+    auth:hasPermission simplePermission:EditOwnAccount ;
+    auth:hasPermission simplePermission:ManageOwnProxies ;
+    auth:hasPermission simplePermission:QueryUserAccountsModel ;
+    auth:hasPermission simplePermission:UseBasicAjaxControllers ;
+    auth:hasPermission simplePermission:UseMiscellaneousPages ;
     .

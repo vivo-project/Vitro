@@ -13,8 +13,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageOwnProxies;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
@@ -201,8 +201,8 @@ public class UserAccountsMyAccountPage extends UserAccountsPage {
 	}
 
 	boolean isProxyPanelAuthorized() {
-		return PolicyHelper
-				.isAuthorizedForActions(vreq, new ManageOwnProxies())
+		return PolicyHelper.isAuthorizedForActions(vreq,
+				SimplePermission.MANAGE_OWN_PROXIES.ACTIONS)
 				&& (getProfilePage(userAccount) != null);
 	}
 

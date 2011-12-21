@@ -30,12 +30,18 @@ public class SimplePermission implements Permission {
 			"AccessSpecialDataModels");
 	public static final SimplePermission DO_BACK_END_EDITING = new SimplePermission(
 			"DoBackEndEditing");
+	public static final SimplePermission DO_FRONT_END_EDITING = new SimplePermission(
+			"DoFrontEndEditing");
 	public static final SimplePermission EDIT_ONTOLOGY = new SimplePermission(
 			"EditOntology");
+	public static final SimplePermission EDIT_OWN_ACCOUNT = new SimplePermission(
+			"EditOwnAccount");
 	public static final SimplePermission EDIT_SITE_INFORMATION = new SimplePermission(
 			"EditSiteInformation");
 	public static final SimplePermission MANAGE_MENUS = new SimplePermission(
 			"ManageMenus");
+	public static final SimplePermission MANAGE_OWN_PROXIES = new SimplePermission(
+			"ManageOwnProxies");
 	public static final SimplePermission MANAGE_PORTALS = new SimplePermission(
 			"ManagePortals");
 	public static final SimplePermission MANAGE_PROXIES = new SimplePermission(
@@ -46,6 +52,8 @@ public class SimplePermission implements Permission {
 			"ManageTabs");
 	public static final SimplePermission MANAGE_USER_ACCOUNTS = new SimplePermission(
 			"ManageUserAccounts");
+	public static final SimplePermission QUERY_USER_ACCOUNTS_MODEL = new SimplePermission(
+			"QueryUserAccountsModel");
 	public static final SimplePermission REBUILD_VCLASS_GROUP_CACHE = new SimplePermission(
 			"RebuildVClassGroupCache");
 	public static final SimplePermission REFRESH_VISUALIZATION_CACHE = new SimplePermission(
@@ -62,12 +70,16 @@ public class SimplePermission implements Permission {
 			"SeeVerbosePropertyInformation");
 	public static final SimplePermission USE_ADVANCED_DATA_TOOLS_PAGES = new SimplePermission(
 			"UseAdvancedDataToolsPages");
+	public static final SimplePermission USE_BASIC_AJAX_CONTROLLERS = new SimplePermission(
+			"UseBasicAjaxControllers");
 	public static final SimplePermission USE_MISCELLANEOUS_ADMIN_PAGES = new SimplePermission(
 			"UseMiscellaneousAdminPages");
 	public static final SimplePermission USE_MISCELLANEOUS_CURATOR_PAGES = new SimplePermission(
 			"UseMiscellaneousCuratorPages");
 	public static final SimplePermission USE_MISCELLANEOUS_EDITOR_PAGES = new SimplePermission(
 			"UseMiscellaneousEditorPages");
+	public static final SimplePermission USE_MISCELLANEOUS_PAGES = new SimplePermission(
+			"UseMiscellaneousPages");
 
 	public static List<SimplePermission> getAllInstances() {
 		return new ArrayList<SimplePermission>(allInstances.values());

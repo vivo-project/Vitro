@@ -23,7 +23,6 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOwnAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
@@ -363,7 +362,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             urls.put("currentPage", getCurrentPageUrl(vreq));
             urls.put("referringPage", getReferringPageUrl(vreq));
             
-            if (PolicyHelper.isAuthorizedForActions(vreq, new EditOwnAccount())) {
+            if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.EDIT_OWN_ACCOUNT.ACTIONS)) {
                 urls.put("myAccount", UrlBuilder.getUrl("/accounts/myAccount"));
             } else {
                 urls.remove("myAccount"); // clear value from a previous request

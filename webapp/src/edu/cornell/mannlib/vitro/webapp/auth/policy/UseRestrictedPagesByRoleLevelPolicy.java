@@ -12,12 +12,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.querymodel.QueryFullModel;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.querymodel.QueryUserAccountsModel;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoFrontEndEditing;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOwnAccount;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageOwnProxies;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousPages;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 
 /**
@@ -41,27 +35,9 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		RoleLevel userRole = HasRoleLevel.getUsersRoleLevel(whoToAuth);
 
 		PolicyDecision result;
-		if (whatToAuth instanceof UseBasicAjaxControllers) {
-			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
-			
-		} else if (whatToAuth instanceof UseMiscellaneousPages) {
-			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
-			
-		} else if (whatToAuth instanceof EditOwnAccount) {
-			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
-
-		} else if (whatToAuth instanceof ManageOwnProxies) {
-			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
-			
-		} else if (whatToAuth instanceof QueryUserAccountsModel) {
-			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
-			
-		} else if (whatToAuth instanceof DoFrontEndEditing) {
-			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
-			
-		} else if (whatToAuth instanceof QueryFullModel) {
+		if (whatToAuth instanceof QueryFullModel) {
 			result = isAuthorized(whatToAuth, RoleLevel.PUBLIC, userRole);
-			
+
 		} else {
 			result = defaultDecision("Unrecognized action");
 		}
