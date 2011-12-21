@@ -19,8 +19,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoBackEndEditing;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditSiteInformation;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeSiteAdminPage;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -129,7 +127,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
         	data.put("manageProxies", UrlBuilder.getUrl("/manageProxies"));
         }
         
-        if (PolicyHelper.isAuthorizedForActions(vreq, new EditSiteInformation())) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.EDIT_SITE_INFORMATION.ACTIONS)) {
             data.put("siteInfo", UrlBuilder.getUrl("/editForm", "controller", "ApplicationBean"));
         }
         
@@ -151,7 +149,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 
         Map<String, Object> map = new HashMap<String, Object>();
  
-        if (PolicyHelper.isAuthorizedForActions(vreq, new EditOntology())) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.EDIT_ONTOLOGY.ACTIONS)) {
             
             String pelletError = null;
             String pelletExplanation = null;

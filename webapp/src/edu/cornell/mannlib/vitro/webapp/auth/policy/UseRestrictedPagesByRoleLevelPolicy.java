@@ -15,18 +15,12 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.querymodel.QueryFul
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.querymodel.QueryUserAccountsModel;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoBackEndEditing;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoFrontEndEditing;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOwnAccount;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditSiteInformation;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageOwnProxies;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManagePortals;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageTabs;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeIndividualEditingPanel;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeRevisionInfo;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeSiteAdminPage;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeVerbosePropertyInformation;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousCuratorPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousEditorPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousPages;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
@@ -52,25 +46,7 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		RoleLevel userRole = HasRoleLevel.getUsersRoleLevel(whoToAuth);
 
 		PolicyDecision result;
-		if (whatToAuth instanceof EditOntology) {
-			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
-
-		} else if (whatToAuth instanceof ManagePortals) {
-			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
-
-		} else if (whatToAuth instanceof ManageTabs) {
-			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
-
-		} else if (whatToAuth instanceof EditSiteInformation) {
-			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
-			
-		} else if (whatToAuth instanceof SeeVerbosePropertyInformation) {
-			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
-			
-		} else if (whatToAuth instanceof UseMiscellaneousCuratorPages) {
-			result = isAuthorized(whatToAuth, RoleLevel.CURATOR, userRole);
-
-		} else if (whatToAuth instanceof DoBackEndEditing) {
+		if (whatToAuth instanceof DoBackEndEditing) {
 			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
 
 		} else if (whatToAuth instanceof SeeSiteAdminPage) {

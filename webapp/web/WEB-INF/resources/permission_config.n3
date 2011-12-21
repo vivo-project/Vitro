@@ -7,6 +7,8 @@
 auth:ADMIN 
     a auth:PermissionSet ;
     rdfs:label "Site Admin" ;
+    
+    # ADMIN-only permissions
     auth:hasPermission simplePermission:AccessSpecialDataModels ;
     auth:hasPermission simplePermission:ManageMenus ;
     auth:hasPermission simplePermission:ManageProxies ;
@@ -17,11 +19,27 @@ auth:ADMIN
     auth:hasPermission simplePermission:SeeStartupStatus ;
     auth:hasPermission simplePermission:UseAdvancedDataToolsPages ;
     auth:hasPermission simplePermission:UseMiscellaneousAdminPages ;
+    
+    # permissions for CURATOR and above.
+    auth:hasPermission simplePermission:EditOntology ;
+    auth:hasPermission simplePermission:EditSiteInformation ;
+    auth:hasPermission simplePermission:ManagePortals ;
+    auth:hasPermission simplePermission:ManageTabs ;
+    auth:hasPermission simplePermission:SeeVerbosePropertyInformation ;
+    auth:hasPermission simplePermission:UseMiscellaneousCuratorPages ;
     .
 
 auth:CURATOR 
     a auth:PermissionSet ;
     rdfs:label "Curator" ;
+    
+    # permissions for CURATOR and above.
+    auth:hasPermission simplePermission:EditOntology ;
+    auth:hasPermission simplePermission:EditSiteInformation ;
+    auth:hasPermission simplePermission:ManagePortals ;
+    auth:hasPermission simplePermission:ManageTabs ;
+    auth:hasPermission simplePermission:SeeVerbosePropertyInformation ;
+    auth:hasPermission simplePermission:UseMiscellaneousCuratorPages ;
     .
 
 auth:EDITOR 

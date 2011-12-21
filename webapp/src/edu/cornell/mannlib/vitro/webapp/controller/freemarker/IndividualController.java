@@ -32,8 +32,8 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeVerbosePropertyInformation;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
@@ -169,7 +169,7 @@ public class IndividualController extends FreemarkerHttpServlet {
         
         Map<String, Object> map = null;
         
-        if (PolicyHelper.isAuthorizedForActions(vreq, new SeeVerbosePropertyInformation())) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.SEE_VERBOSE_PROPERTY_INFORMATION.ACTIONS)) {
             // Get current verbose property display value
             String verbose = vreq.getParameter("verbose");
             Boolean verboseValue;

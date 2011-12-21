@@ -8,8 +8,8 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeVerbosePropertyInformation;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -65,7 +65,8 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
             return;
         }
         
-        if (!PolicyHelper.isAuthorizedForActions(vreq, new SeeVerbosePropertyInformation())) {
+		if (!PolicyHelper.isAuthorizedForActions(vreq,
+				SimplePermission.SEE_VERBOSE_PROPERTY_INFORMATION.ACTIONS)) {
             return;
         }
         

@@ -28,12 +28,20 @@ public class SimplePermission implements Permission {
 
 	public static final SimplePermission ACCESS_SPECIAL_DATA_MODELS = new SimplePermission(
 			"AccessSpecialDataModels");
+	public static final SimplePermission EDIT_ONTOLOGY = new SimplePermission(
+			"EditOntology");
+	public static final SimplePermission EDIT_SITE_INFORMATION = new SimplePermission(
+			"EditSiteInformation");
 	public static final SimplePermission MANAGE_MENUS = new SimplePermission(
 			"ManageMenus");
+	public static final SimplePermission MANAGE_PORTALS = new SimplePermission(
+			"ManagePortals");
 	public static final SimplePermission MANAGE_PROXIES = new SimplePermission(
 			"ManageProxies");
 	public static final SimplePermission MANAGE_SEARCH_INDEX = new SimplePermission(
 			"ManageSearchIndex");
+	public static final SimplePermission MANAGE_TABS = new SimplePermission(
+			"ManageTabs");
 	public static final SimplePermission MANAGE_USER_ACCOUNTS = new SimplePermission(
 			"ManageUserAccounts");
 	public static final SimplePermission REBUILD_VCLASS_GROUP_CACHE = new SimplePermission(
@@ -42,10 +50,14 @@ public class SimplePermission implements Permission {
 			"RefreshVisualizationCache");
 	public static final SimplePermission SEE_STARTUP_STATUS = new SimplePermission(
 			"SeeStartupStatus");
+	public static final SimplePermission SEE_VERBOSE_PROPERTY_INFORMATION = new SimplePermission(
+			"SeeVerbosePropertyInformation");
 	public static final SimplePermission USE_ADVANCED_DATA_TOOLS_PAGES = new SimplePermission(
 			"UseAdvancedDataToolsPages");
 	public static final SimplePermission USE_MISCELLANEOUS_ADMIN_PAGES = new SimplePermission(
 			"UseMiscellaneousAdminPages");
+	public static final SimplePermission USE_MISCELLANEOUS_CURATOR_PAGES = new SimplePermission(
+			"UseMiscellaneousCuratorPages");
 
 	public static List<SimplePermission> getAllInstances() {
 		return new ArrayList<SimplePermission>(allInstances.values());
