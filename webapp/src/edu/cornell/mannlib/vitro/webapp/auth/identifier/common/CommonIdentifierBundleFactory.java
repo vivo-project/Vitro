@@ -5,6 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.auth.identifier.common;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
@@ -19,11 +21,15 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundleFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.Permission;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionRegistry;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
+import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 /**
@@ -53,6 +59,7 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 		bundle.addAll(createRoleLevelIdentifiers(req));
 		bundle.addAll(createBlacklistOrAssociatedIndividualIdentifiers(req));
 		bundle.addAll(createExplicitProxyEditingIdentifiers(req));
+		bundle.addAll(createPermissionIdentifiers(req));
 
 		return bundle;
 	}
@@ -141,7 +148,8 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 	}
 
 	/**
-	 * Get all Individuals associated with the current user by explicit proxy relationship.
+	 * Get all Individuals associated with the current user by explicit proxy
+	 * relationship.
 	 */
 	private Collection<? extends Identifier> createExplicitProxyEditingIdentifiers(
 			HttpServletRequest req) {
@@ -149,11 +157,49 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 
 		UserAccount user = LoginStatusBean.getCurrentUser(req);
 		if (user != null) {
-			for(String proxiedUri: user.getProxiedIndividualUris()) {
+			for (String proxiedUri : user.getProxiedIndividualUris()) {
 				ids.add(new HasProxyEditingRights(proxiedUri));
 			}
 		}
 
+		return ids;
+	}
+
+	/**
+	 * Create an identifier for each Permission that the User has.
+	 */
+	private Collection<? extends Identifier> createPermissionIdentifiers(
+			HttpServletRequest req) {
+		Collection<Identifier> ids = new ArrayList<Identifier>();
+
+		UserAccount user = LoginStatusBean.getCurrentUser(req);
+		if (user == null) {
+			log.debug("No Permissions: not logged in.");
+			return ids;
+		}
+
+		WebappDaoFactory wdf = (WebappDaoFactory) context
+				.getAttribute("webappDaoFactory");
+		if (wdf == null) {
+			log.error("Could not get a WebappDaoFactory from the ServletContext");
+			return ids;
+		}
+		
+		Set<String> permissionUris = new HashSet<String>();
+		UserAccountsDao uaDao = wdf.getUserAccountsDao();
+		for (String psUri: user.getPermissionSetUris()) {
+			PermissionSet ps = uaDao.getPermissionSetByUri(psUri);
+			if (ps != null) {
+				permissionUris.addAll(ps.getPermissionUris());
+			}
+		}
+		
+		PermissionRegistry registry = PermissionRegistry.getRegistry(context);
+		for (String permissionUri: permissionUris) {
+			Permission permission = registry.getPermission(permissionUri);
+			ids.add(new HasPermission(permission));
+		}
+		
 		return ids;
 	}
 

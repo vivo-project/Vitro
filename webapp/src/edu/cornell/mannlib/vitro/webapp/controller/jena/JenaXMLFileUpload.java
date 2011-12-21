@@ -33,12 +33,9 @@ import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 
-import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 
 public class JenaXMLFileUpload  extends JenaIngestController  {	
@@ -103,7 +100,8 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
             throw new ServletException("Must POST a multipart encoded request");
         }
 
-        if (!isAuthorizedToDisplayPage(request, resp, new Actions(new UseAdvancedDataToolsPages()))) {
+		if (!isAuthorizedToDisplayPage(request, resp,
+				SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTIONS)) {
         	return;
         }
 
@@ -155,7 +153,8 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
 	@Override	
 	public void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {		
-        if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseAdvancedDataToolsPages()))) {
+		if (!isAuthorizedToDisplayPage(request, response,
+				SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTIONS)) {
         	return;
         }
 

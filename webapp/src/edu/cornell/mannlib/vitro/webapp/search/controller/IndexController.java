@@ -16,8 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageSearchIndex;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -81,8 +81,7 @@ public class IndexController extends FreemarkerHttpServlet {
 	private static final String PAGE_URL = "/SearchIndex";
 	private static final String TEMPLATE_NAME = "searchIndex.ftl";
 
-	public static final Actions REQUIRED_ACTIONS = new Actions(
-			new ManageSearchIndex());
+	public static final Actions REQUIRED_ACTIONS = SimplePermission.MANAGE_SEARCH_INDEX.ACTIONS;
 
 	@Override
 	protected Actions requiredActions(VitroRequest vreq) {

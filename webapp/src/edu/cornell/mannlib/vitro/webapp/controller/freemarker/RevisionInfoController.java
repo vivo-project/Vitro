@@ -5,8 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeRevisionInfo;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -19,7 +19,7 @@ public class RevisionInfoController extends FreemarkerHttpServlet {
 	private static final long serialVersionUID = 1L;
     private static final String TEMPLATE_DEFAULT = "revisionInfo.ftl";
     
-    public static final Actions REQUIRED_ACTIONS = new Actions(new SeeRevisionInfo());
+    public static final Actions REQUIRED_ACTIONS = SimplePermission.SEE_REVISION_INFO.ACTIONS;
     
     @Override
     protected Actions requiredActions(VitroRequest vreq) {

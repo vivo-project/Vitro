@@ -7,8 +7,8 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -24,7 +24,7 @@ public class SimpleReasonerRecomputeController extends FreemarkerHttpServlet {
     
     @Override
 	protected Actions requiredActions(VitroRequest vreq) {
-    	return new Actions(new UseMiscellaneousAdminPages());
+    	return SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTIONS;
 	}
 
 	protected ResponseValues processRequest(VitroRequest vreq) { 

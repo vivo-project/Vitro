@@ -7,8 +7,8 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageProxies;
 import edu.cornell.mannlib.vitro.webapp.controller.AbstractPageHandler.Message;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
@@ -27,7 +27,7 @@ public class ManageProxiesController extends FreemarkerHttpServlet {
 
 	@Override
 	protected Actions requiredActions(VitroRequest vreq) {
-		return new Actions(new ManageProxies());
+		return SimplePermission.MANAGE_PROXIES.ACTIONS;
 	}
 
 	@Override

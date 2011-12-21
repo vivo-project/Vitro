@@ -382,7 +382,7 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 				Resource s = getOntModel().createResource(uri);
 				getOntModel().remove(s, p, o);
 			}
-			for (String uri: addThese) {
+			for (String uri : addThese) {
 				Resource s = getOntModel().createResource(uri);
 				getOntModel().add(s, p, o);
 			}
@@ -410,6 +410,8 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 			PermissionSet ps = new PermissionSet();
 			ps.setUri(uri);
 			ps.setLabel(getPropertyStringValue(r, RDFS.label));
+			ps.setDefaultForNewUsers(isResourceOfType(r,
+					DEFAULT_PERMISSION_SET_FOR_NEW_USERS));
 			ps.setPermissionUris(getPropertyResourceURIValues(r,
 					PERMISSIONSET_HAS_PERMISSION));
 			return ps;
@@ -434,6 +436,8 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 					PermissionSet ps = new PermissionSet();
 					ps.setUri(r.getURI());
 					ps.setLabel(getPropertyStringValue(r, RDFS.label));
+					ps.setDefaultForNewUsers(isResourceOfType(r,
+							DEFAULT_PERMISSION_SET_FOR_NEW_USERS));
 					ps.setPermissionUris(getPropertyResourceURIValues(r,
 							PERMISSIONSET_HAS_PERMISSION));
 					list.add(ps);

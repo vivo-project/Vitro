@@ -11,8 +11,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 
 public class NamespacePrefixRetryController extends BaseEditController {
@@ -20,7 +19,8 @@ public class NamespacePrefixRetryController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(NamespacePrefixRetryController.class.getName());
 	
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
-        if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseMiscellaneousAdminPages()))) {
+		if (!isAuthorizedToDisplayPage(request, response,
+				SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTIONS)) {
         	return;
         }
 

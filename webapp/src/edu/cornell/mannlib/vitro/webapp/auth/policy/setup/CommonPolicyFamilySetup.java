@@ -11,6 +11,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.CommonIdentifierB
 import edu.cornell.mannlib.vitro.webapp.auth.policy.DisplayRestrictedDataByRoleLevelPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.DisplayRestrictedDataToSelfPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.EditRestrictedDataByRoleLevelPolicy;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PermissionsPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.SelfEditingPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.UseRestrictedPagesByRoleLevelPolicy;
@@ -27,6 +28,8 @@ public class CommonPolicyFamilySetup implements ServletContextListener {
 		StartupStatus ss = StartupStatus.getBean(ctx);
 
 		try {
+			ServletPolicyList.addPolicy(ctx, new PermissionsPolicy());
+
 			ServletPolicyList.addPolicy(ctx,
 					new DisplayRestrictedDataByRoleLevelPolicy(ctx));
 			ServletPolicyList.addPolicy(ctx,

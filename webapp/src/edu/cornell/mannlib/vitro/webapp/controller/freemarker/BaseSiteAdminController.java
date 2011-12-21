@@ -15,18 +15,9 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.util.FormUtils;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoBackEndEditing;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditSiteInformation;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageProxies;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeSiteAdminPage;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeStartupStatus;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
@@ -43,7 +34,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
     private static final Log log = LogFactory.getLog(BaseSiteAdminController.class);
     protected static final String TEMPLATE_DEFAULT = "siteAdmin-main.ftl";
 
-    public static final Actions REQUIRED_ACTIONS = new Actions(new SeeSiteAdminPage());
+    public static final Actions REQUIRED_ACTIONS = SimplePermission.SEE_SITE_ADMIN_PAGE.ACTIONS;
     
     @Override
 	protected Actions requiredActions(VitroRequest vreq) {
@@ -73,10 +64,8 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
         
         Map<String, String> urls = new HashMap<String, String>();
 
-        if (PolicyHelper.isAuthorizedForActions(vreq, new UseMiscellaneousAdminPages())) {
-
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTIONS)) {
             urls.put("recomputeInferences", UrlBuilder.getUrl("/RecomputeInferences"));     
-        
             urls.put("rebuildClassGroupCache", UrlBuilder.getUrl("/browse?clearcache=1"));
         }
         
@@ -91,7 +80,8 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
     
         Map<String, Object> map = new HashMap<String, Object>();
         
-        if (PolicyHelper.isAuthorizedForActions(vreq, new DoBackEndEditing())) {
+		if (PolicyHelper.isAuthorizedForActions(vreq,
+				SimplePermission.DO_BACK_END_EDITING.ACTIONS)) {
 
             map.put("formAction", UrlBuilder.getUrl("/editRequestDispatch"));
             
@@ -128,25 +118,25 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 
         Map<String, Object> data = new HashMap<String, Object>();
         
-        if (PolicyHelper.isAuthorizedForActions(vreq, new ManageUserAccounts())) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.MANAGE_USER_ACCOUNTS.ACTIONS)) {
         	data.put("userAccounts", UrlBuilder.getUrl("/accountsAdmin"));
         }
  
-        if (PolicyHelper.isAuthorizedForActions(vreq, new ManageProxies())) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.MANAGE_PROXIES.ACTIONS)) {
         	data.put("manageProxies", UrlBuilder.getUrl("/manageProxies"));
         }
         
-        if (PolicyHelper.isAuthorizedForActions(vreq, new EditSiteInformation())) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.EDIT_SITE_INFORMATION.ACTIONS)) {
             data.put("siteInfo", UrlBuilder.getUrl("/editForm", "controller", "ApplicationBean"));
         }
         
-        if (PolicyHelper.isAuthorizedForActions(vreq, new ManageMenus())) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.MANAGE_MENUS.ACTIONS)) {
             data.put("menuManagement", UrlBuilder.getUrl("/individual",
                     "uri", "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#DefaultMenu",
                     "switchToDisplayModel", "true"));
         }
         
-        if (PolicyHelper.isAuthorizedForActions(vreq, new SeeStartupStatus())) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.SEE_STARTUP_STATUS.ACTIONS)) {
         	data.put("startupStatus", UrlBuilder.getUrl("/startupStatus"));
         	data.put("startupStatusAlert", !StartupStatus.getBean(getServletContext()).allClear());
         }
@@ -158,7 +148,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 
         Map<String, Object> map = new HashMap<String, Object>();
  
-        if (PolicyHelper.isAuthorizedForActions(vreq, new EditOntology())) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.EDIT_ONTOLOGY.ACTIONS)) {
             
             String pelletError = null;
             String pelletExplanation = null;
@@ -200,7 +190,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 
         Map<String, String> urls = new HashMap<String, String>();
         
-        if (PolicyHelper.isAuthorizedForActions(vreq, new UseAdvancedDataToolsPages())) {            
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTIONS)) {            
             urls.put("ingest", UrlBuilder.getUrl("/ingest"));
             urls.put("rdfData", UrlBuilder.getUrl("/uploadRDFForm"));
             urls.put("rdfExport", UrlBuilder.getUrl("/export"));

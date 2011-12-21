@@ -5,8 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
@@ -19,7 +19,7 @@ public class MenuN3EditController extends FreemarkerHttpServlet {
     
     protected final static String N3_PARAM = "navigationN3";
     
-    public final static Actions REQUIRED_ACTIONS = new Actions(new ManageMenus());
+    public final static Actions REQUIRED_ACTIONS = SimplePermission.MANAGE_MENUS.ACTIONS;
     
     @Override
     protected Actions requiredActions(VitroRequest vreq) {
