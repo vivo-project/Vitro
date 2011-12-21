@@ -7,8 +7,8 @@ import java.util.Collection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
@@ -29,7 +29,7 @@ public class UserAccountsAdminController extends FreemarkerHttpServlet {
 
 	@Override
 	protected Actions requiredActions(VitroRequest vreq) {
-		return new Actions(new ManageUserAccounts());
+		return SimplePermission.MANAGE_USER_ACCOUNTS.ACTIONS;
 	}
 
 	@Override

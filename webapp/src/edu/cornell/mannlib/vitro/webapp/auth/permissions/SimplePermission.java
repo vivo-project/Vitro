@@ -10,7 +10,6 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.auth.permissions.Permission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleRequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
@@ -27,8 +26,26 @@ public class SimplePermission implements Permission {
 
 	private static final Map<String, SimplePermission> allInstances = new HashMap<String, SimplePermission>();
 
+	public static final SimplePermission ACCESS_SPECIAL_DATA_MODELS = new SimplePermission(
+			"AccessSpecialDataModels");
 	public static final SimplePermission MANAGE_MENUS = new SimplePermission(
 			"ManageMenus");
+	public static final SimplePermission MANAGE_PROXIES = new SimplePermission(
+			"ManageProxies");
+	public static final SimplePermission MANAGE_SEARCH_INDEX = new SimplePermission(
+			"ManageSearchIndex");
+	public static final SimplePermission MANAGE_USER_ACCOUNTS = new SimplePermission(
+			"ManageUserAccounts");
+	public static final SimplePermission REBUILD_VCLASS_GROUP_CACHE = new SimplePermission(
+			"RebuildVClassGroupCache");
+	public static final SimplePermission REFRESH_VISUALIZATION_CACHE = new SimplePermission(
+			"RefreshVisualizationCache");
+	public static final SimplePermission SEE_STARTUP_STATUS = new SimplePermission(
+			"SeeStartupStatus");
+	public static final SimplePermission USE_ADVANCED_DATA_TOOLS_PAGES = new SimplePermission(
+			"UseAdvancedDataToolsPages");
+	public static final SimplePermission USE_MISCELLANEOUS_ADMIN_PAGES = new SimplePermission(
+			"UseMiscellaneousAdminPages");
 
 	public static List<SimplePermission> getAllInstances() {
 		return new ArrayList<SimplePermission>(allInstances.values());

@@ -7,7 +7,16 @@
 auth:ADMIN 
     a auth:PermissionSet ;
     rdfs:label "Site Admin" ;
+    auth:hasPermission simplePermission:AccessSpecialDataModels ;
     auth:hasPermission simplePermission:ManageMenus ;
+    auth:hasPermission simplePermission:ManageProxies ;
+    auth:hasPermission simplePermission:ManageSearchIndex ;
+    auth:hasPermission simplePermission:ManageUserAccounts ;
+    auth:hasPermission simplePermission:RebuildVClassGroupCache ;
+    auth:hasPermission simplePermission:RefreshVisualizationCache ;
+    auth:hasPermission simplePermission:SeeStartupStatus ;
+    auth:hasPermission simplePermission:UseAdvancedDataToolsPages ;
+    auth:hasPermission simplePermission:UseMiscellaneousAdminPages ;
     .
 
 auth:CURATOR 

@@ -21,12 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoBackEndEditing;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditSiteInformation;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageProxies;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageUserAccounts;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeSiteAdminPage;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeStartupStatus;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
@@ -73,10 +68,8 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
         
         Map<String, String> urls = new HashMap<String, String>();
 
-        if (PolicyHelper.isAuthorizedForActions(vreq, new UseMiscellaneousAdminPages())) {
-
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTIONS)) {
             urls.put("recomputeInferences", UrlBuilder.getUrl("/RecomputeInferences"));     
-        
             urls.put("rebuildClassGroupCache", UrlBuilder.getUrl("/browse?clearcache=1"));
         }
         
@@ -128,11 +121,11 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 
         Map<String, Object> data = new HashMap<String, Object>();
         
-        if (PolicyHelper.isAuthorizedForActions(vreq, new ManageUserAccounts())) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.MANAGE_USER_ACCOUNTS.ACTIONS)) {
         	data.put("userAccounts", UrlBuilder.getUrl("/accountsAdmin"));
         }
  
-        if (PolicyHelper.isAuthorizedForActions(vreq, new ManageProxies())) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.MANAGE_PROXIES.ACTIONS)) {
         	data.put("manageProxies", UrlBuilder.getUrl("/manageProxies"));
         }
         
@@ -140,13 +133,13 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
             data.put("siteInfo", UrlBuilder.getUrl("/editForm", "controller", "ApplicationBean"));
         }
         
-        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.MANAGE_MENUS.ACTION)) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.MANAGE_MENUS.ACTIONS)) {
             data.put("menuManagement", UrlBuilder.getUrl("/individual",
                     "uri", "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#DefaultMenu",
                     "switchToDisplayModel", "true"));
         }
         
-        if (PolicyHelper.isAuthorizedForActions(vreq, new SeeStartupStatus())) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.SEE_STARTUP_STATUS.ACTIONS)) {
         	data.put("startupStatus", UrlBuilder.getUrl("/startupStatus"));
         	data.put("startupStatusAlert", !StartupStatus.getBean(getServletContext()).allClear());
         }
@@ -200,7 +193,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 
         Map<String, String> urls = new HashMap<String, String>();
         
-        if (PolicyHelper.isAuthorizedForActions(vreq, new UseAdvancedDataToolsPages())) {            
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTIONS)) {            
             urls.put("ingest", UrlBuilder.getUrl("/ingest"));
             urls.put("rdfData", UrlBuilder.getUrl("/uploadRDFForm"));
             urls.put("rdfExport", UrlBuilder.getUrl("/export"));

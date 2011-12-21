@@ -19,8 +19,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.sparql.resultset.ResultSetFormat;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 
 /**
  *  This servlet works as a RequestDispatcher to direct to the sparl query builder page.
@@ -72,7 +71,8 @@ public class SparqlQueryBuilderServlet extends BaseEditController {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException
     {    	    	   	
-    	if (!isAuthorizedToDisplayPage(request, response, new Actions(new UseAdvancedDataToolsPages()))) {
+		if (!isAuthorizedToDisplayPage(request, response,
+				SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTIONS)) {
     		return;
     	}
 
