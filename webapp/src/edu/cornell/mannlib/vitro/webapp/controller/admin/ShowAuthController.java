@@ -6,11 +6,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.ServletContext;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndividual;
@@ -42,7 +44,7 @@ public class ShowAuthController extends FreemarkerHttpServlet {
 
 		Map<String, Object> body = new HashMap<String, Object>();
 
-		body.put("identifiers", RequestIdentifiers.getIdBundleForRequest(vreq));
+		body.put("identifiers", getSortedIdentifiers(vreq));
 		body.put("currentUser", LoginStatusBean.getCurrentUser(vreq));
 		body.put("associatedIndividuals", getAssociatedIndividuals(vreq));
 		body.put("factories", getIdentifierFactoryNames(vreq));
@@ -50,6 +52,14 @@ public class ShowAuthController extends FreemarkerHttpServlet {
 		body.put("matchingProperty", getMatchingProperty(vreq));
 
 		return new TemplateResponseValues("admin-showAuth.ftl", body);
+	}
+
+	private List<Identifier> getSortedIdentifiers(VitroRequest vreq) {
+		Map<String, Identifier> idMap = new TreeMap<String, Identifier>();
+		for (Identifier id: RequestIdentifiers.getIdBundleForRequest(vreq)) {
+			idMap.put(id.toString(), id);
+		}
+		return new ArrayList<Identifier>(idMap.values());
 	}
 
 	private List<String> getIdentifierFactoryNames(VitroRequest vreq) {

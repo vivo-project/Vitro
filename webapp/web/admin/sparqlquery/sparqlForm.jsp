@@ -6,8 +6,8 @@
 <%@page import="java.util.List"%>
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
-<%@page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManagePortals" %>
-<% request.setAttribute("requestedActions", new ManagePortals()); %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission" %>
+<% request.setAttribute("requestedActions", SimplePermission.MANAGE_PORTALS.ACTION); %>
 <vitro:confirmAuthorization />
 
 <body>
