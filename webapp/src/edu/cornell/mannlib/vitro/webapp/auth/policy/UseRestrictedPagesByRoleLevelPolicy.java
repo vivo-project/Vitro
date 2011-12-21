@@ -13,15 +13,10 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.querymodel.QueryFullModel;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.querymodel.QueryUserAccountsModel;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoBackEndEditing;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoFrontEndEditing;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOwnAccount;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageOwnProxies;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeIndividualEditingPanel;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeRevisionInfo;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeSiteAdminPage;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousEditorPages;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousPages;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 
@@ -46,22 +41,7 @@ public class UseRestrictedPagesByRoleLevelPolicy implements PolicyIface {
 		RoleLevel userRole = HasRoleLevel.getUsersRoleLevel(whoToAuth);
 
 		PolicyDecision result;
-		if (whatToAuth instanceof DoBackEndEditing) {
-			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
-
-		} else if (whatToAuth instanceof SeeSiteAdminPage) {
-			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
-
-		} else if (whatToAuth instanceof SeeRevisionInfo) {
-			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
-
-		} else if (whatToAuth instanceof SeeIndividualEditingPanel) {
-			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
-			
-		} else if (whatToAuth instanceof UseMiscellaneousEditorPages) {
-			result = isAuthorized(whatToAuth, RoleLevel.EDITOR, userRole);
-			
-		} else if (whatToAuth instanceof UseBasicAjaxControllers) {
+		if (whatToAuth instanceof UseBasicAjaxControllers) {
 			result = isAuthorized(whatToAuth, RoleLevel.SELF, userRole);
 			
 		} else if (whatToAuth instanceof UseMiscellaneousPages) {

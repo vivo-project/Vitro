@@ -28,6 +28,8 @@ public class SimplePermission implements Permission {
 
 	public static final SimplePermission ACCESS_SPECIAL_DATA_MODELS = new SimplePermission(
 			"AccessSpecialDataModels");
+	public static final SimplePermission DO_BACK_END_EDITING = new SimplePermission(
+			"DoBackEndEditing");
 	public static final SimplePermission EDIT_ONTOLOGY = new SimplePermission(
 			"EditOntology");
 	public static final SimplePermission EDIT_SITE_INFORMATION = new SimplePermission(
@@ -48,6 +50,12 @@ public class SimplePermission implements Permission {
 			"RebuildVClassGroupCache");
 	public static final SimplePermission REFRESH_VISUALIZATION_CACHE = new SimplePermission(
 			"RefreshVisualizationCache");
+	public static final SimplePermission SEE_INDVIDUAL_EDITING_PANEL = new SimplePermission(
+			"SeeIndividualEditingPanel");
+	public static final SimplePermission SEE_REVISION_INFO = new SimplePermission(
+			"SeeRevisionInfo");
+	public static final SimplePermission SEE_SITE_ADMIN_PAGE = new SimplePermission(
+			"SeeSiteAdminPage");
 	public static final SimplePermission SEE_STARTUP_STATUS = new SimplePermission(
 			"SeeStartupStatus");
 	public static final SimplePermission SEE_VERBOSE_PROPERTY_INFORMATION = new SimplePermission(
@@ -58,6 +66,8 @@ public class SimplePermission implements Permission {
 			"UseMiscellaneousAdminPages");
 	public static final SimplePermission USE_MISCELLANEOUS_CURATOR_PAGES = new SimplePermission(
 			"UseMiscellaneousCuratorPages");
+	public static final SimplePermission USE_MISCELLANEOUS_EDITOR_PAGES = new SimplePermission(
+			"UseMiscellaneousEditorPages");
 
 	public static List<SimplePermission> getAllInstances() {
 		return new ArrayList<SimplePermission>(allInstances.values());

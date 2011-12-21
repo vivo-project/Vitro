@@ -18,8 +18,6 @@ import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoBackEndEditing;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeSiteAdminPage;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
@@ -36,7 +34,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
     private static final Log log = LogFactory.getLog(BaseSiteAdminController.class);
     protected static final String TEMPLATE_DEFAULT = "siteAdmin-main.ftl";
 
-    public static final Actions REQUIRED_ACTIONS = new Actions(new SeeSiteAdminPage());
+    public static final Actions REQUIRED_ACTIONS = SimplePermission.SEE_SITE_ADMIN_PAGE.ACTIONS;
     
     @Override
 	protected Actions requiredActions(VitroRequest vreq) {
@@ -82,7 +80,8 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
     
         Map<String, Object> map = new HashMap<String, Object>();
         
-        if (PolicyHelper.isAuthorizedForActions(vreq, new DoBackEndEditing())) {
+		if (PolicyHelper.isAuthorizedForActions(vreq,
+				SimplePermission.DO_BACK_END_EDITING.ACTIONS)) {
 
             map.put("formAction", UrlBuilder.getUrl("/editRequestDispatch"));
             

@@ -27,6 +27,13 @@ auth:ADMIN
     auth:hasPermission simplePermission:ManageTabs ;
     auth:hasPermission simplePermission:SeeVerbosePropertyInformation ;
     auth:hasPermission simplePermission:UseMiscellaneousCuratorPages ;
+    
+    # permissions for EDITOR and above.
+    auth:hasPermission simplePermission:DoBackEndEditing ;
+    auth:hasPermission simplePermission:SeeIndividualEditingPanel ;
+    auth:hasPermission simplePermission:SeeRevisionInfo ;
+    auth:hasPermission simplePermission:SeeSiteAdminPage ;
+    auth:hasPermission simplePermission:UseMiscellaneousEditorPages ;
     .
 
 auth:CURATOR 
@@ -40,11 +47,25 @@ auth:CURATOR
     auth:hasPermission simplePermission:ManageTabs ;
     auth:hasPermission simplePermission:SeeVerbosePropertyInformation ;
     auth:hasPermission simplePermission:UseMiscellaneousCuratorPages ;
+    
+    # permissions for EDITOR and above.
+    auth:hasPermission simplePermission:DoBackEndEditing ;
+    auth:hasPermission simplePermission:SeeIndividualEditingPanel ;
+    auth:hasPermission simplePermission:SeeRevisionInfo ;
+    auth:hasPermission simplePermission:SeeSiteAdminPage ;
+    auth:hasPermission simplePermission:UseMiscellaneousEditorPages ;
     .
 
 auth:EDITOR 
     a auth:PermissionSet ;
     rdfs:label "Editor" ;
+    
+    # permissions for EDITOR and above.
+    auth:hasPermission simplePermission:DoBackEndEditing ;
+    auth:hasPermission simplePermission:SeeIndividualEditingPanel ;
+    auth:hasPermission simplePermission:SeeRevisionInfo ;
+    auth:hasPermission simplePermission:SeeSiteAdminPage ;
+    auth:hasPermission simplePermission:UseMiscellaneousEditorPages ;
     .
 
 auth:SELF_EDITOR
