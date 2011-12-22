@@ -18,7 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
  * A class of simple permissions. Each instance holds a RequestedAction, and
  * will only authorize that RequestedAction (or one with the same URI).
  */
-public class SimplePermission implements Permission {
+public class SimplePermission extends Permission {
 	private static final Log log = LogFactory.getLog(SimplePermission.class);
 
 	private static final String NAMESPACE = "java:"
@@ -88,18 +88,17 @@ public class SimplePermission implements Permission {
 	}
 
 	private final String localName;
-	private final String uri;
 	public final RequestedAction ACTION;
 	public final Actions ACTIONS;
 
 	public SimplePermission(String localName) {
+		super(NAMESPACE + localName);
+		
 		if (localName == null) {
 			throw new NullPointerException("name may not be null.");
 		}
 
 		this.localName = localName;
-		this.uri = NAMESPACE + localName;
-
 		this.ACTION = new SimpleRequestedAction(localName);
 		this.ACTIONS = new Actions(this.ACTION);
 
@@ -110,19 +109,12 @@ public class SimplePermission implements Permission {
 		allInstances.put(uri, this);
 	}
 
-	@Override
 	public String getLocalName() {
 		return this.localName;
 	}
 
-	@Override
 	public String getNamespace() {
 		return NAMESPACE;
-	}
-
-	@Override
-	public String getUri() {
-		return NAMESPACE + this.localName;
 	}
 
 	@Override
