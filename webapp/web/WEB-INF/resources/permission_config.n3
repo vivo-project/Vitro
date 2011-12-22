@@ -42,6 +42,9 @@ auth:ADMIN
     auth:hasPermission simplePermission:QueryUserAccountsModel ;
     auth:hasPermission simplePermission:UseBasicAjaxControllers ;
     auth:hasPermission simplePermission:UseMiscellaneousPages ;
+    
+    # permissions for ANY user, even if they are not logged in.
+    auth:hasPermission simplePermission:QueryFullModel ;
     .
 
 auth:CURATOR 
@@ -70,6 +73,9 @@ auth:CURATOR
     auth:hasPermission simplePermission:QueryUserAccountsModel ;
     auth:hasPermission simplePermission:UseBasicAjaxControllers ;
     auth:hasPermission simplePermission:UseMiscellaneousPages ;
+    
+    # permissions for ANY user, even if they are not logged in.
+    auth:hasPermission simplePermission:QueryFullModel ;
     .
 
 auth:EDITOR 
@@ -90,11 +96,14 @@ auth:EDITOR
     auth:hasPermission simplePermission:QueryUserAccountsModel ;
     auth:hasPermission simplePermission:UseBasicAjaxControllers ;
     auth:hasPermission simplePermission:UseMiscellaneousPages ;
+    
+    # permissions for ANY user, even if they are not logged in.
+    auth:hasPermission simplePermission:QueryFullModel ;
     .
 
 auth:SELF_EDITOR
     a auth:PermissionSet ;
-    a auth:DefaultPermissionSetForNewUsers ;
+    a auth:PermissionSetForNewUsers ;
     rdfs:label "Self Editor" ;
 
     # permissions for ANY logged-in user.
@@ -104,4 +113,16 @@ auth:SELF_EDITOR
     auth:hasPermission simplePermission:QueryUserAccountsModel ;
     auth:hasPermission simplePermission:UseBasicAjaxControllers ;
     auth:hasPermission simplePermission:UseMiscellaneousPages ;
+    
+    # permissions for ANY user, even if they are not logged in.
+    auth:hasPermission simplePermission:QueryFullModel ;
+    .
+
+auth:PUBLIC
+    a auth:PermissionSet ;
+    a auth:PermissionSetForPublic ;
+    rdfs:label "Public" ;
+    
+    # permissions for ANY user, even if they are not logged in.
+    auth:hasPermission simplePermission:QueryFullModel ;
     .

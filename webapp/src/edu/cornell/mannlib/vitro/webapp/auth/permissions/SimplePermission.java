@@ -52,6 +52,8 @@ public class SimplePermission implements Permission {
 			"ManageTabs");
 	public static final SimplePermission MANAGE_USER_ACCOUNTS = new SimplePermission(
 			"ManageUserAccounts");
+	public static final SimplePermission QUERY_FULL_MODEL = new SimplePermission(
+			"QueryFullModel");
 	public static final SimplePermission QUERY_USER_ACCOUNTS_MODEL = new SimplePermission(
 			"QueryUserAccountsModel");
 	public static final SimplePermission REBUILD_VCLASS_GROUP_CACHE = new SimplePermission(

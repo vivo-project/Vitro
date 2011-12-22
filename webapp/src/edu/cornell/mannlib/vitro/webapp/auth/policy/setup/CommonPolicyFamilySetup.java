@@ -14,7 +14,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.EditRestrictedDataByRoleLeve
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PermissionsPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.SelfEditingPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.UseRestrictedPagesByRoleLevelPolicy;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
@@ -36,8 +35,6 @@ public class CommonPolicyFamilySetup implements ServletContextListener {
 					new DisplayRestrictedDataToSelfPolicy(ctx));
 			ServletPolicyList.addPolicy(ctx,
 					new EditRestrictedDataByRoleLevelPolicy(ctx));
-			ServletPolicyList.addPolicy(ctx,
-					new UseRestrictedPagesByRoleLevelPolicy());
 
 			ServletPolicyList.addPolicy(ctx, new SelfEditingPolicy(ctx));
 

@@ -28,7 +28,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.querymodel.QueryFullModel;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 
@@ -55,7 +54,7 @@ public class SparqlQueryAjaxController extends VitroAjaxController {
 		if (OPTION_MODEL_USER_ACCOUNTS.equals(modelParam)) {
 			return SimplePermission.QUERY_USER_ACCOUNTS_MODEL.ACTIONS;
 		} else {
-			return new Actions(new QueryFullModel());
+			return SimplePermission.QUERY_FULL_MODEL.ACTIONS;
 		}
 	}
 

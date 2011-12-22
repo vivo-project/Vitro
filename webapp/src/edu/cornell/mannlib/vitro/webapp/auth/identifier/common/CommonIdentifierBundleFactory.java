@@ -170,13 +170,16 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 	 */
 	private Collection<? extends Identifier> createPermissionIdentifiers(
 			HttpServletRequest req) {
-		Collection<Identifier> ids = new ArrayList<Identifier>();
-
 		UserAccount user = LoginStatusBean.getCurrentUser(req);
 		if (user == null) {
-			log.debug("No Permissions: not logged in.");
-			return ids;
+			return createPublicPermissions();
+		} else {
+			return createUserPermissions(user);
 		}
+	}
+
+	private Collection<? extends Identifier> createPublicPermissions() {
+		Collection<Identifier> ids = new ArrayList<Identifier>();
 
 		WebappDaoFactory wdf = (WebappDaoFactory) context
 				.getAttribute("webappDaoFactory");
@@ -184,22 +187,51 @@ public class CommonIdentifierBundleFactory implements IdentifierBundleFactory {
 			log.error("Could not get a WebappDaoFactory from the ServletContext");
 			return ids;
 		}
-		
-		Set<String> permissionUris = new HashSet<String>();
+
 		UserAccountsDao uaDao = wdf.getUserAccountsDao();
-		for (String psUri: user.getPermissionSetUris()) {
+
+		Set<String> permissionUris = new HashSet<String>();
+		for (PermissionSet ps : uaDao.getAllPermissionSets()) {
+			if (ps.isForPublic()) {
+				permissionUris.addAll(ps.getPermissionUris());
+			}
+		}
+
+		PermissionRegistry registry = PermissionRegistry.getRegistry(context);
+		for (String permissionUri : permissionUris) {
+			Permission permission = registry.getPermission(permissionUri);
+			ids.add(new HasPermission(permission));
+		}
+
+		return ids;
+	}
+
+	private Collection<? extends Identifier> createUserPermissions(UserAccount user) {
+		Collection<Identifier> ids = new ArrayList<Identifier>();
+
+		WebappDaoFactory wdf = (WebappDaoFactory) context
+				.getAttribute("webappDaoFactory");
+		if (wdf == null) {
+			log.error("Could not get a WebappDaoFactory from the ServletContext");
+			return ids;
+		}
+
+		UserAccountsDao uaDao = wdf.getUserAccountsDao();
+
+		Set<String> permissionUris = new HashSet<String>();
+		for (String psUri : user.getPermissionSetUris()) {
 			PermissionSet ps = uaDao.getPermissionSetByUri(psUri);
 			if (ps != null) {
 				permissionUris.addAll(ps.getPermissionUris());
 			}
 		}
-		
+
 		PermissionRegistry registry = PermissionRegistry.getRegistry(context);
-		for (String permissionUri: permissionUris) {
+		for (String permissionUri : permissionUris) {
 			Permission permission = registry.getPermission(permissionUri);
 			ids.add(new HasPermission(permission));
 		}
-		
+
 		return ids;
 	}
 
