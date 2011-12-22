@@ -287,7 +287,7 @@ public class PermissionSetsLoader implements ServletContextListener {
 			checkForPermissionSetsWithoutLabels();
 			checkForReferencesToNonexistentPermissionSets();
 			checkForReferencesToNonexistentPermissions();
-			warnIfNoDefaultPermissionSetsForNewUsers();
+			warnIfNoPermissionSetsForNewUsers();
 		}
 
 		private void checkForPermissionSetsWithoutLabels() {
@@ -327,14 +327,14 @@ public class PermissionSetsLoader implements ServletContextListener {
 			}
 		}
 
-		private void warnIfNoDefaultPermissionSetsForNewUsers() {
+		private void warnIfNoPermissionSetsForNewUsers() {
 			for (PermissionSet ps : uaDao.getAllPermissionSets()) {
-				if (ps.isDefaultForNewUsers()) {
+				if (ps.isForNewUsers()) {
 					return;
 				}
 			}
 			ss.warning(listener, "No PermissionSet has been declared to be a "
-					+ "Default PermissionSet for new users.");
+					+ "PermissionSet for new users.");
 		}
 
 	}

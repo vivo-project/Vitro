@@ -31,8 +31,14 @@ mydomain:role1
 	
 mydomain:role2
 	a auth:PermissionSet ;
-    a auth:DefaultPermissionSetForNewUsers ;
+    a auth:PermissionSetForNewUsers ;
 	rdfs:label "Role 2" ;
+	.
+	
+mydomain:role3
+	a auth:PermissionSet ;
+    a auth:PermissionSetForPublic ;
+	rdfs:label "Role 3" ;
 	.
 	
 mydomain:permissionA

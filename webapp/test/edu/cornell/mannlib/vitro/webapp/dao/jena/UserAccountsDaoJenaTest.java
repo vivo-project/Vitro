@@ -358,9 +358,15 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		PermissionSet ps2 = new PermissionSet();
 		ps2.setUri(URI_ROLE2);
 		ps2.setLabel("Role 2");
-		ps2.setDefaultForNewUsers(true);
+		ps2.setForNewUsers(true);
 		expected.add(ps2);
 
+		PermissionSet ps3 = new PermissionSet();
+		ps3.setUri(URI_ROLE3);
+		ps3.setLabel("Role 3");
+		ps3.setForPublic(true);
+		expected.add(ps3);
+		
 		assertCorrectPermissionSets(expected, dao.getAllPermissionSets());
 	}
 
@@ -467,7 +473,8 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		map.put("uri", ps.getUri());
 		map.put("label", ps.getLabel());
 		map.put("permissions", ps.getPermissionUris());
-		map.put("defaultForNewUsers", ps.isDefaultForNewUsers());
+		map.put("forNewUsers", ps.isForNewUsers());
+		map.put("forPublic", ps.isForPublic());
 		return map;
 	}
 
