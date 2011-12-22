@@ -74,8 +74,7 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 		IndividualImpl ind = new IndividualImpl();
 		ind.setURI(SELFEDITOR_URI);
 
-		ids = new ArrayIdentifierBundle();
-		ids.add(new HasProfile(SELFEDITOR_URI));
+		ids = new ArrayIdentifierBundle(new HasProfile(SELFEDITOR_URI));
 	}
 
 	@Test
