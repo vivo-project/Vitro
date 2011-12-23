@@ -2,11 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts.admin;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -64,7 +65,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 	private boolean externalAuthOnly;
 	private String firstName = "";
 	private String lastName = "";
-	private String selectedRoleUri = "";
+	private Collection<String> selectedRoleUris = new ArrayList<String>();
 	private String associatedProfileUri = "";
 	private String newProfileClassUri = "";
 
@@ -101,7 +102,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 		externalAuthOnly = isFlagOnRequest(PARAMETER_EXTERNAL_AUTH_ONLY);
 		firstName = getStringParameter(PARAMETER_FIRST_NAME, "");
 		lastName = getStringParameter(PARAMETER_LAST_NAME, "");
-		selectedRoleUri = getStringParameter(PARAMETER_ROLE, "");
+		selectedRoleUris = getStringParameters(PARAMETER_ROLE);
 		associatedProfileUri = getStringParameter(
 				PARAMETER_ASSOCIATED_PROFILE_URI, "");
 		newProfileClassUri = getStringParameter(
@@ -155,7 +156,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 			errorCode = ERROR_NO_FIRST_NAME;
 		} else if (lastName.isEmpty()) {
 			errorCode = ERROR_NO_LAST_NAME;
-		} else if (!isRootUser() && selectedRoleUri.isEmpty()) {
+		} else if (!isRootUser() && selectedRoleUris.isEmpty()) {
 			errorCode = ERROR_NO_ROLE;
 		} else {
 			errorCode = strategy.additionalValidations();
@@ -203,7 +204,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 			body.put("externalAuthId", externalAuthId);
 			body.put("firstName", firstName);
 			body.put("lastName", lastName);
-			body.put("selectedRole", selectedRoleUri);
+			body.put("selectedRoles", selectedRoleUris);
 			body.put(PARAMETER_NEW_PROFILE_CLASS_URI, newProfileClassUri);
 
 			if (externalAuthOnly) {
@@ -219,7 +220,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 			body.put("externalAuthId", userAccount.getExternalAuthId());
 			body.put("firstName", userAccount.getFirstName());
 			body.put("lastName", userAccount.getLastName());
-			body.put("selectedRole", getExistingRoleUri());
+			body.put("selectedRoles", userAccount.getPermissionSetUris());
 			body.put(PARAMETER_NEW_PROFILE_CLASS_URI, "");
 
 			if (userAccount.isExternalAuthOnly()) {
@@ -254,15 +255,6 @@ public class UserAccountsEditPage extends UserAccountsPage {
 		return new TemplateResponseValues(TEMPLATE_NAME, body);
 	}
 
-	private String getExistingRoleUri() {
-		Set<String> uris = userAccount.getPermissionSetUris();
-		if (uris.isEmpty()) {
-			return "";
-		} else {
-			return uris.iterator().next();
-		}
-	}
-
 	private Map<String, String> buildUrlsMapWithEditUrl() {
 		Map<String, String> map = buildUrlsMap();
 		map.put("edit", editAccountUrl(userAccount.getUri()));
@@ -287,8 +279,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 			userAccount.setPermissionSetUris(Collections.<String> emptySet());
 			userAccount.setExternalAuthOnly(false);
 		} else {
-			userAccount.setPermissionSetUris(Collections
-					.singleton(selectedRoleUri));
+			userAccount.setPermissionSetUris(selectedRoleUris);
 			userAccount.setExternalAuthOnly(externalAuthOnly);
 		}
 		strategy.setAdditionalProperties(userAccount);

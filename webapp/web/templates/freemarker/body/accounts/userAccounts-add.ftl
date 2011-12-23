@@ -67,7 +67,7 @@
         <p><input id="externalAuthChkBox" type="checkbox" name="externalAuthOnly" <#if externalAuthOnly?? >checked</#if>  />Externally Authenticated Only</p>
         <p>Roles<span class="requiredHint"> *</span></p>
         <#list roles as role>
-            <input type="radio" name="role" value="${role.uri}" role="radio" <#if selectedRole = role.uri>checked</#if> />
+            <input type="radio" name="role" value="${role.uri}" role="radio" ${selectedRoles?seq_contains(role.uri)?string("checked", "")} />
             <label class="inline" for="${role.label}"> ${role.label}</label>
             <br />
         </#list>
