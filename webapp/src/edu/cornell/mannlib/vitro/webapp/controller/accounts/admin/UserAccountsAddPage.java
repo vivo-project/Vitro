@@ -194,7 +194,7 @@ public class UserAccountsAddPage extends UserAccountsPage {
 		body.put(PARAMETER_FIRST_NAME, firstName);
 		body.put(PARAMETER_LAST_NAME, lastName);
 		body.put("selectedRole", selectedRoleUri);
-		body.put("roles", buildRolesList());
+		body.put("roles", buildListOfSelectableRoles());
 		body.put("profileTypes", buildProfileTypesList());
 		body.put(PARAMETER_NEW_PROFILE_CLASS_URI, newProfileClassUri);
 		body.put("formUrls", buildUrlsMap());

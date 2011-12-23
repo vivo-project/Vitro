@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.controller.accounts;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -54,11 +53,16 @@ public abstract class UserAccountsPage extends AbstractPageHandler {
 	}
 
 	/**
-	 * Create a list of all known PermissionSets.
+	 * Create a list of all known non-public PermissionSets.
 	 */
-	protected List<PermissionSet> buildRolesList() {
+	protected List<PermissionSet> buildListOfSelectableRoles() {
 		List<PermissionSet> list = new ArrayList<PermissionSet>();
-		list.addAll(userAccountsDao.getAllPermissionSets());
+		for (PermissionSet ps: userAccountsDao.getAllPermissionSets()) {
+			if (!ps.isForPublic()) {
+				list.add(ps);
+			}
+		}
+
 		Collections.sort(list, new Comparator<PermissionSet>() {
 			@Override
 			public int compare(PermissionSet ps1, PermissionSet ps2) {

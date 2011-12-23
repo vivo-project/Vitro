@@ -235,7 +235,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 		}
 
 		if (!isRootUser()) {
-			body.put("roles", buildRolesList());
+			body.put("roles", buildListOfSelectableRoles());
 		}
 
 		body.put("profileTypes", buildProfileTypesList());

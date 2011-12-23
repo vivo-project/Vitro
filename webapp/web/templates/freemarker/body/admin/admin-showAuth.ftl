@@ -41,7 +41,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showAuth.css" /
             (matching property is not defined)
         </#if>
     </h4>
-    <table summary="Associated Individuals" width="100%">
+    <table summary="Associated Individuals">
         <#if associatedIndividuals?has_content>
             <#list associatedIndividuals as associatedIndividual>
                 <tr>
@@ -59,7 +59,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showAuth.css" /
     </table>
 
     <h4>Identifier factories:</h4>
-    <table summary="Active Identifier Factories" width="100%">
+    <table summary="Active Identifier Factories">
         <#list factories as factory>
             <tr>
                 <td>${factory}</td>
