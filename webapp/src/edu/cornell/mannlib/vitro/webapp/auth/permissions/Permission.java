@@ -8,47 +8,64 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
  * Interface that describes a unit of authorization, or permission to perform
  * requested actions.
  */
-public interface Permission {
+public abstract class Permission implements Comparable<Permission> {
+	protected final String uri;
+
+	protected Permission(String uri) {
+		if (uri == null) {
+			throw new NullPointerException("uri may not be null.");
+		}
+		this.uri = uri;
+	}
+
 	/**
 	 * Get the URI that identifies this Permission object.
 	 */
-	String getUri();
-
-	/**
-	 * Convenience method to get the localName portion of the URI.
-	 */
-	String getLocalName();
-
-	/**
-	 * Convenience method to get the namespace portion of the URI.
-	 */
-	String getNamespace();
+	public String getUri() {
+		return uri;
+	}
 
 	/**
 	 * Is a user with this Permission authorized to perform this
 	 * RequestedAction?
 	 */
-	boolean isAuthorized(RequestedAction whatToAuth);
+	public abstract boolean isAuthorized(RequestedAction whatToAuth);
+
+	@Override
+	public int compareTo(Permission that) {
+		return this.uri.compareTo(that.uri);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!obj.getClass().equals(this.getClass())) {
+			return false;
+		}
+		Permission that = (Permission) obj;
+		return this.uri.equals(that.uri);
+	}
+
+	@Override
+	public int hashCode() {
+		return uri.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + "['" + uri + "']";
+	}
 
 	/**
-	 * An implementation of Permission that authorizes nothing.
+	 * A concrete Permission instance that authorizes nothing.
 	 */
-	static Permission NOT_AUTHORIZED = new Permission() {
-
-		@Override
-		public String getUri() {
-			return "java:" + Permission.class.getName() + "#NOT_AUTHORIZED";
-		}
-
-		@Override
-		public String getLocalName() {
-			return "NOT_AUTHORIZED";
-		}
-
-		@Override
-		public String getNamespace() {
-			return "java:" + Permission.class.getName();
-		}
+	static Permission NOT_AUTHORIZED = new Permission("java:"
+			+ Permission.class.getName() + "#NOT_AUTHORIZED") {
 
 		@Override
 		public boolean isAuthorized(RequestedAction whatToAuth) {

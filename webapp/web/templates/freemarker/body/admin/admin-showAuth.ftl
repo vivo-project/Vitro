@@ -7,9 +7,9 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showAuth.css" /
 <h2>Authorization Info</h2>
 
 <section id="show-auth" role="region">
+    <h4>Current user</h4>
+    <table summary="Information about the current user">
     <#if currentUser?has_content>
-        <table summary="Information about the current user" style="border: 1">
-            <caption>Current user</caption>
             <tr><th>URI:</th><td>${currentUser.uri}</td></tr>
             <tr><th>First name:</th><td>${currentUser.firstName}</td></tr>
             <tr><th>Last name:</th><td>${currentUser.lastName}</td></tr>
@@ -19,13 +19,13 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showAuth.css" /
             <#list currentUser.permissionSetUris as role>
                 <tr><th>Role:</th><td>${role}</td></tr>
             </#list>
-        </table>
     <#else>
-        <h3>Not logged in</h3>
+        <tr><th>Not logged in</th></tr>
     </#if>
+    </table>
    
-    <table summary="VIVO revision's levels table">
-        <caption>Identifiers:</caption>
+    <h4>Identifiers:</h4>
+    <table summary="Identifiers">
         <#list identifiers as identifier>
             <tr>
                 <td>${identifier}</td>
@@ -33,14 +33,15 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showAuth.css" /
         </#list>
     </table>
 
+    <h4>
+        AssociatedIndividuals: 
+        <#if matchingProperty??>
+            (match by ${matchingProperty})
+        <#else>
+            (matching property is not defined)
+        </#if>
+    </h4>
     <table summary="Associated Individuals">
-        <caption>AssociatedIndividuals: 
-            <#if matchingProperty??>
-                (match by <pre>${matchingProperty}</pre>)
-            <#else>
-                (matching property is not defined)
-            </#if>
-        </caption>
         <#if associatedIndividuals?has_content>
             <#list associatedIndividuals as associatedIndividual>
                 <tr>
@@ -57,8 +58,8 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showAuth.css" /
         </#if>
     </table>
 
+    <h4>Identifier factories:</h4>
     <table summary="Active Identifier Factories">
-        <caption>Identifier factories:</caption>
         <#list factories as factory>
             <tr>
                 <td>${factory}</td>
@@ -66,8 +67,8 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showAuth.css" /
         </#list>
     </table>
 
-    <table summary="Policies">
-        <caption>Policies:</caption>
+    <h4>Policies:</h4>
+    <table summary="Policies" width="100%">
         <#list policies as policy>
             <tr>
                 <td>${policy}</td>

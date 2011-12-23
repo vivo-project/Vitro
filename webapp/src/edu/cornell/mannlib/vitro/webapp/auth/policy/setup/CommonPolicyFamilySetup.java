@@ -7,18 +7,24 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.CommonIdentifierBundleFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundleFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.HasPermissionFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.HasProfileOrIsBlacklistedFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.HasProxyEditingRightsFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.HasRoleLevelFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.IsRootUserFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.IsUserFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.DisplayRestrictedDataByRoleLevelPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.DisplayRestrictedDataToSelfPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.EditRestrictedDataByRoleLevelPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PermissionsPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.SelfEditingPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.UseRestrictedPagesByRoleLevelPolicy;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
- * Set up the common policy family, with Identifier factory.
+ * Set up the common policy family, with Identifier factories.
  */
 public class CommonPolicyFamilySetup implements ServletContextListener {
 
@@ -28,27 +34,29 @@ public class CommonPolicyFamilySetup implements ServletContextListener {
 		StartupStatus ss = StartupStatus.getBean(ctx);
 
 		try {
-			ServletPolicyList.addPolicy(ctx, new PermissionsPolicy());
+			policy(ctx, new PermissionsPolicy());
+			policy(ctx, new DisplayRestrictedDataByRoleLevelPolicy(ctx));
+			policy(ctx, new DisplayRestrictedDataToSelfPolicy(ctx));
+			policy(ctx, new EditRestrictedDataByRoleLevelPolicy(ctx));
+			policy(ctx, new SelfEditingPolicy(ctx));
 
-			ServletPolicyList.addPolicy(ctx,
-					new DisplayRestrictedDataByRoleLevelPolicy(ctx));
-			ServletPolicyList.addPolicy(ctx,
-					new DisplayRestrictedDataToSelfPolicy(ctx));
-			ServletPolicyList.addPolicy(ctx,
-					new EditRestrictedDataByRoleLevelPolicy(ctx));
-			ServletPolicyList.addPolicy(ctx,
-					new UseRestrictedPagesByRoleLevelPolicy());
-
-			ServletPolicyList.addPolicy(ctx, new SelfEditingPolicy(ctx));
-
-			// This factory creates Identifiers for all of the above policies.
-			CommonIdentifierBundleFactory factory = new CommonIdentifierBundleFactory(
-					ctx);
-
-			ActiveIdentifierBundleFactories.addFactory(sce, factory);
+			factory(ctx, new IsUserFactory(ctx));
+			factory(ctx, new IsRootUserFactory(ctx));
+			factory(ctx, new HasRoleLevelFactory(ctx));
+			factory(ctx, new HasProfileOrIsBlacklistedFactory(ctx));
+			factory(ctx, new HasPermissionFactory(ctx));
+			factory(ctx, new HasProxyEditingRightsFactory(ctx));
 		} catch (Exception e) {
 			ss.fatal(this, "could not run CommonPolicyFamilySetup", e);
 		}
+	}
+
+	private void policy(ServletContext ctx, PolicyIface policy) {
+		ServletPolicyList.addPolicy(ctx, policy);
+	}
+
+	private void factory(ServletContext ctx, IdentifierBundleFactory factory) {
+		ActiveIdentifierBundleFactories.addFactory(ctx, factory);
 	}
 
 	@Override

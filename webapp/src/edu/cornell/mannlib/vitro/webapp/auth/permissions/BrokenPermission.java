@@ -8,38 +8,9 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
  * This is what the PermissionRegistry hands out if you ask for a Permission
  * that it doesn't know about. Nothing is authorized by this Permission.
  */
-public class BrokenPermission implements Permission {
-	private final String uri;
-	private final String localName;
-	private final String namespace;
-
+public class BrokenPermission extends Permission {
 	public BrokenPermission(String uri) {
-		this.uri = uri;
-
-		int namespaceBreak = uri.lastIndexOf("#");
-		if (namespaceBreak == -1) {
-			namespaceBreak = uri.lastIndexOf("/");
-		}
-
-		int localNameStart = namespaceBreak + 1;
-
-		this.namespace = uri.substring(0, localNameStart);
-		this.localName = uri.substring(localNameStart);
-	}
-
-	@Override
-	public String getUri() {
-		return uri;
-	}
-
-	@Override
-	public String getLocalName() {
-		return localName;
-	}
-
-	@Override
-	public String getNamespace() {
-		return namespace;
+		super(uri);
 	}
 
 	@Override

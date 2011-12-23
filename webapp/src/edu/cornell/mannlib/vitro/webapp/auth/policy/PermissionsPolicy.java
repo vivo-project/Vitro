@@ -19,14 +19,25 @@ public class PermissionsPolicy implements PolicyIface {
 	@Override
 	public PolicyDecision isAuthorized(IdentifierBundle whoToAuth,
 			RequestedAction whatToAuth) {
+		if (whoToAuth == null) {
+			return defaultDecision("whomToAuth was null");
+		}
+		if (whatToAuth == null) {
+			return defaultDecision("whatToAuth was null");
+		}
+
 		for (Permission p : HasPermission.getPermissions(whoToAuth)) {
 			if (p.isAuthorized(whatToAuth)) {
 				return new BasicPolicyDecision(Authorization.AUTHORIZED,
 						"PermissionsPolicy: approved by " + p);
 			}
 		}
-		return new BasicPolicyDecision(Authorization.INCONCLUSIVE,
-				"no permission will approve " + whatToAuth);
+		return defaultDecision("no permission will approve " + whatToAuth);
+	}
+
+	/** If the user isn't explicitly authorized, return this. */
+	private PolicyDecision defaultDecision(String message) {
+		return new BasicPolicyDecision(Authorization.INCONCLUSIVE, message);
 	}
 
 	@Override

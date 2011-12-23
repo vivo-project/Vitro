@@ -142,7 +142,8 @@ public class JenaBaseDaoCon {
     protected  ObjectProperty     USERACCOUNT_PROXY_EDITOR_FOR = _constModel.createObjectProperty(VitroVocabulary.USERACCOUNT_PROXY_EDITOR_FOR);
 
     protected  OntClass           PERMISSIONSET = _constModel.createClass(VitroVocabulary.PERMISSIONSET);
-    protected  OntClass           DEFAULT_PERMISSION_SET_FOR_NEW_USERS = _constModel.createClass(VitroVocabulary.DEFAULT_PERMISSION_SET_FOR_NEW_USERS);
+    protected  OntClass           PERMISSION_SET_FOR_NEW_USERS = _constModel.createClass(VitroVocabulary.PERMISSION_SET_FOR_NEW_USERS);
+    protected  OntClass           PERMISSION_SET_FOR_PUBLIC = _constModel.createClass(VitroVocabulary.PERMISSION_SET_FOR_PUBLIC);
     protected  ObjectProperty     PERMISSIONSET_HAS_PERMISSION = _constModel.createObjectProperty(VitroVocabulary.PERMISSIONSET_HAS_PERMISSION);
 
     protected  OntClass           PERMISSION = _constModel.createClass(VitroVocabulary.PERMISSION);

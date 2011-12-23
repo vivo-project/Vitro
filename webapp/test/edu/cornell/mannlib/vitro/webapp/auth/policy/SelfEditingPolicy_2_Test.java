@@ -94,8 +94,7 @@ public class SelfEditingPolicy_2_Test extends AbstractTestClass {
 		seIndividual = new IndividualImpl();
 		seIndividual.setURI(SELFEDITOR_URI);
 
-		ids = new ArrayIdentifierBundle();
-		ids.add(new HasProfile(SELFEDITOR_URI));
+		ids = new ArrayIdentifierBundle(new HasProfile(SELFEDITOR_URI));
 
 		// setLoggerLevel(SelfEditingPolicySetupTest.class, Level.DEBUG);
 	}

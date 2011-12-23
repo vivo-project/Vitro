@@ -50,7 +50,7 @@
         <select name="roleFilterUri" id="roleFilterUri">
             <option value="" <#if roleFilterUri = "">selected</#if> >Filter by roles</option>
             <#list roles as role>
-            <option value="${formUrls.list}?roleFilterUri=${role.uri}" <#if roleFilterUri = role.uri>selected</#if> >${role.label}</option>
+            <option value="${formUrls.list}?roleFilterUri=${role.uri?url}" <#if roleFilterUri = role.uri>selected</#if> >${role.label}</option>
             </#list>
             <!--
             When roleFilterUri or searchTerm changes,
