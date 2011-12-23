@@ -25,14 +25,38 @@ public class IsUser extends AbstractCommonIdentifier implements Identifier {
 		return set;
 	}
 
-	private final String uri;
+	private final String uri; // never null
 
 	public IsUser(String uri) {
+		if (uri == null) {
+			throw new NullPointerException("uri may not be null.");
+		}
+
 		this.uri = uri;
 	}
 
 	public String getUri() {
 		return uri;
+	}
+
+	@Override
+	public int hashCode() {
+		return uri.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof IsUser)) {
+			return false;
+		}
+		IsUser that = (IsUser) obj;
+		return this.uri.equals(that.uri);
 	}
 
 	@Override
