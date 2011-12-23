@@ -36,7 +36,7 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.CommonIdentifierBundleFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.HasRoleLevelFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.Permission;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionRegistry;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
@@ -163,7 +163,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		new ConfigurationPropertiesStub().setBean(servletContext);
 
 		ActiveIdentifierBundleFactories.addFactory(servletContext,
-				new CommonIdentifierBundleFactory(servletContext));
+				new HasRoleLevelFactory(servletContext));
 	}
 
 	private UserAccount createUserFromUserInfo(UserInfo userInfo) {
