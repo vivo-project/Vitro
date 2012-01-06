@@ -730,7 +730,9 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                 	}
                     if (superVclass != null) {
                         vClasses.add(superVclass);
-						String isInferencing = getWebappDaoFactory().getProperties().get("infersTypes");
+                        //Commenting out this section to prevent all subclasses of owl:Thing
+                        //returned if range is owl:Thing, refer to NIHVIVO-3357
+					/*	String isInferencing = getWebappDaoFactory().getProperties().get("infersTypes");
 						// if this model infers types based on the taxonomy, adding the subclasses will only
 						// waste time for no benefit
 						PelletListener pl = getWebappDaoFactory().getPelletListener();
@@ -743,7 +745,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                             	if (vClass != null)
                             	    vClasses.add(vClass);
                         	}
-						} 
+						} */
                     }
                 }
             }
