@@ -133,6 +133,7 @@ public class PermissionRegistry {
 
 				permissions.addAll(SimplePermission.getAllInstances());
 				permissions.addAll(createDisplayByRolePermissions(ctx));
+				permissions.addAll(createEditByRolePermissions(ctx));
 
 				PermissionRegistry.createRegistry(ctx, permissions);
 
@@ -155,6 +156,16 @@ public class PermissionRegistry {
 					ctx));
 			list.add(new DisplayByRolePermission("Public", RoleLevel.PUBLIC,
 					ctx));
+			return list;
+		}
+
+		private Collection<Permission> createEditByRolePermissions(
+				ServletContext ctx) {
+			List<Permission> list = new ArrayList<Permission>();
+			list.add(new EditByRolePermission("Admin", RoleLevel.DB_ADMIN, ctx));
+			list.add(new EditByRolePermission("Curator", RoleLevel.CURATOR, ctx));
+			list.add(new EditByRolePermission("Editor", RoleLevel.EDITOR, ctx));
+			list.add(new EditByRolePermission("Public", RoleLevel.PUBLIC, ctx));
 			return list;
 		}
 

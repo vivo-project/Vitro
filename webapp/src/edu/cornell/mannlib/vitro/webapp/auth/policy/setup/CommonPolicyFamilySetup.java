@@ -15,7 +15,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.HasRoleLevelFact
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.IsRootUserFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.IsUserFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.DisplayRestrictedDataToSelfPolicy;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.EditRestrictedDataByRoleLevelPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PermissionsPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.SelfEditingPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
@@ -35,7 +34,6 @@ public class CommonPolicyFamilySetup implements ServletContextListener {
 		try {
 			policy(ctx, new PermissionsPolicy());
 			policy(ctx, new DisplayRestrictedDataToSelfPolicy(ctx));
-			policy(ctx, new EditRestrictedDataByRoleLevelPolicy(ctx));
 			policy(ctx, new SelfEditingPolicy(ctx));
 
 			factory(ctx, new IsUserFactory(ctx));
