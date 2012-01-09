@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 import static edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginExternalAuthSetup.ATTRIBUTE_REFERRER;
 
 import java.io.IOException;
+import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -50,10 +51,22 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+		if (log.isDebugEnabled()) {
+			@SuppressWarnings("unchecked")
+			Enumeration<String> names = req.getHeaderNames();
+
+			log.debug("------------request:" + req.getRequestURL());
+			while (names.hasMoreElements()) {
+				String name = names.nextElement();
+				log.debug(name + "=" + req.getHeader(name));
+			}
+		}
+
 		String externalAuthId = ExternalAuthHelper.getHelper(req)
 				.getExternalAuthId(req);
+		log.debug("externalAuthID='" + externalAuthId + "'");
+
 		if (externalAuthId == null) {
-			log.debug("No externalAuthId.");
 			complainAndReturnToReferrer(req, resp, ATTRIBUTE_REFERRER,
 					MESSAGE_LOGIN_FAILED);
 			return;
