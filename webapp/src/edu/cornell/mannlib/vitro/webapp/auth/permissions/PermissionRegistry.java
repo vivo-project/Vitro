@@ -16,6 +16,7 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
@@ -31,7 +32,7 @@ public class PermissionRegistry {
 	private static final String ATTRIBUTE_NAME = PermissionRegistry.class
 			.getName();
 
-	/** 
+	/**
 	 * Has the registry been created yet?
 	 */
 	public static boolean isRegistryCreated(ServletContext ctx) {
@@ -59,7 +60,8 @@ public class PermissionRegistry {
 	}
 
 	/**
-	 * Get the registry from the context. If there isn't one, throw an exception.
+	 * Get the registry from the context. If there isn't one, throw an
+	 * exception.
 	 */
 	public static PermissionRegistry getRegistry(ServletContext ctx) {
 		if (ctx == null) {
@@ -128,7 +130,10 @@ public class PermissionRegistry {
 			StartupStatus ss = StartupStatus.getBean(ctx);
 			try {
 				List<Permission> permissions = new ArrayList<Permission>();
+
 				permissions.addAll(SimplePermission.getAllInstances());
+				permissions.addAll(createDisplayByRolePermissions(ctx));
+				permissions.addAll(createEditByRolePermissions(ctx));
 
 				PermissionRegistry.createRegistry(ctx, permissions);
 
@@ -138,6 +143,30 @@ public class PermissionRegistry {
 				ss.fatal(this, "Failed to initialize the PermissionRegistry.",
 						e);
 			}
+		}
+
+		private Collection<Permission> createDisplayByRolePermissions(
+				ServletContext ctx) {
+			List<Permission> list = new ArrayList<Permission>();
+			list.add(new DisplayByRolePermission("Admin", RoleLevel.DB_ADMIN,
+					ctx));
+			list.add(new DisplayByRolePermission("Curator", RoleLevel.CURATOR,
+					ctx));
+			list.add(new DisplayByRolePermission("Editor", RoleLevel.EDITOR,
+					ctx));
+			list.add(new DisplayByRolePermission("Public", RoleLevel.PUBLIC,
+					ctx));
+			return list;
+		}
+
+		private Collection<Permission> createEditByRolePermissions(
+				ServletContext ctx) {
+			List<Permission> list = new ArrayList<Permission>();
+			list.add(new EditByRolePermission("Admin", RoleLevel.DB_ADMIN, ctx));
+			list.add(new EditByRolePermission("Curator", RoleLevel.CURATOR, ctx));
+			list.add(new EditByRolePermission("Editor", RoleLevel.EDITOR, ctx));
+			list.add(new EditByRolePermission("Public", RoleLevel.PUBLIC, ctx));
+			return list;
 		}
 
 		@Override

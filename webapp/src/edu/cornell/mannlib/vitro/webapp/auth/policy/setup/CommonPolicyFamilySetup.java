@@ -9,14 +9,12 @@ import javax.servlet.ServletContextListener;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.HasPermissionFactory;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.HasPermissionSetFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.HasProfileOrIsBlacklistedFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.HasProxyEditingRightsFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.HasRoleLevelFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.IsRootUserFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.IsUserFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.DisplayRestrictedDataByRoleLevelPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.DisplayRestrictedDataToSelfPolicy;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.EditRestrictedDataByRoleLevelPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PermissionsPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.SelfEditingPolicy;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
@@ -35,15 +33,13 @@ public class CommonPolicyFamilySetup implements ServletContextListener {
 
 		try {
 			policy(ctx, new PermissionsPolicy());
-			policy(ctx, new DisplayRestrictedDataByRoleLevelPolicy(ctx));
 			policy(ctx, new DisplayRestrictedDataToSelfPolicy(ctx));
-			policy(ctx, new EditRestrictedDataByRoleLevelPolicy(ctx));
 			policy(ctx, new SelfEditingPolicy(ctx));
 
 			factory(ctx, new IsUserFactory(ctx));
 			factory(ctx, new IsRootUserFactory(ctx));
-			factory(ctx, new HasRoleLevelFactory(ctx));
 			factory(ctx, new HasProfileOrIsBlacklistedFactory(ctx));
+			factory(ctx, new HasPermissionSetFactory(ctx));
 			factory(ctx, new HasPermissionFactory(ctx));
 			factory(ctx, new HasProxyEditingRightsFactory(ctx));
 		} catch (Exception e) {

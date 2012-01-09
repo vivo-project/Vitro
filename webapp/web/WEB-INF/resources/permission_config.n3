@@ -3,6 +3,8 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
 @prefix simplePermission: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
+@prefix displayByRole: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.DisplayByRolePermission#> .
+@prefix editByRole: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.EditByRolePermission#> .
 
 auth:ADMIN 
     a auth:PermissionSet ;
@@ -45,6 +47,10 @@ auth:ADMIN
     
     # permissions for ANY user, even if they are not logged in.
     auth:hasPermission simplePermission:QueryFullModel ;
+    
+    # role-based permissions for ADMIN
+    auth:hasPermission displayByRole:Admin ;
+    auth:hasPermission editByRole:Admin ;
     .
 
 auth:CURATOR 
@@ -76,6 +82,10 @@ auth:CURATOR
     
     # permissions for ANY user, even if they are not logged in.
     auth:hasPermission simplePermission:QueryFullModel ;
+    
+    # role-based permissions for CURATOR
+    auth:hasPermission displayByRole:Curator ;
+    auth:hasPermission editByRole:Curator ;
     .
 
 auth:EDITOR 
@@ -99,6 +109,10 @@ auth:EDITOR
     
     # permissions for ANY user, even if they are not logged in.
     auth:hasPermission simplePermission:QueryFullModel ;
+    
+    # role-based permissions for EDITOR
+    auth:hasPermission displayByRole:Editor ;
+    auth:hasPermission editByRole:Editor ;
     .
 
 auth:SELF_EDITOR
@@ -116,6 +130,12 @@ auth:SELF_EDITOR
     
     # permissions for ANY user, even if they are not logged in.
     auth:hasPermission simplePermission:QueryFullModel ;
+
+    # role-based permissions for SELF_EDITOR
+    #     For role-based display and editing, SelfEditor is like Public. 
+    #     SelfEditor uses its special permissions to edit/display its own values.
+    auth:hasPermission displayByRole:Public ; 
+    auth:hasPermission editByRole:Public ; 
     .
 
 auth:PUBLIC
@@ -125,4 +145,8 @@ auth:PUBLIC
     
     # permissions for ANY user, even if they are not logged in.
     auth:hasPermission simplePermission:QueryFullModel ;
+
+    # role-based permissions for PUBLIC
+    auth:hasPermission displayByRole:Public ;
+    auth:hasPermission editByRole:Public ;
     .
