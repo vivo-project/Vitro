@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -29,9 +28,9 @@ public class SparqlQueryRunner {
 
 	private static final Syntax SYNTAX = Syntax.syntaxARQ;
 
-	private final OntModel model;
+	private final Model model;
 
-	public SparqlQueryRunner(OntModel model) {
+	public SparqlQueryRunner(Model model) {
 		if (model == null) {
 			throw new NullPointerException("model may not be null.");
 		}
