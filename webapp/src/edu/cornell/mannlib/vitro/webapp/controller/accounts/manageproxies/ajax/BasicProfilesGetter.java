@@ -20,9 +20,6 @@ import com.hp.hpl.jena.query.QuerySolution;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.AbstractAjaxResponder;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.utils.ImageUtil;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 
@@ -50,7 +47,6 @@ public class BasicProfilesGetter extends AbstractAjaxResponder {
 
 	private final String term;
 	private final OntModel fullModel;
-	private final String placeholderImageUrl;
 
 	public BasicProfilesGetter(HttpServlet servlet, VitroRequest vreq,
 			HttpServletResponse resp) {
@@ -58,9 +54,6 @@ public class BasicProfilesGetter extends AbstractAjaxResponder {
 		fullModel = vreq.getJenaOntModel();
 
 		term = getStringParameter(PARAMETER_SEARCH_TERM, "");
-
-		placeholderImageUrl = UrlBuilder.getUrl(ImageUtil
-				.getPlaceholderImagePathForType(VitroVocabulary.USERACCOUNT));
 	}
 
 	@Override
@@ -73,8 +66,8 @@ public class BasicProfilesGetter extends AbstractAjaxResponder {
 			String queryStr = QUERY_BASIC_PROFILES.replace("%typesUnion%",
 					buildTypeClause()).replace("%term%", cleanTerm);
 
-			JSONArray jsonArray = new SparqlQueryRunner<JSONArray>(fullModel,
-					new BasicProfileInfoParser()).executeQuery(queryStr);
+			JSONArray jsonArray = new SparqlQueryRunner(fullModel)
+					.executeSelect(new BasicProfileInfoParser(), queryStr);
 
 			String response = jsonArray.toString();
 			log.debug(response);
@@ -91,10 +84,9 @@ public class BasicProfilesGetter extends AbstractAjaxResponder {
 		for (int i = 1; i < types.length; i++) {
 			typeClause += " UNION { ?uri rdf:type <" + types[i].trim() + "> }";
 		}
-		
+
 		return typeClause;
 	}
-
 
 	/** Parse a query row into a map of keys and values. */
 	private static class BasicProfileInfoParser extends JsonArrayParser {

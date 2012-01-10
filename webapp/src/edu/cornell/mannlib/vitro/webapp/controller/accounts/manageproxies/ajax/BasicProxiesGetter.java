@@ -77,9 +77,10 @@ public class BasicProxiesGetter extends AbstractAjaxResponder {
 			String cleanTerm = SparqlQueryUtils.escapeForRegex(term);
 			String queryStr = QUERY_BASIC_PROXIES.replace("%term%", cleanTerm);
 
-			JSONArray jsonArray = new SparqlQueryRunner<JSONArray>(
-					userAccountsModel, new BasicProxyInfoParser(
-							placeholderImageUrl)).executeQuery(queryStr);
+			JSONArray jsonArray = new SparqlQueryRunner(userAccountsModel)
+					.executeSelect(
+							new BasicProxyInfoParser(placeholderImageUrl),
+							queryStr);
 
 			String response = jsonArray.toString();
 			log.debug(response);
