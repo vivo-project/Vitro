@@ -24,7 +24,11 @@
 
     <#if classLinks?has_content>
         <div class="searchTOC">
-            <h4>Limit ${classGroupName} to</h4>
+            <#if classGroupName?has_content>
+                <h4>Limit ${classGroupName} to</h4>
+            <#else>
+                <h4>Limit to</h4>
+            </#if>
             <ul>           
             <#list classLinks as link>
                 <li><a href="${link.url}" title="class link">${link.text}</a></li>
