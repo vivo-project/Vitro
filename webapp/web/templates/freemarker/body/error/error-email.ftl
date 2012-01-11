@@ -25,11 +25,14 @@
         </p>
         
         <p>
-            <strong>Stack trace</strong> (full trace available in the vivo log): ${stackTrace}
+            <strong>Stack trace</strong> (full trace available in the vivo log): 
+            <pre>${stackTrace}</pre>
         </p>
         
         <#if cause?has_content>
-            <p><strong>Caused by:</strong> ${cause}</p>
+            <p><strong>Caused by:</strong> 
+                <pre>${cause}</pre>
+            </p>
         </#if>
         
     </body>
@@ -43,10 +46,12 @@ Requested url: ${requestedUrl}
 
 Error message: ${errorMessage}
 
-Stack trace (full trace available in the vivo log): ${stackTrace}
+Stack trace (full trace available in the vivo log): 
+${stackTrace}
 
 <#if cause?has_content>
-Caused by: ${cause}
+Caused by: 
+${cause}
 </#if>       
 </#assign>
 
