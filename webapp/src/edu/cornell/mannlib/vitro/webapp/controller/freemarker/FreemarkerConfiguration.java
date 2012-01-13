@@ -5,14 +5,12 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -21,8 +19,6 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.Tags;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.Tags.TagsWrapper;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
@@ -31,7 +27,6 @@ import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateException;
-import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 
 public class FreemarkerConfiguration extends Configuration {
@@ -42,9 +37,6 @@ public class FreemarkerConfiguration extends Configuration {
     private final ServletContext context;
     private final ApplicationBean appBean;
     private final String appName;
-    private final Tags stylesheets;
-    private final Tags scripts;
-    private final Tags headScripts;
     
     FreemarkerConfiguration(String themeDir, VitroRequest vreq, ServletContext context) {
         
@@ -53,10 +45,6 @@ public class FreemarkerConfiguration extends Configuration {
         this.appBean = vreq.getAppBean();
         this.appName = appBean.getApplicationName();
         
-        this.stylesheets = new Tags();
-        this.scripts = new Tags();
-        this.headScripts = new Tags();
-    
         String buildEnv = ConfigurationProperties.getBean(context).getProperty("Environment.build");
         log.debug("Current build environment: " + buildEnv);
         if ("development".equals(buildEnv)) { // Set Environment.build = development in deploy.properties
@@ -100,25 +88,10 @@ public class FreemarkerConfiguration extends Configuration {
 
     }
 
-    /** Some template variables are shared so that they are accessible to
-     * all templates, but they are request-specific and so need to be
-     * reset at the beginning of a new request.
-     * 
-     * This is public for now because it's accessed by propDelete.jsp. 
-     * Once the property deletion is integrated into Freemarker and generated
-     * with a Freemarker page, the visibility can be reduced to package.
-     */
-    public void resetRequestSpecificSharedVariables() {      
-        stylesheets.reset();
-        scripts.reset();
-        headScripts.reset();
-    }
-    
     /**
      * These are values that are accessible to all
      * templates loaded by the Configuration's TemplateLoader. They
-     * should be application- rather than request-specific, or else get
-     * reset with a new request.
+     * should be application- rather than request-specific.
      * @param VitroRequest vreq
      */
     private void setSharedVariables(VitroRequest vreq) {
@@ -130,10 +103,6 @@ public class FreemarkerConfiguration extends Configuration {
         sharedVariables.put("urls", getSiteUrls());
         sharedVariables.put("themeDir", themeDir);
         sharedVariables.put("currentTheme", themeDir.substring(themeDir.lastIndexOf('/')+1));
-        
-        sharedVariables.put("stylesheets", wrapTagList(stylesheets));
-        sharedVariables.put("scripts", wrapTagList(scripts));
-        sharedVariables.put("headScripts", wrapTagList(headScripts));
         
         sharedVariables.putAll(getDirectives());
         sharedVariables.putAll(getMethods());
@@ -177,23 +146,6 @@ public class FreemarkerConfiguration extends Configuration {
         return urls;
     }
  
-    /** Script and stylesheet lists are wrapped with a specialized BeansWrapper
-     * that exposes certain write methods, instead of the configuration's object wrapper,
-     * which doesn't. The templates can then add stylesheets and scripts to the lists
-     * by calling their add() methods.
-     * @param Tags tags
-     * @return TemplateModel
-     */
-    private TemplateModel wrapTagList(Tags tags) {        
-        try {
-            BeansWrapper wrapper = new TagsWrapper();
-            return wrapper.wrap(tags); // this is a StringModel
-        } catch (TemplateModelException e) {
-            log.error("Error creating Tags template model");
-            return null;
-        }
-    }
-
     public static Map<String, Object> getDirectives() {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("dump", new freemarker.ext.dump.DumpDirective());
