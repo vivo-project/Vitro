@@ -9,9 +9,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.web.beanswrappers.ReadOnlyBeansWrapper;
 import freemarker.ext.beans.BeansWrapper;
-import freemarker.ext.beans.BeansWrapper.MethodAppearanceDecision;
+import freemarker.template.TemplateModel;
+import freemarker.template.TemplateModelException;
 
 public class Tags extends BaseTemplateModel {
     
@@ -27,10 +27,22 @@ public class Tags extends BaseTemplateModel {
         this.tags = tags;
     }
     
-    public void reset() {
-        tags.clear();
+    public TemplateModel wrap() {
+        try {
+            return new TagsWrapper().wrap(this);    	
+        } catch (TemplateModelException e) {
+            log.error("Error creating Tags template model");
+            return null;
+        }
     }
-
+    
+    /** Script and stylesheet lists are wrapped with a specialized BeansWrapper
+     * that exposes certain write methods, instead of the configuration's object wrapper,
+     * which doesn't. The templates can then add stylesheets and scripts to the lists
+     * by calling their add() methods.
+     * @param Tags tags
+     * @return TemplateModel
+     */
     static public class TagsWrapper extends BeansWrapper {
         
         public TagsWrapper() {
@@ -67,7 +79,7 @@ public class Tags extends BaseTemplateModel {
     }
  
     public String list() {
-        return StringUtils.join(tags, "");
+        return StringUtils.join(tags, "\n");
     }
     
 
