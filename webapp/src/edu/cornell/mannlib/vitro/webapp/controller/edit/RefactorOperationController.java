@@ -330,7 +330,7 @@ public class RefactorOperationController extends BaseEditController {
 	private void doMovePropertyStatements(VitroRequest request, HttpServletResponse response, EditProcessObject epo) {
 		String userURI = LoginStatusBean.getBean(request).getUserURI();
 		
-		OntModel ontModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
+		OntModel ontModel = ModelContext.getBaseOntModel(getServletContext());
 		
 		Model tempRetractModel = ModelFactory.createDefaultModel();
 		Model tempAddModel = ModelFactory.createDefaultModel();
@@ -342,7 +342,6 @@ public class RefactorOperationController extends BaseEditController {
 		
 		ontModel.enterCriticalSection(Lock.READ);
 		try {
-			Resource res = ontModel.getResource(oldURIStr);
 			Resource subjClass = (subjectClassURIStr.equals("") ? null : ResourceFactory.createResource(subjectClassURIStr));
 			Property prop = ResourceFactory.createProperty(oldURIStr);
 			Property newProp = (newURIStr.equals("")) ? null : ResourceFactory.createProperty(newURIStr);
@@ -350,17 +349,23 @@ public class RefactorOperationController extends BaseEditController {
 			OntProperty newPropInv = null;
 			try {
 				propInv = ontModel.getObjectProperty(prop.getURI()).getInverse();
-			} catch (Exception e) { }
+			} catch (Exception e) {
+			    // forget about dealing with an inverse if we hit any trouble here
+			}
 			try {
 				newPropInv = ontModel.getObjectProperty(newProp.getURI()).getInverse();
-			} catch (Exception e) { }
-			RDFNode objClass = (objectClassURIStr == null || objectClassURIStr.equals("")) ? null : ResourceFactory.createResource(objectClassURIStr);
+			} catch (Exception e) { 
+			    // forget about dealing with an inverse if we hit any trouble here
+			}
+			RDFNode objClass = (objectClassURIStr == null || objectClassURIStr.equals("")) 
+			        ? null 
+			        : ResourceFactory.createResource(objectClassURIStr);
 			
-			ClosableIterator closeIt = (epo.getAttribute("propertyType").equals("ObjectProperty")) ?
+			StmtIterator closeIt = (epo.getAttribute("propertyType").equals("ObjectProperty")) ?
 				ontModel.listStatements(null,prop,(Resource)null) :
 				ontModel.listStatements(null,prop,(Literal)null);
 			try {
-				for (Iterator stmtIt = closeIt; stmtIt.hasNext();) {
+				for (StmtIterator stmtIt = closeIt; stmtIt.hasNext();) {
 					Statement stmt = (Statement) stmtIt.next();
 					Resource subj = stmt.getSubject();
 					boolean moveIt = true;
@@ -409,10 +414,7 @@ public class RefactorOperationController extends BaseEditController {
 	private void doMoveInstances(VitroRequest request, HttpServletResponse response, EditProcessObject epo) {
 		String userURI = LoginStatusBean.getBean(request).getUserURI();
 		
-		OntModel ontModel = (OntModel) getServletContext().getAttribute("baseOntModel");
-		if (ontModel==null) {
-			ontModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
-		}
+		OntModel ontModel = ModelContext.getBaseOntModel(getServletContext());
 		
 		String oldClassURIStr = (String) epo.getAttribute("VClassURI");
 		String newClassURIStr = (String) request.getParameter("NewVClassURI");
@@ -424,9 +426,9 @@ public class RefactorOperationController extends BaseEditController {
 		try {
 			Resource oldClassRes = ontModel.getResource(oldClassURIStr);
 			Resource newClassRes = (newClassURIStr.equals("")) ? null : ontModel.getResource(newClassURIStr);
-			ClosableIterator closeIt = ontModel.listStatements(null, RDF.type, oldClassRes);
+			StmtIterator closeIt = ontModel.listStatements(null, RDF.type, oldClassRes);
 			try {
-				for (Iterator stmtIt = closeIt; stmtIt.hasNext();) {
+				for (StmtIterator stmtIt = closeIt; stmtIt.hasNext();) {
 					Statement stmt = (Statement) stmtIt.next();
 					tempRetractModel.add(stmt);
 					if (newClassRes != null) {
