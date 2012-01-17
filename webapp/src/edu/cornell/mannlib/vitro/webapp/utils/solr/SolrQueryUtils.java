@@ -52,6 +52,20 @@ public class SolrQueryUtils {
 	}
 
 	/**
+	 * Parse a response into a list of maps, accepting only those maps that pass
+	 * a filter, and only up to a maximum number of records.
+	 * 
+	 * The Solr field names in the document are replaced by json field names in
+	 * the result, according to the fieldMap.
+	 */
+	public static List<Map<String, String>> parseAndFilterResponse(
+			QueryResponse queryResponse, FieldMap fieldMap,
+			SolrResponseFilter filter, int maxNumberOfResults) {
+		return new SolrResultsParser(queryResponse, fieldMap)
+				.parseAndFilterResponse(filter, maxNumberOfResults);
+	}
+
+	/**
 	 * Break a string into a list of words, according to a RegEx delimiter. Trim
 	 * leading and trailing white space from each word.
 	 */

@@ -56,6 +56,40 @@ public class SolrResultsParser {
 	}
 
 	/**
+	 * Parse the response, accepting only those maps that are acceptable to the
+	 * filter, until we reach the maximum desired number of results (or until we
+	 * have parsed the entire response).
+	 */
+	public List<Map<String, String>> parseAndFilterResponse(
+			SolrResponseFilter filter, int maxNumberOfResults) {
+		List<Map<String, String>> maps = new ArrayList<Map<String, String>>();
+
+		if (queryResponse == null) {
+			log.error("Query response for a search was null");
+			return maps;
+		}
+
+		SolrDocumentList docs = queryResponse.getResults();
+		if (docs == null) {
+			log.error("Docs for a search was null");
+			return maps;
+		}
+		log.debug("Total number of hits = " + docs.getNumFound());
+
+		for (SolrDocument doc : docs) {
+			Map<String, String> map = parseSingleDocument(doc);
+			if (filter.accept(map)) {
+				maps.add(map);
+			}
+			if (maps.size() >= maxNumberOfResults) {
+				break;
+			}
+		}
+
+		return maps;
+	}
+
+	/**
 	 * Create a map from this document, applying translation on the field names.
 	 */
 	private Map<String, String> parseSingleDocument(SolrDocument doc) {

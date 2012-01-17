@@ -2,19 +2,31 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts.admin.ajax;
 
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.AC_NAME_STEMMED;
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.NAME_LOWERCASE_SINGLE_VALUED;
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.NAME_RAW;
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.NAME_UNSTEMMED;
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.RDFTYPE;
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.URI;
+import static edu.cornell.mannlib.vitro.webapp.utils.solr.SolrQueryUtils.Conjunction.OR;
+
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrQuery.ORDER;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.json.JSONException;
 
 import com.hp.hpl.jena.ontology.OntModel;
@@ -25,12 +37,17 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.Syntax;
+import com.hp.hpl.jena.rdf.model.Literal;
 
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.AbstractAjaxResponder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
+import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
+import edu.cornell.mannlib.vitro.webapp.utils.solr.AutoCompleteWords;
+import edu.cornell.mannlib.vitro.webapp.utils.solr.FieldMap;
+import edu.cornell.mannlib.vitro.webapp.utils.solr.SolrQueryUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.solr.SolrResponseFilter;
 
 /**
  * Get a list of Profiles with last names that begin with this search term, and
@@ -43,47 +60,52 @@ import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
  * If the matching property is not defined, or if the search term is empty, or
  * if an error occurs, return an empty result.
  */
-class ProfileAutoCompleter extends AbstractAjaxResponder {
+class ProfileAutoCompleter extends AbstractAjaxResponder implements
+		SolrResponseFilter {
 	private static final Log log = LogFactory
 			.getLog(ProfileAutoCompleter.class);
 
 	private static final String PARAMETER_SEARCH_TERM = "term";
 	private static final String PARAMETER_ETERNAL_AUTH_ID = "externalAuthId";
 
+	private static final Collection<String> profileTypes = Collections
+			.singleton("http://xmlns.com/foaf/0.1/Person");
+
+	private static final String WORD_DELIMITER = "[, ]+";
+	private static final FieldMap RESPONSE_FIELDS = SolrQueryUtils.fieldMap()
+			.put(URI, "uri").put(NAME_RAW, "label");
+
 	private static final Syntax SYNTAX = Syntax.syntaxARQ;
 
+	/** Use this to check whether search results should be filtered out. */
 	private static final String QUERY_TEMPLATE = "" //
-			+ "PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n"
-			+ "PREFIX foaf: <http://xmlns.com/foaf/0.1/> \n" + "\n" //
-			+ "SELECT DISTINCT ?uri ?fn ?ln \n" //
+			+ "SELECT DISTINCT ?id \n" //
 			+ "WHERE {\n" //
-			+ "    ?uri rdf:type foaf:Person ; \n" //
-			+ "         foaf:firstName ?fn ; \n" //
-			+ "         foaf:lastName ?ln . \n" //
-			+ "    OPTIONAL { ?uri <%matchingPropertyUri%> ?id} \n" //
-			+ "    FILTER ( !bound(?id) || (?id = '%externalAuthId%') ) \n" //
-			+ "    FILTER ( REGEX(?ln, '%searchTerm%', 'i') ) \n" //
+			+ "    <%uri%> <%matchingPropertyUri%> ?id . \n" //
 			+ "} \n" //
-			+ "ORDER BY ?ln ?fn \n" //
-			+ "LIMIT 20 \n";
+			+ "LIMIT 1 \n";
 
-	private final String term;
 	private final String externalAuthId;
 	private final String selfEditingIdMatchingProperty;
+	private final String term;
+	private final AutoCompleteWords searchWords;
 	private final OntModel fullModel;
 
 	public ProfileAutoCompleter(HttpServlet parent, VitroRequest vreq,
 			HttpServletResponse resp) {
 		super(parent, vreq, resp);
-		term = getStringParameter(PARAMETER_SEARCH_TERM, "");
-		externalAuthId = getStringParameter(PARAMETER_ETERNAL_AUTH_ID, "");
+		this.externalAuthId = getStringParameter(PARAMETER_ETERNAL_AUTH_ID, "");
+
+		this.term = getStringParameter(PARAMETER_SEARCH_TERM, "");
+		this.searchWords = SolrQueryUtils.parseForAutoComplete(term,
+				WORD_DELIMITER);
 
 		// TODO This seems to expose the matching property and mechanism too
 		// much. Can this be done within SelfEditingConfiguration somehow?
-		selfEditingIdMatchingProperty = SelfEditingConfiguration.getBean(vreq)
-				.getMatchingPropertyUri();
+		this.selfEditingIdMatchingProperty = SelfEditingConfiguration.getBean(
+				vreq).getMatchingPropertyUri();
 
-		fullModel = vreq.getJenaOntModel();
+		this.fullModel = vreq.getJenaOntModel();
 	}
 
 	@Override
@@ -97,97 +119,112 @@ class ProfileAutoCompleter extends AbstractAjaxResponder {
 		if (selfEditingIdMatchingProperty.isEmpty()) {
 			return EMPTY_RESPONSE;
 		}
-		return doSparqlQueryAndParseResult();
+
+		try {
+			SolrQuery query = buildSolrQuery();
+			QueryResponse queryResponse = executeSolrQuery(query);
+
+			List<Map<String, String>> maps = SolrQueryUtils
+					.parseAndFilterResponse(queryResponse, RESPONSE_FIELDS,
+							this, 30);
+
+			addProfileUrls(maps);
+
+			String response = assembleJsonResponse(maps);
+			log.debug(response);
+			return response;
+		} catch (SolrServerException e) {
+			log.error("Failed to get basic profile info", e);
+			return EMPTY_RESPONSE;
+		}
 	}
 
-	private String doSparqlQueryAndParseResult() throws JSONException {
-		String queryStr = prepareQueryString();
+	private SolrQuery buildSolrQuery() {
+		SolrQuery q = new SolrQuery();
+		q.setFields(NAME_RAW, URI);
+		q.setSortField(NAME_LOWERCASE_SINGLE_VALUED, ORDER.asc);
+		q.setFilterQueries(SolrQueryUtils.assembleConjunctiveQuery(RDFTYPE,
+				profileTypes, OR));
+		q.setStart(0);
+		q.setRows(10000);
+		q.setQuery(searchWords.assembleQuery(NAME_UNSTEMMED, AC_NAME_STEMMED));
+		return q;
+	}
+
+	private QueryResponse executeSolrQuery(SolrQuery query)
+			throws SolrServerException {
+		ServletContext ctx = servlet.getServletContext();
+		SolrServer solr = SolrSetup.getSolrServer(ctx);
+		return solr.query(query);
+	}
+
+	/**
+	 * For each URI in the maps, insert the corresponding URL.
+	 */
+	private void addProfileUrls(List<Map<String, String>> maps) {
+		for (Map<String, String> map : maps) {
+			String uri = map.get("uri");
+			String url = UrlBuilder.getIndividualProfileUrl(uri, vreq);
+			map.put("url", url);
+		}
+	}
+
+	/**
+	 * To test whether a search result is acceptable, find the matching property
+	 * for the individual.
+	 * 
+	 * We will accept any individual without a matching property, or with a
+	 * matching property that matches the user we are editing.
+	 */
+	@Override
+	public boolean accept(Map<String, String> map) {
+		String uri = map.get("uri");
+		if (uri == null) {
+			log.debug("reject result with no uri");
+			return false;
+		}
+
+		String id = runQueryAndGetId(uri);
+		if (id.isEmpty() || id.equals(externalAuthId)) {
+			log.debug("accept '" + uri + "' with id='" + id + "'");
+			return true;
+		}
+
+		log.debug("reject '" + uri + "' with id='" + id + "'");
+		return false;
+	}
+
+	/**
+	 * Run the query for the filter. Return the ID, if one was found.
+	 */
+	private String runQueryAndGetId(String uri) {
+		String queryString = QUERY_TEMPLATE.replace("%matchingPropertyUri%",
+				selfEditingIdMatchingProperty).replace("%uri%", uri);
 
 		QueryExecution qe = null;
-		List<ProfileInfo> results;
 		try {
-			Query query = QueryFactory.create(queryStr, SYNTAX);
+			Query query = QueryFactory.create(queryString, SYNTAX);
 			qe = QueryExecutionFactory.create(query, fullModel);
-			results = parseResults(qe.execSelect());
+
+			ResultSet resultSet = qe.execSelect();
+			if (!resultSet.hasNext()) {
+				return "";
+			}
+
+			QuerySolution solution = resultSet.next();
+			Literal literal = solution.getLiteral("id");
+			if (literal == null) {
+				return "";
+			}
+
+			return literal.getString();
 		} catch (Exception e) {
-			log.error("Failed to execute the query: " + queryStr, e);
-			results = Collections.emptyList();
+			log.error("Failed to execute the query: " + queryString, e);
+			return "";
 		} finally {
 			if (qe != null) {
 				qe.close();
 			}
 		}
-
-		JSONArray jsonArray = prepareJsonArray(results);
-		return jsonArray.toString();
 	}
-
-	private String prepareQueryString() {
-		String cleanTerm = SparqlQueryUtils.escapeForRegex(term);
-		String queryString = QUERY_TEMPLATE
-				.replace("%matchingPropertyUri%", selfEditingIdMatchingProperty)
-				.replace("%searchTerm%", cleanTerm)
-				.replace("%externalAuthId%", externalAuthId);
-		log.debug("Query string is '" + queryString + "'");
-		return queryString;
-	}
-
-	private List<ProfileInfo> parseResults(ResultSet results) {
-		List<ProfileInfo> profiles = new ArrayList<ProfileInfo>();
-		while (results.hasNext()) {
-			QuerySolution solution = results.next();
-			ProfileInfo pi = parseSolution(solution);
-			profiles.add(pi);
-		}
-		log.debug("Results are: " + profiles);
-		return profiles;
-	}
-
-	private ProfileInfo parseSolution(QuerySolution solution) {
-		String uri = solution.getResource("uri").getURI();
-		String url = UrlBuilder.getIndividualProfileUrl(uri, vreq);
-
-		String firstName = solution.getLiteral("fn").getString();
-		String lastName = solution.getLiteral("ln").getString();
-		String label = lastName + ", " + firstName;
-
-		return new ProfileInfo(uri, url, label);
-	}
-
-	private JSONArray prepareJsonArray(List<ProfileInfo> results)
-			throws JSONException {
-		JSONArray jsonArray = new JSONArray();
-
-		for (int i = 0; i < results.size(); i++) {
-			ProfileInfo profile = results.get(i);
-
-			Map<String, String> map = new HashMap<String, String>();
-			map.put("label", profile.label);
-			map.put("uri", profile.uri);
-			map.put("url", profile.url);
-
-			jsonArray.put(i, map);
-		}
-
-		return jsonArray;
-	}
-
-	private static class ProfileInfo {
-		final String uri;
-		final String url;
-		final String label;
-
-		public ProfileInfo(String uri, String url, String label) {
-			this.uri = uri;
-			this.url = url;
-			this.label = label;
-		}
-
-		@Override
-		public String toString() {
-			return "ProfileInfo[label=" + label + ", uri=" + uri + ", url="
-					+ url + "]";
-		}
-	}
-
 }
