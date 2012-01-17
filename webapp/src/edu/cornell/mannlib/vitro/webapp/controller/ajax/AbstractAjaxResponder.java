@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServlet;
@@ -73,6 +74,18 @@ public abstract class AbstractAjaxResponder {
 		} else {
 			return new HashSet<String>(Arrays.asList(values));
 		}
+	}
+
+	/**
+	 * Assemble a list of maps into a single String representing a JSON array of
+	 * objects with fields.
+	 */
+	protected String assembleJsonResponse(List<Map<String, String>> maps) {
+		JSONArray jsonArray = new JSONArray();
+		for (Map<String, String> map: maps) {
+			jsonArray.put(map);
+		}
+		return jsonArray.toString();
 	}
 
 	/**
