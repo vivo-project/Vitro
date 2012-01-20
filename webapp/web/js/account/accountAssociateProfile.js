@@ -240,8 +240,15 @@ $(document).ready(function() {
     associateProfileFields.onLoad();
     
     //Add progress indicator for autocomplete input field
+    
 
     var progressImage;
+    
+    
+    $('#externalAuthId').click(function(event){
+       progressImage = $(event.target).closest("div").find(".loading-profileMyAccount")
+    });
+    
 
     $('#associateProfileName').click(function(event){
         progressImage = $(event.target).closest("div").find(".loading-profileMyAccount")
