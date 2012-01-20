@@ -238,5 +238,22 @@ var associateProfileFields = {
  
 $(document).ready(function() {   
     associateProfileFields.onLoad();
+    
+    //Add progress indicator for autocomplete input field
+
+    var progressImage;
+
+    $('#associateProfileName').click(function(event){
+        progressImage = $(event.target).closest("div").find(".loading-profileMyAccount")
+    });
+
+
+    $(document).ajaxStart(function(){
+      progressImage.removeClass('hidden').css('display', 'inline-block');
+    });
+
+    $(document).ajaxStop(function(){
+      progressImage.hide().addClass('hidden');
+    });
 }); 
         

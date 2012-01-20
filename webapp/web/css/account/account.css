@@ -178,8 +178,9 @@ padding-right: 5px;
     margin-bottom: 10px;
 }
 #associationOptions {
-    float:right; 
-    display:none;
+    float: right; 
+    display: none;
+    width: 450px;
 }
 #verifyProfileLink {
     margin-left:10px;
@@ -477,6 +478,6 @@ span[name=proxySelectorSearchStatus] {
 img.loading-relateEdior,
 img.loading-relateProfile,
 img.loading-addProfile,
-img.loading-profileMyAccoount {
+img.loading-profileMyAccount {
     padding-left: 10px;
 }

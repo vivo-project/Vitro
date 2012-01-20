@@ -38,7 +38,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/auto
         <div id="associateProfileBackgroundThree">
             <p>
                 <label for="associateProfileName">Select the associated profile</label>
-                <input type="text" id="associateProfileName" name="associateProfileName" class="acSelector" size="35">
+                <input type="text" id="associateProfileName" name="associateProfileName" class="acSelector" size="35"><span><img class="loading-profileMyAccount hidden" src="${urls.images}/indicatorWhite.gif" /></span>
             </p>
         </div>
         <div id="associateProfileBackgroundFour">
