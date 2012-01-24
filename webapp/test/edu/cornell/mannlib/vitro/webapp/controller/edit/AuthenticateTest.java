@@ -37,7 +37,6 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.factory.HasPermissionFactory;
-import edu.cornell.mannlib.vitro.webapp.auth.permissions.Permission;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionRegistry;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PermissionsPolicy;
@@ -163,7 +162,7 @@ public class AuthenticateTest extends AbstractTestClass {
 
 		request = new HttpServletRequestStub();
 		request.setSession(session);
-		request.setRequestUrl(new URL("http://this.that/vivo/authenticate"));
+		request.setRequestUrlByParts("http://this.that", "/vivo", "/authenticate", null);
 		request.setMethod("POST");
 
 		response = new HttpServletResponseStub();

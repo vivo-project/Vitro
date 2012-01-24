@@ -27,9 +27,17 @@ public class ServletContextStub implements ServletContext {
 	// Stub infrastructure
 	// ----------------------------------------------------------------------
 
+	private String contextPath = ""; // root context returns ""
 	private final Map<String, Object> attributes = new HashMap<String, Object>();
 	private final Map<String, String> mockResources = new HashMap<String, String>();
+	private final Map<String, String> realPaths = new HashMap<String, String>();
 
+	public void setContextPath(String contextPath) {
+		if (contextPath == null) {
+			throw new NullPointerException("contextPath may not be null.");
+		}
+	}
+	
 	public void setMockResource(String path, String contents) {
 		if (path == null) {
 			throw new NullPointerException("path may not be null.");
@@ -40,10 +48,26 @@ public class ServletContextStub implements ServletContext {
 			mockResources.put(path, contents);
 		}
 	}
+	
+	public void setRealPath(String path, String filepath) {
+		if (path == null) {
+			throw new NullPointerException("path may not be null.");
+		}
+		if (filepath == null) {
+			realPaths.remove(path);
+		} else {
+			realPaths.put(path, filepath);
+		}
+	}
 
 	// ----------------------------------------------------------------------
 	// Stub methods
 	// ----------------------------------------------------------------------
+
+	@Override
+	public String getContextPath() {
+		return contextPath;
+	}
 
 	@Override
 	public Object getAttribute(String name) {
@@ -78,6 +102,11 @@ public class ServletContextStub implements ServletContext {
 		}
 	}
 
+	@Override
+	public String getRealPath(String path) {
+		return realPaths.get(path);
+	}
+
 	// ----------------------------------------------------------------------
 	// Un-implemented methods
 	// ----------------------------------------------------------------------
@@ -86,12 +115,6 @@ public class ServletContextStub implements ServletContext {
 	public ServletContext getContext(String arg0) {
 		throw new RuntimeException(
 				"ServletContextStub.getContext() not implemented.");
-	}
-
-	@Override
-	public String getContextPath() {
-		throw new RuntimeException(
-				"ServletContextStub.getContextPath() not implemented.");
 	}
 
 	@Override
@@ -129,12 +152,6 @@ public class ServletContextStub implements ServletContext {
 	public RequestDispatcher getNamedDispatcher(String arg0) {
 		throw new RuntimeException(
 				"ServletContextStub.getNamedDispatcher() not implemented.");
-	}
-
-	@Override
-	public String getRealPath(String arg0) {
-		throw new RuntimeException(
-				"ServletContextStub.getRealPath() not implemented.");
 	}
 
 	@Override

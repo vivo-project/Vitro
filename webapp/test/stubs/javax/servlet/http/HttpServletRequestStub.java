@@ -21,16 +21,22 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
+
 /**
  * A simple stub for HttpServletRequest
  */
-@SuppressWarnings("deprecation")
 public class HttpServletRequestStub implements HttpServletRequest {
 	// ----------------------------------------------------------------------
 	// Stub infrastructure
 	// ----------------------------------------------------------------------
 
-	private URL requestUrl;
+	private String pathInfo;
+	private String requestUri;
+	private String requestUrl;
+	private String contextPath;
+	private String servletPath;
+
 	private String httpMethodType = "GET";
 	private String remoteAddr = "127.0.0.1";
 
@@ -52,8 +58,60 @@ public class HttpServletRequestStub implements HttpServletRequest {
 		this.attributes.putAll(attributes);
 	}
 
+	/**
+	 * Supply the request URL as a single URL. We will parse it on the
+	 * assumption that the contextPath and the pathInfo are empty. 
+	 * Don't include a query string. Instead, set parameters.
+	 */
 	public void setRequestUrl(URL url) {
-		this.requestUrl = url;
+		this.contextPath = "";
+		this.pathInfo = null;
+
+		this.requestUrl = url.toString();
+
+		String path = url.getPath();
+		if (path.isEmpty()) {
+			this.servletPath = "/";
+		} else {
+			this.servletPath = path;
+		}
+
+		this.requestUri = this.servletPath;
+	}
+
+	/**
+	 * Supply the pieces of the request URL, so we can respond correctly when
+	 * asked for a piece.
+	 * Don't include a query string. Instead, set parameters.
+	 */
+	public void setRequestUrlByParts(String shemeHostPort, String contextPath,
+			String servletPath, String pathInfo) {
+		if (contextPath == null) {
+			throw new NullPointerException("contextPath may not be null.");
+		}
+		this.contextPath = contextPath;
+
+		this.pathInfo = pathInfo;
+
+		if (servletPath == null) {
+			throw new NullPointerException("servletPath may not be null.");
+		}
+		if (!servletPath.startsWith("/")) {
+			throw new IllegalArgumentException(
+					"servletPath must start with a /");
+		}
+		this.servletPath = servletPath;
+
+		this.requestUri = contextPath + servletPath + ((pathInfo == null) ? "" : pathInfo);
+		
+		if (shemeHostPort == null) {
+			throw new NullPointerException("shemeHostPort may not be null.");
+		}
+		if (!shemeHostPort.contains("://")) {
+			throw new IllegalArgumentException(
+					"schemeHostPort must be sheme://host[:port]");
+		}
+		this.requestUrl = shemeHostPort + this.requestUri;
 	}
 
 	/** Set to "GET" or "POST", etc. */
@@ -64,7 +122,7 @@ public class HttpServletRequestStub implements HttpServletRequest {
 	public void setRemoteAddr(String remoteAddr) {
 		this.remoteAddr = remoteAddr;
 	}
-	
+
 	public void setHeader(String name, String value) {
 		name = name.toLowerCase();
 		if (!headers.containsKey(name)) {
@@ -93,10 +151,12 @@ public class HttpServletRequestStub implements HttpServletRequest {
 	// Stub methods
 	// ----------------------------------------------------------------------
 
+	@Override
 	public HttpSession getSession() {
 		return getSession(true);
 	}
 
+	@Override
 	public HttpSession getSession(boolean create) {
 		if (create && (session == null)) {
 			session = new HttpSessionStub();
@@ -104,32 +164,63 @@ public class HttpServletRequestStub implements HttpServletRequest {
 		return session;
 	}
 
-	public String getContextPath() {
-		String path = requestUrl.getPath();
-		if (path.isEmpty()) {
-			return "";
-		}
-		int secondSlash = path.indexOf("/", 1);
-		if (secondSlash == -1) {
-			return "";
-		} else {
-			return path.substring(0, secondSlash);
-		}
+	@Override
+	public StringBuffer getRequestURL() {
+		return new StringBuffer(requestUrl);
 	}
 
+	@Override
+	public String getRequestURI() {
+		return requestUri;
+	}
+
+	@Override
+	public String getContextPath() {
+		return contextPath;
+	}
+
+	@Override
+	public String getServletPath() {
+		return servletPath;
+	}
+	
+	@Override
+	public String getPathInfo() {
+		return pathInfo;
+	}
+	
+	@Override
+	public String getQueryString() {
+		if (parameters.isEmpty()) {
+			return null;
+		}
+		
+		String qs = "";
+		for (String key:parameters.keySet()) {
+			for (String value: parameters.get(key)) {
+				qs += "&" + key + "=" + URLEncoder.encode(value);
+			}
+		}
+		return "?" + qs.substring(1);
+	}
+
+	@Override
 	public String getMethod() {
 		return httpMethodType;
 	}
 
+	@Override
 	public String getRemoteAddr() {
 		return remoteAddr;
 	}
 
+	@Override
 	@SuppressWarnings("rawtypes")
 	public Enumeration getParameterNames() {
 		return Collections.enumeration(parameters.keySet());
 	}
 
+	@Override
 	@SuppressWarnings("rawtypes")
 	public Map getParameterMap() {
 		Map<String, String[]> map = new HashMap<String, String[]>();
@@ -139,6 +230,7 @@ public class HttpServletRequestStub implements HttpServletRequest {
 		return map;
 	}
 
+	@Override
 	public String getParameter(String name) {
 		if (!parameters.containsKey(name)) {
 			return null;
@@ -146,6 +238,7 @@ public class HttpServletRequestStub implements HttpServletRequest {
 		return parameters.get(name).get(0);
 	}
 
+	@Override
 	public String[] getParameterValues(String name) {
 		if (!parameters.containsKey(name)) {
 			return null;
@@ -154,19 +247,23 @@ public class HttpServletRequestStub implements HttpServletRequest {
 		return list.toArray(new String[list.size()]);
 	}
 
+	@Override
 	public Object getAttribute(String name) {
 		return attributes.get(name);
 	}
 
+	@Override
 	@SuppressWarnings("rawtypes")
 	public Enumeration getAttributeNames() {
 		return Collections.enumeration(attributes.keySet());
 	}
 
+	@Override
 	public void removeAttribute(String name) {
 		attributes.remove(name);
 	}
 
+	@Override
 	public void setAttribute(String name, Object value) {
 		if (value == null) {
 			removeAttribute(name);
@@ -174,11 +271,13 @@ public class HttpServletRequestStub implements HttpServletRequest {
 		attributes.put(name, value);
 	}
 
+	@Override
 	@SuppressWarnings("rawtypes")
 	public Enumeration getHeaderNames() {
 		return Collections.enumeration(headers.keySet());
 	}
 
+	@Override
 	public String getHeader(String name) {
 		name = name.toLowerCase();
 		if (headers.containsKey(name)) {
@@ -188,6 +287,7 @@ public class HttpServletRequestStub implements HttpServletRequest {
 		}
 	}
 
+	@Override
 	@SuppressWarnings("rawtypes")
 	public Enumeration getHeaders(String name) {
 		name = name.toLowerCase();
@@ -222,19 +322,9 @@ public class HttpServletRequestStub implements HttpServletRequest {
 				"HttpServletRequestStub.getIntHeader() not implemented.");
 	}
 
-	public String getPathInfo() {
-		throw new RuntimeException(
-				"HttpServletRequestStub.getPathInfo() not implemented.");
-	}
-
 	public String getPathTranslated() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getPathTranslated() not implemented.");
-	}
-
-	public String getQueryString() {
-		throw new RuntimeException(
-				"HttpServletRequestStub.getQueryString() not implemented.");
 	}
 
 	public String getRemoteUser() {
@@ -242,24 +332,9 @@ public class HttpServletRequestStub implements HttpServletRequest {
 				"HttpServletRequestStub.getRemoteUser() not implemented.");
 	}
 
-	public String getRequestURI() {
-		throw new RuntimeException(
-				"HttpServletRequestStub.getRequestURI() not implemented.");
-	}
-
-	public StringBuffer getRequestURL() {
-		throw new RuntimeException(
-				"HttpServletRequestStub.getRequestURL() not implemented.");
-	}
-
 	public String getRequestedSessionId() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getRequestedSessionId() not implemented.");
-	}
-
-	public String getServletPath() {
-		throw new RuntimeException(
-				"HttpServletRequestStub.getServletPath() not implemented.");
 	}
 
 	public Principal getUserPrincipal() {

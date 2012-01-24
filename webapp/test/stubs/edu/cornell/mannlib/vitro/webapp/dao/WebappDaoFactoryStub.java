@@ -36,21 +36,46 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	// Stub infrastructure
 	// ----------------------------------------------------------------------
 
-	private IndividualDao individualDao;
+	private String defaultNamespace;
+	private ApplicationDao applicationDao;
 	private DataPropertyDao dataPropertyDao;
+	private IndividualDao individualDao;
+	private MenuDao menuDao;
 	private ObjectPropertyDao objectPropertyDao;
+	private ObjectPropertyStatementDao objectPropertyStatementDao;
+	private OntologyDao ontologyDao;
 	private UserAccountsDao userAccountsDao;
 
-	public void setIndividualDao(IndividualDao individualDao) {
-		this.individualDao = individualDao;
+	public void setDefaultNamespace(String defaultNamespace) {
+		this.defaultNamespace = defaultNamespace;
+	}
+
+	public void setApplicationDao(ApplicationDao applicationDao) {
+		this.applicationDao = applicationDao;
 	}
 
 	public void setDataPropertyDao(DataPropertyDao dataPropertyDao) {
 		this.dataPropertyDao = dataPropertyDao;
 	}
 
+	public void setIndividualDao(IndividualDao individualDao) {
+		this.individualDao = individualDao;
+	}
+
+	public void setMenuDao(MenuDao menuDao) {
+		this.menuDao = menuDao;
+	}
+
 	public void setObjectPropertyDao(ObjectPropertyDao objectPropertyDao) {
 		this.objectPropertyDao = objectPropertyDao;
+	}
+
+	public void setObjectPropertyStatementDao(ObjectPropertyStatementDao objectPropertyStatementDao) {
+		this.objectPropertyStatementDao = objectPropertyStatementDao;
+	}
+	
+	public void setOntologyDao(OntologyDao ontologyDao) {
+		this.ontologyDao = ontologyDao;
 	}
 
 	public void setUserAccountsDao(UserAccountsDao userAccountsDao) {
@@ -62,8 +87,13 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	// ----------------------------------------------------------------------
 
 	@Override
-	public IndividualDao getIndividualDao() {
-		return this.individualDao;
+	public String getDefaultNamespace() {
+		return this.defaultNamespace;
+	}
+
+	@Override
+	public ApplicationDao getApplicationDao() {
+		return this.applicationDao;
 	}
 
 	@Override
@@ -72,8 +102,27 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	}
 
 	@Override
+	public IndividualDao getIndividualDao() {
+		return this.individualDao;
+	}
+
+	@Override
+	public MenuDao getMenuDao() {
+		return this.menuDao;
+	}
+
+	@Override
 	public ObjectPropertyDao getObjectPropertyDao() {
 		return this.objectPropertyDao;
+	}
+
+	@Override
+	public ObjectPropertyStatementDao getObjectPropertyStatementDao() {
+return this.objectPropertyStatementDao;	}
+
+	@Override
+	public OntologyDao getOntologyDao() {
+		return this.ontologyDao;
 	}
 
 	@Override
@@ -101,12 +150,6 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	public String checkURI(String uriStr, boolean checkUniqueness) {
 		throw new RuntimeException(
 				"WebappDaoFactory.checkURI() not implemented.");
-	}
-
-	@Override
-	public String getDefaultNamespace() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getDefaultNamespace() not implemented.");
 	}
 
 	@Override
@@ -152,12 +195,6 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	}
 
 	@Override
-	public OntologyDao getOntologyDao() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getOntologyDao() not implemented.");
-	}
-
-	@Override
 	public VClassDao getVClassDao() {
 		throw new RuntimeException(
 				"WebappDaoFactory.getVClassDao() not implemented.");
@@ -170,21 +207,9 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	}
 
 	@Override
-	public ObjectPropertyStatementDao getObjectPropertyStatementDao() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getObjectPropertyStatementDao() not implemented.");
-	}
-
-	@Override
 	public DisplayModelDao getDisplayModelDao() {
 		throw new RuntimeException(
 				"WebappDaoFactory.getDisplayModelDao() not implemented.");
-	}
-
-	@Override
-	public ApplicationDao getApplicationDao() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getApplicationDao() not implemented.");
 	}
 
 	@Override
@@ -209,12 +234,6 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	public PageDao getPageDao() {
 		throw new RuntimeException(
 				"WebappDaoFactory.getPageDao() not implemented.");
-	}
-
-	@Override
-	public MenuDao getMenuDao() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getMenuDao() not implemented.");
 	}
 
 	@Override
