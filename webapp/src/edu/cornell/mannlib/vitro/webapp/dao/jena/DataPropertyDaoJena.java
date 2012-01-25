@@ -459,7 +459,13 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     }
     
     public DataProperty getDataPropertyByURI(String dataPropertyURI) {
-        return datapropFromOntProperty(getOntModelSelector().getTBoxModel().getDatatypeProperty(dataPropertyURI));
+        OntModel tboxModel = getOntModelSelector().getTBoxModel();
+        tboxModel.enterCriticalSection(Lock.READ);
+        try {
+            return datapropFromOntProperty(tboxModel.getDatatypeProperty(dataPropertyURI));
+        } finally {
+            tboxModel.leaveCriticalSection();
+        }
     }
 
     public String insertDataProperty(DataProperty dtp) throws InsertException{
