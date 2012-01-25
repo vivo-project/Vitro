@@ -541,6 +541,7 @@ public class SimpleReasoner extends StatementListener {
         } finally {
             aboxModel.leaveCriticalSection();
         }
+        
         for (Resource ind : subjectList) {
 			if (entailedType(ind,superClass)) {
 				continue;
@@ -551,10 +552,12 @@ public class SimpleReasoner extends StatementListener {
 			    if (inferenceModel.contains(infStmt)) {
 				    inferenceModel.remove(infStmt);
 			    } 
-			    setMostSpecificTypes(ind, inferenceModel, new HashSet<String>());
+			    
             } finally {
                 inferenceModel.leaveCriticalSection();
             }
+			
+			setMostSpecificTypes(ind, inferenceModel, new HashSet<String>());
 		}
 	}
 
