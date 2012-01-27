@@ -195,15 +195,15 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
         
         WebappDaoFactory wdf = vreq.getWebappDaoFactory();        
         Property prop = getPropertyByUri(predicateUri, wdf);
-        
-        if(isDataProperty( prop , wdf )){
-            editConfGeneratorName = DEFAULT_DATA_FORM;
-        } else{
+        //If we want to have data property custom form, we need to consider that as well
+      //  if(isDataProperty( prop , wdf )){
+      //      editConfGeneratorName = DEFAULT_DATA_FORM;
+      //  } else{
         	String customForm = prop.getCustomEntryForm();
         	if(customForm != null && !customForm.trim().isEmpty()) {
         		editConfGeneratorName = customForm;
         	}
-        }
+      //  }
         
         log.debug("generator name is " + editConfGeneratorName);
         return editConfGeneratorName;

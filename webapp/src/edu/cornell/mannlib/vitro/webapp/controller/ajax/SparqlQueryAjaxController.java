@@ -29,6 +29,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.ajax.SparqlUtils.AjaxControllerException;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 
 /**
@@ -65,8 +66,8 @@ public class SparqlQueryAjaxController extends VitroAjaxController {
 			String modelParam = getModelParam(vreq);
 			Model model = locateModel(vreq, modelParam);
 			String queryParam = locateQueryParam(vreq);
-			Query query = createQuery(queryParam);
-			executeQuery(response, query, model);
+			Query query = SparqlUtils.createQuery(queryParam);
+			SparqlUtils.executeQuery(response, query, model);
 			return;
 		} catch (AjaxControllerException e) {
 			log.error(e.getMessage());
@@ -121,40 +122,5 @@ public class SparqlQueryAjaxController extends VitroAjaxController {
 					+ PARAMETER_QUERY + "' parameter is required");
 		}
 	}
-
-	private Query createQuery(String queryParam) throws AjaxControllerException {
-		Query query = QueryFactory.create(queryParam, Syntax.syntaxARQ);
-		if (!query.isSelectType()) {
-			throw new AjaxControllerException(SC_NOT_FOUND,
-					"Only 'select' queries are allowed.");
-		}
-		return query;
-	}
-
-	private void executeQuery(HttpServletResponse response, Query query,
-			Model model) throws IOException {
-		Dataset dataset = DatasetFactory.create(model);
-		QueryExecution qe = QueryExecutionFactory.create(query, dataset);
-		try {
-			ResultSet results = qe.execSelect();
-			response.setContentType(RESPONSE_MIME_TYPE);
-			OutputStream out = response.getOutputStream();
-			ResultSetFormatter.outputAsJSON(out, results);
-		} finally {
-			qe.close();
-		}
-	}
-
-	private static class AjaxControllerException extends Exception {
-		private final int statusCode;
-
-		AjaxControllerException(int statusCode, String message) {
-			super(message);
-			this.statusCode = statusCode;
-		}
-
-		public int getStatusCode() {
-			return statusCode;
-		}
-	}
+	
 }
