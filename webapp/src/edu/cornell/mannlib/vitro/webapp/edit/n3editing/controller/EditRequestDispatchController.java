@@ -173,14 +173,22 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 	//e.g. default add individual form etc. and additional scenarios
 	//TODO: Check if additional scenarios should be checked here
 	private String processEditConfGeneratorName(VitroRequest vreq) {
-    	//use default object property form if nothing else works
-        String editConfGeneratorName = DEFAULT_OBJ_FORM;
-
+    	
         //Handle deletion before any of the other cases        
         if(isDeleteForm(vreq)) {
         	return DEFAULT_DELETE_FORM;
         }        
                         
+        //use default object property form if nothing else works
+        //or default data property form if the predicate in this case is data property
+        String editConfGeneratorName = DEFAULT_OBJ_FORM;
+        WebappDaoFactory wdf = vreq.getWebappDaoFactory();   
+        String predicateUri =  getPredicateUri(vreq);        
+        Property prop = getPropertyByUri(predicateUri, wdf);
+        //If we want to have data property custom form, we need to consider that as well
+        if(isDataProperty( prop , wdf )){
+            editConfGeneratorName = DEFAULT_DATA_FORM;
+        }
         // *** handle the case where the form is specified as a request parameter ***
         String formParam = getFormParam(vreq);
         if(  formParam != null && !formParam.isEmpty() ){
@@ -188,22 +196,16 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
             return formParam;              
         }
         
-        String predicateUri =  getPredicateUri(vreq);        
         if( isVitroLabel(predicateUri) ) { //in case of data property
         	return RDFS_LABEL_FORM;
         } 
         
-        WebappDaoFactory wdf = vreq.getWebappDaoFactory();        
-        Property prop = getPropertyByUri(predicateUri, wdf);
-        //If we want to have data property custom form, we need to consider that as well
-      //  if(isDataProperty( prop , wdf )){
-      //      editConfGeneratorName = DEFAULT_DATA_FORM;
-      //  } else{
-        	String customForm = prop.getCustomEntryForm();
-        	if(customForm != null && !customForm.trim().isEmpty()) {
-        		editConfGeneratorName = customForm;
-        	}
-      //  }
+        //now if there is a custom form, for either data or object property, that form will be used
+    	String customForm = prop.getCustomEntryForm();
+    	if(customForm != null && !customForm.trim().isEmpty()) {
+    		editConfGeneratorName = customForm;
+    	}
+  
         
         log.debug("generator name is " + editConfGeneratorName);
         return editConfGeneratorName;
