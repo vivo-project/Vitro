@@ -9,16 +9,14 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import stubs.edu.cornell.mannlib.vitro.webapp.beans.IndividualStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.controller.individual.IndividualRequestAnalysisContextStub;
 import stubs.javax.servlet.http.HttpServletRequestStub;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
-import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 
@@ -64,7 +62,7 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 			+ ID_INDIVIDUAL_FOREIGN;
 
 	private IndividualRequestAnalyzer analyzer;
-	private MyAnalysisContext analysisContext;
+	private IndividualRequestAnalysisContextStub analysisContext;
 	private HttpServletRequestStub req;
 	private VitroRequest vreq;
 	private IndividualRequestInfo requestInfo;
@@ -76,7 +74,7 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 	@Before
 	public void setup() {
 		req = new HttpServletRequestStub();
-		analysisContext = new MyAnalysisContext(DEFAULT_NAMESPACE);
+		analysisContext = new IndividualRequestAnalysisContextStub(DEFAULT_NAMESPACE);
 
 		testIndividual = new IndividualStub(URI_INDIVIDUAL_TEST);
 		analysisContext.addIndividual(testIndividual);
@@ -398,83 +396,4 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 				requestInfo.getRdfFormat());
 	}
 
-	// ----------------------------------------------------------------------
-	// Supporting classes
-	// ----------------------------------------------------------------------
-
-	private static class MyAnalysisContext implements
-			IndividualRequestAnalysisContext {
-		// ----------------------------------------------------------------------
-		// Stub infrastructure
-		// ----------------------------------------------------------------------
-
-		private final String defaultNamespace;
-		private final Map<String, Individual> individualsByUri = new HashMap<String, Individual>();
-		private final Map<String, Individual> profilePages = new HashMap<String, Individual>();
-		private final Map<String, String> namespacesByPrefix = new HashMap<String, String>();
-		private final Map<String, String> aliasUrlsByIndividual = new HashMap<String, String>();
-
-		public MyAnalysisContext(String defaultNamespace) {
-			this.defaultNamespace = defaultNamespace;
-		}
-
-		public void addIndividual(Individual individual) {
-			individualsByUri.put(individual.getURI(), individual);
-		}
-
-		public void addProfilePage(String netId, Individual individual) {
-			profilePages.put(netId, individual);
-		}
-
-		public void setNamespacePrefix(String prefix, String namespace) {
-			namespacesByPrefix.put(prefix, namespace);
-		}
-
-		public void setAliasUrl(String individualUri, String aliasUrl) {
-			aliasUrlsByIndividual.put(individualUri, aliasUrl);
-		}
-
-		// ----------------------------------------------------------------------
-		// Stub methods
-		// ----------------------------------------------------------------------
-
-		@Override
-		public String getDefaultNamespace() {
-			return defaultNamespace;
-		}
-
-		@Override
-		public String getNamespaceForPrefix(String prefix) {
-			if (prefix == null) {
-				return "";
-			}
-			String namespace = namespacesByPrefix.get(prefix);
-			return (namespace == null) ? "" : namespace;
-		}
-
-		@Override
-		public Individual getIndividualByURI(String individualUri) {
-			if (individualUri == null) {
-				return null;
-
-			}
-			return individualsByUri.get(individualUri);
-		}
-
-		@Override
-		public Individual getIndividualByNetId(String netId) {
-			if (netId == null) {
-				return null;
-			}
-			return profilePages.get(netId);
-		}
-
-		@Override
-		public String getAliasUrlForBytestreamIndividual(Individual individual) {
-			if (individual == null) {
-				return null;
-			}
-			return aliasUrlsByIndividual.get(individual.getURI());
-		}
-	}
 }
