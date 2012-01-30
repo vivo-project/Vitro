@@ -42,6 +42,7 @@
         CONSTRUCT {
             ?subject ?property ?object .
             ?object a ?subclass .
+            ?subclass vitro:inClassGroup ?classgroup .
             ?object rdfs:label ?label .
         } WHERE {
             { 
@@ -49,6 +50,10 @@
             } UNION {            
                 ?subject ?property ?object .
                 ?object a ?subclass . 
+            } UNION {
+                ?subject ?property ?object .
+                ?object a ?subclass .
+                ?subclass vitro:inClassGroup ?classgroup 
             } UNION {         
                 ?subject ?property ?object .
                 ?object rdfs:label ?label .
