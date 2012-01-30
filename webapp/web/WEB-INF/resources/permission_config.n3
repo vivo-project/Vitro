@@ -148,5 +148,7 @@ auth:PUBLIC
 
     # role-based permissions for PUBLIC
     auth:hasPermission displayByRole:Public ;
-    auth:hasPermission editByRole:Public ;
+    
+    # why are some properties declared editable by PUBLIC, but we don't want them to be.
+    # auth:hasPermission editByRole:Public ;
     .
