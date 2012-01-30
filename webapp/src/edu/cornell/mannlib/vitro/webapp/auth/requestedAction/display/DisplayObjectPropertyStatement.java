@@ -17,4 +17,13 @@ public class DisplayObjectPropertyStatement extends RequestedAction {
 	public ObjectPropertyStatement getObjectPropertyStatement() {
 		return objectPropertyStatement;
 	}
+
+	@Override
+	public String toString() {
+		return "DisplayObjectPropertyStatement["
+				+ objectPropertyStatement.getSubjectURI() + "==>"
+				+ objectPropertyStatement.getPropertyURI() + "==>"
+				+ objectPropertyStatement.getObjectURI() + "]";
+	}
+
 }

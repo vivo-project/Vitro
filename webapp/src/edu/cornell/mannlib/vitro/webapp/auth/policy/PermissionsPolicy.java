@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasPermission;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.Permission;
@@ -15,6 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
  * Permissions will authorize it.
  */
 public class PermissionsPolicy implements PolicyIface {
+	private static final Log log = LogFactory.getLog(PermissionsPolicy.class);
 
 	@Override
 	public PolicyDecision isAuthorized(IdentifierBundle whoToAuth,
@@ -28,10 +32,12 @@ public class PermissionsPolicy implements PolicyIface {
 
 		for (Permission p : HasPermission.getPermissions(whoToAuth)) {
 			if (p.isAuthorized(whatToAuth)) {
+				log.debug("Permission " + p + " approves request " + whatToAuth);
 				return new BasicPolicyDecision(Authorization.AUTHORIZED,
 						"PermissionsPolicy: approved by " + p);
 			}
 		}
+		log.debug("No permission will approve " + whatToAuth);
 		return defaultDecision("no permission will approve " + whatToAuth);
 	}
 
