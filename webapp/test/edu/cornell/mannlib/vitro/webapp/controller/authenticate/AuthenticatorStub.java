@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,47 +18,22 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
  * put it into place.
  */
 public class AuthenticatorStub extends Authenticator {
+	public static final String FACTORY_ATTRIBUTE_NAME = AuthenticatorFactory.class
+			.getName();
+	
 	// ----------------------------------------------------------------------
-	// factory
+	// factory - store this in the context.
+	//
+	// Creates a single instance of the stub and returns it for all requests.
 	// ----------------------------------------------------------------------
 
-	/**
-	 * Create a single instance of the stub. Force our factory into the
-	 * Authenticator, so each request for an instance returns that one.
-	 * 
-	 * Call this at the top of each unit test, so you get fresh instance for
-	 * each test.
-	 */
-	public static AuthenticatorStub setup() throws SecurityException,
-			NoSuchFieldException, IllegalArgumentException,
-			IllegalAccessException {
-		AuthenticatorStub authenticator = new AuthenticatorStub();
-
-		Field factoryField = Authenticator.class.getDeclaredField("factory");
-		factoryField.setAccessible(true);
-		Authenticator.AuthenticatorFactory factory = new AuthenticatorStub.AuthenticatorFactory(
-				authenticator);
-		factoryField.set(null, factory);
-
-		return authenticator;
-	}
-
-	/**
-	 * This factory holds a single instance of the stub, and hands it out each
-	 * time we request an "newInstance".
-	 */
-	private static class AuthenticatorFactory implements
-			Authenticator.AuthenticatorFactory {
-		private final AuthenticatorStub authenticator;
-
-		public AuthenticatorFactory(AuthenticatorStub authenticator) {
-			this.authenticator = authenticator;
-		}
+	public static class Factory implements Authenticator.AuthenticatorFactory {
+		private final AuthenticatorStub instance = new AuthenticatorStub();
 
 		@Override
-		public Authenticator newInstance(HttpServletRequest request) {
-			authenticator.setRequest(request);
-			return authenticator;
+		public AuthenticatorStub getInstance(HttpServletRequest request) {
+			instance.setRequest(request);
+			return instance;
 		}
 	}
 

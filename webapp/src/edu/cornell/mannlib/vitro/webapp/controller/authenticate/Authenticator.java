@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Hex;
@@ -27,23 +28,33 @@ public abstract class Authenticator {
 	// ----------------------------------------------------------------------
 	// The factory
 	//
-	// Unit tests can replace the factory to get a stub class instead.
-	// Note: this can only work because the factory value is not final.
+	// Each Authenticator instance is used for a single request, so we store
+	// a factory in the context that can create these instances.
 	// ----------------------------------------------------------------------
 
-	public static interface AuthenticatorFactory {
-		Authenticator newInstance(HttpServletRequest request);
+	private static final String FACTORY_ATTRIBUTE_NAME = AuthenticatorFactory.class
+			.getName();
+
+	public interface AuthenticatorFactory {
+		Authenticator getInstance(HttpServletRequest request);
 	}
 
-	private static AuthenticatorFactory factory = new AuthenticatorFactory() {
-		@Override
-		public Authenticator newInstance(HttpServletRequest request) {
-			return new BasicAuthenticator(request);
-		}
-	};
-
+	/**
+	 * Ask the currently configured AuthenticatorFactory to give us an
+	 * Authenticator for this request.
+	 * 
+	 * If there is no factory, configure a Basic one.
+	 */
 	public static Authenticator getInstance(HttpServletRequest request) {
-		return factory.newInstance(request);
+		ServletContext ctx = request.getSession().getServletContext();
+		Object attribute = ctx.getAttribute(FACTORY_ATTRIBUTE_NAME);
+		if (! (attribute instanceof AuthenticatorFactory)) {
+			attribute = new BasicAuthenticator.Factory();
+			ctx.setAttribute(FACTORY_ATTRIBUTE_NAME, attribute);
+		}
+		AuthenticatorFactory factory = (AuthenticatorFactory) attribute;	
+
+		return factory.getInstance(request);
 	}
 
 	// ----------------------------------------------------------------------

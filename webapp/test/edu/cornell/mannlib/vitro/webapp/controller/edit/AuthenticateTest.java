@@ -10,7 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -52,7 +51,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
 /**
  */
 public class AuthenticateTest extends AbstractTestClass {
-
+	private AuthenticatorStub.Factory authenticatorFactory;
 	private AuthenticatorStub authenticator;
 	private ServletContextStub servletContext;
 	private WebappDaoFactoryStub webappDaoFactory;
@@ -120,7 +119,8 @@ public class AuthenticateTest extends AbstractTestClass {
 
 	@Before
 	public void setup() throws Exception {
-		authenticator = AuthenticatorStub.setup();
+		authenticatorFactory = new AuthenticatorStub.Factory();
+		authenticator = authenticatorFactory.getInstance(request);
 		authenticator.addUser(createUserFromUserInfo(NEW_DBA));
 		authenticator.addUser(createUserFromUserInfo(OLD_DBA));
 		authenticator.addUser(createUserFromUserInfo(OLD_SELF));
@@ -148,12 +148,14 @@ public class AuthenticateTest extends AbstractTestClass {
 
 		servletContext = new ServletContextStub();
 		servletContext.setAttribute("webappDaoFactory", webappDaoFactory);
+		servletContext.setAttribute(AuthenticatorStub.FACTORY_ATTRIBUTE_NAME,
+				authenticatorFactory);
 
 		setLoggerLevel(ServletPolicyList.class, Level.WARN);
 		ServletPolicyList.addPolicy(servletContext, new PermissionsPolicy());
 		PermissionRegistry.createRegistry(servletContext,
 				Collections.singleton(SimplePermission.SEE_SITE_ADMIN_PAGE));
-		
+
 		servletConfig = new ServletConfigStub();
 		servletConfig.setServletContext(servletContext);
 
@@ -162,7 +164,8 @@ public class AuthenticateTest extends AbstractTestClass {
 
 		request = new HttpServletRequestStub();
 		request.setSession(session);
-		request.setRequestUrlByParts("http://this.that", "/vivo", "/authenticate", null);
+		request.setRequestUrlByParts("http://this.that", "/vivo",
+				"/authenticate", null);
 		request.setMethod("POST");
 
 		response = new HttpServletResponseStub();

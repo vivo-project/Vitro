@@ -48,6 +48,7 @@ public class ProgramLoginTest extends AbstractTestClass {
 	private static final UserAccount OLD_USER = createUserAccount(OLD_USER_URI,
 			OLD_USER_NAME, OLD_USER_PASSWORD, 10);
 
+	private AuthenticatorStub.Factory authenticatorFactory;
 	private AuthenticatorStub authenticator;
 	private ServletContextStub servletContext;
 	private ServletConfigStub servletConfig;
@@ -64,11 +65,14 @@ public class ProgramLoginTest extends AbstractTestClass {
 
 	@Before
 	public void setup() throws Exception {
-		authenticator = AuthenticatorStub.setup();
+		authenticatorFactory = new AuthenticatorStub.Factory();
+		authenticator = authenticatorFactory.getInstance(request);
 		authenticator.addUser(NEW_USER);
 		authenticator.addUser(OLD_USER);
 
 		servletContext = new ServletContextStub();
+		servletContext.setAttribute(AuthenticatorStub.FACTORY_ATTRIBUTE_NAME,
+				authenticatorFactory);
 
 		servletConfig = new ServletConfigStub();
 		servletConfig.setServletContext(servletContext);
