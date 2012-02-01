@@ -20,7 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 public class AuthenticatorStub extends Authenticator {
 	public static final String FACTORY_ATTRIBUTE_NAME = AuthenticatorFactory.class
 			.getName();
-	
+
 	// ----------------------------------------------------------------------
 	// factory - store this in the context.
 	//
@@ -95,6 +95,11 @@ public class AuthenticatorStub extends Authenticator {
 	@Override
 	public UserAccount getAccountForExternalAuth(String externalAuthId) {
 		return usersByExternalAuthId.get(externalAuthId);
+	}
+
+	@Override
+	public boolean isUserPermittedToLogin(UserAccount userAccount) {
+		return true;
 	}
 
 	@Override

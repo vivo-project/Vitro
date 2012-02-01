@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.user.UserAccountsFirstTimeExternalPage;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator.LoginNotPermitted;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 
@@ -77,6 +78,14 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 
 		UserAccount userAccount = getAuthenticator(req)
 				.getAccountForExternalAuth(externalAuthId);
+
+		if (!getAuthenticator(req).isUserPermittedToLogin(userAccount)) {
+			log.debug("Logins disabled for " + userAccount);
+			complainAndReturnToReferrer(req, resp, ATTRIBUTE_REFERRER,
+					MESSAGE_LOGIN_DISABLED);
+			return;
+		}
+
 		if (userAccount == null) {
 			log.debug("Creating new account for " + externalAuthId
 					+ ", return to '" + afterLoginUrl + "'");
@@ -84,11 +93,19 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 					externalAuthId, afterLoginUrl);
 			resp.sendRedirect(UrlBuilder.getUrl("/accounts/firstTimeExternal"));
 			return;
-		} else {
+		}
+
+		try {
 			log.debug("Logging in as " + userAccount.getUri());
 			getAuthenticator(req).recordLoginAgainstUserAccount(userAccount,
 					AuthenticationSource.EXTERNAL);
 			new LoginRedirector(req, afterLoginUrl).redirectLoggedInUser(resp);
+			return;
+		} catch (LoginNotPermitted e) {
+			// should have been caught by isUserPermittedToLogin()
+			log.debug("Logins disabled for " + userAccount);
+			complainAndReturnToReferrer(req, resp, ATTRIBUTE_REFERRER,
+					MESSAGE_LOGIN_DISABLED);
 			return;
 		}
 	}

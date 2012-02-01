@@ -77,6 +77,13 @@ public class BasicAuthenticator extends Authenticator {
 	}
 
 	@Override
+	public boolean isUserPermittedToLogin(UserAccount userAccount) {
+		// All users are permitted to login. If the user doesn't have an account
+		// yet (userAccount is null), an account should be created for them.
+		return true;
+	}
+
+	@Override
 	public boolean isCurrentPassword(UserAccount userAccount,
 			String clearTextPassword) {
 		if (userAccount == null) {

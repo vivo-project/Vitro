@@ -23,6 +23,14 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
  * This needs to be based on a HttpSession, because things like the UserDAO are
  * tied to the session. It seemed easier to base it on a HttpServletRequest,
  * which we can use to get the session.
+ * 
+ * TODO: Wouldn't it be cool if we could remove the LoginNotPermitted exception?
+ * Perhaps we could have a sub-object called an Authenticator.ForUser, and you
+ * call a getAuthenticatorForUser() method which returns null if your login has
+ * been disabled. Then, that object would provide these methods:
+ * accountRequiresEditing(), getAssociatedIndividualUris(), isCurrentPassword(),
+ * recordLoginAgainstUserAccount(), recordNewPassword(). If you didn't have such
+ * an object, you couldn't even call these methods.
  */
 public abstract class Authenticator {
 	// ----------------------------------------------------------------------
@@ -48,11 +56,11 @@ public abstract class Authenticator {
 	public static Authenticator getInstance(HttpServletRequest request) {
 		ServletContext ctx = request.getSession().getServletContext();
 		Object attribute = ctx.getAttribute(FACTORY_ATTRIBUTE_NAME);
-		if (! (attribute instanceof AuthenticatorFactory)) {
+		if (!(attribute instanceof AuthenticatorFactory)) {
 			attribute = new BasicAuthenticator.Factory();
 			ctx.setAttribute(FACTORY_ATTRIBUTE_NAME, attribute);
 		}
-		AuthenticatorFactory factory = (AuthenticatorFactory) attribute;	
+		AuthenticatorFactory factory = (AuthenticatorFactory) attribute;
 
 		return factory.getInstance(request);
 	}
@@ -76,6 +84,16 @@ public abstract class Authenticator {
 	 * Get the UserAccount for this email address, or null if there is none.
 	 */
 	public abstract UserAccount getAccountForInternalAuth(String emailAddress);
+
+	/**
+	 * Is this user permitted to login? Some Authenticators might disable logins
+	 * for certain users.
+	 * 
+	 * Behavior when userAccount is null depends on the particular
+	 * Authenticator. An answer of "true" presumably means that the user will be
+	 * permitted to login and create an account on the fly.
+	 */
+	public abstract boolean isUserPermittedToLogin(UserAccount userAccount);
 
 	/**
 	 * Internal: does this UserAccount have this password? False if the
@@ -113,9 +131,14 @@ public abstract class Authenticator {
 	 * - record the user in the session map
 	 * - notify other users of the model
 	 * </pre>
+	 * 
+	 * @throws LoginNotPermitted
+	 *             if the Authenticator denies this user the ability to login.
+	 *             This should be thrown if and only if isUserPermittedToLogin()
+	 *             returns false.
 	 */
 	public abstract void recordLoginAgainstUserAccount(UserAccount userAccount,
-			AuthenticationSource authSource);
+			AuthenticationSource authSource) throws LoginNotPermitted;
 
 	/**
 	 * <pre>
@@ -172,5 +195,13 @@ public abstract class Authenticator {
 		} catch (AddressException e) {
 			return false;
 		}
+	}
+
+	// ----------------------------------------------------------------------
+	// Exceptions
+	// ----------------------------------------------------------------------
+
+	public static class LoginNotPermitted extends Exception {
+		// no other information
 	}
 }

@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator.LoginNotPermitted;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
@@ -44,6 +45,7 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 
 	private static final String MESSAGE_NO_EMAIL_ADDRESS = "errorNoEmail";
 	private static final String MESSAGE_NO_PASSWORD = "errorNoPassword";
+	private static final String MESSAGE_LOGIN_DISABLED = "errorLoginDisabled";
 	private static final String MESSAGE_LOGIN_FAILED = "errorLoginFailed";
 	private static final String MESSAGE_NEW_PASSWORD_REQUIRED = "newPasswordRequired";
 	private static final String MESSAGE_NEW_PASSWORD_WRONG_LENGTH = "errorNewPasswordWrongLength";
@@ -101,6 +103,9 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 			if (password.isEmpty()) {
 				return showForm(MESSAGE_NO_PASSWORD);
 			}
+			if (!loginPermitted()) {
+				return showForm(MESSAGE_LOGIN_DISABLED);
+			}
 			if (newPasswordRequired()) {
 				if (newPassword.isEmpty()) {
 					return showForm(MESSAGE_NEW_PASSWORD_REQUIRED);
@@ -127,6 +132,10 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 			return showForm(MESSAGE_LOGIN_FAILED);
 		}
 
+		private boolean loginPermitted() {
+			return auth.isUserPermittedToLogin(userAccount);
+		}
+
 		private boolean newPasswordRequired() {
 			return auth.isCurrentPassword(userAccount, password)
 					&& (userAccount.isPasswordChangeRequired());
@@ -138,17 +147,21 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 		}
 
 		private boolean tryToLogin() {
-			if (auth.isCurrentPassword(userAccount, password)) {
-				auth.recordLoginAgainstUserAccount(userAccount, INTERNAL);
-
-				if (!newPassword.isEmpty()) {
-					auth.recordNewPassword(userAccount, newPassword);
-				}
-
-				return true;
-			} else {
+			if (!auth.isCurrentPassword(userAccount, password)) {
 				return false;
 			}
+
+			try {
+				auth.recordLoginAgainstUserAccount(userAccount, INTERNAL);
+			} catch (LoginNotPermitted e) {
+				return false;
+			}
+
+			if (!newPassword.isEmpty()) {
+				auth.recordNewPassword(userAccount, newPassword);
+			}
+
+			return true;
 		}
 
 		private ResponseValues showForm(String... codes) {
