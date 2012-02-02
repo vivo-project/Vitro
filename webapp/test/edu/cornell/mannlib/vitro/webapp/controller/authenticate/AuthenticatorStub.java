@@ -137,7 +137,11 @@ public class AuthenticatorStub extends Authenticator {
 
 	@Override
 	public void recordLoginAgainstUserAccount(UserAccount userAccount,
-			AuthenticationSource authSource) {
+			AuthenticationSource authSource) throws LoginNotPermitted {
+		if (!isUserPermittedToLogin(userAccount)) {
+			throw new LoginNotPermitted();
+		}
+
 		recordedLogins.add(userAccount.getEmailAddress());
 
 		LoginStatusBean lsb = new LoginStatusBean(userAccount.getUri(),

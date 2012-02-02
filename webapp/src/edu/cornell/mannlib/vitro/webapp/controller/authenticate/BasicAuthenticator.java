@@ -142,7 +142,10 @@ public class BasicAuthenticator extends Authenticator {
 
 	@Override
 	public void recordLoginAgainstUserAccount(UserAccount userAccount,
-			AuthenticationSource authSource) {
+			AuthenticationSource authSource) throws LoginNotPermitted {
+		if (!isUserPermittedToLogin(userAccount)) {
+			throw new LoginNotPermitted();
+		}
 		if (userAccount == null) {
 			log.error("Trying to record the login of a null user. ");
 			return;

@@ -92,6 +92,9 @@ public abstract class Authenticator {
 	 * Behavior when userAccount is null depends on the particular
 	 * Authenticator. An answer of "true" presumably means that the user will be
 	 * permitted to login and create an account on the fly.
+	 * 
+	 * Note that this method may rely on the HttpServletRequest object that was
+	 * provided to the factory when this instance was created.
 	 */
 	public abstract boolean isUserPermittedToLogin(UserAccount userAccount);
 
