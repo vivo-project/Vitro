@@ -48,6 +48,14 @@ public class PolicyHelper {
 			Actions actions) {
 		PolicyIface policy = ServletPolicyList.getPolicies(req);
 		IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(req);
+		return isAuthorizedForActions(ids, policy, actions);
+	}
+
+	/**
+	 * Are these actions authorized for these identifiers by these policies?
+	 */
+	public static boolean isAuthorizedForActions(IdentifierBundle ids,
+			PolicyIface policy, Actions actions) {
 		return Actions.notNull(actions).isAuthorized(policy, ids);
 	}
 
