@@ -8,7 +8,8 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 
 /**
  * Keep a list of the active IdentifierBundleFactories in the context.
@@ -50,14 +51,15 @@ public class ActiveIdentifierBundleFactories {
 
 		getActiveFactories(ctx).addFactory(factory);
 	}
-	
+
 	/**
-	 * Just for diagnostics. Don't expose the factories themselves, only their names.
+	 * Just for diagnostics. Don't expose the factories themselves, only their
+	 * names.
 	 */
 	public static List<String> getFactoryNames(ServletContext ctx) {
 		List<String> names = new ArrayList<String>();
 		ActiveIdentifierBundleFactories actFact = getActiveFactories(ctx);
-		for (IdentifierBundleFactory factory: actFact.factories) {
+		for (IdentifierBundleFactory factory : actFact.factories) {
 			names.add(factory.toString());
 		}
 		return names;
@@ -72,10 +74,28 @@ public class ActiveIdentifierBundleFactories {
 	 * request.
 	 */
 	static IdentifierBundle getIdentifierBundle(HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		ServletContext ctx = session.getServletContext();
-		return getActiveFactories(ctx).getIdentifierBundle(request, session,
-				ctx);
+		return getActiveFactories(request).getBundleForRequest(request);
+	}
+
+	/**
+	 * Get the Identifiers that would be created if this user were to log in.
+	 */
+	public static IdentifierBundle getUserIdentifierBundle(
+			HttpServletRequest request, UserAccount userAccount) {
+		return getActiveFactories(request).getBundleForUser(userAccount);
+	}
+
+	/**
+	 * Get the singleton instance from the servlet context. If there isn't one,
+	 * create one. This never returns null.
+	 */
+	private static ActiveIdentifierBundleFactories getActiveFactories(
+			HttpServletRequest req) {
+		if (req == null) {
+			throw new NullPointerException("req may not be null.");
+		}
+		
+		return getActiveFactories(req.getSession().getServletContext());
 	}
 
 	/**
@@ -118,15 +138,26 @@ public class ActiveIdentifierBundleFactories {
 	 * Run through the active factories and get all Identifiers for this
 	 * request.
 	 */
-	private IdentifierBundle getIdentifierBundle(HttpServletRequest request,
-			HttpSession session, ServletContext ctx) {
+	private IdentifierBundle getBundleForRequest(HttpServletRequest request) {
 		IdentifierBundle ib = new ArrayIdentifierBundle();
 		for (IdentifierBundleFactory ibf : factories) {
-			IdentifierBundle obj = ibf.getIdentifierBundle(request);
-			if (obj != null) {
-				ib.addAll(obj);
+			ib.addAll(ibf.getIdentifierBundle(request));
+		}
+		return ib;
+	}
+
+	/**
+	 * Get all Identifiers that would be created if this User logged in.
+	 */
+	private IdentifierBundle getBundleForUser(UserAccount userAccount) {
+		IdentifierBundle ib = new ArrayIdentifierBundle();
+		for (IdentifierBundleFactory ibf : factories) {
+			if (ibf instanceof UserBasedIdentifierBundleFactory) {
+				UserBasedIdentifierBundleFactory ubibf = (UserBasedIdentifierBundleFactory) ibf;
+				ib.addAll(ubibf.getIdentifierBundleForUser(userAccount));
 			}
 		}
 		return ib;
 	}
+
 }

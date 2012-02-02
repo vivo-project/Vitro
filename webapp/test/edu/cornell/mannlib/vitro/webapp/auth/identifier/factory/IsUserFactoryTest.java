@@ -7,6 +7,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
+import stubs.edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDaoStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryStub;
 import stubs.javax.servlet.ServletContextStub;
 import stubs.javax.servlet.http.HttpServletRequestStub;
@@ -17,6 +18,7 @@ import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.IsUser;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 
 /**
  * The simplest of the IdentifierBundleFactory classes.
@@ -25,6 +27,7 @@ public class IsUserFactoryTest extends AbstractTestClass {
 	private static final String USER_URI = "http://userUri";
 
 	private WebappDaoFactoryStub wdf;
+	private UserAccountsDaoStub uaDao;
 
 	private ServletContextStub ctx;
 	private HttpSessionStub session;
@@ -37,7 +40,10 @@ public class IsUserFactoryTest extends AbstractTestClass {
 
 	@Before
 	public void setup() {
+		uaDao = new UserAccountsDaoStub();
+		
 		wdf = new WebappDaoFactoryStub();
+		wdf.setUserAccountsDao(uaDao);
 
 		ctx = new ServletContextStub();
 		ctx.setAttribute("webappDaoFactory", wdf);
@@ -63,6 +69,10 @@ public class IsUserFactoryTest extends AbstractTestClass {
 		LoginStatusBean lsb = new LoginStatusBean(USER_URI,
 				AuthenticationSource.EXTERNAL);
 		LoginStatusBean.setBean(session, lsb);
+		
+		UserAccount user = new UserAccount();
+		user.setUri(USER_URI);
+		uaDao.addUser(user);
 
 		expectedIds = new ArrayIdentifierBundle(new IsUser(USER_URI));
 		actualIds = factory.getIdentifierBundle(req);

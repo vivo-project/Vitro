@@ -6,12 +6,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
@@ -26,7 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
  * create either an IsBlacklisted or HasAssociatedIndividual for each one.
  */
 public class HasProfileOrIsBlacklistedFactory extends
-		BaseIdentifierBundleFactory {
+		BaseUserBasedIdentifierBundleFactory {
 	private static final Log log = LogFactory
 			.getLog(HasProfileOrIsBlacklistedFactory.class);
 
@@ -35,10 +33,10 @@ public class HasProfileOrIsBlacklistedFactory extends
 	}
 
 	@Override
-	public IdentifierBundle getIdentifierBundle(HttpServletRequest req) {
+	public IdentifierBundle getIdentifierBundleForUser(UserAccount user) {
 		ArrayIdentifierBundle ids = new ArrayIdentifierBundle();
 
-		for (Individual ind : getAssociatedIndividuals(req)) {
+		for (Individual ind : getAssociatedIndividuals(user)) {
 			// If they are blacklisted, this factory will return an identifier
 			Identifier id = IsBlacklisted.getInstance(ind, ctx);
 			if (id != null) {
@@ -54,17 +52,15 @@ public class HasProfileOrIsBlacklistedFactory extends
 	/**
 	 * Get all Individuals associated with the current user as SELF.
 	 */
-	private Collection<Individual> getAssociatedIndividuals(
-			HttpServletRequest req) {
+	private Collection<Individual> getAssociatedIndividuals(UserAccount user) {
 		Collection<Individual> individuals = new ArrayList<Individual>();
 
-		UserAccount user = LoginStatusBean.getCurrentUser(req);
 		if (user == null) {
 			log.debug("No Associated Individuals: not logged in.");
 			return individuals;
 		}
 
-		SelfEditingConfiguration sec = SelfEditingConfiguration.getBean(req);
+		SelfEditingConfiguration sec = SelfEditingConfiguration.getBean(ctx);
 		individuals.addAll(sec.getAssociatedIndividuals(indDao, user));
 
 		return individuals;

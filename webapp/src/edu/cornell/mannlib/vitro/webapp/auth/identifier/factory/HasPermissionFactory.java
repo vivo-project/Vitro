@@ -9,12 +9,10 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasPermission;
@@ -26,7 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 /**
  * Figure out what Permissions the user is entitled to have.
  */
-public class HasPermissionFactory extends BaseIdentifierBundleFactory {
+public class HasPermissionFactory extends BaseUserBasedIdentifierBundleFactory {
 	private static final Log log = LogFactory
 			.getLog(HasPermissionFactory.class);
 
@@ -35,8 +33,7 @@ public class HasPermissionFactory extends BaseIdentifierBundleFactory {
 	}
 
 	@Override
-	public IdentifierBundle getIdentifierBundle(HttpServletRequest req) {
-		UserAccount user = LoginStatusBean.getCurrentUser(req);
+	public IdentifierBundle getIdentifierBundleForUser(UserAccount user) {
 		if (user == null) {
 			return createPublicPermissions();
 		} else {
