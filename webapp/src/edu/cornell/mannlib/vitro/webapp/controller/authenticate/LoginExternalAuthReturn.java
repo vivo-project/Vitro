@@ -15,11 +15,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
+import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.user.UserAccountsFirstTimeExternalPage;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator.LoginNotPermitted;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
+import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.Message;
 
 /**
  * Handle the return from the external authorization login server. If we are
@@ -108,6 +110,15 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 					MESSAGE_LOGIN_DISABLED);
 			return;
 		}
+	}
+
+	@Override
+	protected void complainAndReturnToReferrer(HttpServletRequest req,
+			HttpServletResponse resp, String sessionAttributeForReferrer,
+			Message message, Object... args) throws IOException {
+		DisplayMessage.setMessage(req, message.formatMessage(args));
+		super.complainAndReturnToReferrer(req, resp,
+				sessionAttributeForReferrer, message, args);
 	}
 
 	private void removeLoginProcessArtifacts(HttpServletRequest req) {
