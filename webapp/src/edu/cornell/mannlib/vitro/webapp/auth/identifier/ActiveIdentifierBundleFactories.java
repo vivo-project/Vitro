@@ -122,8 +122,7 @@ public class ActiveIdentifierBundleFactories {
 			HttpSession session, ServletContext ctx) {
 		IdentifierBundle ib = new ArrayIdentifierBundle();
 		for (IdentifierBundleFactory ibf : factories) {
-			IdentifierBundle obj = ibf.getIdentifierBundle(request, session,
-					ctx);
+			IdentifierBundle obj = ibf.getIdentifierBundle(request);
 			if (obj != null) {
 				ib.addAll(obj);
 			}
