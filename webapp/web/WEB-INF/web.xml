@@ -731,6 +731,15 @@
   </servlet-mapping>
 
   <servlet>
+    <servlet-name>RestrictLogins</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.admin.RestrictLoginsController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>RestrictLogins</servlet-name>
+    <url-pattern>/admin/restrictLogins</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
     <servlet-name>StatementChangeListingController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.listing.jena.StatementChangeListingController</servlet-class>
   </servlet>

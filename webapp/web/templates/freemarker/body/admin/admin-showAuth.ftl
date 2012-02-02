@@ -75,4 +75,11 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showAuth.css" /
             </tr>
         </#list>
     </table>
+
+    <h4>Authenticator:</h4>
+    <table summary="Authenticator" width="100%">
+        <tr>
+            <td>${authenticator}</td>
+        </tr>
+    </table>
 </section>

@@ -19,6 +19,10 @@
                 <li role="listitem"><a href="${siteConfig.menuManagement}" title="Menu management">Menu management</a></li>
             </#if>      
             
+            <#if siteConfig.restrictLogins?has_content>
+                <li role="listitem"><a href="${siteConfig.restrictLogins}" title="Restrict Logins">Restrict Logins</a></li>
+            </#if>
+            
             <#if siteConfig.siteInfo?has_content>
                 <li role="listitem"><a href="${siteConfig.siteInfo}" title="Site information">Site information</a></li>
             </#if>

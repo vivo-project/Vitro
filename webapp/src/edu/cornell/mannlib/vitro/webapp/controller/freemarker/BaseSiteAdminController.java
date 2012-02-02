@@ -141,6 +141,10 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
         	data.put("startupStatusAlert", !StartupStatus.getBean(getServletContext()).allClear());
         }
         
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.LOGIN_DURING_MAINTENANCE.ACTIONS)) {
+            data.put("restrictLogins", UrlBuilder.getUrl("/admin/restrictLogins"));
+        }
+        
         return data;
     }
     
