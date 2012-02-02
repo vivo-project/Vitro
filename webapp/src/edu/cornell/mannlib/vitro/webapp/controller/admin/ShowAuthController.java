@@ -24,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
@@ -50,6 +51,7 @@ public class ShowAuthController extends FreemarkerHttpServlet {
 		body.put("factories", getIdentifierFactoryNames(vreq));
 		body.put("policies", ServletPolicyList.getPolicies(vreq));
 		body.put("matchingProperty", getMatchingProperty(vreq));
+		body.put("authenticator", Authenticator.getInstance(vreq));
 
 		return new TemplateResponseValues("admin-showAuth.ftl", body);
 	}
