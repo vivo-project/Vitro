@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.binary.Hex;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 
 /**
@@ -57,12 +59,17 @@ public abstract class Authenticator {
 		ServletContext ctx = request.getSession().getServletContext();
 		Object attribute = ctx.getAttribute(FACTORY_ATTRIBUTE_NAME);
 		if (!(attribute instanceof AuthenticatorFactory)) {
-			attribute = new BasicAuthenticator.Factory();
-			ctx.setAttribute(FACTORY_ATTRIBUTE_NAME, attribute);
+			setAuthenticatorFactory(new BasicAuthenticator.Factory(), ctx);
+			attribute = ctx.getAttribute(FACTORY_ATTRIBUTE_NAME);
 		}
 		AuthenticatorFactory factory = (AuthenticatorFactory) attribute;
 
 		return factory.getInstance(request);
+	}
+
+	public static void setAuthenticatorFactory(AuthenticatorFactory factory,
+			ServletContext ctx) {
+		ctx.setAttribute(FACTORY_ATTRIBUTE_NAME, factory);
 	}
 
 	// ----------------------------------------------------------------------
@@ -198,6 +205,16 @@ public abstract class Authenticator {
 		} catch (AddressException e) {
 			return false;
 		}
+	}
+
+	/**
+	 * Get the IDs that would be created for this userAccount, if this user were
+	 * to log in.
+	 */
+	public static IdentifierBundle getIdsForUserAccount(HttpServletRequest req,
+			UserAccount userAccount) {
+		return ActiveIdentifierBundleFactories.getUserIdentifierBundle(req,
+				userAccount);
 	}
 
 	// ----------------------------------------------------------------------

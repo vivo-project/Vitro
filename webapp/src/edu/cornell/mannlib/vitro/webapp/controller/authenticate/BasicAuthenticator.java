@@ -312,4 +312,9 @@ public class BasicAuthenticator extends Authenticator {
 		return wadf;
 	}
 
+	@Override
+	public String toString() {
+		return "BasicAuthenticator[" + request + "]";
+	}
+
 }
