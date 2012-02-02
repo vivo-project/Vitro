@@ -12,6 +12,7 @@ auth:ADMIN
     
     # ADMIN-only permissions
     auth:hasPermission simplePermission:AccessSpecialDataModels ;
+    auth:hasPermission simplePermission:LoginDuringMaintenance ;
     auth:hasPermission simplePermission:ManageMenus ;
     auth:hasPermission simplePermission:ManageProxies ;
     auth:hasPermission simplePermission:ManageSearchIndex ;

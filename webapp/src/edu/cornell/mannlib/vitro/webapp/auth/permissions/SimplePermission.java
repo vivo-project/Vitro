@@ -38,6 +38,8 @@ public class SimplePermission extends Permission {
 			"EditOwnAccount");
 	public static final SimplePermission EDIT_SITE_INFORMATION = new SimplePermission(
 			"EditSiteInformation");
+	public static final SimplePermission LOGIN_DURING_MAINTENANCE = new SimplePermission(
+			"LoginDuringMaintenance");
 	public static final SimplePermission MANAGE_MENUS = new SimplePermission(
 			"ManageMenus");
 	public static final SimplePermission MANAGE_OWN_PROXIES = new SimplePermission(
