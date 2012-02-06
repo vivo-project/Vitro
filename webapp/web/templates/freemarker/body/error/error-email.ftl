@@ -9,29 +9,31 @@
 <#assign html>
 <html>
     <head>
-        <title>${subject}</title>
+        <title>${subject!}</title>
     </head>
     <body>
         <p>
-            An error occurred on your VIVO site at ${datetime}.
+            An error occurred on your VIVO site at ${datetime!}.
         </p>
         
         <p>
-            <strong>Requested url:</strong> ${requestedUrl}
+            <strong>Requested url:</strong> ${requestedUrl!}
         </p>
         
         <p>
-            <strong>Error message:</strong> ${errorMessage}
+        <#if errorMessage?has_content>
+            <strong>Error message:</strong> ${errorMessage!}
+        </#if>
         </p>
         
         <p>
             <strong>Stack trace</strong> (full trace available in the vivo log): 
-            <pre>${stackTrace}</pre>
+            <pre>${stackTrace!}</pre>
         </p>
         
         <#if cause?has_content>
             <p><strong>Caused by:</strong> 
-                <pre>${cause}</pre>
+                <pre>${cause!}</pre>
             </p>
         </#if>
         
@@ -40,18 +42,20 @@
 </#assign>
 
 <#assign text>
-An error occurred on your VIVO site at ${datetime}.
+An error occurred on your VIVO site at ${datetime!}.
 
-Requested url: ${requestedUrl}
+Requested url: ${requestedUrl!}
 
-Error message: ${errorMessage}
+<#if errorMessage?has_content>
+    Error message: ${errorMessage!}
+</#if>
 
 Stack trace (full trace available in the vivo log): 
-${stackTrace}
+${stackTrace!}
 
 <#if cause?has_content>
 Caused by: 
-${cause}
+${cause!}
 </#if>       
 </#assign>
 
