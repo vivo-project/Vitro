@@ -27,7 +27,7 @@
                 # Require the subclasses retrieved to be in a classgroup, since others are not generally
                 # for display. See vivo-dev-all thread titled "Internal Entity and mostSpecificType,"
                 # Aug 9-10, 2011.
-                ?subclass vitro:inClassGroup ?classgroup 
+                # ?subclass vitro:inClassGroup ?classgroup 
             } 
             FILTER ( afn:namespace(?subclass) != "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" )   
             </collated>       
@@ -42,6 +42,7 @@
         CONSTRUCT {
             ?subject ?property ?object .
             ?object a ?subclass .
+            ?subclass vitro:inClassGroup ?classgroup .
             ?object rdfs:label ?label .
         } WHERE {
             { 
@@ -49,6 +50,10 @@
             } UNION {            
                 ?subject ?property ?object .
                 ?object a ?subclass . 
+            } UNION {
+                ?subject ?property ?object .
+                ?object a ?subclass .
+                ?subclass vitro:inClassGroup ?classgroup 
             } UNION {         
                 ?subject ?property ?object .
                 ?object rdfs:label ?label .

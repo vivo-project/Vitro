@@ -39,6 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailMessage;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.Tags;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
 import freemarker.ext.beans.BeansWrapper;
@@ -103,7 +104,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             
             FreemarkerConfiguration config = getConfig(vreq);
             vreq.setAttribute("freemarkerConfig", config);            
-            config.resetRequestSpecificSharedVariables();
             
 			responseValues = processRequest(vreq);			
 	        doResponse(vreq, response, responseValues);	 
@@ -446,6 +446,12 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         map.put("url", new edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective()); 
         map.put("widget", new edu.cornell.mannlib.vitro.webapp.web.directives.WidgetDirective());
         
+        // Add these accumulator objects. They will collect tags so the template can write them 
+        // at the appropriate location.
+        map.put("stylesheets", new Tags().wrap());
+        map.put("scripts", new Tags().wrap());
+        map.put("headScripts", new Tags().wrap());
+
         return map;        
     }  
     

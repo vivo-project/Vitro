@@ -191,7 +191,7 @@ $(document).ready(function() {
 	var progressImage;
 	
 	$('#addProfileEditor').click(function(event){
-        progressImage = $(event.target).closest("section").find(".loading-profileMyAccoount")
+        progressImage = $(event.target).closest("section").find(".loading-profileMyAccount")
     });
     
     $('#selectProfileEditors').click(function(event){

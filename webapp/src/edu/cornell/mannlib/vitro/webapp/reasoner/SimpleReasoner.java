@@ -62,7 +62,8 @@ public class SimpleReasoner extends StatementListener {
 	
 	private CumulativeDeltaModeler aBoxDeltaModeler1 = null;
 	private CumulativeDeltaModeler aBoxDeltaModeler2 = null;
-	private boolean batchMode1 = false, batchMode2 = false;
+	private volatile boolean batchMode1 = false;
+	private volatile boolean batchMode2 = false;
 	private boolean stopRequested = false;
 	
 	private List<ReasonerPlugin> pluginList = new ArrayList<ReasonerPlugin>();
@@ -540,6 +541,7 @@ public class SimpleReasoner extends StatementListener {
         } finally {
             aboxModel.leaveCriticalSection();
         }
+        
         for (Resource ind : subjectList) {
 			if (entailedType(ind,superClass)) {
 				continue;
@@ -550,10 +552,12 @@ public class SimpleReasoner extends StatementListener {
 			    if (inferenceModel.contains(infStmt)) {
 				    inferenceModel.remove(infStmt);
 			    } 
-			    setMostSpecificTypes(ind, inferenceModel, new HashSet<String>());
+			    
             } finally {
                 inferenceModel.leaveCriticalSection();
             }
+			
+			setMostSpecificTypes(ind, inferenceModel, new HashSet<String>());
 		}
 	}
 
@@ -564,9 +568,10 @@ public class SimpleReasoner extends StatementListener {
 	 */
 	public void setMostSpecificTypes(Resource individual, Model inferenceModel, HashSet<String> unknownTypes) {
 			
-		inferenceModel.enterCriticalSection(Lock.WRITE);
-		aboxModel.enterCriticalSection(Lock.READ);
 		tboxModel.enterCriticalSection(Lock.READ);
+		aboxModel.enterCriticalSection(Lock.READ);
+		inferenceModel.enterCriticalSection(Lock.READ);
+		HashSet<String> typeURIs = new HashSet<String>();
 		
 		try {
 			OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
@@ -611,7 +616,6 @@ public class SimpleReasoner extends StatementListener {
 				types.add(ontClass); 
 			}
 	
-			HashSet<String> typeURIs = new HashSet<String>();
 			List<OntClass> types2 = new ArrayList<OntClass>();
 			types2.addAll(types);
 			
@@ -648,14 +652,15 @@ public class SimpleReasoner extends StatementListener {
 			    }    	
 			}
 							
-			setMostSpecificTypes(individual, typeURIs, inferenceModel);
+			
 			
 		} finally {
+			inferenceModel.leaveCriticalSection();
 			aboxModel.leaveCriticalSection();
 			tboxModel.leaveCriticalSection();
-			inferenceModel.leaveCriticalSection();
 		}
 	
+		setMostSpecificTypes(individual, typeURIs, inferenceModel);
 	    return;	
 	}
 	
@@ -967,35 +972,14 @@ public class SimpleReasoner extends StatementListener {
 		log.info("Finished computing mostSpecificType annotations");
 	}
 
-	public boolean isABoxReasoningAsynchronous() {
+	public synchronized boolean isABoxReasoningAsynchronous() {
          if (batchMode1 || batchMode2) {
         	 return true;
          } else {
         	 return false;
          }
 	}
-	
-	protected  void startBatchMode() {
-		if (batchMode1 || batchMode2) {
-			return;  
-		} else {
-			batchMode1 = true;
-			batchMode2 = false;
-			aBoxDeltaModeler1.getRetractions().removeAll();
-			log.info("started processing retractions in batch mode");
-		}
-	}
-
-	protected void endBatchMode() {
 		
-		if (!batchMode1 && !batchMode2) {
-			log.warn("SimpleReasoner received an end batch mode request when not currently in batch mode. No action was taken");
-			return;
-		}
-		
-		new Thread(new DeltaComputer(),"DeltaComputer").start();
-	}
-	
 	@Override
 	public synchronized void notifyEvent(Model model, Object event) {
 		
@@ -1003,13 +987,32 @@ public class SimpleReasoner extends StatementListener {
 	    	if (((BulkUpdateEvent) event).getBegin()) {
 	    		
 	    		log.info("received BulkUpdateEvent(begin)");
-	            startBatchMode();
+	    		
+	    		if (batchMode1 || batchMode2) {
+	    			log.info("received a BulkUpdateEvent(begin) while already in batch update mode; this event will be ignored.");
+	    			return;  
+	    		} else {
+	    			batchMode1 = true;
+	    			batchMode2 = false;
+	    			aBoxDeltaModeler1.getRetractions().removeAll();
+	    			log.info("started processing retractions in batch mode");
+	    		}
 	    	} else {
+	    		if (!batchMode1 && !batchMode2) {
+	    			log.warn("SimpleReasoner received an end batch mode request when not currently in batch mode. No action was taken");
+	    			return;
+	    		}
 	    		log.info("received BulkUpdateEvent(end)");
-	    		endBatchMode();
+	    		
+	    		if (!deltaComputerProcessing) {
+	    		  deltaComputerProcessing = true;
+	    		  new Thread(new DeltaComputer(),"DeltaComputer").start();
+	    		}
 	    	}
 	    }
 	}
+	
+	private volatile boolean deltaComputerProcessing = false;
 	
     private class DeltaComputer extends Thread {      
         public DeltaComputer() {
@@ -1064,7 +1067,7 @@ public class SimpleReasoner extends StatementListener {
     	    		retractions.removeAll();	
     	   			retractions.leaveCriticalSection();
     			}			
- 
+ 				
                 if (stopRequested) {
                 	log.info("a stopRequested signal was received during DeltaComputer.run. Halting Processing.");
                 	return;
@@ -1078,18 +1081,19 @@ public class SimpleReasoner extends StatementListener {
    				log.info("finished computing inferences for batch " + qualifier + " update");
    				
     			if (batchMode1 && (aBoxDeltaModeler2.getRetractions().size() > 0)) {
-    				retractions = aBoxDeltaModeler2.getRetractions();
     				batchMode2 = true;
     				batchMode1 = false;
+    				retractions = aBoxDeltaModeler2.getRetractions();
     				qualifier = "(2)";
     				log.info("switching from batch mode 1 to batch mode 2");
     			} else if (batchMode2 && (aBoxDeltaModeler1.getRetractions().size() > 0)) {
-    				retractions = aBoxDeltaModeler1.getRetractions();
     				batchMode1 = true;
     				batchMode2 = false;
+    				retractions = aBoxDeltaModeler1.getRetractions();
     				qualifier = "(1)";
     				log.info("switching from batch mode 2 to batch mode 1");
     			} else {
+    		      	deltaComputerProcessing = false;
     				finished = true;
     		       	batchMode1 = false;
     	        	batchMode2 = false;   
@@ -1097,21 +1101,21 @@ public class SimpleReasoner extends StatementListener {
     			}	
         	}
         	
-        	if (aBoxDeltaModeler1.getRetractions().size() > 0) {
-        	   log.warn("Unexpected condition: the aBoxDeltaModeler1 retractions model was not empty at the end of the DeltaComputer.run method");
-               aBoxDeltaModeler1.getRetractions().removeAll();
-        	}
-
-        	if (aBoxDeltaModeler2.getRetractions().size() > 0) {
-         	   log.warn("Unexpected condition: the aBoxDeltaModeler2 retractions model was not empty at the end of the DeltaComputer.run method");
-                aBoxDeltaModeler2.getRetractions().removeAll();
-         	}
- 
-        	if (batchMode1 || batchMode2) {
+        	deltaComputerProcessing = false;
+			
+           	if (batchMode1 || batchMode2) {
         		log.warn("Unexpected condition at the end of DeltaComputer.run method: batchMode1=" + batchMode1 + ", batchMode2 =" + batchMode2 + ". (both should be false)" );
             	batchMode1 = false;
             	batchMode2 = false;    		        		
         	}
+           	
+        	if (aBoxDeltaModeler1.getRetractions().size() > 0) {
+        	   log.warn("Unexpected condition: the aBoxDeltaModeler1 retractions model was not empty at the end of the DeltaComputer.run method");
+        	}
+
+        	if (aBoxDeltaModeler2.getRetractions().size() > 0) {
+         	   log.warn("Unexpected condition: the aBoxDeltaModeler2 retractions model was not empty at the end of the DeltaComputer.run method");
+         	}
         }        
     }
    

@@ -14,7 +14,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/auto
             <p class="explanatoryText">Can be used to associate the account with the user's profile via the matching property.</p>
         <#else>
             <label for="externalAuthId">External Authentication ID</label> 
-            <input type="text" name="externalAuthId" value="${externalAuthId}" id="externalAuthId" role="input "/>
+            <input type="text" name="externalAuthId" value="${externalAuthId}" id="externalAuthId" role="input "/><span><img class="loading-profileMyAccount hidden" src="${urls.images}/indicatorWhite.gif" /></span>
             <span id="externalAuthIdInUse" >This Identifier is already in use.</span>
         </#if>
         </div>
@@ -38,7 +38,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/auto
         <div id="associateProfileBackgroundThree">
             <p>
                 <label for="associateProfileName">Select the associated profile</label>
-                <input type="text" id="associateProfileName" name="associateProfileName" class="acSelector" size="35">
+                <input type="text" id="associateProfileName" name="associateProfileName" class="acSelector" size="35"><span><img class="loading-profileMyAccount hidden" src="${urls.images}/indicatorWhite.gif" /></span>
             </p>
         </div>
         <div id="associateProfileBackgroundFour">

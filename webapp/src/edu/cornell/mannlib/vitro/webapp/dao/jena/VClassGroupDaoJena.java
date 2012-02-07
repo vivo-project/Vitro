@@ -24,6 +24,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -190,43 +191,53 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
     }
 
     public int insertNewVClassGroup(VClassGroup vcg, OntModel ontModel) {
-    	
+        if( vcg == null ){
+            log.error("insertNewVClassGroup() null is invalid as vclassgroup, nothing changed");
+            return 1;
+        }
+            
     	// VitroClassGroups should really inherit from Individual objects now,
     	// but they don't (yet).
-    	// I'm going to make an Individual so I can avoid duplicating URI code.
-    	
+    	// I'm going to make an Individual so I can avoid duplicating URI code.    	        
     	edu.cornell.mannlib.vitro.webapp.beans.Individual groupInd = 
-    		new IndividualImpl(); // We should make a factory for these
-    	groupInd.setURI(vcg.getURI());
-    	groupInd.setNamespace(DEFAULT_NAMESPACE+"vitroClassGroup");
-    	groupInd.setName(vcg.getPublicName());
-    	groupInd.setVClassURI(CLASSGROUP.getURI());
-    	
-    	String groupURI = null;
-    	
-    	OntModel unionForURIGeneration = ModelFactory.createOntologyModel(
-    	        OntModelSpec.OWL_MEM, ModelFactory.createUnion(
-    	                getOntModelSelector().getApplicationMetadataModel(), 
-    	                getOntModelSelector().getFullModel()));
-    	
-    	WebappDaoFactory wadfForURIGeneration = null;
-    	try {
-    	    wadfForURIGeneration = new WebappDaoFactoryJena(
-    	            unionForURIGeneration);
-    		groupURI = wadfForURIGeneration
-                    .getIndividualDao().insertNewIndividual(groupInd);
-    	} catch (InsertException ie) {
-    		throw new RuntimeException(InsertException.class.getName() + "Unable to insert class group "+groupURI, ie);
-    	} finally {
-    	    wadfForURIGeneration.close();
-    	}
-    	
+    		new IndividualImpl(); // We should make a factory for these    	    	  
+
+        //don't set the name of the individual so the classgroup gets a random localname
+        groupInd.setNamespace(DEFAULT_NAMESPACE+"vitroClassGroup");    
+        
+        //if a URI is specified then try to use that, this may wipe out the NS
+        if( vcg.getURI() != null )
+            groupInd.setURI(vcg.getURI());                      
+        
+        groupInd.setVClassURI(CLASSGROUP.getURI());   
+
+        //Insert the new classgroup
+        String groupURI = null;
+        OntModel unionForURIGeneration = ModelFactory.createOntologyModel(
+                OntModelSpec.OWL_MEM, ModelFactory.createUnion(
+                        getOntModelSelector().getApplicationMetadataModel(), 
+                        getOntModelSelector().getFullModel()));        
+        WebappDaoFactory wadfForURIGeneration = null;
+        try {
+            wadfForURIGeneration = new WebappDaoFactoryJena(
+                    unionForURIGeneration);
+            groupURI = wadfForURIGeneration
+                    .getIndividualDao().insertNewIndividual(groupInd);                                   
+        } catch (InsertException ie) {
+            throw new RuntimeException(InsertException.class.getName() + " Unable to insert class group "+groupURI, ie);
+        } finally {
+            wadfForURIGeneration.close();
+            log.error("Could not create new individual for classgroup " + vcg.getPublicName() );
+        }	
+    	        
+        //now try to add display rank and public name
     	if (groupURI != null) {
 	        ontModel.enterCriticalSection(Lock.WRITE);
 	        try {
 	        	Individual groupJenaInd = ontModel.getIndividual(groupURI);
 	            try {
 	                groupJenaInd.addProperty(DISPLAY_RANK, Integer.toString(vcg.getDisplayRank()), XSDDatatype.XSDint);
+	                groupJenaInd.addProperty(RDFS.label, vcg.getPublicName(), XSDDatatype.XSDstring );
 	            } catch (Exception e) {
 	                log.error("error setting displayRank for "+groupInd.getURI());
 	            }
