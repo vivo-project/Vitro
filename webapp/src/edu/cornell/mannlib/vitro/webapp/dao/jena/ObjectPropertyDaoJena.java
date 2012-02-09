@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.ConversionException;
+import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.ontology.OntResource;
@@ -78,6 +79,9 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
 
     protected ObjectProperty propertyFromOntProperty(OntProperty op) {
         if (op==null) {
+            return null;
+        }
+        if( op instanceof DatatypeProperty){
             return null;
         }
         ObjectProperty p = new ObjectProperty();
