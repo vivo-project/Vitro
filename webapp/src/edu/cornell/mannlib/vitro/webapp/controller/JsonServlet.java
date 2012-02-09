@@ -43,6 +43,8 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.SelectListG
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.DataGetterUtils;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.DISPLAY_ONT_MODEL;
+
 /**
  * This servlet is for servicing requests for JSON objects/data.
  * It could be generalized to get other types of data ex. XML, HTML etc
@@ -328,8 +330,7 @@ public class JsonServlet extends VitroHttpServlet {
         // set ProhibitedFromSearch object so picklist doesn't show
         // individuals from classes that should be hidden from list views
     	OntModel displayOntModel = 
-		    (OntModel) getServletConfig().getServletContext()
-		    .getAttribute("displayOntModel");
+		    (OntModel) getServletConfig().getServletContext().getAttribute(DISPLAY_ONT_MODEL);
     	if (displayOntModel != null) {
 	     	ProhibitedFromSearch pfs = new ProhibitedFromSearch(
 				DisplayVocabulary.SEARCH_INDEX_URI, displayOntModel);
