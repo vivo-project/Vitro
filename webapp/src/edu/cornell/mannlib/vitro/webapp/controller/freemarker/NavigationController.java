@@ -32,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import freemarker.template.Configuration;
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.DISPLAY_ONT_MODEL;
 
 public class NavigationController extends FreemarkerHttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -43,14 +44,14 @@ public class NavigationController extends FreemarkerHttpServlet {
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
-		OntModel displayOntModel = (OntModel)config.getServletContext().getAttribute("displayOntModel");
+		OntModel displayOntModel = (OntModel)config.getServletContext().getAttribute(DISPLAY_ONT_MODEL);
 		this.urlPatterns = new NavigationURLPatternListener( );
 		displayOntModel.getBaseModel().register( urlPatterns );
 	}
 	
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {		
-		OntModel displayOntModel = (OntModel)getServletContext().getAttribute("displayOntModel");
+		OntModel displayOntModel = (OntModel)getServletContext().getAttribute(DISPLAY_ONT_MODEL);
 		OntModel jenaOntModel = (OntModel)getServletContext().getAttribute("jenaOntModel");
 				
 		//figure out what is being requested
