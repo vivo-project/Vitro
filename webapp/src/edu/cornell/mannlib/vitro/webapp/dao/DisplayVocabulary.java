@@ -99,7 +99,7 @@ public class DisplayVocabulary {
     
     /** <p>Values from HttpRequest.getPathInfo() will be mapped to values from urlMapping.</p> */
     //public static final DatatypeProperty URL_MAPPING = m_model.createDatatypeProperty( NS + "urlMapping" );
-    
+        
     
     
     /** <p>This represents a menu item or other general navigation item.</p> */
@@ -119,14 +119,21 @@ public class DisplayVocabulary {
     public static final String CONTEXT_DISPLAY_TBOX = "displayOntModelTBOX";
     public static final String CONTEXT_DISPLAY_DISPLAY = "displayOntModelDisplayModel";
     
+    /** Key for display model in request, session or context attributes */
+    public static final String DISPLAY_ONT_MODEL = "displayOntModel";
+    
     //URL for menu management
-    public static final String PROCESS_MENU_MANAGEMENT_URL = "/processEditDisplayModel";
+    public static final String PROCESS_MENU_MANAGEMENT_URL = "/menuManagmentEdit";
     public static final String REORDER_MENU_URL = PROCESS_MENU_MANAGEMENT_URL + "?cmd=Reorder&" + SWITCH_TO_DISPLAY_MODEL + "=true";
 
     /* URIs for some individuals in the dispaly ontology */
 
 	public static final String HOME_MENU_ITEM = DISPLAY_NS + "HomeMenuItem";
         
+	/* some URIs of properties used with the SPARQL DataGetter */
+    public static final String SAVE_TO_VAR = DISPLAY_NS + "saveToVar" ;
+    public static final String QUERY_MODEL = DISPLAY_NS + "queryModel";    
+    public static final String QUERY = DISPLAY_NS + "query";
     
     //public static final Individual EVENTS = m_model.createIndividual( NS + "Events", PAGE );
     
