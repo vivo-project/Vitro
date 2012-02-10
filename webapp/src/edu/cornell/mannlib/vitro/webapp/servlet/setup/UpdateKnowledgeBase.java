@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.DISPLAY_ONT_MODEL;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -130,7 +132,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	}	
 			
 	private void doMigrateDisplayModel(ServletContext ctx) {
-		Object o = ctx.getAttribute("displayOntModel");
+		Object o = ctx.getAttribute(DISPLAY_ONT_MODEL);
 	    if (!(o instanceof OntModel)) {
 	    	return;
 	    }

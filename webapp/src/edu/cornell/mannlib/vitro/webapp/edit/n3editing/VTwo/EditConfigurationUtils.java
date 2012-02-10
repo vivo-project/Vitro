@@ -113,7 +113,12 @@ public class EditConfigurationUtils {
     	//DataProperty dataProp = wdf.getDataPropertyDao().getDataPropertyByURI(predicateUri);
     	 WebappDaoFactory unfilteredWdf = vreq.getUnfilteredWebappDaoFactory();
     	 DataProperty dataProp = unfilteredWdf.getDataPropertyDao().getDataPropertyByURI( predicateUri );
-      	return dataProp;
+    	 if( dataProp != null )
+    	     return dataProp;
+    	 else{
+    	     //when editing the display model, unfitlering wdf doesn't seem to have the needed properties.
+    	     return wdf.getDataPropertyDao().getDataPropertyByURI(predicateUri);
+    	 }
     }
     
     //get url without context - used for edit configuration object

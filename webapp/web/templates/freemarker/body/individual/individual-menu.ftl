@@ -6,6 +6,8 @@
 
 <#assign hasElement = propertyGroups.pullProperty("${namespaces.display}hasElement")!>
 
+<#assign addNewMenuItemUrl = "${urls.base}/menuManagementController?cmd=add" >
+
 <#if hasElement?has_content>
     <script type="text/javascript">
         var menuItemData = [];
@@ -22,9 +24,8 @@
     
     <#-- Link to add a new menu item -->
     <#if editable>
-        <#assign addUrl = hasElement.addUrl>
-        <#if addUrl?has_content>
-            <p><a class="add-hasElement green button" href="${addUrl}" title="Add new menu item">Add menu item</a></p>
+        <#if addNewMenuItemUrl?has_content>
+            <p><a class="add-hasElement green button" href="${addNewMenuItemUrl}" title="Add new menu item">Add menu item</a></p>
             
             <p class="note">Refresh page after reordering menu items</p>
         </#if>

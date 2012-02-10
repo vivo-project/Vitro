@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.DISPLAY_ONT_MODEL;
+
 import java.io.File;
 import java.io.FileOutputStream;
 
@@ -78,7 +80,7 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
 	    	OntModel displayModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
 	    	displayModel.add(displayDbModel);	    	
 	    	displayModel.getBaseModel().register(new ModelSynchronizer(displayDbModel));	    	
-	    	ctx.setAttribute("displayOntModel", displayModel);
+	    	ctx.setAttribute(DISPLAY_ONT_MODEL, displayModel);
 	    	
 	    	//at each startup load all RDF files from directory to sub-models of display model  
 	    	initializeDisplayLoadedAtStartup(ctx, displayModel);		    	

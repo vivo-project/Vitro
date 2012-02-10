@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.DISPLAY_ONT_MODEL;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -460,7 +462,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     		//TODO: Check how model is retrieved
             OntModel displayOntModel = 
                (OntModel) session.getServletContext()
-                    .getAttribute("displayOntModel");
+                    .getAttribute(DISPLAY_ONT_MODEL);
             if (displayOntModel != null) {
                 ProhibitedFromSearch pfs = new ProhibitedFromSearch(
                     DisplayVocabulary.SEARCH_INDEX_URI, displayOntModel);

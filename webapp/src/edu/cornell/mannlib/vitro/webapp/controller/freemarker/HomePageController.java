@@ -13,7 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetter;
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.DataGetterUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetterUtils;
 
 public class HomePageController extends FreemarkerHttpServlet {
 
@@ -26,7 +26,7 @@ public class HomePageController extends FreemarkerHttpServlet {
     protected ResponseValues processRequest(VitroRequest vreq) { 
         
         Map<String, Object> body = new HashMap<String, Object>();    
-        List<PageDataGetter> dataGetters = DataGetterUtils.getDataGetterObjects(vreq, DisplayVocabulary.HOME_PAGE_URI);
+        List<PageDataGetter> dataGetters = PageDataGetterUtils.getDataGetterObjects(vreq, DisplayVocabulary.HOME_PAGE_URI);
         for(PageDataGetter dataGetter: dataGetters) {
 	        if( dataGetter != null ){
 	            String uriOfPageInDisplayModel = "not defined";            

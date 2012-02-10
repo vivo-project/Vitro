@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.filters;
 
 import static edu.cornell.mannlib.vitro.webapp.controller.VitroRequest.SPECIAL_WRITE_MODEL;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.CONTEXT_DISPLAY_TBOX;
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.DISPLAY_ONT_MODEL;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.SWITCH_TO_DISPLAY_MODEL;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.USE_DISPLAY_MODEL_PARAM;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.USE_MODEL_PARAM;
@@ -229,7 +230,7 @@ public class VitroRequestPrep implements Filter {
     	
     	// If they asked for the display model, give it to them.
 		if (isParameterPresent(vreq, SWITCH_TO_DISPLAY_MODEL)) {
-			OntModel mainOntModel = (OntModel)_context.getAttribute("displayOntModel");
+			OntModel mainOntModel = (OntModel)_context.getAttribute( DISPLAY_ONT_MODEL);
 			OntModel tboxOntModel = (OntModel) _context.getAttribute(CONTEXT_DISPLAY_TBOX);
 	   		setSpecialWriteModel(vreq, mainOntModel);
 			return createNewWebappDaoFactory(wadf, mainOntModel, tboxOntModel, null);
@@ -294,6 +295,9 @@ public class VitroRequestPrep implements Filter {
 	}
 	
 	private void setSpecialWriteModel(VitroRequest vreq, OntModel mainOntModel) {
+	    //bdc34: not clear where the special model needs to be set.	   
+	    vreq.setAttribute("jenaOntModel", mainOntModel);
+	    
 		if (mainOntModel != null) {
 			vreq.setAttribute(SPECIAL_WRITE_MODEL, mainOntModel);
 		}

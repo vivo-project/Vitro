@@ -73,7 +73,12 @@ public class ClassGroupPageData implements PageDataGetter{
         		log.debug("Class " + v.getName() + " - " + v.getURI() + " has " + v.getEntityCount() + " entities");
         	}
         }
-        data.put("vClassGroup", group);  //may put null     
+        data.put("vClassGroup", group);  //may put null
+        
+        //This page level data getters tries to set its own template,
+        // not all of the data getters need to do this.
+        data.put("bodyTemplate", "page-classgroup.ftl");
+        
         //Also add data service url
         //Hardcoding for now, need a more dynamic way of doing this
         data.put("dataServiceUrlIndividualsByVClass", this.getDataServiceUrl());
@@ -121,7 +126,7 @@ public class ClassGroupPageData implements PageDataGetter{
     }
     
     public String getType(){
-        return DataGetterUtils.generateDataGetterTypeURI(ClassGroupPageData.class.getName());
+        return PageDataGetterUtils.generateDataGetterTypeURI(ClassGroupPageData.class.getName());
     } 
     
   //Get data servuice

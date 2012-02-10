@@ -2,10 +2,16 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.DISPLAY_ONT_MODEL;
+
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Dataset;
@@ -15,7 +21,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 
 public class VitroRequest extends HttpServletRequestWrapper {
-
+    final static Log log = LogFactory.getLog(VitroRequest.class);
+    
     //Attribute in case of special model editing such as display model editing
     public static final String SPECIAL_WRITE_MODEL = "specialWriteModel";     
 
@@ -139,6 +146,35 @@ public class VitroRequest extends HttpServletRequestWrapper {
     	return jenaOntModel;    	
     }
 
+    //Get the display and editing configuration model
+    public OntModel getDisplayModel(){     
+        //bdc34: I have no idea what the correct way to get this model is
+        
+        //try from the request
+        if( _req.getAttribute("displayOntModel") != null ){
+            return (OntModel) _req.getAttribute(DISPLAY_ONT_MODEL);
+                
+        //try from the session
+        } else {
+            HttpSession session = _req.getSession(false);
+            if( session != null ){
+                if( session.getAttribute(DISPLAY_ONT_MODEL) != null ){            
+                    return (OntModel) session.getAttribute(DISPLAY_ONT_MODEL);
+                    
+                //try from the context                    
+                }else{
+                    if( session.getServletContext().getAttribute(DISPLAY_ONT_MODEL) != null){
+                        return (OntModel)session.getServletContext().getAttribute(DISPLAY_ONT_MODEL); 
+                    }
+                }
+            }            
+        }
+        
+        //nothing worked, could not find display model
+        log.error("No display model could be found.");
+        return null;                
+    }
+        
     public ApplicationBean getAppBean(){
         //return (ApplicationBean) getAttribute("appBean");
     	return getWebappDaoFactory().getApplicationDao().getApplicationBean();

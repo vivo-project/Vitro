@@ -30,7 +30,7 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.SelectDataGetterUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.menuManagement.SelectDataGetterUtils;
 
 /**
  *Process edits from display model editing, so form should submit to this page which should

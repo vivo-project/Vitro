@@ -13,6 +13,7 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
@@ -31,13 +32,14 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 
-public class DataGetterUtils {
+public class PageDataGetterUtils {
     protected static final String DATA_GETTER_MAP = "pageTypeToDataGetterMap";
-    private static final Log log = LogFactory.getLog(DataGetterUtils.class);
+    private static final Log log = LogFactory.getLog(PageDataGetterUtils.class);
 
     public static Map<String,Object> getDataForPage(String pageUri, VitroRequest vreq, ServletContext context) {
         //Based on page type get the appropriate data getter
-        Map<String, Object> page = getMapForPage(vreq, pageUri);
+        Map<String, Object> page = vreq.getWebappDaoFactory().getPageDao().getPage(pageUri);        
+        
         Map<String,Object> data = new HashMap<String,Object>();
         List<PageDataGetter> dataGetters = getDataGetterObjects(vreq, pageUri);
         for(PageDataGetter getter: dataGetters) {
@@ -60,7 +62,8 @@ public class DataGetterUtils {
      */
     public static JSONObject covertDataToJSONForPage(String pageUri, Map<String, Object> data, VitroRequest vreq, ServletContext context) {
         //Based on page type get the appropriate data getter
-        Map<String, Object> page = getMapForPage(vreq, pageUri);
+        Map<String, Object> page = vreq.getWebappDaoFactory().getPageDao().getPage(pageUri);
+        
         //Get types associated with page
         JSONObject rObj = null;
         List<String> types = (List<String>)page.get("types");
@@ -85,13 +88,6 @@ public class DataGetterUtils {
             }
         }     
         return rObj;
-    }
-    /*
-     * Returns map with all page attributes from display model
-     */
-    public static Map<String, Object> getMapForPage(VitroRequest vreq, String pageUri) {
-        //do a query to the display model for attributes of this page.        
-        return vreq.getWebappDaoFactory().getPageDao().getPage(pageUri);
     }
     
     public static Map<String,Object> getAdditionalData(
@@ -124,12 +120,11 @@ public class DataGetterUtils {
 	    	
 	    	for(String dgClassName: dataGetterClassNames) {
 	    		String className = getClassNameFromUri(dgClassName);
-	    		PageDataGetter pg = (PageDataGetter) Class.forName(className).newInstance();
-	    		if(pg != null) {
+	    		Object obj = Class.forName(className).newInstance();
+	    		if(obj != null && obj instanceof PageDataGetter) {
+	    		    PageDataGetter pg = (PageDataGetter) obj;
 	    			dataGetterObjects.add(pg);
-	    		} else {
-	    			log.error("Data getter does not exist for " + className);
-	    		}
+	    		} 
 	    	} 
 	    }
     	catch(Exception ex) {
@@ -140,7 +135,7 @@ public class DataGetterUtils {
     
     //Class uris returned include "java:" and to instantiate object need to remove java: portion
     public static String getClassNameFromUri(String dataGetterClassUri) {
-    	if(dataGetterClassUri.contains("java:")) {
+    	if( !StringUtils.isEmpty(dataGetterClassUri) && dataGetterClassUri.contains("java:")) {
     		String[] splitArray = dataGetterClassUri.split("java:");
     		if(splitArray.length > 1) {
     			return splitArray[1];

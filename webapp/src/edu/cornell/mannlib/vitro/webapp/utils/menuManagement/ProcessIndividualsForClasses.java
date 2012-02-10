@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter;
+package edu.cornell.mannlib.vitro.webapp.utils.menuManagement;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -41,6 +41,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetterUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.IndividualsForClassesDataGetter;
 
 /*
  * Handle processing of data retrieved from IndividualsForClasses data getter to return to form template
@@ -57,7 +59,7 @@ public class ProcessIndividualsForClasses implements ProcessDataGetter {
 		populateIncludedClasses(pageData, templateData);
 		populateRestrictedClasses(pageData, templateData);
 		//Also save the class group for display
-		DataGetterUtils.getClassGroupForDataGetter(context, pageData, templateData); 
+		PageDataGetterUtils.getClassGroupForDataGetter(context, pageData, templateData); 
 
 	}
     

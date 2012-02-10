@@ -132,8 +132,8 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     static final String JENA_DISPLAY_TBOX_MODEL = 
         DisplayVocabulary.DISPLAY_TBOX_MODEL_URI;
     static final String JENA_DISPLAY_DISPLAY_MODEL = 
-        DisplayVocabulary.DISPLAY_DISPLAY_MODEL_URI;
-
+        DisplayVocabulary.DISPLAY_DISPLAY_MODEL_URI;    
+    
     // use OWL models with no reasoning
     static final OntModelSpec DB_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
     static final OntModelSpec MEM_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM; 

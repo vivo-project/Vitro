@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter;
+package edu.cornell.mannlib.vitro.webapp.utils.menuManagement;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -40,23 +40,39 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.ClassGroupPageData;
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetterUtils;
 
 /*
- * This class includes methods that help in selecting a data getter based on 
- * parameters, and VIVO will have its own version or extend this
+ * Handle processing of data retrieved from ClassGroupPage data getter to return to form template
+ * and handle processing of form submission to create the appropriate individuals for classes data getter
  */
-public class MenuManagementDataUtils {
-    private static final Log log = LogFactory.getLog(MenuManagementDataUtils.class);
+public class ProcessClassGroup implements ProcessDataGetter{
+    private static final Log log = LogFactory.getLog(ProcessClassGroup.class);
 
-    //Data that is to be returned to template that does not involve data getters
-    //e.g. what are the current class groups, etc.
-    public static void includeRequiredSystemData(ServletContext context, Map<String, Object> templateData) {
-    	
-    	
-    }
+  //template data represents what needs to be modified and returned to template
+	//page data is data retrieved from data getter
+    public void populateTemplate(ServletContext context, Map<String, Object> pageData, Map<String, Object> templateData) {
+		//This is a class group page so 
+		templateData.put("isClassGroupPage", true);
+		templateData.put("includeAllClasses", true);
+		
+		//Get the class group from VClassGroup
+		PageDataGetterUtils.getClassGroupForDataGetter(context, pageData, templateData);
+	}
     
-
+    
+    //Process submission
+    
+    public  Model processSubmission(VitroRequest vreq, Resource dataGetterResource) {
+    	ClassGroupPageData cpg = new ClassGroupPageData();
+		Model dgModel = ModelFactory.createDefaultModel();
+		String dataGetterTypeUri = cpg.getType();
+		dgModel.add(dgModel.createStatement(dataGetterResource, 
+				RDF.type, 
+				ResourceFactory.createResource(dataGetterTypeUri)));
+		return dgModel;
+    }
     
 }

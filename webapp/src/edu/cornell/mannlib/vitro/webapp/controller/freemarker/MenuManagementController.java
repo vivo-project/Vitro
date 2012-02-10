@@ -24,10 +24,10 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.DataGetterUtils;
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.MenuManagementDataUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.menuManagement.MenuManagementDataUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.menuManagement.SelectDataGetterUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetterUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetter;
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.SelectDataGetterUtils;
 
 /*
  * Custom controller for menu management.  This will be replaced later once N3 Editing
@@ -35,7 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.SelectDataGetterUti
  */
 public class MenuManagementController extends FreemarkerHttpServlet {
     private static final Log log = LogFactory.getLog(MenuManagementController.class);
-    protected final static String SUBMIT_FORM = "/processEditDisplayModel"; 
+    protected final static String SUBMIT_FORM = "/menuManagementEdit"; 
     protected final static String CANCEL_FORM = "/individual?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fontologies%2Fdisplay%2F1.1%23DefaultMenu&switchToDisplayModel=true"; 
     protected final static String DELETE_FORM = "menuManagement-remove.ftl";
     protected final static String EDIT_FORM = "menuManagement.ftl"; 
@@ -114,7 +114,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     	//not a page already assigned a class group
     	data.put("isClassGroupPage", false);
     	data.put("includeAllClasses", false);
-    	data.put("classGroups", DataGetterUtils.getClassGroups(getServletContext()));
+    	data.put("classGroups", PageDataGetterUtils.getClassGroups(getServletContext()));
     	data.put("selectedTemplateType", "default");
     	//
     	this.getMenuItemData(vreq, menuItem, data);
@@ -134,7 +134,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     	//not a page already assigned a class group
     	data.put("isClassGroupPage", false);
     	data.put("includeAllClasses", false);
-    	data.put("classGroups", DataGetterUtils.getClassGroups(getServletContext()));
+    	data.put("classGroups", PageDataGetterUtils.getClassGroups(getServletContext()));
     	data.put("selectedTemplateType", "default");
     	//defaults to regular class group page
 	}
@@ -149,7 +149,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     	data.put("menuItem", menuItem);
     	data.put("menuAction", "Edit");
     	//Get All class groups
-    	data.put("classGroups", DataGetterUtils.getClassGroups(getServletContext()));
+    	data.put("classGroups", PageDataGetterUtils.getClassGroups(getServletContext()));
     	//Get data for menu item and associated page
     	this.getMenuItemData(vreq, menuItem, data);
     	this.getPageData(vreq, data);    	
@@ -273,13 +273,14 @@ public class MenuManagementController extends FreemarkerHttpServlet {
   
     private void retrieveData(VitroRequest vreq, Resource page, String dataGetterType,  Map<String, Object> templateData) {
     	//Data Getter type is now a class name
-    	String className = DataGetterUtils.getClassNameFromUri(dataGetterType);
+    	String className = PageDataGetterUtils.getClassNameFromUri(dataGetterType);
     	try{
     		String pageURI = page.getURI();
     		PageDataGetter pg = (PageDataGetter) Class.forName(className).newInstance();
-    		Map<String, Object> pageInfo = DataGetterUtils.getMapForPage( vreq, pageURI );
+    		
+    		Map<String, Object> pageInfo = vreq.getWebappDaoFactory().getPageDao().getPage(pageURI);    		
 
-    		Map<String, Object> pageData = DataGetterUtils.getAdditionalData(pageURI, dataGetterType, pageInfo, vreq, pg, getServletContext());
+    		Map<String, Object> pageData = PageDataGetterUtils.getAdditionalData(pageURI, dataGetterType, pageInfo, vreq, pg, getServletContext());
     		SelectDataGetterUtils.processAndRetrieveData(vreq, getServletContext(), pageData, className, templateData);
     	} catch(Exception ex) {
     		log.error("Exception occurred in instantiation page data getter for " + className, ex);

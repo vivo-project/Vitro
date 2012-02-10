@@ -56,6 +56,10 @@ public abstract class BaseEditConfigurationGenerator implements EditConfiguratio
     void prepare(VitroRequest vreq, EditConfigurationVTwo editConfig) {
     	//This used to get the model from the servlet context
     	//        Model model = (Model) getServletContext().getAttribute("jenaOntModel");
+        
+        //PROBLEM: this is returning the jenaOntModel
+        // but we want the current abox model which might have 
+        // been set to the display model or something.
         Model model = vreq.getJenaOntModel();
         
         if( editConfig.getSubjectUri() == null)

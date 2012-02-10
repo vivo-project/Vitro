@@ -215,7 +215,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>MenuManagementController</servlet-name>
-    <url-pattern>/editDisplayModel</url-pattern>
+    <url-pattern>/menuManagementController</url-pattern>
   </servlet-mapping>
 
   <servlet>
@@ -224,7 +224,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>MenuManagementEdit</servlet-name>
-    <url-pattern>/processEditDisplayModel</url-pattern>
+    <url-pattern>/menuManagementEdit</url-pattern>
   </servlet-mapping>
 
   <servlet>

@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.jsptags;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.DISPLAY_ONT_MODEL;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -444,7 +445,7 @@ public class InputElementFormattingTag extends TagSupport {
             // individuals from classes that should be hidden from list views
         	OntModel displayOntModel = 
     		    (OntModel) pageContext.getServletContext()
-    		        .getAttribute("displayOntModel");
+    		        .getAttribute(DISPLAY_ONT_MODEL);
         	if (displayOntModel != null) {
     	     	ProhibitedFromSearch pfs = new ProhibitedFromSearch(
     				DisplayVocabulary.SEARCH_INDEX_URI, displayOntModel);

@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.DISPLAY_ONT_MODEL;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,7 +96,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
         unionOms.setUserAccountsModel(userAccountsModel);       
         
         OntModel displayModel = ontModelFromContextAttribute(
-                ctx,"displayOntModel");
+                ctx,DISPLAY_ONT_MODEL);
         baseOms.setDisplayModel(displayModel);
         inferenceOms.setDisplayModel(displayModel);
         unionOms.setDisplayModel(displayModel);

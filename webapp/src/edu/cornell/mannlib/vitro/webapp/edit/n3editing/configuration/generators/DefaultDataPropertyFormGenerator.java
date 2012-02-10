@@ -44,12 +44,14 @@ public class DefaultDataPropertyFormGenerator extends BaseEditConfigurationGener
 	    String predicateUri = vreq.getParameter("predicateUri");
 	    WebappDaoFactory unfilteredWdf = vreq.getUnfilteredWebappDaoFactory();
 	    DataProperty dataproperty = unfilteredWdf.getDataPropertyDao().getDataPropertyByURI( predicateUri );
+	    
+	    dataproperty = vreq.getWebappDaoFactory().getDataPropertyDao().getDataPropertyByURI( predicateUri );
 	    if( dataproperty == null) {
 	        // No dataproperty will be returned for rdfs:label, but we shouldn't throw an error.
 	        // This is controlled by the Jena layer, so we can't change the behavior.
 	        if (! predicateUri.equals(VitroVocabulary.LABEL)) {
 	            log.error("Could not find data property '"+predicateUri+"' in model");
-	            throw new Error("editDatapropStmtRequest.jsp: Could not find DataProperty in model: " + predicateUri);
+	            throw new Error("Could not find DataProperty in model: " + predicateUri);
 	        }
 	    }
 	    

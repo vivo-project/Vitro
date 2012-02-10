@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter;
+package edu.cornell.mannlib.vitro.webapp.utils.menuManagement;
 
 import java.util.Map;
 

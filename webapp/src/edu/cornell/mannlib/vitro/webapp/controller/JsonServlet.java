@@ -41,7 +41,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.SelectListGenerator;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.DataGetterUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetterUtils;
 
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.DISPLAY_ONT_MODEL;
 
@@ -284,7 +284,7 @@ public class JsonServlet extends VitroHttpServlet {
  
     // Map given to process method includes the actual individuals returned from the search
     public static JSONObject processVClassResults(Map<String, Object> map, VitroRequest vreq, ServletContext context, boolean multipleVclasses) throws Exception{
-         JSONObject rObj = DataGetterUtils.processVclassResultsJSON(map, vreq, multipleVclasses);
+         JSONObject rObj = PageDataGetterUtils.processVclassResultsJSON(map, vreq, multipleVclasses);
          return rObj;
     } 
 
@@ -534,11 +534,11 @@ public class JsonServlet extends VitroHttpServlet {
 	   String pageUri = vreq.getParameter("pageUri");
 	   if(pageUri != null && !pageUri.isEmpty()) {
 		   ServletContext context = getServletContext();
-		   Map<String,Object> data = DataGetterUtils.getDataForPage(pageUri, vreq, context);
+		   Map<String,Object> data = PageDataGetterUtils.getDataForPage(pageUri, vreq, context);
 		   //Convert to json version based on type of page
 		   if(data != null) {
 			 //Convert to json version based on type of page
-			   rObj = DataGetterUtils.covertDataToJSONForPage(pageUri, data, vreq, context);
+			   rObj = PageDataGetterUtils.covertDataToJSONForPage(pageUri, data, vreq, context);
 	   		}
 	   }
 

@@ -215,7 +215,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     }
     
     // Subclasses will override
-    protected ResponseValues processRequest(VitroRequest vreq) {
+    protected ResponseValues processRequest(VitroRequest vreq) throws Exception {
         return null;
     }
        
