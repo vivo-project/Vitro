@@ -23,10 +23,10 @@ public class HomePageController extends FreemarkerHttpServlet {
     private static final String BODY_TEMPLATE = "home.ftl";
 
     @Override
-    protected ResponseValues processRequest(VitroRequest vreq) { 
+    protected ResponseValues processRequest(VitroRequest vreq) throws InstantiationException, IllegalAccessException, ClassNotFoundException { 
         
         Map<String, Object> body = new HashMap<String, Object>();    
-        List<PageDataGetter> dataGetters = PageDataGetterUtils.getDataGetterObjects(vreq, DisplayVocabulary.HOME_PAGE_URI);
+        List<PageDataGetter> dataGetters = PageDataGetterUtils.getPageDataGetterObjects(vreq, DisplayVocabulary.HOME_PAGE_URI);
         for(PageDataGetter dataGetter: dataGetters) {
 	        if( dataGetter != null ){
 	            String uriOfPageInDisplayModel = "not defined";            

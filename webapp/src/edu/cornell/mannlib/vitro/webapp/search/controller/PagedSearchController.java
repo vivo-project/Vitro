@@ -572,7 +572,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
 
     /**
      * Makes a message to display to user for a bad search term.
-     * @param query
+     * @param queryText
      * @param exceptionMsg
      */
     private String makeBadSearchMessage(String querytext, String exceptionMsg){

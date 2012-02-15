@@ -30,68 +30,79 @@ import com.hp.hpl.jena.shared.Lock;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 
-public class SparqlQueryDataGetter implements DataGetter{    
-    String pageUri;
-    String query;
+public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{    
+    String dataGetterURI;
+    String queryText;
     String saveToVar;
-    String modelUri;
+    String modelURI;
     
     final static Log log = LogFactory.getLog(SparqlQueryDataGetter.class);
     
+    /**
+     * Constructor with display model and data getter URI that will be called by reflection.
+     */
+    public SparqlQueryDataGetter(Model displayModel, String dataGetterURI){
+        this.configure(displayModel,dataGetterURI);
+    }        
+    
     @Override
-    public Map<String, Object> getData(ServletContext context, VitroRequest vreq, Map<String, Object> pageData) {
-        if( pageUri == null )
-            throw new IllegalAccessError("configure() must be called before getData()");
-                
-        return doQuery( vreq.getParameterMap(),getModelToRunQueryOn(context, vreq ));
+    public Map<String, Object> getData(ServletContext context, VitroRequest vreq, Map<String, Object> pageData) {                        
+        return doQuery( vreq.getParameterMap(), getModel(context, vreq, modelURI));
     }
 
-    @Override
-    public void configure(Model model, String dataGetterURI) {
-        if( model == null ) 
+    /**
+     * Configure this instance based on the URI and display model.
+     */
+    protected void configure(Model displayModel, String dataGetterURI) {
+        if( displayModel == null ) 
             throw new IllegalArgumentException("Display Model may not be null.");
         if( dataGetterURI == null )
             throw new IllegalArgumentException("PageUri may not be null.");
                 
-        this.pageUri = dataGetterURI;        
+        this.dataGetterURI = dataGetterURI;        
         
         QuerySolutionMap initBindings = new QuerySolutionMap();
-        initBindings.add("pageUri", ResourceFactory.createResource(this.pageUri));
+        initBindings.add("dataGetterURI", ResourceFactory.createResource(this.dataGetterURI));
         
         int count = 0;
-        Query query = QueryFactory.create(pageQuery) ;               
-        model.enterCriticalSection(Lock.READ);
+        Query dataGetterConfigurationQuery = QueryFactory.create(dataGetterQuery) ;               
+        displayModel.enterCriticalSection(Lock.READ);
         try{
-            QueryExecution qexec = QueryExecutionFactory.create(query, model, initBindings) ;        
+            QueryExecution qexec = QueryExecutionFactory.create(
+                    dataGetterConfigurationQuery, displayModel, initBindings) ;        
             ResultSet res = qexec.execSelect();
             try{                
                 while( res.hasNext() ){
                     count++;
                     QuerySolution soln = res.next();
                     
-                    //query is not OPTIONAL
+                    //query is NOT OPTIONAL
                     Literal value = soln.getLiteral("query");
-                    if( query == null )
-                        log.error("no query defined for page " + this.pageUri);
+                    if( dataGetterConfigurationQuery == null )
+                        log.error("no query defined for page " + this.dataGetterURI);
                     else
-                        this.query = value.getLexicalForm();                    
+                        this.queryText = value.getLexicalForm();                    
                     
                     //model is OPTIONAL
                     RDFNode node = soln.getResource("model");
                     if( node != null && node.isURIResource() ){
-                        this.modelUri = node.asResource().getURI();                        
+                        this.modelURI = node.asResource().getURI();                        
                     }else if( node != null && node.isLiteral() ){
-                        this.modelUri = node.asLiteral().getLexicalForm();                        
+                        this.modelURI = node.asLiteral().getLexicalForm();                        
+                    }else{
+                        this.modelURI = null;
                     }
                         
                     //saveToVar is OPTIONAL
-                    node = soln.getResource("saveToVar");
-                    if( node != null && node.isLiteral() ){
-                        this.saveToVar= node.asLiteral().getLexicalForm();                        
+                    Literal saveTo = soln.getLiteral("saveToVar");
+                    if( saveTo != null && saveTo.isLiteral() ){
+                        this.saveToVar = saveTo.asLiteral().getLexicalForm();                        
+                    }else{
+                        this.saveToVar = defaultVarNameForResults;
                     }
                 }
             }finally{ qexec.close(); }
-        }finally{ model.leaveCriticalSection(); }                
+        }finally{ displayModel.leaveCriticalSection(); }                
     }
     
     /**
@@ -100,20 +111,13 @@ public class SparqlQueryDataGetter implements DataGetter{
      */
     private Map<String, Object> doQuery(Map<String, String[]>parameterMap, Model queryModel){
 
-        if( this.query == null ){            
-            log.error("no SPARQL query defined for page " + this.pageUri);
-            //TODO: return an error message?
+        if( this.queryText == null ){            
+            log.error("no SPARQL query defined for page " + this.dataGetterURI);
             return Collections.emptyMap();
         }
         
-        Query query = null;
-        try{
-             query = QueryFactory.create( this.query );
-        }catch(Exception ex){
-            //TODO: return an error message?
-            log.error( "for page " + this.pageUri, ex );
-            return Collections.emptyMap();
-        }        
+        //this may throw an error
+        Query query = QueryFactory.create( this.queryText );                
 
         //build query bindings
         QuerySolutionMap initialBindings = createBindings( parameterMap);                 
@@ -177,25 +181,13 @@ public class SparqlQueryDataGetter implements DataGetter{
         }   
     }
 
-    
-    private Model getModelToRunQueryOn(ServletContext context, VitroRequest vreq ) {
-        //just use JenaOntModel for now. in the future specify the
-        //query model from the DataGetter's RDF configuration.
-        return vreq.getJenaOntModel();        
-    }
 
-    private Model getDisplayModel(VitroRequest vreq, ServletContext context) {
-        return vreq.getDisplayModel();
-    }
-    
-    private QuerySolutionMap createBindings(Map<String, String[]>parameterMap) {
-        
+
+    private QuerySolutionMap createBindings(Map<String, String[]>parameterMap) {        
         QuerySolutionMap initBindings = new QuerySolutionMap();
-        initBindings.add("pageUri", ResourceFactory.createResource(pageUri));
 
         //could have bindings from HTTP parameters
-        for( String var : parameterMap.keySet() ) {
-            
+        for( String var : parameterMap.keySet() ) {           
             String[] values =  parameterMap.get(var);
             if( values != null && values.length == 1 ){
                 //what do do when we don't want a Resource?
@@ -203,16 +195,20 @@ public class SparqlQueryDataGetter implements DataGetter{
             }else if( values.length > 1){
                 log.error("more than 1 http parameter for " + var);                
             }
-        }
-        
+        }        
         return initBindings;
     }
 
     private static final String queryPropertyURI = "<" + DisplayVocabulary.QUERY + ">";
     private static final String saveToVarPropertyURI= "<" + DisplayVocabulary.SAVE_TO_VAR+ ">";
     private static final String queryModelPropertyURI= "<" + DisplayVocabulary.QUERY_MODEL+ ">";
+
+    public static final String defaultVarNameForResults = "results";
     
-    private static final String pageQuery =
+    /**
+     * Query to get the definition of the SparqlDataGetter for a given URI.
+     */
+    private static final String dataGetterQuery =
         "PREFIX display: <" + DisplayVocabulary.DISPLAY_NS +"> \n" +
         "SELECT ?query ?saveToVar ?model WHERE { \n" +
         "  ?pageUri "+queryPropertyURI+" ?query . \n" +

@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +73,7 @@ public class PageController extends FreemarkerHttpServlet{
     }
 
     private void executeDataGetters(String pageUri, VitroRequest vreq, ServletContext context, Map<String, Object> mapForTemplate) 
-    throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+    throws Exception {
         List<DataGetter> dgList = DataGetterUtils.getDataGettersForPage(vreq.getDisplayModel(), pageUri);
                         
         for( DataGetter dg : dgList){            
@@ -83,7 +84,8 @@ public class PageController extends FreemarkerHttpServlet{
         }                       
     }
 
-    private void executePageDataGetters(String pageUri, VitroRequest vreq, ServletContext context, Map<String, Object> mapForTemplate) {                
+    private void executePageDataGetters(String pageUri, VitroRequest vreq, ServletContext context, Map<String, Object> mapForTemplate) 
+    throws Exception{                
         mapForTemplate.putAll( PageDataGetterUtils.getDataForPage(pageUri, vreq, context) );        
     }
 

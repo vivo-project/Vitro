@@ -1,0 +1,77 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+package edu.cornell.mannlib.vitro.webapp.utils.dataGetter;
+
+import static org.junit.Assert.fail;
+
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Level;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.impl.RDFDefaultErrorHandler;
+
+import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+
+public class DataGetterUtilsTest extends AbstractTestClass{
+    
+    OntModel displayModel;
+    String testDataGetterURI_1 = "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#query1data";
+    String pageURI_1 = "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#SPARQLPage";
+    String pageX = "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#pageX";
+    String dataGetterX = "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#pageDataGetterX";
+    
+    @Before
+    public void setUp() throws Exception {    
+        // Suppress error logging.
+        setLoggerLevel(RDFDefaultErrorHandler.class, Level.OFF);
+        
+        Model model = ModelFactory.createDefaultModel();        
+        InputStream in = DataGetterUtilsTest.class.getResourceAsStream("resources/dataGetterTest.n3");
+        model.read(in,"","N3");        
+        displayModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM,model);
+    }
+
+    @Test
+    public void testGetJClassForDataGetterURI() throws IllegalAccessException {
+        String fullJavaClassName = DataGetterUtils.getJClassForDataGetterURI(displayModel, testDataGetterURI_1);
+        Assert.assertNotNull(fullJavaClassName);
+        Assert.assertTrue("java class name should not be empty", ! StringUtils.isEmpty(fullJavaClassName));
+        Assert.assertEquals(SparqlQueryDataGetter.class.getName(), fullJavaClassName);
+    }
+
+    @Test
+    public void testDataGetterForURI() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException {
+        DataGetter dg = DataGetterUtils.dataGetterForURI(displayModel, testDataGetterURI_1);
+        Assert.assertNotNull(dg);
+    }
+    
+    @Test
+    public void testGetDataGettersForPage() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException {
+        List<DataGetter> dgList = 
+            DataGetterUtils.getDataGettersForPage(displayModel, pageURI_1);
+        Assert.assertNotNull(dgList);
+        Assert.assertTrue("List of DataGetters was empty, it should not be.", dgList.size() > 0);
+    }
+
+
+    @Test
+    public void testNonPageDataGetter() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException{        
+        DataGetter dg = DataGetterUtils.dataGetterForURI(displayModel,dataGetterX);
+        Assert.assertNull(dg);        
+        
+        List<DataGetter> dgList = 
+            DataGetterUtils.getDataGettersForPage(displayModel, pageX);
+        Assert.assertNotNull(dgList);
+        Assert.assertTrue("List should be, it was not", dgList.size() == 0);                
+    }
+
+}

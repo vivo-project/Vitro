@@ -1,6 +1,8 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 package edu.cornell.mannlib.vitro.webapp.utils.dataGetter;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,8 +30,13 @@ public class DataGetterUtils {
     
     final static Log log = LogFactory.getLog(DataGetterUtils.class);
 
+    /**
+     * Get a list of DataGetter objects that are associated with a page.
+     * This should not return PageDataGetters and should not throw an 
+     * exception if a page has PageDataGetters.  
+     */
     public static List<DataGetter> getDataGettersForPage( Model displayModel, String pageURI) 
-    throws InstantiationException, IllegalAccessException, ClassNotFoundException{
+    throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException{
         //get data getter uris for pageURI
         List<String> dgUris = getDataGetterURIsForPageURI( displayModel, pageURI);
         
@@ -43,15 +50,62 @@ public class DataGetterUtils {
     }
 
     /**
-     * May return null.
+     * Tests if classInQuestion implements interFace.
      */
-    public static DataGetter dataGetterForURI(Model displayModel, String dataGetterURI) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+    public static boolean isInstanceOfInterface( Class classInQuestion, Class interFace){
+        if( classInQuestion == null || interFace == null )
+            throw new IllegalAccessError("classInQuestion or interFace must not be null"); 
+        
+        //figure out if it implements interface         
+        Class[] interfaces = classInQuestion.getInterfaces();
+        if( interfaces == null )
+            return false;
+        boolean foundIface = false;
+        for( Class cz : interfaces ){
+            if( interFace.equals( cz ) ){
+                return true;                
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Returns a DataGetter using information in the 
+     * displayModel for the individual with the URI given by dataGetterURI
+     * to configure it. 
+     * 
+     * May return null.
+     * This should not throw an exception if the URI exists and has a type
+     * that does not implement the DataGetter interface.
+     */
+    public static DataGetter dataGetterForURI(Model displayModel, String dataGetterURI) 
+    throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, InvocationTargetException, SecurityException, NoSuchMethodException 
+    {
         
         //get java class for dataGetterURI
         String dgClassName = getJClassForDataGetterURI(displayModel, dataGetterURI);
         
-        //construct class
-        Object obj =  Class.forName(dgClassName).newInstance();
+        //figure out if it implements interface DataGetter
+        Class dgClass = Class.forName(dgClassName);
+        if( ! isInstanceOfInterface( dgClass, DataGetter.class) ){
+            return null;
+        }
+        
+        //try to run constructor with (Model, String) parameters
+        Class partypes[] = { Model.class , String.class };        
+        Constructor ct = dgClass.getConstructor( partypes );
+        
+        Object obj = null;
+        if( ct != null ){
+            Object[] initargs = new Object[2];
+            initargs[0]= displayModel;
+            initargs[1] = dataGetterURI;
+            obj = ct.newInstance(initargs);
+        } else {
+            log.debug("no constructor with signature " +
+            		"(Model displayModel,String URI) found, trying empty constructor");                        
+            obj =  dgClass.newInstance();
+        }
         
         if( !(obj instanceof DataGetter) ){
             log.debug("For <" + dataGetterURI + "> the class " +
@@ -59,9 +113,7 @@ public class DataGetterUtils {
             return null;
         }
         
-        DataGetter dg = (DataGetter)obj;
-        dg.configure(displayModel, dataGetterURI);        
-        return dg;                
+        return (DataGetter)obj;                
     }
 
     public static String getJClassForDataGetterURI(Model displayModel, String dataGetterURI) throws IllegalAccessException {

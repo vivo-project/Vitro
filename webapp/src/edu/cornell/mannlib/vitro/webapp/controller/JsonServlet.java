@@ -525,9 +525,10 @@ public class JsonServlet extends VitroHttpServlet {
     /**
      * Gets data based on data getter for page uri and returns in the form of Json objects
      * @param req
-     * @param resp
+     * @param resp  
      */
-   private void getDataForPage(HttpServletRequest req, HttpServletResponse resp) {
+   private void getDataForPage(HttpServletRequest req, HttpServletResponse resp) 
+   throws Exception{
 	   VitroRequest vreq = new VitroRequest(req);
        String errorMessage = null;
        JSONObject rObj = null;

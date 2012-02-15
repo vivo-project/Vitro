@@ -31,17 +31,18 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListCont
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
+import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
 
 public class PageDataGetterUtils {
     protected static final String DATA_GETTER_MAP = "pageTypeToDataGetterMap";
     private static final Log log = LogFactory.getLog(PageDataGetterUtils.class);
 
-    public static Map<String,Object> getDataForPage(String pageUri, VitroRequest vreq, ServletContext context) {
+    public static Map<String,Object> getDataForPage(String pageUri, VitroRequest vreq, ServletContext context) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         //Based on page type get the appropriate data getter
         Map<String, Object> page = vreq.getWebappDaoFactory().getPageDao().getPage(pageUri);        
         
         Map<String,Object> data = new HashMap<String,Object>();
-        List<PageDataGetter> dataGetters = getDataGetterObjects(vreq, pageUri);
+        List<PageDataGetter> dataGetters = getPageDataGetterObjects(vreq, pageUri);
         for(PageDataGetter getter: dataGetters) {
             try{
                 Map<String,Object> moreData = null;
@@ -59,15 +60,14 @@ public class PageDataGetterUtils {
      * 
      * Convert data to JSON for page uri based on type and related datagetters
      * TODO: How to handle different data getters?  Will this replace json fields or add to them?
+     * @throws ClassNotFoundException 
+     * @throws IllegalAccessException 
+     * @throws InstantiationException 
      */
-    public static JSONObject covertDataToJSONForPage(String pageUri, Map<String, Object> data, VitroRequest vreq, ServletContext context) {
-        //Based on page type get the appropriate data getter
-        Map<String, Object> page = vreq.getWebappDaoFactory().getPageDao().getPage(pageUri);
-        
-        //Get types associated with page
-        JSONObject rObj = null;
-        List<String> types = (List<String>)page.get("types");
-        List<PageDataGetter> dataGetters = getDataGetterObjects(vreq, pageUri);
+    public static JSONObject covertDataToJSONForPage(String pageUri, Map<String, Object> data, VitroRequest vreq, ServletContext context) throws InstantiationException, IllegalAccessException, ClassNotFoundException {       
+        //Get PageDataGetter types associated with pageUri
+        JSONObject rObj = null;        
+        List<PageDataGetter> dataGetters = getPageDataGetterObjects(vreq, pageUri);
         for(PageDataGetter getter: dataGetters) {
         	 JSONObject typeObj = null;
              try{
@@ -110,30 +110,35 @@ public class PageDataGetterUtils {
     }
     
     /***
-     * For the page, get the actual Data Getters to be employed
+     * For the page, get the actual Data Getters to be employed.
+     * @throws ClassNotFoundException 
+     * @throws IllegalAccessException 
+     * @throws InstantiationException 
      */
-    public static List<PageDataGetter> getDataGetterObjects(VitroRequest vreq, String pageUri) {
+    public static List<PageDataGetter> getPageDataGetterObjects(VitroRequest vreq, String pageUri) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
     	List<PageDataGetter> dataGetterObjects = new ArrayList<PageDataGetter>();
-    	try {
-	    	List<String> dataGetterClassNames = vreq.getWebappDaoFactory().getPageDao().getDataGetterClass(pageUri);
-			
-	    	
-	    	for(String dgClassName: dataGetterClassNames) {
-	    		String className = getClassNameFromUri(dgClassName);
-	    		Object obj = Class.forName(className).newInstance();
-	    		if(obj != null && obj instanceof PageDataGetter) {
-	    		    PageDataGetter pg = (PageDataGetter) obj;
-	    			dataGetterObjects.add(pg);
-	    		} 
-	    	} 
-	    }
-    	catch(Exception ex) {
-    		log.error("Error occurred in retrieving data getter class names for "+ pageUri, ex);
-    	}
+    	
+    	List<String> dataGetterClassNames = vreq.getWebappDaoFactory().getPageDao().getDataGetterClass(pageUri);
+    	if( dataGetterClassNames == null )
+    	    return Collections.emptyList();
+    	
+    	for(String dgClassName: dataGetterClassNames) {
+    		String className = getClassNameFromUri(dgClassName);
+    		Class clz =  Class.forName(className);
+    		
+    		if( DataGetterUtils.isInstanceOfInterface(clz, PageDataGetter.class)){    		        		
+    		    Object obj = clz.newInstance();
+    		    if(obj != null && obj instanceof PageDataGetter) {
+    		        PageDataGetter pg = (PageDataGetter) obj;
+    		        dataGetterObjects.add(pg);
+    		    }	    		
+    		}// else skip if class does not implement PageDataGetter
+    	} 
+	        
     	return dataGetterObjects;
     }
     
-    //Class uris returned include "java:" and to instantiate object need to remove java: portion
+    //Class URIs returned include "java:" and to instantiate object need to remove java: portion
     public static String getClassNameFromUri(String dataGetterClassUri) {
     	if( !StringUtils.isEmpty(dataGetterClassUri) && dataGetterClassUri.contains("java:")) {
     		String[] splitArray = dataGetterClassUri.split("java:");
@@ -157,8 +162,7 @@ public class PageDataGetterUtils {
      */
     public static JSONObject processVclassResultsJSON(Map<String, Object> map, VitroRequest vreq, boolean multipleVclasses) {
         JSONObject rObj = new JSONObject();
-        VClass vclass=null; 
-        String errorMessage = null;
+        VClass vclass=null;         
         
         try { 
               
@@ -191,7 +195,7 @@ public class PageDataGetterUtils {
                     vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(vclassId);
                     if (vclass == null) {
                         log.error("Couldn't retrieve vclass ");   
-                        throw new Exception (errorMessage = "Class " + vclassId + " not found");
+                        throw new Exception ("Class " + vclassId + " not found");
                     }  
                   }
             }else{

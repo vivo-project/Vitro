@@ -696,38 +696,17 @@ public class JenaIngestController extends BaseEditController {
         }
     }
     
-    protected ModelMaker getVitroJenaModelMaker(HttpServletRequest request) {
-        ModelMaker myVjmm = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
-        myVjmm = (myVjmm == null) ? (ModelMaker) getServletContext().getAttribute("vitroJenaSDBModelMaker") : myVjmm;
-        return new VitroJenaSpecialModelMaker(myVjmm, request);
+    protected ModelMaker getVitroJenaModelMaker(HttpServletRequest request){
+        return JenaIngestController.getVitroJenaModelMaker(request,getServletContext());
     }
     
-    protected Model getModel(String name, HttpServletRequest request) {
-        if ("vitro:jenaOntModel".equals(name)) {
-            Object sessionOntModel = request.getSession().getAttribute("jenaOntModel");
-            if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
-                return (OntModel) sessionOntModel;
-            } else {
-                return (OntModel) getServletContext().getAttribute("jenaOntModel");
-            }
-        } else if ("vitro:baseOntModel".equals(name)) {
-            Object sessionOntModel = request.getSession().getAttribute("baseOntModel");
-            if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
-                return (OntModel) sessionOntModel;
-            } else {
-                return (OntModel) getServletContext().getAttribute("baseOntModel");
-            }
-        } else if ("vitro:inferenceOntModel".equals(name)) {
-            Object sessionOntModel = request.getSession().getAttribute("inferenceOntModel");
-            if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
-                return (OntModel) sessionOntModel;
-            } else {
-                return (OntModel) getServletContext().getAttribute("inferenceOntModel");
-            }
-        } else {
-            return getVitroJenaModelMaker(request).getModel(name);
-        }
+
+    
+    protected Model getModel( String name, HttpServletRequest request ){
+        return JenaIngestController.getModel(name, request, getServletContext());
     }
+    
+    
     
     protected String getModelType(VitroRequest vreq, ModelMaker maker) {
         String modelType = vreq.getParameter("modelType");
@@ -1252,5 +1231,37 @@ public class JenaIngestController extends BaseEditController {
         }
         
     }
+
+    public static Model getModel(String name, HttpServletRequest request, ServletContext context) {
+        if ("vitro:jenaOntModel".equals(name)) {
+            Object sessionOntModel = request.getSession().getAttribute("jenaOntModel");
+            if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
+                return (OntModel) sessionOntModel;
+            } else {
+                return (OntModel) context.getAttribute("jenaOntModel");
+            }
+        } else if ("vitro:baseOntModel".equals(name)) {
+            Object sessionOntModel = request.getSession().getAttribute("baseOntModel");
+            if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
+                return (OntModel) sessionOntModel;
+            } else {
+                return (OntModel) context.getAttribute("baseOntModel");
+            }
+        } else if ("vitro:inferenceOntModel".equals(name)) {
+            Object sessionOntModel = request.getSession().getAttribute("inferenceOntModel");
+            if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
+                return (OntModel) sessionOntModel;
+            } else {
+                return (OntModel) context.getAttribute("inferenceOntModel");
+            }
+        } else {
+            return getVitroJenaModelMaker(request,context).getModel(name);
+        }
+    }
     
+    protected static ModelMaker getVitroJenaModelMaker(HttpServletRequest request, ServletContext context) {
+        ModelMaker myVjmm = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
+        myVjmm = (myVjmm == null) ? (ModelMaker) context.getAttribute("vitroJenaSDBModelMaker") : myVjmm;
+        return new VitroJenaSpecialModelMaker(myVjmm, request);
+    }
 }
