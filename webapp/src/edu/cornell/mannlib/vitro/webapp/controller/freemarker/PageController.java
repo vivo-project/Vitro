@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,10 +15,12 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetter;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetterUtils;
@@ -68,6 +69,8 @@ public class PageController extends FreemarkerHttpServlet{
         executePageDataGetters( pageUri, vreq, getServletContext(), mapForTemplate );
         executeDataGetters( pageUri, vreq, getServletContext(), mapForTemplate);
 
+        mapForTemplate.putAll( getPageControllerValues( pageUri, vreq, getServletContext(), mapForTemplate));
+        
         ResponseValues rv = new TemplateResponseValues(getTemplate( mapForTemplate ), mapForTemplate);            
         return rv;       
     }
@@ -89,7 +92,26 @@ public class PageController extends FreemarkerHttpServlet{
         mapForTemplate.putAll( PageDataGetterUtils.getDataForPage(pageUri, vreq, context) );        
     }
 
-
+    /**
+     * Add any additional values to the template variable map that are related to the page.
+     * For example, editing links.
+     */
+    private Map<String,Object> getPageControllerValues(
+            String pageUri, VitroRequest vreq, ServletContext servletContext,
+            Map<String, Object> mapForTemplate) {
+        Map<String,Object> map = new HashMap<String,Object>();
+        
+        //Add editing link for page if authorized        
+        Map<String,Object> pageMap = (Map<String, Object>) mapForTemplate.get("page");        
+        if( PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.MANAGE_MENUS.ACTIONS) ){
+            String editPageUrl = UrlBuilder.getIndividualProfileUrl(pageUri, vreq);            
+            editPageUrl = UrlBuilder.addParams(editPageUrl, DisplayVocabulary.SWITCH_TO_DISPLAY_MODEL , "1");            
+            pageMap.put("URLToEditPage", editPageUrl);
+        }        
+            
+        return map;
+    }
+    
     private String getTemplate(Map<String, Object> mapForTemplate) {
         //first try to get the body template from the display model RDF
         if( mapForTemplate.containsKey("page") ){

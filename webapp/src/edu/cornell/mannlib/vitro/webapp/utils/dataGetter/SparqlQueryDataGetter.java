@@ -109,7 +109,7 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
      * Do the query and return a result. This is in its own method 
      * to make testing easy.
      */
-    private Map<String, Object> doQuery(Map<String, String[]>parameterMap, Model queryModel){
+    protected Map<String, Object> doQuery(Map<String, String[]>parameterMap, Model queryModel){
 
         if( this.queryText == null ){            
             log.error("no SPARQL query defined for page " + this.dataGetterURI);
