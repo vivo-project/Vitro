@@ -36,7 +36,7 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     
     private String name;
 
-    PropertyTemplateModel(Property property, Individual subject, EditingPolicyHelper policyHelper, VitroRequest vreq) {
+    PropertyTemplateModel(Property property, Individual subject, VitroRequest vreq) {
         this.vreq = vreq;
         subjectUri = subject.getURI(); 
         propertyUri = property.getURI();

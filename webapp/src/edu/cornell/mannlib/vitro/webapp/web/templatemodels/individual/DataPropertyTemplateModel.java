@@ -34,9 +34,9 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     private final List<DataPropertyStatementTemplateModel> statements;
     
     DataPropertyTemplateModel(DataProperty dp, Individual subject, VitroRequest vreq, 
-            EditingPolicyHelper policyHelper, List<DataProperty> populatedDataPropertyList) {
+            boolean editing, List<DataProperty> populatedDataPropertyList) {
         
-        super(dp, subject, policyHelper, vreq);
+        super(dp, subject, vreq);
         setName(dp.getPublicName());
 
         statements = new ArrayList<DataPropertyStatementTemplateModel>();
@@ -47,21 +47,19 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
             DataPropertyStatementDao dpDao = vreq.getWebappDaoFactory().getDataPropertyStatementDao();
             List<Literal> values = dpDao.getDataPropertyValuesForIndividualByProperty(subject, dp);            
             for (Literal value : values) {
-                statements.add(new DataPropertyStatementTemplateModel(subjectUri, propertyUri, value, policyHelper, vreq));
+                statements.add(new DataPropertyStatementTemplateModel(subjectUri, propertyUri, value, editing, vreq));
             }
         } else {
             log.debug("Data property " + getUri() + " is unpopulated.");
         }        
         
-        setAddUrl(policyHelper, dp);
+        if ( editing ) {
+        	setAddUrl(dp);
+        }
     }
 
 
-    protected void setAddUrl(EditingPolicyHelper policyHelper, Property property) {
-
-        if (policyHelper == null) {
-            return;
-        }
+    protected void setAddUrl(Property property) {
            
         DataProperty dp = (DataProperty) property;        
         // NIHVIVO-2790 vitro:moniker now included in the display, but don't allow new statements

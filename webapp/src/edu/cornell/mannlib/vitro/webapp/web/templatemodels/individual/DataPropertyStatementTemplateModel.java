@@ -28,13 +28,13 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
    
     //Extended to include vitro request to check for special parameters
     public DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, 
-            Literal literal, EditingPolicyHelper policyHelper, VitroRequest vreq) {
+            Literal literal, boolean editing, VitroRequest vreq) {
         super(subjectUri, propertyUri, vreq);
         
         //attempt to strip any odd HTML
         this.value = cleanTextForDisplay( literal.getLexicalForm() );
 
-        setEditUrls(literal, policyHelper, propertyUri);      
+        setEditUrls(literal, editing, propertyUri);      
     }
     
     /*
@@ -51,9 +51,9 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
         this.value = value;
     }
     
-    protected void setEditUrls(Literal value, EditingPolicyHelper policyHelper, String propertyUri) {
+    protected void setEditUrls(Literal value, boolean editing, String propertyUri) {
 
-        if (policyHelper == null) {
+        if ( ! editing ) {
             return;
         }     
             

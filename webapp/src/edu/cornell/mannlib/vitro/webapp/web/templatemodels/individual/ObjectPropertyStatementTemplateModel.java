@@ -31,7 +31,7 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     private final String templateName;
     private final String objectKey;
     public ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, String objectKey, 
-            Map<String, String> data, EditingPolicyHelper policyHelper, String templateName, VitroRequest vreq) {
+            Map<String, String> data, boolean editing, String templateName, VitroRequest vreq) {
         super(subjectUri, propertyUri, vreq);
         
         this.data = data;
@@ -39,20 +39,21 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
         this.templateName = templateName;
         //to keep track of later
         this.objectKey = objectKey;
-        setEditUrls(policyHelper);
+        
+        if ( editing ) {
+        	setEditUrls();
+        }
     }
 
-    protected void setEditUrls(EditingPolicyHelper policyHelper) {
-        // If the policyHelper is non-null, we are in edit mode, so create the list of editing permissions.
+    protected void setEditUrls() {
+        // If we are in edit mode, create the list of editing permissions.
         // We do this now rather than in getEditUrl() and getDeleteUrl(), because getEditUrl() also needs to know
         // whether a delete is allowed.
-        if (policyHelper != null) {
-            ObjectPropertyStatement ops = new ObjectPropertyStatementImpl(subjectUri, propertyUri, objectUri);
+        ObjectPropertyStatement ops = new ObjectPropertyStatementImpl(subjectUri, propertyUri, objectUri);
             
-            // Do delete url first, since used in building edit url
-            setDeleteUrl();
-            setEditUrl(ops);
-        }        
+        // Do delete url first, since used in building edit url
+        setDeleteUrl();
+        setEditUrl(ops);
     }
     
     protected void setDeleteUrl() {

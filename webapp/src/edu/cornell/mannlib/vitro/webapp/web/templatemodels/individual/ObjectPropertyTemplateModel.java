@@ -90,15 +90,15 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     private String objectKey;    
     
     ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, 
-            EditingPolicyHelper policyHelper)
+            boolean editing)
         throws InvalidConfigurationException {
         
-        super(op, subject, policyHelper, vreq); 
+        super(op, subject, vreq); 
         setName(op.getDomainPublic());
         
         // Get the config for this object property
         try {
-            config = new PropertyListConfig(op, policyHelper);
+            config = new PropertyListConfig(op, editing);
         } catch (InvalidConfigurationException e) {
             throw e;
         } catch (Exception e) {
@@ -107,14 +107,12 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         
         objectKey = getQueryObjectVariableName();
         
-        setAddUrl(policyHelper, op);
+        if (editing) {
+        	setAddUrl(op);
+        }
     }
 
-    protected void setAddUrl(EditingPolicyHelper policyHelper, Property property) {
-
-        if (policyHelper == null) {
-            return;
-        }
+    protected void setAddUrl(Property property) {
         
         // Determine whether a new statement can be added
         RequestedAction action = new AddObjectPropStmt(subjectUri, propertyUri, RequestActionConstants.SOME_URI);
@@ -207,19 +205,19 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     }
      
     public static ObjectPropertyTemplateModel getObjectPropertyTemplateModel(ObjectProperty op, 
-            Individual subject, VitroRequest vreq, EditingPolicyHelper policyHelper, 
+            Individual subject, VitroRequest vreq, boolean editing, 
             List<ObjectProperty> populatedObjectPropertyList) {
         
         if (op.getCollateBySubclass()) {
             try {
-                return new CollatedObjectPropertyTemplateModel(op, subject, vreq, policyHelper, populatedObjectPropertyList);
+                return new CollatedObjectPropertyTemplateModel(op, subject, vreq, editing, populatedObjectPropertyList);
             } catch (InvalidConfigurationException e) {
                 log.warn(e.getMessage());     
                 // If the collated config is invalid, instantiate an UncollatedObjectPropertyTemplateModel instead.
             }
         } 
         try {
-            return new UncollatedObjectPropertyTemplateModel(op, subject, vreq, policyHelper, populatedObjectPropertyList);
+            return new UncollatedObjectPropertyTemplateModel(op, subject, vreq, editing, populatedObjectPropertyList);
         } catch (InvalidConfigurationException e) {
             log.error(e.getMessage());
             return null;
@@ -363,7 +361,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private String templateName;
         private ObjectPropertyDataPostProcessor postprocessor = null;
 
-        PropertyListConfig(ObjectProperty op, EditingPolicyHelper policyHelper) 
+        PropertyListConfig(ObjectProperty op, boolean editing) 
             throws InvalidConfigurationException {
 
             // Get the custom config filename
@@ -383,7 +381,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                     configFilePath = getConfigFilePath(DEFAULT_CONFIG_FILE_NAME);
                     // Should we test for the existence of the default, and throw an error if it doesn't exist?
                 }                   
-                setValuesFromConfigFile(configFilePath, op, vreq.getWebappDaoFactory(), policyHelper);           
+                setValuesFromConfigFile(configFilePath, op, vreq.getWebappDaoFactory(), editing);           
 
             } catch (Exception e) {
                 log.error("Error processing config file " + configFilePath + " for object property " + op.getURI(), e);
@@ -403,7 +401,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                             " in " + configFilePath + ":\n" +                            
                             configError + " Using default config instead.");
                     configFilePath = getConfigFilePath(DEFAULT_CONFIG_FILE_NAME);
-                    setValuesFromConfigFile(configFilePath, op, vreq.getWebappDaoFactory(), policyHelper);                    
+                    setValuesFromConfigFile(configFilePath, op, vreq.getWebappDaoFactory(), editing);                    
                 }
             }
             
@@ -443,7 +441,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         }
         
         private void setValuesFromConfigFile(String configFilePath, ObjectProperty op, WebappDaoFactory wdf, 
-                EditingPolicyHelper policyHelper) {
+                boolean editing) {
             
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db;
@@ -454,7 +452,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                 String propertyUri = op.getURI();
                 
                 // Required values
-                selectQuery = getSelectQuery(doc, propertyUri, policyHelper);
+                selectQuery = getSelectQuery(doc, propertyUri, editing);
                 
                 templateName = getConfigValue(doc, NODE_NAME_TEMPLATE, propertyUri); 
                 
@@ -482,19 +480,19 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             }            
         }
         
-        private String getSelectQuery(Document doc, String propertyUri, EditingPolicyHelper policyHelper) {
+        private String getSelectQuery(Document doc, String propertyUri, boolean editing) {
             Node selectQueryNode = doc.getElementsByTagName(NODE_NAME_QUERY_SELECT).item(0);
             String value = null;
             if (selectQueryNode != null) {
                 boolean collated = ObjectPropertyTemplateModel.this instanceof CollatedObjectPropertyTemplateModel;
-                /* If not editing the page (policyHelper == null), hide statements with missing linked individual or other
+                /* If not editing the page (editing == false), hide statements with missing linked individual or other
                  * critical information missing (e.g., anchor and url on a link); otherwise, show these statements.
                  * We might want to refine this based on whether the user can edit the statement in question, but that
                  * would require a completely different approach: include the statement in the query results, and then during the 
                  * postprocessing phase, check the editing policy, and  remove the statement if it's not editable. We would not
                  * preprocess the query, as here.
                  */
-                boolean criticalDataRequired = policyHelper == null;
+                boolean criticalDataRequired = editing;
                 NodeList children = selectQueryNode.getChildNodes();
                 int childCount = children.getLength();
                 value = "";

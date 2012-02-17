@@ -39,11 +39,11 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
     private final VClassDao vclassDao;
     
     CollatedObjectPropertyTemplateModel(ObjectProperty op, Individual subject, 
-            VitroRequest vreq, EditingPolicyHelper policyHelper,
+            VitroRequest vreq, boolean editing,
             List<ObjectProperty> populatedObjectPropertyList) 
         throws InvalidConfigurationException {
         
-        super(op, subject, vreq, policyHelper); 
+        super(op, subject, vreq, editing); 
 
         vclassDao = vreq.getWebappDaoFactory().getVClassDao();
         
@@ -57,7 +57,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
             postprocess(statementData);
             
             /* Collate the data */
-           subclasses = collate(subjectUri, propertyUri, statementData, policyHelper);
+           subclasses = collate(subjectUri, propertyUri, statementData, editing);
             
            for (SubclassTemplateModel subclass : subclasses) {
                List<ObjectPropertyStatementTemplateModel> list = subclass.getStatements();
@@ -188,7 +188,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
     
     // Collate the statements by subclass. 
     private List<SubclassTemplateModel> collate(String subjectUri, String propertyUri,
-            List<Map<String, String>> statementData, EditingPolicyHelper policyHelper) {
+            List<Map<String, String>> statementData, boolean editing) {
   
         String objectKey = getObjectKey();
         
@@ -217,7 +217,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
             }
 
             listForThisSubclass.add(new ObjectPropertyStatementTemplateModel(subjectUri, 
-                    propertyUri, objectKey, map, policyHelper, getTemplateName(), vreq));
+                    propertyUri, objectKey, map, editing, getTemplateName(), vreq));
 
         } 
         

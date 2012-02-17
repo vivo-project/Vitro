@@ -37,21 +37,17 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
     protected final Individual individual;
     protected final LoginStatusBean loginStatusBean;
     protected final VitroRequest vreq;
+    private final boolean editing;
     
     protected GroupedPropertyList propertyList;
     
-    private EditingPolicyHelper policyHelper;
-
     public BaseIndividualTemplateModel(Individual individual, VitroRequest vreq) {
         this.vreq = vreq;
         this.individual = individual;
         this.loginStatusBean = LoginStatusBean.getBean(vreq);
         // Needed for getting portal-sensitive urls. Remove if multi-portal support is removed.
         
-        // If editing, create a helper object to check requested actions against policies
-        if (isEditable()) {
-            policyHelper = new EditingPolicyHelper(vreq);
-        } 
+        this.editing = isEditable();
     }
     
     protected boolean isVClass(String vClassUri) {
@@ -106,7 +102,7 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
 
     public GroupedPropertyList getPropertyList() {
         if (propertyList == null) {
-            propertyList = new GroupedPropertyList(individual, vreq, policyHelper);
+            propertyList = new GroupedPropertyList(individual, vreq, editing);
         }
         return propertyList;
     }
@@ -135,7 +131,7 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
      * are handled like ordinary ObjectProperty instances.
      */
     public NameStatementTemplateModel getNameStatement() {
-        return new NameStatementTemplateModel(getUri(), vreq, policyHelper);
+        return new NameStatementTemplateModel(getUri(), vreq, editing);
     }
     
     /* These methods simply forward to the methods of the wrapped individual. It would be desirable to 

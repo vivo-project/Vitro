@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -15,7 +14,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 public class PropertyGroupTemplateModel extends BaseTemplateModel {
@@ -26,7 +24,7 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
     private final List<PropertyTemplateModel> properties;
       
     PropertyGroupTemplateModel(VitroRequest vreq, PropertyGroup group, 
-            Individual subject, EditingPolicyHelper policyHelper, 
+            Individual subject, boolean editing, 
             List<DataProperty> populatedDataPropertyList, List<ObjectProperty> populatedObjectPropertyList) {
 
         this.name = group.getName();
@@ -36,9 +34,9 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
         for (Property p : propertyList)  {
             if (p instanceof ObjectProperty) {
                 ObjectProperty op = (ObjectProperty)p;
-                properties.add(ObjectPropertyTemplateModel.getObjectPropertyTemplateModel(op, subject, vreq, policyHelper, populatedObjectPropertyList));
+                properties.add(ObjectPropertyTemplateModel.getObjectPropertyTemplateModel(op, subject, vreq, editing, populatedObjectPropertyList));
             } else {
-                properties.add(new DataPropertyTemplateModel((DataProperty)p, subject, vreq, policyHelper, populatedDataPropertyList));
+                properties.add(new DataPropertyTemplateModel((DataProperty)p, subject, vreq, editing, populatedDataPropertyList));
             }
         }
     }

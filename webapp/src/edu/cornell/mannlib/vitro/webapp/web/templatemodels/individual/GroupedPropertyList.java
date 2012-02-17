@@ -56,12 +56,10 @@ public class GroupedPropertyList extends BaseTemplateModel {
     private List<PropertyGroupTemplateModel> groups;
 
     GroupedPropertyList(Individual subject, VitroRequest vreq,
-            EditingPolicyHelper policyHelper) {
+            boolean editing) {
         this.vreq = vreq;
         this.subject = subject;
         this.wdf = vreq.getWebappDaoFactory();
-
-        boolean editing = policyHelper != null;
 
         // Create the property list for the subject. The properties will be put
         // into groups later.
@@ -107,7 +105,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
                 propertyGroupList.size());
         for (PropertyGroup propertyGroup : propertyGroupList) {
             groups.add(new PropertyGroupTemplateModel(vreq, propertyGroup,
-                    subject, policyHelper, populatedDataPropertyList,
+                    subject, editing, populatedDataPropertyList,
                     populatedObjectPropertyList));
         }
 

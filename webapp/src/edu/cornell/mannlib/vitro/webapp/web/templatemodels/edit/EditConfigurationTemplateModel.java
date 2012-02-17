@@ -37,13 +37,8 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.SelectListGeneratorVTwo;
 import edu.cornell.mannlib.vitro.webapp.web.beanswrappers.ReadOnlyBeansWrapper;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DataPropertyStatementTemplateModel;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.EditingPolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ObjectPropertyStatementTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ObjectPropertyTemplateModel;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.PropertyStatementTemplateModel;
-import freemarker.ext.beans.BeansWrapper;
-import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 
@@ -455,7 +450,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 				predicateUri, 
 				objectKey, 
 		        statementDisplay, 
-		        null, null, vreq);
+		        false, null, vreq);
 		ReadOnlyBeansWrapper wrapper = new ReadOnlyBeansWrapper();
 		return wrapper.wrap(osm);
     }
@@ -466,8 +461,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	ObjectProperty op = EditConfigurationUtils.getObjectProperty(vreq);
 		List<ObjectProperty> propList = new ArrayList<ObjectProperty>();
 		propList.add(op);
-    	EditingPolicyHelper policyHelper = new EditingPolicyHelper(vreq);
-    	ObjectPropertyTemplateModel otm = ObjectPropertyTemplateModel.getObjectPropertyTemplateModel(op, subject, vreq, policyHelper,propList);
+    	ObjectPropertyTemplateModel otm = ObjectPropertyTemplateModel.getObjectPropertyTemplateModel(op, subject, vreq, true, propList);
 		ReadOnlyBeansWrapper wrapper = new ReadOnlyBeansWrapper();
 		return wrapper.wrap(otm);
     }

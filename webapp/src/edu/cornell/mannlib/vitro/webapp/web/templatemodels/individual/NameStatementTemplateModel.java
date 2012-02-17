@@ -22,7 +22,7 @@ public class NameStatementTemplateModel extends
      * This method handles the special case where we are creating a DataPropertyStatementTemplateModel outside the GroupedPropertyList.
      * Specifically, it allows rdfs:label to be treated like a data property statement and thus have editing links. 
      */
-    NameStatementTemplateModel(String subjectUri, VitroRequest vreq, EditingPolicyHelper policyHelper) {
+    NameStatementTemplateModel(String subjectUri, VitroRequest vreq, boolean editing) {
         super(subjectUri, VitroVocabulary.LABEL, vreq);
 
         WebappDaoFactory wdf = vreq.getWebappDaoFactory();
@@ -35,7 +35,7 @@ public class NameStatementTemplateModel extends
         
         if (literal != null) {
             value = cleanTextForDisplay( literal.getLexicalForm() );
-            setEditUrls(literal, policyHelper, propertyUri);
+            setEditUrls(literal, editing, propertyUri);
         } else {
             // If the individual has no rdfs:label, use the local name. It will not be editable. (This replicates previous behavior;
             // perhaps we would want to allow a label to be added. But such individuals do not usually have their profiles viewed or
