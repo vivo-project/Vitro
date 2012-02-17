@@ -94,9 +94,6 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         this.name = name;
     }
     
-    protected abstract void setAddUrl(EditingPolicyHelper policyHelper, Property property);
-    
-    
     /* Template properties */
     
     public abstract String getType();

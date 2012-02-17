@@ -2,15 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-import java.util.List;
-import java.util.HashMap;
-
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.rdf.model.Literal;
 
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropDataPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditDataPropStmt;
@@ -19,7 +16,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
-import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
 
@@ -33,7 +29,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
     //Extended to include vitro request to check for special parameters
     public DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, 
             Literal literal, EditingPolicyHelper policyHelper, VitroRequest vreq) {
-        super(subjectUri, propertyUri, policyHelper, vreq);
+        super(subjectUri, propertyUri, vreq);
         
         //attempt to strip any odd HTML
         this.value = cleanTextForDisplay( literal.getLexicalForm() );
@@ -47,8 +43,8 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
      * to handle rdfs:label like vitro links and vitroPublic image, because it is not possible to construct a DataProperty from
      * rdfs:label.
      */
-    DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, VitroRequest vreq, EditingPolicyHelper policyHelper) {
-        super(subjectUri, propertyUri, policyHelper, vreq);
+    DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, VitroRequest vreq) {
+        super(subjectUri, propertyUri, vreq);
     }
     
     public void setValue(String value) {
@@ -68,12 +64,12 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
         String dataPropHash = String.valueOf(RdfLiteralHash.makeRdfLiteralHash(dps));
             
         // Do delete url first, since used in building edit url
-        setDeleteUrl(policyHelper, propertyUri, dps, dataPropHash);            
-        setEditUrl(policyHelper, propertyUri, dps, dataPropHash);       
+        setDeleteUrl(propertyUri, dps, dataPropHash);            
+        setEditUrl(propertyUri, dps, dataPropHash);       
     }
     
     
-    protected void setDeleteUrl(EditingPolicyHelper policyHelper, String propertyUri, DataPropertyStatement dps, String dataPropHash) {
+    protected void setDeleteUrl(String propertyUri, DataPropertyStatement dps, String dataPropHash) {
 
         // Hack for rdfs:label - the policy doesn't prevent deletion.
         if (propertyUri.equals(VitroVocabulary.LABEL)) {
@@ -82,7 +78,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
 
         // Determine whether the statement can be deleted
         RequestedAction action = new DropDataPropStmt(dps);
-        if ( ! policyHelper.isAuthorizedAction(action) ) {
+        if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return;
         }
         
@@ -97,7 +93,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
         deleteUrl = UrlBuilder.getUrl(EDIT_PATH, params);
     } 
 
-    protected void setEditUrl(EditingPolicyHelper policyHelper, String propertyUri, DataPropertyStatement dps, String dataPropHash) {
+    protected void setEditUrl(String propertyUri, DataPropertyStatement dps, String dataPropHash) {
 
         // vitro:moniker is deprecated. We display existing data values so editors can 
         // move them to other properties and delete, but don't allow editing.
@@ -107,7 +103,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
         
         // Determine whether the statement can be edited
         RequestedAction action = new EditDataPropStmt(dps);
-        if ( ! policyHelper.isAuthorizedAction(action) ) {
+        if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return;
         }
         

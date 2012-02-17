@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropStmt;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
@@ -31,7 +32,7 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     private final String objectKey;
     public ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, String objectKey, 
             Map<String, String> data, EditingPolicyHelper policyHelper, String templateName, VitroRequest vreq) {
-        super(subjectUri, propertyUri, policyHelper, vreq);
+        super(subjectUri, propertyUri, vreq);
         
         this.data = data;
         this.objectUri = data.get(objectKey);        
@@ -49,16 +50,16 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
             ObjectPropertyStatement ops = new ObjectPropertyStatementImpl(subjectUri, propertyUri, objectUri);
             
             // Do delete url first, since used in building edit url
-            setDeleteUrl(policyHelper, ops);
-            setEditUrl(policyHelper, ops);
+            setDeleteUrl();
+            setEditUrl(ops);
         }        
     }
     
-    protected void setDeleteUrl(EditingPolicyHelper policyHelper, ObjectPropertyStatement ops) {
+    protected void setDeleteUrl() {
         
         // Determine whether the statement can be deleted
         RequestedAction action = new DropObjectPropStmt(subjectUri, propertyUri, objectUri);
-        if ( ! policyHelper.isAuthorizedAction(action) ) {    
+        if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return;
         }
         
@@ -92,11 +93,11 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
         }    
     }
     
-    protected void setEditUrl(EditingPolicyHelper policyHelper, ObjectPropertyStatement ops) {
+    protected void setEditUrl(ObjectPropertyStatement ops) {
         
         // Determine whether the statement can be edited
         RequestedAction action =  new EditObjPropStmt(ops);
-        if ( ! policyHelper.isAuthorizedAction(action) ) {
+        if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return;
         }
         

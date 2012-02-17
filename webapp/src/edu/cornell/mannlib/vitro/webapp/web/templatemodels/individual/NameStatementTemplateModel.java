@@ -7,16 +7,11 @@ import org.apache.commons.logging.LogFactory;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
 
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditDataPropStmt;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
 
 public class NameStatementTemplateModel extends
         DataPropertyStatementTemplateModel {
@@ -28,7 +23,7 @@ public class NameStatementTemplateModel extends
      * Specifically, it allows rdfs:label to be treated like a data property statement and thus have editing links. 
      */
     NameStatementTemplateModel(String subjectUri, VitroRequest vreq, EditingPolicyHelper policyHelper) {
-        super(subjectUri, VitroVocabulary.LABEL, vreq, policyHelper);
+        super(subjectUri, VitroVocabulary.LABEL, vreq);
 
         WebappDaoFactory wdf = vreq.getWebappDaoFactory();
         

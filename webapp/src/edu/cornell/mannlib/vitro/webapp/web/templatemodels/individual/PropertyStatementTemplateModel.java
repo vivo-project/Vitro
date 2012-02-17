@@ -2,10 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -24,7 +20,7 @@ public abstract class PropertyStatementTemplateModel extends BaseTemplateModel {
     protected String deleteUrl;
  
     
-    PropertyStatementTemplateModel(String subjectUri, String propertyUri, EditingPolicyHelper policyHelper, VitroRequest vreq) {
+    PropertyStatementTemplateModel(String subjectUri, String propertyUri, VitroRequest vreq) {
         this.vreq = vreq;        
         this.subjectUri = subjectUri;
         this.propertyUri = propertyUri;              

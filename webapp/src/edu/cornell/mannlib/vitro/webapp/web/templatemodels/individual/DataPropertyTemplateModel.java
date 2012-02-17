@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -11,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.rdf.model.Literal;
 
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropStmt;
@@ -57,7 +57,6 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     }
 
 
-    @Override
     protected void setAddUrl(EditingPolicyHelper policyHelper, Property property) {
 
         if (policyHelper == null) {
@@ -81,7 +80,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
           
         // Determine whether a new statement can be added
         RequestedAction action = new AddDataPropStmt(subjectUri, propertyUri, RequestActionConstants.SOME_LITERAL, null, null);
-        if ( ! policyHelper.isAuthorizedAction(action) ) {
+        if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return;
         }
         
