@@ -492,7 +492,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                  * postprocessing phase, check the editing policy, and  remove the statement if it's not editable. We would not
                  * preprocess the query, as here.
                  */
-                boolean criticalDataRequired = editing;
+                boolean criticalDataRequired = !editing;
                 NodeList children = selectQueryNode.getChildNodes();
                 int childCount = children.getLength();
                 value = "";
