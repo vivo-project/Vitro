@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
+<!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+
 <!--
 	Config file with subclass selector and subclass ordering. Should not throw an error on a collated property
 -->
