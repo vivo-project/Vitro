@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+	No construct query. Should throw an error.  
+-->
+
+<list-view-config>
+    <query-select>
+        SELECT <collated> ?subclass </collated>
+               ?object
+        WHERE {
+            ?subject ?property ?object
+            <collated>
+            ?object a ?subclass.
+            </collated>
+        }  
+    </query-select>
+
+    <template>propStatement-default.ftl</template>
+</list-view-config>

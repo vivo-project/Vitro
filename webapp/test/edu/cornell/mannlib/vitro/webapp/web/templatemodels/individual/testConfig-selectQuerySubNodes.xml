@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+	Test this with collated and uncollated, critical and non-critical, 
+	to be sure that we include or omit the appropriate text.  
+-->
+
+<list-view-config>
+    <query-select>Plain <collated>collated </collated>plain <critical-data-required>critical </critical-data-required>plain <collated>collated </collated>plain.</query-select>
+    <query-construct> Construct </query-construct>
+    <template>propStatement-default.ftl</template>
+</list-view-config>

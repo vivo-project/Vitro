@@ -3,6 +3,7 @@
 package stubs.javax.servlet;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,11 +18,14 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * A simple stand-in for the {@link ServletContext}, for use in unit tests.
  */
-@SuppressWarnings("deprecation")
 public class ServletContextStub implements ServletContext {
+	private static final Log log = LogFactory.getLog(ServletContextStub.class);
 
 	// ----------------------------------------------------------------------
 	// Stub infrastructure
@@ -37,7 +41,7 @@ public class ServletContextStub implements ServletContext {
 			throw new NullPointerException("contextPath may not be null.");
 		}
 	}
-	
+
 	public void setMockResource(String path, String contents) {
 		if (path == null) {
 			throw new NullPointerException("path may not be null.");
@@ -48,15 +52,29 @@ public class ServletContextStub implements ServletContext {
 			mockResources.put(path, contents);
 		}
 	}
-	
+
 	public void setRealPath(String path, String filepath) {
 		if (path == null) {
 			throw new NullPointerException("path may not be null.");
 		}
 		if (filepath == null) {
+			log.debug("removing real path for '" + path + "'");
 			realPaths.remove(path);
 		} else {
+			log.debug("adding real path for '" + path + "' = '" + filepath
+					+ "'");
 			realPaths.put(path, filepath);
+		}
+	}
+
+	/**
+	 * Call setRealPath for each of the files in this directory (non-recursive).
+	 * Use the prefix, a separator, and the filename as the path.
+	 */
+	public void setRealPaths(String pathPrefix, File dir) {
+		for (File file : dir.listFiles()) {
+			setRealPath(pathPrefix + File.separatorChar + file.getName(),
+					file.getPath());
 		}
 	}
 
@@ -104,7 +122,9 @@ public class ServletContextStub implements ServletContext {
 
 	@Override
 	public String getRealPath(String path) {
-		return realPaths.get(path);
+		String real = realPaths.get(path);
+		log.debug("Real path for '" + path + "' is '" + real + "'");
+		return real;
 	}
 
 	// ----------------------------------------------------------------------

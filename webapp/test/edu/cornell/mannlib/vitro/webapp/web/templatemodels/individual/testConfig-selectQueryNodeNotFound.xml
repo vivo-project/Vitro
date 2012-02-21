@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+	Invalid - no <query-select> node.  
+-->
+
+<list-view-config>
+    <query-construct>
+        CONSTRUCT {
+            ?subject ?property ?object .
+        } WHERE {
+            ?subject ?property ?object 
+        }
+    </query-construct>
+    
+    <template>propStatement-default.ftl</template>
+</list-view-config>

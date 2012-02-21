@@ -45,6 +45,7 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	private ObjectPropertyStatementDao objectPropertyStatementDao;
 	private OntologyDao ontologyDao;
 	private UserAccountsDao userAccountsDao;
+	private VClassDao vClassDao;
 
 	public void setDefaultNamespace(String defaultNamespace) {
 		this.defaultNamespace = defaultNamespace;
@@ -80,6 +81,10 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 
 	public void setUserAccountsDao(UserAccountsDao userAccountsDao) {
 		this.userAccountsDao = userAccountsDao;
+	}
+	
+	public void setVClassDao(VClassDao vClassDao) {
+		this.vClassDao = vClassDao;
 	}
 
 	// ----------------------------------------------------------------------
@@ -128,6 +133,11 @@ return this.objectPropertyStatementDao;	}
 	@Override
 	public UserAccountsDao getUserAccountsDao() {
 		return this.userAccountsDao;
+	}
+
+	@Override
+	public VClassDao getVClassDao() {
+		return this.vClassDao;
 	}
 
 	// ----------------------------------------------------------------------
@@ -192,12 +202,6 @@ return this.objectPropertyStatementDao;	}
 	public DatatypeDao getDatatypeDao() {
 		throw new RuntimeException(
 				"WebappDaoFactory.getDatatypeDao() not implemented.");
-	}
-
-	@Override
-	public VClassDao getVClassDao() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getVClassDao() not implemented.");
 	}
 
 	@Override

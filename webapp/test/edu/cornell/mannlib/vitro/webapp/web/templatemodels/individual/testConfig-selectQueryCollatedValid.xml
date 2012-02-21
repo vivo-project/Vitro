@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+	Config file with subclass selector and subclass ordering. Should not throw an error on a collated property
+-->
+
+<list-view-config>
+    <query-select>SELECT ?subclass ORDER BY ?subclass</query-select>
+    <query-construct> Construct </query-construct>
+    <template>propStatement-default.ftl</template>
+</list-view-config>
