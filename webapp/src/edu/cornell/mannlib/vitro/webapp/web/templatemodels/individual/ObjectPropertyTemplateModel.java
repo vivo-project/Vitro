@@ -368,7 +368,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                     configFilePath = getConfigFilePath(DEFAULT_CONFIG_FILE_NAME);
                     // Should we test for the existence of the default, and throw an error if it doesn't exist?
                 }                   
-                setValuesFromConfigFile(configFilePath, op, vreq.getWebappDaoFactory(), editing);           
+                setValuesFromConfigFile(configFilePath, vreq.getWebappDaoFactory(), editing);           
 
             } catch (Exception e) {
                 log.error("Error processing config file " + configFilePath + " for object property " + op.getURI(), e);
@@ -388,7 +388,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                             " in " + configFilePath + ":\n" +                            
                             configError + " Using default config instead.");
                     configFilePath = getConfigFilePath(DEFAULT_CONFIG_FILE_NAME);
-                    setValuesFromConfigFile(configFilePath, op, vreq.getWebappDaoFactory(), editing);                    
+                    setValuesFromConfigFile(configFilePath, vreq.getWebappDaoFactory(), editing);                    
                 }
             }
             
@@ -427,12 +427,12 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             return null;
         }
         
-        private void setValuesFromConfigFile(String configFilePath, ObjectProperty op, WebappDaoFactory wdf, 
+        private void setValuesFromConfigFile(String configFilePath, WebappDaoFactory wdf, 
                 boolean editing) {
-        	
 			try {
 				FileReader reader = new FileReader(configFilePath);
 				CustomListViewConfigFile configFileContents = new CustomListViewConfigFile(reader);
+				
 				boolean collated = ObjectPropertyTemplateModel.this instanceof CollatedObjectPropertyTemplateModel;
 
 				selectQuery = configFileContents.getSelectQuery(collated, editing);
@@ -459,25 +459,25 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
 				Constructor<?> constructor = clazz.getConstructor(ObjectPropertyTemplateModel.class, WebappDaoFactory.class);
 				return (ObjectPropertyDataPostProcessor) constructor.newInstance(optm, wdf);
 			} catch (ClassNotFoundException e) {
-				log.error("Error processing config file '" + configFilePath
+				log.warn("Error processing config file '" + configFilePath
 						+ "': can't load postprocessor class '" + className
 						+ "'. " + "Using default postprocessor.", e);
 				return new DefaultObjectPropertyDataPostProcessor(optm, wdf);
 			} catch (NoSuchMethodException e) {
-				log.error("Error processing config file '" + configFilePath
+				log.warn("Error processing config file '" + configFilePath
 						+ "': postprocessor class '" + className
 						+ "' does not have a constructor that takes "
 						+ "ObjectPropertyTemplateModel and WebappDaoFactory. "
 						+ "Using default postprocessor.", e);
 				return new DefaultObjectPropertyDataPostProcessor(optm, wdf);
 			} catch (ClassCastException e) {
-				log.error("Error processing config file '" + configFilePath
+				log.warn("Error processing config file '" + configFilePath
 						+ "': postprocessor class '" + className + "' does "
 						+ "not implement ObjectPropertyDataPostProcessor. "
 						+ "Using default postprocessor.", e);
 				return new DefaultObjectPropertyDataPostProcessor(optm, wdf);
 			} catch (Exception e) {
-				log.error("Error processing config file '" + configFilePath
+				log.warn("Error processing config file '" + configFilePath
 						+ "': can't create postprocessor instance of class '"
 						+ className + "'. " + "Using default postprocessor.", e);
 				return new DefaultObjectPropertyDataPostProcessor(optm, wdf);
