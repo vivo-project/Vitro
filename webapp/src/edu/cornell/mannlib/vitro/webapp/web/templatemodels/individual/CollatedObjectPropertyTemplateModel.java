@@ -21,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.InvalidConfigurationException;
 
 public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateModel {
 
@@ -77,7 +78,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
         return subclasses.isEmpty();
     }
     
-    protected ConfigError checkQuery(String queryString) {
+    public ConfigError checkQuery(String queryString) {
         
         if (StringUtils.isBlank(queryString)) {
             return ConfigError.NO_SELECT_QUERY;

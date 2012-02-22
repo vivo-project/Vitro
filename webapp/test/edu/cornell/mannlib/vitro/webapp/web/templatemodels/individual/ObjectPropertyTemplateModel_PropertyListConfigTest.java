@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Level;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -39,7 +38,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ObjectPropertyTemplateModel.InvalidConfigurationException;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.InvalidConfigurationException;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.PropertyListConfig;
 import freemarker.template.Configuration;
 
 public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
@@ -204,7 +204,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 			throws InvalidConfigurationException {
 		// TODO if we can't translate the path, log the error and use the
 		// default.
-		captureLogsFromOPTM();
+		captureLogsFromPropertyListConfig();
 		op = buildOperation("fileHasNoRealPath");
 		optm = new NonCollatingOPTM(op, subject, vreq, false);
 
@@ -215,7 +215,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 
 	@Test
 	public void configFileNotFound() throws InvalidConfigurationException {
-		captureLogsFromOPTM();
+		captureLogsFromPropertyListConfig();
 
 		op = buildOperation("configFileDoesNotExist");
 
@@ -233,7 +233,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 	@Test
 	public void configFileNotValidXml() throws InvalidConfigurationException {
 		suppressSyserr();
-		captureLogsFromOPTM();
+		captureLogsFromPropertyListConfig();
 
 		op = buildOperation("notValidXml");
 		optm = new NonCollatingOPTM(op, subject, vreq, false);
@@ -248,7 +248,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 	@Test
 	public void selectQueryNodeIsNotFound()
 			throws InvalidConfigurationException {
-		captureLogsFromOPTM();
+		captureLogsFromPropertyListConfig();
 
 		op = buildOperation("selectQueryNodeNotFound");
 		optm = new NonCollatingOPTM(op, subject, vreq, false);
@@ -259,7 +259,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 
 	@Test
 	public void selectQueryNodeIsBlank() throws InvalidConfigurationException {
-		captureLogsFromOPTM();
+		captureLogsFromPropertyListConfig();
 
 		op = buildOperation("selectQueryNodeBlank");
 		optm = new NonCollatingOPTM(op, subject, vreq, false);
@@ -273,7 +273,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 	//
 	@Test
 	public void templateNodeNotFound() throws InvalidConfigurationException {
-		captureLogsFromOPTM();
+		captureLogsFromPropertyListConfig();
 
 		op = buildOperation("templateNodeNotFound");
 		optm = new NonCollatingOPTM(op, subject, vreq, false);
@@ -284,7 +284,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 
 	@Test
 	public void templateNodeIsEmpty() throws InvalidConfigurationException {
-		captureLogsFromOPTM();
+		captureLogsFromPropertyListConfig();
 
 		op = buildOperation("templateNodeIsEmpty");
 		optm = new NonCollatingOPTM(op, subject, vreq, false);
@@ -295,7 +295,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 
 	@Test
 	public void templateDoesNotExist() throws InvalidConfigurationException {
-		captureLogsFromOPTM();
+		captureLogsFromPropertyListConfig();
 
 		op = buildOperation("templateDoesNotExist");
 		optm = new NonCollatingOPTM(op, subject, vreq, false);
@@ -414,7 +414,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 	@Test
 	public void postProcessorClassNotFound()
 			throws InvalidConfigurationException {
-		captureLogsFromOPTM();
+		captureLogsFromPropertyListConfig();
 
 		op = buildOperation("postProcessorClassNotFound");
 		optm = new NonCollatingOPTM(op, subject, vreq, false);
@@ -428,7 +428,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 	@Test
 	public void postProcessorClassIsNotSuitable()
 			throws InvalidConfigurationException {
-		captureLogsFromOPTM();
+		captureLogsFromPropertyListConfig();
 
 		op = buildOperation("postProcessorClassNotSuitable");
 		optm = new NonCollatingOPTM(op, subject, vreq, false);
@@ -442,7 +442,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 	@Test
 	public void postProcessorClassHasWrongConstructor()
 			throws InvalidConfigurationException {
-		captureLogsFromOPTM();
+		captureLogsFromPropertyListConfig();
 
 		op = buildOperation("postProcessorWrongConstructor");
 		optm = new NonCollatingOPTM(op, subject, vreq, false);
@@ -456,7 +456,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 	@Test
 	public void postProcessorConstructorThrowsAnException()
 			throws InvalidConfigurationException {
-		captureLogsFromOPTM();
+		captureLogsFromPropertyListConfig();
 
 		op = buildOperation("postProcessorConstructorThrowsException");
 		optm = new NonCollatingOPTM(op, subject, vreq, false);
@@ -498,11 +498,10 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 	}
 
 	/**
-	 * Capture the log for ObjectPropertyTemplateModel and suppress it from the
-	 * console.
+	 * Capture the log for PropertyListConfig and suppress it from the console.
 	 */
-	private void captureLogsFromOPTM() {
-		captureLogOutput(ObjectPropertyTemplateModel.class, logMessages, true);
+	private void captureLogsFromPropertyListConfig() {
+		captureLogOutput(PropertyListConfig.class, logMessages, true);
 	}
 
 	private void assertLogMessagesContains(String message, String expected) {
@@ -548,17 +547,10 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 			Field configField = ObjectPropertyTemplateModel.class
 					.getDeclaredField("config");
 			configField.setAccessible(true);
-			Object config = configField.get(optm);
+			PropertyListConfig config = (PropertyListConfig) configField
+					.get(optm);
 
-			Class<?> configClass = Class
-					.forName("edu.cornell.mannlib.vitro.webapp.web."
-							+ "templatemodels.individual."
-							+ "ObjectPropertyTemplateModel$PropertyListConfig");
-
-			Field ppField = configClass.getDeclaredField("postprocessor");
-			ppField.setAccessible(true);
-			Object pp = ppField.get(config);
-
+			ObjectPropertyDataPostProcessor pp = config.getPostprocessor();
 			if (pp == null) {
 				assertNull(message + " - postprocessor is null", expected);
 			} else {
@@ -607,7 +599,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 		}
 
 		@Override
-		protected ConfigError checkQuery(String queryString) {
+		public ConfigError checkQuery(String queryString) {
 			return null;
 		}
 

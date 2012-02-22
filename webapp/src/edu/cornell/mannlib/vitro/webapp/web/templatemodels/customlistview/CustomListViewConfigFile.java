@@ -71,7 +71,7 @@ public class CustomListViewConfigFile {
 	// Might be empty but will not be null.
 	private final String postprocessorName;
 
-	public CustomListViewConfigFile(Reader reader) throws InvalidConfigFileException {
+	public CustomListViewConfigFile(Reader reader) throws InvalidConfigurationException {
 		Document doc = parseDocument(reader);
 		selectQueryElement = parseSelectQuery(doc);
 		constructQueries = parseConstructQueries(doc);
@@ -80,9 +80,9 @@ public class CustomListViewConfigFile {
 	}
 
 	private Document parseDocument(Reader reader)
-			throws InvalidConfigFileException {
+			throws InvalidConfigurationException {
 		if (reader == null) {
-			throw new InvalidConfigFileException("Config file reader is null.");
+			throw new InvalidConfigurationException("Config file reader is null.");
 		}
 
 		try {
@@ -91,18 +91,18 @@ public class CustomListViewConfigFile {
 			Document doc = db.parse(new InputSource(reader));
 			return doc;
 		} catch (ParserConfigurationException e) {
-			throw new InvalidConfigFileException("Problem with XML parser.", e);
+			throw new InvalidConfigurationException("Problem with XML parser.", e);
 		} catch (SAXException e) {
-			throw new InvalidConfigFileException(
+			throw new InvalidConfigurationException(
 					"Config file is not valid XML: " + e.getMessage(), e);
 		} catch (IOException e) {
-			throw new InvalidConfigFileException("Unable to read config file.",
+			throw new InvalidConfigurationException("Unable to read config file.",
 					e);
 		}
 	}
 
 	private Element parseSelectQuery(Document doc)
-			throws InvalidConfigFileException {
+			throws InvalidConfigurationException {
 		Element element = getExactlyOneElement(doc, TAG_SELECT);
 		elementMustNotBeEmpty(element);
 		return element;
@@ -120,14 +120,14 @@ public class CustomListViewConfigFile {
 	}
 
 	private String parseTemplateName(Document doc)
-			throws InvalidConfigFileException {
+			throws InvalidConfigurationException {
 		Element element = getExactlyOneElement(doc, TAG_TEMPLATE);
 		elementMustNotBeEmpty(element);
 		return element.getTextContent();
 	}
 
 	private String parsePostprocessorName(Document doc)
-			throws InvalidConfigFileException {
+			throws InvalidConfigurationException {
 		Element element = getZeroOrOneElement(doc, TAG_POSTPROCESSOR);
 		if (element == null) {
 			return "";
@@ -148,40 +148,40 @@ public class CustomListViewConfigFile {
 	}
 
 	private Element getExactlyOneElement(Document doc, String tagName)
-			throws InvalidConfigFileException {
+			throws InvalidConfigurationException {
 		List<Element> elements = getElements(doc, tagName);
 
 		if (elements.size() == 1) {
 			return elements.get(0);
 		} else if (elements.isEmpty()) {
-			throw new InvalidConfigFileException("Config file must contain a "
+			throw new InvalidConfigurationException("Config file must contain a "
 					+ tagName + " element");
 		} else {
-			throw new InvalidConfigFileException(
+			throw new InvalidConfigurationException(
 					"Config file may not contain more than one " + tagName
 							+ " element");
 		}
 	}
 
 	private Element getZeroOrOneElement(Document doc, String tagName)
-			throws InvalidConfigFileException {
+			throws InvalidConfigurationException {
 		List<Element> elements = getElements(doc, tagName);
 		if (elements.size() == 1) {
 			return elements.get(0);
 		} else if (elements.isEmpty()) {
 			return null;
 		} else {
-			throw new InvalidConfigFileException(
+			throw new InvalidConfigurationException(
 					"Config file may not contain more than one " + tagName
 							+ " element");
 		}
 	}
 
 	private void elementMustNotBeEmpty(Element element)
-			throws InvalidConfigFileException {
+			throws InvalidConfigurationException {
 		String contents = element.getTextContent();
 		if (contents.trim().isEmpty()) {
-			throw new InvalidConfigFileException("In a config file, the <"
+			throw new InvalidConfigurationException("In a config file, the <"
 					+ element.getTagName() + "> element must not be empty.");
 		}
 	}
@@ -249,13 +249,4 @@ public class CustomListViewConfigFile {
 		}
 	}
 
-	public static class InvalidConfigFileException extends Exception {
-		public InvalidConfigFileException(String message) {
-			super(message);
-		}
-
-		public InvalidConfigFileException(String message, Throwable cause) {
-			super(message, cause);
-		}
-	}
 }

@@ -2,10 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -31,10 +27,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMa
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.CustomListViewConfigFile;
-import freemarker.cache.TemplateLoader;
-import freemarker.template.Configuration;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.InvalidConfigurationException;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.PropertyListConfig;
 
 public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel {
     
@@ -59,7 +53,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         // ?subject ?property ?\w+
         Pattern.compile("\\?" + KEY_SUBJECT + "\\s+\\?" + KEY_PROPERTY + "\\s+\\?(\\w+)");
     
-    protected static enum ConfigError {
+    public static enum ConfigError {
         NO_SELECT_QUERY("Missing select query specification"),
         NO_SUBCLASS_SELECT("Query does not select a subclass variable"),
         NO_SUBCLASS_ORDER_BY("Query does not sort first by subclass variable"),
@@ -93,7 +87,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         
         // Get the config for this object property
         try {
-            config = new PropertyListConfig(op, editing);
+            config = new PropertyListConfig(this, vreq, op, editing);
         } catch (InvalidConfigurationException e) {
             throw e;
         } catch (Exception e) {
@@ -146,7 +140,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         return Route.OBJECT_PROPERTY_EDIT;
     }
 
-    protected ConfigError checkQuery(String queryString) {
+    public ConfigError checkQuery(String queryString) {
         if (StringUtils.isBlank(queryString)) {
             return ConfigError.NO_SELECT_QUERY;
         }
@@ -154,19 +148,19 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     }
       
     private String getSelectQuery() {
-        return config.selectQuery;
+        return config.getSelectQuery();
     }
     
     private Set<String> getConstructQueries() {
-        return config.constructQueries;
+        return config.getConstructQueries();
     }
     
     protected String getTemplateName() {
-        return config.templateName;
+        return config.getTemplateName();
     }
 
     protected boolean hasDefaultListView() {
-        return config.isDefaultConfig;
+        return config.isDefaultListView();
     }
     
     protected static String getImageUploadUrl(String subjectUri, String action) {
@@ -227,14 +221,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             logData(data);
         }
         
-        ObjectPropertyDataPostProcessor postprocessor = config.postprocessor;
-        if (postprocessor == null) {
-            log.debug("No postprocessor for property " + getUri());
-            return;
-        } else {
-            log.debug("Using postprocessor " + postprocessor.getClass().getName() + " for property " + getUri());
-        }
-        
+        ObjectPropertyDataPostProcessor postprocessor = config.getPostprocessor();
+        log.debug("Using postprocessor " + postprocessor.getClass().getName() + " for property " + getUri());
         postprocessor.process(data);
         
         if (log.isDebugEnabled()) {
@@ -331,174 +319,6 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         return objectKey;
     }
     
-    private class PropertyListConfig {  
-        
-        private static final String CONFIG_FILE_PATH = "/config/";
-        private static final String DEFAULT_CONFIG_FILE_NAME = "listViewConfig-default.xml";
-        
-        /* NB The default post-processor is not the same as the post-processor for the default view. The latter
-         * actually defines its own post-processor, whereas the default post-processor is used for custom views
-         * that don't define a post-processor, to ensure that the standard post-processing applies.
-         * 
-         * edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DefaultObjectPropertyDataPostProcessor
-         */
-        
-        private boolean isDefaultConfig;
-        private Set<String> constructQueries;
-        private String selectQuery;
-        private String templateName;
-        private ObjectPropertyDataPostProcessor postprocessor = null;
-
-        PropertyListConfig(ObjectProperty op, boolean editing) 
-            throws InvalidConfigurationException {
-
-            // Get the custom config filename
-            String configFileName = vreq.getWebappDaoFactory().getObjectPropertyDao().getCustomListViewConfigFileName(op);
-            if (configFileName == null) { // no custom config; use default config
-                configFileName = DEFAULT_CONFIG_FILE_NAME;
-            }
-            log.debug("Using list view config file " + configFileName + " for object property " + op.getURI());
-            
-            String configFilePath = getConfigFilePath(configFileName);
-            
-            try {
-                File config = new File(configFilePath);            
-                if ( ! isDefaultConfig(configFileName) && ! config.exists() ) {
-                    log.warn("Can't find config file " + configFilePath + " for object property " + op.getURI() + "\n" +
-                            ". Using default config file instead.");
-                    configFilePath = getConfigFilePath(DEFAULT_CONFIG_FILE_NAME);
-                    // Should we test for the existence of the default, and throw an error if it doesn't exist?
-                }                   
-                setValuesFromConfigFile(configFilePath, vreq.getWebappDaoFactory(), editing);           
-
-            } catch (Exception e) {
-                log.error("Error processing config file " + configFilePath + " for object property " + op.getURI(), e);
-                // What should we do here?
-            }
-            
-            if ( ! isDefaultConfig(configFileName) ) {
-                ConfigError configError = checkConfiguration();
-                if ( configError != null ) { // the configuration contains an error
-                    // If this is a collated property, throw an error: this results in creating an 
-                    // UncollatedPropertyTemplateModel instead.
-                    if (ObjectPropertyTemplateModel.this instanceof CollatedObjectPropertyTemplateModel) {
-                        throw new InvalidConfigurationException(configError.getMessage());
-                    }
-                    // Otherwise, switch to the default config
-                    log.warn("Invalid list view config for object property " + op.getURI() + 
-                            " in " + configFilePath + ":\n" +                            
-                            configError + " Using default config instead.");
-                    configFilePath = getConfigFilePath(DEFAULT_CONFIG_FILE_NAME);
-                    setValuesFromConfigFile(configFilePath, vreq.getWebappDaoFactory(), editing);                    
-                }
-            }
-            
-            isDefaultConfig = isDefaultConfig(configFileName);
-        }
-        
-        private boolean isDefaultConfig(String configFileName) {
-            return configFileName.equals(DEFAULT_CONFIG_FILE_NAME);
-        }
-        
-        private ConfigError checkConfiguration() {
-
-            ConfigError error = ObjectPropertyTemplateModel.this.checkQuery(selectQuery);
-            if (error != null) {
-                return error;
-            }
-
-            if (StringUtils.isBlank(selectQuery)) {
-                return ConfigError.NO_SELECT_QUERY;
-            }
-
-            if ( StringUtils.isBlank(templateName)) {
-               return ConfigError.NO_TEMPLATE;
-            }
-
-            Configuration fmConfig = (Configuration) vreq.getAttribute("freemarkerConfig");
-            TemplateLoader tl = fmConfig.getTemplateLoader();
-            try {
-                if ( tl.findTemplateSource(templateName) == null ) {
-                    return ConfigError.TEMPLATE_NOT_FOUND;
-                }
-            } catch (IOException e) {
-                log.error("Error finding template " + templateName, e);
-            }
-
-            return null;
-        }
-        
-        private void setValuesFromConfigFile(String configFilePath, WebappDaoFactory wdf, 
-                boolean editing) {
-			try {
-				FileReader reader = new FileReader(configFilePath);
-				CustomListViewConfigFile configFileContents = new CustomListViewConfigFile(reader);
-				
-				boolean collated = ObjectPropertyTemplateModel.this instanceof CollatedObjectPropertyTemplateModel;
-
-				selectQuery = configFileContents.getSelectQuery(collated, editing);
-				templateName = configFileContents.getTemplateName();
-				constructQueries = configFileContents.getConstructQueries();
-
-				String postprocessorName = configFileContents.getPostprocessorName();
-				postprocessor = getPostProcessor(postprocessorName, ObjectPropertyTemplateModel.this, wdf, configFilePath);
-			} catch (Exception e) {
-				log.error("Error processing config file " + configFilePath, e);
-			}
-        }
-        
-		private ObjectPropertyDataPostProcessor getPostProcessor(
-				String className,
-				ObjectPropertyTemplateModel optm,
-				WebappDaoFactory wdf, String configFilePath) {
-			try {
-				if (StringUtils.isBlank(className)) {
-					return new DefaultObjectPropertyDataPostProcessor(optm, wdf);
-				}
-				
-				Class<?> clazz = Class.forName(className);
-				Constructor<?> constructor = clazz.getConstructor(ObjectPropertyTemplateModel.class, WebappDaoFactory.class);
-				return (ObjectPropertyDataPostProcessor) constructor.newInstance(optm, wdf);
-			} catch (ClassNotFoundException e) {
-				log.warn("Error processing config file '" + configFilePath
-						+ "': can't load postprocessor class '" + className
-						+ "'. " + "Using default postprocessor.", e);
-				return new DefaultObjectPropertyDataPostProcessor(optm, wdf);
-			} catch (NoSuchMethodException e) {
-				log.warn("Error processing config file '" + configFilePath
-						+ "': postprocessor class '" + className
-						+ "' does not have a constructor that takes "
-						+ "ObjectPropertyTemplateModel and WebappDaoFactory. "
-						+ "Using default postprocessor.", e);
-				return new DefaultObjectPropertyDataPostProcessor(optm, wdf);
-			} catch (ClassCastException e) {
-				log.warn("Error processing config file '" + configFilePath
-						+ "': postprocessor class '" + className + "' does "
-						+ "not implement ObjectPropertyDataPostProcessor. "
-						+ "Using default postprocessor.", e);
-				return new DefaultObjectPropertyDataPostProcessor(optm, wdf);
-			} catch (Exception e) {
-				log.warn("Error processing config file '" + configFilePath
-						+ "': can't create postprocessor instance of class '"
-						+ className + "'. " + "Using default postprocessor.", e);
-				return new DefaultObjectPropertyDataPostProcessor(optm, wdf);
-			}           
-		}
-
-        private String getConfigFilePath(String filename) {
-            return servletContext.getRealPath(CONFIG_FILE_PATH + filename);
-        }
-    }
-    
-    protected class InvalidConfigurationException extends Exception { 
-
-        private static final long serialVersionUID = 1L;
-
-        protected InvalidConfigurationException(String s) {
-            super(s);
-        }
-    }
-    
     /* Template properties */
     
     public String getType() {
@@ -506,7 +326,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     }
 
     public String getTemplate() {
-        return config.templateName;
+        return getTemplateName();
     }
     
     public abstract boolean isCollatedBySubclass();

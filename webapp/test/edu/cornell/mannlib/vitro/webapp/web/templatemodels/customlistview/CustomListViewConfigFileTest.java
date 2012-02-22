@@ -17,8 +17,6 @@ import org.junit.matchers.JUnitMatchers;
 import org.junit.rules.ExpectedException;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.CustomListViewConfigFile;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.CustomListViewConfigFile.InvalidConfigFileException;
 
 /**
  * Note: when testing, an "empty" element may be self-closing, or with
@@ -59,19 +57,19 @@ public class CustomListViewConfigFileTest extends AbstractTestClass {
 	// ----------------------------------------------------------------------
 
 	@Test
-	public void readerIsNull() throws InvalidConfigFileException {
+	public void readerIsNull() throws InvalidConfigurationException {
 		expectException("Config file reader is null.");
 		configFile = new CustomListViewConfigFile(null);
 	}
 
 	@Test
-	public void readerThrowsIOException() throws InvalidConfigFileException {
+	public void readerThrowsIOException() throws InvalidConfigurationException {
 		expectException("Unable to read config file.");
 		configFile = new CustomListViewConfigFile(new ExplodingReader());
 	}
 
 	@Test
-	public void invalidXml() throws InvalidConfigFileException {
+	public void invalidXml() throws InvalidConfigurationException {
 		suppressSyserr(); // catch the error report from the XML parser
 		expectException(JUnitMatchers
 				.containsString("Config file is not valid XML:"));
@@ -79,14 +77,14 @@ public class CustomListViewConfigFileTest extends AbstractTestClass {
 	}
 
 	@Test
-	public void selectQueryMissing() throws InvalidConfigFileException {
+	public void selectQueryMissing() throws InvalidConfigurationException {
 		expectException("Config file must contain a query-select element");
 		readConfigFile("<list-view-config>"
 				+ "<template>template.ftl</template>" + "</list-view-config>");
 	}
 
 	@Test
-	public void selectQueryMultiple() throws InvalidConfigFileException {
+	public void selectQueryMultiple() throws InvalidConfigurationException {
 		expectException("Config file may not contain more than one query-select element");
 		readConfigFile("<list-view-config>"
 				+ "<query-select>SELECT</query-select>"
@@ -95,21 +93,21 @@ public class CustomListViewConfigFileTest extends AbstractTestClass {
 	}
 
 	@Test
-	public void selectQueryEmpty() throws InvalidConfigFileException {
+	public void selectQueryEmpty() throws InvalidConfigurationException {
 		expectException("In a config file, the <query-select> element must not be empty.");
 		readConfigFile("<list-view-config>" + "<query-select/>"
 				+ "<template>template.ftl</template>" + "</list-view-config>");
 	}
 
 	@Test
-	public void templateNameMissing() throws InvalidConfigFileException {
+	public void templateNameMissing() throws InvalidConfigurationException {
 		expectException("Config file must contain a template element");
 		readConfigFile("<list-view-config>"
 				+ "<query-select>SELECT</query-select>" + "</list-view-config>");
 	}
 
 	@Test
-	public void templateNameMultiple() throws InvalidConfigFileException {
+	public void templateNameMultiple() throws InvalidConfigurationException {
 		expectException("Config file may not contain more than one template element");
 		readConfigFile("<list-view-config>"
 				+ "<query-select>SELECT</query-select>"
@@ -118,7 +116,7 @@ public class CustomListViewConfigFileTest extends AbstractTestClass {
 	}
 
 	@Test
-	public void templateNameEmpty() throws InvalidConfigFileException {
+	public void templateNameEmpty() throws InvalidConfigurationException {
 		expectException("In a config file, the <template> element must not be empty.");
 		readConfigFile("<list-view-config>"
 				+ "<query-select>SELECT</query-select>"
@@ -126,7 +124,7 @@ public class CustomListViewConfigFileTest extends AbstractTestClass {
 	}
 
 	@Test
-	public void postprocessorNameMultiple() throws InvalidConfigFileException {
+	public void postprocessorNameMultiple() throws InvalidConfigurationException {
 		expectException("Config file may not contain more than one postprocessor element");
 		readConfigFile("<list-view-config>"
 				+ "<query-select>SELECT</query-select>"
@@ -140,7 +138,7 @@ public class CustomListViewConfigFileTest extends AbstractTestClass {
 	// ----------------------------------------------------------------------
 
 	@Test
-	public void minimalSuccess() throws InvalidConfigFileException {
+	public void minimalSuccess() throws InvalidConfigurationException {
 		readConfigFile("<list-view-config>"
 				+ "<query-select>SELECT</query-select>"
 				+ "<template>template.ftl</template>" + "</list-view-config>");
@@ -149,7 +147,7 @@ public class CustomListViewConfigFileTest extends AbstractTestClass {
 	}
 
 	@Test
-	public void maximalSuccess() throws InvalidConfigFileException {
+	public void maximalSuccess() throws InvalidConfigurationException {
 		readConfigFile("<list-view-config>"
 				+ "<query-select>SELECT</query-select>"
 				+ "<query-construct>CONSTRUCT ONE</query-construct>"
@@ -163,7 +161,7 @@ public class CustomListViewConfigFileTest extends AbstractTestClass {
 	}
 
 	@Test
-	public void postprocessorEmptyIsOK() throws InvalidConfigFileException {
+	public void postprocessorEmptyIsOK() throws InvalidConfigurationException {
 		readConfigFile("<list-view-config>"
 				+ "<query-select>SELECT</query-select>"
 				+ "<query-construct>CONSTRUCT</query-construct>"
@@ -174,28 +172,28 @@ public class CustomListViewConfigFileTest extends AbstractTestClass {
 	}
 
 	@Test
-	public void selectCollatedEditing() throws InvalidConfigFileException {
+	public void selectCollatedEditing() throws InvalidConfigurationException {
 		readConfigFile(XML_WITH_RICH_SELECT_CLAUSE);
 		assertConfigFile(true, true, "SELECT  collated1  collated2  ", constructs(),
 				"template.ftl", "");
 	}
 
 	@Test
-	public void selectCollatedNotEditing() throws InvalidConfigFileException {
+	public void selectCollatedNotEditing() throws InvalidConfigurationException {
 		readConfigFile(XML_WITH_RICH_SELECT_CLAUSE);
 		assertConfigFile(true, false, "SELECT  collated1  collated2  critical",
 				constructs(), "template.ftl", "");
 	}
 
 	@Test
-	public void selectNotCollatedEditing() throws InvalidConfigFileException {
+	public void selectNotCollatedEditing() throws InvalidConfigurationException {
 		readConfigFile(XML_WITH_RICH_SELECT_CLAUSE);
 		assertConfigFile(false, true, "SELECT      ", constructs(),
 				"template.ftl", "");
 	}
 
 	@Test
-	public void selectNotCollatedNotEditing() throws InvalidConfigFileException {
+	public void selectNotCollatedNotEditing() throws InvalidConfigurationException {
 		readConfigFile(XML_WITH_RICH_SELECT_CLAUSE);
 		assertConfigFile(false, false, "SELECT      critical", constructs(),
 				"template.ftl", "");
@@ -215,17 +213,17 @@ public class CustomListViewConfigFileTest extends AbstractTestClass {
 	// ----------------------------------------------------------------------
 
 	private void expectException(String message) {
-		thrown.expect(InvalidConfigFileException.class);
+		thrown.expect(InvalidConfigurationException.class);
 		thrown.expectMessage(message);
 	}
 
 	private void expectException(Matcher<String> matcher) {
-		thrown.expect(InvalidConfigFileException.class);
+		thrown.expect(InvalidConfigurationException.class);
 		thrown.expectMessage(matcher);
 	}
 
 	private void readConfigFile(String xmlString)
-			throws InvalidConfigFileException {
+			throws InvalidConfigurationException {
 		StringReader reader = new StringReader(xmlString);
 		configFile = new CustomListViewConfigFile(reader);
 	}
