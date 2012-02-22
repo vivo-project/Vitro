@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
+package edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview;
 
 import static org.junit.Assert.assertEquals;
 
@@ -17,7 +17,8 @@ import org.junit.matchers.JUnitMatchers;
 import org.junit.rules.ExpectedException;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.CustomListViewConfigFile.InvalidConfigFileException;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.CustomListViewConfigFile;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.CustomListViewConfigFile.InvalidConfigFileException;
 
 /**
  * Note: when testing, an "empty" element may be self-closing, or with

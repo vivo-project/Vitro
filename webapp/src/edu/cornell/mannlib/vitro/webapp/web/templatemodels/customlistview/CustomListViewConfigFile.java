@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
+package edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -71,7 +71,7 @@ public class CustomListViewConfigFile {
 	// Might be empty but will not be null.
 	private final String postprocessorName;
 
-	CustomListViewConfigFile(Reader reader) throws InvalidConfigFileException {
+	public CustomListViewConfigFile(Reader reader) throws InvalidConfigFileException {
 		Document doc = parseDocument(reader);
 		selectQueryElement = parseSelectQuery(doc);
 		constructQueries = parseConstructQueries(doc);

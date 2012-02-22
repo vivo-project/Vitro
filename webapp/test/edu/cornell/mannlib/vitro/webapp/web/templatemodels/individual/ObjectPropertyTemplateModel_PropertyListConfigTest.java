@@ -157,6 +157,9 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 
 	// ----------------------------------------------------------------------
 	// The tests
+	//
+	// TODO - remove any tests that are covered by the newer
+	// CustomListViewConfigFileTest.
 	// ----------------------------------------------------------------------
 
 	//

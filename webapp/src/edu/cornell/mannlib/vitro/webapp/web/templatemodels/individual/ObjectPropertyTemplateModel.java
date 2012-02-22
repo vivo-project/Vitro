@@ -32,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.CustomListViewConfigFile;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 
