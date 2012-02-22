@@ -276,7 +276,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 		optm = new NonCollatingOPTM(op, subject, vreq, false);
 
 		assertLogMessagesContains("no template node",
-				"Missing template specification");
+				"Config file must contain a template element");
 	}
 
 	@Test
@@ -289,7 +289,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 		optm = new NonCollatingOPTM(op, subject, vreq, false);
 
 		assertLogMessagesContains("empty template node",
-				"Missing template specification");
+				"In a config file, the <template> element must not be empty.");
 	}
 
 	@Test
@@ -410,8 +410,8 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 
 		// TODO This should not cause an error. If it did, it should not swallow
 		// the exception. It should use the default PP.
-		assertLogMessagesContains("pp name empty", "NullPointerException");
-		assertPostProcessorClass("pp name empty", null);
+		assertPostProcessorClass("pp name empty",
+				DefaultObjectPropertyDataPostProcessor.class);
 	}
 
 	@Test

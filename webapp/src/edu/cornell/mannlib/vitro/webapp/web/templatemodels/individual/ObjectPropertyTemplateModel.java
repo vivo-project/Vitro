@@ -3,10 +3,10 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -14,15 +14,9 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
@@ -341,13 +335,6 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         private static final String CONFIG_FILE_PATH = "/config/";
         private static final String DEFAULT_CONFIG_FILE_NAME = "listViewConfig-default.xml";
         
-        private static final String NODE_NAME_QUERY_CONSTRUCT = "query-construct";
-        private static final String NODE_NAME_QUERY_SELECT = "query-select";
-        private static final String NODE_NAME_TEMPLATE = "template";
-        private static final String NODE_NAME_POSTPROCESSOR = "postprocessor";
-        private static final String NODE_NAME_COLLATED = "collated";
-        private static final String NODE_NAME_CRITICAL_DATA_REQUIRED = "critical-data-required";
-
         /* NB The default post-processor is not the same as the post-processor for the default view. The latter
          * actually defines its own post-processor, whereas the default post-processor is used for custom views
          * that don't define a post-processor, to ensure that the standard post-processing applies.
@@ -442,79 +429,38 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         
         private void setValuesFromConfigFile(String configFilePath, ObjectProperty op, WebappDaoFactory wdf, 
                 boolean editing) {
-            
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db;
- 
-            try {
-                db = dbf.newDocumentBuilder();
-                Document doc = db.parse(configFilePath);
-                String propertyUri = op.getURI();
-                
-                // Required values
-                selectQuery = getSelectQuery(doc, propertyUri, editing);
-                
-                templateName = getConfigValue(doc, NODE_NAME_TEMPLATE, propertyUri); 
-                
-                // Optional values
-                constructQueries = getConfigValues(doc, NODE_NAME_QUERY_CONSTRUCT, propertyUri);
-                
-                String postprocessorName = getConfigValue(doc, NODE_NAME_POSTPROCESSOR, propertyUri);
+        	
+			try {
+				FileReader reader = new FileReader(configFilePath);
+				CustomListViewConfigFile configFileContents = new CustomListViewConfigFile(reader);
+				boolean collated = ObjectPropertyTemplateModel.this instanceof CollatedObjectPropertyTemplateModel;
 
-                if (StringUtils.isBlank(postprocessorName)) {
-                    log.debug("No postprocessor specified for property " + propertyUri + ". Using default postprocessor.");
-                    postprocessorName = DEFAULT_POSTPROCESSOR;
-                } 
-                try {
-                    getPostProcessor(postprocessorName, wdf);
-                } catch (Exception e) {
-                    if (! postprocessorName.equals(DEFAULT_POSTPROCESSOR)) {
-                        log.debug("Cannot find postprocessor specified for property " + propertyUri + ". Using default postprocessor.");
-                        postprocessorName = DEFAULT_POSTPROCESSOR;
-                        getPostProcessor(postprocessorName, wdf);
-                    }                 
-                }
-                
-            } catch (Exception e) {
-                log.error("Error processing config file " + configFilePath, e);
-            }            
-        }
-        
-        private String getSelectQuery(Document doc, String propertyUri, boolean editing) {
-            Node selectQueryNode = doc.getElementsByTagName(NODE_NAME_QUERY_SELECT).item(0);
-            String value = null;
-            if (selectQueryNode != null) {
-                boolean collated = ObjectPropertyTemplateModel.this instanceof CollatedObjectPropertyTemplateModel;
-                /* If not editing the page (editing == false), hide statements with missing linked individual or other
-                 * critical information missing (e.g., anchor and url on a link); otherwise, show these statements.
-                 * We might want to refine this based on whether the user can edit the statement in question, but that
-                 * would require a completely different approach: include the statement in the query results, and then during the 
-                 * postprocessing phase, check the editing policy, and  remove the statement if it's not editable. We would not
-                 * preprocess the query, as here.
-                 */
-                boolean criticalDataRequired = !editing;
-                NodeList children = selectQueryNode.getChildNodes();
-                int childCount = children.getLength();
-                value = "";
-                for (int i = 0; i < childCount; i++) {
-                    Node node = children.item(i);    
-                    if (node.getNodeName().equals(NODE_NAME_COLLATED)) {
-                        if (collated) {
-                            value += node.getChildNodes().item(0).getNodeValue();
-                        } // else ignore this node                    
-                    } else if (node.getNodeName().equals(NODE_NAME_CRITICAL_DATA_REQUIRED)) {
-                        if (criticalDataRequired) {
-                            value += node.getChildNodes().item(0).getNodeValue();
-                        } // else ignore this node
-                    } else {
-                        value += node.getNodeValue();
-                    }     
-                }
-                log.debug("Found config parameter " + NODE_NAME_QUERY_SELECT + " for object property " + propertyUri +  " with value " + value);
-            } else {
-                log.error("No value found for config parameter " + NODE_NAME_QUERY_SELECT + " for object property " + propertyUri);
-            }
-            return value;
+				selectQuery = configFileContents.getSelectQuery(collated, editing);
+				templateName = configFileContents.getTemplateName();
+				constructQueries = configFileContents.getConstructQueries();
+
+				String postprocessorName = configFileContents.getPostprocessorName();
+
+				if (StringUtils.isBlank(postprocessorName)) {
+					log.debug("No postprocessor specified for property "
+							+ propertyUri + ". Using default postprocessor.");
+					postprocessorName = DEFAULT_POSTPROCESSOR;
+				}
+				try {
+					getPostProcessor(postprocessorName, wdf);
+				} catch (Exception e) {
+					if (!postprocessorName.equals(DEFAULT_POSTPROCESSOR)) {
+						log.debug("Cannot find postprocessor specified for property "
+								+ propertyUri
+								+ ". Using default postprocessor.");
+						postprocessorName = DEFAULT_POSTPROCESSOR;
+						getPostProcessor(postprocessorName, wdf);
+					}
+				}
+
+			} catch (Exception e) {
+				log.error("Error processing config file " + configFilePath, e);
+			}
         }
         
         private void getPostProcessor(String name, WebappDaoFactory wdf) throws Exception {
@@ -523,36 +469,6 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             postprocessor = (ObjectPropertyDataPostProcessor) constructor.newInstance(ObjectPropertyTemplateModel.this, wdf);           
         }
  
-        private String getConfigValue(Document doc, String nodeName, String propertyUri) {
-            Node node = doc.getElementsByTagName(nodeName).item(0);
-            String value = null;
-            if (node != null) {
-                value = node.getChildNodes().item(0).getNodeValue();   
-                log.debug("Found config parameter " + nodeName + " for object property " + propertyUri +  " with value " + value);
-            } else {
-                log.debug("No value found for config parameter " + nodeName + " for object property " + propertyUri);
-            }
-            return value;           
-        }
-        
-        private Set<String> getConfigValues(Document doc, String nodeName, String propertyUri) {
-            Set<String> values = null;
-            NodeList nodes = doc.getElementsByTagName(nodeName);
-            int nodeCount = nodes.getLength();
-            if (nodeCount > 0) {
-                values = new HashSet<String>(nodeCount);
-                for (int i = 0; i < nodeCount; i++) {
-                    Node node = nodes.item(i);
-                    String value = node.getChildNodes().item(0).getNodeValue();
-                    values.add(value);  
-                    log.debug("Found config parameter " + nodeName + " for object property " + propertyUri +  " with value " + value);
-                }
-            } else {
-                log.debug("No values found for config parameter " + nodeName + " for object property " + propertyUri);
-            }
-            return values;
-        }
-        
         private String getConfigFilePath(String filename) {
             return servletContext.getRealPath(CONFIG_FILE_PATH + filename);
         }
