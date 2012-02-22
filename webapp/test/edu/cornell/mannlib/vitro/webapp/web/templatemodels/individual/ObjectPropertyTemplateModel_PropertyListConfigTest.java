@@ -281,8 +281,6 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 
 	@Test
 	public void templateNodeIsEmpty() throws InvalidConfigurationException {
-		// TODO fix this so it doesn't throw a NullPointerException - use
-		// textValue() or something
 		captureLogsFromOPTM();
 
 		op = buildOperation("templateNodeIsEmpty");
@@ -403,13 +401,9 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 
 	@Test
 	public void postProcessorNameEmpty() throws InvalidConfigurationException {
-		captureLogsFromOPTM();
-
 		op = buildOperation("postProcessorNameEmpty");
 		optm = new NonCollatingOPTM(op, subject, vreq, false);
 
-		// TODO This should not cause an error. If it did, it should not swallow
-		// the exception. It should use the default PP.
 		assertPostProcessorClass("pp name empty",
 				DefaultObjectPropertyDataPostProcessor.class);
 	}
@@ -418,14 +412,12 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 	public void postProcessorClassNotFound()
 			throws InvalidConfigurationException {
 		captureLogsFromOPTM();
-		setLoggerLevel(ObjectPropertyTemplateModel.class, Level.DEBUG);
 
 		op = buildOperation("postProcessorClassNotFound");
 		optm = new NonCollatingOPTM(op, subject, vreq, false);
 
-		// TODO this should log an error.
 		assertLogMessagesContains("pp class not found",
-				"Cannot find postprocessor specified");
+				"java.lang.ClassNotFoundException");
 		assertPostProcessorClass("pp class not found",
 				DefaultObjectPropertyDataPostProcessor.class);
 	}
@@ -434,14 +426,12 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 	public void postProcessorClassIsNotSuitable()
 			throws InvalidConfigurationException {
 		captureLogsFromOPTM();
-		setLoggerLevel(ObjectPropertyTemplateModel.class, Level.DEBUG);
 
 		op = buildOperation("postProcessorClassNotSuitable");
 		optm = new NonCollatingOPTM(op, subject, vreq, false);
 
-		// TODO this should log an error.
 		assertLogMessagesContains("pp doesn't implement required interface",
-				"Cannot find postprocessor specified");
+				"java.lang.ClassCastException");
 		assertPostProcessorClass("pp doesn't implement required interface",
 				DefaultObjectPropertyDataPostProcessor.class);
 	}
@@ -450,14 +440,12 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 	public void postProcessorClassHasWrongConstructor()
 			throws InvalidConfigurationException {
 		captureLogsFromOPTM();
-		setLoggerLevel(ObjectPropertyTemplateModel.class, Level.DEBUG);
 
 		op = buildOperation("postProcessorWrongConstructor");
 		optm = new NonCollatingOPTM(op, subject, vreq, false);
 
-		// TODO this should log an error.
 		assertLogMessagesContains("pp has wrong constructor",
-				"Cannot find postprocessor specified");
+				"java.lang.NoSuchMethodException");
 		assertPostProcessorClass("pp has wrong constructor",
 				DefaultObjectPropertyDataPostProcessor.class);
 	}
@@ -466,14 +454,12 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 	public void postProcessorConstructorThrowsAnException()
 			throws InvalidConfigurationException {
 		captureLogsFromOPTM();
-		setLoggerLevel(ObjectPropertyTemplateModel.class, Level.DEBUG);
 
 		op = buildOperation("postProcessorConstructorThrowsException");
 		optm = new NonCollatingOPTM(op, subject, vreq, false);
 
-		// TODO this should log an error.
 		assertLogMessagesContains("pp throws an exception",
-				"Cannot find postprocessor specified");
+				"java.lang.reflect.InvocationTargetException");
 		assertPostProcessorClass("pp throws an exception",
 				DefaultObjectPropertyDataPostProcessor.class);
 	}
@@ -636,8 +622,18 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 
 	}
 
+	/** Does not implement the required interface. */
+	public static class ClassNotSuitable {
+		@SuppressWarnings("unused")
+		public ClassNotSuitable(ObjectPropertyTemplateModel optm,
+				WebappDaoFactory wadf) {
+			// Do nothing.
+		}
+
+	}
+
 	/** Does not have a constructor with the correct arguments */
-	public static class PostProcessorHasWrongConstructor implements
+	public static class PostProcessorWrongConstructor implements
 			ObjectPropertyDataPostProcessor {
 
 		@Override

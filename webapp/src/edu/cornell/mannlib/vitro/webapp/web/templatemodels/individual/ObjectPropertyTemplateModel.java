@@ -338,9 +338,9 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         /* NB The default post-processor is not the same as the post-processor for the default view. The latter
          * actually defines its own post-processor, whereas the default post-processor is used for custom views
          * that don't define a post-processor, to ensure that the standard post-processing applies.
+         * 
+         * edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DefaultObjectPropertyDataPostProcessor
          */
-        private static final String DEFAULT_POSTPROCESSOR = 
-            "edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DefaultObjectPropertyDataPostProcessor";
         
         private boolean isDefaultConfig;
         private Set<String> constructQueries;
@@ -440,35 +440,50 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
 				constructQueries = configFileContents.getConstructQueries();
 
 				String postprocessorName = configFileContents.getPostprocessorName();
-
-				if (StringUtils.isBlank(postprocessorName)) {
-					log.debug("No postprocessor specified for property "
-							+ propertyUri + ". Using default postprocessor.");
-					postprocessorName = DEFAULT_POSTPROCESSOR;
-				}
-				try {
-					getPostProcessor(postprocessorName, wdf);
-				} catch (Exception e) {
-					if (!postprocessorName.equals(DEFAULT_POSTPROCESSOR)) {
-						log.debug("Cannot find postprocessor specified for property "
-								+ propertyUri
-								+ ". Using default postprocessor.");
-						postprocessorName = DEFAULT_POSTPROCESSOR;
-						getPostProcessor(postprocessorName, wdf);
-					}
-				}
-
+				postprocessor = getPostProcessor(postprocessorName, ObjectPropertyTemplateModel.this, wdf, configFilePath);
 			} catch (Exception e) {
 				log.error("Error processing config file " + configFilePath, e);
 			}
         }
         
-        private void getPostProcessor(String name, WebappDaoFactory wdf) throws Exception {
-            Class<?> postprocessorClass = Class.forName(name);
-            Constructor<?> constructor = postprocessorClass.getConstructor(ObjectPropertyTemplateModel.class, WebappDaoFactory.class);
-            postprocessor = (ObjectPropertyDataPostProcessor) constructor.newInstance(ObjectPropertyTemplateModel.this, wdf);           
-        }
- 
+		private ObjectPropertyDataPostProcessor getPostProcessor(
+				String className,
+				ObjectPropertyTemplateModel optm,
+				WebappDaoFactory wdf, String configFilePath) {
+			try {
+				if (StringUtils.isBlank(className)) {
+					return new DefaultObjectPropertyDataPostProcessor(optm, wdf);
+				}
+				
+				Class<?> clazz = Class.forName(className);
+				Constructor<?> constructor = clazz.getConstructor(ObjectPropertyTemplateModel.class, WebappDaoFactory.class);
+				return (ObjectPropertyDataPostProcessor) constructor.newInstance(optm, wdf);
+			} catch (ClassNotFoundException e) {
+				log.error("Error processing config file '" + configFilePath
+						+ "': can't load postprocessor class '" + className
+						+ "'. " + "Using default postprocessor.", e);
+				return new DefaultObjectPropertyDataPostProcessor(optm, wdf);
+			} catch (NoSuchMethodException e) {
+				log.error("Error processing config file '" + configFilePath
+						+ "': postprocessor class '" + className
+						+ "' does not have a constructor that takes "
+						+ "ObjectPropertyTemplateModel and WebappDaoFactory. "
+						+ "Using default postprocessor.", e);
+				return new DefaultObjectPropertyDataPostProcessor(optm, wdf);
+			} catch (ClassCastException e) {
+				log.error("Error processing config file '" + configFilePath
+						+ "': postprocessor class '" + className + "' does "
+						+ "not implement ObjectPropertyDataPostProcessor. "
+						+ "Using default postprocessor.", e);
+				return new DefaultObjectPropertyDataPostProcessor(optm, wdf);
+			} catch (Exception e) {
+				log.error("Error processing config file '" + configFilePath
+						+ "': can't create postprocessor instance of class '"
+						+ className + "'. " + "Using default postprocessor.", e);
+				return new DefaultObjectPropertyDataPostProcessor(optm, wdf);
+			}           
+		}
+
         private String getConfigFilePath(String filename) {
             return servletContext.getRealPath(CONFIG_FILE_PATH + filename);
         }
