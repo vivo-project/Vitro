@@ -16,7 +16,9 @@
         
         <#-- Display the group heading --> 
         <#if groupName?has_content>
-            <h2 id="${groupName}">${groupName?capitalize}</h2>
+    		<#--the function replaces spaces in the name with underscores, also called for the property group menu-->
+        	<#assign groupNameHtmlId = p.createPropertyGroupHtmlId(groupName) >
+            <h2 id="${groupNameHtmlId}">${groupName?capitalize}</h2>
         <#else>
             <h2 id="properties">Properties</h2>
         </#if>

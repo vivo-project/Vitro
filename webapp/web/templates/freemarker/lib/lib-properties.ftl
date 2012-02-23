@@ -228,4 +228,8 @@ name will be used as the label. -->
     </#list>
 </#macro>
 
+<#--Property group names may have spaces in them, replace spaces with underscores for html id/hash-->
+<#function createPropertyGroupHtmlId propertyGroupName>
+	<#return propertyGroupName?replace(" ", "_")>
+</#function>
 

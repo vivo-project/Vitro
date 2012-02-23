@@ -12,11 +12,13 @@
             <nav id="property-group-menu" role="navigation">
                 <ul role="list">
                     <#list groups as group>
-                        <#assign groupname = group.getName(nameForOtherGroup)>
+                        <#assign groupname = group.getName(nameForOtherGroup)>                        
                         <#if groupname?has_content>
+                    		<#--create property group html id is the function that will replace all spaces with underscore to make a valid id-->
+                        	<#assign groupnameHtmlId = p.createPropertyGroupHtmlId(groupname) >
                             <#-- capitalize will capitalize each word in the name; cap_first only the first. We may need a custom
                             function to capitalize all except function words. -->
-                            <li role="listitem"><a href="#${groupname}" title="group name">${groupname?capitalize}</a></li>
+                            <li role="listitem"><a href="#${groupnameHtmlId}" title="group name">${groupname?capitalize}</a></li>
                         </#if>
                     </#list>
                 </ul>
