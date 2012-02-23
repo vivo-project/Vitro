@@ -73,7 +73,7 @@ public class ServletContextStub implements ServletContext {
 	 */
 	public void setRealPaths(String pathPrefix, File dir) {
 		for (File file : dir.listFiles()) {
-			setRealPath(pathPrefix + File.separatorChar + file.getName(),
+			setRealPath(pathPrefix + "/" + file.getName(),
 					file.getPath());
 		}
 	}
