@@ -120,7 +120,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 
 		ctx = new ServletContextStub();
 		// create paths for all of the files in the temporary config directory.
-		ctx.setRealPaths("/config", configDir);
+		ctx.setRealPaths("/config/", configDir);
 		// add a path to match the hard-coded default path.
 		ctx.setRealPath("/config/listViewConfig-default.xml",
 				ctx.getRealPath("/config/testConfig-default.xml"));

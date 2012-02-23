@@ -69,12 +69,12 @@ public class ServletContextStub implements ServletContext {
 
 	/**
 	 * Call setRealPath for each of the files in this directory (non-recursive).
-	 * Use the prefix, a separator, and the filename as the path.
+	 * The prefix is the "pretend" location that we're mapping these files to,
+	 * e.g. "/config/". Use the prefix and the filename as the path.
 	 */
 	public void setRealPaths(String pathPrefix, File dir) {
 		for (File file : dir.listFiles()) {
-			setRealPath(pathPrefix + "/" + file.getName(),
-					file.getPath());
+			setRealPath(pathPrefix + file.getName(), file.getPath());
 		}
 	}
 
