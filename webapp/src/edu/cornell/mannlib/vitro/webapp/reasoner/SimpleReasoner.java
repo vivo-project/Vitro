@@ -912,66 +912,6 @@ public class SimpleReasoner extends StatementListener {
 		log.info("ABox inference model updated");
 	}
 
-	
-	public synchronized void computeMostSpecificType() {
-	    recomputing = true;
-	    try {
-	    	doComputeMostSpecificType();
-	    } finally {
-	        recomputing = false;
-	    }
-	}
-	
-	/*
-	 * Special for version 1.4 
-	 */
-	public synchronized void doComputeMostSpecificType() {
-
-		log.info("Computing mostSpecificType annotations.");
-		HashSet<String> unknownTypes = new HashSet<String>();
-			
-		try {
-			String queryString = "select distinct ?subject where {?subject <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#Concept>}";
-			ArrayList<String> individuals = this.getIndividualURIs(queryString);
-
-			int numStmts = 0;
-			for (String individualURI : individuals ) {
-				
-				Resource individual = ResourceFactory.createResource(individualURI);
-				
-				try {
-				    setMostSpecificTypes(individual, inferenceModel, unknownTypes);
-				} catch (NullPointerException npe) {
-					log.error("a NullPointerException was received while computing mostSpecificType annotations. Halting inference computation.");	
-					return;
-				} catch (JenaException je) {
-					 if (je.getMessage().equals("Statement models must no be null")) {
-						 log.error("Exception while computing mostSpecificType annotations.: " + je.getMessage() + ". Halting inference computation.");
-		                 return; 
-					 } 
-					 log.error("Exception while computing mostSpecificType annotations.: " + je.getMessage());	
-				} catch (Exception e) {
-					log.error("Exception while computing mostSpecificType annotations", e);	
-				}
-				
-				numStmts++;
-                if ((numStmts % 10000) == 0) {
-                    log.info("Still computing mostSpecificType annotations...");
-                }
-                
-                if (stopRequested) {
-                	log.info("a stopRequested signal was received during computeMostSpecificType. Halting Processing.");
-                	return;
-                }
-			}
-		} catch (Exception e) {
-			 log.error("Exception while computing mostSpecificType annotations", e);
-			 return;
-		} 
-		
-		log.info("Finished computing mostSpecificType annotations");
-	}
-
 	public synchronized boolean isABoxReasoningAsynchronous() {
          if (batchMode1 || batchMode2) {
         	 return true;

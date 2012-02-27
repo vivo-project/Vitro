@@ -109,10 +109,6 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			   try {
 				  if (ontologyUpdater.updateRequired()) {
 					  ctx.setAttribute(KBM_REQURIED_AT_STARTUP, Boolean.TRUE);
-					  log.info("Migrating data model");
-					  doMigrateDisplayModel(ctx);
-					  log.info("Display model migrated");
-					  ontologyUpdater.update();
 				  }
 			   } catch (IOException ioe) {
 					String errMsg = "IOException updating knowledge base " +
@@ -136,56 +132,9 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	    if (!(o instanceof OntModel)) {
 	    	return;
 	    }
-	    OntModel displayModel = (OntModel) o;
-	    migrateDisplayModel(displayModel);
+	    OntModel displayModel = (OntModel) o; 
 	}
-		
-	public static void migrateDisplayModel(Model displayModel) {
-				
-		Resource browseDataGetterClass = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.BrowseDataGetter");
-		Resource pageDataGetterClass = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.ClassGroupPageData");
-		Resource internalDataGetterClass = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.InternalClassesDataGetter");
-		Resource individualsDataGetterClass = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.IndividualsForClassesDataGetter");
-		
-		Resource homeDataGetter = ResourceFactory.createResource(DisplayVocabulary.DISPLAY_NS + "homeDataGetter");
-		Property dataGetterProperty = displayModel.getProperty(DisplayVocabulary.HAS_DATA_GETTER);
-	
-		Resource homePage = displayModel.getResource(DisplayVocabulary.HOME_PAGE_URI);
-		Resource classGroupPage = displayModel.getResource(DisplayVocabulary.CLASSGROUP_PAGE_TYPE);
-		Resource internalClassesPage = displayModel.getResource(DisplayVocabulary.CLASSINDIVIDUALS_INTERNAL_TYPE);
-		Resource individualsPage = displayModel.getResource(DisplayVocabulary.CLASSINDIVIDUALS_PAGE_TYPE);
-				
-		displayModel.add(homePage, dataGetterProperty, homeDataGetter);	
-		displayModel.add(homeDataGetter, RDF.type, browseDataGetterClass);
-		
-		Model additions = ModelFactory.createDefaultModel();
-	    Model retractions = ModelFactory.createDefaultModel();
-	    
-	    StmtIterator iter = displayModel.listStatements((Resource) null, RDF.type, internalClassesPage);
-	    while (iter.hasNext()) {
-	    	Statement stmt = iter.next();
-	    	retractions.add(stmt);
-	    	additions.add(stmt.getSubject(), RDF.type, internalDataGetterClass);
-	    }
-		
-	    iter = displayModel.listStatements((Resource) null, RDF.type, classGroupPage);
-	    while (iter.hasNext()) {
-	    	Statement stmt = iter.next();
-	    	retractions.add(stmt);
-	    	additions.add(stmt.getSubject(), RDF.type, pageDataGetterClass);
-	    }
-	    
-	    iter = displayModel.listStatements((Resource) null, RDF.type, individualsPage);
-	    while (iter.hasNext()) {
-	    	Statement stmt = iter.next();
-	    	retractions.add(stmt);
-	    	additions.add(stmt.getSubject(), RDF.type, individualsDataGetterClass);
-	    }
-	    
-	    displayModel.remove(retractions);
-	    displayModel.add(additions);
-	}
-	
+			
 	private OntModel loadModelFromDirectory(String directoryPath) {
 		
 		OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);

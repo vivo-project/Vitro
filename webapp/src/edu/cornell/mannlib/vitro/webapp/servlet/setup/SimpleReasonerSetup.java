@@ -129,11 +129,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
                     new Thread(new ABoxRecomputer(simpleReasoner),"ABoxRecomputer").start();
                 }
                 
-            } else if ( isMSTComputeRequired(sce.getServletContext()) ) {
-                log.info("mostSpecificType computation required. It will be done in a separate thread.");
-                waitForTBoxReasoning(pelletListener);
-                new Thread(new MostSpecificTypeRecomputer(simpleReasoner),"MostSpecificTypeComputer").start();
-            }
+            } 
 
             SimpleReasonerTBoxListener simpleReasonerTBoxListener = new SimpleReasonerTBoxListener(simpleReasoner);
             sce.getServletContext().setAttribute(SimpleReasonerTBoxListener.class.getName(),simpleReasonerTBoxListener);
@@ -231,20 +227,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
             simpleReasoner.recompute();
         }
     }
-    
-    private class MostSpecificTypeRecomputer implements Runnable {
         
-        private SimpleReasoner simpleReasoner;
-        
-        public MostSpecificTypeRecomputer(SimpleReasoner simpleReasoner) {
-            this.simpleReasoner = simpleReasoner;
-        }
-        
-        public void run() {
-            simpleReasoner.computeMostSpecificType();              
-        }
-    }
-    
     /**
      * Read the names of the plugin classes classes.
      * 

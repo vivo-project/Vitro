@@ -236,7 +236,6 @@ public class KnowledgeBaseUpdater {
 		OntModel newTBoxModel = settings.getNewTBoxModel();
 		OntModel ABoxModel = settings.getAssertionOntModelSelector().getABoxModel();
 		ABoxUpdater aboxUpdater = new ABoxUpdater(oldTBoxModel, newTBoxModel, ABoxModel,settings.getNewTBoxAnnotationsModel(), logger, record);
-		aboxUpdater.migrateExternalConcepts();
 		aboxUpdater.processPropertyChanges(changes.getAtomicPropertyChanges());
 		aboxUpdater.processClassChanges(changes.getAtomicClassChanges());
 	}
