@@ -600,6 +600,9 @@ public abstract class BaseDumpDirective implements TemplateDirectiveModel {
     
     protected void writeDump(Map<String, Object> map, Environment env, String templateName) 
     throws TemplateException, IOException {
+    	// Make the stylesheets list visible to dump.ftl
+    	map.put("stylesheets", env.getVariable("stylesheets"));
+    	
         Template template = env.getConfiguration().getTemplate(templateName);
         StringWriter sw = new StringWriter();
         template.process(map, sw);     
