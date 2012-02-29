@@ -7,21 +7,23 @@
 <div class="dump">
     <h3>${title}</h3>
     
-    <@doDump dump />
+    <#-- dump has been changed to dumpValue to avoid confusion 
+    with the dump directive which is stored in the DataModel as 'dump' -->    
+    <@doDump dumpValue />
 </div>
 
-<#macro doDump dump>
-    <#if dump?keys?has_content>
+<#macro doDump dumpValue>
+    <#if dumpValue?keys?has_content>
         <ul>
-            <#list dump?keys as key>
+            <#list dumpValue?keys as key>
                 <li class="variable">
                     <p><strong>Variable name:</strong> ${key}</p>  
                     
-                    <#local type = dump[key].type!>
+                    <#local type = dumpValue[key].type!>
                     <#if type == "Directive" || type == "Method"> 
-                        <@doMethod dump[key] />
+                        <@doMethod dumpValue[key] />
                     <#else>                
-                        <@doTypeAndValue dump[key] />
+                        <@doTypeAndValue dumpValue[key] />
                     </#if>
                 </li>       
             </#list>

@@ -49,7 +49,9 @@ owl:ObjectProperty
       
 <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#DataGetter>
       a       owl:Class .  
-      
+
+<java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter>
+    a owl:Class .      
       
       
 ########Data Properties#########
@@ -101,14 +103,16 @@ owl:versionInfo
       
   <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#usesDataGetterClass>
       a       owl:DatatypeProperty .      
-      
-###Custom data getters that may or may not be associated with a page use the following relationships
-###E.g. sparql data getters can specify the query to be used as well as what variable in the template
-###should store the results
-<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#saveToVar>
-      a      owl:DatatypeProperty  .     
+
 <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#query>
-      a      owl:DatatypeProperty  .         
+    a owl:DatatypeProperty .
+    
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#saveToVar>
+    a owl:DatatypeProperty.
+    
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#queryModel>
+    a owl:DatatypeProperty.              
+      
 ######### Object Properties#########
 ###Basic
 rdfs:range
@@ -179,7 +183,4 @@ owl:topObjectProperty
 <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#restrictResultsByClass>
       a       owl:ObjectProperty .    
       
-###Custom data getters that may or may not be associated with a page use the following relationships
-###E.g. sparql data getters can specify what model to use for querying
-<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#queryModel>
-      a       owl:ObjectProperty .         
+        

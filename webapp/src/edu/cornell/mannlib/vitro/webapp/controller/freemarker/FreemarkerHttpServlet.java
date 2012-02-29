@@ -443,6 +443,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
         map.put("url", new edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective()); 
         map.put("widget", new edu.cornell.mannlib.vitro.webapp.web.directives.WidgetDirective());
+        map.putAll( FreemarkerConfiguration.getDirectives() );
         
         // Add these accumulator objects. They will collect tags so the template can write them 
         // at the appropriate location.

@@ -83,8 +83,8 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
                     else
                         this.queryText = value.getLexicalForm();                    
                     
-                    //model is OPTIONAL
-                    RDFNode node = soln.getResource("model");
+                    //model is OPTIONAL                    
+                    RDFNode node = soln.get("queryModel");
                     if( node != null && node.isURIResource() ){
                         this.modelURI = node.asResource().getURI();                        
                     }else if( node != null && node.isLiteral() ){
@@ -116,7 +116,7 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
             return Collections.emptyMap();
         }
         
-        //this may throw an error
+        //this may throw a SPARQL syntax error 
         Query query = QueryFactory.create( this.queryText );                
 
         //build query bindings
@@ -206,14 +206,14 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
     public static final String defaultVarNameForResults = "results";
     
     /**
-     * Query to get the definition of the SparqlDataGetter for a given data getter URI.
+     * Query to get the definition of the SparqlDataGetter for a given URI.
      */
     private static final String dataGetterQuery =
         "PREFIX display: <" + DisplayVocabulary.DISPLAY_NS +"> \n" +
-        "SELECT ?query ?saveToVar ?model WHERE { \n" +
-        "  ?dataGetterUri "+queryPropertyURI+" ?query . \n" +
-        "  OPTIONAL{ ?dataGetterUri "+saveToVarPropertyURI+" ?saveToVar } \n " +
-        "  OPTIONAL{ ?dataGetterUri "+queryModelPropertyURI+" ?model } \n" +
+        "SELECT ?query ?saveToVar ?queryModel WHERE { \n" +
+        "  ?dataGetterURI "+queryPropertyURI+" ?query . \n" +
+        "  OPTIONAL{ ?dataGetterURI "+saveToVarPropertyURI+" ?saveToVar } \n " +
+        "  OPTIONAL{ ?dataGetterURI "+queryModelPropertyURI+" ?queryModel } \n" +
         "}";      
 
    

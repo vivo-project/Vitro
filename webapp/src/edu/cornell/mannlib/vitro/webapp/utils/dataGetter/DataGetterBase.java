@@ -11,6 +11,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.jena.JenaIngestController;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 
@@ -26,7 +27,9 @@ public abstract class DataGetterBase implements DataGetter {
         }else if(REQUEST_DISPLAY_MODEL.equals(modelName)){
             return vreq.getDisplayModel();
         }else if( REQUEST_JENA_ONT_MODEL.equals(modelName)){
-            return vreq.getJenaOntModel();
+            return vreq.getJenaOntModel();            
+        }else if( CONTEXT_DISPLAY_MODEL.equals(modelName)){
+            return (Model)context.getAttribute( DisplayVocabulary.DISPLAY_ONT_MODEL);            
         }else if( ! StringUtils.isEmpty( modelName)){           
             Model model = JenaIngestController.getModel( modelName, vreq, context);
             if( model == null )
@@ -41,5 +44,6 @@ public abstract class DataGetterBase implements DataGetter {
 
    public final static String REQUEST_DISPLAY_MODEL = "vitro:requestDisplayModel";   
    public final static String REQUEST_JENA_ONT_MODEL = "vitro:requestJenaOntModel";
+   public final static String CONTEXT_DISPLAY_MODEL =  "vitro:contextDisplayModel";
    
 }
