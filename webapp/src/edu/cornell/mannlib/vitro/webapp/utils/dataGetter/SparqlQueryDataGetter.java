@@ -206,14 +206,14 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
     public static final String defaultVarNameForResults = "results";
     
     /**
-     * Query to get the definition of the SparqlDataGetter for a given URI.
+     * Query to get the definition of the SparqlDataGetter for a given data getter URI.
      */
     private static final String dataGetterQuery =
         "PREFIX display: <" + DisplayVocabulary.DISPLAY_NS +"> \n" +
         "SELECT ?query ?saveToVar ?model WHERE { \n" +
-        "  ?pageUri "+queryPropertyURI+" ?query . \n" +
-        "  OPTIONAL{ ?pageUri "+saveToVarPropertyURI+" ?saveToVar } \n " +
-        "  OPTIONAL{ ?pageUri "+queryModelPropertyURI+" ?queryModel } \n" +
+        "  ?dataGetterUri "+queryPropertyURI+" ?query . \n" +
+        "  OPTIONAL{ ?dataGetterUri "+saveToVarPropertyURI+" ?saveToVar } \n " +
+        "  OPTIONAL{ ?dataGetterUri "+queryModelPropertyURI+" ?model } \n" +
         "}";      
 
    

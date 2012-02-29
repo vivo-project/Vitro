@@ -1,0 +1,13 @@
+.resultRow {
+float:none;
+clear:both;
+}
+
+.resultCell {
+float:left;
+border:1px solid #000000;
+}
+
+.resultHeading {
+font-weight:bold;
+}
