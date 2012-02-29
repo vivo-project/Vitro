@@ -49,7 +49,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetterORIG.PageDataGetter;
 
 
 public class DataGetterUtils {
