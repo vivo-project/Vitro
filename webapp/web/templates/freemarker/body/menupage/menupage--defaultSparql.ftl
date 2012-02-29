@@ -1,3 +1,5 @@
+<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+
 <#--Save to variable is sparqlResults -->
 <#assign resultsExist = false/>
 <#if sparqlResults?has_content>
