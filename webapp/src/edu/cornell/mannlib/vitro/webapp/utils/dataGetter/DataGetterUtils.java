@@ -6,7 +6,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +38,7 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.JsonServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -45,7 +48,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListCont
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetterUtils;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
+import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetterORIG.PageDataGetter;
+
 
 public class DataGetterUtils {
     
@@ -155,7 +160,7 @@ public class DataGetterUtils {
                     QuerySolution soln = results.nextSolution();
                     Resource type = soln.getResource("type");
                     if( type != null && type.getURI() != null){
-                        types.add( PageDataGetterUtils.getClassNameFromUri( type.getURI() ));
+                        types.add( DataGetterUtils.getClassNameFromUri( type.getURI() ));
                     }
                 }
             }finally{ qexec.close(); }
@@ -401,5 +406,154 @@ public class DataGetterUtils {
         "SELECT ?classGroupUri WHERE { \n" +
         "  ?dataGetterUri "+forClassGroupURI+" ?classGroupUri . \n" +
         "}";      
+    
+    
+    /**
+     * 
+     * Convert data to JSON for page uri based on type and related datagetters
+     * TODO: How to handle different data getters?  Will this replace json fields or add to them?
+     * @throws ClassNotFoundException 
+     * @throws IllegalAccessException 
+     * @throws InstantiationException 
+     */
+    public static JSONObject covertDataToJSONForPage(String pageUri, Model displayModel) throws InstantiationException, IllegalAccessException, ClassNotFoundException {       
+        //Get PageDataGetter types associated with pageUri
+        JSONObject rObj = null;   
+        try{
+	        List<DataGetter> dataGetters = getDataGettersForPage(displayModel, pageUri);
+	        for(DataGetter getter: dataGetters) {
+	        	 JSONObject typeObj = null;
+	             try{
+	            	 //Assumes the data getter itself will have a convert to json method
+	            	 /*
+	                 typeObj = getter.convertToJSON(data, vreq);
+	                 if( typeObj != null) {
+	                     //Copy over everything from this type Obj to 
+	                     //TODO: Review how to handle duplicate keys, etc.
+	                     if(rObj != null) {
+	                         //For now, just nests as separate entry
+	                         rObj.put(getter.getType(), typeObj);
+	                     } else {
+	                         rObj = typeObj;
+	                     }
+	                 } */     
+	        	
+	            } catch(Throwable th){
+	                log.error(th,th);
+	            }
+	        }     
+        } catch(Throwable th) {
+        	log.error(th, th);
+        }
+        return rObj;
+    }
+    
+    
+    /***
+     * For the page, get the actual Data Getters to be employed.
+     * @throws ClassNotFoundException 
+     * @throws IllegalAccessException 
+     * @throws InstantiationException 
+     */
+    /*
+    public static List<PageDataGetter> DataGetterObjects(VitroRequest vreq, String pageUri) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+    	List<PageDataGetter> dataGetterObjects = new ArrayList<PageDataGetter>();
+    	
+    	List<String> dataGetterClassNames = vreq.getWebappDaoFactory().getPageDao().getDataGetterClass(pageUri);
+    	if( dataGetterClassNames == null )
+    	    return Collections.emptyList();
+    	
+    	for(String dgClassName: dataGetterClassNames) {
+    		String className = getClassNameFromUri(dgClassName);
+    		Class clz =  Class.forName(className);
+    		
+    		if( DataGetterUtils.isInstanceOfInterface(clz, PageDataGetter.class)){    		        		
+    		    Object obj = clz.newInstance();
+    		    if(obj != null && obj instanceof PageDataGetter) {
+    		        PageDataGetter pg = (PageDataGetter) obj;
+    		        dataGetterObjects.add(pg);
+    		    }	    		
+    		}// else skip if class does not implement PageDataGetter
+    	} 
+	        
+    	return dataGetterObjects;
+    }
+    */
+    
+    //Class URIs returned include "java:" and to instantiate object need to remove java: portion
+    public static String getClassNameFromUri(String dataGetterClassUri) {
+    	if( !StringUtils.isEmpty(dataGetterClassUri) && dataGetterClassUri.contains("java:")) {
+    		String[] splitArray = dataGetterClassUri.split("java:");
+    		if(splitArray.length > 1) {
+    			return splitArray[1];
+    		}
+    	}
+    	return dataGetterClassUri;
+    }
+    
+
+    
+    /*
+     * Copied from JSONServlet as expect this to be related to VitroClassGroup
+     */
+    public static JSONObject processVClassGroupJSON(VitroRequest vreq, ServletContext context, VClassGroup vcg) {
+        JSONObject map = new JSONObject();           
+        try {
+            ArrayList<JSONObject> classes = new ArrayList<JSONObject>(vcg.size());
+            for( VClass vc : vcg){
+                JSONObject vcObj = new JSONObject();
+                vcObj.put("name", vc.getName());
+                vcObj.put("URI", vc.getURI());
+                vcObj.put("entityCount", vc.getEntityCount());
+                classes.add(vcObj);
+            }
+            map.put("classes", classes);                
+            map.put("classGroupName", vcg.getPublicName());
+            map.put("classGroupUri", vcg.getURI());
+        
+        } catch(Exception ex) {
+            log.error("Error occurred in processing VClass group ", ex);
+        }
+        return map;        
+    }
+    
+	
+    //Get All VClass Groups information
+    //Used within menu management and processing
+    //TODO: Check if more appropriate location possible
+    public static List<HashMap<String, String>> getClassGroups(ServletContext context) {
+    	//Wanted this to be 
+    	VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+        List<VClassGroup> vcgList = vcgc.getGroups();
+        //For now encoding as hashmap with label and URI as trying to retrieve class group
+        //results in errors for some reason
+        List<HashMap<String, String>> classGroups = new ArrayList<HashMap<String, String>>();
+        for(VClassGroup vcg: vcgList) {
+        	HashMap<String, String> hs = new HashMap<String, String>();
+        	hs.put("publicName", vcg.getPublicName());
+        	hs.put("URI", vcg.getURI());
+        	classGroups.add(hs);
+        }
+        return classGroups;
+    }
+    
+    
+   //TODO: Check whether this needs to be put here or elsewhere, as this is data getter specific
+    //with respect to class groups
+  //Need to use VClassGroupCache to retrieve class group information - this is the information returned from "for class group"
+	public static void getClassGroupForDataGetter(ServletContext context, Map<String, Object> pageData, Map<String, Object> templateData) {
+    	//Get the class group from VClassGroup, this is the same as the class group for the class group page data getter
+		//and the associated class group (not custom) for individuals datagetter
+		String classGroupUri = (String) pageData.get("classGroupUri");
+		VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+    	VClassGroup group = vcgc.getGroup(classGroupUri);
+
+		templateData.put("classGroup", group);
+		templateData.put("associatedPage", group.getPublicName());
+		templateData.put("associatedPageURI", group.getURI());
+    }
+    
+	
+	
     
 }
