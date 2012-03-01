@@ -62,7 +62,7 @@ public class SimpleReasonerTBoxListener extends StatementListener {
 	
 	private synchronized void processUpdate(ModelUpdate mu) {
 		if (!processingUpdates && (modelUpdates.peek() != null)) {
-			log.error("TBoxProcessor thread was not running and work queue is not empty. size = " + modelUpdates.size());
+			log.warn("TBoxProcessor thread was not running and work queue is not empty. size = " + modelUpdates.size() + " The work will be processed now.");
 		}
 		
 		modelUpdates.add(mu);
