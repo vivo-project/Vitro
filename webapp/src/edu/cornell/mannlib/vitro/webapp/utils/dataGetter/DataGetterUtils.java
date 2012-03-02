@@ -403,7 +403,7 @@ public class DataGetterUtils {
     private static final String classGroupForDataGetterQuery =
         "PREFIX display: <" + DisplayVocabulary.DISPLAY_NS +"> \n" +
         "SELECT ?classGroupUri WHERE { \n" +
-        "  ?dataGetterUri "+forClassGroupURI+" ?classGroupUri . \n" +
+        "  ?dataGetterURI "+forClassGroupURI+" ?classGroupUri . \n" +
         "}";      
     
     

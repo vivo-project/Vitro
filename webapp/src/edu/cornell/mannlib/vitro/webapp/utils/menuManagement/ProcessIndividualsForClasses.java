@@ -41,8 +41,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetterUtils;
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.IndividualsForClassesDataGetter;
+import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter;
 
 /*
  * Handle processing of data retrieved from IndividualsForClasses data getter to return to form template
@@ -59,7 +59,7 @@ public class ProcessIndividualsForClasses implements ProcessDataGetter {
 		populateIncludedClasses(pageData, templateData);
 		populateRestrictedClasses(pageData, templateData);
 		//Also save the class group for display
-		PageDataGetterUtils.getClassGroupForDataGetter(context, pageData, templateData); 
+		DataGetterUtils.getClassGroupForDataGetter(context, pageData, templateData); 
 
 	}
     
@@ -98,7 +98,7 @@ public class ProcessIndividualsForClasses implements ProcessDataGetter {
 	}
 	public  Model processSubmission(VitroRequest vreq, Resource dataGetterResource) {
 		String[] selectedClasses = vreq.getParameterValues("classInClassGroup");
-		String dataGetterTypeUri = new IndividualsForClassesDataGetter().getType();
+		String dataGetterTypeUri = DataGetterUtils.generateDataGetterTypeURI(IndividualsForClassesDataGetter.class.getName());
 		Model dgModel = ModelFactory.createDefaultModel();
 		dgModel.add(dgModel.createStatement(dataGetterResource, 
 				RDF.type, 

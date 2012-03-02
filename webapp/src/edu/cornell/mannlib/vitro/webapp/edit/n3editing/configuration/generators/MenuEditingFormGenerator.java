@@ -73,6 +73,11 @@ public class MenuEditingFormGenerator implements EditConfigurationGenerator {
     	//actual pagej
     
     	EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();
+    	//will this forward to the appropriate controller
+    	String queryString = vreq.getQueryString();
+		String redirectPage = vreq.getContextPath() + "/menuManagementController?" + queryString;
+    	editConfiguration.setSkipToUrl(redirectPage);
+    	/*
     	//Setting a custom test template for now
     	//TODO: Where to get this custom template from?  Should it be a predicate in display model somewhere?
     	editConfiguration.setTemplate(this.template);
@@ -119,7 +124,7 @@ public class MenuEditingFormGenerator implements EditConfigurationGenerator {
     	this.associatePageData(vreq, editConfiguration, model);
     	//don't need this here exactly
     	//this.generateSelectForExisting(vreq, session, editConfiguration, subject, prop, wdf);
-    	
+    	*/
     	return editConfiguration;
     }
     

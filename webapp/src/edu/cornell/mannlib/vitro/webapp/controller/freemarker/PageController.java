@@ -66,7 +66,8 @@ public class PageController extends FreemarkerHttpServlet{
             return doNotFound(vreq);
         }
         
-        executePageDataGetters( pageUri, vreq, getServletContext(), mapForTemplate );
+        //executePageDataGetters( pageUri, vreq, getServletContext(), mapForTemplate );
+        //these should all be data getters now
         executeDataGetters( pageUri, vreq, getServletContext(), mapForTemplate);
 
         mapForTemplate.putAll( getPageControllerValues( pageUri, vreq, getServletContext(), mapForTemplate));
@@ -86,12 +87,12 @@ public class PageController extends FreemarkerHttpServlet{
             }
         }                       
     }
-
+/*
     private void executePageDataGetters(String pageUri, VitroRequest vreq, ServletContext context, Map<String, Object> mapForTemplate) 
     throws Exception{                
-        mapForTemplate.putAll( PageDataGetterUtils.getDataForPage(pageUri, vreq, context) );        
+        mapForTemplate.putAll( DataGetterUtils.getDataForPage(pageUri, vreq, context) );        
     }
-
+*/
     /**
      * Add any additional values to the template variable map that are related to the page.
      * For example, editing links.

@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -26,8 +27,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.utils.menuManagement.MenuManagementDataUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.menuManagement.SelectDataGetterUtils;
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetterUtils;
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetter;
+import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetter;
 
 /*
  * Custom controller for menu management.  This will be replaced later once N3 Editing
@@ -114,7 +115,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     	//not a page already assigned a class group
     	data.put("isClassGroupPage", false);
     	data.put("includeAllClasses", false);
-    	data.put("classGroups", PageDataGetterUtils.getClassGroups(getServletContext()));
+    	data.put("classGroups", DataGetterUtils.getClassGroups(getServletContext()));
     	data.put("selectedTemplateType", "default");
     	//
     	this.getMenuItemData(vreq, menuItem, data);
@@ -134,7 +135,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     	//not a page already assigned a class group
     	data.put("isClassGroupPage", false);
     	data.put("includeAllClasses", false);
-    	data.put("classGroups", PageDataGetterUtils.getClassGroups(getServletContext()));
+    	data.put("classGroups", DataGetterUtils.getClassGroups(getServletContext()));
     	data.put("selectedTemplateType", "default");
     	//defaults to regular class group page
 	}
@@ -149,7 +150,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     	data.put("menuItem", menuItem);
     	data.put("menuAction", "Edit");
     	//Get All class groups
-    	data.put("classGroups", PageDataGetterUtils.getClassGroups(getServletContext()));
+    	data.put("classGroups", DataGetterUtils.getClassGroups(getServletContext()));
     	//Get data for menu item and associated page
     	this.getMenuItemData(vreq, menuItem, data);
     	this.getPageData(vreq, data);    	
@@ -261,29 +262,33 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     	while(dataGetterIt.hasNext()) {
     		Statement dataGetterStmt = dataGetterIt.nextStatement();
     		Resource dataGetter = dataGetterStmt.getResource();
+    		if(dataGetter != null) {
+    			this.retrieveData(vreq, dataGetter.getURI(), data);
+    		}
+    		/*
     		//Get types of data getter
     		StmtIterator dataGetterTypes = writeModel.listStatements(dataGetter, RDF.type, (RDFNode) null);
     		while(dataGetterTypes.hasNext()) {
     			String dataGetterType = dataGetterTypes.nextStatement().getResource().getURI();
-    			this.retrieveData(vreq, page, dataGetterType, data);
-    		}
+    			this.retrieveData(vreq, dataGetterType, data);
+    		}*/
     	}
     
     }
   
-    private void retrieveData(VitroRequest vreq, Resource page, String dataGetterType,  Map<String, Object> templateData) {
+    private void retrieveData(VitroRequest vreq, String dataGetterURI,  Map<String, Object> templateData) {
     	//Data Getter type is now a class name
-    	String className = PageDataGetterUtils.getClassNameFromUri(dataGetterType);
+    	Model displayModel = vreq.getDisplayModel();
     	try{
-    		String pageURI = page.getURI();
-    		PageDataGetter pg = (PageDataGetter) Class.forName(className).newInstance();
-    		
-    		Map<String, Object> pageInfo = vreq.getWebappDaoFactory().getPageDao().getPage(pageURI);    		
-
-    		Map<String, Object> pageData = PageDataGetterUtils.getAdditionalData(pageURI, dataGetterType, pageInfo, vreq, pg, getServletContext());
+        	String className = DataGetterUtils.getJClassForDataGetterURI(displayModel, dataGetterURI);
+    		//TODO: Change so that instantiation here occurs correctly <-- how should data getter be instantiated
+    		DataGetter pg = DataGetterUtils.dataGetterForURI(vreq.getDisplayModel(), dataGetterURI);
+    		//TODO: Check template data variable and what that is?
+    		Map<String, Object> pageData = pg.getData(getServletContext(), vreq, templateData);
+    		//Map<String, Object> pageInfo = vreq.getWebappDaoFactory().getPageDao().getPage(pageURI);    		
     		SelectDataGetterUtils.processAndRetrieveData(vreq, getServletContext(), pageData, className, templateData);
     	} catch(Exception ex) {
-    		log.error("Exception occurred in instantiation page data getter for " + className, ex);
+    		log.error("Exception occurred in instantiation page data getter for " + dataGetterURI, ex);
     	}
     	
 		

@@ -40,8 +40,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.ClassGroupPageData;
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.IndividualsForClassesDataGetter;
+import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData;
+import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter;
 
 /*
  * This class includes methods that help in selecting a data getter based on 

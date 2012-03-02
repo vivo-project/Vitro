@@ -38,15 +38,15 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateMo
  * classGroupUri: uri of the classgroup associated with this page.
  * vClassGroup: a data structure that is the classgroup associated with this page.     
  */
-public class ClassGroupDataGetter extends DataGetterBase implements DataGetter{
+public class ClassGroupPageData extends DataGetterBase implements DataGetter{
 	
-    private static final Log log = LogFactory.getLog(ClassGroupDataGetter.class);
+    private static final Log log = LogFactory.getLog(ClassGroupPageData.class);
     String dataGetterURI;
     String classGroupUri;
     /**
      * Constructor with display model and data getter URI that will be called by reflection.
      */
-    public ClassGroupDataGetter(Model displayModel, String dataGetterURI){
+    public ClassGroupPageData(Model displayModel, String dataGetterURI){
         this.configure(displayModel,dataGetterURI);
     }        
     

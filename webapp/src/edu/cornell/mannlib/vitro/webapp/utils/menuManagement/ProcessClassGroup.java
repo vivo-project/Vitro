@@ -41,8 +41,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.ClassGroupPageData;
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetterUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData;
 
 /*
  * Handle processing of data retrieved from ClassGroupPage data getter to return to form template
@@ -59,16 +59,15 @@ public class ProcessClassGroup implements ProcessDataGetter{
 		templateData.put("includeAllClasses", true);
 		
 		//Get the class group from VClassGroup
-		PageDataGetterUtils.getClassGroupForDataGetter(context, pageData, templateData);
+		DataGetterUtils.getClassGroupForDataGetter(context, pageData, templateData);
 	}
     
     
     //Process submission
     
     public  Model processSubmission(VitroRequest vreq, Resource dataGetterResource) {
-    	ClassGroupPageData cpg = new ClassGroupPageData();
 		Model dgModel = ModelFactory.createDefaultModel();
-		String dataGetterTypeUri = cpg.getType();
+		String dataGetterTypeUri = DataGetterUtils.generateDataGetterTypeURI(ClassGroupPageData.class.getName());
 		dgModel.add(dgModel.createStatement(dataGetterResource, 
 				RDF.type, 
 				ResourceFactory.createResource(dataGetterTypeUri)));
