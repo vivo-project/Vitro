@@ -98,7 +98,7 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
     }
     
 	/** Package access to allow for unit testing. */
-	void processChanges(String editorUri, OntModel writeModel,
+	void processChanges(String editorUri, Model writeModel,
 			Model toBeAdded, Model toBeRetracted) throws Exception {
 		Lock lock = null;
 		log.debug("Model to be retracted is");
@@ -108,13 +108,17 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
 		try {
 			lock = writeModel.getLock();
 			lock.enterCriticalSection(Lock.WRITE);
-			writeModel.getBaseModel().notifyEvent(new EditEvent(editorUri, true));
+			if( writeModel instanceof OntModel){
+			    ((OntModel)writeModel).getBaseModel().notifyEvent(new EditEvent(editorUri, true));
+			}
 			writeModel.add(toBeAdded);
 			writeModel.remove(toBeRetracted);
 		} catch (Throwable t) {
 			throw new Exception("Error while modifying model \n" + t.getMessage());
 		} finally {
-			writeModel.getBaseModel().notifyEvent(new EditEvent(editorUri, false));
+		    if( writeModel instanceof OntModel){
+		        ((OntModel)writeModel).getBaseModel().notifyEvent(new EditEvent(editorUri, false));
+		    }
 			lock.leaveCriticalSection();
 		}
 	}
@@ -143,7 +147,7 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
         return models;
     }
 
-    private OntModel getWriteModel(VitroRequest vreq){
+    private Model getWriteModel(VitroRequest vreq){
     	return StandardModelSelector.selector.getModel(vreq,getServletContext());  
     }
 

@@ -101,19 +101,10 @@ public class DefaultDeleteGenerator extends BaseEditConfigurationGenerator imple
     		//not concerned about remainder, can move into default obj prop form if required
     		this.initObjectParameters(vreq);
     		this.processObjectPropForm(vreq, editConfiguration);
-    	} else {
-    		this.initDataParameters(vreq, session);
-    	   this.processDataPropForm(vreq, editConfiguration);
+    	} else {    		
+    	   this.processDataPropForm(vreq, session, editConfiguration);
     	}
     }
-    
-    private void initDataParameters(VitroRequest vreq, HttpSession session) {
-    	dataHash = EditConfigurationUtils.getDataHash(vreq);
-	    if( dataHash != null ){	    
-	        log.debug("Found a datapropKey in parameters and parsed it to int: " + dataHash);	         
-	    }
-	    dps = EditConfigurationUtils.getDataPropertyStatement(vreq, session, dataHash, predicateUri);
-	}
 
 
     
@@ -129,9 +120,22 @@ public class DefaultDeleteGenerator extends BaseEditConfigurationGenerator imple
     	//TODO: Check if null in case no object uri exists but this is still an object property
     }
     
-    private void processDataPropForm(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
-    	//set data prop value, data prop key str, 
-    	editConfiguration.setDatapropKey( EditConfigurationUtils.getDataHash(vreq) );
+	
+    private void processDataPropForm(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {
+        dataHash = EditConfigurationUtils.getDataHash(vreq);
+        if( dataHash != null ){     
+            log.debug("Found a datapropKey in parameters and parsed it to int: " + dataHash);
+            editConfiguration.setDatapropKey( dataHash );
+            dps = EditConfigurationUtils.getDataPropertyStatement(vreq, session, dataHash, predicateUri);
+            if( dps != null ){
+                editConfiguration.addFormSpecificData("dataPropertyLexicalValue", dps.getData());
+            }else{
+                editConfiguration.addFormSpecificData("dataPropertyLexicalValue", "unknown value");
+            }
+        }else{
+            log.debug("Did NOT find a datapropKey for hte data hash.");
+            editConfiguration.addFormSpecificData("dataPropertyLexicalValue", "unknown value");
+        }                
     }
     
 

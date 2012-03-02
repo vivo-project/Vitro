@@ -4,13 +4,22 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.commons.lang.StringUtils;
+
+import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.IdModelSelector;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.ModelSelector;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.StandardModelSelector;
+import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
 
 public abstract class BaseEditConfigurationGenerator implements EditConfigurationGenerator {
 
@@ -54,13 +63,10 @@ public abstract class BaseEditConfigurationGenerator implements EditConfiguratio
     //Originally included in edit request dispatch controller but moved here due to
     //exceptions such as default add missing individual form
     void prepare(VitroRequest vreq, EditConfigurationVTwo editConfig) {
-    	//This used to get the model from the servlet context
-    	//        Model model = (Model) getServletContext().getAttribute("jenaOntModel");
+        //setup the model selectors for query, write and display models on editConfig
+        setupModelSelectorsFromVitroRequest(vreq, editConfig);        
         
-        //PROBLEM: this is returning the jenaOntModel
-        // but we want the current abox model which might have 
-        // been set to the display model or something.
-        Model model = vreq.getJenaOntModel();
+        OntModel queryModel = (OntModel)vreq.getAttribute("jenaOntModel");
         
         if( editConfig.getSubjectUri() == null)
             editConfig.setSubjectUri( EditConfigurationUtils.getSubjectUri(vreq));
@@ -73,14 +79,42 @@ public abstract class BaseEditConfigurationGenerator implements EditConfiguratio
             // editing existing object
             if( editConfig.getObject() == null)
                 editConfig.setObject( EditConfigurationUtils.getObjectUri(vreq));
-            editConfig.prepareForObjPropUpdate(model);
+            editConfig.prepareForObjPropUpdate(queryModel);
         } else if( dataKey != null ) { // edit of a data prop statement
             //do nothing since the data prop form generator must take care of it
-            editConfig.prepareForDataPropUpdate(model, vreq.getWebappDaoFactory().getDataPropertyDao());
+            editConfig.prepareForDataPropUpdate(queryModel, vreq.getWebappDaoFactory().getDataPropertyDao());
         } else{
             //this might be a create new or a form
-            editConfig.prepareForNonUpdate(model);
+            editConfig.prepareForNonUpdate(queryModel);
         }
+    }     
+
+    /**
+     * Setup the model selectors using the models set in the VitroRequest. Call this
+     * if the form should use the selectors from the VitroRequest.  Don't call this
+     * and setup specific selectors if the custom form needs to always target specific
+     * models.
+     */
+    public void setupModelSelectorsFromVitroRequest(VitroRequest vreq, EditConfigurationVTwo editConfig){
+        if( ! StringUtils.isEmpty( vreq.getNameForWriteModel() )  ){
+            editConfig.setWriteModelSelector(new IdModelSelector( vreq.getNameForWriteModel() ));
+            editConfig.setWriteModelId( vreq.getNameForWriteModel());
+        }else{
+            editConfig.setWriteModelSelector( StandardModelSelector.selector );
+        }
+        
+        if( ! StringUtils.isEmpty( vreq.getNameForABOXModel() )){
+            editConfig.setQueryModelSelector( new IdModelSelector(vreq.getNameForABOXModel() ));
+            editConfig.setResourceModelSelector( new IdModelSelector(vreq.getNameForABOXModel() ));
+            editConfig.setAboxModelId(vreq.getNameForABOXModel());            
+        }else{
+            editConfig.setQueryModelSelector( StandardModelSelector.selector );
+            editConfig.setResourceModelSelector( StandardModelSelector.selector );
+        }
+        
+        if( ! StringUtils.isEmpty( vreq.getNameForTBOXModel() )){
+            editConfig.setTboxModelId(vreq.getNameForTBOXModel());    
+        }                
     }
     
     /**
