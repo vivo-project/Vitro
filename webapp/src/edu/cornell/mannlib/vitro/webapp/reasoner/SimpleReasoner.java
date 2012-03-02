@@ -1021,10 +1021,11 @@ public class SimpleReasoner extends StatementListener {
 		
 	    if (event instanceof BulkUpdateEvent) {	
 	    	if (((BulkUpdateEvent) event).getBegin()) {	
-	    		eventCount++;
-	    		log.info("received a bulk update begin event.");
-	    		if (batchMode1 || batchMode2) {
-	    			log.info("received a bulk update begin event while already in batch update mode; this event will be ignored.");
+	    		
+	    		log.info("received a bulk update begin event");
+	    		if (deltaComputerProcessing) {
+	    			eventCount++;
+	    			log.info("received a bulk update begin event while processing in asynchronous mode. Event count = " + eventCount);
 	    			return;  
 	    		} else {
 	    			batchMode1 = true;
@@ -1041,13 +1042,13 @@ public class SimpleReasoner extends StatementListener {
 	    			log.info("initializing batch mode 1");
 	    		}
 	    	} else {
-	    		eventCount--;   
 	    		log.info("received a bulk update end event");
 	    		if (!deltaComputerProcessing) {
 	    		    deltaComputerProcessing = true;
 	    		    new Thread(new DeltaComputer(),"DeltaComputer").start();
 	    		} else {
-	    			log.info("received a bulk update end event while currently processing in aynchronous mode");	    			
+	    			eventCount--;
+	    			log.info("received a bulk update end event while currently processing in aynchronous mode. Event count = " + eventCount);
 	    		}
 	    	}
 	    }
@@ -1064,17 +1065,23 @@ public class SimpleReasoner extends StatementListener {
 			   log.info("entering batch mode 2");
     	   } else {
     		   deltaComputerProcessing = false;
+    		   if (eventCount == 0) {
+    			   batchMode1 = false;
+    		   }
     	   }
 	   } else if (batchMode2) {
 			aBoxDeltaModeler1.getRetractions().removeAll();
-			
-	    	if (aBoxDeltaModeler2.getRetractions().size() > 0) { 
-	    	   batchMode1 = true;	
-	    	   batchMode2 = false;
+
+    	    if (aBoxDeltaModeler2.getRetractions().size() > 0) { 
+    	       batchMode1 = true;
+    	   	   batchMode2 = false;  
 			   log.info("entering batch mode 1");
-	    	} else {
-	    	   deltaComputerProcessing = false;
-	    	}
+    	    } else {
+    		   deltaComputerProcessing = false;
+    		   if (eventCount == 0) {
+    			   batchMode2 = false;
+    		   }
+    	    }
 	   } else { 
 		    log.warn("unexpected condition, invoked when batchMode1 and batchMode2 were both false");
             deltaComputerProcessing = false;
@@ -1083,7 +1090,7 @@ public class SimpleReasoner extends StatementListener {
        return deltaComputerProcessing;
 	}
 		
-    private class DeltaComputer extends Thread {      
+    private class DeltaComputer extends Thread  {      
         public DeltaComputer() {
         }
         
@@ -1115,10 +1122,12 @@ public class SimpleReasoner extends StatementListener {
     			try {
     	   	       	log.info("started computing inferences for batch " + qualifier + " updates");
     				iter = retractions.listStatements();
-    	
+    			   	
+    				
     				while (iter.hasNext() && !stopRequested) {				
     					Statement stmt = iter.next();
-    					
+    				    num++;
+     				    
     					try {
     						if (stmt.getPredicate().equals(RDF.type)) {
     							removedABoxTypeAssertion(stmt, inferenceModel);
@@ -1132,7 +1141,6 @@ public class SimpleReasoner extends StatementListener {
     						 log.error("exception in batch mode ",e);
     					}
     					
-						num++;
 		                if ((num % 6000) == 0) {
 		                    log.info("still computing inferences for batch " + qualifier + " update...");
 		                }	
@@ -1160,10 +1168,11 @@ public class SimpleReasoner extends StatementListener {
                 	return;
                 }
                 
-                log.info("finished computing inferences for batch " + qualifier + " updates. Processed " + num + " statements.");
+                log.info("finished computing inferences for batch " + qualifier + " updates");
+                log.debug("\t--> processed " + num + " statements");
         	}
         	
-        	log.info("ending DeltaComputer.run");
+        	log.info("ending DeltaComputer.run. batchMode1 = " + batchMode1 + ", batchMode2 = " + batchMode2);
         }        
     }    
 }
