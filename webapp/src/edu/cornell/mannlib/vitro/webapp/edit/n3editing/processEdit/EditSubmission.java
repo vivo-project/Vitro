@@ -29,11 +29,15 @@ import com.hp.hpl.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 import edu.cornell.mannlib.vitro.webapp.edit.elements.EditElement;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.BasicValidation;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.N3Validator;
 
+/**
+ * @deprecated use {@link MultiValueEditSubmission} 
+ */
 public class EditSubmission {
     String editKey;
 

@@ -72,8 +72,8 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		    return errorResponse;
 
         // get the models to work with in case the write model and query model are not the defaults 
-		OntModel queryModel = configuration.getQueryModelSelector().getModel(vreq, getServletContext());		
-	    OntModel writeModel = configuration.getWriteModelSelector().getModel(vreq,getServletContext());  
+		Model queryModel = configuration.getQueryModelSelector().getModel(vreq, getServletContext());		
+	    Model writeModel = configuration.getWriteModelSelector().getModel(vreq,getServletContext());  
 	    
 	    //If data property check for back button confusion
 	    boolean isBackButton = checkForBackButtonConfusion(configuration, vreq, queryModel);

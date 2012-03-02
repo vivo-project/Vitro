@@ -47,6 +47,8 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
  *
  * Literals in literalsOnForm and literalsInScope should be escaped and quoted
  * in preparation for N3. They may also be appended with a datatype or lang.
+ * 
+ * @deprecated  Use EditConfigurationVTwo instead of this class. 
  */
 public class EditConfiguration {
     

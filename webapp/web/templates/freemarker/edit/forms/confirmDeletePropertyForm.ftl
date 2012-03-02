@@ -10,7 +10,7 @@
     	<#assign property = editConfiguration.objectPropertyStatementDisplayPropertyModel />
     </#if>
 <#else>
-	<#assign statement = editConfiguration.dataStatementDisplay />
+	<#assign statement = editConfiguration.pageData.dataPropertyLexicalValue />
 </#if>
 
 <#assign deletionTemplateName = editConfiguration.deleteTemplate/>

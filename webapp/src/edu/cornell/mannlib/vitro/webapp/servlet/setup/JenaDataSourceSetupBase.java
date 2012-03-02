@@ -32,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.RegeneratingGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SDBGraphGenerator;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource;
 
 public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     private static final String VITRO_DEFAULT_NAMESPACE = "Vitro.defaultNamespace";
@@ -394,9 +395,13 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     
     private static VitroJenaModelMaker vjmm = null;
     private static VitroJenaSDBModelMaker vsmm = null;
+    private static VitroModelSource vms = null;
     private static final String sdbModelMaker = "vitroJenaSDBModelMaker";
     private static final String rdbModelMaker = "vitroJenaModelMaker";
+    private static final String vitroModelSource = "vitroModelSource";
     
+    //bdc34: is there any good reason that this doesn't just return the objects instead
+    //of oddly passing them around as static properties on this class?
     protected void makeModelMakerFromConnectionProperties(TripleStoreType type, 
                                                           ServletContext ctx) {
         String jdbcUrl = getJdbcUrl(ctx);
@@ -453,12 +458,13 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
                 String format = getRdfFormat( file.getName() );
                 try{                   
                     model.read( new FileInputStream(file), null, format);
+                    log.info("read in file " + file.getCanonicalPath() );
                 }catch( Throwable th){
                     log.warn("Could not load file " + 
                             file.getAbsolutePath() + file.separator + file.getName() +
                             " check that it contains valid " + format + " data.", 
                             th);
-                }
+                }                
             }
         }                                               
         return model;
@@ -472,6 +478,11 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     public static void setVitroJenaSDBModelMaker(VitroJenaSDBModelMaker vsmm, 
                                                  ServletContext ctx){
         ctx.setAttribute(sdbModelMaker, vsmm);
+    }
+    
+    public static void setVitroModelSource(VitroModelSource vms,ServletContext ctx) {
+        ctx.setAttribute( vitroModelSource, vms);
+        
     }
     
     protected String getDefaultNamespace(ServletContext ctx) {
@@ -493,6 +504,10 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         return vsmm;
     }
 
+    public static VitroModelSource getVitroModelSource(ServletContext ctx){
+        return (VitroModelSource)ctx.getAttribute(vitroModelSource);
+    }
+    
     private static String getDbType(ServletContext ctx) {
         return ConfigurationProperties.getBean(ctx).getProperty( // database type
                 "VitroConnection.DataSource.dbtype", "MySQL");

@@ -19,13 +19,20 @@ import com.hp.hpl.jena.query.Dataset;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource.ModelName;
 
 public class VitroRequest extends HttpServletRequestWrapper {
+    
     final static Log log = LogFactory.getLog(VitroRequest.class);
     
     //Attribute in case of special model editing such as display model editing
     public static final String SPECIAL_WRITE_MODEL = "specialWriteModel";     
 
+    public  static final String ID_FOR_WRITE_MODEL = "idForWriteModel";
+    public  static final String ID_FOR_TBOX_MODEL = "idForTboxModel";
+    public  static final String ID_FOR_ABOX_MODEL = "idForAboxModel";
+    public static final String ID_FOR_DISPLAY_MODEL = "idForDisplayModel";
+    
     private HttpServletRequest _req;
 
     public VitroRequest(HttpServletRequest _req) {
@@ -175,6 +182,46 @@ public class VitroRequest extends HttpServletRequestWrapper {
         return null;                
     }
         
+    /**
+     * Gets an identifier for the display model associated 
+     * with this request.  It may have been switched from
+     * the normal display model to a different one.
+     * This could be a URI or a {@link ModelName}
+     */
+    public String getIdForDisplayModel(){
+        return (String)getAttribute(ID_FOR_DISPLAY_MODEL);        
+    }
+    
+    /**
+     * Gets an identifier for the a-box model associated 
+     * with this request.  It may have been switched from
+     * the standard one to a different one.
+     * This could be a URI or a {@link ModelName}
+     */    
+    public String  getNameForABOXModel(){
+        return (String)getAttribute(ID_FOR_ABOX_MODEL);        
+    }
+    
+    /**
+     * Gets an identifier for the t-box model associated 
+     * with this request.  It may have been switched from
+     * the standard one to a different one.
+     * This could be a URI or a {@link ModelName}
+     */    
+    public String  getNameForTBOXModel(){
+        return (String)getAttribute(ID_FOR_TBOX_MODEL);        
+    }
+    
+    /**
+     * Gets an identifier for the write model associated 
+     * with this request.  It may have been switched from
+     * the standard one to a different one.
+     * This could be a URI or a {@link ModelName}
+     */    
+    public String  getNameForWriteModel(){
+        return (String)getAttribute(ID_FOR_WRITE_MODEL);        
+    }
+    
     public ApplicationBean getAppBean(){
         //return (ApplicationBean) getAttribute("appBean");
     	return getWebappDaoFactory().getApplicationDao().getApplicationBean();
@@ -198,4 +245,6 @@ public class VitroRequest extends HttpServletRequestWrapper {
     public String[] getParameterValues(String name) {
         return _req.getParameterValues(name);        
     }                
+            
+    
 }

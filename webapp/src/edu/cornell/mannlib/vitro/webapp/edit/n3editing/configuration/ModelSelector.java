@@ -5,8 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.Model;
 
 public interface ModelSelector {
-    public OntModel getModel(HttpServletRequest request, ServletContext context);
+    public Model getModel(HttpServletRequest request, ServletContext context);
 }

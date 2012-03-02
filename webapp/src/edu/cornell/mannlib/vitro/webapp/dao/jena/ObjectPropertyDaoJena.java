@@ -279,7 +279,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            OntProperty op = getOntModel().getOntProperty(propertyURI);
+            OntProperty op = getOntModel().getObjectProperty(propertyURI);
             return propertyFromOntProperty(op);
         } finally {
             getOntModel().leaveCriticalSection();

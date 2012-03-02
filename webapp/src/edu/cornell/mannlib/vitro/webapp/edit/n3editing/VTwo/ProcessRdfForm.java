@@ -217,22 +217,25 @@ public class ProcessRdfForm {
         return changes; 
     }
        
-    //TODO: move this to utils or controller?
     public static void applyChangesToWriteModel(
             AdditionsAndRetractions changes, 
-            OntModel queryModel, OntModel writeModel, String editorUri) {                             
+            Model queryModel, Model writeModel, String editorUri) {                             
         //side effect: modify the write model with the changes      
         Lock lock = null;
         try{
             lock =  writeModel.getLock();
             lock.enterCriticalSection(Lock.WRITE);
-            writeModel.getBaseModel().notifyEvent(new EditEvent(editorUri,true));   
+            if( writeModel instanceof OntModel){
+                ((OntModel)writeModel).getBaseModel().notifyEvent(new EditEvent(editorUri,true));    
+            }               
             writeModel.add( changes.getAdditions() );
             writeModel.remove( changes.getRetractions() );
         }catch(Throwable t){
             log.error("error adding edit change n3required model to in memory model \n"+ t.getMessage() );
         }finally{
-            writeModel.getBaseModel().notifyEvent(new EditEvent(editorUri,false));
+            if( writeModel instanceof OntModel){
+                ((OntModel)writeModel).getBaseModel().notifyEvent(new EditEvent(editorUri,false));
+            }
             lock.leaveCriticalSection();
         }          
     }

@@ -53,6 +53,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.InitialJenaModelUtils;
@@ -323,9 +324,14 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
         makeModelMakerFromConnectionProperties(TripleStoreType.SDB, ctx);
         VitroJenaSDBModelMaker vsmm = getVitroJenaSDBModelMaker();
         setVitroJenaSDBModelMaker(vsmm, ctx);
+                
+        //bdc34: I have no reason for vsmm vs vjmm.  
+        //I don't know what are the implications of this choice.        
+        setVitroModelSource( new VitroModelSource(vsmm,ctx), ctx);
         
         log.info("Model makers set up");
     }
+
 
     /**
      * If we find a "portal1" portal (and we should), its URI should use the

@@ -143,6 +143,7 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
 	 * in the database and it will be reloaded each time the system starts up.
 	 */
 	private void initializeDisplayLoadedAtStartup(ServletContext ctx, OntModel displayModel){
+	    log.info("loading display model from files in " + ctx.getRealPath(DISPLAY_MODEL_LOAD_AT_STARTUP_DIR) );
 	    Model displayLoadAtStartup = readInDisplayModelLoadAtStartup(ctx);
 	    	    
 	    if( log.isDebugEnabled() ){

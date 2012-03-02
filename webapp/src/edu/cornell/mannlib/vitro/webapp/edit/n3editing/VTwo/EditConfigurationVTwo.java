@@ -147,6 +147,8 @@ public class EditConfigurationVTwo {
     private ProhibitedFromSearch prohibitedFromSearch;
 
     //TODO: can we rename this to match the name "pageData" that is used on the templates for this?
+    //How about we change pageData to something else since page is in the name of just about everything related
+    //to templates.
     private HashMap<String, Object> formSpecificData;
     
     /** Name of freemarker template to generate form. */
@@ -161,6 +163,15 @@ public class EditConfigurationVTwo {
      */
     private boolean useDependentResourceDelete = true;   
 
+    /** Model id from write model. */
+    private String writeModelId;
+    
+    /** Model id for the abox. */    
+    private String aboxModelId;
+    
+    /** Model id for the tbox. */
+    private String tboxModelId;
+    
 	/** Model to write changes of a completed edit to. Usually this is null
      * and the edit will be written to the main graph of the system.     */
     private ModelSelector writeModelSelector;
@@ -903,13 +914,18 @@ public class EditConfigurationVTwo {
     	return this.getDatapropKey() != null ;
     }
     
-    //TODO: can we rename this to match the name "pageData" that is used on the templates for this? 
-    //This is for specific data for a form that will be set by the generator    
+    //TODO: can we rename this to match the name "pageData" that is used on the templates for this?
+    //How about we change pageData to something else since page is in the name of just about everything related
+    //to templates.
+    
+    /** This is for specific data for a form that will be set by the generator. */    
 	public  void setFormSpecificData(HashMap<String, Object> formSpecificData) {
 		this.formSpecificData = formSpecificData;
 	}
 
     //TODO: can we rename this to match the name "pageData" that is used on the templates for this?
+    //How about we change pageData to something else since page is in the name of just about everything related
+    //to templates.
 	public void addFormSpecificData( String key, Object value){
 	    if( this.formSpecificData == null){
 	        this.formSpecificData = new HashMap<String,Object>();
@@ -918,8 +934,10 @@ public class EditConfigurationVTwo {
 	}
 	
     //TODO: can we rename this to match the name "pageData" that is used on the templates for this?
-	public HashMap<String, Object> getFormSpecificData() {
-		// TODO Auto-generated method stub
+    //How about we change pageData to something else since page is in the name of just about everything related
+    //to templates.
+	
+	public HashMap<String, Object> getFormSpecificData() {	
 		return this.formSpecificData;
 	}
 
@@ -1046,5 +1064,28 @@ public class EditConfigurationVTwo {
     public String getSkipToUrl() {
         return skipToUrl;
     }
-    
+
+    public void setWriteModelId(String writeModelId) {
+        this.writeModelId = writeModelId;
+    }
+
+    public String getWriteModelId() {
+        return writeModelId;
+    }
+
+    public void setAboxModelId(String aboxModelId) {
+        this.aboxModelId = aboxModelId;
+    }
+
+    public String getAboxModelId() {
+        return aboxModelId;
+    }
+
+    public void setTboxModelId(String tboxModelId) {
+        this.tboxModelId = tboxModelId;
+    }
+
+    public String getTboxModelId() {
+        return tboxModelId;
+    }    
 }
