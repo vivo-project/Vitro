@@ -135,8 +135,6 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<javac srcdir="${utilities.source.dir}" destdir="${utility.classes.dir}" debug="true" deprecation="${javac.deprecation}" encoding="UTF8" includeantruntime="false" optimize="false" source="1.6">
 			<classpath refid="utility.compile.classpath" />
 		</javac>
-
-		<typedef name="dirDifference" classname="edu.cornell.mannlib.vitro.utilities.anttasks.DirDifferenceFileSet" classpathref="utility.run.classpath" />
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
