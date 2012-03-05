@@ -161,11 +161,13 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	//pretends this is a data property editing statement and throws an error
     	//"object"       : [ "objectVar" ,  "${objectUriJson}" , "URI"],
     	if(EditConfigurationUtils.isObjectProperty(predicateUri, vreq)) {
+    		log.debug("This is an object property: " + predicateUri);
     		//not concerned about remainder, can move into default obj prop form if required
     		this.isObjectPropForm = true;
     		this.initObjectParameters(vreq);
     		this.processObjectPropForm(vreq, editConfiguration);
     	} else {
+    		log.debug("This is a data property: " + predicateUri);
     		this.isObjectPropForm = false;
     	   this.processDataPropForm(vreq, editConfiguration);
     	}
@@ -187,7 +189,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     
     private void processDataPropForm(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
         //bdc34
-        throw new Error("DefaultObjectPropertyForm should not be doing data property editng");    	
+        throw new Error("DefaultObjectPropertyForm should not be doing data property editing");    	
     }
     
     //Get N3 required 

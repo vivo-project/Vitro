@@ -178,6 +178,7 @@ public class EditConfigurationUtils {
     	WebappDaoFactory wdf = vreq.getWebappDaoFactory();
     	ObjectProperty op = wdf.getObjectPropertyDao().getObjectPropertyByURI(predicateUri);
     	DataProperty dp = wdf.getDataPropertyDao().getDataPropertyByURI(predicateUri);
+    	log.debug("For " + predicateUri + ", object property from dao null? " + (op == null) + " and data property  null?" + (dp == null));
     	return (op != null && dp == null);
     }
     
