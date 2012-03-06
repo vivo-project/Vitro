@@ -62,9 +62,12 @@
         <label for="last-name">Last name<span class="requiredHint"> *</span></label> 
         <input type="text" name="lastName" value="${lastName}" id="last-name" role="input" />
 
-        <#include "userAccounts-associateProfilePanel.ftl">
+		<#if externalAuthPermitted??>
+            <#include "userAccounts-associateProfilePanel.ftl">
 
-        <p><input id="externalAuthChkBox" type="checkbox" name="externalAuthOnly"  <#if externalAuthOnly?? >checked</#if>  />Externally Authenticated Only</p>
+            <p><input id="externalAuthChkBox" type="checkbox" name="externalAuthOnly"  <#if externalAuthOnly?? >checked</#if>  />Externally Authenticated Only</p>
+        </#if>
+
         <#if roles?has_content>
             <p>Roles<span class="requiredHint"> *</span></p>
             <#list roles as role>

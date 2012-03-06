@@ -237,6 +237,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 
 		if (!isRootUser()) {
 			body.put("roles", buildListOfSelectableRoles());
+			body.put("externalAuthPermitted", Boolean.TRUE);
 		}
 
 		body.put("profileTypes", buildProfileTypesList());
