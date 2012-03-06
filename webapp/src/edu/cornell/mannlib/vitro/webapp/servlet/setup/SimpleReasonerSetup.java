@@ -60,12 +60,12 @@ public class SimpleReasonerSetup implements ServletContextListener {
             }
             
             // Set various Pellet options for incremental consistency checking, etc.
-            PelletOptions.DL_SAFE_RULES = true;
-            PelletOptions.USE_COMPLETION_QUEUE = true;
-            PelletOptions.USE_TRACING = true;
-            PelletOptions.TRACK_BRANCH_EFFECTS = true;
-            PelletOptions.USE_INCREMENTAL_CONSISTENCY = true;
-            PelletOptions.USE_INCREMENTAL_DELETION = true;
+            //PelletOptions.DL_SAFE_RULES = true;
+            //PelletOptions.USE_COMPLETION_QUEUE = true;
+            //PelletOptions.USE_TRACING = true;
+            //PelletOptions.TRACK_BRANCH_EFFECTS = true;
+            //PelletOptions.USE_INCREMENTAL_CONSISTENCY = true;
+            //PelletOptions.USE_INCREMENTAL_DELETION = true;
              
             PelletListener pelletListener = new PelletListener(unionOms.getTBoxModel(),assertionsOms.getTBoxModel(),inferencesOms.getTBoxModel(),ReasonerConfiguration.DEFAULT);
             sce.getServletContext().setAttribute("pelletListener",pelletListener);
