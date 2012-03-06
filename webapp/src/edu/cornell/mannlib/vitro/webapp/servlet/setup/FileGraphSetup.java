@@ -20,7 +20,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.ontology.OntDocumentManager;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.sdb.SDBFactory;
@@ -48,6 +50,8 @@ public class FileGraphSetup implements ServletContextListener {
 		OntModelSelector baseOms = null;
 		
 		try {
+			
+			OntDocumentManager.getInstance().setProcessImports(true);
 			baseOms = ModelContext.getBaseOntModelSelector(sce.getServletContext());
 			Store kbStore = (Store) sce.getServletContext().getAttribute("kbStore");
 						
@@ -78,6 +82,8 @@ public class FileGraphSetup implements ServletContextListener {
 			System.out.println("Throwable in listener " + this.getClass().getName());
 			log.error(t);
 			t.printStackTrace();
+		} finally {
+			OntDocumentManager.getInstance().setProcessImports(false);
 		}
 		
 		if (isUpdateRequired(sce.getServletContext()))  {
@@ -114,7 +120,7 @@ public class FileGraphSetup implements ServletContextListener {
 			try {
 				FileInputStream fis = new FileInputStream( file );
 				try {
-					Model model = ModelFactory.createDefaultModel(); 
+					OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
 					if ( p.endsWith(".n3") || p.endsWith(".N3") || p.endsWith(".ttl") || p.endsWith(".TTL") ) {
 						model.read( fis, null, "N3" );
 					} else if ( p.endsWith(".owl") || p.endsWith(".OWL") || p.endsWith(".rdf") || p.endsWith(".RDF") || p.endsWith(".xml") || p.endsWith(".XML") ) {
