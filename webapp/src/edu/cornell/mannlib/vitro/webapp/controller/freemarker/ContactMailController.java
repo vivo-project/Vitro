@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -25,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -38,7 +40,6 @@ public class ContactMailController extends FreemarkerHttpServlet {
     private static final long serialVersionUID = 1L;
 	
     private final static String SPAM_MESSAGE        = "Your message was flagged as spam.";
-    private final static String EMAIL_BACKUP_FILE_PATH = "/WEB-INF/LatestMessage.html";
     
     private final static String WEB_USERNAME_PARAM  = "webusername";
     private final static String WEB_USEREMAIL_PARAM = "webuseremail";
@@ -48,6 +49,10 @@ public class ContactMailController extends FreemarkerHttpServlet {
     private final static String TEMPLATE_EMAIL = "contactForm-email.ftl";
     private final static String TEMPLATE_BACKUP = "contactForm-backup.ftl";
     private final static String TEMPLATE_ERROR = "contactForm-error.ftl";
+    
+	private static final String PROPERTY_VITRO_HOME_DIR = "vitro.home.directory";
+	private static final String EMAIL_JOURNAL_FILE_DIR = "emailJournal";
+	private static final String EMAIL_JOURNAL_FILE_NAME = "contactFormEmails.html";
     
 	@Override
     protected String getTitle(String siteName, VitroRequest vreq) {
@@ -107,14 +112,14 @@ public class ContactMailController extends FreemarkerHttpServlet {
 	    		deliveryfrom, originalReferer, vreq.getRemoteAddr(), config, vreq);
 	    
 	    try {
-	    	// Write the email to a backup file
-	        FileWriter fw = new FileWriter(getServletContext().getRealPath(EMAIL_BACKUP_FILE_PATH),true);
+	    	// Write the message to the journal file
+	    	FileWriter fw = new FileWriter(locateTheJournalFile(vreq),true);
 	        PrintWriter outFile = new PrintWriter(fw); 
 	        writeBackupCopy(outFile, msgText, config, vreq);
   
-	        Session s = FreemarkerEmailFactory.getEmailSession(vreq);
-
 	        try {
+	        	// Send the message
+	        	Session s = FreemarkerEmailFactory.getEmailSession(vreq);
 	        	sendMessage(s, webuseremail, webusername, recipients, deliveryfrom, msgText);
 	        } catch (AddressException e) {
 	            statusMsg = "Please supply a valid email address.";
@@ -146,6 +151,40 @@ public class ContactMailController extends FreemarkerHttpServlet {
 			return new TemplateResponseValues(TEMPLATE_ERROR, body);
 	    }   
 	}
+
+	/**
+	 * The journal file belongs in a sub-directory of the Vitro home directory.
+	 * If the sub-directory doesn't exist, create it.
+	 */
+	private File locateTheJournalFile(VitroRequest vreq) {
+		String homeDirPath = ConfigurationProperties.getBean(vreq).getProperty(
+				PROPERTY_VITRO_HOME_DIR);
+		if (homeDirPath == null) {
+			throw new IllegalArgumentException(
+					"Configuration properties must contain a value for '"
+							+ PROPERTY_VITRO_HOME_DIR + "'");
+		}
+
+		File homeDir = new File(homeDirPath);
+		if (!homeDir.exists()) {
+			throw new IllegalStateException("Vitro home directory '"
+					+ homeDir.getAbsolutePath() + "' does not exist.");
+		}
+
+		File journalDir = new File(homeDir, EMAIL_JOURNAL_FILE_DIR);
+		if (!journalDir.exists()) {
+			boolean created = journalDir.mkdir();
+			if (!created) {
+				throw new IllegalStateException(
+						"Unable to create email journal directory at '"
+								+ journalDir + "'");
+			}
+		}
+
+		File journalFile = new File(journalDir, EMAIL_JOURNAL_FILE_NAME);
+		return journalFile;
+	}
+
 
 	private String getOriginalRefererFromSession(VitroRequest vreq) {
 		String originalReferer = (String) vreq.getSession().getAttribute("contactFormReferer");        		
