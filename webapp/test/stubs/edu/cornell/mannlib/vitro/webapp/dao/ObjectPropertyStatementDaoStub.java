@@ -56,16 +56,6 @@ public class ObjectPropertyStatementDaoStub implements
 		}
 
 		@Override
-		public boolean isSubjectOriented() {
-			return false;
-		}
-
-		@Override
-		public void setSubjectOriented(boolean subjectOriented) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
 		public String getSubjectURI() {
 			return s;
 		}

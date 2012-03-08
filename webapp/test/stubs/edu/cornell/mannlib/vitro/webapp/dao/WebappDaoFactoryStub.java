@@ -169,7 +169,7 @@ return this.objectPropertyStatementDao;	}
 	}
 
 	@Override
-	public String[] getPreferredLanguages() {
+	public List<String> getPreferredLanguages() {
 		throw new RuntimeException(
 				"WebappDaoFactory.getPreferredLanguages() not implemented.");
 	}

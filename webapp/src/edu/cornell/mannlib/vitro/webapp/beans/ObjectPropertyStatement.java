@@ -7,10 +7,6 @@ public interface ObjectPropertyStatement {
 
     public String toString();
 
-    public boolean isSubjectOriented();
-
-    public void setSubjectOriented(boolean subjectOriented);
-
     public String getSubjectURI();
 
     public void setSubjectURI(String subjectURI);

@@ -101,7 +101,7 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
     	return innerWebappDaoFactory.getNonuserNamespaces();
     }
     
-    public String[] getPreferredLanguages() {
+    public List<String> getPreferredLanguages() {
     	return innerWebappDaoFactory.getPreferredLanguages();
     }
     

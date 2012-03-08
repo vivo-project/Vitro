@@ -9,6 +9,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.ontology.AllValuesFromRestriction;
 import com.hp.hpl.jena.ontology.AnnotationProperty;
 import com.hp.hpl.jena.ontology.CardinalityRestriction;
@@ -59,6 +62,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 
 public class VClassDaoJena extends JenaBaseDao implements VClassDao {
 	
+    protected static final Log log = LogFactory.getLog(VClassDaoJena.class);
+    
     public VClassDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
     }
@@ -446,11 +451,12 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
         List<VClass> classes = new ArrayList<VClass>();
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            ClosableIterator<OntClass> classIt = getOntModel().listClasses();
+            ClosableIterator<Individual> classIt = getOntModel().listIndividuals(OWL.Class);
             try {
                 while (classIt.hasNext()) {
                     try {
-                        OntClass cls = classIt.next();
+                        Individual classInd = classIt.next();
+                        OntClass cls = (OntClass) classInd.as(OntClass.class);
                         if (!cls.isAnon() && !(NONUSER_NAMESPACES.contains(cls.getNameSpace()))) {
                             classes.add(new VClassJena(cls,getWebappDaoFactory()));
                         }
@@ -481,11 +487,15 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
 	 */
     private Iterator<OntClass> smarterListHierarchyRootClasses(OntModel ontModel, String ontologyURI) {
     	List<OntClass> rootClassList = new ArrayList<OntClass>();
-    	ClosableIterator ci = ontModel.listClasses();
+    	ClosableIterator<Individual> ci = ontModel.listIndividuals(OWL.Class);
     	try {
-	    	for (ClosableIterator i = ci ; i.hasNext(); ) {
+	    	for (ClosableIterator<Individual> i = ci ; i.hasNext(); ) {
 	    		try {
-		    		OntClass ontClass = (OntClass) i.next();
+	    		    Individual classInd = i.next();
+//	    		    if (!classInd.canAs(OntClass.class)) {
+//	    		        continue;
+//	    		    }
+		    		OntClass ontClass = (OntClass) classInd.as(OntClass.class);
 	    			boolean isRoot = true;
 	    			for (Iterator<RDFNode> j = ontClass.listPropertyValues(RDFS.subClassOf); j.hasNext(); ) {
 	    				Resource res = (Resource) j.next();
@@ -510,7 +520,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
 	    				rootClassList.add(ontClass);
 	    			}
 	    		} catch (ClassCastException cce) {
-					log.error(cce);
+					log.error(cce, cce);
 				}
 	    	}
     	} finally {

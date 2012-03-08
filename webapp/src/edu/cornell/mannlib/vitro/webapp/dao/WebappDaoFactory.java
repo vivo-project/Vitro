@@ -39,7 +39,7 @@ public interface WebappDaoFactory {
     
     public Set<String> getNonuserNamespaces();
     
-    public String[] getPreferredLanguages();
+    public List<String> getPreferredLanguages();
     
     /**
      * BJL23 2008-05-20: Putting this here for lack of a more logical place.  

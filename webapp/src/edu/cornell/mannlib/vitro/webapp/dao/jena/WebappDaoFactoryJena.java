@@ -233,7 +233,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         return config.getDefaultNamespace();
     }
     
-    public String[] getPreferredLanguages() {
+    public List<String> getPreferredLanguages() {
     	return config.getPreferredLanguages();
     }
     

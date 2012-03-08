@@ -109,7 +109,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             DatasetWrapperFactory datasetWrapperFactory, 
             SDBDatasetMode datasetMode,
             WebappDaoFactoryJena wadf,
-            boolean skipInitialization) {
+            boolean skipInitialization) throws IndividualNotFoundException {
     	this.individualURI = individualURI;
     	this.datasetMode = datasetMode;
     	this.dwf = datasetWrapperFactory;
@@ -176,7 +176,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     public IndividualSDB(String individualURI, 
             DatasetWrapperFactory datasetWrapperFactory,
             SDBDatasetMode datasetMode,
-            WebappDaoFactoryJena wadf) {
+            WebappDaoFactoryJena wadf) throws IndividualNotFoundException {
         this(individualURI, 
              datasetWrapperFactory, 
              datasetMode, 
@@ -184,7 +184,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
              !SKIP_INITIALIZATION);
     }
     
-    public class IndividualNotFoundException extends RuntimeException {}
+    public class IndividualNotFoundException extends Exception {}
     
     private void setUpURIParts(OntResource ind) {
         if (ind != null) {
@@ -464,8 +464,24 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     			if (!s.getSubject().canAs(OntResource.class) || !s.getObject().canAs(OntResource.class)) {
     			    continue;	
     			}
-    			Individual subj = new IndividualSDB(((OntResource) s.getSubject().as(OntResource.class)).getURI(), this.dwf, datasetMode, webappDaoFactory);
-    			Individual obj = new IndividualSDB(((OntResource) s.getObject().as(OntResource.class)).getURI(), this.dwf, datasetMode, webappDaoFactory);
+    			Individual subj = null;
+    			try {
+    			    subj = new IndividualSDB(
+    			            ((OntResource) s.getSubject().as(OntResource.class))
+    			                    .getURI(), 
+    			                            this.dwf, datasetMode, webappDaoFactory);
+    			} catch (IndividualNotFoundException e) {
+    			    // leave null subject
+    			}
+    			Individual obj = null;
+    			try {
+    			    obj = new IndividualSDB(
+    			            ((OntResource) s.getObject().as(OntResource.class))
+    			                    .getURI(), 
+    			                            this.dwf, datasetMode, webappDaoFactory);
+    			} catch (IndividualNotFoundException e) {
+    			    // leave null object
+    			}
     			ObjectProperty op = webappDaoFactory.getObjectPropertyDao().getObjectPropertyByURI(s.getPredicate().getURI());
     			// We don't want to filter out statements simply because we 
     			// can't find a type for the property, so we'll just make a 
@@ -517,15 +533,19 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	    while (values.hasNext()) {
     	    	result = values.next();
     	    	RDFNode value = result.get("object");
-    	    	if (value.canAs(OntResource.class)) {
-        	    	relatedIndividuals.add(
-        	    		new IndividualSDB(
-        	    		        ((OntResource) value.as(OntResource.class))
-        	    		                .getURI(), 
-        	    		                this.dwf, 
-        	    		                datasetMode, 
-        	    		                webappDaoFactory) );  
-        	    } 
+    	    	try {
+        	    	if (value.canAs(OntResource.class)) {
+            	    	relatedIndividuals.add(
+            	    		new IndividualSDB(
+            	    		        ((OntResource) value.as(OntResource.class))
+            	    		                .getURI(), 
+            	    		                this.dwf, 
+            	    		                datasetMode, 
+            	    		                webappDaoFactory) );  
+            	    } 
+    	    	} catch (IndividualNotFoundException e) {
+    	    	    // don't add to the list
+    	    	}
     	    }
     	} finally {
     		dataset.getLock().leaveCriticalSection();
@@ -555,9 +575,13 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             		QuerySolution result = results.next();
             		RDFNode value = result.get("object");
             	    if (value != null && value.canAs(OntResource.class)) {
-            	    	return new IndividualSDB(
-            	    	        ((OntResource) value.as(OntResource.class)).getURI(), 
-            	    	                dwf, datasetMode, webappDaoFactory);  
+            	        try {
+                	    	return new IndividualSDB(
+                	    	        ((OntResource) value.as(OntResource.class)).getURI(), 
+                	    	                dwf, datasetMode, webappDaoFactory);
+            	        } catch (IndividualNotFoundException e) {
+            	            return null;
+            	        }
             	    } 
         	    }
         		return null;
