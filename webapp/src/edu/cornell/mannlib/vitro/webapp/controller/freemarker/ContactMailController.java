@@ -49,6 +49,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
     private final static String TEMPLATE_EMAIL = "contactForm-email.ftl";
     private final static String TEMPLATE_BACKUP = "contactForm-backup.ftl";
     private final static String TEMPLATE_ERROR = "contactForm-error.ftl";
+    private final static String TEMPLATE_FORM = "contactForm-form.ftl";
     
 	private static final String PROPERTY_VITRO_HOME_DIR = "vitro.home.directory";
 	private static final String EMAIL_JOURNAL_FILE_DIR = "emailJournal";
@@ -75,9 +76,13 @@ public class ContactMailController extends FreemarkerHttpServlet {
 		String webuseremail = nonNullAndTrim(vreq, WEB_USEREMAIL_PARAM);
 		String comments = nonNullAndTrim(vreq, COMMENTS_PARAM);
 	    String formType = nonNullAndTrim(vreq, "DeliveryType");
+	    String captchaInput = nonNullAndTrim(vreq, "defaultReal");
+	    String captchaDisplay = nonNullAndTrim(vreq, "defaultRealHash");
 
-		if (validateInput(webusername, webuseremail, comments) != null) {
-			return errorParametersNotValid();
+	    String errorMsg = validateInput(webusername, webuseremail, comments, captchaInput, captchaDisplay);
+
+		if ( errorMsg != null) {
+			return errorParametersNotValid(errorMsg, webusername, webuseremail, comments);
 		}
 		
 		String spamReason = checkForSpam(comments, formType);
@@ -302,20 +307,28 @@ public class ContactMailController extends FreemarkerHttpServlet {
 	}
 
     private String validateInput(String webusername, String webuseremail,
-    							 String comments) {
+    							 String comments, String captchaInput, String captchaDisplay) {
     	
         if( webusername.isEmpty() ){
-            return "A proper webusername field was not found in the form submitted.";
+            return "Please enter a value in the Full name field.";
         } 
 
         if( webuseremail.isEmpty() ){
-            return "A proper webuser email field was not found in the form submitted.";
+            return "Please enter a valid email address.";
         } 
 
         if (comments.isEmpty()) { 
-            return "The proper comments field was not found in the form submitted.";
+            return "Please enter your comments or questions in the space provided.";
         } 
         
+        if (captchaInput.isEmpty()) { 
+            return "Please enter the contents of the gray box in the security field provided.";
+        } 
+        
+		if ( !captchaHash(captchaInput).equals(captchaDisplay) ) {
+			return "The value you entered in the security field did not match the letters displayed in the gray box.";
+		}
+
         return null;
     }
     
@@ -347,6 +360,15 @@ public class ContactMailController extends FreemarkerHttpServlet {
         
     }
     
+	private String captchaHash(String value) {
+		int hash = 5381;
+		value = value.toUpperCase();
+		for(int i = 0; i < value.length(); i++) {
+			hash = ((hash << 5) + hash) + value.charAt(i);
+		}
+		return String.valueOf(hash);
+	}
+
 	private ResponseValues errorNoSmtpServer() {
         Map<String, Object> body = new HashMap<String, Object>();
         body.put("errorMessage", 
@@ -363,11 +385,14 @@ public class ContactMailController extends FreemarkerHttpServlet {
 		return new TemplateResponseValues(TEMPLATE_ERROR, body);
 	}
 	
-	private ResponseValues errorParametersNotValid() {
-		// rjy7 We should reload the form, not go to the error page!
+	private ResponseValues errorParametersNotValid(String errorMsg, String webusername, String webuseremail, String comments) {
         Map<String, Object> body = new HashMap<String, Object>();
-		body.put("errorMessage", "Invalid submission");
-		return new TemplateResponseValues(TEMPLATE_ERROR, body);
+		body.put("errorMessage", errorMsg);
+		body.put("formAction", "submitFeedback");
+		body.put("webusername", webusername);
+		body.put("webuseremail", webuseremail);
+		body.put("comments", comments);
+		return new TemplateResponseValues(TEMPLATE_FORM, body);
 	}
 	
 	private ResponseValues errorSpam() {
