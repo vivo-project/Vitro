@@ -15,6 +15,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfigurationConstants;
 
 public class ProcessRdfFormTest extends AbstractTestClass{
      
@@ -241,6 +242,59 @@ public class ProcessRdfFormTest extends AbstractTestClass{
                 ResourceFactory.createResource(NEWURI_STRING + "0"), 
                 ResourceFactory.createProperty("http://test.com/uri2"),
                 ResourceFactory.createResource("http://test.com/uri3")));
+    }
+
+    @Test
+    //Edit existing statement
+    public void forcedNewResourceTest() throws Exception{       
+        /* A very basic new statement edit. */        
+        EditConfigurationVTwo config = new EditConfigurationVTwo();
+        config.setEditKey("mockEditKey");
+        config.setN3Required(Arrays.asList("?newRes ?test2 ?test3 ." ));
+        config.setUrisOnform(Arrays.asList( "newRes", "test2", "test3"));
+        //set uris in scope to include an existing value for new resource
+        config.addUrisInScope("newRes", Arrays.asList("<http://test.com/uri1>"));
+        config.addNewResource("newRes", null);
+        config.setEntityToReturnTo("?newRes");        
+        
+        Map<String,String[]> values = new HashMap<String, String[]>(); 
+        //value from form should indicate that newRes should have new uri created
+        values.put("newRes", (new String[] {EditConfigurationConstants.NEW_URI_SENTINEL}));
+        values.put("test2", (new String[] {"http://test.com/uri2"}));
+        values.put("test3", (new String[] {"http://test.com/uri3"}));
+        values.put("editKey", (new String[] {"mockEditKey"}));
+                
+        MultiValueEditSubmission submission = new MultiValueEditSubmission(values, config);
+        
+        ProcessRdfForm processor = new ProcessRdfForm(config,getMockNewURIMaker());
+        
+        /* test just the N3 substitution part */
+        List<String>req = config.getN3Required();
+        List<String>opt = config.getN3Optional();
+        processor.subInValuesToN3( config , submission, req, opt, null , null);
+        assertNotNull(req);
+        assertTrue( req.size() > 0);
+        assertNotNull(req.get(0));
+        assertEquals("<"+NEWURI_STRING + "0> <http://test.com/uri2> <http://test.com/uri3> .", req.get(0));
+        
+        assertEquals("<" + NEWURI_STRING + "0>", submission.getEntityToReturnTo());
+        
+        /* test the N3 and parse RDF parts */
+        AdditionsAndRetractions changes = processor.process( config, submission );
+        
+        assertNotNull( changes );
+        assertNotNull( changes.getAdditions() );
+        assertNotNull( changes.getRetractions());
+        assertTrue( changes.getAdditions().size() == 1 );
+        //the old uri should be removed
+        assertTrue( changes.getRetractions().size() == 0 );
+        
+        assertTrue( changes.getAdditions().contains(
+                ResourceFactory.createResource(NEWURI_STRING + "0"), 
+                ResourceFactory.createProperty("http://test.com/uri2"),
+                ResourceFactory.createResource("http://test.com/uri3")));
+        
+
     }
     
     

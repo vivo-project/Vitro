@@ -28,6 +28,7 @@ import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModelException;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfigurationConstants;
 
 public class FreemarkerConfiguration extends Configuration {
 
@@ -107,6 +108,9 @@ public class FreemarkerConfiguration extends Configuration {
         sharedVariables.putAll(getDirectives());
         sharedVariables.putAll(getMethods());
         sharedVariables.put("siteTagline", appBean.getShortHand()); 
+        
+        //Put in edit configuration constants - useful for freemarker templates/editing
+        sharedVariables.put("editConfigurationConstants", EditConfigurationConstants.exportConstants());
         
         for ( Map.Entry<String, Object> variable : sharedVariables.entrySet() ) {
             try {

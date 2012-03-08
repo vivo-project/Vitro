@@ -49,6 +49,8 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHas
 public class ProcessRdfFormController extends FreemarkerHttpServlet{
 	
     private Log log = LogFactory.getLog(ProcessRdfFormController.class);
+
+
     	
     @Override
 	protected Actions requiredActions(VitroRequest vreq) {

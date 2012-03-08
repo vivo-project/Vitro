@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -23,6 +24,7 @@ import com.hp.hpl.jena.shared.Lock;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfigurationConstants;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.controller.ProcessRdfFormController.Utilities;
 
 /**
@@ -41,8 +43,7 @@ public class ProcessRdfForm {
     private EditN3GeneratorVTwo populator;
     
     private Map<String,String> urisForNewResources = null; 
-    
-    /**
+   /**
      * Construct the ProcessRdfForm object. 
      */
     public ProcessRdfForm( EditConfigurationVTwo config, NewURIMaker newURIMaker){
@@ -171,7 +172,13 @@ public class ProcessRdfForm {
         
         //need to substitute into the return to URL becase it may need new resource URIs
         List<String> URLToReturnTo = Arrays.asList(submission.getEntityToReturnTo());
-                
+        
+        /* *********** Check if new resource needs to be forcibly created ******** */
+        urisForNewResources = URIsForNewRsources(editConfig, newURIMaker);
+        substituteInForcedNewURIs(urisForNewResources, submission.getUrisFromForm(), requiredAsserts, optionalAsserts, URLToReturnTo);
+        logSubstitue( "Added form URIs that required new URIs", requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts);
+
+        
         /* ********** Form submission URIs ********* */
         substituteInMultiURIs(submission.getUrisFromForm(), requiredAsserts, optionalAsserts, URLToReturnTo);
         logSubstitue( "Added form URIs", requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts);
@@ -182,10 +189,13 @@ public class ProcessRdfForm {
         logSubstitue( "Added form Literals", requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts);
         //Retractions does NOT get values from form.                               
         
+    
+        
         /* *********** Add subject, object and predicate ******** */
         substituteInSubPredObjURIs(editConfig, requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts, URLToReturnTo);
         logSubstitue( "Added sub, pred and obj URIs", requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts);
         
+     
         /* ********* Existing URIs and Literals ********** */
         substituteInMultiURIs(editConfig.getUrisInScope(), 
                 requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts, URLToReturnTo);
@@ -197,7 +207,8 @@ public class ProcessRdfForm {
         //Both Assertions and Retractions get existing values.
         
         /* ************  Edits may need new resources *********** */
-        urisForNewResources = URIsForNewRsources(editConfig, newURIMaker);
+        //moved this up?
+        //urisForNewResources = URIsForNewRsources(editConfig, newURIMaker);
         substituteInURIs( urisForNewResources, requiredAsserts, optionalAsserts, URLToReturnTo);
         logSubstitue( "Added URIs for new Resources", requiredAsserts, optionalAsserts, requiredRetracts, optionalRetracts);
         // Only Assertions get new resources.       
@@ -205,7 +216,9 @@ public class ProcessRdfForm {
         submission.setEntityToReturnTo(URLToReturnTo.get(0));
     }
 
-    //TODO: maybe move this to utils or contorller?
+
+
+	//TODO: maybe move this to utils or contorller?
     public static AdditionsAndRetractions addDependentDeletes( AdditionsAndRetractions changes, Model queryModel){
         //Add retractions for dependent resource delete if that is configured and 
         //if there are any dependent resources.                     
@@ -454,6 +467,36 @@ public class ProcessRdfForm {
            }
        }                
    }    
+   
+   /*
+    * In some situations, an object may have an existing URI but be left blank
+    * when the desired behavior is that a new object be created to replace the existing URI
+    * E.g. autocomplete forms that allow editing of autocomplete fields
+    */
+   @SuppressWarnings("unchecked")
+   private void substituteInForcedNewURIs(
+			Map<String, String> urisForNewResources, Map<String, List<String>> urisFromForm,
+			List<String> requiredAsserts, List<String> optionalAsserts,
+			List<String> uRLToReturnTo) {
+	   Map<String, List<String>> newUris = new HashMap<String, List<String>>();
+	   //Check if any values from the submission have the "force new uri" value
+	   //TODO: Check how to handle multiple new resource values
+	   Iterator<String> keyIterator = urisFromForm.keySet().iterator();
+	   while(keyIterator.hasNext()) {
+		   String key = keyIterator.next().toString();
+		   if(urisFromForm.get(key).contains(EditConfigurationConstants.NEW_URI_SENTINEL)) {
+			   String newUri = urisForNewResources.get(key);
+			   List<String> newUrisForKey = new ArrayList<String>();
+			   newUrisForKey.add(newUri);
+			   newUris.put(key, newUrisForKey);
+		   }
+	   }
+	   if(newUris.size() > 0) {
+		   substituteInMultiURIs(newUris, requiredAsserts, optionalAsserts, uRLToReturnTo);
+	   }
+	   
+	}
+   
       
    private static Log log = LogFactory.getLog(ProcessRdfForm.class);
 }
