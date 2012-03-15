@@ -15,6 +15,8 @@ public class EditConfigurationConstants {
     /** Constants used by edit configuration */
 	//forces creation of new uri if present
     public static final String NEW_URI_SENTINEL = ">NEW URI REQUIRED<";
+    public static final String BLANK_SENTINEL = ">SUBMITTED VALUE WAS BLANK<";
+
     //For freemarker configuration
     public static Map<String, String> exportConstants() {
     	Map<String, String> constants = new HashMap<String, String>();

@@ -9,9 +9,12 @@ import java.util.Map;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
@@ -295,6 +298,84 @@ public class ProcessRdfFormTest extends AbstractTestClass{
                 ResourceFactory.createResource("http://test.com/uri3")));
         
 
+    }
+    
+    /* An edit of an existing statement set where some statements need to be replaced while
+     * others must be retained. */
+    @Test
+    public void basicEditReplaceStatement() throws Exception{
+        String testXURI = "http://test.com/uriX";
+        String testYURI = "http://test.com/uriY";
+        String testZURIOrginal = "http://test.com/uriZ";
+        String testZURIChanged = "http://test.com/uriZChanged";
+        String zType = "http://test.com/TestType";
+        String rdfsLabel = "http://www.w3.org/2000/01/rdf-schema#label";
+        /* set up model */
+        Model model = ModelFactory.createDefaultModel();
+        //?x ?y ?zOriginal.
+        model.add(model.createResource(testXURI), 
+                  model.createProperty(testYURI), 
+                  model.createResource(testZURIOrginal));
+        //?zOriginal a TestType.
+
+        model.add(model.createResource(testZURIOrginal), 
+                RDF.type, 
+                model.createResource(zType));
+        //?zOriginal label "zLabel";
+
+        model.add(model.createResource(testZURIOrginal), 
+                RDFS.label, 
+                model.createLiteral("Z Original Label"));
+        
+        /* set up EditConfiguration */
+        EditConfigurationVTwo config = new EditConfigurationVTwo();
+        config.setEditKey("mockEditKey");        
+        config.setLiteralsOnForm(Arrays.asList("zLabel"));
+        config.setUrisOnform(Arrays.asList("testX", "testY", "testZ"));
+        config.setN3Required( Arrays.asList("?testX ?testY ?testZ ." ));
+        config.setN3Optional( Arrays.asList("?testZ a <" + zType + "> . \n" + 
+        		"?testZ <" + rdfsLabel + "> ?zLabel ." ));
+        //mimicking an existing value for the label
+        config.addLiteralInScope("zLabel", model.createLiteral("Z Original Label"));        
+        
+        config.setVarNameForSubject("testX");
+        config.setSubjectUri(testXURI);
+        
+        config.setPredicateUri(testYURI);
+        config.setVarNameForPredicate("testY");
+        
+        config.setObject(testZURIOrginal);
+        config.setVarNameForObject("testZ");                
+                
+        config.addField(new FieldVTwo().setName("zLabel"));
+        config.prepareForObjPropUpdate(model);    
+        /* set up Submission */        
+        Map<String,String[]> values = new HashMap<String, String[]>();                
+        values.put("testZ", (new String[] {testZURIChanged}));
+        values.put("zLabel", (new String[] {"New Z Label"}));
+        values.put("editKey", (new String[] {"mockEditKey"}));               
+        MultiValueEditSubmission submission = new MultiValueEditSubmission(values, config);
+        
+        ProcessRdfForm processor = new ProcessRdfForm(config,getMockNewURIMaker());        
+        AdditionsAndRetractions changes = processor.process( config, submission );
+             
+        assertNotNull( changes );
+        assertNotNull( changes.getAdditions() );
+        assertNotNull( changes.getRetractions());
+        
+       // assertTrue( changes.getAdditions().size() == 3 );
+        //only one statement should be retracted
+       // assertTrue( changes.getRetractions().size() == 1 );
+        
+        assertTrue( changes.getAdditions().contains(
+                ResourceFactory.createResource(testXURI), 
+                ResourceFactory.createProperty(testYURI),
+                ResourceFactory.createResource(testZURIChanged)));
+        
+        assertTrue( changes.getRetractions().contains(
+                ResourceFactory.createResource(testXURI), 
+                ResourceFactory.createProperty(testYURI),
+                ResourceFactory.createResource(testZURIOrginal)));        
     }
     
     
