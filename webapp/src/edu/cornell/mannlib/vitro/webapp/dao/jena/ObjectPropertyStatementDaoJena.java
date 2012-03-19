@@ -403,7 +403,18 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
     @Override
     /** 
      * Finds all mostSpecificTypes of an individual that are members of a classgroup.
-     * Returns a list of type labels.
+     * Returns a list of type labels. 
+     * 
+     * Note that the Map returned is a LinkedHashMap, which means that an iterator 
+     * will return the entries in the order in which the keys were inserted in the map.
+     * Since the SPARQL query included an "ORDER BY ?label" clause, and since an 
+     * iterator through that ResultSet was used to add entries to the map, an iterator
+     * on the map will return entries that are sorted by label (value, not key).
+     * 
+     * While this sorting order is not specified as a requirement (maybe it should be?),
+     * it is certainly useful that the types are returned in some order that is
+     * replicable, so an individual with multiple mostSpecificTypes, will always see
+     * the same list in the same order. (See https://issues.library.cornell.edu/browse/NIHVIVO-568)
      * **/
     public Map<String, String> getMostSpecificTypesInClassgroupsForIndividual(String subjectUri) {
         
