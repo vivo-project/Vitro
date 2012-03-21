@@ -145,12 +145,6 @@ return this.objectPropertyStatementDao;	}
 	// ----------------------------------------------------------------------
 
 	@Override
-	public Map<String, String> getProperties() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getProperties() not implemented.");
-	}
-
-	@Override
 	public String checkURI(String uriStr) {
 		throw new RuntimeException(
 				"WebappDaoFactory.checkURI() not implemented.");

@@ -76,10 +76,6 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
 
     /* ******************* filtering *********************** */
 
-	public Map<String,String> getProperties() {
-		return innerWebappDaoFactory.getProperties();
-	}
-
     public String checkURI(String uriStr) {
     	return innerWebappDaoFactory.checkURI(uriStr);
     }

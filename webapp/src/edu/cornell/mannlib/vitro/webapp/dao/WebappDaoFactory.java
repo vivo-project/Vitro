@@ -12,12 +12,6 @@ public interface WebappDaoFactory {
      * Free any resources associated with this WebappDaoFactory  
      */
     public void close();
-	
-	/**
-	 * Retrieves a map containing arbitrary key-value pairs describing this 
-	 * WebappDaoFactory
-	 */
-	public Map<String,String> getProperties();
 
 	/**
 	 * Checks a URI String for two things: well-formedness and uniqueness in the
