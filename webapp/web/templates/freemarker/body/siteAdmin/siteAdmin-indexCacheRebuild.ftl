@@ -6,11 +6,7 @@
     <section class="pageBodyGroup indexCacheRebuild" role="region">
         <h3>Refresh Content</h3>
         
-        <ul role="navigation">
-            <#if indexCacheRebuild.rebuildClassGroupCache?has_content>
-                <li role="listitem"><a href="${indexCacheRebuild.rebuildClassGroupCache}" title="Rebuild class group cache">Rebuild class group cache</a></li>
-            </#if>
-            
+        <ul role="navigation">                        
             <#if indexCacheRebuild.rebuildSearchIndex?has_content>
                 <li role="listitem"><a href="${indexCacheRebuild.rebuildSearchIndex }" title="Rebuild search index">Rebuild search index</a></li>
             </#if>
