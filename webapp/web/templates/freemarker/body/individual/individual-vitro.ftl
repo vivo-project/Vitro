@@ -9,8 +9,7 @@
                   propertyGroups=propertyGroups 
                   namespaces=namespaces 
                   editable=editable 
-                  showPlaceholder="with_add_link" 
-                  placeholder="${urls.images}/placeholders/thumbnail.jpg" />
+                  showPlaceholder="with_add_link" />
     </#assign>
     
     <#if ( individualImage?contains('<img class="individual-photo"') )>

@@ -19,6 +19,10 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfigurationConstants;
+import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualLocalNameMethod;
+import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualPlaceholderImageUrlMethod;
+import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualProfileUrlMethod;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
@@ -28,7 +32,6 @@ import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModelException;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfigurationConstants;
 
 public class FreemarkerConfiguration extends Configuration {
 
@@ -160,8 +163,9 @@ public class FreemarkerConfiguration extends Configuration {
     
     public static Map<String, Object> getMethods() {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("profileUrl", new edu.cornell.mannlib.vitro.webapp.web.methods.IndividualProfileUrlMethod());
-        map.put("localName", new edu.cornell.mannlib.vitro.webapp.web.methods.IndividualLocalNameMethod());
+        map.put("profileUrl", new IndividualProfileUrlMethod());
+        map.put("localName", new IndividualLocalNameMethod());
+        map.put("placeholderImageUrl", new IndividualPlaceholderImageUrlMethod());
         return map;
     }
     
