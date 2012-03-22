@@ -36,7 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
-import edu.cornell.mannlib.vitro.webapp.utils.ImageUtil;
+import edu.cornell.mannlib.vitro.webapp.web.images.PlaceholderUtil;
 
 /**
  * Handle adding, replacing or deleting the main image on an Individual.
@@ -405,8 +405,9 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 				ACTION_UPLOAD);
 		String cancelUrl = (entity == null) ? "" : exitPageUrl(vreq,
 				entity.getURI());
-		String placeholderUrl = (entity == null) ? "" : UrlBuilder.getUrl(ImageUtil
-				.getPlaceholderImagePathForIndividual(vreq, entity.getURI()));
+		String placeholderUrl = (entity == null) ? "" : UrlBuilder
+				.getUrl(PlaceholderUtil.getPlaceholderImagePathForIndividual(
+						vreq, entity.getURI()));
 
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_NEW);
 

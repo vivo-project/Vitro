@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.utils.ImageUtil;
+import edu.cornell.mannlib.vitro.webapp.web.images.PlaceholderUtil;
 import freemarker.core.Environment;
 import freemarker.template.TemplateModelException;
 
@@ -32,7 +32,7 @@ public class IndividualPlaceholderImageUrlMethod extends BaseTemplateMethodModel
         Environment env = Environment.getCurrentEnvironment();
         HttpServletRequest request = (HttpServletRequest) env.getCustomAttribute("request");
         VitroRequest vreq = new VitroRequest(request);
-        String imageUrl = ImageUtil.getPlaceholderImagePathForIndividual(vreq, uri);
+        String imageUrl = PlaceholderUtil.getPlaceholderImagePathForIndividual(vreq, uri);
         return UrlBuilder.getUrl(imageUrl);
     }
 
