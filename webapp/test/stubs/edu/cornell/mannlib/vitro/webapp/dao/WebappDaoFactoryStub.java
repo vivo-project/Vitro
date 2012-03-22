@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
-import edu.cornell.mannlib.vitro.webapp.dao.Classes2ClassesDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
@@ -184,12 +183,6 @@ return this.objectPropertyStatementDao;	}
 	public String getUserURI() {
 		throw new RuntimeException(
 				"WebappDaoFactory.getUserURI() not implemented.");
-	}
-
-	@Override
-	public Classes2ClassesDao getClasses2ClassesDao() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getClasses2ClassesDao() not implemented.");
 	}
 
 	@Override

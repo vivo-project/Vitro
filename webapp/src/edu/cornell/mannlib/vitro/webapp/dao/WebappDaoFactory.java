@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.dao;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public interface WebappDaoFactory {
@@ -59,11 +58,6 @@ public interface WebappDaoFactory {
     public String getUserURI();
 
     /* =============== DAOs for ontology (TBox) manipulation =============== */
-
-    /**
-     * returns a Data Access Object for working with class subsumption axioms 
-     */
-    public Classes2ClassesDao getClasses2ClassesDao();
 
     /**
      * returns a Data Access Object for working with DataProperties

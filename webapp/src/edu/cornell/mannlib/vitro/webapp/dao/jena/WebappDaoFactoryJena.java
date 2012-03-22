@@ -30,7 +30,6 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
-import edu.cornell.mannlib.vitro.webapp.dao.Classes2ClassesDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
@@ -310,13 +309,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     		return userAccountsDao;
     	else
     		return userAccountsDao = new UserAccountsDaoJena(this);
-    }
-    
-    Classes2ClassesDao classes2ClassesDao = null;
-    public Classes2ClassesDao getClasses2ClassesDao() {
-        if(classes2ClassesDao == null )
-            classes2ClassesDao = new Classes2ClassesDaoJena(this);
-        return classes2ClassesDao;
     }
 
     DataPropertyStatementDao dataPropertyStatementDao = null;

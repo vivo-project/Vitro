@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
-import edu.cornell.mannlib.vitro.webapp.dao.Classes2ClassesDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
@@ -163,10 +162,6 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
 
 
     /* ******************* non-filtering DAOs *************************** */
-
-    public Classes2ClassesDao getClasses2ClassesDao() {
-        return innerWebappDaoFactory.getClasses2ClassesDao();
-    }
 
     public DatatypeDao getDatatypeDao() {
         return innerWebappDaoFactory.getDatatypeDao();

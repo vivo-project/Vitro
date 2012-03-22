@@ -11,6 +11,7 @@ import java.util.List;
 import net.sf.jga.algorithms.Filter;
 import net.sf.jga.fn.UnaryFunctor;
 import net.sf.jga.fn.property.GetProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.Classes2Classes;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
@@ -238,6 +239,14 @@ public class VClassDaoFiltering extends BaseFiltering implements VClassDao{
     
     public VClass getBottomConcept() {
     	return innerVClassDao.getBottomConcept();
+    }
+    
+    public void insertNewClasses2Classes(Classes2Classes c2c) {
+        innerVClassDao.insertNewClasses2Classes(c2c);
+    }
+    
+    public void deleteClasses2Classes(Classes2Classes c2c) {
+        innerVClassDao.deleteClasses2Classes(c2c);
     }
     
     public boolean isSubClassOf(VClass vc1, VClass vc2) {
