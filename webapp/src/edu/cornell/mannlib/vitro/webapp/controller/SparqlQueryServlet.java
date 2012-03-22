@@ -101,7 +101,7 @@ public class SparqlQueryServlet extends BaseEditController {
     throws ServletException, IOException
     {    	    	   	
 		if (!isAuthorizedToDisplayPage(request, response,
-				SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTIONS)) {
+				SimplePermission.USE_SPARQL_QUERY_PAGE.ACTIONS)) {
     		return;
     	}
 
