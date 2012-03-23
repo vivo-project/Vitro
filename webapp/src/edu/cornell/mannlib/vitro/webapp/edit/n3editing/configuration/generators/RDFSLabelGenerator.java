@@ -45,7 +45,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
  */
 public class RDFSLabelGenerator implements EditConfigurationGenerator {
 	
-	private Log log = LogFactory.getLog(DefaultObjectPropertyFormGenerator.class);
+	private Log log = LogFactory.getLog(RDFSLabelGenerator.class);
 	
 	private String subjectUri = null;
 	private String predicateUri = null;	
