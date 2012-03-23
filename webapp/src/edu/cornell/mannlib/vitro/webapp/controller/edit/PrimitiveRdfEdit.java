@@ -32,7 +32,7 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
 
     private static final long serialVersionUID = 1L;
 
-    //Using the same setsup as primitive delete
+    //Using the same setup as primitive delete
     @Override
     protected Actions requiredActions(VitroRequest vreq) {
     	return SimplePermission.USE_BASIC_AJAX_CONTROLLERS.ACTIONS;
