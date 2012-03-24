@@ -135,8 +135,6 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 
 		subject = new IndividualImpl();
 
-		BaseTemplateModel.setServletContext(ctx);
-
 		Configuration fmConfig = new Configuration();
 		vreq.setAttribute("freemarkerConfig", fmConfig);
 		tl = new TemplateLoaderStub();

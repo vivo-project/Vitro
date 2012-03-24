@@ -18,7 +18,6 @@ public class FreemarkerSetup implements ServletContextListener {
 	@Override
 	public void contextInitialized(ServletContextEvent event) {	
 		ServletContext sc = event.getServletContext();	
-        BaseTemplateModel.setServletContext(sc);
         FreemarkerComponentGenerator.setServletContext(sc);
 		UrlBuilder.contextPath = sc.getContextPath();
 		

@@ -20,8 +20,6 @@ public abstract class BaseTemplateModel {
 	private static final String URI_CHARACTERS = 
 			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&%'()*+,;=";
     
-    protected static ServletContext servletContext;
-    
     // Convenience method so subclasses can call getUrl(path)
     protected String getUrl(String path) {
         return UrlBuilder.getUrl(path);
@@ -71,14 +69,6 @@ public abstract class BaseTemplateModel {
      */
     protected <T> void cleanMapValuesForDisplay( Map<T,String> map){
         AntiScript.cleanMapValues(map);
-    }
-    
-    protected static ServletContext getServletContext() {
-        return servletContext;
-    }
-
-    public static void setServletContext(ServletContext context) {
-        servletContext = context;
     }
     
 }
