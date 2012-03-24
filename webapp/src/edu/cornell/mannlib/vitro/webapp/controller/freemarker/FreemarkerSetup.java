@@ -9,8 +9,6 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
-
 public class FreemarkerSetup implements ServletContextListener {
     
     private static final Log log = LogFactory.getLog(FreemarkerSetup.class);

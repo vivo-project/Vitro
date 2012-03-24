@@ -131,7 +131,7 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
      * are handled like ordinary ObjectProperty instances.
      */
     public NameStatementTemplateModel getNameStatement() {
-        return new NameStatementTemplateModel(getUri(), vreq, editing);
+        return new NameStatementTemplateModel(getUri(), vreq);
     }
     
     /* These methods simply forward to the methods of the wrapped individual. It would be desirable to 

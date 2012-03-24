@@ -20,97 +20,61 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
 
 public class DataPropertyStatementTemplateModel extends PropertyStatementTemplateModel {
-    
     private static final Log log = LogFactory.getLog(DataPropertyStatementTemplateModel.class); 
-    private static final String EDIT_PATH = "editRequestDispatch";  
     
-    protected String value;
+    private final Literal literalValue;
+    private final String deleteUrl;
+    private final String editUrl;
    
     //Extended to include vitro request to check for special parameters
     public DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, 
-            Literal literal, boolean editing, VitroRequest vreq) {
+            Literal literal, VitroRequest vreq) {
         super(subjectUri, propertyUri, vreq);
         
-        //attempt to strip any odd HTML
-        this.value = cleanTextForDisplay( literal.getLexicalForm() );
+        this.literalValue = literal;
 
-        setEditUrls(literal, editing, propertyUri);      
-    }
-    
-    /*
-     * This method handles the special case where we are creating a DataPropertyStatementTemplateModel outside the GroupedPropertyList.
-     * Specifically, it allows rdfs:label to be treated like a data property statement and thus have editing links. It is not possible
-     * to handle rdfs:label like vitro links and vitroPublic image, because it is not possible to construct a DataProperty from
-     * rdfs:label.
-     */
-    DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, VitroRequest vreq) {
-        super(subjectUri, propertyUri, vreq);
-    }
-    
-    public void setValue(String value) {
-        this.value = value;
-    }
-    
-    protected void setEditUrls(Literal value, boolean editing, String propertyUri) {
-
-        if ( ! editing ) {
-            return;
-        }     
-            
-        DataPropertyStatement dps = new DataPropertyStatementImpl(subjectUri, propertyUri, value.getLexicalForm());
-        // Language and datatype are needed to get the correct hash value
-        dps.setLanguage(value.getLanguage());
-        dps.setDatatypeURI(value.getDatatypeURI());
-        String dataPropHash = String.valueOf(RdfLiteralHash.makeRdfLiteralHash(dps));
-            
         // Do delete url first, since used in building edit url
-        setDeleteUrl(propertyUri, dps, dataPropHash);            
-        setEditUrl(propertyUri, dps, dataPropHash);       
+        this.deleteUrl = makeDeleteUrl();            
+        this.editUrl = makeEditUrl();       
     }
     
-    
-    protected void setDeleteUrl(String propertyUri, DataPropertyStatement dps, String dataPropHash) {
-
-        // Hack for rdfs:label - the policy doesn't prevent deletion.
-        if (propertyUri.equals(VitroVocabulary.LABEL)) {
-            return;
-        }      
-
+	private String makeDeleteUrl() {
         // Determine whether the statement can be deleted
+		DataPropertyStatement dps = makeStatement();
         RequestedAction action = new DropDataPropStmt(dps);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
-            return;
+            return "";
         }
         
         ParamMap params = new ParamMap(
                 "subjectUri", subjectUri,
                 "predicateUri", propertyUri,
-                "datapropKey", dataPropHash,
+                "datapropKey", makeHash(dps),
                 "cmd", "delete");
         
         params.putAll(UrlBuilder.getModelParams(vreq));
         
-        deleteUrl = UrlBuilder.getUrl(EDIT_PATH, params);
-    } 
+        return UrlBuilder.getUrl(EDIT_PATH, params);
+	}
 
-    protected void setEditUrl(String propertyUri, DataPropertyStatement dps, String dataPropHash) {
-
+	private String makeEditUrl() {
         // vitro:moniker is deprecated. We display existing data values so editors can 
         // move them to other properties and delete, but don't allow editing.
         if ( propertyUri.equals(VitroVocabulary.MONIKER) ) {
-            return;           
+            return "";           
         }
         
         // Determine whether the statement can be edited
+		DataPropertyStatement dps = makeStatement();
         RequestedAction action = new EditDataPropStmt(dps);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
-            return;
+            return "";
         }
         
         ParamMap params = new ParamMap(
                 "subjectUri", subjectUri,
                 "predicateUri", propertyUri,
-                "datapropKey", dataPropHash);
+                "datapropKey", makeHash(dps));
         
         if ( deleteUrl.isEmpty() ) {
             params.put("deleteProhibited", "prohibited");
@@ -118,14 +82,36 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
         
         params.putAll(UrlBuilder.getModelParams(vreq));
         
-        editUrl = UrlBuilder.getUrl(EDIT_PATH, params);             
-    }
+        return UrlBuilder.getUrl(EDIT_PATH, params);             
+	}
         
-        
+	private DataPropertyStatement makeStatement() {
+		DataPropertyStatement dps = new DataPropertyStatementImpl(subjectUri, propertyUri, literalValue.getLexicalForm());
+		// Language and datatype are needed to get the correct hash value
+		dps.setLanguage(literalValue.getLanguage());
+		dps.setDatatypeURI(literalValue.getDatatypeURI());
+		return dps;
+	}
+
+	private String makeHash(DataPropertyStatement dps) {
+        // Language and datatype are needed to get the correct hash value
+        return String.valueOf(RdfLiteralHash.makeRdfLiteralHash(dps));
+	}
+
     /* Template properties */
     
     public String getValue() {
-        return value;
+        //attempt to strip any odd HTML
+        return cleanTextForDisplay( literalValue.getLexicalForm() );
     }
 
+    @Override
+	public String getDeleteUrl() {
+		return deleteUrl;
+	}
+    
+    @Override
+	public String getEditUrl() {
+		return editUrl;
+	}
 }

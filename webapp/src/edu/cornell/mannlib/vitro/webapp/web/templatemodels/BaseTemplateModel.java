@@ -4,8 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels;
 
 import java.util.Map;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

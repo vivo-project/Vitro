@@ -47,7 +47,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
             DataPropertyStatementDao dpDao = vreq.getWebappDaoFactory().getDataPropertyStatementDao();
             List<Literal> values = dpDao.getDataPropertyValuesForIndividualByProperty(subject, dp);            
             for (Literal value : values) {
-                statements.add(new DataPropertyStatementTemplateModel(subjectUri, propertyUri, value, editing, vreq));
+                statements.add(new DataPropertyStatementTemplateModel(subjectUri, propertyUri, value, vreq));
             }
         } else {
             log.debug("Data property " + getUri() + " is unpopulated.");
