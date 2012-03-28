@@ -49,6 +49,11 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     }
 
 	private String makeDeleteUrl() {
+    	// Is the delete link suppressed for this property?
+    	if (new EditLinkSuppressor(vreq).isDeleteLinkSuppressed(propertyUri)) {
+    		return "";
+    	}
+        
         // Determine whether the statement can be deleted
         RequestedAction action = new DropObjectPropStmt(subjectUri, propertyUri, objectUri);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
@@ -85,7 +90,12 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
 	}
 
 	private String makeEditUrl(ObjectPropertyStatement ops) {
-        // Determine whether the statement can be edited
+    	// Is the edit link suppressed for this property?
+    	if (new EditLinkSuppressor(vreq).isEditLinkSuppressed(propertyUri)) {
+    		return "";
+    	}
+        
+       // Determine whether the statement can be edited
         RequestedAction action =  new EditObjPropStmt(ops);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return "";

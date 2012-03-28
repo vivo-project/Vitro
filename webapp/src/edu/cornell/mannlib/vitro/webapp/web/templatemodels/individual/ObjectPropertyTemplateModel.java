@@ -102,6 +102,10 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     }
 
     protected void setAddUrl(Property property) {
+    	// Is the add link suppressed for this property?
+    	if (new EditLinkSuppressor(vreq).isAddLinkSuppressed(propertyUri)) {
+    		return;
+    	}
         
         // Determine whether a new statement can be added
         RequestedAction action = new AddObjectPropStmt(subjectUri, propertyUri, RequestActionConstants.SOME_URI);
