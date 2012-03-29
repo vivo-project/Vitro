@@ -19,6 +19,6 @@ public class DisplayObjectProperty extends RequestedAction {
 
 	@Override
 	public String toString() {
-		return "DisplayObjectProperty[" + objectProperty + "]";
+		return "DisplayObjectProperty[" + objectProperty.getLocalName() + "]";
 	}
 }
