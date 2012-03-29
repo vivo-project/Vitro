@@ -46,8 +46,7 @@ public class PropertyRestrictionPolicyHelper {
 			.getLog(PropertyRestrictionPolicyHelper.class);
 
 	private static final Collection<String> PROHIBITED_NAMESPACES = Arrays
-			.asList(new String[] { VitroVocabulary.vitroURI,
-					VitroVocabulary.OWL, "" });
+			.asList(new String[] { VitroVocabulary.vitroURI, "" });
 
 	private static final Collection<String> PERMITTED_EXCEPTIONS = Arrays
 			.asList(new String[] {
