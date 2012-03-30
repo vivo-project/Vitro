@@ -9,32 +9,32 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
  * property.
  */
 public abstract class AbstractObjectPropertyStatementAction extends RequestedAction {
-	private final String uriOfSubject;
-	private final String uriOfPredicate;
-	private final String uriOfObject;
+	private final String subjectUri;
+	private final String predicateUri;
+	private final String objectUri;
 
-	public AbstractObjectPropertyStatementAction(String uriOfSubject, String uriOfPredicate,
-			String uriOfObject) {
-		this.uriOfSubject = uriOfSubject;
-		this.uriOfPredicate = uriOfPredicate;
-		this.uriOfObject = uriOfObject;
+	public AbstractObjectPropertyStatementAction(String subjectUri, String predicateUri,
+			String objectUri) {
+		this.subjectUri = subjectUri;
+		this.predicateUri = predicateUri;
+		this.objectUri = objectUri;
 	}
 
-	public String getUriOfSubject() {
-		return uriOfSubject;
+	public String getSubjectUri() {
+		return subjectUri;
 	}
 
-	public String getUriOfPredicate() {
-		return uriOfPredicate;
+	public String getPredicateUri() {
+		return predicateUri;
 	}
 
-	public String getUriOfObject() {
-		return uriOfObject;
+	public String getObjectUri() {
+		return objectUri;
 	}
 
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName() + ": <" + uriOfSubject + "> <"
-				+ uriOfPredicate + "> <" + uriOfObject + ">";
+		return this.getClass().getSimpleName() + ": <" + subjectUri + "> <"
+				+ predicateUri + "> <" + objectUri + ">";
 	}
 }

@@ -68,9 +68,9 @@ public class SelfEditingPolicy extends BaseSelfEditingPolicy implements
 	 */
 	private PolicyDecision isAuthorizedForObjectPropertyAction(
 			List<String> userUris, AbstractObjectPropertyStatementAction action) {
-		String subject = action.getUriOfSubject();
-		String predicate = action.getUriOfPredicate();
-		String object = action.getUriOfObject();
+		String subject = action.getSubjectUri();
+		String predicate = action.getPredicateUri();
+		String object = action.getObjectUri();
 
 		if (!canModifyResource(subject)) {
 			return cantModifyResource(subject);

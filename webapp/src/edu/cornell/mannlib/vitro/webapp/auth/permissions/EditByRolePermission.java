@@ -88,9 +88,9 @@ public class EditByRolePermission extends Permission {
 	 * to modify its subject, its predicate, and its object.
 	 */
 	private boolean isAuthorized(AbstractObjectPropertyStatementAction action) {
-		String subjectUri = action.getUriOfSubject();
-		String predicateUri = action.getUriOfPredicate();
-		String objectUri = action.getUriOfObject();
+		String subjectUri = action.getSubjectUri();
+		String predicateUri = action.getPredicateUri();
+		String objectUri = action.getObjectUri();
 		return canModifyResource(subjectUri)
 				&& canModifyPredicate(predicateUri)
 				&& canModifyResource(objectUri);

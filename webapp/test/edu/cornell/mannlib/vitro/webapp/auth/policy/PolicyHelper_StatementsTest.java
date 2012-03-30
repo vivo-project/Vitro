@@ -257,10 +257,10 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 
 		private PolicyDecision isAuthorized(
 				AbstractObjectPropertyStatementAction whatToAuth) {
-			if ((APPROVED_SUBJECT_URI.equals(whatToAuth.getUriOfSubject()))
+			if ((APPROVED_SUBJECT_URI.equals(whatToAuth.getSubjectUri()))
 					&& (APPROVED_PREDICATE_URI
-							.equals(whatToAuth.getUriOfPredicate()))
-					&& (APPROVED_OBJECT_URI.equals(whatToAuth.getUriOfObject()))) {
+							.equals(whatToAuth.getPredicateUri()))
+					&& (APPROVED_OBJECT_URI.equals(whatToAuth.getObjectUri()))) {
 				return authorized();
 			} else {
 				return inconclusive();
