@@ -9,9 +9,9 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
  * property.
  */
 public abstract class AbstractObjectPropertyStatementAction extends RequestedAction {
-	public final String uriOfSubject;
-	public final String uriOfPredicate;
-	public final String uriOfObject;
+	private final String uriOfSubject;
+	private final String uriOfPredicate;
+	private final String uriOfObject;
 
 	public AbstractObjectPropertyStatementAction(String uriOfSubject, String uriOfPredicate,
 			String uriOfObject) {
