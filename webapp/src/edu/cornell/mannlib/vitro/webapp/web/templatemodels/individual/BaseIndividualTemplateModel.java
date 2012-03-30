@@ -113,8 +113,7 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
 	 */
     public boolean isEditable() {
 		AddDataPropertyStatement adps = new AddDataPropertyStatement(individual.getURI(),
-				RequestActionConstants.SOME_URI,
-				RequestActionConstants.SOME_LITERAL, null, null);
+				RequestActionConstants.SOME_URI);
 		AddObjectPropertyStatement aops = new AddObjectPropertyStatement(individual.getURI(),
 				RequestActionConstants.SOME_URI,
 				RequestActionConstants.SOME_URI);

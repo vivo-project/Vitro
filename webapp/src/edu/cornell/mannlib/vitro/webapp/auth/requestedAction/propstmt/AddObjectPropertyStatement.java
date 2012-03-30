@@ -2,10 +2,19 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 
-/** Should we allow the user to add this ObjectPropertyStatement? */
-public class AddObjectPropertyStatement extends AbstractObjectPropertyStatementAction {
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 
-	public AddObjectPropertyStatement(String uriOfSub, String uriOfPred, String uriOfObj) {
+/**
+ * Should we allow the user to add this ObjectPropertyStatement to this model?
+ */
+public class AddObjectPropertyStatement extends
+		AbstractObjectPropertyStatementAction {
+	public AddObjectPropertyStatement(String uriOfSub, String uriOfPred,
+			String uriOfObj) {
 		super(uriOfSub, uriOfPred, uriOfObj);
+	}
+
+	public AddObjectPropertyStatement(ObjectPropertyStatement ops) {
+		super(ops);
 	}
 }

@@ -105,7 +105,7 @@ public class PolicyHelper {
 					predicate.getURI(), objectNode.asResource().getURI());
 		} else {
 			action = new AddDataPropertyStatement(subject.getURI(),
-					predicate.getURI(), objectNode.asLiteral());
+					predicate.getURI());
 		}
 		return isAuthorizedForActions(req, action);
 	}
@@ -157,7 +157,7 @@ public class PolicyHelper {
 					predicate.getURI(), objectNode.asResource().getURI());
 		} else {
 			action = new DropDataPropertyStatement(subject.getURI(),
-					predicate.getURI(), objectNode.asLiteral());
+					predicate.getURI());
 		}
 		return isAuthorizedForActions(req, action);
 	}

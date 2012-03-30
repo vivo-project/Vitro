@@ -3,17 +3,27 @@
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 
 /**
- * A base class for requestion actions that relate to data properties.
+ * A base class for requested actions that involve adding, editing, or dropping
+ * data property statements from a model.
  */
-public abstract class AbstractDataPropertyStatementAction extends RequestedAction {
+public abstract class AbstractDataPropertyStatementAction extends
+		RequestedAction {
 	private final String subjectUri;
 	private final String predicateUri;
 
-	public AbstractDataPropertyStatementAction(String subjectUri, String predicateUri) {
+	public AbstractDataPropertyStatementAction(String subjectUri,
+			String predicateUri) {
 		this.subjectUri = subjectUri;
 		this.predicateUri = predicateUri;
+	}
+
+	public AbstractDataPropertyStatementAction(DataPropertyStatement dps) {
+		this.subjectUri = (dps.getIndividual() == null) ? dps
+				.getIndividualURI() : dps.getIndividual().getURI();
+		this.predicateUri = dps.getDatapropURI();
 	}
 
 	public String getSubjectUri() {

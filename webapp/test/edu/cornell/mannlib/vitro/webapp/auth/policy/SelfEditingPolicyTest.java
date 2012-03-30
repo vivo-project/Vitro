@@ -118,21 +118,19 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 
 		// now with dataprop statements
 		whatToAuth = new AddDataPropertyStatement(SELFEDITOR_URI,
-				"http://mannlib.cornell.edu/bad#prp234", "someString", null,
-				null);
+				"http://mannlib.cornell.edu/bad#prp234");
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 
 		whatToAuth = new AddDataPropertyStatement(SELFEDITOR_URI,
-				"http://mannlib.cornell.edu/bad#prp999", "someString", null,
-				null);
+				"http://mannlib.cornell.edu/bad#prp999");
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 
 		whatToAuth = new AddDataPropertyStatement(SELFEDITOR_URI,
-				SAFE_PREDICATE, "someString", null, null);
+				SAFE_PREDICATE);
 		assertDecision(AUTHORIZED, policy.isAuthorized(ids, whatToAuth));
 
 		whatToAuth = new AddDataPropertyStatement(SELFEDITOR_URI,
-				UNSAFE_PREDICATE, "someString", null, null);
+				UNSAFE_PREDICATE);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 	}
 

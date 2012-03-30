@@ -2,37 +2,20 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 
-import com.hp.hpl.jena.rdf.model.Literal;
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 
-/** Should we allow the user to add this DataPropertyStatement? */
-public class AddDataPropertyStatement extends AbstractDataPropertyStatementAction {
-    protected String data;
-    protected String dataType;
-    protected String lang;
-    
-    public AddDataPropertyStatement(String subjectUri, String predicateUri, String value, String dataType, String lang) {
-        super(subjectUri, predicateUri);
-        this.data= value;
-        this.dataType = dataType;
-        this.lang = lang;
-    }
+/**
+ * Should we allow the user to add this DataPropertyStatement to this model?
+ */
+public class AddDataPropertyStatement extends
+		AbstractDataPropertyStatementAction {
 
-    public AddDataPropertyStatement(String subjectUri, String predicateUri, Literal literal) {
-    	super(subjectUri, predicateUri);
-    	this.data= literal.getValue().toString();
-    	this.dataType = literal.getDatatypeURI();
-    	this.lang = literal.getLanguage();
-    }
-    
-    public String getData() {
-        return data;
-    }
+	public AddDataPropertyStatement(String subjectUri, String predicateUri) {
+		super(subjectUri, predicateUri);
+	}
 
-    public String getDataType() {
-        return dataType;
-    }
+	public AddDataPropertyStatement(DataPropertyStatement dps) {
+		super(dps);
+	}
 
-    public String getLang() {
-        return lang;
-    }
 }

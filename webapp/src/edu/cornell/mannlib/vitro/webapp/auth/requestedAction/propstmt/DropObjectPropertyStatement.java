@@ -2,10 +2,18 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 
-/** Should we allow the user to delete this ObjectPropertyStatement? */
-public class DropObjectPropertyStatement extends AbstractObjectPropertyStatementAction {
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 
+/**
+ * Should we allow the user to delete this ObjectPropertyStatement from this
+ * model?
+ */
+public class DropObjectPropertyStatement extends AbstractObjectPropertyStatementAction {
 	public DropObjectPropertyStatement(String sub, String pred, String obj) {
 		super(sub, pred, obj);
+	}
+	
+	public DropObjectPropertyStatement(ObjectPropertyStatement ops) {
+		super(ops);
 	}
 }
