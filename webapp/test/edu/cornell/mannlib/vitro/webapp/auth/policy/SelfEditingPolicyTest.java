@@ -31,11 +31,11 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.CreateOwlC
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.DefineDataProperty;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.DefineObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ontology.RemoveOwlClass;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditDataPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditDataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
@@ -88,75 +88,75 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 						"http://mannlib.cornell.edu/bad#prp0020" });
 		PropertyRestrictionPolicyHelper.setBean(ctx, prph);
 
-		whatToAuth = new AddObjectPropStmt(SELFEDITOR_URI,
+		whatToAuth = new AddObjectPropertyStatement(SELFEDITOR_URI,
 				"http://mannlib.cornell.edu/bad#prp234", SAFE_RESOURCE);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 
-		whatToAuth = new AddObjectPropStmt(SAFE_RESOURCE,
+		whatToAuth = new AddObjectPropertyStatement(SAFE_RESOURCE,
 				"http://mannlib.cornell.edu/bad#prp234", SELFEDITOR_URI);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 
-		whatToAuth = new AddObjectPropStmt(SELFEDITOR_URI,
+		whatToAuth = new AddObjectPropertyStatement(SELFEDITOR_URI,
 				"http://mannlib.cornell.edu/bad#prp999", SAFE_RESOURCE);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 
-		whatToAuth = new AddObjectPropStmt(SAFE_RESOURCE,
+		whatToAuth = new AddObjectPropertyStatement(SAFE_RESOURCE,
 				"http://mannlib.cornell.edu/bad#prp999", SELFEDITOR_URI);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 
-		whatToAuth = new AddObjectPropStmt(SAFE_RESOURCE, SAFE_PREDICATE,
-				SELFEDITOR_URI);
+		whatToAuth = new AddObjectPropertyStatement(SAFE_RESOURCE,
+				SAFE_PREDICATE, SELFEDITOR_URI);
 		assertDecision(AUTHORIZED, policy.isAuthorized(ids, whatToAuth));
 
-		whatToAuth = new AddObjectPropStmt(SELFEDITOR_URI, SAFE_PREDICATE,
-				SAFE_RESOURCE);
+		whatToAuth = new AddObjectPropertyStatement(SELFEDITOR_URI,
+				SAFE_PREDICATE, SAFE_RESOURCE);
 		assertDecision(AUTHORIZED, policy.isAuthorized(ids, whatToAuth));
 
-		whatToAuth = new AddObjectPropStmt(SELFEDITOR_URI, UNSAFE_PREDICATE,
-				SAFE_RESOURCE);
+		whatToAuth = new AddObjectPropertyStatement(SELFEDITOR_URI,
+				UNSAFE_PREDICATE, SAFE_RESOURCE);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 
 		// now with dataprop statements
-		whatToAuth = new AddDataPropStmt(SELFEDITOR_URI,
+		whatToAuth = new AddDataPropertyStatement(SELFEDITOR_URI,
 				"http://mannlib.cornell.edu/bad#prp234", "someString", null,
 				null);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 
-		whatToAuth = new AddDataPropStmt(SELFEDITOR_URI,
+		whatToAuth = new AddDataPropertyStatement(SELFEDITOR_URI,
 				"http://mannlib.cornell.edu/bad#prp999", "someString", null,
 				null);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 
-		whatToAuth = new AddDataPropStmt(SELFEDITOR_URI, SAFE_PREDICATE,
-				"someString", null, null);
+		whatToAuth = new AddDataPropertyStatement(SELFEDITOR_URI,
+				SAFE_PREDICATE, "someString", null, null);
 		assertDecision(AUTHORIZED, policy.isAuthorized(ids, whatToAuth));
 
-		whatToAuth = new AddDataPropStmt(SELFEDITOR_URI, UNSAFE_PREDICATE,
-				"someString", null, null);
+		whatToAuth = new AddDataPropertyStatement(SELFEDITOR_URI,
+				UNSAFE_PREDICATE, "someString", null, null);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 	}
 
 	@Test
 	public void testVisitIdentifierBundleAddObjectPropStmt() {
-		whatToAuth = new AddObjectPropStmt(SELFEDITOR_URI, SAFE_PREDICATE,
-				SAFE_RESOURCE);
+		whatToAuth = new AddObjectPropertyStatement(SELFEDITOR_URI,
+				SAFE_PREDICATE, SAFE_RESOURCE);
 		assertDecision(AUTHORIZED, policy.isAuthorized(ids, whatToAuth));
 
-		whatToAuth = new AddObjectPropStmt(SAFE_RESOURCE, SAFE_PREDICATE,
-				SELFEDITOR_URI);
+		whatToAuth = new AddObjectPropertyStatement(SAFE_RESOURCE,
+				SAFE_PREDICATE, SELFEDITOR_URI);
 		assertDecision(AUTHORIZED, policy.isAuthorized(ids, whatToAuth));
 
 		// this is the case where the editor is not part of the stmt
-		whatToAuth = new AddObjectPropStmt(SAFE_RESOURCE, SAFE_PREDICATE,
-				SAFE_RESOURCE);
+		whatToAuth = new AddObjectPropertyStatement(SAFE_RESOURCE,
+				SAFE_PREDICATE, SAFE_RESOURCE);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 
-		whatToAuth = new AddObjectPropStmt(SELFEDITOR_URI, UNSAFE_PREDICATE,
-				SAFE_RESOURCE);
+		whatToAuth = new AddObjectPropertyStatement(SELFEDITOR_URI,
+				UNSAFE_PREDICATE, SAFE_RESOURCE);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 
-		whatToAuth = new AddObjectPropStmt(SELFEDITOR_URI, SAFE_PREDICATE,
-				UNSAFE_RESOURCE);
+		whatToAuth = new AddObjectPropertyStatement(SELFEDITOR_URI,
+				SAFE_PREDICATE, UNSAFE_RESOURCE);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 	}
 
@@ -173,25 +173,25 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 	//
 	@Test
 	public void testVisitIdentifierBundleDropObjectPropStmt() {
-		whatToAuth = new DropObjectPropStmt(SELFEDITOR_URI, SAFE_PREDICATE,
-				SAFE_RESOURCE);
+		whatToAuth = new DropObjectPropertyStatement(SELFEDITOR_URI,
+				SAFE_PREDICATE, SAFE_RESOURCE);
 		assertDecision(AUTHORIZED, policy.isAuthorized(ids, whatToAuth));
 
-		whatToAuth = new DropObjectPropStmt(SAFE_RESOURCE, SAFE_PREDICATE,
-				SELFEDITOR_URI);
+		whatToAuth = new DropObjectPropertyStatement(SAFE_RESOURCE,
+				SAFE_PREDICATE, SELFEDITOR_URI);
 		assertDecision(AUTHORIZED, policy.isAuthorized(ids, whatToAuth));
 
 		// this is the case where the editor is not part of the stmt
-		whatToAuth = new DropObjectPropStmt(SAFE_RESOURCE, SAFE_PREDICATE,
-				SAFE_RESOURCE);
+		whatToAuth = new DropObjectPropertyStatement(SAFE_RESOURCE,
+				SAFE_PREDICATE, SAFE_RESOURCE);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 
-		whatToAuth = new DropObjectPropStmt(SELFEDITOR_URI, UNSAFE_PREDICATE,
-				SAFE_RESOURCE);
+		whatToAuth = new DropObjectPropertyStatement(SELFEDITOR_URI,
+				UNSAFE_PREDICATE, SAFE_RESOURCE);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 
-		whatToAuth = new DropObjectPropStmt(SELFEDITOR_URI, SAFE_PREDICATE,
-				UNSAFE_RESOURCE);
+		whatToAuth = new DropObjectPropertyStatement(SELFEDITOR_URI,
+				SAFE_PREDICATE, UNSAFE_RESOURCE);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 	}
 
@@ -219,50 +219,50 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 		dps.setIndividualURI(SELFEDITOR_URI);
 		dps.setDatapropURI(SAFE_PREDICATE);
 		dps.setData("junk");
-		whatToAuth = new EditDataPropStmt(dps);
+		whatToAuth = new EditDataPropertyStatement(dps);
 		assertDecision(AUTHORIZED, policy.isAuthorized(ids, whatToAuth));
 
 		dps = new DataPropertyStatementImpl();
 		dps.setIndividualURI(SELFEDITOR_URI);
 		dps.setDatapropURI(UNSAFE_PREDICATE);
 		dps.setData("junk");
-		whatToAuth = new EditDataPropStmt(dps);
+		whatToAuth = new EditDataPropertyStatement(dps);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 
 		dps = new DataPropertyStatementImpl();
 		dps.setIndividualURI(UNSAFE_RESOURCE);
 		dps.setDatapropURI(SAFE_PREDICATE);
-		whatToAuth = new EditDataPropStmt(dps);
+		whatToAuth = new EditDataPropertyStatement(dps);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 
 		dps = new DataPropertyStatementImpl();
 		dps.setIndividualURI(SAFE_RESOURCE);
 		dps.setDatapropURI(SAFE_PREDICATE);
-		whatToAuth = new EditDataPropStmt(dps);
+		whatToAuth = new EditDataPropertyStatement(dps);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 	}
 
 	@Test
 	public void testVisitIdentifierBundleEditObjPropStmt() {
-		whatToAuth = new EditObjPropStmt(SELFEDITOR_URI, SAFE_PREDICATE,
-				SAFE_RESOURCE);
+		whatToAuth = new EditObjectPropertyStatement(SELFEDITOR_URI,
+				SAFE_PREDICATE, SAFE_RESOURCE);
 		assertDecision(AUTHORIZED, policy.isAuthorized(ids, whatToAuth));
 
-		whatToAuth = new EditObjPropStmt(SAFE_RESOURCE, SAFE_PREDICATE,
-				SELFEDITOR_URI);
+		whatToAuth = new EditObjectPropertyStatement(SAFE_RESOURCE,
+				SAFE_PREDICATE, SELFEDITOR_URI);
 		assertDecision(AUTHORIZED, policy.isAuthorized(ids, whatToAuth));
 
 		// this is the case where the editor is not part of the stmt
-		whatToAuth = new EditObjPropStmt(SAFE_RESOURCE, SAFE_PREDICATE,
-				SAFE_RESOURCE);
+		whatToAuth = new EditObjectPropertyStatement(SAFE_RESOURCE,
+				SAFE_PREDICATE, SAFE_RESOURCE);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 
-		whatToAuth = new EditObjPropStmt(SELFEDITOR_URI, UNSAFE_PREDICATE,
-				SAFE_RESOURCE);
+		whatToAuth = new EditObjectPropertyStatement(SELFEDITOR_URI,
+				UNSAFE_PREDICATE, SAFE_RESOURCE);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 
-		whatToAuth = new EditObjPropStmt(SELFEDITOR_URI, SAFE_PREDICATE,
-				UNSAFE_RESOURCE);
+		whatToAuth = new EditObjectPropertyStatement(SELFEDITOR_URI,
+				SAFE_PREDICATE, UNSAFE_RESOURCE);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 	}
 
@@ -273,24 +273,24 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 	@Test
 	public void twoSEIsFindObjectPropertySubject() {
 		setUpTwoSEIs();
-		whatToAuth = new DropObjectPropStmt(SELFEDITOR_URI, SAFE_PREDICATE,
-				SAFE_RESOURCE);
+		whatToAuth = new DropObjectPropertyStatement(SELFEDITOR_URI,
+				SAFE_PREDICATE, SAFE_RESOURCE);
 		assertDecision(AUTHORIZED, policy.isAuthorized(ids, whatToAuth));
 	}
 
 	@Test
 	public void twoSEIsFindObjectPropertyObject() {
 		setUpTwoSEIs();
-		whatToAuth = new DropObjectPropStmt(SAFE_RESOURCE, SAFE_PREDICATE,
-				SELFEDITOR_URI);
+		whatToAuth = new DropObjectPropertyStatement(SAFE_RESOURCE,
+				SAFE_PREDICATE, SELFEDITOR_URI);
 		assertDecision(AUTHORIZED, policy.isAuthorized(ids, whatToAuth));
 	}
 
 	@Test
 	public void twoSEIsDontFindInObjectProperty() {
 		setUpTwoSEIs();
-		whatToAuth = new DropObjectPropStmt(SAFE_RESOURCE, SAFE_PREDICATE,
-				SAFE_RESOURCE);
+		whatToAuth = new DropObjectPropertyStatement(SAFE_RESOURCE,
+				SAFE_PREDICATE, SAFE_RESOURCE);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 	}
 
@@ -302,7 +302,7 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 		dps.setIndividualURI(SELFEDITOR_URI);
 		dps.setDatapropURI(SAFE_PREDICATE);
 		dps.setData("junk");
-		whatToAuth = new EditDataPropStmt(dps);
+		whatToAuth = new EditDataPropertyStatement(dps);
 		assertDecision(AUTHORIZED, policy.isAuthorized(ids, whatToAuth));
 	}
 
@@ -314,7 +314,7 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 		dps.setIndividualURI(SAFE_RESOURCE);
 		dps.setDatapropURI(SAFE_PREDICATE);
 		dps.setData("junk");
-		whatToAuth = new EditDataPropStmt(dps);
+		whatToAuth = new EditDataPropertyStatement(dps);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 	}
 

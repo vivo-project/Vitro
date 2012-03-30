@@ -5,19 +5,19 @@ package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 import com.hp.hpl.jena.rdf.model.Literal;
 
 /** Should we allow the user to add this DataPropertyStatement? */
-public class AddDataPropStmt extends AbstractDataPropertyAction {
+public class AddDataPropertyStatement extends AbstractDataPropertyStatementAction {
     protected String data;
     protected String dataType;
     protected String lang;
     
-    public AddDataPropStmt(String subjectUri, String predicateUri, String value, String dataType, String lang) {
+    public AddDataPropertyStatement(String subjectUri, String predicateUri, String value, String dataType, String lang) {
         super(subjectUri, predicateUri);
         this.data= value;
         this.dataType = dataType;
         this.lang = lang;
     }
 
-    public AddDataPropStmt(String subjectUri, String predicateUri, Literal literal) {
+    public AddDataPropertyStatement(String subjectUri, String predicateUri, Literal literal) {
     	super(subjectUri, predicateUri);
     	this.data= literal.getValue().toString();
     	this.dataType = literal.getDatatypeURI();

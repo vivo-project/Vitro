@@ -24,8 +24,8 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractDataPropertyAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractObjectPropertyAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractDataPropertyStatementAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractObjectPropertyStatementAction;
 
 /**
  * Test the function of PolicyHelper in authorizing statements and models.
@@ -235,17 +235,17 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 		@Override
 		public PolicyDecision isAuthorized(IdentifierBundle whoToAuth,
 				RequestedAction whatToAuth) {
-			if (whatToAuth instanceof AbstractDataPropertyAction) {
-				return isAuthorized((AbstractDataPropertyAction) whatToAuth);
-			} else if (whatToAuth instanceof AbstractObjectPropertyAction) {
-				return isAuthorized((AbstractObjectPropertyAction) whatToAuth);
+			if (whatToAuth instanceof AbstractDataPropertyStatementAction) {
+				return isAuthorized((AbstractDataPropertyStatementAction) whatToAuth);
+			} else if (whatToAuth instanceof AbstractObjectPropertyStatementAction) {
+				return isAuthorized((AbstractObjectPropertyStatementAction) whatToAuth);
 			} else {
 				return inconclusive();
 			}
 		}
 
 		private PolicyDecision isAuthorized(
-				AbstractDataPropertyAction whatToAuth) {
+				AbstractDataPropertyStatementAction whatToAuth) {
 			if ((APPROVED_SUBJECT_URI.equals(whatToAuth.getSubjectUri()))
 					&& (APPROVED_PREDICATE_URI.equals(whatToAuth
 							.getPredicateUri()))) {
@@ -256,7 +256,7 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 		}
 
 		private PolicyDecision isAuthorized(
-				AbstractObjectPropertyAction whatToAuth) {
+				AbstractObjectPropertyStatementAction whatToAuth) {
 			if ((APPROVED_SUBJECT_URI.equals(whatToAuth.uriOfSubject))
 					&& (APPROVED_PREDICATE_URI
 							.equals(whatToAuth.uriOfPredicate))

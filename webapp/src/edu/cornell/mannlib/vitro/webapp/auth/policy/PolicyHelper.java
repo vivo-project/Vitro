@@ -19,10 +19,10 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropDataPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropDataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropertyStatement;
 
 /**
  * A collection of static methods to help determine whether requested actions
@@ -101,11 +101,11 @@ public class PolicyHelper {
 
 		RequestedAction action;
 		if (objectNode.isResource()) {
-			action = new AddObjectPropStmt(subject.getURI(),
+			action = new AddObjectPropertyStatement(subject.getURI(),
 					predicate.getURI(), objectNode.asResource().getURI());
 		} else {
-			action = new AddDataPropStmt(subject.getURI(), predicate.getURI(),
-					objectNode.asLiteral());
+			action = new AddDataPropertyStatement(subject.getURI(),
+					predicate.getURI(), objectNode.asLiteral());
 		}
 		return isAuthorizedForActions(req, action);
 	}
@@ -153,11 +153,11 @@ public class PolicyHelper {
 
 		RequestedAction action;
 		if (objectNode.isResource()) {
-			action = new DropObjectPropStmt(subject.getURI(),
+			action = new DropObjectPropertyStatement(subject.getURI(),
 					predicate.getURI(), objectNode.asResource().getURI());
 		} else {
-			action = new DropDataPropStmt(subject.getURI(), predicate.getURI(),
-					objectNode.asLiteral());
+			action = new DropDataPropertyStatement(subject.getURI(),
+					predicate.getURI(), objectNode.asLiteral());
 		}
 		return isAuthorizedForActions(req, action);
 	}

@@ -8,12 +8,12 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
  * A base class for requested actions that involve manipulating an object
  * property.
  */
-public abstract class AbstractObjectPropertyAction extends RequestedAction {
+public abstract class AbstractObjectPropertyStatementAction extends RequestedAction {
 	public final String uriOfSubject;
 	public final String uriOfPredicate;
 	public final String uriOfObject;
 
-	public AbstractObjectPropertyAction(String uriOfSubject, String uriOfPredicate,
+	public AbstractObjectPropertyStatementAction(String uriOfSubject, String uriOfPredicate,
 			String uriOfObject) {
 		this.uriOfSubject = uriOfSubject;
 		this.uriOfPredicate = uriOfPredicate;

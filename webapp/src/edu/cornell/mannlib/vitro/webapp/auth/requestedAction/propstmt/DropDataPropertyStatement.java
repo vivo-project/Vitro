@@ -8,16 +8,16 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 
 /** Should we allow the user to delete this DataPropertyStatement? */
-public class DropDataPropStmt extends AbstractDataPropertyAction {
+public class DropDataPropertyStatement extends AbstractDataPropertyStatementAction {
 
     private final DataPropertyStatement dataPropStmt;
     
-    public DropDataPropStmt(DataPropertyStatement dps){
+    public DropDataPropertyStatement(DataPropertyStatement dps){
     	super(dps.getIndividualURI(),dps.getDatapropURI() );
         this.dataPropStmt = dps;
     }
 
-    public DropDataPropStmt(String subjectUri, String predicateUri, String data) {
+    public DropDataPropertyStatement(String subjectUri, String predicateUri, String data) {
     	super(subjectUri, predicateUri);
         dataPropStmt = new DataPropertyStatementImpl();
         dataPropStmt.setIndividualURI(subjectUri);
@@ -25,7 +25,7 @@ public class DropDataPropStmt extends AbstractDataPropertyAction {
         dataPropStmt.setData(data);        
     }
     
-	public DropDataPropStmt(String subjectUri, String predicateUri, Literal data) {
+	public DropDataPropertyStatement(String subjectUri, String predicateUri, Literal data) {
     	super(subjectUri, predicateUri);
         dataPropStmt = new DataPropertyStatementImpl();
         dataPropStmt.setIndividualURI(subjectUri);

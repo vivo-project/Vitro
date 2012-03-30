@@ -13,7 +13,7 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -77,7 +77,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
         }
           
         // Determine whether a new statement can be added
-        RequestedAction action = new AddDataPropStmt(subjectUri, propertyUri, RequestActionConstants.SOME_LITERAL, null, null);
+        RequestedAction action = new AddDataPropertyStatement(subjectUri, propertyUri, RequestActionConstants.SOME_LITERAL, null, null);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return;
         }

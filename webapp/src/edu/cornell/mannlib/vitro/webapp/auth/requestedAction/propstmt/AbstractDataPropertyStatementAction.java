@@ -7,11 +7,11 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
 /**
  * A base class for requestion actions that relate to data properties.
  */
-public abstract class AbstractDataPropertyAction extends RequestedAction {
+public abstract class AbstractDataPropertyStatementAction extends RequestedAction {
 	private final String subjectUri;
 	private final String predicateUri;
 
-	public AbstractDataPropertyAction(String subjectUri, String predicateUri) {
+	public AbstractDataPropertyStatementAction(String subjectUri, String predicateUri) {
 		this.subjectUri = subjectUri;
 		this.predicateUri = predicateUri;
 	}

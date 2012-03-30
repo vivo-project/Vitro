@@ -26,9 +26,9 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasProfile;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditDataPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditDataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -112,8 +112,8 @@ public class SelfEditingPolicy_2_Test extends AbstractTestClass {
 
 	@Test
 	public void nullIdentifierBundle() {
-		AddObjectPropStmt whatToAuth = new AddObjectPropStmt(SELFEDITOR_URI,
-				SAFE_PREDICATE, SAFE_RESOURCE);
+		AddObjectPropertyStatement whatToAuth = new AddObjectPropertyStatement(
+				SELFEDITOR_URI, SAFE_PREDICATE, SAFE_RESOURCE);
 		PolicyDecision dec = policy.isAuthorized(null, whatToAuth);
 		Assert.assertNotNull(dec);
 		Assert.assertEquals(Authorization.INCONCLUSIVE, dec.getAuthorized());
@@ -261,13 +261,13 @@ public class SelfEditingPolicy_2_Test extends AbstractTestClass {
 	// ------------------------------------------------------------------------
 
 	/**
-	 * Create an {@link AddObjectPropStmt}, test it, and compare to expected
-	 * results.
+	 * Create an {@link AddObjectPropertyStatement}, test it, and compare to
+	 * expected results.
 	 */
 	private void assertAddObjectPropStmt(String uriOfSub, String uriOfPred,
 			String uriOfObj, Authorization expectedAuthorization) {
-		AddObjectPropStmt whatToAuth = new AddObjectPropStmt(uriOfSub,
-				uriOfPred, uriOfObj);
+		AddObjectPropertyStatement whatToAuth = new AddObjectPropertyStatement(
+				uriOfSub, uriOfPred, uriOfObj);
 		PolicyDecision dec = policy.isAuthorized(ids, whatToAuth);
 		log.debug(dec);
 		Assert.assertNotNull(dec);
@@ -275,13 +275,13 @@ public class SelfEditingPolicy_2_Test extends AbstractTestClass {
 	}
 
 	/**
-	 * Create an {@link EditObjPropStmt}, test it, and compare to expected
-	 * results.
+	 * Create an {@link EditObjectPropertyStatement}, test it, and compare to
+	 * expected results.
 	 */
 	private void assertEditObjPropStmt(String uriOfSub, String uriOfPred,
 			String uriOfObj, Authorization expectedAuthorization) {
-		EditObjPropStmt whatToAuth = new EditObjPropStmt(uriOfSub, uriOfPred,
-				uriOfObj);
+		EditObjectPropertyStatement whatToAuth = new EditObjectPropertyStatement(
+				uriOfSub, uriOfPred, uriOfObj);
 		PolicyDecision dec = policy.isAuthorized(ids, whatToAuth);
 		log.debug(dec);
 		Assert.assertNotNull(dec);
@@ -289,8 +289,8 @@ public class SelfEditingPolicy_2_Test extends AbstractTestClass {
 	}
 
 	/**
-	 * Create an {@link EditDataPropStmt}, test it, and compare to expected
-	 * results.
+	 * Create an {@link EditDataPropertyStatement}, test it, and compare to
+	 * expected results.
 	 */
 	private void assertEditDataPropStmt(String individualURI,
 			String datapropURI, String data, Authorization expectedAuthorization) {
@@ -299,7 +299,8 @@ public class SelfEditingPolicy_2_Test extends AbstractTestClass {
 		dps.setDatapropURI(datapropURI);
 		dps.setData(data);
 
-		EditDataPropStmt whatToAuth = new EditDataPropStmt(dps);
+		EditDataPropertyStatement whatToAuth = new EditDataPropertyStatement(
+				dps);
 		PolicyDecision dec = policy.isAuthorized(ids, whatToAuth);
 		log.debug(dec);
 		Assert.assertNotNull(dec);

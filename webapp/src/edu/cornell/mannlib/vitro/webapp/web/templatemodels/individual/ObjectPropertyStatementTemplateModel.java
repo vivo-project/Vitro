@@ -11,8 +11,8 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -55,7 +55,7 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     	}
         
         // Determine whether the statement can be deleted
-        RequestedAction action = new DropObjectPropStmt(subjectUri, propertyUri, objectUri);
+        RequestedAction action = new DropObjectPropertyStatement(subjectUri, propertyUri, objectUri);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return "";
         }
@@ -96,7 +96,7 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     	}
         
        // Determine whether the statement can be edited
-        RequestedAction action =  new EditObjPropStmt(ops);
+        RequestedAction action =  new EditObjectPropertyStatement(ops);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return "";
         }

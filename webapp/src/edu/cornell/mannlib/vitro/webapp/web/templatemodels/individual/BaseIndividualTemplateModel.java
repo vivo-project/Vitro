@@ -17,8 +17,8 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -112,10 +112,10 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
 	 * an object property to the Individual being shown.
 	 */
     public boolean isEditable() {
-		AddDataPropStmt adps = new AddDataPropStmt(individual.getURI(),
+		AddDataPropertyStatement adps = new AddDataPropertyStatement(individual.getURI(),
 				RequestActionConstants.SOME_URI,
 				RequestActionConstants.SOME_LITERAL, null, null);
-		AddObjectPropStmt aops = new AddObjectPropStmt(individual.getURI(),
+		AddObjectPropertyStatement aops = new AddObjectPropertyStatement(individual.getURI(),
 				RequestActionConstants.SOME_URI,
 				RequestActionConstants.SOME_URI);
     	return PolicyHelper.isAuthorizedForActions(vreq, new Actions(adps).or(aops));

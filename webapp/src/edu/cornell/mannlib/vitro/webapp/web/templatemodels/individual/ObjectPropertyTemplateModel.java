@@ -17,7 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -108,7 +108,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     	}
         
         // Determine whether a new statement can be added
-        RequestedAction action = new AddObjectPropStmt(subjectUri, propertyUri, RequestActionConstants.SOME_URI);
+        RequestedAction action = new AddObjectPropertyStatement(subjectUri, propertyUri, RequestActionConstants.SOME_URI);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return;
         }

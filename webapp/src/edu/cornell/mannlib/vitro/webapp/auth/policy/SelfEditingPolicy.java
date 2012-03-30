@@ -12,8 +12,8 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndi
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractDataPropertyAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractObjectPropertyAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractDataPropertyStatementAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractObjectPropertyStatementAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.resource.AbstractResourceAction;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 
@@ -44,14 +44,14 @@ public class SelfEditingPolicy extends BaseSelfEditingPolicy implements
 			return inconclusiveDecision("Not self-editing.");
 		}
 
-		if (whatToAuth instanceof AbstractObjectPropertyAction) {
+		if (whatToAuth instanceof AbstractObjectPropertyStatementAction) {
 			return isAuthorizedForObjectPropertyAction(userUris,
-					(AbstractObjectPropertyAction) whatToAuth);
+					(AbstractObjectPropertyStatementAction) whatToAuth);
 		}
 
-		if (whatToAuth instanceof AbstractDataPropertyAction) {
+		if (whatToAuth instanceof AbstractDataPropertyStatementAction) {
 			return isAuthorizedForDataPropertyAction(userUris,
-					(AbstractDataPropertyAction) whatToAuth);
+					(AbstractDataPropertyStatementAction) whatToAuth);
 		}
 
 		if (whatToAuth instanceof AbstractResourceAction) {
@@ -67,7 +67,7 @@ public class SelfEditingPolicy extends BaseSelfEditingPolicy implements
 	 * about him.
 	 */
 	private PolicyDecision isAuthorizedForObjectPropertyAction(
-			List<String> userUris, AbstractObjectPropertyAction action) {
+			List<String> userUris, AbstractObjectPropertyStatementAction action) {
 		String subject = action.getUriOfSubject();
 		String predicate = action.getUriOfPredicate();
 		String object = action.getUriOfObject();
@@ -94,7 +94,7 @@ public class SelfEditingPolicy extends BaseSelfEditingPolicy implements
 	 * about him.
 	 */
 	private PolicyDecision isAuthorizedForDataPropertyAction(
-			List<String> userUris, AbstractDataPropertyAction action) {
+			List<String> userUris, AbstractDataPropertyStatementAction action) {
 		String subject = action.getSubjectUri();
 		String predicate = action.getPredicateUri();
 

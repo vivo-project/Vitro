@@ -3,9 +3,9 @@
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 
 /** Should we allow the user to delete this ObjectPropertyStatement? */
-public class DropObjectPropStmt extends AbstractObjectPropertyAction {
+public class DropObjectPropertyStatement extends AbstractObjectPropertyStatementAction {
 
-	public DropObjectPropStmt(String sub, String pred, String obj) {
+	public DropObjectPropertyStatement(String sub, String pred, String obj) {
 		super(sub, pred, obj);
 	}
 }
