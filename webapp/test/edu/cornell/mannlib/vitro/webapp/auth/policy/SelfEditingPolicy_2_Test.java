@@ -294,13 +294,8 @@ public class SelfEditingPolicy_2_Test extends AbstractTestClass {
 	 */
 	private void assertEditDataPropStmt(String individualURI,
 			String datapropURI, String data, Authorization expectedAuthorization) {
-		DataPropertyStatement dps = new DataPropertyStatementImpl();
-		dps.setIndividualURI(individualURI);
-		dps.setDatapropURI(datapropURI);
-		dps.setData(data);
-
 		EditDataPropertyStatement whatToAuth = new EditDataPropertyStatement(
-				dps);
+				individualURI, datapropURI);
 		PolicyDecision dec = policy.isAuthorized(ids, whatToAuth);
 		log.debug(dec);
 		Assert.assertNotNull(dec);

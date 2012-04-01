@@ -36,8 +36,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectP
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
@@ -212,31 +210,16 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 	//
 	@Test
 	public void testVisitIdentifierBundleEditDataPropStmt() {
-
-		DataPropertyStatement dps = new DataPropertyStatementImpl();
-		dps.setIndividualURI(SELFEDITOR_URI);
-		dps.setDatapropURI(SAFE_PREDICATE);
-		dps.setData("junk");
-		whatToAuth = new EditDataPropertyStatement(dps);
+		whatToAuth = new EditDataPropertyStatement(SELFEDITOR_URI,SAFE_PREDICATE);
 		assertDecision(AUTHORIZED, policy.isAuthorized(ids, whatToAuth));
 
-		dps = new DataPropertyStatementImpl();
-		dps.setIndividualURI(SELFEDITOR_URI);
-		dps.setDatapropURI(UNSAFE_PREDICATE);
-		dps.setData("junk");
-		whatToAuth = new EditDataPropertyStatement(dps);
+		whatToAuth = new EditDataPropertyStatement(SELFEDITOR_URI, UNSAFE_PREDICATE);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 
-		dps = new DataPropertyStatementImpl();
-		dps.setIndividualURI(UNSAFE_RESOURCE);
-		dps.setDatapropURI(SAFE_PREDICATE);
-		whatToAuth = new EditDataPropertyStatement(dps);
+		whatToAuth = new EditDataPropertyStatement(UNSAFE_RESOURCE, SAFE_PREDICATE);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 
-		dps = new DataPropertyStatementImpl();
-		dps.setIndividualURI(SAFE_RESOURCE);
-		dps.setDatapropURI(SAFE_PREDICATE);
-		whatToAuth = new EditDataPropertyStatement(dps);
+		whatToAuth = new EditDataPropertyStatement(SAFE_RESOURCE, SAFE_PREDICATE);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 	}
 
@@ -296,11 +279,7 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 	public void twoSEIsFindDataPropertySubject() {
 		setUpTwoSEIs();
 
-		DataPropertyStatement dps = new DataPropertyStatementImpl();
-		dps.setIndividualURI(SELFEDITOR_URI);
-		dps.setDatapropURI(SAFE_PREDICATE);
-		dps.setData("junk");
-		whatToAuth = new EditDataPropertyStatement(dps);
+		whatToAuth = new EditDataPropertyStatement(SELFEDITOR_URI, SAFE_PREDICATE);
 		assertDecision(AUTHORIZED, policy.isAuthorized(ids, whatToAuth));
 	}
 
@@ -308,11 +287,7 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 	public void twoSEIsDontFindInDataProperty() {
 		setUpTwoSEIs();
 
-		DataPropertyStatement dps = new DataPropertyStatementImpl();
-		dps.setIndividualURI(SAFE_RESOURCE);
-		dps.setDatapropURI(SAFE_PREDICATE);
-		dps.setData("junk");
-		whatToAuth = new EditDataPropertyStatement(dps);
+		whatToAuth = new EditDataPropertyStatement(SAFE_RESOURCE, SAFE_PREDICATE);
 		assertDecision(INCONCLUSIVE, policy.isAuthorized(ids, whatToAuth));
 	}
 
