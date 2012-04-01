@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 
+import com.hp.hpl.jena.ontology.OntModel;
+
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 
 /**
@@ -9,12 +11,13 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
  */
 public class AddObjectPropertyStatement extends
 		AbstractObjectPropertyStatementAction {
-	public AddObjectPropertyStatement(String uriOfSub, String uriOfPred,
-			String uriOfObj) {
-		super(uriOfSub, uriOfPred, uriOfObj);
+	public AddObjectPropertyStatement(OntModel ontModel, String uriOfSub,
+			String uriOfPred, String uriOfObj) {
+		super(ontModel, uriOfSub, uriOfPred, uriOfObj);
 	}
 
-	public AddObjectPropertyStatement(ObjectPropertyStatement ops) {
-		super(ops);
+	public AddObjectPropertyStatement(OntModel ontModel,
+			ObjectPropertyStatement ops) {
+		super(ontModel, ops);
 	}
 }

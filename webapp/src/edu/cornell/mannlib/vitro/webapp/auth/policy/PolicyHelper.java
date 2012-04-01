@@ -23,6 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPro
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
 /**
  * A collection of static methods to help determine whether requested actions
@@ -63,15 +64,15 @@ public class PolicyHelper {
 	 * Do the current policies authorize the current user to add all of the
 	 * statements in this model?
 	 */
-	public static boolean isAuthorizedToAdd(HttpServletRequest req, Model model) {
-		if ((req == null) || (model == null)) {
+	public static boolean isAuthorizedToAdd(VitroRequest vreq, Model model) {
+		if ((vreq == null) || (model == null)) {
 			return false;
 		}
 
 		StmtIterator stmts = model.listStatements();
 		try {
 			while (stmts.hasNext()) {
-				if (!isAuthorizedToAdd(req, stmts.next())) {
+				if (!isAuthorizedToAdd(vreq, stmts.next())) {
 					return false;
 				}
 			}
@@ -86,9 +87,8 @@ public class PolicyHelper {
 	 * 
 	 * The statement is expected to be fully-populated, with no null fields.
 	 */
-	public static boolean isAuthorizedToAdd(HttpServletRequest req,
-			Statement stmt) {
-		if ((req == null) || (stmt == null)) {
+	public static boolean isAuthorizedToAdd(VitroRequest vreq, Statement stmt) {
+		if ((vreq == null) || (stmt == null)) {
 			return false;
 		}
 
@@ -101,28 +101,29 @@ public class PolicyHelper {
 
 		RequestedAction action;
 		if (objectNode.isResource()) {
-			action = new AddObjectPropertyStatement(subject.getURI(),
-					predicate.getURI(), objectNode.asResource().getURI());
+			action = new AddObjectPropertyStatement(vreq.getJenaOntModel(),
+					subject.getURI(), predicate.getURI(), objectNode
+							.asResource().getURI());
 		} else {
-			action = new AddDataPropertyStatement(subject.getURI(),
-					predicate.getURI());
+			action = new AddDataPropertyStatement(vreq.getJenaOntModel(),
+					subject.getURI(), predicate.getURI());
 		}
-		return isAuthorizedForActions(req, action);
+		return isAuthorizedForActions(vreq, action);
 	}
 
 	/**
 	 * Do the current policies authorize the current user to drop all of the
 	 * statements in this model?
 	 */
-	public static boolean isAuthorizedToDrop(HttpServletRequest req, Model model) {
-		if ((req == null) || (model == null)) {
+	public static boolean isAuthorizedToDrop(VitroRequest vreq, Model model) {
+		if ((vreq == null) || (model == null)) {
 			return false;
 		}
 
 		StmtIterator stmts = model.listStatements();
 		try {
 			while (stmts.hasNext()) {
-				if (!isAuthorizedToDrop(req, stmts.next())) {
+				if (!isAuthorizedToDrop(vreq, stmts.next())) {
 					return false;
 				}
 			}
@@ -138,9 +139,8 @@ public class PolicyHelper {
 	 * 
 	 * The statement is expected to be fully-populated, with no null fields.
 	 */
-	public static boolean isAuthorizedToDrop(HttpServletRequest req,
-			Statement stmt) {
-		if ((req == null) || (stmt == null)) {
+	public static boolean isAuthorizedToDrop(VitroRequest vreq, Statement stmt) {
+		if ((vreq == null) || (stmt == null)) {
 			return false;
 		}
 
@@ -153,13 +153,14 @@ public class PolicyHelper {
 
 		RequestedAction action;
 		if (objectNode.isResource()) {
-			action = new DropObjectPropertyStatement(subject.getURI(),
-					predicate.getURI(), objectNode.asResource().getURI());
+			action = new DropObjectPropertyStatement(vreq.getJenaOntModel(),
+					subject.getURI(), predicate.getURI(), objectNode
+							.asResource().getURI());
 		} else {
-			action = new DropDataPropertyStatement(subject.getURI(),
-					predicate.getURI());
+			action = new DropDataPropertyStatement(vreq.getJenaOntModel(),
+					subject.getURI(), predicate.getURI());
 		}
-		return isAuthorizedForActions(req, action);
+		return isAuthorizedForActions(vreq, action);
 	}
 
 	/**

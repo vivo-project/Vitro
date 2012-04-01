@@ -12,6 +12,7 @@ import stubs.javax.servlet.ServletContextStub;
 import stubs.javax.servlet.http.HttpServletRequestStub;
 import stubs.javax.servlet.http.HttpSessionStub;
 
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -26,6 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractDataPropertyStatementAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractObjectPropertyStatementAction;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
 /**
  * Test the function of PolicyHelper in authorizing statements and models.
@@ -38,7 +40,7 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 
 	private ServletContextStub ctx;
 	private HttpSessionStub session;
-	private HttpServletRequestStub req;
+	private VitroRequest vreq;
 
 	@Before
 	public void setup() {
@@ -47,8 +49,10 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 		session = new HttpSessionStub();
 		session.setServletContext(ctx);
 
-		req = new HttpServletRequestStub();
+		HttpServletRequestStub req = new HttpServletRequestStub();
 		req.setSession(session);
+		vreq = new VitroRequest(req);
+		vreq.setJenaOntModel(ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM));
 
 		setLoggerLevel(ServletPolicyList.class, Level.WARN);
 		ServletPolicyList.addPolicy(ctx, new MySimplePolicy());
@@ -61,7 +65,7 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 	@Test
 	public void addNullStatement() {
 		assertEquals("null statement", false,
-				PolicyHelper.isAuthorizedToAdd(req, (Statement) null));
+				PolicyHelper.isAuthorizedToAdd(vreq, (Statement) null));
 	}
 
 	@Test
@@ -77,7 +81,7 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 		Statement stmt = dataStatement(APPROVED_SUBJECT_URI,
 				APPROVED_PREDICATE_URI);
 		assertEquals("authorized", true,
-				PolicyHelper.isAuthorizedToAdd(req, stmt));
+				PolicyHelper.isAuthorizedToAdd(vreq, stmt));
 	}
 
 	@Test
@@ -85,13 +89,13 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 		Statement stmt = dataStatement(APPROVED_SUBJECT_URI,
 				UNAPPROVED_PREDICATE_URI);
 		assertEquals("not authorized", false,
-				PolicyHelper.isAuthorizedToAdd(req, stmt));
+				PolicyHelper.isAuthorizedToAdd(vreq, stmt));
 	}
 
 	@Test
 	public void dropNullStatement() {
 		assertEquals("null statement", false,
-				PolicyHelper.isAuthorizedToDrop(req, (Statement) null));
+				PolicyHelper.isAuthorizedToDrop(vreq, (Statement) null));
 	}
 
 	@Test
@@ -107,7 +111,7 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 		Statement stmt = dataStatement(APPROVED_SUBJECT_URI,
 				APPROVED_PREDICATE_URI);
 		assertEquals("authorized", true,
-				PolicyHelper.isAuthorizedToDrop(req, stmt));
+				PolicyHelper.isAuthorizedToDrop(vreq, stmt));
 	}
 
 	@Test
@@ -115,7 +119,7 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 		Statement stmt = dataStatement(APPROVED_SUBJECT_URI,
 				UNAPPROVED_PREDICATE_URI);
 		assertEquals("not authorized", false,
-				PolicyHelper.isAuthorizedToDrop(req, stmt));
+				PolicyHelper.isAuthorizedToDrop(vreq, stmt));
 	}
 
 	// ----------------------------------------------------------------------
@@ -125,7 +129,7 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 	@Test
 	public void addNullModel() {
 		assertEquals("null statement", false,
-				PolicyHelper.isAuthorizedToAdd(req, (Model) null));
+				PolicyHelper.isAuthorizedToAdd(vreq, (Model) null));
 	}
 
 	@Test
@@ -137,7 +141,7 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 	@Test
 	public void addEmptyModel() {
 		assertEquals("empty model", true,
-				PolicyHelper.isAuthorizedToAdd(req, model()));
+				PolicyHelper.isAuthorizedToAdd(vreq, model()));
 	}
 
 	@Test
@@ -147,7 +151,7 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 				objectStatement(APPROVED_SUBJECT_URI, APPROVED_PREDICATE_URI,
 						APPROVED_OBJECT_URI));
 		assertEquals("authorized model", true,
-				PolicyHelper.isAuthorizedToAdd(req, model));
+				PolicyHelper.isAuthorizedToAdd(vreq, model));
 	}
 
 	@Test
@@ -157,13 +161,13 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 				objectStatement(APPROVED_SUBJECT_URI, UNAPPROVED_PREDICATE_URI,
 						APPROVED_OBJECT_URI));
 		assertEquals("unauthorized model", false,
-				PolicyHelper.isAuthorizedToAdd(req, model));
+				PolicyHelper.isAuthorizedToAdd(vreq, model));
 	}
 
 	@Test
 	public void dropNullModel() {
 		assertEquals("null statement", false,
-				PolicyHelper.isAuthorizedToDrop(req, (Model) null));
+				PolicyHelper.isAuthorizedToDrop(vreq, (Model) null));
 	}
 
 	@Test
@@ -175,7 +179,7 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 	@Test
 	public void dropEmptyModel() {
 		assertEquals("empty model", true,
-				PolicyHelper.isAuthorizedToDrop(req, model()));
+				PolicyHelper.isAuthorizedToDrop(vreq, model()));
 	}
 
 	@Test
@@ -185,7 +189,7 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 				objectStatement(APPROVED_SUBJECT_URI, APPROVED_PREDICATE_URI,
 						APPROVED_OBJECT_URI));
 		assertEquals("authorized model", true,
-				PolicyHelper.isAuthorizedToDrop(req, model));
+				PolicyHelper.isAuthorizedToDrop(vreq, model));
 	}
 
 	@Test
@@ -195,7 +199,7 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 				objectStatement(APPROVED_SUBJECT_URI, APPROVED_PREDICATE_URI,
 						APPROVED_OBJECT_URI));
 		assertEquals("unauthorized model", false,
-				PolicyHelper.isAuthorizedToDrop(req, model));
+				PolicyHelper.isAuthorizedToDrop(vreq, model));
 	}
 
 	// ----------------------------------------------------------------------

@@ -2,7 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
+import com.hp.hpl.jena.ontology.OntModel;
+
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 
 /**
@@ -10,17 +11,20 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
  * data property statements from a model.
  */
 public abstract class AbstractDataPropertyStatementAction extends
-		RequestedAction {
+		AbstractPropertyStatementAction {
 	private final String subjectUri;
 	private final String predicateUri;
 
-	public AbstractDataPropertyStatementAction(String subjectUri,
-			String predicateUri) {
+	public AbstractDataPropertyStatementAction(OntModel ontModel,
+			String subjectUri, String predicateUri) {
+		super(ontModel);
 		this.subjectUri = subjectUri;
 		this.predicateUri = predicateUri;
 	}
 
-	public AbstractDataPropertyStatementAction(DataPropertyStatement dps) {
+	public AbstractDataPropertyStatementAction(OntModel ontModel,
+			DataPropertyStatement dps) {
+		super(ontModel);
 		this.subjectUri = (dps.getIndividual() == null) ? dps
 				.getIndividualURI() : dps.getIndividual().getURI();
 		this.predicateUri = dps.getDatapropURI();

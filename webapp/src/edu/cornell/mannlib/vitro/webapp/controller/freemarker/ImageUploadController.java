@@ -138,14 +138,16 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 			RequestedAction ra;
 			if (ACTION_DELETE.equals(action)
 					|| ACTION_DELETE_EDIT.equals(action)) {
-				ra = new DropObjectPropertyStatement(entity.getURI(),
-						VitroVocabulary.IND_MAIN_IMAGE, imageUri);
+				ra = new DropObjectPropertyStatement(vreq.getJenaOntModel(),
+						entity.getURI(), VitroVocabulary.IND_MAIN_IMAGE,
+						imageUri);
 			} else if (imageUri != null) {
-				ra = new EditObjectPropertyStatement(entity.getURI(),
-						VitroVocabulary.IND_MAIN_IMAGE, imageUri);
+				ra = new EditObjectPropertyStatement(vreq.getJenaOntModel(),
+						entity.getURI(), VitroVocabulary.IND_MAIN_IMAGE,
+						imageUri);
 			} else {
-				ra = new AddObjectPropertyStatement(entity.getURI(),
-						VitroVocabulary.IND_MAIN_IMAGE,
+				ra = new AddObjectPropertyStatement(vreq.getJenaOntModel(),
+						entity.getURI(), VitroVocabulary.IND_MAIN_IMAGE,
 						RequestActionConstants.SOME_URI);
 			}
 			return new Actions(ra);

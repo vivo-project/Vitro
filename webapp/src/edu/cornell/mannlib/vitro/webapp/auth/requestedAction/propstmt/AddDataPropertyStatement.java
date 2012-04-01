@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 
+import com.hp.hpl.jena.ontology.OntModel;
+
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 
 /**
@@ -10,12 +12,13 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 public class AddDataPropertyStatement extends
 		AbstractDataPropertyStatementAction {
 
-	public AddDataPropertyStatement(String subjectUri, String predicateUri) {
-		super(subjectUri, predicateUri);
+	public AddDataPropertyStatement(OntModel ontModel, String subjectUri,
+			String predicateUri) {
+		super(ontModel, subjectUri, predicateUri);
 	}
 
-	public AddDataPropertyStatement(DataPropertyStatement dps) {
-		super(dps);
+	public AddDataPropertyStatement(OntModel ontModel, DataPropertyStatement dps) {
+		super(ontModel, dps);
 	}
 
 }

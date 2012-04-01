@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 
+import com.hp.hpl.jena.ontology.OntModel;
+
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 
 /**
@@ -9,5 +11,13 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
  * statements from a model.
  */
 public abstract class AbstractPropertyStatementAction extends RequestedAction {
+	private final OntModel ontModel;
 
+	public AbstractPropertyStatementAction(OntModel ontModel) {
+		this.ontModel = ontModel;
+	}
+
+	public OntModel getOntModel() {
+		return ontModel;
+	}
 }

@@ -76,7 +76,8 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
         }
           
         // Determine whether a new statement can be added
-        RequestedAction action = new AddDataPropertyStatement(subjectUri, propertyUri);
+		RequestedAction action = new AddDataPropertyStatement(
+				vreq.getJenaOntModel(), subjectUri, propertyUri);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return;
         }

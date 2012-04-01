@@ -62,7 +62,7 @@ public class NameStatementTemplateModel extends PropertyStatementTemplateModel {
 	private String makeEditUrl(Literal literal) {
         // Determine whether the statement can be edited
         DataPropertyStatement dps = makeStatement(literal);
-        RequestedAction action = new EditDataPropertyStatement(dps);
+        RequestedAction action = new EditDataPropertyStatement(vreq.getJenaOntModel(), dps);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return "";
         }

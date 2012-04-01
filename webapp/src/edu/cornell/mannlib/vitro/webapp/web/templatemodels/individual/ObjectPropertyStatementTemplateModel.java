@@ -55,7 +55,8 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     	}
         
         // Determine whether the statement can be deleted
-        RequestedAction action = new DropObjectPropertyStatement(subjectUri, propertyUri, objectUri);
+		RequestedAction action = new DropObjectPropertyStatement(
+				vreq.getJenaOntModel(), subjectUri, propertyUri, objectUri);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return "";
         }
@@ -96,7 +97,7 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     	}
         
        // Determine whether the statement can be edited
-        RequestedAction action =  new EditObjectPropertyStatement(ops);
+        RequestedAction action =  new EditObjectPropertyStatement(vreq.getJenaOntModel(), ops);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return "";
         }
