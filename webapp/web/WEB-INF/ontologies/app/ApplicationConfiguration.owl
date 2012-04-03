@@ -250,7 +250,8 @@
     <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#displayName -->
 
     <owl:DatatypeProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#displayName">
-        <rdfs:comment>Domain was Group OR DomainConfig</rdfs:comment>
+        <rdfs:comment>range is intended to be plain literal with language tag.</rdfs:comment>
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#DisplayConfig"/>
     </owl:DatatypeProperty>
     
 
@@ -276,8 +277,8 @@
     <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#fileName -->
 
     <owl:DatatypeProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#fileName">
+        <rdfs:comment>range is intended to be plain literal with language tag.</rdfs:comment>
         <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#Template"/>
-        <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
 
@@ -285,8 +286,9 @@
     <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#mediaType -->
 
     <owl:DatatypeProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#mediaType">
+        <rdfs:comment>&#39;text/html&#39; for html content</rdfs:comment>
+        <rdfs:comment>range is intended to be plain literal with a language tag.</rdfs:comment>
         <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#DatatypePropertyDisplayConfig"/>
-        <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
 
@@ -303,9 +305,8 @@
     <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#publicDescription -->
 
     <owl:DatatypeProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#publicDescription">
-        <rdfs:comment>Domain is intended to be Group OR PropertyEditConfig.  BL and BC did not want to assign a domain.</rdfs:comment>
+        <rdfs:comment>range is intended to be plain literal with language tag.</rdfs:comment>
         <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ApplicationConfig"/>
-        <rdfs:range rdf:resource="&rdf;PlainLiteral"/>
     </owl:DatatypeProperty>
     
 
@@ -313,8 +314,8 @@
     <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#queryString -->
 
     <owl:DatatypeProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#queryString">
+        <rdfs:comment>range is intended to be plain literal with language tag.</rdfs:comment>
         <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#SparqlQuery"/>
-        <rdfs:range rdf:resource="&xsd;string"/>
     </owl:DatatypeProperty>
     
 
