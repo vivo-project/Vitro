@@ -573,9 +573,9 @@
     
 
 
-    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#onlyIfExistingStatements -->
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ifStatement -->
 
-    <owl:NamedIndividual rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#onlyIfExistingStatements">
+    <owl:NamedIndividual rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ifStatement">
         <rdf:type rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#OfferEditOption"/>
     </owl:NamedIndividual>
     
