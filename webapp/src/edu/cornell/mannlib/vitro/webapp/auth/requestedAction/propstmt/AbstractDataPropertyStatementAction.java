@@ -34,8 +34,14 @@ public abstract class AbstractDataPropertyStatementAction extends
 		return subjectUri;
 	}
 
+	@Override
 	public String getPredicateUri() {
 		return predicateUri;
+	}
+
+	@Override
+	public String[] getResourceUris() {
+		return new String[] {subjectUri};
 	}
 
 	@Override

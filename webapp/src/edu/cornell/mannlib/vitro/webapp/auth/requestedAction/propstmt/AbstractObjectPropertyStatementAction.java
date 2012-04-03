@@ -38,12 +38,18 @@ public abstract class AbstractObjectPropertyStatementAction extends
 		return subjectUri;
 	}
 
+	public String getObjectUri() {
+		return objectUri;
+	}
+	
+	@Override
 	public String getPredicateUri() {
 		return predicateUri;
 	}
 
-	public String getObjectUri() {
-		return objectUri;
+	@Override
+	public String[] getResourceUris() {
+		return new String[] {subjectUri, objectUri};
 	}
 
 	@Override

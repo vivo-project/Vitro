@@ -20,4 +20,12 @@ public abstract class AbstractPropertyStatementAction extends RequestedAction {
 	public OntModel getOntModel() {
 		return ontModel;
 	}
+
+	/**
+	 * Get the URI of the Resources that are involved in this statement. Those
+	 * are the Subject, and the Object if this is an ObjectProperty request.
+	 */
+	public abstract String[] getResourceUris();
+
+	public abstract String getPredicateUri();
 }
