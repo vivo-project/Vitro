@@ -7,7 +7,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -23,7 +26,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPro
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
 /**
  * A collection of static methods to help determine whether requested actions
@@ -61,34 +63,14 @@ public class PolicyHelper {
 	}
 
 	/**
-	 * Do the current policies authorize the current user to add all of the
-	 * statements in this model?
-	 */
-	public static boolean isAuthorizedToAdd(VitroRequest vreq, Model model) {
-		if ((vreq == null) || (model == null)) {
-			return false;
-		}
-
-		StmtIterator stmts = model.listStatements();
-		try {
-			while (stmts.hasNext()) {
-				if (!isAuthorizedToAdd(vreq, stmts.next())) {
-					return false;
-				}
-			}
-			return true;
-		} finally {
-			stmts.close();
-		}
-	}
-
-	/**
-	 * Do the current policies authorize the current user to add this statement?
+	 * Do the current policies authorize the current user to add this statement
+	 * to this model?
 	 * 
 	 * The statement is expected to be fully-populated, with no null fields.
 	 */
-	public static boolean isAuthorizedToAdd(VitroRequest vreq, Statement stmt) {
-		if ((vreq == null) || (stmt == null)) {
+	public static boolean isAuthorizedToAdd(HttpServletRequest req,
+			Statement stmt, OntModel modelToBeModified) {
+		if ((req == null) || (stmt == null) || (modelToBeModified == null)) {
 			return false;
 		}
 
@@ -101,46 +83,25 @@ public class PolicyHelper {
 
 		RequestedAction action;
 		if (objectNode.isResource()) {
-			action = new AddObjectPropertyStatement(vreq.getJenaOntModel(),
+			action = new AddObjectPropertyStatement(modelToBeModified,
 					subject.getURI(), predicate.getURI(), objectNode
 							.asResource().getURI());
 		} else {
-			action = new AddDataPropertyStatement(vreq.getJenaOntModel(),
+			action = new AddDataPropertyStatement(modelToBeModified,
 					subject.getURI(), predicate.getURI());
 		}
-		return isAuthorizedForActions(vreq, action);
+		return isAuthorizedForActions(req, action);
 	}
 
 	/**
-	 * Do the current policies authorize the current user to drop all of the
-	 * statements in this model?
-	 */
-	public static boolean isAuthorizedToDrop(VitroRequest vreq, Model model) {
-		if ((vreq == null) || (model == null)) {
-			return false;
-		}
-
-		StmtIterator stmts = model.listStatements();
-		try {
-			while (stmts.hasNext()) {
-				if (!isAuthorizedToDrop(vreq, stmts.next())) {
-					return false;
-				}
-			}
-			return true;
-		} finally {
-			stmts.close();
-		}
-	}
-
-	/**
-	 * Do the current policies authorize the current user to drop this
-	 * statement?
+	 * Do the current policies authorize the current user to drop this statement
+	 * from this model?
 	 * 
 	 * The statement is expected to be fully-populated, with no null fields.
 	 */
-	public static boolean isAuthorizedToDrop(VitroRequest vreq, Statement stmt) {
-		if ((vreq == null) || (stmt == null)) {
+	public static boolean isAuthorizedToDrop(HttpServletRequest req,
+			Statement stmt, OntModel modelToBeModified) {
+		if ((req == null) || (stmt == null) || (modelToBeModified == null)) {
 			return false;
 		}
 
@@ -153,14 +114,150 @@ public class PolicyHelper {
 
 		RequestedAction action;
 		if (objectNode.isResource()) {
-			action = new DropObjectPropertyStatement(vreq.getJenaOntModel(),
+			action = new DropObjectPropertyStatement(modelToBeModified,
 					subject.getURI(), predicate.getURI(), objectNode
 							.asResource().getURI());
 		} else {
-			action = new DropDataPropertyStatement(vreq.getJenaOntModel(),
+			action = new DropDataPropertyStatement(modelToBeModified,
 					subject.getURI(), predicate.getURI());
 		}
-		return isAuthorizedForActions(vreq, action);
+		return isAuthorizedForActions(req, action);
+	}
+
+	/**
+	 * Do the current policies authorize the current user to modify this model
+	 * by adding all of the statments in the additions model and dropping all of
+	 * the statements in the retractions model?
+	 * 
+	 * This differs from the other calls to "isAuthorized..." because we always
+	 * expect the answer to be true. If the answer is false, it should be logged
+	 * as an error.
+	 * 
+	 * Even if a statement fails the test, continue to test the others, so the
+	 * log will contain a full record of all failures. This is no more expensive
+	 * than if all statements succeeded.
+	 */
+	public static boolean isAuthorizedAsExpected(HttpServletRequest req,
+			Model additions, Model retractions, OntModel modelBeingModified) {
+		if (req == null) {
+			log.warn("Can't evaluate authorization if req is null");
+			return false;
+		}
+		if (additions == null) {
+			log.warn("Can't evaluate authorization if additions model is null");
+			return false;
+		}
+		if (retractions == null) {
+			log.warn("Can't evaluate authorization if retractions model is null");
+			return false;
+		}
+		if (modelBeingModified == null) {
+			log.warn("Can't evaluate authorization if model being modified is null");
+			return false;
+		}
+
+		/*
+		 * The naive way to test the additions is to test each statement against
+		 * the JenaOntModel. However, some of the statements may not be
+		 * authorized unless others are added first. The client code should not
+		 * need to know which sequence will be successful. The client code only
+		 * cares that such a sequence does exist.
+		 * 
+		 * There are 3 obvious ways to test this, ranging from the most rigorous
+		 * (and most costly) to the least costly (and least rigorous).
+		 * 
+		 * 1. Try all sequences to find one that works. First, try to add each
+		 * statement to the modelBeingModified. If any statement succeeds,
+		 * construct a temporary model that joins that statement to the
+		 * modelBeingModified. Now try the remaining statements against that
+		 * temporary model, adding the statement each time we are successful. If
+		 * we eventually find all of the statements authorized, declare success.
+		 * This is logically rigorous, but could become geometrically expensive
+		 * as statements are repeatedly tried against incremented models. O(n!).
+		 * 
+		 * 2. Try each statement on the assumption that all of the others have
+		 * already been added. So for each statement we create a temporary
+		 * modeol that joins the other additions to the JenaOntModel. If all
+		 * statements pass this test, declare success. This is logically flawed
+		 * since it is possible that two statements would circularly authorize
+		 * each other, but that neither statement could be added first. However,
+		 * that seems like a small risk, and the algorithm is considerably less
+		 * expensive. O(n).
+		 * 
+		 * 3. Try each statement on the assumption that all of the statements
+		 * (including itself) have already been added. If all statements pass
+		 * this test, declare success. This has the additional minor flaw of
+		 * allowing a statement to authorize its own addition, but this seems
+		 * very unlikely. This is about as expensive as choice 2., but much
+		 * simpler to code.
+		 * 
+		 * For now, I am going with choice 3.
+		 */
+
+		boolean result = true;
+
+		OntModel modelToTestAgainst = ModelFactory
+				.createOntologyModel(OntModelSpec.OWL_MEM);
+		modelToTestAgainst.addSubModel(additions);
+		modelToTestAgainst.addSubModel(modelBeingModified);
+
+		StmtIterator addStmts = additions.listStatements();
+		try {
+			while (addStmts.hasNext()) {
+				Statement stmt = addStmts.next();
+				if (isAuthorizedToAdd(req, stmt, modelToTestAgainst)) {
+					if (log.isDebugEnabled()) {
+						log.debug("Last-chance authorization check: "
+								+ "authorized to add statement: "
+								+ formatStatement(stmt));
+					}
+				} else {
+					log.warn("Last-chance authorization check reveals not "
+							+ "authorized to add statement: "
+							+ formatStatement(stmt));
+					result = false;
+				}
+			}
+		} finally {
+			addStmts.close();
+		}
+
+		/*
+		 * For retractions, there is no such conundrum. Assume that all of the
+		 * additions have been added, and check the authorization of each
+		 * retraction.
+		 */
+
+		StmtIterator dropStmts = retractions.listStatements();
+		try {
+			while (dropStmts.hasNext()) {
+				Statement stmt = dropStmts.next();
+				if (isAuthorizedToDrop(req, stmt, modelToTestAgainst)) {
+					if (log.isDebugEnabled()) {
+						log.debug("Last-chance authorization check: "
+								+ "authorized to drop statement: "
+								+ formatStatement(stmt));
+					}
+				} else {
+					log.warn("Last-chance authorization check reveals not "
+							+ "authorized to drop statement: "
+							+ formatStatement(stmt));
+					result = false;
+				}
+			}
+		} finally {
+			dropStmts.close();
+		}
+
+		return result;
+	}
+
+	private static String formatStatement(Statement stmt) {
+		if (stmt == null) {
+			return "null statement";
+		}
+		return "<" + stmt.getSubject() + "> <" + stmt.getPredicate() + "> <"
+				+ stmt.getObject() + ">";
 	}
 
 	/**
