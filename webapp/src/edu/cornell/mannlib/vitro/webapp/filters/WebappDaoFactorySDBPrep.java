@@ -5,6 +5,10 @@ package edu.cornell.mannlib.vitro.webapp.filters;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,18 +25,27 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.graph.Graph;
+import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.query.DataSource;
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.DatasetFactory;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.sdb.SDBFactory;
 import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
 import com.hp.hpl.jena.sdb.sql.SDBConnection;
 
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.SingleContentOntModelSelector;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraphMultilingual;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
@@ -89,6 +102,15 @@ public class WebappDaoFactorySDBPrep implements Filter {
 		Dataset dataset = null;
 		WebappDaoFactory wadf = null;
 		
+		// temporary scaffolding in the rdfapi dev branch
+        // TODO remove me
+        if (ConfigurationProperties.getBean(request).getProperty(
+                "VitroConnection.DataSource.endpointURI") != null) {
+            filterSparql(request, oms, defaultNamespace);
+            filterChain.doFilter(request, response);
+            return;
+        }
+		
 		try {		
 		    if (bds == null || storeDesc == null || oms == null) {
 		        throw new RuntimeException("SDB store not property set up");
@@ -138,6 +160,56 @@ public class WebappDaoFactorySDBPrep implements Filter {
 			}
 		}
 		
+	}
+	
+	private void filterSparql(ServletRequest request, OntModelSelector oms, String defaultNamespace) {
+	    log.info("---------");
+	    
+	    VitroRequest vreq = new VitroRequest((HttpServletRequest) request);
+	    
+        Enumeration<String> headStrs = vreq.getHeaderNames();
+        while (headStrs.hasMoreElements()) {
+            String head = headStrs.nextElement(); 
+            log.info(head + " : "  + vreq.getHeader(head));                     
+        }
+        
+        List<String> langs = new ArrayList<String>();
+        
+        log.info("Accept-Language: " + vreq.getHeader("Accept-Language"));
+        Enumeration<Locale> locs = vreq.getLocales();
+        while (locs.hasMoreElements()) {
+            Locale locale = locs.nextElement();
+            langs.add(locale.toString().replace("_", "-"));
+            log.info(locale.toString() + " / " + locale.getLanguage() + " + " + locale.getCountry() + " : " + locale.getDisplayCountry() + " | " + locale.getLanguage() + " : " + locale.getDisplayLanguage());
+        }
+        WebappDaoFactoryConfig config = new WebappDaoFactoryConfig();
+        config.setDefaultNamespace(defaultNamespace);
+        config.setPreferredLanguages(langs);
+        
+        //okay let's make a graph-backed model
+        String endpointURI = ConfigurationProperties.getBean(
+                request).getProperty("VitroConnection.DataSource.endpointURI");
+        
+        Graph g = new SparqlGraphMultilingual(endpointURI, langs);
+        //Graph g = new SparqlGraph(endpointURI);
+        
+        Model m = ModelFactory.createModelForGraph(g);
+        OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
+        oms = new SingleContentOntModelSelector(om, oms.getDisplayModel(), oms.getUserAccountsModel());
+                        
+        DataSource dataset = DatasetFactory.create();
+        dataset.addNamedModel("fake:fake", m);           
+        
+        WebappDaoFactory wadf = new WebappDaoFactoryJena(oms, config);
+        //wadf = new WebappDaoFactorySDB(oms, dataset, config);
+        vreq.setWebappDaoFactory(wadf);
+        vreq.setFullWebappDaoFactory(wadf);
+        vreq.setUnfilteredWebappDaoFactory(wadf);
+        vreq.setWebappDaoFactory(wadf);
+        vreq.setAssertionsWebappDaoFactory(wadf);
+        vreq.setDataset(dataset);
+        vreq.setJenaOntModel(om);
+        vreq.setOntModelSelector(oms);
 	}
 
 	@Override

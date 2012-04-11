@@ -128,8 +128,6 @@ public class MailUsersServlet extends VitroHttpServlet {
         msgBuf.append("</html>" + lineSeparator );
 
         String msgText = msgBuf.toString();
-        // debugging
-        //PrintWriter outFile = new PrintWriter (new FileWriter(request.getSession().getServletContext().getRealPath("/WEB-INF/LatestMessage.html"),true)); //autoflush
 
         Calendar cal = Calendar.getInstance();
 

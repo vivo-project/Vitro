@@ -2,9 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.io.File;
 import java.sql.SQLException;
 import java.util.Set;
 

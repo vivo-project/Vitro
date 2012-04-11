@@ -133,6 +133,9 @@ webapp/web/WEB-INF/tlds/taglibs-string.tld
 webapp/web/themes/enhanced/css/blueprint/grid.css
 webapp/web/themes/enhanced/css/blueprint/ie.css
 
+# See /doc/3rd-party-licenses.txt for LICENSE file
+webapp/web/css/jquery_plugins/jquery.realperson.css
+
 # PROBLEM: Can't find any info on licensing.
 webapp/web/themes/enhanced/css/blueprint/liquid.css
 

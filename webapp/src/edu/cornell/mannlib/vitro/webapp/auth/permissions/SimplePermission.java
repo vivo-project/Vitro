@@ -84,6 +84,8 @@ public class SimplePermission extends Permission {
 			"UseMiscellaneousEditorPages");
 	public static final SimplePermission USE_MISCELLANEOUS_PAGES = new SimplePermission(
 			"UseMiscellaneousPages");
+	public static final SimplePermission USE_SPARQL_QUERY_PAGE = new SimplePermission(
+			"UseSparqlQueryPage");
 
 	public static List<SimplePermission> getAllInstances() {
 		return new ArrayList<SimplePermission>(allInstances.values());

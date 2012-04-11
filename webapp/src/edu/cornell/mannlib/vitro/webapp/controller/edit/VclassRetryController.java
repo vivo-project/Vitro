@@ -197,7 +197,7 @@ public class VclassRetryController extends BaseEditController {
             Classes2Classes c2c = new Classes2Classes();
             c2c.setSubclassURI(((VClass)newObj).getURI());
             c2c.setSuperclassURI(superclassURI);
-            daoFactory.getClasses2ClassesDao().insertNewClasses2Classes(c2c);            
+            daoFactory.getVClassDao().insertNewClasses2Classes(c2c);            
         }
         public void doUpdated(Object oldObj, Object newObj, EditProcessObject epo) {
             // nothing to do

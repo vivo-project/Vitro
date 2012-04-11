@@ -19,6 +19,7 @@ import com.hp.hpl.jena.query.Dataset;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource.ModelName;
 
 public class VitroRequest extends HttpServletRequestWrapper {
@@ -78,6 +79,10 @@ public class VitroRequest extends HttpServletRequestWrapper {
     	setAttribute("jenaOntModel", ontModel);
     }
     
+    public void setOntModelSelector(OntModelSelector oms) {
+        setAttribute("ontModelSelector", oms);
+    }
+    
     /** gets assertions + inferences WebappDaoFactory with no filtering **/
     public WebappDaoFactory getFullWebappDaoFactory() {
     	Object webappDaoFactoryAttr = _req.getAttribute("fullWebappDaoFactory");
@@ -97,10 +102,24 @@ public class VitroRequest extends HttpServletRequestWrapper {
     public WebappDaoFactory getAssertionsWebappDaoFactory() {
     	Object webappDaoFactoryAttr = _req.getSession().getAttribute("assertionsWebappDaoFactory");
         if (webappDaoFactoryAttr instanceof WebappDaoFactory) {
+             log.info("Returning assertionsWebappDaoFactory from session");
              return (WebappDaoFactory) webappDaoFactoryAttr;
         } else {
-        	return (WebappDaoFactory) _req.getSession().getServletContext().getAttribute("assertionsWebappDaoFactory");	
+            webappDaoFactoryAttr = getAttribute("assertionsWebappDaoFactory");
+            if (webappDaoFactoryAttr instanceof WebappDaoFactory) {
+                log.info("returning assertionsWebappDaoFactory from request attribute");
+                return (WebappDaoFactory) webappDaoFactoryAttr;     
+            } else {
+                log.info("Returning assertionsWebappDaoFactory from context");
+                return (WebappDaoFactory) _req.getSession().getServletContext().getAttribute("assertionsWebappDaoFactory");
+            }
+        		
         }
+    }
+    
+    /** gets assertions-only WebappDaoFactory with no filtering */
+    public void setAssertionsWebappDaoFactory(WebappDaoFactory wadf) {
+        setAttribute("assertionsWebappDaoFactory", wadf); 
     }
     
     /** gets inferences-only WebappDaoFactory with no filtering */
@@ -136,6 +155,16 @@ public class VitroRequest extends HttpServletRequestWrapper {
     	}
     	return jenaOntModel;
     }
+    
+    public OntModelSelector getOntModelSelector() {
+        Object o = this.getAttribute("ontModelSelector");
+        if (o instanceof OntModelSelector) {
+            return (OntModelSelector) o;
+        } else {
+            return null;
+        }
+    }
+    
     
     public OntModel getAssertionsOntModel() {
     	OntModel jenaOntModel = (OntModel)_req.getSession().getAttribute( JenaBaseDao.ASSERTIONS_ONT_MODEL_ATTRIBUTE_NAME );

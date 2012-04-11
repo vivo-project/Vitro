@@ -3,9 +3,11 @@
 <#-- Template for displaying paged search results -->
 
 <h2>
+<#escape x as x?html>
     Search results for '${querytext}'
     <#if classGroupName?has_content>limited to type '${classGroupName}'</#if>
     <#if typeName?has_content>limited to type '${typeName}'</#if>
+</#escape>
 </h2>
 
 <div class="contentsBrowseGroup">

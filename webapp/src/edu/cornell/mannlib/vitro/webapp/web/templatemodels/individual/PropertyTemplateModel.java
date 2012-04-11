@@ -111,7 +111,8 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     }
     
     public String getAddUrl() {
-        return addUrl;
+        //log.info("addUrl=" + addUrl);
+        return (addUrl != null) ? addUrl : "";
     }
     
     public Map<String, Object> getVerboseDisplay() {

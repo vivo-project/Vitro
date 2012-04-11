@@ -338,42 +338,38 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return appBean.getThemeDir().replaceAll("/$", "");
     }
 
-    /** 
-     * Define the request-specific URLs that are accessible to the templates. 
-     * @param VitroRequest vreq
-     */
-    private void setRequestUrls(VitroRequest vreq) {
-        
+	/**
+	 * Define the request-specific URLs that are accessible to the templates.
+	 * Merge it with the context-specific URLs from the configuration, because
+	 * this map will mask that one.
+	 */
+    private Map<String, Object> buildRequestUrls(VitroRequest vreq) {
+        Map<String, Object> requestUrls = new HashMap<String, Object>();
+    	
         FreemarkerConfiguration config = (FreemarkerConfiguration)vreq.getAttribute("freemarkerConfig");
         TemplateModel urlModel = config.getSharedVariable("urls");
         
         try {
             @SuppressWarnings("unchecked")
-            Map<String, Object> urls = (Map<String, Object>) DeepUnwrap.permissiveUnwrap(urlModel);
+			Map<String, Object> configUrls = (Map<String, Object>) DeepUnwrap.permissiveUnwrap(urlModel);
+			requestUrls.putAll(configUrls);
             
             // This is request-specific because email can be configured
             // and de-configured in the application interface. 
             if (FreemarkerEmailFactory.isConfigured(vreq)) {
-                urls.put("contact", UrlBuilder.getUrl(Route.CONTACT));
-            } else {
-                urls.remove("contact"); // clear value from a previous request
+                requestUrls.put("contact", UrlBuilder.getUrl(Route.CONTACT));
             }      
             
-            urls.put("currentPage", getCurrentPageUrl(vreq));
-            urls.put("referringPage", getReferringPageUrl(vreq));
+            requestUrls.put("currentPage", getCurrentPageUrl(vreq));
+            requestUrls.put("referringPage", getReferringPageUrl(vreq));
             
             if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.EDIT_OWN_ACCOUNT.ACTIONS)) {
-                urls.put("myAccount", UrlBuilder.getUrl("/accounts/myAccount"));
-            } else {
-                urls.remove("myAccount"); // clear value from a previous request
+            	requestUrls.put("myAccount", UrlBuilder.getUrl("/accounts/myAccount"));
             }
-            
-            config.setSharedVariable("urls", urls);
-
         } catch (TemplateModelException e) {
             log.error(e, e);
         }
-
+        return requestUrls;
     }
     
     private String getCurrentPageUrl(HttpServletRequest request) {
@@ -424,7 +420,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         // This may be overridden by the body data model received from the subcontroller.
         map.put("title", getTitle(vreq.getAppBean().getApplicationName(), vreq));
         
-        setRequestUrls(vreq);
+        map.put("urls", buildRequestUrls(vreq));
 
         map.put("menu", getDisplayModelMenu(vreq));
         

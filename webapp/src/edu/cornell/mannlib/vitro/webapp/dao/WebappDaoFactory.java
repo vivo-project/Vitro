@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.dao;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public interface WebappDaoFactory {
@@ -12,12 +11,6 @@ public interface WebappDaoFactory {
      * Free any resources associated with this WebappDaoFactory  
      */
     public void close();
-	
-	/**
-	 * Retrieves a map containing arbitrary key-value pairs describing this 
-	 * WebappDaoFactory
-	 */
-	public Map<String,String> getProperties();
 
 	/**
 	 * Checks a URI String for two things: well-formedness and uniqueness in the
@@ -39,7 +32,7 @@ public interface WebappDaoFactory {
     
     public Set<String> getNonuserNamespaces();
     
-    public String[] getPreferredLanguages();
+    public List<String> getPreferredLanguages();
     
     /**
      * BJL23 2008-05-20: Putting this here for lack of a more logical place.  
@@ -65,11 +58,6 @@ public interface WebappDaoFactory {
     public String getUserURI();
 
     /* =============== DAOs for ontology (TBox) manipulation =============== */
-
-    /**
-     * returns a Data Access Object for working with class subsumption axioms 
-     */
-    public Classes2ClassesDao getClasses2ClassesDao();
 
     /**
      * returns a Data Access Object for working with DataProperties

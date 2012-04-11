@@ -207,7 +207,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         ObjectPropertyDao opDao = wdf.getObjectPropertyDao();
         ObjectProperty op = opDao.getObjectPropertyByURI(propertyUri);
         if (op == null) {
-            log.error("ObjectProperty op returned null from opDao.getObjectPropertyByURI()");
+            log.error("ObjectProperty op returned null from opDao.getObjectPropertyByURI(" + propertyUri + ")");
         } else if (op.getURI() == null) {
             log.error("ObjectProperty op returned with null propertyURI from opDao.getObjectPropertyByURI()");
         } else {

@@ -43,12 +43,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
  * Allows for real-time incremental materialization or retraction of RDFS-
  * style class and property subsumption based ABox inferences as statements
  * are added to or removed from the (ABox or TBox) knowledge base. 
+ * @author sjm222
  */
 
 public class SimpleReasoner extends StatementListener {
 
 	private static final Log log = LogFactory.getLog(SimpleReasoner.class);
-	//private static final MyTempLogger log = new MyTempLogger();
 	
 	private OntModel tboxModel;             // asserted and inferred TBox axioms
 	private OntModel aboxModel;             // ABox assertions
@@ -120,9 +120,9 @@ public class SimpleReasoner extends StatementListener {
 	}
 	
 	/*
-	 * Performs selected incremental ABox reasoning based
-	 * on the addition of a new statement (aka assertion) 
-	 * to the ABox.
+	 * Performs incremental ABox reasoning based
+	 * on the addition of a new statement
+	 *  (aka assertion) to the ABox.
 	 */
 	@Override
 	public void addedStatement(Statement stmt) {
@@ -142,7 +142,7 @@ public class SimpleReasoner extends StatementListener {
 	}
 	
 	/*
-	 * Performs selected incremental ABox reasoning based
+	 * Performs incremental ABox reasoning based
 	 * on the retraction of a statement (aka assertion)
 	 * from the ABox. 
 	 */
@@ -160,7 +160,12 @@ public class SimpleReasoner extends StatementListener {
 		}
 	}
 	
-	public synchronized void handleRemovedStatement(Statement stmt) {
+	
+	/*
+	 * Synchronized part of removedStatement. Interacts
+	 * with DeltaComputer.
+	 */
+	protected synchronized void handleRemovedStatement(Statement stmt) {
 		
 		if (batchMode1) {
 			 aBoxDeltaModeler1.removedStatement(stmt);
@@ -176,7 +181,7 @@ public class SimpleReasoner extends StatementListener {
 	}
 	
 	/*
-	 * Performs incremental selected ABox reasoning based
+	 * Performs incremental ABox reasoning based
 	 * on changes to the class hierarchy.
 	 * 
 	 * Handles rdfs:subclassOf, owl:equivalentClass, 
@@ -229,7 +234,7 @@ public class SimpleReasoner extends StatementListener {
 	}
 
 	/*
-	 * Performs incremental selected ABox reasoning based
+	 * Performs incremental ABox reasoning based
 	 * on changes to the class hierarchy.
 	 * 
 	 * Handles rdfs:subclassOf, owl:equivalentClass, 
@@ -281,10 +286,10 @@ public class SimpleReasoner extends StatementListener {
 		}
 	}
 
-	/*
-	 * 
-	 */
-	public void addedABoxTypeAssertion(Resource individual, Model inferenceModel, HashSet<String> unknownTypes) {
+    /*
+     * This signature used when recomputing the whole ABox
+     */
+	protected void addedABoxTypeAssertion(Resource individual, Model inferenceModel, HashSet<String> unknownTypes) {
 
 		StmtIterator iter = null;
 		
@@ -302,6 +307,7 @@ public class SimpleReasoner extends StatementListener {
 			aboxModel.leaveCriticalSection();
 		}
 	}
+	
 	/*
 	 * Performs incremental reasoning based on a new type assertion
 	 * added to the ABox (assertion that an individual is of a certain
@@ -309,9 +315,8 @@ public class SimpleReasoner extends StatementListener {
 	 * 
 	 * If it is added that B is of type A, then for each superclass of
 	 * A assert that B is of that type.
-	 * 
 	 */
-	public void addedABoxTypeAssertion(Statement stmt, Model inferenceModel, HashSet<String> unknownTypes) {
+	protected void addedABoxTypeAssertion(Statement stmt, Model inferenceModel, HashSet<String> unknownTypes) {
 		
 		tboxModel.enterCriticalSection(Lock.READ);
 		
@@ -377,13 +382,10 @@ public class SimpleReasoner extends StatementListener {
 	 * that B is of that type.
 	 * 
 	 */
-	public void removedABoxTypeAssertion(Statement stmt, Model inferenceModel) {
+	protected void removedABoxTypeAssertion(Statement stmt, Model inferenceModel) {
 				
 		tboxModel.enterCriticalSection(Lock.READ);
-		
-		// convert this method to use generic resources - not get ontclass, not cls.listSuperClasses...
-		// use model contains if want to log warning about type owl class
-		
+				
 		try {
 			
 			OntClass cls = null;
@@ -431,7 +433,6 @@ public class SimpleReasoner extends StatementListener {
 						inferenceModel.enterCriticalSection(Lock.WRITE);
 						try {
 							if (inferenceModel.contains(infStmt)) {
-								//log.debug("Removing this inferred statement:  " + infStmt.toString() + " - " + infStmt.getSubject().toString() + " - " + infStmt.getPredicate().toString() + " - " + infStmt.getObject().toString());
 								inferenceModel.remove(infStmt);
 							}
 						} finally {
@@ -454,7 +455,7 @@ public class SimpleReasoner extends StatementListener {
 	
 	// Returns true if it is entailed by class subsumption that
 	// subject is of type cls; otherwise returns false.
-	public boolean entailedType(Resource subject, OntClass cls) {
+	protected boolean entailedType(Resource subject, OntClass cls) {
 		aboxModel.enterCriticalSection(Lock.READ);
 		tboxModel.enterCriticalSection(Lock.READ);
 		
@@ -485,9 +486,9 @@ public class SimpleReasoner extends StatementListener {
 	/*
 	 * If it is added that B is a subClass of A, then for each
 	 * individual that is typed as B, either in the ABox or in the
-	 * inferred model, assert that it is of type A.
+	 * inferred model, infer that it is of type A.
 	 */
-	public void addedSubClass(OntClass subClass, OntClass superClass, Model inferenceModel) {
+	protected void addedSubClass(OntClass subClass, OntClass superClass, Model inferenceModel) {
 		log.debug("subClass = " + subClass.getURI() + " superClass = " + superClass.getURI());
 		OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
 		unionModel.addSubModel(aboxModel);
@@ -530,7 +531,7 @@ public class SimpleReasoner extends StatementListener {
 	 * UNLESS the individual is of some type C that is a subClass 
 	 * of A (including A itself)
 	 */
-	public void removedSubClass(OntClass subClass, OntClass superClass, Model inferenceModel) {
+	protected void removedSubClass(OntClass subClass, OntClass superClass, Model inferenceModel) {
 		OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
 		unionModel.addSubModel(aboxModel);
 		unionModel.addSubModel(inferenceModel);
@@ -567,10 +568,10 @@ public class SimpleReasoner extends StatementListener {
 
 	/*
      * Find the most specific types (classes) of an individual and
-     * indicate them for the individual with the core:mostSpecificType
+     * indicate them for the individual with the mostSpecificType
      * annotation.
 	 */
-	public void setMostSpecificTypes(Resource individual, Model inferenceModel, HashSet<String> unknownTypes) {
+	protected void setMostSpecificTypes(Resource individual, Model inferenceModel, HashSet<String> unknownTypes) {
 			
 		tboxModel.enterCriticalSection(Lock.READ);
 		aboxModel.enterCriticalSection(Lock.READ);
@@ -665,13 +666,13 @@ public class SimpleReasoner extends StatementListener {
 	    return;	
 	}
 	
-	public void setMostSpecificTypes(Resource individual, HashSet<String> typeURIs, Model inferenceModel) {
+	protected void setMostSpecificTypes(Resource individual, HashSet<String> typeURIs, Model inferenceModel) {
 		
 		inferenceModel.enterCriticalSection(Lock.WRITE);
 		
 		try {
 		    Model retractions = ModelFactory.createDefaultModel();
-			// remove obsolete most-specific-type assertions
+			// remove obsolete mostSpecificType assertions
 			StmtIterator iter = inferenceModel.listStatements(individual, mostSpecificType, (RDFNode) null);
 			
 			while (iter.hasNext()) {
@@ -689,7 +690,7 @@ public class SimpleReasoner extends StatementListener {
 			
 			inferenceModel.remove(retractions);
 			
-			// add new most-specific-type assertions 
+			// add new mostSpecificType assertions 
 			Iterator<String> typeIter = typeURIs.iterator();
 			
 			while (typeIter.hasNext()) {
@@ -706,13 +707,13 @@ public class SimpleReasoner extends StatementListener {
 	
 	    return;	
 	}
-	
-	private boolean recomputing = false;
-	
+		
 	/**
 	 * Returns true if the reasoner is in the process of recomputing all
 	 * inferences.
 	 */
+	private boolean recomputing = false;
+	
 	public boolean isRecomputing() {
 	    return recomputing;
 	}
@@ -731,14 +732,14 @@ public class SimpleReasoner extends StatementListener {
 
 	/*
 	 * Recompute the entire ABox inference graph. The new 
-	 * inference graph is built up in a separate model and
-	 * then reconciled with the inference graph used by the
-	 * application. The model reconciliation must be done
+	 * inference graph is built in a separate model and
+	 * then reconciled with the inference graph in active
+	 * use. The model reconciliation must be done
 	 * without reading the whole inference models into 
 	 * memory in order to support very large ABox 
 	 * inference models.	  
 	 */
-	public synchronized void recomputeABox() {
+	protected synchronized void recomputeABox() {
 		
 		HashSet<String> unknownTypes = new HashSet<String>();
 		
@@ -799,8 +800,8 @@ public class SimpleReasoner extends StatementListener {
 		
 		log.info("Finished computing class-based ABox inferences");
 		
-		// reflect the recomputed inferences into the application inference
-		// model.
+		// reflect the recomputed inferences into the application
+		// inference model.
 	    log.info("Updating ABox inference model");
 	    StmtIterator iter = null;
  
@@ -912,24 +913,17 @@ public class SimpleReasoner extends StatementListener {
 		
 		log.info("ABox inference model updated");
 	}
-
-	public synchronized boolean isABoxReasoningAsynchronous() {
-         if (batchMode1 || batchMode2) {
-        	 return true;
-         } else {
-        	 return false;
-         }
-	}
-		
-
-   
-	public ArrayList<String> getAllIndividualURIs() {
+			
+	/*
+	 * Get the URIs for all individuals in the system
+	 */
+	protected ArrayList<String> getAllIndividualURIs() {
 	    
 		String queryString = "select distinct ?subject where {?subject <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type}";
         return getIndividualURIs(queryString);
 	}
 
-	public ArrayList<String> getIndividualURIs(String queryString) {
+	protected ArrayList<String> getIndividualURIs(String queryString) {
 	    
 		ArrayList<String> individuals = new ArrayList<String>();
 		aboxModel.enterCriticalSection(Lock.READ);	
@@ -960,6 +954,19 @@ public class SimpleReasoner extends StatementListener {
 		return individuals;
 	}
     
+	
+	// system-configured reasoning modules (plugins)
+	public boolean isInterestedInRemovedStatement(Statement stmt) {
+		
+		if (stmt.getPredicate().equals(RDF.type)) return true;
+
+		for (ReasonerPlugin plugin : getPluginList()) {
+			if (plugin.isInterestedInRemovedStatement(stmt)) return true;
+		}
+		
+        return false;
+	}
+	
 	protected void doPlugins(ModelUpdate.Operation op, Statement stmt) {
 		
 		for (ReasonerPlugin plugin : getPluginList()) {
@@ -982,36 +989,37 @@ public class SimpleReasoner extends StatementListener {
 			}
 		}
 	}
-	
-	public boolean isInterestedInRemovedStatement(Statement stmt) {
 		
-		if (stmt.getPredicate().equals(RDF.type)) return true;
-
-		for (ReasonerPlugin plugin : getPluginList()) {
-			if (plugin.isInterestedInRemovedStatement(stmt)) return true;
-		}
-		
-        return false;
-	}
-	
-	//TODO remove this for 1.5
-	public synchronized void computeMostSpecificType() {
-
-	}
-	
 	/**
-	 * This is called when the system shuts down.
+	 * This is called when the application shuts down.
 	 */
 	public void setStopRequested() {
 	    this.stopRequested = true;
 	}
-    
+	
+	/*
+	 * Utility method for logging
+	 */
     public static String stmtString(Statement statement) {
     	return  " [subject = " + statement.getSubject().getURI() +
     			"] [property = " + statement.getPredicate().getURI() +
                 "] [object = " + (statement.getObject().isLiteral() ? ((Literal)statement.getObject()).getLexicalForm() + " (Literal)"
                 		                                          : ((Resource)statement.getObject()).getURI() + " (Resource)") + "]";	
     }  
+	
+    
+    // DeltaComputer
+    
+	/*
+	 * Asynchronous reasoning mode (DeltaComputer) is used in the case of batch removals. 
+	 */
+	public synchronized boolean isABoxReasoningAsynchronous() {
+         if (batchMode1 || batchMode2) {
+        	 return true;
+         } else {
+        	 return false;
+         }
+	}
     
 	private volatile boolean deltaComputerProcessing = false;
 	private int eventCount = 0;
@@ -1083,7 +1091,7 @@ public class SimpleReasoner extends StatementListener {
     		   }
     	    }
 	   } else { 
-		    log.warn("unexpected condition, invoked when batchMode1 and batchMode2 were both false");
+		    log.warn("unexpected condition, invoked when batchMode1 and batchMode2 are both false");
             deltaComputerProcessing = false;
 	   }
        
@@ -1174,5 +1182,5 @@ public class SimpleReasoner extends StatementListener {
         	
         	log.info("ending DeltaComputer.run. batchMode1 = " + batchMode1 + ", batchMode2 = " + batchMode2);
         }        
-    }    
+    }   
 }

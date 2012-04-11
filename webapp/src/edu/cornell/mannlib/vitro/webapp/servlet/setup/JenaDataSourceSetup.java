@@ -68,6 +68,14 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
         ServletContext ctx = sce.getServletContext();
         StartupStatus ss = StartupStatus.getBean(ctx);
         
+        // temporary scaffolding in the rdfapi dev branch
+        // TODO remove me
+        if (ConfigurationProperties.getBean(ctx).getProperty(
+                "VitroConnection.DataSource.endpointURI") != null) {
+            (new JenaDataSourceSetupSparql()).contextInitialized(sce);
+            return;
+        }
+        
         try {
             long startTime = System.currentTimeMillis();
             setUpJenaDataSource(ctx);

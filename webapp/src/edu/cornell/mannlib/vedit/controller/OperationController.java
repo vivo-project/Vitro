@@ -441,14 +441,14 @@ public class OperationController extends BaseEditController {
             } catch (InvocationTargetException e) {
                 log.error(this.getClass().getName()+" encountered exception performing two-stage update");
                 Throwable innerE = e.getTargetException();
-                log.error(innerE);
+                log.error(innerE, innerE);
                 if (innerE.getMessage()!=null) {
-                	log.error(innerE.getMessage());
+                	//log.error(innerE.getMessage());
                 	epo.setAttribute("globalErrorMsg",innerE.getMessage());
                 }
                 return FAILURE;
             } catch (IllegalAccessException iae) {
-            	log.error(iae);
+            	log.error(iae, iae);
             	epo.setAttribute("globalErrorMessage", "Illegal access - see error logs.");
             	return FAILURE;
             }
@@ -459,15 +459,15 @@ public class OperationController extends BaseEditController {
             	log.error(this.getClass().getName()+" encountered exception performing edit action");
                 Throwable innerE = e.getTargetException();
                 //innerE.printStackTrace();
-                log.error(innerE);
+                log.error(innerE, innerE);
                 if (innerE.getMessage()!=null) {
                     //System.out.println(innerE.getMessage());
-                	log.error(innerE.getMessage());
+                	//log.error(innerE.getMessage());
                 	epo.setAttribute("globalErrorMsg",innerE.getMessage());
                 }
                 return FAILURE;
             } catch (IllegalAccessException iae) {
-            	log.error(iae);
+            	log.error(iae, iae);
             	epo.setAttribute("globalErrorMessage", "Illegal access - see error logs.");
             	return FAILURE;
             }

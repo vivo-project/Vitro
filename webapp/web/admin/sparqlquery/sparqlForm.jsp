@@ -7,7 +7,7 @@
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission" %>
-<% request.setAttribute("requestedActions", SimplePermission.MANAGE_PORTALS.ACTION); %>
+<% request.setAttribute("requestedActions", SimplePermission.USE_SPARQL_QUERY_PAGE.ACTION); %>
 <vitro:confirmAuthorization />
 
 <body>

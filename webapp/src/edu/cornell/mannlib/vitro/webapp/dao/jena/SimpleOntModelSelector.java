@@ -14,14 +14,14 @@ import com.hp.hpl.jena.shared.Lock;
  */
 public class SimpleOntModelSelector implements OntModelSelector {
 
-	private OntModel fullModel;
-	private OntModel aboxModel;
-	private OntModel applicationMetadataModel;
-	private OntModel tboxModel;
-	private OntModel userAccountsModel;
+	protected OntModel fullModel;
+	protected OntModel aboxModel;
+	protected OntModel applicationMetadataModel;
+	protected OntModel tboxModel;
+	protected OntModel userAccountsModel;
 	
-	private OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
-	private OntModel displayModel;
+	protected OntModelSpec DEFAULT_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
+	protected OntModel displayModel;
 	
 	/**
 	 * Construct an OntModelSelector with a bunch of empty models

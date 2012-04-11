@@ -82,11 +82,25 @@ public class SparqlGraph implements GraphWithPerform {
     @Override
     public void performAdd(Triple t) {
         
-        String updateString = "INSERT DATA { " 
+        //log.info("adding " + t);
+        
+        String updateString = "INSERT DATA { GRAPH <junk:junk> { " 
                 + sparqlNode(t.getSubject(), "") + " " 
                 + sparqlNode(t.getPredicate(), "") + " " 
                 + sparqlNode(t.getObject(), "") + 
-                "}";
+                " } }";
+        
+        if (false) {
+            try { 
+            
+                throw new RuntimeException("Breakpoint");
+            } catch (RuntimeException e) {
+                log.error(e, e);
+                //throw(e);
+            }
+        }
+        
+        //log.info(updateString);
         
         try {
             RepositoryConnection conn = getConnection();
@@ -108,11 +122,15 @@ public class SparqlGraph implements GraphWithPerform {
     
     @Override
     public void performDelete(Triple t) {
-        String updateString = "DELETE DATA { " 
+        log.info ("************** DELETE!!!!! ********************");
+        
+        String updateString = "DELETE DATA { GRAPH <junk:junk> { " 
                 + sparqlNode(t.getSubject(), "") + " " 
                 + sparqlNode(t.getPredicate(), "") + " " 
                 + sparqlNode(t.getObject(), "") + 
-                "}";
+                " } }";
+        
+        log.info(updateString);
         
         try {
             RepositoryConnection conn = getConnection();
@@ -158,6 +176,7 @@ public class SparqlGraph implements GraphWithPerform {
 
     @Override
     public void delete(Triple arg0) throws DeleteDeniedException {
+        log.info("********************** DELETE!!!!!! ************************");
         performDelete(arg0);
     }
 
@@ -212,7 +231,7 @@ public class SparqlGraph implements GraphWithPerform {
         .append(sparqlNode(object, "?o"))
         .append("\n}");
         
-        log.info(findQuery.toString());
+        //log.info(findQuery.toString());
         ResultSet rs = execSelect(findQuery.toString());
         //rs = execSelect(findQuery.toString());
         //rs = execSelect(findQuery.toString());
@@ -226,6 +245,7 @@ public class SparqlGraph implements GraphWithPerform {
             //log.info(t);
             triplist.add(t);
         }
+        //log.info(triplist.size() + " results");
         return WrappedIterator.create(triplist.iterator());
     }
 
@@ -236,7 +256,7 @@ public class SparqlGraph implements GraphWithPerform {
     @Override
     public BulkUpdateHandler getBulkUpdateHandler() {
         if (this.bulkUpdateHandler == null) {
-            this.bulkUpdateHandler = new SimpleBulkUpdateHandler(this);
+            this.bulkUpdateHandler = new SparqlGraphBulkUpdater(this);
         }
         return this.bulkUpdateHandler;
     }
@@ -383,7 +403,7 @@ public class SparqlGraph implements GraphWithPerform {
         try {
             return new ResultSetMem(qe.execSelect());
         } finally {
-            log.info((System.currentTimeMillis() - startTime) + " to execute via Jena");
+            //log.info((System.currentTimeMillis() - startTime) + " to execute via Jena");
             qe.close();
         }
     }

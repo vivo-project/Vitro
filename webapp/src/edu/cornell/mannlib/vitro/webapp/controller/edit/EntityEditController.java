@@ -47,7 +47,8 @@ public class EntityEditController extends BaseEditController {
         String entURI = request.getParameter("uri");
         VitroRequest vreq = (new VitroRequest(request));
         ApplicationBean application = vreq.getAppBean();
-
+        
+        //Individual ent = vreq.getWebappDaoFactory().getIndividualDao().getIndividualByURI(entURI);
         Individual ent = vreq.getAssertionsWebappDaoFactory().getIndividualDao().getIndividualByURI(entURI);
         if (ent == null) {
         	try {

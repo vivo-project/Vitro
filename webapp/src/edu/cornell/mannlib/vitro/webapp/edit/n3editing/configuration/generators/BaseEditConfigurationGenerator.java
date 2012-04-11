@@ -66,7 +66,7 @@ public abstract class BaseEditConfigurationGenerator implements EditConfiguratio
         //setup the model selectors for query, write and display models on editConfig
         setupModelSelectorsFromVitroRequest(vreq, editConfig);        
         
-        OntModel queryModel = (OntModel)vreq.getAttribute("jenaOntModel");
+        OntModel queryModel = vreq.getJenaOntModel(); // (OntModel)vreq.getAttribute("jenaOntModel");
         
         if( editConfig.getSubjectUri() == null)
             editConfig.setSubjectUri( EditConfigurationUtils.getSubjectUri(vreq));

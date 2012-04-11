@@ -19,6 +19,10 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfigurationConstants;
+import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualLocalNameMethod;
+import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualPlaceholderImageUrlMethod;
+import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualProfileUrlMethod;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
@@ -108,6 +112,9 @@ public class FreemarkerConfiguration extends Configuration {
         sharedVariables.putAll(getMethods());
         sharedVariables.put("siteTagline", appBean.getShortHand()); 
         
+        //Put in edit configuration constants - useful for freemarker templates/editing
+        sharedVariables.put("editConfigurationConstants", EditConfigurationConstants.exportConstants());
+        
         for ( Map.Entry<String, Object> variable : sharedVariables.entrySet() ) {
             try {
                 setSharedVariable(variable.getKey(), variable.getValue());
@@ -156,8 +163,9 @@ public class FreemarkerConfiguration extends Configuration {
     
     public static Map<String, Object> getMethods() {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("profileUrl", new edu.cornell.mannlib.vitro.webapp.web.methods.IndividualProfileUrlMethod());
-        map.put("localName", new edu.cornell.mannlib.vitro.webapp.web.methods.IndividualLocalNameMethod());
+        map.put("profileUrl", new IndividualProfileUrlMethod());
+        map.put("localName", new IndividualLocalNameMethod());
+        map.put("placeholderImageUrl", new IndividualPlaceholderImageUrlMethod());
         return map;
     }
     

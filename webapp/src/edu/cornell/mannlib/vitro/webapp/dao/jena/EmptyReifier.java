@@ -43,17 +43,17 @@ public class EmptyReifier implements Reifier {
 
     @Override
     public ExtendedIterator<Triple> find(TripleMatch arg0) {
-        return WrappedIterator.create(Collections.EMPTY_LIST.iterator());
+        return g.find(arg0);
     }
 
     @Override
     public ExtendedIterator<Triple> findEither(TripleMatch arg0, boolean arg1) {
-        return WrappedIterator.create(Collections.EMPTY_LIST.iterator());
+        return find(arg0);
     }
 
     @Override
     public ExtendedIterator<Triple> findExposed(TripleMatch arg0) {
-        return WrappedIterator.create(Collections.EMPTY_LIST.iterator());
+        return find(arg0);
     }
 
     @Override
@@ -68,14 +68,14 @@ public class EmptyReifier implements Reifier {
 
     @Override
     public boolean handledAdd(Triple arg0) {
-        // TODO Auto-generated method stub
-        return false;
+        g.add(arg0);
+        return true;
     }
 
     @Override
     public boolean handledRemove(Triple arg0) {
-        // TODO Auto-generated method stub
-        return false;
+        g.delete(arg0);
+        return true;
     }
 
     @Override
@@ -98,20 +98,17 @@ public class EmptyReifier implements Reifier {
 
     @Override
     public void remove(Triple arg0) {
-        // TODO Auto-generated method stub
-
+        g.delete(arg0);
     }
 
     @Override
     public void remove(Node arg0, Triple arg1) {
-        // TODO Auto-generated method stub
-
+        g.delete(arg1);
     }
 
     @Override
     public int size() {
-        // TODO Auto-generated method stub
-        return 0;
+        return g.size();
     }
 
 }

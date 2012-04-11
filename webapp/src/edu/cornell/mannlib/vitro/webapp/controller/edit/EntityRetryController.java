@@ -78,7 +78,11 @@ public class EntityRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        WebappDaoFactory wadf = (vreq.getAssertionsWebappDaoFactory()!=null) ? vreq.getAssertionsWebappDaoFactory() : vreq.getFullWebappDaoFactory();
+        WebappDaoFactory wadf = vreq.getAssertionsWebappDaoFactory();
+        if (wadf == null) {
+            log.info("Using vreq.getFullWebappDaoFactory()");
+            vreq.getFullWebappDaoFactory();
+        } 
         
         LoginStatusBean loginBean = LoginStatusBean.getBean(request);
         WebappDaoFactory myWebappDaoFactory = wadf.getUserAwareDaoFactory(loginBean.getUserURI());

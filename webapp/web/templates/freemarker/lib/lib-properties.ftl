@@ -89,8 +89,8 @@ Assumes property is non-null. -->
 <#-- Some properties usually display without a label. But if there's an add link, 
 we need to also show the property label. If no label is specified, the property
 name will be used as the label. -->
-<#macro addLinkWithLabel property editable label="${property.name?capitalize}" extraParams="">
-    <#local addLink><@addLink property editable label extraParams /></#local>
+<#macro addLinkWithLabel property editable label="${property.name?capitalize}">
+    <#local addLink><@addLink property editable label /></#local>
     <#local verboseDisplay><@verboseDisplay property /></#local>
     <#-- Changed to display the label when user is in edit mode, even if there's no add link (due to 
     displayLimitAnnot, for example). Otherwise the display looks odd, since neighboring 
@@ -104,23 +104,14 @@ name will be used as the label. -->
     </#if>
 </#macro>
 
-<#macro addLink property editable label="${property.name}" extraParams="">
+<#macro addLink property editable label="${property.name}">
     <#if editable>
         <#local url = property.addUrl>
         <#if url?has_content>
-            <@showAddLink property.localName label addParamsToEditUrl(url, extraParams) />
+            <@showAddLink property.localName label url />
         </#if>
     </#if>
 </#macro>
-
-<#function addParamsToEditUrl url extraParams="">
-    <#if extraParams?is_hash_ex>
-        <#list extraParams?keys as key>
-            <#local url = "${url}&${key}=${extraParams[key]?url}">
-        </#list>
-    </#if>
-    <#return url>
-</#function>
 
 <#macro showAddLink propertyLocalName label url>
     <a class="add-${propertyLocalName}" href="${url}" title="Add new ${label?lower_case} entry"><img class="add-individual" src="${urls.images}/individual/addIcon.gif" alt="add" /></a>
@@ -138,18 +129,18 @@ name will be used as the label. -->
     </li>
 </#macro>
 
-<#macro editingLinks propertyLocalName statement editable extraParams="">
+<#macro editingLinks propertyLocalName statement editable>
     <#if editable>
-        <@editLink propertyLocalName statement extraParams />
-        <@deleteLink propertyLocalName statement extraParams />
+        <@editLink propertyLocalName statement />
+        <@deleteLink propertyLocalName statement />
      
     </#if>
 </#macro>
 
-<#macro editLink propertyLocalName statement extraParams="">
+<#macro editLink propertyLocalName statement>
     <#local url = statement.editUrl>
     <#if url?has_content>
-        <@showEditLink propertyLocalName addParamsToEditUrl(url, extraParams) />
+        <@showEditLink propertyLocalName url />
     </#if>
 </#macro>
 
@@ -157,10 +148,10 @@ name will be used as the label. -->
     <a class="edit-${propertyLocalName}" href="${url}" title="edit this entry"><img class="edit-individual" src="${urls.images}/individual/editIcon.gif" alt="edit" /></a>
 </#macro>
 
-<#macro deleteLink propertyLocalName statement extraParams=""> 
+<#macro deleteLink propertyLocalName statement> 
     <#local url = statement.deleteUrl>
     <#if url?has_content>
-        <@showDeleteLink propertyLocalName addParamsToEditUrl(url, extraParams) />
+        <@showDeleteLink propertyLocalName url />
     </#if>
 </#macro>
 
@@ -191,25 +182,21 @@ name will be used as the label. -->
      
      Note that this macro has a side-effect in the call to propertyGroups.pullProperty().
 -->
-<#macro image individual propertyGroups namespaces editable showPlaceholder="never" placeholder="">
+<#macro image individual propertyGroups namespaces editable showPlaceholder="never">
     <#local mainImage = propertyGroups.pullProperty("${namespaces.vitroPublic}mainImage")!>
-    <#local extraParams = "">
-    <#if placeholder?has_content>
-        <#local extraParams = { "placeholder" : placeholder } >
-    </#if>
     <#local thumbUrl = individual.thumbUrl!>
     <#-- Don't assume that if the mainImage property is populated, there is a thumbnail image (though that is the general case).
          If there's a mainImage statement but no thumbnail image, treat it as if there is no image. -->
     <#if (mainImage.statements)?has_content && thumbUrl?has_content>
-        <a href="${individual.imageUrl}" title="individual photo"><img class="individual-photo" src="${thumbUrl}" title="click to view larger image" alt="${individual.name}" width="160" /></a>
-        <@editingLinks "${mainImage.localName}" mainImage.first() editable extraParams />
+        <a href="${individual.imageUrl}" title="individual photo">
+        	<img class="individual-photo" src="${thumbUrl}" title="click to view larger image" alt="${individual.name}" width="160" />
+        </a>
+        <@editingLinks "${mainImage.localName}" mainImage.first() editable />
     <#else>
-        <#local imageLabel><@addLinkWithLabel mainImage editable "Photo" extraParams /></#local>
+        <#local imageLabel><@addLinkWithLabel mainImage editable "Photo" /></#local>
         ${imageLabel}
-        <#if placeholder?has_content>
-            <#if showPlaceholder == "always" || (showPlaceholder="with_add_link" && imageLabel?has_content)>
-                <img class="individual-photo" src="${placeholder}" title = "no image" alt="placeholder image" width="160" />
-            </#if>
+        <#if showPlaceholder == "always" || (showPlaceholder="with_add_link" && imageLabel?has_content)>
+            <img class="individual-photo" src="${placeholderImageUrl(individual.uri)}" title = "no image" alt="placeholder image" width="160" />
         </#if>
     </#if>
 </#macro>

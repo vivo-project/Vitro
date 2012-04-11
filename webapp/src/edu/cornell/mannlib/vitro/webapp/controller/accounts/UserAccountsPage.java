@@ -35,9 +35,6 @@ public abstract class UserAccountsPage extends AbstractPageHandler {
 
 	private static final String PERSON_CLASS_URI = "http://xmlns.com/foaf/0.1/Person";
 
-	private static final String DEFAULT_IMAGE_URL = UrlBuilder
-			.getUrl("/images/placeholders/person.thumbnail.jpg");
-
 	/**
 	 * After the account is created, or the password is reset, the user has this
 	 * many days to repond to the email.
@@ -109,7 +106,6 @@ public abstract class UserAccountsPage extends AbstractPageHandler {
 				UrlBuilder.getUrl("/accounts/firstTimeExternal"));
 		map.put("accountsAjax", UrlBuilder.getUrl("/accountsAjax"));
 		map.put("proxyAjax", UrlBuilder.getUrl("/proxiesAjax"));
-		map.put("defaultImageUrl", DEFAULT_IMAGE_URL);
 
 		return map;
 	}

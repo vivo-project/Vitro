@@ -22,6 +22,7 @@ auth:ADMIN
     auth:hasPermission simplePermission:SeeStartupStatus ;
     auth:hasPermission simplePermission:UseAdvancedDataToolsPages ;
     auth:hasPermission simplePermission:UseMiscellaneousAdminPages ;
+    auth:hasPermission simplePermission:UseSparqlQueryPage ;
     
     # permissions for CURATOR and above.
     auth:hasPermission simplePermission:EditOntology ;

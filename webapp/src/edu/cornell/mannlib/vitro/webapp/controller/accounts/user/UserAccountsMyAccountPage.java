@@ -26,6 +26,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.web.images.PlaceholderUtil;
 
 /**
  * Handle the "My Account" form display and submission.
@@ -268,7 +270,9 @@ public class UserAccountsMyAccountPage extends UserAccountsPage {
 		String userUri = proxyUser.getUri();
 		String label = assembleUserAccountLabel(proxyUser);
 		String classLabel = "";
-		String imageUrl = "";
+		String imageUrl = UrlBuilder.getUrl(PlaceholderUtil
+				.getPlaceholderImagePathForType(vreq,
+						VitroVocabulary.USERACCOUNT));
 
 		// Does this user have a profile? Can we get better info?
 		Individual proxyProfilePage = getProfilePage(proxyUser);

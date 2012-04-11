@@ -32,4 +32,4 @@ display:Home
 ########## Data Getter ############
     
 <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#homeDataGetter>
-      a <java:edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.BrowseDataGetter> .    
+      a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.BrowseDataGetter> .    

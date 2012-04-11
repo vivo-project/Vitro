@@ -16,7 +16,6 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mindswap.pellet.PelletOptions;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.OWL;
@@ -45,6 +44,14 @@ public class SimpleReasonerSetup implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+        
+        // temporary scaffolding in the rdfapi dev branch
+        // TODO remove me
+        if (ConfigurationProperties.getBean(sce).getProperty(
+                "VitroConnection.DataSource.endpointURI") != null) {
+            return;
+        }
+        
         try {    
             // set up Pellet reasoning for the TBox    
             
@@ -60,12 +67,12 @@ public class SimpleReasonerSetup implements ServletContextListener {
             }
             
             // Set various Pellet options for incremental consistency checking, etc.
-            PelletOptions.DL_SAFE_RULES = true;
-            PelletOptions.USE_COMPLETION_QUEUE = true;
-            PelletOptions.USE_TRACING = true;
-            PelletOptions.TRACK_BRANCH_EFFECTS = true;
-            PelletOptions.USE_INCREMENTAL_CONSISTENCY = true;
-            PelletOptions.USE_INCREMENTAL_DELETION = true;
+            //PelletOptions.DL_SAFE_RULES = true;
+            //PelletOptions.USE_COMPLETION_QUEUE = true;
+            //PelletOptions.USE_TRACING = true;
+            //PelletOptions.TRACK_BRANCH_EFFECTS = true;
+            //PelletOptions.USE_INCREMENTAL_CONSISTENCY = true;
+            //PelletOptions.USE_INCREMENTAL_DELETION = true;
              
             PelletListener pelletListener = new PelletListener(unionOms.getTBoxModel(),assertionsOms.getTBoxModel(),inferencesOms.getTBoxModel(),ReasonerConfiguration.DEFAULT);
             sce.getServletContext().setAttribute("pelletListener",pelletListener);

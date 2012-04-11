@@ -24,9 +24,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
-import edu.cornell.mannlib.vitro.webapp.utils.ImageUtil;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
+import edu.cornell.mannlib.vitro.webapp.web.images.PlaceholderUtil;
 
 /**
  * Get the basic auto-complete info for the proxy selection.
@@ -64,8 +64,9 @@ public class BasicProxiesGetter extends AbstractAjaxResponder {
 		OntModelSelector oms = ModelContext.getUnionOntModelSelector(ctx);
 		userAccountsModel = oms.getUserAccountsModel();
 
-		placeholderImageUrl = UrlBuilder.getUrl(ImageUtil
-				.getPlaceholderImagePathForType(VitroVocabulary.USERACCOUNT));
+		placeholderImageUrl = UrlBuilder.getUrl(PlaceholderUtil
+				.getPlaceholderImagePathForType(vreq,
+						VitroVocabulary.USERACCOUNT));
 	}
 
 	@Override

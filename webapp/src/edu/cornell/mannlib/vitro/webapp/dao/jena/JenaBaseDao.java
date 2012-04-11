@@ -80,7 +80,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 
     protected String DEFAULT_NAMESPACE;
     protected Set<String> NONUSER_NAMESPACES;
-    protected String[] PREFERRED_LANGUAGES;
+    protected List<String> PREFERRED_LANGUAGES;
 
     /* ******************* constructor ************************* */
     
@@ -501,7 +501,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
                 }
             }
         } catch (Exception e) {
-            log.error("Error in updatePropertyDateValue");
+            log.error("Error in updatePropertyDateValue", e);
         }
     }
     
@@ -552,8 +552,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
                 }
             }
         } catch (Exception e) {
-            log.error("Error in updatePropertyDateTimeValue");
-            log.error(e, e);
+            log.error("Error in updatePropertyDateTimeValue", e);
         }
     }
 
@@ -767,7 +766,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     		if (label.isLiteral()) {
     			Literal labelLit = ((Literal)label);
     			String labelLanguage = labelLit.getLanguage();
-    			if ( (labelLanguage==null) && (lang==null) ) {
+    			if ( (labelLanguage == null) && (lang == null || lang.isEmpty()) ) {
     				return labelLit;
     			}
     			if ( (lang != null) && (lang.equals(labelLanguage)) ) {
@@ -856,6 +855,10 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     private Literal tryPropertyForPreferredLanguages( OntResource r, Property p, boolean alsoTryNoLang ) {
     	Literal label = null;
 	    List<RDFNode> labels = r.listPropertyValues(p).toList();
+	    
+	    if (labels.size() == 0) {
+	        return null;
+	    }
 
 	    // Sort by lexical value to guarantee consistent results
 	    Collections.sort(labels, new Comparator<RDFNode>() {
@@ -871,8 +874,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 	        }
 	    });
 	    
-	    for (int i=0; i<PREFERRED_LANGUAGES.length; i++) {
-	    	String lang = PREFERRED_LANGUAGES[i];
+	    for (String lang : PREFERRED_LANGUAGES) {
 	    	label = getLabel(lang,labels);
 	    	if (label != null) {
 	    		break;
@@ -880,12 +882,21 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 	    }
         if ( label == null && alsoTryNoLang ) {
         	label = getLabel("", labels);
+        	// accept any label as a last resort
+        	if (label == null) {
+        	    for (RDFNode labelNode : labels) {
+        	      if (labelNode instanceof Literal) {
+        	          label = ((Literal) labelNode);
+        	          break;
+        	      }
+        	    }
+        	}
         }
 	    return label;
     }
 
     protected String getDefaultLanguage() {
-        return PREFERRED_LANGUAGES[0];
+        return PREFERRED_LANGUAGES.get(0);
     }
     
     /**

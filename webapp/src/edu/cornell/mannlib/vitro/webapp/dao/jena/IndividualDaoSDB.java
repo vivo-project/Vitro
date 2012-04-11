@@ -187,9 +187,10 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     		        continue;
     		    }
     		    if (uri != null && !uri.equals(currRes.getURI())) {
-    		        Individual ent = makeIndividual(uri, label);
-    		        if (ent != null) {
-    		            ents.add(ent);
+    		        try {
+    		            ents.add(makeIndividual(uri, label));
+    		        } catch (IndividualNotFoundException e) {
+    		            // don't add
     		        }
     	            uri = currRes.getURI();
     	            label = null;
@@ -201,9 +202,10 @@ public class IndividualDaoSDB extends IndividualDaoJena {
                     label = labelLit.getLexicalForm();
                 }
                 if (!rs.hasNext()) {
-                    Individual ent = makeIndividual(uri, label);
-                    if (ent != null) {
-                        ents.add(ent);
+                    try {
+                        ents.add(makeIndividual(uri, label));
+                    } catch (IndividualNotFoundException e) {
+                        // don't add   
                     }
                 }
     		}
@@ -237,8 +239,12 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     		    if (currRes.isAnon()) {
     		        continue;
     		    }
-    		    filteredIndividualList.add(
-    		    		makeIndividual(currRes.getURI(), null));
+    		    try {
+    		        filteredIndividualList.add(
+    		    	    	makeIndividual(currRes.getURI(), null));
+    		    } catch (IndividualNotFoundException e) {
+    		        // don't add
+    		    }
     		}
        	} finally {
     		dataset.getLock().leaveCriticalSection();
@@ -247,7 +253,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
        	return filteredIndividualList;
     }
     
-    private Individual makeIndividual(String uri, String label) {
+    private Individual makeIndividual(String uri, String label) throws IndividualNotFoundException {
         Individual ent = new IndividualSDB(uri, 
                 this.dwf, datasetMode, getWebappDaoFactory(), 
                 SKIP_INITIALIZATION);
