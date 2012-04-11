@@ -101,10 +101,9 @@ public class SparqlGraphMultilingual extends SparqlGraph implements GraphWithPer
                 log.info("raw time " + rawTime + " ; filter time " + filterTime);
             }
             return WrappedIterator.create(tripl.iterator());
-        } else {
-            long filterTime = System.currentTimeMillis() - rawTime - startTime;
+        } else { 
             if (rawTime > 9) {
-                log.info("raw time " + rawTime + " ; filter time " + filterTime);
+                log.info("raw time " + rawTime);
                 log.info("^ " + subject + " : " + predicate + " : " + object);
             }
             return WrappedIterator.create(tripList.iterator());
