@@ -110,7 +110,7 @@ public class FileServingServlet extends VitroHttpServlet {
 			in = fileStorage.getInputStream(fileInfo.getBytestreamUri(),
 					actualFilename);
 		} catch (FileNotFoundException e) {
-			log.error(e, e);
+			log.error("Expected file doesn't exist: " + e);
 			response.sendError(SC_INTERNAL_SERVER_ERROR, e.toString());
 			return;
 		}

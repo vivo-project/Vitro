@@ -450,7 +450,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 				predicateUri, 
 				objectKey, 
 		        statementDisplay, 
-		        false, null, vreq);
+		        null, vreq);
 		ReadOnlyBeansWrapper wrapper = new ReadOnlyBeansWrapper();
 		return wrapper.wrap(osm);
     }

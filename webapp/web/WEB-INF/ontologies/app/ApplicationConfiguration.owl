@@ -1,0 +1,595 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<rdf:RDF xmlns="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#"
+     xml:base="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <owl:Ontology rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Datatypes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#configContextFor -->
+
+    <owl:ObjectProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#configContextFor">
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ConfigContext"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#dataSelector -->
+
+    <owl:ObjectProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#dataSelector">
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#DisplayView"/>
+        <rdfs:range rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#SparqlSelectQuery"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#entryForm -->
+
+    <owl:ObjectProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#entryForm">
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#PropertyEditConfig"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#hasConfiguration -->
+
+    <owl:ObjectProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#hasConfiguration">
+        <rdfs:range rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ApplicationConfig"/>
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ConfigContext"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#hasDisplayView -->
+
+    <owl:ObjectProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#hasDisplayView">
+        <rdfs:subPropertyOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#hasDisplayView"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#hasListView -->
+
+    <owl:ObjectProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#hasListView">
+        <rdfs:range rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ListDisplayView"/>
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#PropertyDisplayConfig"/>
+        <rdfs:subPropertyOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#hasDisplayView"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#hasShortView -->
+
+    <owl:ObjectProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#hasShortView">
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ClassDisplayConfig"/>
+        <rdfs:range rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ShortDisplayView"/>
+        <rdfs:subPropertyOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#hasDisplayView"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#inheritingConfigContextFor -->
+
+    <owl:ObjectProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#inheritingConfigContextFor">
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ConfigContext"/>
+        <rdfs:subPropertyOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#configContextFor"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#inheritingQualifiedBy -->
+
+    <owl:ObjectProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#inheritingQualifiedBy">
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ConfigContext"/>
+        <rdfs:subPropertyOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#qualifiedBy"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#modelConstructor -->
+
+    <owl:ObjectProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#modelConstructor">
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#DisplayView"/>
+        <rdfs:range rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#SparqlConstructQuery"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#nonInheritingConfigContextFor -->
+
+    <owl:ObjectProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#nonInheritingConfigContextFor">
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ConfigContext"/>
+        <rdfs:subPropertyOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#configContextFor"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#nonInheritingQualifiedBy -->
+
+    <owl:ObjectProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#nonInheritingQualifiedBy">
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ConfigContext"/>
+        <rdfs:subPropertyOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#qualifiedBy"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#offerEdit -->
+
+    <owl:ObjectProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#offerEdit">
+        <rdfs:range rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#OfferEditOption"/>
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#PropertyEditConfig"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#qualifiedBy -->
+
+    <owl:ObjectProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#qualifiedBy">
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ConfigContext"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#suppressEditControl -->
+
+    <owl:ObjectProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#suppressEditControl">
+        <rdfs:range rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#EditControl"/>
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#PropertyEditConfig"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#templateFile -->
+
+    <owl:ObjectProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#templateFile">
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#DisplayView"/>
+        <rdfs:range rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#FreemarkerTemplate"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#valuesOfType -->
+
+    <owl:ObjectProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#valuesOfType">
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ObjectPropertyEditConfig"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#aggregateEdit -->
+
+    <owl:DatatypeProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#aggregateEdit">
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#PropertyEditConfig"/>
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#collateBySubclass -->
+
+    <owl:DatatypeProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#collateBySubclass">
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ObjectPropertyDisplayConfig"/>
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#displayLimit -->
+
+    <owl:DatatypeProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#displayLimit">
+        <rdfs:range rdf:resource="&xsd;nonNegativeInteger"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ClassDisplayConfig"/>
+                    <rdf:Description rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#PropertyDisplayConfig"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#displayName -->
+
+    <owl:DatatypeProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#displayName">
+        <rdfs:comment>range is intended to be plain literal with language tag.</rdfs:comment>
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#DisplayConfig"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#displayRank -->
+
+    <owl:DatatypeProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#displayRank">
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#DisplayConfig"/>
+        <rdfs:range rdf:resource="&xsd;nonNegativeInteger"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#entryLimit -->
+
+    <owl:DatatypeProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#entryLimit">
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#EditConfig"/>
+        <rdfs:range rdf:resource="&xsd;nonNegativeInteger"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#fileName -->
+
+    <owl:DatatypeProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#fileName">
+        <rdfs:comment>range is intended to be plain literal with language tag.</rdfs:comment>
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#Template"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#mediaType -->
+
+    <owl:DatatypeProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#mediaType">
+        <rdfs:comment>&#39;text/html&#39; for html content</rdfs:comment>
+        <rdfs:comment>range is intended to be plain literal with a language tag.</rdfs:comment>
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#DatatypePropertyDisplayConfig"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#offerCreate -->
+
+    <owl:DatatypeProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#offerCreate">
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ObjectPropertyEditConfig"/>
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#publicDescription -->
+
+    <owl:DatatypeProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#publicDescription">
+        <rdfs:comment>range is intended to be plain literal with language tag.</rdfs:comment>
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ApplicationConfig"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#queryString -->
+
+    <owl:DatatypeProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#queryString">
+        <rdfs:comment>range is intended to be plain literal with language tag.</rdfs:comment>
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#SparqlQuery"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#selectFromExisting -->
+
+    <owl:DatatypeProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#selectFromExisting">
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ObjectPropertyEditConfig"/>
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#suppressDisplay -->
+
+    <owl:DatatypeProperty rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#suppressDisplay">
+        <rdfs:domain rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#DisplayConfig"/>
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#AddControl -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#AddControl">
+        <rdfs:subClassOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#EditControl"/>
+    </owl:Class>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#Application -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#Application">
+        <rdfs:subClassOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ConfigContext"/>
+    </owl:Class>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ApplicationConfig -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ApplicationConfig">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+    </owl:Class>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ChangeControl -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ChangeControl">
+        <rdfs:subClassOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#EditControl"/>
+    </owl:Class>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ClassDisplayConfig -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ClassDisplayConfig">
+        <rdfs:subClassOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#DisplayConfig"/>
+    </owl:Class>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ClassEditConfig -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ClassEditConfig">
+        <rdfs:subClassOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#EditConfig"/>
+    </owl:Class>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ConfigContext -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ConfigContext"/>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#DatatypePropertyDisplayConfig -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#DatatypePropertyDisplayConfig">
+        <rdfs:subClassOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#PropertyDisplayConfig"/>
+    </owl:Class>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#DatatypePropertyEditConfig -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#DatatypePropertyEditConfig">
+        <rdfs:subClassOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#PropertyEditConfig"/>
+    </owl:Class>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#DeleteControl -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#DeleteControl">
+        <rdfs:subClassOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#EditControl"/>
+    </owl:Class>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#DisplayConfig -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#DisplayConfig">
+        <rdfs:subClassOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ApplicationConfig"/>
+    </owl:Class>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#DisplayView -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#DisplayView"/>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#EditConfig -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#EditConfig">
+        <rdfs:subClassOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ApplicationConfig"/>
+    </owl:Class>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#EditControl -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#EditControl"/>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#FreemarkerTemplate -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#FreemarkerTemplate">
+        <rdfs:subClassOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#Template"/>
+    </owl:Class>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ListDisplayView -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ListDisplayView">
+        <rdfs:subClassOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#DisplayView"/>
+    </owl:Class>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ObjectPropertyDisplayConfig -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ObjectPropertyDisplayConfig">
+        <rdfs:subClassOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#PropertyDisplayConfig"/>
+    </owl:Class>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ObjectPropertyEditConfig -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ObjectPropertyEditConfig">
+        <rdfs:subClassOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#PropertyEditConfig"/>
+    </owl:Class>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#OfferEditOption -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#OfferEditOption"/>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#PropertyDisplayConfig -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#PropertyDisplayConfig">
+        <rdfs:subClassOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#DisplayConfig"/>
+    </owl:Class>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#PropertyEditConfig -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#PropertyEditConfig">
+        <rdfs:subClassOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#EditConfig"/>
+    </owl:Class>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ShortDisplayView -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ShortDisplayView">
+        <rdfs:subClassOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#DisplayView"/>
+    </owl:Class>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#SparqlConstructQuery -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#SparqlConstructQuery">
+        <rdfs:subClassOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#SparqlQuery"/>
+    </owl:Class>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#SparqlQuery -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#SparqlQuery"/>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#SparqlSelectQuery -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#SparqlSelectQuery">
+        <rdfs:subClassOf rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#SparqlQuery"/>
+    </owl:Class>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#Template -->
+
+    <owl:Class rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#Template">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#defer -->
+
+    <owl:NamedIndividual rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#defer">
+        <rdf:type rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#OfferEditOption"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#false -->
+
+    <owl:NamedIndividual rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#false">
+        <rdf:type rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#OfferEditOption"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ifStatement -->
+
+    <owl:NamedIndividual rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#ifStatement">
+        <rdf:type rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#OfferEditOption"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#true -->
+
+    <owl:NamedIndividual rdf:about="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#true">
+        <rdf:type rdf:resource="http://http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#OfferEditOption"/>
+    </owl:NamedIndividual>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.2.3.1824) http://owlapi.sourceforge.net -->
+

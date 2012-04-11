@@ -15,6 +15,7 @@ import stubs.edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestricti
 import stubs.javax.servlet.ServletContextStub;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.impl.RDFDefaultErrorHandler;
 
@@ -26,11 +27,9 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasProfile;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditDataPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditDataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -69,6 +68,14 @@ public class SelfEditingPolicy_2_Test extends AbstractTestClass {
 	/** A bundle that contains a SelfEditing individual. */
 	IdentifierBundle ids;
 
+	/**
+	 * An empty model that acts as a placeholder in the requested actions. The
+	 * SelfEditingPolicy does not base its decisions on the contents of the
+	 * model.
+	 */
+	private OntModel ontModel;
+
+	
 	@Before
 	public void setUp() throws Exception {
 		InputStream is = getClass().getResourceAsStream(
@@ -78,6 +85,7 @@ public class SelfEditingPolicy_2_Test extends AbstractTestClass {
 		// suppress the warning messages from loading the model.
 		setLoggerLevel(RDFDefaultErrorHandler.class, Level.OFF);
 
+		// TODO This doesn't appear to be used for anything. Can it go away, along with the data file?
 		OntModel model = ModelFactory.createOntologyModel();
 		model.read(is, "");
 		Assert.assertNotNull(model);
@@ -96,6 +104,8 @@ public class SelfEditingPolicy_2_Test extends AbstractTestClass {
 
 		ids = new ArrayIdentifierBundle(new HasProfile(SELFEDITOR_URI));
 
+		ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+
 		// setLoggerLevel(SelfEditingPolicySetupTest.class, Level.DEBUG);
 	}
 
@@ -112,8 +122,8 @@ public class SelfEditingPolicy_2_Test extends AbstractTestClass {
 
 	@Test
 	public void nullIdentifierBundle() {
-		AddObjectPropStmt whatToAuth = new AddObjectPropStmt(SELFEDITOR_URI,
-				SAFE_PREDICATE, SAFE_RESOURCE);
+		AddObjectPropertyStatement whatToAuth = new AddObjectPropertyStatement(
+				ontModel, SELFEDITOR_URI, SAFE_PREDICATE, SAFE_RESOURCE);
 		PolicyDecision dec = policy.isAuthorized(null, whatToAuth);
 		Assert.assertNotNull(dec);
 		Assert.assertEquals(Authorization.INCONCLUSIVE, dec.getAuthorized());
@@ -261,13 +271,13 @@ public class SelfEditingPolicy_2_Test extends AbstractTestClass {
 	// ------------------------------------------------------------------------
 
 	/**
-	 * Create an {@link AddObjectPropStmt}, test it, and compare to expected
-	 * results.
+	 * Create an {@link AddObjectPropertyStatement}, test it, and compare to
+	 * expected results.
 	 */
 	private void assertAddObjectPropStmt(String uriOfSub, String uriOfPred,
 			String uriOfObj, Authorization expectedAuthorization) {
-		AddObjectPropStmt whatToAuth = new AddObjectPropStmt(uriOfSub,
-				uriOfPred, uriOfObj);
+		AddObjectPropertyStatement whatToAuth = new AddObjectPropertyStatement(
+				ontModel, uriOfSub, uriOfPred, uriOfObj);
 		PolicyDecision dec = policy.isAuthorized(ids, whatToAuth);
 		log.debug(dec);
 		Assert.assertNotNull(dec);
@@ -275,13 +285,13 @@ public class SelfEditingPolicy_2_Test extends AbstractTestClass {
 	}
 
 	/**
-	 * Create an {@link EditObjPropStmt}, test it, and compare to expected
-	 * results.
+	 * Create an {@link EditObjectPropertyStatement}, test it, and compare to
+	 * expected results.
 	 */
 	private void assertEditObjPropStmt(String uriOfSub, String uriOfPred,
 			String uriOfObj, Authorization expectedAuthorization) {
-		EditObjPropStmt whatToAuth = new EditObjPropStmt(uriOfSub, uriOfPred,
-				uriOfObj);
+		EditObjectPropertyStatement whatToAuth = new EditObjectPropertyStatement(
+				ontModel, uriOfSub, uriOfPred, uriOfObj);
 		PolicyDecision dec = policy.isAuthorized(ids, whatToAuth);
 		log.debug(dec);
 		Assert.assertNotNull(dec);
@@ -289,17 +299,13 @@ public class SelfEditingPolicy_2_Test extends AbstractTestClass {
 	}
 
 	/**
-	 * Create an {@link EditDataPropStmt}, test it, and compare to expected
-	 * results.
+	 * Create an {@link EditDataPropertyStatement}, test it, and compare to
+	 * expected results.
 	 */
 	private void assertEditDataPropStmt(String individualURI,
 			String datapropURI, String data, Authorization expectedAuthorization) {
-		DataPropertyStatement dps = new DataPropertyStatementImpl();
-		dps.setIndividualURI(individualURI);
-		dps.setDatapropURI(datapropURI);
-		dps.setData(data);
-
-		EditDataPropStmt whatToAuth = new EditDataPropStmt(dps);
+		EditDataPropertyStatement whatToAuth = new EditDataPropertyStatement(
+				ontModel, individualURI, datapropURI);
 		PolicyDecision dec = policy.isAuthorized(ids, whatToAuth);
 		log.debug(dec);
 		Assert.assertNotNull(dec);

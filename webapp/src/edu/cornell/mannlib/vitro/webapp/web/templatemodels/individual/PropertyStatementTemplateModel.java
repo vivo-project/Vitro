@@ -2,46 +2,28 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 public abstract class PropertyStatementTemplateModel extends BaseTemplateModel {
+	protected static final String EDIT_PATH = "editRequestDispatch";  
 
-    private static final Log log = LogFactory.getLog(PropertyStatementTemplateModel.class); 
-    
     protected final VitroRequest vreq;
-    // Used for editing
     protected final String subjectUri;
     protected final String propertyUri;
-    protected String editUrl;
-    protected String deleteUrl;
- 
     
     PropertyStatementTemplateModel(String subjectUri, String propertyUri, VitroRequest vreq) {
         this.vreq = vreq;        
         this.subjectUri = subjectUri;
         this.propertyUri = propertyUri;              
-        editUrl = "";
-        deleteUrl = "";
     }
-    
-    
     
     /* Template properties */
     
-    public String getEditUrl() {
-        return editUrl;
-    }
-    
-    public String getDeleteUrl() {
-        return deleteUrl;
-    }
-    
+    public abstract String getEditUrl();
+    public abstract String getDeleteUrl();
     public boolean isEditable() {
-        return ! editUrl.isEmpty();
+        return ! getEditUrl().isEmpty();
     }
 
 }

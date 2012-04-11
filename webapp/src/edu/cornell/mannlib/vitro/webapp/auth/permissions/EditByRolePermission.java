@@ -9,8 +9,8 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractDataPropertyAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractObjectPropertyAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractDataPropertyStatementAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractObjectPropertyStatementAction;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 
 /**
@@ -55,10 +55,10 @@ public class EditByRolePermission extends Permission {
 	public boolean isAuthorized(RequestedAction whatToAuth) {
 		boolean result;
 
-		if (whatToAuth instanceof AbstractDataPropertyAction) {
-			result = isAuthorized((AbstractDataPropertyAction) whatToAuth);
-		} else if (whatToAuth instanceof AbstractObjectPropertyAction) {
-			result = isAuthorized((AbstractObjectPropertyAction) whatToAuth);
+		if (whatToAuth instanceof AbstractDataPropertyStatementAction) {
+			result = isAuthorized((AbstractDataPropertyStatementAction) whatToAuth);
+		} else if (whatToAuth instanceof AbstractObjectPropertyStatementAction) {
+			result = isAuthorized((AbstractObjectPropertyStatementAction) whatToAuth);
 		} else {
 			result = false;
 		}
@@ -76,7 +76,7 @@ public class EditByRolePermission extends Permission {
 	 * The user may add, edit, or delete this data property if they are allowed
 	 * to modify its subject and its predicate.
 	 */
-	private boolean isAuthorized(AbstractDataPropertyAction action) {
+	private boolean isAuthorized(AbstractDataPropertyStatementAction action) {
 		String subjectUri = action.getSubjectUri();
 		String predicateUri = action.getPredicateUri();
 		return canModifyResource(subjectUri)
@@ -87,10 +87,10 @@ public class EditByRolePermission extends Permission {
 	 * The user may add, edit, or delete this data property if they are allowed
 	 * to modify its subject, its predicate, and its object.
 	 */
-	private boolean isAuthorized(AbstractObjectPropertyAction action) {
-		String subjectUri = action.getUriOfSubject();
-		String predicateUri = action.getUriOfPredicate();
-		String objectUri = action.getUriOfObject();
+	private boolean isAuthorized(AbstractObjectPropertyStatementAction action) {
+		String subjectUri = action.getSubjectUri();
+		String predicateUri = action.getPredicateUri();
+		String objectUri = action.getObjectUri();
 		return canModifyResource(subjectUri)
 				&& canModifyPredicate(predicateUri)
 				&& canModifyResource(objectUri);

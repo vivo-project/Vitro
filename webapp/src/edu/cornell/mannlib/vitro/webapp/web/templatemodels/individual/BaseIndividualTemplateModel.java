@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -15,8 +17,8 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -37,12 +39,14 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
     protected final Individual individual;
     protected final LoginStatusBean loginStatusBean;
     protected final VitroRequest vreq;
+    private final ServletContext ctx;
     private final boolean editing;
     
     protected GroupedPropertyList propertyList;
     
     public BaseIndividualTemplateModel(Individual individual, VitroRequest vreq) {
         this.vreq = vreq;
+        this.ctx = vreq.getSession().getServletContext();
         this.individual = individual;
         this.loginStatusBean = LoginStatusBean.getBean(vreq);
         // Needed for getting portal-sensitive urls. Remove if multi-portal support is removed.
@@ -54,7 +58,7 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         boolean isVClass = individual.isVClass(vClassUri);  
         // If reasoning is asynchronous (under RDB), this inference may not have been made yet. 
         // Check the superclasses of the individual's vclass.
-        SimpleReasoner simpleReasoner = (SimpleReasoner)getServletContext().getAttribute(SimpleReasoner.class.getName());
+        SimpleReasoner simpleReasoner = (SimpleReasoner) ctx.getAttribute(SimpleReasoner.class.getName());
         if (!isVClass && simpleReasoner != null && simpleReasoner.isABoxReasoningAsynchronous()) { 
             log.debug("Checking superclasses to see if individual is a " + vClassUri + " because reasoning is asynchronous");
             List<VClass> directVClasses = individual.getVClasses(true);
@@ -108,10 +112,11 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
 	 * an object property to the Individual being shown.
 	 */
     public boolean isEditable() {
-		AddDataPropStmt adps = new AddDataPropStmt(individual.getURI(),
-				RequestActionConstants.SOME_URI,
-				RequestActionConstants.SOME_LITERAL, null, null);
-		AddObjectPropStmt aops = new AddObjectPropStmt(individual.getURI(),
+		AddDataPropertyStatement adps = new AddDataPropertyStatement(
+				vreq.getJenaOntModel(), individual.getURI(),
+				RequestActionConstants.SOME_URI);
+		AddObjectPropertyStatement aops = new AddObjectPropertyStatement(
+				vreq.getJenaOntModel(), individual.getURI(),
 				RequestActionConstants.SOME_URI,
 				RequestActionConstants.SOME_URI);
     	return PolicyHelper.isAuthorizedForActions(vreq, new Actions(adps).or(aops));
@@ -127,7 +132,7 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
      * are handled like ordinary ObjectProperty instances.
      */
     public NameStatementTemplateModel getNameStatement() {
-        return new NameStatementTemplateModel(getUri(), vreq, editing);
+        return new NameStatementTemplateModel(getUri(), vreq);
     }
     
     /* These methods simply forward to the methods of the wrapped individual. It would be desirable to 
@@ -216,7 +221,7 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
     public String selfEditingId() {
         String id = null;
         String idMatchingProperty = 
-            ConfigurationProperties.getBean(getServletContext()).getProperty("selfEditing.idMatchingProperty");
+            ConfigurationProperties.getBean(ctx).getProperty("selfEditing.idMatchingProperty");
         if (! StringUtils.isBlank(idMatchingProperty)) {
             WebappDaoFactory wdf = vreq.getUnfilteredWebappDaoFactory();
             Collection<DataPropertyStatement> ids = 

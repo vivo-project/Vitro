@@ -145,6 +145,11 @@ public class PermissionRegistry {
 			}
 		}
 
+		/**
+		 * There is no DisplayByRolePermission for self-editors. They get the
+		 * same rights as PUBLIC. Other permissions give them their self-editing
+		 * privileges.
+		 */
 		private Collection<Permission> createDisplayByRolePermissions(
 				ServletContext ctx) {
 			List<Permission> list = new ArrayList<Permission>();
@@ -159,13 +164,20 @@ public class PermissionRegistry {
 			return list;
 		}
 
+		/**
+		 * There is no EditByRolePermission for PUBLIC or for self-editors. A
+		 * property may be given an edit-level of "PUBLIC", but that may also
+		 * simply be the default assigned to it when editing, and we don't want
+		 * to recognize that.
+		 * 
+		 * Other permissions give self-editors their editing privileges.
+		 */
 		private Collection<Permission> createEditByRolePermissions(
 				ServletContext ctx) {
 			List<Permission> list = new ArrayList<Permission>();
 			list.add(new EditByRolePermission("Admin", RoleLevel.DB_ADMIN, ctx));
 			list.add(new EditByRolePermission("Curator", RoleLevel.CURATOR, ctx));
 			list.add(new EditByRolePermission("Editor", RoleLevel.EDITOR, ctx));
-			list.add(new EditByRolePermission("Public", RoleLevel.PUBLIC, ctx));
 			return list;
 		}
 

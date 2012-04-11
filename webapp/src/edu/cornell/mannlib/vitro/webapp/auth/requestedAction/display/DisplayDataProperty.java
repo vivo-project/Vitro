@@ -16,4 +16,9 @@ public class DisplayDataProperty extends RequestedAction {
 	public DataProperty getDataProperty() {
 		return dataProperty;
 	}
+
+	@Override
+	public String toString() {
+		return "DisplayDataProperty[" + dataProperty + "]";
+	}
 }

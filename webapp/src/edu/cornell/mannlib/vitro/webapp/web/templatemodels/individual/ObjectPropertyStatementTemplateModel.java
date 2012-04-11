@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -9,8 +11,8 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -19,107 +21,104 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMa
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class ObjectPropertyStatementTemplateModel extends PropertyStatementTemplateModel {
-    
     private static final Log log = LogFactory.getLog(ObjectPropertyStatementTemplateModel.class); 
     
-    private static final String EDIT_PATH = "editRequestDispatch";
-
     private final Map<String, String> data;
     
-    // Used for editing
     private final String objectUri;
     private final String templateName;
     private final String objectKey;
+    private final String editUrl;
+    private final String deleteUrl;
+    
     public ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, String objectKey, 
-            Map<String, String> data, boolean editing, String templateName, VitroRequest vreq) {
+            Map<String, String> data, String templateName, VitroRequest vreq) {
         super(subjectUri, propertyUri, vreq);
         
-        this.data = data;
+        this.data = Collections.unmodifiableMap(new HashMap<String, String>(data));
         this.objectUri = data.get(objectKey);        
         this.templateName = templateName;
         //to keep track of later
         this.objectKey = objectKey;
         
-        if ( editing ) {
-        	setEditUrls();
-        }
+        ObjectPropertyStatement ops = new ObjectPropertyStatementImpl(subjectUri, propertyUri, objectUri);
+        
+        // Do delete url first, since it is used in building edit url
+        this.deleteUrl = makeDeleteUrl();
+        this.editUrl = makeEditUrl(ops);
     }
 
-    protected void setEditUrls() {
-        // If we are in edit mode, create the list of editing permissions.
-        // We do this now rather than in getEditUrl() and getDeleteUrl(), because getEditUrl() also needs to know
-        // whether a delete is allowed.
-        ObjectPropertyStatement ops = new ObjectPropertyStatementImpl(subjectUri, propertyUri, objectUri);
-            
-        // Do delete url first, since used in building edit url
-        setDeleteUrl();
-        setEditUrl(ops);
-    }
-    
-    protected void setDeleteUrl() {
+	private String makeDeleteUrl() {
+    	// Is the delete link suppressed for this property?
+    	if (new EditLinkSuppressor(vreq).isDeleteLinkSuppressed(propertyUri)) {
+    		return "";
+    	}
         
         // Determine whether the statement can be deleted
-        RequestedAction action = new DropObjectPropStmt(subjectUri, propertyUri, objectUri);
+		RequestedAction action = new DropObjectPropertyStatement(
+				vreq.getJenaOntModel(), subjectUri, propertyUri, objectUri);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
-            return;
+            return "";
         }
         
         if (propertyUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
-            deleteUrl = ObjectPropertyTemplateModel.getImageUploadUrl(subjectUri, "delete");
-        } else {
-            ParamMap params = new ParamMap(
-                    "subjectUri", subjectUri,
-                    "predicateUri", propertyUri,
-                    "objectUri", objectUri,
-                    "cmd", "delete",
-                    "objectKey", objectKey);
-            
-            for ( String key : data.keySet() ) {
-                String value = data.get(key);
-                // Remove an entry with a null value instead of letting it get passed
-                // as a param with an empty value, in order to align with behavior on
-                // profile page. E.g., if statement.moniker is null, a test for 
-                // statement.moniker?? will yield different results if null on the 
-                // profile page but an empty string on the deletion page.
-                if (value != null) {
-                    params.put("statement_" + key, data.get(key));
-                }
-            }
-            
-            params.put("templateName", templateName);
-            
-            params.putAll(UrlBuilder.getModelParams(vreq));
-            
-            deleteUrl = UrlBuilder.getUrl(EDIT_PATH, params);
-        }    
-    }
-    
-    protected void setEditUrl(ObjectPropertyStatement ops) {
+            return ObjectPropertyTemplateModel.getImageUploadUrl(subjectUri, "delete");
+        } 
         
-        // Determine whether the statement can be edited
-        RequestedAction action =  new EditObjPropStmt(ops);
+        ParamMap params = new ParamMap(
+                "subjectUri", subjectUri,
+                "predicateUri", propertyUri,
+                "objectUri", objectUri,
+                "cmd", "delete",
+                "objectKey", objectKey);
+            
+        for ( String key : data.keySet() ) {
+            String value = data.get(key);
+            // Remove an entry with a null value instead of letting it get passed
+            // as a param with an empty value, in order to align with behavior on
+            // profile page. E.g., if statement.moniker is null, a test for 
+            // statement.moniker?? will yield different results if null on the 
+            // profile page but an empty string on the deletion page.
+            if (value != null) {
+                params.put("statement_" + key, data.get(key));
+            }
+        }
+        
+        params.put("templateName", templateName);
+        params.putAll(UrlBuilder.getModelParams(vreq));
+        
+        return UrlBuilder.getUrl(EDIT_PATH, params);
+	}
+
+	private String makeEditUrl(ObjectPropertyStatement ops) {
+    	// Is the edit link suppressed for this property?
+    	if (new EditLinkSuppressor(vreq).isEditLinkSuppressed(propertyUri)) {
+    		return "";
+    	}
+        
+       // Determine whether the statement can be edited
+        RequestedAction action =  new EditObjectPropertyStatement(vreq.getJenaOntModel(), ops);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
-            return;
+            return "";
         }
         
         if (propertyUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
-            editUrl = ObjectPropertyTemplateModel.getImageUploadUrl(subjectUri, "edit");
-        } else {
-            ParamMap params = new ParamMap(
-                    "subjectUri", subjectUri,
-                    "predicateUri", propertyUri,
-                    "objectUri", objectUri);
-            
-            if ( deleteUrl.isEmpty() ) {
-                params.put("deleteProhibited", "prohibited");
-            }
-            
-            params.putAll(UrlBuilder.getModelParams(vreq));
-            
-            editUrl = UrlBuilder.getUrl(EDIT_PATH, params);
-        }       
-    }
-    
+            return ObjectPropertyTemplateModel.getImageUploadUrl(subjectUri, "edit");
+        } 
+
+        ParamMap params = new ParamMap(
+                "subjectUri", subjectUri,
+                "predicateUri", propertyUri,
+                "objectUri", objectUri);
+        
+        if ( deleteUrl.isEmpty() ) {
+            params.put("deleteProhibited", "prohibited");
+        }
+        
+        params.putAll(UrlBuilder.getModelParams(vreq));
+        
+        return UrlBuilder.getUrl(EDIT_PATH, params);
+	}
     
     /* Template methods */
 
@@ -130,5 +129,15 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     public String uri(String key) {
     	return cleanURIForDisplay(data.get(key));
     }
+
+	@Override
+	public String getDeleteUrl() {
+		return deleteUrl;
+	}
   
+	@Override
+	public String getEditUrl() {
+		return editUrl;
+	}
+
 }

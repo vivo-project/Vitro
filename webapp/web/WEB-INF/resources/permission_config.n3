@@ -137,7 +137,6 @@ auth:SELF_EDITOR
     #     For role-based display and editing, SelfEditor is like Public. 
     #     SelfEditor uses its special permissions to edit/display its own values.
     auth:hasPermission displayByRole:Public ; 
-    auth:hasPermission editByRole:Public ; 
     .
 
 auth:PUBLIC
@@ -150,7 +149,4 @@ auth:PUBLIC
 
     # role-based permissions for PUBLIC
     auth:hasPermission displayByRole:Public ;
-    
-    # why are some properties declared editable by PUBLIC, but we don't want them to be.
-    # auth:hasPermission editByRole:Public ;
     .

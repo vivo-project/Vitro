@@ -21,7 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
@@ -58,7 +58,7 @@ public class ShowAuthController extends FreemarkerHttpServlet {
 
 	private List<Identifier> getSortedIdentifiers(VitroRequest vreq) {
 		Map<String, Identifier> idMap = new TreeMap<String, Identifier>();
-		for (Identifier id: RequestIdentifiers.getIdBundleForRequest(vreq)) {
+		for (Identifier id : RequestIdentifiers.getIdBundleForRequest(vreq)) {
 			idMap.put(id.toString(), id);
 		}
 		return new ArrayList<Identifier>(idMap.values());
@@ -89,7 +89,8 @@ public class ShowAuthController extends FreemarkerHttpServlet {
 	 * this individual?
 	 */
 	private boolean mayEditIndividual(VitroRequest vreq, String individualUri) {
-		RequestedAction action = new EditObjPropStmt(individualUri,
+		RequestedAction action = new EditObjectPropertyStatement(
+				vreq.getJenaOntModel(), individualUri,
 				RequestActionConstants.SOME_URI,
 				RequestActionConstants.SOME_URI);
 		return PolicyHelper.isAuthorizedForActions(vreq, action);

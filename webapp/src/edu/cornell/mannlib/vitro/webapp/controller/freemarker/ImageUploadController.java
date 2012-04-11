@@ -19,9 +19,9 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -138,14 +138,16 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 			RequestedAction ra;
 			if (ACTION_DELETE.equals(action)
 					|| ACTION_DELETE_EDIT.equals(action)) {
-				ra = new DropObjectPropStmt(entity.getURI(),
-						VitroVocabulary.IND_MAIN_IMAGE, imageUri);
+				ra = new DropObjectPropertyStatement(vreq.getJenaOntModel(),
+						entity.getURI(), VitroVocabulary.IND_MAIN_IMAGE,
+						imageUri);
 			} else if (imageUri != null) {
-				ra = new EditObjPropStmt(entity.getURI(),
-						VitroVocabulary.IND_MAIN_IMAGE, imageUri);
+				ra = new EditObjectPropertyStatement(vreq.getJenaOntModel(),
+						entity.getURI(), VitroVocabulary.IND_MAIN_IMAGE,
+						imageUri);
 			} else {
-				ra = new AddObjectPropStmt(entity.getURI(),
-						VitroVocabulary.IND_MAIN_IMAGE,
+				ra = new AddObjectPropertyStatement(vreq.getJenaOntModel(),
+						entity.getURI(), VitroVocabulary.IND_MAIN_IMAGE,
 						RequestActionConstants.SOME_URI);
 			}
 			return new Actions(ra);
