@@ -169,6 +169,9 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 				<!-- these are already in Tomcat: we mustn't conflict. -->
 				<exclude name="lib/jsp-api.jar" />
 				<exclude name="lib/servlet-api.jar" />
+				
+				<!-- copy the framework bundles into the war directory -->
+				<include name="bundles/framework/*" />
 			</fileset>
 		</copy>
 
