@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- $This file is distributed under the terms of the license in /doc/license.txt$-->
+<!-- $This file is distributed under the terms of the license in /doc/license.txt$
+-->
 
 <!-- ====================================================================== 
      Build script for the Vivo Products.
                    
      jeb228                                                                
-     ======================================================================-->
+     ======================================================================
+-->
 <project name="vivoProduct" default="describe">
 
 	<!--
@@ -55,6 +57,7 @@
 	           else="${webapp.dir}/lib">
 		<available file="${product.modifications.dir}/WEB-INF/lib" />
 	</condition>
+	<property name="test.classes.dir" location="${build.dir}/datastartestclasses" />
 
 	<path id="product.compile.classpath">
 		<pathelement location="${classes.dir}" />
@@ -68,10 +71,12 @@
 	</path>
 
 	<path id="product.test.compile.classpath">
+		<pathelement location="${build.dir}/testclasses" />
 		<path refid="test.compile.classpath" />
 	</path>
-
+	
 	<path id="product.test.run.classpath">
+		<pathelement location="${test.classes.dir}" />
 		<path refid="test.run.classpath" />
 	</path>
 
@@ -105,7 +110,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
           target: compile              
          ================================= -->
 	<target name="compile"
-	        depends="vitroCore.compile, productCompile"
+	        depends="vitroCore.compile"
 	        description="--> Compile Java sources.">
 	</target>
 
@@ -113,7 +118,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
           target: test              
          ================================= -->
 	<target name="test"
-	        depends="vitroCore.test, productTest"
+	        depends="vitroCore.test, productCompile, productTest"
 	        unless="skiptests"
 	        description="--> Run JUnit tests">
 	</target>
@@ -143,28 +148,29 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
           target: productCompile                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="productCompile" depends="vitroCore.compile" if="product.sources.exist">
-		<!-- deletes all files that depend on changed .java files -->
-		<depend srcdir="${product.source.dir}"
-		        destdir="${build.dir}/war/WEB-INF/classes"
-		        closure="false"
-		        cache="${build.dir}/.depcache">
-			<classpath refid="product.compile.classpath" />
-		</depend>
-
+		<mkdir dir="${build.dir}/datastarclasses" />
 		<javac srcdir="${product.source.dir}"
-		       destdir="${build.dir}/war/WEB-INF/classes"
+		       destdir="${build.dir}/datastarclasses"
 		       debug="true"
 		       deprecation="true"
 		       optimize="true"
 		       source="1.5">
-			<classpath refid="product.compile.classpath" />
+<!--			<classpath refid="product.compile.classpath" /> -->
+			<classpath>
+				<path refid="product.compile.classpath" />
+				<pathelement location="${build.dir}/war/WEB-INF/classes" />
+			</classpath>
 		</javac>
+		<copy todir="${build.dir}/war/WEB-INF/classes" >
+			<fileset dir="${build.dir}/datastarclasses" />
+		</copy>
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
           target: productTest                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="productTest" depends="vitroCore.test" if="product.tests.exist" unless="skiptests">
+		<mkdir dir="${test.classes.dir}"/>
 		<javac srcdir="${product.test.dir}"
 		       destdir="${test.classes.dir}"
 		       debug="true"
