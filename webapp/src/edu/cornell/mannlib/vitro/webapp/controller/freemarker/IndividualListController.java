@@ -2,25 +2,21 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -165,36 +161,14 @@ public class IndividualListController extends FreemarkerHttpServlet {
         }
     }
     
-//    //Pulling out common code that is used for both single (regular) vclass query and multiple (intersection) query
-//    public static Map<String,Object> getResultsForVClasses(List<String> vclassURIs, int page, String alpha, IndividualDao indDao, ServletContext context) 
-//    throws IOException, ServletException{
-//   	 	Map<String,Object> rvMap = new HashMap<String,Object>();    
-//   	 	try{
-//	   		 SolrQuery query = getQuery(vclassURIs, alpha, page, INDIVIDUALS_PER_PAGE);        
-//	   		 rvMap = getResultsForVClassQuery(query, page, alpha, indDao, context);
-//		     List<Individual> individuals = (List<Individual>) rvMap.get("entities");
-//		     if (individuals == null) 
-//	             log.debug("entities list is null for vclasses " + vclassURIs.toString() );                        
-//	   	 } catch(Throwable th) {
-//	   		 log.error("An error occurred retrieving results for vclass query", th);
-//	   	 }
-//        return rvMap;
-//    }
-    
-    @SuppressWarnings("unchecked")
     public static Map<String,Object> getResultsForVClass(String vclassURI, int page, String alpha, IndividualDao indDao, ServletContext context) 
-    throws IOException, SearchException{
+    throws SearchException{
    	 	Map<String,Object> rvMap = new HashMap<String,Object>();    
    	 	try{
-		     //make query for this rdf:type
-	   		 List<String> classUris = new ArrayList<String>();
-	   		 classUris.add(vclassURI);
-	   		 SolrQuery query = getQuery(classUris, alpha, page, INDIVIDUALS_PER_PAGE);        
-	   		 rvMap = getResultsForVClassQuery(query, page, INDIVIDUALS_PER_PAGE, alpha, indDao, context);
-		     List<Individual> individuals = (List<Individual>) rvMap.get("entities");
-		     if (individuals == null) 
-	             log.debug("entities list is null for vclass " + vclassURI ); 
-   	 	} catch (ServletException e) {
+            List<String> classUris = Collections.singletonList(vclassURI);
+			IndividualListQueryResults results = buildAndExecuteVClassQuery(classUris, alpha, page, INDIVIDUALS_PER_PAGE, context, indDao);
+	        rvMap = getResultsForVClassQuery(results, page, INDIVIDUALS_PER_PAGE, alpha);
+   	 	} catch (SolrServerException e) {
    	 	    String msg = "An error occurred retrieving results for vclass query";
    	 	    log.error(msg, e);
    	 	    // Throw this up to processRequest, so the template gets the error message.
@@ -205,72 +179,34 @@ public class IndividualListController extends FreemarkerHttpServlet {
         return rvMap;
     }
     
-    @SuppressWarnings("unchecked")
-    public static Map<String,Object> getResultsForVClassIntersections(List<String> vclassURIs, int page, int pageSize, String alpha, IndividualDao indDao, ServletContext context) 
-    throws IOException, ServletException{
+    public static Map<String,Object> getResultsForVClassIntersections(List<String> vclassURIs, int page, int pageSize, String alpha, IndividualDao indDao, ServletContext context) {
         Map<String,Object> rvMap = new HashMap<String,Object>();  
         try{
-             // make query for multiple rdf types 
-	         SolrQuery query = getQuery(vclassURIs, alpha, page, pageSize); 
-	         log.debug("Executed solr query for " + vclassURIs.toString());
-	         rvMap = getResultsForVClassQuery(query, page, pageSize, alpha, indDao, context);
-	         List<Individual> individuals = (List<Individual>) rvMap.get("entities");
-		     if (individuals == null) 
-		       log.debug("entities list is null for vclass " + vclassURIs.toString() ); 
+            IndividualListQueryResults results = buildAndExecuteVClassQuery(vclassURIs, alpha, page, pageSize, context, indDao);
+	        rvMap = getResultsForVClassQuery(results, page, pageSize, alpha);
         } catch(Throwable th) {
        	    log.error("Error retrieving individuals corresponding to intersection multiple classes." + vclassURIs.toString(), th);
         }
         return rvMap;
     }
+
+	private static IndividualListQueryResults buildAndExecuteVClassQuery(
+			List<String> vclassURIs, String alpha, int page, int pageSize,
+			ServletContext context, IndividualDao indDao)
+			throws SolrServerException {
+		 SolrQuery query = getQuery(vclassURIs, alpha, page, pageSize);
+		 IndividualListQueryResults results = IndividualListQueryResults.runQuery(query, indDao, context);
+		 log.debug("Executed solr query for " + vclassURIs);
+		 if (results.getIndividuals().isEmpty()) { 
+			 log.debug("entities list is null for vclass " + vclassURIs);
+		 }
+		return results;
+	}
     
-    /**
-     * This method is now called in a couple of places.  It should be refactored
-     * into a DAO or similar object.
-     */
-    protected static Map<String,Object> getResultsForVClassQuery(SolrQuery query, int page, int pageSize, String alpha, IndividualDao indDao, ServletContext context) 
-    throws IOException, ServletException {
-        Map<String,Object> rvMap = new HashMap<String,Object>();           
-        SolrServer solr = SolrSetup.getSolrServer(context);
-        QueryResponse response = null;
+    private static Map<String,Object> getResultsForVClassQuery(IndividualListQueryResults results, int page, int pageSize, String alpha) {
+        Map<String,Object> rvMap = new HashMap<String,Object>();
         
-        // Execute query for individuals of the specified type
-        try {
-            response = solr.query(query);            
-        } catch (Throwable t) {
-            log.error(t, t);            
-        }
-
-        if ( response == null ) {         
-            throw new ServletException("Could not run search in IndividualListController");        
-        }
-
-        SolrDocumentList docs = response.getResults();
-        
-        if (docs == null) {
-            throw new ServletException("Could not run search in IndividualListController");    
-        }
-
-        // get list of individuals for the search results
-        long hitCount = docs.getNumFound();
-        log.debug("Number of search results: " + hitCount);
-
-        Iterator<SolrDocument> docIter = docs.iterator();
-        List<Individual> individuals = new ArrayList<Individual>(docs.size()); 
-
-        while ( docIter.hasNext() ){
-	            SolrDocument doc = docIter.next();
-	            if (doc != null) {
-	                String uri = doc.get(VitroSearchTermNames.URI).toString();
-	                Individual individual = indDao.getIndividualByURI( uri ); 
-	                if (individual != null) {	                                        
-	                    individuals.add( individual );
-	                    log.debug("Adding individual " + uri + " to individual list display");
-	                } else {
-	                    log.debug("No existing individual for search document with uri = " + uri);
-	                }
-	            } 	            
-	    }
-        
+        long hitCount = results.getHitCount();
         if ( hitCount > pageSize ){
             rvMap.put("showPages", Boolean.TRUE);
             List<PageRecord> pageRecords = makePagesList(hitCount, pageSize, page);
@@ -281,9 +217,8 @@ public class IndividualListController extends FreemarkerHttpServlet {
         }
                          
         rvMap.put("alpha",alpha);
-
         rvMap.put("totalCount", hitCount);
-        rvMap.put("entities",individuals);                      
+        rvMap.put("entities", results.getIndividuals());                      
          
         return rvMap;
     }
@@ -337,17 +272,13 @@ public class IndividualListController extends FreemarkerHttpServlet {
     }    
 
     private static String makeMultiClassQuery( List<String> vclassUris){
-        String queryText = "";    
         List<String> queryTypes = new ArrayList<String>();  
         try {            
             // query term for rdf:type - multiple types possible
             for(String vclassUri: vclassUris) {
                 queryTypes.add(VitroSearchTermNames.RDFTYPE + ":\"" + vclassUri + "\" ");
             }           
-            if (queryTypes.size() > 0) {
-                queryText = StringUtils.join(queryTypes, " AND ");
-            }
-            return queryText;
+			return StringUtils.join(queryTypes, " AND ");
         } catch (Exception ex){
             log.error("Could not make Solr query",ex);
             return "";
