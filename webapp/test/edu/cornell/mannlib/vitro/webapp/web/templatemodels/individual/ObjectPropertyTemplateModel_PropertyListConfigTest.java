@@ -82,22 +82,15 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 		createConfigFile("constructQueryMissing");
 		createConfigFile("constructQueryMultiple");
 		createConfigFile("default");
-		createConfigFile("notValidXml");
 		createConfigFile("postProcessorClassNotFound");
 		createConfigFile("postProcessorClassNotSuitable");
 		createConfigFile("postProcessorConstructorThrowsException");
 		createConfigFile("postProcessorNameEmpty");
 		createConfigFile("postProcessorOK");
 		createConfigFile("postProcessorWrongConstructor");
-		createConfigFile("selectQueryNodeBlank");
-		createConfigFile("selectQueryNodeNotFound");
-		createConfigFile("selectQuerySubNodes");
-		createConfigFile("selectQueryNoSubNodes");
 		createConfigFile("selectQueryCollatedValid");
 		createConfigFile("selectQueryCollatedNoSelect");
 		createConfigFile("selectQueryCollatedNoOrder");
-		createConfigFile("templateNodeIsEmpty");
-		createConfigFile("templateNodeNotFound");
 		createConfigFile("templateDoesNotExist");
 	}
 
@@ -152,12 +145,13 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 	// TODO - baseTemplateModel shouldn't require the servlet context to be set
 	// statically!!! ServletContext shouldn't be a static field.
 
-	// ----------------------------------------------------------------------
-	// The tests
-	//
-	// TODO - remove any tests that are covered by the newer
-	// CustomListViewConfigFileTest.
-	// ----------------------------------------------------------------------
+	/*
+	 * These tests were removed because the newer CustomListViewConfigTest
+	 * covered them: configFileNotValidXml(), selectQueryNodeIsNotFound(),
+	 * selectQueryNodeIsBlank(), selectSubNodesCollatedCritical(),
+	 * selectSubNodesCollatedUncritical(), selectSubNodesUncollatedCritical(),
+	 * selectSubNodesUncollatedUncritical(), selectNoSubNodesCollatedCritical()
+	 */
 
 	//
 	// Null arguments
@@ -227,68 +221,9 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 		assertLogMessagesContains("file not found", "Can't find config file");
 	}
 
-	@Test
-	public void configFileNotValidXml() throws InvalidConfigurationException {
-		suppressSyserr();
-		captureLogsFromPropertyListConfig();
-
-		op = buildOperation("notValidXml");
-		optm = new NonCollatingOPTM(op, subject, vreq, false);
-
-		assertLogMessagesContains("not valid XML", "SAXParseException");
-	}
-
-	//
-	// Problems with the <query-select> node
-	//
-
-	@Test
-	public void selectQueryNodeIsNotFound()
-			throws InvalidConfigurationException {
-		captureLogsFromPropertyListConfig();
-
-		op = buildOperation("selectQueryNodeNotFound");
-		optm = new NonCollatingOPTM(op, subject, vreq, false);
-
-		assertLogMessagesContains("no select query",
-				"Missing select query specification");
-	}
-
-	@Test
-	public void selectQueryNodeIsBlank() throws InvalidConfigurationException {
-		captureLogsFromPropertyListConfig();
-
-		op = buildOperation("selectQueryNodeBlank");
-		optm = new NonCollatingOPTM(op, subject, vreq, false);
-
-		assertLogMessagesContains("blank select query",
-				"Missing select query specification");
-	}
-
 	//
 	// Problems with the <template> node
 	//
-	@Test
-	public void templateNodeNotFound() throws InvalidConfigurationException {
-		captureLogsFromPropertyListConfig();
-
-		op = buildOperation("templateNodeNotFound");
-		optm = new NonCollatingOPTM(op, subject, vreq, false);
-
-		assertLogMessagesContains("no template node",
-				"Config file must contain a template element");
-	}
-
-	@Test
-	public void templateNodeIsEmpty() throws InvalidConfigurationException {
-		captureLogsFromPropertyListConfig();
-
-		op = buildOperation("templateNodeIsEmpty");
-		optm = new NonCollatingOPTM(op, subject, vreq, false);
-
-		assertLogMessagesContains("empty template node",
-				"In a config file, the <template> element must not be empty.");
-	}
 
 	@Test
 	public void templateDoesNotExist() throws InvalidConfigurationException {
@@ -302,51 +237,8 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 	}
 
 	//
-	// Optional tags in the select query.
+	// Check for valid query.
 	//
-
-	@Test
-	public void selectSubNodesCollatedCritical()
-			throws InvalidConfigurationException {
-		op = buildOperation("selectQuerySubNodes");
-		optm = new SimpleCollatingOPTM(op, subject, vreq, false);
-		assertSelectQuery("collated, critical",
-				"Plain collated plain critical plain collated plain.");
-	}
-
-	@Test
-	public void selectSubNodesCollatedUncritical()
-			throws InvalidConfigurationException {
-		op = buildOperation("selectQuerySubNodes");
-		optm = new SimpleCollatingOPTM(op, subject, vreq, true);
-		assertSelectQuery("collated, UNcritical",
-				"Plain collated plain plain collated plain.");
-	}
-
-	@Test
-	public void selectSubNodesUncollatedCritical()
-			throws InvalidConfigurationException {
-		op = buildOperation("selectQuerySubNodes");
-		optm = new NonCollatingOPTM(op, subject, vreq, false);
-		assertSelectQuery("UNcollated, critical",
-				"Plain plain critical plain plain.");
-	}
-
-	@Test
-	public void selectSubNodesUncollatedUncritical()
-			throws InvalidConfigurationException {
-		op = buildOperation("selectQuerySubNodes");
-		optm = new NonCollatingOPTM(op, subject, vreq, true);
-		assertSelectQuery("UNcollated, UNcritical", "Plain plain plain plain.");
-	}
-
-	@Test
-	public void selectNoSubNodesCollatedCritical()
-			throws InvalidConfigurationException {
-		op = buildOperation("selectQueryNoSubNodes");
-		optm = new SimpleCollatingOPTM(op, subject, vreq, false);
-		assertSelectQuery("simple collated, critical", "Plain.");
-	}
 
 	@Test
 	public void collatedNoSubclassSelector()
@@ -509,20 +401,6 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 				+ expected);
 	}
 
-	private void assertSelectQuery(String message, String expected) {
-		String actual = "BOGUS";
-		try {
-			Method m = ObjectPropertyTemplateModel.class.getDeclaredMethod(
-					"getSelectQuery", new Class<?>[0]);
-			m.setAccessible(true);
-			actual = (String) m.invoke(optm, new Object[0]);
-		} catch (Exception e) {
-			fail(message + " - " + e);
-		}
-
-		assertEquals(message, expected, actual);
-	}
-
 	@SuppressWarnings("unchecked")
 	private void assertConstructQueries(String message, String... expectedArray) {
 		Set<String> expected = new HashSet<String>(Arrays.asList(expectedArray));
@@ -578,31 +456,6 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 		@Override
 		public boolean isCollatedBySubclass() {
 			return false;
-		}
-
-		@Override
-		protected TemplateLoader getFreemarkerTemplateLoader() {
-			return ObjectPropertyTemplateModel_PropertyListConfigTest.this.tl;
-		}
-
-	}
-
-	/*
-	 * No populated properties and we don't do syntax checking on the select
-	 * query.
-	 */
-	private class SimpleCollatingOPTM extends
-			CollatedObjectPropertyTemplateModel {
-		SimpleCollatingOPTM(ObjectProperty op, Individual subject,
-				VitroRequest vreq, boolean editing)
-				throws InvalidConfigurationException {
-			super(op, subject, vreq, editing, Collections
-					.<ObjectProperty> emptyList());
-		}
-
-		@Override
-		public ConfigError checkQuery(String queryString) {
-			return null;
 		}
 
 		@Override
