@@ -23,7 +23,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,9 +47,6 @@ public class FreemarkerEmailMessage {
 	private static final Log log = LogFactory
 			.getLog(FreemarkerEmailMessage.class);
 
-	private static final String CONFIG_ATTRIBUTE = "freemarkerConfig";
-
-	private final HttpServletRequest req;
 	private final Session session;
 	private final FreemarkerConfiguration config;
 
@@ -67,21 +63,11 @@ public class FreemarkerEmailMessage {
 	/**
 	 * Package access - should only be created by the factory.
 	 */
-	FreemarkerEmailMessage(HttpServletRequest req, Session session,
+	FreemarkerEmailMessage(FreemarkerConfiguration fConfig, Session session,
 			InternetAddress replyToAddress) {
-		this.req = req;
 		this.session = session;
 		this.replyToAddress = replyToAddress;
-
-		Object o = req.getAttribute(CONFIG_ATTRIBUTE);
-		if (!(o instanceof FreemarkerConfiguration)) {
-			String oClass = (o == null) ? "null" : o.getClass().getName();
-
-			throw new IllegalStateException(
-					"Request does not contain a Configuration at '"
-							+ CONFIG_ATTRIBUTE + "': " + oClass);
-		}
-		this.config = (FreemarkerConfiguration) o;
+		this.config = fConfig;
 	}
 
 	public void addRecipient(RecipientType type, String emailAddress) {

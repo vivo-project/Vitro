@@ -35,7 +35,6 @@ public class FreemarkerComponentGenerator extends FreemarkerHttpServlet {
         // Mimic what FreemarkerHttpServlet does for a new request
         VitroRequest vreq = new VitroRequest(request);       
         FreemarkerConfiguration config = getConfig(vreq);
-        vreq.setAttribute("freemarkerConfig", config);
         Map<String, Object> map = getPageTemplateValues(vreq);
         
         request.setAttribute("ftl_head", getHead("head", map, config, vreq));

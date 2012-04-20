@@ -112,7 +112,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
 
 	    String originalReferer = getOriginalRefererFromSession(vreq);
 
-	    Configuration config = (Configuration) vreq.getAttribute("freemarkerConfig");
+	    Configuration config = FreemarkerConfigurationLoader.getConfig(vreq);
 	    String msgText = composeEmail(webusername, webuseremail, comments, 
 	    		deliveryfrom, originalReferer, vreq.getRemoteAddr(), config, vreq);
 	    

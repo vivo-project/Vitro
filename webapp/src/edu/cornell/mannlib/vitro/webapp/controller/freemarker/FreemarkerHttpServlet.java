@@ -101,7 +101,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             }
             
             FreemarkerConfiguration config = getConfig(vreq);
-            vreq.setAttribute("freemarkerConfig", config);            
             
 			responseValues = processRequest(vreq);			
 	        doResponse(vreq, response, responseValues);	 
@@ -346,7 +345,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     private Map<String, Object> buildRequestUrls(VitroRequest vreq) {
         Map<String, Object> requestUrls = new HashMap<String, Object>();
     	
-        FreemarkerConfiguration config = (FreemarkerConfiguration)vreq.getAttribute("freemarkerConfig");
+        FreemarkerConfiguration config = FreemarkerConfigurationLoader.getConfig(vreq);
         TemplateModel urlModel = config.getSharedVariable("urls");
         
         try {
