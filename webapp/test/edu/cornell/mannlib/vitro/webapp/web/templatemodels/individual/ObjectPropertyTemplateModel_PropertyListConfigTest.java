@@ -37,10 +37,9 @@ import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.InvalidConfigurationException;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.PropertyListConfig;
-import freemarker.template.Configuration;
+import freemarker.cache.TemplateLoader;
 
 public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 		AbstractTestClass {
@@ -135,11 +134,11 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 
 		subject = new IndividualImpl();
 
-		Configuration fmConfig = new Configuration();
-		vreq.setAttribute("freemarkerConfig", fmConfig);
+		// We need a stub TemplateLoader because PropertyListConfig will check
+		// to see whether the template name is recognized. How can we get around
+		// that? This will do for now.
 		tl = new TemplateLoaderStub();
 		tl.createTemplate("propStatement-default.ftl", "");
-		fmConfig.setTemplateLoader(tl);
 	}
 
 	@AfterClass
@@ -564,7 +563,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 	// Supporting classes
 	// ----------------------------------------------------------------------
 
-	private static class NonCollatingOPTM extends ObjectPropertyTemplateModel {
+	private class NonCollatingOPTM extends ObjectPropertyTemplateModel {
 		NonCollatingOPTM(ObjectProperty op, Individual subject,
 				VitroRequest vreq, boolean editing)
 				throws InvalidConfigurationException {
@@ -581,13 +580,18 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 			return false;
 		}
 
+		@Override
+		protected TemplateLoader getFreemarkerTemplateLoader() {
+			return ObjectPropertyTemplateModel_PropertyListConfigTest.this.tl;
+		}
+
 	}
 
 	/*
 	 * No populated properties and we don't do syntax checking on the select
 	 * query.
 	 */
-	private static class SimpleCollatingOPTM extends
+	private class SimpleCollatingOPTM extends
 			CollatedObjectPropertyTemplateModel {
 		SimpleCollatingOPTM(ObjectProperty op, Individual subject,
 				VitroRequest vreq, boolean editing)
@@ -601,16 +605,26 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 			return null;
 		}
 
+		@Override
+		protected TemplateLoader getFreemarkerTemplateLoader() {
+			return ObjectPropertyTemplateModel_PropertyListConfigTest.this.tl;
+		}
+
 	}
 
 	/** No populated properties but we do check the syntax of the select query. */
-	private static class CheckingCollatingOPTM extends
+	private class CheckingCollatingOPTM extends
 			CollatedObjectPropertyTemplateModel {
 		CheckingCollatingOPTM(ObjectProperty op, Individual subject,
 				VitroRequest vreq, boolean editing)
 				throws InvalidConfigurationException {
 			super(op, subject, vreq, editing, Collections
 					.<ObjectProperty> emptyList());
+		}
+
+		@Override
+		protected TemplateLoader getFreemarkerTemplateLoader() {
+			return ObjectPropertyTemplateModel_PropertyListConfigTest.this.tl;
 		}
 
 	}

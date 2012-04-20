@@ -40,6 +40,7 @@ public class PropertyListConfig {
     // TODO Lump these together into the PropertyListConfigContext
     private final ObjectPropertyTemplateModel optm;
     private final VitroRequest vreq;
+    private final TemplateLoader templateLoader;
     
     private boolean isDefaultConfig;
     private Set<String> constructQueries;
@@ -47,12 +48,14 @@ public class PropertyListConfig {
     private String templateName;
     private ObjectPropertyDataPostProcessor postprocessor; // never null
 
-    public PropertyListConfig(ObjectPropertyTemplateModel optm, VitroRequest vreq, ObjectProperty op, boolean editing) 
+    public PropertyListConfig(ObjectPropertyTemplateModel optm, TemplateLoader templateLoader, VitroRequest vreq, 
+    		ObjectProperty op, boolean editing) 
         throws InvalidConfigurationException {
     	
     	this.optm = optm;
     	this.vreq = vreq;
     	WebappDaoFactory wadf = vreq.getWebappDaoFactory();
+    	this.templateLoader = templateLoader;
 
         // Get the custom config filename
         String configFileName = wadf.getObjectPropertyDao().getCustomListViewConfigFileName(op);
@@ -117,10 +120,8 @@ public class PropertyListConfig {
            return ConfigError.NO_TEMPLATE;
         }
 
-        Configuration fmConfig = (Configuration) vreq.getAttribute("freemarkerConfig");
-        TemplateLoader tl = fmConfig.getTemplateLoader();
         try {
-            if ( tl.findTemplateSource(templateName) == null ) {
+            if ( templateLoader.findTemplateSource(templateName) == null ) {
                 return ConfigError.TEMPLATE_NOT_FOUND;
             }
         } catch (IOException e) {
