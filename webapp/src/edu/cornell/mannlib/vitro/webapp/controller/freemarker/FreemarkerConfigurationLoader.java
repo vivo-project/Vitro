@@ -19,10 +19,9 @@ public class FreemarkerConfigurationLoader {
 
 	private static final Map<String, FreemarkerConfiguration> themeToConfigMap = new HashMap<String, FreemarkerConfiguration>();
 
-	public static FreemarkerConfiguration getConfig(VitroRequest vreq,
-			ServletContext context) {
+	public static FreemarkerConfiguration getConfig(VitroRequest vreq) {
 		String themeDir = getThemeDir(vreq.getAppBean());
-		return getConfigForTheme(themeDir, vreq.getAppBean(), context);
+		return getConfigForTheme(themeDir, vreq.getAppBean(), vreq.getSession().getServletContext());
 	}
 
 	private static String getThemeDir(ApplicationBean appBean) {

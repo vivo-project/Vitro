@@ -406,7 +406,7 @@ public class InputElementFormattingTag extends TagSupport {
             }
             
             //get freemarker Configuration
-            Configuration fmConfig = FreemarkerConfigurationLoader.getConfig(vreq, pageContext.getServletContext());
+            Configuration fmConfig = FreemarkerConfigurationLoader.getConfig(vreq);
             
             /* populate the pieces */
             String classStr = doClass();

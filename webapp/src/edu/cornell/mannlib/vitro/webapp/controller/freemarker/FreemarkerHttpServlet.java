@@ -197,7 +197,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     }
    
     protected FreemarkerConfiguration getConfig(VitroRequest vreq) {               
-        return FreemarkerConfigurationLoader.getConfig(vreq, getServletContext());
+        return FreemarkerConfigurationLoader.getConfig(vreq);
     }
 
     /**

@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -75,7 +74,7 @@ public abstract class VitroAjaxController extends HttpServlet {
 	 * its data through a template.
 	 */
 	protected final Configuration getFreemarkerConfiguration(VitroRequest vreq) {
-		return FreemarkerConfigurationLoader.getConfig(vreq, getServletContext());
+		return FreemarkerConfigurationLoader.getConfig(vreq);
 	}
 	
 	/**

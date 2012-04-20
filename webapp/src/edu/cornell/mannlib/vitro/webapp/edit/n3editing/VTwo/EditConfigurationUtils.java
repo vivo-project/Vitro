@@ -257,7 +257,7 @@ public class EditConfigurationUtils {
 	//Generate HTML for a specific field name given 
 	public static String generateHTMLForElement(VitroRequest vreq, String fieldName, EditConfigurationVTwo editConfig) {
 		String html = "";
-        Configuration fmConfig = FreemarkerConfigurationLoader.getConfig(vreq, vreq.getSession().getServletContext());
+        Configuration fmConfig = FreemarkerConfigurationLoader.getConfig(vreq);
 
         FieldVTwo field = editConfig == null ? null : editConfig.getField(fieldName);
         MultiValueEditSubmission editSub = EditSubmissionUtils.getEditSubmissionFromSession(vreq.getSession(), editConfig);
