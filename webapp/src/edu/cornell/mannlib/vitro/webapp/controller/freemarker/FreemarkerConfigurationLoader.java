@@ -22,7 +22,7 @@ public class FreemarkerConfigurationLoader {
 	public static FreemarkerConfiguration getConfig(VitroRequest vreq,
 			ServletContext context) {
 		String themeDir = getThemeDir(vreq.getAppBean());
-		return getConfigForTheme(themeDir, vreq, context);
+		return getConfigForTheme(themeDir, vreq.getAppBean(), context);
 	}
 
 	private static String getThemeDir(ApplicationBean appBean) {
@@ -46,16 +46,16 @@ public class FreemarkerConfigurationLoader {
 	 * 1. The template loader is theme-specific, since it specifies a theme
 	 * directory to load templates from.
 	 * 
-	 * 2. Shared variables like stylesheets are theme-specific.
+	 * 2. Some shared variables are theme-specific.
 	 */
 	private static FreemarkerConfiguration getConfigForTheme(String themeDir,
-			VitroRequest vreq, ServletContext context) {
+			ApplicationBean appBean, ServletContext context) {
 		synchronized (themeToConfigMap) {
 			if (themeToConfigMap.containsKey(themeDir)) {
 				return themeToConfigMap.get(themeDir);
 			} else {
 				FreemarkerConfiguration config = new FreemarkerConfiguration(
-						themeDir, vreq, context);
+						themeDir, appBean, context);
 				themeToConfigMap.put(themeDir, config);
 				return config;
 			}
