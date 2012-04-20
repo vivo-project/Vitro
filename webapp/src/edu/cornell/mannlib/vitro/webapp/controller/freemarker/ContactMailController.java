@@ -32,7 +32,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessing
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
-import freemarker.template.Configuration;
 
 public class ContactMailController extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory
@@ -112,15 +111,14 @@ public class ContactMailController extends FreemarkerHttpServlet {
 
 	    String originalReferer = getOriginalRefererFromSession(vreq);
 
-	    Configuration config = FreemarkerConfigurationLoader.getConfig(vreq);
 	    String msgText = composeEmail(webusername, webuseremail, comments, 
-	    		deliveryfrom, originalReferer, vreq.getRemoteAddr(), config, vreq);
+	    		deliveryfrom, originalReferer, vreq.getRemoteAddr(), vreq);
 	    
 	    try {
 	    	// Write the message to the journal file
 	    	FileWriter fw = new FileWriter(locateTheJournalFile(vreq),true);
 	        PrintWriter outFile = new PrintWriter(fw); 
-	        writeBackupCopy(outFile, msgText, config, vreq);
+	        writeBackupCopy(outFile, msgText, vreq);
   
 	        try {
 	        	// Send the message
@@ -222,7 +220,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
     
     private String composeEmail(String webusername, String webuseremail,
     							String comments, String deliveryfrom,
-    							String originalReferer, String ipAddr, Configuration config,
+    							String originalReferer, String ipAddr,
     							HttpServletRequest request) {
  
         Map<String, Object> email = new HashMap<String, Object>();
@@ -238,7 +236,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
         }
     	
         try {
-            return processTemplateToString(template, email, config, request);
+            return processTemplateToString(template, email, request);
         } catch (TemplateProcessingException e) {
             log.error("Error processing email text through template: " + e.getMessage(), e);
             return null;            
@@ -246,7 +244,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
     }
     
     private void writeBackupCopy(PrintWriter outFile, String msgText, 
-    		Configuration config, HttpServletRequest request) {
+    		HttpServletRequest request) {
 
         Map<String, Object> backup = new HashMap<String, Object>();
         String template = TEMPLATE_BACKUP; 
@@ -256,7 +254,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
         backup.put("msgText", msgText);
         
         try {
-            String backupText = processTemplateToString(template, backup, config, request);
+            String backupText = processTemplateToString(template, backup, request);
             outFile.print(backupText);
             outFile.flush();
             //outFile.close(); 

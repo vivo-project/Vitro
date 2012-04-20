@@ -51,7 +51,6 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryFactory;
 import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.LinkTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.searchresult.IndividualSearchResult;
-import freemarker.template.Configuration;
 
 /**
  * Paged search controller that uses Solr
@@ -104,12 +103,11 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             super.doGet(vreq,response);
         }else{
             try {                
-                Configuration config = getConfig(vreq);            
                 ResponseValues rvalues = processRequest(vreq);
                 
                 response.setCharacterEncoding("UTF-8");
                 response.setContentType("text/xml;charset=UTF-8");
-                writeTemplate(rvalues.getTemplateName(), rvalues.getMap(), config, request, response);
+                writeTemplate(rvalues.getTemplateName(), rvalues.getMap(), request, response);
             } catch (Exception e) {
                 log.error(e, e);
             }

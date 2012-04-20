@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
@@ -27,8 +28,8 @@ public class TemplateProcessingHelper {
     private HttpServletRequest request = null;
     private ServletContext context = null;
     
-    public TemplateProcessingHelper(Configuration config, HttpServletRequest request, ServletContext context) {
-        this.config = config;
+    public TemplateProcessingHelper(HttpServletRequest request, ServletContext context) {
+        this.config = FreemarkerConfigurationLoader.getConfig(new VitroRequest(request));
         this.request = request;
         this.context = context;
     }
