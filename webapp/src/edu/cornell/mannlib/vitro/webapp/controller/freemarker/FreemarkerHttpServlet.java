@@ -481,22 +481,12 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return helper.processTemplate(templateName, map);
     }
     
-    protected StringWriter processTemplate(ResponseValues values,
-            HttpServletRequest request) throws TemplateProcessingException {
-        return processTemplate(values.getTemplateName(), values.getMap(), request);
-    }
-    
     // In fact, we can put StringWriter objects directly into the data model, so perhaps we should eliminate the processTemplateToString() methods.
     protected String processTemplateToString(String templateName, Map<String, Object> map, 
             HttpServletRequest request) throws TemplateProcessingException {
         return processTemplate(templateName, map, request).toString();
     }
   
-    protected String processTemplateToString(ResponseValues values, 
-            HttpServletRequest request) throws TemplateProcessingException {
-        return processTemplate(values, request).toString();
-    }
-    
     protected void writePage(Map<String, Object> root, HttpServletRequest request,
             HttpServletResponse response, int statusCode, ResponseValues rv) throws TemplateProcessingException {
         
