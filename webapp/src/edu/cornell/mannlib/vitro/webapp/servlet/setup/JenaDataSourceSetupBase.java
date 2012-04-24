@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.sdb.StoreDesc;
@@ -522,6 +523,15 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     private static String getValidationQuery(ServletContext ctx) {
         return ConfigurationProperties.getBean(ctx).getProperty(
                 "VitroConnection.DataSource.validationQuery", "SELECT 1");
+    }
+    
+    public static void setStartupDataset(Dataset dataset, ServletContext ctx) {
+        ctx.setAttribute("startupDataset", dataset);
+    }
+    
+    public static Dataset getStartupDataset(ServletContext ctx) {
+        Object o = ctx.getAttribute("startupDataset");
+        return (o instanceof Dataset) ? ((Dataset) o) : null;
     }
 
 }

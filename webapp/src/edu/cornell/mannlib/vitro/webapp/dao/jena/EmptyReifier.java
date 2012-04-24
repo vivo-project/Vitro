@@ -1,6 +1,9 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import java.util.ArrayList;
 import java.util.Collections;
+
+import org.apache.commons.collections.iterators.EmptyIterator;
 
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Node;
@@ -48,12 +51,12 @@ public class EmptyReifier implements Reifier {
 
     @Override
     public ExtendedIterator<Triple> findEither(TripleMatch arg0, boolean arg1) {
-        return find(arg0);
+        return WrappedIterator.create(EmptyIterator.INSTANCE);
     }
 
     @Override
     public ExtendedIterator<Triple> findExposed(TripleMatch arg0) {
-        return find(arg0);
+        return WrappedIterator.create(EmptyIterator.INSTANCE);
     }
 
     @Override

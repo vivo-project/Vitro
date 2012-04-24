@@ -15,8 +15,11 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -51,6 +54,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlDatasetGraph;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource;
@@ -58,7 +63,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.InitialJenaModelUtils;
 
-public class JenaDataSourceSetup extends JenaDataSourceSetupBase 
+public class JenaDataSourceSetupSparql2 extends JenaDataSourceSetupBase 
         implements javax.servlet.ServletContextListener {
     
     private static final Log log = LogFactory.getLog(JenaDataSourceSetup.class);
@@ -67,14 +72,6 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
     public void contextInitialized(ServletContextEvent sce) {
         ServletContext ctx = sce.getServletContext();
         StartupStatus ss = StartupStatus.getBean(ctx);
-        
-        // temporary scaffolding in the rdfapi dev branch
-        // TODO remove me
-        if (ConfigurationProperties.getBean(ctx).getProperty(
-                "VitroConnection.DataSource.endpointURI") != null) {
-            (new JenaDataSourceSetupSparql2()).contextInitialized(sce);
-            return;
-        }
         
         try {
             long startTime = System.currentTimeMillis();
@@ -113,29 +110,38 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
         // SDB setup
         
         // union default graph
-        SDB.getContext().set(SDB.unionDefaultGraph, true) ;
-
-        StoreDesc storeDesc = makeStoreDesc(ctx);
-        setApplicationStoreDesc(storeDesc, ctx);
-
-        BasicDataSource bds = getApplicationDataSource(ctx); 
-        if (bds == null) {
-            bds = makeDataSourceFromConfigurationProperties(ctx);
-            setApplicationDataSource(bds, ctx);
-        }
+//        SDB.getContext().set(SDB.unionDefaultGraph, true) ;
+//
+//       StoreDesc storeDesc = makeStoreDesc(ctx);
+//        setApplicationStoreDesc(storeDesc, ctx);
+//
+//        BasicDataSource bds = getApplicationDataSource(ctx); 
+//        if (bds == null) {
+//            bds = makeDataSourceFromConfigurationProperties(ctx);
+//            setApplicationDataSource(bds, ctx);
+//        }
         
-        Store store = connectStore(bds, storeDesc);
-        setApplicationStore(store, ctx);
-        setStartupDataset(SDBFactory.connectDataset(store), ctx);
+//        Store store = connectStore(bds, storeDesc);
+//        setApplicationStore(store, ctx);
+
+        //okay let's make a graph-backed model
+        String endpointURI = ConfigurationProperties.getBean(
+                ctx).getProperty("VitroConnection.DataSource.endpointURI");
         
-        if (!isSetUp(store)) {
-            log.info("Initializing SDB store");
-            if (isFirstStartup()) {
-                setupSDB(ctx, store);    
-            } else {
-                migrateToSDBFromExistingRDBStore(ctx, store); 
-            }
-        }
+        Graph g = new SparqlGraph(endpointURI);
+        Dataset dataset = DatasetFactory.create(new SparqlDatasetGraph(endpointURI));
+        setStartupDataset(dataset, ctx);
+        
+//        setStartupDataset(SDBFactory.connectDataset(store), ctx);
+        
+//        if (!isSetUp(store)) {
+//            log.info("Initializing SDB store");
+//            if (isFirstStartup()) {
+//                setupSDB(ctx, store);    
+//            } else {
+//                migrateToSDBFromExistingRDBStore(ctx, store); 
+//            }
+//        }
         
         // The code below, which sets up the OntModelSelectors, controls whether 
         // each model is maintained in memory, in the DB, or both while the 
@@ -146,9 +152,8 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
         // and inferences) with the post-SDB-conversion models.
 
         // ABox assertions
-        Model aboxAssertions = makeDBModel(
-                bds, JenaDataSourceSetupBase.JENA_DB_MODEL, DB_ONT_MODEL_SPEC, 
-                TripleStoreType.SDB, ctx);
+        Model aboxAssertions = dataset.getNamedModel(
+                JenaDataSourceSetupBase.JENA_DB_MODEL);
         Model listenableAboxAssertions = ModelFactory.createUnion(
                 aboxAssertions, ModelFactory.createDefaultModel());
         baseOms.setABoxModel(
@@ -156,9 +161,8 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
                         OntModelSpec.OWL_MEM, listenableAboxAssertions));
         
         // ABox inferences
-        Model aboxInferences = makeDBModel(
-                bds, JenaDataSourceSetupBase.JENA_INF_MODEL, DB_ONT_MODEL_SPEC, 
-                TripleStoreType.SDB, ctx);
+        Model aboxInferences = dataset.getNamedModel(
+                JenaDataSourceSetupBase.JENA_INF_MODEL);
         Model listenableAboxInferences = ModelFactory.createUnion(
                 aboxInferences, ModelFactory.createDefaultModel());
         inferenceOms.setABoxModel(ModelFactory.createOntologyModel(
@@ -171,9 +175,8 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
         
         // TBox assertions
         try {
-            Model tboxAssertionsDB = makeDBModel(
-                    bds, JENA_TBOX_ASSERTIONS_MODEL, DB_ONT_MODEL_SPEC, 
-                    TripleStoreType.SDB, ctx);
+            Model tboxAssertionsDB = dataset.getNamedModel(
+                    JENA_TBOX_ASSERTIONS_MODEL);
             OntModel tboxAssertions = ModelFactory.createOntologyModel(
                     MEM_ONT_MODEL_SPEC);
             
@@ -195,9 +198,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
         
         // TBox inferences
         try {
-            Model tboxInferencesDB = makeDBModel(
-                    bds, JENA_TBOX_INF_MODEL, DB_ONT_MODEL_SPEC, 
-                    TripleStoreType.SDB, ctx);
+            Model tboxInferencesDB = dataset.getNamedModel(JENA_TBOX_INF_MODEL);
             OntModel tboxInferences = ModelFactory.createOntologyModel(
                     MEM_ONT_MODEL_SPEC);
             
@@ -233,9 +234,8 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
         // Application metadata model is cached in memory.
         try {
             
-            Model applicationMetadataModelDB = makeDBModel(
-                    bds, JENA_APPLICATION_METADATA_MODEL, DB_ONT_MODEL_SPEC, 
-                    TripleStoreType.SDB, ctx);
+            Model applicationMetadataModelDB = dataset.getNamedModel(
+                    JENA_APPLICATION_METADATA_MODEL);
             OntModel applicationMetadataModel = 
                     ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
             
@@ -289,7 +289,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
         WebappDaoFactoryConfig config = new WebappDaoFactoryConfig();
         config.setDefaultNamespace(getDefaultNamespace(ctx));
         WebappDaoFactory baseWadf = new WebappDaoFactorySDB(
-                baseOms, bds, storeDesc, config,
+                baseOms, dataset, config,
                 WebappDaoFactorySDB.SDBDatasetMode.ASSERTIONS_ONLY);
         ctx.setAttribute("assertionsWebappDaoFactory",baseWadf);
         
@@ -301,18 +301,16 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
         inferenceOms.setFullModel(inferenceUnion);
         ModelContext.setInferenceOntModel(inferenceOms.getFullModel(), ctx);
         WebappDaoFactory infWadf = new WebappDaoFactorySDB(
-                inferenceOms, bds, storeDesc, config, 
+                inferenceOms, dataset, config, 
                 WebappDaoFactorySDB.SDBDatasetMode.INFERENCES_ONLY);
         ctx.setAttribute("deductionsWebappDaoFactory", infWadf);
         
         OntModel masterUnion = ModelFactory.createOntologyModel(
-                DB_ONT_MODEL_SPEC, makeDBModel(
-                        bds, WebappDaoFactorySDB.UNION_GRAPH,
-                                DB_ONT_MODEL_SPEC, TripleStoreType.SDB, ctx));
+                DB_ONT_MODEL_SPEC, dataset.getDefaultModel());
         unionOms.setFullModel(masterUnion);
         ctx.setAttribute("jenaOntModel", masterUnion);  
         WebappDaoFactory wadf = new WebappDaoFactorySDB(
-                unionOms, bds, storeDesc, config);
+                unionOms, dataset, config);
         ctx.setAttribute("webappDaoFactory",wadf);
 
         ModelContext.setOntModelSelector(unionOms, ctx);

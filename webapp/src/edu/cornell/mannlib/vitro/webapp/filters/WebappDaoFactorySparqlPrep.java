@@ -44,6 +44,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SingleContentOntModelSelector;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlDatasetGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraphMultilingual;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
@@ -149,9 +150,11 @@ public class WebappDaoFactorySparqlPrep implements Filter {
 				OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
 				oms = new SingleContentOntModelSelector(om, oms.getDisplayModel(), oms.getUserAccountsModel());
 								
-				DataSource datasource = DatasetFactory.create();
-				datasource.addNamedModel("fake:fake", m);
-				dataset = datasource;			
+				dataset = DatasetFactory.create(new SparqlDatasetGraph(endpointURI));
+				
+				//DataSource datasource = DatasetFactory.create();
+				//datasource.addNamedModel("fake:fake", m);
+				//dataset = datasource;			
 				
 				wadf = new WebappDaoFactoryJena(oms, config);
 				//wadf = new WebappDaoFactorySDB(oms, dataset, config);

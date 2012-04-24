@@ -18,6 +18,8 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -52,6 +54,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SingleContentOntModelSelector;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlDatasetGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
@@ -109,6 +112,8 @@ public class JenaDataSourceSetupSparql extends JenaDataSourceSetupBase
                 ctx).getProperty("VitroConnection.DataSource.endpointURI");
         
         Graph g = new SparqlGraph(endpointURI);
+        Dataset dataset = DatasetFactory.create(new SparqlDatasetGraph(endpointURI));
+        setStartupDataset(dataset, ctx);
         
         Model m = ModelFactory.createModelForGraph(g);
         OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);

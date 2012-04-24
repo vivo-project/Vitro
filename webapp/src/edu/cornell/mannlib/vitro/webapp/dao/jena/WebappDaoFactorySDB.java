@@ -49,6 +49,14 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
         this.dwf = new StaticDatasetFactory(dataset);
 	}
 	
+	public WebappDaoFactorySDB(OntModelSelector ontModelSelector, 
+            Dataset dataset, 
+            WebappDaoFactoryConfig config, SDBDatasetMode datasetMode) {
+	    super(ontModelSelector, config);
+	    this.dwf = new StaticDatasetFactory(dataset);
+	    this.datasetMode = datasetMode;
+	}
+	
     /**
      * For use when any Dataset access should get a temporary DB connection
      * from a pool

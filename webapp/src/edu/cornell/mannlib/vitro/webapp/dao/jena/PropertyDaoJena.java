@@ -657,7 +657,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 		        	    relatedClasses.addAll(listSuperClasses(ontClass));
 		        	    for (OntClass relatedClass : relatedClasses) {
     		        	    // find properties in restrictions
-    		        		if (relatedClass.isRestriction()) {
+    		        		if (relatedClass.isRestriction() && relatedClass.canAs(Restriction.class)) {
     		        			// TODO: check if restriction is something like
     		        			// maxCardinality 0 or allValuesFrom owl:Nothing,
     		        			// in which case the property is NOT applicable!

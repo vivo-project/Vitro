@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openrdf.query.GraphQuery;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.Update;
@@ -27,7 +26,6 @@ import com.hp.hpl.jena.graph.TransactionHandler;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.graph.TripleMatch;
 import com.hp.hpl.jena.graph.impl.GraphWithPerform;
-import com.hp.hpl.jena.graph.impl.SimpleBulkUpdateHandler;
 import com.hp.hpl.jena.graph.impl.SimpleEventManager;
 import com.hp.hpl.jena.graph.query.QueryHandler;
 import com.hp.hpl.jena.graph.query.SimpleQueryHandler;
@@ -49,6 +47,7 @@ import com.hp.hpl.jena.util.iterator.WrappedIterator;
 public class SparqlGraph implements GraphWithPerform {
     
     private String endpointURI;
+    private String graphURI;
     private static final Log log = LogFactory.getLog(SparqlGraph.class);
     
     private BulkUpdateHandler bulkUpdateHandler;
@@ -61,9 +60,23 @@ public class SparqlGraph implements GraphWithPerform {
     
     private Repository repository;
     
+    /**
+     * Returns a SparqlGraph for the union of named graphs in a remote repository 
+     * @param endpointURI
+     */
     public SparqlGraph(String endpointURI) {
-        this.endpointURI = endpointURI;
-        this.repository = new HTTPRepository(endpointURI);
+        this(endpointURI, null);
+    }
+    
+    /**
+     * Returns a SparqlGraph for a particular named graph in a remote repository 
+     * @param endpointURI
+     * @param graphURI
+     */
+    public SparqlGraph(String endpointURI, String graphURI) {
+       this.endpointURI = endpointURI;
+       this.graphURI = graphURI;
+       this.repository = new HTTPRepository(endpointURI);
     }
     
     private RepositoryConnection getConnection() {
@@ -84,21 +97,11 @@ public class SparqlGraph implements GraphWithPerform {
         
         //log.info("adding " + t);
         
-        String updateString = "INSERT DATA { GRAPH <junk:junk> { " 
+        String updateString = "INSERT DATA { " + ((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "" )  
                 + sparqlNode(t.getSubject(), "") + " " 
                 + sparqlNode(t.getPredicate(), "") + " " 
-                + sparqlNode(t.getObject(), "") + 
-                " } }";
-        
-        if (false) {
-            try { 
-            
-                throw new RuntimeException("Breakpoint");
-            } catch (RuntimeException e) {
-                log.error(e, e);
-                //throw(e);
-            }
-        }
+                + sparqlNode(t.getObject(), "") + " } " 
+                + ((graphURI != null) ? " } " : "");
         
         //log.info(updateString);
         
@@ -122,15 +125,14 @@ public class SparqlGraph implements GraphWithPerform {
     
     @Override
     public void performDelete(Triple t) {
-        log.info ("************** DELETE!!!!! ********************");
-        
-        String updateString = "DELETE DATA { GRAPH <junk:junk> { " 
+                
+        String updateString = "DELETE DATA { " + ((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "" )  
                 + sparqlNode(t.getSubject(), "") + " " 
                 + sparqlNode(t.getPredicate(), "") + " " 
-                + sparqlNode(t.getObject(), "") + 
-                " } }";
+                + sparqlNode(t.getObject(), "") + " } " 
+                + ((graphURI != null) ? " } " : "");
         
-        log.info(updateString);
+        //log.info(updateString);
         
         try {
             RepositoryConnection conn = getConnection();
@@ -164,19 +166,26 @@ public class SparqlGraph implements GraphWithPerform {
         if (subject.isBlank() || predicate.isBlank() || object.isBlank()) {
             return false;
         }
-        StringBuffer containsQuery = new StringBuffer("ASK { \n")
-        .append(sparqlNode(subject, "?s"))
+        StringBuffer containsQuery = new StringBuffer("ASK { \n");
+        if (graphURI != null) {
+            containsQuery.append("  GRAPH <" + graphURI + "> { ");
+        }
+        containsQuery.append(sparqlNode(subject, "?s"))
         .append(" ")
         .append(sparqlNode(predicate, "?p"))
         .append(" ")
-        .append(sparqlNode(object, "?o"))
-        .append("\n}");
-        return execAsk(containsQuery.toString());    
+        .append(sparqlNode(object, "?o"));
+        if (graphURI != null) {
+            containsQuery.append(" } \n");
+        }
+        containsQuery.append("\n}");
+        boolean result = execAsk(containsQuery.toString());
+        return result;
     }
 
     @Override
     public void delete(Triple arg0) throws DeleteDeniedException {
-        log.info("********************** DELETE!!!!!! ************************");
+        //log.info("********************** DELETE!!!!!! ************************");
         performDelete(arg0);
     }
 
@@ -192,7 +201,7 @@ public class SparqlGraph implements GraphWithPerform {
         return find(t.getSubject(), t.getPredicate(), t.getObject());
     }
 
-    private String sparqlNode(Node node, String varName) {
+    public static String sparqlNode(Node node, String varName) {
         if (node == null || node.isVariable()) {
             return varName;
         } else if (node.isBlank()) {
@@ -202,7 +211,9 @@ public class SparqlGraph implements GraphWithPerform {
             return uriBuff.append("<").append(node.getURI()).append(">").toString();
         } else if (node.isLiteral()) {
             StringBuffer literalBuff = new StringBuffer();
-            literalBuff.append("\"").append(node.getLiteralLexicalForm()).append("\"");
+            literalBuff.append("\"");
+            pyString(literalBuff, node.getLiteralLexicalForm());
+            literalBuff.append("\"");
             if (node.getLiteralDatatypeURI() != null) {
                 literalBuff.append("^^<").append(node.getLiteralDatatypeURI()).append(">");
             } else if (node.getLiteralLanguage() != null && node.getLiteralLanguage() != "") {
@@ -223,15 +234,19 @@ public class SparqlGraph implements GraphWithPerform {
                 return WrappedIterator.create(Collections.EMPTY_LIST.iterator());
             }
         }
-        StringBuffer findQuery = new StringBuffer("SELECT * WHERE { \n")
-        .append(sparqlNode(subject, "?s"))
+        StringBuffer findQuery = new StringBuffer("SELECT * WHERE { \n");
+        if (graphURI != null) {
+            findQuery.append("  GRAPH <" + graphURI + "> { ");
+        }
+        findQuery.append(sparqlNode(subject, "?s"))
         .append(" ")
         .append(sparqlNode(predicate, "?p"))
         .append(" ")
-        .append(sparqlNode(object, "?o"))
-        .append("\n}");
-        
-        //log.info(findQuery.toString());
+        .append(sparqlNode(object, "?o"));
+        if (graphURI != null) {
+            findQuery.append("  } ");
+        }
+        findQuery.append("\n}");
         ResultSet rs = execSelect(findQuery.toString());
         //rs = execSelect(findQuery.toString());
         //rs = execSelect(findQuery.toString());
@@ -311,6 +326,7 @@ public class SparqlGraph implements GraphWithPerform {
 
     @Override
     public boolean isIsomorphicWith(Graph arg0) {
+        log.info("Hey dummy!");
         throw new UnsupportedOperationException("isIsomorphicWith() not supported " +
         		"by SPARQL graphs");
     }
@@ -325,7 +341,8 @@ public class SparqlGraph implements GraphWithPerform {
 
     @Override
     public int size() {
-        return find(null, null, null).toList().size();
+        int size = find(null, null, null).toList().size();
+        return size;
     }
     
     private final static Capabilities capabilities = new Capabilities() {
@@ -408,5 +425,44 @@ public class SparqlGraph implements GraphWithPerform {
         }
     }
     
+    /*
+     * 
+     * see http://www.python.org/doc/2.5.2/ref/strings.html
+     * or see jena's n3 grammar jena/src/com/hp/hpl/jena/n3/n3.g
+     */ 
+    protected static void pyString(StringBuffer sbuff, String s)
+    {
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
 
+            // Escape escapes and quotes
+            if (c == '\\' || c == '"' )
+            {
+                sbuff.append('\\') ;
+                sbuff.append(c) ;
+                continue ;
+            }            
+
+            // Whitespace                        
+            if (c == '\n'){ sbuff.append("\\n");continue; }
+            if (c == '\t'){ sbuff.append("\\t");continue; }
+            if (c == '\r'){ sbuff.append("\\r");continue; }
+            if (c == '\f'){ sbuff.append("\\f");continue; }                            
+            if (c == '\b'){ sbuff.append("\\b");continue; }
+            if( c == 7 )  { sbuff.append("\\a");continue; }
+            
+            // Output as is (subject to UTF-8 encoding on output that is)
+            sbuff.append(c) ;
+            
+//            // Unicode escapes
+//            // c < 32, c >= 127, not whitespace or other specials
+//            String hexstr = Integer.toHexString(c).toUpperCase();
+//            int pad = 4 - hexstr.length();
+//            sbuff.append("\\u");
+//            for (; pad > 0; pad--)
+//                sbuff.append("0");
+//            sbuff.append(hexstr);
+        }
+    }
+    
 }
