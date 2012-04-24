@@ -135,7 +135,7 @@ public class DateTimeIntervalValidationVTwo implements N3ValidatorVTwo {
             	String precisionString = precisionStr.get(0);
             	VitroVocabulary.Precision precision = DateTimeWithPrecision.toPrecision( precisionString );
                 if( precision == null )
-                    log.warn("cannot convert " + precisionStr + " to a precision");
+                    log.debug("cannot convert " + precisionStr + " to a precision");
                 else
                     return precision;
             } else {

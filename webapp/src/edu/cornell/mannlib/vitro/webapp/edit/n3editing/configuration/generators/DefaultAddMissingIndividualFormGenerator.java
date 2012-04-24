@@ -34,8 +34,8 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTw
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditN3GeneratorVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.SelectListGeneratorVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.SelectListGeneratorVTwo;
 import edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.DefaultAddMissingIndividualFormModelPreprocessor;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.AntiXssValidation;
@@ -319,18 +319,23 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     private void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri) {
     	Map<String, FieldVTwo> fields = new HashMap<String, FieldVTwo>();
     	if(EditConfigurationUtils.isObjectProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq)) {
-    		fields = getObjectPropertyField(editConfiguration, vreq);
+    		    			      
+    	    //make name field
+    	    FieldVTwo field = new FieldVTwo();
+	        field.setName("name");      	        
+	        
+	        List<String> validators = new ArrayList<String>();
+	        validators.add("nonempty");
+	        field.setValidators(validators);   
+	                            
+	        fields.put(field.getName(), field);
+    	        
     	} else {
     		log.error("Is not object property so fields not set");
     	}
     	
     	editConfiguration.setFields(fields);
     }
-    
-   
-
-	
-	
 
 	private String getRangeClassUri(VitroRequest vreq) {
 		Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
@@ -353,36 +358,6 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
 	    	if( rangeClass == null ) throw new Error ("Cannot find class for range for property.  Looking for " + prop.getRangeVClassURI() );    
 	    }
 		return rangeClass.getURI();
-	}
-
-	private Map<String, FieldVTwo> getObjectPropertyField(
-			EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
-		Map<String, FieldVTwo> fields = new HashMap<String, FieldVTwo>();
-		FieldVTwo field = new FieldVTwo();
-    	field.setName("name");    	
-    	//queryForExisting is not being used anywhere in Field
-    	
-    	List<String> validators = new ArrayList<String>();
-    	validators.add("nonempty");
-    	field.setValidators(validators);
-    	
-    	//subjectUri and subjectClassUri are not being used in Field
-    	
-    	field.setOptionsType("UNDEFINED");
-    	//TODO:check why predicate uri is empty on original jsp
-    	field.setPredicateUri("");
-    	
-    	field.setObjectClassUri("");
-    	field.setRangeDatatypeUri(null);
-    	
-    	field.setRangeLang(null);
-    	field.setLiteralOptions(new ArrayList<List<String>>());
-      	
-    	fields.put(field.getName(), field);
-    	
-    	return fields;
-    	
-    	
 	}
 
 	private void prepareForUpdate(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {

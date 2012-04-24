@@ -20,6 +20,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditSubmission;
@@ -133,8 +134,10 @@ public class DateTimeWithPrecisionVTwo extends BaseEditElementVTwo {
         VitroVocabulary.Precision existingPrec = toPrecision(precisionUri);
         
         if( precisionUri != null && !"".equals(precisionUri) && existingPrec == null ){
-            log.error("field " + getFieldName() + ": existing precision uri was " +
+            if( ! BLANK_SENTINEL.equals( precisionUri )){
+                log.warn("field " + getFieldName() + ": existing precision uri was " +
             		"'" + precisionUri + "' but could not convert to Precision object");
+            }
         }
         
         if( precisionUri == null || precisionUri.isEmpty() || existingPrec == null){

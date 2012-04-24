@@ -37,8 +37,8 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.AntiXssValidation;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditN3GeneratorVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.SelectListGeneratorVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.SelectListGeneratorVTwo;
 import edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
@@ -243,24 +243,12 @@ public class NewIndividualFormGenerator implements EditConfigurationGenerator {
     private void setLabelField(EditConfigurationVTwo editConfiguration,
 			VitroRequest vreq, Map<String, FieldVTwo> fields) {
     	FieldVTwo field = new FieldVTwo();
-    	field.setName("label");    	
-    	//queryForExisting is not being used anywhere in Field
-		String stringDatatypeUri = XSD.xstring.toString();
-
+    	field.setName("label");
+    	field.setRangeDatatypeUri( XSD.xstring.toString() );        
     	
     	List<String> validators = new ArrayList<String>();
     	validators.add("nonempty");
-    	field.setValidators(validators);
-    	
-    	//subjectUri and subjectClassUri are not being used in Field
-    	
-    	field.setOptionsType("UNDEFINED");
-    	//why isn't predicate uri set for data properties?
-    	field.setPredicateUri(null);
-    	field.setObjectClassUri(null);
-    	field.setRangeDatatypeUri(stringDatatypeUri);
-    	
-    	field.setLiteralOptions(new ArrayList<List<String>>());
+    	field.setValidators(validators);    	
     	
     	fields.put(field.getName(), field);		
     	editConfiguration.setFields(fields);

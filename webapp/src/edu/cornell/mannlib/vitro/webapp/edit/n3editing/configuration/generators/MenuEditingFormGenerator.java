@@ -29,8 +29,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.SelectListGeneratorVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.SelectListGeneratorVTwo;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils;
 
@@ -371,9 +371,7 @@ public class MenuEditingFormGenerator implements EditConfigurationGenerator {
 
     	List<String> validators = new ArrayList<String>();
     	validators.add("nonempty");
-    	field.setValidators(validators);
-    	field.setOptionsType("LITERALS");
-    	field.setPredicateUri(DisplayVocabulary.DISPLAY_NS + "title");
+    	field.setValidators(validators);    	    	    	
 
     	fields.put("title", field);
     	//Object Var Field

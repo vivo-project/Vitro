@@ -153,7 +153,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 	//TODO: should more of what happens in this method
     //happen in the generators?
 	private EditConfigurationVTwo setupEditConfiguration(String editConfGeneratorName,
-			VitroRequest vreq) {	    	    	    
+			VitroRequest vreq) throws Exception {	    	    	    
     	HttpSession session = vreq.getSession();
     	EditConfigurationVTwo editConfig = 
     	    makeEditConfigurationVTwo( editConfGeneratorName, vreq, session);
@@ -362,7 +362,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     
        
     private EditConfigurationVTwo makeEditConfigurationVTwo(
-            String editConfGeneratorName, VitroRequest vreq, HttpSession session) {
+            String editConfGeneratorName, VitroRequest vreq, HttpSession session) throws Exception {
     	
     	EditConfigurationGenerator EditConfigurationVTwoGenerator = null;
     	

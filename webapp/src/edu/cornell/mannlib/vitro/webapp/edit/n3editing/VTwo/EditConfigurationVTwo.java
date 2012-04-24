@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,6 +30,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.ModelSelector;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.StandardModelSelector;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.StandardWDFSelector;
@@ -429,11 +431,14 @@ public class EditConfigurationVTwo {
         return EditConfigurationUtils.copy(n3Required);
     }
 
-    //TODO: can we use varargs here?
     public void setN3Required(List<String> n3Required) {
         this.n3Required = n3Required;
     }
 
+    public void setN3Required(String ... n3RequiredStrs){
+        this.n3Required = Arrays.asList( n3RequiredStrs );        
+    }
+    
      /** return a copy of the value so that the configuration is not modified by external code.
      * @return
      */
@@ -445,6 +450,11 @@ public class EditConfigurationVTwo {
         this.n3Optional = n3Optional;
     }
 
+    public void setN3Optional(String ... n3Strs){
+        this.n3Optional = Arrays.asList( n3Strs );        
+    }
+
+    
     public Map<String,String> getNewResources() {
         return newResources;
     }
@@ -452,7 +462,21 @@ public class EditConfigurationVTwo {
     public void setNewResources(Map<String,String> newResources) {
         this.newResources = newResources;
     }
+    
+    public void setNewResources(String ... strs){
+        if( strs == null || strs.length % 2 != 0 ){
+            throw new Error(" setNewResources() must have pairs of varName, prefix ");
+        }
+        Map<String,String> map = new HashMap<String,String>();
+        
+        for( int i=0;i<strs.length;i=i+2 ){
+            map.put(strs[i],strs[i+1]);            
+        }
+        
+        this.newResources = map;
+    }
 
+    
     public List<String> getUrisOnform() {
         return urisOnform;
     }
@@ -461,6 +485,10 @@ public class EditConfigurationVTwo {
         this.urisOnform = urisOnform;
     }
 
+    public void setUrisOnForm(String ... strs){
+        this.urisOnform = Arrays.asList( strs );        
+    }
+    
     public void setFilesOnForm(List<String> filesOnForm){
         this.filesOnForm = filesOnForm;
     }
@@ -477,6 +505,11 @@ public class EditConfigurationVTwo {
         this.literalsOnForm = literalsOnForm;
     }
 
+    public void setLiteralsOnForm(String ... strs){
+        this.literalsOnForm = Arrays.asList( strs );        
+    }
+
+    
     public Map<String, List<String>> getUrisInScope() {
         return urisInScope;
     }

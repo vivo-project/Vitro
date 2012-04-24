@@ -20,14 +20,15 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldOptions;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.IndividualsViaObjectPropetyOptions;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.AntiXssValidation;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
@@ -57,19 +58,23 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 	  }
     @Override
     public EditConfigurationVTwo getEditConfiguration(VitroRequest vreq,
-            HttpSession session) {
+            HttpSession session) throws Exception {
     	
     	//Check if create new and return specific edit configuration from that generator.
     	if(DefaultAddMissingIndividualFormGenerator.isCreateNewIndividual(vreq, session)) {
     		DefaultAddMissingIndividualFormGenerator generator = new DefaultAddMissingIndividualFormGenerator();
     		return generator.getEditConfiguration(vreq, session);
     	}
+    	
     	//TODO: Add a generator for delete: based on command being delete - propDelete.jsp
-        //Generate a edit conf for the default object property form and return it.	
+        //Generate a edit configuration for the default object property form and return it.
+    	//if(DefaultDeleteGenerator.isDelete( vreq,session)){
+    	//  return (new DefaultDeleteGenerator()).getEditConfiguration(vreq,session);
+    	
     	return getDefaultObjectEditConfiguration(vreq, session);
     }
     
-    private EditConfigurationVTwo getDefaultObjectEditConfiguration(VitroRequest vreq, HttpSession session) {
+    private EditConfigurationVTwo getDefaultObjectEditConfiguration(VitroRequest vreq, HttpSession session) throws Exception {
     	EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();    	
     	
     	//process subject, predicate, object parameters
@@ -295,112 +300,19 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     }
 
     
-    private void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri) {
+    private void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri) throws Exception {
     	Map<String, FieldVTwo> fields = new HashMap<String, FieldVTwo>();
     	if(EditConfigurationUtils.isObjectProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq)) {
     		fields = getObjectPropertyField(editConfiguration, vreq);
     	} else {
-    		fields = getDataPropertyField(editConfiguration, vreq);
+    	    throw new Exception("DefaultObjectPropertyFormGenerator does not handle data properties.");
     	}
     	
     	editConfiguration.setFields(fields);
-    }
-    
-    private Map<String, FieldVTwo> getDataPropertyField(
-			EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
-		Map<String, FieldVTwo> fields = new HashMap<String, FieldVTwo>();
-		FieldVTwo field = new FieldVTwo();
-    	field.setName(dataLiteral);
-    	//queryForExisting is not being used anywhere in Field
-    	String rangeDatatypeUri = getRangeDatatypeUri(editConfiguration, vreq);
-    	String rangeLang = getRangeLang(editConfiguration, vreq);
-    	
-    	List<String> validators = new ArrayList<String>();
-    	validators.add("datatype:" + rangeDatatypeUri);
-    	field.setValidators(validators);
-    	
-    	//subjectUri and subjectClassUri are not being used in Field
-    	
-    	field.setOptionsType("LITERALS");
-    	//why isn't predicate uri set for data properties?
-    	field.setPredicateUri(null);
-    	field.setObjectClassUri(null);
-    	field.setRangeDatatypeUri(rangeDatatypeUri);
-    	//have either range datatype uri or range lang
-    	if(rangeDatatypeUri == null) {
-    		field.setRangeLang(rangeLang);
-    	}
-    	field.setLiteralOptions(getLiteralOptions(editConfiguration, vreq));
-    	
-    	fields.put(field.getName(), field);    	
-    	return fields;
-	}
-
-	private List<List<String>> getLiteralOptions(
-			EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
-		   DataPropertyStatement dps =EditConfigurationUtils.getDataPropertyStatement(vreq, vreq.getSession(), dataHash, predicateUri);
-		   List<List<String>> literalOptions = new ArrayList<List<String>>();
-		 if(dps == null) {
-		        log.debug("No incoming dataproperty statement attribute for property ; adding a new statement");                
-		        String rangeDatatypeUri = getRangeDatatypeUri(editConfiguration, vreq);
-		        if(rangeDatatypeUri != null && rangeDatatypeUri.length() > 0) {                        
-		            String defaultVal =  defaultsForXSDtypes.get(rangeDatatypeUri);
-		            List<String> defaultArray = new ArrayList<String>();
-		            defaultArray.add(defaultVal);
-		            literalOptions.add(defaultArray);
-		        }
-		    }   
-		return literalOptions;
-	}
-
-	private String getRangeLang(EditConfigurationVTwo editConfiguration,
-			VitroRequest vreq) {
-		String rangeLang = null;
-		
-	   DataPropertyStatement dps =EditConfigurationUtils.getDataPropertyStatement(vreq, vreq.getSession(), dataHash, predicateUri);
-	   if(dps != null) {
-		   rangeLang = dps.getLanguage();
-		   if( rangeLang == null ) {
-	           log.debug("no language attribute on data property statement in DefaultDataPropertyFormGenerator");
-	       }else{
-	           log.debug("language attribute of ["+rangeLang+"] on data property statement in DefaultDataPropertyFormGenerator");
-	       }
-	   }
-	   if( rangeLang != null && rangeLang.trim().length() == 0)
-           rangeLang = null;
-	    return rangeLang;
-	}
-
-	private String getRangeDatatypeUri(EditConfigurationVTwo editConfiguration,
-			VitroRequest vreq) {
-		Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
-		DataProperty prop = EditConfigurationUtils.getDataProperty(vreq);
-		
-		//rangeDefaultJson goes into literalk options
-		//validations include dataype:rangedatatypeurijson
-		//rangeDatatypeUri is rangeDAttypeUriJson
-		//rangeLang = rangeLanJson
-	   DataPropertyStatement dps =EditConfigurationUtils.getDataPropertyStatement(vreq, vreq.getSession(), dataHash, predicateUri);
-	   String rangeDatatypeUri = vreq.getWebappDaoFactory().getDataPropertyDao().getRequiredDatatypeURI(subject, prop);
-  
-	    if( dps != null ){
-	      rangeDatatypeUri = dps.getDatatypeURI();
-	        if( rangeDatatypeUri == null ){
-	            log.debug("no range datatype uri set on data property statement when property's range datatype is "+prop.getRangeDatatypeURI()+" in DefaultDataPropertyFormGenerator");
-	        } else {
-	            log.debug("range datatype uri of ["+rangeDatatypeUri+"] on data property statement in DefaultDataPropertyFormGenerator");
-	        }
-	    } else {
-	        log.debug("No incoming dataproperty statement attribute for property "+prop.getPublicName()+"; adding a new statement");                
-	    }      
-	    if( rangeDatatypeUri != null && rangeDatatypeUri.trim().length() == 0)
-            rangeDatatypeUri = null;
-	    
-	    return rangeDatatypeUri;
-	}
+    }       
 
 	private Map<String, FieldVTwo> getObjectPropertyField(
-			EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
+			EditConfigurationVTwo editConfiguration, VitroRequest vreq) throws Exception {
 		Map<String, FieldVTwo> fields = new HashMap<String, FieldVTwo>();
 		FieldVTwo field = new FieldVTwo();
     	field.setName("objectVar");    	
@@ -409,20 +321,13 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	List<String> validators = new ArrayList<String>();
     	validators.add("nonempty");
     	field.setValidators(validators);
-    	
-    	//subjectUri and subjectClassUri are not being used in Field
-    	
-    	field.setOptionsType("INDIVIDUALS_VIA_OBJECT_PROPERTY");
-    	field.setPredicateUri(predicateUri);
-    	
-    	field.setObjectClassUri(null);
-    	field.setRangeDatatypeUri(null);
-    	
-    	field.setRangeLang(null);
-    	field.setLiteralOptions(new ArrayList<List<String>>());
     	    	
-    	fields.put(field.getName(), field);
-    	
+    	field.setOptions( new IndividualsViaObjectPropetyOptions(
+    	        subjectUri, 
+    	        predicateUri, 
+    	        objectUri));    	    	
+    	    	    
+    	fields.put(field.getName(), field);    	
     	return fields;
     	
     	

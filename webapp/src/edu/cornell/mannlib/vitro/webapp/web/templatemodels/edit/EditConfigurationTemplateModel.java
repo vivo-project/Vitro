@@ -33,8 +33,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditElementVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.SelectListGeneratorVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.SelectListGeneratorVTwo;
 import edu.cornell.mannlib.vitro.webapp.web.beanswrappers.ReadOnlyBeansWrapper;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ObjectPropertyStatementTemplateModel;
@@ -48,7 +48,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     VitroRequest vreq;
 	private Log log = LogFactory.getLog(EditConfigurationTemplateModel.class);
 
-    public EditConfigurationTemplateModel( EditConfigurationVTwo editConfig, VitroRequest vreq){
+    public EditConfigurationTemplateModel( EditConfigurationVTwo editConfig, VitroRequest vreq) throws Exception{
         this.editConfig = editConfig;
         this.vreq = vreq;
         //get additional data that may be required to generate template
@@ -72,7 +72,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
      * Such as options for a drop-down etc. 
      */
     
-    private void retrieveEditData() {
+    private void retrieveEditData() throws Exception {
     	//Get vitro request attributes for
     	setFormTitle();
     	setSubmitLabel();
@@ -89,17 +89,16 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 
     //Based on certain pre-set fields/variables, look for what
     //drop-downs need to be populated
-	private void populateDropdowns() {
+	private void populateDropdowns() throws Exception {
 		
 		//For each field with an optionType defined, create the options
 		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
 		for(String fieldName: editConfig.getFields().keySet()){
 		    FieldVTwo field = editConfig.getField(fieldName);
-		    if( field.getOptionsType() == FieldVTwo.OptionsType.UNDEFINED 
-		         || field.getOptionsType() == null ){
+		    if( field.getFieldOptions() == null ){
 		        continue;
 		    }
-		    Map<String, String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, fieldName, wdf);
+		    Map<String, String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, fieldName, wdf);		    
 		    optionsMap = SelectListGeneratorVTwo.getSortedMap(optionsMap);
 		    pageData.put(fieldName, optionsMap);		       
 		}
