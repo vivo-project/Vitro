@@ -14,7 +14,6 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailMessage;
 import freemarker.core.Environment;
-import freemarker.template.SimpleScalar;
 import freemarker.template.TemplateDirectiveBody;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
@@ -58,21 +57,6 @@ public class EmailDirective extends BaseTemplateDirectiveModel {
 			throw new TemplateModelException("The email directive must have "
 					+ "either a 'html' parameter or a 'text' parameter.");
 		}
-	}
-
-	private String getOptionalSimpleScalarParameter(Map<?, ?> params,
-			String name) throws TemplateModelException {
-		Object o = params.get(name);
-		if (o == null) {
-			return null;
-		}
-
-		if (!(o instanceof SimpleScalar)) {
-			throw new TemplateModelException("The '" + name + "' parameter "
-					+ "for the email directive must be a string value.");
-		}
-
-		return o.toString();
 	}
 
 	@Override

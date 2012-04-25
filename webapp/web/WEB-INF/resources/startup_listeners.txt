@@ -48,6 +48,8 @@ edu.cornell.mannlib.vitro.webapp.auth.policy.RootUserPolicy$Setup
 
 edu.cornell.mannlib.vitro.webapp.auth.policy.RestrictHomeMenuItemEditingPolicy$Setup
 
+edu.cornell.mannlib.vitro.webapp.services.shortview.ShortViewServiceSetup
+
 # The Solr index uses a "public" permission, so the PropertyRestrictionPolicyHelper 
 #   and the PermissionRegistry must already be set up.
 edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup
