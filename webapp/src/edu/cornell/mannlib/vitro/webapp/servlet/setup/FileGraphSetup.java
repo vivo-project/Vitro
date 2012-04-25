@@ -178,20 +178,8 @@ public class FileGraphSetup implements ServletContextListener {
             dbModel.add(fileModel);
             modelChanged = true;
         } else if (!isIsomorphic) {
-            System.out.println("==================================================");
-            System.out.println("Remove the following print statement from FileGraphSetup.java");
-            System.out.println("Updating " + path + " because graphs are not isomorphic");
             log.info("Updating " + path + " because graphs are not isomorphic");
             log.info("dbModel: " + dbModel.size() + " ; fileModel: " + fileModel.size());
-            System.out.println("--------------------");
-            System.out.println("fileModel - dbModel:");
-            System.out.println("--------------------");
-            fileModel.difference(dbModel).write(System.out);
-            System.out.println("--------------------");
-            System.out.println("dbModel - fileModel:");
-            System.out.println("--------------------");
-            dbModel.difference(fileModel).write(System.out);
-            
             dbModel.removeAll();
             dbModel.add(fileModel);
             modelChanged = true;

@@ -79,7 +79,15 @@ public class SparqlGraph implements GraphWithPerform {
        this.repository = new HTTPRepository(endpointURI);
     }
     
-    private RepositoryConnection getConnection() {
+    public String getEndpointURI() {
+        return endpointURI;
+    }
+    
+    public String getGraphURI() {
+        return graphURI;
+    }
+    
+    public RepositoryConnection getConnection() {
         try {
             return this.repository.getConnection();
         } catch (RepositoryException e) {
@@ -92,63 +100,63 @@ public class SparqlGraph implements GraphWithPerform {
         performAdd(arg0);
     }
 
+    public void executeUpdate(String updateString) {    
+        try {
+            RepositoryConnection conn = getConnection();
+            try {
+                Update u = conn.prepareUpdate(QueryLanguage.SPARQL, updateString);
+                u.execute();
+            } catch (MalformedQueryException e) {
+                throw new RuntimeException(e);
+            } catch (UpdateExecutionException e) {
+                throw new RuntimeException(e);
+            } finally {
+                conn.close();
+            }
+        } catch (RepositoryException re) {
+            throw new RuntimeException(re);
+        }
+    }
+    
     @Override
     public void performAdd(Triple t) {
         
         //log.info("adding " + t);
         
         String updateString = "INSERT DATA { " + ((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "" )  
-                + sparqlNode(t.getSubject(), "") + " " 
-                + sparqlNode(t.getPredicate(), "") + " " 
-                + sparqlNode(t.getObject(), "") + " } " 
+                + sparqlNodeUpdate(t.getSubject(), "") + " " 
+                + sparqlNodeUpdate(t.getPredicate(), "") + " " 
+                + sparqlNodeUpdate(t.getObject(), "") + " } " 
                 + ((graphURI != null) ? " } " : "");
         
         //log.info(updateString);
         
-        try {
-            RepositoryConnection conn = getConnection();
-            try {
-                Update u = conn.prepareUpdate(QueryLanguage.SPARQL, updateString);
-                u.execute();
-            } catch (MalformedQueryException e) {
-                throw new RuntimeException(e);
-            } catch (UpdateExecutionException e) {
-                throw new RuntimeException(e);
-            } finally {
-                conn.close();
-            }
-        } catch (RepositoryException re) {
-            throw new RuntimeException(re);
-        }
-        
+        executeUpdate(updateString);
+                
     }
     
     @Override
     public void performDelete(Triple t) {
                 
         String updateString = "DELETE DATA { " + ((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "" )  
-                + sparqlNode(t.getSubject(), "") + " " 
-                + sparqlNode(t.getPredicate(), "") + " " 
-                + sparqlNode(t.getObject(), "") + " } " 
+                + sparqlNodeUpdate(t.getSubject(), "") + " " 
+                + sparqlNodeUpdate(t.getPredicate(), "") + " " 
+                + sparqlNodeUpdate(t.getObject(), "") + " } " 
                 + ((graphURI != null) ? " } " : "");
         
         //log.info(updateString);
         
-        try {
-            RepositoryConnection conn = getConnection();
-            try {
-                Update u = conn.prepareUpdate(QueryLanguage.SPARQL, updateString);
-                u.execute();
-            } catch (MalformedQueryException e) {
-                throw new RuntimeException(e);
-            } catch (UpdateExecutionException e) {
-                throw new RuntimeException(e);
-            } finally {
-                conn.close();
-            }
-        } catch (RepositoryException re) {
-            throw new RuntimeException(re);
-        }
+        executeUpdate(updateString);
+    }
+    
+    public void removeAll() {
+        // now we flush out any remaining blank nodes
+        String updateString = "DELETE { ?s ?p ?o } WHERE { \n" +
+                              ((getGraphURI() != null) ? ("GRAPH <" + getGraphURI() + "> { \n") : ("")) +
+                              "    ?s ?p ?o \n" +
+                              ((getGraphURI() != null) ? "} \n" : "") +
+                              "}";
+        executeUpdate(updateString);
     }
     
     @Override
@@ -205,7 +213,7 @@ public class SparqlGraph implements GraphWithPerform {
         if (node == null || node.isVariable()) {
             return varName;
         } else if (node.isBlank()) {
-            return "<" + "fake:blank" + ">"; // or throw exception?
+            return "<fake:blank>"; // or throw exception?
         } else if (node.isURI()) {
             StringBuffer uriBuff = new StringBuffer();
             return uriBuff.append("<").append(node.getURI()).append(">").toString();
@@ -222,6 +230,14 @@ public class SparqlGraph implements GraphWithPerform {
             return literalBuff.toString();
         } else {
             return varName;
+        }
+    }
+    
+    public static String sparqlNodeUpdate(Node node, String varName) {
+        if (node.isBlank()) {
+            return "_:" + node.getBlankNodeLabel().replaceAll("\\W", "");
+        } else {
+            return sparqlNode(node, varName);
         }
     }
     
