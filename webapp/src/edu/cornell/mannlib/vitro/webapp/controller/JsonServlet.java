@@ -2,12 +2,15 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.DISPLAY_ONT_MODEL;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -27,7 +30,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Literal;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -42,8 +44,6 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfigu
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.SelectListGenerator;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetterUtils;
-
-import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.DISPLAY_ONT_MODEL;
 
 /**
  * This servlet is for servicing requests for JSON objects/data.
@@ -162,40 +162,17 @@ public class JsonServlet extends VitroHttpServlet {
             log.error(ex,ex);
         }
 
-        if( rObj == null )
-            rObj = new JSONObject();
-        
-        try{
-            resp.setCharacterEncoding("UTF-8");
-            resp.setContentType("application/json;charset=UTF-8");
-            
-            if( errorMessage != null ){
-                rObj.put("errorMessage", errorMessage);
-                resp.setStatus(500 /*HttpURLConnection.HTTP_SERVER_ERROR*/);
-            }else{
-                rObj.put("errorMessage", "");
-            }            
-            Writer writer = resp.getWriter();
-            writer.write(rObj.toString());
-        }catch(JSONException jse){
-            log.error(jse,jse);
-        } catch (IOException e) {
-            log.error(e,e);
-        }
+        writeJsonResponse(rObj, errorMessage, resp);
         
     }
-    
+
     public static JSONObject getSolrIndividualsByVClass(String vclassURI, HttpServletRequest req, ServletContext context) throws Exception {
-        List<String> vclassURIs = new ArrayList<String>();
-        vclassURIs.add(vclassURI);
+        List<String> vclassURIs = Collections.singletonList(vclassURI);
         VitroRequest vreq = new VitroRequest(req);        
-        VClass vclass=null;
-        JSONObject rObj = new JSONObject();
         
         Map<String, Object> map = getSolrVClassIntersectionResults(vclassURIs, vreq, context);
         //last parameter indicates single vclass instead of multiple vclasses
-        rObj = processVClassResults(map, vreq, context, false);                    
-        return rObj;                                               
+        return processVClassResults(map, vreq, context, false);                    
     }
 
     
@@ -230,26 +207,7 @@ public class JsonServlet extends VitroHttpServlet {
             log.error(ex,ex);
         }
 
-        if( rObj == null )
-            rObj = new JSONObject();
-        
-        try{
-            resp.setCharacterEncoding("UTF-8");
-            resp.setContentType("application/json;charset=UTF-8");
-            
-            if( errorMessage != null ){
-                rObj.put("errorMessage", errorMessage);
-                resp.setStatus(500 /*HttpURLConnection.HTTP_SERVER_ERROR*/);
-            }else{
-                rObj.put("errorMessage", "");
-            }            
-            Writer writer = resp.getWriter();
-            writer.write(rObj.toString());
-        }catch(JSONException jse){
-            log.error(jse,jse);
-        } catch (IOException e) {
-            log.error(e,e);
-        }
+        writeJsonResponse(rObj, errorMessage, resp);
     }
     
     public static JSONObject getSolrIndividualsByVClasses(List<String> vclassURIs, HttpServletRequest req, ServletContext context) throws Exception {
@@ -543,45 +501,49 @@ public class JsonServlet extends VitroHttpServlet {
 	   		}
 	   }
 
-	   if( rObj == null )
-           rObj = new JSONObject();
-	 //Send object
-       try{
-           resp.setCharacterEncoding("UTF-8");
-           resp.setContentType("application/json;charset=UTF-8");
-           
-           if( errorMessage != null ){
-               rObj.put("errorMessage", errorMessage);
-               resp.setStatus(500 /*HttpURLConnection.HTTP_SERVER_ERROR*/);
-           }else{
-               rObj.put("errorMessage", "");
-           }            
-           Writer writer = resp.getWriter();
-           writer.write(rObj.toString());
-       }catch(JSONException jse){
-           log.error(jse,jse);
-       } catch (IOException e) {
-           log.error(e,e);
-       }
+	 writeJsonResponse(rObj, errorMessage, resp);
 	   
     }
 
     private JSONArray individualsToJson(List<Individual> individuals) throws ServletException {
-        JSONArray ja = new JSONArray();
-        Iterator<Individual> it = individuals.iterator();
         try{
-            while(it.hasNext()){
-                Individual ent = (Individual) it.next();
+        	JSONArray ja = new JSONArray();
+        	for (Individual ent: individuals) {
                 JSONObject entJ = new JSONObject();
                 entJ.put("name", ent.getName());
                 entJ.put("URI", ent.getURI());
                 ja.put( entJ );
             }
+        	return ja;
         }catch(JSONException ex){
             throw new ServletException("could not convert list of Individuals into JSON: " +  ex);
         }
-
-        return ja;
     }
+
+	private void writeJsonResponse(JSONObject rObj, String errorMessage,
+			HttpServletResponse resp) {
+        if( rObj == null ) {
+            rObj = new JSONObject();
+        }
+
+		try{
+            resp.setCharacterEncoding("UTF-8");
+            resp.setContentType("application/json;charset=UTF-8");
+            
+            if( errorMessage != null ){
+                rObj.put("errorMessage", errorMessage);
+                resp.setStatus(500 /*HttpURLConnection.HTTP_SERVER_ERROR*/);
+            }else{
+                rObj.put("errorMessage", "");
+            }            
+            Writer writer = resp.getWriter();
+            writer.write(rObj.toString());
+        }catch(JSONException jse){
+            log.error(jse,jse);
+        } catch (IOException e) {
+            log.error(e,e);
+        }
+	}
+    
 
 }
