@@ -21,13 +21,12 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.shared.LockMRSW;
 import com.hp.hpl.jena.sparql.core.DatasetGraph;
 import com.hp.hpl.jena.sparql.core.Quad;
 import com.hp.hpl.jena.sparql.resultset.ResultSetMem;
 import com.hp.hpl.jena.sparql.util.Context;
-import com.hp.hpl.jena.sparql.util.NodeFactory;
 import com.hp.hpl.jena.util.iterator.SingletonIterator;
 import com.hp.hpl.jena.util.iterator.WrappedIterator;
 
@@ -35,6 +34,7 @@ public class SparqlDatasetGraph implements DatasetGraph {
 
     private String endpointURI;
     private Repository repository;
+    private Lock lock = new LockMRSW();
     
     public SparqlDatasetGraph(String endpointURI) {
         this.endpointURI = endpointURI;
@@ -171,8 +171,7 @@ public class SparqlDatasetGraph implements DatasetGraph {
 
     @Override
     public Lock getLock() {
-        // TODO Auto-generated method stub
-        return null;
+        return lock;
     }
 
     @Override

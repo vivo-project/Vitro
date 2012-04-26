@@ -249,16 +249,17 @@ public class JenaDataSourceSetupSparql2 extends JenaDataSourceSetupBase
             applicationMetadataModel.getBaseModel().register(
                     new ModelSynchronizer(applicationMetadataModelDB));
             
-            if (isFirstStartup()) {
+            if (applicationMetadataModel.size()== 0 /* isFirstStartup() */) {
                 applicationMetadataModel.add(
                         InitialJenaModelUtils.loadInitialModel(
                                 ctx, getDefaultNamespace(ctx)));
                 
-            } else if (applicationMetadataModelDB.size() == 0) {
-                repairAppMetadataModel(
-                        applicationMetadataModel, aboxAssertions, 
-                        aboxInferences);
             }
+//            else if (applicationMetadataModelDB.size() == 0) {
+//                repairAppMetadataModel(
+//                        applicationMetadataModel, aboxAssertions, 
+//                        aboxInferences);
+//            }
             
             baseOms.setApplicationMetadataModel(applicationMetadataModel);
             inferenceOms.setApplicationMetadataModel(

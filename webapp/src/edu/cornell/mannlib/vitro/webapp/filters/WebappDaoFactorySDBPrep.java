@@ -204,13 +204,13 @@ public class WebappDaoFactorySDBPrep implements Filter {
         //datasource.addNamedModel("fake:fake", m);
         //dataset = datasource;            
         
-        WebappDaoFactory wadf = new WebappDaoFactoryJena(oms, config);
-        //wadf = new WebappDaoFactorySDB(oms, dataset, config);
+        //WebappDaoFactory wadf = new WebappDaoFactoryJena(oms, config);
+        WebappDaoFactory wadf = new WebappDaoFactorySDB(oms, dataset, config);
         vreq.setWebappDaoFactory(wadf);
         vreq.setFullWebappDaoFactory(wadf);
         vreq.setUnfilteredWebappDaoFactory(wadf);
         vreq.setWebappDaoFactory(wadf);
-        vreq.setAssertionsWebappDaoFactory(wadf);
+        //vreq.setAssertionsWebappDaoFactory(wadf);
         vreq.setDataset(dataset);
         vreq.setJenaOntModel(om);
         vreq.setOntModelSelector(oms);

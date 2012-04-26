@@ -156,13 +156,14 @@ public class WebappDaoFactorySparqlPrep implements Filter {
 				//datasource.addNamedModel("fake:fake", m);
 				//dataset = datasource;			
 				
+				vreq.setAssertionsWebappDaoFactory(wadf);
+				
 				wadf = new WebappDaoFactoryJena(oms, config);
 				//wadf = new WebappDaoFactorySDB(oms, dataset, config);
 				vreq.setWebappDaoFactory(wadf);
 				vreq.setFullWebappDaoFactory(wadf);
 				vreq.setUnfilteredWebappDaoFactory(wadf);
 				vreq.setWebappDaoFactory(wadf);
-				vreq.setAssertionsWebappDaoFactory(wadf);
 				vreq.setDataset(dataset);
 				vreq.setJenaOntModel(om);
 				vreq.setOntModelSelector(oms);

@@ -45,13 +45,6 @@ public class SimpleReasonerSetup implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         
-        // temporary scaffolding in the rdfapi dev branch
-        // TODO remove me
-        if (ConfigurationProperties.getBean(sce).getProperty(
-                "VitroConnection.DataSource.endpointURI") != null) {
-            return;
-        }
-        
         try {    
             // set up Pellet reasoning for the TBox    
             
