@@ -70,6 +70,7 @@ public class DataGetterUtils {
             if( dg != null )
                 dgList.add(dg); 
         }
+        log.debug("getDataGettersForPage: " + dgList);
         return dgList;
     }
 
@@ -137,6 +138,7 @@ public class DataGetterUtils {
             return null;
         }
         
+        log.debug("dataGetterForURI: " + obj);
         return (DataGetter)obj;                
     }
 
