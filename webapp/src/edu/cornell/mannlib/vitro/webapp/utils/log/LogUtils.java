@@ -9,6 +9,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -17,11 +20,38 @@ import org.apache.commons.logging.Log;
  * Some static methods that might help with logging for debug purposes.
  */
 public class LogUtils {
+	// ----------------------------------------------------------------------
+	// Public Static methods
+	// ----------------------------------------------------------------------
+
 	public static String deepFormatForLog(Log log, String level, Object o) {
 		if (!isLevelEnabled(log, level)) {
 			return "";
 		}
 		return new LogUtils(log).deepFormat(o);
+	}
+
+	public static String formatRequestProperties(Log log, String level,
+			HttpServletRequest req) {
+		if (!isLevelEnabled(log, level)) {
+			return "";
+		}
+		return new LogUtils(log).requestProperties(req);
+	}
+
+	// ----------------------------------------------------------------------
+	// The instance
+	// ----------------------------------------------------------------------
+
+	private String requestProperties(HttpServletRequest req) {
+		@SuppressWarnings("unchecked")
+		Map<String, String[]> map = req.getParameterMap();
+
+		String s = req.getRequestURL().append('\n').toString();
+		for (String name : new TreeSet<String>(map.keySet())) {
+			s += "   " + name + " = " + Arrays.toString(map.get(name)) + '\n';
+		}
+		return s.trim();
 	}
 
 	private static boolean isLevelEnabled(Log log, String level) {
