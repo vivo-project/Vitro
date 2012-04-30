@@ -83,7 +83,7 @@ public class PolicyHelper_ModelsTest extends AbstractTestClass {
 		setLoggerLevel(ServletPolicyList.class, Level.WARN);
 		ServletPolicyList.addPolicy(ctx, new MySimplePolicy());
 
-		setLoggerLevel(PolicyHelper.class, Level.DEBUG);
+//		setLoggerLevel(PolicyHelper.class, Level.DEBUG);
 	}
 
 	// ----------------------------------------------------------------------
