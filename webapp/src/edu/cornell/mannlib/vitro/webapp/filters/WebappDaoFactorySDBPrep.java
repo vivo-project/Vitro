@@ -196,7 +196,7 @@ public class WebappDaoFactorySDBPrep implements Filter {
         
         Model m = ModelFactory.createModelForGraph(g);
         OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
-        oms = new SingleContentOntModelSelector(om, oms.getDisplayModel(), oms.getUserAccountsModel());
+        //oms = new SingleContentOntModelSelector(om, oms.getDisplayModel(), oms.getUserAccountsModel());
                         
         Dataset dataset = DatasetFactory.create(new SparqlDatasetGraph(endpointURI));
         
