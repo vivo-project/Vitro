@@ -126,9 +126,11 @@ public class JsonServletTest extends AbstractTestClass {
 
 	@Test
 	public void vclassesNoClassgroup() throws ServletException, IOException {
+		setLoggerLevel(JsonServlet.class, Level.FATAL);
+		setLoggerLevel(JsonObjectProducer.class, Level.FATAL);
 		req.addParameter(GET_VCLASSES_FOR_VCLASS_GROUP, "true");
 		servlet.service(req, resp);
-		assertEquals("empty response", "", resp.getOutput());
+		assertFailureWithErrorMessage("java.lang.Exception: no URI passed for classgroupUri");
 		assertEquals("status=failure", SC_INTERNAL_SERVER_ERROR,
 				resp.getStatus());
 	}
@@ -160,6 +162,7 @@ public class JsonServletTest extends AbstractTestClass {
 	public void individualsByClassNoVClass() throws ServletException,
 			IOException {
 		setLoggerLevel(JsonServlet.class, Level.FATAL);
+		setLoggerLevel(JsonObjectProducer.class, Level.FATAL);
 		req.addParameter(GET_SOLR_INDIVIDUALS_BY_VCLASS, "true");
 		servlet.service(req, resp);
 		assertFailureWithErrorMessage("java.lang.Exception: "
@@ -170,6 +173,7 @@ public class JsonServletTest extends AbstractTestClass {
 	public void individualsByClassUnrecognizedVClass() throws ServletException,
 			IOException {
 		setLoggerLevel(JsonServlet.class, Level.FATAL);
+		setLoggerLevel(JsonObjectProducer.class, Level.FATAL);
 		String vclassId = "http://bogusVclass";
 		req.addParameter(GET_SOLR_INDIVIDUALS_BY_VCLASS, "true");
 		req.addParameter(VCLASS_ID, vclassId);
