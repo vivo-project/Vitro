@@ -6,12 +6,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.Update;
-import org.openrdf.query.UpdateExecutionException;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
 
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.GraphEvents;
@@ -21,6 +15,7 @@ import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.graph.impl.SimpleBulkUpdateHandler;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.sparql.util.graph.GraphFactory;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
@@ -71,9 +66,26 @@ public class SparqlGraphBulkUpdater extends SimpleBulkUpdateHandler {
     @Override
     public void add(Graph g, boolean arg1) {
         Model gm = ModelFactory.createModelForGraph(g);
+        Model blankNodeModel = ModelFactory.createDefaultModel();
+        Model nonBlankNodeModel = ModelFactory.createDefaultModel();
+        StmtIterator sit = gm.listStatements();
+        while (sit.hasNext()) {
+            Statement stmt = sit.nextStatement();
+            if (!stmt.getSubject().isAnon() && !stmt.getObject().isAnon()) {
+                nonBlankNodeModel.add(stmt);
+            } else {
+                blankNodeModel.add(stmt);
+            }
+        }
+        addModel(nonBlankNodeModel);
+        // replace following call with different method
+        addModel(blankNodeModel);
+    }
+    
+    public void addModel(Model model) {
         Model m = ModelFactory.createDefaultModel();
         int testLimit = 1000;
-        StmtIterator stmtIt = gm.listStatements();
+        StmtIterator stmtIt = model.listStatements();
         int count = 0;
         try {
             while (stmtIt.hasNext()) {
@@ -101,6 +113,7 @@ public class SparqlGraphBulkUpdater extends SimpleBulkUpdateHandler {
             stmtIt.close();
         }
     }
+    
 
     @Override 
     public void removeAll() {

@@ -109,6 +109,8 @@ public class SparqlGraph implements GraphWithPerform {
             } catch (MalformedQueryException e) {
                 throw new RuntimeException(e);
             } catch (UpdateExecutionException e) {
+                log.error(e,e);
+                log.error("Update command: \n" + updateString);
                 throw new RuntimeException(e);
             } finally {
                 conn.close();
