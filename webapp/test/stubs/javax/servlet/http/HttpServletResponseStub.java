@@ -10,6 +10,8 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -29,6 +31,7 @@ public class HttpServletResponseStub implements HttpServletResponse {
 	private String errorMessage;
 	private Map<String, String> headers = new HashMap<String, String>();
 	private String contentType;
+	private String charset = "";
 
 	private ByteArrayOutputStream outputStream;
 	private StringWriter outputWriter;
@@ -129,14 +132,34 @@ public class HttpServletResponseStub implements HttpServletResponse {
 		return headers.containsKey(name);
 	}
 
+	/**
+	 * Calling setContentType("this/type;charset=UTF-8") is the same as calling
+	 * setContentType("this/type;charset=UTF-8"); setCharacterEncoding("UTF-8")
+	 */
 	@Override
 	public void setContentType(String contentType) {
 		this.contentType = contentType;
+		
+		Pattern p = Pattern.compile(";\\scharset=([^;]+)");
+		Matcher m = p.matcher(contentType);
+		if (m.find()) {
+			this.charset = m.group(1);
+		}
 	}
 
 	@Override
 	public String getContentType() {
 		return contentType;
+	}
+
+	@Override
+	public void setCharacterEncoding(String charset) {
+		this.charset = charset;
+	}
+
+	@Override
+	public String getCharacterEncoding() {
+		return charset;
 	}
 
 	// ----------------------------------------------------------------------
@@ -153,12 +176,6 @@ public class HttpServletResponseStub implements HttpServletResponse {
 	public int getBufferSize() {
 		throw new RuntimeException(
 				"HttpServletResponseStub.getBufferSize() not implemented.");
-	}
-
-	@Override
-	public String getCharacterEncoding() {
-		throw new RuntimeException(
-				"HttpServletResponseStub.getCharacterEncoding() not implemented.");
 	}
 
 	@Override
@@ -189,12 +206,6 @@ public class HttpServletResponseStub implements HttpServletResponse {
 	public void setBufferSize(int arg0) {
 		throw new RuntimeException(
 				"HttpServletResponseStub.setBufferSize() not implemented.");
-	}
-
-	@Override
-	public void setCharacterEncoding(String arg0) {
-		throw new RuntimeException(
-				"HttpServletResponseStub.setCharacterEncoding() not implemented.");
 	}
 
 	@Override
