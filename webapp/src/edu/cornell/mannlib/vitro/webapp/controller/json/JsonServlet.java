@@ -32,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetterUtils
  * It could be generalized to get other types of data ex. XML, HTML etc
  * @author bdc34
  *
+ * Moved most of the logic into a group of JsonProducer classes. jeb228
  */
 public class JsonServlet extends VitroHttpServlet {
     private static final long serialVersionUID = 1L;
@@ -69,8 +70,8 @@ public class JsonServlet extends VitroHttpServlet {
         	new	GetSolrIndividualsByVClasses(vreq).process(resp);
         } else if( vreq.getParameter("getDataForPage") != null ){
             new GetDataForPage(vreq).process(resp);
-//        }else if( vreq.getParameter("getRenderedSolrIndividualsByVClass") != null ){
-//            new GetRenderedSolrIndividualsByVClass(vreq).process(resp);
+        }else if( vreq.getParameter("getRenderedSolrIndividualsByVClass") != null ){
+            new GetRenderedSolrIndividualsByVClass(vreq).process(resp);
         }
     }
     

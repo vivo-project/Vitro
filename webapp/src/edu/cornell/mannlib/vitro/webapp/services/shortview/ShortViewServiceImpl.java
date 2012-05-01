@@ -13,10 +13,16 @@ import java.util.TreeSet;
 
 import javax.servlet.ServletContext;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.services.freemarker.FreemarkerProcessingService;
+import edu.cornell.mannlib.vitro.webapp.services.freemarker.FreemarkerProcessingService.TemplateParsingException;
+import edu.cornell.mannlib.vitro.webapp.services.freemarker.FreemarkerProcessingServiceSetup;
 import edu.cornell.mannlib.vitro.webapp.services.shortview.FakeApplicationOntologyService.TemplateAndDataGetters;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetter;
 
@@ -24,6 +30,9 @@ import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetter;
  * The basic implementation of ShortViewService
  */
 public class ShortViewServiceImpl implements ShortViewService {
+	private static final Log log = LogFactory
+			.getLog(ShortViewServiceImpl.class);
+
 	private static final Map<String, Object> EMPTY_MAP = Collections.emptyMap();
 
 	private final FakeApplicationOntologyService faker;
@@ -39,17 +48,38 @@ public class ShortViewServiceImpl implements ShortViewService {
 
 		TemplateAndSupplementalData tsd = getShortViewInfo(individual, context,
 				vreq);
+		String templateName = tsd.getTemplateName();
+		Map<String, Object> supplementalData = tsd.getSupplementalData();
 
-		// TODO Auto-generated method stub
-		throw new RuntimeException(
-				"ShortViewService.renderShortView() not implemented.");
+		try {
+			Map<String, Object> fullModelMap = new HashMap<String, Object>(
+					modelMap);
+			fullModelMap.putAll(supplementalData);
+
+			FreemarkerProcessingService fps = FreemarkerProcessingServiceSetup
+					.getService(vreq.getSession().getServletContext());
+
+			if (!fps.isTemplateAvailable(templateName, vreq)) {
+				return "<p>Can't locate short view template '" + templateName
+						+ "' for " + individual.getName() + "</p>";
+			}
+
+			return fps.renderTemplate(templateName, fullModelMap, vreq);
+		} catch (TemplateParsingException e) {
+			return "<p>Can't parse the short view template '" + templateName
+					+ "' for " + individual.getName() + "</p>";
+		} catch (Exception e) {
+			log.error(e, e);
+			return "<p>Failed to render the short view for "
+					+ individual.getName() + "</p>";
+		}
 	}
 
 	@Override
 	public TemplateAndSupplementalData getShortViewInfo(Individual individual,
 			ShortViewContext svContext, VitroRequest vreq) {
 		TemplateAndDataGetters tdg = fetchTemplateAndDataGetters(individual,
-				svContext);
+				svContext, vreq);
 		Map<String, Object> gotData = runDataGetters(tdg.getDataGetters(), vreq);
 		return new TemplateAndSupplementalDataImpl(tdg.getTemplateName(),
 				gotData);
@@ -68,18 +98,19 @@ public class ShortViewServiceImpl implements ShortViewService {
 
 	/** Find the template and data getters for this individual in this context. */
 	private TemplateAndDataGetters fetchTemplateAndDataGetters(
-			Individual individual, ShortViewContext svContext) {
+			Individual individual, ShortViewContext svContext, VitroRequest vreq) {
 		List<String> classUris = new ArrayList<String>();
 		classUris.addAll(figureMostSpecificClassUris(individual));
 
 		for (String classUri : classUris) {
-			TemplateAndDataGetters tdg = faker.getShortViewProperties(classUri,
+			TemplateAndDataGetters tdg = faker.getShortViewProperties(
+					vreq.getWebappDaoFactory(), individual, classUri,
 					svContext.name());
 			if (tdg != null) {
 				return tdg;
 			}
 		}
-		
+
 		// Didn't find one? Use the default values.
 		return new TemplateAndDataGetters(svContext.getDefaultTemplateName());
 	}
