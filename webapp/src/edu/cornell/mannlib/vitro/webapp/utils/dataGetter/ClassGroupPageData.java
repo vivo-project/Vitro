@@ -12,18 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.QuerySolutionMap;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
@@ -164,7 +153,7 @@ public class ClassGroupPageData extends DataGetterBase implements DataGetter{
     
   //Get data servuice
     public String getDataServiceUrl() {
-    	return UrlBuilder.getUrl("/dataservice?getSolrIndividualsByVClass=1&vclassId=");
+    	return UrlBuilder.getUrl("/dataservice?getRenderedSolrIndividualsByVClass=1&vclassId=");
     }
     
     /**

@@ -1,0 +1,37 @@
+<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+
+<#-- Default individual browse view -->
+
+<#import "lib-properties.ftl" as p>
+
+<li class="individual" role="listitem" role="navigation">
+
+<#if (individual.thumbUrl)??>
+    <img src="${individual.thumbUrl}" width="90" alt="${individual.name}" />
+    <h1 class="thumb">
+        <a href="${individual.profileUrl}" title="View the profile page for ${individual.name}}">${individual.name}</a>
+    </h1>
+<#else>
+    <h1>
+        <a href="${individual.profileUrl}" title="View the profile page for ${individual.name}}">${individual.name}</a>
+    </h1>
+</#if>
+
+<#assign typesString>
+	[<#list individual.mostSpecificTypes as type><#if type != vclass>,"${type}"</#if></#list>]
+</#assign>
+<#assign cleanTypes = typesString?replace("[,", "[")?eval >
+
+<#if cleanTypes?size == 1>
+    <span class="title">${cleanTypes[0]}</span>
+<#elseif (cleanTypes?size > 1) >
+    <span class="title">
+        <ul>
+            <#list cleanTypes as type>
+            <li>${type}</li>
+            </#list>
+        </ul>
+    </span>
+</#if>
+</li>
+
