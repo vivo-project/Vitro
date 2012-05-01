@@ -17,11 +17,7 @@
     </h1>
 </#if>
 
-<#assign typesString>
-	[<#list individual.mostSpecificTypes as type><#if type != vclass>,"${type}"</#if></#list>]
-</#assign>
-<#assign cleanTypes = typesString?replace("[,", "[")?eval >
-
+<#assign cleanTypes = 'edu.cornell.mannlib.vitro.webapp.web.TemplateUtils$DropFromSequence'?new()(individual.mostSpecificTypes, vclass) />
 <#if cleanTypes?size == 1>
     <span class="title">${cleanTypes[0]}</span>
 <#elseif (cleanTypes?size > 1) >
