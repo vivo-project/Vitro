@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.log;
 
-import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,7 +12,6 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 
 /**
@@ -96,27 +94,17 @@ public class LogUtils {
 		if (o instanceof Map<?, ?>) {
 			return formatMap((Map<?, ?>) (o));
 		}
-		if (o.getClass().isArray()
-				&& (!o.getClass().getComponentType().isPrimitive())) {
-			return formatClass(o) + ": " + Arrays.deepToString((Object[]) o);
+		if (o.getClass().isArray()) {
+			return formatArray(o);
 		}
-		return formatClass(o) + ": " + String.valueOf(o);
+		return formatObject(o);
 	}
 
 	private String formatClass(Object o) {
 		if (o == null) {
 			return "";
 		}
-
-		Class<?> clazz = o.getClass();
-		TypeVariable<?>[] generics = clazz.getTypeParameters();
-
-		if (generics.length == 0) {
-			return clazz.getName();
-		} else {
-			return clazz.getName() + '<' + StringUtils.join(generics, ", ")
-					+ '>';
-		}
+		return o.getClass().getName();
 	}
 
 	private String formatCollection(Collection<?> collection) {
@@ -152,6 +140,20 @@ public class LogUtils {
 		result.append('}');
 
 		return result.toString();
+	}
+
+	private String formatArray(Object o) {
+		return formatClass(o) + ": " + Arrays.deepToString((Object[]) o);
+	}
+
+	private String formatObject(Object o) {
+		String className = o.getClass().getName();
+		String valueString = String.valueOf(o);
+		if (valueString.contains(className)) {
+			return valueString;
+		} else {
+			return formatClass(o) + ": " + valueString;
+		}
 	}
 
 }
