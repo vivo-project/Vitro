@@ -75,26 +75,6 @@ public class DataGetterUtils {
     }
 
     /**
-     * Tests if classInQuestion implements interFace.
-     */
-    public static boolean isInstanceOfInterface( Class classInQuestion, Class interFace){
-        if( classInQuestion == null || interFace == null )
-            throw new IllegalAccessError("classInQuestion or interFace must not be null"); 
-        
-        //figure out if it implements interface         
-        Class[] interfaces = classInQuestion.getInterfaces();
-        if( interfaces == null )
-            return false;
-        boolean foundIface = false;
-        for( Class cz : interfaces ){
-            if( interFace.equals( cz ) ){
-                return true;                
-            }
-        }
-        return false;
-    }
-    
-    /**
      * Returns a DataGetter using information in the 
      * displayModel for the individual with the URI given by dataGetterURI
      * to configure it. 
@@ -106,40 +86,34 @@ public class DataGetterUtils {
     public static DataGetter dataGetterForURI(Model displayModel, String dataGetterURI) 
     throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, InvocationTargetException, SecurityException, NoSuchMethodException 
     {
-        
         //get java class for dataGetterURI
         String dgClassName = getJClassForDataGetterURI(displayModel, dataGetterURI);
         
         //figure out if it implements interface DataGetter
-        Class dgClass = Class.forName(dgClassName);
-        if( ! isInstanceOfInterface( dgClass, DataGetter.class) ){
+        Class<?> clz = Class.forName(dgClassName);
+        if( ! DataGetter.class.isAssignableFrom(clz) ){
+    		log.debug("Class doesn't implement DataGetter: '" + dgClassName + "'");
             return null;
         }
+        @SuppressWarnings("unchecked")
+		Class<DataGetter> dgClass = (Class<DataGetter>) clz; 
         
-        //try to run constructor with (Model, String) parameters
-        Class partypes[] = { Model.class , String.class };        
-        Constructor ct = dgClass.getConstructor( partypes );
+        Constructor<DataGetter> ct = null;
         
-        Object obj = null;
-        if( ct != null ){
-            Object[] initargs = new Object[2];
-            initargs[0]= displayModel;
-            initargs[1] = dataGetterURI;
-            obj = ct.newInstance(initargs);
-        } else {
-            log.debug("no constructor with signature " +
-            		"(Model displayModel,String URI) found, trying empty constructor");                        
-            obj =  dgClass.newInstance();
+        ct = dgClass.getConstructor(Model.class, String.class);
+        if (ct != null) {
+			log.debug("Using this constructor: " + ct);
+        	return ct.newInstance(displayModel, dataGetterURI);
         }
         
-        if( !(obj instanceof DataGetter) ){
-            log.debug("For <" + dataGetterURI + "> the class " +
-                    "for its rdf:type " + dgClassName + " does not implement the interface DataGetter.");
-            return null;
+        ct = dgClass.getConstructor();
+        if (ct != null) {
+			log.debug("Using this constructor: " + ct);
+        	return ct.newInstance();
         }
         
-        log.debug("dataGetterForURI: " + obj);
-        return (DataGetter)obj;                
+		log.debug("Didn't find a suitable constructor for '" + dgClassName + "'");
+        return null;
     }
 
     public static String getJClassForDataGetterURI(Model displayModel, String dataGetterURI) throws IllegalAccessException {
