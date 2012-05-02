@@ -11,8 +11,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -80,7 +78,7 @@ public class ShortViewServiceImpl implements ShortViewService {
 			ShortViewContext svContext, VitroRequest vreq) {
 		TemplateAndDataGetters tdg = fetchTemplateAndDataGetters(individual,
 				svContext, vreq);
-		Map<String, Object> gotData = runDataGetters(tdg.getDataGetters(), vreq);
+		Map<String, Object> gotData = runDataGetters(tdg.getDataGetters());
 		return new TemplateAndSupplementalDataImpl(tdg.getTemplateName(),
 				gotData);
 	}
@@ -103,9 +101,8 @@ public class ShortViewServiceImpl implements ShortViewService {
 		classUris.addAll(figureMostSpecificClassUris(individual));
 
 		for (String classUri : classUris) {
-			TemplateAndDataGetters tdg = faker.getShortViewProperties(
-					vreq.getWebappDaoFactory(), individual, classUri,
-					svContext.name());
+			TemplateAndDataGetters tdg = faker.getShortViewProperties(vreq,
+					individual, classUri, svContext.name());
 			if (tdg != null) {
 				return tdg;
 			}
@@ -116,13 +113,10 @@ public class ShortViewServiceImpl implements ShortViewService {
 	}
 
 	/** Build a data map from the combined results of all data getters. */
-	private Map<String, Object> runDataGetters(Set<DataGetter> dataGetters,
-			VitroRequest vreq) {
-		ServletContext ctx = vreq.getSession().getServletContext();
-
+	private Map<String, Object> runDataGetters(Set<DataGetter> dataGetters) {
 		Map<String, Object> gotData = new HashMap<String, Object>();
 		for (DataGetter dg : dataGetters) {
-			gotData.putAll(dg.getData(ctx, vreq, EMPTY_MAP));
+			gotData.putAll(dg.getData(EMPTY_MAP));
 		}
 		return gotData;
 	}

@@ -67,7 +67,7 @@ public class PageController extends FreemarkerHttpServlet{
         
         //executePageDataGetters( pageUri, vreq, getServletContext(), mapForTemplate );
         //these should all be data getters now
-        executeDataGetters( pageUri, vreq, getServletContext(), mapForTemplate);
+        executeDataGetters( pageUri, vreq, mapForTemplate);
 
         mapForTemplate.putAll( getPageControllerValues( pageUri, vreq, getServletContext(), mapForTemplate));
         
@@ -75,12 +75,12 @@ public class PageController extends FreemarkerHttpServlet{
         return rv;       
     }
 
-    private void executeDataGetters(String pageUri, VitroRequest vreq, ServletContext context, Map<String, Object> mapForTemplate) 
+    private void executeDataGetters(String pageUri, VitroRequest vreq, Map<String, Object> mapForTemplate) 
     throws Exception {
         List<DataGetter> dgList = DataGetterUtils.getDataGettersForPage(vreq, vreq.getDisplayModel(), pageUri);
                         
         for( DataGetter dg : dgList){            
-            Map<String,Object> moreData = dg.getData(context,vreq,mapForTemplate);            
+            Map<String,Object> moreData = dg.getData(mapForTemplate);            
             if( moreData != null ){
                 mapForTemplate.putAll(moreData);
             }

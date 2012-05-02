@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.utils.dataGetter;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,30 +16,21 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
 
-import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
 
@@ -52,6 +42,8 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateMo
 public class IndividualsForClassesDataGetter extends DataGetterBase implements DataGetter{
     private static final Log log = LogFactory.getLog(IndividualsForClassesDataGetter.class);
     protected static String restrictClassesTemplateName = null;
+    VitroRequest vreq;
+    ServletContext context;
     String dataGetterURI;
     String classGroupURI;
     Map<String, Object> classIntersectionsMap;
@@ -59,19 +51,23 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
     /**
      * Constructor with display model and data getter URI that will be called by reflection.
      */
-    public IndividualsForClassesDataGetter(Model displayModel, String dataGetterURI){
-        this.configure(displayModel,dataGetterURI);
+    public IndividualsForClassesDataGetter(VitroRequest vreq, Model displayModel, String dataGetterURI){
+        this.configure(vreq,displayModel,dataGetterURI);
     }   
     
     /**
      * Configure this instance based on the URI and display model.
      */
-    protected void configure(Model displayModel, String dataGetterURI) {
+    protected void configure(VitroRequest vreq, Model displayModel, String dataGetterURI) {
+    	if( vreq == null ) 
+    		throw new IllegalArgumentException("VitroRequest  may not be null.");
         if( displayModel == null ) 
             throw new IllegalArgumentException("Display Model may not be null.");
         if( dataGetterURI == null )
             throw new IllegalArgumentException("PageUri may not be null.");
                 
+        this.vreq = vreq;
+        this.context = vreq.getSession().getServletContext();
         this.dataGetterURI = dataGetterURI;   
         this.classGroupURI = DataGetterUtils.getClassGroupForDataGetter(displayModel, dataGetterURI);
         this.classIntersectionsMap = getClassIntersectionsMap(displayModel);
@@ -122,7 +118,7 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
     }
     
     @Override
-    public Map<String, Object> getData(ServletContext context, VitroRequest vreq, Map<String, Object> pageData) { 
+    public Map<String, Object> getData(Map<String, Object> pageData) { 
         this.setTemplateName();
     	HashMap<String, Object> data = new HashMap<String,Object>();
         

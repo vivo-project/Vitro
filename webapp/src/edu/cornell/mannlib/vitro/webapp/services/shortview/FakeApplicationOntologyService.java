@@ -46,12 +46,13 @@ public class FakeApplicationOntologyService {
 	 * Return the template name and DataGetter instances associated with this
 	 * class and this short view context. If none, return null.
 	 */
-	public TemplateAndDataGetters getShortViewProperties(WebappDaoFactory wadf,
+	public TemplateAndDataGetters getShortViewProperties(VitroRequest vreq,
 			Individual individual, String classUri, String contextName) {
 		if ((BROWSE.name().equals(contextName))
-				&& (isClassInPeopleClassGroup(wadf, classUri))) {
+				&& (isClassInPeopleClassGroup(vreq.getWebappDaoFactory(),
+						classUri))) {
 			return new TemplateAndDataGetters("view-browse-people.ftl",
-					new FakeVivoPeopleDataGetter(individual.getURI()));
+					new FakeVivoPeopleDataGetter(vreq, individual.getURI()));
 		}
 		// A mockup of Tammy's use case.
 		// if ((SEARCH.name().equals(contextName))
@@ -117,8 +118,7 @@ public class FakeApplicationOntologyService {
 
 	private static class FakeFacultyDataGetter implements DataGetter {
 		@Override
-		public Map<String, Object> getData(ServletContext context,
-				VitroRequest vreq, Map<String, Object> valueMap) {
+		public Map<String, Object> getData(Map<String, Object> valueMap) {
 			Map<String, Object> map = new HashMap<String, Object>();
 			Map<String, Object> extras = new HashMap<String, Object>();
 			extras.put("departmentName", "Department of Redundancy Department");
@@ -156,19 +156,22 @@ public class FakeApplicationOntologyService {
 		}
 
 		private String individualUri;
+		private VitroRequest vreq;
+		private ServletContext ctx;
 
-		public FakeVivoPeopleDataGetter(String individualUri) {
-			super(fakeDisplayModel, "http://FakeVivoPeopleDataGetter");
+		public FakeVivoPeopleDataGetter(VitroRequest vreq, String individualUri) {
+			super(vreq, fakeDisplayModel, "http://FakeVivoPeopleDataGetter");
 			this.individualUri = individualUri;
+			this.vreq = vreq;
+			this.ctx = vreq.getSession().getServletContext();
 		}
 
 		@Override
-		public Map<String, Object> getData(ServletContext context,
-				VitroRequest vreq, Map<String, Object> pageData) {
+		public Map<String, Object> getData(Map<String, Object> pageData) {
 			Map<String, String[]> parms = new HashMap<String, String[]>();
 			parms.put("uri", new String[] { individualUri });
 
-			return doQuery(parms, getModel(context, vreq, null));
+			return doQuery(parms, getModel(ctx, vreq, null));
 		}
 
 	}

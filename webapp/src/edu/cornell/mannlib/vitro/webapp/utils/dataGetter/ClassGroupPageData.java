@@ -32,29 +32,36 @@ public class ClassGroupPageData extends DataGetterBase implements DataGetter{
     private static final Log log = LogFactory.getLog(ClassGroupPageData.class);
     String dataGetterURI;
     String classGroupUri;
+    VitroRequest vreq;
+    ServletContext context;
+
     /**
      * Constructor with display model and data getter URI that will be called by reflection.
      */
-    public ClassGroupPageData(Model displayModel, String dataGetterURI){
-        this.configure(displayModel,dataGetterURI);
+    public ClassGroupPageData(VitroRequest vreq, Model displayModel, String dataGetterURI){
+        this.configure(vreq, displayModel,dataGetterURI);
     }        
     
     /**
      * Configure this instance based on the URI and display model.
      */
-    protected void configure(Model displayModel, String dataGetterURI) {
+    protected void configure(VitroRequest vreq, Model displayModel, String dataGetterURI) {
+    	if( vreq == null ) 
+    		throw new IllegalArgumentException("VitroRequest  may not be null.");
         if( displayModel == null ) 
             throw new IllegalArgumentException("Display Model may not be null.");
         if( dataGetterURI == null )
             throw new IllegalArgumentException("PageUri may not be null.");
                 
+        this.vreq = vreq;
+        this.context = vreq.getSession().getServletContext();
         this.dataGetterURI = dataGetterURI;        
         this.classGroupUri = 	DataGetterUtils.getClassGroupForDataGetter(displayModel, dataGetterURI);
     }
     
     
     @Override
-    public Map<String, Object> getData(ServletContext context, VitroRequest vreq, Map<String, Object> pageData) { 
+    public Map<String, Object> getData(Map<String, Object> pageData) { 
     	  HashMap<String, Object> data = new HashMap<String,Object>();
           data.put("classGroupUri", this.classGroupUri);
 

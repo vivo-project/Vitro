@@ -35,30 +35,37 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
     String queryText;
     String saveToVar;
     String modelURI;
+    VitroRequest vreq;
+    ServletContext context;
+
     
     final static Log log = LogFactory.getLog(SparqlQueryDataGetter.class);
     
     /**
      * Constructor with display model and data getter URI that will be called by reflection.
      */
-    public SparqlQueryDataGetter(Model displayModel, String dataGetterURI){
-        this.configure(displayModel,dataGetterURI);
+    public SparqlQueryDataGetter(VitroRequest vreq, Model displayModel, String dataGetterURI){
+        this.configure(vreq, displayModel,dataGetterURI);
     }        
     
     @Override
-    public Map<String, Object> getData(ServletContext context, VitroRequest vreq, Map<String, Object> pageData) {                        
+    public Map<String, Object> getData(Map<String, Object> pageData) {                        
         return doQuery( vreq.getParameterMap(), getModel(context, vreq, modelURI));
     }
 
     /**
      * Configure this instance based on the URI and display model.
      */
-    protected void configure(Model displayModel, String dataGetterURI) {
+    protected void configure(VitroRequest vreq, Model displayModel, String dataGetterURI) {
+    	if( vreq == null ) 
+    		throw new IllegalArgumentException("VitroRequest  may not be null.");
         if( displayModel == null ) 
             throw new IllegalArgumentException("Display Model may not be null.");
         if( dataGetterURI == null )
             throw new IllegalArgumentException("PageUri may not be null.");
                 
+        this.vreq = vreq;
+        this.context = vreq.getSession().getServletContext();
         this.dataGetterURI = dataGetterURI;        
         
         QuerySolutionMap initBindings = new QuerySolutionMap();
