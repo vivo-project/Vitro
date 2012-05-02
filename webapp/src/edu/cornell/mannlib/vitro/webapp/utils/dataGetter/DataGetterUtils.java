@@ -59,14 +59,14 @@ public class DataGetterUtils {
      * This should not return PageDataGetters and should not throw an 
      * exception if a page has PageDataGetters.  
      */
-    public static List<DataGetter> getDataGettersForPage( Model displayModel, String pageURI) 
+    public static List<DataGetter> getDataGettersForPage( VitroRequest vreq, Model displayModel, String pageURI) 
     throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException{
         //get data getter uris for pageURI
         List<String> dgUris = getDataGetterURIsForPageURI( displayModel, pageURI);
         
         List<DataGetter> dgList = new ArrayList<DataGetter>();
         for( String dgURI: dgUris){
-            DataGetter dg =dataGetterForURI(displayModel, dgURI) ;
+            DataGetter dg =dataGetterForURI(vreq, displayModel, dgURI) ;
             if( dg != null )
                 dgList.add(dg); 
         }
@@ -83,7 +83,7 @@ public class DataGetterUtils {
      * This should not throw an exception if the URI exists and has a type
      * that does not implement the DataGetter interface.
      */
-    public static DataGetter dataGetterForURI(Model displayModel, String dataGetterURI) 
+    public static DataGetter dataGetterForURI(VitroRequest vreq, Model displayModel, String dataGetterURI) 
     throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, InvocationTargetException, SecurityException, NoSuchMethodException 
     {
         //get java class for dataGetterURI
@@ -95,25 +95,41 @@ public class DataGetterUtils {
     		log.debug("Class doesn't implement DataGetter: '" + dgClassName + "'");
             return null;
         }
-        @SuppressWarnings("unchecked")
-		Class<DataGetter> dgClass = (Class<DataGetter>) clz; 
         
-        Constructor<DataGetter> ct = null;
+        // we want a constructor that will work for one of these argument lists (in this order)
+        Object[][] argLists = new Object[][] {
+        		{ vreq, displayModel, dataGetterURI }, 
+        		{ displayModel, dataGetterURI }, 
+        		{ vreq }, 
+        		{}
+        	};
         
-        ct = dgClass.getConstructor(Model.class, String.class);
-        if (ct != null) {
-			log.debug("Using this constructor: " + ct);
-        	return ct.newInstance(displayModel, dataGetterURI);
-        }
-        
-        ct = dgClass.getConstructor();
-        if (ct != null) {
-			log.debug("Using this constructor: " + ct);
-        	return ct.newInstance();
+        // look through the available constructors for the best fit
+        for (Object[] argList: argLists) {
+        	for (Constructor<?> ct: clz.getConstructors()) {
+        		if (isConstructorSuitableForArguments(ct, argList)) {
+        			log.debug("Using this constructor: " + ct);
+        			return (DataGetter) ct.newInstance(argList);
+        		}
+        	}
         }
         
 		log.debug("Didn't find a suitable constructor for '" + dgClassName + "'");
         return null;
+    }
+    
+    private static boolean isConstructorSuitableForArguments(Constructor<?> ct, Object[] args) {
+		Class<?>[] parameterTypes = ct.getParameterTypes();
+		if (args.length != parameterTypes.length) {
+			return false;
+		}
+		for (int i = 0; i < args.length; i++) {
+			Class<? extends Object> argClass = args[i].getClass();
+			if (! parameterTypes[i].isAssignableFrom(argClass)) {
+				return false;
+			}
+		}
+		return true;
     }
 
     public static String getJClassForDataGetterURI(Model displayModel, String dataGetterURI) throws IllegalAccessException {
@@ -390,11 +406,11 @@ public class DataGetterUtils {
      * @throws IllegalAccessException 
      * @throws InstantiationException 
      */
-    public static JSONObject covertDataToJSONForPage(String pageUri, Model displayModel) throws InstantiationException, IllegalAccessException, ClassNotFoundException {       
+    public static JSONObject covertDataToJSONForPage(VitroRequest vreq, String pageUri, Model displayModel) throws InstantiationException, IllegalAccessException, ClassNotFoundException {       
         //Get PageDataGetter types associated with pageUri
         JSONObject rObj = null;   
         try{
-	        List<DataGetter> dataGetters = getDataGettersForPage(displayModel, pageUri);
+	        List<DataGetter> dataGetters = getDataGettersForPage(vreq, displayModel, pageUri);
 	        for(DataGetter getter: dataGetters) {
 	        	 JSONObject typeObj = null;
 	             try{

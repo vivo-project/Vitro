@@ -282,7 +282,7 @@ public class MenuManagementController extends FreemarkerHttpServlet {
     	try{
         	String className = DataGetterUtils.getJClassForDataGetterURI(displayModel, dataGetterURI);
     		//TODO: Change so that instantiation here occurs correctly <-- how should data getter be instantiated
-    		DataGetter pg = DataGetterUtils.dataGetterForURI(vreq.getDisplayModel(), dataGetterURI);
+    		DataGetter pg = DataGetterUtils.dataGetterForURI(vreq, vreq.getDisplayModel(), dataGetterURI);
     		//TODO: Check template data variable and what that is?
     		Map<String, Object> pageData = pg.getData(getServletContext(), vreq, templateData);
     		//Map<String, Object> pageInfo = vreq.getWebappDaoFactory().getPageDao().getPage(pageURI);    		
