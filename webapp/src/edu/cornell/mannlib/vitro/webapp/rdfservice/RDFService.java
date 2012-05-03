@@ -90,6 +90,21 @@ public interface RDFService {
 	 */
 	public String getDefaultReadGraphURI() throws RDFServiceException;
 	
+	/**
+	 * Register a listener to listen to changes in any graph in
+	 * the RDF store.
+	 * 
+	 * @return String URI of default read graph
+	 */
+	public void registerListener(ChangeListener changeListener) throws RDFServiceException;
+	
+	/**
+	 * Unregister a listener to listen to changes in any graph in
+	 * the RDF store.
+	 * 
+	 * @return String URI of default read graph
+	 */
+	public void unregisterListener(ChangeListener changeListener) throws RDFServiceException;
 
 	/**
 	 * Create a ChangeSet object
