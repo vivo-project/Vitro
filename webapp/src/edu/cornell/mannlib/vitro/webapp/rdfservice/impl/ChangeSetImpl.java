@@ -1,12 +1,15 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.rdfservice;
+package edu.cornell.mannlib.vitro.webapp.rdfservice.impl;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange.Operation;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 
 /*
  * Input parameter to changeSetUpdate() method in RDFService.

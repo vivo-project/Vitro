@@ -1,6 +1,9 @@
-package edu.cornell.mannlib.vitro.webapp.rdfservice;
+package edu.cornell.mannlib.vitro.webapp.rdfservice.impl;
 
 import java.io.InputStream;
+
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 
 /*
  * A ModelChange is one component of a ChangeSet.
