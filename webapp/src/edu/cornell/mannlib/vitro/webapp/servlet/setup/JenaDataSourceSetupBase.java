@@ -18,14 +18,21 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
 import com.hp.hpl.jena.sdb.store.DatabaseType;
 import com.hp.hpl.jena.sdb.store.LayoutType;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDBGraphGenerator;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RegeneratingGraph;
@@ -62,8 +69,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     protected static String USER_ABOX_PATH = BASE+"user/abox";
     protected static String USER_TBOX_PATH = BASE+"user/tbox";
     protected static String USER_APPMETA_PATH = BASE+"user/applicationMetadata";
-    protected static String SYSTEMPATH = BASE+"system/";
-    protected static String AUTHPATH = BASE+"auth/";
+    protected static String SYSTEMPATH = BASE+"system/";       
     public static String APPPATH = BASE+"app/";
     //these files are loaded everytime the system starts up
     public static String APPPATH_LOAD = APPPATH + "menuload/";
@@ -418,7 +424,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         } else if (TripleStoreType.SDB.equals(type)) {
             StoreDesc storeDesc = new StoreDesc(
                     LayoutType.LayoutTripleNodesHash, DatabaseType.fetch(dbtypeStr));
-            BasicDataSource bds = JenaDataSourceSetup.makeBasicDataSource(
+            BasicDataSource bds = WebappDaoSDBSetup.makeBasicDataSource(
                     getDbDriverClassName(ctx), jdbcUrl, username, password, ctx);
             bds.setMaxActive(4); // for now, the SDB model makers should not use more
                                  // than a small handful of connections
@@ -524,4 +530,68 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
                 "VitroConnection.DataSource.validationQuery", "SELECT 1");
     }
 
+    protected OntModel ontModelFromContextAttribute(ServletContext ctx,
+            String attribute) {
+        OntModel ontModel;
+        Object attributeValue = ctx.getAttribute(attribute);
+        if (attributeValue != null && attributeValue instanceof OntModel) {
+            ontModel = (OntModel) attributeValue;
+        } else {
+            ontModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
+            ctx.setAttribute(attribute, ontModel);
+        }
+        return ontModel;
+    }
+    
+    protected static void repairAppMetadataModel(Model applicationMetadataModel,
+            Model aboxAssertions, 
+            Model aboxInferences) {
+
+        log.info("Moving application metadata from ABox to dedicated model");
+        getAppMetadata(aboxAssertions, applicationMetadataModel);
+        getAppMetadata(aboxInferences, applicationMetadataModel);
+        aboxAssertions.remove(applicationMetadataModel);
+        aboxInferences.remove(applicationMetadataModel);
+
+        return;
+    }
+    
+    protected static void getAppMetadata(Model source, Model target) {
+        
+        String amdQuery = "DESCRIBE ?x WHERE { " +
+                    "{?x a <" + VitroVocabulary.PORTAL +"> } UNION " +
+                    "{?x a <" + VitroVocabulary.PROPERTYGROUP +"> } UNION " +
+                    "{?x a <" + VitroVocabulary.CLASSGROUP +"> } } ";
+        
+        try {                        
+            Query q = QueryFactory.create(amdQuery, Syntax.syntaxARQ);
+            QueryExecution qe = QueryExecutionFactory.create(q, source);
+            qe.execDescribe(target);
+           } catch (Exception e) {
+            log.error("unable to create the application metadata model",e);
+        }    
+        
+           return;
+    }
+    
+    private static final String STOREDESC_ATTR = "storeDesc";
+    private static final String STORE_ATTR = "kbStore";
+    
+    public static void setApplicationStoreDesc(StoreDesc storeDesc, 
+                                          ServletContext ctx) {
+        ctx.setAttribute(STOREDESC_ATTR, storeDesc);
+    }
+   
+    public static StoreDesc getApplicationStoreDesc(ServletContext ctx) {
+        return (StoreDesc) ctx.getAttribute(STOREDESC_ATTR);
+    }
+    
+    public static void setApplicationStore(Store store,
+                                           ServletContext ctx) {
+        ctx.setAttribute(STORE_ATTR, store);
+    }
+    
+    public static Store getApplicationStore(ServletContext ctx) {
+        return (Store) ctx.getAttribute(STORE_ATTR);
+    }
 }

@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.servlet.setup;
+package edu.cornell.mannlib.vitro.webapp.config;
 
 import java.io.File;
 import java.sql.Connection;
@@ -12,10 +12,13 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
-public class BasicSmokeTests implements ServletContextListener {
+/**
+ * Test that gets run at servlet context startup to check for the existence and 
+ * validity of properties in the configuration. 
+ */
+public class ConfigurationPropertiesSmokeTests implements ServletContextListener {
 
 	private static final String PROPERTY_HOME_DIRECTORY = "vitro.home.directory";
 	private static final String PROPERTY_DB_URL = "VitroConnection.DataSource.url";

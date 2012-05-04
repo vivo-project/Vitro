@@ -4,8 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -15,9 +15,6 @@ import com.hp.hpl.jena.rdf.model.Literal;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.Precision;
-import edu.cornell.mannlib.vitro.webapp.edit.elements.DateTimeWithPrecision;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditSubmission;
 
 /*
  * Assumption for date time interval validation: Only one start field/end field/and precision.
@@ -133,7 +130,7 @@ public class DateTimeIntervalValidationVTwo implements N3ValidatorVTwo {
             //Currently checks first precision str and then returns response
             if(precisionStr.size() > 0) {
             	String precisionString = precisionStr.get(0);
-            	VitroVocabulary.Precision precision = DateTimeWithPrecision.toPrecision( precisionString );
+            	VitroVocabulary.Precision precision = DateTimeWithPrecisionVTwo.toPrecision( precisionString );
                 if( precision == null )
                     log.debug("cannot convert " + precisionStr + " to a precision");
                 else
