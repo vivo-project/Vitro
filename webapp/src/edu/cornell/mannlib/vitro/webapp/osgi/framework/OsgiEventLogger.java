@@ -16,12 +16,18 @@ import org.osgi.framework.ServiceReference;
 
 /**
  * If the logging level is set to debug, write all sorts of framework events to
- * the log. Otherwise, it does nothing.
+ * the log. Otherwise, do nothing.
  */
-public class LoggingFrameworkListener implements ServiceListener,
+public class OsgiEventLogger implements ServiceListener,
 		BundleListener, FrameworkListener {
 	private static final Log log = LogFactory
-			.getLog(LoggingFrameworkListener.class);
+			.getLog(OsgiEventLogger.class);
+	
+	public void addToContext(BundleContext bundleContext) {
+		bundleContext.addBundleListener(this);
+		bundleContext.addServiceListener(this);
+		bundleContext.addFrameworkListener(this);
+	}
 
 	@Override
 	public void bundleChanged(BundleEvent be) {

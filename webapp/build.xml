@@ -59,6 +59,11 @@
 		<path refid="compile.classpath" />
 	</path>
 
+	<path id="bundle.compile.classpath">
+		<pathelement location="${war.classes.dir}" />
+		<path refid="compile.classpath" />
+	</path>
+
 	<path id="test.run.classpath">
 		<pathelement location="${appbase.dir}/test" />
 		<pathelement location="${test.classes.dir}" />
@@ -115,15 +120,15 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 				</not>
 			</condition>
 		</fail>
-		
+
 		<fail message="The vitro.home.directory &quot;${vitro.home.directory}&quot; is not writable.">
-		    <condition>
-		        <not>
-		            <isfileselected file="${vitro.home.directory}" >
-		                <writable/>
-		            </isfileselected>
-		        </not>
-		    </condition>
+			<condition>
+				<not>
+					<isfileselected file="${vitro.home.directory}">
+						<writable />
+					</isfileselected>
+				</not>
+			</condition>
 		</fail>
 
 		<property name="solr.home.dir" location="${vitro.home.directory}/solr" />
@@ -152,8 +157,11 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
          - - - - - - - - - - - - - - - - - -->
 	<target name="prepare" depends="properties, compileUtilities">
 		<mkdir dir="${build.dir}" />
+		<mkdir dir="${build.dir}/bundleclasses" />
+		<mkdir dir="${build.dir}/bundlejars" />
 		<mkdir dir="${war.classes.dir}" />
 		<mkdir dir="${war.resources.dir}" />
+		<mkdir dir="${war.webinf.dir}/bundles/application" />
 		<mkdir dir="${test.classes.dir}" />
 
 		<!-- copy all sorts of web stuff into the war directory. -->
@@ -169,7 +177,9 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 				<!-- these are already in Tomcat: we mustn't conflict. -->
 				<exclude name="lib/jsp-api.jar" />
 				<exclude name="lib/servlet-api.jar" />
-				
+				<!-- this one is only used during the build -->
+				<exclude name="lib/biz.aQute.bnd.jar" />
+
 				<!-- copy the framework bundles into the war directory -->
 				<include name="bundles/framework/*" />
 			</fileset>
@@ -217,7 +227,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	<!-- ================================= 
           target: test              
          ================================= -->
-	<target name="test" depends="compile" unless="skiptests" description="--> Run JUnit tests">
+	<target name="test" depends="compile, bundles" unless="skiptests" description="--> Run JUnit tests">
 		<javac srcdir="${appbase.dir}/test" destdir="${test.classes.dir}" debug="true" deprecation="${javac.deprecation}" encoding="UTF8" includeantruntime="false" optimize="false" source="1.6">
 			<classpath refid="test.compile.classpath" />
 		</javac>
@@ -227,6 +237,29 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 			<arg file="${appbase.dir}/test" />
 			<arg value="${testlevel}" />
 		</java>
+	</target>
+
+	<!-- ================================= 
+          target: bundles              
+         ================================= -->
+	<target name="bundles" depends="compile" description="--> Compile and assemble the bundles">
+		<javac srcdir="${corebase.dir}/bundlesrc" destdir="${build.dir}/bundleclasses" debug="true" 
+			deprecation="${javac.deprecation}" encoding="UTF8" includeantruntime="false" optimize="true" source="1.6">
+			<classpath refid="bundle.compile.classpath" />
+		</javac>
+
+		<taskdef resource="aQute/bnd/ant/taskdef.properties" classpath="${corebase.dir}/lib/biz.aQute.bnd.jar" />
+
+		<bnd files="${corebase.dir}/../bnd.bnd" 
+			classpath="${build.dir}/bundleclasses" failok="false" eclipse="false" exceptions="true" 
+			output="${build.dir}/bundlejars" />
+		
+		<copy todir="${war.webinf.dir}/bundles/application">
+			<fileset dir="${build.dir}/bundlejars">
+				<!-- this shouldn't be included - it is just there to fool bnd. -->
+				<exclude name="edu.cornell.mannlib.vitro.bundles.fake.jar" />
+			</fileset>
+		</copy>
 	</target>
 
 	<!-- ================================= 

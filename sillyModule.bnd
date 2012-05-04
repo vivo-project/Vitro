@@ -1,0 +1,5 @@
+Private-Package: edu.cornell.mannlib.vitro.bundles.sillymodule
+Bundle-SymbolicName: edu.cornell.mannlib.vitro.bundles.sillymodule
+Import-Package: aQute.bnd.annotation.component,\
+	*
+Service-Component: *
