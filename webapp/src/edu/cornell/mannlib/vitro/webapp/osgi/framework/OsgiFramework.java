@@ -2,10 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.osgi.framework;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -16,8 +12,6 @@ import org.apache.felix.framework.Felix;
 import org.apache.felix.main.AutoProcessor;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
-import org.osgi.framework.Constants;
-import org.osgi.service.log.LogService;
 
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
@@ -45,24 +39,7 @@ public class OsgiFramework {
 	 */
 	public static final String APPLICATION_BUNDLES_DIR = "WEB-INF/bundles/application";
 
-	/**
-	 * The packages that must be exported for application bundles to use. If a
-	 * package is needed in the base of the application as well as in the
-	 * bundles, it must be included here.
-	 * 
-	 * It would be nice if these packages could be wrapped in bundles, but then
-	 * they would not be usable by the base of the application (the non-OSGi
-	 * part).
-	 * 
-	 * This results from the fact that we are straddling the line between OSGi
-	 * and non-OSGi.
-	 */
-	public static final Collection<String> EXPORTED_PACKAGES = Collections
-			.unmodifiableList(Arrays.asList("aQute.bnd.annotation.component",
-					"edu.cornell.mannlib.vitro.webapp.osgi.interfaces",
-					"javax.servlet", "javax.servlet.http",
-					"org.apache.commons.logging", "org.osgi.service.log"));
-
+	
 	public static OsgiFramework getFramework(ServletContext ctx) {
 		Object o = ctx.getAttribute(ATTRIBUTE_NAME);
 		if (o instanceof OsgiFramework) {
@@ -77,15 +54,11 @@ public class OsgiFramework {
 	// The framework
 	// ----------------------------------------------------------------------
 
-	private final OsgiFrameworkLogger logger;
 	private final OsgiFrameworkProperties props;
 	private final Felix felix;
 
-	public OsgiFramework(OsgiFrameworkLogger logger,
-			OsgiFrameworkProperties props) {
-		this.logger = logger;
+	public OsgiFramework(OsgiFrameworkProperties props) {
 		this.props = props;
-
 		this.felix = new Felix(props.getPropertyMap());
 		log.debug("Created the Felix framework.");
 	}
@@ -97,8 +70,6 @@ public class OsgiFramework {
 		felix.init();
 		BundleContext bundleContext = felix.getBundleContext();
 		log.debug("Initialized the Felix framework.");
-		log.debug("Exported bundles: " + bundleContext.getProperty(Constants.FRAMEWORK_SYSTEMPACKAGES));
-		log.debug("Extra exported bundles: " + bundleContext.getProperty(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA));
 
 		/*
 		 * Log all framework events (if enabled);
@@ -106,22 +77,17 @@ public class OsgiFramework {
 		new OsgiEventLogger().addToContext(bundleContext);
 
 		/*
-		 * Set up the LogService that 3rd-party bundles will use.
+		 * Start the framework.
 		 */
-		bundleContext.registerService(LogService.class, logger, null);
-
+		felix.start();
+		log.debug("Started the Felix framework.");
+		
 		/*
 		 * Install and start all of the bundles from FRAMEWORK_BUNDLES_DIR:
 		 * ConfigurationAdmin, SCR, FileInstall, etc.
 		 */
 		AutoProcessor.process(props.getPropertyMap(), bundleContext);
 		log.debug("Ran the AutoProcessor.");
-
-		/*
-		 * Start the framework.
-		 */
-		felix.start();
-		log.debug("Started the Felix framework.");
 	}
 
 	public void stop() throws BundleException {
@@ -153,7 +119,7 @@ public class OsgiFramework {
 				OsgiFrameworkProperties props = new OsgiFrameworkProperties(
 						ctx, logger);
 
-				OsgiFramework framework = new OsgiFramework(logger, props);
+				OsgiFramework framework = new OsgiFramework(props);
 				framework.start();
 				ctx.setAttribute(ATTRIBUTE_NAME, framework);
 			} catch (BundleException e) {

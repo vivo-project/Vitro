@@ -3,12 +3,12 @@
 package edu.cornell.mannlib.vitro.webapp.osgi.framework;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.felix.framework.util.FelixConstants;
@@ -54,9 +54,9 @@ public class OsgiFrameworkProperties {
 		 * import.
 		 */
 		map.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA,
-				StringUtils.join(OsgiFramework.EXPORTED_PACKAGES, ","));
+				OsgiFrameworkExportedPackages.getPackageList());
 
-		/**
+		/*
 		 * Create a temp directory to store unpacked bundles. It will be cleaned
 		 * and rebuilt every time we restart.
 		 */
@@ -64,11 +64,17 @@ public class OsgiFrameworkProperties {
 		map.put(Constants.FRAMEWORK_STORAGE_CLEAN,
 				Constants.FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT);
 
-		/**
+		/*
 		 * Set up the logger for the Felix framework.
 		 */
 		map.put(FelixConstants.LOG_LOGGER_PROP, logger);
 		map.put(FelixConstants.LOG_LEVEL_PROP, logger.osgiLogLevelString());
+
+		/*
+		 * Publish the logger as a LogService for the other bundles.
+		 */
+		map.put(FelixConstants.SYSTEMBUNDLE_ACTIVATORS_PROP,
+				Collections.singletonList(logger.getActivator()));
 
 		return map;
 	}
@@ -115,10 +121,15 @@ public class OsgiFrameworkProperties {
 		map.put("felix.fileinstall.log.level", logger.osgiLogLevelString());
 
 		/*
+		 * Poll every 10 seconds (in millis).
+		 */
+		map.put("felix.fileinstall.poll", "10000");
+
+		/*
 		 * Wait a bit before the first poll of the bundle directory.
 		 */
 		map.put("felix.fileinstall.noInitialDelay", "false");
-
+		
 		/*
 		 * If some code in the app changes the configuration of a bundle, don't
 		 * store the changed configuration. We want to start the same way each

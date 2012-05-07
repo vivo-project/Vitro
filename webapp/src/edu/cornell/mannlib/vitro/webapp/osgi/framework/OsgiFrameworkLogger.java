@@ -5,8 +5,11 @@ package edu.cornell.mannlib.vitro.webapp.osgi.framework;
 import org.apache.commons.logging.Log;
 import org.apache.felix.framework.Logger;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogService;
 
 /**
@@ -21,6 +24,7 @@ import org.osgi.service.log.LogService;
  */
 public class OsgiFrameworkLogger extends Logger implements LogService {
 	private final Log log;
+	private final Activator activator;
 
 	/**
 	 * Notice that we use the Framework's log instance, so the output appears to
@@ -28,6 +32,7 @@ public class OsgiFrameworkLogger extends Logger implements LogService {
 	 */
 	public OsgiFrameworkLogger(Log log) {
 		this.log = log;
+		this.activator = new Activator(this, log);
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -92,7 +97,7 @@ public class OsgiFrameworkLogger extends Logger implements LogService {
 			return be;
 		}
 	}
-	
+
 	public int osgiLogLevel() {
 		if (log.isDebugEnabled()) {
 			return 4;
@@ -108,9 +113,41 @@ public class OsgiFrameworkLogger extends Logger implements LogService {
 		}
 		return 0;
 	}
-	
+
 	public String osgiLogLevelString() {
 		return String.valueOf(osgiLogLevel());
+	}
+
+	/**
+	 * Create a "bundle activator" to be executed when the system bundle starts.
+	 */
+	public Activator getActivator() {
+		return this.activator;
+	}
+
+	private static class Activator implements BundleActivator {
+		private final OsgiFrameworkLogger logger;
+		private final Log commonsLog;
+		private ServiceRegistration<?> sr;
+
+		public Activator(OsgiFrameworkLogger logger, Log commonsLog) {
+			this.logger = logger;
+			this.commonsLog = commonsLog;
+		}
+
+		@Override
+		public void start(BundleContext bundleContext) throws Exception {
+			commonsLog.debug("Register the LogService");
+			sr = bundleContext.registerService(LogService.class.getName(),
+					logger, null);
+		}
+
+		@Override
+		public void stop(BundleContext bundleContext) throws Exception {
+			commonsLog.debug("Unregister the LogService");
+			sr.unregister();
+		}
+
 	}
 
 }
