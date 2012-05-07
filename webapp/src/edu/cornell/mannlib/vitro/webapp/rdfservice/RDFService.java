@@ -17,7 +17,7 @@ public interface RDFService {
 	}
 
 	public enum ModelSerializationFormat {
-	    XML, N3
+	    RDFXML, N3
 	}
 	
 	/**
