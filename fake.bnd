@@ -1,2 +1,0 @@
-Bundle-SymbolicName: edu.cornell.mannlib.vitro.bundles.fake
-Export-Package: edu.cornell.mannlib.vitro.webapp.osgi.interfaces
