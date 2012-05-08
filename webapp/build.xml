@@ -115,7 +115,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 				</not>
 			</condition>
 		</fail>
-		
+<!--		
 		<fail message="The vitro.home.directory &quot;${vitro.home.directory}&quot; is not writable.">
 		    <condition>
 		        <not>
@@ -125,7 +125,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		        </not>
 		    </condition>
 		</fail>
-
+-->
 		<property name="solr.home.dir" location="${vitro.home.directory}/solr" />
 	</target>
 
