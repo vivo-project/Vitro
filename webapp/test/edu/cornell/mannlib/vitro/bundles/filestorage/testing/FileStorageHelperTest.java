@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.filestorage.backend;
+package edu.cornell.mannlib.vitro.bundles.filestorage.testing;
 
 import static org.junit.Assert.assertEquals;
 
@@ -10,6 +10,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
+
+import edu.cornell.mannlib.vitro.bundles.filestorage.internal.FileStorageHelper;
+import edu.cornell.mannlib.vitro.bundles.filestorage.internal.InvalidCharacterException;
 
 /**
  * 

@@ -1,0 +1,6 @@
+Private-Package: edu.cornell.mannlib.vitro.bundles.filestorage.internal,\
+	edu.cornell.mannlib.vitro.bundles.filestorage.bundle
+Import-Package: edu.cornell.mannlib.vitro.webapp.modules.interfaces,\
+	org.apache.commons.logging,\
+	org.osgi.framework
+Service-Component: *

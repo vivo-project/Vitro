@@ -38,10 +38,10 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadControl
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.filestorage.TempFileHolder;
 import edu.cornell.mannlib.vitro.webapp.filestorage.UploadedFileHelper;
-import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileAlreadyExistsException;
-import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
+import edu.cornell.mannlib.vitro.webapp.modules.interfaces.FileStorage;
+import edu.cornell.mannlib.vitro.webapp.modules.interfaces.FileStorage.FileAlreadyExistsException;
 
 /**
  * Handle the mechanics of validating, storing, and deleting file images.

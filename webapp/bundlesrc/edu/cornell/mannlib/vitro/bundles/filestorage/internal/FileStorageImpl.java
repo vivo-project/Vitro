@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.filestorage.backend;
+package edu.cornell.mannlib.vitro.bundles.filestorage.internal;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -23,6 +23,8 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import edu.cornell.mannlib.vitro.webapp.modules.interfaces.FileStorage;
 
 /**
  * The default implementation of {@link FileStorage}.
@@ -48,7 +50,7 @@ public class FileStorageImpl implements FileStorage {
 	 *             if the configuration property doesn't point to an existing,
 	 *             writeable directory.
 	 */
-	FileStorageImpl(File baseDir, Collection<String> namespaces)
+	public FileStorageImpl(File baseDir, Collection<String> namespaces)
 			throws IOException {
 		checkBaseDirValid(baseDir);
 		checkNamespacesValid(namespaces);
@@ -217,14 +219,14 @@ public class FileStorageImpl implements FileStorage {
 	}
 
 	// ----------------------------------------------------------------------
-	// package access methods -- used in unit tests.
+	// public, but only for use in unit tests.
 	// ----------------------------------------------------------------------
 
-	File getBaseDir() {
+	public File getBaseDir() {
 		return this.baseDir;
 	}
 
-	Map<Character, String> getNamespaces() {
+	public Map<Character, String> getNamespaces() {
 		return this.namespacesMap;
 	}
 

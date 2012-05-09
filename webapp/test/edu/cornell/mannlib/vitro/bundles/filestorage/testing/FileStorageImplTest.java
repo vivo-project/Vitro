@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.filestorage.backend;
+package edu.cornell.mannlib.vitro.bundles.filestorage.testing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -25,7 +25,11 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import edu.cornell.mannlib.vitro.bundles.filestorage.internal.FileStorageHelper;
+import edu.cornell.mannlib.vitro.bundles.filestorage.internal.FileStorageImpl;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import edu.cornell.mannlib.vitro.webapp.modules.interfaces.FileStorage;
+import edu.cornell.mannlib.vitro.webapp.modules.interfaces.FileStorage.FileAlreadyExistsException;
 
 /**
  * Test the FileStorage methods. The zero-argument constructor was tested in

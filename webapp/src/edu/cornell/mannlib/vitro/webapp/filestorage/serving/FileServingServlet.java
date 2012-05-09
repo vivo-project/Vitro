@@ -14,7 +14,6 @@ import java.net.URLDecoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,9 +22,9 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
-import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
+import edu.cornell.mannlib.vitro.webapp.modules.interfaces.FileStorage;
+import edu.cornell.mannlib.vitro.webapp.osgi.framework.OsgiFramework;
 
 /**
  * <p>
@@ -52,21 +51,17 @@ public class FileServingServlet extends VitroHttpServlet {
 
 	private FileStorage fileStorage;
 
-	/**
-	 * Get a reference to the File Storage system.
-	 */
 	@Override
 	public void init() throws ServletException {
-		Object o = getServletContext().getAttribute(
-				FileStorageSetup.ATTRIBUTE_NAME);
-		if (o instanceof FileStorage) {
-			fileStorage = (FileStorage) o;
-		} else {
-			throw new UnavailableException(
-					"The ServletContext did not hold a FileStorage object at '"
-							+ FileStorageSetup.ATTRIBUTE_NAME
-							+ "'; found this instead: " + o);
-		}
+		OsgiFramework osgi = OsgiFramework.getFramework(getServletContext());
+		fileStorage = osgi.getProxyForModule(this, FileStorage.class);
+	}
+
+	@Override
+	public void destroy() {
+		OsgiFramework osgi = OsgiFramework.getFramework(getServletContext());
+		osgi.releaseProxyForModule(fileStorage);
+		fileStorage = null;
 	}
 
 	@Override

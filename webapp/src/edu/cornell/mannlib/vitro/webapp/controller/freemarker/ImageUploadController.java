@@ -31,11 +31,11 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.For
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
-import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
+import edu.cornell.mannlib.vitro.webapp.modules.interfaces.FileStorage;
+import edu.cornell.mannlib.vitro.webapp.osgi.framework.OsgiFramework;
 import edu.cornell.mannlib.vitro.webapp.web.images.PlaceholderUtil;
 
 /**
@@ -99,30 +99,17 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 
 	private FileStorage fileStorage;
 
-	/**
-	 * When initialized, get a reference to the File Storage system. Without
-	 * that, we can do nothing.
-	 */
 	@Override
 	public void init() throws ServletException {
-		super.init();
-		Object o = getServletContext().getAttribute(
-				FileStorageSetup.ATTRIBUTE_NAME);
-		if (o instanceof FileStorage) {
-			fileStorage = (FileStorage) o;
-		} else if (o == null) {
-			throw new UnavailableException(this.getClass().getSimpleName()
-					+ " could not initialize. Attribute '"
-					+ FileStorageSetup.ATTRIBUTE_NAME
-					+ "' was not set in the servlet context.");
-		} else {
-			throw new UnavailableException(this.getClass().getSimpleName()
-					+ " could not initialize. Attribute '"
-					+ FileStorageSetup.ATTRIBUTE_NAME
-					+ "' in the servlet context contained an instance of '"
-					+ o.getClass().getName() + "' instead of '"
-					+ FileStorage.class.getName() + "'");
-		}
+		OsgiFramework osgi = OsgiFramework.getFramework(getServletContext());
+		fileStorage = osgi.getProxyForModule(this, FileStorage.class);
+	}
+
+	@Override
+	public void destroy() {
+		OsgiFramework osgi = OsgiFramework.getFramework(getServletContext());
+		osgi.releaseProxyForModule(fileStorage);
+		fileStorage = null;
 	}
 
 	/**
