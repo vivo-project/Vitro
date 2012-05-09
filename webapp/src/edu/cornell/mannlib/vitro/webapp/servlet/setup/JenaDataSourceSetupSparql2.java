@@ -19,7 +19,6 @@ import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -32,7 +31,6 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.sdb.SDB;
 import com.hp.hpl.jena.sdb.SDBFactory;
 import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
@@ -54,6 +52,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlDatasetGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
@@ -129,7 +128,7 @@ public class JenaDataSourceSetupSparql2 extends JenaDataSourceSetupBase
                 ctx).getProperty("VitroConnection.DataSource.endpointURI");
         
         Graph g = new SparqlGraph(endpointURI);
-        Dataset dataset = DatasetFactory.create(new SparqlDatasetGraph(endpointURI));
+        Dataset dataset = new SparqlDataset(new SparqlDatasetGraph(endpointURI));
         setStartupDataset(dataset, ctx);
         
 //        setStartupDataset(SDBFactory.connectDataset(store), ctx);
@@ -191,6 +190,7 @@ public class JenaDataSourceSetupSparql2 extends JenaDataSourceSetupBase
 
             tboxAssertions.getBaseModel().register(new ModelSynchronizer(
                     tboxAssertionsDB));
+                        
             baseOms.setTBoxModel(tboxAssertions);
         } catch (Throwable e) {
             log.error("Unable to load tbox assertion cache from DB", e);

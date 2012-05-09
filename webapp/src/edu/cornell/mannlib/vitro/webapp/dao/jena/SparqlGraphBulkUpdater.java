@@ -65,6 +65,21 @@ public class SparqlGraphBulkUpdater extends SimpleBulkUpdateHandler {
 
     @Override
     public void add(Graph g, boolean arg1) {
+        log.info("adding graph");
+        Model[] model = separateStatementsWithBlankNodes(g);
+        addModel(model[1] /* nonBlankNodeModel */);
+        // replace following call with different method
+        addModel(model[0] /*blankNodeModel*/);
+    }
+    
+    /**
+     * Returns a pair of models.  The first contains any statement containing at 
+     * least one blank node.  The second contains all remaining statements.
+     * @param g
+     * @return
+     */
+    
+    private Model[] separateStatementsWithBlankNodes(Graph g) {
         Model gm = ModelFactory.createModelForGraph(g);
         Model blankNodeModel = ModelFactory.createDefaultModel();
         Model nonBlankNodeModel = ModelFactory.createDefaultModel();
@@ -77,12 +92,68 @@ public class SparqlGraphBulkUpdater extends SimpleBulkUpdateHandler {
                 blankNodeModel.add(stmt);
             }
         }
-        addModel(nonBlankNodeModel);
-        // replace following call with different method
-        addModel(blankNodeModel);
+        Model[] result = new Model[2];
+        result[0] = blankNodeModel;
+        result[1] = nonBlankNodeModel;
+        return result;
+    }
+    
+
+    @Override 
+    public void delete(Graph g, boolean withReifications) {
+        delete(g);
+    }
+    
+    @Override 
+    public void delete(Graph g) {
+        Model[] model = separateStatementsWithBlankNodes(g);
+        deleteModel(model[1] /*statements without blank nodes*/);
+        // replace blank nodes in remaining statements with variables
+        
+        StringBuffer patternBuff = new StringBuffer();
+        Iterator<Triple> tripIt = g.find(null, null, null);
+        while(tripIt.hasNext()) {
+            Triple t = tripIt.next();
+            patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getSubject(), null));
+            patternBuff.append(" ");
+            patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getPredicate(), null));
+            patternBuff.append(" ");
+            patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getObject(), null));
+            patternBuff.append(" .\n");
+        }
+        
+        StringBuffer queryBuff = new StringBuffer();
+        String graphURI = graph.getGraphURI();
+        queryBuff.append("DELETE { " + ((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "" ) + " \n");
+        queryBuff.append(patternBuff);
+        if (graphURI != null) {
+            queryBuff.append("    } \n");
+        }
+        queryBuff.append("} WHERE { \n");
+        if (graphURI != null) {
+            queryBuff.append("    GRAPH <" + graphURI + "> { \n");
+        }
+        queryBuff.append(patternBuff);
+        if (graphURI != null) {
+            queryBuff.append("    } \n");
+        }
+        queryBuff.append("} \n");
+        
+        log.debug(queryBuff.toString());
+        
+        graph.executeUpdate(queryBuff.toString());
+        
     }
     
     public void addModel(Model model) {
+        verbModel(model, "INSERT");
+    }
+    
+    public void deleteModel(Model model) {
+        verbModel(model, "DELETE");
+    }
+    
+    private void verbModel(Model model, String verb) {
         Model m = ModelFactory.createDefaultModel();
         int testLimit = 1000;
         StmtIterator stmtIt = model.listStatements();
@@ -96,7 +167,7 @@ public class SparqlGraphBulkUpdater extends SimpleBulkUpdateHandler {
                     m.write(sw, "N-TRIPLE");
                     StringBuffer updateStringBuff = new StringBuffer();
                     String graphURI = graph.getGraphURI();
-                    updateStringBuff.append("INSERT DATA { " + ((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "" ));
+                    updateStringBuff.append(verb + " DATA { " + ((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "" ));
                     updateStringBuff.append(sw);
                     updateStringBuff.append(((graphURI != null) ? " } " : "") + " }");
                     
@@ -132,11 +203,7 @@ public class SparqlGraphBulkUpdater extends SimpleBulkUpdateHandler {
     }
 
     public static void removeAll(Graph g, Node s, Node p, Node o)
-    {
-        // OK, so the strategy here should be to remove all triples without blank nodes first
-        // Then, feel the entire remaining part of the graph as a DELETE WHERE 
-        // with the blank nodes as variables?
-        
+    {        
         ExtendedIterator<Triple> it = g.find( s, p, o );
         try { 
             while (it.hasNext()) {

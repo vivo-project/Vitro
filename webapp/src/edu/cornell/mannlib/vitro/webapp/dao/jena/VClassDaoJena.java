@@ -38,6 +38,7 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -620,9 +621,13 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                 supURIs.add(getClassURIStr(cls));
             }
         } catch (Exception e) {
-            //TODO make this attempt respect the direct argument
-            // we'll try this again using a different method that doesn't try to convert to OntClass
-            List<Resource> supList = this.listDirectObjectPropertyValues(getOntModel().getResource(classURI), RDFS.subClassOf);
+            log.debug(e,e);
+            // we'll try this again using a different method 
+            // that doesn't try to convert to OntClass
+            supURIs.clear();
+            List<Resource> supList = (direct) 
+                    ? listDirectObjectPropertyValues(subClass, RDFS.subClassOf)
+                    : listObjectPropertyValues(subClass, RDFS.subClassOf);
             for (Resource res : supList) {
                 supURIs.add(getClassURIStr(res));
             }
@@ -630,6 +635,18 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
         return supURIs;
     }
 
+    private List<Resource> listObjectPropertyValues(Resource res, Property prop) {
+        List<Resource> values = new ArrayList<Resource>();
+        StmtIterator stmtIt = res.listProperties(prop);
+        while (stmtIt.hasNext()) {
+            Statement s = stmtIt.nextStatement();
+            if (s.getObject().isResource()) {
+                values.add(s.getObject().asResource());
+            }
+        }
+        return values;
+    }
+    
     public VClass getTopConcept() {
         VClass top = new VClass();
         if (getOntModel().getProfile().NAMESPACE().equals(RDFS.getURI())) {

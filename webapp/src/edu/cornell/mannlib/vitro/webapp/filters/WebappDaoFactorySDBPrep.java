@@ -28,9 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.query.DataSource;
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.sdb.SDBFactory;
@@ -43,10 +41,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.SingleContentOntModelSelector;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlDatasetGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraphMultilingual;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
@@ -198,7 +195,7 @@ public class WebappDaoFactorySDBPrep implements Filter {
         OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
         //oms = new SingleContentOntModelSelector(om, oms.getDisplayModel(), oms.getUserAccountsModel());
                         
-        Dataset dataset = DatasetFactory.create(new SparqlDatasetGraph(endpointURI));
+        Dataset dataset = new SparqlDataset(new SparqlDatasetGraph(endpointURI));
         
         //DataSource datasource = DatasetFactory.create();
         //datasource.addNamedModel("fake:fake", m);

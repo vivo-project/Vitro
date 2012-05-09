@@ -57,7 +57,7 @@ public class Classes2ClassesOperationController extends BaseEditController {
             return;
         }
 
-        VClassDao vcDao = request.getFullWebappDaoFactory().getVClassDao();
+        VClassDao vcDao = request.getAssertionsWebappDaoFactory().getVClassDao();
         
         String modeStr = request.getParameter("opMode");
         modeStr = (modeStr == null) ? "" : modeStr;

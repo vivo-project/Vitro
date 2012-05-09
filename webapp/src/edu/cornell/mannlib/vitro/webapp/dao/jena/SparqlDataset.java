@@ -1,59 +1,62 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.sparql.core.DatasetGraph;
 
 public class SparqlDataset implements Dataset {
 
-    private String endpointURI;
+    private SparqlDatasetGraph g;
     
-    public SparqlDataset(String endpointURI) {
-        this.endpointURI = endpointURI;
+    public SparqlDataset(SparqlDatasetGraph g) {
+        this.g = g;
     }
     
     @Override
     public DatasetGraph asDatasetGraph() {
-        // TODO Auto-generated method stub
-        return null;
+        return g;
     }
 
     @Override
     public void close() {
-        // TODO Auto-generated method stub
-
+        g.close();
     }
 
     @Override
     public boolean containsNamedModel(String arg0) {
-        return true;
+        return g.containsGraph(Node.createURI(arg0));
     }
 
     @Override
     public Model getDefaultModel() {
-        // TODO Auto-generated method stub
-        return null;
+        return ModelFactory.createModelForGraph(g.getDefaultGraph());
     }
 
     @Override
     public Lock getLock() {
-        // TODO Auto-generated method stub
-        return null;
+        return g.getLock();
     }
 
     @Override
     public Model getNamedModel(String arg0) {
-        // TODO Auto-generated method stub
-        return null;
+        return ModelFactory.createModelForGraph(g.getGraph(Node.createURI(arg0)));
     }
 
     @Override
     public Iterator<String> listNames() {
-        // TODO Auto-generated method stub
-        return null;
+        ArrayList<String> nameList = new ArrayList<String>();
+        Iterator<Node> nodeIt = g.listGraphNodes();
+        while (nodeIt.hasNext()) {
+            Node n = nodeIt.next();
+            nameList.add(n.getURI());
+        }
+        return nameList.iterator();
     }
 
 }

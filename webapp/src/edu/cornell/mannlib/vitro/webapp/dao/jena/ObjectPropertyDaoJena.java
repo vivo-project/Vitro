@@ -785,12 +785,12 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     static {
         List<String> namespaceFilters = new ArrayList<String>();
         for (String namespace : EXCLUDED_NAMESPACES) {
-            namespaceFilters.add("( afn:namespace(?property) != \"" + namespace + "\" )");
+            namespaceFilters.add("( !regex(str(?property), \"^" + namespace + "\" ))");
         }
         // A hack to include the vitro:primaryLink and vitro:additionalLink properties in the list
         namespaceFilters.add("( ?property = vitro:primaryLink ||" +
                                "?property = vitro:additionalLink ||" +
-                               "afn:namespace(?property) != \"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#\" )");
+                               "!regex(str(?property), \"^http://vitro.mannlib.cornell.edu/ns/vitro/0.7#\" ))");
         PROPERTY_FILTERS = StringUtils.join(namespaceFilters, " && ");
     }
     

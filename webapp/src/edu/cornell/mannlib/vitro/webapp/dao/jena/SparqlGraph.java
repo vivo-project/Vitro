@@ -131,7 +131,11 @@ public class SparqlGraph implements GraphWithPerform {
                 + sparqlNodeUpdate(t.getObject(), "") + " } " 
                 + ((graphURI != null) ? " } " : "");
         
-        //log.info(updateString);
+        
+        if (graphURI != null) {
+            log.info("=====> update to graph " + graphURI);
+        }
+        log.info(updateString);
         
         executeUpdate(updateString);
                 
@@ -195,7 +199,6 @@ public class SparqlGraph implements GraphWithPerform {
 
     @Override
     public void delete(Triple arg0) throws DeleteDeniedException {
-        //log.info("********************** DELETE!!!!!! ************************");
         performDelete(arg0);
     }
 
@@ -228,7 +231,7 @@ public class SparqlGraph implements GraphWithPerform {
                 literalBuff.append("^^<").append(node.getLiteralDatatypeURI()).append(">");
             } else if (node.getLiteralLanguage() != null && node.getLiteralLanguage() != "") {
                 literalBuff.append("@").append(node.getLiteralLanguage());
-;            }
+            }
             return literalBuff.toString();
         } else {
             return varName;
@@ -238,6 +241,14 @@ public class SparqlGraph implements GraphWithPerform {
     public static String sparqlNodeUpdate(Node node, String varName) {
         if (node.isBlank()) {
             return "_:" + node.getBlankNodeLabel().replaceAll("\\W", "");
+        } else {
+            return sparqlNode(node, varName);
+        }
+    }
+    
+    public static String sparqlNodeDelete(Node node, String varName) {
+        if (node.isBlank()) {
+            return "?" + node.getBlankNodeLabel().replaceAll("\\W", "");
         } else {
             return sparqlNode(node, varName);
         }
@@ -265,7 +276,16 @@ public class SparqlGraph implements GraphWithPerform {
             findQuery.append("  } ");
         }
         findQuery.append("\n}");
-        ResultSet rs = execSelect(findQuery.toString());
+        
+        String queryString = findQuery.toString();
+        //log.info(queryString);
+        
+//        //TODO remove me
+//        if (queryString.contains("individual/AI") && queryString.contains("label")) {
+//            throw new RuntimeException("break!");
+//        }
+        
+        ResultSet rs = execSelect(queryString);
         //rs = execSelect(findQuery.toString());
         //rs = execSelect(findQuery.toString());
         
