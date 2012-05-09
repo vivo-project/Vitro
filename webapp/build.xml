@@ -56,6 +56,7 @@
 
 	<path id="test.compile.classpath">
 		<pathelement location="${war.classes.dir}" />
+		<pathelement location="${build.dir}/bundleclasses" />
 		<path refid="compile.classpath" />
 	</path>
 
