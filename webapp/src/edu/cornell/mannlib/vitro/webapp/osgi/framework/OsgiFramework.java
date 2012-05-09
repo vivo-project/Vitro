@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.osgi.framework;
 
+import java.util.Map;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -13,6 +15,7 @@ import org.apache.felix.main.AutoProcessor;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 
+import edu.cornell.mannlib.vitro.webapp.osgi.baseservices.OsgiFrameworkLogger;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
@@ -39,7 +42,6 @@ public class OsgiFramework {
 	 */
 	public static final String APPLICATION_BUNDLES_DIR = "WEB-INF/bundles/application";
 
-	
 	public static OsgiFramework getFramework(ServletContext ctx) {
 		Object o = ctx.getAttribute(ATTRIBUTE_NAME);
 		if (o instanceof OsgiFramework) {
@@ -54,13 +56,20 @@ public class OsgiFramework {
 	// The framework
 	// ----------------------------------------------------------------------
 
-	private final OsgiFrameworkProperties props;
+	private final Map<String, Object> propertyMap;
 	private final Felix felix;
 
+	private final OsgiModuleAccessor moduleAccessor;
+	private final OsgiServicePublisher servicePublisher;
+
 	public OsgiFramework(OsgiFrameworkProperties props) {
-		this.props = props;
-		this.felix = new Felix(props.getPropertyMap());
+		this.propertyMap = props.getPropertyMap();
+
+		this.felix = new Felix(propertyMap);
 		log.debug("Created the Felix framework.");
+
+		this.moduleAccessor = new OsgiModuleAccessor();
+		this.servicePublisher = new OsgiServicePublisher();
 	}
 
 	public void start() throws BundleException {
@@ -74,24 +83,42 @@ public class OsgiFramework {
 		/*
 		 * Log all framework events (if enabled);
 		 */
-		new OsgiEventLogger().addToContext(bundleContext);
+		new OsgiFrameworkEventMonitor().addToContext(bundleContext);
 
 		/*
 		 * Start the framework.
 		 */
 		felix.start();
 		log.debug("Started the Felix framework.");
-		
+
 		/*
 		 * Install and start all of the bundles from FRAMEWORK_BUNDLES_DIR:
 		 * ConfigurationAdmin, SCR, FileInstall, etc.
 		 */
-		AutoProcessor.process(props.getPropertyMap(), bundleContext);
+		AutoProcessor.process(propertyMap, bundleContext);
 		log.debug("Ran the AutoProcessor.");
+
+		/*
+		 * Set up the bridges so base modules can access OSGi services and OSGi
+		 * bundles can access base modules.
+		 */
+		moduleAccessor.setBundleContext(bundleContext);
+		servicePublisher.setBundleContext(bundleContext);
 	}
 
 	public void stop() throws BundleException {
 		try {
+			/*
+			 * Clean up any remaining services that were published by the
+			 * application base.
+			 */
+			servicePublisher.shutdown();
+			/*
+			 * Clean up any remaining module references that haven't been
+			 * released.
+			 */
+			moduleAccessor.shutdown();
+
 			log.debug("Stopping Felix framework.");
 			felix.stop();
 			felix.waitForStop(0);
@@ -101,14 +128,23 @@ public class OsgiFramework {
 		}
 	}
 
+	public OsgiModuleAccessor getModuleAccessor() {
+		return this.moduleAccessor;
+	}
+
+	public OsgiServicePublisher getServicePublisher() {
+		return this.servicePublisher;
+	}
+
 	// ----------------------------------------------------------------------
 	// Setup and teardown
 	// ----------------------------------------------------------------------
 
-	/**
-	 * When the webapp starts, launch the OSGi framework.
-	 */
 	public static class Setup implements ServletContextListener {
+		/**
+		 * When the webapp starts, launch the OSGi framework. Store a reference
+		 * to it in the ServletContext.
+		 */
 		@Override
 		public void contextInitialized(ServletContextEvent sce) {
 			ServletContext ctx = sce.getServletContext();

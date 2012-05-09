@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.osgi.framework;
+package edu.cornell.mannlib.vitro.webapp.osgi.baseservices;
 
 import org.apache.commons.logging.Log;
 import org.apache.felix.framework.Logger;
@@ -21,6 +21,9 @@ import org.osgi.service.log.LogService;
  * 
  * This is also an implementation of the OSGi LogService, and will be registered
  * as such, so 3rd-party bundles can use it.
+ * 
+ * TODO Perhaps we should break this into two classes - one for the framework
+ * itself and one as a factory for the bundles.
  */
 public class OsgiFrameworkLogger extends Logger implements LogService {
 	private final Log log;
@@ -119,7 +122,7 @@ public class OsgiFrameworkLogger extends Logger implements LogService {
 	}
 
 	/**
-	 * Create a "bundle activator" to be executed when the system bundle starts.
+	 * Create a BundleActivator to be executed when the system bundle starts.
 	 */
 	public Activator getActivator() {
 		return this.activator;

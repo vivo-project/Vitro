@@ -10,12 +10,13 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * The packages that must be exported for application bundles to use. If a
- * package is needed in the base of the application as well as in the bundles,
- * it must be included here.
+ * The packages that must be exported for OSGi bundles to use. If a package is
+ * needed in the base of the application as well as in the bundles, it must be
+ * included here.
  * 
- * It would be nice if these packages could be wrapped in bundles, but then they
- * would not be usable by the base of the application (the non-OSGi part).
+ * Perhaps these packages could be made into bundles themselves, but then they
+ * would not be usable by the base of the application (the non-OSGi part), since
+ * they would be loaded by a different class loader.
  * 
  * This results from the fact that we are straddling the line between OSGi and
  * non-OSGi.
@@ -42,7 +43,7 @@ public class OsgiFrameworkExportedPackages {
 	 */
 	private static Collection<? extends String> packageSpecsForVitro() {
 		return Arrays
-				.asList("edu.cornell.mannlib.vitro.webapp.osgi.interfaces");
+				.asList("edu.cornell.mannlib.vitro.webapp.modules.interfaces");
 	}
 
 	/**
@@ -81,6 +82,9 @@ public class OsgiFrameworkExportedPackages {
 	 * 
 	 * We can't simply include this as a bundle because we use it in the base of
 	 * the application. Specifically, in OsgiFrameworkLogger.
+	 * 
+	 * TODO If the OsgiFrameworkLogger did not straddle the line, then perhaps
+	 * we would not need to export these packages.
 	 */
 	private static List<String> packageSpecsForOsgiCompServices() {
 		return Arrays.asList("info.dmtree;specification-version=1.0",
