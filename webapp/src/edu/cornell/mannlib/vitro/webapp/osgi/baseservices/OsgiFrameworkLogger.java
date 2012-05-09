@@ -128,7 +128,7 @@ public class OsgiFrameworkLogger extends Logger implements LogService {
 		return this.activator;
 	}
 
-	private static class Activator implements BundleActivator {
+	public static class Activator implements BundleActivator {
 		private final OsgiFrameworkLogger logger;
 		private final Log commonsLog;
 		private ServiceRegistration<?> sr;

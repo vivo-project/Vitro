@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.osgi.framework;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -59,8 +60,9 @@ public class OsgiFramework {
 	private final Map<String, Object> propertyMap;
 	private final Felix felix;
 
-	private final OsgiModuleAccessor moduleAccessor;
+	private final OsgiModuleProxyFactory moduleProxyFactory;
 	private final OsgiServicePublisher servicePublisher;
+	private final OsgiFrameworkServiceHelper serviceHelper;
 
 	public OsgiFramework(OsgiFrameworkProperties props) {
 		this.propertyMap = props.getPropertyMap();
@@ -68,8 +70,9 @@ public class OsgiFramework {
 		this.felix = new Felix(propertyMap);
 		log.debug("Created the Felix framework.");
 
-		this.moduleAccessor = new OsgiModuleAccessor();
+		this.moduleProxyFactory = new OsgiModuleProxyFactory();
 		this.servicePublisher = new OsgiServicePublisher();
+		this.serviceHelper = new OsgiFrameworkServiceHelper(this.felix);
 	}
 
 	public void start() throws BundleException {
@@ -102,7 +105,7 @@ public class OsgiFramework {
 		 * Set up the bridges so base modules can access OSGi services and OSGi
 		 * bundles can access base modules.
 		 */
-		moduleAccessor.setBundleContext(bundleContext);
+		moduleProxyFactory.setBundleContext(bundleContext);
 		servicePublisher.setBundleContext(bundleContext);
 	}
 
@@ -117,7 +120,7 @@ public class OsgiFramework {
 			 * Clean up any remaining module references that haven't been
 			 * released.
 			 */
-			moduleAccessor.shutdown();
+			moduleProxyFactory.shutdown();
 
 			log.debug("Stopping Felix framework.");
 			felix.stop();
@@ -128,12 +131,20 @@ public class OsgiFramework {
 		}
 	}
 
-	public OsgiModuleAccessor getModuleAccessor() {
-		return this.moduleAccessor;
-	}
-
 	public OsgiServicePublisher getServicePublisher() {
 		return this.servicePublisher;
+	}
+
+	public <T> T getProxyForModule(Object requester, Class<T> interfaceClass) {
+		return moduleProxyFactory.getProxyForModule(requester, interfaceClass);
+	}
+
+	public <T> void releaseProxyForModule(T proxy) {
+		moduleProxyFactory.releaseProxyForModule(proxy);
+	}
+
+	public List<String> listAvailableServiceClasses() {
+		return serviceHelper.listAvailableServiceClasses();
 	}
 
 	// ----------------------------------------------------------------------
