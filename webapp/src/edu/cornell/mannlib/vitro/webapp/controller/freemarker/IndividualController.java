@@ -686,12 +686,8 @@ public class IndividualController extends FreemarkerHttpServlet {
 	        	} else {
 	        		rootDir = RICH_EXPORT_ROOT +  include + "/";
 	        	}
-	        	
-	        	long start = System.currentTimeMillis();
-				Model extendedModel = ExtendedLinkedDataUtils.createModelFromQueries(getServletContext(), rootDir, contextModel, entity.getURI());
-	        	long elapsedTimeMillis = System.currentTimeMillis()-start;
-	        	log.info("Time to create rich export model: msecs = " + elapsedTimeMillis);
-	        	
+	        		        
+				Model extendedModel = ExtendedLinkedDataUtils.createModelFromQueries(getServletContext(), rootDir, contextModel, entity.getURI());	        		        	
 				newModel.add(extendedModel);
 	        }
 		}
