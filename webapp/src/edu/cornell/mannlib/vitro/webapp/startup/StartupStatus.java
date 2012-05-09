@@ -14,13 +14,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Accumulates a list of messages from the StartupManager, and from the context
- * listeners that the run during startup.
+ * Accumulates a list of messages from the StartupManager, from the context
+ * listeners that run during startup, and from the component activators in OSGi
+ * bundles.
  * 
  * This is thread-safe, with immutable items in the list and synchronized access
  * to the list.
  */
-public class StartupStatus {
+public class StartupStatus implements
+		edu.cornell.mannlib.vitro.webapp.modules.interfaces.StartupStatus {
 	private static final Log log = LogFactory.getLog(StartupStatus.class);
 
 	private static final String ATTRIBUTE_NAME = "STARTUP_STATUS";
@@ -49,31 +51,28 @@ public class StartupStatus {
 
 	private SynchronizedStatusItemList itemList = new SynchronizedStatusItemList();
 
-	public void info(ServletContextListener listener, String message) {
-		addItem(StatusItem.Level.INFO, listener, message, null);
+	public void info(Object initializer, String message) {
+		addItem(StatusItem.Level.INFO, initializer, message, null);
 	}
 
-	public void info(ServletContextListener listener, String message,
-			Throwable cause) {
-		addItem(StatusItem.Level.INFO, listener, message, cause);
+	public void info(Object initializer, String message, Throwable cause) {
+		addItem(StatusItem.Level.INFO, initializer, message, cause);
 	}
 
-	public void warning(ServletContextListener listener, String message) {
-		addItem(StatusItem.Level.WARNING, listener, message, null);
+	public void warning(Object initializer, String message) {
+		addItem(StatusItem.Level.WARNING, initializer, message, null);
 	}
 
-	public void warning(ServletContextListener listener, String message,
-			Throwable cause) {
-		addItem(StatusItem.Level.WARNING, listener, message, cause);
+	public void warning(Object initializer, String message, Throwable cause) {
+		addItem(StatusItem.Level.WARNING, initializer, message, cause);
 	}
 
-	public void fatal(ServletContextListener listener, String message) {
-		addItem(StatusItem.Level.FATAL, listener, message, null);
+	public void fatal(Object initializer, String message) {
+		addItem(StatusItem.Level.FATAL, initializer, message, null);
 	}
 
-	public void fatal(ServletContextListener listener, String message,
-			Throwable cause) {
-		addItem(StatusItem.Level.FATAL, listener, message, cause);
+	public void fatal(Object initializer, String message, Throwable cause) {
+		addItem(StatusItem.Level.FATAL, initializer, message, cause);
 	}
 
 	/** Say that a previous fatal error prevented this listener from running. */
@@ -92,8 +91,8 @@ public class StartupStatus {
 		}
 	}
 
-	private void addItem(StatusItem.Level level, ServletContextListener source,
-			String message, Throwable cause) {
+	private void addItem(StatusItem.Level level, Object source, String message,
+			Throwable cause) {
 		StatusItem item = new StatusItem(level, source, message, cause);
 		itemList.add(item);
 
@@ -169,8 +168,8 @@ public class StartupStatus {
 
 		private boolean unexpectedArguments;
 
-		public StatusItem(Level level, ServletContextListener source,
-				String message, Throwable cause) {
+		public StatusItem(Level level, Object source, String message,
+				Throwable cause) {
 			this.level = figureLevel(level);
 			this.sourceName = figureSourceName(source);
 			this.shortSourceName = figureShortSourceName(source);
@@ -195,7 +194,7 @@ public class StartupStatus {
 			}
 		}
 
-		private String figureSourceName(ServletContextListener source) {
+		private String figureSourceName(Object source) {
 			if (source == null) {
 				unexpectedArguments = true;
 				return "UNKNOWN SOURCE";
@@ -208,7 +207,7 @@ public class StartupStatus {
 		 * Don't just use getSimpleName(): on an inner class we'd like to see
 		 * the parent also.
 		 */
-		private String figureShortSourceName(ServletContextListener source) {
+		private String figureShortSourceName(Object source) {
 			if (source == null) {
 				unexpectedArguments = true;
 				return "UNKNOWN_SOURCE";

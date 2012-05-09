@@ -21,7 +21,9 @@ import org.apache.commons.logging.LogFactory;
  * 
  * Once the properties have been parsed and stored, they are immutable.
  */
-public class ConfigurationPropertiesImpl extends ConfigurationProperties {
+public class ConfigurationPropertiesImpl extends ConfigurationProperties
+		implements
+		edu.cornell.mannlib.vitro.webapp.modules.interfaces.ConfigurationProperties {
 	private static final Log log = LogFactory
 			.getLog(ConfigurationPropertiesImpl.class);
 

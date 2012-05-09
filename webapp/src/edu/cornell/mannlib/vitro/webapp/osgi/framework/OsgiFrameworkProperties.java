@@ -15,6 +15,7 @@ import org.apache.felix.framework.util.FelixConstants;
 import org.apache.felix.main.AutoProcessor;
 import org.osgi.framework.Constants;
 
+import edu.cornell.mannlib.vitro.webapp.osgi.baseservices.BaseServicesActivator;
 import edu.cornell.mannlib.vitro.webapp.osgi.baseservices.OsgiFrameworkLogger;
 
 /**
@@ -78,11 +79,7 @@ public class OsgiFrameworkProperties {
 		 * Publish the base services so the bundles can use them.
 		 */
 		map.put(FelixConstants.SYSTEMBUNDLE_ACTIVATORS_PROP, Arrays.asList(
-				logger.getActivator()
-//				,
-//				new VitroContextImpl(ctx).getActivator(),
-//				new BaseServicesActivator(ctx)
-				));
+				logger.getActivator(), new BaseServicesActivator(ctx)));
 
 		return map;
 	}
