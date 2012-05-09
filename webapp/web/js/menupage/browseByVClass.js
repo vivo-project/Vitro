@@ -48,6 +48,12 @@ var browseByVClass = {
             return false;
         });
         
+        this.browseVClasses.children('li').each( function() {
+           $(this).find('a').click(function () {
+                // the extra space is needed to prevent odd scrolling behavior
+                location.hash = $(this).attr('data-uri') + ' ';
+           }); 
+        });
         // Call the pagination listener
         this.paginationListener();
     },
@@ -66,7 +72,12 @@ var browseByVClass = {
     // Load individuals for default class as specified by menupage template
     defaultVClass: function() {
         if ( this.defaultBrowseVClassURI != "false" ) {
-            this.getIndividuals(this.defaultBrowseVClassUri, "all", 1, false);
+            if ( location.hash ) {
+                this.getIndividuals(location.hash.substring(1,location.hash.length - 1), "all", 1, false);
+            }
+            else {
+                this.getIndividuals(this.defaultBrowseVClassUri, "all", 1, false);
+            }
         }
     },
     
