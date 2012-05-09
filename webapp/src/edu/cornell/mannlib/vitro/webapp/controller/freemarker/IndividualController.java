@@ -669,22 +669,12 @@ public class IndividualController extends FreemarkerHttpServlet {
     	}
     	
     	newModel = getLabelAndTypes(entity, contextModel, newModel );
-    		
-    	// get all the statements not covered by the object property / datatype property code above
-    	// note implication that extendedLinkedData individuals will only be evaluated for the
-    	// recognized object properties.
-    	contextModel.enterCriticalSection(Lock.READ);
-		try {
-			StmtIterator iter = contextModel.listStatements(subj, (Property) null, (RDFNode) null);
-			while (iter.hasNext()) {
-				Statement stmt = iter.next();
-				if (!newModel.contains(stmt)) {
-				   newModel.add(stmt);
-				}
-			}  
-		} finally {
-			contextModel.leaveCriticalSection();
-		} 
+
+    	// NIHVIVO-3696 "Linked data responses not correctly filtered by public display specifications"
+    	// Removed section that added all the statements not covered by 
+    	// the object property / datatype property code above.    	
+    	// It is still possible that the extended model added by the
+    	// rich export will added unintended statements.
 			
 		if (recurseDepth == 0 && includes != null && entity.isVClass(PERSON_CLASS_URI)) {
 			
