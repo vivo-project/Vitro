@@ -61,7 +61,6 @@ public class OsgiFramework {
 	private final Felix felix;
 
 	private final OsgiModuleProxyFactory moduleProxyFactory;
-	private final OsgiServicePublisher servicePublisher;
 	private final OsgiFrameworkServiceHelper serviceHelper;
 
 	public OsgiFramework(OsgiFrameworkProperties props) {
@@ -71,7 +70,6 @@ public class OsgiFramework {
 		log.debug("Created the Felix framework.");
 
 		this.moduleProxyFactory = new OsgiModuleProxyFactory();
-		this.servicePublisher = new OsgiServicePublisher();
 		this.serviceHelper = new OsgiFrameworkServiceHelper(this.felix);
 	}
 
@@ -106,16 +104,10 @@ public class OsgiFramework {
 		 * bundles can access base modules.
 		 */
 		moduleProxyFactory.setBundleContext(bundleContext);
-		servicePublisher.setBundleContext(bundleContext);
 	}
 
 	public void stop() throws BundleException {
 		try {
-			/*
-			 * Clean up any remaining services that were published by the
-			 * application base.
-			 */
-			servicePublisher.shutdown();
 			/*
 			 * Clean up any remaining module references that haven't been
 			 * released.
@@ -129,10 +121,6 @@ public class OsgiFramework {
 		} catch (InterruptedException e) {
 			log.warn("Interrupted while stopping the Felix framework", e);
 		}
-	}
-
-	public OsgiServicePublisher getServicePublisher() {
-		return this.servicePublisher;
 	}
 
 	public <T> T getProxyForModule(Object requester, Class<T> interfaceClass) {
