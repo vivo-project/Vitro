@@ -15,7 +15,7 @@ public interface ModelChange {
 	    ADD, REMOVE
 	}
 		
-	abstract InputStream getSerializedModel();
+	public InputStream getSerializedModel();
 	
 	public void setSerializedModel(InputStream serializedModel);
 	

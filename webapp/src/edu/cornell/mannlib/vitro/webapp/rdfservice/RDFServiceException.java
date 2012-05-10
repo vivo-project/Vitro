@@ -5,5 +5,9 @@ public class RDFServiceException extends Exception {
 	public RDFServiceException() {
 		super();
 	}
+	
+	public RDFServiceException(String message) {
+		super(message);
+	}
 
 }

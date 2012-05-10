@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.rdfservice;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 /*
@@ -22,13 +23,16 @@ public interface RDFService {
 	
 	/**
 	 * Perform a series of additions to and or removals from specified graphs
-	 * in the RDF store. For each change preConditionSparql will be executed 
-	 * before the update is made and if it returns a non-empty result, no updates
-	 * will be made. The same preConditionSparql is used for each change/graph pair. 
+	 * in the RDF store.  preConditionSparql will be executed against the 
+	 * union of all the graphs in the knowledge base before any updates are made. 
+	 * If the precondition query returns a non-empty result, no updates
+	 * will be made. 
 	 * 
-	 * @param ChangeSet - a set of changes to be performed on the RDF store.            
+	 * @param ChangeSet - a set of changes to be performed on the RDF store.
+	 *    
+	 * @return boolean - indicates whether the precondition was satisfied            
 	 */
-	public void changeSetUpdate(ChangeSet changeSet) throws RDFServiceException;
+	public boolean changeSetUpdate(ChangeSet changeSet) throws RDFServiceException;
 		
 	/**
 	 * If the given individual already exists in the default graph, throws an 
@@ -52,16 +56,49 @@ public interface RDFService {
 	public void newIndividual(String individualURI, String individualTypeURI, String graphURI) throws RDFServiceException;
 	
 	/**
-	 * Performs a SPARQL query against the knowledge base. The query may have
+	 * Performs a SPARQL construct query against the knowledge base. The query may have
 	 * an embedded graph identifier.
 	 * 
 	 * @param String query - the SPARQL query to be executed against the RDF store
-	 * @param RDFService.SPARQLQueryType queryType - the type of SPARQL query (SELECT, CONSTRUCT, DESCRIBE, ASK)
+	 * @param RDFService.ModelSerializationFormat resultFormat - type of serialization for RDF result of the SPARQL query
+	 * @param OutputStream outputStream - the result of the query
+	 * 
+	 */
+	public InputStream sparqlConstructQuery(String query, RDFService.ModelSerializationFormat resultFormat) throws RDFServiceException;
+	
+	/**
+	 * Performs a SPARQL describe query against the knowledge base. The query may have
+	 * an embedded graph identifier.
+	 * 
+	 * @param String query - the SPARQL query to be executed against the RDF store
 	 * @param RDFService.ModelSerializationFormat resultFormat - type of serialization for RDF result of the SPARQL query
 	 * 
-	 * @return  InputStream - the result of the SPARQL query 
+	 * @return InputStream - the result of the query
+	 * 
 	 */
-	public InputStream sparqlConstructQuery(String query, RDFService.SPARQLQueryType queryType, RDFService.ModelSerializationFormat resultFormat) throws RDFServiceException;
+	public InputStream sparqlDescribeQuery(String query, RDFService.ModelSerializationFormat resultFormat) throws RDFServiceException;
+	
+	/**
+	 * Performs a SPARQL select query against the knowledge base. The query may have
+	 * an embedded graph identifier.
+	 * 
+	 * @param String query - the SPARQL query to be executed against the RDF store
+	 * 
+	 * @return InputStream - the result of the query
+	 * 
+	 */
+	public InputStream sparqlSelectQuery(String query) throws RDFServiceException;
+	
+	/**
+	 * Performs a SPARQL ASK query against the knowledge base. The query may have
+	 * an embedded graph identifier.
+	 * 
+	 * @param String query - the SPARQL query to be executed against the RDF store
+	 * 
+	 * @return  boolean - the result of the SPARQL query 
+	 */
+	
+	public boolean sparqlAskQuery(String query) throws RDFServiceException;
 	
 	/**
 	 * Get a list of all the graph URIs in the RDF store.
