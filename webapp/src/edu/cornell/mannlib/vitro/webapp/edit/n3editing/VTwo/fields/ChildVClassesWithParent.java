@@ -46,7 +46,9 @@ public class ChildVClassesWithParent implements FieldOptions {
         // first test to see whether there's a default "leave blank" value specified with the literal options        
         if ( ! StringUtils.isEmpty( defaultOptionLabel ) ){
             optionsMap.put(LEFT_BLANK, defaultOptionLabel);        
-        }        
+        } 
+        
+        optionsMap.put(classUri, "Other");       
 
         VClassDao vclassDao = wDaoFact.getVClassDao();
         List<String> subClassList = vclassDao.getAllSubClassURIs(classUri);
