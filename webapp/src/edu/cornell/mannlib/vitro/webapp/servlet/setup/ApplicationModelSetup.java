@@ -25,6 +25,7 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
@@ -65,7 +66,7 @@ implements ServletContextListener {
             OntModel displayModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
             displayModel.add(displayDbModel);           
             displayModel.getBaseModel().register(new ModelSynchronizer(displayDbModel));            
-            ctx.setAttribute(DISPLAY_ONT_MODEL, displayModel);
+            ModelContext.setDisplayModel(displayModel, ctx);
             
             //at each startup load all RDF files from directory to sub-models of display model  
             initializeDisplayLoadedAtStartup(ctx, displayModel);                

@@ -53,7 +53,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
-import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 public class IndividualSDB extends IndividualImpl implements Individual {
 
@@ -870,22 +869,6 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 		return false;
 	}
 	
-	@Override
-	public boolean isMemberOfClassProhibitedFromSearch(ProhibitedFromSearch pfs) {  
-
-		List<VClass> types =  getVClasses(false);
-		Iterator<VClass> itr = types.iterator();
-
-		while(itr.hasNext()) {
-			String typeURI = itr.next().getURI();
-			if (pfs.isClassProhibitedFromSearch(typeURI)) {
-				return true;
-			}
-		}
-
-		return false;
-
-	}
     /**
      * Overriding the base method so that we can do the sorting by arbitrary property here.  An
      * IndividualSDB has a reference back to the model; everything else is just a dumb bean (for now).

@@ -192,11 +192,6 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
 		}
 		return false;
 	}
-    
-    public boolean isMemberOfClassProhibitedFromSearch(ProhibitedFromSearch pfs) {
-    	throw new UnsupportedOperationException(this.getClass().getName() +
-    		".isMemberOfClassProhibitedFromSearch must be overriden by a subclass");
-    }
 
 	public List<VClass> getVClasses(boolean direct) {
     	if (direct) {

@@ -249,11 +249,13 @@ public class WebappDaoSDBSetup extends JenaDataSourceSetupBase
     private void loadDataFromFilesystem(OntModelSelector baseOms, 
                                         ServletContext ctx) {
         Long startTime = System.currentTimeMillis();
-        log.debug("Initializing models from RDF files");    
+        log.info("Initializing models from RDF files");    
+        
         readOntologyFilesInPathSet(USER_ABOX_PATH, ctx, baseOms.getABoxModel());
         readOntologyFilesInPathSet(USER_TBOX_PATH, ctx, baseOms.getTBoxModel());
         readOntologyFilesInPathSet(
                 USER_APPMETA_PATH, ctx, baseOms.getApplicationMetadataModel());
+        
         log.debug(((System.currentTimeMillis() - startTime) / 1000)
                 + " seconds to read RDF files ");
     }

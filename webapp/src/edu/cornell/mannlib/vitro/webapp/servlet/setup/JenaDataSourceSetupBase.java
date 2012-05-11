@@ -287,6 +287,10 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
        return firstStartup;
    }
    
+   public static void thisIsFirstStartup(){
+       firstStartup = true;
+   }
+   
    protected Model makeDBModel(BasicDataSource ds, 
                                String jenaDbModelname, 
                                OntModelSpec jenaDbOntModelSpec, 
@@ -378,10 +382,10 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
              }
         } else {
             if(!f.exists()) {
-                log.debug("File for path " + p + " does not exist");
+                log.info("File for path " + p + " does not exist");
             }
             else if(f.isDirectory()) {
-                log.debug("Path " + p + 
+                log.info("Path " + p + 
                         " corresponds to directory and not file so was not read in");
             }
         }

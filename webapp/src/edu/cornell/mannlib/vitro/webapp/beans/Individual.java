@@ -3,14 +3,11 @@
 package edu.cornell.mannlib.vitro.webapp.beans;
 
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 /**
  * User: bdc34
@@ -69,9 +66,7 @@ public interface Individual extends ResourceBean, Comparable<Individual> {
     void setVClasses(List<VClass> vClassList, boolean direct);
     
     /** Does the individual belong to this class? */
-    boolean isVClass(String uri);
-    
-    public boolean isMemberOfClassProhibitedFromSearch(ProhibitedFromSearch pfs);
+    boolean isVClass(String uri);   
 
     void setObjectPropertyStatements(List<ObjectPropertyStatement> list);
     List<ObjectPropertyStatement> getObjectPropertyStatements();

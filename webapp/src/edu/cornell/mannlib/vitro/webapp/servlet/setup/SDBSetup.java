@@ -68,13 +68,11 @@ implements javax.servlet.ServletContextListener {
         Store store = connectStore(bds, storeDesc);
         setApplicationStore(store, ctx);
         
-        if (!isSetUp(store)) {
-            log.info("Initializing SDB store");
-            if (isFirstStartup()) {
-                setupSDB(ctx, store);    
-            } else {
-                migrateToSDBFromExistingRDBStore(ctx, store); 
-            }
+        if (!isSetUp(store)) {            
+            JenaPersistentDataSourceSetup.thisIsFirstStartup();
+            setupSDB(ctx, store);
+        }else{
+            migrateToSDBFromExistingRDBStore(ctx, store); 
         }
     }
     
@@ -124,7 +122,8 @@ implements javax.servlet.ServletContextListener {
 
     protected static void setupSDB(ServletContext ctx, Store store,
             Model memModel, Model inferenceModel) {
-
+        log.info("Initializing SDB store");
+        
         store.getTableFormatter().create();
         store.getTableFormatter().truncate();
 
