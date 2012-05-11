@@ -74,7 +74,7 @@ public class OsgiFrameworkExportedPackages {
 	 * TODO figure this out.
 	 */
 	private static Collection<? extends String> packageSpecsForServletApiJar() {
-		return Arrays.asList("javax.servlet", "javax.servlet.http");
+		return Arrays.asList("javax.servlet;version=2.4", "javax.servlet.http;version=2.4");
 	}
 
 	/**
@@ -85,6 +85,7 @@ public class OsgiFrameworkExportedPackages {
 	 * 
 	 * TODO If the OsgiFrameworkLogger did not straddle the line, then perhaps
 	 * we would not need to export these packages.
+	 * TODO But the HttpService implementation that uses osg.osgi.service.http
 	 */
 	private static List<String> packageSpecsForOsgiCompServices() {
 		return Arrays.asList("info.dmtree;specification-version=1.0",

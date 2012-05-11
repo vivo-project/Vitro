@@ -143,9 +143,9 @@ public class OsgiFrameworkProperties {
 		map.put("felix.fileinstall.poll", "10000");
 
 		/*
-		 * Wait a bit before the first poll of the bundle directory.
+		 * Do the first poll right away.
 		 */
-		map.put("felix.fileinstall.noInitialDelay", "false");
+		map.put("felix.fileinstall.noInitialDelay", "true");
 
 		/*
 		 * If some code in the app changes the configuration of a bundle, don't
