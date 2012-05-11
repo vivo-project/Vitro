@@ -3,6 +3,9 @@
 package edu.cornell.mannlib.vitro.webapp.osgi.baseservices.httpservice;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -45,7 +48,8 @@ public class VitroHttpService implements HttpService {
 	private final ServletContext servletContext;
 	private final HttpContext defaultHttpContext;
 
-	private final Map<String, ServletRegistrationInfo> servletMap = new HashMap<String, ServletRegistrationInfo>();
+	/** Servlets and resource groups, mapped by their aliases. */
+	private final Map<String, RegistrationInfo> servletMap = new HashMap<String, RegistrationInfo>();
 
 	public VitroHttpService(ServletContext servletContext,
 			HttpContext defaultHttpContext) {
@@ -76,19 +80,35 @@ public class VitroHttpService implements HttpService {
 		Map<String, String> initparamsMap = toMap(initparams);
 		BasicServletConfig sc = new BasicServletConfig(ctxWrapper, alias,
 				initparamsMap);
-		servletMap.put(alias, new ServletRegistrationInfo(alias, servlet, sc,
-				httpContext, ctxWrapper));
+
+		servletMap.put(alias, new ServletRegistrationInfo(alias,
+				nonNull(httpContext), servlet, sc, ctxWrapper));
 
 		log.debug("initializing servlet at '" + alias + "'");
 		servlet.init(sc);
 	}
 
 	@Override
-	public void registerResources(String alias, String name, HttpContext context)
-			throws NamespaceException {
-		// TODO register resources
-		log.error("VitroHttpService.registerResources not implemented. alias="
-				+ alias + ", name=" + name + ", context=" + context);
+	public void registerResources(String alias, String name,
+			HttpContext httpContext) throws NamespaceException {
+		log.debug("registerResources alias=" + alias + ", name=" + name
+				+ ", httpContext=" + httpContext);
+
+		if (servletMap.containsKey(alias)) {
+			throw new NamespaceException("Alias '" + alias
+					+ "' is already registered.");
+		}
+
+		servletMap.put(alias, new ResourcesRegistrationInfo(alias,
+				nonNull(httpContext), name));
+	}
+
+	private HttpContext nonNull(HttpContext httpContext) {
+		if (httpContext == null) {
+			return createDefaultHttpContext();
+		} else {
+			return httpContext;
+		}
 	}
 
 	/**
@@ -102,26 +122,83 @@ public class VitroHttpService implements HttpService {
 		if (matchingAlias == null) {
 			log.debug("can't service request: " + requestPath);
 			return false;
-		} else {
-			log.debug("service request: " + requestPath);
-			ServletRegistrationInfo sri = servletMap.get(matchingAlias);
+		}
+
+		RegistrationInfo ri = servletMap.get(matchingAlias);
+		if (ri instanceof ServletRegistrationInfo) {
+			log.debug("servicing servlet request for '" + requestPath + "'");
+			ServletRegistrationInfo sri = (ServletRegistrationInfo) ri;
 			RequestWrapper wrappedReq = new RequestWrapper(req, matchingAlias);
 			delegateToRegisteredServlet(wrappedReq, resp, sri);
 			return true;
 		}
+
+		ResourcesRegistrationInfo rri = (ResourcesRegistrationInfo) ri;
+		return serveResource(req, resp, rri);
+	}
+
+	private boolean serveResource(HttpServletRequest req,
+			HttpServletResponse resp, ResourcesRegistrationInfo rri) throws IOException {
+		String resourcePath = resolveResourcePath(rri, req);
+		URL url = rri.getHttpContext().getResource(resourcePath);
+		if (url == null) {
+			log.debug("can't find resource for '" + resourcePath + "'");
+			return false;
+		}
+
+		String mimeType = figureMimeType(rri, resourcePath);
+		log.debug("mime type is " + mimeType);
+		resp.setContentType(mimeType);
+		
+		InputStream in = url.openStream();
+		OutputStream out = resp.getOutputStream();
+		byte[] buffer = new byte[8192];
+		int howManyBytes;
+		while (-1 != (howManyBytes = in.read(buffer)) ) {
+			out.write(buffer, 0, howManyBytes);
+		}
+
+		return true;
+	}
+
+	private String resolveResourcePath(ResourcesRegistrationInfo rri,
+			HttpServletRequest req) {
+		String alias = rri.getAlias();
+		if (alias.equals("/")) {
+			alias = "";
+		}
+		String internalName = rri.getInternalName();
+		if (internalName.equals("/")) {
+			internalName = "";
+		}
+		String uri = req.getServletPath();
+		if (req.getPathInfo() != null) {
+			uri += req.getPathInfo();
+		}
+		
+		return internalName + uri.substring(alias.length());
+	}
+
+	private String figureMimeType(ResourcesRegistrationInfo rri,
+			String resourcePath) {
+		String mimeType = rri.getHttpContext().getMimeType(resourcePath);
+		if (mimeType == null) {
+			mimeType = servletContext.getMimeType(resourcePath);
+		}
+		return mimeType;
 	}
 
 	@Override
 	public void unregister(String alias) {
 		if (servletMap.containsKey(alias)) {
 			log.debug("removing '" + alias + "' from servlet map");
-			ServletRegistrationInfo sri = servletMap.remove(alias);
-			sri.getServlet().destroy();
+			RegistrationInfo ri = servletMap.remove(alias);
+			if (ri instanceof ServletRegistrationInfo) {
+				ServletRegistrationInfo sri = (ServletRegistrationInfo) ri;
+				sri.getServlet().destroy();
+			}
 			return;
 		}
-
-		// TODO unregister a resources collection
-		log.error("VitroHttpService.unregister not implemented. alias=" + alias);
 	}
 
 	public void shutdown() {
@@ -139,9 +216,11 @@ public class VitroHttpService implements HttpService {
 			httpContext = defaultHttpContext;
 		}
 
-		for (ServletRegistrationInfo sri : servletMap.values()) {
+		for (RegistrationInfo sri : servletMap.values()) {
 			if (sri.getHttpContext().equals(httpContext)) {
-				return sri.getServletContext();
+				if (sri instanceof ServletRegistrationInfo) {
+					return ((ServletRegistrationInfo) sri).getServletContext();
+				}
 			}
 		}
 
@@ -193,4 +272,5 @@ public class VitroHttpService implements HttpService {
 			return path.substring(0, slashHere);
 		}
 	}
+
 }
