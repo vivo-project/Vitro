@@ -87,24 +87,23 @@ public class ClassGroupPageData extends DataGetterBase implements DataGetter{
                           break;
                       }                                
                   }
-                  if( group == null ){
-                      log.error("Cannot get classgroup '" + classGroupUri);
-                  }else{
-                      setAllClassCountsToZero(group);
-                  }
+                  
+                  setAllClassCountsToZero(group);
+
+                  log.debug("Retrieved class group " + group.getURI()
+                        + " and returning to template");
+                  if (log.isDebugEnabled()) {
+                      List<VClass> groupClasses = group.getVitroClassList();
+                      for (VClass v : groupClasses) {
+                        log.debug("Class " + v.getName() + " - " + v.getURI()
+                                + " has " + v.getEntityCount() + " entities");
+                      }
+                  }               
               }else{
                   log.error("classgroup " + classGroupUri + " does not exist in the system");
-              }
-              
-          }
-          log.debug("Retrieved class group " + group.getURI() + " and returning to template");  
-          //if debug enabled, print out the number of entities within each class in the class gorup
-          if(log.isDebugEnabled()){
-          	List<VClass> groupClasses = group.getVitroClassList();
-          	for(VClass v: groupClasses) {
-          		log.debug("Class " + v.getName() + " - " + v.getURI() + " has " + v.getEntityCount() + " entities");
-          	}
-          }
+              }              
+          }          
+         
           data.put("vClassGroup", group);  //may put null
           
           //This page level data getters tries to set its own template,
