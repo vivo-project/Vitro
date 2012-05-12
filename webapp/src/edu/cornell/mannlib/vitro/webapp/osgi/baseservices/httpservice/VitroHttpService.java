@@ -3,9 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.osgi.baseservices.httpservice;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -48,8 +45,8 @@ public class VitroHttpService implements HttpService {
 	private final ServletContext servletContext;
 	private final HttpContext defaultHttpContext;
 
-	/** Servlets and resource groups, mapped by their aliases. */
-	private final Map<String, RegistrationInfo> servletMap = new HashMap<String, RegistrationInfo>();
+	/** Registered servlets and resource groups, mapped by their aliases. */
+	private final Map<String, Servicer> registry = new HashMap<String, Servicer>();
 
 	public VitroHttpService(ServletContext servletContext,
 			HttpContext defaultHttpContext) {
@@ -68,39 +65,35 @@ public class VitroHttpService implements HttpService {
 	public void registerServlet(String alias, Servlet servlet,
 			Dictionary initparams, HttpContext httpContext)
 			throws ServletException, NamespaceException {
-		log.debug("registerServlet alias=" + alias + ", servlet=" + servlet
-				+ ", initparams=" + initparams + ", context=" + httpContext);
-
-		if (servletMap.containsKey(alias)) {
-			throw new NamespaceException("Alias '" + alias
-					+ "' is already registered.");
-		}
 
 		ServletContextWrapper ctxWrapper = obtainServletContextWrapper(httpContext);
-		Map<String, String> initparamsMap = toMap(initparams);
-		BasicServletConfig sc = new BasicServletConfig(ctxWrapper, alias,
-				initparamsMap);
+		Servicer servicer = new ServletServicer(alias, nonNull(httpContext),
+				servlet, initparams, ctxWrapper);
 
-		servletMap.put(alias, new ServletRegistrationInfo(alias,
-				nonNull(httpContext), servlet, sc, ctxWrapper));
+		registerServicer(servicer);
 
-		log.debug("initializing servlet at '" + alias + "'");
-		servlet.init(sc);
+		servicer.init();
 	}
 
 	@Override
 	public void registerResources(String alias, String name,
 			HttpContext httpContext) throws NamespaceException {
-		log.debug("registerResources alias=" + alias + ", name=" + name
-				+ ", httpContext=" + httpContext);
+		Servicer servicer = new ResourceGroupServicer(alias,
+				nonNull(httpContext), servletContext, name);
 
-		if (servletMap.containsKey(alias)) {
+		registerServicer(servicer);
+	}
+
+	private void registerServicer(Servicer servicer) throws NamespaceException {
+		String alias = servicer.getAlias();
+
+		if (registry.containsKey(alias)) {
 			throw new NamespaceException("Alias '" + alias
 					+ "' is already registered.");
 		}
 
-		servletMap.put(alias, new ResourcesRegistrationInfo(alias,
-				nonNull(httpContext), name));
+		log.debug("register servicer: " + servicer);
+		registry.put(alias, servicer);
 	}
 
 	private HttpContext nonNull(HttpContext httpContext) {
@@ -124,79 +117,17 @@ public class VitroHttpService implements HttpService {
 			return false;
 		}
 
-		RegistrationInfo ri = servletMap.get(matchingAlias);
-		if (ri instanceof ServletRegistrationInfo) {
-			log.debug("servicing servlet request for '" + requestPath + "'");
-			ServletRegistrationInfo sri = (ServletRegistrationInfo) ri;
-			RequestWrapper wrappedReq = new RequestWrapper(req, matchingAlias);
-			delegateToRegisteredServlet(wrappedReq, resp, sri);
-			return true;
-		}
-
-		ResourcesRegistrationInfo rri = (ResourcesRegistrationInfo) ri;
-		return serveResource(req, resp, rri);
-	}
-
-	private boolean serveResource(HttpServletRequest req,
-			HttpServletResponse resp, ResourcesRegistrationInfo rri) throws IOException {
-		String resourcePath = resolveResourcePath(rri, req);
-		URL url = rri.getHttpContext().getResource(resourcePath);
-		if (url == null) {
-			log.debug("can't find resource for '" + resourcePath + "'");
-			return false;
-		}
-
-		String mimeType = figureMimeType(rri, resourcePath);
-		log.debug("mime type is " + mimeType);
-		resp.setContentType(mimeType);
-		
-		InputStream in = url.openStream();
-		OutputStream out = resp.getOutputStream();
-		byte[] buffer = new byte[8192];
-		int howManyBytes;
-		while (-1 != (howManyBytes = in.read(buffer)) ) {
-			out.write(buffer, 0, howManyBytes);
-		}
-
+		Servicer servicer = registry.get(matchingAlias);
+		servicer.service(req, resp);
 		return true;
-	}
-
-	private String resolveResourcePath(ResourcesRegistrationInfo rri,
-			HttpServletRequest req) {
-		String alias = rri.getAlias();
-		if (alias.equals("/")) {
-			alias = "";
-		}
-		String internalName = rri.getInternalName();
-		if (internalName.equals("/")) {
-			internalName = "";
-		}
-		String uri = req.getServletPath();
-		if (req.getPathInfo() != null) {
-			uri += req.getPathInfo();
-		}
-		
-		return internalName + uri.substring(alias.length());
-	}
-
-	private String figureMimeType(ResourcesRegistrationInfo rri,
-			String resourcePath) {
-		String mimeType = rri.getHttpContext().getMimeType(resourcePath);
-		if (mimeType == null) {
-			mimeType = servletContext.getMimeType(resourcePath);
-		}
-		return mimeType;
 	}
 
 	@Override
 	public void unregister(String alias) {
-		if (servletMap.containsKey(alias)) {
+		if (registry.containsKey(alias)) {
 			log.debug("removing '" + alias + "' from servlet map");
-			RegistrationInfo ri = servletMap.remove(alias);
-			if (ri instanceof ServletRegistrationInfo) {
-				ServletRegistrationInfo sri = (ServletRegistrationInfo) ri;
-				sri.getServlet().destroy();
-			}
+			Servicer servicer = registry.remove(alias);
+			servicer.dispose();
 			return;
 		}
 	}
@@ -216,10 +147,10 @@ public class VitroHttpService implements HttpService {
 			httpContext = defaultHttpContext;
 		}
 
-		for (RegistrationInfo sri : servletMap.values()) {
+		for (Servicer sri : registry.values()) {
 			if (sri.getHttpContext().equals(httpContext)) {
-				if (sri instanceof ServletRegistrationInfo) {
-					return ((ServletRegistrationInfo) sri).getServletContext();
+				if (sri instanceof ServletServicer) {
+					return ((ServletServicer) sri).getServletContext();
 				}
 			}
 		}
@@ -227,36 +158,16 @@ public class VitroHttpService implements HttpService {
 		return new ServletContextWrapper(servletContext, httpContext);
 	}
 
-	private Map<String, String> toMap(Dictionary<String, String> initparams) {
-		Map<String, String> map = new HashMap<String, String>();
-		Enumeration<String> keys = initparams.keys();
-		while (keys.hasMoreElements()) {
-			String key = keys.nextElement();
-			String value = initparams.get(key);
-			map.put(key, value);
-		}
-		return map;
-	}
-
-	private void delegateToRegisteredServlet(HttpServletRequest req,
-			HttpServletResponse resp, ServletRegistrationInfo sri)
-			throws ServletException, IOException {
-		boolean authorized = sri.getHttpContext().handleSecurity(req, resp);
-		if (authorized) {
-			sri.getServlet().service(req, resp);
-		}
-	}
-
 	private String findMatchingAlias(String requestPath) {
 		for (String path = requestPath; !path.isEmpty(); path = removeTail(path)) {
-			if (servletMap.containsKey(path)) {
+			if (registry.containsKey(path)) {
 				log.debug("alias '" + path + "' matches requestPath '"
 						+ requestPath + "'");
 				return path;
 			}
 		}
 
-		if (servletMap.containsKey("/")) {
+		if (registry.containsKey("/")) {
 			log.debug("alias '/' matches requestPath '" + requestPath + "'");
 			return "/";
 		}

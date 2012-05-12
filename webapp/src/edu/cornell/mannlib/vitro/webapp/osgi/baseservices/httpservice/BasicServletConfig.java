@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.osgi.baseservices.httpservice;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,10 +21,10 @@ public class BasicServletConfig implements ServletConfig {
 	private final Map<String, String> initParameters;
 
 	public BasicServletConfig(ServletContext ctx, String servletName,
-			Map<String, String> initParameters) {
+			Dictionary<String, String> initParameters) {
 		this.ctx = ctx;
 		this.servletName = servletName;
-		this.initParameters = new HashMap<String, String>(initParameters);
+		this.initParameters = toMap(initParameters);
 	}
 
 	@Override
@@ -48,4 +49,20 @@ public class BasicServletConfig implements ServletConfig {
 		return servletName;
 	}
 
+	private Map<String, String> toMap(Dictionary<String, String> initparams) {
+		Map<String, String> map = new HashMap<String, String>();
+		Enumeration<String> keys = initparams.keys();
+		while (keys.hasMoreElements()) {
+			String key = keys.nextElement();
+			String value = initparams.get(key);
+			map.put(key, value);
+		}
+		return map;
+	}
+
+	@Override
+	public String toString() {
+		return "BasicServletConfig[servletName=" + servletName
+				+ ", initParameters=" + initParameters + "]";
+	}
 }
