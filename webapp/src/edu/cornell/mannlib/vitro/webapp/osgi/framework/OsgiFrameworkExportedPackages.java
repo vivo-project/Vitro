@@ -74,7 +74,8 @@ public class OsgiFrameworkExportedPackages {
 	 * TODO figure this out.
 	 */
 	private static Collection<? extends String> packageSpecsForServletApiJar() {
-		return Arrays.asList("javax.servlet;version=2.4", "javax.servlet.http;version=2.4");
+		return Arrays.asList("javax.servlet;version=2.4",
+				"javax.servlet.http;version=2.4");
 	}
 
 	/**
@@ -84,11 +85,12 @@ public class OsgiFrameworkExportedPackages {
 	 * the application. Specifically, in OsgiFrameworkLogger.
 	 * 
 	 * TODO If the OsgiFrameworkLogger did not straddle the line, then perhaps
-	 * we would not need to export these packages.
-	 * TODO But the HttpService implementation that uses osg.osgi.service.http
+	 * we would not need to export these packages. TODO But the HttpService
+	 * implementation that uses osg.osgi.service.http
 	 */
 	private static List<String> packageSpecsForOsgiCompServices() {
-		return Arrays.asList("info.dmtree;specification-version=1.0",
+		return Arrays.asList(
+				"info.dmtree;specification-version=1.0",
 				"info.dmtree.notification;version=1.0",
 				"info.dmtree.notification.spi;version=1.0",
 				"info.dmtree.registry;version=1.0",
@@ -96,8 +98,10 @@ public class OsgiFrameworkExportedPackages {
 				"info.dmtree.spi;version=1.0",
 				"org.osgi.application;version=1.0",
 				"org.osgi.service.application;version=1.0",
-				"org.osgi.service.cm;version=1.2",
-				"org.osgi.service.component;version=1.0",
+				// exported by ConfigurationAdmin bundle
+				// "org.osgi.service.cm;version=1.2",
+				// exported by Declarative Services bundle
+				// "org.osgi.service.component;version=1.0",
 				"org.osgi.service.deploymentadmin;version=1.0",
 				"org.osgi.service.deploymentadmin.spi;version=1.0",
 				"org.osgi.service.device;version=1.1",
