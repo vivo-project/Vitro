@@ -56,6 +56,12 @@ public abstract class Servicer {
 		}
 	}
 
+	/** For debugging purposes, the bundle looks like this. */
+	protected String formatBundle() {
+		return "'" + bundle.getSymbolicName() + "'[" + bundle.getBundleId()
+				+ "]";
+	}
+
 	/**
 	 * This servicer has been selected to process this HTTP request. Processing
 	 * ends here, so if it can't be processed properly, send the appropriate

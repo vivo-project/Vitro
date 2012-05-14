@@ -137,8 +137,10 @@ public class ResourceGroupServicer extends Servicer {
 		return mimeType;
 	}
 
+	@Override
 	public String toString() {
-		return "ResourceGroupServicer[alias" + getAlias() + ", internalName="
-				+ internalName + ", httpContext=" + getHttpContext() + "]";
+		return "ResourceGroupServicer[alias" + getAlias() + ", bundle="
+				+ formatBundle() + ", internalName=" + internalName
+				+ ", httpContext=" + getHttpContext() + "]";
 	}
 }

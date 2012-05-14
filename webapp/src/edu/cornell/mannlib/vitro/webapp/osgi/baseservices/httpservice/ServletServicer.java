@@ -91,9 +91,9 @@ public class ServletServicer extends Servicer {
 
 	@Override
 	public String toString() {
-		return "ServletServicer[alias=" + getAlias() + ", servlet=" + servlet
-				+ ", initparams=" + servletConfig + ", context="
-				+ getHttpContext() + "]";
+		return "ServletServicer[alias=" + getAlias() + ", bundle="
+				+ formatBundle() + ", servlet=" + servlet + ", initparams="
+				+ servletConfig + ", context=" + getHttpContext() + "]";
 	}
 
 	// ----------------------------------------------------------------------

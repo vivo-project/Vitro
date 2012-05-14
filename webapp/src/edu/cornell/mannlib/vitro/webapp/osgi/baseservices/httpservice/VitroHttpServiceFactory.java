@@ -2,45 +2,28 @@
 
 package edu.cornell.mannlib.vitro.webapp.osgi.baseservices.httpservice;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.http.HttpContext;
 
 /**
- * This creates an instance of VitroHttpService for each bundle that wants one,
+ * A factory implementation of the OSGi HttpService.
+ * 
+ * Creates an instance of VitroHttpService for each bundle that wants one,
  * and disposes of the service when it is no longer used.
  * 
- * Each instance gets its own copy of the default HttpContext, since it is
- * required to be bundle-dependent.
- * 
  * If any service instances remain at shutdown, complain.
- * 
- * TODO Figure out how collisions are handled with this structure, and whether
- * that's acceptable. If two bundles have register servlets at /foo, then we get
- * to decide which one to use by ordering the bundles by their properties. But
- * what if one bundle registers /foo and the other registers /foo/bar? Or what
- * if they both register /foo, but the URL is /foo/bar, and the first one
- * doesn't satisfy it? Need to figure out what do to in these edge cases.
- * 
- * TODO Keeping a separate registry may not work, since it means we can't tell
- * if two servlets from two different bundles are using the same HttpContext (in
- * which case they should get the same ServletContext). But is that likely?
  */
 public class VitroHttpServiceFactory implements
-		ServiceFactory<VitroHttpService>, HttpRequestHandler {
+		ServiceFactory<VitroHttpService> {
 	private static final Log log = LogFactory
 			.getLog(VitroHttpServiceFactory.class);
 
@@ -49,6 +32,8 @@ public class VitroHttpServiceFactory implements
 	 * registered servlets.
 	 */
 	private final ServletContext servletContext;
+
+	private final HttpRequestHandler httpRequestHandler;
 
 	/** Record the active service instances. */
 	private final Set<VitroHttpService> serviceInstances = Collections
@@ -59,26 +44,32 @@ public class VitroHttpServiceFactory implements
 	// ----------------------------------------------------------------------
 
 	/**
-	 * When created, register this as the HttpRequestHandler.
+	 * When created, set up an HttpRequestHandler.
 	 */
 	public VitroHttpServiceFactory(ServletContext servletContext) {
 		this.servletContext = servletContext;
-		HttpServiceFilter.setHttpRequestHandler(this);
+		this.httpRequestHandler = new HttpRequestHandler(servletContext);
+		HttpServiceFilter.setHttpRequestHandler(this.httpRequestHandler);
 	}
 
 	/**
-	 * When the system shuts down, remove this as the HttpRequestHandler. Shut
-	 * down each remaining service and complain that the client bundle hadn't
-	 * released it.
+	 * When the system shuts down, remove the HttpRequestHandler and shut it
+	 * down. Complain about any registered Servlce or ResourceGroup that had not
+	 * already been unregistered.
+	 * 
+	 * Shut down each remaining service and complain that the client bundle
+	 * hadn't released it.
 	 */
 	public void shutdown() {
 		HttpServiceFilter.setHttpRequestHandler(null);
+		this.httpRequestHandler.shutdown();
+
 		synchronized (serviceInstances) {
 			for (VitroHttpService service : serviceInstances) {
 				log.warn("Service is still active at shutdown: " + service);
-				service.shutdown();
 			}
 		}
+		serviceInstances.clear();
 	}
 
 	// ----------------------------------------------------------------------
@@ -92,9 +83,8 @@ public class VitroHttpServiceFactory implements
 	@Override
 	public VitroHttpService getService(Bundle bundle,
 			ServiceRegistration<VitroHttpService> registration) {
-		HttpContext defaultHttpContext = new DefaultHttpContext(bundle);
-		VitroHttpService service = new VitroHttpService(bundle, servletContext,
-				defaultHttpContext);
+		VitroHttpService service = new VitroHttpService(bundle,
+				httpRequestHandler, servletContext);
 		log.debug("Created a service: " + service);
 		serviceInstances.add(service);
 		return service;
@@ -109,29 +99,7 @@ public class VitroHttpServiceFactory implements
 			ServiceRegistration<VitroHttpService> registration,
 			VitroHttpService service) {
 		serviceInstances.remove(service);
-		service.shutdown();
 		log.debug("Disposed of a service: " + service);
-	}
-
-	// ----------------------------------------------------------------------
-	// Registry lifecycle
-	// ----------------------------------------------------------------------
-
-	// ----------------------------------------------------------------------
-	// Request servicing
-	// ----------------------------------------------------------------------
-
-	@Override
-	public boolean serviceRequest(HttpServletRequest req,
-			HttpServletResponse resp) throws ServletException, IOException {
-		synchronized (serviceInstances) {
-			for (VitroHttpService service : serviceInstances) {
-				if (service.serviceRequest(req, resp)) {
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 
 }
