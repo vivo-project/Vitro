@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.framework.Bundle;
 import org.osgi.service.http.HttpContext;
 
 /**
@@ -25,10 +26,11 @@ public class ServletServicer extends Servicer {
 	private final BasicServletConfig servletConfig;
 	private final ServletContextWrapper servletContext;
 
-	public ServletServicer(String alias, HttpContext httpContext,
-			Servlet servlet, Dictionary<String, String> initparams,
+	public ServletServicer(String alias, Bundle bundle,
+			HttpContext httpContext, Servlet servlet,
+			Dictionary<String, String> initparams,
 			ServletContextWrapper servletContext) {
-		super(alias, httpContext);
+		super(alias, bundle, httpContext);
 
 		this.servlet = servlet;
 		this.servletConfig = new BasicServletConfig(servletContext, alias,

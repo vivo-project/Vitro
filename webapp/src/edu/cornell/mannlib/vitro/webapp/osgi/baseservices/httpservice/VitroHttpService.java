@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.osgi.baseservices.httpservice;
 
 import java.io.IOException;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.framework.Bundle;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
@@ -42,14 +42,16 @@ import org.osgi.service.http.NamespaceException;
 public class VitroHttpService implements HttpService {
 	private static final Log log = LogFactory.getLog(VitroHttpService.class);
 
+	private final Bundle bundle;
 	private final ServletContext servletContext;
 	private final HttpContext defaultHttpContext;
 
 	/** Registered servlets and resource groups, mapped by their aliases. */
 	private final Map<String, Servicer> registry = new HashMap<String, Servicer>();
 
-	public VitroHttpService(ServletContext servletContext,
+	public VitroHttpService(Bundle bundle, ServletContext servletContext,
 			HttpContext defaultHttpContext) {
+		this.bundle = bundle;
 		this.servletContext = servletContext;
 		this.defaultHttpContext = defaultHttpContext;
 	}
@@ -67,8 +69,8 @@ public class VitroHttpService implements HttpService {
 			throws ServletException, NamespaceException {
 
 		ServletContextWrapper ctxWrapper = obtainServletContextWrapper(httpContext);
-		Servicer servicer = new ServletServicer(alias, nonNull(httpContext),
-				servlet, initparams, ctxWrapper);
+		Servicer servicer = new ServletServicer(alias, bundle,
+				nonNull(httpContext), servlet, initparams, ctxWrapper);
 
 		registerServicer(servicer);
 
@@ -78,7 +80,7 @@ public class VitroHttpService implements HttpService {
 	@Override
 	public void registerResources(String alias, String name,
 			HttpContext httpContext) throws NamespaceException {
-		Servicer servicer = new ResourceGroupServicer(alias,
+		Servicer servicer = new ResourceGroupServicer(alias, bundle,
 				nonNull(httpContext), servletContext, name);
 
 		registerServicer(servicer);
@@ -184,4 +186,9 @@ public class VitroHttpService implements HttpService {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "VitroHttpService[" + bundle.getSymbolicName() + " - ["
+				+ bundle.getBundleId() + "]]";
+	}
 }

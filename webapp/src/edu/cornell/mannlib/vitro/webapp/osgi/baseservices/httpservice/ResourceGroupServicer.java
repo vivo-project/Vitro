@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.framework.Bundle;
 import org.osgi.service.http.HttpContext;
 
 /**
@@ -26,9 +27,10 @@ public class ResourceGroupServicer extends Servicer {
 	private final ServletContext servletContext;
 	private final String internalName;
 
-	public ResourceGroupServicer(String alias, HttpContext httpContext,
-			ServletContext servletContext, String internalName) {
-		super(alias, httpContext);
+	public ResourceGroupServicer(String alias, Bundle bundle,
+			HttpContext httpContext, ServletContext servletContext,
+			String internalName) {
+		super(alias, bundle, httpContext);
 		this.servletContext = servletContext;
 		this.internalName = internalName;
 	}

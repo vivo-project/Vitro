@@ -3,8 +3,9 @@
 package edu.cornell.mannlib.vitro.webapp.osgi.baseservices.httpservice;
 
 import java.io.IOException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -43,73 +44,94 @@ public class VitroHttpServiceFactory implements
 	private static final Log log = LogFactory
 			.getLog(VitroHttpServiceFactory.class);
 
+	/**
+	 * The servlet context from Tomcat. This will be partially revealed to the
+	 * registered servlets.
+	 */
 	private final ServletContext servletContext;
 
-	private final ConcurrentMap<Long, VitroHttpService> serviceInstances = new ConcurrentHashMap<Long, VitroHttpService>();
+	/** Record the active service instances. */
+	private final Set<VitroHttpService> serviceInstances = Collections
+			.synchronizedSet(new HashSet<VitroHttpService>());
 
+	// ----------------------------------------------------------------------
+	// Factory lifecycle
+	// ----------------------------------------------------------------------
+
+	/**
+	 * When created, register this as the HttpRequestHandler.
+	 */
 	public VitroHttpServiceFactory(ServletContext servletContext) {
 		this.servletContext = servletContext;
 		HttpServiceFilter.setHttpRequestHandler(this);
 	}
 
+	/**
+	 * When the system shuts down, remove this as the HttpRequestHandler. Shut
+	 * down each remaining service and complain that the client bundle hadn't
+	 * released it.
+	 */
+	public void shutdown() {
+		HttpServiceFilter.setHttpRequestHandler(null);
+		synchronized (serviceInstances) {
+			for (VitroHttpService service : serviceInstances) {
+				log.warn("Service is still active at shutdown: " + service);
+				service.shutdown();
+			}
+		}
+	}
+
+	// ----------------------------------------------------------------------
+	// Service lifecycle
+	// ----------------------------------------------------------------------
+
+	/**
+	 * The first time a bundle requests the service, create a service instance
+	 * and remember it.
+	 */
 	@Override
 	public VitroHttpService getService(Bundle bundle,
 			ServiceRegistration<VitroHttpService> registration) {
-		log.debug("Creating an HttpService instance for bundle "
-				+ bundle.getSymbolicName());
 		HttpContext defaultHttpContext = new DefaultHttpContext(bundle);
-		VitroHttpService service = new VitroHttpService(servletContext,
+		VitroHttpService service = new VitroHttpService(bundle, servletContext,
 				defaultHttpContext);
-		serviceInstances.put(bundle.getBundleId(), service);
+		log.debug("Created a service: " + service);
+		serviceInstances.add(service);
 		return service;
 	}
 
+	/**
+	 * When a client bundle stops, or releases the service, shut down the
+	 * service and forget about it.
+	 */
 	@Override
 	public void ungetService(Bundle bundle,
 			ServiceRegistration<VitroHttpService> registration,
 			VitroHttpService service) {
-		Long bundleId = bundle.getBundleId();
-		if (!serviceInstances.containsKey(bundleId)) {
-			log.warn("Ungetting a service that is not active. Bundle is "
-					+ bundle.getSymbolicName());
-			return;
-		}
-
-		VitroHttpService storedService = serviceInstances.get(bundleId);
-		if (!storedService.equals(service)) {
-			log.warn("Bundle is trying to unget a service that it didn't "
-					+ "get initially. Bundle is " + bundle.getSymbolicName());
-			return;
-		}
-
-		log.debug("Disposing of the HttpService instance for bundle "
-				+ bundle.getSymbolicName());
-		serviceInstances.remove(bundleId);
+		serviceInstances.remove(service);
 		service.shutdown();
+		log.debug("Disposed of a service: " + service);
 	}
+
+	// ----------------------------------------------------------------------
+	// Registry lifecycle
+	// ----------------------------------------------------------------------
+
+	// ----------------------------------------------------------------------
+	// Request servicing
+	// ----------------------------------------------------------------------
 
 	@Override
 	public boolean serviceRequest(HttpServletRequest req,
 			HttpServletResponse resp) throws ServletException, IOException {
 		synchronized (serviceInstances) {
-			for (VitroHttpService service : serviceInstances.values()) {
+			for (VitroHttpService service : serviceInstances) {
 				if (service.serviceRequest(req, resp)) {
 					return true;
 				}
 			}
 		}
 		return false;
-	}
-
-	public void shutdown() {
-		synchronized (serviceInstances) {
-			for (Long bundleId : serviceInstances.keySet()) {
-				log.warn("Service is still active at shutdown for bundle"
-						+ bundleId);
-				VitroHttpService service = serviceInstances.get(bundleId);
-				service.shutdown();
-			}
-		}
 	}
 
 }

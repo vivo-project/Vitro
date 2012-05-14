@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.osgi.framework.Bundle;
 import org.osgi.service.http.HttpContext;
 
 /**
@@ -16,21 +17,30 @@ import org.osgi.service.http.HttpContext;
  */
 public abstract class Servicer {
 	private final String alias;
+	private final Bundle bundle;
 	private final HttpContext httpContext;
 
-	public Servicer(String alias, HttpContext httpContext) {
+	public Servicer(String alias, Bundle bundle, HttpContext httpContext) {
 		if (alias == null) {
 			throw new NullPointerException("alias may not be null.");
+		}
+		if (bundle == null) {
+			throw new NullPointerException("bundle may not be null.");
 		}
 		if (httpContext == null) {
 			throw new NullPointerException("httpContext may not be null.");
 		}
 		this.alias = alias;
+		this.bundle = bundle;
 		this.httpContext = httpContext;
 	}
 
 	public String getAlias() {
 		return alias;
+	}
+
+	public Bundle getBundle() {
+		return bundle;
 	}
 
 	public HttpContext getHttpContext() {
