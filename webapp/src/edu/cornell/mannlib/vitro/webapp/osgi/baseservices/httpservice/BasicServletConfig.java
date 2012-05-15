@@ -51,11 +51,13 @@ public class BasicServletConfig implements ServletConfig {
 
 	private Map<String, String> toMap(Dictionary<String, String> initparams) {
 		Map<String, String> map = new HashMap<String, String>();
-		Enumeration<String> keys = initparams.keys();
-		while (keys.hasMoreElements()) {
-			String key = keys.nextElement();
-			String value = initparams.get(key);
-			map.put(key, value);
+		if (initparams != null) {
+			Enumeration<String> keys = initparams.keys();
+			while (keys.hasMoreElements()) {
+				String key = keys.nextElement();
+				String value = initparams.get(key);
+				map.put(key, value);
+			}
 		}
 		return map;
 	}
