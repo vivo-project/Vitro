@@ -1,0 +1,7 @@
+Private-Package: edu.cornell.mannlib.vitro.bundles.experiment.bundle
+Bundle-Activator: edu.cornell.mannlib.vitro.bundles.experiment.bundle.ExperimentActivator
+Service-Component: *
+Import-Package: org.apache.commons.logging,\
+	org.osgi.framework,\
+	*,\
+	org.osgi.service.component;version=1.1.0
