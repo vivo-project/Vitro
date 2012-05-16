@@ -1,0 +1,19 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+.pageContent {"background-color":"","padding-left":"","padding-top":"","border-width":"","border-style":"","border-color":"#ccc"}
+
+.pageContentContainer {background-color:#f5f5f5;border-color:#ccc;border-width:1px;border-style:solid;margin-bottom:4px;}
+
+.pageContentTypeLabel {padding-left:6px;}
+
+.pageContentWrapper {background-color:#f9f9f9;padding-left:6px;padding-top:2px;border-top-width:1px;border-style:solid;border-color:#ccc;}
+
+.pageContentExpand {float:right;padding-right:5px;}
+
+.arrow {
+	width:13px; height:9px; display:block;
+}
+.expandArrow {background-image:url(../../images/individual/arrow-down.gif);}
+.collapseArrow {background-image:url(../../images/individual/arrow-up.gif);}
+
+.deleteButton{margin-bottom:5px;}
