@@ -62,6 +62,7 @@
 
 	<path id="bundle.compile.classpath">
 		<pathelement location="${war.classes.dir}" />
+		<fileset dir="${appbase.dir}/bundles/framework" includes="*.jar" />
 		<path refid="compile.classpath" />
 	</path>
 
@@ -183,9 +184,11 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 
 				<!-- copy the framework bundles into the war directory -->
 				<include name="bundles/framework/*" />
+				<!-- copy any service configuration files into the war directory -->
+				<include name="bundles/configuration/*" />
 			</fileset>
 		</copy>
-
+		
 		<!-- use the production Log4J properties, unless a debug version exists. -->
 		<available file="${appbase.dir}/config/debug.log4j.properties" property="debug.log4j.exists" />
 		<copy tofile="${war.classes.dir}/log4j.properties" filtering="true" overwrite="true">

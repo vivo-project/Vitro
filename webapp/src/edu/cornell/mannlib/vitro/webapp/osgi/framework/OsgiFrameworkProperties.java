@@ -121,10 +121,12 @@ public class OsgiFrameworkProperties {
 
 		/*
 		 * This is where to find the bundles that we consider to be part of the
-		 * application.
+		 * application. Also properties files for configurable services.
 		 */
 		map.put("felix.fileinstall.dir",
-				figurePathWithinWebapp(OsgiFramework.APPLICATION_BUNDLES_DIR));
+				figurePathWithinWebapp(OsgiFramework.APPLICATION_BUNDLES_DIR)
+						+ ","
+						+ figurePathWithinWebapp(OsgiFramework.SERVICE_CONFIGURATIONS_DIR));
 
 		/*
 		 * Use the same cache directory that the framework uses.

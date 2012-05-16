@@ -43,6 +43,12 @@ public class OsgiFramework {
 	 */
 	public static final String APPLICATION_BUNDLES_DIR = "WEB-INF/bundles/application";
 
+	/**
+	 * The directory that contains the "service configuration files". These are
+	 * properties files to be applied to the services in the application.
+	 */
+	public static final String SERVICE_CONFIGURATIONS_DIR = "WEB-INF/bundles/configuration";
+
 	public static OsgiFramework getFramework(ServletContext ctx) {
 		Object o = ctx.getAttribute(ATTRIBUTE_NAME);
 		if (o instanceof OsgiFramework) {
