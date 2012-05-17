@@ -69,9 +69,7 @@ public class OsgiFrameworkExportedPackages {
 	}
 
 	/**
-	 * Do we really need to export the packages from servlet-api.jar?
-	 * 
-	 * TODO figure this out.
+	 * These must be available for clients that use the HttpService.
 	 */
 	private static Collection<? extends String> packageSpecsForServletApiJar() {
 		return Arrays.asList("javax.servlet;version=2.4",
