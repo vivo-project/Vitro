@@ -16,7 +16,7 @@ import org.apache.felix.main.AutoProcessor;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 
-import edu.cornell.mannlib.vitro.webapp.osgi.baseservices.OsgiFrameworkLogger;
+import edu.cornell.mannlib.vitro.webapp.osgi.baseservices.logservice.OsgiFrameworkLogger;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
@@ -73,7 +73,7 @@ public class OsgiFramework {
 		this.propertyMap = props.getPropertyMap();
 
 		this.felix = new Felix(propertyMap);
-		log.debug("Created the Felix framework.");
+		log.info("Created the Felix framework.");
 
 		this.moduleProxyFactory = new OsgiModuleProxyFactory();
 		this.serviceHelper = new OsgiFrameworkServiceHelper(this.felix);
@@ -85,7 +85,7 @@ public class OsgiFramework {
 		 */
 		felix.init();
 		BundleContext bundleContext = felix.getBundleContext();
-		log.debug("Initialized the Felix framework.");
+		log.info("Initialized the Felix framework.");
 
 		/*
 		 * Log all framework events (if enabled);
@@ -96,7 +96,7 @@ public class OsgiFramework {
 		 * Start the framework.
 		 */
 		felix.start();
-		log.debug("Started the Felix framework.");
+		log.info("Started the Felix framework.");
 
 		/*
 		 * Install and start all of the bundles from FRAMEWORK_BUNDLES_DIR:
@@ -123,7 +123,7 @@ public class OsgiFramework {
 			log.debug("Stopping Felix framework.");
 			felix.stop();
 			felix.waitForStop(0);
-			log.debug("Stopped the Felix framework.");
+			log.info("Stopped the Felix framework.");
 		} catch (InterruptedException e) {
 			log.warn("Interrupted while stopping the Felix framework", e);
 		}

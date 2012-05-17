@@ -3,7 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.osgi.framework;
 
 import java.io.File;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +16,8 @@ import org.apache.felix.main.AutoProcessor;
 import org.osgi.framework.Constants;
 
 import edu.cornell.mannlib.vitro.webapp.osgi.baseservices.BaseServicesActivator;
-import edu.cornell.mannlib.vitro.webapp.osgi.baseservices.OsgiFrameworkLogger;
+import edu.cornell.mannlib.vitro.webapp.osgi.baseservices.logservice.OsgiFrameworkLogger;
+import edu.cornell.mannlib.vitro.webapp.osgi.baseservices.logservice.VitroLogServiceFactory;
 
 /**
  * Create the properties map that will control the framework.
@@ -73,13 +74,13 @@ public class OsgiFrameworkProperties {
 		 * Set up the logger for the Felix framework.
 		 */
 		map.put(FelixConstants.LOG_LOGGER_PROP, logger);
-		map.put(FelixConstants.LOG_LEVEL_PROP, logger.osgiLogLevelString());
+		map.put(FelixConstants.LOG_LEVEL_PROP, figureLogLevelForBundle(""));
 
 		/*
 		 * Publish the base services so the bundles can use them.
 		 */
-		map.put(FelixConstants.SYSTEMBUNDLE_ACTIVATORS_PROP, Arrays.asList(
-				logger.getActivator(), new BaseServicesActivator(ctx)));
+		map.put(FelixConstants.SYSTEMBUNDLE_ACTIVATORS_PROP,
+				Collections.singletonList(new BaseServicesActivator(ctx)));
 
 		return map;
 	}
@@ -108,10 +109,10 @@ public class OsgiFrameworkProperties {
 		Map<String, Object> map = new HashMap<String, Object>();
 
 		/**
-		 * The ServiceComponentRuntime bundle will use the same logger that the
-		 * framework uses, so set the same logging level.
+		 * Set the logging level of the ServiceComponentRuntime bundle to the
+		 * value found for OsgiFramework_scr in log4j.properties.
 		 */
-		map.put("ds.loglevel", logger.osgiLogLevelString());
+		map.put("ds.loglevel", figureLogLevelForBundle("scr"));
 
 		return map;
 	}
@@ -134,10 +135,11 @@ public class OsgiFrameworkProperties {
 		map.put("felix.fileinstall.tmpdir", figureCacheDirPath());
 
 		/**
-		 * The FileInstall bundle will use the same logger that the framework
-		 * uses, so set the same logging level.
+		 * Set the logging level of the FileInstall bundle to the value found
+		 * for OsgiFramework_fileinstall in log4j.properties.
 		 */
-		map.put("felix.fileinstall.log.level", logger.osgiLogLevelString());
+		map.put("felix.fileinstall.log.level",
+				figureLogLevelForBundle("fileinstall"));
 
 		/*
 		 * Poll every 10 seconds (in millis).
@@ -182,6 +184,13 @@ public class OsgiFrameworkProperties {
 	private String figurePathWithinWebapp(String path) {
 		File webappBaseDir = new File(ctx.getRealPath("/"));
 		return new File(webappBaseDir, path).getPath();
+	}
+
+	private String figureLogLevelForBundle(String bundleSuffix) {
+		String bundleLogname = VitroLogServiceFactory
+				.getLognameForSuffix(bundleSuffix);
+		Log bundleLog = LogFactory.getLog(bundleLogname);
+		return VitroLogServiceFactory.getOsgiLogLevelString(bundleLog);
 	}
 
 }

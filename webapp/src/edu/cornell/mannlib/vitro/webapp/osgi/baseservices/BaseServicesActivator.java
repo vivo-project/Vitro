@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.osgi.baseservices;
 
-import java.util.Dictionary;
-
 import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
@@ -12,11 +10,13 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.http.HttpService;
+import org.osgi.service.log.LogService;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationPropertiesImpl;
 import edu.cornell.mannlib.vitro.webapp.modules.interfaces.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.modules.interfaces.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.osgi.baseservices.httpservice.VitroHttpServiceFactory;
+import edu.cornell.mannlib.vitro.webapp.osgi.baseservices.logservice.VitroLogServiceFactory;
 
 /**
  * When the OSGi framework starts, register some expected services. When it
@@ -28,11 +28,13 @@ public class BaseServicesActivator implements BundleActivator {
 
 	private final ServletContext ctx;
 
-	private ServiceRegistration<ConfigurationProperties> cpsr;
-	private ServiceRegistration<StartupStatus> sssr;
+	private ServiceRegistration<?> logSr;
+
+	private ServiceRegistration<ConfigurationProperties> configSr;
+	private ServiceRegistration<StartupStatus> startupSr;
 
 	private VitroHttpServiceFactory httpFactory;
-	private ServiceRegistration<?> hssr;
+	private ServiceRegistration<?> httpSr;
 
 	public BaseServicesActivator(ServletContext ctx) {
 		this.ctx = ctx;
@@ -40,38 +42,47 @@ public class BaseServicesActivator implements BundleActivator {
 
 	@Override
 	public void start(BundleContext bundleContext) throws Exception {
+		/* LogService */
+		VitroLogServiceFactory logFactory = new VitroLogServiceFactory();
+		log.debug("Register the LogServiceFactory");
+		logSr = bundleContext.registerService(LogService.class.getName(),
+				logFactory, null);
+
 		/* ConfigurationProperties */
 		edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties cp = edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties
 				.getBean(ctx);
 		ConfigurationPropertiesImpl cpi = (ConfigurationPropertiesImpl) cp;
 		log.debug("Register the ConfigurationProperties");
-		cpsr = bundleContext.registerService(ConfigurationProperties.class,
+		configSr = bundleContext.registerService(ConfigurationProperties.class,
 				cpi, null);
 
 		/* StartupStatus */
 		StartupStatus ss = edu.cornell.mannlib.vitro.webapp.startup.StartupStatus
 				.getBean(ctx);
 		log.debug("Register the StartupStatus");
-		sssr = bundleContext.registerService(StartupStatus.class, ss, null);
+		startupSr = bundleContext.registerService(StartupStatus.class, ss, null);
 
 		/* HttpService */
 		httpFactory = new VitroHttpServiceFactory(ctx);
 		log.debug("Register the HttpServiceFactory");
-		hssr = bundleContext.registerService(HttpService.class.getName(),
+		httpSr = bundleContext.registerService(HttpService.class.getName(),
 				httpFactory, null);
 	}
 
 	@Override
 	public void stop(BundleContext bundleContext) throws Exception {
-		log.debug("Unregister the HttpServiceFacade");
+		log.debug("Unregister the VitroHttpServiceFactory");
 		httpFactory.shutdown();
-		hssr.unregister();
+		httpSr.unregister();
 
 		log.debug("Unregister the StartupStatus");
-		sssr.unregister();
+		startupSr.unregister();
 
 		log.debug("Unregister the ConfigurationProperties");
-		cpsr.unregister();
+		configSr.unregister();
+
+		log.debug("Unregister the VitroLogServiceFactory");
+		logSr.unregister();
 	}
 
 }
