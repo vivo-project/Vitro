@@ -438,7 +438,14 @@ public class EditConfigurationVTwo {
     public void setN3Required(String ... n3RequiredStrs){
         this.n3Required = Arrays.asList( n3RequiredStrs );        
     }
+    //these methods allow strings to be added to the n3 required list and not just for the list to be set
+    public void addN3Required(List<String> n3Required) {
+    	this.n3Required.addAll(n3Required);
+    }
     
+    public void addN3Required(String ... n3RequiredStrs) {
+    	 this.n3Required.addAll(Arrays.asList( n3RequiredStrs ));  
+    }
      /** return a copy of the value so that the configuration is not modified by external code.
      * @return
      */
@@ -452,6 +459,14 @@ public class EditConfigurationVTwo {
 
     public void setN3Optional(String ... n3Strs){
         this.n3Optional = Arrays.asList( n3Strs );        
+    }
+    
+    public void addN3Optional(List<String> n3Optional) {
+        this.n3Optional.addAll(n3Optional);
+    }
+
+    public void addN3Optional(String ... n3Strs){
+        this.n3Optional.addAll(Arrays.asList( n3Strs ));        
     }
 
     
@@ -508,7 +523,14 @@ public class EditConfigurationVTwo {
     public void setLiteralsOnForm(String ... strs){
         this.literalsOnForm = Arrays.asList( strs );        
     }
-
+    
+    public void addLiteralsOnForm(List<String> literalsOnForm) {
+    	this.literalsOnForm.addAll(literalsOnForm);
+    }
+    
+    public void addLiteralsOnForm(String ... strs){
+        this.literalsOnForm.addAll(Arrays.asList( strs ));        
+    }
     
     public Map<String, List<String>> getUrisInScope() {
         return urisInScope;
