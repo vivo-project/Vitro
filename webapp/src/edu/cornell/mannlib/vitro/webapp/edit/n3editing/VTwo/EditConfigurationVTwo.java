@@ -503,6 +503,15 @@ public class EditConfigurationVTwo {
     public void setUrisOnForm(String ... strs){
         this.urisOnform = Arrays.asList( strs );        
     }
+    //This doesn't overwrite or set but adds to existing list
+    public void addUrisOnForm(List<String> urisOnform) {
+        this.urisOnform.addAll(urisOnform);
+    }
+
+    public void addUrisOnForm(String ... strs){
+        this.urisOnform.addAll(Arrays.asList( strs ));        
+    }
+    
     
     public void setFilesOnForm(List<String> filesOnForm){
         this.filesOnForm = filesOnForm;
@@ -1089,6 +1098,16 @@ public class EditConfigurationVTwo {
         fields.put( field.getName(), field);                
     }
 
+    public void addFields(List<FieldVTwo> fields) {
+    	if( fields != null ) 
+	    {    	
+    		for(FieldVTwo f: fields) {
+	    		this.addField(f);
+	    	}
+    	}
+    	
+    }
+    
     @Override
     public String toString(){        
         return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);        

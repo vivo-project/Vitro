@@ -58,26 +58,37 @@ public class ProcessSparqlDataGetterN3 implements ProcessDataGetterN3 {
      */
     public List<String> retrieveLiteralsOnForm(int counter) {
     	List<String> literalsOnForm = new ArrayList<String>();
-    	literalsOnForm.add("saveToVar" + counter);
-    	literalsOnForm.add("query" + counter);
+    	literalsOnForm.add(getVarName("saveToVar",counter));
+    	literalsOnForm.add(getVarName("query", counter));
     	return literalsOnForm;
     	
     }
     
      
-    public List<String> retrieveUrissOnForm(int counter) {
+    public List<String> retrieveUrisOnForm(int counter) {
     	List<String> urisOnForm = new ArrayList<String>();
     	//We have no uris as far as I know.. well query Model is a uri
-    	urisOnForm.add("queryModel" + counter);
+    	urisOnForm.add(getVarName("queryModel", counter));
     	return urisOnForm;
     	
     }
     
    public List<FieldVTwo> retrieveFields(int counter) {
 	   List<FieldVTwo> fields = new ArrayList<FieldVTwo>();
-	   fields.add(new FieldVTwo().setName("queryModel" + counter));
-	   fields.add(new FieldVTwo().setName("saveToVar" + counter));
-	   fields.add(new FieldVTwo().setName("query" + counter));
+	   
+	   //An alternative way of doing this 
+	   /*
+	   List<String> allFieldsBase = new ArrayList<String>();
+	   allFieldsBase.addAll(getLiteralVarNamesBase());
+	   allFieldsBase.addAll(getUriVarNamesBase());
+	   
+	   for(String varName: allFieldsBase) {
+		   fields.add(new FieldVTwo().setName(getVarName(varName, counter)));
+	   } */
+	   
+	   fields.add(new FieldVTwo().setName(getVarName("queryModel", counter)));
+	   fields.add(new FieldVTwo().setName(getVarName("saveToVar", counter)));
+	   fields.add(new FieldVTwo().setName(getVarName("query", counter)));
 
 	   return fields;
    }
@@ -90,6 +101,9 @@ public class ProcessSparqlDataGetterN3 implements ProcessDataGetterN3 {
 	   return Arrays.asList("queryModel");   
    }
 
+   public String getVarName(String base, int counter) {
+	   return base + counter;
+   }
    
 
 }

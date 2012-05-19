@@ -16,6 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.ManagePagePreprocessor;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.menuManagement.MenuManagementDataUtils;
 
@@ -59,6 +60,8 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
        
         //Adding additional data, specifically edit mode
         addFormSpecificData(conf, vreq);
+        //Add preprocessor
+        conf.addEditSubmissionPreprocessor(new ManagePagePreprocessor(conf));
         //Prepare
         prepare(vreq, conf);
         

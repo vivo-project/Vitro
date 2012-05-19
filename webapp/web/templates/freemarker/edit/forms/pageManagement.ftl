@@ -31,6 +31,11 @@
 
 <#--class group section has associated page uri, but that depends on editing a current page or if one is selected later-->
 <section id="pageDetails">
+    <#--form method="POST" action="${formUrls}" role="${menuAction} menu item"-->
+	<form method="POST" action="/editRequestDispatch" role="add page">
+	        <input type="hidden" name="switchToDisplayModel" id="switchToDisplayModel" value="1" role="input" />
+	        <input type="hidden" id="editKey" name="editKey" value="${editKey}" />
+	
     <h2>Add Page</h2>
     <section id="floatRight" style="margin-top:0px;float:right;background-color:#fff;width:580px;margin-right:-4px">
         <div id="rightSide">
@@ -47,8 +52,11 @@
             <section id="contentDivs"></section>
             <section id="headerBar" style="background-color:#f5f5f5;border-color:#ccc;border-width:1px;border-style:solid;border-bottom-width:0px;padding-left:6px">
             </section>
+            
             <section id="classGroup" style="background-color:#f9f9f9;padding-left:6px;padding-top:2px;border-width:1px;border-style:solid;border-color:#ccc;">
+                       
                 <section id="selectContentType" name="selectContentType" ${selectClassGroupStyle} role="region">     
+                    
                     <label for="selectClassGroup">Class Group<span class="requiredHint"> *</span></label>
                     <select name="selectClassGroup" id="selectClassGroup" role="combobox">
                         <option value="-1" role="option">Select one</option>
@@ -57,6 +65,8 @@
                         </#list>
                     </select>
                 </section>
+                
+                
                 <section id="classesInSelectedGroup" name="classesInSelectedGroup" ${existingClassGroupStyle}>
                     <#-- Select classes in a class group -->    
                     <p id="selectClassesMessage" name="selectClassesMessage">Select content to display<span class="requiredHint"> *</span></p>
@@ -129,7 +139,12 @@
         <br />
         <p class="requiredHint">* required fields</p>
     </section>
+    <!--Hidden input with JSON objects added will be included here-->
+    <div id="pageContentSubmissionInputs" style="display:none"></div>
+    </form>
 </section>
+
+<!-
 
 <!--Hardcoding for now but should be retrieved from generator-->
 <script type="text/javascript">

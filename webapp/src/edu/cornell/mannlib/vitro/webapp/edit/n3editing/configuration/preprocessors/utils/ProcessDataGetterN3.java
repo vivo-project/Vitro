@@ -15,9 +15,10 @@ public interface ProcessDataGetterN3 {
     public List<String >retrieveLiteralsOnForm(int counter);
     
      
-    public List<String> retrieveUrissOnForm(int counter);
+    public List<String> retrieveUrisOnForm(int counter);
     public List<FieldVTwo> retrieveFields(int counter);
     public List<String> getLiteralVarNamesBase();
     public List<String> getUriVarNamesBase();
+    public String getVarName(String base, int counter);
 
 }

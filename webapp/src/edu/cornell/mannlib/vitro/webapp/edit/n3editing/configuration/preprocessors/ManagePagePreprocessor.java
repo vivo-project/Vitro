@@ -114,6 +114,27 @@ public class ManagePagePreprocessor extends
 	private void addInputsToSubmission(ProcessDataGetterN3 pn, int counter, JSONObject jsonObject) {
 		 List<String> literalLabels = pn.getLiteralVarNamesBase();
 		 List<String> uriLabels = pn.getUriVarNamesBase();
+		 
+		 for(String literalLabel:literalLabels) {
+			 //TODO: Deal with multiple submission values
+			 //This retrieves the value for this particular json object
+			 String literalValue = jsonObject.getString(literalLabel);
+			 //Var names will depend on which data getter object this is on the page, so depends on counter
+			 String submissionLiteralName = pn.getVarName(literalLabel, counter);
+			 //This adds literal, connecting the field with 
+			 submission.addLiteralToForm(editConfiguration, editConfiguration.getField(submissionLiteralName), submissionLiteralName, new String[]{literalValue});
+		 }
+		 
+		 for(String uriLabel:uriLabels) {
+			 //TODO: Deal with multiple submission values
+			 //This retrieves the value for this particular json object
+			 String uriValue = jsonObject.getString(uriLabel);
+			 //Var names will depend on which data getter object this is on the page, so depends on counter
+			 String submissionUriName = pn.getVarName(uriLabel, counter);
+			 //This adds literal, connecting the field with 
+			 submission.addLiteralToForm(editConfiguration, editConfiguration.getField(submissionUriName), submissionUriName, new String[]{uriValue});
+			 
+		 }
 		 //this needs to be different
 		 //Get the literals directly from the processor - which you can get based on counter
 		 //Problem then is we know what the connection is - some way to put that logic within the processor itself?
@@ -150,7 +171,8 @@ public class ManagePagePreprocessor extends
 
 
 	private void addFields(ProcessDataGetterN3 pn, int counter) {
-		
+		List<FieldVTwo> fields = pn.retrieveFields(counter);
+		editConfiguration.addFields(fields);
 	}
 	
 	
@@ -158,7 +180,10 @@ public class ManagePagePreprocessor extends
 	//original literals on form: label, uris on form: conceptNode and conceptSource
 	//This will overwrite the original values in the edit configuration
 	private void addLiteralsAndUrisOnForm(ProcessDataGetterN3 pn, int counter) {
-		
+		List<String> literalsOnForm = pn.retrieveLiteralsOnForm(counter);
+		editConfiguration.addLiteralsOnForm(literalsOnForm);
+		List<String> urisOnForm = pn.retrieveUrisOnForm(counter);
+		editConfiguration.addUrisOnForm(urisOnForm);
 	}
 
 	// N3 being reproduced
@@ -200,6 +225,8 @@ public class ManagePagePreprocessor extends
 	//Each JSON Object will indicate the type of the data getter within it
 	private String getDataGetterClass(JSONObject jsonObject) {
 		return jsonObject.getString("dataGetterClass");
+		
+		
 	}
 	
 	
