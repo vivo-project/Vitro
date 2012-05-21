@@ -5,6 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice.impl;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -31,6 +33,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
@@ -48,6 +51,7 @@ public class RDFServiceImpl implements RDFService {
 	private static final Log log = LogFactory.getLog(RDFServiceImpl.class);
 	private String endpointURI;
 	private Repository repository;
+	private HashSet<ChangeListener> registeredListeners;
 	
     /**
      * Returns an RDFService for a remote repository 
@@ -56,13 +60,14 @@ public class RDFServiceImpl implements RDFService {
     public RDFServiceImpl(String endpointURI) {
         this.endpointURI = endpointURI;
         this.repository = new HTTPRepository(endpointURI);
+        this.registeredListeners = new HashSet<ChangeListener>();
     }
     	
 	/**
 	 * Perform a series of additions to and or removals from specified graphs
 	 * in the RDF store.  preConditionSparql will be executed against the 
 	 * union of all the graphs in the knowledge base before any updates are made. 
-	 * If the precondition query returns a non-empty result, no updates
+	 * If the precondition query returns a non-empty result no updates
 	 * will be made. 
 	 * 
 	 * @param ChangeSet - a set of changes to be performed on the RDF store.
@@ -105,7 +110,8 @@ public class RDFServiceImpl implements RDFService {
 	@Override
 	public void newIndividual(String individualURI, 
 			                  String individualTypeURI) throws RDFServiceException {
-		
+	
+       newIndividual(individualURI, individualTypeURI, null);
 	}
 
 	/**
@@ -121,7 +127,26 @@ public class RDFServiceImpl implements RDFService {
 	public void newIndividual(String individualURI, 
 			                  String individualTypeURI, 
 			                  String graphURI) throws RDFServiceException {
-		
+	
+	   StringBuffer containsQuery = new StringBuffer("ASK { \n");
+       if (graphURI != null) {
+           containsQuery.append("  GRAPH <" + graphURI + "> { ");
+       }
+	   containsQuery.append("<");	
+	   containsQuery.append(individualURI);
+	   containsQuery.append("> ");	
+	   containsQuery.append("?p ?o");
+       if (graphURI != null) {
+           containsQuery.append(" } \n");
+       }
+       containsQuery.append("\n}");
+	   
+       if (sparqlAskQuery(containsQuery.toString())) {
+    	    throw new RDFServiceException("individual already exists");
+       } else {
+    	    Triple triple = new Triple(Node.createURI(individualURI), RDF.type.asNode(), Node.createURI(individualTypeURI));
+    	    addTriple(triple, graphURI); 
+       }	
 	}
 	
 	/**
@@ -188,12 +213,13 @@ public class RDFServiceImpl implements RDFService {
 	 * an embedded graph identifier.
 	 * 
 	 * @param String query - the SPARQL query to be executed against the RDF store
+	 * @param RDFService.ResultFormat resultFormat - format for the result of the Select query
 	 * 
 	 * @return InputStream - the result of the query
 	 * 
 	 */
 	@Override
-	public InputStream sparqlSelectQuery(String queryStr) throws RDFServiceException {
+	public InputStream sparqlSelectQuery(String queryStr, RDFService.ResultFormat resultFormat) throws RDFServiceException {
 		
         Query query = QueryFactory.create(queryStr);
         QueryExecution qe = QueryExecutionFactory.sparqlService(endpointURI, query);
@@ -201,7 +227,24 @@ public class RDFServiceImpl implements RDFService {
         try {
         	ResultSet resultSet = qe.execSelect();
         	ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); 
-        	ResultSetFormatter.out(outputStream,resultSet);
+        	
+        	switch (resultFormat) {
+        	   case CSV:
+        		  ResultSetFormatter.outputAsCSV(outputStream,resultSet);
+        		  break;
+        	   case TEXT:
+        		  ResultSetFormatter.out(outputStream,resultSet);
+        		  break;
+        	   case JSON:
+        		  ResultSetFormatter.outputAsJSON(outputStream, resultSet);
+        		  break;
+        	   case XML:
+        		  ResultSetFormatter.outputAsXML(outputStream, resultSet);
+        		  break;
+        	   default: 
+        		  throw new RDFServiceException("unrecognized result format");
+        	}
+        	
         	InputStream result = new ByteArrayInputStream(outputStream.toByteArray());
         	return result;
         } finally {
@@ -279,22 +322,20 @@ public class RDFServiceImpl implements RDFService {
 	 * Register a listener to listen to changes in any graph in
 	 * the RDF store.
 	 * 
-	 * @return String URI of default read graph
 	 */
 	@Override
-	public void registerListener(ChangeListener changeListener) throws RDFServiceException {
-		
+	public synchronized void registerListener(ChangeListener changeListener) throws RDFServiceException {
+		registeredListeners.add(changeListener);
 	}
 	
 	/**
-	 * Unregister a listener to listen to changes in any graph in
-	 * the RDF store.
+	 * Unregister a listener from listening to changes in any graph
+	 * in the RDF store.
 	 * 
-	 * @return String URI of default read graph
 	 */
 	@Override
-	public void unregisterListener(ChangeListener changeListener) throws RDFServiceException {
-		
+	public synchronized void unregisterListener(ChangeListener changeListener) throws RDFServiceException {
+		registeredListeners.remove(changeListener);
 	}
 
 	/**
@@ -308,7 +349,7 @@ public class RDFServiceImpl implements RDFService {
 	}
 	
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	// Non override methods below
+	// Non-override methods below
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     protected String getEndpointURI() {
         return endpointURI;
@@ -343,17 +384,13 @@ public class RDFServiceImpl implements RDFService {
     }
        
     protected void addTriple(Triple t, String graphURI) {
-        
-        //log.info("adding " + t);
-        
+                
         String updateString = "INSERT DATA { " + ((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "" )  
                 + sparqlNodeUpdate(t.getSubject(), "") + " " 
                 + sparqlNodeUpdate(t.getPredicate(), "") + " " 
                 + sparqlNodeUpdate(t.getObject(), "") + " } " 
                 + ((graphURI != null) ? " } " : "");
-        
-        //log.info(updateString);
-        
+                
         executeUpdate(updateString);
                 
     }
@@ -365,13 +402,21 @@ public class RDFServiceImpl implements RDFService {
                 + sparqlNodeUpdate(t.getPredicate(), "") + " " 
                 + sparqlNodeUpdate(t.getObject(), "") + " } " 
                 + ((graphURI != null) ? " } " : "");
-        
-        //log.info(updateString);
-        
+                
         executeUpdate(updateString);
     }
    
-        
+    
+    protected synchronized void notifyListenersOfRemove(String serializedTriple, RDFService.ModelSerializationFormat serializationFormat, ModelChange.Operation operation) {
+    	
+    	Iterator<ChangeListener> iter = registeredListeners.iterator();
+    	
+    	while (iter.hasNext()) {
+    		ChangeListener listener = iter.next();
+    		
+    	}
+    }
+    
 	protected boolean isPreconditionSatisfied(String query, 
 			                                  RDFService.SPARQLQueryType queryType)
 			                                		  throws RDFServiceException {

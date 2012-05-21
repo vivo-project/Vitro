@@ -21,6 +21,10 @@ public interface RDFService {
 	    RDFXML, N3
 	}
 	
+	public enum ResultFormat {
+	    JSON, CSV, XML, TEXT
+	}
+	
 	/**
 	 * Perform a series of additions to and or removals from specified graphs
 	 * in the RDF store.  preConditionSparql will be executed against the 
@@ -83,11 +87,12 @@ public interface RDFService {
 	 * an embedded graph identifier.
 	 * 
 	 * @param String query - the SPARQL query to be executed against the RDF store
+	 * @param RDFService.ResultFormat resultFormat - format for the result of the Select query
 	 * 
 	 * @return InputStream - the result of the query
 	 * 
 	 */
-	public InputStream sparqlSelectQuery(String query) throws RDFServiceException;
+	public InputStream sparqlSelectQuery(String query, RDFService.ResultFormat resultFormat) throws RDFServiceException;
 	
 	/**
 	 * Performs a SPARQL ASK query against the knowledge base. The query may have
