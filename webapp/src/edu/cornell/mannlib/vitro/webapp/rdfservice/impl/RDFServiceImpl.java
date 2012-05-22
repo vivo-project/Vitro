@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice.impl;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -392,7 +391,7 @@ public class RDFServiceImpl implements RDFService {
                 + ((graphURI != null) ? " } " : "");
                 
         executeUpdate(updateString);
-                
+        notifyListeners(t, ModelChange.Operation.ADD, graphURI);
     }
     
     protected void removeTriple(Triple t, String graphURI) {
@@ -404,23 +403,39 @@ public class RDFServiceImpl implements RDFService {
                 + ((graphURI != null) ? " } " : "");
                 
         executeUpdate(updateString);
+        notifyListeners(t, ModelChange.Operation.REMOVE, graphURI);
     }
    
-    
-    protected synchronized void notifyListenersOfRemove(String serializedTriple, RDFService.ModelSerializationFormat serializationFormat, ModelChange.Operation operation) {
-    	
+    protected synchronized void notifyListeners(Triple triple, ModelChange.Operation operation, String graphURI) {
+    	    	
+		if (!(triple.getSubject().isURI() && triple.getPredicate().isURI() && triple.getObject().isURI())) {
+		   return;
+		}
+	
+		Model model = ModelFactory.createDefaultModel();
+		Statement statement = model.createStatement(model.createResource(triple.getSubject().getURI()),
+				                                    model.createProperty(triple.getPredicate().getURI()),
+				                                    model.createResource(triple.getObject().getURI()));
+		model.add(statement);
+		ByteArrayOutputStream serializedModel = new ByteArrayOutputStream(); 
+		model.write(serializedModel,getSerializationFormatString(RDFService.ModelSerializationFormat.N3));
+		String serializedTriple = serializedModel.toString();
+		
     	Iterator<ChangeListener> iter = registeredListeners.iterator();
     	
     	while (iter.hasNext()) {
     		ChangeListener listener = iter.next();
-    		
+    		if (operation == ModelChange.Operation.ADD) {
+    		    listener.addedStatement(serializedTriple, RDFService.ModelSerializationFormat.N3, graphURI);
+    		} else {
+     		    listener.addedStatement(serializedTriple, RDFService.ModelSerializationFormat.N3, graphURI);   			
+    		}
     	}
     }
     
 	protected boolean isPreconditionSatisfied(String query, 
 			                                  RDFService.SPARQLQueryType queryType)
 			                                		  throws RDFServiceException {
-		
 		Model model = ModelFactory.createDefaultModel();
 		
 		switch (queryType) {
@@ -439,7 +454,6 @@ public class RDFServiceImpl implements RDFService {
 		}		
 	}
     
-	
 	protected boolean sparqlSelectQueryHasResults(String queryStr) throws RDFServiceException {
 		
         Query query = QueryFactory.create(queryStr);
@@ -452,7 +466,6 @@ public class RDFServiceImpl implements RDFService {
             qe.close();
         }
 	}
-	
 	
 	protected void performAdd(ModelChange modelChange) throws RDFServiceException {
 	
