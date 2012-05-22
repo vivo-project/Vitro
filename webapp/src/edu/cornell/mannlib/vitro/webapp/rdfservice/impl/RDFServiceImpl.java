@@ -5,12 +5,13 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice.impl;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openrdf.model.Resource;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.Update;
@@ -18,6 +19,7 @@ import org.openrdf.query.UpdateExecutionException;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.http.HTTPRepository;
 
 import com.hp.hpl.jena.graph.Node;
@@ -49,17 +51,19 @@ public class RDFServiceImpl implements RDFService {
 	
 	private static final Log log = LogFactory.getLog(RDFServiceImpl.class);
 	private String endpointURI;
+	private String defaultWriteGraphURI;
 	private Repository repository;
-	private HashSet<ChangeListener> registeredListeners;
+	private ArrayList<ChangeListener> registeredListeners;
 	
     /**
      * Returns an RDFService for a remote repository 
      * @param endpointURI
      */
-    public RDFServiceImpl(String endpointURI) {
+    public RDFServiceImpl(String endpointURI, String defaultWriteGraphURI) {
         this.endpointURI = endpointURI;
+        this.defaultWriteGraphURI = defaultWriteGraphURI;
         this.repository = new HTTPRepository(endpointURI);
-        this.registeredListeners = new HashSet<ChangeListener>();
+        this.registeredListeners = new ArrayList<ChangeListener>();
     }
     	
 	/**
@@ -110,7 +114,7 @@ public class RDFServiceImpl implements RDFService {
 	public void newIndividual(String individualURI, 
 			                  String individualTypeURI) throws RDFServiceException {
 	
-       newIndividual(individualURI, individualTypeURI, null);
+       newIndividual(individualURI, individualTypeURI, defaultWriteGraphURI);
 	}
 
 	/**
@@ -277,11 +281,30 @@ public class RDFServiceImpl implements RDFService {
 	 * 
 	 * @return  List<String> - list of all the graph URIs in the RDF store 
 	 */
+	//TODO - need to verify that the sesame getContextIDs method is implemented
+	// in such a way that it works with all triple stores that support the
+	// graph update API
 	@Override
 	public List<String> getGraphURIs() throws RDFServiceException {
-		List<String> list = null;
 		
-		return list;
+        List<String> graphNodeList = new ArrayList<String>();
+        
+        try {
+            RepositoryConnection conn = getConnection();
+            try {
+                RepositoryResult<Resource> conResult = conn.getContextIDs();
+                while (conResult.hasNext()) {
+                    Resource res = conResult.next();
+                    graphNodeList.add(res.stringValue());   
+                }
+            } finally {
+                conn.close();
+            }
+        } catch (RepositoryException re) {
+            throw new RuntimeException(re);
+        }
+        
+        return graphNodeList;		
 	}
 
 	/**
@@ -300,23 +323,9 @@ public class RDFServiceImpl implements RDFService {
 	 */
 	@Override
 	public String getDefaultWriteGraphURI() throws RDFServiceException {
-		String graphURI = null;
-		
-		return graphURI;
+        return defaultWriteGraphURI;
 	}
-	
-	/**
-	 * Get the URI of the default read graph
-	 * 
-	 * @return String URI of default read graph
-	 */
-	@Override
-	public String getDefaultReadGraphURI() throws RDFServiceException {
-		String graphURI = null;
 		
-		return graphURI;
-	}
-	
 	/**
 	 * Register a listener to listen to changes in any graph in
 	 * the RDF store.
@@ -324,7 +333,10 @@ public class RDFServiceImpl implements RDFService {
 	 */
 	@Override
 	public synchronized void registerListener(ChangeListener changeListener) throws RDFServiceException {
-		registeredListeners.add(changeListener);
+		
+		if (!registeredListeners.contains(changeListener)) {
+		   registeredListeners.add(changeListener);
+		}
 	}
 	
 	/**
@@ -384,51 +396,56 @@ public class RDFServiceImpl implements RDFService {
        
     protected void addTriple(Triple t, String graphURI) {
                 
-        String updateString = "INSERT DATA { " + ((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "" )  
-                + sparqlNodeUpdate(t.getSubject(), "") + " " 
-                + sparqlNodeUpdate(t.getPredicate(), "") + " " 
-                + sparqlNodeUpdate(t.getObject(), "") + " } " 
-                + ((graphURI != null) ? " } " : "");
-                
-        executeUpdate(updateString);
+        StringBuffer updateString = new StringBuffer();
+        updateString.append("INSERT DATA { ");
+        updateString.append((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "" );
+        updateString.append(sparqlNodeUpdate(t.getSubject(), ""));
+        updateString.append(" ");
+        updateString.append(sparqlNodeUpdate(t.getPredicate(), ""));
+        updateString.append(" ");
+        updateString.append(sparqlNodeUpdate(t.getObject(), ""));
+        updateString.append(" }");
+        updateString.append((graphURI != null) ? " } " : "");
+        
+        executeUpdate(updateString.toString());
         notifyListeners(t, ModelChange.Operation.ADD, graphURI);
     }
     
     protected void removeTriple(Triple t, String graphURI) {
                 
-        String updateString = "DELETE DATA { " + ((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "" )  
-                + sparqlNodeUpdate(t.getSubject(), "") + " " 
-                + sparqlNodeUpdate(t.getPredicate(), "") + " " 
-                + sparqlNodeUpdate(t.getObject(), "") + " } " 
-                + ((graphURI != null) ? " } " : "");
+        StringBuffer updateString = new StringBuffer();
+        updateString.append("DELETE DATA { ");
+        updateString.append((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "" );
+        updateString.append(sparqlNodeUpdate(t.getSubject(), ""));
+        updateString.append(" ");
+        updateString.append(sparqlNodeUpdate(t.getPredicate(), ""));
+        updateString.append(" ");
+        updateString.append(sparqlNodeUpdate(t.getObject(), ""));
+        updateString.append(" }");
+        updateString.append((graphURI != null) ? " } " : "");
                 
-        executeUpdate(updateString);
+        executeUpdate(updateString.toString());
         notifyListeners(t, ModelChange.Operation.REMOVE, graphURI);
     }
    
     protected synchronized void notifyListeners(Triple triple, ModelChange.Operation operation, String graphURI) {
-    	    	
-		if (!(triple.getSubject().isURI() && triple.getPredicate().isURI() && triple.getObject().isURI())) {
-		   return;
-		}
-	
-		Model model = ModelFactory.createDefaultModel();
-		Statement statement = model.createStatement(model.createResource(triple.getSubject().getURI()),
-				                                    model.createProperty(triple.getPredicate().getURI()),
-				                                    model.createResource(triple.getObject().getURI()));
-		model.add(statement);
-		ByteArrayOutputStream serializedModel = new ByteArrayOutputStream(); 
-		model.write(serializedModel,getSerializationFormatString(RDFService.ModelSerializationFormat.N3));
-		String serializedTriple = serializedModel.toString();
-		
+    	    			
+        StringBuffer serializedTriple = new StringBuffer();
+        serializedTriple.append(sparqlNodeUpdate(triple.getSubject(), ""));
+        serializedTriple.append(" ");
+        serializedTriple.append(sparqlNodeUpdate(triple.getPredicate(), ""));
+        serializedTriple.append(" ");
+        serializedTriple.append(sparqlNodeUpdate(triple.getObject(), ""));
+        serializedTriple.append(" .");
+                
     	Iterator<ChangeListener> iter = registeredListeners.iterator();
     	
     	while (iter.hasNext()) {
     		ChangeListener listener = iter.next();
     		if (operation == ModelChange.Operation.ADD) {
-    		    listener.addedStatement(serializedTriple, RDFService.ModelSerializationFormat.N3, graphURI);
+    		    listener.addedStatement(serializedTriple.toString(), graphURI);
     		} else {
-     		    listener.addedStatement(serializedTriple, RDFService.ModelSerializationFormat.N3, graphURI);   			
+     		    listener.removedStatement(serializedTriple.toString(), graphURI);   			
     		}
     	}
     }

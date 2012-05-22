@@ -14,20 +14,18 @@ public interface ChangeListener {
 	/**
 	 * Override this to listen to all statements added to the RDF store. 
 	 * 
-	 * @param String serializedTriple - the added statement
-	 * @param RDFService.ModelSerializationFormat format - RDF format of serializedTriple
+	 * @param String serializedTriple - the added statement in n3 format
 	 * @param String graphURI - the graph to which the statement was added
 	 */
-	public void addedStatement(String serializedTriple, RDFService.ModelSerializationFormat format, String graphURI);
+	public void addedStatement(String serializedTriple, String graphURI);
 	
 	/**
 	 * Override this to listen to all statements removed from the RDF store. 
 	 * 
-	 * @param String serializedTriple - the removed statement
-	 * @param RDFService.ModelSerializationFormat format - RDF format of serializedTriple
+	 * @param String serializedTriple - the removed statement in n3 format
 	 * @param String graphURI - the graph from which the statement was removed
 	 */
-	public void removedStatement(String serializedTriple, RDFService.ModelSerializationFormat format, String graphURI);
+	public void removedStatement(String serializedTriple, String graphURI);
 	
 	/**
 	 * Override this to listen to events pertaining to the given graphURI. 

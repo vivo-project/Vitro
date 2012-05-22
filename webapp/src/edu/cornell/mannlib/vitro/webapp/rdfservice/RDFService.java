@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.rdfservice;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.List;
 
 /*
@@ -124,13 +123,6 @@ public interface RDFService {
 	 * @return String URI of default write graph
 	 */
 	public String getDefaultWriteGraphURI() throws RDFServiceException;
-	
-	/**
-	 * Get the URI of the default read graph
-	 * 
-	 * @return String URI of default read graph
-	 */
-	public String getDefaultReadGraphURI() throws RDFServiceException;
 	
 	/**
 	 * Register a listener to listen to changes in any graph in

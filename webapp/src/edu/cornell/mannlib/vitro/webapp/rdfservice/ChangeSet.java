@@ -31,7 +31,7 @@ public interface ChangeSet {
 	public void addRemoval(InputStream model,
 			               RDFService.ModelSerializationFormat format,
 			               String graphURI);
-	
+	    
 	public ModelChange manufactureModelChange();
 	
 	public ModelChange manufactureModelChange(InputStream serializedModel,
