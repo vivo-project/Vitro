@@ -199,7 +199,7 @@ var pageManagementUtils = {
             if (validationError == "") {
             		//Create the appropriate json objects
             		pageManagementUtils.createPageContentForSubmission();
-                   $(this).submit();
+            		return true;
                } else{
                    $('#error-alert').removeClass('hidden');
                    $('#error-alert p').html(validationError);
@@ -433,7 +433,7 @@ var pageManagementUtils = {
         var validationError = "";
         
         // Check menu name
-        if ($('input[type=text][name=menuName]').val() == "") {
+        if ($('input[type=text][name=pageName]').val() == "") {
             validationError += "You must supply a name<br />";
             }
         // Check pretty url     

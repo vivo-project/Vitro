@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
@@ -27,7 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.menuManagement.MenuManagementDataU
 public class ManagePageGenerator extends BaseEditConfigurationGenerator implements EditConfigurationGenerator{
 	
 	private String template = "pageManagement.ftl";
-	
+	public static final String defaultDisplayNs = DisplayVocabulary.NAMESPACE.getURI() + "n";
 	@Override
     public EditConfigurationVTwo getEditConfiguration( VitroRequest vreq, HttpSession session) { 
         EditConfigurationVTwo conf = new EditConfigurationVTwo();
@@ -71,7 +72,7 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 	private void setUrisAndLiteralsOnForm(EditConfigurationVTwo conf,
 			VitroRequest vreq) {
 		conf.setUrisOnForm(new String[]{"page", "menuItem"}); //new resources: should this be on form for new - should be for existing
-		conf.setLiteralsOnForm(new String[]{"pageTitle", "urlMapping", "linkText", "menuPosition", "menuLinkText", "bodyTemplate", "pageContentUnit"}); //page content unit = data getter JSON object
+		conf.setLiteralsOnForm(new String[]{"pageName", "prettyUrl", "menuPosition", "menuLinkText", "customTemplate", "pageContentUnit"}); //page content unit = data getter JSON object
 		
 	}
 
@@ -88,12 +89,12 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 
 	private void setN3Optional(EditConfigurationVTwo conf) {
 		//body template is not required, and a given page may or may not be a menu item, but should linked to menu if menu item
-	      conf.setN3Optional(Arrays.asList(prefixes + pageBodyTemplateN3, 
-	    		  							prefixes + menuItemN3 + menuN3));
+	      conf.setN3Optional(new ArrayList<String>(Arrays.asList(prefixes + pageBodyTemplateN3, 
+	    		  							prefixes + menuItemN3 + menuN3)));
 	}
 
 	private void setN3Required(EditConfigurationVTwo conf) {
-	      conf.setN3Required(Arrays.asList(prefixes + pageN3));
+	      conf.setN3Required(new ArrayList<String>(Arrays.asList(prefixes + pageN3)));
 		
 	}
 	
@@ -103,24 +104,31 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 		//Optional fields for page include body template
 		
 		//required, therefore nonempty
-		FieldVTwo titleField = new FieldVTwo().setName("pageTitle").
+		FieldVTwo titleField = new FieldVTwo().setName("pageName").
 												setValidators(Arrays.asList("nonempty"));
 		conf.addField(titleField);
 
-		FieldVTwo urlField = new FieldVTwo().setName("urlMapping").setValidators(Arrays.asList("nonempty"));
+		FieldVTwo urlField = new FieldVTwo().setName("prettyUrl").setValidators(Arrays.asList("nonempty"));
 		conf.addField(urlField);
 		
 		//optional: body template
-		FieldVTwo bodyTemplateField = new FieldVTwo().setName("bodyTemplate");
+		FieldVTwo bodyTemplateField = new FieldVTwo().setName("customTemplate");
 		conf.addField(bodyTemplateField);
 
 		
 		//For menu item, these are optional b/c they depend on menu item
-		FieldVTwo menuItemLinkTextField = new FieldVTwo().setName("linkText");
+		FieldVTwo menuItemLinkTextField = new FieldVTwo().setName("menuLinkText");
 		conf.addField(menuItemLinkTextField);
 		
 		FieldVTwo menuItemPositionField = new FieldVTwo().setName("menuPosition");
 		conf.addField(menuItemPositionField);
+		
+		//The actual page content information is stored in this field, and then
+		//interpreted using the preprocessor
+		FieldVTwo pageContentUnitField = new FieldVTwo().setName("pageContentUnit");
+		conf.addField(pageContentUnitField);
+		
+		//For existing values, will need to include fields here
 	}
 
 
@@ -152,7 +160,7 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 		        
 	        } else {
 	        	//For the case of an existing page
-	        	//Page title pageTitle or page hasDataGetter dataGetter
+	        	//Page title pageName or page hasDataGetter dataGetter
 		        editConfiguration.setUrlPatternToReturnTo("/individual"); 
 		        editConfiguration.setEntityToReturnTo(subjectUri);
 	        }
@@ -182,8 +190,8 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
     //In the case where this is a new page, need to ensure page gets a new 
     private void setNewResources(EditConfigurationVTwo conf) {
 		//null makes default namespace be triggered
-    	conf.addNewResource("page", DEFAULT_NS_FOR_NEW_RESOURCE);
-    	conf.addNewResource("menuItem", DEFAULT_NS_FOR_NEW_RESOURCE);
+    	conf.addNewResource("page", defaultDisplayNs);
+    	conf.addNewResource("menuItem", defaultDisplayNs);
 		
 	}    
     
@@ -255,7 +263,7 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 		data.put("menuAction", "Add");
     	//Generate empty values for fields
     	data.put("menuItem", "");
-    	data.put("menuName", "");
+    	data.put("pageName", "");
     	data.put("prettyUrl", "");
     	data.put("associatedPage", "");
     	data.put("associatedPageURI", "");
@@ -275,15 +283,15 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 	"@prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> . \n";
 	
 	final static String pageN3 = "?page a display:Page ;  \n" +  
-		"display:title ?pageTitle ;\n" +  
-		"display:urlMapping ?urlMapping .";  
+		"display:title ?pageName ;\n" +  
+		"display:urlMapping ?prettyUrl .";  
 
 	//"display:hasDataGetter ?pageDataGetter .";
 	
 	//A page may also require a body template so we can get that here as well
 	//That would be optional
 	
-	final static String pageBodyTemplateN3 = "?page display:requiresBodyTemplate ?bodyTemplate .";
+	final static String pageBodyTemplateN3 = "?page display:requiresBodyTemplate ?customTemplate .";
 	
 	//Menu position is added dynamically at end by default and can be changed on reordering page
 	final static String menuItemN3 = "?menuItem a display:NavigationElement ; \n" + 
@@ -297,8 +305,8 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 	final static String menuN3 = "display:DefaultMenu display:hasElement ?menuItem .";
 	
 	//These are public static methods that can be used in the preprocessor
-	public final static String getDataGetterN3(int numberDataGetter) {
-		return prefixes + "?page display:hasDataGetter ?dataGetter" + numberDataGetter + ".";
+	public final static String getDataGetterN3(String dataGetterVar) {
+		return prefixes + "?page display:hasDataGetter " + dataGetterVar + ".";
 	}
 	
 

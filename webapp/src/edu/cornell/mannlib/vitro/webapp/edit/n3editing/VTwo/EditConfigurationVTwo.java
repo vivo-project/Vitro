@@ -436,15 +436,15 @@ public class EditConfigurationVTwo {
     }
 
     public void setN3Required(String ... n3RequiredStrs){
-        this.n3Required = Arrays.asList( n3RequiredStrs );        
+        this.n3Required =  new ArrayList<String>(Arrays.asList( n3RequiredStrs )); //using ArrayList to allow list to be resized
     }
     //these methods allow strings to be added to the n3 required list and not just for the list to be set
-    public void addN3Required(List<String> n3Required) {
-    	this.n3Required.addAll(n3Required);
+    public void addN3Required(List<String> n3RequiredInput) {
+    	this.n3Required.addAll(n3RequiredInput);
     }
     
-    public void addN3Required(String ... n3RequiredStrs) {
-    	 this.n3Required.addAll(Arrays.asList( n3RequiredStrs ));  
+    public void addN3Required(String ... n3RequiredStrsInput) {
+    	 this.n3Required.addAll(Arrays.asList( n3RequiredStrsInput ));  
     }
      /** return a copy of the value so that the configuration is not modified by external code.
      * @return
@@ -458,7 +458,7 @@ public class EditConfigurationVTwo {
     }
 
     public void setN3Optional(String ... n3Strs){
-        this.n3Optional = Arrays.asList( n3Strs );        
+        this.n3Optional = new ArrayList<String>(Arrays.asList( n3Strs )); //using ArrayList to allow list to be resized       
     }
     
     public void addN3Optional(List<String> n3Optional) {
@@ -501,7 +501,7 @@ public class EditConfigurationVTwo {
     }
 
     public void setUrisOnForm(String ... strs){
-        this.urisOnform = Arrays.asList( strs );        
+        this.urisOnform = new ArrayList<String>(Arrays.asList( strs )); //using ArrayList to allow resizing        
     }
     //This doesn't overwrite or set but adds to existing list
     public void addUrisOnForm(List<String> urisOnform) {
@@ -530,7 +530,7 @@ public class EditConfigurationVTwo {
     }
 
     public void setLiteralsOnForm(String ... strs){
-        this.literalsOnForm = Arrays.asList( strs );        
+        this.literalsOnForm = new ArrayList<String>(Arrays.asList( strs ));//using ArrayList to allow resizing        
     }
     
     public void addLiteralsOnForm(List<String> literalsOnForm) {

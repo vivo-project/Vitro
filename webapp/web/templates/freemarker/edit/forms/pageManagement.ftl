@@ -4,14 +4,12 @@
 <#assign menuAction = pageData.menuAction />
 <#assign classGroup = pageData.classGroup />
 <#assign classGroups = pageData.classGroups />
-
+<#assign pageName = "" />
 <#assign selectedTemplateType = "default" />
-<#assign menuItem = ""/>
-<#assign menuName = ""/>
 <#assign prettyUrl = ""/>
 <#assign associatedPage = ""/>
 <#assign associatedPageURI = ""/>
-    	
+<#assign menuItem = ""/>    	
 <#assign isClassGroupPage = false/>
 <#assign includeAllClasses = false/>
 
@@ -32,10 +30,10 @@
 <#--class group section has associated page uri, but that depends on editing a current page or if one is selected later-->
 <section id="pageDetails">
     <#--form method="POST" action="${formUrls}" role="${menuAction} menu item"-->
-	<form method="POST" action="/editRequestDispatch" role="add page">
+	<form method="POST" action="${submitUrl}" role="add page">
 	        <input type="hidden" name="switchToDisplayModel" id="switchToDisplayModel" value="1" role="input" />
 	        <input type="hidden" id="editKey" name="editKey" value="${editKey}" />
-	
+			<input type="hidden" id="menuItem" name="menuItem" value="${menuItem}"/>
     <h2>Add Page</h2>
     <section id="floatRight" style="margin-top:0px;float:right;background-color:#fff;width:580px;margin-right:-4px">
         <div id="rightSide">

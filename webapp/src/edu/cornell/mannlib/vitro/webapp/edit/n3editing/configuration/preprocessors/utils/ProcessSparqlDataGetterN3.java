@@ -15,31 +15,33 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 //Returns the appropriate n3 based on data getter
-public class ProcessSparqlDataGetterN3 implements ProcessDataGetterN3 {
+public  class ProcessSparqlDataGetterN3 implements ProcessDataGetterN3 {
 	private static String classType = "java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter";
-	private JSONObject jsonObject = null;
 	
-	public ProcessSparqlDataGetterN3(JSONObject inputJsonObject) {
-		jsonObject = inputJsonObject;
+	public ProcessSparqlDataGetterN3(){
+		
 	}
 	//Pass in variable that represents the counter 
 
 	//TODO: ensure correct model returned
+	//We shouldn't use the ACTUAL values here but generate the n3 required
     public List<String> retrieveN3Required(int counter) {
     	String dataGetterVar = getDataGetterVar(counter);
     	String n3 = dataGetterVar + " a <" + classType + ">; \n" + 
-    	"display:queryModel <" + jsonObject.getString("queryModel") + ">; \n" + 
-    	"display:saveToVar '" + jsonObject.getString("saveToVar") + "'; \n" + 
-    	"display:query \"\"\"" + jsonObject.getString("query") + "\"\"\" .";
-    	return Arrays.asList(getPrefixes() + n3);
+    	"display:queryModel " + getN3VarName("queryModel", counter) + "; \n" + 
+    	"display:saveToVar " + getN3VarName("saveToVar", counter) + "; \n" + 
+    	"display:query " + getN3VarName("query", counter) + " .";
+    	List<String> requiredList = new ArrayList<String>();
+    	requiredList.add(getPrefixes() + n3);
+    	return requiredList;
     	
     }
     public List<String> retrieveN3Optional(int counter) {
     	return null;
     }
-    
-    private String getDataGetterVar(int counter) {
-    	return "dataGetter" + counter;
+    //placeholder so need "?" in front of the variable
+    public String getDataGetterVar(int counter) {
+    	return "?dataGetter" + counter;
     }
     
     private String getPrefixes() {
@@ -85,7 +87,8 @@ public class ProcessSparqlDataGetterN3 implements ProcessDataGetterN3 {
 	   for(String varName: allFieldsBase) {
 		   fields.add(new FieldVTwo().setName(getVarName(varName, counter)));
 	   } */
-	   
+	   //For existing data getters
+	   //fields.add(new FieldVTwo().setName(getVarName("dataGetter", counter)));
 	   fields.add(new FieldVTwo().setName(getVarName("queryModel", counter)));
 	   fields.add(new FieldVTwo().setName(getVarName("saveToVar", counter)));
 	   fields.add(new FieldVTwo().setName(getVarName("query", counter)));
@@ -94,9 +97,10 @@ public class ProcessSparqlDataGetterN3 implements ProcessDataGetterN3 {
    }
    
    public List<String> getLiteralVarNamesBase() {
-	   return Arrays.asList("savetoVar", "query");   
+	   return Arrays.asList("saveToVar", "query");   
    }
 
+   //these are for the fields ON the form
    public List<String> getUriVarNamesBase() {
 	   return Arrays.asList("queryModel");   
    }
@@ -105,6 +109,18 @@ public class ProcessSparqlDataGetterN3 implements ProcessDataGetterN3 {
 	   return base + counter;
    }
    
+   //For use within n3 strings, need a "?"
+   public String getN3VarName(String base, int counter) {
+	   return "?" + getVarName(base, counter);
+   }
+   
+   //Return name of new resources
+   public List<String> getNewResources(int counter) {
+	   //Each data getter requires a new resource
+	   List<String> newResources = new ArrayList<String>();
+	   newResources.add("dataGetter" + counter);
+	   return newResources;
+   }
 
 }
 

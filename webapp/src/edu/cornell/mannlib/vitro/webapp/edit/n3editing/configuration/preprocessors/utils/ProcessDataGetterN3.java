@@ -20,5 +20,7 @@ public interface ProcessDataGetterN3 {
     public List<String> getLiteralVarNamesBase();
     public List<String> getUriVarNamesBase();
     public String getVarName(String base, int counter);
+    public String getDataGetterVar(int counter);
+    public List<String> getNewResources(int counter);
 
 }

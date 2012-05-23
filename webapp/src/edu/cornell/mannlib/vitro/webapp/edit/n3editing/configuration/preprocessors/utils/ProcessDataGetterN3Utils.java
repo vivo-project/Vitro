@@ -32,13 +32,15 @@ public class ProcessDataGetterN3Utils {
     	 return map;
     }
     
-    public static ProcessDataGetterN3 getDataGetterProcessorN3(String dataGetterClass, JSONObject jsonObject) {
+    public static ProcessDataGetterN3 getDataGetterProcessorN3(String dataGetterClass) {
     	HashMap<String, String> map = getDataGetterTypeToProcessorMap();
+    	//
     	if(map.containsKey(dataGetterClass)) {
     		String processorClass = map.get(dataGetterClass);
     		try {
     			Class<?> clz = Class.forName(processorClass);
-    			ProcessDataGetterN3 pn = (ProcessDataGetterN3) clz.getConstructor(JSONObject.class).newInstance(jsonObject);
+    			//Don't actually need to pass in json object since that includes the actual submission values
+    			ProcessDataGetterN3 pn = (ProcessDataGetterN3) clz.getConstructor().newInstance();
     			return pn;
     		} catch(Exception ex) {
     			log.error("Exception occurred in trying to get processor class for n3 for " + dataGetterClass, ex);

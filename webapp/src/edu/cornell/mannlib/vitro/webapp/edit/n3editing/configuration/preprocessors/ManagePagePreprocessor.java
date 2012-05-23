@@ -3,6 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,11 +15,14 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
+
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.BaseEditSubmissionPreprocessorVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessDataGetterN3;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessDataGetterN3Utils;
 import net.sf.json.JSONObject;
@@ -78,7 +83,7 @@ public class ManagePagePreprocessor extends
 		int counter = 0;
 		for(JSONObject jsonObject:pageContentUnitsJSON) {
 			String dataGetterClass = getDataGetterClass(jsonObject);
-			ProcessDataGetterN3 pn = ProcessDataGetterN3Utils.getDataGetterProcessorN3(dataGetterClass, jsonObject);
+			ProcessDataGetterN3 pn = ProcessDataGetterN3Utils.getDataGetterProcessorN3(dataGetterClass);
 			//Add n3 required
 			addN3Required(pn, counter);
 			//Add N3 Optional as well
@@ -87,14 +92,23 @@ public class ManagePagePreprocessor extends
 			addLiteralsAndUrisOnForm(pn, counter);
 			// Add fields
 			addFields(pn, counter);
+			//Add new resources - data getters need to be new resources
+			addNewResources(pn, counter);
 			//Add input values to submission
 			addInputsToSubmission(pn, counter, jsonObject);
 			counter++;
 		}
-		
-		
-		
+	}
+	
+	
 
+	private void addNewResources(ProcessDataGetterN3 pn, int counter) {
+		// TODO Auto-generated method stub
+		List<String> newResources = pn.getNewResources(counter);
+		for(String newResource:newResources) {
+			editConfiguration.addNewResource(newResource, ManagePageGenerator.defaultDisplayNs);
+		}
+		
 	}
 
 	private void convertToJson() {
@@ -193,13 +207,29 @@ public class ManagePagePreprocessor extends
 	//This will overwrite the original with the set of new n3 required
 	private void addN3Required(ProcessDataGetterN3 pn, int counter) {
 		//Use the process utils to figure out what class required to retrieve the N3 required
-		editConfiguration.addN3Required(pn.retrieveN3Required(counter));
+		List<String> requiredList = pn.retrieveN3Required(counter);
+		//Add connection between data getter and page
+		requiredList.addAll(getPageToDataGetterN3(pn, counter));
+		if(requiredList != null) {
+			editConfiguration.addN3Required(requiredList);
+		}
+	}
+	private List<String> getPageToDataGetterN3(
+			ProcessDataGetterN3 pn, int counter) {
+		String dataGetterVar = pn.getDataGetterVar(counter);
+		//Put this method in the generator but can be put elsewhere
+		String pageToDataGetterN3 = ManagePageGenerator.getDataGetterN3(dataGetterVar);
+		return Arrays.asList(pageToDataGetterN3);
 		
 	}
+
 	//Add n3 optional
 	
 	private void addN3Optional(ProcessDataGetterN3 pn, int counter) {
-		editConfiguration.addN3Optional(pn.retrieveN3Optional(counter));
+		List<String> optionalList = pn.retrieveN3Optional(counter);
+		if(optionalList != null) {
+			editConfiguration.addN3Optional(optionalList);
+		}
 	}
 
 	private String[] convertDelimitedStringToArray(String inputString) {
@@ -224,11 +254,21 @@ public class ManagePagePreprocessor extends
 	
 	//Each JSON Object will indicate the type of the data getter within it
 	private String getDataGetterClass(JSONObject jsonObject) {
-		return jsonObject.getString("dataGetterClass");
+		String javaURI = jsonObject.getString("dataGetterClass");
+		return getQualifiedDataGetterName(javaURI);
 		
 		
 	}
 	
-	
+	//Get rid of java: in front of class name
+	private String getQualifiedDataGetterName(String dataGetterTypeURI) {
+		String javaURI = "java:";
+		
+		if(dataGetterTypeURI.startsWith(javaURI)) {
+			int beginIndex = javaURI.length();
+			return dataGetterTypeURI.substring(beginIndex);
+		}
+		return dataGetterTypeURI;
+	}
 
 }
