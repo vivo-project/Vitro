@@ -57,7 +57,13 @@ public class RDFServiceImpl implements RDFService {
 	
     /**
      * Returns an RDFService for a remote repository 
-     * @param endpointURI
+     * @param String - URI of the SPARQL endpoint for the knowledge base
+     * @param String - URI of the default write graph within the knowledge base.
+     *                   this is the graph that will be written to when a graph
+     *                   is not explicitly specified.
+     * 
+     * The default read graph is the union of all graphs in the
+     * knowledge base
      */
     public RDFServiceImpl(String endpointURI, String defaultWriteGraphURI) {
         this.endpointURI = endpointURI;
