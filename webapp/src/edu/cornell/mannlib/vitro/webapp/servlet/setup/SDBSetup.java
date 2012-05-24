@@ -71,8 +71,6 @@ implements javax.servlet.ServletContextListener {
         if (!isSetUp(store)) {            
             JenaPersistentDataSourceSetup.thisIsFirstStartup();
             setupSDB(ctx, store);
-        }else{
-            migrateToSDBFromExistingRDBStore(ctx, store); 
         }
     }
     
@@ -190,15 +188,6 @@ implements javax.servlet.ServletContextListener {
             store.getTableFormatter().addIndexes();
             log.info("Indexes created.");
         }
-    }
-
-    private void migrateToSDBFromExistingRDBStore(ServletContext ctx,
-            Store store) {
-        Model rdbAssertionsModel = makeDBModelFromConfigurationProperties(
-                JENA_DB_MODEL, DB_ONT_MODEL_SPEC, ctx);
-        Model rdbInferencesModel = makeDBModelFromConfigurationProperties(
-                JENA_INF_MODEL, DB_ONT_MODEL_SPEC, ctx);
-        setupSDB(ctx, store, rdbAssertionsModel, rdbInferencesModel);
     }
 
     /*
