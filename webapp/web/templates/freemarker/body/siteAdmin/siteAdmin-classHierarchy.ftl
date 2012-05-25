@@ -17,10 +17,14 @@
         </select>
         <input id="addClass" value="Add New Class" class="form-button" type="submit" />
     </form>
+    <#if displayOption == "group"><div style="float:right;padding-right:280px;margin-top:-50px">
+        <form action="editForm" method="get">
+            <input type="submit" class="form-button" value="Add New Group"/>
+            <input type="hidden" name="controller" value="Classgroup"/>
+        </form>  
+        </div>  
+    </#if>
         
-    
-
-
     <div id="expandLink"><span id="expandAll" ><a href="#" title="expand all">expand all</a></span></div>
     <section id="container">
 
