@@ -33,6 +33,12 @@
                             manage publications
                         </a>
                     </h3>
+                <#elseif property.localName == "hasResearcherRole">
+                <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> 
+                    <a id="managePropLink" href="${urls.base}/manageGrants?subjectUri=${subjectUri[1]!}" title="manage grants & projects" <#if verbosePropertySwitch.currentValue>style="padding-top:10px"</#if> >
+                        manage grants & projects
+                    </a>
+                </h3>
                 <#else>
                     <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> </h3>
                 </#if>
