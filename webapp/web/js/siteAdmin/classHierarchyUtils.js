@@ -96,6 +96,7 @@
 
     getTheChildren: function(node) {
         var childDetails = "";
+        var subclassString = " ";
         var ctr = 0
         $.each(node.children, function() {
             if ( ctr == 0 ) {
@@ -105,12 +106,18 @@
             else {
                 childDetails += "<tr><td></td>" ;
             }
-
+            
+            if ( this.children.length == 1 ) {
+                subclassString += "<span style='font-size:0.8em'> (1 subclass)</span>"; 
+            }
+            else if ( this.children.length > 1 ) {
+                subclassString += "<span style='font-size:0.8em'> (" + this.children.length + " subclasses)</span>";
+            }
             childDetails += "<td class='subclassCell'><span class='subclassExpandPlus' id='subclassExpand" 
                             + classHierarchyUtils.expandCounter + "'>&nbsp;</span>" 
-                            + this.name + "</td></tr><tr><td></td><td><table id='subclassTable" 
+                            + this.name + subclassString + "</td></tr><tr><td></td><td><table id='subclassTable" 
                             + classHierarchyUtils.expandCounter + "' class='subclassTable'>";
-
+            subclassString = " ";
             classHierarchyUtils.clickableSpans.push('subclassExpand' + classHierarchyUtils.expandCounter);
             
             classHierarchyUtils.expandCounter += 1;
