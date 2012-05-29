@@ -190,8 +190,10 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
     //In the case where this is a new page, need to ensure page gets a new 
     private void setNewResources(EditConfigurationVTwo conf) {
 		//null makes default namespace be triggered
-    	conf.addNewResource("page", defaultDisplayNs);
-    	conf.addNewResource("menuItem", defaultDisplayNs);
+    	//conf.addNewResource("page", defaultDisplayNs);
+    	//conf.addNewResource("menuItem", defaultDisplayNs);
+    	conf.addNewResource("page", null);
+    	conf.addNewResource("menuItem", null);
 		
 	}    
     

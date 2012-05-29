@@ -106,7 +106,13 @@ public class ManagePagePreprocessor extends
 		// TODO Auto-generated method stub
 		List<String> newResources = pn.getNewResources(counter);
 		for(String newResource:newResources) {
-			editConfiguration.addNewResource(newResource, ManagePageGenerator.defaultDisplayNs);
+			//Will null get us display vocabulary or something else?
+			
+			editConfiguration.addNewResource(newResource, null);
+			//Weirdly enough, the defaultDisplayNS doesn't act as a namespace REALLY
+			//as it first gets assigned as the URI itself and this lead to an error
+			//instead of repetitively trying to get another URI
+			//editConfiguration.addNewResource(newResource, ManagePageGenerator.defaultDisplayNs );
 		}
 		
 	}

@@ -51,7 +51,7 @@
             <section id="headerBar" style="background-color:#f5f5f5;border-color:#ccc;border-width:1px;border-style:solid;border-bottom-width:0px;padding-left:6px">
             </section>
             
-            <section id="classGroup" style="background-color:#f9f9f9;padding-left:6px;padding-top:2px;border-width:1px;border-style:solid;border-color:#ccc;">
+            <section id="browseClassGroup" style="background-color:#f9f9f9;padding-left:6px;padding-top:2px;border-width:1px;border-style:solid;border-color:#ccc;">
                        
                 <section id="selectContentType" name="selectContentType" ${selectClassGroupStyle} role="region">     
                     
@@ -96,15 +96,28 @@
                     </ul>
                 </section>
             </section>
-            <section id="nonClassGroup" style="background-color:#f9f9f9;padding-left:6px;padding-top:2px;border-width:1px;border-style:solid;border-color:#ccc;">
-                <label id="variableLabel" for="variable">Variable Name<span class="requiredHint"> *</span></label>
-                <input type="text" name="variable" size="20" value="" id="variable" role="input" />
-                <label id="taLabel" for="selectClassGroup"><span id="taSpan"></span><span class="requiredHint"> *</span></label>
-                <textarea id="textArea" name="textArea" cols="70" rows="15" style="margin-bottom:7px"></textarea>
+            <!--Broken fixed html and sparql content into separate portions-->
+            <!--This content will be copied/shown for these particular content types, so any fields for n3 editing need to be included
+            here that correspond to a specific content type.  These are related to specific "data getters" on the server side.  -->
+            <section id="fixedHtml" style="background-color:#f9f9f9;padding-left:6px;padding-top:2px;border-width:1px;border-style:solid;border-color:#ccc;">
+                <label id="fixedHTMLVariableLabel" for="fixedHTMLVariable">Variable Name<span class="requiredHint"> *</span></label>
+                <input type="text" name="saveToVar" size="20" value="" id="fixedHTMLSaveToVar" role="input" />
+                <label id="fixedHTMLValueLabel" for="fixedHTMLValue">HTML<span id="fixedHTMLValueSpan"></span><span class="requiredHint"> *</span></label>
+                <textarea id="fixedHTMLValue" name="htmlValue" cols="70" rows="15" style="margin-bottom:7px"></textarea>
             </section>
+            <section id="sparqlQuery" style="background-color:#f9f9f9;padding-left:6px;padding-top:2px;border-width:1px;border-style:solid;border-color:#ccc;">
+                <label id="variableLabel" for="variable">Variable Name<span class="requiredHint"> *</span></label>
+                <input type="text" name="saveToVar" size="20" value="" id="saveToVar" role="input" />
+                <label id="queryModelLabel" for="queryModel">Query Model</label>
+                <input type="text" name="queryModel" size="20" value="" id="queryModel" role="input" />
+                <label id="queryLabel" for="queryLabel"><span id="querySpan">Query</span><span class="requiredHint"> *</span></label>
+                <textarea id="query" name="query" cols="70" rows="15" style="margin-bottom:7px"></textarea>
+            </section>
+          
             <input  type="button" id="moreContent" name="moreContent" value="Add More Content" class="delete" style="margin-top:8px" />          
         </div>
     </section>
+    <!--Information for page or menu item level-->
     <div id="leftSide">
         <section id="addPageOne" role="region" style="background-color:#fff;">
             <label for="page-name">Title<span class="requiredHint"> *</span></label>
@@ -137,7 +150,8 @@
         <br />
         <p class="requiredHint">* required fields</p>
     </section>
-    <!--Hidden input with JSON objects added will be included here-->
+    <!--Hidden input with JSON objects added will be included here.  This is the field with the page content information
+    mirroring what is required by the Data getter server side objects. -->
     <div id="pageContentSubmissionInputs" style="display:none"></div>
     </form>
 </section>
@@ -145,27 +159,42 @@
 <!-
 
 <!--Hardcoding for now but should be retrieved from generator-->
+
 <script type="text/javascript">
     var customFormData = {
       dataGetterLabelToURI:{
       		//maps labels to URIs
       		"browseClassGroup": "java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData",
-      		"sparqlDataGetter":"java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter"
+      		"individualsForClasses": "java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter",
+      		"sparqlQuery":"java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter",
+      		"fixedHtml":"java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.FixedHTMLDataGetter"
       },
       dataGetterMap:{"java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData": "Class Group Page",
 					"java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.BrowseDataGetter": "Browse Page",  
 					"java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter": "Class Group Page - Selected Classes", 
-					"java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter": "Sparql Query Results" }
+					"java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter": "Sparql Query Results",
+					"java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.FixedHTMLDataGetter": "Fixed HTML Page"}
     };
- </script>
+</script>
+ 
+
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css" />')}
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/menupage/menuManagement.css" />')}
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/menupage/pageManagement.css" />')}
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"></script>')}
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery.fix.clone.js"></script>')}
+
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/json2.js"></script>')}
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/customFormUtils.js"></script>')}
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/browserUtils.js"></script>')}
+<#--Include additional templates here to allow for additional data getters etc. for other products-->
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/menupage/processFixedHTMLDataGetterContent.js"></script>')}
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/menupage/processClassGroupDataGetterContent.js"></script>')}
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/menupage/processSparqlDataGetterContent.js"></script>')}
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/menupage/processIndividualsForClassesDataGetterContent.js"></script>')}
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/menupage/processDataGetterUtils.js"></script>')}
+
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/menupage/pageManagementUtils.js"></script>')}
 
