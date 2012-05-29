@@ -111,14 +111,6 @@
 :configContextFor rdf:type owl:ObjectProperty ;                  
                   rdfs:domain :ConfigContext .
 
-:inheritingConfigContextFor rdf:type owl:ObjectProperty ;
-                            rdfs:domain :ConfigContext ;                            
-                            rdfs:subPropertyOf :configContextFor .
-
-:nonInheritingConfigContextFor rdf:type owl:ObjectProperty ;
-                               rdfs:domain :ConfigContext ;
-                               rdfs:subPropertyOf :configContextFor .
-
 :qualifiedBy rdf:type owl:ObjectProperty ;             
              rdfs:domain :ConfigContext .
 
@@ -129,6 +121,14 @@
 :nonInheritingQualifiedBy rdf:type owl:ObjectProperty ;
                           rdfs:domain :ConfigContext ;
                           rdfs:subPropertyOf :qualifiedBy .
+
+:inheritingConfigurationFor rdf:type owl:ObjectProperty ;
+                            rdfs:domain :ConfigContext ;                            
+                            rdfs:subPropertyOf :configContextFor .
+
+:nonInheritingConfigurationFor rdf:type owl:ObjectProperty ;
+                               rdfs:domain :ConfigContext ;
+                               rdfs:subPropertyOf :configContextFor .
 
 :hasListView rdf:type owl:ObjectProperty ;
              rdfs:range :ListDisplayView ;
@@ -246,15 +246,15 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :defer rdf:type :OfferEditOption ,
-                owl:NamedIndividual .
+                 owl:NamedIndividual .
 
-:false rdf:type :OfferEditOption ,
-                owl:NamedIndividual .
+:doNotOfferForEdit rdf:type :OfferEditOption ,
+                   owl:NamedIndividual .
 
 :ifStatement rdf:type :OfferEditOption ,
-                      owl:NamedIndividual .
+                       owl:NamedIndividual .
 
-:true rdf:type :OfferEditOption ,
+:offerForEdit  rdf:type :OfferEditOption ,
                owl:NamedIndividual .
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
