@@ -102,7 +102,7 @@
             <section id="fixedHtml" style="background-color:#f9f9f9;padding-left:6px;padding-top:2px;border-width:1px;border-style:solid;border-color:#ccc;">
                 <label id="fixedHTMLVariableLabel" for="fixedHTMLVariable">Variable Name<span class="requiredHint"> *</span></label>
                 <input type="text" name="saveToVar" size="20" value="" id="fixedHTMLSaveToVar" role="input" />
-                <label id="fixedHTMLValueLabel" for="fixedHTMLValue">HTML<span id="fixedHTMLValueSpan"></span><span class="requiredHint"> *</span></label>
+                <label id="fixedHTMLValueLabel" for="fixedHTMLValue">Enter fixed HTML here<span id="fixedHTMLValueSpan"></span><span class="requiredHint"> *</span></label>
                 <textarea id="fixedHTMLValue" name="htmlValue" cols="70" rows="15" style="margin-bottom:7px"></textarea>
             </section>
             <section id="sparqlQuery" style="background-color:#f9f9f9;padding-left:6px;padding-top:2px;border-width:1px;border-style:solid;border-color:#ccc;">
@@ -110,7 +110,7 @@
                 <input type="text" name="saveToVar" size="20" value="" id="saveToVar" role="input" />
                 <label id="queryModelLabel" for="queryModel">Query Model</label>
                 <input type="text" name="queryModel" size="20" value="" id="queryModel" role="input" />
-                <label id="queryLabel" for="queryLabel"><span id="querySpan">Query</span><span class="requiredHint"> *</span></label>
+                <label id="queryLabel" for="queryLabel"><span id="querySpan">Enter SPARQL query here</span><span class="requiredHint"> *</span></label>
                 <textarea id="query" name="query" cols="70" rows="15" style="margin-bottom:7px"></textarea>
             </section>
           

@@ -3,6 +3,7 @@
 var pageManagementUtils = {
 	dataGetterLabelToURI:null,//initialized by custom data
 	processDataGetterUtils:processDataGetterUtils,//an external class that should exist before this one
+	dataGetterMap:null,
 	// on initial page setup
 	onLoad:function(){
 		if (this.disableFormInUnsupportedBrowsers()) {
@@ -20,7 +21,7 @@ var pageManagementUtils = {
 		//Go through each and initialize with their class
 		
 		if(pageManagementUtils.processDataGetterUtils != null) {
-			var dataGetterProcessorMap = pageManagementUtils.processDataGetterUtils.dataGetterProcessorMap;
+			var dataGetterProcessorMap = pageManagementUtils.dataGetterProcessorMap = pageManagementUtils.processDataGetterUtils.dataGetterProcessorMap;
 			$.each(dataGetterProcessorMap, function(key, dataGetterProcessorObject) {
 				//passes class name from data getter label to uri to processor
 				dataGetterProcessorObject.initProcessor(pageManagementUtils.dataGetterLabelToURI[key]);
@@ -51,7 +52,7 @@ var pageManagementUtils = {
     },
 	initObjects:function(){
 		this.counter = 0;
-		this.contentTypeSelect =  $("#typeSelect");
+		this.contentTypeSelect =  $("select#typeSelect");
 		//list of options
 		this.contentTypeSelectOptions =  $('select#typeSelect option');
 		this.classGroupSection = $("section#browseClassGroup");
@@ -65,8 +66,8 @@ var pageManagementUtils = {
        // this.changeContentType = $('#changeContentType');
         this.selectContentType = $('#selectContentType');
        // this.existingContentType = $('#existingContentType');
-        this.selectClassGroupDropdown = $('#selectClassGroup');
-        this.classesForClassGroup = $('#classesInSelectedGroup');
+        this.selectClassGroupDropdown = $('select#selectClassGroup');
+        this.classesForClassGroup = $('section#classesInSelectedGroup');
         this.selectedGroupForPage = $('#selectedContentTypeValue');
         this.allClassesSelectedCheckbox = $('#allSelected');
         this.displayInternalMessage = $('#internal-class label em');
@@ -77,7 +78,7 @@ var pageManagementUtils = {
         this.menuSection = $("section#menu");
         this.submitButton = $("input#submit");
         this.leftSideDiv = $("div#leftSide");
-        this.rightSideDiv = $("div#ri;ghtSide")
+        this.rightSideDiv = $("div#rightSide")
 	},
 	initDisplay: function(){
 		//right side components
@@ -127,17 +128,12 @@ var pageManagementUtils = {
 	    this.moreContentButton.click( function() {
 	        var selectedType = pageManagementUtils.contentTypeSelect.val();
 	        var selectedTypeText = $("#typeSelect option:selected").text();
-	        //Not sure why selected group here? This won't always be true for more content
-	        //var selectedGroup = $('select#selectClassGroup').val();
 	        
-	        //Aren't these already hidden? 
-	        //Hide both sections
+	        //Hide all sections
 	        pageManagementUtils.classGroupSection.hide();
 	        pageManagementUtils.fixedHTMLSection.hide();
 	        pageManagementUtils.sparqlQuerySection.hide();
-	        
-	        //Reset class group
-	        pageManagementUtils.resetClassGroupSection();
+	        //Reset main content type drop-down
 	        pageManagementUtils.contentTypeSelectOptions.eq(0).attr('selected', 'selected');
 	        pageManagementUtils.moreContentButton.hide();
 	        if ( pageManagementUtils.leftSideDiv.css("height") != undefined ) {
@@ -148,75 +144,61 @@ var pageManagementUtils = {
 	        }
 	       pageManagementUtils.headerBar.hide();
 	       pageManagementUtils.headerBar.text("");
-	        //pageManagementUtils.cloneContentArea(selectedType,selectedGroup);
-	        pageManagementUtils.cloneContentArea(selectedType, selectedTypeText);
-	        pageManagementUtils.contentTypeSelect.focus();
+	       pageManagementUtils.cloneContentArea(selectedType, selectedTypeText);
+	        //Reset class group section AFTER cloning not before
+	       pageManagementUtils.resetClassGroupSection();
+	       //Clear all inputs values
+	       pageManagementUtils.clearSourceTemplateValues();
+	       pageManagementUtils.contentTypeSelect.focus();
 	    });
 	
 	    //replacing with menu management edit version which is extended with some of the logic below
 	    this.selectClassGroupDropdown.change(function() {
             pageManagementUtils.chooseClassGroup();
         });
-	    /*
-	    $("select#selectClassGroup").change( function() {
-	        if ( $("select#selectClassGroup").val() == "" ) {
-	            $("section#classesInSelectedGroup").addClass('hidden');
-	            $("div#leftSide").css("height","");
-	            $("input#moreContent").hide();
-	            
-	        }
-	        else {
-	            $("section#classesInSelectedGroup").removeClass('hidden');
-	            $("input#moreContent").show();
-	            if ( $("div#leftSide").height() < $("div#rightSide").height() ) {
-	                $("div#leftSide").css("height",$("div#rightSide").height() + "px");
-	            }          
-	        }
-	    });*/
-	  //TODO: These will all change
-	    $("select#typeSelect").change( function() {
+	    
+	    this.contentTypeSelect.change( function() {
 	    	_this = pageManagementUtils;
-	        $('input#variable').val("");
-	        $('textarea#textArea').val("");
+	    	pageManagementUtils.clearSourceTemplateValues();
 	        if ( _this.contentTypeSelect.val() == "browseClassGroup" ) {
 	            pageManagementUtils.classGroupSection.show();
 	            pageManagementUtils.fixedHTMLSection.hide();
 	            pageManagementUtils.sparqlQuerySection.hide();
-	            $("input#moreContent").hide();
-	            $("section#headerBar").text("Browse Class Group - ");
-	            $("section#headerBar").show();
+	            pageManagementUtils.moreContentButton.hide();
+	            pageManagementUtils.headerBar.text("Browse Class Group - ");
+	            pageManagementUtils.headerBar.show();
 	        }
 	        if ( _this.contentTypeSelect.val() == "fixedHtml" || _this.contentTypeSelect.val() == "sparqlQuery" ) {
 	        	 pageManagementUtils.classGroupSection.hide();
+	        	 //if fixed html show that, otherwise show sparq
 	            if ( _this.contentTypeSelect.val() == "fixedHtml" ) {
-	                $('span#taSpan').text("Enter fixed HTML here");
-	                $("section#headerBar").text("Fixed HTML - ");
+	                pageManagementUtils.headerBar.text("Fixed HTML - ");
+	                pageManagementUtils.fixedHTMLSection.show();
+	            	pageManagementUtils.sparqlQuerySection.hide();
 	            }
 	            else {
-	                $('span#taSpan').text("Enter SPARQL query here");
-	                $("section#headerBar").text("SPARQL Query Results - ");
+	                pageManagementUtils.headerBar.text("SPARQL Query Results - ");
+	                pageManagementUtils.sparqlQuerySection.show();
+	            	pageManagementUtils.fixedHTMLSection.hide();
 	            }
-	            //if fixhed html show that, otherwise show sparq
-	            if(_this.contentTypeSelect.val() == "fixedHtml") {
-	            	pageManagementUtils.fixedHTMLSection.show();
-	            	pageManagementUtils.sparqlQuerySection.hide();
-	            } else {
-	            	 pageManagementUtils.sparqlQuerySection.show();
-		            	pageManagementUtils.fixedHTMLSection.hide();
-	            }
-	            $("section#headerBar").show();
-	            $('select#selectClassGroup option').eq(0).attr('selected', 'selected');
-	            $("section#classesInSelectedGroup").addClass('hidden');
-	            $("input#moreContent").show();
+	           
+	            pageManagementUtils.headerBar.show();
+	            //$('select#selectClassGroup option').eq(0).attr('selected', 'selected');
+	            pageManagementUtils.classesForClassGroup.addClass('hidden');
+	            pageManagementUtils.moreContentButton.show();
 	        }
 	        if ( _this.contentTypeSelect.val() == "" ) {
-	            $("section#classGroup").hide();
-	            $("section#nonClassGroup").hide();
-	            $("input#moreContent").hide();
-	            $('select#selectClassGroup option').eq(0).attr('selected', 'selected');
-	            $("section#classesInSelectedGroup").addClass('hidden');
-	            $("section#headerBar").hide();
-	            $("section#headerBar").text("");
+	        	pageManagementUtils.classGroupSection.hide();
+	        	pageManagementUtils.fixedHTMLSection.hide();
+	        	pageManagementUtils.sparqlQuerySection.hide();
+	           
+	            pageManagementUtils.moreContentButton.hide();
+	            
+	            //$('select#selectClassGroup option').eq(0).attr('selected', 'selected');
+	            
+	            pageManagementUtils.classesForClassGroup.addClass('hidden');
+	            pageManagementUtils.headerBar.hide();
+	            pageManagementUtils.headerBar.text("");
 	        }
 	        pageManagementUtils.adjustSaveButtonHeight();
 	    });
@@ -230,13 +212,14 @@ var pageManagementUtils = {
         });*/
 	    
 	    //Submission: validate as well as create appropriate hidden json inputs
-	    $("form").submit(function () { 
+	    $("form").submit(function (event) { 
             var validationError = pageManagementUtils.validateMenuItemForm();
             if (validationError == "") {
             		//Create the appropriate json objects
             		pageManagementUtils.createPageContentForSubmission();
             		//return true;
             		//For testing, not submitting anything
+            		event.preventDefault();
             		return false;
                } else{
             	   
@@ -248,6 +231,24 @@ var pageManagementUtils = {
                } 
          });
     
+	},
+	//Clear values in content areas that are cloned to create the page content type specific sections
+	//i.e. reset sparql query/class group areas
+	//TODO: Check if reset is more what we need here?
+	clearSourceTemplateValues:function() {
+		//inputs, textareas
+		pageManagementUtils.clearInputs(pageManagementUtils.fixedHTMLSection);
+		pageManagementUtils.clearInputs(pageManagementUtils.sparqlQuerySection);
+		pageManagementUtils.clearInputs(pageManagementUtils.classGroupSection);
+
+	},
+	clearInputs:function($el) {
+		//jquery selector :input selects all input text area select and button elements
+		$el.find("input").val("");
+		$el.find("textarea").val("");
+		//resetting class group section as well so selection is reset if type changes
+		$el.find("select option:eq(0)").attr("selected", "selected");
+		
 	},
 	//Clone content area
 	cloneContentArea: function(contentType, contentTypeLabel) {
@@ -268,7 +269,7 @@ var pageManagementUtils = {
         
         pageManagementUtils.createClonedContentContainer($newContentObj, counter, contentTypeLabel, varOrClass);
         //previously increased by 10, just increasing by 1 here
-        counter++;  
+        pageManagementUtils.counter++;  
     },
     createClonedContentContainer:function($newContentObj, counter, contentTypeLabel, varOrClass) {
         //Create the container for the new content
@@ -321,8 +322,11 @@ var pageManagementUtils = {
         });
     },
     resetClassGroupSection:function() {
-    	 $('select#selectClassGroup option').eq(0).attr('selected', 'selected');
-	     $("section#classesInSelectedGroup").addClass('hidden');
+    	//doing this in clear inputs instead which will be triggered
+    	//every time content type is changed AS well as on  more content button after
+    	//original content is cloned and stored
+    	//$('select#selectClassGroup option').eq(0).attr('selected', 'selected');
+    	 pageManagementUtils.classesForClassGroup.addClass('hidden');
     },
     //Adjust save button height
     adjustSaveButtonHeight:function() {
@@ -372,14 +376,14 @@ var pageManagementUtils = {
               
               //From NEW code
               if (pageManagementUtils.selectClassGroupDropdown.val() == "" ) {
-  	            $("section#classesInSelectedGroup").addClass('hidden');
+            	  pageManagementUtils.classesForClassGroup.addClass('hidden');
   	            $("div#leftSide").css("height","");
-  	            $("input#moreContent").hide();
+  	            pageManagementUtils.moreContentButton.hide();
   	            
 	  	        }
 	  	     else {
-	  	            $("section#classesInSelectedGroup").removeClass('hidden');
-	  	            $("input#moreContent").show();
+	  	    	 	pageManagementUtils.classesForClassGroup.removeClass('hidden');
+	  	            pageManagementUtils.moreContentButton.show();
 	  	            if ( $("div#leftSide").height() < $("div#rightSide").height() ) {
 	  	                $("div#leftSide").css("height",$("div#rightSide").height() + "px");
 	  	            }          
@@ -475,10 +479,11 @@ var pageManagementUtils = {
     	//return the json object required
     	if(pageManagementUtils.processDataGetterUtils != null) {
 			var dataGetterType = pageManagementUtils.processDataGetterUtils.selectDataGetterType(pageContentSection);
-			if(dataGetterProcessorMap != null) {
-				var dataGetterProcessor = dataGetterProcessorMap[dataGetterType];
-				dataGetterProcessor.processPageContentSection(pageContentSection);
-				return dataGetterProcessor;
+			if(pageManagementUtils.dataGetterProcessorMap != null) {
+				var dataGetterProcessor = pageManagementUtils.dataGetterProcessorMap[dataGetterType];
+				//the content type specific processor will create the json object to be returned
+				var jsonObject = dataGetterProcessor.processPageContentSection(pageContentSection);
+				return jsonObject;
 			} else {
 				//ERROR handling
 		    	alert("An error has occurred and the map of processors for this content is missing. Please contact the administrator");
@@ -497,7 +502,7 @@ var pageManagementUtils = {
  	    //Save content type
 	    $newContentObj.attr("contentType", contentType);
 	    //Set id for object
-	    $newContentObj.attr("id", "contentType" + counter);
+	    $newContentObj.attr("id", contentType + counter);
 	    $newContentObj.show();
 	    pageManagementUtils.renameIdsInClone($newContentObj, counter);
 	 //   pageManagementUtils.cloneTextAreaValues(originalObjectPath, $newContentObj);
@@ -516,9 +521,9 @@ var pageManagementUtils = {
     //given an object and a counter, rename all the ids
     renameIdsInClone:function($newContentObj, counter) {
     	$newContentObj.find("[id]").each(function(index, el) { 
-    		var originalId = $(this).attr["id"];
+    		var originalId = $(this).attr("id");
     		var newId = originalId + counter;
-    		$(this).attr(newId);
+    		$(this).attr("id", newId);
     	});
     }
     

@@ -7,8 +7,8 @@
 //This will need to be overridden or extended, what have you.. in VIVO
 var processDataGetterUtils = {
 		dataGetterProcessorMap:{"browseClassGroup": processClassGroupDataGetterContent, 
-								"sparqlDataGetter": processSparqlDataGetterContent, 
-								"fixedHTML":processFixedHTMLDataGetterContent,
+								"sparqlQuery": processSparqlDataGetterContent, 
+								"fixedHtml":processFixedHTMLDataGetterContent,
 								"individualsForClasses":processIndividualsForClassesDataGetterContent},
 	    selectDataGetterType:function(pageContentSection) {
 			var contentType = pageContentSection.attr("contentType");
