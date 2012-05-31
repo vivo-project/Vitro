@@ -65,6 +65,11 @@ span#expandAll {
     float: right;
     font-size: 0.85em;
 }
+span.rangeClass {
+    color:#064D68;
+    padding-left:22px;
+    padding-right:8px;
+}
 div#expandLink {
     margin-top:-10px;
     width:100%;

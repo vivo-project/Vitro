@@ -32,6 +32,7 @@
         this.form = $('form#classHierarchyForm');
         this.select = $('select#displayOption');
         this.addClass = $('input#addClass');
+        this.addGroup = $('input#addGroup');
     },
 
     bindEventListeners: function() {
@@ -47,6 +48,10 @@
         });
         this.addClass.click(function() {
             classHierarchyUtils.form.attr("action", "vclass_retry");
+            classHierarchyUtils.form.submit();
+        });
+        this.addGroup.click(function() {
+            classHierarchyUtils.form.attr("action", "editForm?controller=Classgroup");
             classHierarchyUtils.form.submit();
         });
     },
@@ -148,13 +153,13 @@
         $clickableHeader.click(function() {
             if ( $clickableHeader.attr('view') == "less" ) {
                 $clickableHeader.addClass("headerSpanMinus");
-                $('table#classHierarchy' + ctr).find('span').addClass("subclassExpandMinus");
+                $('table#classHierarchy' + ctr).find('span.subclassExpandPlus').addClass("subclassExpandMinus");
                 $('table#classHierarchy' + ctr).find('table.subclassTable').show();
                 $clickableHeader.attr('view', 'more' );
             }
             else {
                 $clickableHeader.removeClass("headerSpanMinus");
-                $('table#classHierarchy' + ctr).find('span').removeClass("subclassExpandMinus");
+                $('table#classHierarchy' + ctr).find('span.subclassExpandPlus').removeClass("subclassExpandMinus");
                 $('table#classHierarchy' + ctr).find('table.subclassTable').hide();
                 $clickableHeader.attr('view', 'less' );
             }
@@ -187,14 +192,14 @@
             if ( classHierarchyUtils.expandAll.text() == "expand all" ) {
                 classHierarchyUtils.expandAll.text("collapse all");
                 $('span.headerSpanPlus').addClass("headerSpanMinus");
-                $('table.classHierarchy').find('span').addClass("subclassExpandMinus");
+                $('table.classHierarchy').find('span.subclassExpandPlus').addClass("subclassExpandMinus");
                 $('table.classHierarchy').find('table.subclassTable').show();
                 $('section#container').find('span.headerSpanPlus').attr('view','more');
             }
             else {
                 classHierarchyUtils.expandAll.text("expand all");
                 $('span.headerSpanPlus').removeClass("headerSpanMinus");
-                $('table.classHierarchy').find('span').removeClass("subclassExpandMinus");
+                $('table.classHierarchy').find('span.subclassExpandPlus').removeClass("subclassExpandMinus");
                 $('table.classHierarchy').find('table.subclassTable').hide();
                 $('section#container').find('span.headerSpanPlus').attr('view','less');
             }
