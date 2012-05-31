@@ -14,24 +14,24 @@ public interface ChangeListener {
 	/**
 	 * Override this to listen to all statements added to the RDF store. 
 	 * 
-	 * @param String serializedTriple - the added statement in n3 format
-	 * @param String graphURI - the graph to which the statement was added
+	 * @param serializedTriple - the added statement in n3 format
+	 * @param graphURI - the graph to which the statement was added
 	 */
 	public void addedStatement(String serializedTriple, String graphURI);
 	
 	/**
 	 * Override this to listen to all statements removed from the RDF store. 
 	 * 
-	 * @param String serializedTriple - the removed statement in n3 format
-	 * @param String graphURI - the graph from which the statement was removed
+	 * @param serializedTriple - the removed statement in n3 format
+	 * @param graphURI - the graph from which the statement was removed
 	 */
 	public void removedStatement(String serializedTriple, String graphURI);
 	
 	/**
 	 * Override this to listen to events pertaining to the given graphURI. 
 	 * 
-	 * @param String graphURI - the graph to which the event pertains
-	 * @param Object event - the event which occurred. 
+	 * @param graphURI - the graph to which the event pertains
+	 * @param event - the event that occurred. 
 	 */
 	public void notifyEvent(String graphURI, Object event);
 }

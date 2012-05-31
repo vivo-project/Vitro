@@ -31,7 +31,7 @@ public interface RDFService {
 	 * If the precondition query returns a non-empty result, no updates
 	 * will be made. 
 	 * 
-	 * @param ChangeSet - a set of changes to be performed on the RDF store.
+	 * @param changeSet - a set of changes to be performed on the RDF store.
 	 *    
 	 * @return boolean - indicates whether the precondition was satisfied            
 	 */
@@ -42,8 +42,8 @@ public interface RDFService {
 	 * RDFServiceException, otherwise adds one type assertion to the default
 	 * graph.
 	 * 
-	 * @param String individualURI - URI of the individual to be added
-	 * @param String individualTypeURI - URI of the type for the individual
+	 * @param individualURI - URI of the individual to be added
+	 * @param individualTypeURI - URI of the type for the individual
 	 */
 	public void newIndividual(String individualURI, String individualTypeURI) throws RDFServiceException;
 
@@ -52,9 +52,9 @@ public interface RDFService {
 	 * RDFServiceException, otherwise adds one type assertion to the given
 	 * graph.
 	 *
-	 * @param String individualURI - URI of the individual to be added
-	 * @param String individualTypeURI - URI of the type for the individual
-	 * @param String graphURI - URI of the graph to which to add the individual
+	 * @param individualURI - URI of the individual to be added
+	 * @param individualTypeURI - URI of the type for the individual
+	 * @param graphURI - URI of the graph to which to add the individual
 	 */
 	public void newIndividual(String individualURI, String individualTypeURI, String graphURI) throws RDFServiceException;
 	
@@ -62,9 +62,10 @@ public interface RDFService {
 	 * Performs a SPARQL construct query against the knowledge base. The query may have
 	 * an embedded graph identifier.
 	 * 
-	 * @param String query - the SPARQL query to be executed against the RDF store
-	 * @param RDFService.ModelSerializationFormat resultFormat - type of serialization for RDF result of the SPARQL query
-	 * @param OutputStream outputStream - the result of the query
+	 * @param query - the SPARQL query to be executed against the RDF store
+	 * @param resultFormat - type of serialization for RDF result of the SPARQL query
+	 * 
+	 * @return InputStream - the result of the query
 	 * 
 	 */
 	public InputStream sparqlConstructQuery(String query, RDFService.ModelSerializationFormat resultFormat) throws RDFServiceException;
@@ -73,8 +74,8 @@ public interface RDFService {
 	 * Performs a SPARQL describe query against the knowledge base. The query may have
 	 * an embedded graph identifier.
 	 * 
-	 * @param String query - the SPARQL query to be executed against the RDF store
-	 * @param RDFService.ModelSerializationFormat resultFormat - type of serialization for RDF result of the SPARQL query
+	 * @param query - the SPARQL query to be executed against the RDF store
+	 * @param resultFormat - type of serialization for RDF result of the SPARQL query
 	 * 
 	 * @return InputStream - the result of the query
 	 * 
@@ -85,8 +86,8 @@ public interface RDFService {
 	 * Performs a SPARQL select query against the knowledge base. The query may have
 	 * an embedded graph identifier.
 	 * 
-	 * @param String query - the SPARQL query to be executed against the RDF store
-	 * @param RDFService.ResultFormat resultFormat - format for the result of the Select query
+	 * @param query - the SPARQL query to be executed against the RDF store
+	 * @param resultFormat - format for the result of the Select query
 	 * 
 	 * @return InputStream - the result of the query
 	 * 
@@ -97,7 +98,7 @@ public interface RDFService {
 	 * Performs a SPARQL ASK query against the knowledge base. The query may have
 	 * an embedded graph identifier.
 	 * 
-	 * @param String query - the SPARQL query to be executed against the RDF store
+	 * @param query - the SPARQL query to be executed against the RDF store
 	 * 
 	 * @return  boolean - the result of the SPARQL query 
 	 */
@@ -112,8 +113,7 @@ public interface RDFService {
 	public List<String> getGraphURIs() throws RDFServiceException;
 
 	/**
-	 * TODO - what is the definition of this method?
-	 * @return 
+	 * TBD - we need to define this method
 	 */
 	public void getGraphMetadata() throws RDFServiceException;
 		
@@ -128,22 +128,22 @@ public interface RDFService {
 	 * Register a listener to listen to changes in any graph in
 	 * the RDF store.
 	 * 
-	 * @return String URI of default read graph
+	 * @param changeListener - the change listener
 	 */
 	public void registerListener(ChangeListener changeListener) throws RDFServiceException;
 	
 	/**
-	 * Unregister a listener to listen to changes in any graph in
-	 * the RDF store.
+	 * Unregister a listener from listening to changes in
+	 * the RDF store in any graph.
 	 * 
-	 * @return String URI of default read graph
+	 * @param changeListener - the change listener
 	 */
 	public void unregisterListener(ChangeListener changeListener) throws RDFServiceException;
 
 	/**
 	 * Create a ChangeSet object
 	 * 
-	 * @return a ChangeSet object
+	 * @return ChangeSet an empty ChangeSet object
 	 */
 	public ChangeSet manufactureChangeSet();	
 }

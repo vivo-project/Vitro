@@ -22,7 +22,7 @@ public interface ChangeSet {
 	/**   
 	 * Setter for the precondition query
 	 * 
-	 * @param String - a SPARQL query            
+	 * @param preconditionQuery - a SPARQL query            
 	 */	
 	public void setPreconditionQuery(String preconditionQuery);
 	
@@ -36,7 +36,7 @@ public interface ChangeSet {
 	/**   
 	 * Setter for the precondition query type
 	 * 
-	 * @param RDFService.SPARQLQueryType - the precondition query type           
+	 * @param queryType - the precondition query type           
 	 */	
 	public void setPreconditionQueryType(RDFService.SPARQLQueryType queryType);
 
@@ -50,23 +50,23 @@ public interface ChangeSet {
 	/**   
 	 * Adds one model change representing an addition to the list of model changes
 	 * 
-	 * @param InputStream - a serialized RDF model (collection of triples)  
-	 * @param RDFService.ModelSerializationFormat - format of the serialized RDF model
-	 * @param String - URI of the graph to which the RDF model should be added         
+	 * @param model - a serialized RDF model (collection of triples)  
+	 * @param serializationFormat - format of the serialized RDF model
+	 * @param graphURI - URI of the graph to which the RDF model should be added         
 	 */		
 	public void addAddition(InputStream model, 
-			                RDFService.ModelSerializationFormat format,
+			                RDFService.ModelSerializationFormat serializationFormat,
 			                String graphURI);
 	
 	/**   
 	 * Adds one model change representing a deletion to the list of model changes
 	 * 
-	 * @param InputStream - a serialized RDF model (collection of triples)  
-	 * @param RDFService.ModelSerializationFormat - format of the serialized RDF model
-	 * @param String - URI of the graph from which the RDF model should be removed         
+	 * @param model - a serialized RDF model (collection of triples)  
+	 * @param serializationFormat - format of the serialized RDF model
+	 * @param graphURI - URI of the graph from which the RDF model should be removed         
 	 */		
 	public void addRemoval(InputStream model,
-			               RDFService.ModelSerializationFormat format,
+			               RDFService.ModelSerializationFormat serializationFormat,
 			               String graphURI);
 
 	/**   
@@ -77,10 +77,10 @@ public interface ChangeSet {
 	/**   
 	 * Creates an instance of the ModelChange class
 	 * 
-	 * @param InputStream - a serialized RDF model (collection of triples)  
-	 * @param RDFService.ModelSerializationFormat - format of the serialized RDF model
-	 * @param ModelChange.Operation - the type of operation to be performed with the serialized RDF model 
-	 * @param String - URI of the graph on which to apply the model change operation        
+	 * @param serializedModel - a serialized RDF model (collection of triples)  
+	 * @param serializationFormat - format of the serialized RDF model
+	 * @param operation - the type of operation to be performed with the serialized RDF model 
+	 * @param graphURI - URI of the graph on which to apply the model change operation        
 	 */		
 	public ModelChange manufactureModelChange(InputStream serializedModel,
                                               RDFService.ModelSerializationFormat serializationFormat,
