@@ -102,12 +102,14 @@ var pageManagementUtils = {
 	bindEventListeners:function(){
 		
 	    this.defaultTemplateRadio.click( function() {
-	            pageManagementUtils.customTemplateRadio.addClass('hidden');
+	            pageManagementUtils.customTemplate.addClass('hidden');
+	            //Also clear custom template value so as not to submit it
+	            pageManagementUtils.clearInputs(pageManagementUtils.customTemplate);
 	            
 	    });
 
 	    this.customTemplateRadio.click( function() {
-	            pageManagementUtils.defaultTemplateRadio.removeClass('hidden');            
+	            pageManagementUtils.customTemplate.removeClass('hidden');            
 	    });
 	
 	    this.isMenuCheckbox.click( function() {
@@ -398,17 +400,20 @@ var pageManagementUtils = {
         // Check/unckeck all classes for selection
         $('input:checkbox[name=allSelected]').click(function(){
              if ( this.checked ) {
-             // if checked, select all the checkboxes
-             $('input:checkbox[name=classInClassGroup]').attr('checked','checked');
+             // if checked, select all the checkboxes for this particular section
+            $(this).closest("ul").find('input:checkbox[name=classInClassGroup]').attr('checked','checked');
+             //$('input:checkbox[name=classInClassGroup]').attr('checked','checked');
 
              } else {
              // if not checked, deselect all the checkboxes
-               $('input:checkbox[name=classInClassGroup]').removeAttr('checked');
+                 $(this).closest("ul").find('input:checkbox[name=classInClassGroup]').removeAttr('checked');
+
+              // $('input:checkbox[name=classInClassGroup]').removeAttr('checked');
              }
         });
 
         $('input:checkbox[name=classInClassGroup]').click(function(){
-            $('input:checkbox[name=allSelected]').removeAttr('checked');
+            $(this).closest(ul).find('input:checkbox[name=allSelected]').removeAttr('checked');
         });
     }, //This is SPECIFIC to VIVO so should be moved there
     updateInternalClassMessage:function(classGroupName) { //User has changed content type 

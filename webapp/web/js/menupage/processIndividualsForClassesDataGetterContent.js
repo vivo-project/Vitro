@@ -10,8 +10,11 @@ var processIndividualsForClassesDataGetterContent = {
 		var classGroup = pageContentSection.find("select[name='selectClassGroup']").val();
 		//query model should also be an input
 		//Get classes selected
-		var classesSelected = pageContentSection.find("input[name='classInClassGroup']:checked").val();
-		var returnObject = {classGroup:classGroup, classesSelected:classesSelected, dataGetterClass:this.dataGetterClass};
+		var classesSelected = [];
+		pageContentSection.find("input[name='classInClassGroup']:checked").each(function(){
+			classesSelected.push($(this).val());
+		});
+		var returnObject = {classGroup:classGroup, classesSelectedInClassGroup:classesSelected, dataGetterClass:this.dataGetterClass};
 		return returnObject;
 	}	
 		

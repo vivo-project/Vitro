@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils;
 
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessDataGetterN3;
+import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetter;
 
 /*
  * This class determines what n3 should be returned for a particular data getter and can be overwritten or extended in VIVO. 
@@ -29,18 +31,19 @@ public class ProcessDataGetterN3Utils {
     public  static HashMap<String, String> getDataGetterTypeToProcessorMap() {
     	 HashMap<String, String> map = new HashMap<String, String>();
     	 map.put("edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessSparqlDataGetterN3");
+    	 map.put("edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessClassGroupDataGetterN3");
+    	 map.put("edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessIndividualsForClassesDataGetterN3");
+   
     	 return map;
     }
     
-    public static ProcessDataGetterN3 getDataGetterProcessorN3(String dataGetterClass) {
+    public static ProcessDataGetterN3 getDataGetterProcessorN3(String dataGetterClass, JSONObject jsonObject) {
     	HashMap<String, String> map = getDataGetterTypeToProcessorMap();
     	//
     	if(map.containsKey(dataGetterClass)) {
     		String processorClass = map.get(dataGetterClass);
     		try {
-    			Class<?> clz = Class.forName(processorClass);
-    			//Don't actually need to pass in json object since that includes the actual submission values
-    			ProcessDataGetterN3 pn = (ProcessDataGetterN3) clz.getConstructor().newInstance();
+    			ProcessDataGetterN3 pn = instantiateClass(processorClass, jsonObject);
     			return pn;
     		} catch(Exception ex) {
     			log.error("Exception occurred in trying to get processor class for n3 for " + dataGetterClass, ex);
@@ -48,6 +51,25 @@ public class ProcessDataGetterN3Utils {
     		}
     	}
     	return null;
+    }
+    
+    private static ProcessDataGetterN3 instantiateClass(String processorClass, JSONObject jsonObject) {
+    	ProcessDataGetterN3 pn = null;
+    	try {
+	    	Class<?> clz = Class.forName(processorClass);
+	    	Constructor<?> ct = clz.getConstructor();
+	    	Class<?>[] parameterTypes =ct.getParameterTypes();
+			if(parameterTypes.length > 0 && parameterTypes[0].isAssignableFrom(jsonObject.getClass())) {
+					 pn = (ProcessDataGetterN3) ct.newInstance(jsonObject);
+			} 	else {
+				pn = (ProcessDataGetterN3) ct.newInstance();
+			} 
+		
+    	} catch(Exception ex) {
+			log.error("Error occurred instantiating " + processorClass, ex);
+		}
+    	return pn;
+        		
     }
     
 }

@@ -25,9 +25,11 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessDataGetterN3;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessDataGetterN3Utils;
+import net.sf.json.JSON;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
-
+import net.sf.json.util.JSONUtils;
 public class ManagePagePreprocessor extends
 		BaseEditSubmissionPreprocessorVTwo {
 
@@ -83,7 +85,7 @@ public class ManagePagePreprocessor extends
 		int counter = 0;
 		for(JSONObject jsonObject:pageContentUnitsJSON) {
 			String dataGetterClass = getDataGetterClass(jsonObject);
-			ProcessDataGetterN3 pn = ProcessDataGetterN3Utils.getDataGetterProcessorN3(dataGetterClass);
+			ProcessDataGetterN3 pn = ProcessDataGetterN3Utils.getDataGetterProcessorN3(dataGetterClass, jsonObject);
 			//Add n3 required
 			addN3Required(pn, counter);
 			//Add N3 Optional as well
@@ -136,23 +138,52 @@ public class ManagePagePreprocessor extends
 		 List<String> uriLabels = pn.getUriVarNamesBase();
 		 
 		 for(String literalLabel:literalLabels) {
-			 //TODO: Deal with multiple submission values
-			 //This retrieves the value for this particular json object
-			 String literalValue = jsonObject.getString(literalLabel);
-			 //Var names will depend on which data getter object this is on the page, so depends on counter
+			 List<String> literalValues = new ArrayList<String>();
+			 Object jsonValue = jsonObject.get(literalLabel);
+			//Var names will depend on which data getter object this is on the page, so depends on counter
 			 String submissionLiteralName = pn.getVarName(literalLabel, counter);
+			 //Single value
+			 if(jsonValue instanceof String) {
+				 //TODO: Deal with multiple submission values
+				 //This retrieves the value for this particular json object
+				 literalValues.add(jsonObject.getString(literalLabel));
+			 } else if(jsonValue instanceof JSONArray) {
+				 JSONArray values = jsonObject.getJSONArray(literalLabel);
+				 literalValues = (List<String>) JSONSerializer.toJava(values);
+			 }
 			 //This adds literal, connecting the field with 
-			 submission.addLiteralToForm(editConfiguration, editConfiguration.getField(submissionLiteralName), submissionLiteralName, new String[]{literalValue});
+			 submission.addLiteralToForm(editConfiguration, 
+					 editConfiguration.getField(submissionLiteralName), 
+					 submissionLiteralName, 
+					 (String[])literalValues.toArray());
 		 }
 		 
 		 for(String uriLabel:uriLabels) {
-			 //TODO: Deal with multiple submission values
-			 //This retrieves the value for this particular json object
-			 String uriValue = jsonObject.getString(uriLabel);
-			 //Var names will depend on which data getter object this is on the page, so depends on counter
+			 List<String> uriValues = new ArrayList<String>();
+			 Object jsonValue = jsonObject.get(uriLabel);
+			//Var names will depend on which data getter object this is on the page, so depends on counter
 			 String submissionUriName = pn.getVarName(uriLabel, counter);
-			 //This adds literal, connecting the field with 
-			 submission.addLiteralToForm(editConfiguration, editConfiguration.getField(submissionUriName), submissionUriName, new String[]{uriValue});
+			 //if single value, then, add to values
+			 if(jsonValue instanceof String) {
+				 //Var names will depend on which data getter object this is on the page, so depends on counter
+				 //This retrieves the value for this particular json object and adds to list
+				 uriValues.add(jsonObject.getString(uriLabel));
+
+			 } else if(jsonValue instanceof JSONArray) {
+				 //multiple values
+				 JSONArray values = jsonObject.getJSONArray(uriLabel);
+				 uriValues = (List<String>) JSONSerializer.toJava(values);
+			 } else {
+				 //This may include JSON Objects but no way to deal with these right now
+			 }
+			 String[] uriValuesSubmission = new String[uriValues.size()];
+
+			 uriValuesSubmission = uriValues.toArray(uriValuesSubmission);
+			 //This adds literal, connecting the field with the value
+			 submission.addLiteralToForm(editConfiguration, 
+					 editConfiguration.getField(submissionUriName), 
+					 submissionUriName, 
+					 uriValuesSubmission);
 			 
 		 }
 		 //this needs to be different

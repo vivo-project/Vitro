@@ -17,7 +17,7 @@ import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 //Returns the appropriate n3 based on data getter
 public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
-	private static String classType = "java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupDataGetter";
+	private static String classType = "java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData";
 	
 	public ProcessClassGroupDataGetterN3(){
 		
