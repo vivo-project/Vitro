@@ -180,10 +180,7 @@ public class ManagePagePreprocessor extends
 
 			 uriValuesSubmission = uriValues.toArray(uriValuesSubmission);
 			 //This adds literal, connecting the field with the value
-			 submission.addLiteralToForm(editConfiguration, 
-					 editConfiguration.getField(submissionUriName), 
-					 submissionUriName, 
-					 uriValuesSubmission);
+			 submission.addUriToForm(editConfiguration, submissionUriName, uriValuesSubmission);
 			 
 		 }
 		 //this needs to be different

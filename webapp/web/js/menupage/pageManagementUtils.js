@@ -221,8 +221,8 @@ var pageManagementUtils = {
             		pageManagementUtils.createPageContentForSubmission();
             		//return true;
             		//For testing, not submitting anything
-            		event.preventDefault();
-            		return false;
+            		//event.preventDefault();
+            		return true;
                } else{
             	   
                    $('#error-alert').removeClass('hidden');
@@ -261,9 +261,9 @@ var pageManagementUtils = {
         //Clone the object, renaming ids and copying text area values as well
         $newContentObj = pageManagementUtils.createCloneObject(contentType, counter);
         
-        if ( contentType == "fixedHTML" || contentType == "sparqlQuery") {
-        	varOrClass = $newContentObj.find('input#saveToVar').val();
-        }
+        if ( contentType == "sparqlQuery" || contentType == "fixedHtml") {
+        	varOrClass = $newContentObj.find('input[name="saveToVar"]').val();
+        } 
         else if ( contentType == "browseClassGroup" ) {
         	$newContentObj.find('section#classesInSelectedGroup' + counter).removeClass('hidden');
         	varOrClass = $newContentObj.find('select#selectClassGroup' + counter + ' option:selected').text();

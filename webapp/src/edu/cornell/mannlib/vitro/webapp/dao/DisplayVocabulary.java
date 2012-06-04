@@ -130,10 +130,13 @@ public class DisplayVocabulary {
 
 	public static final String HOME_MENU_ITEM = DISPLAY_NS + "HomeMenuItem";
         
-	/* some URIs of properties used with the SPARQL DataGetter */
+	/* some URIs of properties used with the SPARQL DataGetter, and save to var is saved for fixedHtml */
     public static final String SAVE_TO_VAR = DISPLAY_NS + "saveToVar" ;
     public static final String QUERY_MODEL = DISPLAY_NS + "queryModel";    
     public static final String QUERY = DISPLAY_NS + "query";
+    
+    /* URI of property for Fixed HTML Generator */
+    public static final String FIXED_HTML_VALUE = DISPLAY_NS + "htmlValue";
     
     //public static final Individual EVENTS = m_model.createIndividual( NS + "Events", PAGE );
     

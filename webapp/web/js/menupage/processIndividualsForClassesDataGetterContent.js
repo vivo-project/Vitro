@@ -12,6 +12,7 @@ var processIndividualsForClassesDataGetterContent = {
 		//Get classes selected
 		var classesSelected = [];
 		pageContentSection.find("input[name='classInClassGroup']:checked").each(function(){
+			//Need to make sure that the class is also saved as a URI
 			classesSelected.push($(this).val());
 		});
 		var returnObject = {classGroup:classGroup, classesSelectedInClassGroup:classesSelected, dataGetterClass:this.dataGetterClass};

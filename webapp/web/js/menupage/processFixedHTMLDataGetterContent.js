@@ -9,10 +9,10 @@ var processFixedHTMLDataGetterContent = {
 	},
 	//requires variable and text area
 	processPageContentSection:function(pageContentSection) {
-		var variableValue = pageContentSection.find("input[name='variable']").val();
-		var queryValue = pageContentSection.find("textarea[name='textArea']").val();
+		var saveToVarValue = pageContentSection.find("input[name='saveToVar']").val();
+		var htmlValue = pageContentSection.find("textarea[name='htmlValue']").val();
 		//query model should also be an input
-		var returnObject = {saveToVar:variableValue, query:queryValue, dataGetterClass:this.dataGetterClass, queryModel:"vitro:contextDisplayModel"};
+		var returnObject = {saveToVar:saveToVarValue, htmlValue:htmlValue, dataGetterClass:this.dataGetterClass};
 		return returnObject;
 	}
 		

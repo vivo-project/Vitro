@@ -18,7 +18,7 @@ import net.sf.json.JSONSerializer;
 //Returns the appropriate n3 based on data getter
 public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
 	private static String classType = "java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData";
-	
+	private static  String classGroupVarBase = "classGroup";
 	public ProcessClassGroupDataGetterN3(){
 		
 	}
@@ -27,16 +27,26 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
 	//TODO: ensure correct model returned
 	//We shouldn't use the ACTUAL values here but generate the n3 required
     public List<String> retrieveN3Required(int counter) {
-    	String dataGetterVar = getDataGetterVar(counter);
-    	String n3 = dataGetterVar + " a <" + classType + ">; \n" + 
-    		"<" + DisplayVocabulary.FOR_CLASSGROUP + "> ?classGroup .";
-    	List<String> requiredList = new ArrayList<String>();
-    	requiredList.add(getPrefixes() + n3);
-    	return requiredList;
+    	return this.retrieveN3ForTypeAndClassGroup(counter);
     	
     }
     public List<String> retrieveN3Optional(int counter) {
     	return null;
+    }
+    
+    public List<String> retrieveN3ForTypeAndClassGroup(int counter) {
+    	String n3ForType = this.getN3ForTypePartial(counter);
+    	String n3 = n3ForType +"; \n" + 
+    		"<" + DisplayVocabulary.FOR_CLASSGROUP + "> " + getN3VarName(classGroupVarBase, counter) + " .";
+    	List<String> n3List = new ArrayList<String>();
+    	n3List.add(getPrefixes() + n3);
+    	return n3List;
+    }
+    
+    public String getN3ForTypePartial(int counter) {
+    	String dataGetterVar = getDataGetterVar(counter);
+    	String n3 = dataGetterVar + " a <" + getClassType() + ">";
+    	return n3;
     }
     
     //These methods will return the literals and uris expected within the n3
@@ -75,6 +85,10 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
 	   return Arrays.asList("classGroup");   
    }
 
+   //This class can be extended so returning type here
+   public String getClassType() {
+	   return classType;
+   }
 
 }
 

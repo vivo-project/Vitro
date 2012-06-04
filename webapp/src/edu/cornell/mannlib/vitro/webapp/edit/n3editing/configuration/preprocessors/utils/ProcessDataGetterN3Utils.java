@@ -33,7 +33,8 @@ public class ProcessDataGetterN3Utils {
     	 map.put("edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessSparqlDataGetterN3");
     	 map.put("edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessClassGroupDataGetterN3");
     	 map.put("edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessIndividualsForClassesDataGetterN3");
-   
+    	 map.put("edu.cornell.mannlib.vitro.webapp.utils.dataGetter.FixedHTMLDataGetter", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessFixedHTMLN3");
+
     	 return map;
     }
     
@@ -57,13 +58,15 @@ public class ProcessDataGetterN3Utils {
     	ProcessDataGetterN3 pn = null;
     	try {
 	    	Class<?> clz = Class.forName(processorClass);
-	    	Constructor<?> ct = clz.getConstructor();
-	    	Class<?>[] parameterTypes =ct.getParameterTypes();
-			if(parameterTypes.length > 0 && parameterTypes[0].isAssignableFrom(jsonObject.getClass())) {
-					 pn = (ProcessDataGetterN3) ct.newInstance(jsonObject);
-			} 	else {
-				pn = (ProcessDataGetterN3) ct.newInstance();
-			} 
+	    	Constructor<?>[] ctList = clz.getConstructors();
+	    	for (Constructor<?> ct: ctList) {
+		    	Class<?>[] parameterTypes =ct.getParameterTypes();
+				if(parameterTypes.length > 0 && parameterTypes[0].isAssignableFrom(jsonObject.getClass())) {
+						 pn = (ProcessDataGetterN3) ct.newInstance(jsonObject);
+				} 	else {
+						pn = (ProcessDataGetterN3) ct.newInstance();
+				} 
+	    	}
 		
     	} catch(Exception ex) {
 			log.error("Error occurred instantiating " + processorClass, ex);

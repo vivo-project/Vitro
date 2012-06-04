@@ -12,7 +12,7 @@ var processClassGroupDataGetterContent = {
 	processPageContentSection:function(pageContentSection) {
 		//Will look at classes etc. 
 		var classGroup = pageContentSection.find("select[name='selectClassGroup']").val();
-		//query model should also be an input
+		//query model should also be an input, ensure class group URI is saved as URI and not string
 		var returnObject = {classGroup:classGroup, dataGetterClass:this.dataGetterClass};
 		return returnObject;
 	}

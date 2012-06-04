@@ -36,12 +36,20 @@ public  class ProcessIndividualsForClassesDataGetterN3 extends ProcessClassGroup
 	//TODO: ensure correct model returned
 	//We shouldn't use the ACTUAL values here but generate the n3 required
     public List<String> retrieveN3Required(int counter) {
-    	List<String> classGroupN3 = super.retrieveN3Required(counter);
+    	
+    	List<String> classGroupN3 = this.retrieveN3ForTypeAndClassGroup(counter);
     	classGroupN3.addAll(this.addIndividualClassesN3(counter));
     	return classGroupN3;
     	
     }
     
+    /*
+    @Override
+    public String getN3ForTypePartial(int counter) {
+    	String dataGetterVar = getDataGetterVar(counter);
+    	String n3 = dataGetterVar + " a <" + getClassType() + ">";
+    	return n3;
+    }*/
     
     private List<String> addIndividualClassesN3(int counter) {
 		List<String> classN3 = new ArrayList<String>();
@@ -125,6 +133,11 @@ public  class ProcessIndividualsForClassesDataGetterN3 extends ProcessClassGroup
    //these are for the fields ON the form
    public List<String> getUriVarNamesBase() {
 	   return Arrays.asList("classGroup", individualClassVarNameBase);   
+   }
+   
+   @Override
+   public String getClassType() {
+	   return classType;
    }
 
 
