@@ -43,7 +43,7 @@
     <ul class="searchhits">
         <#list individuals as individual>
             <li>                        
-                <#include "${individual.searchView}">
+            	<@shortView uri=individual.uri viewContext="search" />
             </li>
         </#list>
     </ul>

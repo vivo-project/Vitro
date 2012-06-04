@@ -33,7 +33,7 @@ import com.hp.hpl.jena.vocabulary.XSD;
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditElementVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.BasicValidation;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.N3Validator;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;

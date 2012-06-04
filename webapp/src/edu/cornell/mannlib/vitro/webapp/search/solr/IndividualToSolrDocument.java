@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.solr;
 
-import org.jsoup.Jsoup;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -14,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.joda.time.DateTime;
+import org.jsoup.Jsoup;
 
 import com.hp.hpl.jena.vocabulary.OWL;
 
@@ -26,50 +25,35 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ClassProhibitedFromSearch;
-import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearch;
 
 public class IndividualToSolrDocument {
         
     public static final Log log = LogFactory.getLog(IndividualToSolrDocument.class.getName());
     
-    public static VitroSearchTermNames term = new VitroSearchTermNames();
-    
-    protected static String entClassName = Individual.class.getName();
-    
-    protected ClassProhibitedFromSearch classesProhibitedFromSearch;
-    
-    protected IndividualProhibitedFromSearch individualProhibitedFromSearch;
+    public static VitroSearchTermNames term = new VitroSearchTermNames();              
     
     protected final String label = "http://www.w3.org/2000/01/rdf-schema#label";
     
     protected List<DocumentModifier> documentModifiers = new ArrayList<DocumentModifier>();
-    
-    public IndividualToSolrDocument(
-            ClassProhibitedFromSearch classesProhibitedFromSearch, 
-    		IndividualProhibitedFromSearch individualProhibitedFromSearch){
-    	
-        this(   classesProhibitedFromSearch,
-    	        individualProhibitedFromSearch,
-    	        Collections.EMPTY_LIST);
-    }
-    
-    public IndividualToSolrDocument(
-            ClassProhibitedFromSearch classesProhibitedFromSearch, 
-            IndividualProhibitedFromSearch individualProhibitedFromSearch,
-            List<DocumentModifier> docModifiers){
-        this.classesProhibitedFromSearch = classesProhibitedFromSearch;
-        this.individualProhibitedFromSearch = individualProhibitedFromSearch;
-        this.documentModifiers = docModifiers;
 
-    }
-    
+    protected List<SearchIndexExcluder> excludes;
+        
+    public IndividualToSolrDocument(List<SearchIndexExcluder> excludes, List<DocumentModifier> docModifiers){
+        this.excludes = excludes;
+        this.documentModifiers = docModifiers;
+    }    
 
 	@SuppressWarnings("static-access")
     public SolrInputDocument translate(Individual ind) throws IndexingException{
         try{    	            	      	        	
         	log.debug("translating " + ind.getURI());
-        	checkForSkipBasedOnNS( ind );
-        	        	            
+        	
+        	String excludeMsg = checkExcludes( ind );
+        	if( excludeMsg != DONT_EXCLUDE){
+        	    log.debug(excludeMsg);
+        	    return null;
+        	}        	    
+        		            
         	SolrInputDocument doc = new SolrInputDocument();                    	
         	
             //DocID
@@ -77,44 +61,30 @@ public class IndividualToSolrDocument {
             
             //vitro id
             doc.addField(term.URI, ind.getURI());
-            
-            //java class
-            doc.addField(term.JCLASS, entClassName);
-
+                    
             //Individual Label
             addLabel( ind, doc );
             
         	//add classes, classgroups get if prohibied becasue of its class
             StringBuffer classPublicNames = new StringBuffer("");
-        	boolean prohibited = addClasses(ind, doc, classPublicNames);
-        	
-        	//filter out class groups, owl:ObjectProperties etc..
-        	if(individualProhibitedFromSearch.isIndividualProhibited( ind.getURI() )){
-        		return null;
-        	}        	   
-        	        	        	
+        	addClasses(ind, doc, classPublicNames);
+        	        	        	        	
         	// collecting URIs and rdfs:labels of objects of statements         	
         	StringBuffer objectNames = new StringBuffer("");        	
         	StringBuffer addUri = new StringBuffer("");           	
-        	addObjectPropertyText(ind, doc, objectNames, addUri);        	                 	                                   
-        	
-        	//add if the individual has a thumbnail or not.
-        	addThumbnailExistance(ind, doc);           
+        	addObjectPropertyText(ind, doc, objectNames, addUri);        	                 	                                           	     
                         
             //time of index in millis past epoc
             doc.addField(term.INDEXEDTIME, new Long( (new DateTime()).getMillis() ) ); 
-            
-            if(!prohibited){
-               addAllText( ind, doc, classPublicNames, objectNames );
+                        
+            addAllText( ind, doc, classPublicNames, objectNames );
                
-               runAdditionalDocModifers(ind,doc,addUri);                        
-
-               //boost for entity
-                if(documentModifiers == null || documentModifiers.isEmpty() &&
-                   (ind.getSearchBoost() != null && ind.getSearchBoost() != 0)) {
-                        doc.setDocumentBoost(ind.getSearchBoost());                    
-                }
-            }
+            //boost for entity
+            if(ind.getSearchBoost() != null && ind.getSearchBoost() != 0) {
+                doc.setDocumentBoost(ind.getSearchBoost());                    
+            }    
+            
+            runAdditionalDocModifers(ind,doc,addUri);            
             
             return doc;
         }catch(SkipIndividualException ex){
@@ -122,7 +92,7 @@ public class IndividualToSolrDocument {
             log.debug(ex);
             return null;
         }catch(Throwable th){
-            //Odd exceptions from jena get thrown on shutdown
+            //Odd exceptions can get thrown on shutdown
             if( log != null )
                 log.debug(th);
             return null;
@@ -130,7 +100,20 @@ public class IndividualToSolrDocument {
     }
     
            
-	protected void runAdditionalDocModifers( Individual ind, SolrInputDocument doc, StringBuffer addUri ) 
+	protected String checkExcludes(Individual ind) {
+        for( SearchIndexExcluder excluder : excludes){
+            try{
+                String msg = excluder.checkForExclusion(ind);
+                if( msg != DONT_EXCLUDE)
+                    return msg;
+            }catch (Exception e) {
+                return e.getMessage();
+            }
+        }	    
+	    return DONT_EXCLUDE;
+    }
+
+    protected void runAdditionalDocModifers( Individual ind, SolrInputDocument doc, StringBuffer addUri ) 
     throws SkipIndividualException{
         //run the document modifiers
         if( documentModifiers != null && !documentModifiers.isEmpty()){
@@ -140,18 +123,6 @@ public class IndividualToSolrDocument {
         }
     }
     
-    protected void checkForSkipBasedOnNS(Individual ind) throws SkipIndividualException {
-        String id = ind.getURI();                  
-        if(id == null){            
-            throw new SkipIndividualException("cannot add individuals without URIs to search index");
-        }else if( id.startsWith(VitroVocabulary.vitroURI) ||
-                id.startsWith(VitroVocabulary.VITRO_PUBLIC) ||
-                id.startsWith(VitroVocabulary.PSEUDO_BNODE_NS) ||
-                id.startsWith(OWL.NS)){
-            throw new SkipIndividualException("not indexing because of namespace:" + id);            
-        }        
-    }
-
     protected void addAllText(Individual ind, SolrInputDocument doc, StringBuffer classPublicNames, StringBuffer objectNames) {
         String t=null;
         //ALLTEXT, all of the 'full text'
@@ -210,19 +181,7 @@ public class IndividualToSolrDocument {
         // NAME_LOWERCASE, NAME_UNSTEMMED, NAME_STEMMED, NAME_PHONETIC, AC_NAME_UNTOKENIZED, AC_NAME_STEMMED
     }
 
-    /**
-     * Adds if the individual has a thumbnail image or not.
-     */
-    protected void addThumbnailExistance(Individual ind, SolrInputDocument doc) {
-        try{
-            if(ind.hasThumb())
-                doc.addField(term.THUMBNAIL, "1");
-            else
-                doc.addField(term.THUMBNAIL, "0");
-        }catch(Exception ex){
-            log.debug("could not index thumbnail: " + ex);
-        }        
-    }
+
 
     /**
      * Get the rdfs:labes for objects of statements and put in objectNames.
@@ -258,32 +217,24 @@ public class IndividualToSolrDocument {
      * @returns true if prohibited from search
      * @throws SkipIndividualException 
      */
-    protected boolean addClasses(Individual ind, SolrInputDocument doc, StringBuffer classPublicNames) throws SkipIndividualException{
+    protected void addClasses(Individual ind, SolrInputDocument doc, StringBuffer classPublicNames) throws SkipIndividualException{
         ArrayList<String> superClassNames = null;        
         
-        // Types and classgroups
-        boolean prohibited = false;
         List<VClass> vclasses = ind.getVClasses(false);
-        superClassNames = new ArrayList<String>();         
+        if( vclasses == null || vclasses.isEmpty() ){
+            throw new SkipIndividualException("Not indexing because individual has no super classes");
+        }        
+                
         for(VClass clz : vclasses){
-            String superLclName = clz.getLocalName();
-            superClassNames.add(superLclName);
             if(clz.getURI() == null){
                 continue;
             }else if(OWL.Thing.getURI().equals(clz.getURI())){
-                //index individuals of type owl:Thing, just don't add owl:Thing as the type field in the index
+                //don't add owl:Thing as the type in the index
                 continue;
-            } else if(clz.getURI().startsWith(OWL.NS)){
-                throw new SkipIndividualException("not indexing " + ind.getURI() + " because of type " + clz.getURI() );    
-            } 
-            // do not index individuals of type Role, AdvisingRelationShip, Authorship, etc.(see search.n3 for more information)
-            else if(classesProhibitedFromSearch.isClassProhibitedFromSearch(clz.getURI())){
-            	 throw new SkipIndividualException("not indexing " + ind.getURI() + " because of prohibited type " + clz.getURI() );
-            } else {
-                if( !prohibited && classesProhibitedFromSearch.isClassProhibitedFromSearch(clz.getURI()))
-                    prohibited = true;
-                if( clz.getSearchBoost() != null)
+            } else {                                
+                if( clz.getSearchBoost() != null){
                     doc.setDocumentBoost(doc.getDocumentBoost() + clz.getSearchBoost());
+                }
                 
                 doc.addField(term.RDFTYPE, clz.getURI());
                 
@@ -302,14 +253,7 @@ public class IndividualToSolrDocument {
                     doc.addField(term.CLASSGROUP_URI,clz.getGroupURI());
                 }               
             }
-        }            
-        
-        if(superClassNames.isEmpty()){
-            throw new SkipIndividualException("Not indexing because individual has no super classes");
-        }               
-        
-        doc.addField(term.PROHIBITED_FROM_TEXT_RESULTS, prohibited?"1":"0");
-        return prohibited;
+        }                                                
     }
     
     public Object getIndexId(Object obj) {
@@ -318,7 +262,7 @@ public class IndividualToSolrDocument {
     
     public String getIdForUri(String uri){
         if( uri != null ){
-            return  entClassName + uri;
+            return  "vitroIndividual:" + uri;
         }else{
             return null;
         }
@@ -352,6 +296,5 @@ public class IndividualToSolrDocument {
         }
     }
 
-    public static float NAME_BOOST = 1.2F;
-    
+    protected static final String DONT_EXCLUDE =null;
 }

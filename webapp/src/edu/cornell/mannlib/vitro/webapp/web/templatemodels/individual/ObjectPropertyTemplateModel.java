@@ -22,6 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfigurationLoader;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
@@ -29,6 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.InvalidConfigurationException;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.PropertyListConfig;
+import freemarker.cache.TemplateLoader;
 
 public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel {
     
@@ -87,7 +89,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         
         // Get the config for this object property
         try {
-            config = new PropertyListConfig(this, vreq, op, editing);
+        	config = new PropertyListConfig(this, getFreemarkerTemplateLoader(), vreq, op, editing);
         } catch (InvalidConfigurationException e) {
             throw e;
         } catch (Exception e) {
@@ -127,6 +129,18 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             addUrl = UrlBuilder.getUrl(EDIT_PATH, params);  
         }
     }
+    
+    /**
+     * Pull this into a protected method so we can stub it out in the unit tests.
+     * Other options: 
+     * 1) receive a TemplateLoader into the constructor of ObjectPropertyTemplateModel, 
+     * 2) provide a service that will check to see whether a given template name is valid,
+     * 3) skip the test for valid template name until we try to use the thing.
+     * This will do for now.
+     */
+	protected TemplateLoader getFreemarkerTemplateLoader() {
+		return FreemarkerConfigurationLoader.getConfig(vreq).getTemplateLoader();
+	}
     
     protected List<Map<String, String>> getStatementData() {
         ObjectPropertyStatementDao opDao = vreq.getWebappDaoFactory().getObjectPropertyStatementDao();

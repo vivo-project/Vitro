@@ -24,11 +24,11 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
-import edu.cornell.mannlib.vitro.webapp.controller.JsonServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController.PageRecord;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController.PageRecord;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.controller.json.JsonServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
@@ -126,12 +126,9 @@ public class PageDataGetterUtils {
     		String className = getClassNameFromUri(dgClassName);
     		Class clz =  Class.forName(className);
     		
-    		if( DataGetterUtils.isInstanceOfInterface(clz, PageDataGetter.class)){    		        		
-    		    Object obj = clz.newInstance();
-    		    if(obj != null && obj instanceof PageDataGetter) {
-    		        PageDataGetter pg = (PageDataGetter) obj;
-    		        dataGetterObjects.add(pg);
-    		    }	    		
+    		if( PageDataGetter.class.isAssignableFrom(clz)){    		        		
+    		    PageDataGetter pg = (PageDataGetter) clz.newInstance();
+    		    dataGetterObjects.add(pg);
     		}// else skip if class does not implement PageDataGetter
     	} 
 	        

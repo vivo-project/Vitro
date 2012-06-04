@@ -3,7 +3,7 @@
 <!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
 <!-- ====================================================================== 
-     Build script for the Vitro core webapp.
+     Build script for the Vitro core webapp. 
      
      This can be used on its own, or invoked from a Product build script.
      ====================================================================== -->
@@ -12,7 +12,7 @@
 
 	<!-- - - - - - - - - - - - - - - - - - 
           properties                      
-         - - - - - - - - - - - - - - - - - -->
+      - - - - - - - - - - - - - - - - -->
 	<dirname property="corebase.dir" file="${ant.file.vitroCore}" />
 
 	<!-- A product script will override appbase.dir, but not corebase.dir -->

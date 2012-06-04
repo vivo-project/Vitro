@@ -61,8 +61,22 @@ public class ThumbnailImageURL implements DocumentModifier {
 		
 		//add a field for storing the location of thumbnail for the individual.
 		doc.addField(fieldForThumbnailURL, runQueryForThumbnailLocation(individual));
-	
+		addThumbnailExistance(individual, doc);
 	}
+
+	/**
+     * Adds if the individual has a thumbnail image or not.
+     */
+    protected void addThumbnailExistance(Individual ind, SolrInputDocument doc) {
+        try{
+            if(ind.hasThumb())
+                doc.addField(term.THUMBNAIL, "1");
+            else
+                doc.addField(term.THUMBNAIL, "0");
+        }catch(Exception ex){
+            log.debug("could not index thumbnail: " + ex);
+        }        
+    }
 
 	protected String runQueryForThumbnailLocation(Individual individual) {
 		

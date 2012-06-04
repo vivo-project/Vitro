@@ -18,17 +18,19 @@ import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.client.solrj.impl.XMLResponseParser;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.search.beans.FileBasedProhibitedFromSearch;
-import edu.cornell.mannlib.vitro.webapp.search.beans.IndividualProhibitedFromSearchImpl;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForContextNodes;
@@ -40,11 +42,32 @@ import edu.cornell.mannlib.vitro.webapp.search.indexing.SearchReindexingListener
 import edu.cornell.mannlib.vitro.webapp.search.indexing.URIsForClassGroupChange;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
-public class SolrSetup implements javax.servlet.ServletContextListener{   
-    private static final Log log = LogFactory.getLog(SolrSetup.class.getName());
+public class SolrSetup implements javax.servlet.ServletContextListener{       
     
     public static final String SOLR_SERVER  = "vitro.local.solr.server";    
     public static final String PROHIBITED_FROM_SEARCH = "edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch";
+
+    /** Exclude from the search index Individuals with types from these namespaces */
+    private static final String[] TYPE_NS_EXCLUDES = {
+        VitroVocabulary.PUBLIC  
+        //if you do OWL.NS here you will exclude all of owl:Thing.
+    };
+
+    /** Exclude from the search index individuals who's URIs start with these namespaces. */
+    private static final String[] INDIVIDUAL_NS_EXCLUDES={
+        VitroVocabulary.vitroURI,
+        VitroVocabulary.VITRO_PUBLIC,
+        VitroVocabulary.PSEUDO_BNODE_NS,
+        OWL.NS    
+    };
+    
+    
+    /** Individuals of these types will be excluded from the search index */
+    private static final String[] OWL_TYPES_EXCLUDES = {
+        OWL.ObjectProperty.getURI(),
+        OWL.DatatypeProperty.getURI(),
+        OWL.AnnotationProperty.getURI()
+    };
         
     @Override
     public void contextInitialized(ServletContextEvent sce) {        
@@ -85,31 +108,42 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             
             /* set up the individual to solr doc translation */            
             OntModel jenaOntModel = ModelContext.getJenaOntModel(context);            
+            Model displayModel = ModelContext.getDisplayModel(context);
             
             /* try to get context attribute DocumentModifiers 
              * and use that as the start of the list of DocumentModifier 
-             * objects.  This allows other listeners to add to the basic set of 
-             * DocumentModifiers. */
-            List<DocumentModifier> modifiers = (List<DocumentModifier>)context.getAttribute("DocumentModifiers");
+             * objects.  This allows other ContextListeners to add to 
+             * the basic set of DocumentModifiers. */
+            @SuppressWarnings("unchecked")
+            List<DocumentModifier> modifiers = 
+                (List<DocumentModifier>)context.getAttribute("DocumentModifiers");            
             if( modifiers == null )
                 modifiers = new ArrayList<DocumentModifier>();
             
-            modifiers.add(new NameBoost());
-            modifiers.add(new ThumbnailImageURL(jenaOntModel));
+       
+            modifiers.add(new NameBoost(  1.2f ));
+            modifiers.add(new ThumbnailImageURL(jenaOntModel));                        
             
-            // setup prohibited from search based on N3 files in the directory WEB-INF/ontologies/search
+            /* try to get context attribute SearchIndexExcludes 
+             * and use that as the start of the list of exclude 
+             * objects.  This allows other ContextListeners to add to 
+             * the basic set of SearchIndexExcludes . */
+            @SuppressWarnings("unchecked")
+            List<SearchIndexExcluder> excludes = 
+                (List<SearchIndexExcluder>)context.getAttribute("SearchIndexExcludes");            
+            if( excludes == null )
+                excludes = new ArrayList<SearchIndexExcluder>();
             
-            File dir = new File(sce.getServletContext().getRealPath("/WEB-INF/ontologies/search"));            
-            ProhibitedFromSearch pfs = new FileBasedProhibitedFromSearch(DisplayVocabulary.SEARCH_INDEX_URI, dir);            
-            context.setAttribute(PROHIBITED_FROM_SEARCH,pfs);
+            excludes.add(new ExcludeBasedOnNamespace( INDIVIDUAL_NS_EXCLUDES ));
+            excludes.add(new ExcludeBasedOnTypeNamespace( TYPE_NS_EXCLUDES ) );
+            excludes.add(new ExcludeBasedOnType( OWL_TYPES_EXCLUDES) );
+            excludes.add(new ExcludeNonFlagVitro() );                        
+            excludes.add( new SyncingExcludeBasedOnType( displayModel ) );                        
             
-            IndividualToSolrDocument indToSolrDoc = new IndividualToSolrDocument(            
-                    pfs,
-            		new IndividualProhibitedFromSearchImpl(context), 
-            		modifiers);                        
+            IndividualToSolrDocument indToSolrDoc =
+                new IndividualToSolrDocument(excludes, modifiers);                        
             
-            /* setup solr indexer */
-            
+            /* setup solr indexer */            
             SolrIndexer solrIndexer = new SolrIndexer(server, indToSolrDoc);                  
             
             // This is where the builder gets the list of places to try to

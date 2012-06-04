@@ -432,7 +432,8 @@ public class JenaDataSourceSetupSparql extends JenaDataSourceSetupBase
         // Nothing to do.
     }
     
-    private OntModel ontModelFromContextAttribute(ServletContext ctx, 
+    @Override
+    protected OntModel ontModelFromContextAttribute(ServletContext ctx, 
                                                   String attribute) {
         OntModel ontModel;
         Object attributeValue = ctx.getAttribute(attribute);
@@ -513,7 +514,7 @@ public class JenaDataSourceSetupSparql extends JenaDataSourceSetupBase
         return;
     }
     
-    private static void getAppMetadata(Model source, Model target) {
+    protected static void getAppMetadata(Model source, Model target) {
                  
         String amdQuery = "DESCRIBE ?x WHERE { " +
                     "{?x a <" + VitroVocabulary.PORTAL +"> } UNION " +
@@ -531,7 +532,7 @@ public class JenaDataSourceSetupSparql extends JenaDataSourceSetupBase
            return;
     }
     
-    private static void repairAppMetadataModel(Model applicationMetadataModel,
+    protected static void repairAppMetadataModel(Model applicationMetadataModel,
                                                Model aboxAssertions, 
                                                Model aboxInferences) {
          

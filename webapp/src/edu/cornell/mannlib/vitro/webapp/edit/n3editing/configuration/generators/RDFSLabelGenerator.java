@@ -34,8 +34,8 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.AntiXssValidation;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditN3GeneratorVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.SelectListGeneratorVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.SelectListGeneratorVTwo;
 import edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -231,33 +231,19 @@ public class RDFSLabelGenerator implements EditConfigurationGenerator {
     	String rangeDatatypeUri = getRangeDatatypeUri(editConfiguration, vreq);
     	String rangeLang = getRangeLang(editConfiguration, vreq);
     	
-    	List<String> validators = getFieldValidators(editConfiguration, vreq);
-    	
-    	field.setValidators(validators);
-    	
-    	//subjectUri and subjectClassUri are not being used in Field
-    	
-    	field.setOptionsType("UNDEFINED");
-    	//why isn't predicate uri set for data properties?
-    	field.setPredicateUri(null);
-    	field.setObjectClassUri(null);
+    	List<String> validators = getFieldValidators(editConfiguration, vreq);    
+    	field.setValidators(validators);    	
+
     	field.setRangeDatatypeUri(rangeDatatypeUri);
     	//have either range datatype uri or range lang, otherwise results in error
     	if(rangeDatatypeUri == null) {
     		field.setRangeLang(rangeLang);
     	}
-    	field.setLiteralOptions(getLiteralOptions(editConfiguration, vreq));
     	    	
     	fields.put(field.getName(), field);
     	return fields;
 	}
 
-	private List<List<String>> getLiteralOptions(
-			EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
-		   DataPropertyStatement dps =EditConfigurationUtils.getDataPropertyStatement(vreq, vreq.getSession(), dataHash, predicateUri);
-		   List<List<String>> literalOptions = new ArrayList<List<String>>();
-		return literalOptions;
-	}
 
 	private String getRangeLang(EditConfigurationVTwo editConfiguration,
 			VitroRequest vreq) {

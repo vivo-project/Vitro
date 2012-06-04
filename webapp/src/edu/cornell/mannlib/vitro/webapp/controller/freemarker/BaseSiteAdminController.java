@@ -130,10 +130,12 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
             data.put("siteInfo", UrlBuilder.getUrl("/editForm", "controller", "ApplicationBean"));
         }
         
+        //TODO: Add specific permissions for page management
         if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.MANAGE_MENUS.ACTIONS)) {
             data.put("menuManagement", UrlBuilder.getUrl("/individual",
                     "uri", "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#DefaultMenu",
                     "switchToDisplayModel", "true"));
+            data.put("pageManagement", UrlBuilder.getUrl("/pageList"));
         }
         
         if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.SEE_STARTUP_STATUS.ACTIONS)) {

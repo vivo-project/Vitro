@@ -3,7 +3,7 @@
 <#-- Template for property listing on individual profile page -->
 
 <#import "lib-properties.ftl" as p>
-
+<#assign subjectUri = individual.controlPanelUrl()?split("=") >
 <#list propertyGroups.all as group>
     <#assign groupName = group.getName(nameForOtherGroup)>
     
@@ -27,7 +27,21 @@
         <#list group.properties as property>
             <article class="property" role="article">
                 <#-- Property display name -->
-                <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /></h3>               
+                <#if property.localName == "authorInAuthorship" >
+                    <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> 
+                        <a id="managePropLink" href="${urls.base}/managePublications?subjectUri=${subjectUri[1]!}" title="manage publications" <#if verbosePropertySwitch.currentValue>style="padding-top:10px"</#if> >
+                            manage publications
+                        </a>
+                    </h3>
+                <#elseif property.localName == "hasResearcherRole">
+                <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> 
+                    <a id="managePropLink" href="${urls.base}/manageGrants?subjectUri=${subjectUri[1]!}" title="manage grants & projects" <#if verbosePropertySwitch.currentValue>style="padding-top:10px"</#if> >
+                        manage grants & projects
+                    </a>
+                </h3>
+                <#else>
+                    <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> </h3>
+                </#if>
                 <#-- List the statements for each property -->
                 <ul class="property-list" role="list">
                     <#-- data property -->

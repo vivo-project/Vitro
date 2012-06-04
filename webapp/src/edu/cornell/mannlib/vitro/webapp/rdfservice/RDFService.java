@@ -146,4 +146,10 @@ public interface RDFService {
 	 * @return ChangeSet an empty ChangeSet object
 	 */
 	public ChangeSet manufactureChangeSet();	
+	
+	/**
+     * Free any resources held by this RDFService object
+     */
+    public void close();
+    
 }

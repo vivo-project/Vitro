@@ -6,7 +6,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -40,11 +39,11 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
-import edu.cornell.mannlib.vitro.webapp.controller.JsonServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController.PageRecord;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.controller.json.JsonServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -60,40 +59,21 @@ public class DataGetterUtils {
      * This should not return PageDataGetters and should not throw an 
      * exception if a page has PageDataGetters.  
      */
-    public static List<DataGetter> getDataGettersForPage( Model displayModel, String pageURI) 
+    public static List<DataGetter> getDataGettersForPage( VitroRequest vreq, Model displayModel, String pageURI) 
     throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException{
         //get data getter uris for pageURI
         List<String> dgUris = getDataGetterURIsForPageURI( displayModel, pageURI);
         
         List<DataGetter> dgList = new ArrayList<DataGetter>();
         for( String dgURI: dgUris){
-            DataGetter dg =dataGetterForURI(displayModel, dgURI) ;
+            DataGetter dg =dataGetterForURI(vreq, displayModel, dgURI) ;
             if( dg != null )
                 dgList.add(dg); 
         }
+        log.debug("getDataGettersForPage: " + dgList);
         return dgList;
     }
 
-    /**
-     * Tests if classInQuestion implements interFace.
-     */
-    public static boolean isInstanceOfInterface( Class classInQuestion, Class interFace){
-        if( classInQuestion == null || interFace == null )
-            throw new IllegalAccessError("classInQuestion or interFace must not be null"); 
-        
-        //figure out if it implements interface         
-        Class[] interfaces = classInQuestion.getInterfaces();
-        if( interfaces == null )
-            return false;
-        boolean foundIface = false;
-        for( Class cz : interfaces ){
-            if( interFace.equals( cz ) ){
-                return true;                
-            }
-        }
-        return false;
-    }
-    
     /**
      * Returns a DataGetter using information in the 
      * displayModel for the individual with the URI given by dataGetterURI
@@ -103,42 +83,53 @@ public class DataGetterUtils {
      * This should not throw an exception if the URI exists and has a type
      * that does not implement the DataGetter interface.
      */
-    public static DataGetter dataGetterForURI(Model displayModel, String dataGetterURI) 
+    public static DataGetter dataGetterForURI(VitroRequest vreq, Model displayModel, String dataGetterURI) 
     throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, InvocationTargetException, SecurityException, NoSuchMethodException 
     {
-        
         //get java class for dataGetterURI
         String dgClassName = getJClassForDataGetterURI(displayModel, dataGetterURI);
         
         //figure out if it implements interface DataGetter
-        Class dgClass = Class.forName(dgClassName);
-        if( ! isInstanceOfInterface( dgClass, DataGetter.class) ){
+        Class<?> clz = Class.forName(dgClassName);
+        if( ! DataGetter.class.isAssignableFrom(clz) ){
+    		log.debug("Class doesn't implement DataGetter: '" + dgClassName + "'");
             return null;
         }
         
-        //try to run constructor with (Model, String) parameters
-        Class partypes[] = { Model.class , String.class };        
-        Constructor ct = dgClass.getConstructor( partypes );
+        // we want a constructor that will work for one of these argument lists (in this order)
+        Object[][] argLists = new Object[][] {
+        		{ vreq, displayModel, dataGetterURI }, 
+        		{ displayModel, dataGetterURI }, 
+        		{ vreq }, 
+        		{}
+        	};
         
-        Object obj = null;
-        if( ct != null ){
-            Object[] initargs = new Object[2];
-            initargs[0]= displayModel;
-            initargs[1] = dataGetterURI;
-            obj = ct.newInstance(initargs);
-        } else {
-            log.debug("no constructor with signature " +
-            		"(Model displayModel,String URI) found, trying empty constructor");                        
-            obj =  dgClass.newInstance();
+        // look through the available constructors for the best fit
+        for (Object[] argList: argLists) {
+        	for (Constructor<?> ct: clz.getConstructors()) {
+        		if (isConstructorSuitableForArguments(ct, argList)) {
+        			log.debug("Using this constructor: " + ct);
+        			return (DataGetter) ct.newInstance(argList);
+        		}
+        	}
         }
         
-        if( !(obj instanceof DataGetter) ){
-            log.debug("For <" + dataGetterURI + "> the class " +
-                    "for its rdf:type " + dgClassName + " does not implement the interface DataGetter.");
-            return null;
-        }
-        
-        return (DataGetter)obj;                
+		log.debug("Didn't find a suitable constructor for '" + dgClassName + "'");
+        return null;
+    }
+    
+    private static boolean isConstructorSuitableForArguments(Constructor<?> ct, Object[] args) {
+		Class<?>[] parameterTypes = ct.getParameterTypes();
+		if (args.length != parameterTypes.length) {
+			return false;
+		}
+		for (int i = 0; i < args.length; i++) {
+			Class<? extends Object> argClass = args[i].getClass();
+			if (! parameterTypes[i].isAssignableFrom(argClass)) {
+				return false;
+			}
+		}
+		return true;
     }
 
     public static String getJClassForDataGetterURI(Model displayModel, String dataGetterURI) throws IllegalAccessException {
@@ -415,11 +406,11 @@ public class DataGetterUtils {
      * @throws IllegalAccessException 
      * @throws InstantiationException 
      */
-    public static JSONObject covertDataToJSONForPage(String pageUri, Model displayModel) throws InstantiationException, IllegalAccessException, ClassNotFoundException {       
+    public static JSONObject covertDataToJSONForPage(VitroRequest vreq, String pageUri, Model displayModel) throws InstantiationException, IllegalAccessException, ClassNotFoundException {       
         //Get PageDataGetter types associated with pageUri
         JSONObject rObj = null;   
         try{
-	        List<DataGetter> dataGetters = getDataGettersForPage(displayModel, pageUri);
+	        List<DataGetter> dataGetters = getDataGettersForPage(vreq, displayModel, pageUri);
 	        for(DataGetter getter: dataGetters) {
 	        	 JSONObject typeObj = null;
 	             try{

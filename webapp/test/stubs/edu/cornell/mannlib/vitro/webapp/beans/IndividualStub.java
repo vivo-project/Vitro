@@ -21,7 +21,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 /**
  * Mock the basic functions of Individual for unit tests.
@@ -378,12 +377,6 @@ public class IndividualStub implements Individual {
 	@Override
 	public void setVClasses(List<VClass> vClassList, boolean direct) {
 		throw new RuntimeException("Individual.setVClasses() not implemented.");
-	}
-
-	@Override
-	public boolean isMemberOfClassProhibitedFromSearch(ProhibitedFromSearch pfs) {
-		throw new RuntimeException(
-				"Individual.isMemberOfClassProhibitedFromSearch() not implemented.");
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,6 +30,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.ModelSelector;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.StandardModelSelector;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.StandardWDFSelector;
@@ -429,11 +431,21 @@ public class EditConfigurationVTwo {
         return EditConfigurationUtils.copy(n3Required);
     }
 
-    //TODO: can we use varargs here?
     public void setN3Required(List<String> n3Required) {
         this.n3Required = n3Required;
     }
 
+    public void setN3Required(String ... n3RequiredStrs){
+        this.n3Required =  new ArrayList<String>(Arrays.asList( n3RequiredStrs )); //using ArrayList to allow list to be resized
+    }
+    //these methods allow strings to be added to the n3 required list and not just for the list to be set
+    public void addN3Required(List<String> n3RequiredInput) {
+    	this.n3Required.addAll(n3RequiredInput);
+    }
+    
+    public void addN3Required(String ... n3RequiredStrsInput) {
+    	 this.n3Required.addAll(Arrays.asList( n3RequiredStrsInput ));  
+    }
      /** return a copy of the value so that the configuration is not modified by external code.
      * @return
      */
@@ -445,6 +457,19 @@ public class EditConfigurationVTwo {
         this.n3Optional = n3Optional;
     }
 
+    public void setN3Optional(String ... n3Strs){
+        this.n3Optional = new ArrayList<String>(Arrays.asList( n3Strs )); //using ArrayList to allow list to be resized       
+    }
+    
+    public void addN3Optional(List<String> n3Optional) {
+        this.n3Optional.addAll(n3Optional);
+    }
+
+    public void addN3Optional(String ... n3Strs){
+        this.n3Optional.addAll(Arrays.asList( n3Strs ));        
+    }
+
+    
     public Map<String,String> getNewResources() {
         return newResources;
     }
@@ -452,7 +477,21 @@ public class EditConfigurationVTwo {
     public void setNewResources(Map<String,String> newResources) {
         this.newResources = newResources;
     }
+    
+    public void setNewResources(String ... strs){
+        if( strs == null || strs.length % 2 != 0 ){
+            throw new Error(" setNewResources() must have pairs of varName, prefix ");
+        }
+        Map<String,String> map = new HashMap<String,String>();
+        
+        for( int i=0;i<strs.length;i=i+2 ){
+            map.put(strs[i],strs[i+1]);            
+        }
+        
+        this.newResources = map;
+    }
 
+    
     public List<String> getUrisOnform() {
         return urisOnform;
     }
@@ -461,6 +500,19 @@ public class EditConfigurationVTwo {
         this.urisOnform = urisOnform;
     }
 
+    public void setUrisOnForm(String ... strs){
+        this.urisOnform = new ArrayList<String>(Arrays.asList( strs )); //using ArrayList to allow resizing        
+    }
+    //This doesn't overwrite or set but adds to existing list
+    public void addUrisOnForm(List<String> urisOnform) {
+        this.urisOnform.addAll(urisOnform);
+    }
+
+    public void addUrisOnForm(String ... strs){
+        this.urisOnform.addAll(Arrays.asList( strs ));        
+    }
+    
+    
     public void setFilesOnForm(List<String> filesOnForm){
         this.filesOnForm = filesOnForm;
     }
@@ -477,6 +529,18 @@ public class EditConfigurationVTwo {
         this.literalsOnForm = literalsOnForm;
     }
 
+    public void setLiteralsOnForm(String ... strs){
+        this.literalsOnForm = new ArrayList<String>(Arrays.asList( strs ));//using ArrayList to allow resizing        
+    }
+    
+    public void addLiteralsOnForm(List<String> literalsOnForm) {
+    	this.literalsOnForm.addAll(literalsOnForm);
+    }
+    
+    public void addLiteralsOnForm(String ... strs){
+        this.literalsOnForm.addAll(Arrays.asList( strs ));        
+    }
+    
     public Map<String, List<String>> getUrisInScope() {
         return urisInScope;
     }
@@ -1034,6 +1098,16 @@ public class EditConfigurationVTwo {
         fields.put( field.getName(), field);                
     }
 
+    public void addFields(List<FieldVTwo> fields) {
+    	if( fields != null ) 
+	    {    	
+    		for(FieldVTwo f: fields) {
+	    		this.addField(f);
+	    	}
+    	}
+    	
+    }
+    
     @Override
     public String toString(){        
         return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);        

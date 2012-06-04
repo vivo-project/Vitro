@@ -21,9 +21,9 @@ import com.hp.hpl.jena.rdf.model.Model;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.controller.JsonServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.controller.json.JsonServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.utils.JsonToFmModel;
@@ -34,28 +34,34 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.Listed
 public class BrowseDataGetter extends DataGetterBase implements DataGetter {
     final static Log log = LogFactory.getLog(BrowseDataGetter.class);
     String dataGetterURI;
+    VitroRequest vreq;
+    ServletContext context;
 
     /**
      * Constructor with display model and data getter URI that will be called by reflection.
      */
-    public BrowseDataGetter(Model displayModel, String dataGetterURI){
-        this.configure(displayModel,dataGetterURI);
+    public BrowseDataGetter(VitroRequest vreq, Model displayModel, String dataGetterURI){
+        this.configure(vreq, displayModel,dataGetterURI);
     }   
     
     /**
      * Configure this instance based on the URI and display model.
      */
-    protected void configure(Model displayModel, String dataGetterURI) {
+    protected void configure(VitroRequest vreq, Model displayModel, String dataGetterURI) {
+    	if( vreq == null ) 
+    		throw new IllegalArgumentException("VitroRequest  may not be null.");
 	   if( displayModel == null ) 
            throw new IllegalArgumentException("Display Model may not be null.");
        if( dataGetterURI == null )
            throw new IllegalArgumentException("PageUri may not be null.");
                
-       this.dataGetterURI = dataGetterURI;   
+       this.vreq = vreq;
+       this.context = vreq.getSession().getServletContext();
+       this.dataGetterURI = dataGetterURI;
     }
     
     @Override
-    public Map<String, Object> getData(ServletContext context, VitroRequest vreq, Map<String, Object> pageData) { 
+    public Map<String, Object> getData(Map<String, Object> pageData) { 
         try{            
             Map params = vreq.getParameterMap();
             

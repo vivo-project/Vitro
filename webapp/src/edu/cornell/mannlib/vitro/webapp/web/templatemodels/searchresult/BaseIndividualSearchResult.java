@@ -45,6 +45,10 @@ public abstract class BaseIndividualSearchResult extends BaseTemplateModel {
     
     /* Template properties */
 
+	public String getUri() {
+		return individual.getURI();
+	}
+    
     public String getProfileUrl() {
         return UrlBuilder.getIndividualProfileUrl(individual, vreq);
     }    
@@ -57,10 +61,6 @@ public abstract class BaseIndividualSearchResult extends BaseTemplateModel {
         ObjectPropertyStatementDao opsDao = vreq.getWebappDaoFactory().getObjectPropertyStatementDao();
         Map<String, String> types = opsDao.getMostSpecificTypesInClassgroupsForIndividual(individual.getURI()); 
         return types.values();  
-    }
-    
-    public String getSearchView() {        
-        return getView(ClassView.SEARCH);
     }
     
     public String getSnippet() {        

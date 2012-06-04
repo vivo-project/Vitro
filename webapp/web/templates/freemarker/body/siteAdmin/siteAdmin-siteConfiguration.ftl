@@ -13,7 +13,11 @@
             
             <#if siteConfig.manageProxies?has_content>
                 <li role="listitem"><a href="${siteConfig.manageProxies}" title="Manage profile editing">Manage profile editing</a></li>
-            </#if>     
+            </#if>  
+            
+            <#if siteConfig.pageManagement?has_content>
+                <li role="listitem"><a href="${siteConfig.pageManagement}" title="Page management">Page management</a></li>
+            </#if>        
             
             <#if siteConfig.menuManagement?has_content>
                 <li role="listitem"><a href="${siteConfig.menuManagement}" title="Menu management">Menu management</a></li>

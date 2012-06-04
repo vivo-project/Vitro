@@ -12,6 +12,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import stubs.javax.servlet.http.HttpServletRequestStub;
+
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -21,6 +23,7 @@ import com.hp.hpl.jena.rdf.model.impl.RDFDefaultErrorHandler;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SimpleOntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
@@ -30,6 +33,7 @@ public class SparqlQueryDataGetterTest extends AbstractTestClass{
     OntModel displayModel;
     String testDataGetterURI_1 = "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#query1data";
     WebappDaoFactory wdf;
+    VitroRequest vreq;
     
     @Before
     public void setUp() throws Exception {
@@ -43,12 +47,14 @@ public class SparqlQueryDataGetterTest extends AbstractTestClass{
         
         SimpleOntModelSelector sos = new SimpleOntModelSelector( ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM));
         sos.setDisplayModel(displayModel);            
-        wdf = new WebappDaoFactoryJena(sos);        
+        wdf = new WebappDaoFactoryJena(sos);    
+        
+        vreq = new VitroRequest(new HttpServletRequestStub());
     }
 
     @Test
     public void testBasicGetData() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException {
-        DataGetter dg = DataGetterUtils.dataGetterForURI(displayModel, testDataGetterURI_1);
+        DataGetter dg = DataGetterUtils.dataGetterForURI(vreq, displayModel, testDataGetterURI_1);
         Assert.assertNotNull(dg);
         Assert.assertTrue(
                 "DataGetter should be of type " + SparqlQueryDataGetter.class.getName(),

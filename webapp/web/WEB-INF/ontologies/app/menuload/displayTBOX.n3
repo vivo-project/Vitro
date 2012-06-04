@@ -64,6 +64,7 @@ rdfs:comment
 rdfs:label
       a       owl:DatatypeProperty .
 
+      
 owl:versionInfo
       a       owl:DatatypeProperty .
       
@@ -144,6 +145,18 @@ owl:topObjectProperty
               "false"^^xsd:boolean ;
       <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#stubObjectPropertyAnnot>
               "true"^^xsd:boolean .      
+
+rdf:type 
+      a owl:ObjectProperty ;
+      rdfs:label "RDF Type"@en-US ;
+      rdfs:range owl:Class ;                   
+      <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#customEntryFormAnnot>
+         "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.RdfTypeGenerator"^^xsd:string ;                             
+      <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#offerCreateNewOptionAnnot>
+              "true"^^xsd:boolean ;
+      <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#selectFromExistingAnnot>
+              "true"^^xsd:boolean .       
+
 
 <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#additionalLink>
       a       owl:ObjectProperty ;

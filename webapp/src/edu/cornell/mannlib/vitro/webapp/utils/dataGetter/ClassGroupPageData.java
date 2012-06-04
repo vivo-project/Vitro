@@ -12,18 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.QuerySolutionMap;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
@@ -43,29 +32,36 @@ public class ClassGroupPageData extends DataGetterBase implements DataGetter{
     private static final Log log = LogFactory.getLog(ClassGroupPageData.class);
     String dataGetterURI;
     String classGroupUri;
+    VitroRequest vreq;
+    ServletContext context;
+
     /**
      * Constructor with display model and data getter URI that will be called by reflection.
      */
-    public ClassGroupPageData(Model displayModel, String dataGetterURI){
-        this.configure(displayModel,dataGetterURI);
+    public ClassGroupPageData(VitroRequest vreq, Model displayModel, String dataGetterURI){
+        this.configure(vreq, displayModel,dataGetterURI);
     }        
     
     /**
      * Configure this instance based on the URI and display model.
      */
-    protected void configure(Model displayModel, String dataGetterURI) {
+    protected void configure(VitroRequest vreq, Model displayModel, String dataGetterURI) {
+    	if( vreq == null ) 
+    		throw new IllegalArgumentException("VitroRequest  may not be null.");
         if( displayModel == null ) 
             throw new IllegalArgumentException("Display Model may not be null.");
         if( dataGetterURI == null )
             throw new IllegalArgumentException("PageUri may not be null.");
                 
+        this.vreq = vreq;
+        this.context = vreq.getSession().getServletContext();
         this.dataGetterURI = dataGetterURI;        
         this.classGroupUri = 	DataGetterUtils.getClassGroupForDataGetter(displayModel, dataGetterURI);
     }
     
     
     @Override
-    public Map<String, Object> getData(ServletContext context, VitroRequest vreq, Map<String, Object> pageData) { 
+    public Map<String, Object> getData(Map<String, Object> pageData) { 
     	  HashMap<String, Object> data = new HashMap<String,Object>();
           data.put("classGroupUri", this.classGroupUri);
 
@@ -91,24 +87,23 @@ public class ClassGroupPageData extends DataGetterBase implements DataGetter{
                           break;
                       }                                
                   }
-                  if( group == null ){
-                      log.error("Cannot get classgroup '" + classGroupUri);
-                  }else{
-                      setAllClassCountsToZero(group);
-                  }
+                  
+                  setAllClassCountsToZero(group);
+
+                  log.debug("Retrieved class group " + group.getURI()
+                        + " and returning to template");
+                  if (log.isDebugEnabled()) {
+                      List<VClass> groupClasses = group.getVitroClassList();
+                      for (VClass v : groupClasses) {
+                        log.debug("Class " + v.getName() + " - " + v.getURI()
+                                + " has " + v.getEntityCount() + " entities");
+                      }
+                  }               
               }else{
                   throw new RuntimeException("classgroup " + classGroupUri + " does not exist in the system");
-              }
-              
-          }
-          log.debug("Retrieved class group " + group.getURI() + " and returning to template");  
-          //if debug enabled, print out the number of entities within each class in the class gorup
-          if(log.isDebugEnabled()){
-          	List<VClass> groupClasses = group.getVitroClassList();
-          	for(VClass v: groupClasses) {
-          		log.debug("Class " + v.getName() + " - " + v.getURI() + " has " + v.getEntityCount() + " entities");
-          	}
-          }
+              }              
+          }          
+         
           data.put("vClassGroup", group);  //may put null
           
           //This page level data getters tries to set its own template,
@@ -164,7 +159,7 @@ public class ClassGroupPageData extends DataGetterBase implements DataGetter{
     
   //Get data servuice
     public String getDataServiceUrl() {
-    	return UrlBuilder.getUrl("/dataservice?getSolrIndividualsByVClass=1&vclassId=");
+    	return UrlBuilder.getUrl("/dataservice?getRenderedSolrIndividualsByVClass=1&vclassId=");
     }
     
     /**

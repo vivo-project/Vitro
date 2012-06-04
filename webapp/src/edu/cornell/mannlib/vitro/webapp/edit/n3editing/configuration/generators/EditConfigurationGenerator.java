@@ -8,5 +8,5 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 
 public interface EditConfigurationGenerator {
-    public EditConfigurationVTwo getEditConfiguration( VitroRequest vreq, HttpSession session );
+    public EditConfigurationVTwo getEditConfiguration( VitroRequest vreq, HttpSession session ) throws Exception;
 }

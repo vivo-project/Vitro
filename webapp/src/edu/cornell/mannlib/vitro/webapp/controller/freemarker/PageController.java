@@ -23,7 +23,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetter;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
-import edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.PageDataGetterUtils;
 /**
  * Controller for getting data for pages defined in the display model. 
  * 
@@ -68,7 +67,7 @@ public class PageController extends FreemarkerHttpServlet{
         
         //executePageDataGetters( pageUri, vreq, getServletContext(), mapForTemplate );
         //these should all be data getters now
-        executeDataGetters( pageUri, vreq, getServletContext(), mapForTemplate);
+        executeDataGetters( pageUri, vreq, mapForTemplate);
 
         mapForTemplate.putAll( getPageControllerValues( pageUri, vreq, getServletContext(), mapForTemplate));
         
@@ -76,12 +75,12 @@ public class PageController extends FreemarkerHttpServlet{
         return rv;       
     }
 
-    private void executeDataGetters(String pageUri, VitroRequest vreq, ServletContext context, Map<String, Object> mapForTemplate) 
+    private void executeDataGetters(String pageUri, VitroRequest vreq, Map<String, Object> mapForTemplate) 
     throws Exception {
-        List<DataGetter> dgList = DataGetterUtils.getDataGettersForPage(vreq.getDisplayModel(), pageUri);
+        List<DataGetter> dgList = DataGetterUtils.getDataGettersForPage(vreq, vreq.getDisplayModel(), pageUri);
                         
         for( DataGetter dg : dgList){            
-            Map<String,Object> moreData = dg.getData(context,vreq,mapForTemplate);            
+            Map<String,Object> moreData = dg.getData(mapForTemplate);            
             if( moreData != null ){
                 mapForTemplate.putAll(moreData);
             }

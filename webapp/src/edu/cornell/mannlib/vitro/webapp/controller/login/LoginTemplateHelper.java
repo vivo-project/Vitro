@@ -18,7 +18,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServ
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
-import freemarker.template.Configuration;
 
 /**
  * A temporary means of displaying the Login templates within the SiteAdmin
@@ -164,13 +163,11 @@ public class LoginTemplateHelper extends LoginTemplateHelperBase {
 	 */
 	private String doTemplate(VitroRequest vreq, TemplateResponseValues values) throws TemplateProcessingException {
 		// Set it up like FreeMarkerHttpServlet.doGet() would do.
-		Configuration config = getConfig(vreq);
-		
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.putAll(getPageTemplateValues(vreq));
 		map.putAll(values.getMap());
 
-		return processTemplateToString(values.getTemplateName(), map, config, vreq);
+		return processTemplateToString(values.getTemplateName(), map, vreq);
 	}
 
 	/**

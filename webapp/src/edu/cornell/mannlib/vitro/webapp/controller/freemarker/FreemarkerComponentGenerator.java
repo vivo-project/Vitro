@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -14,7 +13,6 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
-import freemarker.template.Configuration;
 
 /**
  * TEMPORARY for transition from JSP to FreeMarker. Once transition
@@ -34,35 +32,33 @@ public class FreemarkerComponentGenerator extends FreemarkerHttpServlet {
    
         // Mimic what FreemarkerHttpServlet does for a new request
         VitroRequest vreq = new VitroRequest(request);       
-        FreemarkerConfiguration config = getConfig(vreq);
-        vreq.setAttribute("freemarkerConfig", config);
         Map<String, Object> map = getPageTemplateValues(vreq);
         
-        request.setAttribute("ftl_head", getHead("head", map, config, vreq));
-        request.setAttribute("ftl_identity", get("identity", map, config, vreq));
-        request.setAttribute("ftl_menu", get("menu", map, config, vreq));
-        request.setAttribute("ftl_search", get("search", map, config, vreq));
-        request.setAttribute("ftl_footer", get("footer", map, config, vreq));
-        request.setAttribute("ftl_googleAnalytics", get("googleAnalytics", map, config, vreq));
+        request.setAttribute("ftl_head", getHead("head", map, vreq));
+        request.setAttribute("ftl_identity", get("identity", map, vreq));
+        request.setAttribute("ftl_menu", get("menu", map, vreq));
+        request.setAttribute("ftl_search", get("search", map, vreq));
+        request.setAttribute("ftl_footer", get("footer", map, vreq));
+        request.setAttribute("ftl_googleAnalytics", get("googleAnalytics", map, vreq));
     }
 
-    private String get(String templateName, Map<String, Object> root, Configuration config, HttpServletRequest request) {
+    private String get(String templateName, Map<String, Object> root, HttpServletRequest request) {
         templateName += ".ftl";
         try {
-            return processTemplate(templateName, root, config, request).toString();
+            return processTemplate(templateName, root, request).toString();
         } catch (TemplateProcessingException e) {
             log.error("Error processing template " + templateName + ": " + e.getMessage(), e);
             return null;
         }
     }
     
-    private String getHead(String templateName, Map<String, Object> root, Configuration config, HttpServletRequest request) {
+    private String getHead(String templateName, Map<String, Object> root, HttpServletRequest request) {
         // The Freemarker head template displays the page title in the <title> tag. Get the value out of the request.
         String title = (String) request.getAttribute("title");
         if (!StringUtils.isEmpty(title)) {
             root.put("title", title);
         }
-        return get(templateName, root, config, request);        
+        return get(templateName, root, request);        
     }
     
     // RY We need the servlet context in getConfig(). For some reason using the method inherited from

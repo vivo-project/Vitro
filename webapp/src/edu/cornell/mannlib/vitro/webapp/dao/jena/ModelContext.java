@@ -7,6 +7,8 @@ import javax.servlet.ServletContext;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.ModelChangedListener;
 
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+
 public class ModelContext {
 	
 	private static final String ONT_MODEL_SELECTOR = "ontModelSelector";
@@ -106,4 +108,10 @@ public class ModelContext {
         
 	}
 	
+	public static OntModel getDisplayModel(ServletContext ctx){
+	    return(OntModel) ctx.getAttribute( DisplayVocabulary.DISPLAY_ONT_MODEL );	    
+	}
+	public static void setDisplayModel(OntModel ontModel, ServletContext ctx){
+	    ctx.setAttribute(DisplayVocabulary.DISPLAY_ONT_MODEL,ontModel);	    
+	}
 }

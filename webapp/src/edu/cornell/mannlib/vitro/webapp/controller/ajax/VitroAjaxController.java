@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -26,8 +25,8 @@ import freemarker.template.Template;
  * A base class for servlets that handle AJAX requests.
  */
 public abstract class VitroAjaxController extends HttpServlet {
-    
-    private static final Log log = LogFactory.getLog(VitroAjaxController.class);
+
+	private static final Log log = LogFactory.getLog(VitroAjaxController.class);
 
 	/**
 	 * Sub-classes must implement this method to handle both GET and POST
@@ -67,38 +66,31 @@ public abstract class VitroAjaxController extends HttpServlet {
      */
     @SuppressWarnings("unused")
 	protected Actions requiredActions(VitroRequest vreq) {
-        return Actions.AUTHORIZED;
-    }
-    
-	/** 
-	 * Returns the current Freemarker Configuration so the controller can process
-	 * its data through a template.
-	 */
-	protected final Configuration getFreemarkerConfiguration(VitroRequest vreq) {
-		return FreemarkerConfigurationLoader.getConfig(vreq, getServletContext());
+		return Actions.AUTHORIZED;
 	}
-	
+
 	/**
 	 * Process data through a Freemarker template and output the result.
 	 */
-	protected void writeTemplate(String templateName, Map<String, Object> map, 
-	        Configuration config, HttpServletRequest request, HttpServletResponse response) {
-        Template template = null;
-        try {
-            template = config.getTemplate(templateName);
-            PrintWriter out = response.getWriter();
-            template.process(map, out);
-        } catch (Exception e) {
-            log.error(e, e);
-        } 
+	protected void writeTemplate(String templateName, Map<String, Object> map,
+			VitroRequest vreq, HttpServletResponse response) {
+		Configuration config = FreemarkerConfigurationLoader.getConfig(vreq);
+		try {
+			Template template = config.getTemplate(templateName);
+			PrintWriter out = response.getWriter();
+			template.process(map, out);
+		} catch (Exception e) {
+			log.error(e, e);
+		}
 	}
-    
-    protected void doError(HttpServletResponse response, String errorMsg, int httpstatus){
-        response.setStatus(httpstatus);
-        try {
-            response.getWriter().write(errorMsg);
-        } catch (IOException e) {
-            log.debug("IO exception during output",e );
-        }
-    }
+
+	protected void doError(HttpServletResponse response, String errorMsg,
+			int httpstatus) {
+		response.setStatus(httpstatus);
+		try {
+			response.getWriter().write(errorMsg);
+		} catch (IOException e) {
+			log.debug("IO exception during output", e);
+		}
+	}
 }

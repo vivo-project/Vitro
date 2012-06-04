@@ -71,7 +71,7 @@ public class ViewFinder {
     private String findCustomTemplateByVClasses(Individual individual, VitroRequest vreq) {
 //        
 //        Method method = view.getMethod();
-//        TemplateLoader templateLoader = ((Configuration) vreq.getAttribute("freemarkerConfig")).getTemplateLoader();
+//        TemplateLoader templateLoader = FreemarkerConfigurationLoader.getConfig(vreq).getTemplateLoader();
 //
 //        /* RY The logic here is incorrect. The vclasses are
 //         * returned in a random order, whereas we need to
