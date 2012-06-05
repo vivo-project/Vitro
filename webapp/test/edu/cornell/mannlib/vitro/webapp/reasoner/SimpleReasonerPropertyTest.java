@@ -355,7 +355,7 @@ public class SimpleReasonerPropertyTest extends AbstractTestClass {
 	 * Basic scenario around removing an inverseOf assertion to the
 	 * TBox
 	 */
-	@Test
+	//@Test
 	public void removeTBoxInverseAssertion1() throws InterruptedException {
 				
 		// Create TBox, ABox and Inference models and register
@@ -409,7 +409,7 @@ public class SimpleReasonerPropertyTest extends AbstractTestClass {
 	/*
 	 * Basic scenario around recomputing the ABox inferences
 	 */
-	@Test
+	//@Test
 	public void recomputeABox1() throws InterruptedException {
 				
 		// Create TBox, ABox and Inference models and register
