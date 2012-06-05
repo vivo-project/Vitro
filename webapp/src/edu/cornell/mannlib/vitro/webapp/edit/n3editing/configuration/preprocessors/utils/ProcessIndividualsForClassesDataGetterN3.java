@@ -20,9 +20,9 @@ import net.sf.json.JSONSerializer;
 //Returns the appropriate n3 for selection of classes from within class group
 public  class ProcessIndividualsForClassesDataGetterN3 extends ProcessClassGroupDataGetterN3 {
 	private static String classType = "java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter";
-	private JSONObject values = null;
+	protected JSONObject values = null;
 	int classCount = 0;
-	private static String individualClassVarNameBase = "classesSelectedInClassGroup";
+	protected static String individualClassVarNameBase = "classesSelectedInClassGroup";
 	public ProcessIndividualsForClassesDataGetterN3(JSONObject jsonObject){
 		this.values = jsonObject;
 		if(values != null && values.containsKey(individualClassVarNameBase)) {
@@ -43,15 +43,8 @@ public  class ProcessIndividualsForClassesDataGetterN3 extends ProcessClassGroup
     	
     }
     
-    /*
-    @Override
-    public String getN3ForTypePartial(int counter) {
-    	String dataGetterVar = getDataGetterVar(counter);
-    	String n3 = dataGetterVar + " a <" + getClassType() + ">";
-    	return n3;
-    }*/
     
-    private List<String> addIndividualClassesN3(int counter) {
+    protected List<String> addIndividualClassesN3(int counter) {
 		List<String> classN3 = new ArrayList<String>();
 		if(classCount > 0) {
 			classN3.add(generateIndividualClassN3(counter));
@@ -59,7 +52,7 @@ public  class ProcessIndividualsForClassesDataGetterN3 extends ProcessClassGroup
 		return classN3;
 	}
     
-    private String generateIndividualClassN3(int counter) {
+   protected String generateIndividualClassN3(int counter) {
     	String dataGetterVar = getDataGetterVar(counter);
     	String n3 = dataGetterVar + " <" + DisplayVocabulary.GETINDIVIDUALS_FOR_CLASS + "> ";
     	//Consider a multi-valued field - in this case single field with multiple values

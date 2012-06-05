@@ -151,11 +151,13 @@ public class ManagePagePreprocessor extends
 				 JSONArray values = jsonObject.getJSONArray(literalLabel);
 				 literalValues = (List<String>) JSONSerializer.toJava(values);
 			 }
+			 String[] literalValuesSubmission = new String[literalValues.size()];
+			 literalValuesSubmission = literalValues.toArray(literalValuesSubmission);
 			 //This adds literal, connecting the field with 
 			 submission.addLiteralToForm(editConfiguration, 
 					 editConfiguration.getField(submissionLiteralName), 
 					 submissionLiteralName, 
-					 (String[])literalValues.toArray());
+					 literalValuesSubmission);
 		 }
 		 
 		 for(String uriLabel:uriLabels) {

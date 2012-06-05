@@ -7,7 +7,7 @@
 	<#assign htmlExists = true />
 </#if>
 <#if htmlExists>
-	${variableName}
+	${.globals[variableName]}
 <#else>
 	No HTML specified.  
 </#if>

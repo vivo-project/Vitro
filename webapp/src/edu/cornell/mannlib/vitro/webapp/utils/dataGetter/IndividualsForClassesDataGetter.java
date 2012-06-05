@@ -47,7 +47,8 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
     String dataGetterURI;
     String classGroupURI;
     Map<String, Object> classIntersectionsMap;
-    
+    private final static String defaultTemplate =  "page-classgroup.ftl";
+
     /**
      * Constructor with display model and data getter URI that will be called by reflection.
      */
@@ -132,6 +133,8 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
             data.put("dataServiceUrlIndividualsByVClass", this.getDataServiceUrl());
             //this is the class group associated with the data getter utilized for display on menu editing, not the custom one created
             data.put("classGroupUri",this.classGroupURI);
+            //default template, overridden at page level if specified in display model
+            data.put("bodyTemplate", defaultTemplate);
         } catch(Exception ex) {
         	log.error("An error occurred retrieving Vclass Intersection individuals", ex);
         }
