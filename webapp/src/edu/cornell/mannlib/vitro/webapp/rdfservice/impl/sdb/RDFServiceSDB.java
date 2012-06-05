@@ -12,6 +12,7 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -23,11 +24,18 @@ import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.sdb.SDBFactory;
 import com.hp.hpl.jena.sdb.StoreDesc;
 import com.hp.hpl.jena.sdb.sql.SDBConnection;
+import com.hp.hpl.jena.update.GraphStore;
+import com.hp.hpl.jena.update.GraphStoreFactory;
+import com.hp.hpl.jena.update.UpdateAction;
+import com.hp.hpl.jena.update.UpdateFactory;
+import com.hp.hpl.jena.update.UpdateRequest;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -93,6 +101,7 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
                     model.add(parseModel(modelChange));  
                 } else if (modelChange.getOperation() == ModelChange.Operation.REMOVE) {
                     model.remove(parseModel(modelChange));
+                    removeBlankNodesWithSparqlUpdate(dataset, model, modelChange.getGraphURI());
                 } else {
                     log.error("unrecognized operation type");
                 }
@@ -110,6 +119,56 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
         }
         
         return true;
+    }
+    
+    private void removeBlankNodesWithSparqlUpdate(Dataset dataset, Model model, String graphURI) {
+        Model blankNodeModel = ModelFactory.createDefaultModel();
+        StmtIterator stmtIt = model.listStatements();
+        while (stmtIt.hasNext()) {
+            Statement stmt = stmtIt.nextStatement();
+            if (stmt.getSubject().isAnon() || stmt.getObject().isAnon()) {
+                blankNodeModel.add(stmt);
+            }
+        }
+        removeUsingSparqlUpdate(dataset, blankNodeModel, graphURI);
+    }
+    
+    private void removeUsingSparqlUpdate(Dataset dataset, Model model, String graphURI) {
+        
+        StringBuffer patternBuff = new StringBuffer();
+        StmtIterator stmtIt = model.listStatements();
+        while(stmtIt.hasNext()) {
+            Triple t = stmtIt.next().asTriple();
+            patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getSubject(), null));
+            patternBuff.append(" ");
+            patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getPredicate(), null));
+            patternBuff.append(" ");
+            patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getObject(), null));
+            patternBuff.append(" .\n");
+        }
+        
+        StringBuffer queryBuff = new StringBuffer();
+        queryBuff.append("DELETE { " + ((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "" ) + " \n");
+        queryBuff.append(patternBuff);
+        if (graphURI != null) {
+            queryBuff.append("    } \n");
+        }
+        queryBuff.append("} WHERE { \n");
+        if (graphURI != null) {
+            queryBuff.append("    GRAPH <" + graphURI + "> { \n");
+        }
+        queryBuff.append(patternBuff);
+        if (graphURI != null) {
+            queryBuff.append("    } \n");
+        }
+        queryBuff.append("} \n");
+        
+        //log.debug(queryBuff.toString());
+        
+        GraphStore graphStore = GraphStoreFactory.create(dataset);
+        UpdateRequest request = UpdateFactory.create();
+        request.add(queryBuff.toString());
+        UpdateAction.execute(request, graphStore);
     }
     
     private Model parseModel(ModelChange modelChange) {
