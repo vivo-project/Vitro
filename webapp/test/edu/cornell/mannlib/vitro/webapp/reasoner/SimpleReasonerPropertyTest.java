@@ -308,6 +308,13 @@ public class SimpleReasonerPropertyTest extends AbstractTestClass {
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		
+		OntProperty P = tBox.createOntProperty("http://test.vivo/P");
+	    P.setLabel("property P", "en-US");
+
+		OntProperty Q = tBox.createOntProperty("http://test.vivo/Q");
+		Q.setLabel("property Q", "en-US");
+
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
@@ -315,14 +322,6 @@ public class SimpleReasonerPropertyTest extends AbstractTestClass {
 		aBox.register(simpleReasoner);
 		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
 		tBox.register(simpleReasonerTBoxListener);
-
-        // set up TBox and Abox
-		
-		OntProperty P = tBox.createOntProperty("http://test.vivo/P");
-	    P.setLabel("property P", "en-US");
-
-		OntProperty Q = tBox.createOntProperty("http://test.vivo/Q");
-		Q.setLabel("property Q", "en-US");
 
         // Individuals a, b, c and d
 		Resource a = aBox.createResource("http://test.vivo/a");
@@ -340,6 +339,9 @@ public class SimpleReasonerPropertyTest extends AbstractTestClass {
 	    
 	    Q.addInverseOf(P);
 	    
+	    tBox.rebind();
+	    tBox.prepare();
+	    
 	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
 	    	Thread.sleep(delay);
 	    }
@@ -355,7 +357,7 @@ public class SimpleReasonerPropertyTest extends AbstractTestClass {
 	 * Basic scenario around removing an inverseOf assertion to the
 	 * TBox
 	 */
-	//@Test
+	@Test
 	public void removeTBoxInverseAssertion1() throws InterruptedException {
 				
 		// Create TBox, ABox and Inference models and register
@@ -363,13 +365,6 @@ public class SimpleReasonerPropertyTest extends AbstractTestClass {
 		// Pellet will compute TBox inferences
 		
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-        Model inf = ModelFactory.createDefaultModel();
-		
-        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
-		aBox.register(simpleReasoner);
-		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
-		tBox.register(simpleReasonerTBoxListener);
 
         // set up TBox and Abox
 		
@@ -381,6 +376,13 @@ public class SimpleReasonerPropertyTest extends AbstractTestClass {
 
 	    Q.addInverseOf(P);
 	    
+		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+        Model inf = ModelFactory.createDefaultModel();
+		
+        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+		aBox.register(simpleReasoner);
+		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
+		tBox.register(simpleReasonerTBoxListener);	    
         // Individuals a, b, c and d
 		Resource c = aBox.createResource("http://test.vivo/c");
 		Resource d = aBox.createResource("http://test.vivo/d");
@@ -395,7 +397,9 @@ public class SimpleReasonerPropertyTest extends AbstractTestClass {
 		
 	    Q.removeInverseProperty(P);
 	    
-	    Thread.sleep(delay);
+	    tBox.rebind();
+	    tBox.prepare();
+	    
 	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
 	    	Thread.sleep(delay);
 	    }
@@ -409,20 +413,13 @@ public class SimpleReasonerPropertyTest extends AbstractTestClass {
 	/*
 	 * Basic scenario around recomputing the ABox inferences
 	 */
-	//@Test
+	@Test
 	public void recomputeABox1() throws InterruptedException {
 				
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
 		// Pellet will compute TBox inferences
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-        Model inf = ModelFactory.createDefaultModel();
-		
-        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
-		aBox.register(simpleReasoner);
-		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
-		tBox.register(simpleReasonerTBoxListener);
 
         // set up TBox and Abox
 		OntProperty P = tBox.createOntProperty("http://test.vivo/propP");
@@ -436,9 +433,14 @@ public class SimpleReasonerPropertyTest extends AbstractTestClass {
 		OntProperty Y = tBox.createOntProperty("http://test.vivo/propY");
 		Q.setLabel("property Y", "en-US");
 		X.addInverseOf(Y);
-		
-        Thread.sleep(delay*3);
 
+		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+        Model inf = ModelFactory.createDefaultModel();
+		
+        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+		aBox.register(simpleReasoner);
+		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
+		tBox.register(simpleReasonerTBoxListener);
         // Individuals a, b, c and d
 		Resource a = aBox.createResource("http://test.vivo/a");
 		Resource b = aBox.createResource("http://test.vivo/b");
@@ -451,8 +453,7 @@ public class SimpleReasonerPropertyTest extends AbstractTestClass {
 	    
 	    simpleReasoner.recompute();
 	    
-	    Thread.sleep(delay);
-	    while (!VitroBackgroundThread.getLivingThreads().isEmpty() || simpleReasoner.isRecomputing()) {
+	    while (simpleReasoner.isRecomputing()) {
 	    	Thread.sleep(delay);
 	    }
  	    
