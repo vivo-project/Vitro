@@ -56,7 +56,7 @@ public class DatapropEditController extends BaseEditController {
         results.add("range datatype");
         results.add("group");
         results.add("display tier");
-        results.add("display limit");
+        results.add("data entry limit");
         results.add("example");
         results.add("description");
         results.add("public description");
