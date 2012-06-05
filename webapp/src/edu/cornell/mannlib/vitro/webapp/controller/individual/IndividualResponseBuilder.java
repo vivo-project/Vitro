@@ -2,8 +2,14 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.individual;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.json.JSONException;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
@@ -22,6 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.web.beanswrappers.ReadOnlyBeansWrapper;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividual;
+import edu.ucsf.vitro.opensocial.OpenSocialManager;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
@@ -33,6 +40,9 @@ import freemarker.template.TemplateModelException;
  * TODO clean this up.
  */
 class IndividualResponseBuilder {
+	private static final Log log = LogFactory
+			.getLog(IndividualResponseBuilder.class);
+	
     private static final Map<String, String> namespaces = new HashMap<String, String>() {{
         put("display", VitroVocabulary.DISPLAY);
         put("vitro", VitroVocabulary.vitroURI);
@@ -78,6 +88,24 @@ class IndividualResponseBuilder {
 		//If special values required for individuals like menu, include values in template values
 		body.putAll(getSpecialEditingValues());
 		
+        // VIVO OpenSocial Extension by UCSF
+        try {
+	        OpenSocialManager openSocialManager = new OpenSocialManager(vreq, 
+	        		itm.isEditable() ? "individual-EDIT-MODE" : "individual", itm.isEditable());
+	        openSocialManager.setPubsubData(OpenSocialManager.JSON_PERSONID_CHANNEL, 
+	        		OpenSocialManager.buildJSONPersonIds(individual, "1 person found"));
+	        body.put(OpenSocialManager.TAG_NAME, openSocialManager);
+	        if (openSocialManager.isVisible()) {
+	        	body.put("bodyOnload", "my.init();");
+	        }
+        } catch (JSONException e) {
+            log.error("JSONException in doTemplate()", e);
+        } catch (IOException e) {
+        	log.error("IOException in doTemplate()", e);
+        } catch (SQLException e) {
+            log.error("SQLException in doTemplate()", e);
+        }	               
+        
 		String template = new IndividualTemplateLocator(vreq, individual).findTemplate();
 		        
 		return new TemplateResponseValues(template, body);
