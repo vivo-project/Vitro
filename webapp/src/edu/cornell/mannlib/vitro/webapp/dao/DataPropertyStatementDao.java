@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.dao;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import com.hp.hpl.jena.rdf.model.Literal;
 
@@ -43,6 +44,10 @@ public interface DataPropertyStatementDao {
     List<Literal> getDataPropertyValuesForIndividualByProperty(Individual subject, DataProperty property);
     
     List<Literal> getDataPropertyValuesForIndividualByProperty(String subjectUri, String propertyUri);
+
+    List<Literal> getDataPropertyValuesForIndividualByProperty(Individual subject, DataProperty property, String queryString, Set<String> constructQueryStrings);
+
+    List<Literal> getDataPropertyValuesForIndividualByProperty(String subjectUri, String propertyUri, String queryString, Set<String> constructQueryStrings);
 
 }
 

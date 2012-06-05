@@ -25,13 +25,15 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
     private final Literal literalValue;
     private final String deleteUrl;
     private final String editUrl;
-   
+    private final String templateName;
+
     //Extended to include vitro request to check for special parameters
-    public DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, 
-            Literal literal, VitroRequest vreq) {
+    public DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, Literal literal,
+            String templateName, VitroRequest vreq) {
         super(subjectUri, propertyUri, vreq);
         
         this.literalValue = literal;
+        this.templateName = templateName;
 
         // Do delete url first, since used in building edit url
         this.deleteUrl = makeDeleteUrl();            
@@ -52,6 +54,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
                 "datapropKey", makeHash(dps),
                 "cmd", "delete");
         
+        params.put("templateName", templateName);
         params.putAll(UrlBuilder.getModelParams(vreq));
         
         return UrlBuilder.getUrl(EDIT_PATH, params);

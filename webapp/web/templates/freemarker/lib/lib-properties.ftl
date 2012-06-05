@@ -34,9 +34,9 @@
     </#if>
 </#macro>
 
-<#macro dataPropertyList property editable>
+<#macro dataPropertyList property editable template=property.template>
     <#list property.statements as statement>
-        <@propertyListItem property statement editable >${statement.value}</@propertyListItem>
+        <@propertyListItem property statement editable ><#include "${template}"></@propertyListItem>
     </#list> 
 </#macro>
 
