@@ -138,7 +138,7 @@
         </c:if>
 	</td>
 	<td valign="top" colspan="1">
-		<b>Display Limit</b><br/>
+		<b>Data Entry Limit</b><br/>
 		<input name="DisplayLimit" value="<form:value name="DisplayLimit"/>"/>
         <c:set var="DisplayLimitError"><form:error name="DisplayLimit"/></c:set>
         <c:if test="${!empty DisplayLimitError}">
