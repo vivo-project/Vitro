@@ -48,6 +48,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 public class WebappDaoFactoryJena implements WebappDaoFactory {
@@ -72,6 +73,8 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
 	private Map<String,String> properties = new HashMap<String,String>();
 	
 	protected DatasetWrapperFactory dwf;
+	
+	protected RDFService rdfService;
 	
     /* **************** constructors **************** */
 
@@ -343,8 +346,10 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     ObjectPropertyStatementDao objectPropertyStatementDao = null;
     public ObjectPropertyStatementDao getObjectPropertyStatementDao() {
         if( objectPropertyStatementDao == null )
+            // TODO supply a valid RDFService as the first argument if we keep this
+            // implementation
             objectPropertyStatementDao = new ObjectPropertyStatementDaoJena(
-                    dwf, this);
+                    null, dwf, this);
         return objectPropertyStatementDao;
     }
 

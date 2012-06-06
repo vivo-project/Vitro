@@ -310,11 +310,11 @@ public class JenaDataSourceSetupSparql extends JenaDataSourceSetupBase
                         inferenceOms.getABoxModel(), 
                         inferenceOms.getTBoxModel()));
        // inferenceOms.setFullModel(inferenceUnion);
-        ModelContext.setInferenceOntModel(inferenceOms.getFullModel(), ctx);
-        WebappDaoFactory infWadf = new WebappDaoFactorySDB(
-                inferenceOms, bds, storeDesc, config, 
-                WebappDaoFactorySDB.SDBDatasetMode.INFERENCES_ONLY);
-        ctx.setAttribute("deductionsWebappDaoFactory", infWadf);
+//        ModelContext.setInferenceOntModel(inferenceOms.getFullModel(), ctx);
+//        WebappDaoFactory infWadf = new WebappDaoFactorySDB(
+//                inferenceOms, bds, storeDesc, config, 
+//                WebappDaoFactorySDB.SDBDatasetMode.INFERENCES_ONLY);
+//        ctx.setAttribute("deductionsWebappDaoFactory", infWadf);
         
         OntModel masterUnion = unionOms.getFullModel(); 
                 
@@ -325,9 +325,9 @@ public class JenaDataSourceSetupSparql extends JenaDataSourceSetupBase
                 
      //   unionOms.setFullModel(masterUnion);
         ctx.setAttribute("jenaOntModel", masterUnion);  
-        WebappDaoFactory wadf = new WebappDaoFactorySDB(
-                unionOms, bds, storeDesc, config);
-        ctx.setAttribute("webappDaoFactory",wadf);
+//        WebappDaoFactory wadf = new WebappDaoFactorySDB(
+//                unionOms, bds, storeDesc, config);
+//        ctx.setAttribute("webappDaoFactory",wadf);
 
         ModelContext.setOntModelSelector(unionOms, ctx);
         ModelContext.setUnionOntModelSelector(unionOms, ctx);          

@@ -52,13 +52,14 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlDataset;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlDatasetGraph;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.sparql.RDFServiceSparql;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.InitialJenaModelUtils;
 
@@ -128,7 +129,9 @@ public class JenaDataSourceSetupSparql2 extends JenaDataSourceSetupBase
                 ctx).getProperty("VitroConnection.DataSource.endpointURI");
         
         Graph g = new SparqlGraph(endpointURI);
-        Dataset dataset = new SparqlDataset(new SparqlDatasetGraph(endpointURI));
+        
+        RDFService rdfService = new RDFServiceSparql(endpointURI);
+        Dataset dataset = new RDFServiceDataset(rdfService);
         setStartupDataset(dataset, ctx);
         
 //        setStartupDataset(SDBFactory.connectDataset(store), ctx);
@@ -290,7 +293,7 @@ public class JenaDataSourceSetupSparql2 extends JenaDataSourceSetupBase
         WebappDaoFactoryConfig config = new WebappDaoFactoryConfig();
         config.setDefaultNamespace(getDefaultNamespace(ctx));
         WebappDaoFactory baseWadf = new WebappDaoFactorySDB(
-                baseOms, dataset, config,
+                rdfService, baseOms, config,
                 WebappDaoFactorySDB.SDBDatasetMode.ASSERTIONS_ONLY);
         ctx.setAttribute("assertionsWebappDaoFactory",baseWadf);
         
@@ -302,7 +305,7 @@ public class JenaDataSourceSetupSparql2 extends JenaDataSourceSetupBase
         inferenceOms.setFullModel(inferenceUnion);
         ModelContext.setInferenceOntModel(inferenceOms.getFullModel(), ctx);
         WebappDaoFactory infWadf = new WebappDaoFactorySDB(
-                inferenceOms, dataset, config, 
+                rdfService, inferenceOms, config, 
                 WebappDaoFactorySDB.SDBDatasetMode.INFERENCES_ONLY);
         ctx.setAttribute("deductionsWebappDaoFactory", infWadf);
         
@@ -311,7 +314,7 @@ public class JenaDataSourceSetupSparql2 extends JenaDataSourceSetupBase
         unionOms.setFullModel(masterUnion);
         ctx.setAttribute("jenaOntModel", masterUnion);  
         WebappDaoFactory wadf = new WebappDaoFactorySDB(
-                unionOms, dataset, config);
+                rdfService, unionOms, config);
         ctx.setAttribute("webappDaoFactory",wadf);
 
         ModelContext.setOntModelSelector(unionOms, ctx);

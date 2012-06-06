@@ -3,8 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.filters;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -31,20 +29,21 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.sdb.SDBFactory;
-import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
-import com.hp.hpl.jena.sdb.sql.SDBConnection;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlDatasetGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraphMultilingual;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 public class WebappDaoFactorySDBPrep implements Filter {
@@ -90,81 +89,11 @@ public class WebappDaoFactorySDBPrep implements Filter {
             }
         }
 		
-        BasicDataSource bds = JenaDataSourceSetupBase.getApplicationDataSource(_ctx);
-        StoreDesc storeDesc = (StoreDesc) _ctx.getAttribute("storeDesc");
         OntModelSelector oms = (OntModelSelector) _ctx.getAttribute("unionOntModelSelector");
         String defaultNamespace = (String) _ctx.getAttribute("defaultNamespace");
-        Connection sqlConn = null;
-		SDBConnection conn = null;
-		Store store = null;
-		Dataset dataset = null;
 		WebappDaoFactory wadf = null;
+		VitroRequest vreq = new VitroRequest((HttpServletRequest) request);
 		
-		// temporary scaffolding in the rdfapi dev branch
-        // TODO remove me
-        if (ConfigurationProperties.getBean(request).getProperty(
-                "VitroConnection.DataSource.endpointURI") != null) {
-            filterSparql(request, oms, defaultNamespace);
-            filterChain.doFilter(request, response);
-            return;
-        }
-		
-		try {		
-		    if (bds == null || storeDesc == null || oms == null) {
-		        throw new RuntimeException("SDB store not property set up");
-		    }
-		    
-			try {
-			    sqlConn = bds.getConnection();
-				conn = new SDBConnection(sqlConn) ;
-			} catch (SQLException sqe) {
-				throw new RuntimeException("Unable to connect to database", sqe);
-			}
-			if (conn != null) {
-				store = SDBFactory.connectStore(conn, storeDesc);
-				dataset = SDBFactory.connectDataset(store);
-				VitroRequest vreq = new VitroRequest((HttpServletRequest) request);
-				WebappDaoFactoryConfig config = new WebappDaoFactoryConfig();
-				config.setDefaultNamespace(defaultNamespace);
-				wadf = new WebappDaoFactorySDB(oms, dataset, config);
-				vreq.setWebappDaoFactory(wadf);
-				vreq.setFullWebappDaoFactory(wadf);
-				vreq.setDataset(dataset);
-				vreq.setJenaOntModel(ModelFactory.createOntologyModel(
-						OntModelSpec.OWL_MEM, dataset.getNamedModel(
-								WebappDaoFactorySDB.UNION_GRAPH)));
-			}
-		} catch (Throwable t) {
-			log.error("Unable to filter request to set up SDB connection", t);
-		}
-		
-		request.setAttribute("WebappDaoFactorySDBPrep.setup", 1);
-		
-		try {
-			filterChain.doFilter(request, response);
-			return;
-		} finally {
-			if (conn != null) {
-				conn.close();
-			}
-			if (dataset != null) {
-			    dataset.close();
-			}
-			if (store != null) {
-			    store.close();
-			}
-			if (wadf != null) {
-			    wadf.close();
-			}
-		}
-		
-	}
-	
-	private void filterSparql(ServletRequest request, OntModelSelector oms, String defaultNamespace) {
-	    log.info("---------");
-	    
-	    VitroRequest vreq = new VitroRequest((HttpServletRequest) request);
-	    
         Enumeration<String> headStrs = vreq.getHeaderNames();
         while (headStrs.hasMoreElements()) {
             String head = headStrs.nextElement(); 
@@ -173,46 +102,39 @@ public class WebappDaoFactorySDBPrep implements Filter {
         
         List<String> langs = new ArrayList<String>();
         
-        log.info("Accept-Language: " + vreq.getHeader("Accept-Language"));
+        log.debug("Accept-Language: " + vreq.getHeader("Accept-Language"));
         Enumeration<Locale> locs = vreq.getLocales();
         while (locs.hasMoreElements()) {
             Locale locale = locs.nextElement();
             langs.add(locale.toString().replace("_", "-"));
-            log.info(locale.toString() + " / " + locale.getLanguage() + " + " + locale.getCountry() + " : " + locale.getDisplayCountry() + " | " + locale.getLanguage() + " : " + locale.getDisplayLanguage());
         }
         WebappDaoFactoryConfig config = new WebappDaoFactoryConfig();
         config.setDefaultNamespace(defaultNamespace);
         config.setPreferredLanguages(langs);
-        
-        //okay let's make a graph-backed model
-        String endpointURI = ConfigurationProperties.getBean(
-                request).getProperty("VitroConnection.DataSource.endpointURI");
-        
-        Graph g = new SparqlGraphMultilingual(endpointURI, langs);
-        //Graph g = new SparqlGraph(endpointURI);
-        
-        Model m = ModelFactory.createModelForGraph(g);
-        OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
-        //oms = new SingleContentOntModelSelector(om, oms.getDisplayModel(), oms.getUserAccountsModel());
-                        
-        Dataset dataset = new SparqlDataset(new SparqlDatasetGraph(endpointURI));
-        
-        //DataSource datasource = DatasetFactory.create();
-        //datasource.addNamedModel("fake:fake", m);
-        //dataset = datasource;            
-        
-        //WebappDaoFactory wadf = new WebappDaoFactoryJena(oms, config);
-        WebappDaoFactory wadf = new WebappDaoFactorySDB(oms, dataset, config);
-        vreq.setWebappDaoFactory(wadf);
-        vreq.setFullWebappDaoFactory(wadf);
-        vreq.setUnfilteredWebappDaoFactory(wadf);
-        vreq.setWebappDaoFactory(wadf);
-        //vreq.setAssertionsWebappDaoFactory(wadf);
-        vreq.setDataset(dataset);
-        vreq.setJenaOntModel(om);
-        vreq.setOntModelSelector(oms);
+		
+		RDFServiceFactory factory = RDFServiceUtils.getRDFServiceFactory(_ctx);
+		RDFService rdfService = factory.getRDFService();
+		Dataset dataset = new RDFServiceDataset(rdfService);
+		wadf = new WebappDaoFactorySDB(rdfService, oms, config);
+		vreq.setWebappDaoFactory(wadf);
+		vreq.setFullWebappDaoFactory(wadf);
+		vreq.setDataset(dataset);
+		vreq.setJenaOntModel(ModelFactory.createOntologyModel(
+				OntModelSpec.OWL_MEM, dataset.getDefaultModel()));
+					
+		request.setAttribute("WebappDaoFactorySDBPrep.setup", 1);
+		
+		try {
+			filterChain.doFilter(request, response);
+			return;
+		} finally {
+			if (wadf != null) {
+			    wadf.close();
+			}
+		}
+		
 	}
-
+	
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
 		try {

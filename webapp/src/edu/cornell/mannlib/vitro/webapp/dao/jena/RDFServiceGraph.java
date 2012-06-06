@@ -37,6 +37,7 @@ import com.hp.hpl.jena.util.iterator.WrappedIterator;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
 public class RDFServiceGraph implements GraphWithPerform {
     
@@ -116,8 +117,8 @@ public class RDFServiceGraph implements GraphWithPerform {
         
         ChangeSet changeSet = rdfService.manufactureChangeSet();
         try {
-            changeSet.addAddition(new ByteArrayInputStream(
-                    serialize(t).getBytes()), RDFService.ModelSerializationFormat.N3, graphURI);
+            changeSet.addAddition(RDFServiceUtils.toInputStream(serialize(t)), 
+                    RDFService.ModelSerializationFormat.N3, graphURI);
             rdfService.changeSetUpdate(changeSet);
         } catch (RDFServiceException rdfse) {
             throw new RuntimeException(rdfse);

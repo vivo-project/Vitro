@@ -10,12 +10,18 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.sparql.core.DatasetGraph;
 
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+
 public class RDFServiceDataset implements Dataset {
 
     private RDFServiceDatasetGraph g;
     
     public RDFServiceDataset(RDFServiceDatasetGraph g) {
         this.g = g;
+    }
+    
+    public RDFServiceDataset(RDFService rdfService) {
+        this.g = new RDFServiceDatasetGraph(rdfService);
     }
     
     @Override

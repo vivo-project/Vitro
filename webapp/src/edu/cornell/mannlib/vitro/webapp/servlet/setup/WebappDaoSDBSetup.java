@@ -60,9 +60,9 @@ public class WebappDaoSDBSetup extends JenaDataSourceSetupBase
                     " seconds to set up SDB store");
             
             //TODO remove this temporary development scaffolding
-            if (ConfigurationProperties.getBean(sce).getProperty(
+            if (true || ConfigurationProperties.getBean(sce).getProperty(
                     "VitroConnection.DataSource.endpointURI") != null) {
-                (new JenaDataSourceSetupSparql2()).contextInitialized(sce);
+                (new RDFServiceSetup()).contextInitialized(sce);
             }
             
         } catch (SQLException sqle) {   
@@ -115,10 +115,10 @@ public class WebappDaoSDBSetup extends JenaDataSourceSetupBase
         StoreDesc storeDesc = getApplicationStoreDesc(ctx);
         WebappDaoFactoryConfig config = new WebappDaoFactoryConfig();
         config.setDefaultNamespace(getDefaultNamespace(ctx));
-        WebappDaoFactory baseWadf = new WebappDaoFactorySDB(
-                baseOms, bds, storeDesc, config,
-                WebappDaoFactorySDB.SDBDatasetMode.ASSERTIONS_ONLY);
-        ctx.setAttribute("assertionsWebappDaoFactory",baseWadf);
+//        WebappDaoFactory baseWadf = new WebappDaoFactorySDB(
+//                baseOms, bds, storeDesc, config,
+//                WebappDaoFactorySDB.SDBDatasetMode.ASSERTIONS_ONLY);
+//        ctx.setAttribute("assertionsWebappDaoFactory",baseWadf);
         
         ///////////////////////////////////////////////////////////////
         //create inference webapp DAO factory
@@ -130,23 +130,23 @@ public class WebappDaoSDBSetup extends JenaDataSourceSetupBase
                         inferenceOms.getTBoxModel()));
         inferenceOms.setFullModel(inferenceUnion);
         ModelContext.setInferenceOntModel(inferenceOms.getFullModel(), ctx);
-        WebappDaoFactory infWadf = new WebappDaoFactorySDB(
-                inferenceOms, bds, storeDesc, config, 
-                WebappDaoFactorySDB.SDBDatasetMode.INFERENCES_ONLY);
-        ctx.setAttribute("deductionsWebappDaoFactory", infWadf);
+//        WebappDaoFactory infWadf = new WebappDaoFactorySDB(
+//                inferenceOms, bds, storeDesc, config, 
+//                WebappDaoFactorySDB.SDBDatasetMode.INFERENCES_ONLY);
+//        ctx.setAttribute("deductionsWebappDaoFactory", infWadf);
         
         ///////////////////////////////////////////////////////////////
         //create default union webapp DAO factory
         
-        OntModel masterUnion = ModelFactory.createOntologyModel(
-                DB_ONT_MODEL_SPEC, makeDBModel(
-                        bds, WebappDaoFactorySDB.UNION_GRAPH,
-                                DB_ONT_MODEL_SPEC, TripleStoreType.SDB, ctx));
-        unionOms.setFullModel(masterUnion);
-        ctx.setAttribute("jenaOntModel", masterUnion);  
-        WebappDaoFactory wadf = new WebappDaoFactorySDB(
-                unionOms, bds, storeDesc, config);
-        ctx.setAttribute("webappDaoFactory",wadf);                           
+//        OntModel masterUnion = ModelFactory.createOntologyModel(
+//                DB_ONT_MODEL_SPEC, makeDBModel(
+//                        bds, WebappDaoFactorySDB.UNION_GRAPH,
+//                                DB_ONT_MODEL_SPEC, TripleStoreType.SDB, ctx));
+//        unionOms.setFullModel(masterUnion);
+//        ctx.setAttribute("jenaOntModel", masterUnion);  
+//        WebappDaoFactory wadf = new WebappDaoFactorySDB(
+//                unionOms, bds, storeDesc, config);
+//        ctx.setAttribute("webappDaoFactory",wadf);                           
         
         makeModelMakerFromConnectionProperties(TripleStoreType.RDB, ctx);
         VitroJenaModelMaker vjmm = getVitroJenaModelMaker();

@@ -26,8 +26,10 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.sdb.SDBFactory;
+import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
 import com.hp.hpl.jena.sdb.sql.SDBConnection;
+import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.update.GraphStore;
 import com.hp.hpl.jena.update.GraphStoreFactory;
 import com.hp.hpl.jena.update.UpdateAction;
@@ -57,18 +59,23 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
     protected DatasetWrapper getDatasetWrapper() {
         try {
             SDBConnection conn = new SDBConnection(bds.getConnection());
-            Dataset dataset = SDBFactory.connectDataset(conn, storeDesc);
-            return new DatasetWrapper(dataset, conn);
+            return new DatasetWrapper(getDataset(conn), conn);
         } catch (SQLException sqle) {
             log.error(sqle, sqle);
             throw new RuntimeException(sqle);
         }     
     }
     
+    protected Dataset getDataset(SDBConnection conn) {
+        Store store = SDBFactory.connectStore(conn, storeDesc);
+        store.getLoader().setUseThreading(false);
+        return SDBFactory.connectDataset(store);
+    }
+    
     @Override
     public boolean changeSetUpdate(ChangeSet changeSet)
             throws RDFServiceException {
-        
+             
         if (changeSet.getPreconditionQuery() != null 
                 && !isPreconditionSatisfied(
                         changeSet.getPreconditionQuery(), 
@@ -83,11 +90,11 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
             conn = new SDBConnection(bds.getConnection());
         } catch (SQLException sqle) {
             log.error(sqle, sqle);
-            throw new RuntimeException(sqle);
+            throw new RDFServiceException(sqle);
         }
         
-        Dataset dataset = SDBFactory.connectDataset(conn, storeDesc);
-        boolean transaction = conn.getTransactionHandler().transactionsSupported();
+        Dataset dataset = getDataset(conn);
+        boolean transaction = false; // conn.getTransactionHandler().transactionsSupported();
         
         try {
             if (transaction) {
@@ -95,26 +102,38 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
             }
             while (csIt.hasNext()) {
                 ModelChange modelChange = csIt.next();
-                Model model = dataset.getNamedModel(modelChange.getGraphURI());
-                model.register(new ModelListener(modelChange.getGraphURI(), this));
-                if (modelChange.getOperation() == ModelChange.Operation.ADD) {
-                    model.add(parseModel(modelChange));  
-                } else if (modelChange.getOperation() == ModelChange.Operation.REMOVE) {
-                    model.remove(parseModel(modelChange));
-                    removeBlankNodesWithSparqlUpdate(dataset, model, modelChange.getGraphURI());
-                } else {
-                    log.error("unrecognized operation type");
+                dataset.getLock().enterCriticalSection(Lock.WRITE);
+                try {
+                    Model model = dataset.getNamedModel(modelChange.getGraphURI());
+                    model.enterCriticalSection(Lock.WRITE);
+                    try {
+                        model.register(new ModelListener(modelChange.getGraphURI(), this));
+                        if (modelChange.getOperation() == ModelChange.Operation.ADD) {
+                            Model m = parseModel(modelChange);
+                            model.add(m);  
+                        } else if (modelChange.getOperation() == ModelChange.Operation.REMOVE) {
+                            model.remove(parseModel(modelChange));
+                            removeBlankNodesWithSparqlUpdate(dataset, model, modelChange.getGraphURI());
+                        } else {
+                            log.error("unrecognized operation type");
+                        } 
+                    } finally {
+                        model.leaveCriticalSection();
+                    }
+                } finally {
+                    dataset.getLock().leaveCriticalSection();
                 }
             }
-        } catch (Throwable t) {
-            if (transaction) {
-                conn.getTransactionHandler().abort();
-            }
-            throw new RuntimeException(t);
-        } finally {
             if (transaction) {
                 conn.getTransactionHandler().commit();
             }
+        } catch (Exception e) {
+            log.error(e, e);
+            if (transaction) {
+                conn.getTransactionHandler().abort();
+            }
+            throw new RDFServiceException(e);
+        } finally {
             conn.close();
         }
         
@@ -173,7 +192,7 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
     
     private Model parseModel(ModelChange modelChange) {
         Model model = ModelFactory.createDefaultModel();
-        model.read(modelChange.getSerializedModel(),
+        model.read(modelChange.getSerializedModel(), null,
                 getSerializationFormatString(modelChange.getSerializationFormat()));
         return model;
     }

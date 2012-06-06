@@ -67,6 +67,17 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         this.endpointURI = endpointURI;
         this.repository = new HTTPRepository(endpointURI);
     }
+    
+    /**
+     * Returns an RDFService for a remote repository 
+     * @param String - URI of the SPARQL endpoint for the knowledge base
+     * 
+     * The default read graph is the union of all graphs in the
+     * knowledge base
+     */
+    public RDFServiceSparql(String endpointURI) {
+        this(endpointURI, null);
+    }
     	
     public void close() {
         try {
