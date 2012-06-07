@@ -94,7 +94,7 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
         }
         
         Dataset dataset = getDataset(conn);
-        boolean transaction = false; // conn.getTransactionHandler().transactionsSupported();
+        boolean transaction = conn.getTransactionHandler().transactionsSupported();
         
         try {
             if (transaction) {
@@ -109,8 +109,8 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
                     try {
                         model.register(new ModelListener(modelChange.getGraphURI(), this));
                         if (modelChange.getOperation() == ModelChange.Operation.ADD) {
-                            Model m = parseModel(modelChange);
-                            model.add(m);  
+                            model.read(modelChange.getSerializedModel(), null,
+                                    getSerializationFormatString(modelChange.getSerializationFormat()));  
                         } else if (modelChange.getOperation() == ModelChange.Operation.REMOVE) {
                             model.remove(parseModel(modelChange));
                             removeBlankNodesWithSparqlUpdate(dataset, model, modelChange.getGraphURI());
@@ -156,6 +156,12 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
         
         StringBuffer patternBuff = new StringBuffer();
         StmtIterator stmtIt = model.listStatements();
+        
+        if (!stmtIt.hasNext()) {
+            stmtIt.close();
+            return;
+        }
+        
         while(stmtIt.hasNext()) {
             Triple t = stmtIt.next().asTriple();
             patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getSubject(), null));

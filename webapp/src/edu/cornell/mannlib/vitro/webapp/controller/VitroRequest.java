@@ -21,6 +21,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource.ModelName;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
 public class VitroRequest extends HttpServletRequestWrapper {
     
@@ -41,6 +43,16 @@ public class VitroRequest extends HttpServletRequestWrapper {
         this._req = _req;
     }
 
+    public RDFService getRDFService() {
+        Object o = getAttribute("rdfService");
+        if (o instanceof RDFService) {
+            return (RDFService) o;
+        } else {
+            RDFService rdfService = RDFServiceUtils.getRDFService(this);
+            setAttribute("rdfService", rdfService);
+            return rdfService;
+        }
+    }
     
     public void setWebappDaoFactory( WebappDaoFactory wdf){
         setAttribute("webappDaoFactory",wdf);

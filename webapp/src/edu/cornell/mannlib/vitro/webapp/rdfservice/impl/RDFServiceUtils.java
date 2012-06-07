@@ -6,6 +6,8 @@ import java.io.UnsupportedEncodingException;
 
 import javax.servlet.ServletContext;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 
 public class RDFServiceUtils {
@@ -29,6 +31,11 @@ public class RDFServiceUtils {
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    public static RDFService getRDFService(VitroRequest vreq) {
+        return getRDFServiceFactory(
+                vreq.getSession().getServletContext()).getRDFService();
     }
     
 }

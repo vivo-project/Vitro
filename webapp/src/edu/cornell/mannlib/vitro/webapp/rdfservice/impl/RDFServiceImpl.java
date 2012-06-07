@@ -168,7 +168,7 @@ public abstract class RDFServiceImpl implements RDFService {
     protected static String getSerializationFormatString(RDFService.ModelSerializationFormat format) {
         switch (format) {
             case RDFXML: 
-                return "RDFXML";
+                return "RDF/XML";
             case N3: 
                 return "N3";
             default: 

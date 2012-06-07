@@ -1,5 +1,7 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
@@ -71,7 +73,7 @@ public class RDFServiceGraphBulkUpdater extends SimpleBulkUpdateHandler {
 
     @Override
     public void add(Graph g, boolean arg1) {
-        log.info("adding graph");
+        log.info("bulk addGraph()");
         Model[] model = separateStatementsWithBlankNodes(g);
         addModel(model[1] /* nonBlankNodeModel */);
         // replace following call with different method
@@ -112,46 +114,34 @@ public class RDFServiceGraphBulkUpdater extends SimpleBulkUpdateHandler {
     
     @Override 
     public void delete(Graph g) {
-        ChangeSet changeSet = graph.getRDFService().manufactureChangeSet();
-        Model m = ModelFactory.createModelForGraph(g);
-        PipedOutputStream out = new PipedOutputStream();
-        m.write(out, "N-TRIPLE");
-        try {
-            changeSet.addRemoval(new PipedInputStream(
-                    out), RDFService.ModelSerializationFormat.N3, graph.getGraphURI());
-            graph.getRDFService().changeSetUpdate(changeSet);
-        } catch (IOException ioe) {
-            throw new RuntimeException(ioe);
-        } catch (RDFServiceException rdfse) {
-            throw new RuntimeException(rdfse);
-        }
+        deleteModel(ModelFactory.createModelForGraph(g));
     }
     
     public void addModel(Model model) {
+        log.info("bulk addModel()");
         ChangeSet changeSet = graph.getRDFService().manufactureChangeSet();
-        PipedOutputStream out = new PipedOutputStream();
-        model.write(out, "N-TRIPLE");
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        model.write(out, "N-TRIPLE");    
+        changeSet.addAddition(new ByteArrayInputStream(
+                out.toByteArray()), RDFService.ModelSerializationFormat.N3, 
+                        graph.getGraphURI());
         try {
-            changeSet.addAddition(new PipedInputStream(
-                    out), RDFService.ModelSerializationFormat.N3, graph.getGraphURI());
             graph.getRDFService().changeSetUpdate(changeSet);
-        } catch (IOException ioe) {
-            throw new RuntimeException(ioe);
         } catch (RDFServiceException rdfse) {
             throw new RuntimeException(rdfse);
         }
     }
     
     public void deleteModel(Model model) {
+        log.info("bulk addModel()");
         ChangeSet changeSet = graph.getRDFService().manufactureChangeSet();
-        PipedOutputStream out = new PipedOutputStream();
-        model.write(out, "N-TRIPLE");
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        model.write(out, "N-TRIPLE");    
+        changeSet.addRemoval(new ByteArrayInputStream(
+                out.toByteArray()), RDFService.ModelSerializationFormat.N3, 
+                        graph.getGraphURI());
         try {
-            changeSet.addRemoval(new PipedInputStream(
-                    out), RDFService.ModelSerializationFormat.N3, graph.getGraphURI());
             graph.getRDFService().changeSetUpdate(changeSet);
-        } catch (IOException ioe) {
-            throw new RuntimeException(ioe);
         } catch (RDFServiceException rdfse) {
             throw new RuntimeException(rdfse);
         }

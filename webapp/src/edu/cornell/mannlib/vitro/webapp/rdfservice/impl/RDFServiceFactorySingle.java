@@ -1,7 +1,8 @@
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl;
 
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 
 /**
@@ -21,10 +22,15 @@ public class RDFServiceFactorySingle implements RDFServiceFactory {
     public RDFService getRDFService() {
         return this.rdfService;
     }
-
+    
     @Override
-    public RDFService getRDFService(VitroRequest vreq) {
-        return this.rdfService;
+    public void registerListener(ChangeListener listener) throws RDFServiceException {
+        this.rdfService.registerListener(listener);
+    }
+    
+    @Override
+    public void unregisterListener(ChangeListener listener) throws RDFServiceException {
+        this.rdfService.unregisterListener(listener);
     }
 
 }

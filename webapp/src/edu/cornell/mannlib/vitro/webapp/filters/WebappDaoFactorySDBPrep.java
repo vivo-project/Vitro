@@ -94,12 +94,6 @@ public class WebappDaoFactorySDBPrep implements Filter {
 		WebappDaoFactory wadf = null;
 		VitroRequest vreq = new VitroRequest((HttpServletRequest) request);
 		
-        Enumeration<String> headStrs = vreq.getHeaderNames();
-        while (headStrs.hasMoreElements()) {
-            String head = headStrs.nextElement(); 
-            log.info(head + " : "  + vreq.getHeader(head));                     
-        }
-        
         List<String> langs = new ArrayList<String>();
         
         log.debug("Accept-Language: " + vreq.getHeader("Accept-Language"));

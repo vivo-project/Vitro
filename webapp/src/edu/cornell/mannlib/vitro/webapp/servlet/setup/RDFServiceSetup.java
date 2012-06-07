@@ -162,24 +162,15 @@ public class RDFServiceSetup extends JenaDataSourceSetupBase
         // ABox assertions
         Model aboxAssertions = dataset.getNamedModel(
                 JenaDataSourceSetupBase.JENA_DB_MODEL);
-        Model listenableAboxAssertions = ModelFactory.createUnion(
-                aboxAssertions, ModelFactory.createDefaultModel());
         baseOms.setABoxModel(
                 ModelFactory.createOntologyModel(
-                        OntModelSpec.OWL_MEM, listenableAboxAssertions));
+                        OntModelSpec.OWL_MEM, aboxAssertions));
         
         // ABox inferences
         Model aboxInferences = dataset.getNamedModel(
                 JenaDataSourceSetupBase.JENA_INF_MODEL);
-        Model listenableAboxInferences = ModelFactory.createUnion(
-                aboxInferences, ModelFactory.createDefaultModel());
         inferenceOms.setABoxModel(ModelFactory.createOntologyModel(
-                OntModelSpec.OWL_MEM, listenableAboxInferences));
-      
-        
-        // Since the TBox models are in memory, they do not have timeout issues 
-        // like the like the ABox models do (and so don't need the extra step 
-        // to make them listenable.)
+                OntModelSpec.OWL_MEM, aboxInferences));
         
         // TBox assertions
         try {
