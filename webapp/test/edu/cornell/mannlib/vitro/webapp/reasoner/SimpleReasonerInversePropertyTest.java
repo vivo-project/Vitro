@@ -18,7 +18,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
-public class SimpleReasonerPropertyTest extends AbstractTestClass {
+public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 	
 	long delay = 50;
   
@@ -439,8 +439,6 @@ public class SimpleReasonerPropertyTest extends AbstractTestClass {
 		
         SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
 		aBox.register(simpleReasoner);
-		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
-		tBox.register(simpleReasonerTBoxListener);
         // Individuals a, b, c and d
 		Resource a = aBox.createResource("http://test.vivo/a");
 		Resource b = aBox.createResource("http://test.vivo/b");
@@ -460,8 +458,6 @@ public class SimpleReasonerPropertyTest extends AbstractTestClass {
 		// Verify inferences	
 		Assert.assertTrue(inf.contains(b,Q,a));
 		Assert.assertTrue(inf.contains(d,Y,c));				
-		
-		simpleReasonerTBoxListener.setStopRequested();
 	}
 	
 	//==================================== Utility methods ====================

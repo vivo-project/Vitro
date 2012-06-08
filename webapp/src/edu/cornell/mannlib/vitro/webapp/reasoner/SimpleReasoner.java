@@ -131,10 +131,12 @@ public class SimpleReasoner extends StatementListener {
 	public void addedStatement(Statement stmt) {
 		try {
 			if (stmt.getPredicate().equals(RDF.type)) {
-			    addedABoxTypeAssertion(stmt, inferenceModel, new HashSet<String>());
-			    setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
+			     addedABoxTypeAssertion(stmt, inferenceModel, new HashSet<String>());
+			     setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
+			} else if (stmt.getPredicate().equals(OWL.sameAs)) {  
+                 addedABoxSameAsAssertion(stmt, inferenceModel); 
 			} else {
-				addedABoxAssertion(stmt, inferenceModel);
+				 addedABoxAssertion(stmt, inferenceModel);
 			}
 			
 			doPlugins(ModelUpdate.Operation.ADD,stmt);
@@ -179,6 +181,8 @@ public class SimpleReasoner extends StatementListener {
 			if (stmt.getPredicate().equals(RDF.type)) {
 				removedABoxTypeAssertion(stmt, inferenceModel);
 				setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
+			} else if (stmt.getPredicate().equals(OWL.sameAs)) {
+                removedABoxSameAsAssertion(stmt, inferenceModel); 	
 			} else {
 				removedABoxAssertion(stmt, inferenceModel);
 			}
@@ -358,13 +362,10 @@ public class SimpleReasoner extends StatementListener {
 	 * A assert that B is of that type.
 	 */
 	protected void addedABoxTypeAssertion(Statement stmt, Model inferenceModel, HashSet<String> unknownTypes) {
-		
-		tboxModel.enterCriticalSection(Lock.READ);
-		
+				
+        tboxModel.enterCriticalSection(Lock.READ);
 		try {
-
 			OntClass cls = null;
-			
 			if ( (stmt.getObject().asResource()).getURI() != null ) {
 				
 			    cls = tboxModel.getOntClass(stmt.getObject().asResource().getURI()); 
@@ -373,32 +374,43 @@ public class SimpleReasoner extends StatementListener {
 					List<OntClass> parents = (cls.listSuperClasses(false)).toList();		
 					parents.addAll((cls.listEquivalentClasses()).toList());	
 					Iterator<OntClass> parentIt = parents.iterator();
-					
-					while (parentIt.hasNext()) {
-						OntClass parentClass = parentIt.next();
-						
-						// VIVO doesn't materialize statements that assert anonymous types
-						// for individuals. Also, sharing an identical anonymous node is
-						// not allowed in owl-dl. picklist population code looks at qualities
-						// of classes not individuals.
-						if (parentClass.isAnon()) continue;
-						
-						Statement infStmt = ResourceFactory.createStatement(stmt.getSubject(), RDF.type, parentClass);
-						aboxModel.enterCriticalSection(Lock.READ);
-						try {
-							inferenceModel.enterCriticalSection(Lock.WRITE);
+	
+					if (parentIt.hasNext()) {
+						List<Resource> sameIndividuals = getSameIndividuals(stmt.getSubject().asResource(), inferenceModel);
+						while (parentIt.hasNext()) {
+							OntClass parentClass = parentIt.next();
+							
+							// VIVO doesn't materialize statements that assert anonymous types
+							// for individuals. Also, sharing an identical anonymous node is
+							// not allowed in owl-dl. picklist population code looks at qualities
+							// of classes not individuals.
+							if (parentClass.isAnon()) continue;
+							
+							Statement infStmt = ResourceFactory.createStatement(stmt.getSubject(), RDF.type, parentClass);
+							aboxModel.enterCriticalSection(Lock.READ);
 							try {
-								if (!inferenceModel.contains(infStmt) && !aboxModel.contains(infStmt))  {
-								    //log.debug("Adding this inferred statement:  " + infStmt.toString() );
-									inferenceModel.add(infStmt);
-							    }
+								inferenceModel.enterCriticalSection(Lock.WRITE);
+								try {
+									if (!inferenceModel.contains(infStmt) && !aboxModel.contains(infStmt))  {
+										inferenceModel.add(infStmt);
+								    }
+									
+									Iterator<Resource> sameIter = sameIndividuals.iterator();
+									while (sameIter.hasNext()) {
+										Resource subject = sameIter.next();
+										if (!inferenceModel.contains(subject,infStmt.getPredicate(),infStmt.getObject()) && !aboxModel.contains(subject,infStmt.getPredicate(),infStmt.getObject())) {
+											inferenceModel.add(subject,infStmt.getPredicate(),infStmt.getObject());
+										}
+									}
+
+								} finally {
+									inferenceModel.leaveCriticalSection();
+								}
 							} finally {
-								inferenceModel.leaveCriticalSection();
-							}
-						} finally {
-							aboxModel.leaveCriticalSection();
-						}	
-					}
+								aboxModel.leaveCriticalSection();
+							}	
+						}						
+					}					
 				} else {
 					if ( !(stmt.getObject().asResource().getNameSpace()).equals(OWL.NS)) {
 						if (!unknownTypes.contains(stmt.getObject().asResource().getURI())) {
@@ -416,28 +428,51 @@ public class SimpleReasoner extends StatementListener {
 			tboxModel.leaveCriticalSection();
 		}
 	}
-
+	
 	/*
-	 * Performs incremental property-based reasoning.
-	 * 
-	 * Materializes inferences based on the owl:inverseOf relationship.
+	 * Materializes inferences based on the owl:sameAs relationship.
 	 *  
-	 * If it is added that x prop1 y, and prop2 is an inverseOf prop1
-	 * then add y prop2 x to the inference graph, if it is not already in
-	 * the assertions graph.
+	 * If it is added that x owl:sameAs y, then all asserted and inferred
+	 * statements about x will become inferred about y if they are not already
+	 * asserted about y, and vice versa.
 	 */
-	public void addedABoxAssertion(Statement stmt, Model inferenceModel) {
-				
-		List<OntProperty> inverseProperties = getInverseProperties(stmt);	
-        Iterator<OntProperty> inverseIter = inverseProperties.iterator();
+	public void addedABoxSameAsAssertion(Statement stmt, Model inferenceModel) {
+		Resource subject = null;
+		Resource object = null;
 		
-	    while (inverseIter.hasNext()) {
-	       Property inverseProp = inverseIter.next();
-	       
-	       Statement infStmt = ResourceFactory.createStatement(stmt.getObject().asResource(), inverseProp, stmt.getSubject());
-	       	       
+		if (stmt.getSubject().isResource()) {
+			 subject = stmt.getSubject().asResource();
+			 if (tboxModel.containsResource(subject) || subject.isAnon()) {
+				 log.debug("the subject of this sameAs statement is either in the tbox or an anonymous node, no reasoning will be done: " + stmtString(stmt));
+				 return;
+			 }
+		} else {
+			 log.warn("the subject of this sameAs statement is not a resource, no reasoning will be done: " + stmtString(stmt));
+			 return;
+		}
+
+		if (stmt.getObject().isResource()) {
+			 object = stmt.getObject().asResource();
+			 if (tboxModel.containsResource(object) || object.isAnon()) {
+				 log.debug("the object of this sameAs statement is either in the tbox or an anonymous node, no reasoning will be done: " + stmtString(stmt));
+				 return;
+			 }
+		} else {
+			 log.warn("the object of this sameAs statement is not a resource, no reasoning will be done: " + stmtString(stmt));
+			 return;
+		}
+
+		Model inferences = ModelFactory.createDefaultModel();		
+        inferences.add(generateSameAsInferences(subject, object, inferenceModel));
+        inferences.add(generateSameAsInferences(object, subject, inferenceModel));
+        inferences.add(object, OWL.sameAs, subject);
+		
+        Iterator<Statement> infIter = inferences.listStatements();
+		
+	    while (infIter.hasNext()) {
+	       Statement infStmt = infIter.next();	
 		   aboxModel.enterCriticalSection(Lock.READ);
-			try {
+		   try {
 				inferenceModel.enterCriticalSection(Lock.WRITE);
 				try {
 					if (inferenceModel.contains(stmt)) {
@@ -454,6 +489,214 @@ public class SimpleReasoner extends StatementListener {
 				aboxModel.leaveCriticalSection();
 			}							   
 	    }	   
+	}	
+	
+	/*
+	 * Create a model that contains every assertion about indB as exists for
+	 * indA in the Abox assertions or inference model
+	 */
+	public Model generateSameAsInferences(Resource indA, Resource indB, Model inferenceModel) {	
+		
+		Model inferences = ModelFactory.createDefaultModel();
+		
+		OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+		unionModel.addSubModel(aboxModel);
+		unionModel.addSubModel(inferenceModel);
+		
+		aboxModel.enterCriticalSection(Lock.READ);
+		try {
+			Iterator<Statement> iter = unionModel.listStatements(indA, (Property) null, (RDFNode) null);
+			
+			while (iter.hasNext()) {
+				Statement stmt = iter.next();
+				if (stmt.getObject() == null) continue;
+				if (OWL.sameAs.equals(stmt.getPredicate()) && indB.equals(stmt.getObject())) continue;
+				   inferences.add(indB, stmt.getPredicate(), stmt.getObject());  
+			}
+		} finally {
+			aboxModel.leaveCriticalSection();
+		}
+		
+		return inferences;
+	}
+
+	/*
+	 * Get a list of individuals the same as the given individual
+	 */
+	public List<Resource> getSameIndividuals(Resource ind, Model inferenceModel) {	
+				
+		OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+		unionModel.addSubModel(aboxModel);
+		unionModel.addSubModel(inferenceModel);
+
+		ArrayList<Resource> sameIndividuals = new ArrayList<Resource>();
+		aboxModel.enterCriticalSection(Lock.READ);
+		inferenceModel.enterCriticalSection(Lock.READ);
+		try {
+			Iterator<Statement> iter = unionModel.listStatements(ind, OWL.sameAs, (RDFNode) null);
+			
+			while (iter.hasNext()) {
+				Statement stmt = iter.next();
+				if (stmt.getObject() == null || !stmt.getObject().isResource() || stmt.getObject().asResource().getURI() == null) continue;
+				sameIndividuals.add(stmt.getObject().asResource());
+			}
+		} finally {
+			inferenceModel.leaveCriticalSection();
+			aboxModel.leaveCriticalSection();
+		}
+		
+		return sameIndividuals;
+	}
+
+	/*
+	 * Materializes inferences based on the owl:sameAs relationship.
+	 *  
+	 * If it is removed	that x is sameAs y, then remove y sameAs x from 
+	 * the inference graph and then recompute the inferences for x and
+	 * y based on their respective assertions.																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																														 that x owl:sameAs y, then all asserted and inferred
+	 */
+	public void removedABoxSameAsAssertion(Statement stmt, Model inferenceModel) {
+		
+		Resource subject = null;
+		Resource object = null;
+		
+		if (stmt.getSubject().isResource()) {
+			 subject = stmt.getSubject().asResource();
+			 if (tboxModel.containsResource(subject) || subject.isAnon()) {
+				 log.debug("the subject of this removed sameAs statement is either in the tbox or an anonymous node, no reasoning will be done: " + stmtString(stmt));
+				 return;
+			 }
+		} else {
+			 log.warn("the subject of this removed sameAs statement is not a resource, no reasoning will be done: " + stmtString(stmt));
+			 return;
+		}
+
+		if (stmt.getObject().isResource()) {
+			 object = stmt.getObject().asResource();
+			 if (tboxModel.containsResource(object) || object.isAnon()) {
+				 log.debug("the object of this removed sameAs statement is either in the tbox or an anonymous node, no reasoning will be done: " + stmtString(stmt));
+				 return;
+			 }
+		} else {
+			 log.warn("the object of this removed sameAs statement is not a resource, no reasoning will be done: " + stmtString(stmt));
+			 return;
+		}
+
+		inferenceModel.enterCriticalSection(Lock.WRITE);
+		try {
+			if (inferenceModel.contains(stmt)) {
+				inferenceModel.remove(stmt);
+			}
+
+			if (!inferenceModel.contains(object, OWL.sameAs, subject) && !aboxModel.contains(object, OWL.sameAs, subject) ) {
+				inferenceModel.add(object, OWL.sameAs, subject);
+			}					
+		} finally {
+			inferenceModel.leaveCriticalSection();
+		}
+		
+		recomputeInferencesForIndividual(subject, inferenceModel);
+		recomputeInferencesForIndividual(object, inferenceModel);
+	}
+	
+	/*
+	 * Recompute inferences for individual
+	 */
+	public void recomputeInferencesForIndividual(Resource ind, Model inferenceModel) {	
+		
+		Model inferencesToRemove = ModelFactory.createDefaultModel();	
+		
+		inferenceModel.enterCriticalSection(Lock.READ);
+		try {
+			Iterator<Statement> iter = inferenceModel.listStatements(ind, (Property) null, (RDFNode) null);
+			
+			while (iter.hasNext()) {
+				inferencesToRemove.add(iter.next());
+			}
+		} finally {
+			inferenceModel.leaveCriticalSection();
+		}
+		
+		inferenceModel.enterCriticalSection(Lock.WRITE);
+		try {
+			inferenceModel.remove(inferencesToRemove);
+		} finally {
+			inferenceModel.leaveCriticalSection();
+		}
+		
+		Iterator<Statement> iter = null;
+		aboxModel.enterCriticalSection(Lock.WRITE);
+		try {
+		    iter = aboxModel.listStatements(ind, (Property) null, (RDFNode) null);
+		} finally {
+			aboxModel.leaveCriticalSection();
+		}
+		
+		while (iter.hasNext()) {
+		   addedStatement(iter.next());	
+		}
+			
+		return;
+	}
+	
+	/*
+	 * Performs incremental property-based reasoning.
+	 * 
+	 * Materializes inferences based on the owl:inverseOf relationship.
+	 *  
+	 * If it is added that x prop1 y, and prop2 is an inverseOf prop1
+	 * then add y prop2 x to the inference graph, if it is not already in
+	 * the assertions graph.
+	 */
+	public void addedABoxAssertion(Statement stmt, Model inferenceModel) {
+        List<Resource> sameIndividuals = getSameIndividuals(stmt.getSubject().asResource(), inferenceModel);
+		List<OntProperty> inverseProperties = getInverseProperties(stmt);	
+        Iterator<OntProperty> inverseIter = inverseProperties.iterator();
+		        
+	    while (inverseIter.hasNext()) {
+	       Property inverseProp = inverseIter.next();
+	       
+	       Statement infStmt = ResourceFactory.createStatement(stmt.getObject().asResource(), inverseProp, stmt.getSubject());
+	       	       
+		   aboxModel.enterCriticalSection(Lock.READ);
+			try {
+				inferenceModel.enterCriticalSection(Lock.WRITE);
+				try {
+					if (!inferenceModel.contains(infStmt) && !aboxModel.contains(infStmt) ) {
+						inferenceModel.add(infStmt);
+					}
+					
+					Iterator<Resource> sameIter = sameIndividuals.iterator();
+					while (sameIter.hasNext()) {
+						Resource subject = sameIter.next();
+						if (!inferenceModel.contains(subject,infStmt.getPredicate(),infStmt.getObject()) && !aboxModel.contains(subject,infStmt.getPredicate(),infStmt.getObject())) {
+							inferenceModel.add(subject,infStmt.getPredicate(),infStmt.getObject());
+						}
+					}
+				} finally {
+					inferenceModel.leaveCriticalSection();
+				}
+			} finally {
+				aboxModel.leaveCriticalSection();
+			}							   
+	    }	
+	    
+		inferenceModel.enterCriticalSection(Lock.WRITE);
+		try {
+			if (inferenceModel.contains(stmt)) {
+				inferenceModel.remove(stmt);
+			}
+
+			Iterator<Resource> sameIter = sameIndividuals.iterator();		
+			while (sameIter.hasNext()) {
+				Resource subject = sameIter.next();	
+				if (!inferenceModel.contains(subject,stmt.getPredicate(),stmt.getObject()) && !aboxModel.contains(subject,stmt.getPredicate(),stmt.getObject())) {
+					inferenceModel.add(subject,stmt.getPredicate(),stmt.getObject());
+				}
+			}	    			
+		} finally {
+			inferenceModel.leaveCriticalSection();
+		}
 	}	
 			
 	/*
@@ -483,8 +726,7 @@ public class SimpleReasoner extends StatementListener {
 							}
 						} finally {
 							inferenceModel.leaveCriticalSection();
-						}	
-						
+						}					
 						return;
 					} 
 					
@@ -542,30 +784,53 @@ public class SimpleReasoner extends StatementListener {
 	 * otherwise entailed by the assertions graph independently of
 	 * this removed statement.
 	 */
-	public void removedABoxAssertion(Statement stmt, Model inferenceModel) {		
+	public void removedABoxAssertion(Statement stmt, Model inferenceModel) {
+		
+	    List<Resource> sameIndividuals = getSameIndividuals(stmt.getSubject().asResource(), inferenceModel);
 		List<OntProperty> inverseProperties = getInverseProperties(stmt);	
         Iterator<OntProperty> inverseIter = inverseProperties.iterator();
 		
 	    while (inverseIter.hasNext()) {
 	        OntProperty inverseProp = inverseIter.next();
-	       
+	        
 	        Statement infStmt = ResourceFactory.createStatement(stmt.getObject().asResource(), inverseProp, stmt.getSubject());
 
 	        inferenceModel.enterCriticalSection(Lock.WRITE);
 			try {
-				 if (!entailedInverseStmt(infStmt) && inferenceModel.contains(infStmt)) { 
+				 if (!entailedStatement(infStmt) && inferenceModel.contains(infStmt)) { 
 					inferenceModel.remove(infStmt);
 				 }
 				 
-				 // if a statement has been removed that is otherwise entailed,
-				 // add it to the inference graph.
-				 if (entailedInverseStmt(stmt) && !inferenceModel.contains(stmt)) {
-					inferenceModel.add(stmt);
-				 }				 
+				 Iterator<Resource> sameIter = sameIndividuals.iterator();	 
+				 while (sameIter.hasNext()) {
+					 Statement infStmtSame = ResourceFactory.createStatement(sameIter.next(), infStmt.getPredicate(), infStmt.getObject());
+					 if (!entailedStatement(infStmtSame) && inferenceModel.contains(infStmtSame)) {
+							inferenceModel.remove(infStmtSame);
+					 }					 
+				 }		 				 
 			} finally {
 				inferenceModel.leaveCriticalSection();
 			}
 	    }	   
+
+        inferenceModel.enterCriticalSection(Lock.WRITE);
+        try {
+			 // if a statement has been removed that is otherwise entailed,
+			 // add it to the inference graph.
+			 if (entailedStatement(stmt) && !inferenceModel.contains(stmt)) {
+				inferenceModel.add(stmt);
+			 }
+			 
+			Iterator<Resource> sameIter = sameIndividuals.iterator();	 
+			while (sameIter.hasNext()) {
+				 Statement stmtSame = ResourceFactory.createStatement(sameIter.next(), stmt.getPredicate(), stmt.getObject());
+				 if (!entailedStatement(stmtSame) && inferenceModel.contains(stmtSame)) {
+					inferenceModel.remove(stmtSame);
+				 }					 
+			}		 
+        } finally {
+        	inferenceModel.leaveCriticalSection();
+        }	    
 	}
 	
 	// Returns true if it is entailed by class subsumption that
@@ -600,39 +865,61 @@ public class SimpleReasoner extends StatementListener {
 	}
 		
 	// Returns true if the triple is entailed by inverse property
-	// reasoning; otherwise returns false.
-	protected boolean entailedInverseStmt(Statement stmt) {	
-		ExtendedIterator <? extends OntProperty> iter = null;
-		
+	// reasoning or sameAs reasoning; otherwise returns false.
+	protected boolean entailedStatement(Statement stmt) {	
+
+		List<OntProperty> inverses = new ArrayList<OntProperty>();
+				
 		tboxModel.enterCriticalSection(Lock.READ);
 		try {
 		    OntProperty prop = tboxModel.getOntProperty(stmt.getPredicate().asResource().getURI());
-			iter = prop.listInverse();
+		    inverses.addAll(prop.listInverse().toList());
 		} finally {
 		    tboxModel.leaveCriticalSection();	
 		}
 
-		aboxModel.enterCriticalSection(Lock.READ);
-		try {						
-			while (iter.hasNext()) {		
-				Property invProp = iter.next();
-
-				// not reasoning on properties in the OWL, RDF or RDFS namespace
-				if ((invProp.getNameSpace()).equals(OWL.NS) || 
-					(invProp.getNameSpace()).equals(RDFS.getURI()) ||
-					(invProp.getNameSpace()).equals(RDF.getURI())) {
-					continue;
+		Iterator<OntProperty> oIter = inverses.iterator();
+		if (oIter.hasNext()) {
+			aboxModel.enterCriticalSection(Lock.READ);
+			try {						
+				while (oIter.hasNext()) {		
+					Property invProp = oIter.next();
+	
+					// not reasoning on properties in the OWL, RDF or RDFS namespace
+					if ((invProp.getNameSpace()).equals(OWL.NS) || 
+						(invProp.getNameSpace()).equals(RDFS.getURI()) ||
+						(invProp.getNameSpace()).equals(RDF.getURI())) {
+						continue;
+					}
+					
+					Statement invStmt = ResourceFactory.createStatement(stmt.getObject().asResource(), invProp, stmt.getSubject());
+					if (aboxModel.contains(invStmt)) {
+						return true;
+					}
 				}
-				
-				Statement invStmt = ResourceFactory.createStatement(stmt.getObject().asResource(), invProp, stmt.getSubject());
-				if (aboxModel.contains(invStmt)) {
-					return true;
+			} finally { 
+				aboxModel.leaveCriticalSection();
+			}	
+		}
+		
+		List<Resource> sameIndividuals = getSameIndividuals(stmt.getSubject().asResource(),inferenceModel);
+		Iterator<Resource> rIter = sameIndividuals.iterator();
+		if (rIter.hasNext()) {
+			aboxModel.enterCriticalSection(Lock.READ);
+			try {						
+				while (rIter.hasNext()) {		
+					Resource subject = rIter.next();
+	
+					if (aboxModel.contains(subject, stmt.getPredicate(), stmt.getObject())) {
+						return true;
+					}
 				}
-			}
-			return false;
-		} finally { 
-			aboxModel.leaveCriticalSection();
-		}	
+			} finally { 
+				aboxModel.leaveCriticalSection();
+			}	
+		}
+		
+		return false;
 	}
 	
 	/*
@@ -793,19 +1080,28 @@ public class SimpleReasoner extends StatementListener {
         inferences.add(generateInverseInferences(prop2, prop1));
         
 		if (inferences.isEmpty()) return;
-		
+				
 		aboxModel.enterCriticalSection(Lock.READ);
 		try {		
 			StmtIterator iter = inferences.listStatements();
 			
 			while (iter.hasNext()) {
 				Statement infStmt = iter.next();
+				List<Resource> sameIndividuals = getSameIndividuals(infStmt.getSubject().asResource(), inferenceModel);
 				
 				inferenceModel.enterCriticalSection(Lock.WRITE);
 				try {
 					if (!inferenceModel.contains(infStmt) && !aboxModel.contains(infStmt)) {
 						inferenceModel.add(infStmt);
-					} 
+					}
+					
+					Iterator<Resource> sameIter = sameIndividuals.iterator();
+					while (sameIter.hasNext()) {
+						Resource subject = sameIter.next();
+						if (!inferenceModel.contains(subject,infStmt.getPredicate(),infStmt.getObject()) && !aboxModel.contains(subject,infStmt.getPredicate(),infStmt.getObject())) {
+							inferenceModel.add(subject,infStmt.getPredicate(),infStmt.getObject());
+						}
+					}
 				} finally {
 					inferenceModel.leaveCriticalSection();
 				}
@@ -862,7 +1158,7 @@ public class SimpleReasoner extends StatementListener {
 		while (iter.hasNext()) {
 			Statement infStmt = iter.next();
 					
-			if (entailedInverseStmt(infStmt)) {
+			if (entailedStatement(infStmt)) {
 				continue;
 			}
 						
@@ -1051,19 +1347,18 @@ public class SimpleReasoner extends StatementListener {
 	 * inference models.	  
 	 */
 	protected synchronized void recomputeABox() {
-		HashSet<String> unknownTypes = new HashSet<String>();
 			
-		// recompute the inferences 
+		// recompute class subsumption inferences 
 		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);			
 		try {
-			log.info("Computing ABox inferences.");
+			HashSet<String> unknownTypes = new HashSet<String>();
 			inferenceRebuildModel.removeAll();
 			
+			log.info("Computing class subsumtion ABox inferences.");
 			int numStmts = 0;
 			ArrayList<String> individuals = this.getAllIndividualURIs();
 			
-			for (String individualURI : individuals) {
-				
+			for (String individualURI : individuals) {			
 				Resource individual = ResourceFactory.createResource(individualURI);
 				
 				try {
@@ -1077,8 +1372,8 @@ public class SimpleReasoner extends StatementListener {
 						}
 					}
 				} catch (NullPointerException npe) {
-                	log.error("a NullPointerException was received while recomputing the ABox inferences. Halting inference computation.");
-                    return;
+	            	log.error("a NullPointerException was received while recomputing the ABox inferences. Halting inference computation.");
+	                return;
 				} catch (JenaException je) {
 					 if (je.getMessage().equals("Statement models must no be null")) {
 						 log.error("Exception while recomputing ABox inference model. Halting inference computation.", je);
@@ -1090,117 +1385,172 @@ public class SimpleReasoner extends StatementListener {
 				}
 				
 				numStmts++;
-                if ((numStmts % 10000) == 0) {
-                    log.info("Still computing class-based ABox inferences...");
-                }
-                
-                if (stopRequested) {
-                	log.info("a stopRequested signal was received during recomputeABox. Halting Processing.");
-                	return;
-                }
+	            if ((numStmts % 10000) == 0) {
+	                log.info("Still computing class subsumption ABox inferences...");
+	            }
+	            
+	            if (stopRequested) {
+	            	log.info("a stopRequested signal was received during recomputeABox. Halting Processing.");
+	            	return;
+	            }
 			}
-
-			log.info("Finished computing class-based ABox inferences");
 			
-			Iterator<Statement> invStatements = null;
-			tboxModel.enterCriticalSection(Lock.READ);
-			try {
-			    invStatements = tboxModel.listStatements((Resource) null, OWL.inverseOf, (Resource) null);
-			} finally {
-			    tboxModel.leaveCriticalSection();	
-			}
-			  
-			while (invStatements.hasNext()) {				
-				Statement stmt = invStatements.next();
-												
+			log.info("Finished computing class subsumption ABox inferences");
+			
+			log.info("Computing inverse property ABox inferences");
+				Iterator<Statement> invStatements = null;
+				tboxModel.enterCriticalSection(Lock.READ);
 				try {
-					OntProperty prop1 = tboxModel.getOntProperty((stmt.getSubject()).getURI());
-					if (prop1 == null) {
-						log.debug("didn't find subject property in the tbox: " + (stmt.getSubject()).getURI());
-						continue;
-					}
-					
-					OntProperty prop2 = tboxModel.getOntProperty(((Resource)stmt.getObject()).getURI()); 
-					if (prop2 == null) {
-						log.debug("didn't find object property in the tbox: " + ((Resource)stmt.getObject()).getURI());
-						continue;
-					}
-					
-					addedInverseProperty(prop1, prop2, inferenceRebuildModel); 
-				} catch (NullPointerException npe) {
-                	log.error("a NullPointerException was received while recomputing the ABox inferences. Halting inference computation.");
-                    return;
-				} catch (JenaException je) {
-					 if (je.getMessage().equals("Statement models must no be null")) {
-						 log.error("Exception while recomputing ABox inference model. Halting inference computation.", je);
-		                 return; 
-					 } 
-					 log.error("Exception while recomputing ABox inference model: ", je);
-				} catch (Exception e) {
-					 log.error("Exception while recomputing ABox inference model: ", e);
+				    invStatements = tboxModel.listStatements((Resource) null, OWL.inverseOf, (Resource) null);
+				} finally {
+				    tboxModel.leaveCriticalSection();	
 				}
 				
-				numStmts++;
-                if ((numStmts % 10000) == 0) {
-                    log.info("Still computing property-based ABox inferences...");
-                }
-                
-                if (stopRequested) {
-                	log.info("a stopRequested signal was received during recomputeABox. Halting Processing.");
-                	return;
-                }
-			}
+				numStmts = 0;
+				while (invStatements.hasNext()) {				
+					Statement stmt = invStatements.next();
+													
+					try {
+						OntProperty prop1 = tboxModel.getOntProperty((stmt.getSubject()).getURI());
+						if (prop1 == null) {
+							//TODO make sure not to print out a million of these for the same property
+							log.debug("didn't find subject property in the tbox: " + (stmt.getSubject()).getURI());
+							continue;
+						}
+						
+						OntProperty prop2 = tboxModel.getOntProperty(((Resource)stmt.getObject()).getURI()); 
+						if (prop2 == null) {
+							//TODO make sure not to print out a million of these for the same property
+							log.debug("didn't find object property in the tbox: " + ((Resource)stmt.getObject()).getURI());
+							continue;
+						}
+						
+						addedInverseProperty(prop1, prop2, inferenceRebuildModel);
+					} catch (NullPointerException npe) {
+		            	log.error("a NullPointerException was received while recomputing the ABox inferences. Halting inference computation.");
+		                return;
+					} catch (JenaException je) {
+						 if (je.getMessage().equals("Statement models must no be null")) {
+							 log.error("Exception while recomputing ABox inference model. Halting inference computation.", je);
+			                 return; 
+						 } 
+						 log.error("Exception while recomputing ABox inference model: ", je);
+					} catch (Exception e) {
+						 log.error("Exception while recomputing ABox inference model: ", e);
+					}
+					
+					numStmts++;
+		            if ((numStmts % 10000) == 0) {
+		                log.info("Still computing inverse property ABox inferences...");
+		            }
+		            
+		            if (stopRequested) {
+		            	log.info("a stopRequested signal was received during recomputeABox. Halting Processing.");
+		            	return;
+		            }
+				}
+				
+				log.info("Finished computing inverse property ABox inferences");
+			
+			log.info("Computing sameAs ABox inferences");
+			
+				Iterator<Statement> sameAsStatements = null;
+				aboxModel.enterCriticalSection(Lock.READ);
+				try {
+				    sameAsStatements = aboxModel.listStatements((Resource) null, OWL.sameAs, (Resource) null);
+				} finally {
+				    aboxModel.leaveCriticalSection();	
+				}
+				
+				numStmts = 0;
+				while (sameAsStatements.hasNext()) {				
+					Statement stmt = sameAsStatements.next();
+													
+					try {
+						addedABoxSameAsAssertion(stmt, inferenceRebuildModel); 
+					} catch (NullPointerException npe) {
+		            	log.error("a NullPointerException was received while recomputing the ABox inferences. Halting inference computation.");
+		                return;
+					} catch (JenaException je) {
+						 if (je.getMessage().equals("Statement models must no be null")) {
+							 log.error("Exception while recomputing ABox inference model. Halting inference computation.", je);
+			                 return; 
+						 } 
+						 log.error("Exception while recomputing ABox inference model: ", je);
+					} catch (Exception e) {
+						 log.error("Exception while recomputing ABox inference model: ", e);
+					}
+					
+					numStmts++;
+		            if ((numStmts % 10000) == 0) {
+		                log.info("Still computing sameAs ABox inferences...");
+		            }
+		            
+		            if (stopRequested) {
+		            	log.info("a stopRequested signal was received during recomputeABox. Halting Processing.");
+		            	return;
+		            }
+				}
+				log.info("Finished computing sameAs ABox inferences");	
+				
+				try {
+					if (updateInferenceModel(inferenceRebuildModel)) {
+			        	log.info("a stopRequested signal was received during updateInferenceModel. Halting Processing.");
+			        	return;
+					}
+				} catch (Exception e) {
+					log.error("Exception while reconciling the current and recomputed ABox inference model for class subsumption inferences. Halting processing." , e);
+					inferenceRebuildModel.removeAll();
+					return;
+				}			
 		} catch (Exception e) {
-			 log.error("Exception while recomputing ABox inference model", e);
-			 inferenceRebuildModel.removeAll(); // don't do this in the finally, it's needed in the case
-                                                // where there isn't an exception
+			 log.error("Exception while recomputing ABox inferences. Halting processing.", e);
+			 inferenceRebuildModel.removeAll();
 			 return;
 		} finally {
 			 inferenceRebuildModel.leaveCriticalSection();
-		}			
-		
-		log.info("Finished computing property-based ABox inferences");
-		
-		// reflect the recomputed inferences into the application
-		// inference model.
-	    log.info("Updating ABox inference model");
-	    StmtIterator iter = null;
- 
-		// Remove everything from the current inference model that is not
-		// in the recomputed inference model	
-        int num = 0;
-		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);
-		scratchpadModel.enterCriticalSection(Lock.WRITE);
-		try {
-			inferenceModel.enterCriticalSection(Lock.READ);
-			try {
-				scratchpadModel.removeAll();
-				iter = inferenceModel.listStatements();
-				
-				while (iter.hasNext()) {				
-					Statement stmt = iter.next();
-					if (!inferenceRebuildModel.contains(stmt)) {
-					   scratchpadModel.add(stmt);  
-					}
+		}		
+	}
+	
+	/*
+	 * reconcile a set of inferences into the application inference model
+	 */
+	protected synchronized boolean updateInferenceModel(Model inferenceRebuildModel) {
 					
-					num++;
-	                if ((num % 10000) == 0) {
-	                    log.info("Still updating ABox inference model (removing outdated inferences)...");
-	                }
-	                
-	                if (stopRequested) {
-	                	log.info("a stopRequested signal was received during recomputeABox. Halting Processing.");
-	                	return;
-	                }
-				}
-			} catch (Exception e) {
-				log.error("Exception while reconciling the current and recomputed ABox inference models", e);
-				return;
-			} finally {
-				iter.close();
-	            inferenceModel.leaveCriticalSection();
-			}
+    log.info("Updating ABox inference model");
+	StmtIterator iter = null;
+ 
+	// Remove everything from the current inference model that is not
+	// in the recomputed inference model	
+    int num = 0;
+	scratchpadModel.enterCriticalSection(Lock.WRITE);
+	try {
+		inferenceModel.enterCriticalSection(Lock.READ);
+		try {
+			scratchpadModel.removeAll();
+			iter = inferenceModel.listStatements();
 			
+			while (iter.hasNext()) {				
+				Statement stmt = iter.next();
+				if (!inferenceRebuildModel.contains(stmt)) {
+				   scratchpadModel.add(stmt);  
+				}
+				
+				num++;
+                if ((num % 10000) == 0) {
+                    log.info("Still updating ABox inference model (removing outdated inferences)...");
+                }
+                
+                if (stopRequested) {
+                	return true;
+                }
+			}
+		} finally {
+			iter.close();
+            inferenceModel.leaveCriticalSection();
+		}
+		
+		try {
 			iter = scratchpadModel.listStatements();
 			while (iter.hasNext()) {
 				Statement stmt = iter.next();
@@ -1208,73 +1558,65 @@ public class SimpleReasoner extends StatementListener {
 				inferenceModel.enterCriticalSection(Lock.WRITE);
 				try {
 					inferenceModel.remove(stmt);
-				} catch (Exception e) {
-					log.error("Exception while reconciling the current and recomputed ABox inference models", e);
-				} finally {
-					inferenceModel.leaveCriticalSection();
-				}
-			}
-						
-			// Add everything from the recomputed inference model that is not already
-			// in the current inference model to the current inference model.	
-			try {
-				scratchpadModel.removeAll();
-				iter = inferenceRebuildModel.listStatements();
-				
-				while (iter.hasNext()) {				
-					Statement stmt = iter.next();
-					
-					inferenceModel.enterCriticalSection(Lock.READ);
-					try {
-						if (!inferenceModel.contains(stmt)) {
-							 scratchpadModel.add(stmt);
-						}	
-					} finally {
-					     inferenceModel.leaveCriticalSection();	
-					}
-										
-					num++;
-	                if ((num % 10000) == 0) {
-	                    log.info("Still updating ABox inference model (adding new inferences)...");
-	                }
-	                
-	                if (stopRequested) {
-	                	log.info("a stopRequested signal was received during recomputeABox. Halting Processing.");
-	                	return;
-	                }
-				}
-			} catch (Exception e) {		
-				log.error("Exception while reconciling the current and recomputed ABox inference models", e);
-				return;
-			} finally {
-				iter.close();	
-			}
-						
-			iter = scratchpadModel.listStatements();
-			while (iter.hasNext()) {
-				Statement stmt = iter.next();
-				
-				inferenceModel.enterCriticalSection(Lock.WRITE);
-				try {
-					inferenceModel.add(stmt);
-				} catch (Exception e) {
-					log.error("Exception while reconciling the current and recomputed ABox inference models", e);
-					return;
 				} finally {
 					inferenceModel.leaveCriticalSection();
 				}
 			}
 		} finally {
 			iter.close();
-			inferenceRebuildModel.removeAll();
-			scratchpadModel.removeAll();
-			inferenceRebuildModel.leaveCriticalSection();
-			scratchpadModel.leaveCriticalSection();			
 		}
-		
-		log.info("ABox inference model updated");
-	}
+					
+		// Add everything from the recomputed inference model that is not already
+		// in the current inference model to the current inference model.	
+		try {
+			scratchpadModel.removeAll();
+			iter = inferenceRebuildModel.listStatements();
 			
+			while (iter.hasNext()) {				
+				Statement stmt = iter.next();
+				
+				inferenceModel.enterCriticalSection(Lock.READ);
+				try {
+					if (!inferenceModel.contains(stmt)) {
+						 scratchpadModel.add(stmt);
+					}
+				} finally {
+				     inferenceModel.leaveCriticalSection();	
+				}
+									
+				num++;
+                if ((num % 10000) == 0) {
+                    log.info("Still updating ABox inference model (adding new inferences)...");
+                }
+                
+                if (stopRequested) {
+                	return true;
+                }
+			}
+		} finally {
+			iter.close();	
+		}
+					
+		iter = scratchpadModel.listStatements();
+		while (iter.hasNext()) {
+			Statement stmt = iter.next();
+			
+			inferenceModel.enterCriticalSection(Lock.WRITE);
+			try {
+				inferenceModel.add(stmt);
+			} finally {
+				inferenceModel.leaveCriticalSection();
+			}
+		}
+	} finally {
+		iter.close();
+		scratchpadModel.removeAll();
+		scratchpadModel.leaveCriticalSection();			
+	}
+	
+	log.info("ABox inference model updated");
+	return false;
+	}
 	/*
 	 * Get the URIs for all individuals in the system
 	 */
@@ -1491,8 +1833,7 @@ public class SimpleReasoner extends StatementListener {
     			try {
     	   	       	log.info("started computing inferences for batch " + qualifier + " updates");
     				iter = retractions.listStatements();
-    			   	
-    				
+    			   		
     				while (iter.hasNext() && !stopRequested) {				
     					Statement stmt = iter.next();
     				    num++;

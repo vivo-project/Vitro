@@ -54,6 +54,8 @@ edu.cornell.mannlib.vitro.webapp.auth.policy.RestrictHomeMenuItemEditingPolicy$S
 
 edu.cornell.mannlib.vitro.webapp.services.shortview.ShortViewServiceSetup
 
+edu.ucsf.vitro.opensocial.OpenSocialSmokeTests
+
 # The Solr index uses a "public" permission, so the PropertyRestrictionPolicyHelper 
 #   and the PermissionRegistry must already be set up.
 edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup
