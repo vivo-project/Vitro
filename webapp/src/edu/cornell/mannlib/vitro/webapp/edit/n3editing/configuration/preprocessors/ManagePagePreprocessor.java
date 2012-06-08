@@ -150,6 +150,10 @@ public class ManagePagePreprocessor extends
 			 } else if(jsonValue instanceof JSONArray) {
 				 JSONArray values = jsonObject.getJSONArray(literalLabel);
 				 literalValues = (List<String>) JSONSerializer.toJava(values);
+			 } else if(jsonValue instanceof Boolean) {
+				 Boolean booleanValue = jsonObject.getBoolean(literalLabel);
+				 //Adds string version
+				 literalValues.add(booleanValue.toString());
 			 }
 			 String[] literalValuesSubmission = new String[literalValues.size()];
 			 literalValuesSubmission = literalValues.toArray(literalValuesSubmission);

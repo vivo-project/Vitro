@@ -509,7 +509,7 @@ public class EditConfigurationVTwo {
     }
 
     public void addUrisOnForm(String ... strs){
-        this.urisOnform.addAll(Arrays.asList( strs ));        
+        this.urisOnform.addAll(new ArrayList<String>(Arrays.asList( strs )));        
     }
     
     
@@ -556,6 +556,8 @@ public class EditConfigurationVTwo {
         urisInScope.put(key, list);
         return this;        
     }
+    
+   
     
     public Map<String, List<Literal>> getLiteralsInScope() {
         return literalsInScope;
@@ -967,7 +969,9 @@ public class EditConfigurationVTwo {
     }
     
     public boolean isUpdate(){
-        return isObjectPropertyUpdate() || isDataPropertyUpdate(); 
+        //return isObjectPropertyUpdate() || isDataPropertyUpdate(); 
+    	//TODO: Change back if this doesn't work
+    	return isObjectPropertyUpdate() || isDataPropertyUpdate() || isParamUpdate();
     }
     
     public boolean isObjectPropertyUpdate(){
@@ -976,6 +980,15 @@ public class EditConfigurationVTwo {
     
     public boolean isDataPropertyUpdate() {
     	return this.getDatapropKey() != null ;
+    }
+    
+    //*****TEST Method***Remove if doesn't work******//
+    public boolean isParamUpdate = false;
+    public void setParamUpdate (boolean inputParamUpdate) {
+    	this.isParamUpdate = inputParamUpdate;
+    }
+    public boolean isParamUpdate() {
+    	return this.isParamUpdate;
     }
     
     //TODO: can we rename this to match the name "pageData" that is used on the templates for this?

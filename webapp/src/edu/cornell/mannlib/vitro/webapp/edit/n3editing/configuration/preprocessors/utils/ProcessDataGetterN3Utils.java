@@ -28,18 +28,9 @@ import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetter;
  */
 public class ProcessDataGetterN3Utils {
     private static final Log log = LogFactory.getLog(ProcessDataGetterN3Utils.class);
-    public  static HashMap<String, String> getDataGetterTypeToProcessorMap() {
-    	 HashMap<String, String> map = new HashMap<String, String>();
-    	 map.put("edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessSparqlDataGetterN3");
-    	 map.put("edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessClassGroupDataGetterN3");
-    	 map.put("edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessIndividualsForClassesDataGetterN3");
-    	 map.put("edu.cornell.mannlib.vitro.webapp.utils.dataGetter.FixedHTMLDataGetter", "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessFixedHTMLN3");
-
-    	 return map;
-    }
     
     public static ProcessDataGetterN3 getDataGetterProcessorN3(String dataGetterClass, JSONObject jsonObject) {
-    	HashMap<String, String> map = getDataGetterTypeToProcessorMap();
+    	HashMap<String, String> map = ProcessDataGetterN3Map.getDataGetterTypeToProcessorMap();
     	//
     	if(map.containsKey(dataGetterClass)) {
     		String processorClass = map.get(dataGetterClass);
