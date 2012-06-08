@@ -786,38 +786,38 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>ObjectPropertyHierarchyListingController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.listing.ObjectPropertyHierarchyListingController</servlet-class>
+    <servlet-name>ShowObjectPropertyHierarchyController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.ShowObjectPropertyHierarchyController</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>ObjectPropertyHierarchyListingController</servlet-name>
+    <servlet-name>ShowObjectPropertyHierarchyController</servlet-name>
     <url-pattern>/showObjectPropertyHierarchy</url-pattern>
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>DataPropertyHierarchyListingController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.listing.DataPropertyHierarchyListingController</servlet-class>
+    <servlet-name>ShowDataPropertyHierarchyController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.ShowDataPropertyHierarchyController</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>DataPropertyHierarchyListingController</servlet-name>
+    <servlet-name>ShowDataPropertyHierarchyController</servlet-name>
     <url-pattern>/showDataPropertyHierarchy</url-pattern>
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>PropertyWebappsListingController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.listing.PropertyWebappsListingController</servlet-class>
+    <servlet-name>ListPropertyWebappsController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.ListPropertyWebappsController</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>PropertyWebappsListingController</servlet-name>
+    <servlet-name>ListPropertyWebappsController</servlet-name>
     <url-pattern>/listPropertyWebapps</url-pattern>
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>DatatypePropertiesListingController</servlet-name>
-    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.listing.DatatypePropertiesListingController</servlet-class>
+    <servlet-name>ListDatatypePropertiesController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.ListDatatypePropertiesController</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>DatatypePropertiesListingController</servlet-name>
+    <servlet-name>ListDatatypePropertiesController</servlet-name>
     <url-pattern>/listDatatypeProperties</url-pattern>
   </servlet-mapping>
 
@@ -1298,6 +1298,20 @@
   <servlet-mapping>
     <servlet-name>GetObjectClasses</servlet-name>
     <url-pattern>/admin/getObjectClasses</url-pattern>
+  </servlet-mapping>
+
+  <!-- VIVO OpenSocial Extension by UCSF -->
+  <servlet>
+    <servlet-name>GadgetController</servlet-name>
+    <servlet-class>edu.ucsf.vitro.opensocial.GadgetController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GadgetController</servlet-name>
+    <url-pattern>/gadget</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>GadgetController</servlet-name>
+    <url-pattern>/gadget/sandbox</url-pattern>
   </servlet-mapping>
 
   <!-- ==================== tag libraries ============================== -->

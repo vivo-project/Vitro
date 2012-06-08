@@ -37,9 +37,11 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
     String modelURI;
     VitroRequest vreq;
     ServletContext context;
-
+    
     
     final static Log log = LogFactory.getLog(SparqlQueryDataGetter.class);
+    //default template
+    private final static String defaultTemplate = "menupage--defaultSparql.ftl";
     
     /**
      * Constructor with display model and data getter URI that will be called by reflection.
@@ -134,7 +136,9 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
         
         //put results in page data, what key to use for results?
         Map<String, Object> rmap = new HashMap<String,Object>();
-        rmap.put(this.saveToVar, results);       
+        rmap.put(this.saveToVar, results);  
+        //This will be overridden at page level in display model if template specified there
+        rmap.put("bodyTemplate", defaultTemplate);
         return rmap;        
     }
     

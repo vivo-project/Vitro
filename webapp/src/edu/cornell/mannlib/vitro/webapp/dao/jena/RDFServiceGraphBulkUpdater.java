@@ -73,7 +73,6 @@ public class RDFServiceGraphBulkUpdater extends SimpleBulkUpdateHandler {
 
     @Override
     public void add(Graph g, boolean arg1) {
-        log.info("bulk addGraph()");
         Model[] model = separateStatementsWithBlankNodes(g);
         addModel(model[1] /* nonBlankNodeModel */);
         // replace following call with different method
@@ -118,7 +117,6 @@ public class RDFServiceGraphBulkUpdater extends SimpleBulkUpdateHandler {
     }
     
     public void addModel(Model model) {
-        log.info("bulk addModel()");
         ChangeSet changeSet = graph.getRDFService().manufactureChangeSet();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         model.write(out, "N-TRIPLE");    
@@ -133,7 +131,6 @@ public class RDFServiceGraphBulkUpdater extends SimpleBulkUpdateHandler {
     }
     
     public void deleteModel(Model model) {
-        log.info("bulk addModel()");
         ChangeSet changeSet = graph.getRDFService().manufactureChangeSet();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         model.write(out, "N-TRIPLE");    
@@ -180,22 +177,7 @@ public class RDFServiceGraphBulkUpdater extends SimpleBulkUpdateHandler {
 
     public static void removeAll( Graph g )
     {
-        ExtendedIterator<Triple> it = GraphUtil.findAll(g);
-        try {
-            while (it.hasNext()) {
-                Triple t = it.next();
-                g.delete(t);
-                it.remove();
-            } 
-        } finally {
-            it.close();
-        }
-        
-        // get rid of remaining blank nodes using a SPARQL DELETE
-        if (g instanceof SparqlGraph) {
-            ((SparqlGraph) g).removeAll();
-        }
-                
+        g.getBulkUpdateHandler().delete(g);
     }
 
 }

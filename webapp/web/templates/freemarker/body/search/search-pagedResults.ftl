@@ -48,6 +48,30 @@
         </#list>
     </ul>
     
+    <#-- VIVO OpenSocial Extension by UCSF -->
+    <#if openSocial??>
+        <#if openSocial.visible>
+            <script type="text/javascript" language="javascript">
+                // find the 'Search' gadget(s).
+                var searchGadgets = my.findGadgetsAttachingTo("gadgets-search");
+                var keyword = '${querytext}';
+                // add params to these gadgets
+                if (keyword) {
+                    for (var i = 0; i < searchGadgets.length; i++) {
+                        var searchGadget = searchGadgets[i];
+                        searchGadget.additionalParams = searchGadget.additionalParams || {};
+                        searchGadget.additionalParams["keyword"] = keyword;
+                    }
+                }
+                else {  // remove these gadgets
+                    my.removeGadgets(searchGadgets);
+                }
+            </script>
+
+            <div id="gadgets-search" class="gadgets-gadget-parent"></div>
+        </#if>
+    </#if>
+
     <#-- Paging controls -->
     <#if (pagingLinks?size > 0)>
         <div class="searchpages">

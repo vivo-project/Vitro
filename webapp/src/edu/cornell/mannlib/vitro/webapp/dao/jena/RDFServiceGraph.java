@@ -1,6 +1,5 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,8 +48,6 @@ public class RDFServiceGraph implements GraphWithPerform {
     private PrefixMapping prefixMapping = new PrefixMappingImpl();
     private GraphEventManager eventManager;
     private Reifier reifier = new EmptyReifier(this);
-    private GraphStatisticsHandler graphStatisticsHandler;
-    private TransactionHandler transactionHandler;
     private QueryHandler queryHandler;
 
     /**
@@ -83,26 +80,6 @@ public class RDFServiceGraph implements GraphWithPerform {
     public void add(Triple arg0) throws AddDeniedException {
         performAdd(arg0);
     }
-
-//    public void executeUpdate(String updateString) {    
-//        try {
-//            RepositoryConnection conn = getConnection();
-//            try {
-//                Update u = conn.prepareUpdate(QueryLanguage.SPARQL, updateString);
-//                u.execute();
-//            } catch (MalformedQueryException e) {
-//                throw new RuntimeException(e);
-//            } catch (UpdateExecutionException e) {
-//                log.error(e,e);
-//                log.error("Update command: \n" + updateString);
-//                throw new RuntimeException(e);
-//            } finally {
-//                conn.close();
-//            }
-//        } catch (RepositoryException re) {
-//            throw new RuntimeException(re);
-//        }
-//    }
     
     private String serialize(Triple t) {
         StringBuffer sb = new StringBuffer();
@@ -130,8 +107,8 @@ public class RDFServiceGraph implements GraphWithPerform {
     public void performDelete(Triple t) {
         ChangeSet changeSet = rdfService.manufactureChangeSet();
         try {
-            changeSet.addRemoval(new ByteArrayInputStream(
-                    serialize(t).getBytes()), RDFService.ModelSerializationFormat.N3, graphURI);
+            changeSet.addRemoval(RDFServiceUtils.toInputStream(serialize(t)), 
+                    RDFService.ModelSerializationFormat.N3, graphURI);
             rdfService.changeSetUpdate(changeSet);
         } catch (RDFServiceException rdfse) {
             throw new RuntimeException(rdfse);
@@ -268,16 +245,8 @@ public class RDFServiceGraph implements GraphWithPerform {
         findQuery.append("\n}");
         
         String queryString = findQuery.toString();
-        //log.info(queryString);
-        
-//        //TODO remove me
-//        if (queryString.contains("individual/AI") && queryString.contains("label")) {
-//            throw new RuntimeException("break!");
-//        }
         
         ResultSet rs = execSelect(queryString);
-        //rs = execSelect(findQuery.toString());
-        //rs = execSelect(findQuery.toString());
         
         List<Triple> triplist = new ArrayList<Triple>();
         while (rs.hasNext()) {
@@ -324,9 +293,6 @@ public class RDFServiceGraph implements GraphWithPerform {
 
     @Override
     public Reifier getReifier() {
-        //if (reifier == null) {
-        //    reifier = new SimpleReifier(this, ReificationStyle.Standard);
-        //}
         return reifier;
     }
 
@@ -354,7 +320,6 @@ public class RDFServiceGraph implements GraphWithPerform {
 
     @Override
     public boolean isIsomorphicWith(Graph arg0) {
-        log.info("Hey dummy!");
         throw new UnsupportedOperationException("isIsomorphicWith() not supported " +
         		"by SPARQL graphs");
     }

@@ -34,7 +34,7 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     public ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, String objectKey, 
             Map<String, String> data, String templateName, VitroRequest vreq) {
         super(subjectUri, propertyUri, vreq);
-        
+
         this.data = Collections.unmodifiableMap(new HashMap<String, String>(data));
         this.objectUri = data.get(objectKey);        
         this.templateName = templateName;

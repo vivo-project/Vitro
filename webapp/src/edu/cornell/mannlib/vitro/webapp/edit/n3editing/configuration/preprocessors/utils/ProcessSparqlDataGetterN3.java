@@ -15,7 +15,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 //Returns the appropriate n3 based on data getter
-public  class ProcessSparqlDataGetterN3 implements ProcessDataGetterN3 {
+public  class ProcessSparqlDataGetterN3 extends ProcessDataGetterAbstract {
 	private static String classType = "java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter";
 	
 	public ProcessSparqlDataGetterN3(){
@@ -38,15 +38,6 @@ public  class ProcessSparqlDataGetterN3 implements ProcessDataGetterN3 {
     }
     public List<String> retrieveN3Optional(int counter) {
     	return null;
-    }
-    //placeholder so need "?" in front of the variable
-    public String getDataGetterVar(int counter) {
-    	return "?dataGetter" + counter;
-    }
-    
-    private String getPrefixes() {
-    	return "@prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> . \n" + 
-    			"@prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> . \n";
     }
   
     
@@ -105,22 +96,7 @@ public  class ProcessSparqlDataGetterN3 implements ProcessDataGetterN3 {
 	   return Arrays.asList("queryModel");   
    }
 
-   public String getVarName(String base, int counter) {
-	   return base + counter;
-   }
-   
-   //For use within n3 strings, need a "?"
-   public String getN3VarName(String base, int counter) {
-	   return "?" + getVarName(base, counter);
-   }
-   
-   //Return name of new resources
-   public List<String> getNewResources(int counter) {
-	   //Each data getter requires a new resource
-	   List<String> newResources = new ArrayList<String>();
-	   newResources.add("dataGetter" + counter);
-	   return newResources;
-   }
+
 
 }
 

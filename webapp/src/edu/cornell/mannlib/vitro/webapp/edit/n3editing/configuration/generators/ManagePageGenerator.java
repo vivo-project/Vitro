@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
@@ -154,7 +155,7 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 	      //For the case of a new page
 	        if(subjectUri == null) {
 	        	//Once added, return to pageList
-	        	editConfiguration.setUrlToReturnTo("/pageList");
+	        	editConfiguration.setUrlToReturnTo(UrlBuilder.getUrl("/pageList"));
 		    	editConfiguration.setEntityToReturnTo("?page");
 		    	editConfiguration.setPredicateUri(predicateUri);
 		        
@@ -190,8 +191,10 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
     //In the case where this is a new page, need to ensure page gets a new 
     private void setNewResources(EditConfigurationVTwo conf) {
 		//null makes default namespace be triggered
-    	conf.addNewResource("page", defaultDisplayNs);
-    	conf.addNewResource("menuItem", defaultDisplayNs);
+    	//conf.addNewResource("page", defaultDisplayNs);
+    	//conf.addNewResource("menuItem", defaultDisplayNs);
+    	conf.addNewResource("page", null);
+    	conf.addNewResource("menuItem", null);
 		
 	}    
     

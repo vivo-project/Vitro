@@ -13,16 +13,21 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.graph.Triple;
+import com.hp.hpl.jena.query.DataSource;
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.sdb.SDBFactory;
@@ -30,11 +35,6 @@ import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
 import com.hp.hpl.jena.sdb.sql.SDBConnection;
 import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.update.GraphStore;
-import com.hp.hpl.jena.update.GraphStoreFactory;
-import com.hp.hpl.jena.update.UpdateAction;
-import com.hp.hpl.jena.update.UpdateFactory;
-import com.hp.hpl.jena.update.UpdateRequest;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
@@ -141,6 +141,7 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
     }
     
     private void removeBlankNodesWithSparqlUpdate(Dataset dataset, Model model, String graphURI) {
+        
         Model blankNodeModel = ModelFactory.createDefaultModel();
         StmtIterator stmtIt = model.listStatements();
         while (stmtIt.hasNext()) {
@@ -149,7 +150,61 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
                 blankNodeModel.add(stmt);
             }
         }
-        removeUsingSparqlUpdate(dataset, blankNodeModel, graphURI);
+                
+        String rootFinder = "SELECT ?s WHERE { ?s ?p ?o OPTIONAL { ?ss ?pp ?s } FILTER (!bound(?ss)) }";
+        Query rootFinderQuery = QueryFactory.create(rootFinder);
+        QueryExecution qe = QueryExecutionFactory.create(rootFinderQuery, blankNodeModel);
+        try {
+            ResultSet rs = qe.execSelect();
+            while (rs.hasNext()) {
+                QuerySolution qs = rs.next();
+                Resource s = qs.getResource("s");
+                String treeFinder = makeDescribe(s);
+                Query treeFinderQuery = QueryFactory.create(treeFinder);
+                QueryExecution qee = QueryExecutionFactory.create(treeFinderQuery, blankNodeModel);
+                try {
+                    Model tree = qee.execDescribe();
+                    StmtIterator sit = tree.listStatements(s, null, (RDFNode) null);
+                    while (sit.hasNext()) {
+                        Statement stmt = sit.nextStatement();
+                        RDFNode n = stmt.getObject();
+                        Model m2 = ModelFactory.createDefaultModel();
+                        if (n.isResource()) {
+                            Resource s2 = (Resource) n;
+                            // now run yet another describe query
+                            String smallerTree = makeDescribe(s2);
+                            Query smallerTreeQuery = QueryFactory.create(smallerTree);
+                            QueryExecution qe3 = QueryExecutionFactory.create(
+                                    smallerTreeQuery, tree);
+                            try {
+                                qe3.execDescribe(m2);
+                            } finally {
+                                qe3.close();
+                            }    
+                        }
+                        m2.add(stmt);
+                        DataSource ds = DatasetFactory.create();
+                        ds.addNamedModel(graphURI, dataset.getNamedModel(graphURI));
+                        removeUsingSparqlUpdate(ds, m2, graphURI);
+                    }                   
+                } finally {
+                    qee.close();
+                }
+            }
+        } finally {
+            qe.close();
+        }        
+    }
+    
+    private String makeDescribe(Resource s) {
+        StringBuffer query = new StringBuffer("DESCRIBE <") ;
+        if (s.isAnon()) {
+            query.append("_:" + s.getId().toString());
+        } else {
+            query.append(s.getURI());
+        }
+        query.append(">");
+        return query.toString();
     }
     
     private void removeUsingSparqlUpdate(Dataset dataset, Model model, String graphURI) {
@@ -173,11 +228,8 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
         }
         
         StringBuffer queryBuff = new StringBuffer();
-        queryBuff.append("DELETE { " + ((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "" ) + " \n");
+        queryBuff.append("CONSTRUCT { \n");
         queryBuff.append(patternBuff);
-        if (graphURI != null) {
-            queryBuff.append("    } \n");
-        }
         queryBuff.append("} WHERE { \n");
         if (graphURI != null) {
             queryBuff.append("    GRAPH <" + graphURI + "> { \n");
@@ -190,10 +242,23 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
         
         //log.debug(queryBuff.toString());
         
-        GraphStore graphStore = GraphStoreFactory.create(dataset);
-        UpdateRequest request = UpdateFactory.create();
-        request.add(queryBuff.toString());
-        UpdateAction.execute(request, graphStore);
+        Query construct = QueryFactory.create(queryBuff.toString());
+        // make a plain dataset to force the query to be run in a way that
+        // won't overwhelm MySQL with too many joins
+        DataSource ds = DatasetFactory.create();
+        ds.addNamedModel(graphURI, (graphURI != null) 
+                ? dataset.getNamedModel(graphURI) : dataset.getDefaultModel());
+        QueryExecution qe = QueryExecutionFactory.create(construct, ds);
+        try {
+            Model m = qe.execConstruct();
+            if (graphURI != null) {
+                dataset.getNamedModel(graphURI).remove(m);    
+            } else {
+                dataset.getDefaultModel().remove(m);
+            }
+        } finally {
+            qe.close();
+        }       
     }
     
     private Model parseModel(ModelChange modelChange) {

@@ -39,4 +39,6 @@ public interface DataPropertyDao extends PropertyDao {
     public List<DataProperty> getDataPropertyList(Individual subject);
     
     public List<DataProperty> getDataPropertyList(String subjectUri);
+    
+    public String getCustomListViewConfigFileName(DataProperty dataProperty);
 }

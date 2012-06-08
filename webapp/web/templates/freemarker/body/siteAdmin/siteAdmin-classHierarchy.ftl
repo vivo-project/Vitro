@@ -16,6 +16,9 @@
             <option value="group" <#if displayOption == "group">selected</#if> >Classes by Class Group</option>
         </select>
         <input id="addClass" value="Add New Class" class="form-button" type="submit" />
+        <#if displayOption == "group">
+                <input type="submit" id="addGroup" class="form-button" value="Add New Group"/>
+        </#if>
     </form>
         
     
