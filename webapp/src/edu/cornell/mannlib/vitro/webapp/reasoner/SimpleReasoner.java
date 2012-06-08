@@ -39,8 +39,12 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ABoxJenaChangeListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.CumulativeDeltaModeler;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 
 /**
  * Allows for real-time incremental materialization or retraction of RDFS-
@@ -53,6 +57,7 @@ public class SimpleReasoner extends StatementListener {
 
 	private static final Log log = LogFactory.getLog(SimpleReasoner.class);
 	
+	private RDFService rdfService;
 	private OntModel tboxModel;             // asserted and inferred TBox axioms
 	private OntModel aboxModel;             // ABox assertions
 	private Model inferenceModel;           // ABox inferences
@@ -78,10 +83,13 @@ public class SimpleReasoner extends StatementListener {
 	 * @param inferenceRebuildModel - output. This the model temporarily used when the whole ABox inference model is rebuilt
 	 * @param inferenceScratchpadModel - output. This the model temporarily used when the whole ABox inference model is rebuilt
  	 */
-	public SimpleReasoner(OntModel tboxModel, OntModel aboxModel, Model inferenceModel,
+	public SimpleReasoner(OntModel tboxModel, RDFService rdfService, Model inferenceModel,
 			              Model inferenceRebuildModel, Model scratchpadModel) {
+	    this.rdfService = rdfService;
 		this.tboxModel = tboxModel;
-		this.aboxModel = aboxModel; 
+        this.aboxModel = ModelFactory.createOntologyModel(
+                OntModelSpec.OWL_MEM, ModelFactory.createModelForGraph(
+                        new RDFServiceGraph(rdfService))); 
 		this.inferenceModel = inferenceModel;
 		this.inferenceRebuildModel = inferenceRebuildModel;
 		this.scratchpadModel = scratchpadModel;	
@@ -90,8 +98,16 @@ public class SimpleReasoner extends StatementListener {
 		aBoxDeltaModeler1 = new CumulativeDeltaModeler();
 		aBoxDeltaModeler2 = new CumulativeDeltaModeler();
 		stopRequested = false;
-				
-	    aboxModel.getBaseModel().register(this);    
+		
+		if (rdfService == null) {
+		    aboxModel.register(this);
+		} else {
+		    try {
+    		    rdfService.registerListener(new ABoxJenaChangeListener(this));
+    		} catch (RDFServiceException e) {
+    		    throw new RuntimeException("Unable to register change listener", e);
+    		}
+		} 
 	}
 	
 	/**
