@@ -295,11 +295,11 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 	}
 	
 	/*
-	 * adding an inverseOf assertion for individuals who are sameAs
-	 * each other.
+	 * adding and removing an inverseOf assertion for individuals who
+	 * are sameAs each other.
 	 */
 	@Test
-	public void addTBoxInverseAssertion1() throws InterruptedException {
+	public void tBoxInverseAssertion1() throws InterruptedException {
 				
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
@@ -328,10 +328,7 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
         // abox statements			
 		aBox.add(a,P,b);	
         aBox.add(a, OWL.sameAs,b);
-		
-        // Assert P and Q as inverses and wait for SimpleReasoner TBox
-	    // thread to end
-	    
+			    
 	    Q.addInverseOf(P);
 	    
 	    tBox.rebind();
@@ -340,14 +337,29 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
 	    	Thread.sleep(delay);
 	    }
-	    	    
-		// Verify inferences	
+	    	    	
 		Assert.assertTrue(inf.contains(b,Q,a));
 		Assert.assertTrue(inf.contains(b,OWL.sameAs,a));
 		Assert.assertTrue(inf.contains(b,P,b));
 		Assert.assertTrue(inf.contains(a,Q,a));
+		
+		Q.removeInverseProperty(P);
+
+	    tBox.rebind();
+	    tBox.prepare();
+	    
+	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
+	    	Thread.sleep(delay);
+	    }
+
+		Assert.assertFalse(inf.contains(b,Q,a));
+		Assert.assertTrue(inf.contains(b,OWL.sameAs,a));
+		Assert.assertTrue(inf.contains(b,P,b));
+		Assert.assertFalse(inf.contains(a,Q,a));
+		
 		simpleReasonerTBoxListener.setStopRequested();
 	}
+	
 	
 	/*
 	 * Basic scenario around recomputing the ABox inferences
