@@ -24,7 +24,7 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
   
 	@Before
 	public void suppressErrorOutput() {
-		//suppressSyserr();
+		suppressSyserr();
         //Turn off log messages to console
 		setLoggerLevel(SimpleReasoner.class, Level.OFF);
 		setLoggerLevel(SimpleReasonerTBoxListener.class, Level.OFF);
@@ -42,44 +42,42 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 	@Test
 	public void addABoxAssertion1() {
 
+		// set up the tbox
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		
 		OntProperty P = tBox.createOntProperty("http://test.vivo/P");
 	    P.setLabel("property P", "en-US");
-
 		OntProperty Q = tBox.createOntProperty("http://test.vivo/Q");
 		Q.setLabel("property Q", "en-US");
 
 	    P.addInverseOf(Q);
 	            
-        // this is the model to receive inferences
+        // this is the model to receive abox inferences
         Model inf = ModelFactory.createDefaultModel();
         
-		// create an ABox and register the SimpleReasoner listener with it
+		// create an abox and register the SimpleReasoner listener with it
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
 		aBox.register(new SimpleReasoner(tBox, aBox, inf));
 		
-        // Individuals a, b, c and d
+        // add assertions to the abox and verify inferences
 		Resource a = aBox.createResource("http://test.vivo/a");
 		Resource b = aBox.createResource("http://test.vivo/b");
 		Resource c = aBox.createResource("http://test.vivo/c");
 		Resource d = aBox.createResource("http://test.vivo/d");
 		
-		// b Q a is inferred from a P b
 		aBox.add(a,P,b);		
-		Assert.assertTrue(inf.contains(b,Q,a));	
-		
-        // d P c is inferred from c Q d.			
+		Assert.assertTrue(inf.contains(b,Q,a));				
 		aBox.add(c,Q,d);		
 		Assert.assertTrue(inf.contains(d,P,c));	
 	}
 	
 	/*
-	 * don't infer if it's already in the abox
+	 * don't infer statements already in the abox
+	 * (never infer because it's in the abox already)
 	*/
 	@Test
 	public void addABoxAssertion2() {
 
+		// set up the tbox
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
 		
 		OntProperty P = tBox.createOntProperty("http://test.vivo/P");
@@ -88,10 +86,10 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		Q.setLabel("property Q", "en-US");
 	    P.addInverseOf(Q);
 	    
-        // this is the model to receive inferences
+        // this is the model to receive abox inferences
         Model inf = ModelFactory.createDefaultModel();
         
-		// create an ABox and add statement b Q a
+		// create an ABox and add data (no inferencing happening yet)
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
         // Individuals a, b, c and d
 		Resource a = aBox.createResource("http://test.vivo/a");
@@ -101,38 +99,42 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		// register SimpleReasoner
 		aBox.register(new SimpleReasoner(tBox, aBox, inf));
 				
-		// b Q a is inferred from a P b, but it is already in the abox
+		Assert.assertFalse(inf.contains(b,Q,a));
+		
+		// add data and verify inferences
 		aBox.add(a,P,b);
 		Assert.assertFalse(inf.contains(b,Q,a));	
 	}
 
 	/*
-	 * don't infer if it's already in the abox
+	 * don't infer statements already in the abox
+	 * (remove the inference when it is asserted)
 	*/
 	@Test
 	public void addABoxAssertion3() {
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
 		
+		// set up the tbox
+		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
 		OntProperty P = tBox.createOntProperty("http://test.vivo/P");
 	    P.setLabel("property P", "en-US");
 		OntProperty Q = tBox.createOntProperty("http://test.vivo/Q");
 		Q.setLabel("property Q", "en-US");
 	    P.addInverseOf(Q);
 	    
-        // this is the model to receive inferences
+        // this is the model to receive abox inferences
         Model inf = ModelFactory.createDefaultModel();
         
-		// create an ABox and register SimpleReasoner
+		// create abox and register SimpleReasoner
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		aBox.register(new SimpleReasoner(tBox, aBox, inf));
 		
-        // Individuals a, b, c and d
+        // add statements to the abox and verify inferences
 		Resource a = aBox.createResource("http://test.vivo/a");
 		Resource b = aBox.createResource("http://test.vivo/b");
 				
-		// b Q a is inferred from a P b, but it is already in the abox
 		aBox.add(a,P,b);
-		aBox.add(b,Q,a);
+		Assert.assertTrue(inf.contains(b,Q,a));		
+		aBox.add(b,Q,a); // this should cause the inference to be removed
 		Assert.assertFalse(inf.contains(b,Q,a));	
 	}
 	
@@ -143,8 +145,8 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 	@Test
 	public void addABoxAssertion4() {
 
+		// set up the tbox
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		
 		OntProperty P = tBox.createOntProperty("http://test.vivo/P");
 	    P.setLabel("property P", "en-US");
 		OntProperty R = tBox.createOntProperty("http://test.vivo/R");
@@ -153,27 +155,24 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		Q.setLabel("property Q", "en-US");
 
 	    R.addEquivalentProperty(P);
-	    P.addEquivalentProperty(R);
 	    P.addInverseOf(Q);
 	            
-        // this is the model to receive inferences
+        // this is the model to receive abox inferences
         Model inf = ModelFactory.createDefaultModel();
         
-		// create an ABox and register the SimpleReasoner listener with it
+		// create an ABox and register the SimpleReasoner with it
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
 		aBox.register(new SimpleReasoner(tBox, aBox, inf));
 		
-        // a, b, c and d
+        // add abox statements and verify inferences
 		Resource a = aBox.createResource("http://test.vivo/a");
 		Resource b = aBox.createResource("http://test.vivo/b");
 		Resource c = aBox.createResource("http://test.vivo/c");
 		Resource d = aBox.createResource("http://test.vivo/d");
 
-        // b Q a is inferred from a R b.			
 		aBox.add(a,R,b);		
 		Assert.assertTrue(inf.contains(b,Q,a));	
-					
-        // d P c is inferred from c Q d.			
+								
 		aBox.add(c,Q,d);		
 		Assert.assertTrue(inf.contains(d,P,c));	
 		Assert.assertTrue(inf.contains(d,R,c));	
@@ -181,11 +180,14 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 	
 	/*
 	 *  basic scenarios around removing abox data
+	 *  don't remove an inference if it's still 
+	 *  entailed by something else in the abox.
 	 */ 
 	@Test
 	public void removedABoxAssertion1() {
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
 		
+		// set up the tbox
+		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
 		OntProperty P = tBox.createOntProperty("http://test.vivo/P");
 	    P.setLabel("property P", "en-US");
 		OntProperty Q = tBox.createOntProperty("http://test.vivo/Q");
@@ -195,24 +197,23 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 	    P.addInverseOf(Q);
 	    P.addInverseOf(T);
 	            
-        // this is the model to receive inferences
+        // this is the model to receive abox inferences
         Model inf = ModelFactory.createDefaultModel();
         
-		// create an ABox and register the SimpleReasoner listener with it
+		// create an ABox and register the SimpleReasoner with it
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
 		aBox.register(new SimpleReasoner(tBox, aBox, inf));
 		
-        // Individuals a, b, c and d
+        // add statements to the abox and verify inferences
 		Resource a = aBox.createResource("http://test.vivo/a");
 		Resource b = aBox.createResource("http://test.vivo/b");
 		Resource c = aBox.createResource("http://test.vivo/c");
 		Resource d = aBox.createResource("http://test.vivo/d");
 		
-        // b Q a is inferred from a P b.		
 		aBox.add(a,P,b);
 		Assert.assertTrue(inf.contains(b,Q,a));	
 		
-        // d P c is inferred from c Q d and from c T d			
+        // d P c is inferred from c Q d and also from c T d			
 		aBox.add(c,Q,d);		
 		aBox.add(c,T,d);
 		Assert.assertTrue(inf.contains(d,P,c));	
@@ -220,17 +221,19 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		aBox.remove(a,P,b);
 		Assert.assertFalse(inf.contains(b,Q,a));
 				
-		aBox.remove(c,Q,d);
-		Assert.assertTrue(inf.contains(d,P,c));
+		aBox.remove(c,Q,d); 
+		Assert.assertTrue(inf.contains(d,P,c)); // still inferred from c T d
 	}
 	
 	/*
 	 *  removing abox data with equivalent and inverse properties
+	 *  don't remove inference if it's still inferred.
 	 */ 
 	@Test
 	public void removedABoxAssertion2() {
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
 		
+		// set up the tbox
+		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
 		OntProperty P = tBox.createOntProperty("http://test.vivo/P");
 	    P.setLabel("property P", "en-US");
 		OntProperty Q = tBox.createOntProperty("http://test.vivo/Q");
@@ -238,26 +241,29 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		OntProperty T = tBox.createOntProperty("http://test.vivo/T");
 		Q.setLabel("property T", "en-US");
 	    P.addInverseOf(Q);
-	    Q.addInverseOf(P);
 	    P.addEquivalentProperty(T);
-        T.addEquivalentProperty(P);
+       
+	    // not clear what these will do
+	    tBox.rebind();
+	    tBox.prepare();
 	    
-        // this is the model to receive inferences
+        // this is the model to receive abox inferences
         Model inf = ModelFactory.createDefaultModel();
         
-		// create an ABox and register the SimpleReasoner listener with it
+		// create an abox and register the SimpleReasoner listener with it
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
 		aBox.register(new SimpleReasoner(tBox, aBox, inf));
 		
-        // Individuals a, b, c and d
+        // add abox data and verify inferences
 		Resource a = aBox.createResource("http://test.vivo/a");
 		Resource b = aBox.createResource("http://test.vivo/b");
 		
-        // b Q a is inferred from a P b and a T b.		
+        // b Q a is inferred from a P b and  also from a T b.		
 		aBox.add(a,P,b);
 		aBox.add(a,T,b);
 		Assert.assertTrue(inf.contains(b,Q,a));
 		Assert.assertFalse(inf.contains(a,P,b));
+		Assert.assertFalse(inf.contains(a,T,b));
 		
 		aBox.remove(a,P,b);
 		Assert.assertTrue(inf.contains(b,Q,a));
@@ -268,80 +274,81 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 	 */ 
 	@Test
 	public void removedABoxAssertion3() {
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
 		
+		//set up the tbox
+		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
 		OntProperty P = tBox.createOntProperty("http://test.vivo/P");
 	    P.setLabel("property P", "en-US");
 		OntProperty Q = tBox.createOntProperty("http://test.vivo/Q");
 		Q.setLabel("property Q", "en-US");
 	    P.addInverseOf(Q);
 	    
-        // this is the model to receive inferences
+	    tBox.rebind(); // not sure what effect this has
+	    
+        // this is the model to receive abox inferences
         Model inf = ModelFactory.createDefaultModel();
         
-		// create an ABox and register the SimpleReasoner listener with it
-		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+		// create the abox and add some data - no reasoning is happening yet
+		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+
 		Resource a = aBox.createResource("http://test.vivo/a");
 		Resource b = aBox.createResource("http://test.vivo/b");
 		aBox.add(a,P,b);
 
+		// register the SimpleReasoner
 		aBox.register(new SimpleReasoner(tBox, aBox, inf));
 		
+		// add abox statements and verify inferences
 		aBox.add(b,Q,a);
-		
 		Assert.assertFalse(inf.contains(b,Q,a));
-		Assert.assertFalse(inf.contains(a,P,b));
-		
+		Assert.assertFalse(inf.contains(a,P,b)); // this could be inferred from b Q a, but
+		                                         // it's already in the abox
 		aBox.remove(a,P,b);
-		Assert.assertTrue(inf.contains(a,P,b));
+		Assert.assertTrue(inf.contains(a,P,b));  // now it gets added to inference model
+		                                         // when it's removed from the abox
 	}
 	
 	/*
-	 * Basic scenario around adding an inverseOf assertion to the
-	 * TBox
+	 * adding an inverseOf assertion to the tbox
 	 */
 	@Test
 	public void addTBoxInverseAssertion1() throws InterruptedException {
-				
-		// Create TBox, ABox and Inference models and register
-		// the ABox reasoner listeners with the ABox and TBox
-		// Pellet will compute TBox inferences
-		
+         
+		// Set up the TBox. 
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		
 		OntProperty P = tBox.createOntProperty("http://test.vivo/P");
 	    P.setLabel("property P", "en-US");
-
 		OntProperty Q = tBox.createOntProperty("http://test.vivo/Q");
 		Q.setLabel("property Q", "en-US");
 
-		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+        // this is the model to receive abox inferences
         Model inf = ModelFactory.createDefaultModel();
-		
-        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+
+        // abox
+		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+        
+		// set up SimpleReasoner and register it with abox. register 
+		// SimpleReasonerTBoxListener with the tbox.
+		SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
 		aBox.register(simpleReasoner);
 		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
 		tBox.register(simpleReasonerTBoxListener);
 
-        // Individuals a, b, c and d
+        // add abox data
 		Resource a = aBox.createResource("http://test.vivo/a");
 		Resource b = aBox.createResource("http://test.vivo/b");
 		Resource c = aBox.createResource("http://test.vivo/c");
 		Resource d = aBox.createResource("http://test.vivo/d");
-		
-        // abox statements			
+				
 		aBox.add(a,P,b);	
 	    aBox.add(c,P,d);
 	    aBox.add(b,Q,a);
 		
-        // Assert P and Q as inverses and wait for SimpleReasoner TBox
-	    // thread to end
+        // Assert P and Q as inverses and wait for
+	    // SimpleReasonerTBoxListener thread to end
 	    
 	    Q.addInverseOf(P);
-	    
-	    tBox.rebind();
-	    tBox.prepare();
-	    
+
 	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
 	    	Thread.sleep(delay);
 	    }
@@ -349,47 +356,43 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		// Verify inferences	
 		Assert.assertTrue(inf.contains(d,Q,c));
 		Assert.assertFalse(inf.contains(b,Q,a));
+		Assert.assertFalse(inf.contains(a,P,b));
 		
 		simpleReasonerTBoxListener.setStopRequested();
 	}
 		
 	/*
-	 * Basic scenario around removing an inverseOf assertion to the
-	 * TBox
+	 * removing an inverseOf assertion from the tbox
 	 */
 	@Test
 	public void removeTBoxInverseAssertion1() throws InterruptedException {
 				
-		// Create TBox, ABox and Inference models and register
-		// the ABox reasoner listeners with the ABox and TBox
-		// Pellet will compute TBox inferences
-		
+		// set up the tbox.
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
 
-        // set up TBox and Abox
-		
 		OntProperty P = tBox.createOntProperty("http://test.vivo/propP");
 	    P.setLabel("property P", "en-US");
-
 		OntProperty Q = tBox.createOntProperty("http://test.vivo/propQ");
 		Q.setLabel("property Q", "en-US");
-
 	    Q.addInverseOf(P);
 	    
+		// this is the model to receive abox inferences
+		Model inf = ModelFactory.createDefaultModel();
+
+		// abox
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-        Model inf = ModelFactory.createDefaultModel();
-		
-        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+        
+		// set up SimpleReasoner and SimpleReasonerTBox listener,
+		// register them with abox and tbox
+		SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
 		aBox.register(simpleReasoner);
 		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
 		tBox.register(simpleReasonerTBoxListener);	    
-        // Individuals a, b, c and d
+		
+        // add statements to the abox and verify inference
 		Resource c = aBox.createResource("http://test.vivo/c");
 		Resource d = aBox.createResource("http://test.vivo/d");
-		
-        // abox statements				
 	    aBox.add(c,P,d);
-		
 		Assert.assertTrue(inf.contains(d,Q,c));
 		
         // Remove P and Q inverse relationship and wait for
@@ -397,14 +400,11 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		
 	    Q.removeInverseProperty(P);
 	    
-	    tBox.rebind();
-	    tBox.prepare();
-	    
 	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
 	    	Thread.sleep(delay);
 	    }
  	    
-		// Verify inferences	
+		// Verify inference has been removed	
 		Assert.assertFalse(inf.contains(d,Q,c));
 				
 		simpleReasonerTBoxListener.setStopRequested();
@@ -416,12 +416,9 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 	@Test
 	public void recomputeABox1() throws InterruptedException {
 				
-		// Create TBox, ABox and Inference models and register
-		// the ABox reasoner listeners with the ABox and TBox
-		// Pellet will compute TBox inferences
+        // set up tbox
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
 
-        // set up TBox and Abox
 		OntProperty P = tBox.createOntProperty("http://test.vivo/propP");
 	    P.setLabel("property P", "en-US");
 		OntProperty Q = tBox.createOntProperty("http://test.vivo/propQ");
@@ -434,21 +431,23 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		Q.setLabel("property Y", "en-US");
 		X.addInverseOf(Y);
 
+		// create abox and abox inf model and register simplereasoner
+		// with abox.
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-        Model inf = ModelFactory.createDefaultModel();
-		
+        Model inf = ModelFactory.createDefaultModel();		
         SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
 		aBox.register(simpleReasoner);
-        // Individuals a, b, c and d
+		
+        // abox statements
 		Resource a = aBox.createResource("http://test.vivo/a");
 		Resource b = aBox.createResource("http://test.vivo/b");
 		Resource c = aBox.createResource("http://test.vivo/c");
 		Resource d = aBox.createResource("http://test.vivo/d");
 
-        // abox statements				
 	    aBox.add(a,P,b);
         aBox.add(c,X,d);
 	    
+        //recompute whole abox
 	    simpleReasoner.recompute();
 	    
 	    while (simpleReasoner.isRecomputing()) {

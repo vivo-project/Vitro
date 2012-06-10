@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mindswap.pellet.jena.PelletReasonerFactory;
 
+import com.hp.hpl.jena.ontology.AnnotationProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
@@ -16,6 +17,7 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 
@@ -25,10 +27,11 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 public class SimpleReasonerSameAsTest extends AbstractTestClass {
 	
 	long delay = 50;
-  
+	private static final String mostSpecificTypePropertyURI = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType";
+	
 	@Before
 	public void suppressErrorOutput() {
-		//suppressSyserr();
+		suppressSyserr();
         //Turn off log messages to console
 		setLoggerLevel(SimpleReasoner.class, Level.OFF);
 		setLoggerLevel(SimpleReasonerTBoxListener.class, Level.OFF);
@@ -363,9 +366,6 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 			    
 	    Q.addInverseOf(P);
 	    
-	    tBox.rebind();
-	    tBox.prepare();
-	    
 	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
 	    	Thread.sleep(delay);
 	    }
@@ -377,9 +377,6 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 		
 		Q.removeInverseProperty(P);
 
-	    tBox.rebind();
-	    tBox.prepare();
-	    
 	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
 	    	Thread.sleep(delay);
 	    }
@@ -429,22 +426,127 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 	
 		Assert.assertTrue(inf.contains(y,RDF.type,classB));
 		Assert.assertTrue(inf.contains(y,RDF.type,classA));
-//		Assert.assertTrue(inf.contains(z,RDF.type,classB));
-//		Assert.assertTrue(inf.contains(z,RDF.type,classA));
+		Assert.assertTrue(inf.contains(z,RDF.type,classB));
+		Assert.assertTrue(inf.contains(z,RDF.type,classA));
 		
 		aBox.remove(x,RDF.type,classB);
 		Assert.assertFalse(inf.contains(y,RDF.type,classB));
-		Assert.assertFalse(inf.contains(y,RDF.type,classA));			
+		Assert.assertFalse(inf.contains(y,RDF.type,classA));
+		Assert.assertFalse(inf.contains(z,RDF.type,classB));
+		Assert.assertFalse(inf.contains(z,RDF.type,classA));
 	}
 
-	
 	/*
 	 * adding and removing subclass assertion when there is an 
 	 * individual member who has a sameAs individual.
 	 */
-	//@Test
+	@Test
 	public void tBoxSubclassAssertion1() throws InterruptedException {
+		
+		//create aBox and tBox, and SimpleReasoner to listen to them
+		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+        Model inf = ModelFactory.createDefaultModel();
+		
+        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+		aBox.register(simpleReasoner);
+		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
+		tBox.register(simpleReasonerTBoxListener);
 
+		// set up TBox	
+		OntClass classA = tBox.createClass("http://test.vivo/A");
+	    classA.setLabel("class A", "en-US");
+		OntClass classB = tBox.createClass("http://test.vivo/B");
+	    classB.setLabel("class B", "en-US");
+		OntClass classC = tBox.createClass("http://test.vivo/C");
+	    classC.setLabel("class C", "en-US");
+	    	   
+	    // set up ABox
+		Resource a = aBox.createResource("http://test.vivo/a");
+		Resource b = aBox.createResource("http://test.vivo/b");
+		Resource c = aBox.createResource("http://test.vivo/c");
+		
+		aBox.add(a, RDF.type, classC);		
+	    aBox.add(a, OWL.sameAs, b);
+	    aBox.add(c, OWL.sameAs, a);
+			    
+	    // update TBox
+	    classA.addSubClass(classB); 
+	    	    
+	    // wait for SimpleReasonerTBoxListener thread to end
+	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
+	    	Thread.sleep(delay);
+	    }
+	    
+	    classB.addSubClass(classC);
+	    classA.addSubClass(classC); // simulate what Pellet would infer, and
+	                                // thus what the SimpleReasonerTBoxListener 
+	                                // would be notified of.
+	    	    
+	    // wait for SimpleReasonerTBoxListener thread to end
+	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
+	    	Thread.sleep(delay);
+	    }
+	    
+		// Verify inferences
+		Assert.assertFalse(inf.contains(a, RDF.type, classC));
+		Assert.assertTrue(inf.contains(a, RDF.type, classB));
+		Assert.assertTrue(inf.contains(a, RDF.type, classA));
+		
+		Assert.assertTrue(inf.contains(b, RDF.type, classC));
+		Assert.assertTrue(inf.contains(b, RDF.type, classB));
+		Assert.assertTrue(inf.contains(b, RDF.type, classA));
+
+		Assert.assertTrue(inf.contains(c, RDF.type, classC));
+		Assert.assertTrue(inf.contains(c, RDF.type, classB));
+		Assert.assertTrue(inf.contains(c, RDF.type, classA));
+
+	    // update TBox
+		classA.removeSubClass(classB);
+	    classA.removeSubClass(classC); // simulate what Pellet would infer, and
+                                       // thus what the SimpleReasonerTBoxListener 
+                                       // would be notified of.
+
+	    // wait for SimpleReasonerTBoxListener thread to end
+	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
+	    	Thread.sleep(delay);
+	    }
+	    
+		// Verify inferences	
+		Assert.assertFalse(inf.contains(a, RDF.type, classC));
+		Assert.assertTrue(inf.contains(a, RDF.type, classB));
+		Assert.assertFalse(inf.contains(a, RDF.type, classA));
+		
+		Assert.assertTrue(inf.contains(b, RDF.type, classC));
+		Assert.assertTrue(inf.contains(b, RDF.type, classB));
+		Assert.assertFalse(inf.contains(b, RDF.type, classA));
+
+		Assert.assertTrue(inf.contains(c, RDF.type, classC));
+		Assert.assertTrue(inf.contains(c, RDF.type, classB));
+		Assert.assertFalse(inf.contains(c, RDF.type, classA));
+	    
+	    // update TBox	    
+	    classB.removeSubClass(classC);
+	    
+	    // wait for SimpleReasonerTBoxListener thread to end
+	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
+	    	Thread.sleep(delay);
+	    }
+	    
+		// Verify inferences	
+		Assert.assertFalse(inf.contains(a, RDF.type, classC));
+		Assert.assertFalse(inf.contains(a, RDF.type, classB));
+		Assert.assertFalse(inf.contains(a, RDF.type, classA));
+		
+		Assert.assertTrue(inf.contains(b, RDF.type, classC));
+		Assert.assertFalse(inf.contains(b, RDF.type, classB));
+		Assert.assertFalse(inf.contains(b, RDF.type, classA));
+
+		Assert.assertTrue(inf.contains(c, RDF.type, classC));
+		Assert.assertFalse(inf.contains(c, RDF.type, classB));
+		Assert.assertFalse(inf.contains(c, RDF.type, classA));
+
+		simpleReasonerTBoxListener.setStopRequested();
 	}	
 
 	/*
@@ -453,19 +555,91 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 	 */
 	//@Test
 	public void mostSpecificTypeTest1() throws InterruptedException {
-
-	}	
-
-	/*
-	 * there is a sameAs chain and one sameAs statement is removed.
-	 * 
-	 */
-	//@Test
-	public void sameAsChain1() throws InterruptedException {
-
-	}	
-
+		// Create TBox, ABox and Inference models and register
+		// the ABox reasoner listeners with the ABox and TBox
+		// Pellet will compute TBox inferences
+		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+        Model inf = ModelFactory.createDefaultModel();
 		
+        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+		aBox.register(simpleReasoner);
+		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
+		tBox.register(simpleReasonerTBoxListener);
+		
+		// Set up the Tbox with a class hierarchy. C is a
+		// subclass of A. D and E are subclasses C.
+		// Pellet will compute TBox inferences.
+		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
+		
+		OntClass classA = tBox.createClass("http://test.vivo/A");
+	    classA.setLabel("class A", "en-US");
+		OntClass classC = tBox.createClass("http://test.vivo/C");
+	    classC.setLabel("class C", "en-US");
+	    OntClass classD = tBox.createClass("http://test.vivo/D");
+	    classD.setLabel("class D", "en-US");
+	    OntClass classE = tBox.createClass("http://test.vivo/E");
+	    classE.setLabel("class E", "en-US");
+
+	    classA.addSubClass(classC);	   	    
+	    classC.addSubClass(classD);
+	    classC.addSubClass(classE);
+	    
+	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
+	    	Thread.sleep(delay);
+	    }
+	    
+        // add & remove ABox type statements and verify inferences
+		Resource a = aBox.createResource("http://test.vivo/a");
+		Resource b = aBox.createResource("http://test.vivo/b");
+		Resource c = aBox.createResource("http://test.vivo/c");
+		Resource d = aBox.createResource("http://test.vivo/d");
+		
+		aBox.add(a, OWL.sameAs, b);
+		aBox.add(c, OWL.sameAs, b);
+		aBox.add(d, OWL.sameAs, a);		
+		
+		aBox.add(a, RDF.type, classD);	
+		aBox.add(d, RDF.type, classC);
+		Assert.assertFalse(inf.contains(a,RDF.type,classD));
+		Assert.assertTrue(inf.contains(a,RDF.type,classC));
+		Assert.assertTrue(inf.contains(b,RDF.type, classD));
+		Assert.assertTrue(inf.contains(b,RDF.type, classC));
+		Assert.assertTrue(inf.contains(c,RDF.type, classD));
+		Assert.assertTrue(inf.contains(c,RDF.type, classC));
+		Assert.assertTrue(inf.contains(d,RDF.type, classD));
+		Assert.assertFalse(inf.contains(d,RDF.type, classC));
+		
+		Assert.assertTrue(inf.contains(a, mostSpecificType, ResourceFactory.createResource(classD.getURI())));
+		Assert.assertTrue(inf.contains(b, mostSpecificType, ResourceFactory.createResource(classD.getURI())));
+		Assert.assertTrue(inf.contains(c, mostSpecificType, ResourceFactory.createResource(classD.getURI())));
+		Assert.assertTrue(inf.contains(d, mostSpecificType, ResourceFactory.createResource(classD.getURI())));
+		Assert.assertFalse(inf.contains(a, mostSpecificType, ResourceFactory.createResource(classC.getURI())));
+		Assert.assertFalse(inf.contains(b, mostSpecificType, ResourceFactory.createResource(classC.getURI())));
+		Assert.assertFalse(inf.contains(c, mostSpecificType, ResourceFactory.createResource(classC.getURI())));
+		Assert.assertFalse(inf.contains(d, mostSpecificType, ResourceFactory.createResource(classC.getURI())));
+
+		aBox.remove(a, RDF.type, classD);
+		Assert.assertFalse(inf.contains(a,RDF.type,classD));
+		Assert.assertTrue(inf.contains(a,RDF.type,classC));
+		Assert.assertFalse(inf.contains(b,RDF.type, classD));
+		Assert.assertTrue(inf.contains(b,RDF.type, classC));
+		Assert.assertFalse(inf.contains(c,RDF.type, classD));
+		Assert.assertTrue(inf.contains(c,RDF.type, classC));
+		Assert.assertFalse(inf.contains(d,RDF.type, classD));
+		Assert.assertFalse(inf.contains(d,RDF.type, classC));
+		Assert.assertTrue(inf.contains(a, mostSpecificType, ResourceFactory.createResource(classC.getURI())));
+		Assert.assertTrue(inf.contains(b, mostSpecificType, ResourceFactory.createResource(classC.getURI())));
+		Assert.assertTrue(inf.contains(c, mostSpecificType, ResourceFactory.createResource(classC.getURI())));
+		Assert.assertTrue(inf.contains(d, mostSpecificType, ResourceFactory.createResource(classC.getURI())));
+		Assert.assertFalse(inf.contains(a, mostSpecificType, ResourceFactory.createResource(classD.getURI())));
+		Assert.assertFalse(inf.contains(b, mostSpecificType, ResourceFactory.createResource(classD.getURI())));
+		Assert.assertFalse(inf.contains(c, mostSpecificType, ResourceFactory.createResource(classD.getURI())));
+		Assert.assertFalse(inf.contains(d, mostSpecificType, ResourceFactory.createResource(classD.getURI())));
+		
+		simpleReasonerTBoxListener.setStopRequested();		
+	}	
+
 	/*
 	 * Basic scenario around recomputing the ABox inferences
 	 */
