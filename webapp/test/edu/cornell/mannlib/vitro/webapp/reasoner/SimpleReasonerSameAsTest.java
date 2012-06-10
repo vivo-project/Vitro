@@ -28,7 +28,7 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
   
 	@Before
 	public void suppressErrorOutput() {
-		suppressSyserr();
+		//suppressSyserr();
         //Turn off log messages to console
 		setLoggerLevel(SimpleReasoner.class, Level.OFF);
 		setLoggerLevel(SimpleReasonerTBoxListener.class, Level.OFF);
@@ -90,7 +90,7 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 	}
 			
 	/*
-	* basic scenario of removing an abox sameAs assertion 
+	* basic scenario of removing an abox sameAs assertion  
 	*/
 	@Test
 	public void removeSameAsABoxAssertion1() {
@@ -103,10 +103,10 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 		OntProperty Q = tBox.createObjectProperty("http://test.vivo/Q");
 		Q.setLabel("property Q", "en-US");
 	            
-		OntProperty S = tBox.createDatatypeProperty("http://test.vivo/");
+		OntProperty S = tBox.createDatatypeProperty("http://test.vivo/data1");
 		S.setLabel("property S", "en-US");
 		
-		OntProperty T = tBox.createDatatypeProperty("http://test.vivo/");
+		OntProperty T = tBox.createDatatypeProperty("http://test.vivo/data2");
 		T.setLabel("property T", "en-US");
 		
 		Literal literal1 = tBox.createLiteral("Literal value 1");
@@ -138,7 +138,7 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 		Assert.assertTrue(inf.contains(a,T,literal2));
 
 		aBox.remove(a,OWL.sameAs,b);
-
+		
 		Assert.assertFalse(inf.contains(b,OWL.sameAs,a));
 		Assert.assertFalse(inf.contains(b,P,c));
 		Assert.assertFalse(inf.contains(b,S,literal1));
@@ -147,8 +147,7 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 	}
 	
 	/*
-	* basic scenario of adding an abox assertion for
-	* an individual is sameAs another. 
+	* adding abox assertion for individual in sameAs chain.
 	*/
 	@Test
 	public void addABoxAssertion1() {
@@ -182,10 +181,23 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 		Resource b = aBox.createResource("http://test.vivo/b");
 		Resource c = aBox.createResource("http://test.vivo/c");
 		Resource d = aBox.createResource("http://test.vivo/d");
+		Resource e = aBox.createResource("http://test.vivo/e");
+		Resource f = aBox.createResource("http://test.vivo/f");
 		
 		aBox.add(a,OWL.sameAs,b);
+		aBox.add(b,OWL.sameAs,e);
+		aBox.add(e,OWL.sameAs,f);
 
 		Assert.assertTrue(inf.contains(b,OWL.sameAs,a));
+		Assert.assertTrue(inf.contains(e,OWL.sameAs,a));
+		Assert.assertTrue(inf.contains(e,OWL.sameAs,b));
+		Assert.assertTrue(inf.contains(a,OWL.sameAs,e));
+		Assert.assertTrue(inf.contains(f,OWL.sameAs,e));
+		Assert.assertTrue(inf.contains(f,OWL.sameAs,b));
+		Assert.assertTrue(inf.contains(f,OWL.sameAs,a));
+		Assert.assertTrue(inf.contains(b,OWL.sameAs,f));
+		Assert.assertTrue(inf.contains(a,OWL.sameAs,f));
+
 		
 		aBox.add(a,P,c);
 		aBox.add(a,S,literal1);
@@ -196,24 +208,48 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 		Assert.assertTrue(inf.contains(b,S,literal1));
 		Assert.assertTrue(inf.contains(a,Q,d));
 		Assert.assertTrue(inf.contains(a,T,literal2));
+		Assert.assertTrue(inf.contains(e,P,c));
+		Assert.assertTrue(inf.contains(e,S,literal1));
+		Assert.assertTrue(inf.contains(e,Q,d));
+		Assert.assertTrue(inf.contains(e,T,literal2));
+		Assert.assertTrue(inf.contains(f,P,c));
+		Assert.assertTrue(inf.contains(f,S,literal1));
+		Assert.assertTrue(inf.contains(f,Q,d));
+		Assert.assertTrue(inf.contains(f,T,literal2));
+		
+		aBox.remove(b,OWL.sameAs,e);
+
+		Assert.assertTrue(inf.contains(b,OWL.sameAs,a));
+		Assert.assertFalse(inf.contains(e,OWL.sameAs,a));
+		Assert.assertFalse(inf.contains(e,OWL.sameAs,b));
+		Assert.assertFalse(inf.contains(a,OWL.sameAs,e));
+		Assert.assertTrue(inf.contains(f,OWL.sameAs,e));
+		Assert.assertFalse(inf.contains(f,OWL.sameAs,b));
+		Assert.assertFalse(inf.contains(f,OWL.sameAs,a));
+		Assert.assertFalse(inf.contains(b,OWL.sameAs,f));
+		Assert.assertFalse(inf.contains(a,OWL.sameAs,f));
+
+		Assert.assertTrue(inf.contains(b,P,c));
+		Assert.assertTrue(inf.contains(b,S,literal1));
+		Assert.assertTrue(inf.contains(a,Q,d));
+		Assert.assertTrue(inf.contains(a,T,literal2));
+		Assert.assertFalse(inf.contains(e,P,c));
+		Assert.assertFalse(inf.contains(e,S,literal1));
+		Assert.assertFalse(inf.contains(e,Q,d));
+		Assert.assertFalse(inf.contains(e,T,literal2));
+		Assert.assertFalse(inf.contains(f,P,c));
+		Assert.assertFalse(inf.contains(f,S,literal1));
+		Assert.assertFalse(inf.contains(f,Q,d));
+		Assert.assertFalse(inf.contains(f,T,literal2));		
 	}
 	
 	/*
-	* adding abox assertion for individuals that are sameAs
-	* each other. 
+	* sameAs with datatype properties
 	*/
 	@Test
 	public void addABoxAssertion2() {
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-			     
-		OntClass classA = tBox.createClass("http://test.vivo/A");
-	    classA.setLabel("class A", "en-US");
-
-		OntClass classB = tBox.createClass("http://test.vivo/B");
-	    classB.setLabel("class B", "en-US");
-
-	    classA.addSubClass(classB);
-		
+			     		
 		OntProperty desc = tBox.createDatatypeProperty("http://test.vivo/desc");
 		desc.setLabel("property desc", "en-US");
 		
@@ -230,18 +266,14 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
         // Individuals a and b
 		Resource a = aBox.createResource("http://test.vivo/a");
 		Resource b = aBox.createResource("http://test.vivo/b");
-
+		
 		aBox.add(a,desc,desc1);
 		aBox.add(b,desc,desc2);
 		aBox.add(a,OWL.sameAs,b);
-		aBox.add(a, RDF.type, classB);
 	
 		Assert.assertTrue(inf.contains(a,desc,desc2));
-		Assert.assertTrue(inf.contains(a,RDF.type,classA));
 		Assert.assertTrue(inf.contains(b,desc,desc1));
 		Assert.assertTrue(inf.contains(b,OWL.sameAs,a));
-		Assert.assertTrue(inf.contains(b,RDF.type,classB));
-		Assert.assertTrue(inf.contains(b,RDF.type,classA));
 	}
 	
 	/*
@@ -361,6 +393,79 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 	}
 	
 	
+	/*
+	 * adding and removing a type assertion for an individual who has
+	 * a sameAs individual.
+	 */
+	//@Test
+	public void tBoxTypeAssertion1() throws InterruptedException {
+				
+		// Create a Tbox with a simple class hierarchy. B is a subclass of A.
+		// Pellet will compute TBox inferences
+		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		
+		OntClass classA = tBox.createClass("http://test.vivo/A");
+	    classA.setLabel("class A", "en-US");
+
+		OntClass classB = tBox.createClass("http://test.vivo/B");
+	    classB.setLabel("class B", "en-US");
+
+	    classA.addSubClass(classB);
+	            
+        // this is the model to receive inferences
+        Model inf = ModelFactory.createDefaultModel();
+        
+		// create an ABox and register the SimpleReasoner listener with it
+		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+		aBox.register(new SimpleReasoner(tBox, aBox, inf));
+		
+		Resource x = aBox.createResource("http://test.vivo/x");
+		Resource y = aBox.createResource("http://test.vivo/y");
+		Resource z = aBox.createResource("http://test.vivo/z");
+		
+       	aBox.add(x,OWL.sameAs,y);
+       	aBox.add(y,OWL.sameAs,z);
+		aBox.add(x,RDF.type,classB);		
+	
+		Assert.assertTrue(inf.contains(y,RDF.type,classB));
+		Assert.assertTrue(inf.contains(y,RDF.type,classA));
+//		Assert.assertTrue(inf.contains(z,RDF.type,classB));
+//		Assert.assertTrue(inf.contains(z,RDF.type,classA));
+		
+		aBox.remove(x,RDF.type,classB);
+		Assert.assertFalse(inf.contains(y,RDF.type,classB));
+		Assert.assertFalse(inf.contains(y,RDF.type,classA));			
+	}
+
+	
+	/*
+	 * adding and removing subclass assertion when there is an 
+	 * individual member who has a sameAs individual.
+	 */
+	//@Test
+	public void tBoxSubclassAssertion1() throws InterruptedException {
+
+	}	
+
+	/*
+	 * test that mostSpecificType inferences propagate to sameAs 
+	 * individuals
+	 */
+	//@Test
+	public void mostSpecificTypeTest1() throws InterruptedException {
+
+	}	
+
+	/*
+	 * there is a sameAs chain and one sameAs statement is removed.
+	 * 
+	 */
+	//@Test
+	public void sameAsChain1() throws InterruptedException {
+
+	}	
+
+		
 	/*
 	 * Basic scenario around recomputing the ABox inferences
 	 */

@@ -24,7 +24,7 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
   
 	@Before
 	public void suppressErrorOutput() {
-		suppressSyserr();
+		//suppressSyserr();
         //Turn off log messages to console
 		setLoggerLevel(SimpleReasoner.class, Level.OFF);
 		setLoggerLevel(SimpleReasonerTBoxListener.class, Level.OFF);
