@@ -86,4 +86,34 @@ public interface ChangeSet {
                                               RDFService.ModelSerializationFormat serializationFormat,
                                               ModelChange.Operation operation,
                                               String graphURI);
+	
+	/**
+	 * Add an event that will be be passed to any change listeners in advance of
+	 * the change set additions and retractions being performed.  The event
+	 * will only be fired if the precondition (if any) is met.
+	 * @param event
+	 */
+	public void addPreChangeEvent(Object event);
+	    
+    /**
+     * Add an event that will be be passed to any change listeners after all of
+     * the change set additions and retractions are performed.
+     * @param event
+     */
+    public void addPostChangeEvent(Object event);
+
+    /**
+     * Return a list of events to pass to any change listeners in 
+     * advance of the change set additions and retractions being performed.
+     * @return
+     */
+	public List<Object> getPreChangeEvents();
+	
+    /**
+     * Return a list of events to pass to any change listeners after 
+     * the change set additions and retractions are performed.
+     * @return
+     */
+    public List<Object> getPostChangeEvents();
+    
 }

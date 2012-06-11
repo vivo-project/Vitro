@@ -143,6 +143,17 @@ public abstract class RDFServiceImpl implements RDFService {
                 listener.removedStatement(sparqlTriple(triple).toString(), graphURI);   			
             }
         }
+    }
+    
+    public synchronized void notifyListenersOfEvent(Object event) {
+        
+        Iterator<ChangeListener> iter = registeredListeners.iterator();
+
+        while (iter.hasNext()) {
+            ChangeListener listener = iter.next();
+            // TODO what is the graphURI parameter for?
+            listener.notifyEvent(null, event);
+        }
     }    
     
     protected boolean isPreconditionSatisfied(String query, 

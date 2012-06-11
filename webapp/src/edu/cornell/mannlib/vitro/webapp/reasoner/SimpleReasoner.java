@@ -41,6 +41,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ABoxJenaChangeListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.CumulativeDeltaModeler;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.DifferenceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -89,7 +90,7 @@ public class SimpleReasoner extends StatementListener {
 		this.tboxModel = tboxModel;
         this.aboxModel = ModelFactory.createOntologyModel(
                 OntModelSpec.OWL_MEM, ModelFactory.createModelForGraph(
-                        new RDFServiceGraph(rdfService))); 
+                        new DifferenceGraph(new RDFServiceGraph(rdfService), inferenceModel.getGraph()))); 
 		this.inferenceModel = inferenceModel;
 		this.inferenceRebuildModel = inferenceRebuildModel;
 		this.scratchpadModel = scratchpadModel;	
@@ -187,8 +188,7 @@ public class SimpleReasoner extends StatementListener {
 	 * Synchronized part of removedStatement. Interacts
 	 * with DeltaComputer.
 	 */
-	protected synchronized void handleRemovedStatement(Statement stmt) {
-		
+	protected synchronized void handleRemovedStatement(Statement stmt) {    
 		if (batchMode1) {
 			 aBoxDeltaModeler1.removedStatement(stmt);
 		} else if (batchMode2) {
@@ -753,7 +753,7 @@ public class SimpleReasoner extends StatementListener {
 					Iterator<OntClass> parentIt = parents.iterator();
 					
 					while (parentIt.hasNext()) {
-						OntClass parentClass = parentIt.next();
+							OntClass parentClass = parentIt.next();
 						
 						// VIVO doesn't materialize statements that assert anonymous types
 						// for individuals. Also, sharing an identical anonymous node is
@@ -770,7 +770,7 @@ public class SimpleReasoner extends StatementListener {
 						inferenceModel.enterCriticalSection(Lock.WRITE);
 						try {
 							if (inferenceModel.contains(infStmt)) {
-								inferenceModel.remove(infStmt);
+	     						inferenceModel.remove(infStmt);
 							}
 						} finally {
 							inferenceModel.leaveCriticalSection();
@@ -1745,7 +1745,7 @@ public class SimpleReasoner extends StatementListener {
     
 	@Override
 	public synchronized void notifyEvent(Model model, Object event) {
-		
+	    
 	    if (event instanceof BulkUpdateEvent) {	
 	    	if (((BulkUpdateEvent) event).getBegin()) {	
 	    		

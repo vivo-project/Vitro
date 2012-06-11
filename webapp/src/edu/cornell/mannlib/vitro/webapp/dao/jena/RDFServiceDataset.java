@@ -41,7 +41,7 @@ public class RDFServiceDataset implements Dataset {
 
     @Override
     public Model getDefaultModel() {
-        return ModelFactory.createModelForGraph(g.getDefaultGraph());
+        return RDFServiceGraph.createRDFServiceModel(g.getDefaultGraph());
     }
 
     @Override
@@ -51,7 +51,7 @@ public class RDFServiceDataset implements Dataset {
 
     @Override
     public Model getNamedModel(String arg0) {
-        return ModelFactory.createModelForGraph(g.getGraph(Node.createURI(arg0)));
+        return RDFServiceGraph.createRDFServiceModel(g.getGraph(Node.createURI(arg0)));
     }
 
     @Override

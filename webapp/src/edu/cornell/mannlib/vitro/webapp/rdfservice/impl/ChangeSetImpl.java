@@ -23,8 +23,10 @@ public class ChangeSetImpl implements ChangeSet {
 	
 	private String preconditionQuery;
 	private RDFService.SPARQLQueryType queryType;
-	private ArrayList<ModelChange> modelChanges;
-	
+	private ArrayList<ModelChange> modelChanges = new ArrayList<ModelChange>();
+	private ArrayList<Object> preChangeEvents = new ArrayList<Object>();
+	private ArrayList<Object> postChangeEvents = new ArrayList<Object>();
+ 	
 	/**   
 	 * Getter for the precondition query
 	 * 
@@ -122,4 +124,25 @@ public class ChangeSetImpl implements ChangeSet {
                                               String graphURI) {
 		return new ModelChangeImpl(serializedModel, serializationFormat, operation, graphURI); 
 	}
+	
+	@Override 
+	public void addPreChangeEvent(Object o) {
+	    this.preChangeEvents.add(o);
+	}
+	
+	@Override 
+    public void addPostChangeEvent(Object o) {
+        this.postChangeEvents.add(o);
+    }
+	
+	@Override
+	public List<Object> getPreChangeEvents() {
+	    return this.preChangeEvents;
+	}
+	
+	@Override
+    public List<Object> getPostChangeEvents() {
+        return this.postChangeEvents;
+    }
+	
 }

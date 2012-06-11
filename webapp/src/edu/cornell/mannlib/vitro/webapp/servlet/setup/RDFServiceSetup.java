@@ -135,7 +135,7 @@ public class RDFServiceSetup extends JenaDataSourceSetupBase
         RDFServiceFactory rdfServiceFactory = new RDFServiceFactorySingle(rdfService);
         RDFServiceUtils.setRDFServiceFactory(ctx, rdfServiceFactory);
         
-        Graph g = new RDFServiceGraph(rdfService);
+//        Graph g = new RDFServiceGraph(rdfService);
         
         Dataset dataset = new RDFServiceDataset(rdfService);
         setStartupDataset(dataset, ctx);

@@ -124,8 +124,14 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
                     dataset.getLock().leaveCriticalSection();
                 }
             }
+            for (Object o : changeSet.getPreChangeEvents()) {
+                this.notifyListenersOfEvent(o);
+            }
             if (transaction) {
                 conn.getTransactionHandler().commit();
+            }
+            for (Object o : changeSet.getPostChangeEvents()) {
+                this.notifyListenersOfEvent(o);
             }
         } catch (Exception e) {
             log.error(e, e);
@@ -404,10 +410,12 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
         }
         
         public void addedStatement(Statement stmt) {
+            log.debug("adding " + stmt + " to " + graphURI);
             s.notifyListeners(stmt.asTriple(), ModelChange.Operation.ADD, graphURI);
         }
         
         public void removedStatement(Statement stmt) {
+            log.debug("removing " + stmt + " from " + graphURI);
             s.notifyListeners(stmt.asTriple(), ModelChange.Operation.REMOVE, graphURI);
         }
         

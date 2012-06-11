@@ -24,6 +24,9 @@ import com.hp.hpl.jena.graph.query.QueryHandler;
 import com.hp.hpl.jena.graph.query.SimpleQueryHandler;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.listeners.StatementListener;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.shared.AddDeniedException;
 import com.hp.hpl.jena.shared.DeleteDeniedException;
 import com.hp.hpl.jena.shared.PrefixMapping;
@@ -432,6 +435,24 @@ public class RDFServiceGraph implements GraphWithPerform {
 //                sbuff.append("0");
 //            sbuff.append(hexstr);
         }
+    }
+    
+    public static Model createRDFServiceModel(final RDFServiceGraph g) {
+        Model m = ModelFactory.createModelForGraph(g);
+        m.register(new StatementListener() {
+            @Override 
+            public void notifyEvent(Model m, Object event) {
+                ChangeSet changeSet = g.getRDFService().manufactureChangeSet();
+                changeSet.addPreChangeEvent(event);
+                try {
+                    g.getRDFService().changeSetUpdate(changeSet);
+                } catch (RDFServiceException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            
+        });
+        return m;
     }
     
 }

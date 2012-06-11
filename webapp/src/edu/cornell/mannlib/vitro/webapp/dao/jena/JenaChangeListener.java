@@ -42,6 +42,7 @@ public class JenaChangeListener implements ChangeListener {
 
     @Override
     public void notifyEvent(String graphURI, Object event) {
+        log.debug("event: " + event.getClass());
         listener.notifyEvent(m, event);
     }
     

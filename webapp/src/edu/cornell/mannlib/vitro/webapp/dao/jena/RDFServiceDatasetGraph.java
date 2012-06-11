@@ -161,12 +161,12 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
     }
 
     @Override
-    public Graph getDefaultGraph() {
+    public RDFServiceGraph getDefaultGraph() {
         return new RDFServiceGraph(rdfService);
     }
 
     @Override
-    public Graph getGraph(Node arg0) {
+    public RDFServiceGraph getGraph(Node arg0) {
         return new RDFServiceGraph(rdfService, arg0.getURI());
     }
 
