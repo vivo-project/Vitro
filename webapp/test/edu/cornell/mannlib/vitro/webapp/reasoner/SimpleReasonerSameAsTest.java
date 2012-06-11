@@ -555,21 +555,9 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 	 */
 	//@Test
 	public void mostSpecificTypeTest1() throws InterruptedException {
-		// Create TBox, ABox and Inference models and register
-		// the ABox reasoner listeners with the ABox and TBox
-		// Pellet will compute TBox inferences
+
+		// set up tbox. Pellet is reasoning; SimpleReasonerTBoxListener is not being used.
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-        Model inf = ModelFactory.createDefaultModel();
-		
-        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
-		aBox.register(simpleReasoner);
-		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
-		tBox.register(simpleReasonerTBoxListener);
-		
-		// Set up the Tbox with a class hierarchy. C is a
-		// subclass of A. D and E are subclasses C.
-		// Pellet will compute TBox inferences.
 		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
 		
 		OntClass classA = tBox.createClass("http://test.vivo/A");
@@ -584,10 +572,16 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 	    classA.addSubClass(classC);	   	    
 	    classC.addSubClass(classD);
 	    classC.addSubClass(classE);
-	    
-	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
-	    	Thread.sleep(delay);
-	    }
+
+		// this will receive the abox inferences
+        Model inf = ModelFactory.createDefaultModel();
+        
+        // abox
+		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+
+        // set up SimpleReasoner and register it with abox		
+        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+		aBox.register(simpleReasoner);
 	    
         // add & remove ABox type statements and verify inferences
 		Resource a = aBox.createResource("http://test.vivo/a");
@@ -636,8 +630,6 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 		Assert.assertFalse(inf.contains(b, mostSpecificType, ResourceFactory.createResource(classD.getURI())));
 		Assert.assertFalse(inf.contains(c, mostSpecificType, ResourceFactory.createResource(classD.getURI())));
 		Assert.assertFalse(inf.contains(d, mostSpecificType, ResourceFactory.createResource(classD.getURI())));
-		
-		simpleReasonerTBoxListener.setStopRequested();		
 	}	
 
 	/*

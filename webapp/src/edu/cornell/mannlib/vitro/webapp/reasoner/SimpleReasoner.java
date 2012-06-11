@@ -890,31 +890,35 @@ public class SimpleReasoner extends StatementListener {
 	// subject is of type cls; otherwise returns false.
 	protected boolean entailedType(Resource subject, OntClass cls) {
 
+		List<Resource> sameIndividuals = getSameIndividuals(subject,inferenceModel);
+		sameIndividuals.add(subject);
+				
 		tboxModel.enterCriticalSection(Lock.READ);
-		aboxModel.enterCriticalSection(Lock.READ);
-		
-		try {			
-			List<OntClass> subclasses = null;
-			subclasses = (cls.listSubClasses(false)).toList();		
-			subclasses.addAll((cls.listEquivalentClasses()).toList());
-			
-			Iterator<OntClass> iter = subclasses.iterator();
-						
-			while (iter.hasNext()) {		
-				OntClass childClass = iter.next();
-				if (childClass.equals(cls)) continue;
-				Statement stmt = ResourceFactory.createStatement(subject, RDF.type, childClass);
-				if (aboxModel.contains(stmt)) return true;
-			}
-			
-			return false;
-		} catch (Exception e) {
-			log.debug("exception in method entailedType: " + e.getMessage());
-			return false;
-		} finally { 
-			aboxModel.leaveCriticalSection();
-			tboxModel.leaveCriticalSection();
-		}	
+		try {
+			aboxModel.enterCriticalSection(Lock.READ);
+			try {			
+				List<OntClass> subclasses = null;
+				subclasses = (cls.listSubClasses(false)).toList();		
+				subclasses.addAll((cls.listEquivalentClasses()).toList());
+				
+				Iterator<OntClass> iter = subclasses.iterator();
+				while (iter.hasNext()) {		
+					OntClass childClass = iter.next();
+					if (childClass.equals(cls)) continue;  // TODO - determine whether this is needed
+					Iterator<Resource> sameIter = sameIndividuals.iterator();
+					while (sameIter.hasNext()) {
+						Statement stmt = ResourceFactory.createStatement(sameIter.next(), RDF.type, childClass);
+						if (aboxModel.contains(stmt)) 
+						   return true;						
+					}
+				}
+				return false;
+			} finally { 
+				aboxModel.leaveCriticalSection();
+			}	
+		} finally {
+			tboxModel.leaveCriticalSection();			
+		}
 	}
 		
 	// Returns true if the triple is entailed by inverse property
