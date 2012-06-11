@@ -1484,14 +1484,11 @@ public class SimpleReasoner extends StatementListener {
 				}
 			} catch (Exception e) {
 				log.error("Exception while reconciling the current and recomputed ABox inference model for class subsumption inferences. Halting processing." , e);
-				inferenceRebuildModel.removeAll();
-				return;
 			}			
 		} catch (Exception e) {
 			log.error("Exception while recomputing ABox inferences. Halting processing.", e);
-			inferenceRebuildModel.removeAll();
-			return;
 		} finally {
+			inferenceRebuildModel.removeAll();
 			inferenceRebuildModel.leaveCriticalSection();
 		}		
 	}
