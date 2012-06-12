@@ -24,6 +24,7 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -44,7 +45,6 @@ import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
@@ -52,9 +52,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.InitialJenaModelUtils;
 
@@ -67,15 +65,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
     public void contextInitialized(ServletContextEvent sce) {
         ServletContext ctx = sce.getServletContext();
         StartupStatus ss = StartupStatus.getBean(ctx);
-        
-        // temporary scaffolding in the rdfapi dev branch
-        // TODO remove me
-        if (ConfigurationProperties.getBean(ctx).getProperty(
-                "VitroConnection.DataSource.endpointURI") != null) {
-            (new JenaDataSourceSetupSparql2()).contextInitialized(sce);
-            return;
-        }
-        
+                
         try {
             long startTime = System.currentTimeMillis();
             setUpJenaDataSource(ctx);
@@ -331,7 +321,7 @@ public class JenaDataSourceSetup extends JenaDataSourceSetupBase
         VitroJenaModelMaker vjmm = getVitroJenaModelMaker();
         setVitroJenaModelMaker(vjmm, ctx);
         makeModelMakerFromConnectionProperties(TripleStoreType.SDB, ctx);
-        VitroJenaSDBModelMaker vsmm = getVitroJenaSDBModelMaker();
+        ModelMaker vsmm = getVitroJenaSDBModelMaker();
         setVitroJenaSDBModelMaker(vsmm, ctx);
                 
         //bdc34: I have no reason for vsmm vs vjmm.  

@@ -69,6 +69,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
@@ -206,13 +207,13 @@ public class JenaIngestController extends BaseEditController {
     }
     
     private void processRDBModelsRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
-        VitroJenaModelMaker vjmm = (VitroJenaModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
+        ModelMaker vjmm = (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
         vreq.getSession().setAttribute("vitroJenaModelMaker", vjmm);
         showModelList(vreq, vjmm, "rdb");
     }
     
     private void processSDBModelsRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
-        VitroJenaSDBModelMaker vsmm = (VitroJenaSDBModelMaker) getServletContext().getAttribute("vitroJenaSDBModelMaker");
+        ModelMaker vsmm = (ModelMaker) getServletContext().getAttribute("vitroJenaSDBModelMaker");
         vreq.getSession().setAttribute("vitroJenaModelMaker", vsmm);
         showModelList(vreq, vsmm, "sdb");
     }
@@ -714,7 +715,7 @@ public class JenaIngestController extends BaseEditController {
                 ? ((VitroJenaSpecialModelMaker) maker).getInnerModelMaker()
                 : maker;
         if (modelType == null) {
-            if (maker instanceof VitroJenaSDBModelMaker) {
+            if (maker instanceof RDFServiceModelMaker) {
                 modelType = "sdb";
             } else {
                 modelType = "rdb";

@@ -15,7 +15,6 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Dataset;
@@ -54,9 +53,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -64,7 +62,6 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.sdb.RDFServiceSDB;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.sparql.RDFServiceSparql;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.InitialJenaModelUtils;
 
@@ -330,7 +327,7 @@ public class RDFServiceSetup extends JenaDataSourceSetupBase
         VitroJenaModelMaker vjmm = getVitroJenaModelMaker();
         setVitroJenaModelMaker(vjmm, ctx);
         makeModelMakerFromConnectionProperties(TripleStoreType.SDB, ctx);
-        VitroJenaSDBModelMaker vsmm = getVitroJenaSDBModelMaker();
+        RDFServiceModelMaker vsmm = new RDFServiceModelMaker(rdfServiceFactory);
         setVitroJenaSDBModelMaker(vsmm, ctx);
                 
         //bdc34: I have no reason for vsmm vs vjmm.  

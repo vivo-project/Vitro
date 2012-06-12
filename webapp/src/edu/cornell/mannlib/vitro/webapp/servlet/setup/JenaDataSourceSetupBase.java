@@ -26,6 +26,7 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
 import com.hp.hpl.jena.sdb.store.DatabaseType;
@@ -405,7 +406,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     }
     
     private static VitroJenaModelMaker vjmm = null;
-    private static VitroJenaSDBModelMaker vsmm = null;
+    private static ModelMaker vsmm = null;
     private static VitroModelSource vms = null;
     private static final String sdbModelMaker = "vitroJenaSDBModelMaker";
     private static final String rdbModelMaker = "vitroJenaModelMaker";
@@ -486,7 +487,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         ctx.setAttribute(rdbModelMaker, vjmm);
     }
     
-    public static void setVitroJenaSDBModelMaker(VitroJenaSDBModelMaker vsmm, 
+    public static void setVitroJenaSDBModelMaker(ModelMaker vsmm, 
                                                  ServletContext ctx){
         ctx.setAttribute(sdbModelMaker, vsmm);
     }
@@ -511,7 +512,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         return vjmm;
     }
     
-    protected VitroJenaSDBModelMaker getVitroJenaSDBModelMaker(){
+    protected ModelMaker getVitroJenaSDBModelMaker(){
         return vsmm;
     }
 
