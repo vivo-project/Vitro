@@ -5,6 +5,9 @@ package edu.cornell.mannlib.vitro.webapp.dao;
 import java.util.List;
 import java.util.Set;
 
+import edu.cornell.mannlib.vitro.webapp.dao.appConfig.ClassDisplayConfigDao;
+import edu.cornell.mannlib.vitro.webapp.dao.appConfig.ClassEditConfigDao;
+
 public interface WebappDaoFactory {
 
     /**
@@ -121,4 +124,7 @@ public interface WebappDaoFactory {
     
     public MenuDao getMenuDao();    
     
+//    public ClassDisplayConfigDao getClassDisplayConfigDao();
+//    
+//    public ClassEditConfigDao getClassEditConfigDao();        
 }

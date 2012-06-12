@@ -44,7 +44,7 @@ public class JenaBaseDao_2_Test extends AbstractTestClass {
 	private Resource emptyResource;
 	private Resource fullResource;
 
-	private JenaBaseDao dao;
+	private JenaBaseDaoUtils dao;
 
 	@Before
 	public void initializeThings() {

@@ -47,6 +47,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
+import edu.cornell.mannlib.vitro.webapp.dao.appConfig.ClassDisplayConfigDao;
+import edu.cornell.mannlib.vitro.webapp.dao.appConfig.ClassEditConfigDao;
+import edu.cornell.mannlib.vitro.webapp.dao.appConfig.jena.ClassDisplayConfigDaoJena;
+import edu.cornell.mannlib.vitro.webapp.dao.appConfig.jena.ClassEditConfigDaoJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
@@ -536,5 +540,19 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     	ontModelSelector = specialSelector;
     	
     }
+
+//    @Override
+//    public ClassDisplayConfigDao getClassDisplayConfigDao() {
+//        return new ClassDisplayConfigDaoJena(
+//                ontModelSelector.getDisplayModel(), 
+//                config.getLocalAppNamespace());
+//    }
+//
+//    @Override
+//    public ClassEditConfigDao getClassEditConfigDao() {
+//        return new ClassEditConfigDaoJena(
+//                ontModelSelector.getDisplayModel(), 
+//                config.getLocalAppNamespace());
+//    }
    
 }

@@ -14,8 +14,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
-import edu.cornell.mannlib.vitro.webapp.web.ViewFinder;
-import edu.cornell.mannlib.vitro.webapp.web.ViewFinder.ClassView;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 public abstract class BaseIndividualSearchResult extends BaseTemplateModel {
@@ -28,12 +26,7 @@ public abstract class BaseIndividualSearchResult extends BaseTemplateModel {
     public BaseIndividualSearchResult(Individual individual, VitroRequest vreq) {
         this.vreq = vreq;
         this.individual = individual;
-    }
-
-    protected String getView(ClassView view) {
-        ViewFinder vf = new ViewFinder(view);
-        return vf.findClassView(individual, vreq);
-    }
+    }  
     
     public static List<IndividualSearchResult> getIndividualTemplateModels(List<Individual> individuals, VitroRequest vreq) {
         List<IndividualSearchResult> models = new ArrayList<IndividualSearchResult>(individuals.size());

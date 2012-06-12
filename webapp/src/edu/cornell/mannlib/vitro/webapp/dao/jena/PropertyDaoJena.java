@@ -46,12 +46,17 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.appConfig.jena.PropertyDisplayConfigDaoJena;
+import edu.cornell.mannlib.vitro.webapp.dao.appConfig.jena.PropertyEditConfigDaoJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 
 public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 	
 	protected static final Log log = LogFactory.getLog(PropertyDaoJena.class.getName());
+    protected PropertyDisplayConfigDaoJena propertyDisplayConfigDao;
+    protected PropertyEditConfigDaoJena propertyEditConfigDao;
 
+	
     private static final Map<String, String> NAMESPACES = new HashMap<String, String>() {{
         put("afn", VitroVocabulary.AFN);
         put("owl", VitroVocabulary.OWL);
@@ -77,6 +82,12 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
                            WebappDaoFactoryJena wadf) {
         super(wadf);
         this.dwf = dwf;
+        propertyDisplayConfigDao = new PropertyDisplayConfigDaoJena(
+        		wadf.ontModelSelector.getDisplayModel(), 
+        		wadf.config.getLocalAppNamespace());
+        propertyEditConfigDao = new PropertyEditConfigDaoJena(
+        		wadf.ontModelSelector.getDisplayModel(),
+        		wadf.config.getLocalAppNamespace());        
     }
     
     @Override

@@ -67,7 +67,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
             return name;
         } else {
             ind.getOntModel().enterCriticalSection(Lock.READ);
-            try {
+            try {                
                 this.name = webappDaoFactory.getJenaBaseDao().getLabelOrId(ind);
                 if (this.name == null) {
                     this.name = "[null]";

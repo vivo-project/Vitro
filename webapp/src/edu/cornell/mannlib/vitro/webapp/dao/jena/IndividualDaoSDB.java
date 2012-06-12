@@ -482,7 +482,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     public Iterator<String> getUpdatedSinceIterator(long updatedSince){
         List<String> individualURIs = new ArrayList<String>();
         Date since = new DateTime(updatedSince).toDate();
-        String sinceStr = xsdDateTimeFormat.format(since);
+        String sinceStr = xsdDateTimeFormat(since);
         getOntModel().enterCriticalSection(Lock.READ);
         try {
             String queryStr = "PREFIX vitro: <"+ VitroVocabulary.vitroURI+"> " +

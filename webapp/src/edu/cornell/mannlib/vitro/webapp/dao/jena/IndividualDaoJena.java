@@ -14,8 +14,6 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -53,8 +51,6 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
     public IndividualDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
     }
-
-    private static final Log log = LogFactory.getLog(IndividualDaoJena.class.getName());
 
     public Collection<DataPropertyStatement> getExternalIds(String individualURI) {
         return this.getExternalIds(individualURI, null);

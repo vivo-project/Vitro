@@ -42,7 +42,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource;
 
 public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
-    private static final String VITRO_DEFAULT_NAMESPACE = "Vitro.defaultNamespace";
+    public static final String VITRO_DEFAULT_NAMESPACE = "Vitro.defaultNamespace";
 
     private static final Log log = LogFactory.getLog(
             JenaDataSourceSetupBase.class);

@@ -12,6 +12,7 @@ public class WebappDaoFactoryConfig {
 	private List<String> preferredLanguages;
 	private String defaultNamespace;
 	private Set<String> nonUserNamespaces;
+	private String localAppNamespace;
 	
 	public WebappDaoFactoryConfig() {
 	    preferredLanguages = Arrays.asList("en-US", "en", "EN");
@@ -43,5 +44,13 @@ public class WebappDaoFactoryConfig {
 	public void setNonUserNamespaces(Set<String> nonUserNamespaces) {
 		this.nonUserNamespaces = nonUserNamespaces;
 	}
+
+    public String getLocalAppNamespace() {
+        return localAppNamespace;
+    }
+
+    public void setLocalAppNamespace(String localAppNamespace) {
+        this.localAppNamespace = localAppNamespace;
+    }
 	
 }

@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +23,6 @@ import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.ontology.ProfileException;
 import com.hp.hpl.jena.ontology.Restriction;
-import com.hp.hpl.jena.ontology.SomeValuesFromRestriction;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -53,8 +51,9 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.appConfig.jena.PropertyDisplayConfigDaoJena;
+import edu.cornell.mannlib.vitro.webapp.dao.appConfig.jena.PropertyEditConfigDaoJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 
@@ -85,25 +84,9 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
 
     public void deleteDataProperty(String URI) {
         deleteDataProperty(URI, getOntModelSelector().getTBoxModel());
-    }
+    }  
 
-    public boolean annotateDataPropertyAsExternalIdentifier(String dataPropertyURI) {
-    	OntModel ontModel = getOntModelSelector().getTBoxModel();
-    	ontModel.enterCriticalSection(Lock.WRITE);
-    	try {
-	        com.hp.hpl.jena.ontology.OntResource ind = ontModel.getOntResource(dataPropertyURI);
-	        if( ind != null ){
-	            ontModel.add(ind,(Property)DATAPROPERTY_ISEXTERNALID, "TRUE");
-	            return true;
-	        }else{
-	            return false;
-	        }
-    	} finally {
-    		ontModel.leaveCriticalSection();
-    	}
-    }
-
-    public void deleteDataProperty(String URI, OntModel ontModel) {
+    protected void deleteDataProperty(String URI, OntModel ontModel) {
     	// TODO check if used as onProperty of restriction
     	ontModel.enterCriticalSection(Lock.WRITE);
     	try {
@@ -127,7 +110,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     	}
         // remove ABox statements after removing property
         // so dependentResource deletion test will pass
-        removeABoxStatementsWithPredicate(URI);
+        removeABoxStatementsWithPredicate(URI);                        
     }
 
     @Override
@@ -779,5 +762,20 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         }        
         return customListViewConfigFileMap.get(dp);
     }
-    
+
+    public boolean annotateDataPropertyAsExternalIdentifier(String dataPropertyURI) {
+    	OntModel ontModel = getOntModelSelector().getTBoxModel();
+    	ontModel.enterCriticalSection(Lock.WRITE);
+    	try {
+	        com.hp.hpl.jena.ontology.OntResource ind = ontModel.getOntResource(dataPropertyURI);
+	        if( ind != null ){
+	            ontModel.add(ind,(Property)DATAPROPERTY_ISEXTERNALID, "TRUE");
+	            return true;
+	        }else{
+	            return false;
+	        }
+    	} finally {
+    		ontModel.leaveCriticalSection();
+    	}
+    }
 }

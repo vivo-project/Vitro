@@ -586,11 +586,12 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         updatePropertyResourceURIValue(p, PROPERTY_INPROPERTYGROUPANNOT, prop.getGroupURI());
     }
 
+    @Override
     public void deleteObjectProperty(ObjectProperty prop) {
     	deleteProperty(prop,getOntModel());
     }
 
-    public void deleteProperty(ObjectProperty prop, OntModel ontModel) {
+    protected void deleteProperty(ObjectProperty prop, OntModel ontModel) {
         ontModel.enterCriticalSection(Lock.WRITE);
         getOntModel().getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),true));
         try {

@@ -1,0 +1,29 @@
+# $This file is distributed under the terms of the license in /doc/license.txt$ 
+
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix core: <http://vivoweb.org/ontology/core#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vitroApp: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> .
+@base <http://example.com/test/> .
+
+
+<TestClass01> rdf:type owl:Class .
+
+<Context01> a vitroApp:ConfigContext ;
+    vitroApp:configContextFor <TestClass01> ;
+    vitroApp:hasConfiguration <DisplayConfig01> ;
+    vitroApp:hasConfiguration <EditConfig01> .
+    
+<DisplayConfig01> a vitroApp:ClassDisplayConfig;
+    vitroApp:displayRank "7";
+    vitroApp:displayName "Configured Test Class Display Name";
+    vitroApp:displayLimit "4" .
+    
+<EditConfig01> a vitroApp:ClassEditConfig .
+             
+ 
+    
+    
