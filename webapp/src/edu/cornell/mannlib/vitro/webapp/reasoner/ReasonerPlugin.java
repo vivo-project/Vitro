@@ -22,4 +22,7 @@ public interface ReasonerPlugin {
 			                       Model aboxInferencesModel, 
 			                       OntModel TBoxInferencesModel);
 	
+	public void setSimpleReasoner(SimpleReasoner simpleReasoner);
+	
+	public SimpleReasoner getSimpleReasoner();
 }

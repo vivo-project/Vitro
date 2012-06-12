@@ -1049,6 +1049,11 @@ public class SimpleReasoner extends StatementListener {
 	 * Adds the inference to the inference model if it is not already in
 	 * the inference model and not in the abox model.
 	 */
+	
+	public void addInference(Statement infStmt, Model inferenceModel) {	
+        addInference(infStmt,inferenceModel,true);
+	}
+	
 	protected void addInference(Statement infStmt, Model inferenceModel, boolean handleSameAs) {
 		
 		aboxModel.enterCriticalSection(Lock.READ);
@@ -1092,7 +1097,7 @@ public class SimpleReasoner extends StatementListener {
 	 * Removes the corresponding inference for each same individual
 	 * if that inference is not entailed by the abox model. 
 	 */
-	protected void removeInference(Statement infStmt, Model inferenceModel) {
+	public void removeInference(Statement infStmt, Model inferenceModel) {
        removeInference(infStmt,inferenceModel,true,true);
 	}
 

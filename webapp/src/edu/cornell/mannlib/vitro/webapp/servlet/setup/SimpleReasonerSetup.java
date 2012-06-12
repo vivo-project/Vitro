@@ -111,6 +111,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
                 try {
                     ReasonerPlugin plugin = (ReasonerPlugin) Class.forName(
                             classname).getConstructors()[0].newInstance();
+                    plugin.setSimpleReasoner(simpleReasoner);
                     pluginList.add(plugin);
                 } catch(Throwable t) {              
                     ss.info(this, "Could not instantiate reasoner plugin " + classname);
