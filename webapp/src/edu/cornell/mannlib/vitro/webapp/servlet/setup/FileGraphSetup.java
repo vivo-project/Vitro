@@ -77,9 +77,7 @@ public class FileGraphSetup implements ServletContextListener {
             log.error(errMsg);
             throw new ClassCastException(errMsg);
         } catch (Throwable t) {
-            System.out.println("Throwable in listener " + this.getClass().getName());
-            log.error(t);
-            t.printStackTrace();
+            log.error(t, t);
         } finally {
             OntDocumentManager.getInstance().setProcessImports(false);
         }

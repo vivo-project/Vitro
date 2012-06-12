@@ -99,6 +99,10 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
         try {
             if (transaction) {
                 conn.getTransactionHandler().begin();
+            } else {
+                for (Object o : changeSet.getPreChangeEvents()) {
+                    this.notifyListenersOfEvent(o);
+                }
             }
             while (csIt.hasNext()) {
                 ModelChange modelChange = csIt.next();
@@ -124,10 +128,10 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
                     dataset.getLock().leaveCriticalSection();
                 }
             }
-            for (Object o : changeSet.getPreChangeEvents()) {
-                this.notifyListenersOfEvent(o);
-            }
             if (transaction) {
+                for (Object o : changeSet.getPreChangeEvents()) {
+                    this.notifyListenersOfEvent(o);
+                }
                 conn.getTransactionHandler().commit();
             }
             for (Object o : changeSet.getPostChangeEvents()) {

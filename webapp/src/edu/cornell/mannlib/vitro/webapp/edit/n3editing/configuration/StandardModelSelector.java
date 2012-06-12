@@ -29,13 +29,13 @@ public class StandardModelSelector implements ModelSelector {
             }
         }
         if(sessionOntModel != null && sessionOntModel instanceof OntModel ) {
-            log.info("++++++++++ using OntModelSelector from session");
+            log.debug("using OntModelSelector from session");
             return (OntModel)sessionOntModel;
         } else if (vreq.getOntModelSelector() != null) {
-            log.info("++++++++++ using OntModelSelector from request");
+            log.debug("using OntModelSelector from request");
             return vreq.getOntModelSelector().getABoxModel();
         } else {
-            log.info("++++++++++ using OntModelSelector from context");
+            log.debug("using OntModelSelector from context");
             return ((OntModelSelector) context
             			.getAttribute("unionOntModelSelector")).getABoxModel();
         }

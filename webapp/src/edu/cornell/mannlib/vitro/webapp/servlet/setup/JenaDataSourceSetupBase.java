@@ -75,7 +75,6 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     public static String APPPATH = BASE+"app/";
     //these files are loaded everytime the system starts up
     public static String APPPATH_LOAD = APPPATH + "menuload/";
-    protected static String SUBMODELS = "/WEB-INF/submodels/";
     
     //All files in this directory will be reloaded every startup
     //and attached as sub-models to the displayOntModel.
@@ -430,7 +429,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         } else if (TripleStoreType.SDB.equals(type)) {
             StoreDesc storeDesc = new StoreDesc(
                     LayoutType.LayoutTripleNodesHash, DatabaseType.fetch(dbtypeStr));
-            BasicDataSource bds = WebappDaoSDBSetup.makeBasicDataSource(
+            BasicDataSource bds = WebappDaoSetup.makeBasicDataSource(
                     getDbDriverClassName(ctx), jdbcUrl, username, password, ctx);
             bds.setMaxActive(4); // for now, the SDB model makers should not use more
                                  // than a small handful of connections

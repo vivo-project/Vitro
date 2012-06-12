@@ -74,7 +74,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.WebappDaoSDBSetup;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.WebappDaoSetup;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils.MergeResult;
@@ -943,7 +943,7 @@ public class JenaIngestController extends BaseEditController {
         log.debug("Connecting to DB at "+jdbcUrl);
         StoreDesc storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash,dbTypeObj) ; 
         ServletContext ctx = vreq.getSession().getServletContext();
-        BasicDataSource bds = WebappDaoSDBSetup.makeBasicDataSource(
+        BasicDataSource bds = WebappDaoSetup.makeBasicDataSource(
                 driver, jdbcUrl, username, password, ctx);
         try {
             VitroJenaSDBModelMaker vsmm = new VitroJenaSDBModelMaker(storeDesc, bds);

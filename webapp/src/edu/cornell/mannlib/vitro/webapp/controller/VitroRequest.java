@@ -114,15 +114,15 @@ public class VitroRequest extends HttpServletRequestWrapper {
     public WebappDaoFactory getAssertionsWebappDaoFactory() {
     	Object webappDaoFactoryAttr = _req.getSession().getAttribute("assertionsWebappDaoFactory");
         if (webappDaoFactoryAttr instanceof WebappDaoFactory) {
-             log.info("Returning assertionsWebappDaoFactory from session");
+             log.debug("Returning assertionsWebappDaoFactory from session");
              return (WebappDaoFactory) webappDaoFactoryAttr;
         } else {
             webappDaoFactoryAttr = getAttribute("assertionsWebappDaoFactory");
             if (webappDaoFactoryAttr instanceof WebappDaoFactory) {
-                log.info("returning assertionsWebappDaoFactory from request attribute");
+                log.debug("returning assertionsWebappDaoFactory from request attribute");
                 return (WebappDaoFactory) webappDaoFactoryAttr;     
             } else {
-                log.info("Returning assertionsWebappDaoFactory from context");
+                log.debug("Returning assertionsWebappDaoFactory from context");
                 return (WebappDaoFactory) _req.getSession().getServletContext().getAttribute("assertionsWebappDaoFactory");
             }
         		

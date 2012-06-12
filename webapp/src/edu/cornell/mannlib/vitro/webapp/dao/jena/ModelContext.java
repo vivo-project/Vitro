@@ -111,16 +111,6 @@ public class ModelContext {
             log.error(e,e);
         }
         
-//      ModelContext.getJenaOntModel(ctx).register(ml);
-//      ModelContext.getBaseOntModel(ctx).register(ml);
-//      ModelContext.getInferenceOntModel(ctx).register(ml);
-//      ModelContext.getUnionOntModelSelector(ctx).getABoxModel().register(ml);
-//      ModelContext.getBaseOntModelSelector(ctx).getABoxModel().register(ml);
-//      ModelContext.getBaseOntModelSelector(ctx).getApplicationMetadataModel().register(ml);
-//      ModelContext.getInferenceOntModelSelector(ctx).getABoxModel().register(ml);
-        
-//      ModelContext.getBaseOntModelSelector(ctx).getTBoxModel().register(ml);
-        
 	}
 	
 	public static OntModel getDisplayModel(ServletContext ctx){

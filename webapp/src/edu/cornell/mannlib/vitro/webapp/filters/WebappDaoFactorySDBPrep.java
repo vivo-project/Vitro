@@ -41,6 +41,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlDatasetGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraphMultilingual;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
@@ -110,9 +111,14 @@ public class WebappDaoFactorySDBPrep implements Filter {
 		RDFService rdfService = factory.getRDFService();
 		Dataset dataset = new RDFServiceDataset(rdfService);
 		wadf = new WebappDaoFactorySDB(rdfService, oms, config);
+	    WebappDaoFactory assertions = new WebappDaoFactorySDB(
+	            rdfService, oms, config, SDBDatasetMode.ASSERTIONS_ONLY);
 		vreq.setWebappDaoFactory(wadf);
+		vreq.setAssertionsWebappDaoFactory(assertions);
 		vreq.setFullWebappDaoFactory(wadf);
 		vreq.setDataset(dataset);
+		vreq.setOntModelSelector(oms);
+		
 		vreq.setJenaOntModel(ModelFactory.createOntologyModel(
 				OntModelSpec.OWL_MEM, dataset.getDefaultModel()));
 					
