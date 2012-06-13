@@ -202,10 +202,18 @@ name will be used as the label. -->
 </#macro>
 
 <#-- Label -->
-<#macro label individual editable>
+<#macro label individual editable labelCount>
     <#local label = individual.nameStatement>
     ${label.value}
-    <@editingLinks "label" label editable />
+    <#if (labelCount > 1)  && editable >
+        <span class="inline">
+            <a id="manageLabels" href="${urls.base}/manageLabels?subjectUri=${individual.uri!}" style="margin-left:20px;font-size:0.7em">
+                manage labels
+            </a>
+        </span>
+    <#else>
+        <@editingLinks "label" label editable />
+    </#if>
 </#macro>
 
 <#-- Most specific types -->

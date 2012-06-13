@@ -226,3 +226,24 @@ ul.dropdown ul ul {
 ul.dropdown li:hover > ul { 
     visibility: visible; 
 }
+/* ------ MANAGE LABELS ------ */
+section#rdfsLabels {
+    margin-left:20px;
+}
+section#rdfsLabels li:first-child {
+    margin-top:20px;
+}
+section#rdfsLabels li {
+    margin-bottom:15px;
+}
+section#rdfsLabels li label {
+    font-size:1em;
+    padding-left:5px;
+}
+section#rdfsLabels a.cancel {
+    color:#F70;
+}
+p#mngLabelsText {
+    margin-left:25px;
+    margin-bottom:12px;
+}

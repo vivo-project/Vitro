@@ -3,6 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.controller.individual;
 
 import java.io.IOException;
+import java.lang.Integer;
+import java.lang.String;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +12,9 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
+
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
@@ -22,6 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.QueryUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -81,6 +87,7 @@ class IndividualResponseBuilder {
 		 * into the data model: no real data can be modified. 
 		 */
 		// body.put("individual", wrap(itm, BeansWrapper.EXPOSE_SAFE));
+	    body.put("labelCount", getLabelCount(itm.getUri(), vreq));
 		body.put("individual", wrap(itm, new ReadOnlyBeansWrapper()));
 		
 		body.put("headContent", getRdfLinkTag(itm));	       
@@ -231,5 +238,38 @@ class IndividualResponseBuilder {
     	}
     	
     	return map;
+    }
+
+    private static String PUBLICATION_QUERY = ""
+        + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"
+        + "SELECT ( str(COUNT(?label)) AS ?labelCount ) WHERE { \n"
+        + "    ?subject rdfs:label ?label \n"
+        + "    FILTER isLiteral(?label) \n"
+        + "}" ;
+    
+       
+    private static Integer getLabelCount(String subjectUri, VitroRequest vreq) {
+          
+        String queryStr = QueryUtils.subUriForQueryVar(PUBLICATION_QUERY, "subject", subjectUri);
+        log.debug("queryStr = " + queryStr);
+        int theCount = 0;
+//        String status = "one";
+        try {
+            ResultSet results = QueryUtils.getQueryResults(queryStr, vreq);
+            if (results.hasNext()) {
+                QuerySolution soln = results.nextSolution();
+                String countStr = soln.get("labelCount").toString();
+                log.debug("countStr = " + countStr);
+                theCount = Integer.parseInt(countStr);
+//                log.debug("theCount = " + theCount);
+//                if ( theCount > 1 ) {
+//                    status = "multiple";
+//                }
+            }
+        } catch (Exception e) {
+            log.error(e, e);
+        }    
+    //   log.debug("status = " + status);
+        return theCount;
     }
 }

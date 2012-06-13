@@ -1,4 +1,7 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#if !labelCount??>
+    <#assign labelCount = 0 >
+</#if>
 
 <#-- Default individual profile page template -->
 <#--@dumpAll /-->
@@ -28,8 +31,8 @@
             <#else>                
                 <h1 class="fn">
                     <#-- Label -->
-                    <@p.label individual editable />
-                        
+                    <@p.label individual editable labelCount />
+
                     <#--  Most-specific types -->
                     <@p.mostSpecificTypes individual /><img id="uriIcon" title="${individual.uri}" class="middle" src="${urls.images}/individual/uriIcon.gif" alt="uri icon"/>
                 </h1>
