@@ -100,7 +100,7 @@ public class ClassGroupPageData extends DataGetterBase implements DataGetter{
                       }
                   }               
               }else{
-                  log.error("classgroup " + classGroupUri + " does not exist in the system");
+                  throw new RuntimeException("classgroup " + classGroupUri + " does not exist in the system");
               }              
           }          
          

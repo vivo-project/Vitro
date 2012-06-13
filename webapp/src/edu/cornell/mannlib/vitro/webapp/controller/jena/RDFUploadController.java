@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.jena;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +38,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 public class RDFUploadController extends JenaIngestController {
     
@@ -119,12 +124,17 @@ public class RDFUploadController extends JenaIngestController {
                     && fileStreams.get("rdfStream").size() > 0 ) {
                 FileItem rdfStream = fileStreams.get("rdfStream").get(0);
                 try {
-                    uploadModel.enterCriticalSection(Lock.WRITE);
-                    try {
-                        uploadModel.read(
-                                rdfStream.getInputStream(), null, languageStr);
-                    } finally {
-                        uploadModel.leaveCriticalSection();
+                    if (directRead) {
+                        addUsingRDFService(rdfStream.getInputStream(), languageStr,
+                                request.getRDFService());
+                    } else {
+                        uploadModel.enterCriticalSection(Lock.WRITE);
+                        try {
+                            uploadModel.read(
+                                    rdfStream.getInputStream(), null, languageStr);
+                        } finally {
+                            uploadModel.leaveCriticalSection();
+                        }
                     }
                     uploadDesc = verb + " RDF from file " + rdfStream.getName();                
                 } catch (IOException e) {
@@ -198,6 +208,24 @@ public class RDFUploadController extends JenaIngestController {
         }
     }
 
+    private void addUsingRDFService(InputStream in, String languageStr, 
+            RDFService rdfService) {
+        ChangeSet changeSet = rdfService.manufactureChangeSet();
+        RDFService.ModelSerializationFormat format = 
+                ("RDF/XML".equals(languageStr) 
+                        || "RDF/XML-ABBREV".equals(languageStr))
+                                ? RDFService.ModelSerializationFormat.RDFXML
+                                : RDFService.ModelSerializationFormat.N3;
+        changeSet.addAddition(in, format, 
+                JenaDataSourceSetupBase.JENA_DB_MODEL);
+        try {
+            rdfService.changeSetUpdate(changeSet);
+        } catch (RDFServiceException rdfse) {
+            log.error(rdfse);
+            throw new RuntimeException(rdfse);
+        }
+    }
+    
     public void loadRDF(FileUploadServletRequest req,
                         VitroRequest request,
                         HttpServletResponse response) 

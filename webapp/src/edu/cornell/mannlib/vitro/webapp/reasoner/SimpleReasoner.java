@@ -39,8 +39,13 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ABoxJenaChangeListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.CumulativeDeltaModeler;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.DifferenceGraph;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 
 /**
  * Allows for real-time incremental materialization or retraction of RDFS-
@@ -53,6 +58,7 @@ public class SimpleReasoner extends StatementListener {
 
 	private static final Log log = LogFactory.getLog(SimpleReasoner.class);
 	
+	private RDFService rdfService;
 	private OntModel tboxModel;             // asserted and inferred TBox axioms
 	private OntModel aboxModel;             // ABox assertions
 	private Model inferenceModel;           // ABox inferences
@@ -79,10 +85,13 @@ public class SimpleReasoner extends StatementListener {
 	 * @param inferenceRebuildModel - output. This the model temporarily used when the whole ABox inference model is rebuilt
 	 * @param inferenceScratchpadModel - output. This the model temporarily used when the whole ABox inference model is rebuilt
  	 */
-	public SimpleReasoner(OntModel tboxModel, OntModel aboxModel, Model inferenceModel,
+	public SimpleReasoner(OntModel tboxModel, RDFService rdfService, Model inferenceModel,
 			              Model inferenceRebuildModel, Model scratchpadModel) {
+	    this.rdfService = rdfService;
 		this.tboxModel = tboxModel;
-		this.aboxModel = aboxModel; 
+        this.aboxModel = ModelFactory.createOntologyModel(
+                OntModelSpec.OWL_MEM, ModelFactory.createModelForGraph(
+                        new DifferenceGraph(new RDFServiceGraph(rdfService), inferenceModel.getGraph()))); 
 		this.inferenceModel = inferenceModel;
 		this.inferenceRebuildModel = inferenceRebuildModel;
 		this.scratchpadModel = scratchpadModel;	
@@ -91,8 +100,16 @@ public class SimpleReasoner extends StatementListener {
 		aBoxDeltaModeler1 = new CumulativeDeltaModeler();
 		aBoxDeltaModeler2 = new CumulativeDeltaModeler();
 		stopRequested = false;
-				
-	    aboxModel.getBaseModel().register(this);    
+		
+		if (rdfService == null) {
+		    aboxModel.register(this);
+		} else {
+		    try {
+    		    rdfService.registerListener(new ABoxJenaChangeListener(this));
+    		} catch (RDFServiceException e) {
+    		    throw new RuntimeException("Unable to register change listener", e);
+    		}
+		} 
 	}
 	
 	/**
@@ -174,8 +191,7 @@ public class SimpleReasoner extends StatementListener {
 	 * Synchronized part of removedStatement. Interacts
 	 * with DeltaComputer.
 	 */
-	protected synchronized void handleRemovedStatement(Statement stmt) {
-		
+	protected synchronized void handleRemovedStatement(Statement stmt) {    
 		if (batchMode1) {
 			 aBoxDeltaModeler1.removedStatement(stmt);
 		} else if (batchMode2) {
@@ -443,6 +459,7 @@ public class SimpleReasoner extends StatementListener {
 					Iterator<OntClass> parentIt = parents.iterator();
 					
 					while (parentIt.hasNext()) {
+					    
 						OntClass parentClass = parentIt.next();
 						
 						// VIVO doesn't materialize statements that assert anonymous types
@@ -451,7 +468,9 @@ public class SimpleReasoner extends StatementListener {
 						// of classes not individuals.
 						if (parentClass.isAnon()) continue;  
 						
-						if (entailedType(stmt.getSubject(),parentClass)) continue;    // if a type is still entailed without the
+						if (entailedType(stmt.getSubject(),parentClass)) {
+						    continue;    // if a type is still entailed without the
+						}
 						                                                              // removed statement, then don't remove it
 						                                                              // from the inferences
 						
@@ -900,7 +919,6 @@ public class SimpleReasoner extends StatementListener {
 				List<OntClass> subclasses = null;
 				subclasses = (cls.listSubClasses(false)).toList();		
 				subclasses.addAll((cls.listEquivalentClasses()).toList());
-				
 				Iterator<OntClass> iter = subclasses.iterator();
 				while (iter.hasNext()) {		
 					OntClass childClass = iter.next();
@@ -908,8 +926,9 @@ public class SimpleReasoner extends StatementListener {
 					Iterator<Resource> sameIter = sameIndividuals.iterator();
 					while (sameIter.hasNext()) {
 						Statement stmt = ResourceFactory.createStatement(sameIter.next(), RDF.type, childClass);
-						if (aboxModel.contains(stmt)) 
-						   return true;						
+						if (aboxModel.contains(stmt)) {
+						   return true;					
+						}
 					}
 				}
 				return false;
@@ -1678,7 +1697,7 @@ public class SimpleReasoner extends StatementListener {
     
 	@Override
 	public synchronized void notifyEvent(Model model, Object event) {
-		
+	    
 	    if (event instanceof BulkUpdateEvent) {	
 	    	if (((BulkUpdateEvent) event).getBegin()) {	
 	    		

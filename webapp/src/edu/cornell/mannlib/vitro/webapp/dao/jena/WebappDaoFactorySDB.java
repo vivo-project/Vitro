@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashSet;
 
 import org.apache.commons.dbcp.BasicDataSource;
 
@@ -20,62 +19,37 @@ import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.SimpleReasonerSetup;
 
 public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
-	
-	public static final String UNION_GRAPH = "urn:x-arq:UnionGraph"; 
+	 
     private SDBDatasetMode datasetMode = SDBDatasetMode.ASSERTIONS_AND_INFERENCES;
     
-	/**
-	 * For use when any database connection associated with the Dataset
-	 * is managed externally
-	 */
-	public WebappDaoFactorySDB(OntModelSelector ontModelSelector, 
-                               Dataset dataset) {
-		super(ontModelSelector);
-		this.dwf = new StaticDatasetFactory(dataset);
+	public WebappDaoFactorySDB(RDFService rdfService,
+	                          OntModelSelector ontModelSelector) { 
+		this(rdfService, ontModelSelector, new WebappDaoFactoryConfig());
 	}
 	
-    /**
-     * For use when any database connection associated with the Dataset
-     * is managed externally
-     */
-	public WebappDaoFactorySDB(OntModelSelector ontModelSelector, 
-	                            Dataset dataset, 
-	                            WebappDaoFactoryConfig config) {
-		super(ontModelSelector, config);
-        this.dwf = new StaticDatasetFactory(dataset);
-	}
-	
-    /**
-     * For use when any Dataset access should get a temporary DB connection
-     * from a pool
-     */
-    public WebappDaoFactorySDB(OntModelSelector ontModelSelector, 
-                                BasicDataSource bds,
-                                StoreDesc storeDesc,
-                                WebappDaoFactoryConfig config) {
-        super(ontModelSelector, config);
-        this.dwf = new ReconnectingDatasetFactory(bds, storeDesc);
+    public WebappDaoFactorySDB(RDFService rdfService,
+                               OntModelSelector ontModelSelector,
+                               WebappDaoFactoryConfig config) {
+        this(rdfService, ontModelSelector, config, null);
     }
     
-    /**
-     * For use when any Dataset access should get a temporary DB connection
-     * from a pool, and access to the inference graph needs to be specified.
-     */
-    public WebappDaoFactorySDB(OntModelSelector ontModelSelector, 
-                                BasicDataSource bds,
-                                StoreDesc storeDesc,
-                                WebappDaoFactoryConfig config,
-                                SDBDatasetMode datasetMode) {
+    public WebappDaoFactorySDB(RDFService rdfService,
+                               OntModelSelector ontModelSelector, 
+                               WebappDaoFactoryConfig config,
+                               SDBDatasetMode datasetMode) {
         super(ontModelSelector, config);
-        this.dwf = new ReconnectingDatasetFactory(bds, storeDesc);
-        this.datasetMode = datasetMode;
+        this.dwf = new StaticDatasetFactory(new RDFServiceDataset(rdfService));
+        this.rdfService = rdfService;
+        if (datasetMode != null) {
+            this.datasetMode = datasetMode;
+        }
     }
-   
-    
+     
     public WebappDaoFactorySDB(WebappDaoFactorySDB base, String userURI) {
         super(base.ontModelSelector);
         this.ontModelSelector = base.ontModelSelector;
@@ -108,7 +82,7 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 			return objectPropertyStatementDao;
 		else
 			return objectPropertyStatementDao = 
-			    new ObjectPropertyStatementDaoSDB(dwf, datasetMode, this);
+			    new ObjectPropertyStatementDaoSDB(rdfService, dwf, datasetMode, this);
 	}
 	
 	@Override
@@ -168,6 +142,12 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 	        }
 	    }
 	    return filterBlock.toString();
+	}
+	
+	@Override
+	public void close() {
+	    super.close();
+	    this.rdfService.close();
 	}
 	
 	private class ReconnectingDatasetFactory implements DatasetWrapperFactory {

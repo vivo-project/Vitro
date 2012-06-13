@@ -211,7 +211,7 @@ class IndividualResponseBuilder {
     
 	private IndividualTemplateModel getIndividualTemplateModel(
 			Individual individual) {
-		individual.sortForDisplay();
+		//individual.sortForDisplay();
 		return new IndividualTemplateModel(individual, vreq);
 	}
 		

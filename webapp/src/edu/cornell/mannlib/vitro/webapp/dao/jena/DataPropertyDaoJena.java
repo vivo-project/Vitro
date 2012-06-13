@@ -674,7 +674,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     static {
         List<String> namespaceFilters = new ArrayList<String>();
         for (String namespace : EXCLUDED_NAMESPACES) {
-            namespaceFilters.add("( afn:namespace(?property) != \"" + namespace + "\" )");
+            namespaceFilters.add("( !regex(str(?property), \"^" + namespace + "\" ))");
         }
         PROPERTY_FILTERS = StringUtils.join(namespaceFilters, " && ");
     } 
@@ -686,11 +686,11 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         "   ?property a owl:DatatypeProperty . \n" +
         "   FILTER ( \n" +
         "       isLiteral(?object) && \n" +
-        "       ( afn:namespace(?property) != \"" + VitroVocabulary.PUBLIC + "\" ) && \n" +
-        "       ( afn:namespace(?property) != \"" + VitroVocabulary.OWL + "\" ) && \n" + 
+        "       ( !regex(str(?property), \"^" + VitroVocabulary.PUBLIC + "\" )) && \n" +
+        "       ( !regex(str(?property), \"^" + VitroVocabulary.OWL + "\" )) && \n" + 
         // NIHVIVO-2790 vitro:moniker has been deprecated, but display existing values for editorial management (deletion is encouraged).
         // This property will be hidden from public display by default.
-        "       ( ?property = <" + VitroVocabulary.MONIKER + "> || afn:namespace(?property) != \"" + VitroVocabulary.vitroURI + "\" ) \n" +           
+        "       ( ?property = <" + VitroVocabulary.MONIKER + "> || !regex(str(?property), \"^" + VitroVocabulary.vitroURI + "\" )) \n" +           
         "   ) \n" +
         "}";
     

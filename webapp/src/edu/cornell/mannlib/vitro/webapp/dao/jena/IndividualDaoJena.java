@@ -109,7 +109,8 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
     public void removeVClass(String individualURI, String vclassURI) {
     	OntModel ontModel = getOntModelSelector().getABoxModel();
         ontModel.enterCriticalSection(Lock.WRITE);
-        ontModel.getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,individualURI));
+        Object event = new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,individualURI);
+        ontModel.getBaseModel().notifyEvent(event);
         try {
             Resource indRes = ontModel.getResource(individualURI);
             getOntModel().remove(indRes, RDF.type, ontModel.getResource(vclassURI));

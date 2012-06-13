@@ -2,9 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.io.File;
 import java.sql.SQLException;
 import java.util.Set;
 
@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -25,6 +26,7 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
 import com.hp.hpl.jena.sdb.store.DatabaseType;
@@ -73,7 +75,6 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     public static String APPPATH = BASE+"app/";
     //these files are loaded everytime the system starts up
     public static String APPPATH_LOAD = APPPATH + "menuload/";
-    protected static String SUBMODELS = "/WEB-INF/submodels/";
     
     //All files in this directory will be reloaded every startup
     //and attached as sub-models to the displayOntModel.
@@ -404,7 +405,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     }
     
     private static VitroJenaModelMaker vjmm = null;
-    private static VitroJenaSDBModelMaker vsmm = null;
+    private static ModelMaker vsmm = null;
     private static VitroModelSource vms = null;
     private static final String sdbModelMaker = "vitroJenaSDBModelMaker";
     private static final String rdbModelMaker = "vitroJenaModelMaker";
@@ -428,7 +429,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         } else if (TripleStoreType.SDB.equals(type)) {
             StoreDesc storeDesc = new StoreDesc(
                     LayoutType.LayoutTripleNodesHash, DatabaseType.fetch(dbtypeStr));
-            BasicDataSource bds = WebappDaoSDBSetup.makeBasicDataSource(
+            BasicDataSource bds = WebappDaoSetup.makeBasicDataSource(
                     getDbDriverClassName(ctx), jdbcUrl, username, password, ctx);
             bds.setMaxActive(4); // for now, the SDB model makers should not use more
                                  // than a small handful of connections
@@ -485,7 +486,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         ctx.setAttribute(rdbModelMaker, vjmm);
     }
     
-    public static void setVitroJenaSDBModelMaker(VitroJenaSDBModelMaker vsmm, 
+    public static void setVitroJenaSDBModelMaker(ModelMaker vsmm, 
                                                  ServletContext ctx){
         ctx.setAttribute(sdbModelMaker, vsmm);
     }
@@ -510,7 +511,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         return vjmm;
     }
     
-    protected VitroJenaSDBModelMaker getVitroJenaSDBModelMaker(){
+    protected ModelMaker getVitroJenaSDBModelMaker(){
         return vsmm;
     }
 
@@ -532,6 +533,15 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     private static String getValidationQuery(ServletContext ctx) {
         return ConfigurationProperties.getBean(ctx).getProperty(
                 "VitroConnection.DataSource.validationQuery", "SELECT 1");
+    }
+    
+    public static void setStartupDataset(Dataset dataset, ServletContext ctx) {
+        ctx.setAttribute("startupDataset", dataset);
+    }
+    
+    public static Dataset getStartupDataset(ServletContext ctx) {
+        Object o = ctx.getAttribute("startupDataset");
+        return (o instanceof Dataset) ? ((Dataset) o) : null;
     }
 
     protected OntModel ontModelFromContextAttribute(ServletContext ctx,

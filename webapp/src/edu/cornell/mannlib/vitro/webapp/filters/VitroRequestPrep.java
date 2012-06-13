@@ -51,6 +51,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 /**
@@ -172,10 +173,11 @@ public class VitroRequestPrep implements Filter {
         	vreq.setDataset(dataset);
         }
         
+        ServletContext ctx = vreq.getSession().getServletContext();
         vreq.setUnfilteredWebappDaoFactory(new WebappDaoFactorySDB(
+                RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService(),
                 ModelContext.getUnionOntModelSelector(
-                        vreq.getSession().getServletContext()),
-                        vreq.getDataset()));
+                        ctx)));
         
         req.setAttribute("VitroRequestPrep.setup", new Integer(1));
         chain.doFilter(req, response);

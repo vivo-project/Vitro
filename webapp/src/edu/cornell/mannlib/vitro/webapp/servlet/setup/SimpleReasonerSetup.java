@@ -16,7 +16,6 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mindswap.pellet.PelletOptions;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.OWL;
@@ -27,6 +26,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.ReasonerConfiguration;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.reasoner.ReasonerPlugin;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasonerTBoxListener;
@@ -45,6 +46,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+        
         try {    
             // set up Pellet reasoning for the TBox    
             
@@ -101,7 +103,9 @@ public class SimpleReasonerSetup implements ServletContextListener {
             
             
             // the simple reasoner will register itself as a listener to the ABox assertions
-            SimpleReasoner simpleReasoner = new SimpleReasoner(unionOms.getTBoxModel(), assertionsOms.getABoxModel(), inferencesOms.getABoxModel(), rebuildModel, scratchModel);
+            RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService();
+            SimpleReasoner simpleReasoner = new SimpleReasoner(
+                    unionOms.getTBoxModel(), rdfService, inferencesOms.getABoxModel(), rebuildModel, scratchModel);
             sce.getServletContext().setAttribute(SimpleReasoner.class.getName(),simpleReasoner);
             
             StartupStatus ss = StartupStatus.getBean(ctx);

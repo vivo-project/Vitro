@@ -509,7 +509,7 @@ public class EditConfigurationVTwo {
     }
 
     public void addUrisOnForm(String ... strs){
-        this.urisOnform.addAll(new ArrayList<String>(Arrays.asList( strs )));        
+        this.urisOnform.addAll(Arrays.asList( strs ));        
     }
     
     

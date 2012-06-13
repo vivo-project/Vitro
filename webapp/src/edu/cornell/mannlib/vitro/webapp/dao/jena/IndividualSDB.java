@@ -134,6 +134,12 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         		        QueryFactory.create(getStatements), dataset)
         		                .execConstruct();
         	} finally {
+        	    if (dataset == null) {
+        	        throw new RuntimeException("dataset is null");
+        	    } else if (dataset.getLock() == null) {
+        	        throw new RuntimeException("dataset lock is null");
+        	    }
+        	    
         		dataset.getLock().leaveCriticalSection();
         		w.close();
         	}

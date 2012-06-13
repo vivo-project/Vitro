@@ -69,11 +69,12 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.WebappDaoSDBSetup;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.WebappDaoSetup;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils.MergeResult;
@@ -206,13 +207,13 @@ public class JenaIngestController extends BaseEditController {
     }
     
     private void processRDBModelsRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
-        VitroJenaModelMaker vjmm = (VitroJenaModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
+        ModelMaker vjmm = (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
         vreq.getSession().setAttribute("vitroJenaModelMaker", vjmm);
         showModelList(vreq, vjmm, "rdb");
     }
     
     private void processSDBModelsRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
-        VitroJenaSDBModelMaker vsmm = (VitroJenaSDBModelMaker) getServletContext().getAttribute("vitroJenaSDBModelMaker");
+        ModelMaker vsmm = (ModelMaker) getServletContext().getAttribute("vitroJenaSDBModelMaker");
         vreq.getSession().setAttribute("vitroJenaModelMaker", vsmm);
         showModelList(vreq, vsmm, "sdb");
     }
@@ -714,7 +715,7 @@ public class JenaIngestController extends BaseEditController {
                 ? ((VitroJenaSpecialModelMaker) maker).getInnerModelMaker()
                 : maker;
         if (modelType == null) {
-            if (maker instanceof VitroJenaSDBModelMaker) {
+            if (maker instanceof RDFServiceModelMaker) {
                 modelType = "sdb";
             } else {
                 modelType = "rdb";
@@ -942,7 +943,7 @@ public class JenaIngestController extends BaseEditController {
         log.debug("Connecting to DB at "+jdbcUrl);
         StoreDesc storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash,dbTypeObj) ; 
         ServletContext ctx = vreq.getSession().getServletContext();
-        BasicDataSource bds = WebappDaoSDBSetup.makeBasicDataSource(
+        BasicDataSource bds = WebappDaoSetup.makeBasicDataSource(
                 driver, jdbcUrl, username, password, ctx);
         try {
             VitroJenaSDBModelMaker vsmm = new VitroJenaSDBModelMaker(storeDesc, bds);
