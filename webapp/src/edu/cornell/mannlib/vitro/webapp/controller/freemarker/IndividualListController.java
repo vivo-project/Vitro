@@ -307,7 +307,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
             for(int page = startPage; page <= endPage ; page++ ){
                 records.add( new PageRecord( "page=" + page, Integer.toString(page), Integer.toString(page), selectedPage == page ) );            
             }
-            records.add( new PageRecord( "page="+ endPage+1, Integer.toString(endPage+1), "more...", false));
+            records.add( new PageRecord( "page="+ (endPage+1), Integer.toString(endPage+1), "more...", false));
         }else if ( requiredPages > MAX_PAGES && selectedPage > requiredPages - MAX_PAGES ){
             //the selected page is in the end of the list 
             int startPage = requiredPages - MAX_PAGES;      
