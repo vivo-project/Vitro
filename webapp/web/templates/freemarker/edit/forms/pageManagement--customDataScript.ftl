@@ -5,6 +5,7 @@ scripts list.-->
 
 <script type="text/javascript">
     var customFormData = {
+      menuAction:"${menuAction}",
       dataGetterLabelToURI:{
       		//maps labels to URIs
       		"browseClassGroup": "java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData",

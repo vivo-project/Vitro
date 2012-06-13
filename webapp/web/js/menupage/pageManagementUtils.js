@@ -2,20 +2,42 @@
   
 var pageManagementUtils = {
 	dataGetterLabelToURI:null,//initialized by custom data
+	dataGetterURIToLabel:null, //initialized from custom data
 	processDataGetterUtils:processDataGetterUtils,//an external class that should exist before this one
 	dataGetterMap:null,
+	menuAction:null,
 	// on initial page setup
 	onLoad:function(){
 		if (this.disableFormInUnsupportedBrowsers()) {
             return;
         }   
 		this.mixIn();
-		this.initDataGetterProcessors(),
+		this.initReverseURIToLabel();
+		this.initDataGetterProcessors();
 	    this.initObjects();
 	    this.bindEventListeners();
 	    this.initDisplay();
-	    
-	},   
+	    //if edit, then generate existing content
+	    if(this.menuAction != null) {
+	    	this.initExistingContent();
+	    }
+	}, 
+	initExistingContent:function() {
+		this.generateExistingContentSections();
+	},
+	initReverseURIToLabel:function() {
+		if(this.dataGetterLabelToURI != null) {
+			this.dataGetterURIToLabel = {};
+			for(var label in this.dataGetterLabelToURI) {
+				if(label != undefined) {
+					var uri = this.dataGetterLabelToURI[label];
+					this.dataGetterURIToLabel[uri] = label;
+				}
+			}
+		} else {
+			//Error condition.  
+		}
+	},
 	initDataGetterProcessors:function() {
 		//data getter processor map should come in from custom data
 		//Go through each and initialize with their class
@@ -268,11 +290,25 @@ var pageManagementUtils = {
         	$newContentObj.find('section#classesInSelectedGroup' + counter).removeClass('hidden');
         	varOrClass = $newContentObj.find('select#selectClassGroup' + counter + ' option:selected').text();
         }
-        
+        //For cases where varOrClass might be empty,  pass an empty string
+        if(varOrClass == null || varOrClass==undefined) {
+        	varOrClass = "";
+        }
         pageManagementUtils.createClonedContentContainer($newContentObj, counter, contentTypeLabel, varOrClass);
         //previously increased by 10, just increasing by 1 here
         pageManagementUtils.counter++;  
     },
+    //For edit, need to have text passed in
+    //Returns new content object itself
+    cloneContentAreaForEdit: function(contentType, contentTypeLabel, labelText) {
+           var counter = pageManagementUtils.counter;           
+           //Clone the object, renaming ids and copying text area values as well
+           $newContentObj = pageManagementUtils.createCloneObject(contentType, counter);               
+           pageManagementUtils.createClonedContentContainer($newContentObj, counter, contentTypeLabel, labelText);
+           //previously increased by 10, just increasing by 1 here
+           pageManagementUtils.counter++;  
+           return $newContentObj;
+    }, 
     createClonedContentContainer:function($newContentObj, counter, contentTypeLabel, varOrClass) {
         //Create the container for the new content
         $newDivContainer = $("<div></div>", {
@@ -530,6 +566,42 @@ var pageManagementUtils = {
     		var newId = originalId + counter;
     		$(this).attr("id", newId);
     	});
+    },
+    //To actually generate the content for existing values
+    generateExistingContentSections:function() {
+    	if(pageManagementUtils.menuAction == "Edit") {
+    		var $existingContent = $("#existingPageContentUnits");
+    		//create json object from string version json2.
+    		if($existingContent.length > 0) {
+    			var jsonObjectString = $existingContent.val();
+    			//this returns an array
+    			var JSONContentObjectArray = JSON.parse(jsonObjectString);
+    			var len = JSONContentObjectArray.length;
+    			var i;
+    			for(i = 0; i < len; i++) {
+    				//Get the type of data getter and create the appropriate section/populate
+    				var JSONContentObject = JSONContentObjectArray[i];
+	    			var dataGetterClass = JSONContentObject["dataGetterClass"];
+	    			if(dataGetterClass != null) {
+	    				//Get the Label for the URI
+	    				var contentType = pageManagementUtils.dataGetterURIToLabel[dataGetterClass];
+	    				//Get the label for this content t
+	    				var contentTypeLabel = "test label";
+	    				//Get the processor class for this type 
+	    				var dataGetterProcessorObject = pageManagementUtils.processDataGetterUtils.dataGetterProcessorMap[contentType];
+	    				var additionalLabelText = dataGetterProcessorObject.retrieveAdditionalLabelText(JSONContentObject);
+	    				//Clone the appropriate section for the label
+	    				var $newContentObj = pageManagementUtils.cloneContentAreaForEdit(contentType, contentTypeLabel, additionalLabelText);
+	    				//Populate the section with the values
+	    				dataGetterProcessorObject.populatePageContentSection(JSONContentObject, $newContentObj);
+	    			} else {
+	    				//error condition
+	    			}
+    			}
+    			
+    		}
+    		
+    	}
     }
     
 };

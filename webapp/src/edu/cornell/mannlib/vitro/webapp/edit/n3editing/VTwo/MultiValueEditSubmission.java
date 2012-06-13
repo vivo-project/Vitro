@@ -304,4 +304,14 @@ public class MultiValueEditSubmission {
              log.debug("No value found for query parameter " + var);              
          }
     }
+    
+    //Check if a certain key has a value associated that is not null 
+    
+    public boolean hasLiteralValue(String key) {
+    	return (this.literalsFromForm.containsKey(key) && this.literalsFromForm.get(key) != null);
+    }
+    
+    public boolean hasUriValue(String key) {
+    	return (this.urisFromForm.containsKey(key) && this.urisFromForm.get(key) != null);
+    }
 }

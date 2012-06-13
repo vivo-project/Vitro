@@ -379,6 +379,31 @@ public class EditConfigurationVTwo {
 
         hasBeenPreparedForUpdate = true;
     }
+    
+    /**
+     * Prepare for a param update: Run SPARQL for existing values.
+     *  This can be used for a direct form which does not correspond directly to either
+     *  data or object property form.
+     */
+    public void prepareForParamUpdate( Model model ){
+        if( model == null ) {
+        	log.debug("Model is null and will be throwing an error");
+        	throw new Error("EditConfiguration.prepareForObjPropUpdate() needs a non-null Model");}
+            
+        
+        basicPrepare();        
+        
+        // run SPARQL, sub in values
+        SparqlEvaluateVTwo sparqlEval = new SparqlEvaluateVTwo( model );
+        runSparqlForAdditional( sparqlEval );
+        try {
+        	runSparqlForExisting( sparqlEval );
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }
+
+        hasBeenPreparedForUpdate = true;
+    }
 
     /**
      * Run SPARQL for Additional values.  This can be used for
@@ -554,6 +579,14 @@ public class EditConfigurationVTwo {
             urisInScope = new HashMap<String, List<String>>();
         }
         urisInScope.put(key, list);
+        return this;        
+    }
+    
+    public EditConfigurationVTwo addUrisInScope(Map<String, List<String>> uriValues) {
+        if( urisInScope  == null ){
+            urisInScope = new HashMap<String, List<String>>();
+        }
+        urisInScope.putAll(uriValues);
         return this;        
     }
     
@@ -1133,6 +1166,14 @@ public class EditConfigurationVTwo {
             literalsInScope = new HashMap<String, List<Literal>>();
         }        
         literalsInScope.put(key, Arrays.asList(values));
+        return this;                
+    }
+    
+    public EditConfigurationVTwo addLiteralsInScope(Map<String, List<Literal>> scopeLiterals) {
+        if( literalsInScope  == null ){
+            literalsInScope = new HashMap<String, List<Literal>>();
+        }        
+        literalsInScope.putAll(scopeLiterals);
         return this;                
     }
 

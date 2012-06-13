@@ -4,6 +4,12 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocess
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import net.sf.json.JSONObject;
+
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.Literal;
 
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 
@@ -22,5 +28,11 @@ public interface ProcessDataGetterN3 {
     public String getVarName(String base, int counter);
     public String getDataGetterVar(int counter);
     public List<String> getNewResources(int counter);
+    
+    //Get Existing values to put in scope
+    public Map<String, List<Literal>> retrieveExistingLiteralValues();
+    public Map<String, List<String>> retrieveExistingUriValues();
+    public void populateExistingValues(String dataGetterURI, int counter, OntModel queryModel);
+    public JSONObject getExistingValuesJSON(String dataGetterURI, OntModel queryModel);
 
 }

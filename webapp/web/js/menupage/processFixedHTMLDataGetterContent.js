@@ -14,6 +14,19 @@ var processFixedHTMLDataGetterContent = {
 		//query model should also be an input
 		var returnObject = {saveToVar:saveToVarValue, htmlValue:htmlValue, dataGetterClass:this.dataGetterClass};
 		return returnObject;
+	},
+	//For an existing set of content where form is already set, fill in the values 
+	populatePageContentSection:function(existingContentObject, pageContentSection) {
+		var saveToVarValue = existingContentObject["saveToVar"];
+		var htmlValue = existingContentObject["htmlValue"];
+		//Now find and set value
+		pageContentSection.find("input[name='saveToVar']").val(saveToVarValue);
+		pageContentSection.find("textarea[name='htmlValue']").val(htmlValue);
+	},
+	//For the label of the content section for editing, need to add additional value
+	retrieveAdditionalLabelText:function(existingContentObject) {
+		var saveToVarValue = existingContentObject["saveToVar"];
+		return saveToVarValue;
 	}
 		
 		

@@ -10,7 +10,23 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.Literal;
+import  com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.QuerySolutionMap;
+import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -19,6 +35,8 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUti
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.ManagePagePreprocessor;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessDataGetterN3;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessDataGetterN3Utils;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.menuManagement.MenuManagementDataUtils;
 
@@ -30,6 +48,8 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 	
 	private String template = "pageManagement.ftl";
 	public static final String defaultDisplayNs = DisplayVocabulary.NAMESPACE.getURI() + "n";
+	private Log log = LogFactory.getLog(ManagePageGenerator.class);
+
 	@Override
     public EditConfigurationVTwo getEditConfiguration( VitroRequest vreq, HttpSession session) { 
         EditConfigurationVTwo conf = new EditConfigurationVTwo();
@@ -164,6 +184,10 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 	        	//Page title pageName or page hasDataGetter dataGetter
 		        editConfiguration.setUrlPatternToReturnTo("/individual"); 
 		        editConfiguration.setEntityToReturnTo(subjectUri);
+		        //Set update version here
+			    //if subject uri = page uri != null or empty, editing existing page
+	        	editConfiguration.setParamUpdate(true);
+		        
 	        }
 	        editConfiguration.setSubjectUri(subjectUri);
 	    	editConfiguration.setPredicateUri(predicateUri);
@@ -177,9 +201,12 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 			//Double-check if this will even work with over-written model in the case of display  model?
 	        setupModelSelectorsFromVitroRequest(vreq, editConfig);         
 	        OntModel queryModel = (OntModel)vreq.getAttribute("jenaOntModel");
-	       
-	        if (editConfig.getSubjectUri() != null) { 
-	            editConfig.prepareForObjPropUpdate(queryModel);
+	        if (editConfig.isParamUpdate()) { 
+	            //editConfig.prepareForObjPropUpdate(queryModel);
+	        	//Set up edit configuration with all the values required
+	        	//Retrieve existing values for page and menu item level
+	        	editConfig.prepareForParamUpdate(queryModel);
+	        	retrieveExistingDataGetterInfo(editConfig, queryModel);
 	        }
 	         else{
 	            //if no subject uri, this is creating a new page
@@ -188,7 +215,140 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 	    }     
 	  
     
-    //In the case where this is a new page, need to ensure page gets a new 
+	//This method will get the data getters related to this page
+	//And retrieve the current information for each of those data getters
+    private void retrieveExistingDataGetterInfo(EditConfigurationVTwo editConfig, OntModel queryModel) {
+		String pageUri = editConfig.getSubjectUri();
+		executeExistingDataGettersInfo(editConfig, pageUri, queryModel);
+		 
+		
+	}
+    
+    private void executeExistingDataGettersInfo(EditConfigurationVTwo editConfig, String pageUri, OntModel queryModel) {
+    	//Create json array to be set within form specific data
+    	JSONArray jsonArray = new JSONArray();
+    	String querystr = getExistingDataGettersQuery();
+    	//Bind pageUri to query
+    	QuerySolutionMap initialBindings = new QuerySolutionMap();
+        initialBindings.add("page", ResourceFactory.createResource(pageUri));
+    	QueryExecution qe = null;
+        try{
+            Query query = QueryFactory.create(querystr);
+            qe = QueryExecutionFactory.create(query, queryModel, initialBindings);
+            ResultSet results = qe.execSelect();
+            int counter = 0;
+            while( results.hasNext()){
+            	QuerySolution qs = results.nextSolution();
+            	Resource dg = qs.getResource("dataGetter");
+            	Resource dgType = qs.getResource("dataGetterType");
+            	String dgClassName = getClassName(dgType.getURI());
+            	
+            	processExistingDataGetter(counter, 
+            			dg.getURI(), 
+            			dgClassName, editConfig, queryModel, jsonArray);
+            	addJSONArrayToFormSpecificData(jsonArray, editConfig);
+            	//Get the util class for this type and add
+            	//Values in scope/Literals and URIs on form/Fields on form that correspond
+            	counter++;
+            }
+
+        } catch(Exception ex) {
+        	log.error("Error occurred in executing query " + querystr, ex);
+        }
+    }
+    
+    private void addJSONArrayToFormSpecificData(JSONArray jsonArray, EditConfigurationVTwo editConfig) {
+    	HashMap<String, Object> data = editConfig.getFormSpecificData();		
+		data.put("existingPageContentUnits", jsonArray.toString());
+		
+	}
+
+	private void processExistingDataGetter(int counter, String dataGetterURI, String dgClassName,
+			EditConfigurationVTwo editConfig, OntModel queryModel, JSONArray jsonArray) {
+    	ProcessDataGetterN3 pn = ProcessDataGetterN3Utils.getDataGetterProcessorN3(dgClassName, null);
+    	
+		//Add N3 Optional as well
+		addExistingN3Optional(editConfig, pn, counter);
+		// Add URIs on Form and Add Literals On Form
+		addExistingLiteralsAndUrisOnForm(editConfig, pn, counter);
+		// Add fields
+		addExistingFields(editConfig, pn, counter);
+		//Add new resources - data getters need to be new resources
+		addExistingDataGetterNewResources(editConfig, pn, counter);
+		//Add values in scope
+    	addValuesInScope(editConfig, pn, counter, dataGetterURI, queryModel);
+    	//create JSON object and return in form specific dadta
+    	addJSONObjectToArray(dataGetterURI, pn, queryModel, jsonArray);
+		
+	}
+
+    //Takes data getter information, packs within JSON object to send back to the form
+	private void addJSONObjectToArray(String dataGetterURI, ProcessDataGetterN3 pn, OntModel queryModel, JSONArray jsonArray) {
+		JSONObject jo = pn.getExistingValuesJSON(dataGetterURI, queryModel);
+		jsonArray.add(jo);
+	}
+
+	//We're adding everything as optional - even what is considered "required" for a specific data getter
+	private void addExistingN3Optional(EditConfigurationVTwo editConfig, ProcessDataGetterN3 pn, int counter) {
+		List<String> n3 = pn.retrieveN3Required(counter);
+		if(pn.retrieveN3Optional(counter) != null) {
+			n3.addAll(pn.retrieveN3Optional(counter));
+		}
+		editConfig.addN3Optional(n3);
+		
+	}
+
+	private void addExistingLiteralsAndUrisOnForm(EditConfigurationVTwo editConfig, ProcessDataGetterN3 pn,
+			int counter) {
+		List<String> literalsOnForm = pn.retrieveLiteralsOnForm(counter);
+		editConfig.addLiteralsOnForm(literalsOnForm);
+		List<String> urisOnForm = pn.retrieveUrisOnForm(counter);
+		editConfig.addUrisOnForm(urisOnForm);
+		
+	}
+
+	private void addExistingFields(EditConfigurationVTwo editConfig, ProcessDataGetterN3 pn, int counter) {
+		List<FieldVTwo> existingFields = pn.retrieveFields(counter);
+		editConfig.addFields(existingFields);
+		
+	}
+
+	private void addExistingDataGetterNewResources(EditConfigurationVTwo editConfig, ProcessDataGetterN3 pn,
+			int counter) {
+		//Should we even add new resources?
+		List<String> newResources = pn.getNewResources(counter);
+		for(String r: newResources) {
+			//using default for now but will have to check
+			editConfig.addNewResource(r, null);
+		}
+		
+	}
+	
+	 private void addValuesInScope(EditConfigurationVTwo editConfig,
+				ProcessDataGetterN3 pn, int counter, String dataGetterURI, OntModel queryModel) {
+		 	pn.populateExistingValues(dataGetterURI, counter, queryModel);
+		 	Map<String, List<Literal>> existingLiteralValues = pn.retrieveExistingLiteralValues();
+		 	Map<String, List<String>> existingUriValues = pn.retrieveExistingUriValues();
+		 	editConfig.addLiteralsInScope(existingLiteralValues);
+		 	editConfig.addUrisInScope(existingUriValues);
+		}
+
+	private String getClassName(String dataGetterURI) {
+    	if(dataGetterURI.contains("java:")) {
+    		return dataGetterURI.substring("java:".length());
+    	}
+    	return dataGetterURI;
+    }
+    
+    //Get the data getter uri and the type of the data getter
+    private String getExistingDataGettersQuery() {
+    	String query = getSparqlPrefix() + "SELECT ?dataGetter ?dataGetterType WHERE {" + 
+    			"?page display:hasDataGetter ?dataGetter .  ?dataGetter rdf:type ?dataGetterType .}";
+    	return query;
+    }
+    
+
+	//In the case where this is a new page, need to ensure page gets a new 
     private void setNewResources(EditConfigurationVTwo conf) {
 		//null makes default namespace be triggered
     	//conf.addNewResource("page", defaultDisplayNs);
@@ -211,22 +371,67 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
     }
     
     
-    //Get page uri for object
     private HashMap<String, String> generateSparqlForExistingUris() {
     	HashMap<String, String> map = new HashMap<String, String>();
+    	map.put("menuItem", getExistingMenuItemQuery());
     	return map;
     }
     
+    private String getExistingMenuItemQuery() {
+		String query = getSparqlPrefix() + "SELECT ?menuItem WHERE {?menuItem display:toPage ?page .}";
+		return query;
+	}
+
+	//Page level literals:
+    //"pageName", "prettyUrl", "menuPosition", "menuLinkText", "customTemplate"
+
     private HashMap<String, String> generateSparqlForExistingLiterals() {
     	HashMap<String, String> map = new HashMap<String, String>();
+    	map.put("pageName", getExistingPageNameQuery());
+    	map.put("prettyUrl", getExistingPrettyUrlQuery());
+    	map.put("menuPosition", getExistingMenuPositionQuery());
+    	map.put("menuLinkText", getExistingMenuLinkTextQuery());
+    	map.put("customTemplate", getExistingCustomTemplateQuery());
     	return map;
     }
-
     
-
-
+  private String getSparqlPrefix() {
+	  return  "PREFIX display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> \n" + 
+			  "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>";
+  }
     
-  //Form specific data
+  private String getExistingPageNameQuery() {
+		// TODO Auto-generated method stub
+	  String query = getSparqlPrefix() + "SELECT ?pageName WHERE {" +
+		"?page display:title ?pageName .}";
+	  return query;
+	}
+
+private String getExistingPrettyUrlQuery() {
+		String query = getSparqlPrefix() + "SELECT ?prettyUrl WHERE {" + 
+		"?page	display:urlMapping ?prettyUrl .}";
+		return query;
+	}
+
+//If menu, return menu position
+private String getExistingMenuPositionQuery() {
+		String menuPositionQuery = getSparqlPrefix() + "SELECT ?menuPosition WHERE {" + 
+		"?menuItem display:toPage ?page . ?menuItem display:menuPosition ?menuPosition. }";
+		return menuPositionQuery;
+	}
+
+private String getExistingMenuLinkTextQuery() {
+	String menuPositionQuery = getSparqlPrefix() + "SELECT ?menuLinkText WHERE {" + 
+			"?menuItem display:toPage ?page . ?menuItem display:linkText ?menuLinkText. }";
+			return menuPositionQuery;
+	}
+
+private String getExistingCustomTemplateQuery() {
+	String query = getSparqlPrefix() + "SELECT ?customTemplate WHERE {?page display:requiresBodyTemplate ?customTemplate .}";
+	return query;
+}
+
+//Form specific data
     //In this case, need to get all the different data getter TYPES and labels
     //Also need to pass back the map for the options presented to the user
     //which is different from the above
@@ -242,7 +447,13 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 		//For every type of page, will need some "always required" data
 		addRequiredPageData(vreq, formSpecificData);
 		//For a new page, we will need to add the following data
-		addNewPageData(vreq, formSpecificData);
+		//Is param update not 
+		if(editConfiguration.getSubjectUri() != null) {
+			addExistingPageData(vreq, formSpecificData);
+		} else {
+			addNewPageData(vreq, formSpecificData);
+		}		
+
 		
 		editConfiguration.setFormSpecificData(formSpecificData);
 	}
@@ -259,6 +470,14 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 	
 	private void addRequiredPageData(VitroRequest vreq, Map<String, Object> data) {
      	MenuManagementDataUtils.includeRequiredSystemData(vreq.getSession().getServletContext(), data);
+	}
+	
+	private void addExistingPageData(VitroRequest vreq, Map<String, Object> data) {
+		addNewPageData(vreq, data);
+		data.put("menuAction", "Edit");
+		data.put("title", "Edit Menu Item");
+		//Set up pageContentUnits as String - to save later
+		data.put("existingPageContentUnits", null);
 	}
 	
 	private void addNewPageData(VitroRequest vreq, Map<String, Object> data) {

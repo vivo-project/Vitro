@@ -47,6 +47,22 @@ public abstract class ProcessDataGetterAbstract implements ProcessDataGetterN3 {
 	   newResources.add("dataGetter" + counter);
 	   return newResources;
    }
+   
+   protected String getSparqlPrefix() {
+		  return  "PREFIX display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> \n" + 
+				  "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>";
+   
+   }
+   
+   //For existing values
+   protected  Map<String, List<Literal>> existingLiteralValues = new HashMap<String, List<Literal>>();
+   protected Map<String, List<String>> existingUriValues = new HashMap<String, List<String>>();
+   public Map<String, List<Literal>> retrieveExistingLiteralValues() {
+		  return existingLiteralValues;
+	   }
+	   public Map<String, List<String>> retrieveExistingUriValues() {
+		  return existingUriValues;
+	   }
 
 }
 

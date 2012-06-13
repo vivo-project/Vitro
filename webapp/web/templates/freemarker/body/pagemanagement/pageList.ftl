@@ -26,6 +26,9 @@
             <td> 
             	<#if pagex.pageUri?has_content> 
                 	<a href="${urls.base}/individual?uri=${pagex.pageUri?url}&switchToDisplayModel=1">${(pagex.title)!'-untitled-'}</a>
+            		&nbsp;
+            		<a href="${urls.base}/editRequestDispatch?subjectUri=${pagex.pageUri?url}&switchToDisplayModel=1&editForm=edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator">Edit</a>
+            		
             	<#else>
             		No URI defined for page. 
             	</#if>

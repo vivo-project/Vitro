@@ -22,6 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUti
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfigurationConstants;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessDataGetterN3;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessDataGetterN3Utils;
@@ -59,6 +60,13 @@ public class ManagePagePreprocessor extends
 		// For query parameters, check whether CUI
 		copySubmissionValues();
 		processDataGetters();
+		//In case of edit, need to force deletion of existing values where necessary
+		//In our case, values that already exist and will be overwritten will be in submission already
+		//just as new values will 
+		//Anything left over should be replaced with blank value sentinel as that would
+		//no longer be on the form and have a value submitted and we can delete that statement
+		//if it exists
+		processExistingValues();
 		
 
 	}
@@ -79,6 +87,45 @@ public class ManagePagePreprocessor extends
 		copyMap.putAll(originalMap);
 		return copyMap;
 	}
+	
+	private void processExistingValues() {
+		//For all literals that were originally in scope that don't have values on the form
+		//anymore, replace with blank sentinel value
+		//For those literals, those values will be replaced with form values where overwritten
+		//And will be deleted where not overwritten which is the behavior we desire
+		Map<String, List<Literal>> literalsInScope = this.editConfiguration.getLiteralsInScope();
+		Map<String, List<String>> urisInScope = this.editConfiguration.getUrisInScope();
+		List<String> literalKeys = new ArrayList<String>(literalsInScope.keySet());
+
+		
+		List<String> uriKeys = new ArrayList<String>(urisInScope.keySet());
+		for(String literalName: literalKeys) {
+			
+			//if submission already has value for this, then leave be
+			//otherwise replace with blank value sentinel
+			if(!submission.hasLiteralValue(literalName)) {
+				submission.addLiteralToForm(editConfiguration, 
+						 editConfiguration.getField(literalName), 
+						 literalName, 
+						 (new String[] {EditConfigurationConstants.BLANK_SENTINEL}));
+			}
+		}
+		
+		for(String uriName: uriKeys) {
+			//these values should never be overwritten or deleted
+			if(uriName != "page" && uriName != "menuItem" && !uriName.startsWith("dataGetter")) {
+				if(!submission.hasUriValue(uriName)) {
+					submission.addLiteralToForm(editConfiguration, 
+							 editConfiguration.getField(uriName), 
+							 uriName, 
+							 (new String[] {EditConfigurationConstants.BLANK_SENTINEL}));
+				}	
+			}
+		}
+		//Other than data getter itself, also get rid of any of the old URIs if any
+		
+	}
+	
 
 	private void processDataGetters() {
 		convertToJson();

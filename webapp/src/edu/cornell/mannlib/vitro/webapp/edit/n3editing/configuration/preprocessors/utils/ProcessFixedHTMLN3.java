@@ -2,22 +2,30 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
+import net.sf.json.JSONObject;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Literal;
 
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
-
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
 //Returns the appropriate n3 based on data getter
 public  class ProcessFixedHTMLN3 extends ProcessDataGetterAbstract {
 	private static String classType = "java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.FixedHTMLDataGetter";
-	
+	private Log log = LogFactory.getLog(ProcessFixedHTMLN3.class);
+
 	public ProcessFixedHTMLN3(){
 		
 	}
@@ -25,6 +33,7 @@ public  class ProcessFixedHTMLN3 extends ProcessDataGetterAbstract {
 
 	//TODO: ensure correct model returned
 	//We shouldn't use the ACTUAL values here but generate the n3 required
+	//?dataGetter a FixedHTMLDataGetter ; display:saveToVar ?saveToVar; display:htmlValue ?htmlValue .
     public List<String> retrieveN3Required(int counter) {
     	String dataGetterVar = getDataGetterVar(counter);
     	String n3 = dataGetterVar + " a <" + classType + ">; \n" + 
@@ -74,7 +83,73 @@ public  class ProcessFixedHTMLN3 extends ProcessDataGetterAbstract {
 	   return Arrays.asList();   
    }
 
-
+   //For Existing Values in case of editing
+  
+   //Execute populate before retrieval
+   public void populateExistingValues(String dataGetterURI, int counter, OntModel queryModel) {
+	   //First, put dataGetterURI within scope as well
+	   existingUriValues.put(this.getDataGetterVar(counter), new ArrayList<String>(Arrays.asList(dataGetterURI)));
+	   //Sparql queries for values to be executed
+	   //And then placed in the correct place/literal or uri
+	   String querystr = getExistingValuesSparqlQuery(dataGetterURI);
+	   QueryExecution qe = null;
+       try{
+           Query query = QueryFactory.create(querystr);
+           qe = QueryExecutionFactory.create(query, queryModel);
+           ResultSet results = qe.execSelect();
+           while( results.hasNext()){
+        	   QuerySolution qs = results.nextSolution();
+        	   Literal saveToVarLiteral = qs.getLiteral("saveToVar");
+        	   Literal htmlValueLiteral = qs.getLiteral("htmlValue");
+        	   //Put both literals in existing literals
+        	   existingLiteralValues.put(this.getVarName("saveToVar", counter),
+        			   new ArrayList<Literal>(Arrays.asList(saveToVarLiteral)));
+        	   existingLiteralValues.put(this.getVarName("htmlValue", counter),
+        			   new ArrayList<Literal>(Arrays.asList(htmlValueLiteral)));
+           }
+       } catch(Exception ex) {
+    	   log.error("Exception occurred in retrieving existing values with query " + querystr, ex);
+       }
+	   
+	   
+   }
+  
+   
+   //?dataGetter a FixedHTMLDataGetter ; display:saveToVar ?saveToVar; display:htmlValue ?htmlValue .
+   protected String getExistingValuesSparqlQuery(String dataGetterURI) {
+	   String query = this.getSparqlPrefix() + "SELECT ?saveToVar ?htmlValue WHERE {" + 
+			   "<" + dataGetterURI + "> display:saveToVar ?saveToVar . \n" + 
+			   "<" + dataGetterURI + "> display:htmlValue ?htmlValue . \n" + 
+			   "}";
+	   return query;
+   }
+   
+   
+   //Method to create a JSON object with existing values to return to form
+   //There may be a better way to do this without having to run the query twice
+   //TODO: Refactor code if required
+   public JSONObject getExistingValuesJSON(String dataGetterURI, OntModel queryModel) {
+	   JSONObject jObject = new JSONObject();
+	   jObject.element("dataGetterClass", classType);
+	   String querystr = getExistingValuesSparqlQuery(dataGetterURI);
+	   QueryExecution qe = null;
+       try{
+           Query query = QueryFactory.create(querystr);
+           qe = QueryExecutionFactory.create(query, queryModel);
+           ResultSet results = qe.execSelect();
+           while( results.hasNext()){
+        	   QuerySolution qs = results.nextSolution();
+        	   Literal saveToVarLiteral = qs.getLiteral("saveToVar");
+        	   Literal htmlValueLiteral = qs.getLiteral("htmlValue");
+        	   jObject.element("saveToVar", saveToVarLiteral.getString());
+        	   jObject.element("htmlValue", htmlValueLiteral.getString());
+           }
+       } catch(Exception ex) {
+    	   log.error("Exception occurred in retrieving existing values with query " + querystr, ex);
+       }
+       return jObject;
+	   
+   }
 
 }
 

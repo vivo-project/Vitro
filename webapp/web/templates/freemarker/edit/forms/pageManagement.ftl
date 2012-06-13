@@ -1,4 +1,6 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#import "lib-vivo-form.ftl" as lvf>
+
 <#--------Set up variables-------->
 <#assign pageData = editConfiguration.pageData />
 <#assign menuAction = pageData.menuAction />
@@ -9,6 +11,23 @@
 <#assign associatedPage = ""/>
 <#assign associatedPageURI = ""/>
 <#assign menuItem = ""/>    	
+<#assign menuLinkText = "" />
+<#assign menuPosition = "" />
+<#--Existing Values For Editing condition-->
+<#assign literalValues = editConfiguration.existingLiteralValues />
+<#assign uriValues = editConfiguration.existingUriValues />
+<#if menuAction == "Edit"> 
+	<#assign pageName = lvf.getFormFieldValue(editSubmission, editConfiguration, "pageName")/>
+	<#assign prettyUrl = lvf.getFormFieldValue(editSubmission, editConfiguration, "prettyUrl")/>
+	<#assign menuItem =  lvf.getFormFieldValue(editSubmission, editConfiguration, "menuItem")/>
+	<#assign menuLinkText =  lvf.getFormFieldValue(editSubmission, editConfiguration, "menuLinkText")/>
+	<#assign menuPosition =  lvf.getFormFieldValue(editSubmission, editConfiguration, "menuPosition")/>
+	<#assign customTemplate = lvf.getFormFieldValue(editSubmission, editConfiguration, "customTemplate")/>
+	<#if customTemplate?has_content>
+		<#assign selectedTemplateType = "custom" />
+	</#if>
+	
+</#if>
 
 <#------------HTML Portion------------->
 <section id="error-alert" role="alert" class="hidden">
@@ -63,13 +82,13 @@
             <input type="radio" name="selectedTemplate" class="custom-template" value="custom" <#if selectedTemplateType = "custom">checked</#if> role="input" />
             <label class="inline" for="custom"> Custom template</label>
             <section id="custom-template" <#if selectedTemplateType != 'custom'>class="hidden" </#if>role="region">
-                <input type="text" name="customTemplate" value="${customTemplate!}" size="40" role="input" /><span class="requiredHint"> *</span>
+                <input type="text" name="customTemplate" value="${customTemplate!''}" size="40" role="input" /><span class="requiredHint"> *</span>
             </section>
             <p style="margin-top:10px;margin-bottom:0px"><input id="menuCheckbox" type="checkbox" name="menuCheckbox"> This is a menu page</p>
             <section id="menu" role="region" style="margin-top:10px">
                 <label for="default">Menu Item Name</label>
-                <input type="text" id="menuLinkText" name="menuLinkText" value="" size="28" role="input" />
-                <input type="text" id="menuPosition" name="menuPosition" value="6" />
+                <input type="text" id="menuLinkText" name="menuLinkText" value="${menuLinkText!''}" size="28" role="input" />
+                <input type="text" id="menuPosition" name="menuPosition" value="${menuPosition!''}" />
                 <p class="note">If left blank, the page title will be used.</p>
             </section>
             <br />
@@ -84,10 +103,15 @@
     <!--Hidden input with JSON objects added will be included here.  This is the field with the page content information
     mirroring what is required by the Data getter server side objects. -->
     <div id="pageContentSubmissionInputs" style="display:none"></div>
+    <!--For existing content, will have div to save existing content-->
+    <div id="existingPageContent" style="display:none">
+    <#if pageData.existingPageContentUnits?has_content>
+    	<input type='hidden' id='existingPageContentUnits' value='${pageData.existingPageContentUnits}'/>
+    </#if>
+    </div>
     </form>
 </section>
 
-<!-
 
 <!--Hardcoding for now but should be retrieved from generator: Custom data-->
 <#include "pageManagement--customDataScript.ftl">
