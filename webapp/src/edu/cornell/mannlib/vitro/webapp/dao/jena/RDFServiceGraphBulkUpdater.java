@@ -1,3 +1,5 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.io.ByteArrayInputStream;
@@ -30,7 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 
 public class RDFServiceGraphBulkUpdater extends SimpleBulkUpdateHandler {
 
-    private static final Log log = LogFactory.getLog(SparqlGraphBulkUpdater.class);
+    private static final Log log = LogFactory.getLog(RDFServiceGraphBulkUpdater.class);
     private RDFServiceGraph graph;
     
     public RDFServiceGraphBulkUpdater(RDFServiceGraph graph) {

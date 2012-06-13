@@ -49,12 +49,14 @@ public class SimpleReasonerTBoxListener extends StatementListener {
 	
 	@Override
 	public void addedStatement(Statement statement) {
+		
 		ModelUpdate mu = new ModelUpdate(statement, ModelUpdate.Operation.ADD, JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL);
 		processUpdate(mu);
 	}
 
 	@Override
 	public void removedStatement(Statement statement) {
+		
 		ModelUpdate mu = new ModelUpdate(statement, ModelUpdate.Operation.RETRACT, JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL);	
 		processUpdate(mu);
 	}

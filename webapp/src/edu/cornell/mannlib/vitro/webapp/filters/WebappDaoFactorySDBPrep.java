@@ -35,6 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlDataset;
@@ -90,7 +91,8 @@ public class WebappDaoFactorySDBPrep implements Filter {
             }
         }
 		
-        OntModelSelector oms = (OntModelSelector) _ctx.getAttribute("unionOntModelSelector");
+        OntModelSelector oms = ModelContext.getUnionOntModelSelector(_ctx);
+        OntModelSelector baseOms = ModelContext.getBaseOntModelSelector(_ctx);
         String defaultNamespace = (String) _ctx.getAttribute("defaultNamespace");
 		WebappDaoFactory wadf = null;
 		VitroRequest vreq = new VitroRequest((HttpServletRequest) request);
@@ -112,7 +114,7 @@ public class WebappDaoFactorySDBPrep implements Filter {
 		Dataset dataset = new RDFServiceDataset(rdfService);
 		wadf = new WebappDaoFactorySDB(rdfService, oms, config);
 	    WebappDaoFactory assertions = new WebappDaoFactorySDB(
-	            rdfService, oms, config, SDBDatasetMode.ASSERTIONS_ONLY);
+	            rdfService, baseOms, config, SDBDatasetMode.ASSERTIONS_ONLY);
 		vreq.setWebappDaoFactory(wadf);
 		vreq.setAssertionsWebappDaoFactory(assertions);
 		vreq.setFullWebappDaoFactory(wadf);

@@ -1,3 +1,5 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.sdb;
 
 import java.io.ByteArrayInputStream;
@@ -35,6 +37,7 @@ import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
 import com.hp.hpl.jena.sdb.sql.SDBConnection;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
@@ -82,9 +85,7 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
                                 changeSet.getPreconditionQueryType())) {
             return false;
         }
-        
-        Iterator<ModelChange> csIt = changeSet.getModelChanges().iterator();
-        
+            
         SDBConnection conn = null;
         try {
             conn = new SDBConnection(bds.getConnection());
@@ -96,47 +97,47 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
         Dataset dataset = getDataset(conn);
         boolean transaction = conn.getTransactionHandler().transactionsSupported();
         
-        try {
+        try {       
+            
             if (transaction) {
                 conn.getTransactionHandler().begin();
-            } else {
-                for (Object o : changeSet.getPreChangeEvents()) {
-                    this.notifyListenersOfEvent(o);
-                }
             }
+            
+            for (Object o : changeSet.getPreChangeEvents()) {
+                this.notifyListenersOfEvent(o);
+            }
+
+            Iterator<ModelChange> csIt = changeSet.getModelChanges().iterator();
             while (csIt.hasNext()) {
                 ModelChange modelChange = csIt.next();
+                modelChange.getSerializedModel().mark(Integer.MAX_VALUE);
                 dataset.getLock().enterCriticalSection(Lock.WRITE);
                 try {
                     Model model = dataset.getNamedModel(modelChange.getGraphURI());
-                    model.enterCriticalSection(Lock.WRITE);
-                    try {
-                        model.register(new ModelListener(modelChange.getGraphURI(), this));
-                        if (modelChange.getOperation() == ModelChange.Operation.ADD) {
-                            model.read(modelChange.getSerializedModel(), null,
-                                    getSerializationFormatString(modelChange.getSerializationFormat()));  
-                        } else if (modelChange.getOperation() == ModelChange.Operation.REMOVE) {
-                            model.remove(parseModel(modelChange));
-                            removeBlankNodesWithSparqlUpdate(dataset, model, modelChange.getGraphURI());
-                        } else {
-                            log.error("unrecognized operation type");
-                        } 
-                    } finally {
-                        model.leaveCriticalSection();
-                    }
+                    operateOnModel(model, modelChange, dataset);
                 } finally {
                     dataset.getLock().leaveCriticalSection();
                 }
             }
+            
             if (transaction) {
-                for (Object o : changeSet.getPreChangeEvents()) {
-                    this.notifyListenersOfEvent(o);
-                }
                 conn.getTransactionHandler().commit();
             }
+            
+            // notify listeners of triple changes
+            csIt = changeSet.getModelChanges().iterator();
+            while (csIt.hasNext()) {
+                ModelChange modelChange = csIt.next();
+                modelChange.getSerializedModel().reset();
+                Model model = ModelFactory.createModelForGraph(
+                        new ListeningGraph(modelChange.getGraphURI(), this));
+                operateOnModel(model, modelChange, null);
+            }
+            
             for (Object o : changeSet.getPostChangeEvents()) {
                 this.notifyListenersOfEvent(o);
             }
+            
         } catch (Exception e) {
             log.error(e, e);
             if (transaction) {
@@ -148,6 +149,25 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
         }
         
         return true;
+    }
+    
+    private void operateOnModel(Model model, ModelChange modelChange, Dataset dataset) {
+        model.enterCriticalSection(Lock.WRITE);
+        try {
+            if (modelChange.getOperation() == ModelChange.Operation.ADD) {
+                model.read(modelChange.getSerializedModel(), null,
+                        getSerializationFormatString(modelChange.getSerializationFormat()));  
+            } else if (modelChange.getOperation() == ModelChange.Operation.REMOVE) {
+                model.remove(parseModel(modelChange));
+                if (dataset != null) {
+                    removeBlankNodesWithSparqlUpdate(dataset, model, modelChange.getGraphURI());
+                }
+            } else {
+                log.error("unrecognized operation type");
+            } 
+        } finally {
+            model.leaveCriticalSection();
+        }
     }
     
     private void removeBlankNodesWithSparqlUpdate(Dataset dataset, Model model, String graphURI) {
@@ -414,12 +434,10 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
         }
         
         public void addedStatement(Statement stmt) {
-            log.debug("adding " + stmt + " to " + graphURI);
             s.notifyListeners(stmt.asTriple(), ModelChange.Operation.ADD, graphURI);
         }
         
         public void removedStatement(Statement stmt) {
-            log.debug("removing " + stmt + " from " + graphURI);
             s.notifyListeners(stmt.asTriple(), ModelChange.Operation.REMOVE, graphURI);
         }
         
