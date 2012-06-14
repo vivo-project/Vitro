@@ -242,15 +242,17 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
             	Resource dg = qs.getResource("dataGetter");
             	Resource dgType = qs.getResource("dataGetterType");
             	String dgClassName = getClassName(dgType.getURI());
-            	
+            	//literals in scope/on form and fields/ as well as
+            	//json representation to be returned to template saved in json array
             	processExistingDataGetter(counter, 
             			dg.getURI(), 
             			dgClassName, editConfig, queryModel, jsonArray);
-            	addJSONArrayToFormSpecificData(jsonArray, editConfig);
-            	//Get the util class for this type and add
-            	//Values in scope/Literals and URIs on form/Fields on form that correspond
+            
             	counter++;
             }
+            //add json array to form specific data to be returned
+        	addJSONArrayToFormSpecificData(jsonArray, editConfig);
+
 
         } catch(Exception ex) {
         	log.error("Error occurred in executing query " + querystr, ex);

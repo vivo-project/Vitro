@@ -35,6 +35,13 @@ display:Home
       a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.BrowseDataGetter> .  
       
 ########## Page Management ##########
+display:pageListPage
+    a display:Page ;              
+    display:title "Pages" ;
+    display:urlMapping "/pageList" ;
+    display:requiresBodyTemplate "pageList.ftl" ;   
+    display:hasDataGetter display:pageListData .
+
 display:pageListData
     a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter>;
     display:queryModel <vitro:contextDisplayModel> ;                        
@@ -50,4 +57,5 @@ display:pageListData
         OPTIONAL{ ?pageUri display:title  ?title. }  
         OPTIONAL {?pageUri display:requiresBodyTemplate ?template .}
         OPTIONAL {?menuItem display:toPage ?pageUri .}
-     }  """ .               
+     }  """ .       
+                  

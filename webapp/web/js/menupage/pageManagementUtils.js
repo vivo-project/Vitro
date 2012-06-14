@@ -18,12 +18,16 @@ var pageManagementUtils = {
 	    this.bindEventListeners();
 	    this.initDisplay();
 	    //if edit, then generate existing content
-	    if(this.menuAction != null) {
+	    if(this.menuAction != null && this.menuAction == "Edit") {
 	    	this.initExistingContent();
 	    }
 	}, 
 	initExistingContent:function() {
 		this.generateExistingContentSections();
+		//display more content button - will need to review how to hit save etc. 
+        //Don't need to display this b/c already in appended section
+		//pageManagementUtils.moreContentButton.show();
+		//Need to have additional save button
 	},
 	initReverseURIToLabel:function() {
 		if(this.dataGetterLabelToURI != null) {
