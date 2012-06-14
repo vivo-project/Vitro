@@ -171,7 +171,7 @@ public class DateTimeWithPrecisionVTwo extends BaseEditElementVTwo {
             DateTime value = getTimeValue(editConfig,editSub);
             /* This is the case where there is a precision so there should be a datetime */
             if( value == null )
-                log.error("Field " + getFieldName() + " has precision " + precisionUri 
+                log.warn("Field " + getFieldName() + " has precision " + precisionUri 
                         + " but the date time is " + value);                        
             
             /* only put the values in the map for ones which are significant based on the precision */
