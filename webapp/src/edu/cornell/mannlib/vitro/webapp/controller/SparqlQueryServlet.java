@@ -271,14 +271,17 @@ public class SparqlQueryServlet extends BaseEditController {
 
     private void toCsv(Writer out, ResultSet results) {
     	// The Skife library wouldn't quote and escape the normal way, 
-    	// so I'm trying it manually.   	
+    	// so I'm trying it manually.
+        List<String> varNames = results.getResultVars();
+        int width = varNames.size();
     	while (results.hasNext()) {
     		QuerySolution solution = (QuerySolution) results.next();
-    		List<String> valueList = new LinkedList<String>();
-    		Iterator<String> varNameIt = solution.varNames();
+    		String[] valueArray = new String[width];
+    		Iterator<String> varNameIt = varNames.iterator();
+    		int index = 0;
     		while (varNameIt.hasNext()) {
     			String varName = varNameIt.next();
-    			String value = "";
+    			String value = null;
     			try {
     				Literal lit = solution.getLiteral(varName);
     				if (lit != null) { 
@@ -290,24 +293,27 @@ public class SparqlQueryServlet extends BaseEditController {
     			} catch (Exception e) {
     				try {
     					Resource res = solution.getResource(varName);
-    					if (res.isAnon()) {
-    						value = res.getId().toString();
-    					} else {
-    						value = res.getURI();
+    					if (res != null) {
+        					if (res.isAnon()) {
+        						value = res.getId().toString();
+        					} else {
+        						value = res.getURI();
+        					}
     					}
 	    			} catch (Exception f) {}
     			}
-    			valueList.add(value);
+    			valueArray[index] = value;
+                index++;
     		}
 
-    		Iterator<String> valueIt = valueList.iterator();
 			StringBuffer rowBuff = new StringBuffer();
-    		while (valueIt.hasNext()) {
-    			String value = valueIt.next();
-    			value.replaceAll("\"", "\\\"");
-
-    			rowBuff.append("\"").append(value).append("\"");
-    			if (valueIt.hasNext()) {
+			for (int i = 0; i < valueArray.length; i++) {
+    			String value = valueArray[i];
+    			if (value != null) {
+    			    value.replaceAll("\"", "\\\"");
+    			    rowBuff.append("\"").append(value).append("\"");
+    			}
+    			if (i + 1 < width) {
     				rowBuff.append(",");
     			}
     		}
