@@ -135,7 +135,7 @@ public class DateTimeWithPrecisionVTwo extends BaseEditElementVTwo {
         
         if( precisionUri != null && !"".equals(precisionUri) && existingPrec == null ){
             if( ! BLANK_SENTINEL.equals( precisionUri )){
-                log.warn("field " + getFieldName() + ": existing precision uri was " +
+                log.debug("field " + getFieldName() + ": existing precision uri was " +
             		"'" + precisionUri + "' but could not convert to Precision object");
             }
         }
@@ -146,7 +146,7 @@ public class DateTimeWithPrecisionVTwo extends BaseEditElementVTwo {
             /* no precision so there should also be no datetime */
             DateTime value = getTimeValue(editConfig,editSub);
             if( value != null )
-                log.info("Unexpected state: Precision for " + getFieldName() 
+                log.debug("Unexpected state: Precision for " + getFieldName() 
                         + " was '" + precisionUri + "' but date time was " + value);
             
             map.put("year", "");
@@ -171,7 +171,7 @@ public class DateTimeWithPrecisionVTwo extends BaseEditElementVTwo {
             DateTime value = getTimeValue(editConfig,editSub);
             /* This is the case where there is a precision so there should be a datetime */
             if( value == null )
-                log.warn("Field " + getFieldName() + " has precision " + precisionUri 
+                log.debug("Field " + getFieldName() + " has precision " + precisionUri 
                         + " but the date time is " + value);                        
             
             /* only put the values in the map for ones which are significant based on the precision */
